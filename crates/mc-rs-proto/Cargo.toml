@@ -6,3 +6,11 @@ license = "MIT"
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
+
+[dependencies]
+async-std = "1.12.0"
+bevy_ecs = "0.11.0"
+bevy_derive = "0.11.0"
+mc-rs-macros = { path = "../mc-rs-macros" }
+thiserror = "1.0.43"
+uuid = { version = "1.4.1", features = ["v3"] }
