@@ -1,0 +1,15 @@
+newline_style = "Unix"
+
+# Enable unstable formatting options
+unstable_features = true
+
+# Imports
+imports_granularity = "Crate"
+
+# Comments
+normalize_comments = true
+comment_width = 100
+wrap_comments = true
+
+# Functions
+fn_single_line = true
