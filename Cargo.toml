@@ -6,6 +6,7 @@ members = [
     "crates/mc-rs-macros",
     "crates/mc-rs-ext",
     "crates/mc-rs-gen",
+    "crates/classfile-rs",
 ]
 default-members = [
     "crates/mc-rs",
