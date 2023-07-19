@@ -1,0 +1,12 @@
+[package]
+name = "mc-rs-gen"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+
+[dependencies]
+
+[features]

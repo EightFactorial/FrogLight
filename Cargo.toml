@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/mc-rs",
+    "crates/mc-rs-proto",
+    "crates/mc-rs-macros",
+    "crates/mc-rs-ext",
+    "crates/mc-rs-gen",
+]
+default-members = [
+    "crates/mc-rs",
+]
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+strip = false
+incremental = true
+
+[profile.release]
+lto = "fat"
+strip = true
+incremental = false

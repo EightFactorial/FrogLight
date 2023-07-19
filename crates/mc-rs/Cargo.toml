@@ -1,0 +1,20 @@
+[package]
+name = "mc-rs"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+
+[dependencies]
+bevy = "0.11.0"
+mc-rs-proto = { path = "../mc-rs-proto" }
+mc-rs-macros = { path = "../mc-rs-macros" }
+
+[features]
+default = ["wayland", "dynamic-linking"]
+
+# Enable bevy features
+wayland = ["bevy/wayland"]
+dynamic-linking = ["bevy/dynamic_linking"]
