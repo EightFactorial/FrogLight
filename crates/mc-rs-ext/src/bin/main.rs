@@ -34,13 +34,13 @@ fn main() {
 
     if !manifest.versions.iter().any(|v| v.id == version) {
         error!("Version {} not found in the version manifest!", version);
-        warn!("Use -r or --refresh to download the version manifest if the version was recently released.");
+        warn!("Use -r or --refresh to redownload the version manifest if the version was recently released.");
         return;
     }
 
     if !unstable && !version.is_stable() {
         error!("Version {} is not stable!", version);
-        warn!("Use -u or --unstable to extract unstable versions.");
+        warn!("Use -u or --unstable to allow using unstable versions.");
         return;
     }
 
