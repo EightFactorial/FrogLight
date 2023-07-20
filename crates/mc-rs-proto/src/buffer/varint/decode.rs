@@ -66,6 +66,15 @@ impl VarDecode for usize {
     }
 }
 
+impl<T: VarDecode> VarDecode for Option<T> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+        match u32::var_decode(buf)? {
+            0 => Ok(None),
+            _ => Ok(Some(T::var_decode(buf)?)),
+        }
+    }
+}
+
 #[test]
 fn decode_i32() {
     assert_eq!(

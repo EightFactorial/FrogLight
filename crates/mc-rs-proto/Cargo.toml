@@ -14,3 +14,4 @@ bevy_derive = "0.11.0"
 mc-rs-macros = { path = "../mc-rs-macros" }
 thiserror = "1.0.43"
 uuid = { version = "1.4.1", features = ["v3"] }
+byteorder = { version = "1.4.3", features = ["i128"] }

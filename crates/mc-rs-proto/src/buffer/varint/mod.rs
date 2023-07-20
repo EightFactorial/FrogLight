@@ -3,13 +3,17 @@ use thiserror::Error;
 mod decode;
 mod encode;
 
-pub trait VarEncode: Sized {
-    fn var_encode(&self) -> Result<Vec<u8>, VarError>;
+/// A trait for types that can be var-encoded into a buffer.
+pub trait VarEncode {
+    /// Encodes this value into the given buffer.
+    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), VarError>;
 }
 
+/// A trait for types that can be var-decoded from a buffer.
 pub trait VarDecode: Sized {
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError>;
 }
+
 #[derive(Debug, Error)]
 pub enum VarError {
     #[error("Io error: {0}")]
