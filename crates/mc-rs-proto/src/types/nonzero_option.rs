@@ -10,7 +10,7 @@ use crate::buffer::{
     Decode, DecodeError, Encode, EncodeError,
 };
 
-/// NonZeroOption is a wrapper that encodes `None` as 0 and `Some` as 1 + the value.
+/// `NonZeroOption` is a wrapper that encodes `None` as 0 and `Some` as 1 + the value.
 ///
 /// For example:
 ///
@@ -57,12 +57,16 @@ impl<T: PartialEq> PartialEq for NonZeroOption<T> {
 
 impl<T: Eq> Eq for NonZeroOption<T> {}
 
+impl<T> From<T> for NonZeroOption<T> {
+    fn from(val: T) -> Self { Self(Some(val)) }
+}
+
 impl<T> From<Option<T>> for NonZeroOption<T> {
     fn from(val: Option<T>) -> Self { Self(val) }
 }
 
-impl<T> From<T> for NonZeroOption<T> {
-    fn from(val: T) -> Self { Self(Some(val)) }
+impl<T> From<NonZeroOption<T>> for Option<T> {
+    fn from(val: NonZeroOption<T>) -> Self { val.0 }
 }
 
 impl<T: Encode + Clone + PartialEq + Add<Output = T> + From<u8>> Encode for NonZeroOption<T> {
@@ -114,9 +118,7 @@ fn nonzero_option_u8() {
 
     // Turn all the numbers into NonZeroOptions and encode them
     for num in numbers.iter() {
-        assert!(NonZeroOption::<u8>::new(Some(*num))
-            .encode(&mut buf)
-            .is_ok());
+        assert!(NonZeroOption::<u8>::new_with(*num).encode(&mut buf).is_ok());
     }
 
     // Decode them back into the same numbers
@@ -136,7 +138,7 @@ fn nonzero_option_u32() {
 
     // Turn all the numbers into NonZeroOptions and encode them
     for num in numbers.iter() {
-        assert!(NonZeroOption::<u32>::new(Some(*num))
+        assert!(NonZeroOption::<u32>::new_with(*num)
             .encode(&mut buf)
             .is_ok());
     }
@@ -158,7 +160,7 @@ fn nonzero_option_var_u32() {
 
     // Turn all the numbers into NonZeroOptions and encode them
     for num in numbers.iter() {
-        assert!(NonZeroOption::<u32>::new(Some(*num))
+        assert!(NonZeroOption::<u32>::new_with(*num)
             .var_encode(&mut buf)
             .is_ok());
     }

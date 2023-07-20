@@ -42,6 +42,7 @@ impl VarEncode for i64 {
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), VarError> {
         let mut value = *self;
         let mut byte = [0];
+
         if value == 0 {
             buf.write_all(&byte)?;
         } else {

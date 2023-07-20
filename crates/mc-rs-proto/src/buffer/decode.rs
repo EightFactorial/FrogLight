@@ -91,14 +91,13 @@ impl Decode for String {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let len = u32::var_decode(buf)?;
 
-        match len > MAX_STRING_LENGTH {
-            true => Err(DecodeError::StringTooLong(len)),
-            false => {
-                let mut vec = vec![0; len as usize];
-                buf.read_exact(&mut vec)?;
+        if len > MAX_STRING_LENGTH {
+            Err(DecodeError::StringTooLong(len))
+        } else {
+            let mut vec = vec![0; len as usize];
+            buf.read_exact(&mut vec)?;
 
-                Ok(String::from_utf8(vec)?)
-            }
+            Ok(String::from_utf8(vec)?)
         }
     }
 }
