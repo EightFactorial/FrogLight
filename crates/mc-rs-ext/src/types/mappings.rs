@@ -172,11 +172,6 @@ impl ClassMap {
             }
         }
 
-        #[cfg(debug_assertions)]
-        {
-            log::debug!("Unmapped classes: {:#?}", self.keys());
-        }
-
         Ok(())
     }
 }

@@ -47,8 +47,6 @@ fn main() {
         return;
     }
 
-    info!("Selected version: {}", version);
-
     match cli.command {
         Commands::Extract { datasets } => match extract_data(version, manifest, datasets) {
             Some(data) => output(json::stringify_pretty(data, 4), cli.output),
