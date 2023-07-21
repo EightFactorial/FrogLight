@@ -37,8 +37,10 @@ pub(crate) enum Commands {
     Extract {
         /// The datasets to extract
         ///
+        /// Specify sets like `blocks,items,entities` to extract multiple
+        ///
         /// If none are specified, all datasets will be extracted
-        #[clap(short, long, value_name = "datasets")]
+        #[clap(short, long, value_name = "datasets", value_delimiter = ',')]
         datasets: Option<Vec<Datasets>>,
     },
     /// Search the game for a String

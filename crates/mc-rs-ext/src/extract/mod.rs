@@ -57,8 +57,15 @@ fn filter_datasets(datasets: &mut Vec<Datasets>) {
         i += 1;
     }
 
-    // Deduplicate
-    datasets.dedup();
+    // Remove duplicates
+    let mut vec = Vec::new();
+    for set in datasets.iter() {
+        if !vec.contains(set) {
+            vec.push(*set);
+        }
+    }
+    datasets.clear();
+    datasets.extend(vec);
 
     #[cfg(debug_assertions)]
     {
