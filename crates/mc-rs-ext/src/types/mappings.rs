@@ -174,6 +174,11 @@ pub fn apply_mappings(
         }
     }
 
+    // Carry over any classes that weren't in the mappings
+    for (key, value) in map.into_iter() {
+        new_map.insert(key, value);
+    }
+
     Ok(new_map)
 }
 
