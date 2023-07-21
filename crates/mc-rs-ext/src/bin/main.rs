@@ -14,7 +14,7 @@ fn main() {
 
     let cli = Cli::parse();
 
-    let manifest = match Manifest::get_manifest(cli.refresh) {
+    let manifest = match Manifest::get(cli.refresh) {
         Ok(m) => m,
         Err(err) => {
             error!("Failed to get manifest: {}", err);

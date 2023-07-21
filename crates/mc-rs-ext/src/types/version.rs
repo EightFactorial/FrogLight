@@ -5,6 +5,7 @@ use thiserror::Error;
 
 use super::Manifest;
 
+/// A version
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Version {
     Release {
@@ -33,6 +34,7 @@ pub enum Version {
 }
 
 impl Version {
+    /// Create a new release version
     pub const fn new_release(major: u8, minor: u8, patch: u8) -> Self {
         Self::Release {
             major,
@@ -41,24 +43,7 @@ impl Version {
         }
     }
 
-    pub const fn new_release_canidate(major: u8, minor: u8, patch: u8, rc: u8) -> Self {
-        Self::ReleaseCanidate {
-            major,
-            minor,
-            patch,
-            rc,
-        }
-    }
-
-    pub const fn new_pre_release(major: u8, minor: u8, patch: u8, pre: u8) -> Self {
-        Self::PreRelease {
-            major,
-            minor,
-            patch,
-            pre,
-        }
-    }
-
+    /// Create a new snapshot version
     pub const fn new_snapshot(year: u8, week: u8, release: String) -> Self {
         Self::Snapshot {
             year,
@@ -67,14 +52,17 @@ impl Version {
         }
     }
 
+    /// Returns true if the version is a stable release
     pub fn is_stable(&self) -> bool { matches!(self, Self::Release { .. }) }
 
+    /// Returns true if the version is newer than the other version
     pub fn is_newer(&self, other: &Version, manifest: &Manifest) -> bool {
         let a = manifest.versions.iter().find(|v| &v.id == self).unwrap();
         let b = manifest.versions.iter().find(|v| &v.id == other).unwrap();
         a.release_time > b.release_time
     }
 
+    /// Returns true if the version is the same or newer than the other version
     pub fn is_same_or_newer(&self, other: &Version, manifest: &Manifest) -> bool {
         let a = manifest.versions.iter().find(|v| &v.id == self).unwrap();
         let b = manifest.versions.iter().find(|v| &v.id == other).unwrap();
@@ -82,6 +70,7 @@ impl Version {
     }
 }
 
+/// An error that can occur while parsing a version
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum VersionError {
     #[error("Invalid version")]

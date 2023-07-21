@@ -8,18 +8,22 @@ use crate::util::minecraft_dir;
 
 use super::Version;
 
+/// The manifest contains information about the
+/// latest and all available versions
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
     pub latest: ManifestLatest,
     pub versions: Vec<ManifestVersion>,
 }
 
+/// The latest versions
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ManifestLatest {
     pub release: Version,
     pub snapshot: Version,
 }
 
+/// A version in the manifest
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ManifestVersion {
     pub id: Version,
@@ -29,6 +33,7 @@ pub struct ManifestVersion {
     pub release_time: DateTime<Utc>,
 }
 
+/// An error that can occur while fetching the manifest
 #[derive(Debug, Error)]
 pub enum ManifestError {
     #[error("Unable to find Minecraft directory")]
@@ -42,8 +47,10 @@ pub enum ManifestError {
 }
 
 impl Manifest {
+    /// The url of the manifest
     const MANIFEST_URL: &str = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
+    /// Get the latest version
     pub fn get_latest(&self, unstable: bool) -> Version {
         if !unstable || self.latest.release.is_newer(&self.latest.snapshot, self) {
             self.latest.release.clone()
@@ -52,7 +59,8 @@ impl Manifest {
         }
     }
 
-    pub fn get_manifest(refresh: bool) -> Result<Manifest, ManifestError> {
+    /// Get the manifest
+    pub fn get(refresh: bool) -> Result<Manifest, ManifestError> {
         let mut path = minecraft_dir().ok_or(ManifestError::MinecraftDirNotFound)?;
         path.push("versions/version_manifest_v2.json");
 

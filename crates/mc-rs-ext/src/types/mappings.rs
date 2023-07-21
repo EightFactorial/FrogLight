@@ -11,10 +11,12 @@ use crate::util::{get_mappings, minecraft_jar};
 
 use super::{Manifest, Version};
 
+/// A map of class names to class files
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct ClassMap(HashMap<String, ClassFile>);
 
 impl ClassMap {
+    /// Create a new class map with the given capacity
     pub fn with_capacity(size: usize) -> Self { Self(HashMap::with_capacity(size)) }
 }
 
@@ -25,10 +27,12 @@ impl IntoIterator for ClassMap {
 }
 
 impl ClassMap {
+    /// Create a new class map with mappings applied
     pub fn new_mapped(version: &Version, manifest: &Manifest) -> Result<ClassMap, MappingsError> {
         ClassMap::new(version, manifest)?.apply_mappings(version)
     }
 
+    /// Create a new class map for the given version
     pub fn new(version: &Version, manifest: &Manifest) -> Result<ClassMap, MappingsError> {
         let path = minecraft_jar(version, manifest).ok_or(MappingsError::McDirNotFound)?;
         let jar = File::open(path)?;
@@ -77,6 +81,7 @@ impl ClassMap {
         Ok(map)
     }
 
+    /// Apply mappings to the class map
     pub fn apply_mappings(mut self, ver: &Version) -> Result<ClassMap, MappingsError> {
         let mut new_map = HashMap::with_capacity(self.len());
         let mappings = Mappings::new(ver)?;
@@ -180,9 +185,11 @@ impl ClassMap {
     }
 }
 
+/// The mappings for a given jar
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct Mappings(HashMap<String, ClassMappings>);
 
+/// The mappings for a single class
 #[derive(Debug, Default, Clone, Hash)]
 pub struct ClassMappings {
     pub name: String,
@@ -191,6 +198,7 @@ pub struct ClassMappings {
 }
 
 impl Mappings {
+    /// Get the mappings for a given version
     fn new(ver: &Version) -> Result<Mappings, MappingsError> {
         let path = get_mappings(ver)?;
         let jar = File::open(path)?;
@@ -249,6 +257,7 @@ impl Mappings {
     }
 }
 
+/// An error that can occur while getting the mappings
 #[derive(Debug, Error)]
 pub enum MappingsError {
     #[error("Minecraft directory not found")]
@@ -261,6 +270,7 @@ pub enum MappingsError {
     Zip(#[from] zip::result::ZipError),
 }
 
+/// The type of mapping
 #[derive(Debug, Clone, Copy)]
 pub enum MappingType {
     Field,

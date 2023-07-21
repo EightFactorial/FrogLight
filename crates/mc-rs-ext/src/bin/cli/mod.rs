@@ -1,6 +1,7 @@
 use clap::{Parser, Subcommand};
 use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 
+/// The command line interface for the application
 #[derive(Debug, Parser)]
 pub(crate) struct Cli {
     /// Refetch the version manifest
@@ -31,6 +32,7 @@ pub(crate) struct Cli {
     pub command: Commands,
 }
 
+/// The commands that can be run
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
     /// Extract information about the game
