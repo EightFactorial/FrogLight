@@ -11,14 +11,8 @@ fn main() {
     setup_logger();
 
     let cli = Cli::parse();
-    let (refresh, unstable) = match cli.command {
-        Commands::Extract {
-            refresh, unstable, ..
-        } => (refresh, unstable),
-        _ => (false, false),
-    };
 
-    let manifest = match Manifest::get_manifest(refresh) {
+    let manifest = match Manifest::get_manifest(cli.refresh) {
         Ok(m) => m,
         Err(err) => {
             error!("Failed to get manifest: {}", err);
@@ -27,10 +21,8 @@ fn main() {
     };
 
     let version = cli
-        .command
-        .version()
-        .clone()
-        .unwrap_or_else(|| manifest.get_latest(unstable));
+        .version
+        .unwrap_or_else(|| manifest.get_latest(cli.unstable));
 
     if !manifest.versions.iter().any(|v| v.id == version) {
         error!("Version {} not found in the version manifest!", version);
@@ -40,7 +32,7 @@ fn main() {
         return;
     }
 
-    if !unstable && !version.is_stable() {
+    if !cli.unstable && !version.is_stable() {
         error!("Version {} is not stable!", version);
         warn!("Use -u or --unstable to allow using unstable versions.");
         return;
@@ -52,7 +44,7 @@ fn main() {
         Commands::Extract { output, .. } => {
             extract_data(version, manifest, output);
         }
-        Commands::Search { query, .. } => todo!(),
+        Commands::Search { .. } => todo!(),
         Commands::Print { output, class, .. } => {
             print_data(version, manifest, output, class);
         }
