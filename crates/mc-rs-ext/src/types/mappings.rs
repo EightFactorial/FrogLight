@@ -106,11 +106,8 @@ pub fn apply_mappings(
                     for insn in code.insns.insns.iter_mut() {
                         match insn {
                             Insn::CheckCast(insn) => {
-                                for (key, value) in mappings.iter() {
-                                    if key == &insn.kind {
-                                        insn.kind = value.name.clone();
-                                        break;
-                                    }
+                                if let Some(class) = mappings.get(&insn.kind) {
+                                    insn.kind = class.name.clone();
                                 }
                             }
                             Insn::GetField(insn) => {
