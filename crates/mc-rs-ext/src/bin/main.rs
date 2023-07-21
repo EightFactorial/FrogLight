@@ -6,6 +6,7 @@ use log::{error, info, warn, LevelFilter};
 use mc_rs_ext::{
     extract::extract_data,
     print::print_data,
+    search::search_data,
     types::{Manifest, Version},
 };
 
@@ -53,7 +54,16 @@ fn main() {
             Some(data) => output(json::stringify_pretty(data, 4), cli.output),
             None => error!("Failed to extract data!"),
         },
-        Commands::Search { .. } => todo!(),
+        Commands::Search { query } => match search_data(version, manifest, query) {
+            Some(data) => {
+                if data.is_empty() {
+                    info!("No results found!");
+                } else {
+                    output(data, cli.output);
+                }
+            }
+            None => error!("Failed to search for query!"),
+        },
         Commands::Print { class } => match print_data(version, manifest, class) {
             Some(data) => output(data, cli.output),
             None => error!("Failed to print data!"),

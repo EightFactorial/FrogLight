@@ -3,7 +3,7 @@ use log::{error, info};
 use crate::types::{ClassMap, Manifest, Version};
 
 pub fn print_data(version: Version, manifest: Manifest, class: String) -> Option<String> {
-    info!("Extracting data for version {}", version);
+    info!("Printing class from version {}", version);
     let map = match ClassMap::new_mapped(&version, &manifest) {
         Ok(m) => m,
         Err(err) => {
