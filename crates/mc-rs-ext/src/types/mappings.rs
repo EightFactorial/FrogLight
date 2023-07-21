@@ -205,7 +205,9 @@ fn parse_mappings(ver: &Version) -> Result<Mappings, MappingsError> {
 
         match MappingType::try_from(parts.next().unwrap()) {
             Ok(MappingType::Class) => {
-                mappings.insert(mem::take(&mut obf_name), mem::take(&mut class_mappings));
+                if !obf_name.is_empty() {
+                    mappings.insert(mem::take(&mut obf_name), mem::take(&mut class_mappings));
+                }
 
                 obf_name = parts.next().unwrap().to_string();
                 class_mappings.name = parts.next().unwrap().to_string();
