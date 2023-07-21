@@ -4,8 +4,8 @@ use strum::{Display, EnumIter, EnumString};
 
 use crate::types::{ClassMap, Manifest, Version};
 
-mod diag;
-mod info;
+pub mod diag;
+pub mod info;
 
 #[enum_dispatch]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter, EnumString, Display)]

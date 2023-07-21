@@ -50,9 +50,7 @@ fn filter_datasets(datasets: &mut Vec<Datasets>) {
     while i < datasets.len() {
         let dataset = datasets[i];
         for dep in dataset.deps() {
-            if !datasets.contains(dep) {
-                datasets.push(*dep);
-            }
+            datasets.insert(i, *dep);
         }
         i += 1;
     }

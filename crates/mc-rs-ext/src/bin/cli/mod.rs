@@ -51,6 +51,8 @@ pub(crate) enum Commands {
     /// Print the contents of a class file
     Print {
         /// The path of the class file
+        ///
+        /// Using `*` will print all classes, but this may take a while
         class: String,
     },
 }
