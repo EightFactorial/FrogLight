@@ -29,7 +29,9 @@ impl IntoIterator for ClassMap {
 impl ClassMap {
     /// Create a new class map with mappings applied
     pub fn new_mapped(version: &Version, manifest: &Manifest) -> Result<ClassMap, MappingsError> {
-        ClassMap::new(version, manifest)?.apply_mappings(version)
+        let mut map = ClassMap::new(version, manifest)?;
+        map.apply_mappings(version)?;
+        Ok(map)
     }
 
     /// Create a new class map for the given version
@@ -82,9 +84,8 @@ impl ClassMap {
     }
 
     /// Apply mappings to the class map
-    pub fn apply_mappings(mut self, ver: &Version) -> Result<ClassMap, MappingsError> {
-        let mut new_map = HashMap::with_capacity(self.len());
-        let mappings = Mappings::new(ver)?;
+    pub fn apply_mappings(&mut self, ver: &Version) -> Result<(), MappingsError> {
+        let mappings = Mappings::get(ver)?;
 
         for (key, value) in mappings.iter() {
             if let Some((_, mut class)) = self.remove_entry(key) {
@@ -167,7 +168,7 @@ impl ClassMap {
                     }
                 }
 
-                new_map.insert(value.name.clone(), class);
+                self.insert(value.name.clone(), class);
             }
         }
 
@@ -176,12 +177,7 @@ impl ClassMap {
             log::debug!("Unmapped classes: {:#?}", self.keys());
         }
 
-        // Carry over any classes that weren't in the mappings
-        for (key, value) in self.into_iter() {
-            new_map.insert(key, value);
-        }
-
-        Ok(ClassMap(new_map))
+        Ok(())
     }
 }
 
@@ -199,7 +195,7 @@ pub struct ClassMappings {
 
 impl Mappings {
     /// Get the mappings for a given version
-    fn new(ver: &Version) -> Result<Mappings, MappingsError> {
+    fn get(ver: &Version) -> Result<Mappings, MappingsError> {
         let path = get_mappings(ver)?;
         let jar = File::open(path)?;
         let mut zip = ZipArchive::new(jar)?;
