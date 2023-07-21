@@ -4,6 +4,12 @@ use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 /// The command line interface for the application
 #[derive(Debug, Parser)]
 pub(crate) struct Cli {
+    /// Quiet mode
+    ///
+    /// This will suppress all output except for errors
+    #[arg(short, long, value_name = "bool", default_value = "false")]
+    pub quiet: bool,
+
     /// Refetch the version manifest
     ///
     /// Use this if a new version has been released but the manifest hasn't been updated yet

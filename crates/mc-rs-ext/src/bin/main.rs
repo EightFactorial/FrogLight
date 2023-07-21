@@ -15,9 +15,8 @@ use crate::cli::Cli;
 mod cli;
 
 fn main() {
-    setup_logger();
-
     let cli = Cli::parse();
+    setup_logger(cli.quiet);
 
     let manifest = match Manifest::get(cli.refresh) {
         Ok(m) => m,
@@ -70,16 +69,20 @@ fn main() {
 }
 
 /// Setup logging for the application
-fn setup_logger() {
+fn setup_logger(quiet: bool) {
     let mut builder = env_logger::builder();
 
-    #[cfg(debug_assertions)]
-    {
-        builder.filter_level(LevelFilter::Debug);
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        builder.filter_level(LevelFilter::Info);
+    if quiet {
+        builder.filter_level(LevelFilter::Error);
+    } else {
+        #[cfg(debug_assertions)]
+        {
+            builder.filter_level(LevelFilter::Debug);
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            builder.filter_level(LevelFilter::Info);
+        }
     }
 
     builder.filter_module("reqwest", LevelFilter::Off);
