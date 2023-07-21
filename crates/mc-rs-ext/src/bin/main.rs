@@ -41,12 +41,12 @@ fn main() {
     info!("Selected version: {}", version);
 
     match cli.command {
-        Commands::Extract { output, .. } => {
-            extract_data(version, manifest, output);
+        Commands::Extract => {
+            extract_data(version, manifest, cli.output);
         }
         Commands::Search { .. } => todo!(),
-        Commands::Print { output, class, .. } => {
-            print_data(version, manifest, output, class);
+        Commands::Print { class } => {
+            print_data(version, manifest, cli.output, class);
         }
     }
 }

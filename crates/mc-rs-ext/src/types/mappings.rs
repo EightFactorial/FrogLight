@@ -9,7 +9,7 @@ use zip::ZipArchive;
 
 use crate::util::{get_mappings, minecraft_jar};
 
-use super::Version;
+use super::{Manifest, Version};
 
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct ClassMap(HashMap<String, ClassFile>);
@@ -21,17 +21,16 @@ impl ClassMap {
 impl IntoIterator for ClassMap {
     type Item = (String, ClassFile);
     type IntoIter = hashbrown::hash_map::IntoIter<String, ClassFile>;
-
     fn into_iter(self) -> Self::IntoIter { self.0.into_iter() }
 }
 
 impl ClassMap {
-    pub fn new_mapped(version: &Version) -> Result<ClassMap, MappingsError> {
-        ClassMap::new(version)?.apply_mappings(version)
+    pub fn new_mapped(version: &Version, manifest: &Manifest) -> Result<ClassMap, MappingsError> {
+        ClassMap::new(version, manifest)?.apply_mappings(version)
     }
 
-    pub fn new(version: &Version) -> Result<ClassMap, MappingsError> {
-        let path = minecraft_jar(version).ok_or(MappingsError::McDirNotFound)?;
+    pub fn new(version: &Version, manifest: &Manifest) -> Result<ClassMap, MappingsError> {
+        let path = minecraft_jar(version, manifest).ok_or(MappingsError::McDirNotFound)?;
         let jar = File::open(path)?;
 
         let mut zip = ZipArchive::new(jar)?;

@@ -4,9 +4,9 @@ use log::{error, info};
 
 use crate::types::{ClassMap, Manifest, Version};
 
-pub fn print_data(version: Version, _manifest: Manifest, path: Option<String>, class: String) {
+pub fn print_data(version: Version, manifest: Manifest, path: Option<String>, class: String) {
     info!("Extracting data for version {}", version);
-    let map = match ClassMap::new_mapped(&version) {
+    let map = match ClassMap::new_mapped(&version, &manifest) {
         Ok(m) => m,
         Err(err) => {
             error!("Failed to read jar: {}", err);
