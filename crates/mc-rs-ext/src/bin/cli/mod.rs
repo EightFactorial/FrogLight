@@ -28,6 +28,12 @@ pub(crate) enum Commands {
         /// If not specified, the latest version will be used
         #[arg(short, long)]
         version: Option<Version>,
+
+        /// The path to output the extracted data to
+        ///
+        /// If not specified, it will be output to the console
+        #[arg(short, long)]
+        output: Option<String>,
     },
     /// Search a Minecraft jar for a String
     Search {
@@ -48,8 +54,14 @@ pub(crate) enum Commands {
         #[arg(short, long)]
         version: Option<Version>,
 
+        /// The path of the output file
+        ///
+        /// If not specified, it will be output to the console
+        #[arg(short, long)]
+        output: Option<String>,
+
         /// The path of the class file
-        path: String,
+        class: String,
     },
 }
 

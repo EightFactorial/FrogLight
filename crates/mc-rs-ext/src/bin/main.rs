@@ -1,7 +1,7 @@
 use clap::Parser;
 use cli::Commands;
 use log::{error, info, warn, LevelFilter};
-use mc_rs_ext::types::Manifest;
+use mc_rs_ext::{extract::extract_data, print::print_data, types::Manifest};
 
 use crate::cli::Cli;
 
@@ -9,8 +9,8 @@ mod cli;
 
 fn main() {
     setup_logger();
-    let cli = Cli::parse();
 
+    let cli = Cli::parse();
     let (refresh, unstable) = match cli.command {
         Commands::Extract {
             refresh, unstable, ..
@@ -34,7 +34,9 @@ fn main() {
 
     if !manifest.versions.iter().any(|v| v.id == version) {
         error!("Version {} not found in the version manifest!", version);
-        warn!("Use -r or --refresh to redownload the version manifest if the version was recently released.");
+        warn!(
+            "Use -r or --refresh to redownload the version manifest if it was recently released."
+        );
         return;
     }
 
@@ -45,6 +47,16 @@ fn main() {
     }
 
     info!("Selected version: {}", version);
+
+    match cli.command {
+        Commands::Extract { output, .. } => {
+            extract_data(version, manifest, output);
+        }
+        Commands::Search { query, .. } => todo!(),
+        Commands::Print { output, class, .. } => {
+            print_data(version, manifest, output, class);
+        }
+    }
 }
 
 /// Setup logging for the application
