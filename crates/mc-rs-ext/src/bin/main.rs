@@ -3,7 +3,11 @@ use std::{fs::File, io::Write};
 use clap::Parser;
 use cli::Commands;
 use log::{error, info, warn, LevelFilter};
-use mc_rs_ext::{extract::extract_data, print::print_data, types::Manifest};
+use mc_rs_ext::{
+    extract::extract_data,
+    print::print_data,
+    types::{Manifest, Version},
+};
 
 use crate::cli::Cli;
 
@@ -32,7 +36,11 @@ fn main() {
         return;
     }
 
-    if !cli.unstable && !version.is_stable() {
+    if !cli.unstable && Version::new_release(1, 19, 4).is_newer(&version, &manifest) {
+        error!("Only versions 1.19.4 and newer are supported!");
+        warn!("Use -u or --unstable to allow using older versions.");
+        return;
+    } else if !cli.unstable && !version.is_stable() {
         error!("Version {} is not a stable release!", version);
         warn!("Use -u or --unstable to allow using unstable versions.");
         return;
@@ -42,12 +50,12 @@ fn main() {
 
     match cli.command {
         Commands::Extract { datasets } => match extract_data(version, manifest, datasets) {
-            Some(data) => output_data(json::stringify_pretty(data, 4), cli.output),
+            Some(data) => output(json::stringify_pretty(data, 4), cli.output),
             None => error!("Failed to extract data!"),
         },
         Commands::Search { .. } => todo!(),
         Commands::Print { class } => match print_data(version, manifest, class) {
-            Some(data) => output_data(data, cli.output),
+            Some(data) => output(data, cli.output),
             None => error!("Failed to print data!"),
         },
     }
@@ -72,7 +80,7 @@ fn setup_logger() {
 }
 
 /// Print to console or write to file
-fn output_data(data: String, output: Option<String>) {
+fn output(data: String, output: Option<String>) {
     if let Some(path) = output {
         info!("Writing to {}", path);
         let mut file = match File::create(path) {
