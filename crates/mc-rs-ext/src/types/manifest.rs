@@ -45,10 +45,10 @@ impl Manifest {
     const MANIFEST_URL: &str = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
     pub fn get_latest(&self, unstable: bool) -> Version {
-        if unstable {
-            self.latest.snapshot.clone()
-        } else {
+        if !unstable || self.latest.release.is_newer(&self.latest.snapshot, self) {
             self.latest.release.clone()
+        } else {
+            self.latest.snapshot.clone()
         }
     }
 

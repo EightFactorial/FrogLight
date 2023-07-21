@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use mc_rs_ext::types::Version;
+use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 
 #[derive(Debug, Parser)]
 pub(crate) struct Cli {
@@ -34,7 +34,13 @@ pub(crate) struct Cli {
 #[derive(Debug, Subcommand)]
 pub(crate) enum Commands {
     /// Extract information about the game
-    Extract,
+    Extract {
+        /// The datasets to extract
+        ///
+        /// If none are specified, all datasets will be extracted
+        #[clap(short, long, value_name = "datasets")]
+        datasets: Option<Vec<Datasets>>,
+    },
     /// Search the game for a String
     Search {
         /// The String to search for
