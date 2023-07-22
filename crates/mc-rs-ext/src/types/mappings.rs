@@ -40,10 +40,9 @@ impl ClassMap {
         let jar = File::open(path)?;
 
         let mut zip = ZipArchive::new(jar)?;
-        let len = zip.len();
+        let mut map = ClassMap::with_capacity(8192);
 
-        let mut map = ClassMap::with_capacity(len);
-        for i in 0..len {
+        for i in 0..zip.len() {
             let mut file = match zip.by_index(i) {
                 Ok(f) => f,
                 Err(err) => {
@@ -52,7 +51,7 @@ impl ClassMap {
                 }
             };
 
-            if file.is_dir() {
+            if file.is_dir() || !file.name().ends_with(".class") {
                 continue;
             }
 
@@ -199,7 +198,7 @@ impl Mappings {
         let tiny_string = read_to_string(tiny)?;
 
         let mut mappings = Mappings::default();
-        let mut obf_name = String::new();
+        let mut class_obf_name = String::new();
         let mut class_mappings = ClassMappings::default();
 
         let mut lines = tiny_string.lines();
@@ -215,26 +214,30 @@ impl Mappings {
 
             match MappingType::try_from(parts.next().unwrap()) {
                 Ok(MappingType::Class) => {
-                    if !obf_name.is_empty() {
-                        mappings.insert(mem::take(&mut obf_name), mem::take(&mut class_mappings));
+                    if !class_obf_name.is_empty() {
+                        mappings.insert(
+                            mem::take(&mut class_obf_name),
+                            mem::take(&mut class_mappings),
+                        );
                     }
 
-                    obf_name = parts.next().unwrap().to_string();
+                    class_obf_name = parts.next().unwrap().to_string();
                     class_mappings.name = parts.next().unwrap().to_string();
                 }
-                Ok(MappingType::Method) => {
-                    let signature = parts.next().unwrap().to_string();
-                    let obf_name = parts.next().unwrap().to_string();
-                    let name = parts.next().unwrap().to_string();
-
-                    class_mappings.methods.push((signature, obf_name, name));
-                }
-                Ok(MappingType::Field) => {
+                Ok(m) => {
                     let kind = parts.next().unwrap().to_string();
                     let obf_name = parts.next().unwrap().to_string();
                     let name = parts.next().unwrap().to_string();
 
-                    class_mappings.fields.push((kind, obf_name, name));
+                    match m {
+                        MappingType::Field => {
+                            class_mappings.fields.push((kind, obf_name, name));
+                        }
+                        MappingType::Method => {
+                            class_mappings.methods.push((kind, obf_name, name));
+                        }
+                        _ => unreachable!(),
+                    }
                 }
 
                 Err(err) => {

@@ -47,11 +47,11 @@ fn main() {
     }
 
     match cli.command {
-        Commands::Extract { datasets } => match extract_data(version, manifest, datasets) {
+        Commands::Extract { datasets } => match extract_data(&version, &manifest, datasets) {
             Some(data) => output(json::stringify_pretty(data, 4), cli.output),
             None => error!("Failed to extract data!"),
         },
-        Commands::Search { query } => match search_data(version, manifest, query) {
+        Commands::Search { query } => match search_data(&version, &manifest, query) {
             Some(data) => {
                 if data.is_empty() {
                     info!("No results found!");
@@ -61,7 +61,7 @@ fn main() {
             }
             None => error!("Failed to search for query!"),
         },
-        Commands::Print { class } => match print_data(version, manifest, class) {
+        Commands::Print { class } => match print_data(&version, &manifest, class) {
             Some(data) => output(data, cli.output),
             None => error!("Failed to print data!"),
         },

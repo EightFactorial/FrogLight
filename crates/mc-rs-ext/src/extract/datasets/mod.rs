@@ -4,8 +4,18 @@ use strum::{Display, EnumIter, EnumString};
 
 use crate::types::{ClassMap, Manifest, Version};
 
+pub mod biome;
+pub mod block;
 pub mod diag;
+pub mod entity;
 pub mod info;
+pub mod lang;
+pub mod packet;
+pub mod particles;
+pub mod recipe;
+pub mod registry;
+pub mod sound;
+pub mod stats;
 
 #[enum_dispatch]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter, EnumString, Display)]
