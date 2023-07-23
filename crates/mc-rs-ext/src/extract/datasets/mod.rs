@@ -9,7 +9,7 @@ pub mod block;
 pub mod diag;
 pub mod entity;
 pub mod info;
-pub mod items;
+pub mod item;
 pub mod lang;
 pub mod packet;
 pub mod particles;
@@ -24,7 +24,7 @@ pub mod stats;
 pub enum Datasets {
     Diagnostics(diag::Diagnostics),
     Info(info::Info),
-    Armor(items::Armor),
+    Armor(item::Armor),
 }
 
 /// The datasets that can be extracted

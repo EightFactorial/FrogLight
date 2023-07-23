@@ -63,43 +63,43 @@ impl Dataset for Armor {
                             continue;
                         }
 
-                        if material.durability_multiplier == 0 {
+                        if material.durability_multiplier == i32::MIN {
                             material.durability_multiplier = *i;
                             continue;
                         }
 
                         // match material.protection_amounts {
-                        //     [0, 0, 0, 0] => {
+                        //     [i32::MIN, i32::MIN, i32::MIN, i32::MIN] => {
                         //         material.protection_amounts[0] = *i;
                         //         continue;
                         //     }
-                        //     [_, 0, 0, 0] => {
+                        //     [_, i32::MIN, i32::MIN, i32::MIN] => {
                         //         material.protection_amounts[1] = *i;
                         //         continue;
                         //     }
-                        //     [_, _, 0, 0] => {
+                        //     [_, _, i32::MIN, i32::MIN] => {
                         //         material.protection_amounts[2] = *i;
                         //         continue;
                         //     }
-                        //     [_, _, _, 0] => {
+                        //     [_, _, _, i32::MIN] => {
                         //         material.protection_amounts[3] = *i;
                         //         continue;
                         //     }
                         //     _ => {}
                         // }
 
-                        if material.enchantability == 0 {
+                        if material.enchantability == i32::MIN {
                             material.enchantability = *i;
                             continue;
                         }
                     }
                     LdcType::Float(f) => {
-                        if material.toughness == 0.0 {
+                        if material.toughness == f32::MIN {
                             material.toughness = *f;
                             continue;
                         }
 
-                        if material.knockback_resistance == 0.0 {
+                        if material.knockback_resistance == f32::MIN {
                             material.knockback_resistance = *f;
                             continue;
                         }
@@ -140,7 +140,7 @@ impl Dataset for Armor {
 // enchantability, SoundEvent equipSound, float toughness, float knockbackResistance,
 // Supplier<Ingredient> repairIngredientSupplier) { .. }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 struct Material {
     constant: String,
     name: String,
@@ -151,4 +151,19 @@ struct Material {
     toughness: f32,
     knockback_resistance: f32,
     // repair_ingredient: String,
+}
+
+impl Default for Material {
+    fn default() -> Self {
+        Self {
+            constant: Default::default(),
+            name: Default::default(),
+            durability_multiplier: i32::MIN,
+            // protection_amounts: [i32::MIN; 4],
+            enchantability: i32::MIN,
+            toughness: f32::MIN,
+            knockback_resistance: f32::MIN,
+            // repair_ingredient: Default::default(),
+        }
+    }
 }

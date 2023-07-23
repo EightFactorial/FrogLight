@@ -222,6 +222,7 @@ impl ClassMap {
         Ok(())
     }
 
+    /// Set the name and descriptor of an instruction
     fn set_name_and_descriptor(
         insn_name: &mut String,
         insn_desc: &mut String,
@@ -240,6 +241,8 @@ impl ClassMap {
         }
     }
 
+    /// Resolve the name of an instruction,
+    /// potentially replacing it with a field from another class
     fn resolve_name(
         insn_name: &mut String,
         array: &[(String, String, String)],
