@@ -14,6 +14,8 @@ use super::{Dataset, Datasets};
 pub struct Info;
 
 impl Dataset for Info {
+    fn min(&self) -> &'static Option<Version> { &None }
+
     fn deps(&self) -> &'static [Datasets] { &[] }
 
     fn parse(

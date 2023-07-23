@@ -47,10 +47,12 @@ fn main() {
     }
 
     match cli.command {
-        Commands::Extract { datasets } => match extract_data(&version, &manifest, datasets) {
-            Some(data) => output(json::stringify_pretty(data, 4), cli.output),
-            None => error!("Failed to extract data!"),
-        },
+        Commands::Extract { datasets } => {
+            match extract_data(&version, &manifest, datasets, cli.unstable) {
+                Some(data) => output(json::stringify_pretty(data, 4), cli.output),
+                None => error!("Failed to extract data!"),
+            }
+        }
         Commands::Search { query } => match search_data(&version, &manifest, query) {
             Some(data) => {
                 if data.is_empty() {

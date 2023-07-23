@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use json::JsonValue;
-use log::{error, info};
+use log::{error, info, warn};
 use strum::IntoEnumIterator;
 
 use crate::{
@@ -17,6 +17,7 @@ pub fn extract_data(
     version: &Version,
     manifest: &Manifest,
     datasets: Option<Vec<Datasets>>,
+    unstable: bool,
 ) -> Option<JsonValue> {
     info!("Extracting data for version {}", version);
 
@@ -33,6 +34,27 @@ pub fn extract_data(
     let mut datasets = datasets.unwrap_or_else(|| Datasets::iter().collect());
     add_dependencies(&mut datasets);
     datasets = datasets.into_iter().unique().collect();
+
+    // Filter and warn about unsupported datasets
+    let mut filtered = false;
+    if !unstable {
+        datasets.retain(|d| {
+            let supported = if let Some(min) = d.min() {
+                version.is_same_or_newer(min, manifest)
+            } else {
+                true
+            };
+
+            if !supported {
+                warn!("Dataset {} is not supported in version {}", d, version);
+                filtered = true;
+            }
+            supported
+        });
+    }
+    if filtered {
+        warn!("Some datasets were filtered out, use --unstable to include them");
+    }
 
     #[cfg(debug_assertions)]
     {

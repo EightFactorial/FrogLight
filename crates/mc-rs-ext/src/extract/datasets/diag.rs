@@ -9,6 +9,8 @@ use super::{Dataset, Datasets};
 pub struct Diagnostics;
 
 impl Dataset for Diagnostics {
+    fn min(&self) -> &'static Option<Version> { &None }
+
     fn deps(&self) -> &'static [Datasets] { &[] }
 
     fn parse(
