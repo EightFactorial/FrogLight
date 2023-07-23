@@ -4,7 +4,10 @@ use classfile::ast::{Insn, LdcType};
 use json::JsonValue;
 use log::error;
 
-use crate::types::{ClassMap, Manifest, Version};
+use crate::{
+    extract::datasets::round_float,
+    types::{ClassMap, Manifest, Version},
+};
 
 use crate::extract::{Dataset, Datasets};
 
@@ -98,13 +101,13 @@ impl Dataset for Armor {
                         }
                     }
                     LdcType::Float(f) => {
-                        if material.toughness == f32::MIN {
-                            material.toughness = *f;
+                        if material.toughness == f64::MIN {
+                            material.toughness = round_float(*f as f64);
                             continue;
                         }
 
-                        if material.knockback_resistance == f32::MIN {
-                            material.knockback_resistance = *f;
+                        if material.knockback_resistance == f64::MIN {
+                            material.knockback_resistance = round_float(*f as f64);
                             continue;
                         }
                     }
@@ -123,7 +126,7 @@ impl Dataset for Armor {
 
         data["items"]["armor"]["types"] = materials
             .iter()
-            .map(|m| JsonValue::String(m.constant.clone()))
+            .map(|m| m.constant.clone())
             .collect::<Vec<_>>()
             .into();
 
@@ -151,8 +154,8 @@ struct Material {
     // protection_amounts: [i32; 4],
     enchantability: i32,
     // equip_sound: String,
-    toughness: f32,
-    knockback_resistance: f32,
+    toughness: f64,
+    knockback_resistance: f64,
     // repair_ingredient: String,
 }
 
@@ -165,8 +168,8 @@ impl Default for Material {
             // protection_amounts: [i32::MIN; 4],
             enchantability: i32::MIN,
             // equip_sound: Default::default(),
-            toughness: f32::MIN,
-            knockback_resistance: f32::MIN,
+            toughness: f64::MIN,
+            knockback_resistance: f64::MIN,
             // repair_ingredient: Default::default(),
         }
     }

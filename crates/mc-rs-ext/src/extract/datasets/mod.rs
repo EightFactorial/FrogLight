@@ -25,6 +25,7 @@ pub enum Datasets {
     Diagnostics(diag::Diagnostics),
     Info(info::Info),
     Registry(registry::Registry),
+    Packets(packet::Packets),
     Armor(item::Armor),
 }
 
@@ -48,6 +49,10 @@ pub trait Dataset {
         data: &mut JsonValue,
     );
 }
+
+#[inline]
+/// Round a float to at most 3 decimals
+fn round_float(float: f64) -> f64 { (float * 1000.0).round() / 1000.0 }
 
 // Dataset template:
 //
