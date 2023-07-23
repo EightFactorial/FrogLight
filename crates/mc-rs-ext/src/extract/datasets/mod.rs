@@ -24,6 +24,7 @@ pub mod stats;
 pub enum Datasets {
     Diagnostics(diag::Diagnostics),
     Info(info::Info),
+    Registry(registry::Registry),
     Armor(item::Armor),
 }
 
@@ -47,3 +48,29 @@ pub trait Dataset {
         data: &mut JsonValue,
     );
 }
+
+// Dataset template:
+//
+// use json::JsonValue;
+//
+// use crate::types::{ClassMap, Manifest, Version};
+//
+// use crate::extract::{Dataset, Datasets};
+//
+// #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+// pub struct Placeholder;
+//
+// impl Dataset for Placeholder {
+//     fn min(&self) -> &'static Option<Version> { &None }
+//
+//     fn deps(&self) -> &'static [Datasets] { &[] }
+//
+//     fn parse(
+//         &self,
+//         _version: &Version,
+//         _manifest: &Manifest,
+//         _classmap: &ClassMap,
+//         _data: &mut JsonValue,
+//     ) {
+//     }
+// }

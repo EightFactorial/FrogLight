@@ -63,12 +63,7 @@ impl ClassMap {
             let class = match ClassFile::parse(&mut file) {
                 Ok(c) => c,
                 Err(err) => {
-                    if !matches!(
-                        err,
-                        ParserError::Unrecognized(_, _)
-                            | ParserError::UnknownInstruction { .. }
-                            | ParserError::IO(_)
-                    ) {
+                    if !matches!(err, ParserError::IO(_)) {
                         error!("Failed to parse class file: {}", err);
                     }
 
@@ -105,7 +100,7 @@ impl ClassMap {
                         method.descriptor = kind.clone();
                     }
 
-                    // TODO: Map attributes
+                    // TODO: Map method attributes
                     // for attribute in method.attributes.iter_mut() {
                     //     match attribute {
                     //         Attribute::ConstantValue(_) => todo!(),
@@ -213,6 +208,19 @@ impl ClassMap {
                         field.name = name.clone();
                         field.descriptor = kind.clone();
                     }
+
+                    // TODO: Map field attributes
+                    // for attribute in field.attributes.iter_mut() {
+                    //     match attribute {
+                    //         Attribute::ConstantValue(_) => todo!(),
+                    //         Attribute::Signature(_) => todo!(),
+                    //         Attribute::Code(_) => todo!(),
+                    //         Attribute::Exceptions(_) => todo!(),
+                    //         Attribute::SourceFile(_) => todo!(),
+                    //         Attribute::LocalVariableTable(_) => todo!(),
+                    //         Attribute::Unknown(_) => todo!(),
+                    //     }
+                    // }
                 }
 
                 self.insert(mapping.name.clone(), class);

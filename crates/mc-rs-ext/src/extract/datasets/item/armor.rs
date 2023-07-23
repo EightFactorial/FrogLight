@@ -54,8 +54,12 @@ impl Dataset for Armor {
                     LdcType::String(s) => {
                         if material.constant.is_empty() {
                             material.constant = s.clone();
-                        } else {
+                            continue;
+                        }
+
+                        if material.name.is_empty() {
                             material.name = s.clone();
+                            continue;
                         }
                     }
                     LdcType::Int(i) => {
@@ -117,12 +121,11 @@ impl Dataset for Armor {
             }
         }
 
-        data["items"]["armor"]["types"] = JsonValue::Array(
-            materials
-                .iter()
-                .map(|m| JsonValue::String(m.constant.clone()))
-                .collect::<Vec<_>>(),
-        );
+        data["items"]["armor"]["types"] = materials
+            .iter()
+            .map(|m| JsonValue::String(m.constant.clone()))
+            .collect::<Vec<_>>()
+            .into();
 
         for material in materials {
             data["items"]["armor"]["stats"][material.constant] = json::object! {
@@ -161,6 +164,7 @@ impl Default for Material {
             durability_multiplier: i32::MIN,
             // protection_amounts: [i32::MIN; 4],
             enchantability: i32::MIN,
+            // equip_sound: Default::default(),
             toughness: f32::MIN,
             knockback_resistance: f32::MIN,
             // repair_ingredient: Default::default(),
