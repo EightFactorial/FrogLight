@@ -1,8 +1,15 @@
-use std::{fs::File, path::PathBuf};
+use std::{
+    fs::File,
+    path::PathBuf,
+    process::{Command, Stdio},
+};
 
 use log::error;
+use zip::ZipArchive;
 
-use crate::types::{Manifest, Version, VersionData};
+use crate::types::{Manifest, MappingsError, Version, VersionData};
+
+use super::{get_mappings, get_tiny_remapper};
 
 pub fn minecraft_jar(ver: &Version, man: &Manifest) -> Option<PathBuf> {
     let mut path = crate::util::minecraft_dir()?;
@@ -85,4 +92,54 @@ pub fn minecraft_jar(ver: &Version, man: &Manifest) -> Option<PathBuf> {
     }
 
     Some(path_jar)
+}
+
+pub fn mapped_minecraft_jar(ver: &Version, man: &Manifest) -> Result<PathBuf, MappingsError> {
+    let jar_path = minecraft_jar(ver, man).ok_or(MappingsError::JarNotFound)?;
+    let mut folder_path = jar_path.clone();
+    folder_path.pop();
+
+    let mapped_jar_path = folder_path.join(format!("{}-mapped.jar", ver));
+    if !mapped_jar_path.exists() {
+        // Check if the mappings file exists
+        let mappings_file_path = folder_path.join("mappings.tiny");
+        if !mappings_file_path.exists() {
+            let mappings_path = get_mappings(ver)?;
+            let mut mappings_jar = File::open(mappings_path)?;
+            let mut mappings_jar = ZipArchive::new(&mut mappings_jar)?;
+            let mut mappings_file = mappings_jar.by_name("mappings/mappings.tiny")?;
+
+            std::io::copy(&mut mappings_file, &mut File::create(&mappings_file_path)?)?;
+        }
+
+        // Run the remapper
+        let remapper_path = get_tiny_remapper()?;
+        let command = Command::new("java")
+            .arg("-jar")
+            .arg(remapper_path)
+            .arg(jar_path)
+            .arg(&mapped_jar_path)
+            .arg(mappings_file_path)
+            .arg("official")
+            .arg("intermediary")
+            .current_dir(folder_path)
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .spawn();
+
+        match command {
+            Ok(mut child) => {
+                let status = child.wait()?;
+                if !status.success() {
+                    return Err(MappingsError::MappingFailed);
+                }
+            }
+            Err(err) => {
+                error!("Failed to run java: {}", err);
+                return Err(err.into());
+            }
+        }
+    }
+
+    Ok(mapped_jar_path)
 }

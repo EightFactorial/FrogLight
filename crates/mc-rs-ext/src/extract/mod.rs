@@ -21,8 +21,8 @@ pub fn extract_data(
 ) -> Option<JsonValue> {
     info!("Extracting data for version {}", version);
 
-    // Read jar
-    let map = match ClassMap::new_mapped(version, manifest) {
+    // Get jar data
+    let map = match ClassMap::new_with_mappings(version, manifest) {
         Ok(m) => m,
         Err(err) => {
             error!("Failed to read jar: {}", err);
@@ -31,35 +31,7 @@ pub fn extract_data(
     };
 
     // Prepare datasets
-    let mut datasets = datasets.unwrap_or_else(|| Datasets::iter().collect());
-    add_dependencies(&mut datasets);
-    datasets = datasets.into_iter().unique().collect();
-
-    // Filter and warn about unsupported datasets
-    let mut filtered = false;
-    if !unstable {
-        datasets.retain(|d| {
-            let supported = if let Some(min) = d.min() {
-                version.is_same_or_newer(min, manifest)
-            } else {
-                true
-            };
-
-            if !supported {
-                warn!("Dataset {} is not supported in version {}", d, version);
-                filtered = true;
-            }
-            supported
-        });
-    }
-    if filtered {
-        warn!("Some datasets were filtered out, use --unstable to include them");
-    }
-
-    #[cfg(debug_assertions)]
-    {
-        log::debug!("Datasets: {:?}", datasets);
-    }
+    let datasets = get_datasets(datasets, version, manifest, unstable);
 
     // Collect data
     let mut data = JsonValue::new_object();
@@ -70,10 +42,47 @@ pub fn extract_data(
     Some(data)
 }
 
-/// Add dependencies
+/// Get the list of datasets to extract
 ///
-/// Some datasets depend on other datasets, so we need to run those first.
-fn add_dependencies(datasets: &mut Vec<Datasets>) {
+/// This will filter out unsupported datasets and add dependencies.
+fn get_datasets(
+    datasets: Option<Vec<Datasets>>,
+    version: &Version,
+    manifest: &Manifest,
+    unstable: bool,
+) -> Vec<Datasets> {
+    // Get the list of sets
+    let mut manual = false;
+    let mut datasets = if let Some(sets) = datasets {
+        manual = true;
+        sets.into_iter().unique().collect_vec()
+    } else {
+        Datasets::iter().collect_vec()
+    };
+
+    // If unstable flag is not set, filter out unsupported sets
+    if !unstable {
+        let mut filtered = false;
+        datasets.retain(|d| {
+            let supported = if let Some(ver) = d.min() {
+                version.is_same_or_newer(ver, manifest)
+            } else {
+                true
+            };
+
+            if !supported && manual {
+                warn!("Dataset {:?} is not supported for version {}", d, version);
+                filtered = true;
+            }
+
+            supported
+        });
+        if filtered && manual {
+            warn!("Use -u or --unstable to forcefully extract unsupported datasets");
+        }
+    }
+
+    // Add dependencies
     for (index, set) in datasets.clone().iter().enumerate().rev() {
         for dep in set.deps() {
             if let Some(pos) = datasets.iter().position(|s| s == dep) {
@@ -86,4 +95,11 @@ fn add_dependencies(datasets: &mut Vec<Datasets>) {
             }
         }
     }
+
+    #[cfg(debug_assertions)]
+    {
+        log::debug!("Datasets: {:?}", datasets);
+    }
+
+    datasets
 }

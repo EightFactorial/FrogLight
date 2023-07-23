@@ -4,7 +4,7 @@ use crate::types::{ClassMap, Manifest, Version};
 
 pub fn search_data(version: &Version, manifest: &Manifest, query: String) -> Option<String> {
     info!("Searching for data from version {}", version);
-    let map = match ClassMap::new_mapped(version, manifest) {
+    let map = match ClassMap::new_with_mappings(version, manifest) {
         Ok(m) => m,
         Err(err) => {
             error!("Failed to read jar: {}", err);
