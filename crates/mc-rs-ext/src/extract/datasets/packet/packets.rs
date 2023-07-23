@@ -50,18 +50,18 @@ impl Dataset for Packets {
         for insn in code.insns.iter() {
             match insn {
                 Insn::Ldc(LdcInsn { constant }) => {
-                    if let Some(Insn::Ldc(LdcInsn { .. })) = prev_insn {
-                        if let LdcType::Int(int) = constant {
+                    if let LdcType::Int(int) = constant {
+                        if matches!(prev_insn, Some(Insn::Ldc(LdcInsn { .. }))) {
                             state.id = *int;
                         }
+                    } else if let LdcType::String(string) = constant {
+                        state.name = string.clone();
                     } else if let LdcType::Class(class) = constant {
                         match direction {
                             true => state.clientbound.insert(packet_id, class.clone()),
                             false => state.serverbound.insert(packet_id, class.clone()),
                         };
                         packet_id += 1;
-                    } else if let LdcType::String(string) = constant {
-                        state.name = string.clone();
                     }
                 }
                 Insn::GetField(GetFieldInsn { name, .. }) => match name.as_str() {
@@ -90,44 +90,49 @@ impl Dataset for Packets {
         }
 
         // Add packets
-        let mut classes = Vec::new();
-        for state in states.iter() {
-            for class in state.clientbound.values() {
-                classes.push(class.clone());
-            }
-            for class in state.serverbound.values() {
-                classes.push(class.clone());
-            }
-        }
-        data["packets"]["classes"] = classes.into();
-
-        // Add packet states
-        data["packets"]["states"]["names"] = states
-            .iter()
-            .map(|state| state.name.clone())
-            .collect_vec()
-            .into();
-
-        let mut state_data = JsonValue::new_object();
-        for s in states {
-            let mut client_list = JsonValue::new_object();
-            for (id, class) in s.clientbound {
-                client_list[class] = id.into();
+        {
+            let mut classes = Vec::new();
+            for state in states.iter() {
+                for class in state.clientbound.values() {
+                    classes.push(class.clone());
+                }
+                for class in state.serverbound.values() {
+                    classes.push(class.clone());
+                }
             }
 
-            let mut server_list = JsonValue::new_object();
-            for (id, class) in s.serverbound {
-                server_list[class] = id.into();
-            }
-
-            state_data[s.name] = json::object! {
-                id: s.id,
-                clientbound: client_list,
-                serverbound: server_list,
-            }
+            data["packets"]["classes"] = classes.into();
         }
 
-        data["packets"]["states"]["data"] = state_data;
+        // Add packet state names
+        {
+            data["packets"]["states"]["names"] = states
+                .iter()
+                .map(|state| state.name.clone())
+                .collect_vec()
+                .into();
+        }
+
+        // Add packet state data
+        {
+            for s in states {
+                let mut client_list = JsonValue::new_object();
+                for (id, class) in s.clientbound {
+                    client_list[class] = id.into();
+                }
+
+                let mut server_list = JsonValue::new_object();
+                for (id, class) in s.serverbound {
+                    server_list[class] = id.into();
+                }
+
+                data["packets"]["states"]["data"][s.name] = json::object! {
+                    id: s.id,
+                    clientbound: client_list,
+                    serverbound: server_list,
+                }
+            }
+        }
     }
 }
 

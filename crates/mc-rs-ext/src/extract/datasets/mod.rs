@@ -26,6 +26,7 @@ pub enum Datasets {
     Info(info::Info),
     Registry(registry::Registry),
     Packets(packet::Packets),
+    SoundEvents(sound::SoundEvents),
     Armor(item::Armor),
 }
 

@@ -1,11 +1,11 @@
 use std::mem;
 
-use classfile::ast::{Insn, LdcType};
+use classfile::ast::{GetFieldInsn, Insn, LdcInsn, LdcType, PutFieldInsn};
 use json::JsonValue;
 use log::error;
 
 use crate::{
-    extract::datasets::round_float,
+    extract::datasets::{round_float, sound::SoundEvents},
     types::{ClassMap, Manifest, Version},
 };
 
@@ -23,7 +23,7 @@ impl Dataset for Armor {
         })
     }
 
-    fn deps(&self) -> &'static [Datasets] { &[] }
+    fn deps(&self) -> &'static [Datasets] { &[Datasets::SoundEvents(SoundEvents)] }
 
     fn parse(
         &self,
@@ -53,7 +53,7 @@ impl Dataset for Armor {
 
         for insn in code.insns.iter() {
             match &insn {
-                Insn::Ldc(insn) => match &insn.constant {
+                Insn::Ldc(LdcInsn { constant }) => match constant {
                     LdcType::String(s) => {
                         if material.constant.is_empty() {
                             material.constant = s.clone();
@@ -113,9 +113,21 @@ impl Dataset for Armor {
                     }
                     _ => {}
                 },
-                Insn::PutField(insn) => {
-                    if insn.class == "net/minecraft/class_1740"
-                        && insn.descriptor == "Lnet/minecraft/class_1740;"
+                Insn::GetField(GetFieldInsn { class, name, .. }) => {
+                    if class == "net/minecraft/class_3417"
+                        && data["sound"]["events"]["map"].has_key(name)
+                    {
+                        material.equip_sound = data["sound"]["events"]["map"][name]
+                            .as_str()
+                            .unwrap()
+                            .to_owned();
+                    }
+                }
+                Insn::PutField(PutFieldInsn {
+                    class, descriptor, ..
+                }) => {
+                    if class == "net/minecraft/class_1740"
+                        && descriptor == "Lnet/minecraft/class_1740;"
                     {
                         materials.push(mem::take(&mut material));
                     }
@@ -124,20 +136,27 @@ impl Dataset for Armor {
             }
         }
 
-        data["items"]["armor"]["types"] = materials
-            .iter()
-            .map(|m| m.constant.clone())
-            .collect::<Vec<_>>()
-            .into();
+        // Add armor types
+        {
+            data["items"]["armor"]["types"] = materials
+                .iter()
+                .map(|m| m.constant.clone())
+                .collect::<Vec<_>>()
+                .into();
+        }
 
-        for material in materials {
-            data["items"]["armor"]["stats"][material.constant] = json::object! {
-                "name": material.name,
-                "durability_multiplier": material.durability_multiplier,
-                "enchantability": material.enchantability,
-                "toughness": material.toughness,
-                "knockback_resistance": material.knockback_resistance,
-            };
+        // Add armor stats
+        {
+            for material in materials {
+                data["items"]["armor"]["stats"][material.constant] = json::object! {
+                    "name": material.name,
+                    "durability_multiplier": material.durability_multiplier,
+                    "enchantability": material.enchantability,
+                    "equip_sound": material.equip_sound,
+                    "toughness": material.toughness,
+                    "knockback_resistance": material.knockback_resistance,
+                };
+            }
         }
     }
 }
@@ -153,7 +172,7 @@ struct Material {
     durability_multiplier: i32,
     // protection_amounts: [i32; 4],
     enchantability: i32,
-    // equip_sound: String,
+    equip_sound: String,
     toughness: f64,
     knockback_resistance: f64,
     // repair_ingredient: String,
@@ -167,7 +186,7 @@ impl Default for Material {
             durability_multiplier: i32::MIN,
             // protection_amounts: [i32::MIN; 4],
             enchantability: i32::MIN,
-            // equip_sound: Default::default(),
+            equip_sound: Default::default(),
             toughness: f64::MIN,
             knockback_resistance: f64::MIN,
             // repair_ingredient: Default::default(),
