@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use enum_dispatch::enum_dispatch;
 use json::JsonValue;
 use strum::{Display, EnumIter, EnumString};
@@ -25,6 +27,7 @@ pub enum Datasets {
     Diagnostics(diag::Diagnostics),
     Info(info::Info),
     Registry(registry::Registry),
+    SRegistry(registry::SerializableRegistry),
     Packets(packet::Packets),
     SoundEvents(sound::SoundEvents),
     Armor(item::Armor),
@@ -34,7 +37,7 @@ pub enum Datasets {
 ///
 /// This trait is implemented for each dataset and is used to extract the data from the jar file
 #[enum_dispatch]
-pub trait Dataset {
+pub trait Dataset: Debug {
     /// The minimum version this dataset is available in
     fn min(&self) -> &'static Option<Version>;
 
@@ -51,8 +54,8 @@ pub trait Dataset {
     );
 }
 
-#[inline]
 /// Round a float to at most 3 decimals
+#[inline]
 fn round_float(float: f64) -> f64 { (float * 1000.0).round() / 1000.0 }
 
 // Dataset template:

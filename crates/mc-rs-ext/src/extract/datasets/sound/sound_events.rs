@@ -68,7 +68,7 @@ impl Dataset for SoundEvents {
 
         // Add event map
         {
-            for (field, event) in hash.clone().into_iter().sorted() {
+            for (field, event) in hash.clone().into_iter() {
                 data["sound"]["events"]["map"][field] = event.into();
             }
         }

@@ -1,6 +1,7 @@
 use std::mem;
 
 use classfile::ast::{GetFieldInsn, Insn, LdcInsn, LdcType, PutFieldInsn};
+use itertools::Itertools;
 use json::JsonValue;
 use log::error;
 
@@ -57,24 +58,21 @@ impl Dataset for Armor {
                     LdcType::String(s) => {
                         if material.constant.is_empty() {
                             material.constant = s.clone();
-                            continue;
-                        }
-
-                        if material.name.is_empty() {
+                        } else if material.name.is_empty() {
                             material.name = s.clone();
-                            continue;
                         }
                     }
                     LdcType::Int(i) => {
                         if material.name.is_empty() {
                             continue;
-                        }
-
-                        if material.durability_multiplier == i32::MIN {
+                        } else if material.durability_multiplier == i32::MIN {
                             material.durability_multiplier = *i;
-                            continue;
+                        } else if material.enchantability == i32::MIN {
+                            material.enchantability = *i;
                         }
 
+                        // Between durability_multiplier and enchantability
+                        //
                         // match material.protection_amounts {
                         //     [i32::MIN, i32::MIN, i32::MIN, i32::MIN] => {
                         //         material.protection_amounts[0] = *i;
@@ -94,21 +92,12 @@ impl Dataset for Armor {
                         //     }
                         //     _ => {}
                         // }
-
-                        if material.enchantability == i32::MIN {
-                            material.enchantability = *i;
-                            continue;
-                        }
                     }
                     LdcType::Float(f) => {
                         if material.toughness == f64::MIN {
                             material.toughness = round_float(*f as f64);
-                            continue;
-                        }
-
-                        if material.knockback_resistance == f64::MIN {
+                        } else if material.knockback_resistance == f64::MIN {
                             material.knockback_resistance = round_float(*f as f64);
-                            continue;
                         }
                     }
                     _ => {}
@@ -141,7 +130,7 @@ impl Dataset for Armor {
             data["items"]["armor"]["types"] = materials
                 .iter()
                 .map(|m| m.constant.clone())
-                .collect::<Vec<_>>()
+                .collect_vec()
                 .into();
         }
 

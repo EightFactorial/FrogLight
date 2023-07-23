@@ -1,6 +1,7 @@
 use std::mem;
 
 use classfile::ast::{Insn, LdcInsn, LdcType, PutFieldInsn};
+use itertools::Itertools;
 use json::JsonValue;
 use log::error;
 
@@ -49,9 +50,9 @@ impl Dataset for Registry {
                 }) => {
                     constant = s.clone();
                 }
-                Insn::PutField(PutFieldInsn { class, .. }) => {
+                Insn::PutField(PutFieldInsn { class, name, .. }) => {
                     if !constant.is_empty() && class == "net/minecraft/class_7924" {
-                        vec.push(mem::take(&mut constant));
+                        vec.push((mem::take(&mut constant), name.clone()));
                     }
                 }
                 _ => {}
@@ -59,9 +60,20 @@ impl Dataset for Registry {
         }
         vec.sort();
 
+        // Add registry map
+        {
+            for (constant, name) in vec.clone() {
+                data["registry"]["map"][name] = constant.into();
+            }
+        }
+
         // Add registry list
         {
-            data["registry"]["list"] = vec.into();
+            data["registry"]["list"] = vec
+                .into_iter()
+                .map(|(constant, _)| constant)
+                .collect_vec()
+                .into();
         }
     }
 }

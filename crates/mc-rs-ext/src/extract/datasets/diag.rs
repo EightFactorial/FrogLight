@@ -21,8 +21,8 @@ impl Dataset for Diagnostics {
         data: &mut JsonValue,
     ) {
         let json = json::object! {
+            "date-generated": Utc::now().date_naive().to_string(),
             "version": option_env!("CARGO_PKG_VERSION"),
-            "date": Utc::now().date_naive().to_string(),
             "classes": classmap.len(),
         };
 
