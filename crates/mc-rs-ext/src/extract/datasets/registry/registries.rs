@@ -63,11 +63,10 @@ impl Dataset for Registry {
                 _ => {}
             }
         }
-        vec.sort();
 
         // Add registry map
         {
-            for (constant, name) in vec.clone() {
+            for (constant, name) in vec.clone().into_iter().sorted_by(|(_, a), (_, b)| a.cmp(b)) {
                 data["registry"]["map"][name] = constant.into();
             }
         }
@@ -77,6 +76,7 @@ impl Dataset for Registry {
             data["registry"]["list"] = vec
                 .into_iter()
                 .map(|(constant, _)| constant)
+                .sorted()
                 .collect_vec()
                 .into();
         }

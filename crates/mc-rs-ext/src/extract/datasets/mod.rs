@@ -29,6 +29,7 @@ pub enum Datasets {
     Registry(registry::Registry),
     SRegistry(registry::SerializableRegistry),
     Packets(packet::Packets),
+    PacketFields(packet::PacketFields),
     SoundEvents(sound::SoundEvents),
     Armor(item::Armor),
 }
@@ -68,6 +69,11 @@ fn round_float(float: f64) -> f64 { (float * 1000.0).round() / 1000.0 }
 //
 // #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 // pub struct Placeholder;
+//
+// impl Placeholder {
+//     pub const CLASS: &'static str = "net/minecraft/class_XXXX";
+//     pub const METHOD: &'static str = "<clinit>";
+// }
 //
 // impl Dataset for Placeholder {
 //     fn min(&self) -> &'static Option<Version> { &None }
