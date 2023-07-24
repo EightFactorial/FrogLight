@@ -142,7 +142,7 @@ impl PacketFields {
                 ..
             }) = insn
             {
-                if class == Self::BUFFER_CLASS && name != "<init>" {
+                if class == Self::BUFFER_CLASS && name != Self::METHOD {
                     if let Some(field) = Self::decode_descriptor(descriptor) {
                         fields.extend(field);
                     } else {

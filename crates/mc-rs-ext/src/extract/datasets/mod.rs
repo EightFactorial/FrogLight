@@ -27,7 +27,7 @@ pub enum Datasets {
     Diagnostics(diag::Diagnostics),
     Info(info::Info),
     Registry(registry::Registry),
-    SRegistry(registry::SerializableRegistry),
+    SerRegistry(registry::SerializableRegistry),
     Packets(packet::Packets),
     PacketFields(packet::PacketFields),
     SoundEvents(sound::SoundEvents),
