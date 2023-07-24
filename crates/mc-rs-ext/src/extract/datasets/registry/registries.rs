@@ -12,6 +12,11 @@ use crate::extract::{Dataset, Datasets};
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Registry;
 
+impl Registry {
+    pub const CLASS: &'static str = "net/minecraft/class_7924";
+    pub const METHOD: &'static str = "<clinit>";
+}
+
 impl Dataset for Registry {
     fn min(&self) -> &'static Option<Version> { &None }
 
@@ -24,19 +29,19 @@ impl Dataset for Registry {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get("net/minecraft/class_7924") else {
+        let Some(class) = classmap.get(Self::CLASS) else {
             error!("Failed to find Registry class");
             return;
         };
 
-        let Some(method) = class.methods.iter().find(|m| m.name == "<clinit>") else {
-            error!("Failed to find Registry.<clinit>");
+        let Some(method) = class.methods.iter().find(|m| m.name == Self::METHOD) else {
+            error!("Failed to find Registry.{}", Self::METHOD);
             return;
         };
 
         let mut method = method.clone();
         let Some(code) = method.code() else {
-            error!("Failed to find Registry.<clinit> code");
+            error!("Failed to find Registry.{} code", Self::METHOD);
             return;
         };
 
@@ -51,7 +56,7 @@ impl Dataset for Registry {
                     constant = s.clone();
                 }
                 Insn::PutField(PutFieldInsn { class, name, .. }) => {
-                    if !constant.is_empty() && class == "net/minecraft/class_7924" {
+                    if !constant.is_empty() && class == Self::CLASS {
                         vec.push((mem::take(&mut constant), name.clone()));
                     }
                 }

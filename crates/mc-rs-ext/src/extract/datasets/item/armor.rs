@@ -15,6 +15,11 @@ use crate::extract::{Dataset, Datasets};
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Armor;
 
+impl Armor {
+    pub const CLASS: &'static str = "net/minecraft/class_1740";
+    pub const METHOD: &'static str = "<clinit>";
+}
+
 impl Dataset for Armor {
     fn min(&self) -> &'static Option<Version> {
         &Some(Version::Release {
@@ -33,19 +38,19 @@ impl Dataset for Armor {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get("net/minecraft/class_1740") else {
+        let Some(class) = classmap.get(Self::CLASS) else {
             error!("Failed to find ArmorMaterial class");
             return;
         };
 
-        let Some(method) = class.methods.iter().find(|m| m.name == "<clinit>") else {
-            error!("Failed to find ArmorMaterial.<clinit>");
+        let Some(method) = class.methods.iter().find(|m| m.name == Self::METHOD) else {
+            error!("Failed to find ArmorMaterial.{}", Self::METHOD);
             return;
         };
 
         let mut method = method.clone();
         let Some(code) = method.code() else {
-            error!("Failed to find ArmorMaterial.<clinit> code");
+            error!("Failed to find ArmorMaterial.{} code", Self::METHOD);
             return;
         };
 
@@ -103,9 +108,7 @@ impl Dataset for Armor {
                     _ => {}
                 },
                 Insn::GetField(GetFieldInsn { class, name, .. }) => {
-                    if class == "net/minecraft/class_3417"
-                        && data["sound"]["events"]["map"].has_key(name)
-                    {
+                    if class == SoundEvents::CLASS && data["sound"]["events"]["map"].has_key(name) {
                         material.equip_sound = data["sound"]["events"]["map"][name]
                             .as_str()
                             .unwrap()
@@ -115,9 +118,7 @@ impl Dataset for Armor {
                 Insn::PutField(PutFieldInsn {
                     class, descriptor, ..
                 }) => {
-                    if class == "net/minecraft/class_1740"
-                        && descriptor == "Lnet/minecraft/class_1740;"
-                    {
+                    if class == Self::CLASS && descriptor == "Lnet/minecraft/class_1740;" {
                         materials.push(mem::take(&mut material));
                     }
                 }

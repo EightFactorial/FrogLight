@@ -12,6 +12,11 @@ use crate::extract::{Dataset, Datasets};
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Packets;
 
+impl Packets {
+    pub const CLASS: &'static str = "net/minecraft/class_2539";
+    pub const METHOD: &'static str = "<clinit>";
+}
+
 impl Dataset for Packets {
     fn min(&self) -> &'static Option<Version> { &None }
 
@@ -24,19 +29,19 @@ impl Dataset for Packets {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get("net/minecraft/class_2539") else {
+        let Some(class) = classmap.get(Self::CLASS) else {
             error!("Failed to find Packets class");
             return;
         };
 
-        let Some(method) = class.methods.iter().find(|m| m.name == "<clinit>") else {
-            error!("Failed to find Packets.<clinit>");
+        let Some(method) = class.methods.iter().find(|m| m.name == Self::METHOD) else {
+            error!("Failed to find Packets.{}", Self::METHOD);
             return;
         };
 
         let mut method = method.clone();
         let Some(code) = method.code() else {
-            error!("Failed to find Packets.<clinit> code");
+            error!("Failed to find Packets.{} code", Self::METHOD);
             return;
         };
 
@@ -65,12 +70,12 @@ impl Dataset for Packets {
                     }
                 }
                 Insn::GetField(GetFieldInsn { name, .. }) => match name.as_str() {
-                    "field_11942" => {
-                        direction = true;
-                        packet_id = 0;
-                    }
                     "field_11941" => {
                         direction = false;
+                        packet_id = 0;
+                    }
+                    "field_11942" => {
+                        direction = true;
                         packet_id = 0;
                     }
                     _ => {}
@@ -78,9 +83,7 @@ impl Dataset for Packets {
                 Insn::PutField(PutFieldInsn {
                     class, descriptor, ..
                 }) => {
-                    if class.as_str() == "net/minecraft/class_2539"
-                        && descriptor.as_str() == "Lnet/minecraft/class_2539;"
-                    {
+                    if class.as_str() == Self::CLASS && descriptor.as_str().contains(Self::CLASS) {
                         states.push(mem::take(&mut state));
                     }
                 }
