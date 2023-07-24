@@ -83,7 +83,10 @@ impl Dataset for Packets {
                 Insn::PutField(PutFieldInsn {
                     class, descriptor, ..
                 }) => {
-                    if class.as_str() == Self::CLASS && descriptor.as_str().contains(Self::CLASS) {
+                    if class.as_str() == Self::CLASS
+                        && descriptor.as_str().contains(Self::CLASS)
+                        && !state.name.is_empty()
+                    {
                         states.push(mem::take(&mut state));
                     }
                 }
