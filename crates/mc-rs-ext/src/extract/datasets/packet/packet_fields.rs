@@ -246,7 +246,7 @@ impl PacketFields {
                 continue;
             }
 
-            // Strip the java prefixes
+            // Strip java prefixes
             if field.starts_with("java/lang/")
                 || field.starts_with("java/util/")
                 || field.starts_with("java/time/")
@@ -286,10 +286,10 @@ impl PacketFields {
                 "com/mojang/authlib/GameProfile" => {
                     *field = "GameProfile".to_string();
                 }
-
                 "io/netty/buffer/ByteBuf" => {
-                    *field = "Vec<u8>".to_string();
+                    *field = "UnsizedByteBuffer".to_string();
                 }
+
                 "it/unimi/dsi/fastutil/ints/IntList" => {
                     *field = "Vec<u32>".to_string();
                 }
@@ -300,6 +300,9 @@ impl PacketFields {
                     remove.push(index);
                 }
 
+                "Optional" => {
+                    *field = "Option".to_string();
+                }
                 "Map" => {
                     *field = "HashMap".to_string();
                 }

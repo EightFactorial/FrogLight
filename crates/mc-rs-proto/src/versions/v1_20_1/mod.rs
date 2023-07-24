@@ -1,8 +1,8 @@
 use crate::Version;
 
-pub mod game;
-pub mod handshake;
+pub mod handshaking;
 pub mod login;
+pub mod play;
 pub mod status;
 
 /// The 1.20.1 protocol version.

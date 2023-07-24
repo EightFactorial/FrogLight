@@ -11,6 +11,7 @@ use strum::IntoEnumIterator;
 
 mod cli;
 mod generate;
+mod util;
 
 fn main() {
     let cli = Cli::parse();
