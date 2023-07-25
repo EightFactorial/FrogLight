@@ -97,7 +97,7 @@ impl Packets {
 
         // Generate the packets for each direction
         let mut packet_groups: Vec<(&str, Vec<String>)> = Vec::new();
-        for direction in ["serverbound", "clientbound"] {
+        for direction in ["clientbound", "serverbound"] {
             let packets = Self::generate_direction(fields, state, direction, &path)?;
             packet_groups.push((direction, packets));
         }

@@ -7,6 +7,7 @@ use strum::{Display, EnumIter, EnumString};
 
 use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 
+mod format;
 mod packets;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter, EnumString, Display)]
@@ -14,6 +15,7 @@ mod packets;
 #[enum_dispatch(Generator)]
 pub enum Generators {
     Packets(packets::Packets),
+    Format(format::Format),
 }
 
 /// The trait that all generators implement
@@ -29,6 +31,7 @@ pub trait Generator: Debug {
 
 // Generator template:
 //
+// use git2::Repository;
 // use json::JsonValue;
 // use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 //
@@ -43,7 +46,8 @@ pub trait Generator: Debug {
 //     fn parse(
 //         &self,
 //         _version: &Version,
-//         _data: &mut JsonValue,
+//         _data: &JsonValue,
+//         _repo: &Repository,
 //     ) {
 //     }
 // }
