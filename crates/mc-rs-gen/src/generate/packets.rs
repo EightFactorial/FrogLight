@@ -198,9 +198,10 @@ fn get_imports(fields: &[&str]) -> Vec<String> {
         let import = match field {
             "Uuid" => Some("uuid::Uuid".to_string()),
             "HashMap" => Some("hashbrown::HashMap".to_string()),
-            //            "ResourceLocation" => Some("crate::types::ResourceLocation".to_string()),
+            "ResourceLocation" => Some("crate::types::ResourceLocation".to_string()),
             //            "ResourceEntry" => Some("crate::types::ResourceEntry".to_string()),
-            //            "UnizedByteBuffer" => Some("crate::types::UnizedByteBuffer".to_string()),
+            //            "GameProfile" => Some("crate::types::GameProfile".to_string()),
+            "UnizedByteBuffer" => Some("crate::types::UnizedByteBuffer".to_string()),
             _ => None,
         };
 
