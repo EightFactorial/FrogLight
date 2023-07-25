@@ -1,6 +1,6 @@
 use bevy_derive::{Deref, DerefMut};
 
-use crate::buffer::{Decode, DecodeError, Encode, EncodeError};
+use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarEncode};
 
 /// A buffer that contains encoded data.
 ///
@@ -10,10 +10,11 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError};
 /// that contains other fields after it.
 ///
 /// For example:
-/// ```rust
-/// # use mc_rs_proto::types::UnsizedByteBuffer;
+/// ```text
+/// use mc_rs_macros::Transcode;
+/// use mc_rs_proto::types::UnsizedByteBuffer;
 ///
-/// #[derive(Debug)]
+/// #[derive(Debug, Transcode)]
 /// struct Packet {
 ///     field: u8,
 ///     buffer: UnsizedByteBuffer,
@@ -29,8 +30,24 @@ impl UnsizedByteBuffer {
 
     pub fn with_capacity(capacity: usize) -> Self { Self(Vec::with_capacity(capacity)) }
 
-    pub fn write_value<T: Encode>(&mut self, value: T) -> Result<(), EncodeError> {
+    pub fn encode_value<T: Encode>(&mut self, value: &T) -> Result<(), EncodeError> {
         value.encode(&mut self.0)
+    }
+
+    pub fn var_encode_value<T: VarEncode>(&mut self, value: &T) -> Result<(), EncodeError> {
+        value.var_encode(&mut self.0)
+    }
+
+    pub fn from_value<T: Encode>(value: &T) -> Result<Self, EncodeError> {
+        let mut buffer = Self::new();
+        buffer.encode_value(value)?;
+        Ok(buffer)
+    }
+
+    pub fn from_var_value<T: VarEncode>(value: &T) -> Result<Self, EncodeError> {
+        let mut buffer = Self::new();
+        buffer.var_encode_value(value)?;
+        Ok(buffer)
     }
 }
 
