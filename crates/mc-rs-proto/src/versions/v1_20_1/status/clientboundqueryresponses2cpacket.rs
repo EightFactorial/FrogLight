@@ -1,8 +1,8 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Packet, Serialize, Deserialize)]
+#[derive(Debug, Clone, Transcode, Serialize, Deserialize)]
 #[json]
 pub struct ClientboundQueryResponseS2CPacket {
     pub description: String,

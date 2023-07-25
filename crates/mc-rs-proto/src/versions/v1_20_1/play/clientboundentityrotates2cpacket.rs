@@ -1,6 +1,6 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntityRotateS2CPacket {
     pub a: u32,
     pub b: u8,

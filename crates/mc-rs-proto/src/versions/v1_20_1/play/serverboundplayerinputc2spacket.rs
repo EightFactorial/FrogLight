@@ -1,6 +1,6 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ServerboundPlayerInputC2SPacket {
     pub a: f32,
     pub b: f32,

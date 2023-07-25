@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::buffer::{Decode, Encode};
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct ResourceLocation(String);
 
 impl ResourceLocation {

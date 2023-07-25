@@ -1,7 +1,7 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ServerboundLoginKeyC2SPacket {
-    pub a: Vec<u8>,
-    pub b: Vec<u8>,
+    pub key: Vec<u8>,
+    pub challenge: Vec<u8>,
 }

@@ -1,6 +1,6 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ServerboundUpdateSignC2SPacket {
     pub a: BlockPos,
     pub b: bool,

@@ -1,6 +1,8 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+use crate::types::GameProfile;
+
+#[derive(Debug, Clone, Transcode)]
 pub struct ClientboundLoginSuccessS2CPacket {
-    // pub a: GameProfile,
+    pub profile: GameProfile,
 }

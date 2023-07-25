@@ -1,6 +1,9 @@
 pub mod enums;
 pub mod packets;
 
+mod game_profile;
+pub use game_profile::GameProfile;
+
 mod nonzero_option;
 pub use nonzero_option::NonZeroOption;
 

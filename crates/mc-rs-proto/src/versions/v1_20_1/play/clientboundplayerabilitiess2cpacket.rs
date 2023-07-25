@@ -1,6 +1,6 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ClientboundPlayerAbilitiesS2CPacket {
     pub a: u8,
     pub b: f32,

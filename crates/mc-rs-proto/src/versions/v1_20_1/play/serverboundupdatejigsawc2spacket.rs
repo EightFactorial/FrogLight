@@ -1,7 +1,7 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 use crate::types::ResourceLocation;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ServerboundUpdateJigsawC2SPacket {
     pub a: BlockPos,
     pub b: ResourceLocation,

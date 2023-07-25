@@ -139,7 +139,7 @@ impl Packets {
     }
 
     /// The header for all generated structs
-    const PACKET_HEADER: &'static str = "#[derive(Debug, Clone, Packet)]";
+    const PACKET_HEADER: &'static str = "#[derive(Debug, Clone, Transcode)]";
 
     /// Generate the packet struct
     fn generate_packet(
@@ -190,7 +190,7 @@ impl Packets {
 fn get_imports(fields: &[&str]) -> Vec<String> {
     let fields = fields.iter().cloned().unique().collect_vec();
 
-    let mut imports = vec!["mc_rs_macros::Packet".to_string()];
+    let mut imports = vec!["mc_rs_macros::Transcode".to_string()];
     for field in fields {
         let import = match field {
             "Uuid" => Some("uuid::Uuid".to_string()),

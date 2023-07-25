@@ -1,8 +1,8 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ClientboundLoginHelloS2CPacket {
-    pub a: String,
-    pub b: Vec<u8>,
-    pub c: Vec<u8>,
+    pub server_id: String,
+    pub public_key: Vec<u8>,
+    pub key_nonce: Vec<u8>,
 }

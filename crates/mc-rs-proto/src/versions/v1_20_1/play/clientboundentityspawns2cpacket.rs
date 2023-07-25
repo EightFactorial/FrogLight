@@ -1,7 +1,7 @@
-use mc_rs_macros::Packet;
+use mc_rs_macros::Transcode;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntitySpawnS2CPacket {
     pub a: u32,
     pub b: Uuid,

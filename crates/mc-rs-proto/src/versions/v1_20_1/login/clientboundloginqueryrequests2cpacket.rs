@@ -1,10 +1,9 @@
-use crate::types::{ResourceLocation, UnsizedByteBuffer};
-use mc_rs_macros::Packet;
+use crate::types::UnsizedByteBuffer;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Packet)]
+#[derive(Debug, Clone, Transcode)]
 pub struct ClientboundLoginQueryRequestS2CPacket {
-    pub a: u32,
-    pub b: ResourceLocation,
-    pub c: u32,
-    pub d: UnsizedByteBuffer,
+    #[var]
+    pub id: u32,
+    pub data: Option<UnsizedByteBuffer>,
 }
