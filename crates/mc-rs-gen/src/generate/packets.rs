@@ -27,15 +27,7 @@ impl Generator for Packets {
         ]
     }
 
-    fn parse(&self, version: &Version, data: &JsonValue) {
-        let repo = match Repository::discover(".") {
-            Ok(repo) => repo,
-            Err(err) => {
-                error!("Failed to open git repository: {}", err);
-                return;
-            }
-        };
-
+    fn parse(&self, version: &Version, data: &JsonValue, repo: &Repository) {
         let mut path: PathBuf = repo.path().parent().unwrap().into();
         path.push("crates/mc-rs-proto");
 
@@ -141,8 +133,7 @@ impl Packets {
     }
 
     /// The header for all generated structs
-    // const PACKET_HEADER: &'static str = "#[derive(Debug, Clone, PartialEq, Encode, Decode)]";
-    const PACKET_HEADER: &'static str = "#[derive(Debug, Clone, PartialEq)]";
+    const PACKET_HEADER: &'static str = "#[derive(Debug, Clone, Packet)]";
 
     /// Generate the packet struct
     fn generate_packet(
@@ -192,8 +183,7 @@ impl Packets {
 fn get_imports(fields: &[&str]) -> Vec<String> {
     let fields = fields.iter().cloned().unique().collect_vec();
 
-    // let mut imports = vec!["mc_rs_macros::{Encode, Decode}"];
-    let mut imports = Vec::new();
+    let mut imports = vec!["mc_rs_macros::Packet".to_string()];
     for field in fields {
         let import = match field {
             "Uuid" => Some("uuid::Uuid".to_string()),

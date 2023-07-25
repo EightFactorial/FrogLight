@@ -16,3 +16,5 @@ thiserror = "1.0.43"
 uuid = { version = "1.4.1", features = ["v3"] }
 byteorder = { version = "1.4.3", features = ["i128"] }
 strum = { version = "0.25.0", features = ["derive"] }
+serde = { version = "1.0.175", features = ["derive"] }
+serde_json = { version = "1.0.103", features = ["preserve_order", "arbitrary_precision"] }

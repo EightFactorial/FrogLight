@@ -1,6 +1,7 @@
 use clap::Parser;
 use cli::Cli;
 use generate::{Generator, Generators};
+use git2::Repository;
 use itertools::Itertools;
 use log::{error, info, warn, LevelFilter};
 use mc_rs_ext::{
@@ -42,6 +43,14 @@ fn main() {
         return;
     }
 
+    let repo = match Repository::discover(".") {
+        Ok(repo) => repo,
+        Err(err) => {
+            error!("Failed to find git repository: {}", err);
+            return;
+        }
+    };
+
     // Get the generators to run
     let generators = cli
         .generators
@@ -67,7 +76,7 @@ fn main() {
     info!("");
     for gen in generators.iter() {
         info!("Generating {:?}...", gen);
-        gen.parse(&cli.version, &data);
+        gen.parse(&cli.version, &data, &repo);
     }
 
     info!("");

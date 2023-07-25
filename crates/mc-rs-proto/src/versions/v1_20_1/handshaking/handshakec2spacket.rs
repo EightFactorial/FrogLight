@@ -1,5 +1,6 @@
+use mc_rs_macros::Packet;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Packet)]
 pub struct HandshakeC2SPacket {
     pub a: u32,
     pub b: String,

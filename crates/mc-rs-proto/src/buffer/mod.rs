@@ -19,6 +19,8 @@ pub enum EncodeError {
     Io(#[from] std::io::Error),
     #[error("Varint error: {0}")]
     Var(#[from] VarError),
+    #[error("Serde error: {0}")]
+    Serde(#[from] serde_json::Error),
 }
 
 /// A trait for types that can be decoded from a buffer.
@@ -31,10 +33,12 @@ pub trait Decode: Sized {
 pub enum DecodeError {
     #[error("Io error: {0}")]
     Io(#[from] std::io::Error),
-    #[error("TryInto error: {0}")]
-    TryInto(#[from] std::num::TryFromIntError),
     #[error("Varint error: {0}")]
     Var(#[from] VarError),
+    #[error("Serde error: {0}")]
+    Serde(#[from] serde_json::Error),
+    #[error("TryInto error: {0}")]
+    TryInto(#[from] std::num::TryFromIntError),
     #[error("Boolean error, expected 0 or 1, got {0}")]
     Boolean(u8),
     #[error("String too long: {0}")]

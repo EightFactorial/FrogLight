@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 use enum_dispatch::enum_dispatch;
+use git2::Repository;
 use json::JsonValue;
 use strum::{Display, EnumIter, EnumString};
 
@@ -15,16 +16,15 @@ pub enum Generators {
     Packets(packets::Packets),
 }
 
-/// The datasets that can be extracted
-///
-/// This trait is implemented for each dataset and is used to extract the data from the jar file
+/// The trait that all generators implement
+
 #[enum_dispatch]
 pub trait Generator: Debug {
-    /// The sets this dataset depends on
+    /// The datasets this generator depends on
     fn deps(&self) -> &'static [Datasets];
 
-    /// Parse the jar file and add the data to the json object
-    fn parse(&self, version: &Version, data: &JsonValue);
+    /// Generate code using the extracted data
+    fn parse(&self, version: &Version, data: &JsonValue, repo: &Repository);
 }
 
 // Generator template:
