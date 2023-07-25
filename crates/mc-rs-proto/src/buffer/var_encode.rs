@@ -104,6 +104,7 @@ impl<K: Encode, V: VarEncode> VarEncode for HashMap<K, V> {
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<K: Encode, V: VarEncode> VarEncode for hashbrown::HashMap<K, V> {
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         self.len().var_encode(buf)?;

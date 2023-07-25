@@ -90,6 +90,7 @@ impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for HashMap<K, V> {
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for hashbrown::HashMap<K, V> {
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let len = u32::var_decode(buf)?;

@@ -1,6 +1,10 @@
-use hashbrown::HashMap;
 use mc_rs_macros::Transcode;
 use uuid::Uuid;
+
+#[cfg(feature = "hashbrown")]
+use hashbrown::HashMap;
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Eq, Transcode)]
 pub struct GameProfile {
