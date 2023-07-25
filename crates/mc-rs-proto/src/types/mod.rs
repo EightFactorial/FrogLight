@@ -1,3 +1,4 @@
+pub mod enums;
 pub mod packets;
 
 mod nonzero_option;
