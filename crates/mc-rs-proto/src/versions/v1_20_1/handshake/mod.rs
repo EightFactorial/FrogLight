@@ -1,3 +1,3 @@
-pub mod serverboundhandshakec2spacket;
+pub mod serverboundhandshakepacket;
 
 // TODO: Write state macro

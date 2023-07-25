@@ -1,6 +1,6 @@
-pub mod clientboundquerypongs2cpacket;
-pub mod clientboundqueryresponses2cpacket;
-pub mod serverboundquerypingc2spacket;
-pub mod serverboundqueryrequestc2spacket;
+pub mod clientboundquerypongpacket;
+pub mod clientboundqueryresponsepacket;
+pub mod serverboundquerypingpacket;
+pub mod serverboundqueryrequestpacket;
 
 // TODO: Write state macro

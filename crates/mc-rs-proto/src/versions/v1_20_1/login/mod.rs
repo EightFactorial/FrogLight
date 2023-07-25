@@ -1,10 +1,10 @@
-pub mod clientboundlogincompressions2cpacket;
-pub mod clientboundlogindisconnects2cpacket;
-pub mod clientboundloginhellos2cpacket;
-pub mod clientboundloginqueryrequests2cpacket;
-pub mod clientboundloginsuccesss2cpacket;
-pub mod serverboundloginhelloc2spacket;
-pub mod serverboundloginkeyc2spacket;
-pub mod serverboundloginqueryresponsec2spacket;
+pub mod clientboundlogincompressionpacket;
+pub mod clientboundlogindisconnectpacket;
+pub mod clientboundloginhellopacket;
+pub mod clientboundloginqueryrequestpacket;
+pub mod clientboundloginsuccesspacket;
+pub mod serverboundloginhellopacket;
+pub mod serverboundloginkeypacket;
+pub mod serverboundloginqueryresponsepacket;
 
 // TODO: Write state macro
