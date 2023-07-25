@@ -53,7 +53,7 @@ fn decode_json(ident: Ident, _data: DataStruct) -> TokenStream {
     quote! {
         impl crate::buffer::Decode for #ident {
             fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
-                serde_json::from_str(&String::decode(buf)?)
+                Ok(serde_json::from_str(&String::decode(buf)?)?)
             }
         }
     }
