@@ -1,3 +1,7 @@
+use std::collections::HashMap;
+
+use crate::buffer::Encode;
+
 use super::{VarEncode, VarError};
 
 impl VarEncode for i16 {
@@ -86,6 +90,30 @@ impl<T: VarEncode> VarEncode for Option<T> {
             }
             None => 0u32.var_encode(buf),
         }
+    }
+}
+
+impl<K: Encode, V: VarEncode> VarEncode for HashMap<K, V> {
+    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), VarError> {
+        self.len().var_encode(buf)?;
+        for (key, value) in self {
+            key.encode(buf)
+                .map_err(|_| VarError::Other("Error encoding hashmap key".to_string()))?;
+            value.var_encode(buf)?;
+        }
+        Ok(())
+    }
+}
+
+impl<K: Encode, V: VarEncode> VarEncode for hashbrown::HashMap<K, V> {
+    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), VarError> {
+        self.len().var_encode(buf)?;
+        for (key, value) in self {
+            key.encode(buf)
+                .map_err(|_| VarError::Other("Error encoding hashmap key".to_string()))?;
+            value.var_encode(buf)?;
+        }
+        Ok(())
     }
 }
 

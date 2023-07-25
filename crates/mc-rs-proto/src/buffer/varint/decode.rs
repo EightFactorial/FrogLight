@@ -1,3 +1,7 @@
+use std::{collections::HashMap, hash::Hash};
+
+use crate::buffer::Decode;
+
 use super::{VarDecode, VarError};
 
 impl VarDecode for i16 {
@@ -72,6 +76,36 @@ impl<T: VarDecode> VarDecode for Option<T> {
             0 => Ok(None),
             _ => Ok(Some(T::var_decode(buf)?)),
         }
+    }
+}
+
+impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for HashMap<K, V> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+        let len = u32::var_decode(buf)?;
+        let mut map = HashMap::with_capacity(len as usize);
+        for _ in 0..len {
+            map.insert(
+                K::decode(buf)
+                    .map_err(|_| VarError::Other("Error decoding hashmap key".to_string()))?,
+                V::var_decode(buf)?,
+            );
+        }
+        Ok(map)
+    }
+}
+
+impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for hashbrown::HashMap<K, V> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+        let len = u32::var_decode(buf)?;
+        let mut map = hashbrown::HashMap::with_capacity(len as usize);
+        for _ in 0..len {
+            map.insert(
+                K::decode(buf)
+                    .map_err(|_| VarError::Other("Error decoding hashmap key".to_string()))?,
+                V::var_decode(buf)?,
+            );
+        }
+        Ok(map)
     }
 }
 

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use byteorder::{WriteBytesExt, BE};
 use uuid::Uuid;
 
@@ -104,6 +106,15 @@ impl<T: Encode> Encode for Vec<T> {
     }
 }
 
+impl<T: Encode, const N: usize> Encode for [T; N] {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        for item in self {
+            item.encode(buf)?;
+        }
+        Ok(())
+    }
+}
+
 impl<T: Encode> Encode for Option<T> {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         match self {
@@ -117,10 +128,23 @@ impl<T: Encode> Encode for Option<T> {
     }
 }
 
-impl<T: Encode, const N: usize> Encode for [T; N] {
+impl<K: Encode, V: Encode> Encode for HashMap<K, V> {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
-        for item in self {
-            item.encode(buf)?;
+        self.len().var_encode(buf)?;
+        for (key, value) in self {
+            key.encode(buf)?;
+            value.encode(buf)?;
+        }
+        Ok(())
+    }
+}
+
+impl<K: Encode, V: Encode> Encode for hashbrown::HashMap<K, V> {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        self.len().var_encode(buf)?;
+        for (key, value) in self {
+            key.encode(buf)?;
+            value.encode(buf)?;
         }
         Ok(())
     }

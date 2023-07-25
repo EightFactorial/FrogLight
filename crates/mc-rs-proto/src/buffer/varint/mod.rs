@@ -20,6 +20,8 @@ pub enum VarError {
     Io(#[from] std::io::Error),
     #[error("TryInto error: {0}")]
     TryInto(#[from] std::num::TryFromIntError),
+    #[error("{0}")]
+    Other(String),
 }
 
 impl PartialEq for VarError {

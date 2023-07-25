@@ -1,3 +1,5 @@
+use std::{collections::HashMap, hash::Hash};
+
 use byteorder::{ReadBytesExt, BE};
 use uuid::Uuid;
 
@@ -121,15 +123,6 @@ impl<T: Decode> Decode for Vec<T> {
     }
 }
 
-impl<T: Decode> Decode for Option<T> {
-    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
-        match bool::decode(buf)? {
-            true => Ok(Some(T::decode(buf)?)),
-            false => Ok(None),
-        }
-    }
-}
-
 impl<T: Decode, const N: usize> Decode for [T; N] {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let mut arr = Vec::with_capacity(N);
@@ -139,5 +132,40 @@ impl<T: Decode, const N: usize> Decode for [T; N] {
 
         arr.try_into()
             .map_err(|_| unreachable!("Length is constant"))
+    }
+}
+
+impl<T: Decode> Decode for Option<T> {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        match bool::decode(buf)? {
+            true => Ok(Some(T::decode(buf)?)),
+            false => Ok(None),
+        }
+    }
+}
+
+impl<K: Decode + Eq + Hash, V: Decode> Decode for HashMap<K, V> {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        let len = u32::var_decode(buf)?;
+
+        let mut map = HashMap::with_capacity(len as usize);
+        for _ in 0..len {
+            map.insert(K::decode(buf)?, V::decode(buf)?);
+        }
+
+        Ok(map)
+    }
+}
+
+impl<K: Decode + Eq + Hash, V: Decode> Decode for hashbrown::HashMap<K, V> {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        let len = u32::var_decode(buf)?;
+
+        let mut map = hashbrown::HashMap::with_capacity(len as usize);
+        for _ in 0..len {
+            map.insert(K::decode(buf)?, V::decode(buf)?);
+        }
+
+        Ok(map)
     }
 }
