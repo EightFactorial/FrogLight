@@ -32,9 +32,21 @@ fn decode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruct) -> Token
     for field in data.fields.iter() {
         let name = field.ident.as_ref().unwrap();
 
-        fields.push(quote! {
-            #name: crate::buffer::Decode::decode(buf)?,
-        });
+        if field.attrs.iter().any(|f| {
+            if let Meta::Path(path) = &f.meta {
+                path.is_ident("var")
+            } else {
+                false
+            }
+        }) {
+            fields.push(quote! {
+                #name: crate::buffer::VarDecode::var_decode(buf)?,
+            });
+        } else {
+            fields.push(quote! {
+                #name: crate::buffer::Decode::decode(buf)?,
+            });
+        }
     }
 
     quote! {

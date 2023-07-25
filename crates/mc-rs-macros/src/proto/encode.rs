@@ -32,9 +32,21 @@ fn encode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruct) -> Token
     for field in data.fields.iter() {
         let name = field.ident.as_ref().unwrap();
 
-        fields.push(quote! {
-            self.#name.encode(buf)?;
-        });
+        if field.attrs.iter().any(|f| {
+            if let Meta::Path(path) = &f.meta {
+                path.is_ident("var")
+            } else {
+                false
+            }
+        }) {
+            fields.push(quote! {
+                crate::buffer::VarEncode::var_encode(&self.#name, buf)?;
+            });
+        } else {
+            fields.push(quote! {
+                crate::buffer::Encode::encode(&self.#name, buf)?;
+            });
+        }
     }
 
     quote! {
