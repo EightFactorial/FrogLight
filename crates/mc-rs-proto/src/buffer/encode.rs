@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use byteorder::{WriteBytesExt, BE};
 use uuid::Uuid;
 
-use super::{varint::VarEncode, Encode, EncodeError};
+use super::{Encode, EncodeError, VarEncode};
 
 impl Encode for bool {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {

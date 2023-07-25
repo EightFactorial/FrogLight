@@ -3,7 +3,7 @@ use std::{collections::HashMap, hash::Hash};
 use byteorder::{ReadBytesExt, BE};
 use uuid::Uuid;
 
-use super::{varint::VarDecode, Decode, DecodeError};
+use super::{Decode, DecodeError, VarDecode};
 
 impl Decode for bool {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {

@@ -5,10 +5,7 @@ use std::{
 
 use bevy_derive::{Deref, DerefMut};
 
-use crate::buffer::{
-    varint::{VarDecode, VarEncode, VarError},
-    Decode, DecodeError, Encode, EncodeError,
-};
+use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarDecode, VarEncode};
 
 /// `NonZeroOption` is a wrapper that encodes `None` as 0 and `Some` as 1 + the value.
 ///
@@ -81,7 +78,7 @@ impl<T: Encode + Clone + PartialEq + Add<Output = T> + From<u8>> Encode for NonZ
 }
 
 impl<T: VarEncode + Clone + PartialEq + Add<Output = T> + From<u8>> VarEncode for NonZeroOption<T> {
-    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), VarError> {
+    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         match &self.0 {
             Some(val) => val.clone().add(T::from(1)).var_encode(buf),
             None => 0u32.var_encode(buf),
@@ -102,7 +99,7 @@ impl<T: Decode + PartialEq + Sub<Output = T> + From<u8>> Decode for NonZeroOptio
 }
 
 impl<T: VarDecode + PartialEq + Sub<Output = T> + From<u8>> VarDecode for NonZeroOption<T> {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let val = T::var_decode(buf)?;
 
         if val == T::from(0) {

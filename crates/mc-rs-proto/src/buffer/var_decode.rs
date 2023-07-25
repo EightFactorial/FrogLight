@@ -2,22 +2,22 @@ use std::{collections::HashMap, hash::Hash};
 
 use crate::buffer::Decode;
 
-use super::{VarDecode, VarError};
+use super::{DecodeError, VarDecode};
 
 impl VarDecode for i16 {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         Ok(i32::var_decode(buf)?.try_into()?)
     }
 }
 
 impl VarDecode for u16 {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         Ok(u32::var_decode(buf)?.try_into()?)
     }
 }
 
 impl VarDecode for i32 {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let mut num = [0];
         let mut ans = 0;
         for i in 0..5 {
@@ -32,13 +32,13 @@ impl VarDecode for i32 {
 }
 
 impl VarDecode for u32 {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         i32::var_decode(buf).map(|x| x as u32)
     }
 }
 
 impl VarDecode for i64 {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let mut num = [0];
         let mut ans = 0;
         for i in 0..10 {
@@ -53,25 +53,25 @@ impl VarDecode for i64 {
 }
 
 impl VarDecode for u64 {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         i64::var_decode(buf).map(|x| x as u64)
     }
 }
 
 impl VarDecode for isize {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
-        isize::try_from(i64::var_decode(buf)?).map_err(VarError::from)
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        isize::try_from(i64::var_decode(buf)?).map_err(DecodeError::from)
     }
 }
 
 impl VarDecode for usize {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
-        usize::try_from(u64::var_decode(buf)?).map_err(VarError::from)
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        usize::try_from(u64::var_decode(buf)?).map_err(DecodeError::from)
     }
 }
 
 impl<T: VarDecode> VarDecode for Option<T> {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         match u32::var_decode(buf)? {
             0 => Ok(None),
             _ => Ok(Some(T::var_decode(buf)?)),
@@ -80,30 +80,22 @@ impl<T: VarDecode> VarDecode for Option<T> {
 }
 
 impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for HashMap<K, V> {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let len = u32::var_decode(buf)?;
         let mut map = HashMap::with_capacity(len as usize);
         for _ in 0..len {
-            map.insert(
-                K::decode(buf)
-                    .map_err(|_| VarError::Other("Error decoding hashmap key".to_string()))?,
-                V::var_decode(buf)?,
-            );
+            map.insert(K::decode(buf)?, V::var_decode(buf)?);
         }
         Ok(map)
     }
 }
 
 impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for hashbrown::HashMap<K, V> {
-    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, VarError> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let len = u32::var_decode(buf)?;
         let mut map = hashbrown::HashMap::with_capacity(len as usize);
         for _ in 0..len {
-            map.insert(
-                K::decode(buf)
-                    .map_err(|_| VarError::Other("Error decoding hashmap key".to_string()))?,
-                V::var_decode(buf)?,
-            );
+            map.insert(K::decode(buf)?, V::var_decode(buf)?);
         }
         Ok(map)
     }
