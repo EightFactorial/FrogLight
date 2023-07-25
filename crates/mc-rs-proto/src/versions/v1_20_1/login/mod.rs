@@ -1,8 +1,10 @@
-pub mod loginhelloc2spacket;
-pub mod loginkeyc2spacket;
-pub mod loginqueryresponsec2spacket;
-pub mod logindisconnects2cpacket;
-pub mod loginhellos2cpacket;
-pub mod loginsuccesss2cpacket;
-pub mod logincompressions2cpacket;
-pub mod loginqueryrequests2cpacket;
+pub mod serverboundloginhelloc2spacket;
+pub mod serverboundloginkeyc2spacket;
+pub mod serverboundloginqueryresponsec2spacket;
+pub mod clientboundlogindisconnects2cpacket;
+pub mod clientboundloginhellos2cpacket;
+pub mod clientboundloginsuccesss2cpacket;
+pub mod clientboundlogincompressions2cpacket;
+pub mod clientboundloginqueryrequests2cpacket;
+
+// TODO: Write state macro

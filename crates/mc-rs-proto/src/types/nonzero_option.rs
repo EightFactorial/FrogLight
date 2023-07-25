@@ -14,11 +14,13 @@ use crate::buffer::{
 ///
 /// For example:
 ///
-/// `None -> 0`
+/// `None -> 0u8`
 ///
-/// `Some(0) -> 1`
+/// `Some(0u8) -> 1u8`
 ///
-/// `Some(1) -> 2`
+/// `Some(1u8) -> 2u8`
+///
+/// `Some(2u32) -> [0u8, 0u8, 0u8, 3u8]`
 ///
 /// etc.
 #[derive(Deref, DerefMut)]

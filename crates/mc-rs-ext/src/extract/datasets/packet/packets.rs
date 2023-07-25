@@ -95,6 +95,13 @@ impl Dataset for Packets {
             prev_insn = Some(insn.clone());
         }
 
+        // Replace `HANDSHAKING` with `HANDSHAKE`
+        {
+            if let Some(state) = states.iter_mut().find(|s| s.name == "HANDSHAKING") {
+                state.name = "HANDSHAKE".to_string();
+            }
+        }
+
         // Add packets
         {
             let mut classes = Vec::new();

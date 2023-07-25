@@ -2,7 +2,7 @@
 ///
 /// This is the state the connection is in when the client is first connecting to the server.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Handshaking;
+pub struct Handshake;
 
 /// The `Status` state.
 ///

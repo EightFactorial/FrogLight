@@ -3,6 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use convert_case::{Case, Casing};
 use git2::Repository;
 use itertools::Itertools;
 use json::JsonValue;
@@ -126,7 +127,12 @@ impl Packets {
         let mut packets = Vec::new();
 
         for (class_name, _) in state[direction].entries() {
-            packets.push(Self::generate_packet(fields, class_name, path.into())?);
+            packets.push(Self::generate_packet(
+                fields,
+                class_name,
+                direction,
+                path.into(),
+            )?);
         }
 
         Ok(packets)
@@ -139,11 +145,12 @@ impl Packets {
     fn generate_packet(
         fields: &JsonValue,
         class_name: &str,
+        direction: &str,
         mut path: PathBuf,
     ) -> Result<String, std::io::Error> {
         // Get the packet name
         let packet_name = match get_packet_name(class_name) {
-            Some(name) => name,
+            Some(name) => format!("{}{}", direction.to_case(Case::Pascal), name),
             None => {
                 error!("Failed to get packet name for {}", class_name);
                 class_name.to_owned()
@@ -191,7 +198,7 @@ fn get_imports(fields: &[&str]) -> Vec<String> {
             "ResourceLocation" => Some("crate::types::ResourceLocation".to_string()),
             //            "ResourceEntry" => Some("crate::types::ResourceEntry".to_string()),
             //            "GameProfile" => Some("crate::types::GameProfile".to_string()),
-            "UnizedByteBuffer" => Some("crate::types::UnizedByteBuffer".to_string()),
+            "UnsizedByteBuffer" => Some("crate::types::UnsizedByteBuffer".to_string()),
             _ => None,
         };
 

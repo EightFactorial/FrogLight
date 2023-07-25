@@ -9,6 +9,7 @@ readme = "README.md"
 
 [dependencies]
 clap = { version = "4.3.17", features = ["derive"] }
+convert_case = "0.6.0"
 derive_more = "0.99.17"
 enum_dispatch = "0.3.12"
 env_logger = "0.10.0"
