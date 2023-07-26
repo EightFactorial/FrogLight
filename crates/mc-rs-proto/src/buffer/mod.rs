@@ -2,6 +2,7 @@ use thiserror::Error;
 
 mod decode;
 mod encode;
+mod tests;
 mod var_decode;
 mod var_encode;
 
@@ -46,6 +47,8 @@ pub enum DecodeError {
     TryInto(#[from] std::num::TryFromIntError),
     #[error("Serde error: {0}")]
     Serde(#[from] serde_json::Error),
+    #[error("Unknown packet id: {0}")]
+    UnknownPacketId(u32),
     #[error("Boolean error, expected 0 or 1, got {0}")]
     Boolean(u8),
     #[error("String too long: {0}")]
