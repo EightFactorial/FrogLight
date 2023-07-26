@@ -102,10 +102,11 @@ pub fn mapped_minecraft_jar(ver: &Version, man: &Manifest) -> Result<PathBuf, Ma
     let mapped_jar_path = folder_path.join(format!("{}-mapped.jar", ver));
     if !mapped_jar_path.exists() {
         // Check if the mappings file exists
+        let mut downloaded_mappings = false;
         let mappings_file_path = folder_path.join("mappings.tiny");
         if !mappings_file_path.exists() {
-            let mappings_path = get_mappings(ver)?;
-            let mut mappings_jar = File::open(mappings_path)?;
+            downloaded_mappings = true;
+            let mut mappings_jar = File::open(get_mappings(ver)?)?;
             let mut mappings_jar = ZipArchive::new(&mut mappings_jar)?;
             let mut mappings_file = mappings_jar.by_name("mappings/mappings.tiny")?;
 
@@ -122,7 +123,7 @@ pub fn mapped_minecraft_jar(ver: &Version, man: &Manifest) -> Result<PathBuf, Ma
             .arg(mappings_file_path)
             .arg("official")
             .arg("intermediary")
-            .current_dir(folder_path)
+            .current_dir(&folder_path)
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .spawn();
@@ -138,6 +139,12 @@ pub fn mapped_minecraft_jar(ver: &Version, man: &Manifest) -> Result<PathBuf, Ma
                 error!("Failed to run java: {}", err);
                 return Err(err.into());
             }
+        }
+
+        // Remove the mapping files if we downloaded them
+        if downloaded_mappings {
+            std::fs::remove_file(get_mappings(ver)?)?;
+            std::fs::remove_file(folder_path.join("mappings.tiny"))?;
         }
     }
 
