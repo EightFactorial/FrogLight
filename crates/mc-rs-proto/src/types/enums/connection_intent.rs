@@ -22,6 +22,17 @@ impl TryFrom<i32> for ConnectionIntent {
     }
 }
 
+impl From<ConnectionIntent> for i32 {
+    fn from(value: ConnectionIntent) -> Self {
+        match value {
+            ConnectionIntent::Handshake => -1,
+            ConnectionIntent::Game => 0,
+            ConnectionIntent::Status => 1,
+            ConnectionIntent::Login => 2,
+        }
+    }
+}
+
 impl TryFrom<i16> for ConnectionIntent {
     type Error = ();
 
@@ -36,6 +47,17 @@ impl TryFrom<i16> for ConnectionIntent {
     }
 }
 
+impl From<ConnectionIntent> for i16 {
+    fn from(value: ConnectionIntent) -> Self {
+        match value {
+            ConnectionIntent::Handshake => -1,
+            ConnectionIntent::Game => 0,
+            ConnectionIntent::Status => 1,
+            ConnectionIntent::Login => 2,
+        }
+    }
+}
+
 impl TryFrom<i8> for ConnectionIntent {
     type Error = ();
 
@@ -46,6 +68,17 @@ impl TryFrom<i8> for ConnectionIntent {
             1 => Ok(Self::Status),
             2 => Ok(Self::Login),
             _ => Err(()),
+        }
+    }
+}
+
+impl From<ConnectionIntent> for i8 {
+    fn from(value: ConnectionIntent) -> Self {
+        match value {
+            ConnectionIntent::Handshake => -1,
+            ConnectionIntent::Game => 0,
+            ConnectionIntent::Status => 1,
+            ConnectionIntent::Login => 2,
         }
     }
 }

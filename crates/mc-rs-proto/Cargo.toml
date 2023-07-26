@@ -13,6 +13,7 @@ async-net = "1.7.0"
 bevy_ecs = "0.11.0"
 bevy_derive = "0.11.0"
 byteorder = { version = "1.4.3", features = ["i128"] }
+derive_more = "0.99.17"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }
 hashbrown = { version = "0.14.0", features = ["serde"], optional = true }
 mc-rs-macros = { path = "../mc-rs-macros" }

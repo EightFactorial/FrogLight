@@ -14,6 +14,9 @@ use crate::{
     State, Version,
 };
 
+#[cfg(test)]
+mod test;
+
 #[derive(Debug)]
 pub struct Connection<V: Version, S: State<V>> {
     _version: PhantomData<V>,
@@ -109,10 +112,10 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         // TODO: Decryption
 
         // Read the length of the packet
-        let len = u32::var_decode(&mut buffer)?;
+        let len = u32::var_decode(&mut buffer)? as usize;
 
         // Take the packet bytes
-        let mut buf: Vec<u8> = Vec::with_capacity(len as usize);
+        let mut buf: Vec<u8> = Vec::with_capacity(len);
         buf.extend_from_slice(&buffer[..len as usize]);
         let mut cursor = Cursor::new(buf);
 
@@ -127,7 +130,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             let packet = <S as State<V>>::Clientbound::decode(&mut Cursor::new(decompressed))?;
 
             // Consume the length from the buffer
-            self.buffer.consume(len as usize);
+            self.buffer.consume(len);
 
             // Return the packet
             Ok(packet)
