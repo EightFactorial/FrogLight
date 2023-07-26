@@ -1,4 +1,4 @@
-#![feature(async_fn_in_trait)]
+#![feature(cursor_remaining)]
 
 pub mod buffer;
 pub mod types;

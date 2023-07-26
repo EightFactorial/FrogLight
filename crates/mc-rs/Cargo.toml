@@ -11,7 +11,7 @@ readme = "README.md"
 bevy = "0.11.0"
 mc-rs-proto = { path = "../mc-rs-proto" }
 mc-rs-macros = { path = "../mc-rs-macros" }
-futures-lite = "1.13.0"
+futures-lite = { version = "1.13.0", features = ["futures-io"] }
 
 [features]
 default = ["wayland", "dynamic-linking"]

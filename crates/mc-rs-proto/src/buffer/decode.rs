@@ -75,6 +75,18 @@ impl Decode for u128 {
     }
 }
 
+impl Decode for usize {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        u64::decode(buf)?.try_into().map_err(DecodeError::from)
+    }
+}
+
+impl Decode for isize {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        i64::decode(buf)?.try_into().map_err(DecodeError::from)
+    }
+}
+
 impl Decode for f32 {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         buf.read_f32::<BE>().map_err(DecodeError::from)

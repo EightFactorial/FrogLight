@@ -71,6 +71,18 @@ impl Encode for u128 {
     }
 }
 
+impl Encode for isize {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        i64::try_from(*self)?.encode(buf)
+    }
+}
+
+impl Encode for usize {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        u64::try_from(*self)?.encode(buf)
+    }
+}
+
 impl Encode for f32 {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         buf.write_f32::<BE>(*self).map_err(EncodeError::from)

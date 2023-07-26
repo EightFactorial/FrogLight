@@ -103,7 +103,7 @@ impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for hashbrown::HashMap<K, V>
 }
 
 #[test]
-fn decode_i32() {
+fn var_decode_i32() {
     assert_eq!(
         i32::var_decode(&mut &[128, 128, 128, 128, 8][..]),
         Ok(-2147483648)
@@ -125,7 +125,7 @@ fn decode_i32() {
 }
 
 #[test]
-fn decode_u32() {
+fn var_decode_u32() {
     assert_eq!(u32::var_decode(&mut &[0][..]), Ok(0));
     assert_eq!(u32::var_decode(&mut &[1][..]), Ok(1));
     assert_eq!(u32::var_decode(&mut &[2][..]), Ok(2));
@@ -146,7 +146,7 @@ fn decode_u32() {
 }
 
 #[test]
-fn decode_i64() {
+fn var_decode_i64() {
     assert_eq!(
         i64::var_decode(&mut &[128, 128, 128, 128, 128, 128, 128, 128, 128, 1][..]),
         Ok(-9223372036854775808)
@@ -171,7 +171,7 @@ fn decode_i64() {
 }
 
 #[test]
-fn decode_u64() {
+fn var_decode_u64() {
     assert_eq!(u64::var_decode(&mut &[0][..]), Ok(0));
     assert_eq!(u64::var_decode(&mut &[1][..]), Ok(1));
     assert_eq!(u64::var_decode(&mut &[2][..]), Ok(2));
