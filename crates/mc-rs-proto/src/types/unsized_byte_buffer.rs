@@ -1,4 +1,4 @@
-use bevy_derive::{Deref, DerefMut};
+use derive_more::{Deref, DerefMut};
 
 use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarEncode};
 

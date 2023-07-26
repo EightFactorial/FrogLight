@@ -11,7 +11,6 @@ readme = "README.md"
 async-compression = { version = "0.4.1", features = ["futures-io", "zlib"] }
 async-net = "1.7.0"
 bevy_ecs = "0.11.0"
-bevy_derive = "0.11.0"
 byteorder = { version = "1.4.3", features = ["i128"] }
 derive_more = "0.99.17"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }

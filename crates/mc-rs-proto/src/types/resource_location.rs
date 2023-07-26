@@ -1,6 +1,6 @@
 use std::{convert::Infallible, str::FromStr};
 
-use bevy_derive::{Deref, DerefMut};
+use derive_more::{Deref, DerefMut};
 use serde::{Deserialize, Serialize};
 
 use crate::buffer::{Decode, Encode};
