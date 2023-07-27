@@ -12,8 +12,7 @@ use crate::{
             },
             status::{
                 clientboundqueryresponsepacket::{
-                    ClientboundQueryResponsePacket, Players as QueryPlayers,
-                    Version as QueryVersion,
+                    ClientboundQueryResponsePacket, QueryPlayers, QueryVersion,
                 },
                 serverboundqueryrequestpacket::ServerboundQueryRequestPacket,
                 ClientboundStatusPackets, ServerboundStatusPackets,

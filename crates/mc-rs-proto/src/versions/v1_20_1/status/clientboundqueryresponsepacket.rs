@@ -8,8 +8,8 @@ pub struct ClientboundQueryResponsePacket {
     pub description: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub favicon: Option<String>,
-    pub players: Players,
-    pub version: Version,
+    pub players: QueryPlayers,
+    pub version: QueryVersion,
     #[serde(
         default,
         rename = "enforcesSecureChat",
@@ -19,20 +19,49 @@ pub struct ClientboundQueryResponsePacket {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Version {
+pub struct QueryVersion {
     pub name: String,
     pub protocol: i32,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Players {
+pub struct QueryPlayers {
     pub max: i32,
     pub online: i32,
     #[serde(default)]
-    pub sample: Vec<SamplePlayer>,
+    pub sample: Vec<QuerySamplePlayer>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct SamplePlayer {
+pub struct QuerySamplePlayer {
     pub uuid: Uuid,
     pub name: String,
+}
+
+#[test]
+fn test_packet() {
+    use crate::{buffer::Encode, traits::Version, versions::v1_20_1::V1_20_1};
+
+    let mut buf = Vec::new();
+    let packet = ClientboundQueryResponsePacket {
+        description: "Hello world!".to_string(),
+        favicon: None,
+        players: QueryPlayers {
+            max: 100,
+            online: 50,
+            sample: vec![],
+        },
+        version: QueryVersion {
+            name: "1.20.1".to_string(),
+            protocol: V1_20_1::ID,
+        },
+        enforces_secure_chat: None,
+    };
+
+    assert!(packet.encode(&mut buf).is_ok());
+    assert_eq!(
+        String::from_utf8(buf[1..].to_vec()),
+        Ok(
+            r#"{"description":"Hello world!","players":{"max":100,"online":50,"sample":[]},"version":{"name":"1.20.1","protocol":763}}"#
+        .to_string())
+    );
 }
