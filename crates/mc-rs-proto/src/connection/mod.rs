@@ -116,7 +116,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
 
         // Take the packet bytes
         let mut buf: Vec<u8> = Vec::with_capacity(len);
-        buf.extend_from_slice(&buffer[..len as usize]);
+        buf.extend_from_slice(&buffer[..len]);
         let mut cursor = Cursor::new(buf);
 
         // Decompress the packet if needed

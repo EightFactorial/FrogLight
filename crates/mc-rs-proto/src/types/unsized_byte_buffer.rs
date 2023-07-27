@@ -6,11 +6,12 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarEncode};
 ///
 /// The buffer takes up the entire remaining space of the packet.
 ///
+/// Unlike a `Vec<T>`, it is not prefixed with a length.
 /// For this reason, it is not possible to use this type in a packet
 /// that contains other fields after it.
 ///
 /// For example:
-/// ```text
+/// ```rust,ignore
 /// use mc_rs_macros::Transcode;
 /// use mc_rs_proto::types::UnsizedByteBuffer;
 ///
@@ -49,6 +50,20 @@ impl UnsizedByteBuffer {
         buffer.var_encode_value(value)?;
         Ok(buffer)
     }
+
+    pub fn from_bytes(bytes: Vec<u8>) -> Self { Self(bytes) }
+}
+
+impl From<Vec<u8>> for UnsizedByteBuffer {
+    fn from(bytes: Vec<u8>) -> Self { Self(bytes) }
+}
+
+impl From<UnsizedByteBuffer> for Vec<u8> {
+    fn from(buffer: UnsizedByteBuffer) -> Self { buffer.0 }
+}
+
+impl From<&[u8]> for UnsizedByteBuffer {
+    fn from(bytes: &[u8]) -> Self { Self(bytes.to_vec()) }
 }
 
 impl Encode for UnsizedByteBuffer {
