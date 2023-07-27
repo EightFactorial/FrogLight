@@ -182,3 +182,11 @@ impl<K: Decode + Eq + Hash, V: Decode> Decode for hashbrown::HashMap<K, V> {
         Ok(map)
     }
 }
+
+impl Decode for azalea_nbt::Nbt {
+    fn decode(_buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        // Maybe I have to use a different NBT library?
+        // Or fork it to read from `impl std::io::Read` instead of a cursor...
+        todo!();
+    }
+}

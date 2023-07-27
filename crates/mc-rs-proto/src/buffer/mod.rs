@@ -26,6 +26,8 @@ pub enum EncodeError {
     TryInto(#[from] std::num::TryFromIntError),
     #[error("Serde error: {0}")]
     Serde(#[from] serde_json::Error),
+    #[error("Invalid NBT data")]
+    InvalidNbt,
     #[error("No packets in this state")]
     NoPackets,
 }
@@ -51,12 +53,16 @@ pub enum DecodeError {
     Serde(#[from] serde_json::Error),
     #[error("Unknown packet id: {0}")]
     UnknownPacketId(u32),
+    #[error("Invalid enum id: {0}")]
+    InvalidEnumId(u32),
     #[error("Boolean error, expected 0 or 1, got {0}")]
     Boolean(u8),
     #[error("String too long: {0}")]
     StringTooLong(u32),
     #[error("Utf8 error: {0}")]
     Utf8(#[from] std::string::FromUtf8Error),
+    #[error("Invalid NBT data")]
+    InvalidNbt,
 }
 
 impl PartialEq for EncodeError {

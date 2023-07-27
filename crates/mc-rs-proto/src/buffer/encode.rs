@@ -169,3 +169,10 @@ impl<K: Encode, V: Encode> Encode for hashbrown::HashMap<K, V> {
         Ok(())
     }
 }
+
+impl Encode for azalea_nbt::Nbt {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        self.write(buf);
+        Ok(())
+    }
+}

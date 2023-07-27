@@ -1,5 +1,6 @@
 pub mod enums;
 pub mod packets;
+pub mod position;
 
 mod game_profile;
 pub use game_profile::GameProfile;
