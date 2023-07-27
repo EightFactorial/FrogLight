@@ -7,5 +7,8 @@ pub use connection_intent::ConnectionIntent;
 mod game_mode;
 pub use game_mode::GameMode;
 
+mod difficulty;
+pub use difficulty::Difficulty;
+
 // mod hand;
 // pub use hand::Hand;

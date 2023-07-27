@@ -7,17 +7,16 @@ use derive_more::{Deref, DerefMut};
 
 use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarDecode, VarEncode};
 
-/// `NonZeroOption` is a wrapper that encodes `None` as 0 and `Some` as 1 + the value.
+/// `NonZeroOption` is a wrapper that encodes `None` as 0 and `Some` as `1 + value`.
 ///
 /// For example:
-///
-/// `None -> 0u8`
-///
-/// `Some(0u8) -> 1u8`
-///
-/// `Some(1u8) -> 2u8`
-///
-/// `Some(2u32) -> [0u8, 0u8, 0u8, 3u8]`
+/// ```text
+/// None -> [0u8]
+/// Some(0u8) -> [1u8]
+/// Some(1u8) -> [2u8]
+/// Some(2u32) -> [0u8, 0u8, 0u8, 3u8]
+/// #[var] Some(3u32) -> [4u8]
+/// ```
 ///
 /// etc.
 #[derive(Deref, DerefMut)]

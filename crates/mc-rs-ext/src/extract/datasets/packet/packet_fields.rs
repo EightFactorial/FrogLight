@@ -265,7 +265,7 @@ impl PacketFields {
                     *field = "NbtCompound".to_string();
                 }
                 "net/minecraft/class_1799" => {
-                    *field = "ItemStack".to_string();
+                    *field = "ItemSlot".to_string();
                 }
                 "net/minecraft/class_2960" => {
                     *field = "ResourceLocation".to_string();

@@ -240,6 +240,7 @@ fn get_imports(fields: &[&str]) -> Vec<String> {
 
             "GameProfile" => Some("crate::types::GameProfile".to_string()),
             "BlockPos" => Some("crate::types::position::BlockPos".to_string()),
+            "ItemSlot" => Some("crate::types::inventory::ItemSlot".to_string()),
             "ResourceLocation" => Some("crate::types::ResourceLocation".to_string()),
             "UnsizedByteBuffer" => Some("crate::types::UnsizedByteBuffer".to_string()),
             //            "ResourceEntry" => Some("crate::types::ResourceEntry".to_string()),

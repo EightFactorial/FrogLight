@@ -1,13 +1,13 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::position::{BlockPos, Vec3};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundExplosionPacket {
-    pub a: f64,
-    pub b: f64,
-    pub c: f64,
-    pub d: f32,
-    pub e: Vec,
-    pub f: f32,
-    pub g: f32,
-    pub h: f32,
+    pub position: Vec3,
+    pub power: f32,
+    pub block_list: Vec<BlockPos>,
+    pub knockback_x: f32,
+    pub knockback_y: f32,
+    pub knockback_z: f32,
 }

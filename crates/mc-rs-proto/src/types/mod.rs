@@ -1,4 +1,5 @@
 pub mod enums;
+pub mod inventory;
 pub mod packets;
 pub mod position;
 
