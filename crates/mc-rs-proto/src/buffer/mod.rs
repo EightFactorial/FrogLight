@@ -26,6 +26,8 @@ pub enum EncodeError {
     TryInto(#[from] std::num::TryFromIntError),
     #[error("Serde error: {0}")]
     Serde(#[from] serde_json::Error),
+    #[error("No packets in this state")]
+    NoPackets,
 }
 
 /// A trait for types that can be decoded from a buffer.

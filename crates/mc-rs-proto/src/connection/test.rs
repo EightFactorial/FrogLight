@@ -59,7 +59,7 @@ async fn send_packets() -> Result<(), ()> {
     // Read the status response packet
     {
         let packet = conn.receive_packet().await.unwrap();
-        let ClientboundStatusPackets::StatusResponse(packet) = packet else {
+        let ClientboundStatusPackets::QueryResponse(packet) = packet else {
             panic!("Expected status response packet");
         };
 
@@ -152,7 +152,7 @@ fn read_status_request(buf: &mut impl std::io::Read) {
     assert_eq!(packet_length, 1);
 
     let packet = ServerboundStatusPackets::decode(buf).unwrap();
-    let ServerboundStatusPackets::StatusRequest(packet) = packet else {
+    let ServerboundStatusPackets::QueryRequest(packet) = packet else {
         panic!("Expected status request packet");
     };
 }

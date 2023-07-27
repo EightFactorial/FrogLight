@@ -13,7 +13,7 @@ use mc_rs_ext::{
     types::Version,
 };
 
-use crate::util::{create_file_with, create_module};
+use crate::util::{create_file_with, create_module, create_module_with};
 
 use super::Generator;
 
@@ -40,10 +40,8 @@ impl Generator for Packets {
         }
 
         // Create the version directory
-        path.push(format!(
-            "src/versions/v{}",
-            version.to_string().replace('.', "_")
-        ));
+        let version_name = version.to_string().replace('.', "_");
+        path.push(format!("src/versions/v{}", version_name));
         if !path.exists() {
             if let Err(err) = std::fs::create_dir_all(&path) {
                 error!("Failed to create directory {}: {}", path.display(), err);
@@ -67,9 +65,13 @@ impl Generator for Packets {
 
         // Generate submodules
         for (&state, &name) in states.iter().zip(names.iter()) {
-            if let Err(e) =
-                Self::generate_state(&data["packets"]["fields"], state, name, path.clone())
-            {
+            if let Err(e) = Self::generate_state(
+                &data["packets"]["fields"],
+                state,
+                name,
+                &version_name,
+                path.clone(),
+            ) {
                 error!("Failed to generate state {}: {}", name, e);
             }
         }
@@ -87,6 +89,7 @@ impl Packets {
         fields: &JsonValue,
         state: &JsonValue,
         name: &str,
+        version: &str,
         mut path: PathBuf,
     ) -> Result<(), std::io::Error> {
         path.push(name.to_ascii_lowercase());
@@ -96,14 +99,20 @@ impl Packets {
         }
 
         // Generate the packets for each direction
-        let mut packet_groups: Vec<(&str, Vec<String>)> = Vec::new();
+        let mut packet_groups: Vec<(&str, Vec<(String, i32)>)> = Vec::new();
         for direction in ["clientbound", "serverbound"] {
             let packets = Self::generate_direction(fields, state, direction, &path)?;
             packet_groups.push((direction, packets));
         }
 
+        let imports = vec![
+            "mc_rs_macros::impl_state".to_owned(),
+            format!("crate::versions::state::{}", name.to_case(Case::Pascal)),
+            format!("super::V{}", version),
+        ];
+
         // Generate the module file
-        let Some(mut file) = create_module(&path)? else {
+        let Some(mut file) = create_module_with(&imports, &path)? else {
             warn!(
                 "File {} already exists, skipping",
                 &path.join("mod.rs").display()
@@ -112,10 +121,21 @@ impl Packets {
         };
 
         // Write the state macro
-        writeln!(file, "// TODO: Write state macro")?;
-        for (_direction, _packets) in packet_groups {
-            // writeln!(file, "// TODO: Write part of state macro")?;
+        writeln!(file, "impl_state!(")?;
+        writeln!(file, "    {},", name.to_case(Case::Pascal))?;
+        writeln!(file, "    V{},", version)?;
+        for (direction, packets) in packet_groups {
+            writeln!(file, "    {} => {{", direction.to_case(Case::Pascal))?;
+            for (packet, id) in packets {
+                writeln!(
+                    file,
+                    "        0x{id:x} => {}::{packet},",
+                    packet.to_ascii_lowercase()
+                )?;
+            }
+            writeln!(file, "    }},")?;
         }
+        writeln!(file, ");")?;
 
         Ok(())
     }
@@ -126,22 +146,19 @@ impl Packets {
         state: &JsonValue,
         direction: &str,
         path: &Path,
-    ) -> Result<Vec<String>, std::io::Error> {
+    ) -> Result<Vec<(String, i32)>, std::io::Error> {
         let mut packets = Vec::new();
 
-        for (class_name, _) in state[direction].entries() {
-            packets.push(Self::generate_packet(
-                fields,
-                class_name,
-                direction,
-                path.into(),
-            )?);
+        for (class_name, packet_id) in state[direction].entries() {
+            let packet_name = Self::generate_packet(fields, class_name, direction, path.into())?;
+
+            packets.push((packet_name, packet_id.as_i32().unwrap()));
         }
 
         Ok(packets)
     }
 
-    /// The header for all generated structs
+    /// The header for all generated packet structs
     const PACKET_HEADER: &'static str = "#[derive(Debug, Clone, Transcode)]";
 
     /// Generate the packet struct
@@ -199,9 +216,9 @@ fn get_imports(fields: &[&str]) -> Vec<String> {
             "Uuid" => Some("uuid::Uuid".to_string()),
             "HashMap" => Some("hashbrown::HashMap".to_string()),
             "ResourceLocation" => Some("crate::types::ResourceLocation".to_string()),
-            //            "ResourceEntry" => Some("crate::types::ResourceEntry".to_string()),
-            //            "GameProfile" => Some("crate::types::GameProfile".to_string()),
+            "GameProfile" => Some("crate::types::GameProfile".to_string()),
             "UnsizedByteBuffer" => Some("crate::types::UnsizedByteBuffer".to_string()),
+            //            "ResourceEntry" => Some("crate::types::ResourceEntry".to_string()),
             _ => None,
         };
 

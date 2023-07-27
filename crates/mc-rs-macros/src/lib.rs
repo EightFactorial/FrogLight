@@ -20,3 +20,9 @@ pub fn derive_decode(input: TokenStream) -> TokenStream { proto::derive_decode(i
 /// This allows the struct or enum to be encoded into and decoded from a buffer.
 #[proc_macro_derive(Transcode, attributes(bitfield, json, var))]
 pub fn derive_transcode(input: TokenStream) -> TokenStream { proto::derive_transcode(input).into() }
+
+/// Derive `State<V>` for a state
+///
+/// This allows the state to be used in a connection for that version.
+#[proc_macro]
+pub fn impl_state(input: TokenStream) -> TokenStream { proto::impl_state(input) }
