@@ -13,7 +13,7 @@ use mc_rs_ext::{
     types::Version,
 };
 
-use crate::util::{create_file_with, create_module, create_module_with};
+use crate::util::{create_file_with, create_module_with};
 
 use super::Generator;
 
@@ -77,9 +77,31 @@ impl Generator for Packets {
         }
 
         // Generate the module file
-        if let Err(e) = create_module(&path) {
-            error!("Failed to generate module file: {}", e);
-        }
+        let Ok(file) = create_module_with(&["crate::Version".to_string()], &path) else {
+            error!("Failed to generate module file: {}", path.display());
+            return;
+        };
+        let Some(mut file) = file else {
+            warn!(
+                "File {} already exists, skipping",
+                path.join("mod.rs").display()
+            );
+            return;
+        };
+
+        // Write the version struct
+        writeln!(
+            file,
+            "#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]"
+        )
+        .unwrap();
+        writeln!(file, "pub struct V{};", version_name).unwrap();
+        writeln!(file).unwrap();
+
+        // Implement the Version trait
+        writeln!(file, "impl Version for V{} {{", version_name).unwrap();
+        writeln!(file, "    const ID: i32 = 0;").unwrap();
+        writeln!(file, "}}").unwrap();
     }
 }
 
