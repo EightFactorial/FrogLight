@@ -1,23 +1,33 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{
+    enums::GameMode,
+    position::{BlockPos, GlobalPos},
+    ResourceLocation, UnsizedByteBuffer,
+};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundGameJoinPacket {
-    pub a: u32,
-    pub b: bool,
-    pub c: u8,
-    pub d: u8,
-    pub e: Vec,
-    pub f: Object,
-    pub g: RegistryKey,
-    pub h: RegistryKey,
-    pub i: u64,
-    pub j: u32,
-    pub k: u32,
-    pub l: u32,
-    pub m: bool,
-    pub n: bool,
-    pub o: bool,
-    pub p: bool,
-    pub q: Option,
-    pub r: u32,
+    pub player_id: u32,
+    pub hardcore: bool,
+    pub game_mode: GameMode,
+    pub previous_game_mode: i8,
+    pub levels: Vec<ResourceLocation>,
+    pub registry: UnsizedByteBuffer,
+    // pub dimension_type: ResourceLocation,
+    // pub dimension: ResourceLocation,
+    // pub seed: i64,
+    // #[var]
+    // pub max_players: u32,
+    // #[var]
+    // pub chunk_radius: u32,
+    // #[var]
+    // pub simulation_distance: u32,
+    // pub reduced_debug_info: bool,
+    // pub show_death_screen: bool,
+    // pub debug: bool,
+    // pub flat: bool,
+    // pub last_death: Option<GlobalPos>,
+    // #[var]
+    // pub portal_cooldown: u32,
 }

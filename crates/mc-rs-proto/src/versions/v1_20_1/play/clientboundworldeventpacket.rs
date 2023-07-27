@@ -1,9 +1,11 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::position::BlockPos;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundWorldEventPacket {
-    pub a: u32,
-    pub b: BlockPos,
-    pub c: u32,
-    pub d: bool,
+    pub event_type: u32,
+    pub position: BlockPos,
+    pub data: u32,
+    pub global: bool,
 }

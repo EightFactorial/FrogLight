@@ -2,5 +2,5 @@ use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundKeepAlivePacket {
-    pub a: u64,
+    pub id: u64,
 }

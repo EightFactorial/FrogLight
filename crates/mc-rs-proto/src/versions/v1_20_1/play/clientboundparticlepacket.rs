@@ -1,15 +1,17 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{position::Vec3, UnsizedByteBuffer};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundParticlePacket {
-    pub a: Object,
-    pub b: bool,
-    pub c: f64,
-    pub d: f64,
-    pub e: f64,
-    pub f: f32,
-    pub g: f32,
-    pub h: f32,
-    pub i: f32,
-    pub j: u32,
+    #[var]
+    pub particle_id: u32,
+    pub override_limit: bool,
+    pub position: Vec3,
+    pub x_distance: f32,
+    pub y_distance: f32,
+    pub z_distance: f32,
+    pub max_speed: f32,
+    pub particle_count: u32,
+    pub data: UnsizedByteBuffer,
 }

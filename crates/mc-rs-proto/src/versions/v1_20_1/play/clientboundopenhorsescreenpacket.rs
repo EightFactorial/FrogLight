@@ -2,7 +2,8 @@ use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundOpenHorseScreenPacket {
-    pub a: u16,
-    pub b: u32,
-    pub c: u32,
+    pub container_id: u8,
+    #[var]
+    pub size: u32,
+    pub entity_id: u32,
 }

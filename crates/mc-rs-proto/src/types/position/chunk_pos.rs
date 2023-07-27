@@ -3,6 +3,8 @@ use std::num::TryFromIntError;
 use bevy_ecs::prelude::Component;
 use mc_rs_macros::Transcode;
 
+use crate::buffer::{VarDecode, VarEncode};
+
 use super::BlockPos;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component, Transcode)]
@@ -39,6 +41,22 @@ impl From<[i32; 2]> for ChunkPos {
 
 impl From<ChunkPos> for [i32; 2] {
     fn from(ChunkPos { x, z }: ChunkPos) -> Self { [x, z] }
+}
+
+impl VarEncode for ChunkPos {
+    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
+        self.x.var_encode(buf)?;
+        self.z.var_encode(buf)
+    }
+}
+
+impl VarDecode for ChunkPos {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
+        Ok(Self {
+            x: i32::var_decode(buf)?,
+            z: i32::var_decode(buf)?,
+        })
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Transcode)]

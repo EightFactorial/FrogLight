@@ -1,14 +1,12 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::UnsizedByteBuffer;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundMapUpdatePacket {
-    pub a: u32,
-    pub b: u8,
-    pub c: bool,
-    pub d: Object,
-    pub e: u16,
-    pub f: u16,
-    pub g: u16,
-    pub h: u16,
-    pub i: Vec<u8>,
+    #[var]
+    pub map_id: u32,
+    pub map_scale: u8,
+    pub locked: bool,
+    pub data: UnsizedByteBuffer,
 }

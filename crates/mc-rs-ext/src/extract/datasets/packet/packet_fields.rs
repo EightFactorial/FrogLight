@@ -267,14 +267,11 @@ impl PacketFields {
                 "net/minecraft/class_1799" => {
                     *field = "ItemSlot".to_string();
                 }
-                "net/minecraft/class_2960" => {
+                "net/minecraft/class_2960" | "net/minecraft/class_5321" => {
                     *field = "ResourceLocation".to_string();
                 }
                 "net/minecraft/class_2561" => {
                     *field = "FormattedText".to_string();
-                }
-                "net/minecraft/class_5321" => {
-                    *field = "RegistryKey".to_string();
                 }
                 "net/minecraft/class_6880" => {
                     *field = "RegistryEntry".to_string();
