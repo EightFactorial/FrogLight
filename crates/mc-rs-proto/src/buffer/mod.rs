@@ -8,7 +8,7 @@ mod var_encode;
 
 /// A trait for types that can be encoded into a buffer.
 pub trait Encode {
-    /// Encode a value into a buffer.
+    /// Encode this value into the given buffer.
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError>;
 }
 
@@ -18,13 +18,14 @@ pub trait VarEncode {
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError>;
 }
 
+/// An error that can occur while encoding a value into a buffer.
 #[derive(Debug, Error)]
 pub enum EncodeError {
-    #[error("Io error: {0}")]
+    #[error(transparent)]
     Io(#[from] std::io::Error),
-    #[error("TryInto error: {0}")]
+    #[error(transparent)]
     TryInto(#[from] std::num::TryFromIntError),
-    #[error("Serde error: {0}")]
+    #[error(transparent)]
     Serde(#[from] serde_json::Error),
     #[error("Invalid NBT data")]
     InvalidNbt,
@@ -34,35 +35,37 @@ pub enum EncodeError {
 
 /// A trait for types that can be decoded from a buffer.
 pub trait Decode: Sized {
-    /// Decode a value from a buffer.
+    /// Decodes a value from the given buffer.
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError>;
 }
 
 /// A trait for types that can be var-decoded from a buffer.
 pub trait VarDecode: Sized {
+    /// Decodes a value from the given buffer.
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError>;
 }
 
+/// An error that can occur while decoding a value from a buffer.
 #[derive(Debug, Error)]
 pub enum DecodeError {
-    #[error("Io error: {0}")]
+    #[error(transparent)]
     Io(#[from] std::io::Error),
-    #[error("TryInto error: {0}")]
+    #[error(transparent)]
     TryInto(#[from] std::num::TryFromIntError),
-    #[error("Serde error: {0}")]
+    #[error(transparent)]
     Serde(#[from] serde_json::Error),
+    #[error(transparent)]
+    Utf8(#[from] std::string::FromUtf8Error),
     #[error("Unknown packet id: {0}")]
     UnknownPacketId(u32),
+    #[error("Invalid NBT data")]
+    InvalidNbt,
     #[error("Invalid enum id: {0}")]
     InvalidEnumId(u32),
     #[error("Boolean error, expected 0 or 1, got {0}")]
     Boolean(u8),
     #[error("String too long: {0}")]
     StringTooLong(u32),
-    #[error("Utf8 error: {0}")]
-    Utf8(#[from] std::string::FromUtf8Error),
-    #[error("Invalid NBT data")]
-    InvalidNbt,
 }
 
 impl PartialEq for EncodeError {
