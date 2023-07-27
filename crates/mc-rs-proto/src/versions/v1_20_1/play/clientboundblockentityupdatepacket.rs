@@ -1,8 +1,11 @@
+use azalea_nbt::Nbt;
 use mc_rs_macros::Transcode;
+
+use crate::types::{position::BlockPos, ResourceLocation};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundBlockEntityUpdatePacket {
-    pub a: BlockPos,
-    pub b: Object,
-    pub c: NbtCompound,
+    pub position: BlockPos,
+    pub entity_kind: ResourceLocation,
+    pub tag: Nbt,
 }

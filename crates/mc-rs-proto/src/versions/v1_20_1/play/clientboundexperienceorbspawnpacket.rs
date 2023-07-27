@@ -1,10 +1,10 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{position::Vec3, EntityId};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundExperienceOrbSpawnPacket {
-    pub a: u32,
-    pub b: f64,
-    pub c: f64,
-    pub d: f64,
-    pub e: u16,
+    pub entity_id: EntityId,
+    pub position: Vec3,
+    pub value: u16,
 }

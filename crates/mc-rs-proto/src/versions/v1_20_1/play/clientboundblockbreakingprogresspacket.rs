@@ -1,8 +1,10 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{position::BlockPos, EntityId};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundBlockBreakingProgressPacket {
-    pub a: u32,
-    pub b: BlockPos,
-    pub c: u16,
+    pub entity_id: EntityId,
+    pub position: BlockPos,
+    pub progress: u8,
 }
