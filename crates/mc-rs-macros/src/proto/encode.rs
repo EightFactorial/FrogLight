@@ -106,15 +106,58 @@ fn encode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) -> TokenStr
         discriminant += 1;
 
         // Encode each field
-        let mut field_list = Vec::new();
-        read_fields(&variant.fields, &mut field_list);
+        match &variant.fields {
+            Fields::Named(fields) => {
+                let names = fields.named.iter().map(|f| &f.ident);
 
-        variant_list.push(quote! {
-            Self::#ident => {
-                crate::buffer::VarEncode::var_encode(&#disc, buf)?;
-                #(#field_list)*
+                let mut field_list = Vec::new();
+                read_fields(&variant.fields, &mut field_list);
+
+                variant_list.push(quote! {
+                    Self::#ident { #(#names,)* } => {
+                        crate::buffer::VarEncode::var_encode(&#disc, buf)?;
+                        #(#field_list)*
+                    }
+                });
             }
-        });
+            Fields::Unnamed(fields) => {
+                let names =
+                    (0..fields.unnamed.len()).map(|i| Ident::new(&format!("f{}", i), ident.span()));
+
+                let mut field_list = Vec::new();
+                for (field, name) in fields.unnamed.iter().zip(names.clone()) {
+                    if field.attrs.iter().any(|f| {
+                        if let Meta::Path(path) = &f.meta {
+                            path.is_ident("var")
+                        } else {
+                            false
+                        }
+                    }) {
+                        field_list.push(quote! {
+                            crate::buffer::VarEncode::var_encode(#name, buf)?;
+                        });
+                    } else {
+                        field_list.push(quote! {
+                            crate::buffer::Encode::encode(#name, buf)?;
+                        });
+                    }
+                }
+
+                variant_list.push(quote! {
+                    Self::#ident( #(#names,)* ) => {
+                        crate::buffer::VarEncode::var_encode(&#disc, buf)?;
+                        #(#field_list)*
+                    }
+                });
+            }
+            Fields::Unit => {
+                variant_list.push(quote! {
+                    Self::#ident => {
+                        crate::buffer::VarEncode::var_encode(&#disc, buf)?;
+                    }
+                });
+            }
+        }
     }
 
     // Finish the impl
