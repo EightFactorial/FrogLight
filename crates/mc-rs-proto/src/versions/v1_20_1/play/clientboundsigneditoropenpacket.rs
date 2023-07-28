@@ -1,7 +1,9 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::position::BlockPos;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundSignEditorOpenPacket {
-    pub a: BlockPos,
-    pub b: bool,
+    pub position: BlockPos,
+    pub front: bool,
 }

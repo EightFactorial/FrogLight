@@ -1,8 +1,9 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{position::ChunkSectionPos, UnsizedByteBuffer};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundChunkDeltaUpdatePacket {
-    pub a: u64,
-    pub b: u32,
-    pub c: u64,
+    pub position: ChunkSectionPos,
+    pub data: UnsizedByteBuffer,
 }

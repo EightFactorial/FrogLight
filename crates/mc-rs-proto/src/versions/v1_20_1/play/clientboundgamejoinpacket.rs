@@ -2,8 +2,9 @@ use mc_rs_macros::Transcode;
 
 use crate::types::{
     enums::GameMode,
-    position::{BlockPos, GlobalPos},
-    ResourceLocation, UnsizedByteBuffer,
+    // position::{BlockPos, GlobalPos},
+    ResourceLocation,
+    UnsizedByteBuffer,
 };
 
 #[derive(Debug, Clone, Transcode)]

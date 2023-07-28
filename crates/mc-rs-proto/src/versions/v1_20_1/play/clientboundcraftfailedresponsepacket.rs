@@ -1,8 +1,8 @@
-use mc_rs_macros::Transcode;
 use crate::types::ResourceLocation;
+use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundCraftFailedResponsePacket {
-    pub a: u8,
-    pub b: ResourceLocation,
+    pub container_id: u8,
+    pub recipe: ResourceLocation,
 }

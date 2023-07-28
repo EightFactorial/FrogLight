@@ -1,12 +1,13 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{
+    packets::look_at::{LookAnchor, LookAtEntity},
+    position::Vec3,
+};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundLookAtPacket {
-    pub a: Enum,
-    pub b: f64,
-    pub c: f64,
-    pub d: f64,
-    pub e: bool,
-    pub f: u32,
-    pub g: Enum,
+    pub anchor: LookAnchor,
+    pub position: Vec3,
+    pub entity: Option<LookAtEntity>,
 }

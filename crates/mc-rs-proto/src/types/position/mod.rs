@@ -5,7 +5,7 @@ mod block_pos;
 pub use block_pos::BlockPos;
 
 mod chunk_pos;
-pub use chunk_pos::{ChunkBlockPos, ChunkPos};
+pub use chunk_pos::{ChunkBlockPos, ChunkPos, ChunkSectionPos};
 
 mod global_pos;
 pub use global_pos::GlobalPos;

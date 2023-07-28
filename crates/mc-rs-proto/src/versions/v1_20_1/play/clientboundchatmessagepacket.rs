@@ -1,10 +1,12 @@
 use mc_rs_macros::Transcode;
 use uuid::Uuid;
 
+use crate::types::UnsizedByteBuffer;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundChatMessagePacket {
-    pub a: Uuid,
-    pub b: u32,
-    pub c: Object,
-    pub d: Object,
+    pub sender: Uuid,
+    #[var]
+    pub index: u32,
+    pub data: UnsizedByteBuffer,
 }

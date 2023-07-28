@@ -1,8 +1,8 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::UnsizedByteBuffer;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundUnlockRecipesPacket {
-    pub a: Enum,
-    pub b: Vec,
-    pub c: Vec,
+    pub data: UnsizedByteBuffer,
 }

@@ -1,15 +1,18 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{enums::GameMode, position::GlobalPos, ResourceLocation};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundPlayerRespawnPacket {
-    pub a: RegistryKey,
-    pub b: RegistryKey,
-    pub c: u64,
-    pub d: u16,
-    pub e: u8,
-    pub f: bool,
-    pub g: bool,
-    pub h: u8,
-    pub i: Option,
-    pub j: u32,
+    pub dimension_type: ResourceLocation,
+    pub dimension: ResourceLocation,
+    pub seed: i64,
+    pub game_mode: GameMode,
+    pub previous_game_mode: i8,
+    pub debug: bool,
+    pub flat: bool,
+    pub data: u8,
+    pub last_death: Option<GlobalPos>,
+    #[var]
+    pub portal_cooldown: u32,
 }

@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+use mc_rs_macros::Transcode;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Transcode)]
 pub struct BlockPos {
     pub x: i32,
     pub y: i32,
