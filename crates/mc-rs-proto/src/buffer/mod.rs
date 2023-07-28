@@ -61,7 +61,7 @@ pub enum DecodeError {
     #[error("Invalid NBT data")]
     InvalidNbt,
     #[error("Invalid enum id: {0}")]
-    InvalidEnumId(u32),
+    InvalidEnumId(i32),
     #[error("Boolean error, expected 0 or 1, got {0}")]
     Boolean(u8),
     #[error("String too long: {0}")]

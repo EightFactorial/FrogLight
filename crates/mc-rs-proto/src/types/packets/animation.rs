@@ -25,7 +25,7 @@ impl Encode for AnimationAction {
 
 impl Decode for AnimationAction {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
-        match u32::var_decode(buf)? {
+        match i32::var_decode(buf)? {
             0 => Ok(AnimationAction::SwingMainHand),
             1 => Ok(AnimationAction::Hurt),
             2 => Ok(AnimationAction::WakeUp),

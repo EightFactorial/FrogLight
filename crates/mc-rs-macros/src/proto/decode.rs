@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{Attribute, Data, DataEnum, DataStruct, DeriveInput, Meta};
+use syn::{Attribute, Data, DataEnum, DataStruct, DeriveInput, Fields, Meta};
 
 /// Derive `Decode`
 pub fn derive_decode(input: proc_macro::TokenStream) -> TokenStream {
@@ -27,34 +27,34 @@ fn decode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruct) -> Token
         }
     }
 
-    // Decode each field
-    let mut fields = Vec::new();
-    for field in data.fields.iter() {
-        let name = field.ident.as_ref().unwrap();
+    // Get a list of fields
+    let mut field_list = Vec::new();
+    read_fields(&data.fields, &mut field_list);
 
-        if field.attrs.iter().any(|f| {
-            if let Meta::Path(path) = &f.meta {
-                path.is_ident("var")
-            } else {
-                false
+    // Generate the decode method
+    let decode_method = match &data.fields {
+        Fields::Named(_) => {
+            quote! {
+                Ok(Self {
+                    #(#field_list)*
+                })
             }
-        }) {
-            fields.push(quote! {
-                #name: crate::buffer::VarDecode::var_decode(buf)?,
-            });
-        } else {
-            fields.push(quote! {
-                #name: crate::buffer::Decode::decode(buf)?,
-            });
         }
-    }
+        Fields::Unnamed(_) => {
+            quote! {
+                Ok(Self(
+                    #(#field_list)*
+                ))
+            }
+        }
+        Fields::Unit => panic!("Cannot derive `Decode` for a unit struct"),
+    };
 
+    // Finish the impl
     quote! {
         impl crate::buffer::Decode for #ident {
             fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
-                Ok(Self {
-                    #(#fields)*
-                })
+                #decode_method
             }
         }
     }
@@ -77,6 +77,108 @@ fn decode_bitfield(_ident: Ident, _data: DataStruct) -> TokenStream {
 }
 
 /// Decode an enum
-fn decode_enum(_attrs: Vec<Attribute>, _ident: Ident, _data: DataEnum) -> TokenStream {
-    todo!();
+fn decode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) -> TokenStream {
+    // Generate a decode method for each variant
+    let mut variants = Vec::new();
+    for variant in data.variants.iter() {
+        // Get the discriminant
+        let discriminant = &variant
+            .discriminant
+            .as_ref()
+            .expect("Enums must have manually specified discriminants")
+            .1;
+
+        let variant_ident = &variant.ident;
+
+        // Get a list of fields
+        let mut field_list = Vec::new();
+        read_fields(&variant.fields, &mut field_list);
+
+        // Generate the decode method
+        let decode_method = match &variant.fields {
+            Fields::Named(_) => {
+                quote! {
+                    Ok(Self::#variant_ident {
+                        #(#field_list)*
+                    })
+                }
+            }
+            Fields::Unnamed(_) => {
+                quote! {
+                    Ok(Self::#variant_ident(
+                        #(#field_list)*
+                    ))
+                }
+            }
+            Fields::Unit => {
+                quote! {
+                    Ok(Self::#variant_ident)
+                }
+            }
+        };
+
+        variants.push(quote! {
+            #discriminant => #decode_method,
+        });
+    }
+
+    // Finish the impl
+    quote! {
+        impl crate::buffer::Decode for #ident {
+            fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
+                match crate::buffer::VarDecode::var_decode(buf)? {
+                    #(#variants)*
+                    id => Err(crate::buffer::DecodeError::InvalidEnumId(id)),
+                }
+            }
+        }
+    }
+}
+
+fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
+    match fields {
+        Fields::Named(fields) => {
+            for field in fields.named.iter() {
+                let Some(name) = &field.ident else {
+                    continue;
+                };
+
+                if field.attrs.iter().any(|f| {
+                    if let Meta::Path(path) = &f.meta {
+                        path.is_ident("var")
+                    } else {
+                        false
+                    }
+                }) {
+                    field_list.push(quote! {
+                        #name: crate::buffer::VarDecode::var_decode(buf)?,
+                    });
+                } else {
+                    field_list.push(quote! {
+                        #name: crate::buffer::Decode::decode(buf)?,
+                    });
+                }
+            }
+        }
+        Fields::Unnamed(fields) => {
+            for field in fields.unnamed.iter() {
+                if field.attrs.iter().any(|f| {
+                    if let Meta::Path(path) = &f.meta {
+                        path.is_ident("var")
+                    } else {
+                        false
+                    }
+                }) {
+                    field_list.push(quote! {
+                        crate::buffer::VarDecode::var_decode(buf)?,
+                    });
+                } else {
+                    field_list.push(quote! {
+                        crate::buffer::Decode::decode(buf)?,
+                    });
+                }
+            }
+        }
+        Fields::Unit => {}
+    }
 }

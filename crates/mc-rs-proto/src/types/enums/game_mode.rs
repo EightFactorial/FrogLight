@@ -1,11 +1,12 @@
+use mc_rs_macros::Transcode;
 use strum::{Display, EnumString};
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash, Display, EnumString)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash, Display, EnumString, Transcode)]
 pub enum GameMode {
-    Survival,
-    Creative,
-    Adventure,
-    Spectator,
+    Survival = 0,
+    Creative = 1,
+    Adventure = 2,
+    Spectator = 3,
 }
 
 impl TryFrom<u32> for GameMode {

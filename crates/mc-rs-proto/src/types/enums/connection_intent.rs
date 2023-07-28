@@ -1,6 +1,7 @@
+use mc_rs_macros::Transcode;
 use strum::{Display, EnumString};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display, EnumString)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display, EnumString, Transcode)]
 pub enum ConnectionIntent {
     Handshake = -1,
     Game = 0,
