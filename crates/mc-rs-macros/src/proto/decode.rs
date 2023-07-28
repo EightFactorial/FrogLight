@@ -1,6 +1,8 @@
+use std::ops::Deref;
+
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{Attribute, Data, DataEnum, DataStruct, DeriveInput, Fields, Meta};
+use syn::{Attribute, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Lit, Meta};
 
 /// Derive `Decode`
 pub fn derive_decode(input: proc_macro::TokenStream) -> TokenStream {
@@ -80,13 +82,44 @@ fn decode_bitfield(_ident: Ident, _data: DataStruct) -> TokenStream {
 fn decode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) -> TokenStream {
     // Generate a decode method for each variant
     let mut variants = Vec::new();
+    let mut discriminant = 0;
+
     for variant in data.variants.iter() {
         // Get the discriminant
-        let discriminant = &variant
-            .discriminant
-            .as_ref()
-            .expect("Enums must have manually specified discriminants")
-            .1;
+        let disc = if let Some((_, expr)) = &variant.discriminant {
+            match expr {
+                Expr::Unary(unary) => {
+                    if let Expr::Lit(lit) = unary.expr.deref() {
+                        if let Lit::Int(int) = &lit.lit {
+                            discriminant = -int
+                                .base10_digits()
+                                .parse::<i32>()
+                                .expect("Unable to parse discriminant");
+                        } else {
+                            panic!("Invalid discriminant")
+                        }
+                    } else {
+                        panic!("Invalid discriminant")
+                    }
+                }
+                Expr::Lit(lit) => {
+                    if let Lit::Int(int) = &lit.lit {
+                        discriminant = int
+                            .base10_digits()
+                            .parse::<i32>()
+                            .expect("Unable to parse discriminant");
+                    } else {
+                        panic!("Invalid discriminant")
+                    }
+                }
+                _ => panic!("Invalid discriminant"),
+            }
+
+            quote! { #discriminant }
+        } else {
+            quote! { #discriminant }
+        };
+        discriminant += 1;
 
         let variant_ident = &variant.ident;
 
@@ -118,7 +151,7 @@ fn decode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) -> TokenStr
         };
 
         variants.push(quote! {
-            #discriminant => #decode_method,
+            #disc => #decode_method,
         });
     }
 
