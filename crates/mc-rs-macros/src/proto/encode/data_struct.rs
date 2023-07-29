@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
-use syn::{Attribute, DataStruct, Meta};
+use syn::{Attribute, DataStruct, Fields, Meta};
 
 use crate::proto::encode::read_fields;
 
@@ -10,8 +10,8 @@ pub(super) fn encode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruc
         if let Meta::Path(path) = attr.meta {
             if path.is_ident("json") {
                 return encode_json(ident, data);
-            } else if path.is_ident("bitfield") {
-                return encode_bitfield(ident, data);
+            } else if path.is_ident("bitset") {
+                return encode_bitset(ident, data);
             }
         }
     }
@@ -42,7 +42,32 @@ fn encode_json(ident: Ident, _data: DataStruct) -> TokenStream {
     }
 }
 
-/// Encode as a bitfield
-fn encode_bitfield(_ident: Ident, _data: DataStruct) -> TokenStream {
-    todo!();
+/// Encode as a bitset
+fn encode_bitset(ident: Ident, data: DataStruct) -> TokenStream {
+    let Fields::Named(fields) = data.fields else {
+        panic!("Bitset must be a named struct");
+    };
+    if fields.named.iter().any(|f| f.ty != syn::parse_quote!(bool)) {
+        panic!("Struct fields must all be `bool`");
+    };
+
+    let field_count = fields.named.len();
+    let mut field_list = Vec::new();
+
+    for (i, field) in fields.named.iter().enumerate() {
+        let field_name = field.ident.as_ref().unwrap();
+        field_list.push(quote! {
+            bitset.set_bit(#i, self.#field_name);
+        });
+    }
+
+    quote! {
+        impl crate::buffer::Encode for #ident {
+            fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
+                let mut bitset = crate::types::BitSet::<#field_count>::new();
+                #(#field_list)*
+                crate::buffer::Encode::encode(&bitset, buf)
+            }
+        }
+    }
 }

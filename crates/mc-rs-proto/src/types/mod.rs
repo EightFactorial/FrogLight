@@ -8,3 +8,6 @@ pub use wrappers::*;
 
 mod game_profile;
 pub use game_profile::GameProfile;
+
+mod bitset;
+pub use bitset::BitSet;

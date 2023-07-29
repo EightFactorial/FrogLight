@@ -1,3 +1,6 @@
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
+#![feature(int_roundings)]
 #![feature(cursor_remaining)]
 
 pub mod buffer;

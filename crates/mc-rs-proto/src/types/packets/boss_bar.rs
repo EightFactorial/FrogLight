@@ -1,6 +1,6 @@
-use mc_rs_macros::{Encode, Transcode};
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, PartialEq, Encode)]
+#[derive(Debug, Clone, PartialEq, Transcode)]
 pub enum BossBarAction {
     Add(BossAddAction),
     Remove,
@@ -45,6 +45,7 @@ pub enum BossBarDivision {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Transcode)]
+#[bitset]
 pub struct BossBarFlags {
     pub darken_screen: bool,
     pub play_boss_music: bool,
