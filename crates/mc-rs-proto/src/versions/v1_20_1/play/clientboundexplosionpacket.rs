@@ -1,6 +1,7 @@
+use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
 
-use crate::types::position::{BlockPos, Vec3};
+use crate::types::position::BlockPos;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundExplosionPacket {

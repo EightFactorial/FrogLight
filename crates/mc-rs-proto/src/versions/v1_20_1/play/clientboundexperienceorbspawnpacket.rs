@@ -1,6 +1,7 @@
+use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
 
-use crate::types::{position::Vec3, EntityId};
+use crate::types::EntityId;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundExperienceOrbSpawnPacket {

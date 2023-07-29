@@ -3,6 +3,8 @@ use bevy_math::IVec2;
 use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
+use crate::buffer::{VarDecode, VarEncode};
+
 /// A chunk position.
 ///
 /// This is a chunk's position in the world.
@@ -17,4 +19,16 @@ impl ChunkPos {
     pub const ZERO: Self = Self(IVec2::ZERO);
 
     pub fn new(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
+}
+
+impl VarEncode for ChunkPos {
+    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
+        self.0.var_encode(buf)
+    }
+}
+
+impl VarDecode for ChunkPos {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
+        Ok(Self(IVec2::var_decode(buf)?))
+    }
 }

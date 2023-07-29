@@ -1,6 +1,5 @@
+use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
-
-use crate::types::position::Vec3;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundVehicleMovePacket {

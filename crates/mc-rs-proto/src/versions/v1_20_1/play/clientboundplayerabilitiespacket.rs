@@ -1,9 +1,10 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::packets::abilities::PlayerAbilityFlags;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundPlayerAbilitiesPacket {
-    // TODO: Bitfield macro attribute
-    pub flags: u8,
+    pub flags: PlayerAbilityFlags,
     pub flying_speed: f32,
     pub walking_speed: f32,
 }

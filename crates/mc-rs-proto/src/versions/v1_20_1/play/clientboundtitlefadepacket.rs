@@ -2,7 +2,7 @@ use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundTitleFadePacket {
-    pub a: u32,
-    pub b: u32,
-    pub c: u32,
+    pub fade_in: u32,
+    pub stay: u32,
+    pub fade_out: u32,
 }

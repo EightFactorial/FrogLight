@@ -1,6 +1,6 @@
 use mc_rs_macros::Transcode;
 
-use crate::types::{position::AngleData, EntityId};
+use crate::types::EntityId;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntityRotateAndMoveRelativePacket {
@@ -8,6 +8,7 @@ pub struct ClientboundEntityRotateAndMoveRelativePacket {
     pub delta_x: u16,
     pub delta_y: u16,
     pub delta_z: u16,
-    pub angle: AngleData,
+    pub yaw: i8,
+    pub pitch: i8,
     pub on_ground: bool,
 }

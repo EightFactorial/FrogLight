@@ -1,4 +1,4 @@
-use azalea_nbt::Nbt;
+use fastnbt::Value;
 use mc_rs_macros::Transcode;
 
 use crate::types::{position::BlockPos, ResourceLocation};
@@ -7,5 +7,5 @@ use crate::types::{position::BlockPos, ResourceLocation};
 pub struct ClientboundBlockEntityUpdatePacket {
     pub position: BlockPos,
     pub entity_kind: ResourceLocation,
-    pub tag: Nbt,
+    pub tag: Value,
 }

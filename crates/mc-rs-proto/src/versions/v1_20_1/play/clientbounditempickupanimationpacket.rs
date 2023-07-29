@@ -1,8 +1,11 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::EntityId;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundItemPickupAnimationPacket {
-    pub a: u32,
-    pub b: u32,
-    pub c: u32,
+    pub item_entity_id: EntityId,
+    pub collecter_entity_id: EntityId,
+    #[var]
+    pub count: u32,
 }

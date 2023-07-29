@@ -1,7 +1,8 @@
 use mc_rs_macros::Transcode;
-use hashbrown::HashMap;
+
+use crate::types::UnsizedByteBuffer;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundSynchronizeTagsPacket {
-    pub a: HashMap,
+    pub tags: UnsizedByteBuffer,
 }

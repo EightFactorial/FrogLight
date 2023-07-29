@@ -1,6 +1,7 @@
 use std::{collections::HashMap, hash::Hash};
 
 use byteorder::{ReadBytesExt, BE};
+use fastnbt::Value;
 use uuid::Uuid;
 
 use super::{Decode, DecodeError, VarDecode};
@@ -183,10 +184,8 @@ impl<K: Decode + Eq + Hash, V: Decode> Decode for hashbrown::HashMap<K, V> {
     }
 }
 
-impl Decode for azalea_nbt::Nbt {
-    fn decode(_buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
-        // Maybe I have to use a different NBT library?
-        // Or fork it to read from `impl std::io::Read` instead of a cursor...
-        todo!();
+impl Decode for Value {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        fastnbt::from_reader(buf).map_err(DecodeError::from)
     }
 }

@@ -1,8 +1,9 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::UnsizedByteBuffer;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundTeamPacket {
-    pub a: String,
-    pub b: u8,
-    pub c: Vec,
+    pub name: String,
+    pub method: UnsizedByteBuffer,
 }

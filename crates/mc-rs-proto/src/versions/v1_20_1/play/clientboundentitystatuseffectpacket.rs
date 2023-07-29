@@ -1,11 +1,15 @@
+use fastnbt::Value;
 use mc_rs_macros::Transcode;
+
+use crate::types::{EntityId, ResourceLocation};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntityStatusEffectPacket {
-    pub a: u32,
-    pub b: Object,
-    pub c: u8,
-    pub d: u32,
-    pub e: u8,
-    pub f: Object,
+    pub entity_id: EntityId,
+    pub effect: ResourceLocation,
+    pub amplifier: u8,
+    #[var]
+    pub duration: u32,
+    pub flags: u8,
+    pub data: Option<Value>,
 }

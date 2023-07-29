@@ -1,7 +1,9 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::EntityId;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntityPassengersSetPacket {
-    pub a: u32,
-    pub b: Vec<u32>,
+    pub vehicle: EntityId,
+    pub passengers: Vec<EntityId>,
 }

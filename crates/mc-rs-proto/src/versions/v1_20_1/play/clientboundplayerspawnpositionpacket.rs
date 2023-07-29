@@ -1,7 +1,9 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::position::BlockPos;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundPlayerSpawnPositionPacket {
-    pub a: BlockPos,
-    pub b: f32,
+    pub position: BlockPos,
+    pub angle: f32,
 }

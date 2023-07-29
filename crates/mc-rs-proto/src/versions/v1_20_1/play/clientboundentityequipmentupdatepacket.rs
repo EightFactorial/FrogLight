@@ -1,8 +1,9 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{packets::equipment::EntityEquipment, EntityId};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntityEquipmentUpdatePacket {
-    pub a: u32,
-    pub b: u8,
-    pub c: ItemStack,
+    pub entity_id: EntityId,
+    pub equipment: EntityEquipment,
 }

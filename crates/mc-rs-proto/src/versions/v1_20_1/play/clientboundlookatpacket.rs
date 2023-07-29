@@ -1,9 +1,7 @@
+use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
 
-use crate::types::{
-    packets::look_at::{LookAnchor, LookAtEntity},
-    position::Vec3,
-};
+use crate::types::packets::look_at::{LookAnchor, LookAtEntity};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundLookAtPacket {

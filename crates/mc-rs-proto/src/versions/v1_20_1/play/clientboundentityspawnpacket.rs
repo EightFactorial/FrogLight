@@ -1,10 +1,8 @@
+use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
 use uuid::Uuid;
 
-use crate::types::{
-    position::{AngleData, Vec3},
-    EntityId, ResourceLocation,
-};
+use crate::types::{EntityId, ResourceLocation};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntitySpawnPacket {
@@ -12,7 +10,8 @@ pub struct ClientboundEntitySpawnPacket {
     pub uuid: Uuid,
     pub entity_kind: ResourceLocation,
     pub position: Vec3,
-    pub angle: AngleData,
+    pub yaw: i8,
+    pub pitch: i8,
     pub head_yaw: i8,
     #[var]
     pub data: i32,

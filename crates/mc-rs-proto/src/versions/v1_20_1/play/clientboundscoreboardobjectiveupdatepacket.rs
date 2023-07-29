@@ -1,9 +1,9 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::packets::objective::ObjectiveUpdate;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundScoreboardObjectiveUpdatePacket {
-    pub a: String,
-    pub b: u8,
-    pub c: FormattedText,
-    pub d: Enum,
+    pub name: String,
+    pub method: ObjectiveUpdate,
 }

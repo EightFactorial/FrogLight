@@ -1,6 +1,8 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::ResourceLocation;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundFeaturesPacket {
-    pub a: Vec,
+    pub features: Vec<ResourceLocation>,
 }

@@ -2,6 +2,6 @@ use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundWorldTimeUpdatePacket {
-    pub a: u64,
-    pub b: u64,
+    pub game_time: u64,
+    pub day_time: u64,
 }
