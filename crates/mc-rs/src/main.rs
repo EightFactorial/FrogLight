@@ -1,3 +1,14 @@
+use bevy::app::App;
+
+mod plugins;
+
 fn main() {
-    println!("Hello, world!");
+    // Create a new app
+    let mut app = App::new();
+
+    // Add plugins
+    plugins::add_plugins(&mut app);
+
+    // Run the app
+    app.run();
 }
