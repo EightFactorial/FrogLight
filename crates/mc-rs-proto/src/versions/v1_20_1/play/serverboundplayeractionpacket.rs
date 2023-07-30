@@ -1,9 +1,12 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::{enums::Direction, packets::player_action::PlayerAction, position::BlockPos};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundPlayerActionPacket {
-    pub a: Enum,
-    pub b: BlockPos,
-    pub c: u16,
-    pub d: u32,
+    pub action: PlayerAction,
+    pub position: BlockPos,
+    pub direction: Direction,
+    #[var]
+    pub sequence: u32,
 }

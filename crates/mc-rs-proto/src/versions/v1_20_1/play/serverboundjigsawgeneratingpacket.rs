@@ -1,8 +1,11 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::position::BlockPos;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundJigsawGeneratingPacket {
-    pub a: BlockPos,
-    pub b: u32,
-    pub c: bool,
+    pub position: BlockPos,
+    #[var]
+    pub levels: u32,
+    pub keep_jigsaws: bool,
 }

@@ -45,6 +45,18 @@ impl TryFrom<i8> for EntityId {
     fn try_from(value: i8) -> Result<Self, Self::Error> { Ok(Self(u32::try_from(value)?)) }
 }
 
+impl std::ops::Add for EntityId {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output { Self(self.0 + rhs.0) }
+}
+
+impl std::ops::Sub for EntityId {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output { Self(self.0 - rhs.0) }
+}
+
 impl Encode for EntityId {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
         self.0.var_encode(buf)

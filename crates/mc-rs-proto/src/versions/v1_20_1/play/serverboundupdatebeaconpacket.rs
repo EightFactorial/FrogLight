@@ -2,6 +2,8 @@ use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundUpdateBeaconPacket {
-    pub a: Option,
-    pub b: Option,
+    #[var]
+    pub primary: Option<u32>,
+    #[var]
+    pub secondary: Option<u32>,
 }

@@ -1,8 +1,10 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::position::BlockPos;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundUpdateSignPacket {
-    pub a: BlockPos,
-    pub b: bool,
-    pub c: String,
+    pub position: BlockPos,
+    pub front: bool,
+    pub lines: [String; 4],
 }

@@ -1,8 +1,12 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::packets::command_action::CommandAction;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundClientCommandPacket {
-    pub a: u32,
-    pub b: Enum,
-    pub c: u32,
+    #[var]
+    pub id: u32,
+    pub action: CommandAction,
+    #[var]
+    pub data: u32,
 }

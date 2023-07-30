@@ -1,8 +1,10 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::packets::input::InputFlags;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundPlayerInputPacket {
-    pub a: f32,
-    pub b: f32,
-    pub c: u8,
+    pub h_vel: f32,
+    pub f_vel: f32,
+    pub flags: InputFlags,
 }

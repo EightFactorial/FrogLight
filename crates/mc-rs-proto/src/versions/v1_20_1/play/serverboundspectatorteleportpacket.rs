@@ -3,5 +3,5 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundSpectatorTeleportPacket {
-    pub a: Uuid,
+    pub uuid: Uuid,
 }

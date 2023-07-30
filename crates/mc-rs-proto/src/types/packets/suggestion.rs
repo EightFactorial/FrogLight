@@ -1,6 +1,6 @@
-// use mc_rs_macros::Transcode;
+use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Transcode)]
 pub enum SuggestionAction {
     Add,
     Remove,

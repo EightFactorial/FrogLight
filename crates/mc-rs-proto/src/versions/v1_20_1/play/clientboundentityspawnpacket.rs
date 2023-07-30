@@ -1,8 +1,7 @@
-use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
 use uuid::Uuid;
 
-use crate::types::{EntityId, ResourceLocation};
+use crate::types::{EntityId, ResourceLocation, Vec3};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntitySpawnPacket {

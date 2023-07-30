@@ -2,5 +2,6 @@ use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundTeleportConfirmPacket {
-    pub a: u32,
+    #[var]
+    pub id: u32,
 }

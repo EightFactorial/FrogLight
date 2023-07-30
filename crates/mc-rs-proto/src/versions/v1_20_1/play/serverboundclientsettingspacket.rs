@@ -1,13 +1,32 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::packets::client_settings::{
+    ChatVisibility, ModelCustomization, SettingsMainHand,
+};
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundClientSettingsPacket {
-    pub a: String,
-    pub b: u8,
-    pub c: Enum,
-    pub d: bool,
-    pub e: u16,
-    pub f: Enum,
-    pub g: bool,
-    pub h: bool,
+    pub language: String,
+    pub view_distance: u8,
+    pub chat_visibility: ChatVisibility,
+    pub chat_colors: bool,
+    pub model: ModelCustomization,
+    pub main_hand: SettingsMainHand,
+    pub text_filtering: bool,
+    pub allow_listing: bool,
+}
+
+impl Default for ServerboundClientSettingsPacket {
+    fn default() -> Self {
+        Self {
+            language: "en_us".to_string(),
+            view_distance: 8,
+            chat_visibility: ChatVisibility::default(),
+            chat_colors: true,
+            model: ModelCustomization::default(),
+            main_hand: SettingsMainHand::Right,
+            text_filtering: false,
+            allow_listing: false,
+        }
+    }
 }

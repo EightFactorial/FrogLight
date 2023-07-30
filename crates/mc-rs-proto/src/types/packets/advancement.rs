@@ -23,3 +23,9 @@ pub struct AdvancementProgress(pub HashMap<ResourceLocation, Option<u64>>);
 //     pub description: String,
 //     pub icon: ItemSlot,
 // }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Transcode)]
+pub enum AdvancementTabAction {
+    Open,
+    Close,
+}

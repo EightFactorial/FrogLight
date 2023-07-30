@@ -1,7 +1,7 @@
-use mc_rs_macros::Transcode;
 use crate::types::ResourceLocation;
+use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundRecipeBookDataPacket {
-    pub a: ResourceLocation,
+    pub recipe: ResourceLocation,
 }

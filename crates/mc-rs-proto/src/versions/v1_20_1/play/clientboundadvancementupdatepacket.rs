@@ -1,10 +1,6 @@
-use hashbrown::HashMap;
 use mc_rs_macros::Transcode;
 
-use crate::types::{
-    packets::advancement::{Advancement, AdvancementProgress},
-    ResourceLocation, UnsizedByteBuffer,
-};
+use crate::types::UnsizedByteBuffer;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundAdvancementUpdatePacket {

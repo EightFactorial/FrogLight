@@ -1,7 +1,6 @@
-use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
 
-use crate::types::UnsizedByteBuffer;
+use crate::types::{UnsizedByteBuffer, Vec3};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundParticlePacket {

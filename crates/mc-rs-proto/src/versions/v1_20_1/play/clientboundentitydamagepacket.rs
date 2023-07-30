@@ -1,7 +1,6 @@
-use bevy_math::Vec3;
 use mc_rs_macros::Transcode;
 
-use crate::types::{EntityId, NonZeroOption};
+use crate::types::{EntityId, NonZeroOption, Vec3};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntityDamagePacket {

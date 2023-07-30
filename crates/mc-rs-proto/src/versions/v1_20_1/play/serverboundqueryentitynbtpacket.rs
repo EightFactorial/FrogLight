@@ -1,7 +1,10 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::EntityId;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundQueryEntityNbtPacket {
-    pub a: u32,
-    pub b: u32,
+    #[var]
+    pub id: u32,
+    pub entity_id: EntityId,
 }

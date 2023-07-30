@@ -1,6 +1,8 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::packets::abilities::ServerboundPlayerAbilityFlags;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundUpdatePlayerAbilitiesPacket {
-    pub a: u8,
+    pub flags: ServerboundPlayerAbilityFlags,
 }

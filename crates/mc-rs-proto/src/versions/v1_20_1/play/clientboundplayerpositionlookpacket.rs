@@ -1,4 +1,4 @@
-use bevy_math::Vec3;
+use crate::types::Vec3;
 use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
