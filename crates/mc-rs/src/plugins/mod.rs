@@ -1,6 +1,6 @@
 use belly::prelude::BellyPlugin;
 use bevy::{app::PluginGroupBuilder, prelude::*};
-use bevy_rapier3d::{prelude::RapierPhysicsPlugin, render::RapierDebugRenderPlugin};
+use bevy_rapier3d::prelude::RapierPhysicsPlugin;
 
 mod mc_rs;
 use mc_rs::MCRSPlugins;
@@ -22,10 +22,14 @@ pub(super) fn add_plugins(app: &mut App) {
     app.add_plugins(BellyPlugin);
 
     // Add Rapier physics plugins
-    app.add_plugins((
-        RapierPhysicsPlugin::<()>::default(),
-        RapierDebugRenderPlugin::default(),
-    ));
+    app.add_plugins(RapierPhysicsPlugin::<()>::default());
+
+    #[cfg(debug_assertions)]
+    {
+        use bevy_rapier3d::render::RapierDebugRenderPlugin;
+
+        app.add_plugins(RapierDebugRenderPlugin::default());
+    }
 
     // Add custom plugins
     MCRSPlugins.build().finish(app);
