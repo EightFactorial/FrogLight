@@ -1,21 +1,34 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
+use bevy_rapier3d::{prelude::RapierPhysicsPlugin, render::RapierDebugRenderPlugin};
 
 mod mc_rs;
 use mc_rs::MCRSPlugins;
 
+mod settings;
+use settings::Settings;
+
 /// Add plugins to the [App].
-///
-/// This includes the Bevy [DefaultPlugins],
-/// as well as several custom plugins from [MCRSPlugins].
 ///
 /// Plugins added changes depending on the enabled features.
 pub(super) fn add_plugins(app: &mut App) {
-    default_plugins().finish(app);
+    let settings = Settings::load();
+
+    // Add default plugins
+    default_plugins(&settings).finish(app);
+    app.insert_resource(settings);
+
+    // Add Rapier physics plugins
+    app.add_plugins((
+        RapierPhysicsPlugin::<()>::default(),
+        RapierDebugRenderPlugin::default(),
+    ));
+
+    // Add custom plugins
     MCRSPlugins.build().finish(app);
 }
 
 /// Configure the default Bevy [DefaultPlugins].
-fn default_plugins() -> PluginGroupBuilder {
+fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
     let mut plugins = DefaultPlugins.build();
 
     // Set the ImagePlugin sampling to nearest
@@ -23,7 +36,7 @@ fn default_plugins() -> PluginGroupBuilder {
         plugins = plugins.set(ImagePlugin::default_nearest())
     }
 
-    // Set the WindowPlugin window title
+    // Set the WindowPlugin window settings
     {
         let title = match cfg!(debug_assertions) {
             true => {
@@ -37,8 +50,14 @@ fn default_plugins() -> PluginGroupBuilder {
             false => format!("MC-RS v{}", env!("CARGO_PKG_VERSION")),
         };
 
+        let window = Window {
+            title,
+            resolution: settings.window.resolution.clone(),
+            ..default()
+        };
+
         plugins = plugins.set(WindowPlugin {
-            primary_window: Some(Window { title, ..default() }),
+            primary_window: Some(window),
             ..default()
         });
     }

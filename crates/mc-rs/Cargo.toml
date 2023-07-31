@@ -12,10 +12,16 @@ build = "build.rs"
 vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitoxide"]}
 
 [dependencies]
-bevy = "0.11.0"
+bevy = { version = "0.11.0", features = ["serialize"] }
+bevy_rapier3d = { version = "0.22.0", features = ["simd-nightly", "debug-render-3d"] }
+futures-lite = { version = "1.13.0", features = ["futures-io"] }
 mc-rs-proto = { path = "../mc-rs-proto" }
 mc-rs-macros = { path = "../mc-rs-macros" }
-futures-lite = { version = "1.13.0", features = ["futures-io"] }
+noise = { version = "0.8.2", features = ["std", "image"] }
+serde = { version = "1.0.179", features = ["derive"] }
+uuid = { version = "1.4.1", features = ["v3"] }
+toml = { version = "0.7.6", features = ["preserve_order"] }
+log = { version = "0.4.19", features = ["std"] }
 
 [features]
 default = ["wayland", "dynamic-linking"]
