@@ -6,6 +6,7 @@ mod mc_rs;
 use mc_rs::MCRSPlugins;
 
 mod settings;
+use rand::seq::IteratorRandom;
 use settings::Settings;
 
 /// Add plugins to the [App].
@@ -49,13 +50,13 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
         let title = match cfg!(debug_assertions) {
             true => {
                 format!(
-                    "MC-RS v{} - nightly {}",
+                    "MC-RS v{} - nightly {} - {}",
                     env!("CARGO_PKG_VERSION"),
-                    env!("VERGEN_GIT_DESCRIBE")
+                    env!("VERGEN_GIT_DESCRIBE"),
+                    get_title()
                 )
             }
-            // TODO: Add random title from list on startup
-            false => format!("MC-RS v{}", env!("CARGO_PKG_VERSION")),
+            false => format!("MC-RS v{} - {}", env!("CARGO_PKG_VERSION"), get_title()),
         };
 
         let window = Window {
@@ -71,4 +72,19 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
     }
 
     plugins
+}
+
+const WINDOW_TITLES: &str = include_str!("../../assets/language/window_title.txt");
+
+/// Get a random window title.
+///
+/// All occurrences of `\n` will be replaced with a newline.
+fn get_title() -> String {
+    let mut rng = rand::thread_rng();
+
+    WINDOW_TITLES
+        .lines()
+        .choose(&mut rng)
+        .unwrap_or(WINDOW_TITLES.lines().next().unwrap())
+        .replace("\\n", "\n")
 }

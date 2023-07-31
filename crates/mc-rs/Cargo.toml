@@ -19,6 +19,7 @@ futures-lite = { version = "1.13.0", features = ["futures-io"] }
 mc-rs-proto = { path = "../mc-rs-proto" }
 mc-rs-macros = { path = "../mc-rs-macros" }
 noise = { version = "0.8.2", features = ["std", "image"] }
+rand = { version = "0.8.5", features = ["packed_simd", "nightly"] }
 serde = { version = "1.0.179", features = ["derive"] }
 uuid = { version = "1.4.1", features = ["v3"] }
 toml = { version = "0.7.6", features = ["preserve_order"] }
