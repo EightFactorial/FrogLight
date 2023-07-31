@@ -6,6 +6,10 @@ license = "MIT"
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
+build = "build.rs"
+
+[build-dependencies]
+vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitoxide"]}
 
 [dependencies]
 bevy = "0.11.0"

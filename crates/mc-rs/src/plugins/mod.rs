@@ -25,12 +25,20 @@ fn default_plugins() -> PluginGroupBuilder {
 
     // Set the WindowPlugin window title
     {
+        let title = match cfg!(debug_assertions) {
+            true => {
+                format!(
+                    "MC-RS v{} - nightly {}",
+                    env!("CARGO_PKG_VERSION"),
+                    env!("VERGEN_GIT_DESCRIBE")
+                )
+            }
+            // TODO: Add random title from list on startup
+            false => format!("MC-RS v{}", env!("CARGO_PKG_VERSION")),
+        };
+
         plugins = plugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                // TODO: Add random title from list on startup
-                title: format!("MC-RS v{}", env!("CARGO_PKG_VERSION"),),
-                ..default()
-            }),
+            primary_window: Some(Window { title, ..default() }),
             ..default()
         });
     }
