@@ -1,3 +1,4 @@
+use belly::prelude::BellyPlugin;
 use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_rapier3d::{prelude::RapierPhysicsPlugin, render::RapierDebugRenderPlugin};
 
@@ -16,6 +17,9 @@ pub(super) fn add_plugins(app: &mut App) {
     // Add default plugins
     default_plugins(&settings).finish(app);
     app.insert_resource(settings);
+
+    // Add Belly plugin
+    app.add_plugins(BellyPlugin);
 
     // Add Rapier physics plugins
     app.add_plugins((
