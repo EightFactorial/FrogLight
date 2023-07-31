@@ -1,7 +1,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use std::{io::Cursor, marker::PhantomData};
+use std::{collections::VecDeque, io::Cursor, marker::PhantomData};
 
 use async_compression::futures::{bufread::ZlibDecoder, write::ZlibEncoder};
 use async_net::{AsyncToSocketAddrs, SocketAddr, TcpStream};
@@ -22,6 +22,7 @@ pub struct Connection<V: Version, S: State<V>> {
     _version: PhantomData<V>,
     _state: PhantomData<S>,
     pub compression: Option<i32>,
+    packet_buffer: VecDeque<<S as State<V>>::Clientbound>,
     buffer: BufReader<TcpStream>,
     stream: TcpStream,
 }
@@ -107,6 +108,12 @@ impl<V: Version, S: State<V>> Connection<V, S> {
 
     /// Receives a packet from the server.
     pub async fn receive_packet(&mut self) -> Result<<S as State<V>>::Clientbound, DecodeError> {
+        // Return a packet from the buffer if possible
+        if let Some(packet) = self.packet_buffer.pop_front() {
+            return Ok(packet);
+        }
+
+        // Read the packet from the stream
         let mut buffer = self.buffer.fill_buf().await?;
 
         // TODO: Decryption
@@ -127,22 +134,44 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             decompressor.read_to_end(&mut decompressed).await?;
 
             // Read the packet from the decompressed data
-            let packet = <S as State<V>>::Clientbound::decode(&mut Cursor::new(decompressed))?;
+            let decompressed_len = decompressed.len();
+            let mut cursor = Cursor::new(decompressed);
+            let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
+
+            // Try to read more packets if the length doesn't match
+            while decompressed_len > cursor.position() as usize {
+                match <S as State<V>>::Clientbound::decode(&mut cursor) {
+                    Ok(packet) => self.packet_buffer.push_back(packet),
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
 
             // Consume the length from the buffer
             self.buffer.consume(len);
 
             // Return the packet
-            Ok(packet)
+            packet
         } else {
             // Read the packet
-            let packet = <S as State<V>>::Clientbound::decode(&mut cursor)?;
+            let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
+
+            // Try to read more packets if the length doesn't match
+            while len > cursor.position() as usize {
+                match <S as State<V>>::Clientbound::decode(&mut cursor) {
+                    Ok(packet) => self.packet_buffer.push_back(packet),
+                    Err(err) => {
+                        return Err(err);
+                    }
+                }
+            }
 
             // Consume the length from the buffer
             self.buffer.consume(cursor.position() as usize);
 
             // Return the packet
-            Ok(packet)
+            packet
         }
     }
 
@@ -164,6 +193,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             _version: PhantomData,
             _state: PhantomData,
             compression: self.compression,
+            packet_buffer: VecDeque::new(),
             buffer: self.buffer,
             stream: self.stream,
         }
@@ -178,6 +208,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             _version: PhantomData,
             _state: PhantomData,
             compression: other.compression,
+            packet_buffer: VecDeque::new(),
             buffer: other.buffer,
             stream: other.stream,
         }
@@ -208,6 +239,7 @@ impl<V: Version, S: State<V>> From<TcpStream> for Connection<V, S> {
             _version: PhantomData,
             _state: PhantomData,
             compression: None,
+            packet_buffer: VecDeque::new(),
             buffer: BufReader::new(stream.clone()),
             stream,
         }
