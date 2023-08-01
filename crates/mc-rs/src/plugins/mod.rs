@@ -1,5 +1,5 @@
 use belly::prelude::BellyPlugin;
-use bevy::{app::PluginGroupBuilder, prelude::*};
+use bevy::{app::PluginGroupBuilder, prelude::*, window::ExitCondition};
 use bevy_rapier3d::prelude::RapierPhysicsPlugin;
 
 mod mc_rs;
@@ -60,14 +60,17 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
         };
 
         let window = Window {
-            title,
+            present_mode: settings.window.present_mode,
+            mode: settings.window.window_mode,
             resolution: settings.window.resolution.clone(),
+            title,
             ..default()
         };
 
         plugins = plugins.set(WindowPlugin {
             primary_window: Some(window),
-            ..default()
+            exit_condition: ExitCondition::OnPrimaryClosed,
+            close_when_requested: true,
         });
     }
 
