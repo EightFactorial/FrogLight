@@ -26,8 +26,8 @@ toml = { version = "0.7.6", features = ["preserve_order"] }
 log = { version = "0.4.19", features = ["std"] }
 
 [features]
-default = ["wayland", "dynamic-linking"]
+default = ["wayland", "splash"]
+splash = []
 
 # Enable bevy features
 wayland = ["bevy/wayland"]
-dynamic-linking = ["bevy/dynamic_linking"]

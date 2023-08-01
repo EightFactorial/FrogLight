@@ -1,12 +1,15 @@
 use belly::prelude::BellyPlugin;
 use bevy::{app::PluginGroupBuilder, prelude::*, window::ExitCondition};
 use bevy_rapier3d::prelude::RapierPhysicsPlugin;
+use rand::seq::IteratorRandom;
+
+#[cfg(feature = "splash")]
+mod splash;
 
 mod mc_rs;
 use mc_rs::MCRSPlugins;
 
 mod settings;
-use rand::seq::IteratorRandom;
 use settings::Settings;
 
 /// Add plugins to the [App].
@@ -28,7 +31,6 @@ pub(super) fn add_plugins(app: &mut App) {
     #[cfg(debug_assertions)]
     {
         use bevy_rapier3d::render::RapierDebugRenderPlugin;
-
         app.add_plugins(RapierDebugRenderPlugin::default());
     }
 
