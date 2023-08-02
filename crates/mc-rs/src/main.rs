@@ -3,7 +3,7 @@ use bevy::app::App;
 mod menus;
 mod networking;
 mod plugins;
-mod types;
+mod systems;
 
 fn main() {
     // Create a new app
@@ -19,7 +19,7 @@ fn main() {
     menus::setup(&mut app);
 
     // Add general systems
-    types::setup(&mut app);
+    systems::setup(&mut app);
 
     // Run the app
     app.run();

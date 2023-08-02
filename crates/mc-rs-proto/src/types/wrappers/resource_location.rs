@@ -19,6 +19,15 @@ impl ResourceLocation {
             Self(format!("minecraft:{s}"))
         }
     }
+
+    pub fn split(self) -> (String, String) {
+        let mut split = self.0.split(':');
+
+        let namespace = split.next().unwrap().to_string();
+        let path = split.next().unwrap().to_string();
+
+        (namespace, path)
+    }
 }
 
 impl From<ResourceLocation> for String {
