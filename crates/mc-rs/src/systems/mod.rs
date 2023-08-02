@@ -2,6 +2,7 @@ use bevy::prelude::App;
 
 pub mod blocks;
 pub mod player;
+pub mod settings;
 pub mod states;
 pub mod world;
 

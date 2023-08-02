@@ -34,8 +34,12 @@ impl Block {
     }
 }
 
+/// A block texture
+///
+/// This is used to determine what texture(s) a block should use and on which sides
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BlockTexture {
+    /// No texture
     None,
     /// The same texture on all sides
     Single(Handle<Image>),
@@ -78,9 +82,9 @@ impl BlockTexture {
         match self {
             BlockTexture::None => None,
             BlockTexture::Single(texture) => Some(std::slice::from_ref(texture)),
-            BlockTexture::TopBottom(textures) => Some(textures),
-            BlockTexture::TopBottomSides(textures) => Some(textures),
-            BlockTexture::AllSides(textures) => Some(textures),
+            BlockTexture::TopBottom(textures)
+            | BlockTexture::TopBottomSides(textures)
+            | BlockTexture::AllSides(textures) => Some(textures),
         }
     }
 

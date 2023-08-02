@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::{fs, path::PathBuf};
 
 use bevy::prelude::Resource;
@@ -9,11 +7,16 @@ use serde::{Deserialize, Serialize};
 pub mod window;
 use window::WindowSettings;
 
+pub mod menu;
+use menu::MenuSettings;
+
 /// Settings for the application.
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Resource)]
 pub struct Settings {
     #[serde(default)]
     pub window: WindowSettings,
+    #[serde(default)]
+    pub menu: MenuSettings,
 }
 
 impl Settings {

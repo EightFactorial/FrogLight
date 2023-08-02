@@ -22,5 +22,5 @@ impl Default for WindowSettings {
     }
 }
 
-/// Get the default present mode.
+/// Get the default [PresentMode].
 fn default_present_mode() -> PresentMode { PresentMode::AutoVsync }

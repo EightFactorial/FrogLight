@@ -6,11 +6,13 @@ use rand::seq::IteratorRandom;
 #[cfg(feature = "splash")]
 mod splash;
 
+#[cfg(debug_assertions)]
+mod debug;
+
 mod mc_rs;
 use mc_rs::MCRSPlugins;
 
-mod settings;
-use settings::Settings;
+use crate::systems::settings::Settings;
 
 /// Add plugins to the [App].
 ///

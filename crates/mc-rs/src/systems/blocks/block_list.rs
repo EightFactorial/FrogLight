@@ -9,9 +9,9 @@ use super::block::{Block, BlockTexture};
 
 /// Adds all block systems to the app
 pub(super) fn add_systems(app: &mut App) {
-    app.init_resource::<BlocksLoaded>();
     app.add_systems(Startup, Blocks::init_blocks);
 
+    app.init_resource::<BlocksLoaded>();
     app.add_systems(
         Update,
         BlocksLoaded::check_loaded
@@ -149,7 +149,7 @@ impl BlocksLoaded {
         let (l, t) = blocks.get_progress(&assets);
 
         if l == t {
-            // Replace any failed textures with the error block
+            // Replace any failed textures with the error block texture
             let fixed = blocks.replace_errors(&assets);
 
             if fixed > 0 {

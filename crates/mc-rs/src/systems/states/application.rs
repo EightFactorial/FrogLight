@@ -5,11 +5,19 @@ use bevy::prelude::*;
 /// This is used to determine which systems should be run
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
 pub enum ApplicationState {
-    #[default]
+    #[cfg(feature = "splash")]
+    #[cfg_attr(feature = "splash", default)]
+    SplashScreen,
+    #[cfg_attr(not(feature = "splash"), default)]
     MainMenu,
     InGame,
     Paused,
 }
+
+/// A system set that runs when the [ApplicationState] is either
+/// [MainMenu](ApplicationState::MainMenu) or [SplashScreen](ApplicationState::SplashScreen)
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub struct MenuSet;
 
 /// A system set that runs when the [ApplicationState] is [MainMenu](ApplicationState::MainMenu)
 /// state
@@ -17,7 +25,7 @@ pub enum ApplicationState {
 pub struct MainMenuSet;
 
 /// A system set that runs when the [ApplicationState] is either
-/// [Paused](ApplicationState::Paused) or [InGame](ApplicationState::InGame)
+/// [InGame](ApplicationState::InGame) or [Paused](ApplicationState::Paused)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct GameSet;
 
@@ -36,8 +44,25 @@ pub(super) fn add_state(app: &mut App) {
     app.configure_sets(
         Update,
         (
-            MainMenuSet.run_if(in_state(ApplicationState::MainMenu)),
-            GameSet.run_if(not(in_state(ApplicationState::MainMenu))),
+            // Splash and MainMenu
+            #[cfg(feature = "splash")]
+            {
+                MenuSet.run_if(
+                    in_state(ApplicationState::MainMenu)
+                        .or_else(in_state(ApplicationState::SplashScreen)),
+                )
+            },
+            #[cfg(not(feature = "splash"))]
+            {
+                MenuSet.run_if(in_state(ApplicationState::MainMenu))
+            },
+            MainMenuSet
+                .run_if(in_state(ApplicationState::MainMenu))
+                .ambiguous_with(MenuSet),
+            // InGame and Paused
+            GameSet.run_if(
+                in_state(ApplicationState::InGame).or_else(in_state(ApplicationState::Paused)),
+            ),
             InGameSet
                 .run_if(in_state(ApplicationState::InGame))
                 .ambiguous_with(GameSet),
