@@ -23,7 +23,7 @@ impl Plugin for SplashPlugin {
                 .ambiguous_with(MenuSet),
         );
 
-        app.add_systems(Startup, (SplashPlugin::load, SplashPlugin::create).chain());
+        app.add_systems(Startup, SplashPlugin::load);
 
         app.add_systems(
             OnEnter(ApplicationState::SplashScreen),
@@ -43,10 +43,6 @@ impl Plugin for SplashPlugin {
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct SplashRoot;
 
-/// A marker component for the splash screen progress bar
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
-struct SplashBar;
-
 /// The maximum value of the progress bar
 #[derive(Debug, Default, Clone, Copy, PartialEq, Deref, DerefMut, Component)]
 struct BarMax(pub f32);
@@ -57,10 +53,10 @@ struct BarValue(pub f32);
 
 impl SplashPlugin {
     /// Load the splash screen stylesheet
-    fn load(mut commands: Commands) { commands.add(StyleSheet::load("style/splash.ess")); }
-
-    /// Create the splash screen root entity
-    fn create(mut commands: Commands) { commands.spawn((SplashRoot, BarValue::default())); }
+    fn load(mut commands: Commands) {
+        commands.add(StyleSheet::load("style/splash.ess"));
+        commands.spawn((SplashRoot, BarValue::default()));
+    }
 
     /// Create the progress bar
     fn create_bar(
@@ -70,7 +66,6 @@ impl SplashPlugin {
         mut commands: Commands,
     ) {
         let entity = query.single();
-        commands.entity(entity).insert(SplashBar);
 
         // If the blocks are already loaded, use a timer
         // Otherwise, the main menu will be shown instantly

@@ -22,18 +22,18 @@ pub(super) fn setup(app: &mut App) {
             .in_set(MenuSet),
     );
 
+    #[cfg(feature = "splash")]
+    {
+        app.add_systems(
+            OnEnter(ApplicationState::InMenu),
+            MenuRoot::delete_splash
+                .run_if(any_with_component::<crate::plugins::splash::SplashRoot>()),
+        );
+    }
+
     app.add_systems(
-        OnEnter(ApplicationState::InMenu),
-        (
-            MenuRoot::show,
-            #[cfg(feature = "splash")]
-            {
-                MenuRoot::delete_splash
-                    .run_if(any_with_component::<crate::plugins::splash::SplashRoot>())
-            },
-        )
-            .chain()
-            .in_set(InMenuSet),
+        Update,
+        MenuRoot::show.run_if(MenuRoot::is_hidden).in_set(InMenuSet),
     );
     app.add_systems(
         OnExit(ApplicationState::InMenu),
@@ -81,6 +81,11 @@ impl MenuRoot {
         ));
     }
 
+    /// Is the menu currently visible
+    fn is_hidden(vis: Query<&Visibility, With<MenuRoot>>) -> bool {
+        vis.single() == Visibility::Hidden
+    }
+
     /// Make the menu visible
     fn show(mut vis: Query<&mut Visibility, With<MenuRoot>>) {
         *vis.single_mut() = Visibility::Visible;
@@ -92,6 +97,7 @@ impl MenuRoot {
     }
 
     #[cfg(feature = "splash")]
+    /// Delete the splash screen
     fn delete_splash(
         mut commands: Commands,
         mut elements: belly::prelude::Elements,
