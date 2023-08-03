@@ -42,10 +42,13 @@ impl Settings {
 
     /// Save settings to file.
     pub fn save(&self) {
-        if let Ok(data) = toml::to_string(self) {
-            if let Err(e) = fs::write(Self::get_path(), data) {
-                Self::log_err(format!("Error saving settings: {e}"));
+        match toml::to_string(self) {
+            Ok(string) => {
+                if let Err(e) = fs::write(Self::get_path(), string) {
+                    Self::log_err(format!("Error saving settings: {e}"));
+                }
             }
+            Err(e) => Self::log_err(format!("Error saving settings: {e}")),
         }
     }
 

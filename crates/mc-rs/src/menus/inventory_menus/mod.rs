@@ -7,6 +7,6 @@ pub mod furnace;
 pub mod inventory;
 pub mod smithing_table;
 
-pub(super) fn setup_inventories(_app: &mut App) {
+pub(super) fn setup_menus(_app: &mut App) {
     // TODO: Add inventory systems
 }

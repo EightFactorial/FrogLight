@@ -6,13 +6,12 @@ use serde::{Deserialize, Serialize};
 /// TODO: Add backgrounds
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum MainMenuBackground {
-    // 3D backgrounds
-    CubeMap(CubeMapBackgrounds),
-
-    // 2D images
-
-    // Solid colors
-    Solid(Color),
+    /// 3D cubemaps
+    CubeMap(CubeMapBackground),
+    /// 2D images
+    Image(ImageBackground),
+    /// Solid colors
+    Solid(ColorBackground),
 }
 
 impl MainMenuBackground {
@@ -20,12 +19,12 @@ impl MainMenuBackground {
 }
 
 impl Default for MainMenuBackground {
-    fn default() -> Self { Self::CubeMap(CubeMapBackgrounds::default()) }
+    fn default() -> Self { Self::CubeMap(CubeMapBackground::default()) }
 }
 
 /// Cube map backgrounds for the main menu
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
-pub enum CubeMapBackgrounds {
+pub enum CubeMapBackground {
     #[default]
     Plains,
     Village,
@@ -36,4 +35,28 @@ pub enum CubeMapBackgrounds {
     Mountains,
     Cave,
     Cavern,
+}
+
+/// Image backgrounds for the main menu
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ImageBackground {
+    #[default]
+    Plains,
+}
+
+/// Solid color bbackgrounds for the main menu
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum ColorBackground {
+    #[default]
+    Black,
+    Gray,
+}
+
+impl From<ColorBackground> for Color {
+    fn from(value: ColorBackground) -> Self {
+        match value {
+            ColorBackground::Black => Color::BLACK,
+            ColorBackground::Gray => Color::GRAY,
+        }
+    }
 }

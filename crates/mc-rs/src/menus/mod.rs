@@ -25,8 +25,7 @@ pub(super) fn setup(app: &mut App) {
 
     // TODO: Add menu systems
 
-    // Add inventory systems
-    inventory_menus::setup_inventories(app);
+    inventory_menus::setup_menus(app);
 }
 
 /// The menu root node
