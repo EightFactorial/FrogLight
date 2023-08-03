@@ -113,16 +113,20 @@ impl FromStr for Version {
                 let mut chars = week_release.chars();
 
                 let mut week = String::new();
+                let mut release = String::new();
                 for c in chars.by_ref() {
                     if !c.is_ascii_digit() {
+                        release.push(c);
                         break;
                     } else {
                         week.push(c);
                     }
                 }
+                for c in chars {
+                    release.push(c);
+                }
 
                 let week = week.parse().unwrap();
-                let release = chars.collect();
 
                 Ok(Self::Snapshot {
                     year,
