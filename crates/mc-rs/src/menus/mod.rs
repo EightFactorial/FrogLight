@@ -1,4 +1,4 @@
-use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
+use bevy::prelude::*;
 
 use crate::systems::states::application::{ApplicationState, InMenuSet, MenuSet};
 
@@ -15,27 +15,29 @@ pub(super) fn setup(app: &mut App) {
         OnEnter(ApplicationState::default()),
         (
             // Create the camera
-            MenuRoot::create_camera
-                .run_if(not(any_with_component::<Camera2d>()))
-                .in_set(MenuSet),
+            MenuRoot::create_camera.run_if(not(any_with_component::<Camera2d>())),
             // Create the menu root node
-            MenuRoot::create
-                .run_if(not(any_with_component::<MenuRoot>()))
-                .in_set(MenuSet),
-        ),
+            MenuRoot::create.run_if(not(any_with_component::<MenuRoot>())),
+        )
+            .in_set(MenuSet),
     );
 
     app.add_systems(
         OnEnter(ApplicationState::InMenu),
-        MenuRoot::show
-            .run_if(any_with_component::<MenuRoot>())
+        (
+            MenuRoot::show,
+            #[cfg(feature = "splash")]
+            {
+                MenuRoot::delete_splash
+                    .run_if(any_with_component::<crate::plugins::splash::SplashRoot>())
+            },
+        )
+            .chain()
             .in_set(InMenuSet),
     );
     app.add_systems(
         OnExit(ApplicationState::InMenu),
-        MenuRoot::hide
-            .run_if(any_with_component::<MenuRoot>())
-            .in_set(InMenuSet),
+        MenuRoot::hide.in_set(InMenuSet),
     );
 
     // TODO: Add menu systems
@@ -51,18 +53,7 @@ pub struct MenuRoot;
 
 impl MenuRoot {
     /// Create a new camera bundle
-    fn create_camera(mut commands: Commands) { commands.spawn(Self::camera_2d_bundle()); }
-
-    /// Get the default Camera2dBundle
-    #[inline]
-    pub fn camera_2d_bundle() -> Camera2dBundle {
-        Camera2dBundle {
-            camera_2d: Camera2d {
-                clear_color: ClearColorConfig::Custom(Color::BLACK),
-            },
-            ..Default::default()
-        }
-    }
+    fn create_camera(mut commands: Commands) { commands.spawn(Camera2dBundle::default()); }
 
     /// Create a new menu root node
     fn create(state: Res<State<ApplicationState>>, mut commands: Commands) {
@@ -91,12 +82,27 @@ impl MenuRoot {
     }
 
     /// Make the menu visible
-    pub fn show(mut vis: Query<&mut Visibility, With<MenuRoot>>) {
+    fn show(mut vis: Query<&mut Visibility, With<MenuRoot>>) {
         *vis.single_mut() = Visibility::Visible;
     }
 
     /// Make the menu visible
-    pub fn hide(mut vis: Query<&mut Visibility, With<MenuRoot>>) {
+    fn hide(mut vis: Query<&mut Visibility, With<MenuRoot>>) {
         *vis.single_mut() = Visibility::Hidden;
+    }
+
+    #[cfg(feature = "splash")]
+    fn delete_splash(
+        mut commands: Commands,
+        mut elements: belly::prelude::Elements,
+        query: Query<Entity, With<crate::plugins::splash::SplashRoot>>,
+    ) {
+        // Remove the elements
+        for entity in elements.select(".splash").entities() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        // Remove the splash screen root
+        commands.entity(query.single()).despawn_recursive();
     }
 }

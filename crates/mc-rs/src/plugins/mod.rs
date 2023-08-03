@@ -6,7 +6,7 @@ use bevy_rapier3d::prelude::RapierPhysicsPlugin;
 use rand::seq::IteratorRandom;
 
 #[cfg(feature = "splash")]
-mod splash;
+pub(crate) mod splash;
 
 #[cfg(debug_assertions)]
 mod debug;
