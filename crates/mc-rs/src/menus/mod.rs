@@ -24,7 +24,7 @@ pub(super) fn setup(app: &mut App) {
     );
 
     // TODO: Add menu systems
-
+    main_menu::setup_menu(app);
     inventory_menus::setup_menus(app);
 }
 

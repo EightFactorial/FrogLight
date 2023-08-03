@@ -3,7 +3,7 @@
 use bevy::{asset::LoadState, prelude::*, utils::HashMap};
 use mc_rs_proto::types::ResourceLocation;
 
-use crate::systems::states::application::MainMenuSet;
+use crate::systems::states::application::InMenuSet;
 
 use super::block::{Block, BlockTexture};
 
@@ -15,7 +15,7 @@ pub(super) fn add_systems(app: &mut App) {
     app.add_systems(
         Update,
         BlocksLoaded::check_loaded
-            .in_set(MainMenuSet)
+            .in_set(InMenuSet)
             .run_if(resource_equals(BlocksLoaded(false)).and_then(resource_exists::<Blocks>())),
     );
 }

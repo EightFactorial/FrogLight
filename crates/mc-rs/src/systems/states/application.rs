@@ -9,31 +9,33 @@ pub enum ApplicationState {
     #[cfg_attr(feature = "splash", default)]
     SplashScreen,
     #[cfg_attr(not(feature = "splash"), default)]
-    MainMenu,
+    InMenu,
     InGame,
     Paused,
 }
 
 /// A system set that runs when the [ApplicationState] is either
-/// [MainMenu](ApplicationState::MainMenu) or [SplashScreen](ApplicationState::SplashScreen)
+/// [InMenu](ApplicationState::InMenu) or [SplashScreen](ApplicationState::SplashScreen)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct MenuSet;
 
-/// A system set that runs when the [ApplicationState] is [MainMenu](ApplicationState::MainMenu)
-/// state
+/// A system set that runs when the [ApplicationState] is
+/// [InMenu](ApplicationState::InMenu) state
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub struct MainMenuSet;
+pub struct InMenuSet;
 
 /// A system set that runs when the [ApplicationState] is either
 /// [InGame](ApplicationState::InGame) or [Paused](ApplicationState::Paused)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct GameSet;
 
-/// A system set that runs when the [ApplicationState] is [InGame](ApplicationState::InGame)
+/// A system set that runs when the [ApplicationState]
+/// is [InGame](ApplicationState::InGame)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct InGameSet;
 
-/// A system set that runs when the [ApplicationState] is [Paused](ApplicationState::Paused)
+/// A system set that runs when the [ApplicationState]
+/// is [Paused](ApplicationState::Paused)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct PausedSet;
 
@@ -48,16 +50,16 @@ pub(super) fn add_state(app: &mut App) {
             #[cfg(feature = "splash")]
             {
                 MenuSet.run_if(
-                    in_state(ApplicationState::MainMenu)
+                    in_state(ApplicationState::InMenu)
                         .or_else(in_state(ApplicationState::SplashScreen)),
                 )
             },
             #[cfg(not(feature = "splash"))]
             {
-                MenuSet.run_if(in_state(ApplicationState::MainMenu))
+                MenuSet.run_if(in_state(ApplicationState::InMenu))
             },
-            MainMenuSet
-                .run_if(in_state(ApplicationState::MainMenu))
+            InMenuSet
+                .run_if(in_state(ApplicationState::InMenu))
                 .ambiguous_with(MenuSet),
             // InGame and Paused
             GameSet.run_if(
