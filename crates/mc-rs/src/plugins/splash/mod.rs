@@ -1,6 +1,10 @@
+use belly::prelude::*;
 use bevy::prelude::*;
 
-use crate::systems::states::application::{ApplicationState, MenuSet};
+use crate::systems::{
+    blocks::block_list::Blocks,
+    states::application::{ApplicationState, MenuSet},
+};
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct SplashPlugin;
@@ -19,6 +23,125 @@ impl Plugin for SplashPlugin {
                 .ambiguous_with(MenuSet),
         );
 
-        // TODO: Add splash screen
+        app.add_systems(Startup, (SplashPlugin::load, SplashPlugin::create).chain());
+
+        app.add_systems(
+            Update,
+            (
+                SplashPlugin::create_bar.run_if(not(any_with_component::<SplashBar>())),
+                SplashPlugin::next_state.run_if(SplashPlugin::bar_finished),
+            )
+                .in_set(SplashSet),
+        );
+    }
+}
+
+/// A marker component for the splash screen
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+struct SplashRoot;
+
+/// A marker component for the splash screen progress bar
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+struct SplashBar;
+
+/// The maximum value of the progress bar
+#[derive(Debug, Default, Clone, Copy, PartialEq, Deref, DerefMut, Component)]
+struct BarMax(pub f32);
+
+/// The current value of the progress bar
+#[derive(Debug, Default, Clone, Copy, PartialEq, Deref, DerefMut, Component)]
+struct BarValue(pub f32);
+
+impl SplashPlugin {
+    /// Load the splash screen stylesheet
+    fn load(mut commands: Commands) { commands.add(StyleSheet::load("style/splash.ess")); }
+
+    /// Create the splash screen root entity
+    fn create(mut commands: Commands) { commands.spawn((SplashRoot, BarValue::default())); }
+
+    /// Create the progress bar
+    fn create_bar(
+        time: Res<Time>,
+        blocks: Res<Blocks>,
+        query: Query<Entity, With<SplashRoot>>,
+        mut commands: Commands,
+    ) {
+        if time.elapsed_seconds() > 1. {
+            let entity = query.single();
+            commands.entity(entity).insert(SplashBar);
+
+            // If the blocks are already loaded, use a timer
+            // Otherwise, the main menu will be shown instantly
+            let loaded = blocks.is_loaded();
+
+            if loaded {
+                // Set the maximum value to the elapsed time + 2 seconds
+                commands
+                    .entity(entity)
+                    .insert(BarMax(time.elapsed_seconds() + 2.));
+            } else {
+                // Set the maximum value to the number of blocks with textures
+                commands
+                    .entity(entity)
+                    .insert(BarMax(blocks.blocks_with_textures_f32()));
+            }
+
+            if loaded {
+                // Bind to the elapsed time
+                commands.add(
+                    eml! {
+                        <body class="splash" s:padding="50px">
+                            <div class="splash-text">"Loading..."</div>
+                            <br />
+                            <progressbar class="splash-bar" s:width="400px" minimum=1. bind:maximum=from!(entity, BarMax:0)
+                                bind:value=from!(Time:elapsed_seconds())
+                                bind:value=to!(entity, BarValue:0)
+                            />
+                        </body>
+                    }
+                );
+            } else {
+                // Bind to the loaded block count
+                commands.add(
+                    eml! {
+                        <body class="splash" s:padding="50px">
+                            <div class="splash-text">"Loading..."</div>
+                            <br />
+                            <progressbar class="splash-bar" s:width="400px" minimum=0. bind:maximum=from!(entity, BarMax:0) 
+                                bind:value=from!(Blocks:blocks_loaded_f32())
+                                bind:value=to!(entity, BarValue:0)
+                            />
+                        </body>
+                    }
+                );
+            }
+        }
+    }
+
+    /// Check if the progress bar is finished
+    fn bar_finished(query: Query<(&BarMax, &BarValue), With<SplashRoot>>) -> bool {
+        if let Ok((max, value)) = query.get_single() {
+            value.0 >= max.0
+        } else {
+            false
+        }
+    }
+
+    /// Destroy the splash screen and go to the main menu state
+    fn next_state(
+        query: Query<Entity, With<SplashRoot>>,
+        mut elements: Elements,
+        mut state: ResMut<NextState<ApplicationState>>,
+        mut commands: Commands,
+    ) {
+        state.set(ApplicationState::InMenu);
+
+        // Remove the elements
+        for entity in elements.select(".splash").entities() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        // Remove the splash root entity
+        commands.entity(query.single()).despawn_recursive();
     }
 }

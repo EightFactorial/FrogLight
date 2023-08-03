@@ -6,7 +6,7 @@ use crate::{
     systems::{
         settings::Settings,
         states::{
-            application::InMenuSet,
+            application::MenuSet,
             menu::{MenuMainSet, MenuState},
         },
     },
@@ -22,16 +22,24 @@ pub(super) fn setup_backgrounds(app: &mut App) {
     app.add_systems(
         Update,
         (
-            BackgroundRoot::destroy.run_if(resource_changed::<Settings>()),
+            BackgroundRoot::destroy.run_if(
+                resource_changed::<Settings>().and_then(any_with_component::<BackgroundRoot>()),
+            ),
             BackgroundRoot::create.run_if(not(any_with_component::<BackgroundRoot>())),
         )
             .chain()
-            .in_set(InMenuSet),
+            .in_set(MenuSet),
     );
 
     app.add_systems(
         OnEnter(MenuState::Main),
         BackgroundRoot::show
+            .run_if(any_with_component::<BackgroundRoot>())
+            .in_set(MenuMainSet),
+    );
+    app.add_systems(
+        OnExit(MenuState::Main),
+        BackgroundRoot::hide
             .run_if(any_with_component::<BackgroundRoot>())
             .in_set(MenuMainSet),
     );
@@ -58,8 +66,17 @@ impl BackgroundRoot {
         let entity = commands
             .spawn((
                 BackgroundRoot,
-                VisibilityBundle {
+                NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        left: Val::Px(0.),
+                        top: Val::Px(0.),
+                        width: Val::Percent(100.),
+                        height: Val::Percent(100.),
+                        ..Default::default()
+                    },
                     visibility,
+                    background_color: Color::BLUE.with_a(0.1).into(),
                     ..Default::default()
                 },
             ))
@@ -79,10 +96,13 @@ impl BackgroundRoot {
     }
 
     /// Make the background visible
-    pub fn show(mut query: Query<&mut Visibility, With<BackgroundRoot>>) {
-        if let Some(mut visibility) = query.iter_mut().next() {
-            *visibility = Visibility::Visible;
-        }
+    pub fn show(mut vis: Query<&mut Visibility, With<BackgroundRoot>>) {
+        *vis.single_mut() = Visibility::Visible;
+    }
+
+    /// Make the background visible
+    pub fn hide(mut vis: Query<&mut Visibility, With<BackgroundRoot>>) {
+        *vis.single_mut() = Visibility::Hidden;
     }
 }
 

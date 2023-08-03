@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::application::InMenuSet;
+use super::application::{ApplicationState, InMenuSet};
 
 /// The current state of the application
 ///
@@ -8,6 +8,7 @@ use super::application::InMenuSet;
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
 pub enum MenuState {
     #[default]
+    None,
     Main,
     Settings,
     Server,
@@ -55,4 +56,17 @@ pub(super) fn add_state(app: &mut App) {
                 .in_set(InMenuSet),
         ),
     );
+
+    app.add_systems(
+        OnEnter(ApplicationState::InMenu),
+        set_state.in_set(InMenuSet),
+    );
+    app.add_systems(
+        OnExit(ApplicationState::InMenu),
+        clear_state.in_set(InMenuSet),
+    );
 }
+
+fn set_state(mut state: ResMut<NextState<MenuState>>) { state.set(MenuState::Main); }
+
+fn clear_state(mut state: ResMut<NextState<MenuState>>) { state.set(MenuState::None); }

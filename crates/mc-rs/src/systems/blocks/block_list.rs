@@ -3,7 +3,7 @@
 use bevy::{asset::LoadState, prelude::*, utils::HashMap};
 use mc_rs_proto::types::ResourceLocation;
 
-use crate::systems::states::application::InMenuSet;
+use crate::systems::states::application::MenuSet;
 
 use super::block::{Block, BlockTexture};
 
@@ -15,18 +15,29 @@ pub(super) fn add_systems(app: &mut App) {
     app.add_systems(
         Update,
         BlocksLoaded::check_loaded
-            .in_set(InMenuSet)
+            .in_set(MenuSet)
             .run_if(resource_equals(BlocksLoaded(false)).and_then(resource_exists::<Blocks>())),
     );
 }
 
-#[derive(Debug, Clone, Resource, Deref, DerefMut)]
-pub struct Blocks(pub HashMap<u32, Block>);
+#[derive(Clone, Resource, Deref, DerefMut)]
+pub struct Blocks {
+    #[deref]
+    map: HashMap<u32, Block>,
+    assets: AssetServer,
+}
 
 impl Blocks {
+    fn new(assets: &AssetServer) -> Self {
+        Self {
+            map: HashMap::new(),
+            assets: assets.clone(),
+        }
+    }
+
     /// Initialize the block list and load the block textures
     fn init_blocks(mut commands: Commands, assets: Res<AssetServer>) {
-        let mut blocks = Self(HashMap::new());
+        let mut blocks = Self::new(&assets);
 
         // Insert the error block
         blocks.insert(
@@ -80,41 +91,44 @@ impl Blocks {
     }
 
     /// Returns true if all the block textures are loaded
-    pub fn is_loaded(&self, assets: &AssetServer) -> bool {
-        let (l, t) = self.get_progress(assets);
-        l == t
-    }
+    pub fn is_loaded(&self) -> bool { self.blocks_loaded() == self.blocks_with_textures() }
 
-    /// Return the progress of loading the block textures
-    ///
-    /// Returns a tuple of blocks with loaded textures and total blocks with textures
-    pub fn get_progress(&self, assets: &AssetServer) -> (u32, u32) {
-        // Get the number of blocks with all textures loaded
-        let blocks_loaded = self.values().fold(0u32, |acc, block| {
+    // Get the number of blocks with all textures loaded
+    pub fn blocks_loaded(&self) -> u32 {
+        self.values().fold(0u32, |acc, block| {
             let Some(textures) = block.texture.get_textures() else {
                 return acc;
             };
 
             let ids = textures.iter().map(|t| t.id());
             acc + matches!(
-                assets.get_group_load_state(ids),
+                self.assets.get_group_load_state(ids),
                 LoadState::Loaded | LoadState::Failed
             ) as u32
-        });
-
-        // Get the number of blocks with textures
-        let blocks_with_textures = self
-            .values()
-            .filter(|b| b.texture.get_textures().is_some())
-            .count() as u32;
-
-        (blocks_loaded, blocks_with_textures)
+        })
     }
+
+    // Get the number of blocks with textures
+    pub fn blocks_with_textures(&self) -> u32 {
+        self.values()
+            .filter(|b| b.texture.get_textures().is_some())
+            .count() as u32
+    }
+
+    /// Return the progress of loading the block textures
+    pub fn progress(&self) -> f32 { self.blocks_loaded_f32() / self.blocks_with_textures_f32() }
+
+    // Get the number of blocks with textures
+    pub fn blocks_with_textures_f32(&self) -> f32 { self.blocks_with_textures() as f32 }
+
+    // Get the number of blocks with all textures loaded
+    pub fn blocks_loaded_f32(&self) -> f32 { self.blocks_loaded() as f32 }
 
     /// Replaces all failed block textures with the error block texture
     ///
     /// Returns the number of blocks that were fixed
-    pub fn replace_errors(&mut self, assets: &AssetServer) -> u32 {
+    pub fn replace_errors(&mut self) -> u32 {
+        let assets = self.assets.clone();
         let fallback = self.get(&u32::MAX).unwrap().texture.clone();
         let mut acc = 0;
 
@@ -141,28 +155,22 @@ pub struct BlocksLoaded(pub bool);
 impl BlocksLoaded {
     /// A system that checks if all the block textures are loaded
     /// and replaces any broken textures with the fallback
-    fn check_loaded(
-        mut blocks: ResMut<Blocks>,
-        mut loaded: ResMut<BlocksLoaded>,
-        assets: Res<AssetServer>,
-    ) {
-        let (l, t) = blocks.get_progress(&assets);
-
-        if l == t {
+    fn check_loaded(mut blocks: ResMut<Blocks>, mut loaded: ResMut<BlocksLoaded>) {
+        if blocks.is_loaded() {
             // Replace any failed textures with the error block texture
-            let fixed = blocks.replace_errors(&assets);
+            let fixed = blocks.replace_errors();
 
             if fixed > 0 {
                 // TODO: Some sort of error popup?
                 error!("{fixed} blocks failed to load textures");
             } else {
-                info!("All blocks ({t}) loaded successfully");
+                info!("All blocks ({}) loaded successfully", blocks.len());
             }
 
             // Set the blocks loaded resource to true
             **loaded = true;
         } else {
-            info!("Loaded {} of {} blocks", l, t);
+            info!("Loaded {}% of blocks", blocks.progress());
         }
     }
 }

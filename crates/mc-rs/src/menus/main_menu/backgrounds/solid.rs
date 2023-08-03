@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-/// Solid color bbackgrounds for the main menu
+/// Solid color backgrounds for the main menu
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum ColorBackground {
     #[default]
