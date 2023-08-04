@@ -34,13 +34,10 @@ impl MainMenu {
                     "MC-RS"
                 </div>
                 <div class="buttons">
-                    <button class="singleplayer">
-                        "Singleplayer"
+                    <button class="servers" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
+                        "Servers"
                     </button>
-                    <button class="multiplayer">
-                        "Multiplayer"
-                    </button>
-                    <button class="settings">
+                    <button class="settings" on:press=|ctx| { Self::click_button(ctx, ".settings-menu") }>
                         "Settings"
                     </button>
                     <button class="quit" on:press=|ctx| { ctx.send_event(AppExit) }>
@@ -49,5 +46,12 @@ impl MainMenu {
                 </div>
             </div>
         });
+    }
+
+    fn click_button(ctx: &mut EventContext<impl Event>, query: &str) {
+        ctx.select(".root div.main-menu").add_class("hidden");
+
+        ctx.select(&format!(".root div{query}"))
+            .remove_class("hidden");
     }
 }

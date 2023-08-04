@@ -88,7 +88,7 @@ impl SplashPlugin {
         elements.select(".root").add_child(if loaded {
             // Bind to the elapsed time
             eml! {
-                <div class="splash" s:padding="50px">
+                <div class="splash">
                     <div class="splash-text">"Loading..."</div>
                     <br />
                     <progressbar class="splash-bar" minimum=1. bind:maximum=from!(entity, BarMax:0)

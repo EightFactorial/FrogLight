@@ -1,13 +1,14 @@
-.splash {
+div.splash {
     margin: auto;
+    padding: 50px;
     width: 35%;
-
+    
     display: flex;
     flex-direction: column;
     align-self: center;
 }
 
-.splash-text {
+div.splash-text {
     align-content: center;
     justify-content: center;
 }
