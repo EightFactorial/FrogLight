@@ -1,0 +1,3 @@
+.root div.main-menu {
+    background-color: white;
+}

@@ -60,17 +60,17 @@ pub(super) fn add_state(app: &mut App) {
             },
             InMenuSet
                 .run_if(in_state(ApplicationState::InMenu))
-                .ambiguous_with(MenuSet),
+                .in_set(MenuSet),
             // InGame and Paused
             GameSet.run_if(
                 in_state(ApplicationState::InGame).or_else(in_state(ApplicationState::Paused)),
             ),
             InGameSet
                 .run_if(in_state(ApplicationState::InGame))
-                .ambiguous_with(GameSet),
+                .in_set(GameSet),
             PausedSet
                 .run_if(in_state(ApplicationState::Paused))
-                .ambiguous_with(GameSet),
+                .in_set(GameSet),
         ),
     );
 }

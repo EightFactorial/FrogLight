@@ -1,6 +1,5 @@
+use belly::prelude::*;
 use bevy::prelude::*;
-
-use crate::systems::states::application::{ApplicationState, InMenuSet, MenuSet};
 
 pub mod credits_menu;
 pub mod inventory_menus;
@@ -11,34 +10,7 @@ pub mod settings_menu;
 
 /// Add menu systems to the app
 pub(super) fn setup(app: &mut App) {
-    app.add_systems(
-        OnEnter(ApplicationState::default()),
-        (
-            // Create the camera
-            MenuRoot::create_camera.run_if(not(any_with_component::<Camera2d>())),
-            // Create the menu root node
-            MenuRoot::create.run_if(not(any_with_component::<MenuRoot>())),
-        )
-            .in_set(MenuSet),
-    );
-
-    #[cfg(feature = "splash")]
-    {
-        app.add_systems(
-            OnEnter(ApplicationState::InMenu),
-            MenuRoot::delete_splash
-                .run_if(any_with_component::<crate::plugins::splash::SplashRoot>()),
-        );
-    }
-
-    app.add_systems(
-        Update,
-        MenuRoot::show.run_if(MenuRoot::is_hidden).in_set(InMenuSet),
-    );
-    app.add_systems(
-        OnExit(ApplicationState::InMenu),
-        MenuRoot::hide.in_set(InMenuSet),
-    );
+    app.add_systems(Startup, (MenuRoot::create_camera, MenuRoot::create));
 
     // TODO: Add menu systems
     main_menu::setup_menu(app);
@@ -55,60 +27,15 @@ impl MenuRoot {
     /// Create a new camera bundle
     fn create_camera(mut commands: Commands) { commands.spawn(Camera2dBundle::default()); }
 
-    /// Create a new menu root node
-    fn create(state: Res<State<ApplicationState>>, mut commands: Commands) {
-        let visibility = if **state == ApplicationState::InMenu {
-            Visibility::Visible
-        } else {
-            Visibility::Hidden
-        };
+    /// Load the global stylesheet and create the menu root node
+    fn create(mut commands: Commands) {
+        commands.add(StyleSheet::load("style/global.ess"));
+        commands.add(StyleSheet::load("style/menu.ess"));
 
-        commands.spawn((
-            MenuRoot,
-            NodeBundle {
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    top: Val::Px(0.),
-                    left: Val::Px(0.),
-                    width: Val::Percent(100.),
-                    height: Val::Percent(100.),
-                    ..Default::default()
-                },
-                background_color: Color::BLACK.into(),
-                visibility,
-                ..Default::default()
-            },
-        ));
-    }
-
-    /// Is the menu currently visible
-    fn is_hidden(vis: Query<&Visibility, With<MenuRoot>>) -> bool {
-        vis.single() == Visibility::Hidden
-    }
-
-    /// Make the menu visible
-    fn show(mut vis: Query<&mut Visibility, With<MenuRoot>>) {
-        *vis.single_mut() = Visibility::Visible;
-    }
-
-    /// Make the menu visible
-    fn hide(mut vis: Query<&mut Visibility, With<MenuRoot>>) {
-        *vis.single_mut() = Visibility::Hidden;
-    }
-
-    #[cfg(feature = "splash")]
-    /// Delete the splash screen
-    fn delete_splash(
-        mut commands: Commands,
-        mut elements: belly::prelude::Elements,
-        query: Query<Entity, With<crate::plugins::splash::SplashRoot>>,
-    ) {
-        // Remove the elements
-        for entity in elements.select(".splash").entities() {
-            commands.entity(entity).despawn_recursive();
-        }
-
-        // Remove the splash screen root
-        commands.entity(query.single()).despawn_recursive();
+        commands.spawn(MenuRoot);
+        commands.add(eml! {
+            <body class="root">
+            </body>
+        });
     }
 }

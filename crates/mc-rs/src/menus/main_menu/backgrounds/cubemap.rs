@@ -1,3 +1,4 @@
+use belly::prelude::*;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -17,7 +18,8 @@ pub enum CubeMapBackground {
 }
 
 impl CubeMapBackground {
-    pub(super) fn create(&self, _parent: Entity, mut _commands: Commands) {
+    #[allow(dead_code)]
+    pub(super) fn create(&self, _parent: Entity, mut _elements: Elements, mut _commands: Commands) {
         // TODO: Add backgrounds
     }
 }

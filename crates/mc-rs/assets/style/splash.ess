@@ -1,6 +1,13 @@
 .splash {
-    background-color: black;
+    margin: auto;
+    width: 35%;
 
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
+
+.splash-text {
     align-content: center;
+    justify-content: center;
 }
