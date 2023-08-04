@@ -25,13 +25,8 @@ pub struct MainMenu;
 
 impl MainMenu {
     /// Create the main menu
-    fn create(
-        query: Query<Entity, With<MenuRoot>>,
-        mut elements: Elements,
-        mut commands: Commands,
-    ) {
-        let entity = query.single();
-        commands.entity(entity).insert(MainMenu);
+    fn create(root: Res<MenuRoot>, mut elements: Elements, mut commands: Commands) {
+        commands.entity(**root).insert(MainMenu);
 
         elements.select(".root").add_child(eml! {
             <div class="main-menu">

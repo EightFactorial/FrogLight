@@ -22,14 +22,14 @@ impl MainMenuBackground {
     /// Create the background
     #[allow(dead_code)]
     fn create(
-        query: Query<Entity, With<MenuRoot>>,
+        root: Res<MenuRoot>,
         settings: Res<Settings>,
         elements: Elements,
         mut commands: Commands,
     ) {
-        let entity = query.single();
-        commands.entity(entity).insert(MainMenuBackground);
+        let entity = **root;
 
+        commands.entity(entity).insert(MainMenuBackground);
         match &settings.menu.main_menu {
             BackgroundEnum::CubeMap(bg) => bg.create(entity, elements, commands),
             BackgroundEnum::Image(bg) => bg.create(entity, elements, commands),

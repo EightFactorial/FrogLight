@@ -65,7 +65,7 @@ impl SplashPlugin {
     fn create(
         time: Res<Time>,
         blocks: Res<Blocks>,
-        query: Query<Entity, With<MenuRoot>>,
+        root: Res<MenuRoot>,
         mut elements: Elements,
         mut commands: Commands,
     ) {
@@ -81,7 +81,7 @@ impl SplashPlugin {
             // Set the max to the number of blocks with textures
             BarMax(blocks.blocks_with_textures_f32())
         };
-        let entity = query.single();
+        let entity = **root;
         commands.entity(entity).insert((BarValue::default(), max));
 
         // Add the progress bar
@@ -113,8 +113,8 @@ impl SplashPlugin {
     }
 
     /// Check if the progress bar is finished
-    fn bar_finished(query: Query<(&BarMax, &BarValue), With<MenuRoot>>) -> bool {
-        if let Ok((max, value)) = query.get_single() {
+    fn bar_finished(query: Query<(&BarMax, &BarValue)>, root: Res<MenuRoot>) -> bool {
+        if let Ok((max, value)) = query.get(**root) {
             value.0 >= max.0
         } else {
             false
@@ -127,18 +127,12 @@ impl SplashPlugin {
     }
 
     /// Delete the splash screen
-    fn delete(
-        mut commands: Commands,
-        mut elements: Elements,
-        query: Query<Entity, With<MenuRoot>>,
-    ) {
+    fn delete(mut commands: Commands, mut elements: Elements, root: Res<MenuRoot>) {
         // Remove the elements
-        for entity in elements.select(".splash").entities() {
-            commands.entity(entity).despawn_recursive();
-        }
+        elements.select(".root div.splash").remove();
 
         // Remove the splash screen components
-        commands.entity(query.single()).remove::<BarValue>();
-        commands.entity(query.single()).remove::<BarMax>();
+        commands.entity(**root).remove::<BarValue>();
+        commands.entity(**root).remove::<BarMax>();
     }
 }

@@ -20,8 +20,8 @@ pub(super) fn setup(app: &mut App) {
 /// The menu root node
 ///
 /// All menus should be children of this node
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub struct MenuRoot;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+pub struct MenuRoot(pub Entity);
 
 impl MenuRoot {
     /// Create a new camera bundle
@@ -32,7 +32,9 @@ impl MenuRoot {
         commands.add(StyleSheet::load("style/global.ess"));
         commands.add(StyleSheet::load("style/menu.ess"));
 
-        commands.spawn(MenuRoot);
+        let entity = commands.spawn_empty().id();
+        commands.insert_resource(MenuRoot(entity));
+
         commands.add(eml! {
             <body class="root">
             </body>
