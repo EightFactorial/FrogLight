@@ -4,8 +4,8 @@ use bevy::prelude::*;
 use crate::{
     menus::MenuRoot,
     systems::{
+        app_state::{ApplicationState, InMenuSet, MenuSet},
         blocks::block_list::Blocks,
-        states::application::{ApplicationState, InMenuSet, MenuSet},
     },
 };
 

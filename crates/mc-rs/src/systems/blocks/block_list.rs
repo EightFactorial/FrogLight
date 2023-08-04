@@ -3,7 +3,7 @@
 use bevy::{asset::LoadState, prelude::*, utils::HashMap};
 use mc_rs_proto::types::ResourceLocation;
 
-use crate::systems::states::application::MenuSet;
+use crate::systems::app_state::MenuSet;
 
 use super::block::{Block, BlockTexture};
 

@@ -39,8 +39,8 @@ pub struct InGameSet;
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct PausedSet;
 
-/// Adds the application state to the app
-pub(super) fn add_state(app: &mut App) {
+/// Adds the application state and system sets to the app
+pub(super) fn configure(app: &mut App) {
     app.add_state::<ApplicationState>();
 
     app.configure_sets(

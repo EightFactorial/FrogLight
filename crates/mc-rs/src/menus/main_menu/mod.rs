@@ -1,7 +1,7 @@
 use belly::prelude::*;
 use bevy::{app::AppExit, prelude::*};
 
-use crate::systems::states::application::{ApplicationState, MenuSet};
+use crate::systems::app_state::{ApplicationState, MenuSet};
 
 use super::MenuRoot;
 
