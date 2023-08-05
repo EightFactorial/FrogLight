@@ -20,7 +20,3 @@
 
 }
 
-.root div.main-background img {
-    height: 100%;
-    width: 100%;
-}

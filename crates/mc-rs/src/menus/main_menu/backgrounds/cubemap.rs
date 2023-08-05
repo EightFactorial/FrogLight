@@ -1,11 +1,14 @@
 use belly::prelude::*;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
+use strum::Display;
 
 use crate::menus::MenuRoot;
 
 /// Cube map backgrounds for the main menu
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Display, Serialize, Deserialize)]
+#[strum(serialize_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
 pub enum BackgroundCubeMapEnum {
     #[default]
     Plains,
