@@ -8,7 +8,7 @@ use rand::seq::IteratorRandom;
 #[cfg(feature = "splash")]
 pub(crate) mod splash;
 
-#[cfg(debug_assertions)]
+#[cfg(feature = "debug")]
 mod debug;
 
 mod mc_rs;
@@ -32,7 +32,7 @@ pub(super) fn add_plugins(app: &mut App) {
     // Add Rapier physics plugins
     app.add_plugins(RapierPhysicsPlugin::<()>::default());
 
-    #[cfg(debug_assertions)]
+    #[cfg(feature = "debug")]
     {
         use bevy_rapier3d::render::RapierDebugRenderPlugin;
         app.add_plugins(RapierDebugRenderPlugin::default());

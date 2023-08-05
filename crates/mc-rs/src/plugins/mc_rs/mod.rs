@@ -12,7 +12,7 @@ impl PluginGroup for MCRSPlugins {
             plugins = plugins.add(SplashPlugin);
         }
 
-        #[cfg(debug_assertions)]
+        #[cfg(feature = "debug")]
         {
             use super::debug::DebugPlugin;
             plugins = plugins.add(DebugPlugin);

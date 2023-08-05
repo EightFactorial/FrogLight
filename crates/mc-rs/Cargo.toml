@@ -32,3 +32,6 @@ splash = []
 
 # Enable bevy features
 wayland = ["bevy/wayland"]
+
+# Enable debug plugins
+debug = []
