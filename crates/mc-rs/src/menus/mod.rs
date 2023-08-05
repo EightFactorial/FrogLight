@@ -17,9 +17,9 @@ pub(super) fn setup(app: &mut App) {
     inventory_menus::setup_menus(app);
 }
 
-/// The menu root node
+/// The menu root entity id
 ///
-/// All menus should be children of this node
+/// All components for the menu should be attached to this entity
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
 pub struct MenuRoot(pub Entity);
 

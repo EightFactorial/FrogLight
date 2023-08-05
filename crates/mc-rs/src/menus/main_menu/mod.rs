@@ -1,7 +1,7 @@
 use belly::prelude::*;
 use bevy::{app::AppExit, prelude::*};
 
-use crate::systems::app_state::{ApplicationState, MenuSet};
+use crate::systems::app_state::{ApplicationState, InMenuSet};
 
 use super::MenuRoot;
 
@@ -11,9 +11,11 @@ pub mod backgrounds;
 pub(super) fn setup_menu(app: &mut App) {
     app.add_systems(
         OnEnter(ApplicationState::InMenu),
-        MainMenu::create
-            .run_if(not(any_with_component::<MainMenu>()))
-            .in_set(MenuSet),
+        (
+            MainMenu::show.run_if(any_with_component::<MainMenu>()),
+            MainMenu::create.run_if(not(any_with_component::<MainMenu>())),
+        )
+            .in_set(InMenuSet),
     );
 
     backgrounds::setup_backgrounds(app);
@@ -24,23 +26,43 @@ pub(super) fn setup_menu(app: &mut App) {
 pub struct MainMenu;
 
 impl MainMenu {
+    /// Show the main menu
+    pub fn show(mut elements: Elements) {
+        elements
+            .select(".root div.main-menu")
+            .remove_class("hidden");
+
+        elements
+            .select(".root div.main-background")
+            .remove_class("hidden");
+    }
+
+    /// Hide the main menu
+    pub fn hide(mut elements: Elements) {
+        elements.select(".root div.main-menu").add_class("hidden");
+
+        elements
+            .select(".root div.main-background")
+            .add_class("hidden");
+    }
+
     /// Create the main menu
     fn create(root: Res<MenuRoot>, mut elements: Elements, mut commands: Commands) {
         commands.entity(**root).insert(MainMenu);
 
         elements.select(".root").add_child(eml! {
             <div class="main-menu">
-                <div class="title">
+                <div class="main-menu-title">
                     "MC-RS"
                 </div>
-                <div class="buttons">
-                    <button class="servers" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
+                <div class="main-menu-buttons">
+                    <button class="button" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
                         "Servers"
                     </button>
-                    <button class="settings" on:press=|ctx| { Self::click_button(ctx, ".settings-menu") }>
-                        "Settings"
+                    <button class="button" on:press=|ctx| { Self::click_button(ctx, ".options-menu") }>
+                        "Options"
                     </button>
-                    <button class="quit" on:press=|ctx| { ctx.send_event(AppExit) }>
+                    <button class="button" on:press=|ctx| { ctx.send_event(AppExit) }>
                         "Quit"
                     </button>
                 </div>
@@ -50,6 +72,7 @@ impl MainMenu {
 
     fn click_button(ctx: &mut EventContext<impl Event>, query: &str) {
         ctx.select(".root div.main-menu").add_class("hidden");
+        ctx.select(".root div.main-background").add_class("hidden");
 
         ctx.select(&format!(".root div{query}"))
             .remove_class("hidden");

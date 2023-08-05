@@ -2,7 +2,13 @@ use belly::prelude::Elements;
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{menus::MenuRoot, systems::settings::Settings};
+use crate::{
+    menus::MenuRoot,
+    systems::{
+        app_state::{ApplicationState, InMenuSet},
+        settings::Settings,
+    },
+};
 
 use self::{cubemap::CubeMapBackground, image::ImageBackground, solid::ColorBackground};
 
@@ -10,17 +16,32 @@ pub mod cubemap;
 pub mod image;
 pub mod solid;
 
-pub(super) fn setup_backgrounds(_app: &mut App) {
-    // TODO
+pub(super) fn setup_backgrounds(app: &mut App) {
+    app.add_systems(
+        OnEnter(ApplicationState::InMenu),
+        MainMenuBackground::create
+            .run_if(not(any_with_component::<MainMenuBackground>()))
+            .in_set(InMenuSet),
+    );
+
+    app.add_systems(
+        OnExit(ApplicationState::InMenu),
+        MainMenuBackground::destroy
+            .run_if(any_with_component::<MainMenuBackground>())
+            .in_set(InMenuSet),
+    );
 }
 
 /// A marker component for the main menu background
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct MainMenuBackground;
 
+/// A resource to hold the main menu background camera entity
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+struct BackgroundCamera(pub Entity);
+
 impl MainMenuBackground {
     /// Create the background
-    #[allow(dead_code)]
     fn create(
         root: Res<MenuRoot>,
         settings: Res<Settings>,
@@ -38,15 +59,19 @@ impl MainMenuBackground {
     }
 
     /// Destroy the background
-    #[allow(dead_code)]
     fn destroy(
-        query: Query<Entity, With<MainMenuBackground>>,
-        mut _elements: Elements,
+        root: Res<MenuRoot>,
+        camera: Option<Res<BackgroundCamera>>,
+        mut elements: Elements,
         mut commands: Commands,
     ) {
-        commands
-            .entity(query.single())
-            .remove::<MainMenuBackground>();
+        commands.entity(**root).remove::<MainMenuBackground>();
+
+        if let Some(camera) = camera {
+            commands.entity(**camera).despawn_recursive();
+        }
+
+        elements.select(".root div.main-background").remove();
     }
 }
 
