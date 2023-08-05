@@ -10,7 +10,11 @@ use crate::{
     },
 };
 
-use self::{cubemap::CubeMapBackground, image::ImageBackground, solid::ColorBackground};
+use self::{
+    cubemap::BackgroundCubeMapEnum,
+    image::{BackgroundImage, BackgroundImageEnum},
+    solid::BackgroundColorEnum,
+};
 
 pub mod cubemap;
 pub mod image;
@@ -21,6 +25,16 @@ pub(super) fn setup_backgrounds(app: &mut App) {
         OnEnter(ApplicationState::InMenu),
         MainMenuBackground::create
             .run_if(not(any_with_component::<MainMenuBackground>()))
+            .in_set(InMenuSet),
+    );
+
+    app.add_systems(
+        Update,
+        MainMenuBackground::destroy
+            .run_if(
+                any_with_component::<MainMenuBackground>().and_then(resource_changed::<Settings>()),
+            )
+            .before(MainMenuBackground::create)
             .in_set(InMenuSet),
     );
 
@@ -40,21 +54,25 @@ pub struct MainMenuBackground;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
 struct BackgroundCamera(pub Entity);
 
+/// A resource to hold the main menu asset handles
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+pub struct BackgroundAssets(pub Vec<HandleUntyped>);
+
 impl MainMenuBackground {
     /// Create the background
     fn create(
         root: Res<MenuRoot>,
         settings: Res<Settings>,
+        assets: Res<AssetServer>,
         elements: Elements,
         mut commands: Commands,
     ) {
-        let entity = **root;
+        commands.entity(**root).insert(MainMenuBackground);
 
-        commands.entity(entity).insert(MainMenuBackground);
         match &settings.menu.main_menu {
-            BackgroundEnum::CubeMap(bg) => bg.create(entity, elements, commands),
-            BackgroundEnum::Image(bg) => bg.create(entity, elements, commands),
-            BackgroundEnum::Solid(bg) => bg.create(entity, elements, commands),
+            BackgroundEnum::CubeMap(bg) => bg.create(&root, &assets, elements, commands),
+            BackgroundEnum::Image(bg) => bg.create(&root, &assets, elements, commands),
+            BackgroundEnum::Solid(bg) => bg.create(elements),
         }
     }
 
@@ -64,13 +82,23 @@ impl MainMenuBackground {
         camera: Option<Res<BackgroundCamera>>,
         mut elements: Elements,
         mut commands: Commands,
+        mut local: Local<bool>,
     ) {
-        commands.entity(**root).remove::<MainMenuBackground>();
+        // Prevent first run
+        if !*local {
+            *local = true;
+            return;
+        }
 
         if let Some(camera) = camera {
             commands.entity(**camera).despawn_recursive();
         }
 
+        commands.remove_resource::<BackgroundCamera>();
+        commands.remove_resource::<BackgroundAssets>();
+
+        commands.entity(**root).remove::<MainMenuBackground>();
+        commands.entity(**root).remove::<BackgroundImage>();
         elements.select(".root div.main-background").remove();
     }
 }
@@ -81,13 +109,13 @@ impl MainMenuBackground {
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum BackgroundEnum {
     /// 3D cubemaps
-    CubeMap(CubeMapBackground),
+    CubeMap(BackgroundCubeMapEnum),
     /// 2D images
-    Image(ImageBackground),
+    Image(BackgroundImageEnum),
     /// Solid colors
-    Solid(ColorBackground),
+    Solid(BackgroundColorEnum),
 }
 
 impl Default for BackgroundEnum {
-    fn default() -> Self { Self::CubeMap(CubeMapBackground::default()) }
+    fn default() -> Self { Self::CubeMap(BackgroundCubeMapEnum::default()) }
 }
