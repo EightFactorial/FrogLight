@@ -12,7 +12,7 @@ use super::BackgroundAssets;
 pub struct BackgroundImage;
 
 /// Image backgrounds for the main menu
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Display, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Display, Serialize, Deserialize)]
 #[strum(serialize_all = "lowercase")]
 pub enum BackgroundImageEnum {
     #[default]
@@ -25,6 +25,9 @@ pub enum BackgroundImageEnum {
     Mountains,
     Cave,
     Cavern,
+
+    /// A path to a custom background
+    Path(String),
 }
 
 impl BackgroundImageEnum {
@@ -38,13 +41,17 @@ impl BackgroundImageEnum {
     ) {
         commands.entity(**root).insert(BackgroundImage);
 
-        let path = format!("textures/gui/title/background/image/{}.png", self);
-        let texture: Handle<Image> = assets.load(path);
-        commands.insert_resource(BackgroundAssets(vec![texture.clone_untyped()]));
+        let image: Handle<Image> = if let BackgroundImageEnum::Path(path) = self {
+            assets.load(path)
+        } else {
+            let path = format!("textures/gui/title/background/image/{}.png", self);
+            assets.load(path)
+        };
 
+        commands.insert_resource(BackgroundAssets(vec![image.clone_untyped()]));
         elements.select(".root").add_child(eml! {
             <div class="main-background">
-                <img src=texture/>
+                <img src=image/>
             </div>
         });
     }

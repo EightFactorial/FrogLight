@@ -106,7 +106,7 @@ impl MainMenuBackground {
 /// Backgrounds for the main menu
 ///
 /// TODO: Add backgrounds
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum BackgroundEnum {
     /// 3D cubemaps
     CubeMap(BackgroundCubeMapEnum),
