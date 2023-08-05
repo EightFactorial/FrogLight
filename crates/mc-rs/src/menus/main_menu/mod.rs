@@ -38,6 +38,7 @@ impl MainMenu {
     }
 
     /// Hide the main menu
+    #[allow(dead_code)]
     pub fn hide(mut elements: Elements) {
         elements.select(".root div.main-menu").add_class("hidden");
 

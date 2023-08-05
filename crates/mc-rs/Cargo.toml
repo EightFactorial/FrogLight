@@ -14,7 +14,7 @@ vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitoxide"]}
 [dependencies]
 belly = { git = "https://github.com/jkb0o/belly.git", branch = "bevy-0.11" }
 bevy = { version = "0.11.0", features = ["serialize"] }
-bevy_rapier3d = { version = "0.22.0", features = ["simd-nightly", "debug-render-3d"] }
+bevy_rapier3d = { version = "0.22.0", features = ["simd-nightly"] }
 convert_case = "0.6.0"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }
 mc-rs-proto = { path = "../mc-rs-proto" }
@@ -34,4 +34,4 @@ splash = []
 wayland = ["bevy/wayland"]
 
 # Enable debug plugins
-debug = []
+debug = ["bevy_rapier3d/debug-render-3d"]
