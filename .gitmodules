@@ -1,3 +1,6 @@
 [submodule "crates/classfile-rs"]
 	path = crates/classfile-rs
 	url = https://github.com/EightFactorial/classfile-rs
+[submodule "crates/belly"]
+	path = crates/belly
+	url = https://github.com/EightFactorial/belly

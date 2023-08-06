@@ -91,7 +91,7 @@ impl SplashPlugin {
                 <div class="splash">
                     <div class="splash-text">"Loading..."</div>
                     <br />
-                    <progressbar class="splash-bar" minimum=1. bind:maximum=from!(entity, BarMax:0)
+                    <progressbar class="splash-bar" minimum=1. maximum={max.0}
                         bind:value=from!(Time:elapsed_seconds())
                         bind:value=to!(entity, BarValue:0)
                     />
@@ -103,7 +103,7 @@ impl SplashPlugin {
                 <div class="splash">
                     <div class="splash-text">"Loading..."</div>
                     <br />
-                    <progressbar class="splash-bar" minimum=0. bind:maximum=from!(entity, BarMax:0)
+                    <progressbar class="splash-bar" minimum=0. maximum={max.0}
                         bind:value=from!(Blocks:blocks_loaded_f32())
                         bind:value=to!(entity, BarValue:0)
                     />
