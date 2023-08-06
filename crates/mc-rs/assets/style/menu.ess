@@ -1,11 +1,47 @@
 .root div.main-menu {
     margin: auto;
 
+    min-width: 400px;
+    width: 35%;
+
+    height: 100%;
+}
+
+
+div.main-menu-menu {
+    margin: auto;
+
     flex-direction: column;
     align-items: center;
     align-content: center;
 
+    width: 100%;
+    min-height: 275px;
+    height: 60%;
+
     background-color: white;
+}
+
+div.main-menu-title {
+    font-size: 64px;
+}
+
+div.main-menu-buttons {
+    position-type: absolute;
+    bottom: 0px;
+
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+
+    width: 80%;
+}
+
+div.main-menu-buttons .button {
+    height: 48px;
+
+    max-width: 600px;
+    width: 100%;
 }
 
 .root div.main-background {
@@ -19,4 +55,3 @@
     z-index: -1l;
 
 }
-

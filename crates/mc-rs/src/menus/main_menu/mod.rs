@@ -37,35 +37,27 @@ impl MainMenu {
             .remove_class("hidden");
     }
 
-    /// Hide the main menu
-    #[allow(dead_code)]
-    pub fn hide(mut elements: Elements) {
-        elements.select(".root div.main-menu").add_class("hidden");
-
-        elements
-            .select(".root div.main-background")
-            .add_class("hidden");
-    }
-
     /// Create the main menu
     fn create(root: Res<MenuRoot>, mut elements: Elements, mut commands: Commands) {
         commands.entity(**root).insert(MainMenu);
 
         elements.select(".root").add_child(eml! {
             <div class="main-menu">
-                <div class="main-menu-title">
-                    "MC-RS"
-                </div>
-                <div class="main-menu-buttons">
-                    <button class="button" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
-                        "Servers"
-                    </button>
-                    <button class="button" on:press=|ctx| { Self::click_button(ctx, ".options-menu") }>
-                        "Options"
-                    </button>
-                    <button class="button" on:press=|ctx| { ctx.send_event(AppExit) }>
-                        "Quit"
-                    </button>
+                <div class="main-menu-menu">
+                    <div class="main-menu-title">
+                        "MC-RS"
+                    </div>
+                    <div class="main-menu-buttons">
+                        <button class="button" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
+                            "Servers"
+                        </button>
+                        <button class="button" on:press=|ctx| { Self::click_button(ctx, ".options-menu") }>
+                            "Options"
+                        </button>
+                        <button class="button" on:press=|ctx| { ctx.send_event(AppExit) }>
+                            "Quit"
+                        </button>
+                    </div>
                 </div>
             </div>
         });
