@@ -1,5 +1,6 @@
 use belly::prelude::*;
 use bevy::{app::AppExit, prelude::*};
+use rand::seq::IteratorRandom;
 
 use crate::systems::app_state::{ApplicationState, InMenuSet};
 
@@ -45,7 +46,9 @@ impl MainMenu {
             <div class="main-menu">
                 <div class="main-menu-menu">
                     <div class="main-menu-title">
-                        <img class="main-menu-logo" src="textures/gui/title/logo.png" />
+                        <img class="main-menu-logo" src="textures/gui/title/logo.png"/>
+                        // TODO: Rotate a bit and add a grow/shink animation
+                        <div class="main-menu-subtitle"><span>{ Self::get_subtitle() }</span></div>
                     </div>
                     <div class="main-menu-buttons">
                         <button class="button" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
@@ -76,5 +79,16 @@ impl MainMenu {
 
         ctx.select(&format!(".root div{query}"))
             .remove_class("hidden");
+    }
+
+    const SUBTITLES: &str = include_str!("../../../assets/language/menu_subtitle.txt");
+
+    fn get_subtitle() -> &'static str {
+        let mut rng = rand::thread_rng();
+
+        Self::SUBTITLES
+            .lines()
+            .choose(&mut rng)
+            .unwrap_or(Self::SUBTITLES.lines().next().expect("No subtitles found"))
     }
 }

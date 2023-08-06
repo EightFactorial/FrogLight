@@ -47,7 +47,7 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
     let mut plugins = DefaultPlugins.build();
 
     // Enable asset hot-reloading
-    #[cfg(debug_assertions)]
+    #[cfg(feature = "debug")]
     {
         plugins = plugins.set(AssetPlugin {
             watch_for_changes: ChangeWatcher::with_delay(Duration::from_secs(1)),

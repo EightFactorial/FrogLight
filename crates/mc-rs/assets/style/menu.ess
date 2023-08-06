@@ -20,7 +20,7 @@ div.main-menu-menu {
 }
 
 div.main-menu-title {
-    width: 100%;
+    width: auto;
     height: auto;
 }
 
@@ -31,6 +31,20 @@ img.main-menu-logo {
     min-height: 150px;
     height: 85%;
     max-height: 200px;
+}
+
+div.main-menu-subtitle {
+    position-type: absolute;
+    bottom: 0px;
+    right: 0px;
+
+    flex-direction: column;
+    justify-content: center;
+}
+
+div.main-menu-subtitle span {
+    font-size: 24px;
+    color: yellow;
 }
 
 div.main-menu-buttons {
@@ -53,8 +67,8 @@ div.main-menu-buttons .button {
 
 div.main-menu div.menu-version {
     position-type: absolute;
-    bottom: 0px;
-    left: 0px;
+    bottom: 1px;
+    left: 1px;
 
     font-size: 28px;
     flex-wrap: wrap;
@@ -63,13 +77,12 @@ div.main-menu div.menu-version {
 
 div.main-menu div.menu-disclaimer {
     position-type: absolute;
-    bottom: 0px;
-    right: 0px;
+    bottom: 1px;
+    right: 1px;
 
     font-size: 28px;
     color: red;
 }
-
 
 .root div.main-background {
     position-type: absolute;
