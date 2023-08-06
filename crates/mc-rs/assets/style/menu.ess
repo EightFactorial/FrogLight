@@ -17,12 +17,20 @@ div.main-menu-menu {
     width: 50%;
     min-height: 275px;
     height: 60%;
-
-    background-color: white;
 }
 
 div.main-menu-title {
-    font-size: 64px;
+    width: 100%;
+    height: auto;
+}
+
+img.main-menu-logo {
+    margin-top: 5px;
+
+    width: 100%;
+    min-height: 150px;
+    height: 85%;
+    max-height: 200px;
 }
 
 div.main-menu-buttons {

@@ -45,7 +45,7 @@ impl MainMenu {
             <div class="main-menu">
                 <div class="main-menu-menu">
                     <div class="main-menu-title">
-                        "MC-RS"
+                        <img class="main-menu-logo" src="textures/gui/title/logo.png" />
                     </div>
                     <div class="main-menu-buttons">
                         <button class="button" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
