@@ -59,6 +59,13 @@ impl MainMenu {
                         </button>
                     </div>
                 </div>
+                <div class="menu-version">
+                    "MC-RS v"
+                    { env!("CARGO_PKG_VERSION") }
+                </div>
+                <div class="menu-disclaimer">
+                    "ALPHA SOFTWARE - USE AT YOUR OWN RISK"
+                </div>
             </div>
         });
     }

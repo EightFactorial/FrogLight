@@ -1,12 +1,10 @@
 .root div.main-menu {
-    margin: auto;
+    flex-direction: column;
+    align-items: center;
 
-    min-width: 400px;
-    width: 35%;
-
+    width: 100%;
     height: 100%;
 }
-
 
 div.main-menu-menu {
     margin: auto;
@@ -15,7 +13,8 @@ div.main-menu-menu {
     align-items: center;
     align-content: center;
 
-    width: 100%;
+    min-width: 400px;
+    width: 50%;
     min-height: 275px;
     height: 60%;
 
@@ -44,6 +43,26 @@ div.main-menu-buttons .button {
     width: 100%;
 }
 
+div.main-menu div.menu-version {
+    position-type: absolute;
+    bottom: 0px;
+    left: 0px;
+
+    font-size: 28px;
+    flex-wrap: wrap;
+    color: white;
+}
+
+div.main-menu div.menu-disclaimer {
+    position-type: absolute;
+    bottom: 0px;
+    right: 0px;
+
+    font-size: 28px;
+    color: red;
+}
+
+
 .root div.main-background {
     position-type: absolute;
     top: 0px;
@@ -53,5 +72,4 @@ div.main-menu-buttons .button {
     height: 100%;
 
     z-index: -1l;
-
 }
