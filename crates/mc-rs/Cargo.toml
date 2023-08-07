@@ -14,7 +14,7 @@ vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitoxide"]}
 [dependencies]
 belly = { git = "https://github.com/EightFactorial/belly" }
 bevy = { version = "0.11.0", features = ["serialize"] }
-bevy_rapier3d = { version = "0.22.0" }
+bevy_rapier3d = "0.22.0"
 convert_case = "0.6.0"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }
 mc-rs-proto = { path = "../mc-rs-proto" }
@@ -30,6 +30,7 @@ log = { version = "0.4.19", features = ["std"] }
 [features]
 default = ["wayland", "splash"]
 splash = []
+simd = ["bevy_rapier3d/simd-nightly", "rand/packed_simd"]
 
 # Enable bevy features
 wayland = ["bevy/wayland"]
