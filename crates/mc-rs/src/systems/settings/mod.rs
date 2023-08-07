@@ -10,13 +10,18 @@ use window::WindowSettings;
 pub mod menu;
 use menu::MenuSettings;
 
+pub mod audio;
+use audio::AudioSettings;
+
 /// Settings for the application.
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Resource)]
 pub struct Settings {
     #[serde(default)]
-    pub window: WindowSettings,
+    pub audio: AudioSettings,
     #[serde(default)]
     pub menu: MenuSettings,
+    #[serde(default)]
+    pub window: WindowSettings,
 }
 
 impl Settings {

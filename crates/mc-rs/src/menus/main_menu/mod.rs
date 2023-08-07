@@ -4,7 +4,9 @@ use rand::seq::IteratorRandom;
 
 use crate::systems::app_state::{ApplicationState, InMenuSet};
 
-use super::MenuRoot;
+use self::backgrounds::MainMenuBackground;
+
+use super::{server_menu::ServerMenu, MenuRoot};
 
 pub mod backgrounds;
 
@@ -19,6 +21,8 @@ pub(super) fn setup_menu(app: &mut App) {
             .in_set(InMenuSet),
     );
 
+    app.add_systems(Update, MainMenu::escape_button.in_set(InMenuSet));
+
     backgrounds::setup_backgrounds(app);
 }
 
@@ -27,15 +31,44 @@ pub(super) fn setup_menu(app: &mut App) {
 pub struct MainMenu;
 
 impl MainMenu {
+    // A list of possible menus
+    const MENUS: [&'static str; 3] = ["div.server-menu", "div.options-menu", "div.main-menu"];
+
+    #[allow(clippy::if_same_then_else)]
+    fn escape_button(mut elements: Elements, input: Res<Input<KeyCode>>) {
+        if !input.just_pressed(KeyCode::Escape) {
+            return;
+        }
+
+        let menus = Self::MENUS.map(|c| {
+            let ent = elements.select(c).entities();
+
+            !elements
+                .select(".hidden")
+                .entities()
+                .iter()
+                .any(|e| ent.contains(e))
+        });
+
+        match menus {
+            [true, _, false] => {
+                ServerMenu::handle_escape(elements);
+            }
+            [false, _, true] => {
+                // On main menu, do nothing
+            }
+            _ => {
+                warn!("Escape pressed, but no menu found to close!");
+                // warn!("Showing main menu");
+                // MainMenu::show(elements);
+            }
+        }
+    }
+
     /// Show the main menu
     pub fn show(mut elements: Elements) {
-        elements
-            .select(".root div.main-menu")
-            .remove_class("hidden");
-
-        elements
-            .select(".root div.main-background")
-            .remove_class("hidden");
+        elements.select("div.main-menu").remove_class("hidden");
+        MainMenuBackground::show(elements);
     }
 
     /// Create the main menu
@@ -43,30 +76,29 @@ impl MainMenu {
         commands.entity(**root).insert(MainMenu);
 
         elements.select(".root").add_child(eml! {
-            <div class="main-menu">
-                <div class="main-menu-menu">
-                    <div class="main-menu-title">
-                        <img class="main-menu-logo" src="textures/gui/title/logo.png"/>
-                        // TODO: Rotate a bit and add a grow/shink animation
-                        <div class="main-menu-subtitle"><span>{ Self::get_subtitle() }</span></div>
+            <div c:main-menu>
+                <div c:main-menu-menu>
+                    <div c:main-menu-title>
+                        <img c:main-menu-logo src="textures/gui/title/logo.png"/>
+                        <div c:main-menu-subtitle><span>{ Self::get_subtitle() }</span></div>
                     </div>
-                    <div class="main-menu-buttons">
-                        <button class="button" on:press=|ctx| { Self::click_button(ctx, ".servers-menu") }>
+                    <div c:main-menu-buttons>
+                        <button c:button on:press=|ctx| { Self::click_button(ctx, "div.server-menu") }>
                             "Servers"
                         </button>
-                        <button class="button" on:press=|ctx| { Self::click_button(ctx, ".options-menu") }>
+                        <button c:button on:press=|ctx| { Self::click_button(ctx, "div.options-menu") }>
                             "Options"
                         </button>
-                        <button class="button" on:press=|ctx| { ctx.send_event(AppExit) }>
+                        <button c:button on:press=|ctx| { ctx.send_event(AppExit) }>
                             "Quit"
                         </button>
                     </div>
                 </div>
-                <div class="menu-version">
+                <div c:menu-version>
                     "MC-RS v"
                     { env!("CARGO_PKG_VERSION") }
                 </div>
-                <div class="menu-disclaimer">
+                <div c:menu-disclaimer>
                     "ALPHA SOFTWARE - USE AT YOUR OWN RISK"
                 </div>
             </div>
@@ -74,11 +106,9 @@ impl MainMenu {
     }
 
     fn click_button(ctx: &mut EventContext<impl Event>, query: &str) {
-        ctx.select(".root div.main-menu").add_class("hidden");
-        ctx.select(".root div.main-background").add_class("hidden");
-
-        ctx.select(&format!(".root div{query}"))
-            .remove_class("hidden");
+        ctx.select("div.main-menu").add_class("hidden");
+        ctx.select("div.main-background").add_class("hidden");
+        ctx.select(query).remove_class("hidden");
     }
 
     const SUBTITLES: &str = include_str!("../../../assets/language/menu_subtitle.txt");

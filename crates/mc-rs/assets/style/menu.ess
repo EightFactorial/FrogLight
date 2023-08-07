@@ -1,4 +1,4 @@
-.root div.main-menu {
+div.main-menu {
     flex-direction: column;
     align-items: center;
 
@@ -88,7 +88,7 @@ div.main-menu div.menu-disclaimer {
     color: red;
 }
 
-.root div.main-background {
+div.main-background {
     position-type: absolute;
     top: 0px;
     left: 0px;
@@ -97,4 +97,43 @@ div.main-menu div.menu-disclaimer {
     height: 100%;
 
     z-index: -1l;
+}
+
+div.server-menu {
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+}
+
+div.server-list {
+    margin: auto;
+    flex-direction: column;
+    align-items: center;
+
+    background-color: black;
+}
+
+div.server-listing-info {
+    flex-direction: column;
+    align-items: center;
+
+    margin: 4px;
+}
+
+button.server-listing-button {
+    position-type: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+div.server-listing-name {
+    padding: 4px;
+    color: gray;
+}
+
+div.server-listing-ip {
+    padding: 4px;
+    color: gray;
 }

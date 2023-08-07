@@ -4,6 +4,7 @@ mod menus;
 mod networking;
 mod plugins;
 mod systems;
+mod util;
 
 fn main() {
     // Create a new app

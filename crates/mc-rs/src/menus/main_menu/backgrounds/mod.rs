@@ -51,9 +51,9 @@ pub struct BackgroundAssets(pub Vec<HandleUntyped>);
 pub struct MainMenuBackground;
 
 impl MainMenuBackground {
-    fn show(mut elements: Elements) {
+    pub(super) fn show(mut elements: Elements) {
         elements
-            .select(".root div.main-background")
+            .select("div.main-background")
             .remove_class("hidden");
     }
 }
