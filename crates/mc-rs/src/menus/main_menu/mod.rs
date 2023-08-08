@@ -6,7 +6,7 @@ use crate::systems::app_state::{ApplicationState, InMenuSet};
 
 use self::backgrounds::MainMenuBackground;
 
-use super::{server_menu::ServerMenu, MenuRoot};
+use super::MenuRoot;
 
 pub mod backgrounds;
 
@@ -21,8 +21,6 @@ pub(super) fn setup_menu(app: &mut App) {
             .in_set(InMenuSet),
     );
 
-    app.add_systems(Update, MainMenu::escape_button.in_set(InMenuSet));
-
     backgrounds::setup_backgrounds(app);
 }
 
@@ -31,40 +29,6 @@ pub(super) fn setup_menu(app: &mut App) {
 pub struct MainMenu;
 
 impl MainMenu {
-    // A list of possible menus
-    const MENUS: [&'static str; 3] = ["div.server-menu", "div.options-menu", "div.main-menu"];
-
-    #[allow(clippy::if_same_then_else)]
-    fn escape_button(mut elements: Elements, input: Res<Input<KeyCode>>) {
-        if !input.just_pressed(KeyCode::Escape) {
-            return;
-        }
-
-        let menus = Self::MENUS.map(|c| {
-            let ent = elements.select(c).entities();
-
-            !elements
-                .select(".hidden")
-                .entities()
-                .iter()
-                .any(|e| ent.contains(e))
-        });
-
-        match menus {
-            [true, _, false] => {
-                ServerMenu::handle_escape(elements);
-            }
-            [false, _, true] => {
-                // On main menu, do nothing
-            }
-            _ => {
-                warn!("Escape pressed, but no menu found to close!");
-                // warn!("Showing main menu");
-                // MainMenu::show(elements);
-            }
-        }
-    }
-
     /// Show the main menu
     pub fn show(mut elements: Elements) {
         elements.select("div.main-menu").remove_class("hidden");
@@ -105,14 +69,22 @@ impl MainMenu {
         });
     }
 
+    /// Function to handle button clicks
     fn click_button(ctx: &mut EventContext<impl Event>, query: &str) {
         ctx.select("div.main-menu").add_class("hidden");
         ctx.select("div.main-background").add_class("hidden");
+
         ctx.select(query).remove_class("hidden");
+
+        if query == "div.server-menu" {
+            // TODO: Request server status and ping
+        }
     }
 
+    /// The list of possible subtitles
     const SUBTITLES: &str = include_str!("../../../assets/language/menu_subtitle.txt");
 
+    /// Get a random subtitle from the list
     fn get_subtitle() -> &'static str {
         let mut rng = rand::thread_rng();
 

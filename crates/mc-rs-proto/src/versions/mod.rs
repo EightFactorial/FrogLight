@@ -6,6 +6,8 @@ pub mod state;
 
 pub mod v1_20_1;
 
+pub type DefaultVersion = v1_20_1::V1_20_1;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
 pub enum Versions {
     V1_20_1(v1_20_1::V1_20_1),

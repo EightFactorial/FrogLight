@@ -13,6 +13,7 @@ vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitoxide"]}
 
 [dependencies]
 anyhow = "1.0.72"
+async-net = "1.7.0"
 belly = { git = "https://github.com/EightFactorial/belly" }
 bevy = { version = "0.11.0", features = ["serialize"] }
 bevy_rapier3d = "0.22.0"

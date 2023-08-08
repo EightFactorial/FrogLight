@@ -56,7 +56,7 @@ impl ServerMenu {
 
     /// Handle the escape button
     pub fn handle_escape(mut elements: Elements) {
-        elements.select(".root div.server-menu").add_class("hidden");
+        elements.select("div.server-menu").add_class("hidden");
         MainMenu::show(elements);
     }
 }
