@@ -73,7 +73,7 @@ fn create_packet_enum(enum_name: &Ident, packets: &[PacketID]) -> proc_macro2::T
 
     // Create the enum
     quote! {
-        #[derive(Debug, derive_more::From)]
+        #[derive(Debug, Clone, derive_more::From)]
         pub enum #enum_name {
             #(#variants,)*
         }

@@ -1,7 +1,5 @@
-use std::time::Duration;
-
 use belly::prelude::BellyPlugin;
-use bevy::{app::PluginGroupBuilder, asset::ChangeWatcher, prelude::*, window::ExitCondition};
+use bevy::{app::PluginGroupBuilder, prelude::*, window::ExitCondition};
 use bevy_rapier3d::prelude::RapierPhysicsPlugin;
 use rand::seq::IteratorRandom;
 
@@ -49,6 +47,9 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
     // Enable asset hot-reloading
     #[cfg(feature = "debug")]
     {
+        use bevy::asset::ChangeWatcher;
+        use std::time::Duration;
+
         plugins = plugins.set(AssetPlugin {
             watch_for_changes: ChangeWatcher::with_delay(Duration::from_secs(1)),
             ..default()

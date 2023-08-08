@@ -32,13 +32,11 @@ where
     Handshake: State<V>,
 {
     /// Create a new connection from an address.
-    pub async fn new(version: V, mut address: &str) -> Result<Self, ConnectionError> {
-        if address.starts_with("http://") {
-            address = &address[7..];
-        } else if address.starts_with("https://") {
-            address = &address[8..];
-        } else if address.starts_with("tcp://") {
-            address = &address[6..];
+    pub async fn new(version: V, address: impl Into<String>) -> Result<Self, ConnectionError> {
+        let address = address.into();
+        let mut address = address.as_str();
+        if let Some(pos) = address.find("://") {
+            address = &address[pos + 3..];
         }
 
         if let Some(colon) = address.find(':') {
@@ -63,7 +61,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     /// Create a new connection from a socket address.
     pub async fn from_sock(address: SocketAddr) -> Result<Self, ConnectionError> {
         let stream = TcpStream::connect(address).await?;
-        Ok(stream.into())
+        Ok(stream.try_into()?)
     }
 
     /// Sends a packet to the server.
@@ -184,6 +182,9 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         }
     }
 
+    /// Returns the peer address of the connection.
+    pub fn peer_addr(&self) -> Option<SocketAddr> { self.stream.peer_addr().ok() }
+
     /// Converts this connection into a connection with a different state.
     pub fn into<S2>(self) -> Connection<V, S2>
     where
@@ -229,20 +230,23 @@ impl<V: Version, S: State<V>> TryFrom<std::net::TcpStream> for Connection<V, S> 
     type Error = std::io::Error;
 
     fn try_from(value: std::net::TcpStream) -> Result<Self, Self::Error> {
-        Ok(TcpStream::try_from(value)?.into())
+        TcpStream::try_from(value)?.try_into()
     }
 }
 
-impl<V: Version, S: State<V>> From<TcpStream> for Connection<V, S> {
-    fn from(stream: TcpStream) -> Self {
-        Connection {
+impl<V: Version, S: State<V>> TryFrom<TcpStream> for Connection<V, S> {
+    type Error = std::io::Error;
+
+    fn try_from(stream: TcpStream) -> Result<Self, Self::Error> {
+        stream.set_nodelay(true)?;
+        Ok(Connection {
             _version: PhantomData,
             _state: PhantomData,
             compression: None,
             packet_buffer: VecDeque::new(),
             buffer: BufReader::new(stream.clone()),
             stream,
-        }
+        })
     }
 }
 
