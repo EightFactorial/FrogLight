@@ -18,6 +18,7 @@ derive_more = "0.99.17"
 fastnbt = "2.4.4"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }
 hashbrown = { version = "0.14.0", features = ["serde"], optional = true }
+log = { version = "0.4.19", features = ["std"] }
 mc-rs-macros = { path = "../mc-rs-macros" }
 serde = { version = "1.0.175", features = ["derive"] }
 serde_json = { version = "1.0.103", features = ["preserve_order", "arbitrary_precision"] }

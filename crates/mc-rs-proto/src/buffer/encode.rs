@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use azalea_chat::FormattedText;
 use byteorder::{WriteBytesExt, BE};
 use fastnbt::Value;
 use uuid::Uuid;
@@ -174,5 +175,11 @@ impl<K: Encode, V: Encode> Encode for hashbrown::HashMap<K, V> {
 impl Encode for Value {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         fastnbt::to_writer(buf, self).map_err(EncodeError::from)
+    }
+}
+
+impl Encode for FormattedText {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        serde_json::to_string(self)?.encode(buf)
     }
 }

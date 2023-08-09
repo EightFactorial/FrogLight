@@ -4,13 +4,16 @@ use async_trait::async_trait;
 use bevy::utils::HashMap;
 use flume::{Receiver, Sender};
 use futures_locks::Mutex;
-use log::error;
+use log::{debug, error};
 use mc_rs_proto::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::{
         state::*,
         v1_20_0::{
             handshake::serverboundhandshakepacket::ServerboundHandshakePacket,
+            login::{
+                serverboundloginhellopacket::ServerboundLoginHelloPacket, ClientboundLoginPackets,
+            },
             status::{
                 serverboundquerypingpacket::ServerboundQueryPingPacket,
                 serverboundqueryrequestpacket::ServerboundQueryRequestPacket,
@@ -90,9 +93,35 @@ impl NetworkHandle for V1_20_0 {
     }
 
     async fn login_handle(
-        _con: Connection<Self, Login>,
+        mut con: Connection<Self, Login>,
     ) -> Result<(Connection<Self, Login>, GameProfile), ConnectionError> {
-        todo!()
+        con.send_packet(ServerboundLoginHelloPacket {
+            username: "MC-RS".to_string(),
+            uuid: None,
+        })
+        .await?;
+
+        let profile = loop {
+            match con.receive_packet().await? {
+                ClientboundLoginPackets::LoginHello(p) => {
+                    debug!("Received login encryption packet: {p:?}");
+                }
+                ClientboundLoginPackets::LoginSuccess(p) => {
+                    break p.profile;
+                }
+                ClientboundLoginPackets::LoginCompression(p) => {
+                    con.compression = Some(p.threshold);
+                }
+                ClientboundLoginPackets::LoginQueryRequest(p) => {
+                    debug!("Received login query: {p:?}");
+                }
+                ClientboundLoginPackets::LoginDisconnect(p) => {
+                    return Err(ConnectionError::Disconnected(p.reason));
+                }
+            }
+        };
+
+        Ok((con, profile))
     }
 
     async fn configuration_handle(
@@ -131,8 +160,7 @@ async fn con_write(
     rx: Receiver<ConnectionSend<V1_20_0>>,
 ) {
     loop {
-        let recv = rx.recv_async().await;
-        if let Ok(data) = recv {
+        if let Ok(data) = rx.recv_async().await {
             let mut con = con.lock().await;
             if let Err(e) = con.send_packet(data).await {
                 error!("Failed to send packet: {:?}", e);

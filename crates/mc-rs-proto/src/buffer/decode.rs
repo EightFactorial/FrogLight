@@ -1,5 +1,6 @@
 use std::{collections::HashMap, hash::Hash};
 
+use azalea_chat::FormattedText;
 use byteorder::{ReadBytesExt, BE};
 use fastnbt::Value;
 use uuid::Uuid;
@@ -187,5 +188,11 @@ impl<K: Decode + Eq + Hash, V: Decode> Decode for hashbrown::HashMap<K, V> {
 impl Decode for Value {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         fastnbt::from_reader(buf).map_err(DecodeError::from)
+    }
+}
+
+impl Decode for FormattedText {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        Ok(serde_json::from_str(&String::decode(buf)?)?)
     }
 }

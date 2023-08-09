@@ -9,6 +9,7 @@ use std::{
 
 use async_compression::futures::{bufread::ZlibDecoder, write::ZlibEncoder};
 use async_net::{AsyncToSocketAddrs, SocketAddr, TcpStream};
+use azalea_chat::FormattedText;
 use futures_lite::{io::BufReader, AsyncBufReadExt, AsyncReadExt, AsyncWriteExt};
 use thiserror::Error;
 
@@ -151,7 +152,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         let mut cursor = Cursor::new(buf);
 
         // Decompress the packet if needed
-        if self.is_compressed() && 0 == u32::var_decode(&mut cursor)? {
+        if self.is_compressed() && 0 != u32::var_decode(&mut cursor)? {
             // Decompress the packet
             let mut decompressor = ZlibDecoder::new(cursor.remaining_slice());
             let mut decompressed = Vec::new();
@@ -243,6 +244,8 @@ pub enum ConnectionError {
     NoAddressFound,
     #[error("Unexpected packet")]
     UnexpectedPacket,
+    #[error("Disconnected: {0:?}")]
+    Disconnected(FormattedText),
 }
 
 impl<V: Version, S: State<V>> TryFrom<std::net::TcpStream> for Connection<V, S> {

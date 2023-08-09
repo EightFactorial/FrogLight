@@ -132,7 +132,10 @@ fn implement_decode(enum_name: &Ident, packets: &[PacketID]) -> proc_macro2::Tok
     // Create match arms for each packet
     let variants = packets.iter().map(|PacketID { id, name, module }| {
         quote! {
-            #id => Ok(#module::#name::decode(buf)?.into())
+            #id => {
+                log::trace!("Found packet 0x{:02X} ({}::{})", #id, stringify!(#module), stringify!(#name));
+                Ok(#module::#name::decode(buf)?.into())
+            }
         }
     });
 

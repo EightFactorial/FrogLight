@@ -5,7 +5,7 @@ use futures_lite::future::{block_on, poll_once};
 use mc_rs_proto::{
     types::enums::ConnectionIntent,
     versions::state::{Configuration, Handshake, Login, Play, Status},
-    Connection, State, Version,
+    Connection, ConnectionError, State, Version,
 };
 
 use crate::networking::{
@@ -30,7 +30,15 @@ pub struct ConnectionEvent<V: Version> {
 }
 
 impl<V: Version> ConnectionEvent<V> {
-    pub fn new(addr: impl Into<String>, intent: ConnectionIntent) -> Self {
+    pub fn new(addr: impl Into<String>) -> Self {
+        Self {
+            addr: addr.into(),
+            intent: ConnectionIntent::Login,
+            _version: PhantomData,
+        }
+    }
+
+    pub fn new_with(addr: impl Into<String>, intent: ConnectionIntent) -> Self {
         Self {
             addr: addr.into(),
             intent,
@@ -91,7 +99,7 @@ where
         mut writer: EventWriter<ConnectionEvent<Self>>,
     ) {
         for request in reader.iter() {
-            writer.send(ConnectionEvent::new(
+            writer.send(ConnectionEvent::new_with(
                 request.host.clone(),
                 ConnectionIntent::Status,
             ));
@@ -241,7 +249,7 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok((con, profile)) => {
-                        info!(
+                        debug!(
                             "Login finished with {}",
                             con.peer_addr().expect("Unable to get peer address")
                         );
@@ -294,7 +302,7 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
-                        info!(
+                        debug!(
                             "Configuration finished with {}",
                             con.peer_addr().expect("Unable to get peer address")
                         );
@@ -332,18 +340,53 @@ where
 
         // Get the channel state and data
         {
-            let mut state = SystemState::<Query<&ConnectionPlayTask<Self>>>::new(world);
-            let query = state.get(world);
-            let task = query.single();
+            let mut state =
+                SystemState::<(Query<(Entity, &ConnectionPlayTask<Self>)>, Commands)>::new(world);
+            let (query, mut commands) = state.get(world);
+            let (entity, task) = query.single();
 
             channel_state = *task.state();
-            while let Ok(result) = task.recv() {
+
+            if task.is_disconnected() {
+                commands.entity(entity).despawn_recursive();
+                return;
+            }
+
+            for result in task.try_iter() {
                 match result {
                     Ok(data) => {
                         channel_data.push(data);
                     }
                     Err(err) => {
-                        error!("Failed to receive packet: {}", err);
+                        if let ConnectionError::Io(err) = err {
+                            if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
+                                error!("Failed to receive packet: {err}");
+
+                                commands.entity(entity).despawn_recursive();
+                                return;
+                            }
+                        } else {
+                            match err {
+                                ConnectionError::Encode(err) => {
+                                    error!("{err}");
+                                }
+                                ConnectionError::Decode(err) => {
+                                    error!("{err}");
+                                }
+                                ConnectionError::Disconnected(reason) => {
+                                    warn!("Client disconnected: {}", reason.to_string());
+                                }
+                                ConnectionError::Io(_)
+                                | ConnectionError::ParsePort(_)
+                                | ConnectionError::NoAddressFound
+                                | ConnectionError::UnexpectedPacket => {
+                                    unreachable!("Does not occur in configuration/play state")
+                                }
+                            }
+
+                            commands.entity(entity).despawn_recursive();
+                            return;
+                        }
                     }
                 }
             }

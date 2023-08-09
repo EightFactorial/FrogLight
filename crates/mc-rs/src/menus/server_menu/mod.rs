@@ -7,7 +7,7 @@ use mc_rs_proto::versions::DefaultVersion;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    networking::request::StatusRequest,
+    networking::{network::ConnectionEvent, request::StatusRequest},
     systems::app_state::{ApplicationState, InMenuSet},
     util::mc_dir::minecraft_dir,
 };
@@ -54,7 +54,13 @@ impl ServerMenu {
                     <for server in=servers.servers>
                         <div c:server-listing>
                             <div c:server-listing-info>
-                                <button c:server-listing-button></button>
+                                // TODO: Get version from query
+                                // TODO: Add description from query
+                                // TODO: Add icon from file or query
+                                <button c:server-listing-button on:press={
+                                    let address = server.ip.clone();
+                                    move |ctx| { ctx.send_event(ConnectionEvent::<DefaultVersion>::new(address.clone())) }
+                                }></button>
                                 <div c:server-listing-name>{ server.name }</div>
                                 <div c:server-listing-ip>{ server.ip }</div>
                             </div>
