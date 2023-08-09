@@ -12,11 +12,11 @@ use crate::networking::network::Network;
 impl Network for V1_20_1 {
     const HAS_CONFIGURATION_STATE: bool = false;
 
-    fn config_packet(packet: <Configuration as State<Self>>::Clientbound) {
+    fn config_packet(_world: &mut World, packet: <Configuration as State<Self>>::Clientbound) {
         info!("Config packet: {:?}", packet);
     }
 
-    fn play_packet(packet: <Play as State<Self>>::Clientbound) {
+    fn play_packet(_world: &mut World, packet: <Play as State<Self>>::Clientbound) {
         info!("Play packet: {:?}", packet);
     }
 }

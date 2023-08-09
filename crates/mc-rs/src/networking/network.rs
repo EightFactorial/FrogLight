@@ -1,6 +1,6 @@
-use std::{fmt::Debug, marker::PhantomData};
+use std::{fmt::Debug, hash::Hash, marker::PhantomData};
 
-use bevy::{prelude::*, tasks::IoTaskPool};
+use bevy::{ecs::system::SystemState, prelude::*, tasks::IoTaskPool};
 use futures_lite::future::{block_on, poll_once};
 use mc_rs_proto::{
     types::enums::ConnectionIntent,
@@ -52,26 +52,35 @@ where
 {
     /// Register the version's networking systems to the app
     fn register(app: &mut App) {
+        // Add events
         app.add_event::<StatusRequest<Self>>();
         app.add_event::<ConnectionEvent<Self>>();
 
+        // Configure the system set
+        app.configure_set(
+            Update,
+            ConnectionSystemSet::<Self>::default()
+                .run_if(any_with_component::<ConnectionMarker<Self>>()),
+        );
+
+        // Add systems to the set
         app.add_systems(
             Update,
             (
+                (Self::status_request, Self::connection_request).chain(),
                 (
-                    Self::status_request,
-                    Self::connection_request,
-                    Self::connection_query,
+                    Self::connection_query.run_if(any_with_component::<ConnectionTask<Self>>()),
+                    Self::handshake_query
+                        .run_if(any_with_component::<ConnectionHandshakeTask<Self>>()),
+                    Self::status_query.run_if(any_with_component::<ConnectionStatusTask<Self>>()),
+                    Self::login_query.run_if(any_with_component::<ConnectionLoginTask<Self>>()),
+                    Self::configuration_query.run_if(
+                        Self::has_configuration_state
+                            .and_then(any_with_component::<ConnectionConfigurationTask<Self>>()),
+                    ),
+                    Self::packet_query.run_if(any_with_component::<ConnectionPlayTask<Self>>()),
                 )
-                    .chain(),
-                Self::handshake_query.run_if(any_with_component::<ConnectionHandshakeTask<Self>>()),
-                Self::status_query.run_if(any_with_component::<ConnectionStatusTask<Self>>()),
-                Self::login_query.run_if(any_with_component::<ConnectionLoginTask<Self>>()),
-                Self::configuration_query.run_if(
-                    Self::has_configuration_state
-                        .and_then(any_with_component::<ConnectionConfigurationTask<Self>>()),
-                ),
-                Self::packet_query.run_if(any_with_component::<ConnectionPlayTask<Self>>()),
+                    .in_set(ConnectionSystemSet::<Self>::default()),
             ),
         );
     }
@@ -97,7 +106,10 @@ where
 
             match event.intent {
                 ConnectionIntent::Status | ConnectionIntent::Login => {
-                    commands.spawn(ConnectionTask::new_with(task, event.intent));
+                    commands.spawn((
+                        ConnectionMarker::<Self>::default(),
+                        ConnectionTask::new_with(task, event.intent),
+                    ));
                 }
                 _ => {
                     warn!("Skipping making connection with invalid connection intent!");
@@ -115,7 +127,10 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
-                        info!("Connected to {}", con.peer_addr().unwrap());
+                        info!(
+                            "Connected to {}",
+                            con.peer_addr().expect("Unable to get peer address")
+                        );
 
                         let new_task =
                             IoTaskPool::get().spawn(Self::handshake_handle(con, task.intent));
@@ -143,7 +158,10 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
-                        info!("Handshake finished with {}", con.peer_addr().unwrap());
+                        info!(
+                            "Handshake finished with {}",
+                            con.peer_addr().expect("Unable to get peer address")
+                        );
 
                         match task.intent {
                             ConnectionIntent::Status => {
@@ -221,7 +239,10 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok((con, profile)) => {
-                        info!("Login finished with {}", con.peer_addr().unwrap());
+                        info!(
+                            "Login finished with {}",
+                            con.peer_addr().expect("Unable to get peer address")
+                        );
 
                         if Self::HAS_CONFIGURATION_STATE {
                             // Go to the configuration state
@@ -271,7 +292,10 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
-                        info!("Configuration finished with {}", con.peer_addr().unwrap());
+                        info!(
+                            "Configuration finished with {}",
+                            con.peer_addr().expect("Unable to get peer address")
+                        );
 
                         let (tx1, rx1) = flume::unbounded();
                         let (tx2, rx2) = flume::unbounded();
@@ -300,50 +324,90 @@ where
     }
 
     /// Query the task for any packets
-    fn packet_query(query: Query<&ConnectionPlayTask<Self>>) {
-        let task = query.single();
+    fn packet_query(world: &mut World) {
+        let mut channel_state: ConnectionState;
+        let mut channel_data = Vec::new();
 
-        while let Ok(result) = task.recv() {
-            match result {
-                Ok(data) => {
-                    match data {
-                        ConnectionData::Configuration(packet) => {
-                            if Self::HAS_CONFIGURATION_STATE {
-                                if *task.state() != ConnectionState::Configuration {
-                                    error!("Received configuration packet in play state!");
-                                }
+        // Get the channel state and data
+        {
+            let mut state = SystemState::<Query<&ConnectionPlayTask<Self>>>::new(world);
+            let query = state.get(world);
+            let task = query.single();
 
-                                Self::config_packet(packet)
-                            } else {
-                                unreachable!("Configuration packet when connection doesn't have Configuration state!")
-                            }
-                        }
-                        ConnectionData::Play(packet) => {
-                            if *task.state() != ConnectionState::Play {
-                                error!("Received play packet in configuration state!");
-                            }
-
-                            Self::play_packet(packet)
-                        }
-                        ConnectionData::NewState(state) => {
-                            if Self::HAS_CONFIGURATION_STATE {
-                                info!("Connection state changed to {:?}", state);
-                                *task.state.write().unwrap() = state;
-                            } else {
-                                unreachable!("State changed when connection doesn't have Configuration state!")
-                            }
-                        }
-                        ConnectionData::Closed => todo!("Handle closed connection!"),
+            channel_state = *task.state();
+            while let Ok(result) = task.recv() {
+                match result {
+                    Ok(data) => {
+                        channel_data.push(data);
                     }
-                }
-                Err(err) => {
-                    error!("Failed to receive packet: {}", err);
+                    Err(err) => {
+                        error!("Failed to receive packet: {}", err);
+                    }
                 }
             }
         }
+
+        for data in channel_data {
+            match data {
+                ConnectionData::Configuration(packet) => {
+                    if Self::HAS_CONFIGURATION_STATE {
+                        if channel_state != ConnectionState::Configuration {
+                            error!("Received configuration packet in play state!");
+                        }
+
+                        Self::config_packet(world, packet)
+                    } else {
+                        unreachable!("Configuration packet when connection doesn't have Configuration state!")
+                    }
+                }
+                ConnectionData::Play(packet) => {
+                    if channel_state != ConnectionState::Play {
+                        error!("Received play packet in configuration state!");
+                    }
+
+                    Self::play_packet(world, packet)
+                }
+                ConnectionData::NewState(state) => {
+                    if Self::HAS_CONFIGURATION_STATE {
+                        info!("Connection state changed to {:?}", state);
+                        channel_state = state;
+                    } else {
+                        unreachable!(
+                            "State changed when connection doesn't have Configuration state!"
+                        )
+                    }
+                }
+                ConnectionData::Closed => todo!("Handle closed connection!"),
+            }
+        }
+
+        // Update the channel state
+        {
+            let mut state = SystemState::<Query<&ConnectionPlayTask<Self>>>::new(world);
+            let query = state.get(world);
+            let task = query.single();
+
+            *task
+                .state
+                .write()
+                .expect("Unable to write to channel state") = channel_state;
+        }
     }
 
-    fn config_packet(packet: <Configuration as State<Self>>::Clientbound);
+    fn config_packet(world: &mut World, packet: <Configuration as State<Self>>::Clientbound);
 
-    fn play_packet(packet: <Play as State<Self>>::Clientbound);
+    fn play_packet(world: &mut World, packet: <Play as State<Self>>::Clientbound);
 }
+
+/// A system set that contains all the systems needed for a connection
+#[derive(Debug, Default, PartialEq, Eq, Hash, SystemSet)]
+pub struct ConnectionSystemSet<V: Version>(PhantomData<V>);
+
+/// I don't know why I have to do this myself
+impl<V: Version> Clone for ConnectionSystemSet<V> {
+    fn clone(&self) -> Self { Self(self.0) }
+}
+
+/// A marker component for entities that represent a connection
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub struct ConnectionMarker<V: Version>(PhantomData<V>);
