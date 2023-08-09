@@ -97,7 +97,7 @@ where
 
             match event.intent {
                 ConnectionIntent::Status | ConnectionIntent::Login => {
-                    commands.spawn((ConnectionTask::new_with(task, event.intent),));
+                    commands.spawn(ConnectionTask::new_with(task, event.intent));
                 }
                 _ => {
                     warn!("Skipping making connection with invalid connection intent!");
@@ -224,6 +224,7 @@ where
                         info!("Login finished with {}", con.peer_addr().unwrap());
 
                         if Self::HAS_CONFIGURATION_STATE {
+                            // Go to the configuration state
                             let new_task =
                                 IoTaskPool::get().spawn(Self::configuration_handle(con.into()));
 
@@ -232,8 +233,7 @@ where
                                 .insert(profile)
                                 .insert(ConnectionConfigurationTask::new(new_task));
                         } else {
-                            info!("Configuration finished with {}", con.peer_addr().unwrap());
-
+                            // Go to the play state
                             let (tx1, rx1) = flume::unbounded();
                             let (tx2, rx2) = flume::unbounded();
 
