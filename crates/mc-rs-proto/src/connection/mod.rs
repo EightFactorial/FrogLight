@@ -172,7 +172,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
 
             log::trace!("Failed to gather {len} bytes for packet 0x{:02X}", id);
             log::trace!("Byte buffer: {:?}", cursor.into_inner());
-            panic!("{err}");
+            panic!("Connection {err}");
         }
 
         let mut cursor = Cursor::new(buf);

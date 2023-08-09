@@ -10,9 +10,7 @@ use mc_rs_proto::{
 
 use crate::networking::{
     handle::ConnectionEnum,
-    task::{
-        ConnectionHandshakeTask, ConnectionLoginTask, ConnectionPlayTask, ConnectionStatusTask,
-    },
+    task::{ConnectionChannel, ConnectionHandshakeTask, ConnectionLoginTask, ConnectionStatusTask},
 };
 
 use super::{
@@ -20,6 +18,10 @@ use super::{
     request::{PingResponse, StatusRequest, StatusResponse},
     task::{ConnectionConfigurationTask, ConnectionTask},
 };
+
+/// A resource containing the local player's bevy entity
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+pub struct LocalPlayer(pub Entity);
 
 /// An event that is sent to create a new connection
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
@@ -86,7 +88,7 @@ where
                         Self::has_configuration_state
                             .and_then(any_with_component::<ConnectionConfigurationTask<Self>>()),
                     ),
-                    Self::packet_query.run_if(any_with_component::<ConnectionPlayTask<Self>>()),
+                    Self::packet_query.run_if(resource_exists::<ConnectionChannel<Self>>()),
                 )
                     .in_set(ConnectionSystemSet::<Self>::default()),
             ),
@@ -146,14 +148,14 @@ where
 
                         commands
                             .entity(entity)
-                            .insert(ConnectionHandshakeTask::new(new_task, task.intent));
+                            .insert(ConnectionHandshakeTask::new(new_task, task.intent))
+                            .remove::<ConnectionTask<Self>>();
                     }
                     Err(err) => {
                         error!("Failed to connect to {}, {}", task.hostname, err);
+                        commands.entity(entity).despawn_recursive();
                     }
                 }
-
-                commands.entity(entity).remove::<ConnectionTask<Self>>();
             }
         }
     }
@@ -173,36 +175,33 @@ where
                             con.peer_addr().expect("Unable to get peer address")
                         );
 
+                        let mut commands = commands.entity(entity);
+
                         match task.intent {
                             ConnectionIntent::Status => {
                                 let new_task =
                                     IoTaskPool::get().spawn(Self::status_handle(con.into()));
 
-                                commands
-                                    .entity(entity)
-                                    .insert(ConnectionStatusTask::new(new_task));
+                                commands.insert(ConnectionStatusTask::new(new_task));
                             }
                             ConnectionIntent::Login => {
                                 let new_task =
                                     IoTaskPool::get().spawn(Self::login_handle(con.into()));
 
-                                commands
-                                    .entity(entity)
-                                    .insert(ConnectionLoginTask::new(new_task));
+                                commands.insert(ConnectionLoginTask::new(new_task));
                             }
                             _ => {
                                 unreachable!("Invalid connection intent!")
                             }
                         }
+
+                        commands.remove::<ConnectionHandshakeTask<Self>>();
                     }
                     Err(err) => {
                         error!("Failed to handshake: {}", err);
+                        commands.entity(entity).despawn_recursive();
                     }
                 }
-
-                commands
-                    .entity(entity)
-                    .remove::<ConnectionHandshakeTask<Self>>();
             }
         }
     }
@@ -262,7 +261,8 @@ where
                             commands
                                 .entity(entity)
                                 .insert(profile)
-                                .insert(ConnectionConfigurationTask::new(new_task));
+                                .insert(ConnectionConfigurationTask::new(new_task))
+                                .remove::<ConnectionLoginTask<Self>>();
                         } else {
                             // Go to the play state
                             let (tx1, rx1) = flume::unbounded();
@@ -275,20 +275,20 @@ where
                                 rx2,
                             ));
 
+                            commands.insert_resource(LocalPlayer(entity));
+                            commands.insert_resource(ConnectionChannel::new(rx1, tx2, new_task));
+
                             commands
                                 .entity(entity)
                                 .insert(profile)
-                                .insert(ConnectionPlayTask::new(rx1, tx2, new_task));
+                                .remove::<ConnectionConfigurationTask<Self>>();
                         }
                     }
                     Err(err) => {
                         error!("Failed to login: {}", err);
+                        commands.entity(entity).despawn_recursive();
                     }
                 }
-
-                commands
-                    .entity(entity)
-                    .remove::<ConnectionLoginTask<Self>>();
             }
         }
     }
@@ -317,18 +317,18 @@ where
                             rx2,
                         ));
 
+                        commands.insert_resource(LocalPlayer(entity));
+                        commands.insert_resource(ConnectionChannel::new(rx1, tx2, new_task));
+
                         commands
                             .entity(entity)
-                            .insert(ConnectionPlayTask::new(rx1, tx2, new_task));
+                            .remove::<ConnectionConfigurationTask<Self>>();
                     }
                     Err(err) => {
                         error!("Failed to configure client: {}", err);
+                        commands.entity(entity).despawn_recursive();
                     }
                 }
-
-                commands
-                    .entity(entity)
-                    .remove::<ConnectionConfigurationTask<Self>>();
             }
         }
     }
@@ -338,17 +338,15 @@ where
         let mut channel_state: ConnectionState;
         let mut channel_data = Vec::new();
 
-        // Get the channel state and data
+        // Get the channel data and state
         {
-            let mut state =
-                SystemState::<(Query<(Entity, &ConnectionPlayTask<Self>)>, Commands)>::new(world);
-            let (query, mut commands) = state.get(world);
-            let (entity, task) = query.single();
+            let mut state = SystemState::<(Res<ConnectionChannel<Self>>, Commands)>::new(world);
+            let (task, mut commands) = state.get(world);
 
-            channel_state = *task.state();
+            channel_state = task.state;
 
             if task.is_disconnected() {
-                commands.entity(entity).despawn_recursive();
+                commands.remove_resource::<ConnectionChannel<Self>>();
                 return;
             }
 
@@ -362,7 +360,7 @@ where
                             if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
                                 error!("Failed to receive packet: {err}");
 
-                                commands.entity(entity).despawn_recursive();
+                                commands.remove_resource::<ConnectionChannel<Self>>();
                                 return;
                             }
                         } else {
@@ -384,7 +382,7 @@ where
                                 }
                             }
 
-                            commands.entity(entity).despawn_recursive();
+                            commands.remove_resource::<ConnectionChannel<Self>>();
                             return;
                         }
                     }
@@ -397,7 +395,7 @@ where
                 ConnectionData::Configuration(packet) => {
                     if Self::HAS_CONFIGURATION_STATE {
                         if channel_state != ConnectionState::Configuration {
-                            error!("Received configuration packet in play state!");
+                            warn!("Received configuration packet in play state!");
                         }
 
                         Self::config_packet(world, packet)
@@ -406,15 +404,20 @@ where
                     }
                 }
                 ConnectionData::Play(packet) => {
-                    if channel_state != ConnectionState::Play {
-                        error!("Received play packet in configuration state!");
-                    }
+                    if Self::HAS_CONFIGURATION_STATE {
+                        if channel_state != ConnectionState::Play {
+                            warn!("Received play packet in configuration state!");
+                        }
 
-                    Self::play_packet(world, packet)
+                        Self::play_packet(world, packet)
+                    } else {
+                        Self::play_packet(world, packet)
+                    }
                 }
                 ConnectionData::NewState(state) => {
                     if Self::HAS_CONFIGURATION_STATE {
-                        info!("Connection state changed to {:?}", state);
+                        debug!("Connection state changed to {:?}", state);
+
                         channel_state = state;
                     } else {
                         unreachable!(
@@ -422,20 +425,15 @@ where
                         )
                     }
                 }
-                ConnectionData::Closed => todo!("Handle closed connection!"),
+                ConnectionData::Closed => todo!("handle closed connection"),
             }
         }
 
         // Update the channel state
         {
-            let mut state = SystemState::<Query<&ConnectionPlayTask<Self>>>::new(world);
-            let query = state.get(world);
-            let task = query.single();
-
-            *task
-                .state
-                .write()
-                .expect("Unable to write to channel state") = channel_state;
+            SystemState::<ResMut<ConnectionChannel<Self>>>::new(world)
+                .get_mut(world)
+                .state = channel_state;
         }
     }
 

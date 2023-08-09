@@ -1,11 +1,7 @@
 #![allow(clippy::type_complexity)]
 #![allow(dead_code)]
 
-use std::{
-    fmt::Debug,
-    marker::PhantomData,
-    sync::{RwLock, RwLockReadGuard},
-};
+use std::{fmt::Debug, marker::PhantomData};
 
 use bevy::{prelude::*, tasks::Task};
 use flume::{Receiver, Sender};
@@ -36,7 +32,6 @@ where
     pub intent: ConnectionIntent,
 }
 
-#[allow(dead_code)]
 impl<V: Version> ConnectionTask<V>
 where
     Handshake: State<V>,
@@ -191,9 +186,9 @@ where
     }
 }
 
-/// A task that is used to track the play state of a connection
-#[derive(Debug, Deref, DerefMut, Component)]
-pub struct ConnectionPlayTask<V: Version>
+/// A resource that communicates with the connection task
+#[derive(Debug, Deref, DerefMut, Resource)]
+pub struct ConnectionChannel<V: Version>
 where
     Configuration: State<V>,
     Play: State<V>,
@@ -201,12 +196,12 @@ where
     #[deref]
     pub rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
     pub tx: Sender<ConnectionSend<V>>,
-    pub state: RwLock<ConnectionState>,
+    pub state: ConnectionState,
     task: Task<()>,
     _version: PhantomData<V>,
 }
 
-impl<V: Version> ConnectionPlayTask<V>
+impl<V: Version> ConnectionChannel<V>
 where
     Configuration: State<V>,
     Play: State<V>,
@@ -220,12 +215,10 @@ where
             rx,
             tx,
             task,
-            state: RwLock::new(ConnectionState::Play),
+            state: ConnectionState::Play,
             _version: PhantomData,
         }
     }
-
-    pub fn state(&self) -> RwLockReadGuard<ConnectionState> { self.state.read().unwrap() }
 
     pub fn task(&self) -> &Task<()> { &self.task }
 
