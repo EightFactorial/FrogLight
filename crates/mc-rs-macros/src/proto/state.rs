@@ -133,7 +133,8 @@ fn implement_decode(enum_name: &Ident, packets: &[PacketID]) -> proc_macro2::Tok
     let variants = packets.iter().map(|PacketID { id, name, module }| {
         quote! {
             #id => {
-                log::trace!("Found packet 0x{:02X} ({}::{})", #id, stringify!(#module), stringify!(#name));
+                #[cfg(feature = "debug")]
+                log::debug!("Found packet 0x{:02X} ({}::{})", #id, stringify!(#module), stringify!(#name));
                 Ok(#module::#name::decode(buf)?.into())
             }
         }

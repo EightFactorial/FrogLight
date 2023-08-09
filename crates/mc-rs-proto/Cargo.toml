@@ -30,3 +30,4 @@ uuid = { version = "1.4.1", features = ["v3"] }
 [features]
 default = ["hashbrown"]
 hashbrown = ["dep:hashbrown"]
+debug = ["mc-rs-macros/debug"]

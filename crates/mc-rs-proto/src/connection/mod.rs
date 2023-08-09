@@ -133,11 +133,18 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     ) -> Result<<S as State<V>>::Clientbound, ConnectionError> {
         // Return a packet from the buffer if possible
         if let Some(packet) = self.packet_buffer.pop_front() {
+            #[cfg(feature = "debug")]
+            log::trace!("Returning packet from buffer: {packet:?}");
             return Ok(packet);
         }
 
         // Read the packet from the stream
         let buffer = self.buffer.fill_buf().await?;
+        #[cfg(feature = "debug")]
+        log::trace!(
+            "Byte peek: {:?}",
+            &buffer[0..std::cmp::min(16, buffer.len())]
+        );
 
         // TODO: Decryption
 
@@ -148,7 +155,25 @@ impl<V: Version, S: State<V>> Connection<V, S> {
 
         // Take the packet bytes
         let mut buf: Vec<u8> = vec![0; len];
+
+        #[cfg(not(feature = "debug"))]
         cursor.read_exact(&mut buf)?;
+        #[cfg(feature = "debug")]
+        if let Err(err) = cursor.read_exact(&mut buf) {
+            let mut cursor = Cursor::new(buffer.to_vec());
+            cursor.set_position(len_len as u64);
+
+            let id = if self.is_compressed() {
+                let _ = u32::var_decode(&mut cursor)?;
+                u32::var_decode(&mut cursor)?
+            } else {
+                u32::var_decode(&mut cursor)?
+            };
+
+            log::trace!("Failed to gather {len} bytes for packet 0x{:02X}", id);
+            panic!("{err}");
+        }
+
         let mut cursor = Cursor::new(buf);
 
         // Decompress the packet if needed
@@ -173,8 +198,22 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                 }
             }
 
+            #[cfg(feature = "debug")]
+            if decompressed_len != cursor.position() as usize {
+                log::warn!(
+                    "Packet length mismatch: expected {}, got {}",
+                    len,
+                    cursor.position()
+                );
+            }
+
             // Consume the length from the buffer
+            #[cfg(feature = "debug")]
+            log::trace!("Consuming {} bytes", len_len + len);
             self.buffer.consume(len_len + len);
+
+            #[cfg(feature = "debug")]
+            log::trace!("Decompressed packet: {:?}", packet);
 
             // Return the packet
             Ok(packet?)
@@ -192,8 +231,22 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                 }
             }
 
+            #[cfg(feature = "debug")]
+            if len != cursor.position() as usize {
+                log::warn!(
+                    "Packet length mismatch: expected {}, got {}",
+                    len,
+                    cursor.position()
+                );
+            }
+
             // Consume the length from the buffer
+            #[cfg(feature = "debug")]
+            log::trace!("Consuming {} bytes", len_len + cursor.position() as usize);
             self.buffer.consume(len_len + cursor.position() as usize);
+
+            #[cfg(feature = "debug")]
+            log::trace!("Packet: {:?}", packet);
 
             // Return the packet
             Ok(packet?)

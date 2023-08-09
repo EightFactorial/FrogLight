@@ -11,6 +11,9 @@ readme = "README.md"
 [lib]
 proc-macro = true
 
+[features]
+debug = []
+
 [dependencies]
 proc-macro2 = "1.0.66"
 quote = "1.0.32"
