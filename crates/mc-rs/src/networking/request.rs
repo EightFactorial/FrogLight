@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
 
+use azalea_chat::FormattedText;
 use bevy::{prelude::*, utils::HashMap};
 use mc_rs_proto::Version;
 use uuid::Uuid;
@@ -28,15 +29,15 @@ impl<V: Version> StatusRequest<V> {
 }
 
 /// A response to a status request
-#[derive(Debug, Clone, PartialEq, Eq, Event)]
+#[derive(Debug, Clone, PartialEq, Event)]
 pub struct StatusResponse {
     pub hostname: String,
-    pub description: String,
+    pub description: FormattedText,
     pub favicon: Option<String>,
     pub player_max: i32,
     pub player_online: i32,
     pub sample_players: HashMap<String, Uuid>,
-    pub version: String,
+    pub version: FormattedText,
     pub protocol: i32,
 }
 

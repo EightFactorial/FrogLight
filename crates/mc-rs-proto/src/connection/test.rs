@@ -62,7 +62,7 @@ async fn send_packets() -> Result<(), ()> {
             panic!("Expected status response packet");
         };
 
-        assert_eq!(packet.version.name, "1.20.1");
+        assert_eq!(packet.version.name, "1.20.1".into());
         assert_eq!(packet.version.protocol, V1_20_1::ID);
         assert_eq!(packet.players.max, 0);
         assert_eq!(packet.players.online, 0);
@@ -102,7 +102,7 @@ async fn read_packets() -> Result<(), ()> {
     // Send a status response packet
     {
         let status_response: ClientboundStatusPackets = ClientboundQueryResponsePacket {
-            description: String::new(),
+            description: String::new().into(),
             favicon: None,
             players: QueryPlayers {
                 max: 0,
@@ -110,7 +110,7 @@ async fn read_packets() -> Result<(), ()> {
                 sample: Vec::new(),
             },
             version: QueryVersion {
-                name: "1.20.1".to_string(),
+                name: "1.20.1".into(),
                 protocol: V1_20_1::ID,
             },
             enforces_secure_chat: Some(false),

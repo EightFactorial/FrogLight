@@ -3,9 +3,11 @@ use std::{fs, path::PathBuf};
 use belly::prelude::*;
 use bevy::{prelude::*, utils::HashMap};
 use fastnbt::Value;
+use mc_rs_proto::versions::DefaultVersion;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    networking::request::StatusRequest,
     systems::app_state::{ApplicationState, InMenuSet},
     util::mc_dir::minecraft_dir,
 };
@@ -14,10 +16,19 @@ use super::{main_menu::MainMenu, MenuRoot};
 
 /// Set up the main menu
 pub(super) fn setup_menu(app: &mut App) {
+    app.add_event::<ServerMenuPing>();
+
     app.add_systems(
         OnEnter(ApplicationState::InMenu),
         ServerMenu::create
             .run_if(not(any_with_component::<ServerMenu>()))
+            .in_set(InMenuSet),
+    );
+
+    app.add_systems(
+        Update,
+        ServerMenu::ping_servers
+            .run_if(any_with_component::<ServerMenu>())
             .in_set(InMenuSet),
     );
 }
@@ -59,6 +70,30 @@ impl ServerMenu {
         elements.select("div.server-menu").add_class("hidden");
         MainMenu::show(elements);
     }
+
+    /// Ping all servers in the server list when the event is sent
+    pub fn ping_servers(
+        query: Query<&Text>,
+        children: Query<&Children>,
+        mut events: EventReader<ServerMenuPing>,
+        mut requests: EventWriter<StatusRequest<DefaultVersion>>,
+        mut elements: Elements,
+    ) {
+        for _ in events.iter() {
+            for entity in elements.select("div.server-listing-ip").entities() {
+                if let Ok(children) = children.get(entity) {
+                    for child in children {
+                        if let Ok(Text { sections, .. }) = query.get(*child) {
+                            if let Some(ip) = sections.first() {
+                                debug!("Sending ping to {}", ip.value);
+                                requests.send(StatusRequest::new(ip.value.clone()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 /// A list of servers
@@ -99,3 +134,7 @@ pub struct ServerListing {
     #[serde(flatten)]
     pub other: HashMap<String, Value>,
 }
+
+/// An event that triggers a status request to all known servers
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Event)]
+pub struct ServerMenuPing;

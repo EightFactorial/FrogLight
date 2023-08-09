@@ -6,7 +6,7 @@ use crate::systems::app_state::{ApplicationState, InMenuSet};
 
 use self::backgrounds::MainMenuBackground;
 
-use super::MenuRoot;
+use super::{server_menu::ServerMenuPing, MenuRoot};
 
 pub mod backgrounds;
 
@@ -77,7 +77,7 @@ impl MainMenu {
         ctx.select(query).remove_class("hidden");
 
         if query == "div.server-menu" {
-            // TODO: Request server status and ping
+            ctx.send_event(ServerMenuPing);
         }
     }
 

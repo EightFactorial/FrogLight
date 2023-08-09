@@ -11,6 +11,10 @@ use mc_rs_proto::{
 
 use super::request::{PingResponse, StatusResponse};
 
+/// A trait for handling connections to a server
+///
+/// Each version of the protocol has a different implementation of this trait
+/// using the appropriate packets for that [Version].
 #[async_trait]
 pub trait NetworkHandle: Version + Send + Sync + 'static
 where
@@ -49,6 +53,10 @@ where
     );
 }
 
+/// A connection to a server
+///
+/// This is a wrapper around a connection to a server that allows for sending and receiving packets
+/// in either the configuration or play state.
 #[derive(Debug)]
 pub enum ConnectionEnum<V: Version>
 where
@@ -64,6 +72,7 @@ where
     Play: State<V>,
     Configuration: State<V>,
 {
+    /// Receive a packet from the connection
     pub async fn receive_packet(&mut self) -> Result<ConnectionData<V>, ConnectionError> {
         match self {
             ConnectionEnum::Configuration(con) => {
@@ -73,6 +82,7 @@ where
         }
     }
 
+    /// Send a packet to the connection
     pub async fn send_packet(&mut self, packet: ConnectionSend<V>) -> Result<(), ConnectionError> {
         match self {
             ConnectionEnum::Configuration(con) => match packet {
@@ -92,7 +102,8 @@ where
         }
     }
 
-    pub fn change_state(self, state: ConnectionState) -> Self {
+    /// Consumes the connection and returns a new one with the given state
+    pub fn with_state(self, state: ConnectionState) -> Self {
         match state {
             ConnectionState::Configuration => match self {
                 ConnectionEnum::Play(con) => ConnectionEnum::Configuration(con.into()),
@@ -107,7 +118,7 @@ where
 }
 
 /// The data received from a connection
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ConnectionData<V: Version>
 where
     Play: State<V>,

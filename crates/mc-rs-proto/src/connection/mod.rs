@@ -1,7 +1,11 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use std::{collections::VecDeque, io::Cursor, marker::PhantomData};
+use std::{
+    collections::VecDeque,
+    io::{Cursor, Read},
+    marker::PhantomData,
+};
 
 use async_compression::futures::{bufread::ZlibDecoder, write::ZlibEncoder};
 use async_net::{AsyncToSocketAddrs, SocketAddr, TcpStream};
@@ -132,16 +136,18 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         }
 
         // Read the packet from the stream
-        let mut buffer = self.buffer.fill_buf().await?;
+        let buffer = self.buffer.fill_buf().await?;
 
         // TODO: Decryption
 
         // Read the length of the packet
-        let len = u32::var_decode(&mut buffer)? as usize;
+        let mut cursor = Cursor::new(buffer);
+        let len = u32::var_decode(&mut cursor)? as usize;
+        let len_len = cursor.position() as usize;
 
         // Take the packet bytes
-        let mut buf: Vec<u8> = Vec::with_capacity(len);
-        buf.extend_from_slice(&buffer[..len]);
+        let mut buf: Vec<u8> = vec![0; len];
+        cursor.read_exact(&mut buf)?;
         let mut cursor = Cursor::new(buf);
 
         // Decompress the packet if needed
@@ -167,7 +173,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             }
 
             // Consume the length from the buffer
-            self.buffer.consume(len);
+            self.buffer.consume(len_len + len);
 
             // Return the packet
             Ok(packet?)
@@ -186,7 +192,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             }
 
             // Consume the length from the buffer
-            self.buffer.consume(cursor.position() as usize);
+            self.buffer.consume(len_len + cursor.position() as usize);
 
             // Return the packet
             Ok(packet?)
@@ -225,9 +231,9 @@ impl<V: Version, S: State<V>> Connection<V, S> {
 
 #[derive(Debug, Error)]
 pub enum ConnectionError {
-    #[error(transparent)]
+    #[error("Error encoding packet: {0}")]
     Encode(#[from] EncodeError),
-    #[error(transparent)]
+    #[error("Error decoding packet: {0}")]
     Decode(#[from] DecodeError),
     #[error(transparent)]
     Io(#[from] std::io::Error),

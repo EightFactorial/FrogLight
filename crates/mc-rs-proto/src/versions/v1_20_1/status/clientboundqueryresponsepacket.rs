@@ -1,3 +1,4 @@
+use azalea_chat::FormattedText;
 use mc_rs_macros::Transcode;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -5,7 +6,7 @@ use uuid::Uuid;
 #[derive(Debug, Clone, Transcode, Serialize, Deserialize)]
 #[json]
 pub struct ClientboundQueryResponsePacket {
-    pub description: String,
+    pub description: FormattedText,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub favicon: Option<String>,
     pub players: QueryPlayers,
@@ -20,7 +21,7 @@ pub struct ClientboundQueryResponsePacket {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct QueryVersion {
-    pub name: String,
+    pub name: FormattedText,
     pub protocol: i32,
 }
 
@@ -43,7 +44,7 @@ fn test_packet() {
 
     let mut buf = Vec::new();
     let packet = ClientboundQueryResponsePacket {
-        description: "Hello world!".to_string(),
+        description: "Hello world!".into(),
         favicon: None,
         players: QueryPlayers {
             max: 100,
@@ -51,7 +52,7 @@ fn test_packet() {
             sample: vec![],
         },
         version: QueryVersion {
-            name: "1.20.1".to_string(),
+            name: "1.20.1".into(),
             protocol: V1_20_1::ID,
         },
         enforces_secure_chat: None,
@@ -59,9 +60,9 @@ fn test_packet() {
 
     assert!(packet.encode(&mut buf).is_ok());
     assert_eq!(
-        String::from_utf8(buf[1..].to_vec()),
+        String::from_utf8(buf[2..].to_vec()),
         Ok(
-            r#"{"description":"Hello world!","players":{"max":100,"online":50,"sample":[]},"version":{"name":"1.20.1","protocol":763}}"#
+            r#"{"description":{"text":"Hello world!"},"players":{"max":100,"online":50,"sample":[]},"version":{"name":{"text":"1.20.1"},"protocol":763}}"#
         .to_string())
     );
 }

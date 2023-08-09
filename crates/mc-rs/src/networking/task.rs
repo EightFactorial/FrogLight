@@ -32,6 +32,7 @@ where
 {
     #[deref]
     pub task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
+    pub hostname: String,
     pub intent: ConnectionIntent,
 }
 
@@ -45,9 +46,13 @@ where
     Play: State<V>,
 {
     /// Create a new connection task
-    pub fn new(task: Task<Result<Connection<V, Handshake>, ConnectionError>>) -> Self {
+    pub fn new(
+        task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
+        hostname: String,
+    ) -> Self {
         Self {
             task,
+            hostname,
             intent: ConnectionIntent::Login,
         }
     }
@@ -55,9 +60,14 @@ where
     /// Create a new connection task with a connection intent
     pub fn new_with(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
+        hostname: String,
         intent: ConnectionIntent,
     ) -> Self {
-        Self { task, intent }
+        Self {
+            task,
+            hostname,
+            intent,
+        }
     }
 
     /// Get the connection task

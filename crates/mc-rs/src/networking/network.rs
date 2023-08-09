@@ -102,13 +102,13 @@ where
     fn connection_request(mut events: EventReader<ConnectionEvent<Self>>, mut commands: Commands) {
         for event in events.iter() {
             let addr = event.addr.clone();
-            let task = IoTaskPool::get().spawn(Connection::new(Self::default(), addr));
+            let task = IoTaskPool::get().spawn(Connection::new(Self::default(), addr.clone()));
 
             match event.intent {
                 ConnectionIntent::Status | ConnectionIntent::Login => {
                     commands.spawn((
                         ConnectionMarker::<Self>::default(),
-                        ConnectionTask::new_with(task, event.intent),
+                        ConnectionTask::new_with(task, addr, event.intent),
                     ));
                 }
                 _ => {
@@ -127,8 +127,9 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
-                        info!(
-                            "Connected to {}",
+                        debug!(
+                            "Connected to {} ({})",
+                            con.hostname,
                             con.peer_addr().expect("Unable to get peer address")
                         );
 
@@ -140,7 +141,7 @@ where
                             .insert(ConnectionHandshakeTask::new(new_task, task.intent));
                     }
                     Err(err) => {
-                        error!("Failed to connect: {}", err);
+                        error!("Failed to connect to {}, {}", task.hostname, err);
                     }
                 }
 
@@ -158,8 +159,9 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
-                        info!(
-                            "Handshake finished with {}",
+                        debug!(
+                            "Handshake finished with {} ({})",
+                            con.hostname,
                             con.peer_addr().expect("Unable to get peer address")
                         );
 
@@ -208,10 +210,10 @@ where
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok((status, ping)) => {
-                        info!("Status finished with {:?}", status);
+                        debug!("Status finished with {:?}", status);
                         status_events.send(status);
 
-                        info!("Ping finished with {:?}", ping);
+                        debug!("Ping finished with {:?}", ping);
                         ping_events.send(ping);
                     }
                     Err(err) => {
