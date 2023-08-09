@@ -30,7 +30,7 @@ impl<V: Version> StatusRequest<V> {
 /// A response to a status request
 #[derive(Debug, Clone, PartialEq, Eq, Event)]
 pub struct StatusResponse {
-    pub host: String,
+    pub hostname: String,
     pub description: String,
     pub favicon: Option<String>,
     pub player_max: i32,
@@ -43,6 +43,6 @@ pub struct StatusResponse {
 /// A response to a ping request
 #[derive(Debug, Clone, PartialEq, Eq, Event)]
 pub struct PingResponse {
-    pub host: String,
+    pub hostname: String,
     pub time: u64,
 }

@@ -41,7 +41,7 @@ async fn send_packets() -> Result<(), ()> {
             protocol_version: V1_20_1::ID,
             hostname: "localhost".to_string(),
             port: 25566,
-            intention: ConnectionIntent::Status.into(),
+            intention: ConnectionIntent::Status,
         };
 
         conn.send_packet(handshake).await.unwrap();
@@ -142,7 +142,7 @@ fn read_handshake(buf: &mut impl std::io::Read) {
     let ServerboundHandshakePackets::Handshake(packet) = packet;
 
     assert_eq!(packet.protocol_version, V1_20_1::ID);
-    assert_eq!(packet.intention, 1);
+    assert_eq!(packet.intention, ConnectionIntent::Status);
     assert_eq!(packet.port, 25566);
 }
 

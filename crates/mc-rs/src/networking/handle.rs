@@ -1,7 +1,10 @@
+#![allow(dead_code)]
+
 use async_trait::async_trait;
-use flume::Receiver;
+use flume::{Receiver, Sender};
+use log::error;
 use mc_rs_proto::{
-    types::enums::ConnectionIntent,
+    types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
     Connection, ConnectionError, State, Version,
 };
@@ -20,7 +23,7 @@ where
     /// Handle connections in the handshake state
     async fn handshake_handle(
         con: Connection<Self, Handshake>,
-        intent: ConnectionIntent,
+        intention: ConnectionIntent,
     ) -> Result<Connection<Self, Handshake>, ConnectionError>;
 
     /// Handle connections in the status state
@@ -31,7 +34,7 @@ where
     /// Handle connections in the login state
     async fn login_handle(
         con: Connection<Self, Login>,
-    ) -> Result<Connection<Self, Login>, ConnectionError>;
+    ) -> Result<(Connection<Self, Login>, GameProfile), ConnectionError>;
 
     /// Handle connections in the configuration state
     async fn configuration_handle(
@@ -39,15 +42,97 @@ where
     ) -> Result<Connection<Self, Configuration>, ConnectionError>;
 
     /// Handle connections in the play state
-    async fn play_handle(con: Connection<Self, Play>) -> Receiver<ConnectionData<Self>>;
+    async fn play_handle(
+        con: ConnectionEnum<Self>,
+        tx: Sender<Result<ConnectionData<Self>, ConnectionError>>,
+        rx: Receiver<ConnectionSend<Self>>,
+    );
 }
 
 #[derive(Debug)]
-#[allow(dead_code)]
+pub enum ConnectionEnum<V: Version>
+where
+    Play: State<V>,
+    Configuration: State<V>,
+{
+    Configuration(Connection<V, Configuration>),
+    Play(Connection<V, Play>),
+}
+
+impl<V: Version> ConnectionEnum<V>
+where
+    Play: State<V>,
+    Configuration: State<V>,
+{
+    pub async fn receive_packet(&mut self) -> Result<ConnectionData<V>, ConnectionError> {
+        match self {
+            ConnectionEnum::Configuration(con) => {
+                Ok(ConnectionData::Configuration(con.receive_packet().await?))
+            }
+            ConnectionEnum::Play(con) => Ok(ConnectionData::Play(con.receive_packet().await?)),
+        }
+    }
+
+    pub async fn send_packet(&mut self, packet: ConnectionSend<V>) -> Result<(), ConnectionError> {
+        match self {
+            ConnectionEnum::Configuration(con) => match packet {
+                ConnectionSend::Configuration(packet) => con.send_packet(packet).await,
+                _ => {
+                    error!("Invalid packet for connection configuration state");
+                    Ok(())
+                }
+            },
+            ConnectionEnum::Play(con) => match packet {
+                ConnectionSend::Play(packet) => con.send_packet(packet).await,
+                _ => {
+                    error!("Invalid packet for connection play state");
+                    Ok(())
+                }
+            },
+        }
+    }
+
+    pub fn change_state(self, state: ConnectionState) -> Self {
+        match state {
+            ConnectionState::Configuration => match self {
+                ConnectionEnum::Play(con) => ConnectionEnum::Configuration(con.into()),
+                _ => self,
+            },
+            ConnectionState::Play => match self {
+                ConnectionEnum::Configuration(con) => ConnectionEnum::Play(con.into()),
+                _ => self,
+            },
+        }
+    }
+}
+
+/// The data received from a connection
+#[derive(Debug)]
 pub enum ConnectionData<V: Version>
 where
     Play: State<V>,
+    Configuration: State<V>,
 {
-    Packet(<Play as State<V>>::Clientbound),
-    Error(ConnectionError),
+    Configuration(<Configuration as State<V>>::Clientbound),
+    Play(<Play as State<V>>::Clientbound),
+    NewState(ConnectionState),
+    Closed,
+}
+
+/// The state of a connection
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub enum ConnectionState {
+    Configuration,
+    Play,
+}
+
+/// The data to send to a connection
+#[derive(Debug, Clone)]
+pub enum ConnectionSend<V: Version>
+where
+    Play: State<V>,
+    Configuration: State<V>,
+{
+    Configuration(<Configuration as State<V>>::Serverbound),
+    Play(<Play as State<V>>::Serverbound),
 }

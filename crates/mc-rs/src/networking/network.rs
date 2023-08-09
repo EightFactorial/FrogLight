@@ -8,10 +8,15 @@ use mc_rs_proto::{
     Connection, State, Version,
 };
 
-use crate::networking::task::{ConnectionHandshakeTask, ConnectionLoginTask, ConnectionStatusTask};
+use crate::networking::{
+    handle::ConnectionEnum,
+    task::{
+        ConnectionHandshakeTask, ConnectionLoginTask, ConnectionPlayTask, ConnectionStatusTask,
+    },
+};
 
 use super::{
-    handle::NetworkHandle,
+    handle::{ConnectionData, ConnectionState, NetworkHandle},
     request::{PingResponse, StatusRequest, StatusResponse},
     task::{ConnectionConfigurationTask, ConnectionTask},
 };
@@ -59,10 +64,14 @@ where
                     Self::connection_query,
                 )
                     .chain(),
-                Self::handshake_query,
-                Self::status_query,
-                Self::login_query,
-                Self::configuration_query,
+                Self::handshake_query.run_if(any_with_component::<ConnectionHandshakeTask<Self>>()),
+                Self::status_query.run_if(any_with_component::<ConnectionStatusTask<Self>>()),
+                Self::login_query.run_if(any_with_component::<ConnectionLoginTask<Self>>()),
+                Self::configuration_query.run_if(
+                    Self::has_configuration_state
+                        .and_then(any_with_component::<ConnectionConfigurationTask<Self>>()),
+                ),
+                Self::packet_query.run_if(any_with_component::<ConnectionPlayTask<Self>>()),
             ),
         );
     }
@@ -88,7 +97,7 @@ where
 
             match event.intent {
                 ConnectionIntent::Status | ConnectionIntent::Login => {
-                    commands.spawn(ConnectionTask::new_with(task, event.intent));
+                    commands.spawn((ConnectionTask::new_with(task, event.intent),));
                 }
                 _ => {
                     warn!("Skipping making connection with invalid connection intent!");
@@ -198,19 +207,143 @@ where
         }
     }
 
+    /// Whether or not the version has the configuration state
+    const HAS_CONFIGURATION_STATE: bool;
+
+    fn has_configuration_state() -> bool { Self::HAS_CONFIGURATION_STATE }
+
     /// Wait for the login to finish and start the next state
     fn login_query(
-        mut _query: Query<(Entity, &mut ConnectionLoginTask<Self>)>,
-        mut _commands: Commands,
+        mut query: Query<(Entity, &mut ConnectionLoginTask<Self>)>,
+        mut commands: Commands,
     ) {
-        todo!();
+        for (entity, mut task) in query.iter_mut() {
+            if let Some(result) = block_on(poll_once(task.task_mut())) {
+                match result {
+                    Ok((con, profile)) => {
+                        info!("Login finished with {}", con.peer_addr().unwrap());
+
+                        if Self::HAS_CONFIGURATION_STATE {
+                            let new_task =
+                                IoTaskPool::get().spawn(Self::configuration_handle(con.into()));
+
+                            commands
+                                .entity(entity)
+                                .insert(profile)
+                                .insert(ConnectionConfigurationTask::new(new_task));
+                        } else {
+                            info!("Configuration finished with {}", con.peer_addr().unwrap());
+
+                            let (tx1, rx1) = flume::unbounded();
+                            let (tx2, rx2) = flume::unbounded();
+
+                            let con: Connection<Self, Play> = con.into();
+                            let new_task = IoTaskPool::get().spawn(Self::play_handle(
+                                ConnectionEnum::Play(con),
+                                tx1,
+                                rx2,
+                            ));
+
+                            commands
+                                .entity(entity)
+                                .insert(profile)
+                                .insert(ConnectionPlayTask::new(rx1, tx2, new_task));
+                        }
+                    }
+                    Err(err) => {
+                        error!("Failed to login: {}", err);
+                    }
+                }
+
+                commands
+                    .entity(entity)
+                    .remove::<ConnectionLoginTask<Self>>();
+            }
+        }
     }
 
     /// Wait for the configuration to finish and start the next state
     fn configuration_query(
-        mut _query: Query<(Entity, &mut ConnectionConfigurationTask<Self>)>,
-        mut _commands: Commands,
+        mut query: Query<(Entity, &mut ConnectionConfigurationTask<Self>)>,
+        mut commands: Commands,
     ) {
-        todo!();
+        for (entity, mut task) in query.iter_mut() {
+            if let Some(result) = block_on(poll_once(task.task_mut())) {
+                match result {
+                    Ok(con) => {
+                        info!("Configuration finished with {}", con.peer_addr().unwrap());
+
+                        let (tx1, rx1) = flume::unbounded();
+                        let (tx2, rx2) = flume::unbounded();
+
+                        let con: Connection<Self, Play> = con.into();
+                        let new_task = IoTaskPool::get().spawn(Self::play_handle(
+                            ConnectionEnum::Play(con),
+                            tx1,
+                            rx2,
+                        ));
+
+                        commands
+                            .entity(entity)
+                            .insert(ConnectionPlayTask::new(rx1, tx2, new_task));
+                    }
+                    Err(err) => {
+                        error!("Failed to configure client: {}", err);
+                    }
+                }
+
+                commands
+                    .entity(entity)
+                    .remove::<ConnectionConfigurationTask<Self>>();
+            }
+        }
     }
+
+    /// Query the task for any packets
+    fn packet_query(query: Query<&ConnectionPlayTask<Self>>) {
+        let task = query.single();
+
+        while let Ok(result) = task.recv() {
+            match result {
+                Ok(data) => {
+                    match data {
+                        ConnectionData::Configuration(packet) => {
+                            if Self::HAS_CONFIGURATION_STATE {
+                                if *task.state() != ConnectionState::Configuration {
+                                    error!("Received configuration packet in play state!");
+                                }
+
+                                Self::config_packet(packet)
+                            } else {
+                                unreachable!("Configuration packet when connection doesn't have Configuration state!")
+                            }
+                        }
+                        ConnectionData::Play(packet) => {
+                            if *task.state() != ConnectionState::Play {
+                                error!("Received play packet in configuration state!");
+                            }
+
+                            Self::play_packet(packet)
+                        }
+                        ConnectionData::NewState(state) => {
+                            if Self::HAS_CONFIGURATION_STATE {
+                                info!("Connection state changed to {:?}", state);
+                                *task.state.write().unwrap() = state;
+                            } else {
+                                unreachable!("State changed when connection doesn't have Configuration state!")
+                            }
+                        }
+                        ConnectionData::Closed => todo!("Handle closed connection!"),
+                    }
+                }
+                Err(err) => {
+                    error!("Failed to receive packet: {}", err);
+                }
+            }
+        }
+    }
+
+    fn config_packet(packet: <Configuration as State<Self>>::Clientbound);
+
+    fn play_packet(packet: <Play as State<Self>>::Clientbound);
 }

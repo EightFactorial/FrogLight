@@ -1,3 +1,5 @@
+#![feature(future_join)]
+
 use bevy::app::App;
 
 mod menus;

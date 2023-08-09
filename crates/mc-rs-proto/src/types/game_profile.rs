@@ -1,3 +1,4 @@
+use bevy_ecs::prelude::Component;
 use mc_rs_macros::Transcode;
 use uuid::Uuid;
 
@@ -6,7 +7,7 @@ use hashbrown::HashMap;
 #[cfg(not(feature = "hashbrown"))]
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, PartialEq, Eq, Transcode)]
+#[derive(Debug, Clone, PartialEq, Eq, Transcode, Component)]
 pub struct GameProfile {
     pub uuid: Uuid,
     pub name: String,

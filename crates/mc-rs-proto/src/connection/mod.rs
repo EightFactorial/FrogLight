@@ -21,6 +21,8 @@ mod test;
 pub struct Connection<V: Version, S: State<V>> {
     _version: PhantomData<V>,
     _state: PhantomData<S>,
+    pub hostname: String,
+    pub port: u16,
     pub compression: Option<i32>,
     packet_buffer: VecDeque<<S as State<V>>::Clientbound>,
     buffer: BufReader<TcpStream>,
@@ -43,24 +45,40 @@ where
             let (address, port) = address.split_at(colon);
             let port: u16 = port[1..].parse()?;
 
-            Self::new_from((address, port)).await
+            Self::new_from(address, port).await
         } else {
-            Self::new_from((address, 25565)).await
+            Self::new_from(address, 25565).await
         }
     }
 }
 
 impl<V: Version, S: State<V>> Connection<V, S> {
-    /// Create a new connection from an address.
-    pub async fn new_from(address: impl AsyncToSocketAddrs) -> Result<Self, ConnectionError> {
+    /// Create a new connection from a hostname and port.
+    pub async fn new_from(hostname: &str, port: u16) -> Result<Self, ConnectionError> {
+        let stream = TcpStream::connect((hostname, port)).await?;
+
+        Ok(Self {
+            _version: PhantomData,
+            _state: PhantomData,
+            hostname: hostname.to_owned(),
+            port,
+            compression: None,
+            packet_buffer: VecDeque::new(),
+            buffer: BufReader::new(stream.clone()),
+            stream,
+        })
+    }
+
+    /// Create a new connection from anything that can be converted to a socket address.
+    pub async fn from(address: impl AsyncToSocketAddrs) -> Result<Self, ConnectionError> {
         let mut addresses = address.to_socket_addrs().await?;
         let address = addresses.next().ok_or(ConnectionError::NoAddressFound)?;
         Self::from_sock(address).await
     }
 
     /// Create a new connection from a socket address.
-    pub async fn from_sock(address: SocketAddr) -> Result<Self, ConnectionError> {
-        let stream = TcpStream::connect(address).await?;
+    pub async fn from_sock(sock: SocketAddr) -> Result<Self, ConnectionError> {
+        let stream = TcpStream::connect(sock).await?;
         Ok(stream.try_into()?)
     }
 
@@ -68,7 +86,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     pub async fn send_packet(
         &mut self,
         packet: impl Into<<S as State<V>>::Serverbound>,
-    ) -> Result<(), EncodeError> {
+    ) -> Result<(), ConnectionError> {
         let mut buf = Vec::new();
         packet.into().encode(&mut buf)?;
 
@@ -96,7 +114,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     }
 
     /// Add the length of the buffer to the front of the buffer.
-    fn add_length(buf: &mut Vec<u8>) -> Result<(), EncodeError> {
+    fn add_length(buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
         let mut len_buf = Vec::with_capacity(buf.len() + 2);
         buf.len().var_encode(&mut len_buf)?;
         len_buf.extend_from_slice(buf);
@@ -105,7 +123,9 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     }
 
     /// Receives a packet from the server.
-    pub async fn receive_packet(&mut self) -> Result<<S as State<V>>::Clientbound, DecodeError> {
+    pub async fn receive_packet(
+        &mut self,
+    ) -> Result<<S as State<V>>::Clientbound, ConnectionError> {
         // Return a packet from the buffer if possible
         if let Some(packet) = self.packet_buffer.pop_front() {
             return Ok(packet);
@@ -141,7 +161,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                 match <S as State<V>>::Clientbound::decode(&mut cursor) {
                     Ok(packet) => self.packet_buffer.push_back(packet),
                     Err(err) => {
-                        return Err(err);
+                        return Err(err.into());
                     }
                 }
             }
@@ -150,7 +170,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             self.buffer.consume(len);
 
             // Return the packet
-            packet
+            Ok(packet?)
         } else {
             // Read the packet
             let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
@@ -160,7 +180,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                 match <S as State<V>>::Clientbound::decode(&mut cursor) {
                     Ok(packet) => self.packet_buffer.push_back(packet),
                     Err(err) => {
-                        return Err(err);
+                        return Err(err.into());
                     }
                 }
             }
@@ -169,7 +189,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             self.buffer.consume(cursor.position() as usize);
 
             // Return the packet
-            packet
+            Ok(packet?)
         }
     }
 
@@ -193,37 +213,30 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         Connection {
             _version: PhantomData,
             _state: PhantomData,
+            hostname: self.hostname,
+            port: self.port,
             compression: self.compression,
             packet_buffer: VecDeque::new(),
             buffer: self.buffer,
             stream: self.stream,
         }
     }
-
-    /// Converts another connection into this state.
-    pub fn from<S2>(other: Connection<V, S2>) -> Self
-    where
-        S2: State<V>,
-    {
-        Connection {
-            _version: PhantomData,
-            _state: PhantomData,
-            compression: other.compression,
-            packet_buffer: VecDeque::new(),
-            buffer: other.buffer,
-            stream: other.stream,
-        }
-    }
 }
 
 #[derive(Debug, Error)]
 pub enum ConnectionError {
-    #[error("IO error: {0}")]
+    #[error(transparent)]
+    Encode(#[from] EncodeError),
+    #[error(transparent)]
+    Decode(#[from] DecodeError),
+    #[error(transparent)]
     Io(#[from] std::io::Error),
-    #[error("Error parsing port: {0}")]
+    #[error(transparent)]
     ParsePort(#[from] std::num::ParseIntError),
     #[error("No ip address found")]
     NoAddressFound,
+    #[error("Unexpected packet")]
+    UnexpectedPacket,
 }
 
 impl<V: Version, S: State<V>> TryFrom<std::net::TcpStream> for Connection<V, S> {
@@ -242,6 +255,8 @@ impl<V: Version, S: State<V>> TryFrom<TcpStream> for Connection<V, S> {
         Ok(Connection {
             _version: PhantomData,
             _state: PhantomData,
+            hostname: stream.peer_addr()?.ip().to_string(),
+            port: stream.peer_addr()?.port(),
             compression: None,
             packet_buffer: VecDeque::new(),
             buffer: BufReader::new(stream.clone()),

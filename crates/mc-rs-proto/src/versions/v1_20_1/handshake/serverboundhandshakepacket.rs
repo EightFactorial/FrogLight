@@ -1,13 +1,14 @@
 use mc_rs_macros::Transcode;
 
+use crate::types::enums::ConnectionIntent;
+
 #[derive(Debug, Clone, Transcode)]
 pub struct ServerboundHandshakePacket {
     #[var]
     pub protocol_version: i32,
     pub hostname: String,
     pub port: u16,
-    #[var]
-    pub intention: i32,
+    pub intention: ConnectionIntent,
 }
 
 #[test]
@@ -20,7 +21,7 @@ fn test_packet() {
         protocol_version: V1_20_1::ID,
         hostname: "localhost".to_string(),
         port: 25565,
-        intention: 1,
+        intention: ConnectionIntent::Status,
     };
 
     assert!(packet.encode(&mut buf).is_ok());

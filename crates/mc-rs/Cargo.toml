@@ -22,6 +22,7 @@ convert_case = "0.6.0"
 fastnbt = "2.4.4"
 flume = "0.10.14"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }
+futures-locks = { version = "0.7.1", default-features = false }
 mc-rs-proto = { path = "../mc-rs-proto" }
 mc-rs-macros = { path = "../mc-rs-macros" }
 noise = { version = "0.8.2", features = ["std", "image"] }
