@@ -7,13 +7,13 @@ pub mod serverboundloginhellopacket;
 pub mod serverboundloginkeypacket;
 pub mod serverboundloginqueryresponsepacket;
 
-use super::V1_20_1;
+use super::V1_20_0;
 use crate::versions::state::Login;
 use mc_rs_macros::impl_state;
 
 impl_state!(
     Login,
-    V1_20_1,
+    V1_20_0,
     Clientbound => {
         0x0 => clientboundlogindisconnectpacket::ClientboundLoginDisconnectPacket,
         0x1 => clientboundloginhellopacket::ClientboundLoginHelloPacket,

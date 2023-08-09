@@ -47,7 +47,7 @@ impl MainMenu {
                         <div c:main-menu-subtitle><span>{ Self::get_subtitle() }</span></div>
                     </div>
                     <div c:main-menu-buttons>
-                        <button c:button on:press=|ctx| { Self::click_button(ctx, "div.server-menu") }>
+                        <button c:button on:press=|ctx| { Self::click_button(ctx, "div.server-menu"); ctx.send_event(ServerMenuPing) }>
                             "Servers"
                         </button>
                         <button c:button on:press=|ctx| { Self::click_button(ctx, "div.options-menu") }>
@@ -75,10 +75,6 @@ impl MainMenu {
         ctx.select("div.main-background").add_class("hidden");
 
         ctx.select(query).remove_class("hidden");
-
-        if query == "div.server-menu" {
-            ctx.send_event(ServerMenuPing);
-        }
     }
 
     /// The list of possible subtitles

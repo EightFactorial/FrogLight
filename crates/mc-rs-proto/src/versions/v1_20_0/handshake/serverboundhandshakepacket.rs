@@ -13,12 +13,12 @@ pub struct ServerboundHandshakePacket {
 
 #[test]
 fn test_packet() {
-    use crate::{buffer::Encode, versions::v1_20_1::V1_20_1, Version};
+    use crate::{buffer::Encode, versions::v1_20_0::V1_20_0, Version};
 
     let mut buf = Vec::new();
 
     let packet = ServerboundHandshakePacket {
-        protocol_version: V1_20_1::ID,
+        protocol_version: V1_20_0::ID,
         hostname: "localhost".to_string(),
         port: 25565,
         intention: ConnectionIntent::Status,

@@ -6,7 +6,7 @@ use crate::{
     types::enums::ConnectionIntent,
     versions::{
         state::Status,
-        v1_20_1::{
+        v1_20_0::{
             handshake::{
                 serverboundhandshakepacket::ServerboundHandshakePacket, ServerboundHandshakePackets,
             },
@@ -17,7 +17,7 @@ use crate::{
                 serverboundqueryrequestpacket::ServerboundQueryRequestPacket,
                 ClientboundStatusPackets, ServerboundStatusPackets,
             },
-            V1_20_1,
+            V1_20_0,
         },
     },
     Connection, Version,
@@ -33,12 +33,12 @@ fn test_send_receive() {
 }
 
 async fn send_packets() -> Result<(), ()> {
-    let mut conn = Connection::new(V1_20_1, "localhost:25566").await.unwrap();
+    let mut conn = Connection::new(V1_20_0, "localhost:25566").await.unwrap();
 
     // Send the handshake packet
     {
         let handshake = ServerboundHandshakePacket {
-            protocol_version: V1_20_1::ID,
+            protocol_version: V1_20_0::ID,
             hostname: "localhost".to_string(),
             port: 25566,
             intention: ConnectionIntent::Status,
@@ -47,7 +47,7 @@ async fn send_packets() -> Result<(), ()> {
         conn.send_packet(handshake).await.unwrap();
     }
 
-    let mut conn: Connection<V1_20_1, Status> = conn.into();
+    let mut conn: Connection<V1_20_0, Status> = conn.into();
 
     // Send the status request packet
     {
@@ -63,7 +63,7 @@ async fn send_packets() -> Result<(), ()> {
         };
 
         assert_eq!(packet.version.name, "1.20.1".into());
-        assert_eq!(packet.version.protocol, V1_20_1::ID);
+        assert_eq!(packet.version.protocol, V1_20_0::ID);
         assert_eq!(packet.players.max, 0);
         assert_eq!(packet.players.online, 0);
         assert_eq!(packet.enforces_secure_chat, Some(false));
@@ -111,7 +111,7 @@ async fn read_packets() -> Result<(), ()> {
             },
             version: QueryVersion {
                 name: "1.20.1".into(),
-                protocol: V1_20_1::ID,
+                protocol: V1_20_0::ID,
             },
             enforces_secure_chat: Some(false),
         }
@@ -141,7 +141,7 @@ fn read_handshake(buf: &mut impl std::io::Read) {
     let packet = ServerboundHandshakePackets::decode(buf).unwrap();
     let ServerboundHandshakePackets::Handshake(packet) = packet;
 
-    assert_eq!(packet.protocol_version, V1_20_1::ID);
+    assert_eq!(packet.protocol_version, V1_20_0::ID);
     assert_eq!(packet.intention, ConnectionIntent::Status);
     assert_eq!(packet.port, 25566);
 }

@@ -40,7 +40,7 @@ pub struct QuerySamplePlayer {
 
 #[test]
 fn test_packet() {
-    use crate::{buffer::Encode, traits::Version, versions::v1_20_1::V1_20_1};
+    use crate::{buffer::Encode, traits::Version, versions::v1_20_0::V1_20_0};
 
     let mut buf = Vec::new();
     let packet = ClientboundQueryResponsePacket {
@@ -53,7 +53,7 @@ fn test_packet() {
         },
         version: QueryVersion {
             name: "1.20.1".into(),
-            protocol: V1_20_1::ID,
+            protocol: V1_20_0::ID,
         },
         enforces_secure_chat: None,
     };

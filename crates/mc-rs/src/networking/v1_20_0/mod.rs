@@ -9,14 +9,14 @@ use mc_rs_proto::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::{
         state::*,
-        v1_20_1::{
+        v1_20_0::{
             handshake::serverboundhandshakepacket::ServerboundHandshakePacket,
             status::{
                 serverboundquerypingpacket::ServerboundQueryPingPacket,
                 serverboundqueryrequestpacket::ServerboundQueryRequestPacket,
                 ClientboundStatusPackets,
             },
-            V1_20_1,
+            V1_20_0,
         },
     },
     Connection, ConnectionError, Version,
@@ -30,13 +30,13 @@ use super::{
 mod network;
 
 #[async_trait]
-impl NetworkHandle for V1_20_1 {
+impl NetworkHandle for V1_20_0 {
     async fn handshake_handle(
         mut con: Connection<Self, Handshake>,
         intention: ConnectionIntent,
     ) -> Result<Connection<Self, Handshake>, ConnectionError> {
         con.send_packet(ServerboundHandshakePacket {
-            protocol_version: V1_20_1::ID,
+            protocol_version: V1_20_0::ID,
             hostname: con.hostname.clone(),
             port: con.port,
             intention,
@@ -113,8 +113,8 @@ impl NetworkHandle for V1_20_1 {
 
 /// Reads packets from the connection and sends them to the channel
 async fn con_read(
-    con: Arc<Mutex<ConnectionEnum<V1_20_1>>>,
-    tx: Sender<Result<ConnectionData<V1_20_1>, ConnectionError>>,
+    con: Arc<Mutex<ConnectionEnum<V1_20_0>>>,
+    tx: Sender<Result<ConnectionData<V1_20_0>, ConnectionError>>,
 ) {
     loop {
         let mut con = con.lock().await;
@@ -127,8 +127,8 @@ async fn con_read(
 
 /// Writes packets from the channel to the connection
 async fn con_write(
-    con: Arc<Mutex<ConnectionEnum<V1_20_1>>>,
-    rx: Receiver<ConnectionSend<V1_20_1>>,
+    con: Arc<Mutex<ConnectionEnum<V1_20_0>>>,
+    rx: Receiver<ConnectionSend<V1_20_0>>,
 ) {
     loop {
         let recv = rx.recv_async().await;
