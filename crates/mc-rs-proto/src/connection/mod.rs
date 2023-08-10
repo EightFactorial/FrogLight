@@ -58,6 +58,8 @@ where
 }
 
 impl<V: Version, S: State<V>> Connection<V, S> {
+    const BUFFER_SIZE: usize = 65536;
+
     /// Create a new connection from a hostname and port.
     pub async fn new_from(hostname: &str, port: u16) -> Result<Self, ConnectionError> {
         let stream = TcpStream::connect((hostname, port)).await?;
@@ -69,7 +71,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             port,
             compression: None,
             packet_buffer: VecDeque::new(),
-            buffer: BufReader::new(stream.clone()),
+            buffer: BufReader::with_capacity(Self::BUFFER_SIZE, stream.clone()),
             stream,
         })
     }
@@ -133,13 +135,17 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     ) -> Result<<S as State<V>>::Clientbound, ConnectionError> {
         // Return a packet from the buffer if possible
         if let Some(packet) = self.packet_buffer.pop_front() {
-            #[cfg(feature = "debug")]
-            log::trace!("Returning packet from buffer: {packet:?}");
             return Ok(packet);
         }
 
         // Read the packet from the stream
         let buffer = self.buffer.fill_buf().await?;
+        let buffer_len = buffer.len();
+
+        if buffer_len == 0 {
+            return Err(ConnectionError::Closed);
+        }
+
         #[cfg(feature = "debug")]
         log::trace!(
             "Byte peek: {:?}",
@@ -156,23 +162,23 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         // Take the packet bytes
         let mut buf: Vec<u8> = vec![0; len];
 
-        #[cfg(not(feature = "debug"))]
-        cursor.read_exact(&mut buf)?;
-        #[cfg(feature = "debug")]
-        if let Err(err) = cursor.read_exact(&mut buf) {
-            let mut cursor = Cursor::new(buffer.to_vec());
-            cursor.set_position(len_len as u64);
+        // If the whole packet is in the buffer, take it
+        // Otherwise repeatedly call fillbuf until the whole packet is in the buffer
+        if len <= buffer_len - len_len {
+            cursor.read_exact(&mut buf)?;
+            self.buffer.consume(len_len + len);
+        } else {
+            let mut read = 0;
+            while read < len {
+                let buffer = self.buffer.fill_buf().await?;
+                let mut cursor = Cursor::new(buffer);
+                cursor.set_position((len - read) as u64);
+                let _ = cursor.read_exact(&mut buf[read..]);
 
-            let id = if self.is_compressed() {
-                let _ = u32::var_decode(&mut cursor)?;
-                u32::var_decode(&mut cursor)?
-            } else {
-                u32::var_decode(&mut cursor)?
-            };
-
-            log::trace!("Failed to gather {len} bytes for packet 0x{:02X}", id);
-            log::trace!("Byte buffer: {:?}", cursor.into_inner());
-            panic!("Connection {err}");
+                let read_bytes = cursor.position();
+                self.buffer.consume(read_bytes as usize);
+                read += read_bytes as usize;
+            }
         }
 
         let mut cursor = Cursor::new(buf);
@@ -189,32 +195,40 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             let mut cursor = Cursor::new(decompressed);
             let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
 
-            // Try to read more packets if the length doesn't match
-            while decompressed_len > cursor.position() as usize {
-                match <S as State<V>>::Clientbound::decode(&mut cursor) {
-                    Ok(packet) => self.packet_buffer.push_back(packet),
-                    Err(err) => {
-                        return Err(err.into());
-                    }
+            #[cfg(feature = "debug")]
+            {
+                let mut string = format!("{:?}", packet);
+                if string.len() > 100 {
+                    string.truncate(100);
+                    string.push_str("...");
+                }
+
+                if packet.is_ok() {
+                    log::trace!("Decompressed packet: {}", string);
+                } else {
+                    log::error!("Decompressed packet: {}", string);
+                    log::trace!("Decompressed buffer: {:?}", cursor.get_ref());
                 }
             }
 
-            #[cfg(feature = "debug")]
-            if decompressed_len != cursor.position() as usize {
-                log::warn!(
-                    "Packet length mismatch: expected {}, got {}",
-                    len,
-                    cursor.position()
-                );
-            }
-
-            // Consume the length from the buffer
-            #[cfg(feature = "debug")]
-            log::trace!("Consuming {} bytes", len_len + len);
-            self.buffer.consume(len_len + len);
-
-            #[cfg(feature = "debug")]
-            log::trace!("Decompressed packet: {:?}", packet);
+            // TODO: Bundle packets
+            // Try to read more packets if the length doesn't match
+            // while decompressed_len > cursor.position() as usize && len != 1 {
+            //     match <S as State<V>>::Clientbound::decode(&mut cursor) {
+            //         Ok(packet) => self.packet_buffer.push_back(packet),
+            //         Err(err) => {
+            //             if let DecodeError::Io(err) = err {
+            //                 if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
+            //                     return Err(err.into());
+            //                 } else {
+            //                     break;
+            //                 }
+            //             } else {
+            //                 return Err(err.into());
+            //             }
+            //         }
+            //     }
+            // }
 
             // Return the packet
             Ok(packet?)
@@ -222,32 +236,41 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             // Read the packet
             let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
 
-            // Try to read more packets if the length doesn't match
-            while len > cursor.position() as usize {
-                match <S as State<V>>::Clientbound::decode(&mut cursor) {
-                    Ok(packet) => self.packet_buffer.push_back(packet),
-                    Err(err) => {
-                        return Err(err.into());
-                    }
+            #[cfg(feature = "debug")]
+            {
+                let mut string = format!("{:?}", packet);
+                if string.len() > 100 {
+                    string.truncate(100);
+                    string.push_str("...");
+                }
+
+                if packet.is_ok() {
+                    log::debug!("Read packet: {}", string);
+                } else {
+                    log::error!("Read packet: {}", string);
+                    log::debug!("Read buffer: {:?}", cursor.get_ref());
                 }
             }
 
-            #[cfg(feature = "debug")]
-            if len != cursor.position() as usize {
-                log::warn!(
-                    "Packet length mismatch: expected {}, got {}",
-                    len,
-                    cursor.position()
-                );
-            }
-
-            // Consume the length from the buffer
-            #[cfg(feature = "debug")]
-            log::trace!("Consuming {} bytes", len_len + cursor.position() as usize);
-            self.buffer.consume(len_len + cursor.position() as usize);
-
-            #[cfg(feature = "debug")]
-            log::trace!("Packet: {:?}", packet);
+            // TODO: Bundle packets
+            // Try to read more packets if the length doesn't match
+            // while len > cursor.position() as usize && len != 1 {
+            //     // log::trace!("Buf len: {}, Cursor position: {}", len, cursor.position());
+            //     match <S as State<V>>::Clientbound::decode(&mut cursor) {
+            //         Ok(packet) => self.packet_buffer.push_back(packet),
+            //         Err(err) => {
+            //             if let DecodeError::Io(err) = err {
+            //                 if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
+            //                     return Err(err.into());
+            //                 } else {
+            //                     break;
+            //                 }
+            //             } else {
+            //                 return Err(err.into());
+            //             }
+            //         }
+            //     }
+            // }
 
             // Return the packet
             Ok(packet?)
@@ -298,6 +321,8 @@ pub enum ConnectionError {
     NoAddressFound,
     #[error("Unexpected packet")]
     UnexpectedPacket,
+    #[error("Connection Closed")]
+    Closed,
     #[error("Disconnected: {0:?}")]
     Disconnected(FormattedText),
 }
@@ -322,7 +347,7 @@ impl<V: Version, S: State<V>> TryFrom<TcpStream> for Connection<V, S> {
             port: stream.peer_addr()?.port(),
             compression: None,
             packet_buffer: VecDeque::new(),
-            buffer: BufReader::new(stream.clone()),
+            buffer: BufReader::with_capacity(Self::BUFFER_SIZE, stream.clone()),
             stream,
         })
     }

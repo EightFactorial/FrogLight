@@ -281,7 +281,7 @@ where
                             commands
                                 .entity(entity)
                                 .insert(profile)
-                                .remove::<ConnectionConfigurationTask<Self>>();
+                                .remove::<ConnectionLoginTask<Self>>();
                         }
                     }
                     Err(err) => {
@@ -346,6 +346,7 @@ where
             channel_state = task.state;
 
             if task.is_disconnected() {
+                log::error!("Channel disconnected");
                 commands.remove_resource::<ConnectionChannel<Self>>();
                 return;
             }
@@ -365,20 +366,16 @@ where
                             }
                         } else {
                             match err {
-                                ConnectionError::Encode(err) => {
-                                    error!("{err}");
-                                }
-                                ConnectionError::Decode(err) => {
-                                    error!("{err}");
-                                }
                                 ConnectionError::Disconnected(reason) => {
                                     warn!("Client disconnected: {}", reason.to_string());
                                 }
-                                ConnectionError::Io(_)
-                                | ConnectionError::ParsePort(_)
+                                ConnectionError::ParsePort(_)
                                 | ConnectionError::NoAddressFound
                                 | ConnectionError::UnexpectedPacket => {
                                     unreachable!("Does not occur in configuration/play state")
+                                }
+                                _ => {
+                                    error!("{err}");
                                 }
                             }
 

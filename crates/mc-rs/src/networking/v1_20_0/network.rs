@@ -13,6 +13,17 @@ impl Network for V1_20_0 {
     }
 
     fn play_packet(_world: &mut World, packet: ClientboundPlayPackets) {
-        info!("Play packet: {:?}", packet);
+        match packet {
+            ClientboundPlayPackets::Bundle(_)
+            | ClientboundPlayPackets::ChunkBiomeData(_)
+            | ClientboundPlayPackets::ChunkData(_)
+            | ClientboundPlayPackets::LightUpdate(_)
+            | ClientboundPlayPackets::SynchronizeRecipes(_)
+            | ClientboundPlayPackets::SynchronizeTags(_)
+            | ClientboundPlayPackets::CommandTree(_) => {}
+            _ => {
+                log::info!("{:?}", packet);
+            }
+        }
     }
 }
