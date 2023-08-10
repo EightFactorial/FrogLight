@@ -2,28 +2,22 @@ use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 use strum::{EnumString, FromRepr};
 
-#[cfg(feature = "hashbrown")]
-use hashbrown::HashMap;
-#[cfg(not(feature = "hashbrown"))]
-use std::collections::HashMap;
-
 use crate::{
     buffer::{Decode, Encode},
     types::inventory::ItemSlot,
 };
 
 #[derive(Debug, Clone, Deref, DerefMut, From, Into)]
-pub struct EntityEquipment(pub HashMap<EquipmentSlot, ItemSlot>);
+pub struct EntityEquipment(pub Vec<(EquipmentSlot, ItemSlot)>);
 
 impl Encode for EntityEquipment {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
-        for (index, (slot, item)) in self.0.iter().enumerate() {
-            let mut byte = *slot as u8;
-            if index != self.0.len() - 1 {
-                byte |= 128;
+        for (i, (slot, item)) in self.iter().enumerate() {
+            let mut slot_byte = u8::from(*slot);
+            if i != self.len() - 1 {
+                slot_byte |= 128;
             }
-
-            byte.encode(buf)?;
+            slot_byte.encode(buf)?;
             item.encode(buf)?;
         }
 
@@ -33,20 +27,22 @@ impl Encode for EntityEquipment {
 
 impl Decode for EntityEquipment {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
-        let mut slots = HashMap::new();
-
+        let mut equipment = Vec::new();
         loop {
             let byte = u8::decode(buf)?;
-            let slot = EquipmentSlot::from_repr(byte.into())
-                .ok_or(crate::buffer::DecodeError::InvalidEnumId(byte as i32))?;
 
-            slots.insert(slot, ItemSlot::decode(buf)?);
+            let slot_byte = vec![byte & 127];
+            let slot = EquipmentSlot::decode(&mut slot_byte.as_slice())?;
+
+            let item = ItemSlot::decode(buf)?;
+            equipment.push((slot, item));
+
             if byte & 128 == 0 {
                 break;
             }
         }
 
-        Ok(Self(slots))
+        Ok(Self(equipment))
     }
 }
 
@@ -58,4 +54,17 @@ pub enum EquipmentSlot {
     Legs,
     Chest,
     Head,
+}
+
+impl From<EquipmentSlot> for u8 {
+    fn from(slot: EquipmentSlot) -> Self {
+        match slot {
+            EquipmentSlot::MainHand => 0,
+            EquipmentSlot::OffHand => 1,
+            EquipmentSlot::Feet => 2,
+            EquipmentSlot::Legs => 3,
+            EquipmentSlot::Chest => 4,
+            EquipmentSlot::Head => 5,
+        }
+    }
 }

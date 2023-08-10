@@ -1,13 +1,14 @@
 use mc_rs_macros::Transcode;
 use uuid::Uuid;
 
-use crate::types::{EntityId, ResourceLocation, Vec3};
+use crate::types::{EntityId, Vec3};
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ClientboundEntitySpawnPacket {
     pub entity_id: EntityId,
     pub uuid: Uuid,
-    pub entity_kind: ResourceLocation,
+    #[var]
+    pub entity_kind: u32,
     pub position: Vec3,
     pub yaw: i8,
     pub pitch: i8,
