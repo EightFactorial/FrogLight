@@ -168,6 +168,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             cursor.read_exact(&mut buf)?;
             self.buffer.consume(len_len + len);
         } else {
+            // I don't think this works
             self.buffer.consume(len_len);
 
             let mut read = 0;
@@ -256,7 +257,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     ) {
         let mut string = format!("{:?}", packet);
         if string.len() > 100 {
-            string.truncate(100);
+            string.truncate(97);
             string.push_str("...");
         }
 

@@ -16,13 +16,12 @@ impl Network for V1_20_0 {
         match packet {
             ClientboundPlayPackets::Bundle(_)
             | ClientboundPlayPackets::ChunkBiomeData(_)
-            | ClientboundPlayPackets::ChunkData(_)
             | ClientboundPlayPackets::LightUpdate(_)
             | ClientboundPlayPackets::SynchronizeRecipes(_)
             | ClientboundPlayPackets::SynchronizeTags(_)
             | ClientboundPlayPackets::CommandTree(_) => {}
             _ => {
-                log::info!("{:?}", packet);
+                log::info!("{packet:?}");
             }
         }
     }
