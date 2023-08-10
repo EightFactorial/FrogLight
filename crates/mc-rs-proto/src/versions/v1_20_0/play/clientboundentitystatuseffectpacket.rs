@@ -1,4 +1,4 @@
-use fastnbt::Value;
+use azalea_nbt::Nbt;
 use mc_rs_macros::Transcode;
 
 use crate::types::{EntityId, ResourceLocation};
@@ -11,5 +11,5 @@ pub struct ClientboundEntityStatusEffectPacket {
     #[var]
     pub duration: u32,
     pub flags: u8,
-    pub data: Option<Value>,
+    pub data: Option<Nbt>,
 }

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use azalea_chat::FormattedText;
+use azalea_nbt::Nbt;
 use byteorder::{WriteBytesExt, BE};
-use fastnbt::Value;
 use uuid::Uuid;
 
 use super::{Encode, EncodeError, VarEncode};
@@ -172,9 +172,10 @@ impl<K: Encode, V: Encode> Encode for hashbrown::HashMap<K, V> {
     }
 }
 
-impl Encode for Value {
+impl Encode for Nbt {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
-        fastnbt::to_writer(buf, self).map_err(EncodeError::from)
+        self.write(buf);
+        Ok(())
     }
 }
 

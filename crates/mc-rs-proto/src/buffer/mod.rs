@@ -27,8 +27,6 @@ pub enum EncodeError {
     TryInto(#[from] std::num::TryFromIntError),
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
-    #[error(transparent)]
-    NbtError(#[from] fastnbt::error::Error),
     #[error("No packets in this state")]
     NoPackets,
 }
@@ -56,8 +54,8 @@ pub enum DecodeError {
     Serde(#[from] serde_json::Error),
     #[error(transparent)]
     Utf8(#[from] std::string::FromUtf8Error),
-    #[error(transparent)]
-    NbtError(#[from] fastnbt::error::Error),
+    #[error("NBT error")]
+    NbtError,
     #[error("Unknown packet id: {0}")]
     UnknownPacketId(u32),
     #[error("Invalid enum id: {0}")]

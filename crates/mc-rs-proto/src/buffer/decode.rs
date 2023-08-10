@@ -1,8 +1,8 @@
 use std::{collections::HashMap, hash::Hash};
 
 use azalea_chat::FormattedText;
+use azalea_nbt::Nbt;
 use byteorder::{ReadBytesExt, BE};
-use fastnbt::Value;
 use uuid::Uuid;
 
 use super::{Decode, DecodeError, VarDecode};
@@ -185,9 +185,9 @@ impl<K: Decode + Eq + Hash, V: Decode> Decode for hashbrown::HashMap<K, V> {
     }
 }
 
-impl Decode for Value {
+impl Decode for Nbt {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
-        fastnbt::from_reader(buf).map_err(DecodeError::from)
+        Nbt::read(buf).map_err(|_| DecodeError::NbtError)
     }
 }
 

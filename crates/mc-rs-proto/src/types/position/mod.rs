@@ -1,4 +1,4 @@
-use bevy_math::{IVec2, IVec3};
+use bevy_math::{IVec2, IVec3, Quat};
 
 mod block_pos;
 pub use block_pos::BlockPos;
@@ -82,5 +82,25 @@ impl VarDecode for IVec3 {
             y: VarDecode::var_decode(buf)?,
             z: VarDecode::var_decode(buf)?,
         })
+    }
+}
+
+impl Encode for Quat {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
+        self.x.encode(buf)?;
+        self.y.encode(buf)?;
+        self.z.encode(buf)?;
+        self.w.encode(buf)
+    }
+}
+
+impl Decode for Quat {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
+        Ok(Self::from_xyzw(
+            Decode::decode(buf)?,
+            Decode::decode(buf)?,
+            Decode::decode(buf)?,
+            Decode::decode(buf)?,
+        ))
     }
 }

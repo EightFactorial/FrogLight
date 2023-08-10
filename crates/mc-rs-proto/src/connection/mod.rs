@@ -168,11 +168,12 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             cursor.read_exact(&mut buf)?;
             self.buffer.consume(len_len + len);
         } else {
+            self.buffer.consume(len_len);
+
             let mut read = 0;
             while read < len {
                 let buffer = self.buffer.fill_buf().await?;
                 let mut cursor = Cursor::new(buffer);
-                cursor.set_position((len - read) as u64);
                 let _ = cursor.read_exact(&mut buf[read..]);
 
                 let read_bytes = cursor.position();
@@ -193,42 +194,14 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             // Read the packet from the decompressed data
             let decompressed_len = decompressed.len();
             let mut cursor = Cursor::new(decompressed);
+
             let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
 
             #[cfg(feature = "debug")]
-            {
-                let mut string = format!("{:?}", packet);
-                if string.len() > 100 {
-                    string.truncate(100);
-                    string.push_str("...");
-                }
+            Self::trace_packet(&packet, &cursor);
 
-                if packet.is_ok() {
-                    log::trace!("Decompressed packet: {}", string);
-                } else {
-                    log::error!("Decompressed packet: {}", string);
-                    log::trace!("Decompressed buffer: {:?}", cursor.get_ref());
-                }
-            }
-
-            // TODO: Bundle packets
-            // Try to read more packets if the length doesn't match
-            // while decompressed_len > cursor.position() as usize && len != 1 {
-            //     match <S as State<V>>::Clientbound::decode(&mut cursor) {
-            //         Ok(packet) => self.packet_buffer.push_back(packet),
-            //         Err(err) => {
-            //             if let DecodeError::Io(err) = err {
-            //                 if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
-            //                     return Err(err.into());
-            //                 } else {
-            //                     break;
-            //                 }
-            //             } else {
-            //                 return Err(err.into());
-            //             }
-            //         }
-            //     }
-            // }
+            // Check if the packet is a bundle and read the bundled packets
+            Self::read_bundle(len, &mut cursor, &mut self.packet_buffer);
 
             // Return the packet
             Ok(packet?)
@@ -237,43 +210,61 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
 
             #[cfg(feature = "debug")]
-            {
-                let mut string = format!("{:?}", packet);
-                if string.len() > 100 {
-                    string.truncate(100);
-                    string.push_str("...");
-                }
+            Self::trace_packet(&packet, &cursor);
 
-                if packet.is_ok() {
-                    log::debug!("Read packet: {}", string);
-                } else {
-                    log::error!("Read packet: {}", string);
-                    log::debug!("Read buffer: {:?}", cursor.get_ref());
-                }
-            }
-
-            // TODO: Bundle packets
-            // Try to read more packets if the length doesn't match
-            // while len > cursor.position() as usize && len != 1 {
-            //     // log::trace!("Buf len: {}, Cursor position: {}", len, cursor.position());
-            //     match <S as State<V>>::Clientbound::decode(&mut cursor) {
-            //         Ok(packet) => self.packet_buffer.push_back(packet),
-            //         Err(err) => {
-            //             if let DecodeError::Io(err) = err {
-            //                 if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
-            //                     return Err(err.into());
-            //                 } else {
-            //                     break;
-            //                 }
-            //             } else {
-            //                 return Err(err.into());
-            //             }
-            //         }
-            //     }
-            // }
+            // Check if the packet is a bundle and read the bundled packets
+            Self::read_bundle(len, &mut cursor, &mut self.packet_buffer);
 
             // Return the packet
             Ok(packet?)
+        }
+    }
+
+    /// Extracts packets from a bundle and adds them to the packet buffer.
+    fn read_bundle(
+        len: usize,
+        cursor: &mut Cursor<Vec<u8>>,
+        buffer: &mut VecDeque<<S as State<V>>::Clientbound>,
+    ) {
+        while len > cursor.position() as usize {
+            let packet = <S as State<V>>::Clientbound::decode(cursor);
+
+            #[cfg(feature = "debug")]
+            Self::trace_packet(&packet, cursor);
+
+            match packet {
+                Ok(packet) => buffer.push_back(packet),
+                Err(err) => {
+                    if let DecodeError::Io(err) = err {
+                        if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
+                            log::error!("Error reading bundled packet: {err:?}");
+                        }
+                    } else {
+                        log::error!("Error reading bundled packet: {err:?}");
+                    }
+                    return;
+                }
+            }
+        }
+    }
+
+    /// Logs the packet if the debug feature is enabled.
+    #[cfg(feature = "debug")]
+    fn trace_packet(
+        packet: &Result<<S as State<V>>::Clientbound, DecodeError>,
+        cursor: &Cursor<Vec<u8>>,
+    ) {
+        let mut string = format!("{:?}", packet);
+        if string.len() > 100 {
+            string.truncate(100);
+            string.push_str("...");
+        }
+
+        if packet.is_ok() {
+            log::trace!("Read packet: {}", string);
+        } else {
+            log::error!("Read packet: {}", string);
+            log::trace!("Read buffer: {:?}", cursor.get_ref());
         }
     }
 

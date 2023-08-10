@@ -340,14 +340,14 @@ where
 
         // Get the channel data and state
         {
-            let mut state = SystemState::<(Res<ConnectionChannel<Self>>, Commands)>::new(world);
-            let (task, mut commands) = state.get(world);
+            let mut state = SystemState::<Res<ConnectionChannel<Self>>>::new(world);
+            let task = state.get(world);
 
             channel_state = task.state;
 
             if task.is_disconnected() {
                 log::error!("Channel disconnected");
-                commands.remove_resource::<ConnectionChannel<Self>>();
+                world.remove_resource::<ConnectionChannel<Self>>();
                 return;
             }
 
@@ -357,31 +357,27 @@ where
                         channel_data.push(data);
                     }
                     Err(err) => {
-                        if let ConnectionError::Io(err) = err {
-                            if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
-                                error!("Failed to receive packet: {err}");
-
-                                commands.remove_resource::<ConnectionChannel<Self>>();
-                                return;
+                        match err {
+                            ConnectionError::Closed => {
+                                error!("Connection Closed");
+                                // TODO: Handle this
                             }
-                        } else {
-                            match err {
-                                ConnectionError::Disconnected(reason) => {
-                                    warn!("Client disconnected: {}", reason.to_string());
-                                }
-                                ConnectionError::ParsePort(_)
-                                | ConnectionError::NoAddressFound
-                                | ConnectionError::UnexpectedPacket => {
-                                    unreachable!("Does not occur in configuration/play state")
-                                }
-                                _ => {
-                                    error!("{err}");
-                                }
+                            ConnectionError::Disconnected(reason) => {
+                                warn!("Disconnected: {}", reason.to_string());
+                                // TODO: Handle this
                             }
-
-                            commands.remove_resource::<ConnectionChannel<Self>>();
-                            return;
+                            ConnectionError::ParsePort(_)
+                            | ConnectionError::NoAddressFound
+                            | ConnectionError::UnexpectedPacket => {
+                                unreachable!("Does not occur in configuration/play state")
+                            }
+                            _ => {
+                                error!("{err}");
+                            }
                         }
+
+                        world.remove_resource::<ConnectionChannel<Self>>();
+                        return;
                     }
                 }
             }

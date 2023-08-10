@@ -1,4 +1,4 @@
-use fastnbt::Value;
+use azalea_nbt::Nbt;
 use mc_rs_macros::Transcode;
 
 use crate::types::{enums::GameMode, position::GlobalPos, ResourceLocation};
@@ -10,7 +10,7 @@ pub struct ClientboundGameJoinPacket {
     pub game_mode: GameMode,
     pub previous_game_mode: i8,
     pub levels: Vec<ResourceLocation>,
-    pub registry: Value,
+    pub registry: Nbt,
     pub dimension_type: ResourceLocation,
     pub dimension: ResourceLocation,
     pub seed: i64,

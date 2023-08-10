@@ -2,7 +2,7 @@ use mc_rs_macros::Transcode;
 
 use crate::types::inventory::ItemSlot;
 
-#[derive(Clone, Debug, Transcode)]
+#[derive(Clone, Debug, PartialEq, Transcode)]
 pub struct MerchantOffer {
     pub base_cost_a: ItemSlot,
     pub result: ItemSlot,
@@ -14,4 +14,14 @@ pub struct MerchantOffer {
     pub special_price_diff: i32,
     pub price_multiplier: f32,
     pub demand: u32,
+}
+
+#[derive(Clone, Debug, PartialEq, Transcode)]
+pub struct MerchantData {
+    #[var]
+    pub kind: u32,
+    #[var]
+    pub profession: u32,
+    #[var]
+    pub level: u32,
 }

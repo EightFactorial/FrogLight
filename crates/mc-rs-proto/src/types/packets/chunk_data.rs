@@ -1,9 +1,9 @@
-use fastnbt::Value;
+use azalea_nbt::Nbt;
 use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, Transcode)]
 pub struct ChunkDataPacket {
-    pub heightmaps: Value,
+    pub heightmaps: Nbt,
     pub data: Vec<u8>,
     pub entities: Vec<BlockEntity>,
 }
@@ -14,5 +14,5 @@ pub struct BlockEntity {
     pub y: u16,
     #[var]
     pub kind: u32,
-    pub data: Value,
+    pub data: Nbt,
 }

@@ -1,8 +1,7 @@
+use azalea_nbt::Nbt;
 use mc_rs_macros::Transcode;
 
-use crate::types::UnsizedByteBuffer;
-
-#[derive(Debug, Default, Clone, Transcode)]
+#[derive(Debug, Default, PartialEq, Clone, Transcode)]
 pub enum ItemSlot {
     #[default]
     Empty,
@@ -31,16 +30,16 @@ impl ItemSlot {
     }
 }
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Transcode)]
 pub struct ItemSlotData {
     #[var]
     pub kind: u32,
     pub count: i8,
-    pub nbt: UnsizedByteBuffer,
+    pub nbt: Nbt,
 }
 
 impl ItemSlotData {
-    pub fn new(kind: u32, count: i8, nbt: UnsizedByteBuffer) -> Self { Self { kind, count, nbt } }
+    pub fn new(kind: u32, count: i8, nbt: Nbt) -> Self { Self { kind, count, nbt } }
 
     pub fn is_empty(&self) -> bool {
         self.count == 0 || self.kind.to_string().as_str() == "minecraft:air"

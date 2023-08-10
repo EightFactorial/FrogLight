@@ -7,7 +7,7 @@ use crate::buffer::{Decode, Encode, VarDecode, VarEncode};
 
 /// A Minecraft entity ID.
 ///
-/// Very different from a Bevy [Entity](bevy_ecs::entity::Entity).
+/// Very different from Bevy's [Entity](bevy_ecs::entity::Entity).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut)]
 pub struct EntityId(pub u32);
 
