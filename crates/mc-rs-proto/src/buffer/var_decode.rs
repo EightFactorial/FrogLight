@@ -70,6 +70,19 @@ impl VarDecode for usize {
     }
 }
 
+impl<T: VarDecode> VarDecode for Vec<T> {
+    fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        let len = u32::var_decode(buf)?;
+
+        let mut vec = Vec::with_capacity(len as usize);
+        for _ in 0..len {
+            vec.push(T::var_decode(buf)?);
+        }
+
+        Ok(vec)
+    }
+}
+
 impl<T: VarDecode> VarDecode for Option<T> {
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         match u32::var_decode(buf)? {

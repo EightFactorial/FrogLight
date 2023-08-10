@@ -24,4 +24,5 @@ pub mod resource_pack;
 pub mod scoreboard;
 pub mod sound;
 pub mod suggestion;
+pub mod tags;
 pub mod update_status;

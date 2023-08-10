@@ -81,6 +81,16 @@ impl VarEncode for usize {
     }
 }
 
+impl<T: VarEncode> VarEncode for Vec<T> {
+    fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        self.len().var_encode(buf)?;
+        for item in self {
+            item.var_encode(buf)?;
+        }
+        Ok(())
+    }
+}
+
 impl<T: VarEncode> VarEncode for Option<T> {
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         match self {
