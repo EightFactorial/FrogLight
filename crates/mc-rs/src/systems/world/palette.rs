@@ -63,6 +63,30 @@ impl Palette {
 
         self
     }
+
+    fn get_index(&self, index: u32) -> u32 {
+        match &self.kind {
+            PaletteKind::Single(id) => *id,
+            PaletteKind::Array(ids) | PaletteKind::Bimap(ids) => ids[index as usize],
+            PaletteKind::Global => index,
+        }
+    }
+
+    pub fn get_values(&self) -> Vec<u32> {
+        if self.bits == 0 {
+            return Vec::new();
+        }
+
+        let mut block_ids = Vec::with_capacity(self.data.len() * (64 / self.bits) as usize);
+        for long in self.data.iter() {
+            for i in 0..(64 / self.bits) {
+                let index = (long >> (i * self.bits)) & ((1 << self.bits) - 1);
+                block_ids.push(self.get_index(index as u32));
+            }
+        }
+
+        block_ids
+    }
 }
 
 #[derive(Debug, Clone)]

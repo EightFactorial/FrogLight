@@ -1,12 +1,6 @@
-use bevy::prelude::{Component, Deref, DerefMut};
 use mc_rs_proto::buffer::{Decode, DecodeError};
 
 use super::{global_palette::GlobalPalette, palette::Palette};
-
-#[derive(
-    Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Deref, DerefMut, Component,
-)]
-pub struct ChunkSection(pub isize);
 
 #[derive(Debug, Default, Clone)]
 pub struct Section {
@@ -25,6 +19,10 @@ impl Section {
             biome_palette: Palette::decode::<V>(DataKind::Biome, buf)?,
         })
     }
+
+    pub fn get_blocks(&self) -> Vec<u32> { self.block_palette.get_values() }
+
+    pub fn get_biomes(&self) -> Vec<u32> { self.biome_palette.get_values() }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

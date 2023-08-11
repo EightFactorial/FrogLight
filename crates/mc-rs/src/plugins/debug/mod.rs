@@ -3,6 +3,8 @@ use bevy::{
     prelude::*,
 };
 
+use crate::networking::network::LocalPlayer;
+
 /// A plugin with a debug display
 ///
 /// This plugin adds a debug display to the game, which shows the current FPS and entity count.
@@ -15,7 +17,11 @@ impl Plugin for DebugPlugin {
 
         app.add_systems(
             Update,
-            (DebugPlugin::update_fps, DebugPlugin::update_entities),
+            (
+                DebugPlugin::update_fps,
+                DebugPlugin::update_entities,
+                DebugPlugin::update_position.run_if(resource_exists::<LocalPlayer>()),
+            ),
         );
     }
 }
@@ -31,6 +37,10 @@ pub struct DebugFpsDisplay;
 /// A marker component for the debug entity count display
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct DebugEntityCounter;
+
+/// A marker component for the player position display
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub struct DebugPlayerPosition;
 
 impl DebugPlugin {
     fn create_display(mut commands: Commands) {
@@ -75,8 +85,16 @@ impl DebugPlugin {
                 parent.spawn((
                     DebugEntityCounter,
                     TextBundle {
+                        style: style.clone(),
+                        text: Text::from_section("0 ENT", text_style.clone()),
+                        ..Default::default()
+                    },
+                ));
+                parent.spawn((
+                    DebugPlayerPosition,
+                    TextBundle {
                         style,
-                        text: Text::from_section("0 ENT", text_style),
+                        text: Text::from_section("0, 0, 0", text_style),
                         ..Default::default()
                     },
                 ));
@@ -84,20 +102,25 @@ impl DebugPlugin {
     }
 
     /// Update the debug fps display
-    fn update_fps(
-        mut query: Query<&mut Text, (With<DebugFpsDisplay>, Without<DebugEntityCounter>)>,
-        diag: Res<DiagnosticsStore>,
-    ) {
+    fn update_fps(mut query: Query<&mut Text, With<DebugFpsDisplay>>, diag: Res<DiagnosticsStore>) {
         if let Some(diag) = diag.get(FrameTimeDiagnosticsPlugin::FPS).unwrap().average() {
             query.single_mut().sections[0].value = format!("{:.1} FPS", diag);
         }
     }
 
     /// Update the debug entity counter
-    fn update_entities(
-        mut query: Query<&mut Text, (With<DebugEntityCounter>, Without<DebugFpsDisplay>)>,
-        count: Query<()>,
-    ) {
+    fn update_entities(mut query: Query<&mut Text, With<DebugEntityCounter>>, count: Query<()>) {
         query.single_mut().sections[0].value = format!("{} ENT", count.iter().count());
+    }
+
+    /// Update the player position display
+    fn update_position(
+        mut query: Query<&mut Text, With<DebugPlayerPosition>>,
+        player: Res<LocalPlayer>,
+        transform: Query<&Transform>,
+    ) {
+        if let Ok(transform) = transform.get(**player) {
+            query.single_mut().sections[0].value = format!("{:?}", transform.translation);
+        }
     }
 }

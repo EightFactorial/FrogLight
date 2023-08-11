@@ -305,8 +305,10 @@ where
                                 rx2,
                             ));
 
+                            commands.entity(entity).insert(TransformBundle::default());
                             let player = LocalPlayer::from_player(entity, &mut commands);
                             commands.insert_resource(player);
+
                             commands.insert_resource(ConnectionChannel::new(rx1, tx2, new_task));
 
                             commands
@@ -314,7 +316,7 @@ where
                                 .insert(profile)
                                 .remove::<ConnectionLoginTask<Self>>();
 
-                            state.set(ApplicationState::InGame);
+                            state.set(ApplicationState::Game);
                         }
                     }
                     Err(err) => {
@@ -359,7 +361,7 @@ where
                             .entity(entity)
                             .remove::<ConnectionConfigurationTask<Self>>();
 
-                        state.set(ApplicationState::InGame);
+                        state.set(ApplicationState::Game);
                     }
                     Err(err) => {
                         error!("Failed to configure client: {}", err);

@@ -2,7 +2,6 @@
 
 use async_trait::async_trait;
 use flume::{Receiver, Sender};
-use log::error;
 use mc_rs_proto::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
@@ -88,15 +87,13 @@ where
             ConnectionEnum::Configuration(con) => match packet {
                 ConnectionSend::Configuration(packet) => con.send_packet(packet).await,
                 _ => {
-                    error!("Invalid packet for connection configuration state");
-                    Ok(())
+                    panic!("Invalid packet for connection configuration state");
                 }
             },
             ConnectionEnum::Play(con) => match packet {
                 ConnectionSend::Play(packet) => con.send_packet(packet).await,
                 _ => {
-                    error!("Invalid packet for connection play state");
-                    Ok(())
+                    panic!("Invalid packet for connection play state");
                 }
             },
         }

@@ -9,9 +9,13 @@ use mc_rs_proto::{
 use self::{
     chunk::{Chunk, ChunkEntity},
     global_palette::GlobalPalette,
+    task::{SectionMarker, SectionTask},
 };
 
-use super::app_state::{ApplicationState, GameSet};
+use super::{
+    app_state::{ApplicationState, GameSet},
+    blocks::block_list::Blocks,
+};
 
 pub mod chunk;
 pub mod global_palette;
@@ -23,20 +27,29 @@ pub mod task;
 /// Adds the `Worlds` resource and its systems.
 pub(super) fn add_systems(app: &mut App) {
     app.add_systems(
-        OnEnter(ApplicationState::InGame),
+        OnEnter(ApplicationState::Game),
         Worlds::create.in_set(GameSet),
     );
 
     app.add_systems(
-        OnExit(ApplicationState::InGame),
-        Worlds::destroy.in_set(GameSet),
+        Update,
+        SectionTask::poll_tasks
+            // .run_if(any_with_component::<SectionTask>())
+            .in_set(GameSet),
+    );
+
+    app.add_systems(
+        OnExit(ApplicationState::Game),
+        (
+            Worlds::destroy,
+            SectionTask::destory_tasks.run_if(any_with_component::<SectionTask>()),
+        )
+            .in_set(GameSet),
     );
 }
 
 pub const CHUNK_HEIGHT: usize = 384;
-#[allow(dead_code)]
 pub const CHUNK_VERT_DISPLACEMENT: isize = -64;
-#[allow(dead_code)]
 pub const CHUNK_SIZE: usize = 16;
 pub const SECTION_HEIGHT: usize = 16;
 pub const SECTION_COUNT: usize = CHUNK_HEIGHT / SECTION_HEIGHT;
@@ -50,7 +63,17 @@ impl Worlds {
     pub fn create(mut commands: Commands) { commands.init_resource::<Worlds>(); }
 
     /// Destroys the `Worlds` resource when leaving a server.
-    fn destroy(mut commands: Commands) { commands.remove_resource::<Worlds>(); }
+    #[allow(clippy::type_complexity)]
+    fn destroy(
+        query: Query<Entity, Or<(With<Chunk>, With<SectionMarker>)>>,
+        mut commands: Commands,
+    ) {
+        for entity in query.iter() {
+            commands.entity(entity).despawn_recursive();
+        }
+
+        commands.remove_resource::<Worlds>();
+    }
 
     /// Spawns a new chunk from the given chunk data and inserts it into the given world.
     ///
@@ -60,10 +83,11 @@ impl Worlds {
         world_type: &WorldType,
         position: ChunkPos,
         chunk_data: ChunkDataPacket,
-        commands: &mut Commands,
+        blocks: &Blocks,
+        world: &mut bevy::ecs::world::World,
     ) -> Result<ChunkEntity, DecodeError> {
-        let chunk = Chunk::decode::<V>(chunk_data, commands)?;
-        Ok(self.insert_chunk(world_type, position, chunk, commands))
+        let (chunk, sections) = Chunk::decode::<V>(chunk_data, blocks, world)?;
+        Ok(self.insert_chunk(world_type, position, chunk, Some(sections), world))
     }
 
     /// Spawns a new chunk and inserts it into the given world.
@@ -74,9 +98,38 @@ impl Worlds {
         world_type: &WorldType,
         position: ChunkPos,
         chunk: Chunk,
-        commands: &mut Commands,
+        sections: Option<Vec<Entity>>,
+        world: &mut bevy::ecs::world::World,
     ) -> ChunkEntity {
-        let entity = ChunkEntity(commands.spawn(chunk).id());
+        // Only make the chunk visible if it has any sections with entities.
+        let visibility = if sections.is_some() {
+            Visibility::Visible
+        } else {
+            Visibility::Hidden
+        };
+
+        let mut chunk = world.spawn((
+            chunk,
+            TransformBundle {
+                local: Transform::from_xyz(
+                    (position.x * CHUNK_SIZE as i32) as f32,
+                    0.,
+                    (position.y * CHUNK_SIZE as i32) as f32,
+                ),
+                ..Default::default()
+            },
+            VisibilityBundle {
+                visibility,
+                ..Default::default()
+            },
+        ));
+
+        if let Some(sections) = sections {
+            chunk.insert_children(0, &sections);
+        }
+
+        let entity = ChunkEntity(chunk.id());
+
         self.insert_entity(world_type, position, entity);
         entity
     }
@@ -170,8 +223,9 @@ impl From<ResourceLocation> for WorldType {
 /// The `World` struct represents a world.
 ///
 /// Currently, it only contains chunk entities.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct World {
+    #[deref]
     pub chunks: HashMap<ChunkPos, ChunkEntity>,
 }
 

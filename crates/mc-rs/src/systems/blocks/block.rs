@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use bevy::prelude::{AssetServer, Handle, Image};
+use block_mesh::{MergeVoxel, Voxel};
 use convert_case::{Case, Casing};
 use mc_rs_proto::types::{enums::Direction, ResourceLocation};
 
@@ -10,28 +11,64 @@ pub struct Block {
     pub name: String,
     pub key: ResourceLocation,
     pub texture: BlockTexture,
+    pub voxel_type: VoxelType,
 }
 
 impl Block {
     /// Create a new block with the given id, name, and texture path(s)
-    pub fn new(id: u32, name: &str, paths: &[&str], assets: &AssetServer) -> Option<Self> {
+    pub fn new(
+        id: u32,
+        name: &str,
+        voxel: VoxelType,
+        paths: &[&str],
+        assets: &AssetServer,
+    ) -> Option<Self> {
         Some(Self {
             id,
             name: name.to_case(Case::Title),
             key: ResourceLocation::new(name.to_case(Case::Snake)),
             texture: BlockTexture::from_paths(paths, assets)?,
+            voxel_type: voxel,
         })
     }
 
     /// Create a new block with the given id, name, and texture
-    pub fn new_with(id: u32, name: &str, texture: BlockTexture) -> Self {
+    pub fn new_with(id: u32, name: &str, voxel: VoxelType, texture: BlockTexture) -> Self {
         Self {
             id,
             name: name.to_case(Case::Title),
             key: ResourceLocation::new(name.to_case(Case::Snake)),
             texture,
+            voxel_type: voxel,
         }
     }
+}
+
+/// The type of voxel the block is
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum VoxelType {
+    /// An empty voxel
+    Empty,
+    /// A voxel with geometry and light can pass through
+    Translucent,
+    /// A voxel with geometry
+    Opaque,
+}
+
+impl Voxel for VoxelType {
+    fn get_visibility(&self) -> block_mesh::VoxelVisibility {
+        match self {
+            VoxelType::Empty => block_mesh::VoxelVisibility::Empty,
+            VoxelType::Translucent => block_mesh::VoxelVisibility::Translucent,
+            VoxelType::Opaque => block_mesh::VoxelVisibility::Opaque,
+        }
+    }
+}
+
+impl MergeVoxel for VoxelType {
+    type MergeValue = Self;
+
+    fn merge_value(&self) -> Self::MergeValue { *self }
 }
 
 /// A block texture

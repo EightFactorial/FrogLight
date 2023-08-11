@@ -3,7 +3,7 @@ use bevy::prelude::*;
 
 use crate::{
     interface::menus::main_menu::MainMenu,
-    systems::app_state::{ApplicationState, InGameSet, InMenuSet},
+    systems::app_state::{ApplicationState, GameSet, InMenuSet},
 };
 
 use self::server::ServerMenu;
@@ -26,8 +26,8 @@ pub(super) fn setup(app: &mut App) {
         ),
     );
     app.add_systems(
-        OnEnter(ApplicationState::InGame),
-        MenuRoot::hide_all.in_set(InGameSet),
+        OnEnter(ApplicationState::Game),
+        MenuRoot::hide_all.in_set(GameSet),
     );
 
     // TODO: Add menu systems

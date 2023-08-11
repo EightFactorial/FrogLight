@@ -10,8 +10,7 @@ pub enum ApplicationState {
     SplashScreen,
     #[cfg_attr(not(feature = "splash"), default)]
     InMenu,
-    InGame,
-    Paused,
+    Game,
 }
 
 /// A system set that runs when the [ApplicationState] is either
@@ -20,24 +19,14 @@ pub enum ApplicationState {
 pub struct MenuSet;
 
 /// A system set that runs when the [ApplicationState] is
-/// [InMenu](ApplicationState::InMenu) state
+/// [InMenu](ApplicationState::InMenu)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct InMenuSet;
 
-/// A system set that runs when the [ApplicationState] is either
-/// [InGame](ApplicationState::InGame) or [Paused](ApplicationState::Paused)
+/// A system set that runs when the [ApplicationState] is
+/// [Game](ApplicationState::Game)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct GameSet;
-
-/// A system set that runs when the [ApplicationState]
-/// is [InGame](ApplicationState::InGame)
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub struct InGameSet;
-
-/// A system set that runs when the [ApplicationState]
-/// is [Paused](ApplicationState::Paused)
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub struct PausedSet;
 
 /// Adds the application state and system sets to the app
 pub(super) fn configure(app: &mut App) {
@@ -61,16 +50,8 @@ pub(super) fn configure(app: &mut App) {
             InMenuSet
                 .run_if(in_state(ApplicationState::InMenu))
                 .in_set(MenuSet),
-            // InGame and Paused
-            GameSet.run_if(
-                in_state(ApplicationState::InGame).or_else(in_state(ApplicationState::Paused)),
-            ),
-            InGameSet
-                .run_if(in_state(ApplicationState::InGame))
-                .in_set(GameSet),
-            PausedSet
-                .run_if(in_state(ApplicationState::Paused))
-                .in_set(GameSet),
+            // Game
+            GameSet.run_if(in_state(ApplicationState::Game)),
         ),
     );
 }

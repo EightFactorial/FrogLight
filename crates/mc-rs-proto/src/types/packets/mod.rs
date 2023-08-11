@@ -19,6 +19,7 @@ pub mod merchant;
 pub mod objective;
 pub mod particle;
 pub mod player_action;
+pub mod position;
 pub mod recipe;
 pub mod resource_pack;
 pub mod scoreboard;

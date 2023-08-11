@@ -22,3 +22,7 @@ impl From<bevy_math::Vec3> for Vec3 {
         }
     }
 }
+
+impl From<Vec3> for bevy_math::Vec3 {
+    fn from(vec: Vec3) -> Self { Self::new(vec.x as f32, vec.y as f32, vec.z as f32) }
+}

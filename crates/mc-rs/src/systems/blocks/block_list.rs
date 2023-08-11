@@ -1,11 +1,13 @@
 #![allow(dead_code)]
 
+use std::sync::{Arc, RwLock};
+
 use bevy::{asset::LoadState, prelude::*, utils::HashMap};
 use mc_rs_proto::types::ResourceLocation;
 
 use crate::systems::app_state::MenuSet;
 
-use super::block::{Block, BlockTexture};
+use super::block::{Block, BlockTexture, VoxelType};
 
 /// Adds all block systems to the app
 pub(super) fn add_systems(app: &mut App) {
@@ -23,14 +25,14 @@ pub(super) fn add_systems(app: &mut App) {
 #[derive(Clone, Resource, Deref, DerefMut)]
 pub struct Blocks {
     #[deref]
-    map: HashMap<u32, Block>,
+    map: Arc<RwLock<HashMap<u32, Block>>>,
     assets: AssetServer,
 }
 
 impl Blocks {
     fn new(assets: &AssetServer) -> Self {
         Self {
-            map: HashMap::new(),
+            map: Default::default(),
             assets: assets.clone(),
         }
     }
@@ -40,17 +42,18 @@ impl Blocks {
         let mut blocks = Self::new(&assets);
 
         // Insert the error block
-        blocks.insert(
+        blocks.write().unwrap().insert(
             u32::MAX,
             Block {
                 id: u32::MAX,
                 name: "Error".to_string(),
                 key: ResourceLocation::new("mc-rs:error"),
                 texture: BlockTexture::from_paths(&["light_blue_wool.png"], &assets).unwrap(),
+                voxel_type: VoxelType::Opaque,
             },
         );
 
-        blocks.insert_block(0, "Air", &Vec::new(), &assets);
+        blocks.insert_block_type(0, "Air", VoxelType::Empty, &Vec::new(), &assets);
 
         blocks.insert_block(1, "Stone", &["stone.png"], &assets);
 
@@ -80,13 +83,36 @@ impl Blocks {
 
     /// Insert a block into the block list
     fn insert_block(&mut self, id: u32, name: &str, paths: &[&str], assets: &AssetServer) {
-        if let Some(block) = Block::new(id, name, paths, assets) {
-            self.insert(id, block);
+        if let Some(block) = Block::new(id, name, VoxelType::Opaque, paths, assets) {
+            self.write().unwrap().insert(id, block);
         } else {
             error!("Failed to create block with id {}", id);
 
-            let fallback = self.get(&u32::MAX).unwrap().texture.clone();
-            self.insert(id, Block::new_with(id, name, fallback));
+            let fallback = self.read().unwrap().get(&u32::MAX).unwrap().texture.clone();
+            self.write()
+                .unwrap()
+                .insert(id, Block::new_with(id, name, VoxelType::Opaque, fallback));
+        }
+    }
+
+    /// Insert a block with a voxel type into the block list
+    fn insert_block_type(
+        &mut self,
+        id: u32,
+        name: &str,
+        voxel: VoxelType,
+        paths: &[&str],
+        assets: &AssetServer,
+    ) {
+        if let Some(block) = Block::new(id, name, voxel, paths, assets) {
+            self.write().unwrap().insert(id, block);
+        } else {
+            error!("Failed to create block with id {}", id);
+
+            let fallback = self.read().unwrap().get(&u32::MAX).unwrap().texture.clone();
+            self.write()
+                .unwrap()
+                .insert(id, Block::new_with(id, name, voxel, fallback));
         }
     }
 
@@ -95,7 +121,7 @@ impl Blocks {
 
     // Get the number of blocks with all textures loaded
     pub fn blocks_loaded(&self) -> u32 {
-        self.values().fold(0u32, |acc, block| {
+        self.read().unwrap().values().fold(0u32, |acc, block| {
             let Some(textures) = block.texture.get_textures() else {
                 return acc;
             };
@@ -110,7 +136,9 @@ impl Blocks {
 
     // Get the number of blocks with textures
     pub fn blocks_with_textures(&self) -> u32 {
-        self.values()
+        self.read()
+            .unwrap()
+            .values()
             .filter(|b| b.texture.get_textures().is_some())
             .count() as u32
     }
@@ -129,10 +157,10 @@ impl Blocks {
     /// Returns the number of blocks that were fixed
     pub fn replace_errors(&mut self) -> u32 {
         let assets = self.assets.clone();
-        let fallback = self.get(&u32::MAX).unwrap().texture.clone();
+        let fallback = self.read().unwrap().get(&u32::MAX).unwrap().texture.clone();
         let mut acc = 0;
 
-        for block in self.values_mut() {
+        for block in self.write().unwrap().values_mut() {
             if let Some(textures) = block.texture.get_textures() {
                 // Check if any of the textures failed to load
                 let ids = textures.iter().map(|t| t.id());
@@ -164,7 +192,10 @@ impl BlocksLoaded {
                 // TODO: Some sort of error popup?
                 error!("{fixed} blocks failed to load textures");
             } else {
-                info!("All blocks ({}) loaded successfully", blocks.len());
+                info!(
+                    "All blocks ({}) loaded successfully",
+                    blocks.read().unwrap().len()
+                );
             }
 
             // Set the blocks loaded resource to true

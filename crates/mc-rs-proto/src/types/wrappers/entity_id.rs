@@ -1,4 +1,4 @@
-use std::num::TryFromIntError;
+use std::{fmt::Display, num::TryFromIntError};
 
 use bevy_ecs::prelude::Component;
 use derive_more::{Deref, DerefMut};
@@ -43,6 +43,10 @@ impl TryFrom<i8> for EntityId {
     type Error = TryFromIntError;
 
     fn try_from(value: i8) -> Result<Self, Self::Error> { Ok(Self(u32::try_from(value)?)) }
+}
+
+impl Display for EntityId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { write!(f, "{}", self.0) }
 }
 
 impl std::ops::Add for EntityId {

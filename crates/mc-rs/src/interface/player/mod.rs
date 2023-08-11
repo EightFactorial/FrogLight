@@ -12,7 +12,7 @@ pub(super) fn setup(app: &mut App) {
     app.add_systems(Startup, InterfaceRoot::load);
 
     app.add_systems(
-        OnEnter(ApplicationState::InGame),
+        OnEnter(ApplicationState::Game),
         InterfaceRoot::create.in_set(GameSet),
     );
 
