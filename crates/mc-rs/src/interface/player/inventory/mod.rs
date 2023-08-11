@@ -1,3 +1,5 @@
+#![allow(clippy::module_inception)]
+
 use bevy::prelude::App;
 
 pub mod anvil;

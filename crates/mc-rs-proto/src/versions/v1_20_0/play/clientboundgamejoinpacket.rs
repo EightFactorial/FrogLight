@@ -11,10 +11,10 @@ pub struct ClientboundGameJoinPacket {
     pub hardcore: bool,
     pub game_mode: GameMode,
     pub previous_game_mode: i8,
-    pub levels: Vec<ResourceLocation>,
+    pub worlds: Vec<ResourceLocation>,
     pub registry: Nbt,
-    pub dimension_type: ResourceLocation,
-    pub dimension: ResourceLocation,
+    pub world_type: ResourceLocation,
+    pub world: ResourceLocation,
     pub seed: i64,
     #[var]
     pub max_players: i32,
@@ -38,9 +38,9 @@ impl Debug for ClientboundGameJoinPacket {
             .field("hardcore", &self.hardcore)
             .field("game_mode", &self.game_mode)
             .field("previous_game_mode", &self.previous_game_mode)
-            .field("levels", &self.levels)
-            .field("dimension_type", &self.dimension_type)
-            .field("dimension", &self.dimension)
+            .field("worlds", &self.worlds)
+            .field("world_type", &self.world_type)
+            .field("world", &self.world)
             .field("seed", &self.seed)
             .field("max_players", &self.max_players)
             .field("chunk_radius", &self.chunk_radius)

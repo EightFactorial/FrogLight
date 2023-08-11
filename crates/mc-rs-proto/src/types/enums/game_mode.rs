@@ -1,7 +1,8 @@
+use bevy_ecs::system::Resource;
 use mc_rs_macros::Transcode;
 use strum::{Display, EnumString};
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash, Display, EnumString, Transcode)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash, Display, EnumString, Transcode, Resource)]
 pub enum GameMode {
     Survival = 0,
     Creative = 1,

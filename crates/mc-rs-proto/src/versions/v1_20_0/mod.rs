@@ -1,6 +1,6 @@
 use crate::Version;
 
-pub mod connection;
+pub mod configuration;
 pub mod handshake;
 pub mod login;
 pub mod play;

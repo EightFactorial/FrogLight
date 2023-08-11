@@ -11,4 +11,5 @@ pub(super) fn setup(app: &mut App) {
     app_state::configure(app);
     blocks::add_systems(app);
     player::add_systems(app);
+    world::add_systems(app);
 }

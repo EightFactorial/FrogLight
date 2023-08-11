@@ -6,7 +6,7 @@ use crate::systems::app_state::{ApplicationState, InMenuSet};
 
 use self::backgrounds::MainMenuBackground;
 
-use super::{server_menu::ServerMenuPing, MenuRoot};
+use super::{server::ServerMenuPing, MenuRoot};
 
 pub mod backgrounds;
 
@@ -30,9 +30,17 @@ pub struct MainMenu;
 
 impl MainMenu {
     /// Show the main menu
+    #[allow(dead_code)]
     pub fn show(mut elements: Elements) {
         elements.select("div.main-menu").remove_class("hidden");
         MainMenuBackground::show(elements);
+    }
+
+    /// Hide the main menu
+    #[allow(dead_code)]
+    pub fn hide(mut elements: Elements) {
+        elements.select("div.main-menu").add_class("hidden");
+        MainMenuBackground::hide(elements);
     }
 
     /// Create the main menu
@@ -78,7 +86,7 @@ impl MainMenu {
     }
 
     /// The list of possible subtitles
-    const SUBTITLES: &str = include_str!("../../../assets/language/menu_subtitle.txt");
+    const SUBTITLES: &str = include_str!("../../../../assets/language/menu_subtitle.txt");
 
     /// Get a random subtitle from the list
     fn get_subtitle() -> &'static str {

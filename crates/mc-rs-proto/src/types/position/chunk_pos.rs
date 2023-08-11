@@ -7,7 +7,7 @@ use crate::buffer::{VarDecode, VarEncode};
 
 /// A chunk position.
 ///
-/// This is a chunk's position in the world.
+/// This is a chunk's position in the world, not how many blocks it is offset from the origin.
 ///
 /// Due to internally using an [IVec2], replace 'y' with 'z' when using this type.
 #[derive(
@@ -19,6 +19,22 @@ impl ChunkPos {
     pub const ZERO: Self = Self(IVec2::ZERO);
 
     pub fn new(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
+}
+
+impl From<(i32, i32)> for ChunkPos {
+    fn from((x, z): (i32, i32)) -> Self { Self(IVec2::new(x, z)) }
+}
+
+impl From<ChunkPos> for (i32, i32) {
+    fn from(ChunkPos(IVec2 { x, y }): ChunkPos) -> Self { (x, y) }
+}
+
+impl From<[i32; 2]> for ChunkPos {
+    fn from([x, z]: [i32; 2]) -> Self { Self(IVec2::new(x, z)) }
+}
+
+impl From<ChunkPos> for [i32; 2] {
+    fn from(ChunkPos(IVec2 { x, y }): ChunkPos) -> Self { [x, y] }
 }
 
 impl VarEncode for ChunkPos {

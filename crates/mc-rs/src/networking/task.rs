@@ -223,4 +223,12 @@ where
     pub fn task(&self) -> &Task<()> { &self.task }
 
     pub fn task_mut(&mut self) -> &mut Task<()> { &mut self.task }
+
+    pub fn send_config(&mut self, packet: impl Into<<Configuration as State<V>>::Serverbound>) {
+        let _ = self.tx.send(ConnectionSend::Configuration(packet.into()));
+    }
+
+    pub fn send_play(&mut self, packet: impl Into<<Play as State<V>>::Serverbound>) {
+        let _ = self.tx.send(ConnectionSend::Play(packet.into()));
+    }
 }

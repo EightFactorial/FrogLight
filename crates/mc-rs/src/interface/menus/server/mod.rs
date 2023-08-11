@@ -1,10 +1,9 @@
-use std::{fs, path::PathBuf};
+use std::{fs, io::Cursor, path::PathBuf};
 
+use azalea_nbt::{Nbt, NbtList};
 use belly::prelude::*;
 use bevy::{prelude::*, utils::HashMap};
-use fastnbt::Value;
 use mc_rs_proto::versions::DefaultVersion;
-use serde::{Deserialize, Serialize};
 
 use crate::{
     networking::{network::ConnectionEvent, request::StatusRequest},
@@ -38,6 +37,14 @@ pub(super) fn setup_menu(app: &mut App) {
 pub struct ServerMenu;
 
 impl ServerMenu {
+    #[allow(dead_code)]
+    pub fn show(mut elements: Elements) {
+        elements.select("div.server-menu").remove_class("hidden");
+    }
+
+    #[allow(dead_code)]
+    pub fn hide(mut elements: Elements) { elements.select("div.server-menu").add_class("hidden"); }
+
     fn create(root: Res<MenuRoot>, mut elements: Elements, mut commands: Commands) {
         let servers = match ServerList::load() {
             Ok(servers) => servers,
@@ -103,7 +110,7 @@ impl ServerMenu {
 }
 
 /// A list of servers
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ServerList {
     pub servers: Vec<ServerListing>,
 }
@@ -111,14 +118,67 @@ pub struct ServerList {
 impl ServerList {
     /// Load the server list
     pub fn load() -> Result<ServerList, anyhow::Error> {
-        Ok(fastnbt::from_bytes(&fs::read(Self::path()?)?)?)
+        let file = fs::read(Self::path()?)?;
+        let nbt = Nbt::read(&mut Cursor::new(file)).map_err(|e| anyhow::anyhow!(e.to_string()))?;
+
+        let root = nbt
+            .as_compound()
+            .ok_or(anyhow::anyhow!("Nbt is not a Nbt compound"))?
+            .get("")
+            .ok_or(anyhow::anyhow!("Nbt has no item at ``"))?
+            .as_compound()
+            .ok_or(anyhow::anyhow!("Nbt at `` not a Nbt compound"))?;
+
+        let servers = root
+            .get("servers")
+            .ok_or(anyhow::anyhow!("Nbt has no `servers` item"))?
+            .as_list()
+            .ok_or(anyhow::anyhow!("`servers` not a Nbt list"))?;
+
+        let NbtList::Compound(servers) = servers else {
+            return Err(anyhow::anyhow!("`servers` not a Nbt list of Nbt compounds"));
+        };
+
+        let mut vec = Vec::with_capacity(servers.len());
+        for server in servers {
+            let mut listing = ServerListing::default();
+            for (key, value) in server.iter() {
+                match key.as_str() {
+                    "name" => {
+                        listing.name = value
+                            .as_string()
+                            .ok_or(anyhow::anyhow!("server `name` not a Nbt string"))?
+                            .to_string();
+                    }
+                    "ip" => {
+                        listing.ip = value
+                            .as_string()
+                            .ok_or(anyhow::anyhow!("server `ip` not a Nbt string"))?
+                            .to_string();
+                    }
+                    "icon" => {
+                        listing.icon = Some(
+                            value
+                                .as_string()
+                                .ok_or(anyhow::anyhow!("server `icon` not a Nbt string"))?
+                                .to_string(),
+                        );
+                    }
+                    _ => {
+                        listing.other.insert(key.to_string(), value.clone());
+                    }
+                }
+            }
+            vec.push(listing);
+        }
+
+        Ok(Self { servers: vec })
     }
 
     /// Save the server list
     #[allow(dead_code)]
     pub fn save(&self) -> Result<(), anyhow::Error> {
-        fs::write(Self::path()?, fastnbt::to_bytes(self)?)?;
-        Ok(())
+        todo!();
     }
 
     /// Get the path to the server list
@@ -130,15 +190,12 @@ impl ServerList {
 }
 
 /// A server in the server menu
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct ServerListing {
     pub ip: String,
     pub name: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
-
-    #[serde(flatten)]
-    pub other: HashMap<String, Value>,
+    pub other: HashMap<String, Nbt>,
 }
 
 /// An event that triggers a status request to all known servers

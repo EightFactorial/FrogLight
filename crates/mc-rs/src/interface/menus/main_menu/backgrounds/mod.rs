@@ -56,6 +56,10 @@ impl MainMenuBackground {
             .select("div.main-background")
             .remove_class("hidden");
     }
+
+    pub(super) fn hide(mut elements: Elements) {
+        elements.select("div.main-background").add_class("hidden");
+    }
 }
 
 /// Backgrounds for the main menu

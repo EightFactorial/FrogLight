@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-use crate::menus::MenuRoot;
+use crate::interface::menus::MenuRoot;
 
 /// Cube map backgrounds for the main menu
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Display, Serialize, Deserialize)]

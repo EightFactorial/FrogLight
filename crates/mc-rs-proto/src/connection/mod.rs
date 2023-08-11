@@ -236,6 +236,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             match packet {
                 Ok(packet) => buffer.push_back(packet),
                 Err(err) => {
+                    #[cfg(feature = "debug")]
                     if let DecodeError::Io(err) = err {
                         if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
                             log::error!("Error reading bundled packet: {err:?}");

@@ -1,25 +1,24 @@
 use serde::{Deserialize, Serialize};
 
+use super::default_f32;
+
 /// Settings for the game menus.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AudioSettings {
-    #[serde(default = "f32_one")]
+    #[serde(default = "default_f32::<1>")]
     pub global_volume: f32,
-    #[serde(default = "f32_one")]
+    #[serde(default = "default_f32::<1>")]
     pub music_volume: f32,
-    #[serde(default = "f32_one")]
+    #[serde(default = "default_f32::<1>")]
     pub effect_volume: f32,
 }
 
 impl Default for AudioSettings {
     fn default() -> Self {
         Self {
-            global_volume: f32_one(),
-            music_volume: f32_one(),
-            effect_volume: f32_one(),
+            global_volume: default_f32::<1>(),
+            music_volume: default_f32::<1>(),
+            effect_volume: default_f32::<1>(),
         }
     }
 }
-
-#[inline]
-fn f32_one() -> f32 { 1. }

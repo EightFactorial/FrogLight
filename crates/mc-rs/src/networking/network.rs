@@ -8,9 +8,17 @@ use mc_rs_proto::{
     Connection, ConnectionError, State, Version,
 };
 
-use crate::networking::{
-    handle::ConnectionEnum,
-    task::{ConnectionChannel, ConnectionHandshakeTask, ConnectionLoginTask, ConnectionStatusTask},
+use crate::{
+    networking::{
+        handle::ConnectionEnum,
+        task::{
+            ConnectionChannel, ConnectionHandshakeTask, ConnectionLoginTask, ConnectionStatusTask,
+        },
+    },
+    systems::{
+        app_state::{ApplicationState, GameSet},
+        world::Worlds,
+    },
 };
 
 use super::{
@@ -21,7 +29,21 @@ use super::{
 
 /// A resource containing the local player's bevy entity
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
-pub struct LocalPlayer(pub Entity);
+pub struct LocalPlayer {
+    #[deref]
+    pub player: Entity,
+    pub head: Entity,
+}
+
+impl LocalPlayer {
+    pub fn new(player: Entity, head: Entity) -> Self { Self { player, head } }
+
+    pub fn from_player(player: Entity, commands: &mut Commands) -> Self {
+        let head = commands.spawn_empty().id();
+        commands.entity(player).add_child(head);
+        Self::new(player, head)
+    }
+}
 
 /// An event that is sent to create a new connection
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
@@ -88,10 +110,17 @@ where
                         Self::has_configuration_state
                             .and_then(any_with_component::<ConnectionConfigurationTask<Self>>()),
                     ),
-                    Self::packet_query.run_if(resource_exists::<ConnectionChannel<Self>>()),
                 )
                     .in_set(ConnectionSystemSet::<Self>::default()),
             ),
+        );
+
+        app.add_systems(
+            Update,
+            Self::packet_query
+                .run_if(resource_exists::<ConnectionChannel<Self>>())
+                .after(Worlds::create)
+                .in_set(GameSet),
         );
     }
 
@@ -242,6 +271,7 @@ where
     /// Wait for the login to finish and start the next state
     fn login_query(
         mut query: Query<(Entity, &mut ConnectionLoginTask<Self>)>,
+        mut state: ResMut<NextState<ApplicationState>>,
         mut commands: Commands,
     ) {
         for (entity, mut task) in query.iter_mut() {
@@ -275,13 +305,16 @@ where
                                 rx2,
                             ));
 
-                            commands.insert_resource(LocalPlayer(entity));
+                            let player = LocalPlayer::from_player(entity, &mut commands);
+                            commands.insert_resource(player);
                             commands.insert_resource(ConnectionChannel::new(rx1, tx2, new_task));
 
                             commands
                                 .entity(entity)
                                 .insert(profile)
                                 .remove::<ConnectionLoginTask<Self>>();
+
+                            state.set(ApplicationState::InGame);
                         }
                     }
                     Err(err) => {
@@ -296,6 +329,7 @@ where
     /// Wait for the configuration to finish and start the next state
     fn configuration_query(
         mut query: Query<(Entity, &mut ConnectionConfigurationTask<Self>)>,
+        mut state: ResMut<NextState<ApplicationState>>,
         mut commands: Commands,
     ) {
         for (entity, mut task) in query.iter_mut() {
@@ -317,12 +351,15 @@ where
                             rx2,
                         ));
 
-                        commands.insert_resource(LocalPlayer(entity));
+                        let player = LocalPlayer::from_player(entity, &mut commands);
+                        commands.insert_resource(player);
                         commands.insert_resource(ConnectionChannel::new(rx1, tx2, new_task));
 
                         commands
                             .entity(entity)
                             .remove::<ConnectionConfigurationTask<Self>>();
+
+                        state.set(ApplicationState::InGame);
                     }
                     Err(err) => {
                         error!("Failed to configure client: {}", err);

@@ -31,6 +31,7 @@ use super::{
 };
 
 mod network;
+mod palette;
 
 #[async_trait]
 impl NetworkHandle for V1_20_0 {

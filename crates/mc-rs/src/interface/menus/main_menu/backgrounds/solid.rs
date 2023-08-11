@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-use crate::{menus::MenuRoot, systems::settings::Settings};
+use crate::{interface::menus::MenuRoot, systems::settings::Settings};
 
 use super::{BackgroundEnum, MainMenuBackground};
 

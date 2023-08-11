@@ -2,7 +2,7 @@
 
 use bevy::app::App;
 
-mod menus;
+mod interface;
 mod networking;
 mod plugins;
 mod systems;
@@ -18,8 +18,8 @@ fn main() {
     // Add networking systems
     networking::setup(&mut app);
 
-    // Add menu systems
-    menus::setup(&mut app);
+    // Add interface systems
+    interface::setup(&mut app);
 
     // Add general systems
     systems::setup(&mut app);

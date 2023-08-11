@@ -2,7 +2,7 @@ use belly::prelude::*;
 use bevy::prelude::*;
 
 use crate::{
-    menus::MenuRoot,
+    interface::menus::MenuRoot,
     systems::{
         app_state::{ApplicationState, InMenuSet, MenuSet},
         blocks::block_list::Blocks,

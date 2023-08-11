@@ -4,14 +4,17 @@ use bevy::prelude::Resource;
 use log::{error, info, log_enabled, Level};
 use serde::{Deserialize, Serialize};
 
+pub mod audio;
+use audio::AudioSettings;
+
 pub mod window;
 use window::WindowSettings;
 
 pub mod menu;
 use menu::MenuSettings;
 
-pub mod audio;
-use audio::AudioSettings;
+pub mod game;
+use game::GameSettings;
 
 /// Settings for the application.
 #[derive(Debug, Default, Clone, Serialize, Deserialize, Resource)]
@@ -22,6 +25,8 @@ pub struct Settings {
     pub menu: MenuSettings,
     #[serde(default)]
     pub window: WindowSettings,
+    #[serde(default)]
+    pub game: GameSettings,
 }
 
 impl Settings {
@@ -90,3 +95,8 @@ impl Settings {
         }
     }
 }
+
+#[allow(dead_code)]
+fn default_u32<const N: u32>() -> u32 { N }
+
+fn default_f32<const N: u32>() -> f32 { N as f32 }
