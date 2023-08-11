@@ -39,11 +39,23 @@ impl LocalPlayer {
     pub fn new(player: Entity, head: Entity) -> Self { Self { player, head } }
 
     pub fn from_player(player: Entity, commands: &mut Commands) -> Self {
-        let head = commands.spawn_empty().id();
-        commands.entity(player).add_child(head);
-        Self::new(player, head)
+        commands.entity(player).insert(LocalPlayerComponent);
+
+        let head = commands.spawn((LocalPlayerHead, TransformBundle::default()));
+        let head_id = head.id();
+
+        commands.entity(player).add_child(head_id);
+        Self::new(player, head_id)
     }
 }
+
+/// A marker component for the local player
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Component)]
+pub struct LocalPlayerComponent;
+
+/// A marker component for the local player's head
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Component)]
+pub struct LocalPlayerHead;
 
 /// An event that is sent to create a new connection
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
