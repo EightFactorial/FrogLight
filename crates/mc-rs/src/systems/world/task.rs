@@ -112,10 +112,10 @@ async fn chunk_fn(chunk: Chunk, neighbors: [Option<Chunk>; 4], blocks: Blocks) -
                 neighbors[3]
                     .as_ref()
                     .and_then(|n| n.get(index).map(|s| s.get_blocks())),
-                if index == 0 {
-                    None
-                } else {
+                if index != 0 {
                     sections.get(index - 1).map(|s| s.get_blocks())
+                } else {
+                    None
                 },
                 sections.get(index + 1).map(|s| s.get_blocks()),
             ],
@@ -158,7 +158,7 @@ fn section_fn(
             for x in 0..MESH_X {
                 // Get the index in the appropriate neighbor
                 let block_id = match (x, y, z) {
-                    (0, 0, _) | (17, 17, _) | (_, 0, 0) | (_, 17, 17) | (0, _, 0) | (17, _, 17) => {
+                    (_, 0, 0) | (0, _, 0) | (0, 0, _) | (_, 17, 17) | (17, _, 17) | (17, 17, _) => {
                         // Ignore the corners
                         continue;
                     }
@@ -191,14 +191,14 @@ fn section_fn(
                             .unwrap_or(&0)
                     }
                     (_, 17, _) => {
-                        let data_index = ChunkShape::linearize([x - 1, 0, y - 1]) as usize;
+                        let data_index = ChunkShape::linearize([x - 1, z - 1, 0]) as usize;
                         *neighbors[5]
                             .as_ref()
                             .map(|n| n.get(data_index).unwrap_or(&0))
                             .unwrap_or(&0)
                     }
                     (_, _, 17) => {
-                        let data_index = ChunkShape::linearize([x - 1, z - 1, 0]) as usize;
+                        let data_index = ChunkShape::linearize([x - 1, 0, y - 1]) as usize;
                         *neighbors[3]
                             .as_ref()
                             .map(|n| n.get(data_index).unwrap_or(&0))
@@ -258,7 +258,7 @@ fn section_fn(
         Mesh::ATTRIBUTE_UV_0,
         VertexAttributeValues::Float32x2(vec![[0.0; 2]; num_vertices]),
     );
-    render_mesh.set_indices(Some(Indices::U32(indices.clone())));
+    render_mesh.set_indices(Some(Indices::U32(indices)));
 
     Some((render_mesh, Vec::new()))
 }

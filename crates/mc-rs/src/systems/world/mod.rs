@@ -145,7 +145,7 @@ impl Worlds {
 
     /// Get the chunk at the position in a world mutably.
     pub fn get_chunk_mut<'a>(
-        &'a mut self,
+        &'a self,
         query: &'a mut Query<&mut Chunk>,
         world_type: &WorldType,
         position: ChunkPos,

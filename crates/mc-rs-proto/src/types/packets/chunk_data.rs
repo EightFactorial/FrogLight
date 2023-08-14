@@ -68,3 +68,37 @@ impl Decode for BlockEntity {
         })
     }
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct SectionDataPacket {
+    pub x: u8,
+    pub y: u8,
+    pub z: u8,
+    pub state: u32,
+}
+
+impl Encode for SectionDataPacket {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
+        let long: u64 = (self.state as u64) << 12
+            | (u64::from(self.x) << 8)
+            | (u64::from(self.z) << 4)
+            | u64::from(self.y);
+
+        long.var_encode(buf)
+    }
+}
+
+impl Decode for SectionDataPacket {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
+        let long = u64::var_decode(buf)?;
+
+        log::debug!("long: {:b}", long);
+
+        Ok(Self {
+            x: ((long >> 8) & 0x0F) as u8,
+            y: (long & 0x0F) as u8,
+            z: ((long >> 4) & 0x0F) as u8,
+            state: (long >> 12) as u32,
+        })
+    }
+}

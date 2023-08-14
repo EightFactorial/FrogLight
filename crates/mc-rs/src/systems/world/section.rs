@@ -1,5 +1,8 @@
 use bevy::prelude::*;
-use mc_rs_proto::buffer::{Decode, DecodeError};
+use mc_rs_proto::{
+    buffer::{Decode, DecodeError},
+    types::packets::chunk_data::SectionDataPacket,
+};
 
 use super::{global_palette::GlobalPalette, palette::Palette};
 
@@ -38,9 +41,24 @@ impl Section {
         })
     }
 
-    pub fn get_blocks(&self) -> Vec<u32> { self.block_palette.get_values() }
+    /// Get the blocks in this section
+    pub fn get_blocks(&self) -> Vec<u32> { self.block_palette.get_palette_data() }
 
-    pub fn get_biomes(&self) -> Vec<u32> { self.biome_palette.get_values() }
+    /// Get the biomes in this section
+    pub fn get_biomes(&self) -> Vec<u32> { self.biome_palette.get_palette_data() }
+
+    /// Update the section with the given data
+    pub(super) fn insert_data<V: GlobalPalette>(&mut self, data: SectionDataPacket) {
+        let delta = self
+            .block_palette
+            .insert_data::<V>(data.x, data.y, data.z, data.state);
+
+        match (delta > 0, delta < 0) {
+            (true, false) => self.block_count += delta as u16,
+            (false, true) => self.block_count -= u16::try_from(delta.abs()).unwrap(),
+            _ => (),
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]

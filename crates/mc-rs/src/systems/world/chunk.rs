@@ -8,7 +8,10 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::RigidBody;
 use mc_rs_proto::{
     buffer::DecodeError,
-    types::{packets::chunk_data::ChunkDataPacket, position::ChunkPos},
+    types::{
+        packets::chunk_data::{ChunkDataPacket, SectionDataPacket},
+        position::{ChunkPos, ChunkSectionPos},
+    },
 };
 
 use crate::systems::blocks::block_list::Blocks;
@@ -91,6 +94,15 @@ impl Chunk {
         let world = root.get("WORLD_SURFACE")?.as_long_array()?;
 
         Some((motion.to_owned(), world.to_owned()))
+    }
+
+    /// Insert data into a chunk section.
+    pub fn update_section<V: GlobalPalette>(
+        &mut self,
+        position: ChunkSectionPos,
+        data: SectionDataPacket,
+    ) {
+        self.sections.write().unwrap()[position.y as usize].insert_data::<V>(data);
     }
 
     /// Regenerate the mesh for chunks that have been updated.

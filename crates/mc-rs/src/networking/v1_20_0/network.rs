@@ -1,6 +1,6 @@
 use bevy::{ecs::system::SystemState, prelude::*};
 use mc_rs_proto::{
-    types::EntityId,
+    types::{position::ChunkPos, EntityId},
     versions::v1_20_0::{
         configuration::ClientboundConfigurationPackets,
         play::{
@@ -18,6 +18,7 @@ use crate::{
         task::ConnectionChannel,
     },
     systems::world::{
+        chunk::Chunk,
         resources::{CurrentWorld, WorldSeed},
         WorldType, Worlds,
     },
@@ -143,14 +144,12 @@ impl Network for V1_20_0 {
 
                 let mut state = SystemState::<(
                     ResMut<ConnectionChannel<Self>>,
-                    Query<Entity, With<LocalPlayer>>,
+                    Query<&mut Transform, With<LocalPlayer>>,
                 )>::new(world);
-                let (mut channel, player) = state.get_mut(world);
+                let (mut channel, mut query) = state.get_mut(world);
                 channel.send_play(ServerboundTeleportConfirmPacket { id: p.id });
 
-                let player = player.single();
-                let mut player = world.entity_mut(player);
-                let mut transform = player.get_mut::<Transform>().unwrap();
+                let mut transform = query.single_mut();
 
                 if p.relative_flags.x {
                     transform.translation.x += p.position.x as f32;
@@ -192,7 +191,29 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::ResourcePackSend(_) => {}
             ClientboundPlayPackets::PlayerRespawn(_) => {}
             ClientboundPlayPackets::EntitySetHeadYaw(_) => {}
-            ClientboundPlayPackets::ChunkDeltaUpdate(_) => {}
+            ClientboundPlayPackets::ChunkDeltaUpdate(p) => {
+                let mut state = SystemState::<(
+                    Query<&mut Chunk>,
+                    Res<Worlds>,
+                    Option<Res<CurrentWorld>>,
+                )>::new(world);
+                let (mut query, worlds, current) = state.get_mut(world);
+
+                let Some(current) = current else {
+                    log::warn!("Received chunk delta update without a current world!");
+                    return;
+                };
+
+                if let Some(mut _chunk) =
+                    worlds.get_chunk_mut(&mut query, &current.name, ChunkPos::from(p.position))
+                {
+                    // for update in p.updates {
+                    //     chunk.update_section::<V1_20_0>(p.position, update);
+                    // }
+                } else {
+                    log::warn!("Received chunk delta update for unloaded chunk!");
+                };
+            }
             ClientboundPlayPackets::SelectAdvancementTab(_) => {}
             ClientboundPlayPackets::ServerMetadata(_) => {}
             ClientboundPlayPackets::OverlayMessage(_) => {}

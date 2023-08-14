@@ -64,7 +64,8 @@ impl Palette {
         self
     }
 
-    fn get_index(&self, index: u32) -> u32 {
+    /// Get the global id of the palette type at the given index
+    fn get_type_index(&self, index: u32) -> u32 {
         match &self.kind {
             PaletteKind::Single(id) => *id,
             PaletteKind::Array(ids) | PaletteKind::Bimap(ids) => ids[index as usize],
@@ -72,7 +73,8 @@ impl Palette {
         }
     }
 
-    pub fn get_values(&self) -> Vec<u32> {
+    /// Get the contents of the palette, converted to global ids
+    pub fn get_palette_data(&self) -> Vec<u32> {
         if self.bits == 0 {
             return Vec::new();
         }
@@ -81,11 +83,48 @@ impl Palette {
         for long in self.data.iter() {
             for i in 0..(64 / self.bits) {
                 let index = (long >> (i * self.bits)) & ((1 << self.bits) - 1);
-                block_ids.push(self.get_index(index as u32));
+                block_ids.push(self.get_type_index(index as u32));
             }
         }
 
         block_ids
+    }
+
+    /// Insert data into the palette at the given position
+    pub(super) fn insert_data<V: GlobalPalette>(
+        &mut self,
+        _x: u8,
+        _y: u8,
+        _z: u8,
+        data: u32,
+    ) -> i8 {
+        let state_id = V::to_global_block(data);
+
+        match &mut self.kind {
+            PaletteKind::Single(id) => {
+                if state_id != *id {
+                    self.kind = PaletteKind::Array(vec![*id, state_id]);
+
+                    // TODO: Update palette data
+                }
+            }
+            PaletteKind::Array(ids) | PaletteKind::Bimap(ids) => {
+                let _index = if let Some(index) = ids.iter().find(|&&id| id == state_id).copied() {
+                    index
+                } else {
+                    ids.push(state_id);
+                    ids.len() as u32 - 1
+                };
+
+                // TODO: Update palette data
+            }
+            PaletteKind::Global => {
+                // TODO: Update palette data
+            }
+        }
+
+        // TODO: Return block delta
+        0
     }
 }
 
