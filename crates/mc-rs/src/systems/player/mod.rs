@@ -64,7 +64,15 @@ fn destroy_camera(query: Query<Entity, With<Camera3d>>, mut commands: Commands) 
     }
 }
 
-fn create_light(mut commands: Commands) { commands.spawn(DirectionalLightBundle::default()); }
+fn create_light(mut commands: Commands) {
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            shadows_enabled: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    });
+}
 
 fn destroy_light(query: Query<Entity, With<DirectionalLight>>, mut commands: Commands) {
     for entity in query.iter() {

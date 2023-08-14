@@ -14,32 +14,26 @@ pub(super) fn add_systems(app: &mut App) {
     app.add_systems(Startup, Blocks::init_blocks);
 
     app.init_resource::<BlocksLoaded>();
+
     app.add_systems(
         Update,
-        BlocksLoaded::check_loaded
-            .in_set(MenuSet)
-            .run_if(resource_equals(BlocksLoaded(false)).and_then(resource_exists::<Blocks>())),
+        (
+            BlocksLoaded::check_loaded
+                .run_if(resource_exists::<BlocksLoaded>().and_then(not(BlocksLoaded::is_loaded))),
+            BlocksLoaded::destroy
+                .run_if(resource_exists::<BlocksLoaded>().and_then(BlocksLoaded::is_loaded)),
+        )
+            .in_set(MenuSet),
     );
 }
 
-#[derive(Clone, Resource, Deref, DerefMut)]
-pub struct Blocks {
-    #[deref]
-    map: Arc<RwLock<HashMap<u32, Block>>>,
-    assets: AssetServer,
-}
+#[derive(Clone, Default, Resource, Deref, DerefMut)]
+pub struct Blocks(Arc<RwLock<HashMap<u32, Block>>>);
 
 impl Blocks {
-    fn new(assets: &AssetServer) -> Self {
-        Self {
-            map: Default::default(),
-            assets: assets.clone(),
-        }
-    }
-
     /// Initialize the block list and load the block textures
     fn init_blocks(mut commands: Commands, assets: Res<AssetServer>) {
-        let mut blocks = Self::new(&assets);
+        let mut blocks = Self::default();
 
         // Insert the error block
         blocks.write().unwrap().insert(
@@ -49,7 +43,7 @@ impl Blocks {
                 name: "Error".to_string(),
                 key: ResourceLocation::new("mc-rs:error"),
                 texture: BlockTexture::from_paths(&["light_blue_wool.png"], &assets).unwrap(),
-                voxel_type: VoxelType::Opaque,
+                voxel_type: VoxelType::Opaque(u32::MAX),
             },
         );
 
@@ -83,15 +77,16 @@ impl Blocks {
 
     /// Insert a block into the block list
     fn insert_block(&mut self, id: u32, name: &str, paths: &[&str], assets: &AssetServer) {
-        if let Some(block) = Block::new(id, name, VoxelType::Opaque, paths, assets) {
+        if let Some(block) = Block::new(id, name, VoxelType::Opaque(id), paths, assets) {
             self.write().unwrap().insert(id, block);
         } else {
             error!("Failed to create block with id {}", id);
 
             let fallback = self.read().unwrap().get(&u32::MAX).unwrap().texture.clone();
-            self.write()
-                .unwrap()
-                .insert(id, Block::new_with(id, name, VoxelType::Opaque, fallback));
+            self.write().unwrap().insert(
+                id,
+                Block::new_with(id, name, VoxelType::Opaque(id), fallback),
+            );
         }
     }
 
@@ -117,10 +112,12 @@ impl Blocks {
     }
 
     /// Returns true if all the block textures are loaded
-    pub fn is_loaded(&self) -> bool { self.blocks_loaded() == self.blocks_with_textures() }
+    pub fn is_loaded(&self, assets: &AssetServer) -> bool {
+        self.blocks_loaded(assets) == self.blocks_with_textures()
+    }
 
     // Get the number of blocks with all textures loaded
-    pub fn blocks_loaded(&self) -> u32 {
+    pub fn blocks_loaded(&self, assets: &AssetServer) -> u32 {
         self.read().unwrap().values().fold(0u32, |acc, block| {
             let Some(textures) = block.texture.get_textures() else {
                 return acc;
@@ -128,7 +125,7 @@ impl Blocks {
 
             let ids = textures.iter().map(|t| t.id());
             acc + matches!(
-                self.assets.get_group_load_state(ids),
+                assets.get_group_load_state(ids),
                 LoadState::Loaded | LoadState::Failed
             ) as u32
         })
@@ -144,19 +141,22 @@ impl Blocks {
     }
 
     /// Return the progress of loading the block textures
-    pub fn progress(&self) -> f32 { self.blocks_loaded_f32() / self.blocks_with_textures_f32() }
+    pub fn progress(&self, assets: &AssetServer) -> f32 {
+        self.blocks_loaded_f32(assets) / self.blocks_with_textures_f32()
+    }
 
     // Get the number of blocks with textures
     pub fn blocks_with_textures_f32(&self) -> f32 { self.blocks_with_textures() as f32 }
 
     // Get the number of blocks with all textures loaded
-    pub fn blocks_loaded_f32(&self) -> f32 { self.blocks_loaded() as f32 }
+    pub fn blocks_loaded_f32(&self, assets: &AssetServer) -> f32 {
+        self.blocks_loaded(assets) as f32
+    }
 
     /// Replaces all failed block textures with the error block texture
     ///
     /// Returns the number of blocks that were fixed
-    pub fn replace_errors(&mut self) -> u32 {
-        let assets = self.assets.clone();
+    pub fn replace_errors(&mut self, assets: &AssetServer) -> u32 {
         let fallback = self.read().unwrap().get(&u32::MAX).unwrap().texture.clone();
         let mut acc = 0;
 
@@ -177,16 +177,24 @@ impl Blocks {
 }
 
 /// A resource that is true when all blocks are loaded
-#[derive(Debug, Default, Clone, PartialEq, Eq, Resource, Deref, DerefMut)]
-pub struct BlocksLoaded(pub bool);
+#[derive(Clone, Default, PartialEq, Resource, Deref, DerefMut)]
+pub struct BlocksLoaded {
+    #[deref]
+    pub bool: bool,
+    pub percent: f32,
+}
 
 impl BlocksLoaded {
     /// A system that checks if all the block textures are loaded
     /// and replaces any broken textures with the fallback
-    fn check_loaded(mut blocks: ResMut<Blocks>, mut loaded: ResMut<BlocksLoaded>) {
-        if blocks.is_loaded() {
+    fn check_loaded(
+        mut blocks: ResMut<Blocks>,
+        mut loaded: ResMut<BlocksLoaded>,
+        assets: Res<AssetServer>,
+    ) {
+        if blocks.is_loaded(&assets) {
             // Replace any failed textures with the error block texture
-            let fixed = blocks.replace_errors();
+            let fixed = blocks.replace_errors(&assets);
 
             if fixed > 0 {
                 // TODO: Some sort of error popup?
@@ -199,9 +207,21 @@ impl BlocksLoaded {
             }
 
             // Set the blocks loaded resource to true
-            **loaded = true;
+            loaded.bool = true;
+            loaded.percent = 1.0;
         } else {
-            info!("Loaded {}% of blocks", blocks.progress());
+            let p = blocks.progress(&assets);
+            loaded.percent = p;
+
+            info!("Loaded {p}% of blocks");
         }
     }
+
+    fn destroy(mut commands: Commands) { commands.remove_resource::<BlocksLoaded>(); }
+
+    /// Get the percent of blocks loaded
+    pub fn get_percent(loaded: Res<BlocksLoaded>) -> f32 { loaded.percent }
+
+    /// Get if all blocks are loaded
+    pub fn is_loaded(loaded: Res<BlocksLoaded>) -> bool { loaded.bool }
 }

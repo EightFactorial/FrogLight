@@ -17,12 +17,9 @@ use crate::{
         network::{LocalPlayer, Network},
         task::ConnectionChannel,
     },
-    systems::{
-        blocks::block_list::Blocks,
-        world::{
-            resources::{CurrentWorld, WorldSeed},
-            WorldType, Worlds,
-        },
+    systems::world::{
+        resources::{CurrentWorld, WorldSeed},
+        WorldType, Worlds,
     },
 };
 
@@ -78,22 +75,16 @@ impl Network for V1_20_0 {
                 chan.send_play(ServerboundKeepAlivePacket { id: p.id });
             }
             ClientboundPlayPackets::ChunkData(p) => {
-                let mut state =
-                    SystemState::<(Res<Worlds>, Option<Res<CurrentWorld>>, Res<Blocks>)>::new(
-                        world,
-                    );
-
-                let (worlds, current, blocks) = state.get(world);
+                let mut state = SystemState::<(Res<Worlds>, Option<Res<CurrentWorld>>)>::new(world);
+                let (worlds, current) = state.get(world);
 
                 let mut worlds = worlds.clone();
-                let blocks = blocks.clone();
 
                 if let Some(current) = current {
                     if let Err(err) = worlds.insert_data::<V1_20_0>(
                         &current.clone(),
                         p.position,
                         p.chunk_data,
-                        &blocks,
                         world,
                     ) {
                         log::error!("Failed to insert chunk {:?} : {err}", p.position);
@@ -104,8 +95,7 @@ impl Network for V1_20_0 {
 
                 {
                     let mut state = SystemState::<ResMut<Worlds>>::new(world);
-                    let mut worlds = state.get_mut(world);
-                    *worlds = worlds.clone();
+                    *state.get_mut(world) = worlds;
                 }
             }
             ClientboundPlayPackets::WorldEvent(_) => {}

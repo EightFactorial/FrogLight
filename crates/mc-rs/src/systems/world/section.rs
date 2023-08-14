@@ -1,6 +1,24 @@
+use bevy::prelude::*;
 use mc_rs_proto::buffer::{Decode, DecodeError};
 
 use super::{global_palette::GlobalPalette, palette::Palette};
+
+/// A marker component for sections
+#[derive(Debug, Clone, Copy, Component)]
+pub struct SectionComponent;
+
+impl SectionComponent {
+    /// Despawn all section entities that are not attached to a chunk
+    pub(super) fn despawn_orphans(
+        query: Query<Entity, (With<SectionComponent>, Without<Parent>)>,
+        mut commands: Commands,
+    ) {
+        for entity in query.iter() {
+            warn!("Despawning orphaned section entity {:?}", entity);
+            commands.entity(entity).despawn_recursive();
+        }
+    }
+}
 
 #[derive(Debug, Default, Clone)]
 pub struct Section {

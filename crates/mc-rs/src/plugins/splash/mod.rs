@@ -66,12 +66,13 @@ impl SplashPlugin {
         time: Res<Time>,
         blocks: Res<Blocks>,
         root: Res<MenuRoot>,
+        assets: Res<AssetServer>,
         mut elements: Elements,
         mut commands: Commands,
     ) {
         // If the blocks are already loaded, use a timer
         // Otherwise, the main menu will be shown instantly
-        let loaded = blocks.is_loaded();
+        let loaded = blocks.is_loaded(&assets);
 
         // Set the bar max value
         let max = if loaded {
@@ -104,7 +105,7 @@ impl SplashPlugin {
                     <div class="splash-text">"Loading..."</div>
                     <br />
                     <progressbar class="splash-bar" minimum=0. maximum={max.0}
-                        bind:value=from!(Blocks:blocks_loaded_f32())
+                        bind:value={from!(BlocksLoaded:get_percent()) * max.0}
                         bind:value=to!(entity, BarValue:0)
                     />
                 </div>

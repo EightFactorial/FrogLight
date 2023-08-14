@@ -50,17 +50,17 @@ pub enum VoxelType {
     /// An empty voxel
     Empty,
     /// A voxel with geometry and light can pass through
-    Translucent,
+    Translucent(u32),
     /// A voxel with geometry
-    Opaque,
+    Opaque(u32),
 }
 
 impl Voxel for VoxelType {
     fn get_visibility(&self) -> block_mesh::VoxelVisibility {
         match self {
             VoxelType::Empty => block_mesh::VoxelVisibility::Empty,
-            VoxelType::Translucent => block_mesh::VoxelVisibility::Translucent,
-            VoxelType::Opaque => block_mesh::VoxelVisibility::Opaque,
+            VoxelType::Translucent(_) => block_mesh::VoxelVisibility::Translucent,
+            VoxelType::Opaque(_) => block_mesh::VoxelVisibility::Opaque,
         }
     }
 }
@@ -89,29 +89,37 @@ pub enum BlockTexture {
 }
 
 impl BlockTexture {
-    /// Get the texture for the given direction
-    pub fn get_texture(&self, direction: Direction) -> Option<&Handle<Image>> {
+    /// Get the texture index for the given direction
+    pub fn get_texture_index(&self, direction: Direction) -> Option<usize> {
         match self {
             BlockTexture::None => None,
-            BlockTexture::Single(texture) => Some(texture),
-            BlockTexture::TopBottom(textures) => match direction {
-                Direction::Up | Direction::Down => Some(&textures[0]),
-                _ => Some(&textures[1]),
+            BlockTexture::Single(_) => Some(0),
+            BlockTexture::TopBottom(_) => match direction {
+                Direction::Up | Direction::Down => Some(0),
+                _ => Some(1),
             },
-            BlockTexture::TopBottomSides(textures) => match direction {
-                Direction::Up => Some(&textures[0]),
-                Direction::Down => Some(&textures[1]),
-                _ => Some(&textures[2]),
+            BlockTexture::TopBottomSides(_) => match direction {
+                Direction::Up => Some(0),
+                Direction::Down => Some(1),
+                _ => Some(2),
             },
-            BlockTexture::AllSides(textures) => match direction {
-                Direction::Up => Some(&textures[0]),
-                Direction::Down => Some(&textures[1]),
-                Direction::North => Some(&textures[2]),
-                Direction::South => Some(&textures[3]),
-                Direction::West => Some(&textures[4]),
-                Direction::East => Some(&textures[5]),
+            BlockTexture::AllSides(_) => match direction {
+                Direction::Up => Some(0),
+                Direction::Down => Some(1),
+                Direction::North => Some(2),
+                Direction::South => Some(3),
+                Direction::West => Some(4),
+                Direction::East => Some(5),
             },
         }
+    }
+
+    /// Get the texture for the given direction
+    pub fn get_texture(&self, direction: Direction) -> Option<&Handle<Image>> {
+        self.get_textures().and_then(|textures| {
+            self.get_texture_index(direction)
+                .map(|index| &textures[index])
+        })
     }
 
     /// Get all of the block textures

@@ -43,7 +43,18 @@ pub struct MenuRoot(pub Entity);
 
 impl MenuRoot {
     /// Create a new camera bundle
-    fn create_camera(mut commands: Commands) { commands.spawn(Camera2dBundle::default()); }
+    fn create_camera(mut commands: Commands) {
+        commands.spawn((
+            Camera2dBundle {
+                camera: Camera {
+                    order: 1isize,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            UiCameraConfig { show_ui: true },
+        ));
+    }
 
     /// Load the global stylesheet and create the menu root node
     fn create(mut commands: Commands) {

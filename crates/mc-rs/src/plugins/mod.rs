@@ -1,5 +1,10 @@
 use belly::prelude::BellyPlugin;
-use bevy::{app::PluginGroupBuilder, prelude::*, window::ExitCondition};
+use bevy::{
+    app::PluginGroupBuilder,
+    prelude::*,
+    render::{render_resource::AddressMode, texture::ImageSampler},
+    window::ExitCondition,
+};
 use bevy_rapier3d::prelude::RapierPhysicsPlugin;
 use rand::seq::IteratorRandom;
 
@@ -58,7 +63,12 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
 
     // Set the ImagePlugin sampling to nearest
     {
-        plugins = plugins.set(ImagePlugin::default_nearest())
+        let mut default_sampler = ImageSampler::nearest_descriptor();
+        default_sampler.address_mode_u = AddressMode::Repeat;
+        default_sampler.address_mode_v = AddressMode::Repeat;
+        default_sampler.address_mode_w = AddressMode::Repeat;
+
+        plugins = plugins.set(ImagePlugin { default_sampler })
     }
 
     // Set the WindowPlugin window settings

@@ -11,14 +11,35 @@ use crate::buffer::{VarDecode, VarEncode};
 ///
 /// Due to internally using an [IVec2], replace 'y' with 'z' when using this type.
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut, From, Into, Transcode,
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Component,
+    Deref,
+    DerefMut,
+    From,
+    Into,
+    Transcode,
 )]
 pub struct ChunkPos(pub IVec2);
 
 impl ChunkPos {
     pub const ZERO: Self = Self(IVec2::ZERO);
 
-    pub fn new(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
+    pub const fn new(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
+
+    pub const fn around(&self) -> [Self; 4] {
+        [
+            Self::new(self.0.x - 1, self.0.y),
+            Self::new(self.0.x + 1, self.0.y),
+            Self::new(self.0.x, self.0.y - 1),
+            Self::new(self.0.x, self.0.y + 1),
+        ]
+    }
 }
 
 impl From<(i32, i32)> for ChunkPos {

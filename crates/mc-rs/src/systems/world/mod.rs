@@ -9,16 +9,14 @@ use mc_rs_proto::{
 use self::{
     chunk::{Chunk, ChunkEntity},
     global_palette::GlobalPalette,
-    task::{SectionMarker, SectionTask},
+    section::SectionComponent,
 };
 
-use super::{
-    app_state::{ApplicationState, GameSet},
-    blocks::block_list::Blocks,
-};
+use super::app_state::{ApplicationState, GameSet};
 
 pub mod chunk;
 pub mod global_palette;
+pub mod material;
 pub mod palette;
 pub mod resources;
 pub mod section;
@@ -26,6 +24,9 @@ pub mod task;
 
 /// Adds the `Worlds` resource and its systems.
 pub(super) fn add_systems(app: &mut App) {
+    material::setup(app);
+    task::setup(app);
+
     app.add_systems(
         OnEnter(ApplicationState::Game),
         Worlds::create.in_set(GameSet),
@@ -33,18 +34,17 @@ pub(super) fn add_systems(app: &mut App) {
 
     app.add_systems(
         Update,
-        SectionTask::poll_tasks
-            // .run_if(any_with_component::<SectionTask>())
+        (
+            Chunk::update_chunk,
+            Chunk::added_chunk,
+            SectionComponent::despawn_orphans,
+        )
             .in_set(GameSet),
     );
 
     app.add_systems(
         OnExit(ApplicationState::Game),
-        (
-            Worlds::destroy,
-            SectionTask::destory_tasks.run_if(any_with_component::<SectionTask>()),
-        )
-            .in_set(GameSet),
+        Worlds::destroy.in_set(GameSet),
     );
 }
 
@@ -65,7 +65,7 @@ impl Worlds {
     /// Destroys the `Worlds` resource when leaving a server.
     #[allow(clippy::type_complexity)]
     fn destroy(
-        query: Query<Entity, Or<(With<Chunk>, With<SectionMarker>)>>,
+        query: Query<Entity, Or<(With<Chunk>, With<SectionComponent>)>>,
         mut commands: Commands,
     ) {
         for entity in query.iter() {
@@ -83,55 +83,11 @@ impl Worlds {
         world_type: &WorldType,
         position: ChunkPos,
         chunk_data: ChunkDataPacket,
-        blocks: &Blocks,
         world: &mut bevy::ecs::world::World,
     ) -> Result<ChunkEntity, DecodeError> {
-        let (chunk, sections) = Chunk::decode::<V>(chunk_data, blocks, world)?;
-        Ok(self.insert_chunk(world_type, position, chunk, Some(sections), world))
-    }
-
-    /// Spawns a new chunk and inserts it into the given world.
-    ///
-    /// This will create the world if it doesn't exist.
-    pub fn insert_chunk(
-        &mut self,
-        world_type: &WorldType,
-        position: ChunkPos,
-        chunk: Chunk,
-        sections: Option<Vec<Entity>>,
-        world: &mut bevy::ecs::world::World,
-    ) -> ChunkEntity {
-        // Only make the chunk visible if it has any sections with entities.
-        let visibility = if sections.is_some() {
-            Visibility::Visible
-        } else {
-            Visibility::Hidden
-        };
-
-        let mut chunk = world.spawn((
-            chunk,
-            TransformBundle {
-                local: Transform::from_xyz(
-                    (position.x * CHUNK_SIZE as i32) as f32,
-                    0.,
-                    (position.y * CHUNK_SIZE as i32) as f32,
-                ),
-                ..Default::default()
-            },
-            VisibilityBundle {
-                visibility,
-                ..Default::default()
-            },
-        ));
-
-        if let Some(sections) = sections {
-            chunk.insert_children(0, &sections);
-        }
-
-        let entity = ChunkEntity(chunk.id());
-
-        self.insert_entity(world_type, position, entity);
-        entity
+        let chunk = Chunk::decode::<V>(position, world_type.clone(), chunk_data, world)?;
+        self.insert_entity(world_type, position, chunk);
+        Ok(chunk)
     }
 
     /// Inserts a chunk entity into the given world.

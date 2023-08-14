@@ -13,6 +13,7 @@ pub(super) fn add_systems(app: &mut App) {
         (
             handle_keyboard.run_if(any_keyboard_events),
             handle_mouse.run_if(any_mouse_events),
+            middle_click,
         )
             .run_if(resource_exists_and_equals(Paused(false)))
             .in_set(GameSet),
@@ -97,4 +98,18 @@ fn handle_mouse(
     pitch = pitch.clamp(-1.54, 1.54);
 
     transform.rotation = Quat::from_rotation_y(yaw) * Quat::from_rotation_x(pitch);
+}
+
+fn middle_click(
+    mut query: Query<&mut Transform, With<DirectionalLight>>,
+    head: Query<&Transform, (With<LocalPlayerHead>, Without<DirectionalLight>)>,
+    mouse: Res<Input<MouseButton>>,
+) {
+    if mouse.just_pressed(MouseButton::Middle) {
+        let head = head.single();
+
+        let mut light = query.single_mut();
+        light.translation = head.translation;
+        light.rotation = head.rotation;
+    }
 }
