@@ -104,15 +104,16 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::GameJoin(p) => {
                 debug!("Joined game: {:?}", p);
 
-                let mut state = SystemState::<(Res<LocalPlayer>, ResMut<Worlds>)>::new(world);
+                let mut state =
+                    SystemState::<(Query<Entity, With<LocalPlayer>>, ResMut<Worlds>)>::new(world);
                 let (player, mut worlds) = state.get_mut(world);
 
                 for world_type in p.worlds {
                     worlds.insert_empty(&WorldType::from(world_type));
                 }
 
-                let player = player.clone();
-                world.entity_mut(*player).insert(EntityId(p.player_id));
+                let player = player.single();
+                world.entity_mut(player).insert(EntityId(p.player_id));
 
                 world.insert_resource(p.game_mode);
                 world.insert_resource(CurrentWorld::new(p.world, p.world_type));
@@ -140,12 +141,14 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::PlayerPositionLook(p) => {
                 info!("Received player position and look: {:?}", p);
 
-                let mut state =
-                    SystemState::<(ResMut<ConnectionChannel<Self>>, Res<LocalPlayer>)>::new(world);
+                let mut state = SystemState::<(
+                    ResMut<ConnectionChannel<Self>>,
+                    Query<Entity, With<LocalPlayer>>,
+                )>::new(world);
                 let (mut channel, player) = state.get_mut(world);
                 channel.send_play(ServerboundTeleportConfirmPacket { id: p.id });
 
-                let player = *player.clone();
+                let player = player.single();
                 let mut player = world.entity_mut(player);
                 let mut transform = player.get_mut::<Transform>().unwrap();
 

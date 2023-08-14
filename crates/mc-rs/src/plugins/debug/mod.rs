@@ -20,7 +20,7 @@ impl Plugin for DebugPlugin {
             (
                 DebugPlugin::update_fps,
                 DebugPlugin::update_entities,
-                DebugPlugin::update_position.run_if(resource_exists::<LocalPlayer>()),
+                DebugPlugin::update_position.run_if(any_with_component::<LocalPlayer>()),
             ),
         );
     }
@@ -94,7 +94,7 @@ impl DebugPlugin {
                     DebugPlayerPosition,
                     TextBundle {
                         style,
-                        text: Text::from_section("0, 0, 0", text_style),
+                        text: Text::from_section("Vec3(0.0, 0.0, 0.0)", text_style),
                         ..Default::default()
                     },
                 ));
@@ -116,11 +116,8 @@ impl DebugPlugin {
     /// Update the player position display
     fn update_position(
         mut query: Query<&mut Text, With<DebugPlayerPosition>>,
-        player: Res<LocalPlayer>,
-        transform: Query<&Transform>,
+        transform: Query<&Transform, With<LocalPlayer>>,
     ) {
-        if let Ok(transform) = transform.get(**player) {
-            query.single_mut().sections[0].value = format!("{:?}", transform.translation);
-        }
+        query.single_mut().sections[0].value = format!("{:?}", transform.single().translation);
     }
 }

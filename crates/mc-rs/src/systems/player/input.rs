@@ -1,7 +1,7 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
 
 use crate::{
-    networking::network::{LocalPlayer, LocalPlayerComponent, LocalPlayerHead},
+    networking::network::{LocalPlayer, LocalPlayerHead},
     systems::app_state::GameSet,
 };
 
@@ -34,16 +34,13 @@ fn any_keyboard_events(keyboard: Res<Input<KeyCode>>) -> bool {
 
 #[allow(clippy::type_complexity)]
 fn handle_keyboard(
-    player: Res<LocalPlayer>,
     keyboard: Res<Input<KeyCode>>,
-    mut query: Query<&mut Transform, Or<(With<LocalPlayerComponent>, With<LocalPlayerHead>)>>,
+    mut player: Query<&mut Transform, (With<LocalPlayer>, Without<LocalPlayerHead>)>,
+    head: Query<&Transform, (Without<LocalPlayer>, With<LocalPlayerHead>)>,
 ) {
     // TODO: Add keybindings
 
-    let Ok(transform) = query.get_mut(player.head) else {
-        return;
-    };
-
+    let transform = head.single();
     let mut movement = Vec3::ZERO;
     if keyboard.pressed(KeyCode::W) {
         movement -= Vec3::Z;
@@ -72,24 +69,18 @@ fn handle_keyboard(
         movement *= 4.0;
     }
 
-    if let Ok(mut transform) = query.get_mut(player.player) {
-        transform.translation += movement * 0.125;
-    }
+    player.single_mut().translation += movement * 0.125;
 }
 
 fn any_mouse_events(events: EventReader<MouseMotion>) -> bool { !events.is_empty() }
 
 fn handle_mouse(
-    player: Res<LocalPlayer>,
     mut query: Query<&mut Transform, With<LocalPlayerHead>>,
     mut mouse: EventReader<MouseMotion>,
 ) {
     // TODO: Add keybindings
 
-    let Ok(mut transform) = query.get_mut(player.head) else {
-        return;
-    };
-
+    let mut transform = query.single_mut();
     let delta = mouse.iter().fold(Vec2::ZERO, |acc, e| acc + e.delta);
 
     let (mut yaw, mut pitch, _) = transform.rotation.to_euler(EulerRot::YXZ);

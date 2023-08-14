@@ -1,6 +1,6 @@
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 
-use crate::networking::network::LocalPlayer;
+use crate::networking::network::LocalPlayerHead;
 
 use super::{
     app_state::{ApplicationState, GameSet},
@@ -35,10 +35,12 @@ pub(super) fn add_systems(app: &mut App) {
     );
 }
 
-fn create_camera(player: Res<LocalPlayer>, settings: Res<Settings>, mut commands: Commands) {
-    debug!("Creating camera for {:?}", *player);
-
-    commands.entity(player.head).insert((
+fn create_camera(
+    query: Query<Entity, With<LocalPlayerHead>>,
+    settings: Res<Settings>,
+    mut commands: Commands,
+) {
+    commands.entity(query.single()).insert((
         Camera3dBundle {
             camera: Camera {
                 order: isize::MIN,

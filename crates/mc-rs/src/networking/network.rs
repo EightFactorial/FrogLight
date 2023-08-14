@@ -27,31 +27,9 @@ use super::{
     task::{ConnectionConfigurationTask, ConnectionTask},
 };
 
-/// A resource containing the local player's bevy entity
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
-pub struct LocalPlayer {
-    #[deref]
-    pub player: Entity,
-    pub head: Entity,
-}
-
-impl LocalPlayer {
-    pub fn new(player: Entity, head: Entity) -> Self { Self { player, head } }
-
-    pub fn from_player(player: Entity, commands: &mut Commands) -> Self {
-        commands.entity(player).insert(LocalPlayerComponent);
-
-        let head = commands.spawn((LocalPlayerHead, TransformBundle::default()));
-        let head_id = head.id();
-
-        commands.entity(player).add_child(head_id);
-        Self::new(player, head_id)
-    }
-}
-
 /// A marker component for the local player
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Component)]
-pub struct LocalPlayerComponent;
+pub struct LocalPlayer;
 
 /// A marker component for the local player's head
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Component)]
@@ -317,9 +295,12 @@ where
                                 rx2,
                             ));
 
-                            commands.entity(entity).insert(TransformBundle::default());
-                            let player = LocalPlayer::from_player(entity, &mut commands);
-                            commands.insert_resource(player);
+                            commands
+                                .entity(entity)
+                                .insert((LocalPlayer, TransformBundle::default()))
+                                .with_children(|player| {
+                                    player.spawn((LocalPlayerHead, TransformBundle::default()));
+                                });
 
                             commands.insert_resource(ConnectionChannel::new(rx1, tx2, new_task));
 
@@ -365,8 +346,13 @@ where
                             rx2,
                         ));
 
-                        let player = LocalPlayer::from_player(entity, &mut commands);
-                        commands.insert_resource(player);
+                        commands
+                            .entity(entity)
+                            .insert((LocalPlayer, TransformBundle::default()))
+                            .with_children(|player| {
+                                player.spawn((LocalPlayerHead, TransformBundle::default()));
+                            });
+
                         commands.insert_resource(ConnectionChannel::new(rx1, tx2, new_task));
 
                         commands
