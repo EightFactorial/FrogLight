@@ -28,7 +28,7 @@ impl Network for V1_20_0 {
     const HAS_CONFIGURATION_STATE: bool = false;
 
     fn config_packet(_world: &mut World, _packet: ClientboundConfigurationPackets) {
-        unreachable!("This version does not have a configuration state",);
+        unreachable!("This version does not have a configuration state");
     }
 
     fn play_packet(world: &mut World, packet: ClientboundPlayPackets) {
@@ -146,10 +146,11 @@ impl Network for V1_20_0 {
                     ResMut<ConnectionChannel<Self>>,
                     Query<&mut Transform, With<LocalPlayer>>,
                 )>::new(world);
-                let (mut channel, mut query) = state.get_mut(world);
+                let (mut channel, mut player) = state.get_mut(world);
                 channel.send_play(ServerboundTeleportConfirmPacket { id: p.id });
 
-                let mut transform = query.single_mut();
+                // Update the player posiiton
+                let mut transform = player.single_mut();
 
                 if p.relative_flags.x {
                     transform.translation.x += p.position.x as f32;

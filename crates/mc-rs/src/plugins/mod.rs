@@ -35,7 +35,7 @@ pub(super) fn add_plugins(app: &mut App) {
     // Add Rapier physics plugins
     app.add_plugins(RapierPhysicsPlugin::<()>::default());
 
-    #[cfg(feature = "debug")]
+    #[cfg(feature = "rapier_debug")]
     {
         use bevy_rapier3d::render::RapierDebugRenderPlugin;
         app.add_plugins(RapierDebugRenderPlugin::default());

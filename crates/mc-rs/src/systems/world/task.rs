@@ -6,6 +6,7 @@ use bevy::{
     },
     tasks::{AsyncComputeTaskPool, Task},
 };
+use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody};
 use block_mesh::{
     greedy_quads,
     ndshape::{ConstShape, ConstShape3u32},
@@ -36,7 +37,7 @@ pub(super) fn setup(app: &mut App) {
 /// A task that generates a mesh for a section
 #[derive(Deref, DerefMut, Component)]
 pub struct ChunkTask(pub Task<ChunkTaskResult>);
-type ChunkTaskResult = Vec<SectionTaskResult>;
+type ChunkTaskResult = Vec<SectionResult>;
 
 impl ChunkTask {
     pub(super) fn create(chunk: Chunk, neighbors: [Option<Chunk>; 4], blocks: Blocks) -> Self {
@@ -62,6 +63,12 @@ impl ChunkTask {
                     .with_children(|parent| {
                         for (index, option) in results.into_iter().enumerate() {
                             if let Some((mesh, _textures)) = option {
+                                let collider = Collider::from_bevy_mesh(
+                                    &mesh,
+                                    &ComputedColliderShape::TriMesh,
+                                )
+                                .unwrap();
+
                                 // Create the material mesh bundle
                                 let material = PbrBundle {
                                     mesh: meshes.add(mesh),
@@ -75,7 +82,12 @@ impl ChunkTask {
                                 };
 
                                 // Spawn a section
-                                parent.spawn((SectionComponent, material));
+                                parent.spawn((
+                                    SectionComponent,
+                                    material,
+                                    RigidBody::Fixed,
+                                    collider,
+                                ));
                             }
                         }
                     })
@@ -87,37 +99,39 @@ impl ChunkTask {
 
 /// Generates a mesh for all sections in a chunk
 async fn chunk_fn(chunk: Chunk, neighbors: [Option<Chunk>; 4], blocks: Blocks) -> ChunkTaskResult {
-    let sections = chunk.sections.read().unwrap();
-    let neighbors = [
-        neighbors[0].as_ref().map(|c| c.sections.read().unwrap()),
-        neighbors[1].as_ref().map(|c| c.sections.read().unwrap()),
-        neighbors[2].as_ref().map(|c| c.sections.read().unwrap()),
-        neighbors[3].as_ref().map(|c| c.sections.read().unwrap()),
-    ];
-
     let mut results = Vec::with_capacity(SECTION_COUNT);
-    for (index, section) in sections.iter().enumerate() {
+    for index in 0..SECTION_COUNT {
         results.push(section_fn(
-            section,
+            &chunk.sections.read().unwrap()[index],
             [
                 neighbors[0]
                     .as_ref()
-                    .and_then(|n| n.get(index).map(|s| s.get_blocks())),
+                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
                 neighbors[1]
                     .as_ref()
-                    .and_then(|n| n.get(index).map(|s| s.get_blocks())),
+                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
                 neighbors[2]
                     .as_ref()
-                    .and_then(|n| n.get(index).map(|s| s.get_blocks())),
+                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
                 neighbors[3]
                     .as_ref()
-                    .and_then(|n| n.get(index).map(|s| s.get_blocks())),
+                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
                 if index != 0 {
-                    sections.get(index - 1).map(|s| s.get_blocks())
+                    chunk
+                        .sections
+                        .read()
+                        .unwrap()
+                        .get(index - 1)
+                        .map(|s| s.get_blocks())
                 } else {
                     None
                 },
-                sections.get(index + 1).map(|s| s.get_blocks()),
+                chunk
+                    .sections
+                    .read()
+                    .unwrap()
+                    .get(index + 1)
+                    .map(|s| s.get_blocks()),
             ],
             &blocks,
         ));
@@ -126,9 +140,8 @@ async fn chunk_fn(chunk: Chunk, neighbors: [Option<Chunk>; 4], blocks: Blocks) -
     results
 }
 
-type SectionTask = Task<SectionTaskResult>;
-type SectionTaskResult = Option<(Mesh, Textures)>;
-type Textures = Vec<Handle<Image>>;
+type SectionResult = Option<(Mesh, SectionTextures)>;
+type SectionTextures = Vec<Handle<Image>>;
 
 const X: u32 = CHUNK_SIZE as u32;
 const Y: u32 = SECTION_HEIGHT as u32;
@@ -145,12 +158,13 @@ fn section_fn(
     section: &Section,
     neighbors: [Option<Vec<u32>>; 6],
     blocks: &Blocks,
-) -> SectionTaskResult {
-    let blocks = blocks.read().unwrap();
-    let section_data = section.get_blocks();
-    if section_data.is_empty() {
+) -> SectionResult {
+    if section.block_palette.bits == 0 {
         return None;
     }
+
+    let blocks = blocks.read().unwrap();
+    let section_data = section.get_blocks();
 
     let mut shape = [VoxelType::Empty; MeshChunkShape::SIZE as usize];
     for y in 0..MESH_Y {

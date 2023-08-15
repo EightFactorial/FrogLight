@@ -5,7 +5,6 @@ use std::{
 
 use azalea_nbt::Nbt;
 use bevy::prelude::*;
-use bevy_rapier3d::prelude::RigidBody;
 use mc_rs_proto::{
     buffer::DecodeError,
     types::{
@@ -61,7 +60,6 @@ impl Chunk {
         };
 
         let entity = world.spawn((
-            RigidBody::Fixed,
             Self {
                 sections: Arc::new(RwLock::new(sections.try_into().unwrap())),
                 motion_blocking,
@@ -72,7 +70,7 @@ impl Chunk {
             TransformBundle {
                 local: Transform::from_xyz(
                     (position.x * CHUNK_SIZE as i32) as f32,
-                    -CHUNK_VERT_DISPLACEMENT as f32,
+                    CHUNK_VERT_DISPLACEMENT as f32,
                     (position.y * CHUNK_SIZE as i32) as f32,
                 ),
                 ..Default::default()
