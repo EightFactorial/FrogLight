@@ -45,4 +45,5 @@ simd = ["bevy_rapier3d/simd-nightly", "rand/packed_simd"]
 wayland = ["bevy/wayland"]
 
 # Enable debug plugins
-debug = ["mc-rs-proto/debug", "mc-rs-macros/debug", "bevy_rapier3d/debug-render-3d"]
+debug = ["mc-rs-proto/debug", "mc-rs-macros/debug"]
+rapier_debug = ["bevy_rapier3d/debug-render-3d"]
