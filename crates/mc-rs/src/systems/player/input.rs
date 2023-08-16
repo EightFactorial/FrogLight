@@ -55,8 +55,9 @@ fn handle_keyboard(
         movement += Vec3::X;
     }
 
-    movement = transform.rotation.mul_vec3(movement.normalize_or_zero());
-    movement.y = 0.0;
+    // Rotate vector by head angle
+    let (yaw, _, _) = transform.rotation.to_euler(EulerRot::YXZ);
+    movement = Quat::from_rotation_y(yaw) * movement;
 
     if keyboard.pressed(KeyCode::Space) {
         movement += Vec3::Y;

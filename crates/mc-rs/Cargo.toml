@@ -16,8 +16,8 @@ anyhow = "1.0.72"
 async-net = "1.7.0"
 async-trait = "0.1.72"
 azalea-chat = { version = "0.7.0", default-features = false }
-azalea-nbt = { git = "https://github.com/EightFactorial/azalea", branch = "nbt", default-features = false }
-belly = { git = "https://github.com/EightFactorial/belly" }
+azalea-nbt = { git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
+belly = { git = "https://github.com/EightFactorial/belly.git" }
 bevy = { version = "0.11.0", features = ["serialize"] }
 bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
 block-mesh = "0.2.0"

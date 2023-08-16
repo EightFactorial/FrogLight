@@ -50,6 +50,7 @@ impl MenuRoot {
                     order: 1isize,
                     ..Default::default()
                 },
+                transform: Transform::from_xyz(10000000., 10000000., 10000000.),
                 ..Default::default()
             },
             UiCameraConfig { show_ui: true },
