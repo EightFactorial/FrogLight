@@ -10,6 +10,7 @@ use self::{
     chunk::{Chunk, ChunkEntity},
     global_palette::GlobalPalette,
     section::SectionComponent,
+    task::ChunkTask,
 };
 
 use super::app_state::{ApplicationState, GameSet};
@@ -35,9 +36,8 @@ pub(super) fn add_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            Chunk::update_chunk,
-            Chunk::added_chunk,
-            SectionComponent::despawn_orphans,
+            (Chunk::update_chunk, Chunk::added_chunk).after(ChunkTask::poll_tasks),
+            SectionComponent::despawn_orphans.run_if(any_component_removed::<Chunk>()),
         )
             .in_set(GameSet),
     );

@@ -6,7 +6,7 @@ use bevy::{
     },
     tasks::{AsyncComputeTaskPool, Task},
 };
-use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody};
+use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, Sleeping};
 use block_mesh::{
     greedy_quads,
     ndshape::{ConstShape, ConstShape3u32},
@@ -20,7 +20,7 @@ use crate::systems::{
 };
 
 use super::{
-    chunk::Chunk,
+    chunk::ChunkSections,
     section::{Section, SectionComponent},
     CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
 };
@@ -29,7 +29,7 @@ pub(super) fn setup(app: &mut App) {
     app.add_systems(
         Update,
         ChunkTask::poll_tasks
-            .run_if(any_with_component::<ChunkTask>())
+            .run_if(ChunkTask::any_tasks_finished)
             .in_set(GameSet),
     );
 }
@@ -40,11 +40,19 @@ pub struct ChunkTask(pub Task<ChunkTaskResult>);
 type ChunkTaskResult = Vec<SectionResult>;
 
 impl ChunkTask {
-    pub(super) fn create(chunk: Chunk, neighbors: [Option<Chunk>; 4], blocks: Blocks) -> Self {
+    pub(super) fn create(
+        chunk: ChunkSections,
+        neighbors: [Option<ChunkSections>; 4],
+        blocks: Blocks,
+    ) -> Self {
         ChunkTask(AsyncComputeTaskPool::get().spawn(chunk_fn(chunk, neighbors, blocks)))
     }
 
     fn as_task(&mut self) -> &mut Task<ChunkTaskResult> { &mut self.0 }
+
+    fn any_tasks_finished(mut query: Query<&ChunkTask>) -> bool {
+        query.iter_mut().any(|task| task.is_finished())
+    }
 
     pub(super) fn poll_tasks(
         mut query: Query<(Entity, &mut ChunkTask)>,
@@ -52,7 +60,6 @@ impl ChunkTask {
         mut materials: ResMut<Assets<StandardMaterial>>,
         mut commands: Commands,
     ) {
-        // For every finished task
         for (entity, mut task) in query.iter_mut() {
             if let Some(results) = block_on(poll_once(task.as_task())) {
                 commands
@@ -63,6 +70,7 @@ impl ChunkTask {
                     .with_children(|parent| {
                         for (index, option) in results.into_iter().enumerate() {
                             if let Some((mesh, _textures)) = option {
+                                // Create the section collider
                                 let collider = Collider::from_bevy_mesh(
                                     &mesh,
                                     &ComputedColliderShape::TriMesh,
@@ -83,55 +91,54 @@ impl ChunkTask {
 
                                 // Spawn a section
                                 parent.spawn((
+                                    RigidBody::Fixed,
+                                    Sleeping {
+                                        sleeping: true,
+                                        ..Default::default()
+                                    },
+                                    collider,
                                     SectionComponent,
                                     material,
-                                    RigidBody::Fixed,
-                                    collider,
                                 ));
                             }
                         }
                     })
                     .remove::<ChunkTask>();
-            }
+            };
         }
     }
 }
 
 /// Generates a mesh for all sections in a chunk
-async fn chunk_fn(chunk: Chunk, neighbors: [Option<Chunk>; 4], blocks: Blocks) -> ChunkTaskResult {
+async fn chunk_fn(
+    chunk: ChunkSections,
+    neighbors: [Option<ChunkSections>; 4],
+    blocks: Blocks,
+) -> ChunkTaskResult {
     let mut results = Vec::with_capacity(SECTION_COUNT);
+
     for index in 0..SECTION_COUNT {
         results.push(section_fn(
-            &chunk.sections.read().unwrap()[index],
+            &chunk.read().unwrap()[index],
             [
                 neighbors[0]
                     .as_ref()
-                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
+                    .map(|c| c.read().unwrap()[index].get_blocks()),
                 neighbors[1]
                     .as_ref()
-                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
+                    .map(|c| c.read().unwrap()[index].get_blocks()),
                 neighbors[2]
                     .as_ref()
-                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
+                    .map(|c| c.read().unwrap()[index].get_blocks()),
                 neighbors[3]
                     .as_ref()
-                    .map(|c| c.sections.read().unwrap()[index].get_blocks()),
+                    .map(|c| c.read().unwrap()[index].get_blocks()),
                 if index != 0 {
-                    chunk
-                        .sections
-                        .read()
-                        .unwrap()
-                        .get(index - 1)
-                        .map(|s| s.get_blocks())
+                    chunk.read().unwrap().get(index - 1).map(|s| s.get_blocks())
                 } else {
                     None
                 },
-                chunk
-                    .sections
-                    .read()
-                    .unwrap()
-                    .get(index + 1)
-                    .map(|s| s.get_blocks()),
+                chunk.read().unwrap().get(index + 1).map(|s| s.get_blocks()),
             ],
             &blocks,
         ));
@@ -159,7 +166,7 @@ fn section_fn(
     neighbors: [Option<Vec<u32>>; 6],
     blocks: &Blocks,
 ) -> SectionResult {
-    if section.block_palette.bits == 0 {
+    if section.block_count == 0 || section.block_palette.bits == 0 {
         return None;
     }
 
