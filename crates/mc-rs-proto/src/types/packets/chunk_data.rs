@@ -92,8 +92,6 @@ impl Decode for SectionDataPacket {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
         let long = u64::var_decode(buf)?;
 
-        log::debug!("long: {:b}", long);
-
         Ok(Self {
             x: ((long >> 8) & 0x0F) as u8,
             y: (long & 0x0F) as u8,
