@@ -23,7 +23,7 @@ use super::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut)]
 pub struct ChunkEntity(pub Entity);
 
-#[derive(Debug, Default, Clone, Component)]
+#[derive(Debug, Clone, Component)]
 pub struct Chunk {
     pub sections: ChunkSections,
     pub motion_blocking: Vec<i64>,
@@ -117,7 +117,7 @@ impl Chunk {
                 .into_iter()
                 .zip(neighbors.iter_mut())
             {
-                if let Some(entity) = world.get_chunk(pos) {
+                if let Some(entity) = world.get_chunk_id(pos) {
                     if let Ok((_, chunk)) = query.get(**entity) {
                         if chunk.block_count() != 0 {
                             *val = Some(chunk.sections.clone());
@@ -135,7 +135,7 @@ impl Chunk {
     }
 
     /// Regenerate the mesh for chunks that have neighbors added.
-    pub(super) fn added_chunk(
+    pub fn added_chunk(
         query: Query<Ref<Chunk>>,
         worlds: Res<Worlds>,
         blocks: Res<Blocks>,
@@ -150,38 +150,33 @@ impl Chunk {
             // For each neighboring chunk
             let world = worlds.get_world(&chunk.world_type).unwrap();
             for neighbor_pos in chunk.position.around().into_iter() {
-                if let Some(entity) = world.get_chunk(neighbor_pos) {
-                    if let Ok(neighbor_chunk) = query.get(**entity) {
-                        // Skip chunks with no blocks
-                        if neighbor_chunk.block_count() == 0 {
+                if let Some(neighbor_chunk) = world.get_chunk_ref(&query, neighbor_pos) {
+                    // Skip chunks with no blocks
+                    if neighbor_chunk.block_count() == 0 {
+                        continue;
+                    }
+
+                    // Get that chunk's neighbors
+                    let mut neighbors = [None, None, None, None];
+                    for (pos, val) in neighbor_pos.around().into_iter().zip(neighbors.iter_mut()) {
+                        // Skip the current chunk
+                        if pos == chunk.position {
                             continue;
                         }
 
-                        // Get that chunk's neighbors
-                        let mut neighbors = [None, None, None, None];
-                        for (pos, val) in
-                            neighbor_pos.around().into_iter().zip(neighbors.iter_mut())
-                        {
-                            // Skip the current chunk
-                            if pos == chunk.position {
-                                continue;
-                            }
-
-                            if let Some(entity) = world.get_chunk(pos) {
-                                if let Ok(chunk) = query.get(**entity) {
-                                    *val = Some(chunk.sections.clone());
-                                }
-                            }
+                        if let Some(chunk) = world.get_chunk_ref(&query, pos) {
+                            *val = Some(chunk.sections.clone());
                         }
-
-                        // Update the neighbor chunk mesh
-                        let mut commands = commands.entity(**entity);
-                        commands.remove::<ChunkTask>().insert(ChunkTask::create(
-                            neighbor_chunk.sections.clone(),
-                            neighbors,
-                            blocks.clone(),
-                        ));
                     }
+
+                    // Update the neighbor chunk mesh
+                    let entity = world.get_chunk_id(neighbor_pos).unwrap();
+                    let mut commands = commands.entity(**entity);
+                    commands.insert(ChunkTask::create(
+                        neighbor_chunk.sections.clone(),
+                        neighbors,
+                        blocks.clone(),
+                    ));
                 }
             }
         }

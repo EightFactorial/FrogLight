@@ -23,7 +23,7 @@ impl SectionComponent {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct Section {
     pub block_count: u16,
     pub block_palette: Palette,
@@ -42,10 +42,10 @@ impl Section {
     }
 
     /// Get the blocks in this section
-    pub fn get_blocks(&self) -> Vec<u32> { self.block_palette.get_palette_data() }
+    pub fn get_blocks(&self) -> Vec<u32> { self.block_palette.get_data() }
 
     /// Get the biomes in this section
-    pub fn get_biomes(&self) -> Vec<u32> { self.biome_palette.get_palette_data() }
+    pub fn get_biomes(&self) -> Vec<u32> { self.biome_palette.get_data() }
 
     /// Update the section with the given data
     pub(super) fn insert_data<V: GlobalPalette>(&mut self, data: SectionDataPacket) {

@@ -36,7 +36,10 @@ pub(super) fn add_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            (Chunk::update_chunk, Chunk::added_chunk).after(ChunkTask::poll_tasks),
+            (Chunk::update_chunk, Chunk::added_chunk)
+                .after(Worlds::create)
+                .after(ChunkTask::poll_tasks)
+                .run_if(resource_exists::<Worlds>()),
             SectionComponent::despawn_orphans.run_if(any_component_removed::<Chunk>()),
         )
             .in_set(GameSet),
@@ -60,7 +63,7 @@ pub struct Worlds(pub HashMap<WorldType, World>);
 
 impl Worlds {
     /// Creates a new `Worlds` resource when joining a server.
-    pub fn create(mut commands: Commands) { commands.init_resource::<Worlds>(); }
+    fn create(mut commands: Commands) { commands.init_resource::<Worlds>(); }
 
     /// Destroys the `Worlds` resource when leaving a server.
     #[allow(clippy::type_complexity)]
@@ -100,10 +103,10 @@ impl Worlds {
         entity: ChunkEntity,
     ) {
         if let Some(world) = self.get_mut(world_type) {
-            world.insert_chunk(position, entity);
+            world.insert_chunk_id(position, entity);
         } else {
             let mut world = World::default();
-            world.insert_chunk(position, entity);
+            world.insert_chunk_id(position, entity);
 
             self.insert(world_type.clone(), world);
         }
@@ -129,7 +132,7 @@ impl Worlds {
     /// Get the entity id of a chunk in a world.
     pub fn get_chunk_id(&self, world_type: &WorldType, position: ChunkPos) -> Option<&ChunkEntity> {
         self.get_world(world_type)
-            .and_then(|world| world.chunks.get(&position))
+            .and_then(|world| world.get_chunk_id(position))
     }
 
     /// Get the chunk at the position in a world.
@@ -139,6 +142,17 @@ impl Worlds {
         world_type: &WorldType,
         position: ChunkPos,
     ) -> Option<&'a Chunk> {
+        self.get_chunk_id(world_type, position)
+            .and_then(|entity| query.get(**entity).ok())
+    }
+
+    /// Get the chunk reference at the position in a world.
+    pub fn get_chunk_ref<'a>(
+        &'a self,
+        query: &'a Query<Ref<Chunk>>,
+        world_type: &WorldType,
+        position: ChunkPos,
+    ) -> Option<Ref<Chunk>> {
         self.get_chunk_id(world_type, position)
             .and_then(|entity| query.get(**entity).ok())
     }
@@ -187,12 +201,38 @@ pub struct World {
 
 impl World {
     /// Inserts a chunk entity into the world.
-    pub fn insert_chunk(&mut self, position: ChunkPos, chunk: ChunkEntity) {
+    pub fn insert_chunk_id(&mut self, position: ChunkPos, chunk: ChunkEntity) {
         self.chunks.insert(position, chunk);
     }
 
     /// Gets the chunk entity at the position.
-    pub fn get_chunk(&self, position: ChunkPos) -> Option<&ChunkEntity> {
+    pub fn get_chunk_id(&self, position: ChunkPos) -> Option<&ChunkEntity> {
         self.chunks.get(&position)
+    }
+
+    /// Gets the chunk at the position.
+    pub fn get_chunk<'a>(&self, query: &'a Query<&Chunk>, position: ChunkPos) -> Option<&'a Chunk> {
+        self.get_chunk_id(position)
+            .and_then(|entity| query.get(**entity).ok())
+    }
+
+    /// Gets the chunk reference at the position.
+    pub fn get_chunk_ref<'a>(
+        &'a self,
+        query: &'a Query<Ref<Chunk>>,
+        position: ChunkPos,
+    ) -> Option<Ref<Chunk>> {
+        self.get_chunk_id(position)
+            .and_then(|entity| query.get(**entity).ok())
+    }
+
+    /// Gets the chunk at the position mutably.
+    pub fn get_chunk_mut<'a>(
+        &'a self,
+        query: &'a mut Query<&mut Chunk>,
+        position: ChunkPos,
+    ) -> Option<Mut<Chunk>> {
+        self.get_chunk_id(position)
+            .and_then(|entity| query.get_mut(**entity).ok())
     }
 }

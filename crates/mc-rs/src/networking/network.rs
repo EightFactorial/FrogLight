@@ -15,10 +15,7 @@ use crate::{
             ConnectionChannel, ConnectionHandshakeTask, ConnectionLoginTask, ConnectionStatusTask,
         },
     },
-    systems::{
-        app_state::{ApplicationState, GameSet},
-        world::Worlds,
-    },
+    systems::app_state::ApplicationState,
 };
 
 use super::{
@@ -80,14 +77,14 @@ where
 
         // Configure the system set
         app.configure_set(
-            Update,
+            PreUpdate,
             ConnectionSystemSet::<Self>::default()
                 .run_if(any_with_component::<ConnectionMarker<Self>>()),
         );
 
         // Add systems to the set
         app.add_systems(
-            Update,
+            PreUpdate,
             (
                 (Self::status_request, Self::connection_request).chain(),
                 (
@@ -100,17 +97,10 @@ where
                         Self::has_configuration_state
                             .and_then(any_with_component::<ConnectionConfigurationTask<Self>>()),
                     ),
+                    Self::packet_query.run_if(resource_exists::<ConnectionChannel<Self>>()),
                 )
                     .in_set(ConnectionSystemSet::<Self>::default()),
             ),
-        );
-
-        app.add_systems(
-            Update,
-            Self::packet_query
-                .run_if(resource_exists::<ConnectionChannel<Self>>())
-                .after(Worlds::create)
-                .in_set(GameSet),
         );
     }
 

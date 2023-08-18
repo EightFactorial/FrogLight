@@ -133,12 +133,16 @@ async fn chunk_fn(
                 neighbors[3]
                     .as_ref()
                     .map(|c| c.read().unwrap()[index].get_blocks()),
-                if index != 0 {
+                if index > 0 {
                     chunk.read().unwrap().get(index - 1).map(|s| s.get_blocks())
                 } else {
                     None
                 },
-                chunk.read().unwrap().get(index + 1).map(|s| s.get_blocks()),
+                if index < SECTION_COUNT - 1 {
+                    chunk.read().unwrap().get(index + 1).map(|s| s.get_blocks())
+                } else {
+                    None
+                },
             ],
             &blocks,
         ));
@@ -160,6 +164,8 @@ const MESH_Y: u32 = Y + 2;
 const MESH_Z: u32 = Z + 2;
 type MeshChunkShape = ConstShape3u32<MESH_X, MESH_Y, MESH_Z>;
 
+static EMPTY_ID: u32 = 0;
+
 /// Generates a mesh for a section
 fn section_fn(
     section: &Section,
@@ -177,62 +183,67 @@ fn section_fn(
     for y in 0..MESH_Y {
         for z in 0..MESH_Z {
             for x in 0..MESH_X {
+                // Ignore all corners
+                if [
+                    (x == 0 || x == MESH_X - 1),
+                    (y == 0 || y == MESH_Y - 1),
+                    (z == 0 || z == MESH_Z - 1),
+                ]
+                .iter()
+                .fold(0u8, |acc, f| acc + *f as u8)
+                    > 1
+                {
+                    continue;
+                }
+
                 // Get the index in the appropriate neighbor
-                let block_id = match (x, y, z) {
-                    (_, 0, 0) | (0, _, 0) | (0, 0, _) | (_, 17, 17) | (17, _, 17) | (17, 17, _) => {
-                        // Ignore the corners
-                        continue;
-                    }
+                let block_id = match (x, z, y) {
                     (0, _, _) => {
-                        let data_index = ChunkShape::linearize([X - 1, z - 1, y - 1]) as usize;
-                        *neighbors[0]
-                            .as_ref()
-                            .map(|n| n.get(data_index).unwrap_or(&0))
-                            .unwrap_or(&0)
+                        if let Some(data) = &neighbors[0] {
+                            &data[ChunkShape::linearize([X - 1, z - 1, y - 1]) as usize]
+                        } else {
+                            &EMPTY_ID
+                        }
                     }
                     (_, 0, _) => {
-                        let data_index = ChunkShape::linearize([x - 1, z - 1, Y - 1]) as usize;
-                        *neighbors[4]
-                            .as_ref()
-                            .map(|n| n.get(data_index).unwrap_or(&0))
-                            .unwrap_or(&0)
+                        if let Some(data) = &neighbors[2] {
+                            &data[ChunkShape::linearize([x - 1, Z - 1, y - 1]) as usize]
+                        } else {
+                            &EMPTY_ID
+                        }
                     }
                     (_, _, 0) => {
-                        let data_index = ChunkShape::linearize([x - 1, Z - 1, y - 1]) as usize;
-                        *neighbors[2]
-                            .as_ref()
-                            .map(|n| n.get(data_index).unwrap_or(&0))
-                            .unwrap_or(&0)
+                        if let Some(data) = &neighbors[4] {
+                            &data[ChunkShape::linearize([x - 1, z - 1, Y - 1]) as usize]
+                        } else {
+                            &EMPTY_ID
+                        }
                     }
                     (17, _, _) => {
-                        let data_index = ChunkShape::linearize([0, z - 1, y - 1]) as usize;
-                        *neighbors[1]
-                            .as_ref()
-                            .map(|n| n.get(data_index).unwrap_or(&0))
-                            .unwrap_or(&0)
+                        if let Some(data) = &neighbors[1] {
+                            &data[ChunkShape::linearize([0, z - 1, y - 1]) as usize]
+                        } else {
+                            &EMPTY_ID
+                        }
                     }
                     (_, 17, _) => {
-                        let data_index = ChunkShape::linearize([x - 1, z - 1, 0]) as usize;
-                        *neighbors[5]
-                            .as_ref()
-                            .map(|n| n.get(data_index).unwrap_or(&0))
-                            .unwrap_or(&0)
+                        if let Some(data) = &neighbors[3] {
+                            &data[ChunkShape::linearize([x - 1, 0, y - 1]) as usize]
+                        } else {
+                            &EMPTY_ID
+                        }
                     }
                     (_, _, 17) => {
-                        let data_index = ChunkShape::linearize([x - 1, 0, y - 1]) as usize;
-                        *neighbors[3]
-                            .as_ref()
-                            .map(|n| n.get(data_index).unwrap_or(&0))
-                            .unwrap_or(&0)
+                        if let Some(data) = &neighbors[5] {
+                            &data[ChunkShape::linearize([x - 1, z - 1, 0]) as usize]
+                        } else {
+                            &EMPTY_ID
+                        }
                     }
-                    _ => {
-                        // Index is in this section
-                        let data_index = ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize;
-                        section_data[data_index]
-                    }
+                    _ => &section_data[ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize],
                 };
 
-                let block = blocks.get(&block_id).unwrap_or_else(|| {
+                let block = blocks.get(block_id).unwrap_or_else(|| {
                     blocks.get(&u32::MAX).expect("Error getting fallback block")
                 });
 
@@ -252,6 +263,10 @@ fn section_fn(
         &faces,
         &mut buffer,
     );
+
+    if buffer.quads.num_quads() == 0 {
+        return None;
+    }
 
     let num_indices = buffer.quads.num_quads() * 6;
     let num_vertices = buffer.quads.num_quads() * 4;

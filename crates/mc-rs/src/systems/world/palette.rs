@@ -1,6 +1,6 @@
 use mc_rs_proto::buffer::{Decode, DecodeError, VarDecode};
 
-use super::{global_palette::GlobalPalette, section::DataKind};
+use super::{global_palette::GlobalPalette, section::DataKind, CHUNK_SIZE, SECTION_HEIGHT};
 
 #[derive(Debug, Default, Clone)]
 pub struct Palette {
@@ -74,9 +74,9 @@ impl Palette {
     }
 
     /// Get the contents of the palette, converted to global ids
-    pub fn get_palette_data(&self) -> Vec<u32> {
-        if self.bits == 0 {
-            return Vec::new();
+    pub fn get_data(&self) -> Vec<u32> {
+        if let PaletteKind::Single(id) = &self.kind {
+            return vec![*id; CHUNK_SIZE * CHUNK_SIZE * SECTION_HEIGHT];
         }
 
         let mut block_ids = Vec::with_capacity(self.data.len() * (64 / self.bits) as usize);
