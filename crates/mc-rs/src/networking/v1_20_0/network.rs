@@ -206,7 +206,7 @@ impl Network for V1_20_0 {
                 };
 
                 if let Some(mut _chunk) =
-                    worlds.get_chunk_mut(&mut query, &current.name, ChunkPos::from(p.position))
+                    worlds.get_chunk_mut(&mut query, &current.name, &ChunkPos::from(p.position))
                 {
                     // for update in p.updates {
                     //     chunk.update_section::<V1_20_0>(p.position, update);

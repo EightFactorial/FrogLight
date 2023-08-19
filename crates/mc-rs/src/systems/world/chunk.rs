@@ -118,7 +118,7 @@ impl Chunk {
                 .into_iter()
                 .zip(neighbors.iter_mut())
             {
-                if let Some(entity) = world.get_chunk_id(pos) {
+                if let Some(entity) = world.get_chunk_id(&pos) {
                     if let Ok((_, chunk)) = query.get(**entity) {
                         if chunk.block_count() != 0 {
                             *val = Some(chunk.sections.clone());
@@ -151,7 +151,7 @@ impl Chunk {
             // For each neighboring chunk
             let world = worlds.get_world(&chunk.world_type).unwrap();
             for neighbor_pos in chunk.position.around().into_iter() {
-                if let Some(neighbor_chunk) = world.get_chunk_ref(&query, neighbor_pos) {
+                if let Some(neighbor_chunk) = world.get_chunk_ref(&query, &neighbor_pos) {
                     // Skip chunks with no blocks
                     if neighbor_chunk.block_count() == 0 {
                         continue;
@@ -160,13 +160,13 @@ impl Chunk {
                     // Get that chunk's neighbors
                     let mut neighbors = [None, None, None, None];
                     for (pos, val) in neighbor_pos.around().into_iter().zip(neighbors.iter_mut()) {
-                        if let Some(chunk) = world.get_chunk_ref(&query, pos) {
+                        if let Some(chunk) = world.get_chunk_ref(&query, &pos) {
                             *val = Some(chunk.sections.clone());
                         }
                     }
 
                     // Update the neighbor chunk mesh
-                    let entity = world.get_chunk_id(neighbor_pos).unwrap();
+                    let entity = world.get_chunk_id(&neighbor_pos).unwrap();
                     commands.entity(**entity).insert(ChunkTask::create(
                         neighbor_chunk.sections.clone(),
                         neighbors,
@@ -194,4 +194,12 @@ impl Chunk {
             .iter()
             .fold(0u32, |acc, section| acc + section.block_count as u32)
     }
+}
+
+impl From<Entity> for ChunkEntity {
+    fn from(entity: Entity) -> Self { Self(entity) }
+}
+
+impl From<ChunkEntity> for Entity {
+    fn from(entity: ChunkEntity) -> Self { entity.0 }
 }

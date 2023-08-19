@@ -128,7 +128,11 @@ impl Worlds {
     }
 
     /// Get the entity id of a chunk in a world.
-    pub fn get_chunk_id(&self, world_type: &WorldType, position: ChunkPos) -> Option<&ChunkEntity> {
+    pub fn get_chunk_id(
+        &self,
+        world_type: &WorldType,
+        position: &ChunkPos,
+    ) -> Option<&ChunkEntity> {
         self.get_world(world_type)
             .and_then(|world| world.get_chunk_id(position))
     }
@@ -138,7 +142,7 @@ impl Worlds {
         &self,
         query: &'a Query<&Chunk>,
         world_type: &WorldType,
-        position: ChunkPos,
+        position: &ChunkPos,
     ) -> Option<&'a Chunk> {
         self.get_chunk_id(world_type, position)
             .and_then(|entity| query.get(**entity).ok())
@@ -149,7 +153,7 @@ impl Worlds {
         &'a self,
         query: &'a Query<Ref<Chunk>>,
         world_type: &WorldType,
-        position: ChunkPos,
+        position: &ChunkPos,
     ) -> Option<Ref<Chunk>> {
         self.get_chunk_id(world_type, position)
             .and_then(|entity| query.get(**entity).ok())
@@ -160,7 +164,7 @@ impl Worlds {
         &'a self,
         query: &'a mut Query<&mut Chunk>,
         world_type: &WorldType,
-        position: ChunkPos,
+        position: &ChunkPos,
     ) -> Option<Mut<Chunk>> {
         self.get_chunk_id(world_type, position)
             .and_then(|entity| query.get_mut(**entity).ok())
@@ -205,12 +209,16 @@ impl World {
     }
 
     /// Gets the chunk entity at the position.
-    pub fn get_chunk_id(&self, position: ChunkPos) -> Option<&ChunkEntity> {
-        self.chunks.get(&position)
+    pub fn get_chunk_id(&self, position: &ChunkPos) -> Option<&ChunkEntity> {
+        self.chunks.get(position)
     }
 
     /// Gets the chunk at the position.
-    pub fn get_chunk<'a>(&self, query: &'a Query<&Chunk>, position: ChunkPos) -> Option<&'a Chunk> {
+    pub fn get_chunk<'a>(
+        &self,
+        query: &'a Query<&Chunk>,
+        position: &ChunkPos,
+    ) -> Option<&'a Chunk> {
         self.get_chunk_id(position)
             .and_then(|entity| query.get(**entity).ok())
     }
@@ -219,7 +227,7 @@ impl World {
     pub fn get_chunk_ref<'a>(
         &'a self,
         query: &'a Query<Ref<Chunk>>,
-        position: ChunkPos,
+        position: &ChunkPos,
     ) -> Option<Ref<Chunk>> {
         self.get_chunk_id(position)
             .and_then(|entity| query.get(**entity).ok())
@@ -229,7 +237,7 @@ impl World {
     pub fn get_chunk_mut<'a>(
         &'a self,
         query: &'a mut Query<&mut Chunk>,
-        position: ChunkPos,
+        position: &ChunkPos,
     ) -> Option<Mut<Chunk>> {
         self.get_chunk_id(position)
             .and_then(|entity| query.get_mut(**entity).ok())
