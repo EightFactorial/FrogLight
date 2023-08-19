@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use bevy::{prelude::*, utils::HashMap};
 use mc_rs_proto::{
     buffer::DecodeError,
@@ -37,8 +35,7 @@ pub(super) fn add_systems(app: &mut App) {
         Update,
         (
             (Chunk::update_chunk, Chunk::added_chunk)
-                .after(Worlds::create)
-                .after(ChunkTask::poll_tasks)
+                .before(ChunkTask::poll_tasks)
                 .run_if(resource_exists::<Worlds>()),
             SectionComponent::despawn_orphans.run_if(any_component_removed::<Chunk>()),
         )
@@ -61,6 +58,7 @@ pub const SECTION_COUNT: usize = CHUNK_HEIGHT / SECTION_HEIGHT;
 #[derive(Debug, Default, Clone, Deref, DerefMut, Resource)]
 pub struct Worlds(pub HashMap<WorldType, World>);
 
+#[allow(dead_code)]
 impl Worlds {
     /// Creates a new `Worlds` resource when joining a server.
     fn create(mut commands: Commands) { commands.init_resource::<Worlds>(); }
@@ -199,6 +197,7 @@ pub struct World {
     pub chunks: HashMap<ChunkPos, ChunkEntity>,
 }
 
+#[allow(dead_code)]
 impl World {
     /// Inserts a chunk entity into the world.
     pub fn insert_chunk_id(&mut self, position: ChunkPos, chunk: ChunkEntity) {

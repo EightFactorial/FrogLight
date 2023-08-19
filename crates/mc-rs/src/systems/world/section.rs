@@ -30,6 +30,7 @@ pub struct Section {
     pub biome_palette: Palette,
 }
 
+#[allow(dead_code)]
 impl Section {
     pub(super) fn decode<V: GlobalPalette>(
         buf: &mut impl std::io::Read,

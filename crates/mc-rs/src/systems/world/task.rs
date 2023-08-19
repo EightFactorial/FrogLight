@@ -118,32 +118,34 @@ async fn chunk_fn(
     let mut results = Vec::with_capacity(SECTION_COUNT);
 
     for index in 0..SECTION_COUNT {
+        let neighbors = [
+            neighbors[0]
+                .as_ref()
+                .map(|c| c.read().unwrap()[index].get_blocks()),
+            neighbors[1]
+                .as_ref()
+                .map(|c| c.read().unwrap()[index].get_blocks()),
+            neighbors[2]
+                .as_ref()
+                .map(|c| c.read().unwrap()[index].get_blocks()),
+            neighbors[3]
+                .as_ref()
+                .map(|c| c.read().unwrap()[index].get_blocks()),
+            if index > 0 {
+                Some(chunk.read().unwrap()[index - 1].get_blocks())
+            } else {
+                None
+            },
+            if index < SECTION_COUNT - 1 {
+                Some(chunk.read().unwrap()[index + 1].get_blocks())
+            } else {
+                None
+            },
+        ];
+
         results.push(section_fn(
             &chunk.read().unwrap()[index],
-            [
-                neighbors[0]
-                    .as_ref()
-                    .map(|c| c.read().unwrap()[index].get_blocks()),
-                neighbors[1]
-                    .as_ref()
-                    .map(|c| c.read().unwrap()[index].get_blocks()),
-                neighbors[2]
-                    .as_ref()
-                    .map(|c| c.read().unwrap()[index].get_blocks()),
-                neighbors[3]
-                    .as_ref()
-                    .map(|c| c.read().unwrap()[index].get_blocks()),
-                if index > 0 {
-                    chunk.read().unwrap().get(index - 1).map(|s| s.get_blocks())
-                } else {
-                    None
-                },
-                if index < SECTION_COUNT - 1 {
-                    chunk.read().unwrap().get(index + 1).map(|s| s.get_blocks())
-                } else {
-                    None
-                },
-            ],
+            neighbors,
             &blocks,
         ));
     }
@@ -172,7 +174,7 @@ fn section_fn(
     neighbors: [Option<Vec<u32>>; 6],
     blocks: &Blocks,
 ) -> SectionResult {
-    if section.block_count == 0 || section.block_palette.bits == 0 {
+    if section.block_count == 0 {
         return None;
     }
 

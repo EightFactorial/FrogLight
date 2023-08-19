@@ -34,6 +34,7 @@ pub struct Chunk {
 
 pub(super) type ChunkSections = Arc<RwLock<[Section; SECTION_COUNT]>>;
 
+#[allow(dead_code)]
 impl Chunk {
     /// Decodes a chunk from a chunk data packet.
     pub(super) fn decode<V: GlobalPalette>(
@@ -135,7 +136,7 @@ impl Chunk {
     }
 
     /// Regenerate the mesh for chunks that have neighbors added.
-    pub fn added_chunk(
+    pub(super) fn added_chunk(
         query: Query<Ref<Chunk>>,
         worlds: Res<Worlds>,
         blocks: Res<Blocks>,
@@ -159,11 +160,6 @@ impl Chunk {
                     // Get that chunk's neighbors
                     let mut neighbors = [None, None, None, None];
                     for (pos, val) in neighbor_pos.around().into_iter().zip(neighbors.iter_mut()) {
-                        // Skip the current chunk
-                        if pos == chunk.position {
-                            continue;
-                        }
-
                         if let Some(chunk) = world.get_chunk_ref(&query, pos) {
                             *val = Some(chunk.sections.clone());
                         }
@@ -171,8 +167,7 @@ impl Chunk {
 
                     // Update the neighbor chunk mesh
                     let entity = world.get_chunk_id(neighbor_pos).unwrap();
-                    let mut commands = commands.entity(**entity);
-                    commands.insert(ChunkTask::create(
+                    commands.entity(**entity).insert(ChunkTask::create(
                         neighbor_chunk.sections.clone(),
                         neighbors,
                         blocks.clone(),
