@@ -19,7 +19,7 @@ pub(super) fn add_systems(app: &mut App) {
         (
             create_camera.run_if(not(any_with_component::<Camera3d>())),
             clear_background,
-            create_light,
+            // create_light,
         )
             .in_set(GameSet),
     );
@@ -66,7 +66,7 @@ fn destroy_camera(query: Query<Entity, With<Camera3d>>, mut commands: Commands) 
     }
 }
 
-fn create_light(mut commands: Commands) {
+fn _create_light(mut commands: Commands) {
     commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             shadows_enabled: true,

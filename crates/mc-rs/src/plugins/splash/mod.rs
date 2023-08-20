@@ -114,11 +114,16 @@ impl SplashPlugin {
     }
 
     /// Check if the progress bar is finished
-    fn bar_finished(query: Query<(&BarMax, &BarValue)>, root: Res<MenuRoot>) -> bool {
+    fn bar_finished(
+        query: Query<(&BarMax, &BarValue)>,
+        root: Res<MenuRoot>,
+        blocks: Res<Blocks>,
+        asset_server: Res<AssetServer>,
+    ) -> bool {
         if let Ok((max, value)) = query.get(**root) {
             value.0 >= max.0
         } else {
-            false
+            blocks.is_loaded(&asset_server)
         }
     }
 

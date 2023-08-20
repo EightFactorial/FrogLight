@@ -5,6 +5,7 @@ use bevy::{
         render_resource::PrimitiveTopology,
     },
     tasks::{AsyncComputeTaskPool, Task},
+    utils::HashMap,
 };
 use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, Sleeping};
 use block_mesh::{
@@ -13,6 +14,8 @@ use block_mesh::{
     GreedyQuadsBuffer, RIGHT_HANDED_Y_UP_CONFIG,
 };
 use futures_lite::future::{block_on, poll_once};
+use itertools::Itertools;
+use mc_rs_proto::types::enums::Direction;
 
 use crate::systems::{
     app_state::GameSet,
@@ -21,6 +24,7 @@ use crate::systems::{
 
 use super::{
     chunk::ChunkSections,
+    material::{BindlessMaterial, ATTRIBUTE_TEXTURE_INDEX},
     section::{Section, SectionComponent},
     CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
 };
@@ -57,7 +61,7 @@ impl ChunkTask {
     pub(super) fn poll_tasks(
         mut query: Query<(Entity, &mut ChunkTask)>,
         mut meshes: ResMut<Assets<Mesh>>,
-        mut materials: ResMut<Assets<StandardMaterial>>,
+        mut materials: ResMut<Assets<BindlessMaterial>>,
         mut commands: Commands,
     ) {
         for (entity, mut task) in query.iter_mut() {
@@ -69,18 +73,20 @@ impl ChunkTask {
                     // Add the new children
                     .with_children(|parent| {
                         for (index, option) in results.into_iter().enumerate() {
-                            if let Some((mesh, _textures)) = option {
+                            if let Some((mesh, textures)) = option {
                                 // Create the section collider
-                                let collider = Collider::from_bevy_mesh(
+                                let Some(collider) = Collider::from_bevy_mesh(
                                     &mesh,
                                     &ComputedColliderShape::TriMesh,
-                                )
-                                .unwrap();
+                                ) else {
+                                    error!("Error creating collider from section mesh!");
+                                    continue;
+                                };
 
                                 // Create the material mesh bundle
-                                let material = PbrBundle {
+                                let material = MaterialMeshBundle::<BindlessMaterial> {
                                     mesh: meshes.add(mesh),
-                                    material: materials.add(Color::DARK_GRAY.into()),
+                                    material: materials.add(BindlessMaterial::new(textures)),
                                     transform: Transform::from_xyz(
                                         0.,
                                         (index * SECTION_HEIGHT) as f32,
@@ -181,6 +187,30 @@ fn section_fn(
     let blocks = blocks.read().unwrap();
     let section_data = section.get_blocks();
 
+    let mut textures = Vec::new();
+    let mut texture_map = HashMap::new();
+    for id in section_data.iter().unique() {
+        let Some(block) = blocks.get(id) else {
+            continue;
+        };
+
+        let Some(new_textures) = block.texture.get_textures() else {
+            continue;
+        };
+
+        let start = textures.len();
+        textures.extend(new_textures.to_vec());
+        texture_map.insert(*id, start);
+    }
+
+    // Insert the fallback block
+    {
+        let block = blocks.get(&u32::MAX).expect("Error getting fallback block");
+        let start = textures.len();
+        textures.extend(block.texture.get_textures().unwrap().to_vec());
+        texture_map.insert(u32::MAX, start);
+    }
+
     let mut shape = [VoxelType::Empty; MeshChunkShape::SIZE as usize];
     for y in 0..MESH_Y {
         for z in 0..MESH_Z {
@@ -245,10 +275,7 @@ fn section_fn(
                     _ => &section_data[ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize],
                 };
 
-                let block = blocks.get(block_id).unwrap_or_else(|| {
-                    blocks.get(&u32::MAX).expect("Error getting fallback block")
-                });
-
+                let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
                 let shape_index = MeshChunkShape::linearize([x, y, z]) as usize;
                 shape[shape_index] = block.voxel_type;
             }
@@ -274,12 +301,46 @@ fn section_fn(
     let num_vertices = buffer.quads.num_quads() * 4;
     let mut indices = Vec::with_capacity(num_indices);
     let mut positions = Vec::with_capacity(num_vertices);
-    let mut normals = Vec::with_capacity(num_vertices);
+    // let mut normals = Vec::with_capacity(num_vertices);
+    let mut tex_index = Vec::with_capacity(num_vertices);
+    let mut tex_uvs = Vec::with_capacity(num_vertices);
     for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
         for quad in group.into_iter() {
-            indices.extend_from_slice(&face.quad_mesh_indices(positions.len() as u32));
-            positions.extend_from_slice(&face.quad_mesh_positions(&quad, 1.0));
-            normals.extend_from_slice(&face.quad_mesh_normals());
+            // Get the data
+            let ind = face.quad_mesh_indices(positions.len() as u32);
+            let pos = face.quad_mesh_positions(&quad, 1.0);
+            // let norm = face.quad_mesh_normals();
+            let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
+
+            {
+                // Get the block
+                let [x, y, z] = quad.minimum;
+                let data_index = ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize;
+                let block_id = &section_data[data_index];
+                let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
+
+                // Get the texture index
+                let [x, y, z] = face.signed_normal().into();
+                let index = block.texture.get_texture_index(Direction::from([x, y, z]));
+                let start = texture_map.get(block_id);
+
+                match (start, index) {
+                    (Some(start), Some(index)) => {
+                        // Add the texture index
+                        tex_index.extend([(*start + index) as u32; 4]);
+                    }
+                    _ => {
+                        // Push the fallback texture index
+                        tex_index.extend([texture_map[&u32::MAX] as u32; 4]);
+                    }
+                }
+            }
+
+            // Add the data
+            indices.extend(ind);
+            positions.extend(pos);
+            // normals.extend(norm);
+            tex_uvs.extend(uvs);
         }
     }
 
@@ -288,15 +349,21 @@ fn section_fn(
         Mesh::ATTRIBUTE_POSITION,
         VertexAttributeValues::Float32x3(positions),
     );
-    render_mesh.insert_attribute(
-        Mesh::ATTRIBUTE_NORMAL,
-        VertexAttributeValues::Float32x3(normals),
-    );
+    // render_mesh.insert_attribute(
+    //     Mesh::ATTRIBUTE_NORMAL,
+    //     VertexAttributeValues::Float32x3(normals),
+    // );
+
     render_mesh.insert_attribute(
         Mesh::ATTRIBUTE_UV_0,
-        VertexAttributeValues::Float32x2(vec![[0.0; 2]; num_vertices]),
+        VertexAttributeValues::Float32x2(tex_uvs),
     );
+    render_mesh.insert_attribute(
+        ATTRIBUTE_TEXTURE_INDEX,
+        VertexAttributeValues::Uint32(tex_index),
+    );
+
     render_mesh.set_indices(Some(Indices::U32(indices)));
 
-    Some((render_mesh, Vec::new()))
+    Some((render_mesh, textures))
 }
