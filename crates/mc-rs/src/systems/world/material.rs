@@ -138,4 +138,7 @@ impl Material for BindlessMaterial {
 
         Ok(())
     }
+
+    // TODO: Figure out why textures with different normals clip
+    // fn alpha_mode(&self) -> AlphaMode { AlphaMode::Blend }
 }

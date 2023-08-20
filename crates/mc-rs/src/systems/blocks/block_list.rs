@@ -11,9 +11,8 @@ use super::block::{Block, BlockTexture, VoxelType};
 
 /// Adds all block systems to the app
 pub(super) fn add_systems(app: &mut App) {
-    app.add_systems(Startup, Blocks::init_blocks);
-
     app.init_resource::<BlocksLoaded>();
+    app.add_systems(Startup, Blocks::init_blocks);
 
     app.add_systems(
         Update,
@@ -82,10 +81,22 @@ impl Blocks {
         blocks.insert_block(79, "Bedrock", &["bedrock.png"], &assets);
 
         for id in 80..=95 {
-            blocks.insert_block(id, "Water", &["water_still.png"], &assets);
+            blocks.insert_block_type(
+                id,
+                "Water",
+                VoxelType::Translucent(id),
+                &["water_still.png"],
+                &assets,
+            );
         }
         for id in 96..=111 {
-            blocks.insert_block(id, "Lava", &["lava_still.png"], &assets);
+            blocks.insert_block_type(
+                id,
+                "Lava",
+                VoxelType::Translucent(id),
+                &["lava_still.png"],
+                &assets,
+            );
         }
 
         blocks.insert_block(127, "Coal Ore", &["coal_ore.png"], &assets);
@@ -146,13 +157,25 @@ impl Blocks {
         );
 
         for id in 237..=264 {
-            blocks.insert_block(id, "Oak Leaves", &["oak_leaves.png"], &assets);
+            blocks.insert_block_type(
+                id,
+                "Oak Leaves",
+                VoxelType::Translucent(id),
+                &["oak_leaves.png"],
+                &assets,
+            );
         }
         for id in 130..=132 {
             blocks.insert_block(id, "Oak Log", &["oak_log_top.png", "oak_log.png"], &assets);
         }
         for id in 321..=348 {
-            blocks.insert_block(id, "Jungle Leaves", &["jungle_leaves.png"], &assets);
+            blocks.insert_block_type(
+                id,
+                "Jungle Leaves",
+                VoxelType::Translucent(id),
+                &["jungle_leaves.png"],
+                &assets,
+            );
         }
         for id in 139..=141 {
             blocks.insert_block(
@@ -205,19 +228,19 @@ impl Blocks {
         &mut self,
         id: u32,
         name: &str,
-        voxel: VoxelType,
+        voxel_type: VoxelType,
         paths: &[&str],
         assets: &AssetServer,
     ) {
-        if let Some(block) = Block::new(id, name, voxel, paths, assets) {
+        if let Some(block) = Block::new(id, name, voxel_type, paths, assets) {
             self.write().unwrap().insert(id, block);
         } else {
             error!("Failed to create block with id {}", id);
 
-            let fallback = self.read().unwrap().get(&u32::MAX).unwrap().texture.clone();
+            let fallback = self.read().unwrap()[&u32::MAX].texture.clone();
             self.write()
                 .unwrap()
-                .insert(id, Block::new_with(id, name, voxel, fallback));
+                .insert(id, Block::new_with(id, name, voxel_type, fallback));
         }
     }
 
