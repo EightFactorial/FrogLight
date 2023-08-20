@@ -60,17 +60,127 @@ impl Blocks {
         blocks.insert_block(6, "Andesite", &["andesite.png"], &assets);
         blocks.insert_block(7, "Polished Andesite", &["polished_andesite.png"], &assets);
 
+        for id in 8..=9 {
+            blocks.insert_block(
+                id,
+                "Grass Block",
+                &["grass_block_top.png", "dirt.png", "grass_block_side.png"],
+                &assets,
+            );
+        }
+        blocks.insert_block(10, "Dirt", &["dirt.png"], &assets);
+        blocks.insert_block(11, "Coarse Dirt", &["coarse_dirt.png"], &assets);
+        for id in 12..=13 {
+            blocks.insert_block(
+                id,
+                "Podzol",
+                &["podzol_top.png", "dirt.png", "podzol_side.png"],
+                &assets,
+            );
+        }
+
+        blocks.insert_block(79, "Bedrock", &["bedrock.png"], &assets);
+
+        for id in 80..=95 {
+            blocks.insert_block(id, "Water", &["water_still.png"], &assets);
+        }
+        for id in 96..=111 {
+            blocks.insert_block(id, "Lava", &["lava_still.png"], &assets);
+        }
+
+        blocks.insert_block(127, "Coal Ore", &["coal_ore.png"], &assets);
         blocks.insert_block(
-            8,
-            "Grass Block",
-            &["grass_block_top.png", "dirt.png", "grass_block_side.png"],
+            128,
+            "Deepslate Coal Ore",
+            &["deepslate_coal_ore.png"],
             &assets,
         );
-        blocks.insert_block(9, "Dirt", &["dirt.png"], &assets);
+        blocks.insert_block(125, "Iron Ore", &["iron_ore.png"], &assets);
+        blocks.insert_block(
+            126,
+            "Deepslate Iron Ore",
+            &["deepslate_iron_ore.png"],
+            &assets,
+        );
+        blocks.insert_block(123, "Gold Ore", &["gold_ore.png"], &assets);
+        blocks.insert_block(
+            124,
+            "Deepslate Gold Ore",
+            &["deepslate_gold_ore.png"],
+            &assets,
+        );
+        blocks.insert_block(5734, "Redstone Ore", &["redstone_ore.png"], &assets);
+        blocks.insert_block(
+            5735,
+            "Deepslate Redstone Ore",
+            &["deepslate_redstone_ore.png"],
+            &assets,
+        );
+        blocks.insert_block(520, "Lapis Lazuli Ore", &["lapis_ore.png"], &assets);
+        blocks.insert_block(
+            521,
+            "Deepslate Lapis Lazuli Ore",
+            &["deepslate_lapis_ore.png"],
+            &assets,
+        );
+        blocks.insert_block(4274, "Diamond Ore", &["diamond_ore.png"], &assets);
+        blocks.insert_block(
+            4275,
+            "Deepslate Diamond Ore",
+            &["deepslate_diamond_ore.png"],
+            &assets,
+        );
+        blocks.insert_block(7511, "Emerald Ore", &["emerald_ore.png"], &assets);
+        blocks.insert_block(
+            7512,
+            "Deepslate Emerald Ore",
+            &["deepslate_emerald_ore.png"],
+            &assets,
+        );
+        blocks.insert_block(21558, "Copper Ore", &["copper_ore.png"], &assets);
+        blocks.insert_block(
+            21559,
+            "Deepslate Copper Ore",
+            &["deepslate_copper_ore.png"],
+            &assets,
+        );
 
-        for id in 22047..=22049 {
+        for id in 237..=264 {
+            blocks.insert_block(id, "Oak Leaves", &["oak_leaves.png"], &assets);
+        }
+        for id in 130..=132 {
+            blocks.insert_block(id, "Oak Log", &["oak_log_top.png", "oak_log.png"], &assets);
+        }
+        for id in 321..=348 {
+            blocks.insert_block(id, "Jungle Leaves", &["jungle_leaves.png"], &assets);
+        }
+        for id in 139..=141 {
+            blocks.insert_block(
+                id,
+                "Jungle Log",
+                &["jungle_log_top.png", "jungle_log.png"],
+                &assets,
+            );
+        }
+
+        blocks.insert_block(112, "Sand", &["sand.png"], &assets);
+        blocks.insert_block(118, "Gravel", &["gravel.png"], &assets);
+        blocks.insert_block(5798, "Clay", &["clay.png"], &assets);
+
+        blocks.insert_block(20890, "Block of Amethyst", &["amethyst_block.png"], &assets);
+        blocks.insert_block(
+            20891,
+            "Budding Amethyst",
+            &["budding_amethyst.png"],
+            &assets,
+        );
+
+        blocks.insert_block(20940, "Tuff", &["tuff.png"], &assets);
+        blocks.insert_block(20941, "Calcite", &["calcite.png"], &assets);
+        for id in 22450..=22452 {
             blocks.insert_block(id, "Deepslate", &["deepslate.png"], &assets);
         }
+        blocks.insert_block(24102, "Smooth Basalt", &["smooth_basalt.png"], &assets);
 
         commands.insert_resource(blocks);
     }
@@ -82,7 +192,7 @@ impl Blocks {
         } else {
             error!("Failed to create block with id {}", id);
 
-            let fallback = self.read().unwrap().get(&u32::MAX).unwrap().texture.clone();
+            let fallback = self.read().unwrap()[&u32::MAX].texture.clone();
             self.write().unwrap().insert(
                 id,
                 Block::new_with(id, name, VoxelType::Opaque(id), fallback),
