@@ -6,6 +6,6 @@ use super::BlockPos;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Transcode)]
 pub struct GlobalPos {
+    pub world: ResourceLocation,
     pub position: BlockPos,
-    pub dimension: ResourceLocation,
 }

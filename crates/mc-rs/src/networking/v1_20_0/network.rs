@@ -14,7 +14,7 @@ use mc_rs_proto::{
 
 use crate::{
     networking::{
-        network::{LocalPlayer, Network},
+        network::{LocalPlayer, LocalPlayerHead, Network},
         task::ConnectionChannel,
     },
     systems::world::{
@@ -144,9 +144,10 @@ impl Network for V1_20_0 {
 
                 let mut state = SystemState::<(
                     ResMut<ConnectionChannel<Self>>,
-                    Query<&mut Transform, With<LocalPlayer>>,
+                    Query<&mut Transform, (With<LocalPlayer>, Without<LocalPlayerHead>)>,
+                    Query<&mut Transform, (Without<LocalPlayer>, With<LocalPlayerHead>)>,
                 )>::new(world);
-                let (mut channel, mut player) = state.get_mut(world);
+                let (mut channel, mut player, mut head) = state.get_mut(world);
                 channel.send_play(ServerboundTeleportConfirmPacket { id: p.id });
 
                 // Update the player posiiton
@@ -170,20 +171,23 @@ impl Network for V1_20_0 {
                     transform.translation.z = p.position.z as f32;
                 }
 
+                // Update the player rotation
+                let mut transform = head.single_mut();
+
                 if p.relative_flags.yaw {
                     transform.rotation *=
-                        Quat::from_rotation_y(p.yaw * std::f32::consts::PI / 180.0);
+                        Quat::from_rotation_z(p.yaw * std::f32::consts::PI / 180.0);
                 } else {
                     transform.rotation =
-                        Quat::from_rotation_y(p.yaw * std::f32::consts::PI / 180.0);
+                        Quat::from_rotation_z(p.yaw * std::f32::consts::PI / 180.0);
                 }
 
                 if p.relative_flags.pitch {
                     transform.rotation *=
-                        Quat::from_rotation_x(p.pitch * std::f32::consts::PI / 180.0);
+                        Quat::from_rotation_y(p.pitch * std::f32::consts::PI / 180.0);
                 } else {
                     transform.rotation =
-                        Quat::from_rotation_x(p.pitch * std::f32::consts::PI / 180.0);
+                        Quat::from_rotation_y(p.pitch * std::f32::consts::PI / 180.0);
                 }
             }
             ClientboundPlayPackets::UnlockRecipes(_) => {}
@@ -201,7 +205,7 @@ impl Network for V1_20_0 {
                 let (mut query, worlds, current) = state.get_mut(world);
 
                 let Some(current) = current else {
-                    log::warn!("Received chunk delta update without a current world!");
+                    warn!("Received chunk delta update without a current world!");
                     return;
                 };
 
@@ -212,7 +216,7 @@ impl Network for V1_20_0 {
                     //     chunk.update_section::<V1_20_0>(p.position, update);
                     // }
                 } else {
-                    log::warn!("Received chunk delta update for unloaded chunk!");
+                    warn!("Received chunk delta update for unloaded chunk!");
                 };
             }
             ClientboundPlayPackets::SelectAdvancementTab(_) => {}
