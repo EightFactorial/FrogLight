@@ -19,7 +19,10 @@ use mc_rs_proto::types::enums::Direction;
 
 use crate::systems::{
     app_state::GameSet,
-    blocks::{block::VoxelType, block_list::Blocks},
+    blocks::{
+        block::{voxel_type::VoxelType, BlockType},
+        block_list::Blocks,
+    },
 };
 
 use super::{
@@ -194,7 +197,7 @@ fn section_fn(
             continue;
         };
 
-        let Some(new_textures) = block.texture.get_textures() else {
+        let Some(new_textures) = block.block_type.textures() else {
             continue;
         };
 
@@ -207,7 +210,7 @@ fn section_fn(
     {
         let block = blocks.get(&u32::MAX).expect("Error getting fallback block");
         let start = textures.len();
-        textures.extend(block.texture.get_textures().unwrap().to_vec());
+        textures.extend(block.block_type.textures().unwrap().to_vec());
         texture_map.insert(u32::MAX, start);
     }
 
@@ -277,7 +280,7 @@ fn section_fn(
 
                 let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
                 let shape_index = MeshChunkShape::linearize([x, y, z]) as usize;
-                shape[shape_index] = block.voxel_type;
+                shape[shape_index] = block.block_type.voxel_type();
             }
         }
     }
@@ -320,9 +323,17 @@ fn section_fn(
                 let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
 
                 // Get the texture index
-                let [x, y, z] = face.signed_normal().into();
-                let index = block.texture.get_texture_index(Direction::from([x, y, z]));
                 let start = texture_map.get(block_id);
+                let direction = {
+                    let [x, y, z] = face.signed_normal().into();
+                    Direction::from([x, y, z])
+                };
+                let index = match &block.block_type {
+                    BlockType::Voxel { texture, .. } | BlockType::Simple { texture, .. } => {
+                        texture.get_texture_index(direction)
+                    }
+                    BlockType::Complex { .. } => todo!(),
+                };
 
                 match (start, index) {
                     (Some(start), Some(index)) => {

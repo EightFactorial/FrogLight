@@ -80,7 +80,7 @@ impl SplashPlugin {
             BarMax(time.elapsed_seconds() + 2.)
         } else {
             // Set the max to the number of blocks with textures
-            BarMax(blocks.blocks_with_textures_f32())
+            BarMax(blocks.blocks_with_textures())
         };
         let entity = **root;
         commands.entity(entity).insert((BarValue::default(), max));
