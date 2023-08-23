@@ -109,10 +109,10 @@ impl Blocks {
                         texture,
                     } = &fallback.block_type
                     {
-                        let voxel_type = match &voxel_type {
+                        let voxel_type = match voxel_type {
                             VoxelType::Opaque(_) => VoxelType::Opaque(block.id),
                             VoxelType::Translucent(_) => VoxelType::Translucent(block.id),
-                            VoxelType::NoMesh => VoxelType::NoMesh,
+                            VoxelType::NoMesh(_) => VoxelType::NoMesh(rand::random()),
                             VoxelType::Empty => VoxelType::Empty,
                         };
 

@@ -1,14 +1,9 @@
-use std::hash::Hash;
-
 use bevy::prelude::*;
 use convert_case::{Case, Casing};
 use mc_rs_proto::types::ResourceLocation;
 
 use self::{voxel_texture::VoxelTexture, voxel_type::VoxelType};
 
-pub mod complex;
-pub mod complex_model;
-pub mod complex_texture;
 pub mod voxel_texture;
 pub mod voxel_type;
 
@@ -62,6 +57,7 @@ impl Block {
         name: &str,
         paths: &[&str],
         dimensions: [f32; 6],
+        collision: bool,
         assets: &AssetServer,
     ) -> Option<Self> {
         Some(Self::new_simple_with(
@@ -69,6 +65,7 @@ impl Block {
             name,
             VoxelTexture::from_paths(paths, assets)?,
             dimensions,
+            collision,
         ))
     }
 
@@ -78,15 +75,21 @@ impl Block {
         name: &str,
         texture: VoxelTexture,
         dimensions: [f32; 6],
+        collision: bool,
     ) -> Self {
-        Self::new(id, name, BlockType::new_simple(dimensions, texture))
+        Self::new(
+            id,
+            name,
+            BlockType::new_simple(dimensions, texture, collision),
+        )
     }
 
     /// Get the voxel type of the block
     pub fn voxel_type(&self) -> VoxelType {
         match &self.block_type {
             BlockType::Voxel { voxel_type, .. } => *voxel_type,
-            BlockType::Simple { .. } | BlockType::Complex { .. } => VoxelType::NoMesh,
+            BlockType::Simple { .. } => VoxelType::Translucent(self.id),
+            BlockType::Complex { .. } => VoxelType::NoMesh(rand::random()),
         }
     }
 
@@ -99,21 +102,21 @@ impl Block {
             BlockType::Complex { .. } => todo!(),
         }
     }
+
+    /// Get if the block has collision
+    pub fn collision(&self) -> bool {
+        match &self.block_type {
+            BlockType::Voxel { .. } => true,
+            BlockType::Simple { collision, .. } | BlockType::Complex { collision, .. } => {
+                *collision
+            }
+        }
+    }
 }
 
 impl Eq for Block {}
 impl PartialEq for Block {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id && self.name == other.name && self.key == other.key
-    }
-}
-
-impl Hash for Block {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-        self.name.hash(state);
-        self.key.hash(state);
-    }
+    fn eq(&self, other: &Self) -> bool { self.id == other.id }
 }
 
 #[derive(Debug, Clone)]
@@ -127,12 +130,14 @@ pub enum BlockType {
     Simple {
         texture: VoxelTexture,
         dimensions: [f32; 6],
+        collision: bool,
     },
     /// A block that has it's own mesh
     #[allow(dead_code)]
     Complex {
         mesh: Mesh,
         textures: Vec<Handle<Image>>,
+        collision: bool,
     },
 }
 
@@ -144,15 +149,20 @@ impl BlockType {
         }
     }
 
-    pub fn new_simple(dimensions: [f32; 6], texture: VoxelTexture) -> Self {
-        debug_assert!(dimensions.iter().all(|d| *d >= 0.0 && *d <= 1.0));
-        debug_assert!(dimensions[0] < dimensions[3]);
-        debug_assert!(dimensions[1] < dimensions[4]);
-        debug_assert!(dimensions[2] < dimensions[5]);
-
+    pub const fn new_simple(dimensions: [f32; 6], texture: VoxelTexture, collision: bool) -> Self {
         Self::Simple {
             texture,
             dimensions,
+            collision,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub const fn new_complex(mesh: Mesh, textures: Vec<Handle<Image>>, collision: bool) -> Self {
+        Self::Complex {
+            mesh,
+            textures,
+            collision,
         }
     }
 }

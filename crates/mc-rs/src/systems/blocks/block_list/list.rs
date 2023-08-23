@@ -46,10 +46,11 @@ fn insert_simple(
     id: u32,
     name: &str,
     dimensions: [f32; 6],
+    collision: bool,
     paths: &[&str],
     assets: &AssetServer,
 ) {
-    if let Some(block) = Block::new_simple(id, name, paths, dimensions, assets) {
+    if let Some(block) = Block::new_simple(id, name, paths, dimensions, collision, assets) {
         blocks.insert(id, block);
     } else {
         error!("Failed to create block with id {}", id);
@@ -246,6 +247,7 @@ pub(super) fn initialize(blocks: &mut HashMap<u32, Block>, assets: &AssetServer)
             id,
             "Oak Slab",
             [0.0, 0.0, 0.0, 1.0, 0.5, 1.0],
+            true,
             &["oak_planks.png"],
             assets,
         )

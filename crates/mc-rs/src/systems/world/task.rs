@@ -76,16 +76,7 @@ impl ChunkTask {
                     // Add the new children
                     .with_children(|parent| {
                         for (index, option) in results.into_iter().enumerate() {
-                            if let Some((mesh, textures)) = option {
-                                // Create the section collider
-                                let Some(collider) = Collider::from_bevy_mesh(
-                                    &mesh,
-                                    &ComputedColliderShape::TriMesh,
-                                ) else {
-                                    error!("Error creating collider from section mesh!");
-                                    continue;
-                                };
-
+                            if let Some((mesh, textures, collider)) = option {
                                 // Create the material mesh bundle
                                 let material = MaterialMeshBundle::<BindlessMaterial> {
                                     mesh: meshes.add(mesh),
@@ -162,7 +153,7 @@ async fn chunk_fn(
     results
 }
 
-type SectionResult = Option<(Mesh, SectionTextures)>;
+type SectionResult = Option<(Mesh, SectionTextures, Collider)>;
 type SectionTextures = Vec<Handle<Image>>;
 
 const X: u32 = CHUNK_SIZE as u32;
@@ -302,11 +293,16 @@ fn section_fn(
 
     let num_indices = buffer.quads.num_quads() * 6;
     let num_vertices = buffer.quads.num_quads() * 4;
+
+    let mut collider_indices = Vec::with_capacity(num_vertices);
+    let mut collider_positions = Vec::with_capacity(num_vertices);
+
     let mut indices = Vec::with_capacity(num_indices);
     let mut positions = Vec::with_capacity(num_vertices);
     // let mut normals = Vec::with_capacity(num_vertices);
-    let mut tex_index = Vec::with_capacity(num_vertices);
     let mut tex_uvs = Vec::with_capacity(num_vertices);
+    let mut tex_index = Vec::with_capacity(num_vertices);
+
     for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
         for quad in group.into_iter() {
             // Get the data
@@ -315,78 +311,93 @@ fn section_fn(
             // let norm = face.quad_mesh_normals();
             let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
 
-            {
-                // Get the block
-                let [x, y, z] = quad.minimum;
-                let data_index = ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize;
-                let block_id = &section_data[data_index];
-                let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
+            // Get the block
+            let [x, y, z] = quad.minimum;
+            let data_index = ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize;
+            let block_id = &section_data[data_index];
+            let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
 
-                let direction = {
-                    let [x, y, z] = face.signed_normal().into();
-                    Direction::from([x, y, z])
-                };
+            let direction = {
+                let [x, y, z] = face.signed_normal().into();
+                Direction::from([x, y, z])
+            };
 
-                // Modify the quad positions
-                match &block.block_type {
-                    BlockType::Simple { dimensions, .. } => {
-                        mod_quad(&direction, &mut pos, dimensions);
-                    }
-                    BlockType::Complex { .. } => todo!("Append complex block mesh"),
-                    _ => {}
+            // Modify the quad
+            match &block.block_type {
+                BlockType::Simple { dimensions, .. } => {
+                    mod_quad(&direction, &mut pos, dimensions);
                 }
-
-                // Get the texture index
-                let start = texture_map.get(block_id);
-                let index = match &block.block_type {
-                    BlockType::Voxel { texture, .. } | BlockType::Simple { texture, .. } => {
-                        texture.get_texture_index(direction)
-                    }
-                    BlockType::Complex { .. } => todo!(),
-                };
-
-                match (start, index) {
-                    (Some(start), Some(index)) => {
-                        // Add the texture index
-                        tex_index.extend([(*start + index) as u32; 4]);
-                    }
-                    _ => {
-                        // Push the fallback texture index
-                        tex_index.extend([texture_map[&u32::MAX] as u32; 4]);
-                    }
-                }
+                BlockType::Complex { .. } => todo!("Append complex block mesh"),
+                _ => {}
             }
 
-            // Add the data
+            // Get the texture index
+            let start = texture_map.get(block_id);
+            let side_index = match &block.block_type {
+                BlockType::Voxel { texture, .. } | BlockType::Simple { texture, .. } => {
+                    texture.get_texture_index(direction)
+                }
+                BlockType::Complex { .. } => todo!(),
+            };
+            let index = match (start, side_index) {
+                (Some(start), Some(side_index)) => (start + side_index) as u32,
+                _ => texture_map[&u32::MAX] as u32,
+            };
+
+            // If the block has collision, add it to the collider mesh
+            if block.collision() {
+                let col_ind = face.quad_mesh_indices(collider_positions.len() as u32);
+                collider_indices.extend(col_ind);
+                collider_positions.extend(pos);
+            }
+
+            // Add the data to the mesh
             indices.extend(ind);
             positions.extend(pos);
             // normals.extend(norm);
             tex_uvs.extend(uvs);
+            tex_index.extend([index; 4]);
         }
     }
 
-    let mut render_mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    render_mesh.insert_attribute(
-        Mesh::ATTRIBUTE_POSITION,
-        VertexAttributeValues::Float32x3(positions),
-    );
-    // render_mesh.insert_attribute(
-    //     Mesh::ATTRIBUTE_NORMAL,
-    //     VertexAttributeValues::Float32x3(normals),
-    // );
+    // Create the section mesh
+    let render_mesh = {
+        let mut render_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+        render_mesh.set_indices(Some(Indices::U32(indices)));
 
-    render_mesh.insert_attribute(
-        Mesh::ATTRIBUTE_UV_0,
-        VertexAttributeValues::Float32x2(tex_uvs),
-    );
-    render_mesh.insert_attribute(
-        ATTRIBUTE_TEXTURE_INDEX,
-        VertexAttributeValues::Uint32(tex_index),
-    );
+        render_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            VertexAttributeValues::Float32x3(positions),
+        );
+        // render_mesh.insert_attribute(
+        //     Mesh::ATTRIBUTE_NORMAL,
+        //     VertexAttributeValues::Float32x3(normals),
+        // );
+        render_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_UV_0,
+            VertexAttributeValues::Float32x2(tex_uvs),
+        );
+        render_mesh.insert_attribute(
+            ATTRIBUTE_TEXTURE_INDEX,
+            VertexAttributeValues::Uint32(tex_index),
+        );
 
-    render_mesh.set_indices(Some(Indices::U32(indices)));
+        render_mesh
+    };
 
-    Some((render_mesh, textures))
+    // Create the section collider
+    let collider = {
+        let mut collision_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+        collision_mesh.set_indices(Some(Indices::U32(collider_indices)));
+        collision_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            VertexAttributeValues::Float32x3(collider_positions),
+        );
+
+        Collider::from_bevy_mesh(&collision_mesh, &ComputedColliderShape::TriMesh)
+    }?;
+
+    Some((render_mesh, textures, collider))
 }
 
 /// Modifies the quad positions to fit the block
