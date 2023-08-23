@@ -87,6 +87,10 @@ impl Block {
     /// Get the voxel type of the block
     pub fn voxel_type(&self) -> VoxelType {
         match &self.block_type {
+            BlockType::Voxel {
+                voxel_type: VoxelType::NoMesh(_),
+                ..
+            } => VoxelType::NoMesh(rand::random()),
             BlockType::Voxel { voxel_type, .. } => *voxel_type,
             BlockType::Simple { .. } => VoxelType::Translucent(self.id),
             BlockType::Complex { .. } => VoxelType::NoMesh(rand::random()),
