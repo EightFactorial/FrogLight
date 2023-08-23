@@ -28,7 +28,7 @@ use crate::systems::{
 use super::{
     chunk::ChunkSections,
     material::{BindlessMaterial, ATTRIBUTE_TEXTURE_INDEX},
-    section::{Section, SectionComponent},
+    section::SectionComponent,
     CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
 };
 
@@ -115,9 +115,22 @@ async fn chunk_fn(
     neighbors: [Option<ChunkSections>; 4],
     blocks: Blocks,
 ) -> ChunkTaskResult {
+    let pool = AsyncComputeTaskPool::get();
+
     let mut results = Vec::with_capacity(SECTION_COUNT);
+    let mut tasks = Vec::with_capacity(SECTION_COUNT);
 
     for index in 0..SECTION_COUNT {
+        // If the section is empty, skip it
+        if let Some(chunk) = chunk.read().unwrap().get(index) {
+            if chunk.block_count == 0 {
+                tasks.push(None);
+                continue;
+            }
+        }
+
+        let section_data = chunk.read().unwrap()[index].get_blocks();
+
         let neighbors = [
             neighbors[0]
                 .as_ref()
@@ -143,11 +156,17 @@ async fn chunk_fn(
             },
         ];
 
-        results.push(section_fn(
-            &chunk.read().unwrap()[index],
-            neighbors,
-            &blocks,
-        ));
+        // Spawn a new thread for the section
+        let task = Some(pool.spawn(section_fn(section_data, neighbors, blocks.clone())));
+        tasks.push(task);
+    }
+
+    // Wait for all sections to finish
+    for task in tasks {
+        match task {
+            Some(task) => results.push(task.await),
+            None => results.push(None),
+        }
     }
 
     results
@@ -169,17 +188,12 @@ type MeshChunkShape = ConstShape3u32<MESH_X, MESH_Y, MESH_Z>;
 static EMPTY_ID: u32 = 0;
 
 /// Generates a mesh for a section
-fn section_fn(
-    section: &Section,
+async fn section_fn(
+    section_data: Vec<u32>,
     neighbors: [Option<Vec<u32>>; 6],
-    blocks: &Blocks,
+    blocks: Blocks,
 ) -> SectionResult {
-    if section.block_count == 0 {
-        return None;
-    }
-
     let blocks = blocks.read().unwrap();
-    let section_data = section.get_blocks();
 
     let mut textures = Vec::new();
     let mut texture_map = HashMap::new();
