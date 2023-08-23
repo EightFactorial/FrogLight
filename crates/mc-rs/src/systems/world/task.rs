@@ -197,7 +197,7 @@ fn section_fn(
             continue;
         };
 
-        let Some(new_textures) = block.block_type.textures() else {
+        let Some(new_textures) = block.textures() else {
             continue;
         };
 
@@ -210,7 +210,7 @@ fn section_fn(
     {
         let block = blocks.get(&u32::MAX).expect("Error getting fallback block");
         let start = textures.len();
-        textures.extend(block.block_type.textures().unwrap().to_vec());
+        textures.extend(block.textures().unwrap().to_vec());
         texture_map.insert(u32::MAX, start);
     }
 
@@ -280,7 +280,7 @@ fn section_fn(
 
                 let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
                 let shape_index = MeshChunkShape::linearize([x, y, z]) as usize;
-                shape[shape_index] = block.block_type.voxel_type();
+                shape[shape_index] = block.voxel_type();
             }
         }
     }
@@ -311,7 +311,7 @@ fn section_fn(
         for quad in group.into_iter() {
             // Get the data
             let ind = face.quad_mesh_indices(positions.len() as u32);
-            let pos = face.quad_mesh_positions(&quad, 1.0);
+            let mut pos = face.quad_mesh_positions(&quad, 1.0);
             // let norm = face.quad_mesh_normals();
             let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
 
@@ -322,12 +322,22 @@ fn section_fn(
                 let block_id = &section_data[data_index];
                 let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
 
-                // Get the texture index
-                let start = texture_map.get(block_id);
                 let direction = {
                     let [x, y, z] = face.signed_normal().into();
                     Direction::from([x, y, z])
                 };
+
+                // Modify the quad positions
+                match &block.block_type {
+                    BlockType::Simple { dimensions, .. } => {
+                        mod_quad(&direction, &mut pos, dimensions);
+                    }
+                    BlockType::Complex { .. } => todo!("Append complex block mesh"),
+                    _ => {}
+                }
+
+                // Get the texture index
+                let start = texture_map.get(block_id);
                 let index = match &block.block_type {
                     BlockType::Voxel { texture, .. } | BlockType::Simple { texture, .. } => {
                         texture.get_texture_index(direction)
@@ -377,4 +387,108 @@ fn section_fn(
     render_mesh.set_indices(Some(Indices::U32(indices)));
 
     Some((render_mesh, textures))
+}
+
+/// Modifies the quad positions to fit the block
+fn mod_quad(direction: &Direction, pos: &mut [[f32; 3]; 4], dim: &[f32; 6]) {
+    let [min_x, min_y, min_z, max_x, max_y, max_z] = dim;
+
+    match direction {
+        Direction::Up => {
+            pos[0][0] += *min_x;
+            pos[2][0] += *min_x;
+            pos[1][0] -= 1. - *max_x;
+            pos[3][0] -= 1. - *max_x;
+
+            pos[0][1] -= 1. - *max_y;
+            pos[1][1] -= 1. - *max_y;
+            pos[2][1] -= 1. - *max_y;
+            pos[3][1] -= 1. - *max_y;
+
+            pos[0][2] += *min_z;
+            pos[1][2] += *min_z;
+            pos[2][2] -= 1. - *max_z;
+            pos[3][2] -= 1. - *max_z;
+        }
+        Direction::Down => {
+            pos[0][0] += *min_x;
+            pos[2][0] += *min_x;
+            pos[1][0] -= 1. - *max_x;
+            pos[3][0] -= 1. - *max_x;
+
+            pos[0][1] += *min_y;
+            pos[1][1] += *min_y;
+            pos[2][1] += *min_y;
+            pos[3][1] += *min_y;
+
+            pos[0][2] += *min_z;
+            pos[1][2] += *min_z;
+            pos[2][2] -= 1. - *max_z;
+            pos[3][2] -= 1. - *max_z;
+        }
+        Direction::North => {
+            pos[0][0] += *min_x;
+            pos[1][0] += *min_x;
+            pos[2][0] += *min_x;
+            pos[3][0] += *min_x;
+
+            pos[0][1] += *min_y;
+            pos[1][1] += *min_y;
+            pos[2][1] -= 1. - *max_y;
+            pos[3][1] -= 1. - *max_y;
+
+            pos[0][2] += *min_z;
+            pos[3][2] += *min_z;
+            pos[1][2] -= 1. - *max_z;
+            pos[2][2] -= 1. - *max_z;
+        }
+        Direction::South => {
+            pos[0][0] += *min_x;
+            pos[1][0] += *min_x;
+            pos[2][0] += *min_x;
+            pos[3][0] += *min_x;
+
+            pos[0][1] += *min_y;
+            pos[1][1] += *min_y;
+            pos[2][1] -= 1. - *max_y;
+            pos[3][1] -= 1. - *max_y;
+
+            pos[0][2] -= 1. - *max_z;
+            pos[3][2] -= 1. - *max_z;
+            pos[1][2] += *min_z;
+            pos[2][2] += *min_z;
+        }
+        Direction::East => {
+            pos[0][0] += *min_x;
+            pos[2][0] += *min_x;
+            pos[1][0] -= 1. - *max_x;
+            pos[3][0] -= 1. - *max_x;
+
+            pos[0][1] += *min_y;
+            pos[1][1] += *min_y;
+            pos[2][1] -= 1. - *max_y;
+            pos[3][1] -= 1. - *max_y;
+
+            pos[0][2] += *min_z;
+            pos[1][2] += *min_z;
+            pos[2][2] += *min_z;
+            pos[3][2] += *min_z;
+        }
+        Direction::West => {
+            pos[0][0] += *min_x;
+            pos[2][0] += *min_x;
+            pos[1][0] -= 1. - *max_x;
+            pos[3][0] -= 1. - *max_x;
+
+            pos[0][1] += *min_y;
+            pos[1][1] += *min_y;
+            pos[2][1] -= 1. - *max_y;
+            pos[3][1] -= 1. - *max_y;
+
+            pos[0][2] -= 1. - *max_z;
+            pos[1][2] -= 1. - *max_z;
+            pos[2][2] -= 1. - *max_z;
+            pos[3][2] -= 1. - *max_z;
+        }
+    }
 }

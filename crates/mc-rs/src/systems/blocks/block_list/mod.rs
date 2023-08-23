@@ -65,7 +65,7 @@ impl Blocks {
     // Get the number of blocks with all textures loaded
     pub fn blocks_loaded(&self, assets: &AssetServer) -> f32 {
         self.read().unwrap().values().fold(0u32, |acc, block| {
-            let Some(textures) = block.block_type.textures() else {
+            let Some(textures) = block.textures() else {
                 return acc;
             };
 
@@ -82,7 +82,7 @@ impl Blocks {
         self.read()
             .unwrap()
             .values()
-            .filter(|&b| b.block_type.textures().is_some())
+            .filter(|&b| b.textures().is_some())
             .count() as f32
     }
 
@@ -99,7 +99,7 @@ impl Blocks {
         let mut acc = 0;
 
         for block in self.write().unwrap().values_mut() {
-            if let Some(textures) = block.block_type.textures() {
+            if let Some(textures) = block.textures() {
                 // Check if any of the textures failed to load
                 let ids = textures.iter().map(|t| t.id());
                 if assets.get_group_load_state(ids) == LoadState::Failed {

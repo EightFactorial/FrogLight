@@ -40,6 +40,26 @@ fn insert_voxel_type(
     }
 }
 
+/// Insert a simple block into the block list
+fn insert_simple(
+    blocks: &mut HashMap<u32, Block>,
+    id: u32,
+    name: &str,
+    dimensions: [f32; 6],
+    paths: &[&str],
+    assets: &AssetServer,
+) {
+    if let Some(block) = Block::new_simple(id, name, paths, dimensions, assets) {
+        blocks.insert(id, block);
+    } else {
+        error!("Failed to create block with id {}", id);
+
+        let fallback = blocks[&u32::MAX].block_type.clone();
+        blocks.insert(id, Block::new(id, name, fallback));
+    }
+}
+
+/// TODO: Automatically generate this list
 pub(super) fn initialize(blocks: &mut HashMap<u32, Block>, assets: &AssetServer) {
     insert_voxel_type(blocks, 0, "Air", VoxelType::Empty, &[], assets);
 
@@ -218,6 +238,17 @@ pub(super) fn initialize(blocks: &mut HashMap<u32, Block>, assets: &AssetServer)
             &["jungle_log_top.png", "jungle_log.png"],
             assets,
         );
+    }
+
+    for id in 11021..=11026 {
+        insert_simple(
+            blocks,
+            id,
+            "Oak Slab",
+            [0.0, 0.0, 0.0, 1.0, 0.5, 1.0],
+            &["oak_planks.png"],
+            assets,
+        )
     }
 
     insert_voxel(blocks, 112, "Sand", &["sand.png"], assets);
