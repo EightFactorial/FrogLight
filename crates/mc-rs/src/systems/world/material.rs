@@ -28,6 +28,9 @@ impl BindlessMaterial {
 pub const ATTRIBUTE_TEXTURE_INDEX: MeshVertexAttribute =
     MeshVertexAttribute::new("TextureIndex", 988540919, VertexFormat::Uint32);
 
+pub const ATTRIBUTE_ANIMATION_INFO: MeshVertexAttribute =
+    MeshVertexAttribute::new("AnimationInfo", 988540920, VertexFormat::Uint32x2);
+
 const MAX_TEXTURE_COUNT: usize = 32;
 
 impl AsBindGroup for BindlessMaterial {
@@ -133,6 +136,7 @@ impl Material for BindlessMaterial {
             // Mesh::ATTRIBUTE_NORMAL.at_shader_location(1),
             Mesh::ATTRIBUTE_UV_0.at_shader_location(1),
             ATTRIBUTE_TEXTURE_INDEX.at_shader_location(2),
+            ATTRIBUTE_ANIMATION_INFO.at_shader_location(3),
         ])?;
         descriptor.vertex.buffers = vec![vertex_layout];
 

@@ -86,7 +86,7 @@ impl MainMenu {
     }
 
     /// The list of possible subtitles
-    const SUBTITLES: &str = include_str!("../../../../assets/language/menu_subtitle.txt");
+    const SUBTITLES: &'static str = include_str!("../../../../assets/language/menu_subtitle.txt");
 
     /// Get a random subtitle from the list
     fn get_subtitle() -> &'static str {

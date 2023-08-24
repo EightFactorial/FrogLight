@@ -27,7 +27,7 @@ use crate::systems::{
 
 use super::{
     chunk::ChunkSections,
-    material::{BindlessMaterial, ATTRIBUTE_TEXTURE_INDEX},
+    material::{BindlessMaterial, ATTRIBUTE_ANIMATION_INFO, ATTRIBUTE_TEXTURE_INDEX},
     section::SectionComponent,
     CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
 };
@@ -316,6 +316,7 @@ async fn section_fn(
     // let mut normals = Vec::with_capacity(num_vertices);
     let mut tex_uvs = Vec::with_capacity(num_vertices);
     let mut tex_index = Vec::with_capacity(num_vertices);
+    let mut tex_anim = Vec::with_capacity(num_vertices);
 
     for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
         for quad in group.into_iter() {
@@ -356,7 +357,7 @@ async fn section_fn(
             let start = texture_map.get(block_id);
             let side_index = match &block.block_type {
                 BlockType::Voxel { texture, .. } | BlockType::Simple { texture, .. } => {
-                    texture.get_texture_index(direction)
+                    texture.get_direction_index(&direction)
                 }
                 BlockType::Complex { .. } => todo!(),
             };
@@ -372,12 +373,16 @@ async fn section_fn(
                 collider_positions.extend(pos);
             }
 
+            // Get the texture animation information
+            let anim = block.anim_info(&direction).unwrap_or([0, 0]);
+
             // Add the data to the mesh
             indices.extend(ind);
             positions.extend(pos);
             // normals.extend(norm);
             tex_uvs.extend(uvs);
             tex_index.extend([index; 4]);
+            tex_anim.extend([anim; 4]);
         }
     }
 
@@ -401,6 +406,10 @@ async fn section_fn(
         render_mesh.insert_attribute(
             ATTRIBUTE_TEXTURE_INDEX,
             VertexAttributeValues::Uint32(tex_index),
+        );
+        render_mesh.insert_attribute(
+            ATTRIBUTE_ANIMATION_INFO,
+            VertexAttributeValues::Uint32x2(tex_anim),
         );
 
         render_mesh

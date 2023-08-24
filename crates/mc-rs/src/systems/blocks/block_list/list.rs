@@ -40,6 +40,26 @@ fn insert_voxel_type(
     }
 }
 
+/// Insert a block with a voxel type into the block list
+fn insert_voxel_anim(
+    blocks: &mut HashMap<u32, Block>,
+    id: u32,
+    name: &str,
+    voxel_type: VoxelType,
+    anim: &[Option<(u32, u32)>],
+    paths: &[&str],
+    assets: &AssetServer,
+) {
+    if let Some(block) = Block::new_voxel_anim(id, name, voxel_type, anim, paths, assets) {
+        blocks.insert(id, block);
+    } else {
+        error!("Failed to create block with id {}", id);
+
+        let fallback = blocks[&u32::MAX].block_type.clone();
+        blocks.insert(id, Block::new(id, name, fallback));
+    }
+}
+
 /// Insert a simple block into the block list
 fn insert_simple(
     blocks: &mut HashMap<u32, Block>,
@@ -117,21 +137,23 @@ pub(super) fn initialize(blocks: &mut HashMap<u32, Block>, assets: &AssetServer)
     insert_voxel(blocks, 79, "Bedrock", &["bedrock.png"], assets);
 
     for id in 80..=95 {
-        insert_voxel_type(
+        insert_voxel_anim(
             blocks,
             id,
             "Water",
             VoxelType::Translucent(id),
+            &[Some((32, 2))],
             &["water_still.png"],
             assets,
         );
     }
     for id in 96..=111 {
-        insert_voxel_type(
+        insert_voxel_anim(
             blocks,
             id,
             "Lava",
             VoxelType::Translucent(id),
+            &[Some((20, 2))],
             &["lava_still.png"],
             assets,
         );

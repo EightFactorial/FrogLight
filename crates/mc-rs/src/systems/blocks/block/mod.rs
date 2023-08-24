@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use convert_case::{Case, Casing};
-use mc_rs_proto::types::ResourceLocation;
+use mc_rs_proto::types::{enums::Direction, ResourceLocation};
 
 use self::{voxel_texture::VoxelTexture, voxel_type::VoxelType};
 
@@ -23,6 +23,23 @@ impl Block {
             key: ResourceLocation::new(name.to_case(Case::Snake)),
             block_type,
         }
+    }
+
+    /// Create a new voxel block with the given id, name, texture path(s), and animation info
+    pub fn new_voxel_anim(
+        id: u32,
+        name: &str,
+        voxel_type: VoxelType,
+        anim: &[Option<(u32, u32)>],
+        paths: &[&str],
+        assets: &AssetServer,
+    ) -> Option<Self> {
+        Some(Self::new_voxel_with(
+            id,
+            name,
+            voxel_type,
+            VoxelTexture::from_paths_with_frames(paths, anim, assets)?,
+        ))
     }
 
     /// Create a new voxel block with the given id, name, and texture path(s)
@@ -98,12 +115,13 @@ impl Block {
     }
 
     /// Get the textures of the block
-    pub fn textures(&self) -> Option<&[Handle<Image>]> {
+    pub fn textures(&self) -> Option<Vec<Handle<Image>>> {
         match &self.block_type {
             BlockType::Voxel { texture, .. } | BlockType::Simple { texture, .. } => {
-                texture.get_textures()
+                let textures = texture.textures.as_ref()?;
+                Some(textures.iter().map(|info| info.texture.clone()).collect())
             }
-            BlockType::Complex { .. } => todo!(),
+            BlockType::Complex { textures, .. } => Some(textures.clone()),
         }
     }
 
@@ -116,11 +134,21 @@ impl Block {
             }
         }
     }
+
+    /// Get the texture animation information
+    pub fn anim_info(&self, direction: &Direction) -> Option<[u32; 2]> {
+        match self.block_type {
+            BlockType::Voxel { ref texture, .. } | BlockType::Simple { ref texture, .. } => texture
+                .get_texture(direction)
+                .and_then(|t| t.frames.map(|(a, b)| [a, b])),
+            _ => None,
+        }
+    }
 }
 
 impl Eq for Block {}
 impl PartialEq for Block {
-    fn eq(&self, other: &Self) -> bool { self.id == other.id }
+    fn eq(&self, other: &Self) -> bool { self.id == other.id && self.key == other.key }
 }
 
 #[derive(Debug, Clone)]
@@ -132,8 +160,8 @@ pub enum BlockType {
     },
     /// A block that takes up a portion of a block
     Simple {
-        texture: VoxelTexture,
         dimensions: [f32; 6],
+        texture: VoxelTexture,
         collision: bool,
     },
     /// A block that has it's own mesh
@@ -155,8 +183,8 @@ impl BlockType {
 
     pub const fn new_simple(dimensions: [f32; 6], texture: VoxelTexture, collision: bool) -> Self {
         Self::Simple {
-            texture,
             dimensions,
+            texture,
             collision,
         }
     }
