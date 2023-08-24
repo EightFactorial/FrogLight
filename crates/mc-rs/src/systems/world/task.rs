@@ -323,7 +323,7 @@ async fn section_fn(
             let ind = face.quad_mesh_indices(positions.len() as u32);
             let mut pos = face.quad_mesh_positions(&quad, 1.0);
             // let norm = face.quad_mesh_normals();
-            let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
+            let mut uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
 
             // Get the block
             let [x, y, z] = quad.minimum;
@@ -335,6 +335,13 @@ async fn section_fn(
                 let [x, y, z] = face.signed_normal().into();
                 Direction::from([x, y, z])
             };
+
+            // Rotate the uvs if it is facing up
+            if direction == Direction::Up {
+                for [u, v] in uvs.iter_mut() {
+                    std::mem::swap(u, v);
+                }
+            }
 
             // Modify the quad
             match &block.block_type {
