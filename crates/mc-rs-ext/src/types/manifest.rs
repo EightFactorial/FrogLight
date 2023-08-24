@@ -48,7 +48,8 @@ pub enum ManifestError {
 
 impl Manifest {
     /// The url of the manifest
-    const MANIFEST_URL: &str = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
+    const MANIFEST_URL: &'static str =
+        "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
     /// Get the latest version
     pub fn get_latest(&self, unstable: bool) -> Version {
