@@ -26,6 +26,7 @@ pub mod stats;
 pub enum Datasets {
     Diagnostics(diag::Diagnostics),
     Info(info::Info),
+    Blocks(block::Blocks),
     Registry(registry::Registry),
     SerRegistry(registry::SerializableRegistry),
     Packets(packet::Packets),
