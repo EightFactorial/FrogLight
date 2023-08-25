@@ -121,6 +121,7 @@ impl Dataset for Blocks {
                     }
                     // Fluid?
                     "method_9634" => {
+                        block.is_fluid = true;
                         block.collidable = false;
                         block.opaque = false;
                     }
@@ -150,6 +151,7 @@ impl Dataset for Blocks {
                             error!("Unable to get jump velocity multiplier for {}", block.name);
                         }
                     }
+                    // Transparent?
                     "method_22488" => {
                         block.opaque = false;
                     }
@@ -234,6 +236,7 @@ impl Dataset for Blocks {
                 "collidable" => block.collidable,
                 "opaque" => block.opaque,
                 "is_air" => block.is_air,
+                "is_fluid" => block.is_fluid,
             };
         });
     }
@@ -252,6 +255,7 @@ pub struct Block {
     pub collidable: bool,
     pub opaque: bool,
     pub is_air: bool,
+    pub is_fluid: bool,
 }
 
 impl Default for Block {
@@ -268,6 +272,7 @@ impl Default for Block {
             collidable: true,
             opaque: true,
             is_air: false,
+            is_fluid: false,
         }
     }
 }
