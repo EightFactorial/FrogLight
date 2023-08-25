@@ -1,9 +1,8 @@
 use std::sync::{Arc, RwLock};
 
-use bevy::{asset::LoadState, prelude::*, utils::HashMap};
+use bevy::{asset::LoadState, prelude::*};
 use mc_rs_proto::types::ResourceLocation;
-
-use crate::systems::app_state::MenuSet;
+use nohash_hasher::IntMap;
 
 use super::block::{voxel_texture::VoxelTexture, voxel_type::VoxelType, Block, BlockType};
 
@@ -13,7 +12,7 @@ mod list;
 pub(super) fn add_systems(app: &mut App) { app.add_systems(Startup, Blocks::init_blocks); }
 
 #[derive(Clone, Default, Resource, Deref, DerefMut)]
-pub struct Blocks(Arc<RwLock<HashMap<u32, Block>>>);
+pub struct Blocks(Arc<RwLock<IntMap<u32, Block>>>);
 
 impl Blocks {
     /// Initialize the block list and load the block textures

@@ -1,11 +1,12 @@
-use bevy::{prelude::AssetServer, utils::HashMap};
+use bevy::prelude::AssetServer;
 use log::error;
+use nohash_hasher::IntMap;
 
 use crate::systems::blocks::block::{voxel_type::VoxelType, Block};
 
 /// Insert a block into the block list
 fn insert_voxel(
-    blocks: &mut HashMap<u32, Block>,
+    blocks: &mut IntMap<u32, Block>,
     id: u32,
     name: &str,
     paths: &[&str],
@@ -23,7 +24,7 @@ fn insert_voxel(
 
 /// Insert a block with a voxel type into the block list
 fn insert_voxel_type(
-    blocks: &mut HashMap<u32, Block>,
+    blocks: &mut IntMap<u32, Block>,
     id: u32,
     name: &str,
     voxel_type: VoxelType,
@@ -42,7 +43,7 @@ fn insert_voxel_type(
 
 /// Insert a block with a voxel type into the block list
 fn insert_voxel_anim(
-    blocks: &mut HashMap<u32, Block>,
+    blocks: &mut IntMap<u32, Block>,
     id: u32,
     name: &str,
     voxel_type: VoxelType,
@@ -62,7 +63,7 @@ fn insert_voxel_anim(
 
 /// Insert a simple block into the block list
 fn insert_simple(
-    blocks: &mut HashMap<u32, Block>,
+    blocks: &mut IntMap<u32, Block>,
     id: u32,
     name: &str,
     dimensions: [f32; 6],
@@ -81,7 +82,7 @@ fn insert_simple(
 }
 
 /// TODO: Automatically generate this list
-pub(super) fn initialize(blocks: &mut HashMap<u32, Block>, assets: &AssetServer) {
+pub(super) fn initialize(blocks: &mut IntMap<u32, Block>, assets: &AssetServer) {
     insert_voxel_type(blocks, 0, "Air", VoxelType::Empty, &[], assets);
 
     insert_voxel(blocks, 1, "Stone", &["stone.png"], assets);
