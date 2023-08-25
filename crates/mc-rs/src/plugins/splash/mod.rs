@@ -19,13 +19,7 @@ pub struct SplashSet;
 
 impl Plugin for SplashPlugin {
     fn build(&self, app: &mut App) {
-        app.configure_set(
-            Update,
-            SplashSet
-                .run_if(in_state(ApplicationState::SplashScreen))
-                .in_set(MenuSet),
-        );
-
+        app.init_resource::<BlocksLoaded>();
         app.add_systems(Startup, SplashPlugin::load);
 
         app.add_systems(
@@ -33,11 +27,30 @@ impl Plugin for SplashPlugin {
             SplashPlugin::create,
         );
 
+        app.configure_set(
+            Update,
+            SplashSet
+                .run_if(in_state(ApplicationState::SplashScreen))
+                .in_set(MenuSet),
+        );
+
         app.add_systems(
             Update,
             SplashPlugin::next_state
                 .run_if(SplashPlugin::bar_finished)
                 .in_set(SplashSet),
+        );
+
+        app.add_systems(
+            Update,
+            (
+                BlocksLoaded::check_loaded.run_if(
+                    resource_exists::<BlocksLoaded>().and_then(not(BlocksLoaded::is_loaded)),
+                ),
+                BlocksLoaded::destroy
+                    .run_if(resource_exists::<BlocksLoaded>().and_then(BlocksLoaded::is_loaded)),
+            )
+                .in_set(MenuSet),
         );
 
         app.add_systems(
@@ -80,7 +93,7 @@ impl SplashPlugin {
             BarMax(time.elapsed_seconds() + 2.)
         } else {
             // Set the max to the number of blocks with textures
-            BarMax(blocks.blocks_with_textures())
+            BarMax(1.)
         };
         let entity = **root;
         commands.entity(entity).insert((BarValue::default(), max));
@@ -104,8 +117,8 @@ impl SplashPlugin {
                 <div class="splash">
                     <div class="splash-text">"Loading..."</div>
                     <br />
-                    <progressbar class="splash-bar" minimum=0. maximum={max.0}
-                        bind:value={from!(BlocksLoaded:get_percent()) * max.0}
+                    <progressbar class="splash-bar" minimum=0. maximum=1.
+                        bind:value=from!(BlocksLoaded:get_percent())
                         bind:value=to!(entity, BarValue:0)
                     />
                 </div>
@@ -141,4 +154,54 @@ impl SplashPlugin {
         commands.entity(**root).remove::<BarValue>();
         commands.entity(**root).remove::<BarMax>();
     }
+}
+
+/// A resource that is true when all blocks are loaded
+#[derive(Clone, Default, PartialEq, Resource, Deref, DerefMut)]
+pub struct BlocksLoaded {
+    #[deref]
+    pub bool: bool,
+    pub percent: f32,
+}
+
+impl BlocksLoaded {
+    /// A system that checks if all the block textures are loaded
+    /// and replaces any broken textures with the fallback
+    fn check_loaded(
+        mut blocks: ResMut<Blocks>,
+        mut loaded: ResMut<BlocksLoaded>,
+        assets: Res<AssetServer>,
+    ) {
+        if blocks.is_loaded(&assets) {
+            // Replace any failed textures with the error block texture
+            let fixed = blocks.replace_errors(&assets);
+
+            if fixed > 0 {
+                // TODO: Some sort of error popup?
+                error!("{fixed} blocks failed to load textures");
+            } else {
+                info!(
+                    "All blocks ({}) loaded successfully",
+                    blocks.read().unwrap().len()
+                );
+            }
+
+            // Set the blocks loaded resource to true
+            loaded.bool = true;
+            loaded.percent = 1.0;
+        } else {
+            let p = blocks.progress(&assets);
+            loaded.percent = p;
+
+            info!("Loaded {p}% of blocks");
+        }
+    }
+
+    fn destroy(mut commands: Commands) { commands.remove_resource::<BlocksLoaded>(); }
+
+    /// Get the percent of blocks loaded
+    pub fn get_percent(&self) -> f32 { self.percent }
+
+    /// Get if all blocks are loaded
+    pub fn is_loaded(loaded: Res<BlocksLoaded>) -> bool { loaded.bool }
 }

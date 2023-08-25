@@ -10,21 +10,7 @@ use super::block::{voxel_texture::VoxelTexture, voxel_type::VoxelType, Block, Bl
 mod list;
 
 /// Adds all block systems to the app
-pub(super) fn add_systems(app: &mut App) {
-    app.init_resource::<BlocksLoaded>();
-    app.add_systems(Startup, Blocks::init_blocks);
-
-    app.add_systems(
-        Update,
-        (
-            BlocksLoaded::check_loaded
-                .run_if(resource_exists::<BlocksLoaded>().and_then(not(BlocksLoaded::is_loaded))),
-            BlocksLoaded::destroy
-                .run_if(resource_exists::<BlocksLoaded>().and_then(BlocksLoaded::is_loaded)),
-        )
-            .in_set(MenuSet),
-    );
-}
+pub(super) fn add_systems(app: &mut App) { app.add_systems(Startup, Blocks::init_blocks); }
 
 #[derive(Clone, Default, Resource, Deref, DerefMut)]
 pub struct Blocks(Arc<RwLock<HashMap<u32, Block>>>);
@@ -128,51 +114,4 @@ impl Blocks {
 
         acc
     }
-}
-
-/// A resource that is true when all blocks are loaded
-#[derive(Clone, Default, PartialEq, Resource, Deref, DerefMut)]
-pub struct BlocksLoaded {
-    #[deref]
-    pub bool: bool,
-    pub percent: f32,
-}
-
-impl BlocksLoaded {
-    /// A system that checks if all the block textures are loaded
-    /// and replaces any broken textures with the fallback
-    fn check_loaded(
-        mut blocks: ResMut<Blocks>,
-        mut loaded: ResMut<BlocksLoaded>,
-        assets: Res<AssetServer>,
-    ) {
-        if blocks.is_loaded(&assets) {
-            // Replace any failed textures with the error block texture
-            let fixed = blocks.replace_errors(&assets);
-
-            if fixed > 0 {
-                // TODO: Some sort of error popup?
-                error!("{fixed} blocks failed to load textures");
-            } else {
-                info!(
-                    "All blocks ({}) loaded successfully",
-                    blocks.read().unwrap().len()
-                );
-            }
-
-            // Set the blocks loaded resource to true
-            loaded.bool = true;
-            loaded.percent = 1.0;
-        } else {
-            let p = blocks.progress(&assets);
-            loaded.percent = p;
-
-            info!("Loaded {p}% of blocks");
-        }
-    }
-
-    fn destroy(mut commands: Commands) { commands.remove_resource::<BlocksLoaded>(); }
-
-    /// Get if all blocks are loaded
-    pub fn is_loaded(loaded: Res<BlocksLoaded>) -> bool { loaded.bool }
 }
