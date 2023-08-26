@@ -5,7 +5,7 @@ use classfile::{
 use hashbrown::HashMap;
 use itertools::Itertools;
 use json::JsonValue;
-use log::error;
+use log::{error, warn};
 
 use crate::types::{ClassMap, Manifest, Version};
 
@@ -73,7 +73,7 @@ impl Dataset for BlockStates {
                         constant: LdcType::String(name),
                     })) = insns.get(index - 1)
                     else {
-                        error!("Could not get name for blockstate with kind {}", kind);
+                        error!("Could not get name for blockstate with class {}", kind);
                         continue;
                     };
 
@@ -83,9 +83,73 @@ impl Dataset for BlockStates {
                         error!("Could not find block {}", name);
                     }
                 }
-                Insn::Invoke(InvokeInsn { name: _name, .. }) => {
-                    // TODO: Map method names to block classes
-                    // Needed for blocks like candles, flowerpots, buttons, etc.
+                Insn::Invoke(InvokeInsn {
+                    class: class_name,
+                    name,
+                    ..
+                }) => {
+                    if class.this_class != *class_name
+                        || matches!(
+                            name.as_str(),
+                            // register()
+                            "method_9492"
+                            // createLightLevelFromLitBlockState()
+                            | "method_26107"
+                        )
+                    {
+                        continue;
+                    }
+
+                    // The number of instructions to go back to get the block name
+                    let insn_index = match name.as_str() {
+                        // createLogBlock()
+                        "method_26117" => 3,
+                        // createLeavesBlock()
+                        "method_26106" => 2,
+                        // createBedBlock()
+                        "method_26109" => 2,
+                        // createShulkerBoxBlock()
+                        "method_26110" => 5,
+                        // createBambooBlock()
+                        "method_47375" => 4,
+                        // createNetherStemBlock()
+                        "method_26115" => 2,
+                        // createPistonBlock()
+                        "method_26119" => 2,
+                        // createStainedBlassBlock()
+                        "method_26120" => 2,
+                        // createWoodenButtonBlock()
+                        "method_45451" => 4,
+                        // createStoneButtonBlock()
+                        "method_45453" => 1,
+                        // createFlowerPotBlock()
+                        "method_50000" => 4,
+                        // createCandleBlock()
+                        "method_50001" => 2,
+                        _ => {
+                            warn!("Unhandled invoke for method {}", name);
+                            2
+                        }
+                    };
+
+                    let Some(Insn::Ldc(LdcInsn {
+                        constant: LdcType::String(block_name),
+                    })) = insns.get(index - insn_index)
+                    else {
+                        error!("Could not get name for block with field {name}");
+                        continue;
+                    };
+
+                    let Some(class_name) = find_new_object(class, name) else {
+                        error!("Could not find class for block {}", block_name);
+                        continue;
+                    };
+
+                    if data["blocks"]["blocks"]["blocks"][block_name].is_object() {
+                        block_classes.insert(block_name, class_name);
+                    } else {
+                        error!("Could not find block {}", block_name);
+                    }
                 }
                 _ => {}
             }
@@ -120,12 +184,12 @@ fn get_class_info(class: &str, classmap: &ClassMap, data: &JsonValue) -> ClassIn
         let mut states = Vec::with_capacity(class.fields.len());
 
         for field in class.fields.iter() {
-            if field.name == "field_12196" {
-                // TODO: Figure out why this field isn't being resolved
-                states.push("FACING".to_owned());
-            } else if !PropertyType::TYPES.contains(&field.descriptor.as_str()) {
+            if !PropertyType::TYPES.contains(&field.descriptor.as_str()) {
                 // Skip fields that aren't state properties
                 continue;
+            } else if field.name == "field_12196" {
+                // TODO: Figure out why this field isn't being resolved
+                states.push("FACING".to_owned());
             } else if let Some(class) = get_field_class(&field.name, class, classmap, data) {
                 states.push(class);
             } else {
@@ -140,6 +204,7 @@ fn get_class_info(class: &str, classmap: &ClassMap, data: &JsonValue) -> ClassIn
     }
 }
 
+/// Returns the state property name for the given field
 fn get_field_class(
     field: &str,
     class: &ClassFile,
@@ -174,7 +239,7 @@ fn get_field_class(
                     .map(|s| s.to_owned());
             } else if let Some(class) = classmap.get(class) {
                 // If we don't know of the field, it's likely pointing to an abstract block class.
-                // Recurse through abstract block classes and get where that field points to.
+                // Recurse through the abstract block field and get where that field points to.
                 get_field_class(name, class, classmap, data)
             } else {
                 error!("Could not find state property {name} in class {class}");
@@ -186,6 +251,32 @@ fn get_field_class(
         }
     } else {
         error!("Could not find a PutFieldInsn for {field}");
+        None
+    }
+}
+
+/// Returns the class name of the first NewObjectInsn for the given method
+fn find_new_object(class: &ClassFile, method_name: &str) -> Option<String> {
+    let Some(method) = class.methods.iter().find(|&m| m.name == method_name) else {
+        return None;
+    };
+    let mut method = method.clone();
+
+    let Some(code) = method.code() else {
+        error!("Could not get code for {}", method_name);
+        return None;
+    };
+    let insns = &code.insns.insns;
+
+    // Get the first NewObjectInsn and return the class name
+    if let Some(insn) = insns.iter().find(|insn| matches!(insn, Insn::NewObject(_))) {
+        if let Insn::NewObject(NewObjectInsn { kind }) = insn {
+            Some(kind.clone())
+        } else {
+            unreachable!("NewObjectInsn was not a NewObjectInsn?")
+        }
+    } else {
+        error!("Could not find a NewObjectInsn for {}", method_name);
         None
     }
 }
