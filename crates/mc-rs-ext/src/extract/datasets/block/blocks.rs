@@ -119,6 +119,17 @@ impl Dataset for Blocks {
                             error!("Unable to get hardness for {}", block.name);
                         }
                     }
+                    // Friction (slipperiness)
+                    "method_9628" => {
+                        if let Some(Insn::Ldc(LdcInsn {
+                            constant: LdcType::Float(friction),
+                        })) = insns.get(index - 1)
+                        {
+                            block.friction = *friction;
+                        } else {
+                            error!("Unable to get friction for {}", block.name);
+                        }
+                    }
                     // No collision
                     "method_9634" => {
                         block.collidable = false;
@@ -155,8 +166,12 @@ impl Dataset for Blocks {
                         block.opaque = false;
                     }
                     // Air
-                    "method_25250" => {
+                    "method_26250" => {
                         block.is_air = true;
+                    }
+                    // Burnable
+                    "method_50013" => {
+                        block.burnable = true;
                     }
                     // Solid block
                     "method_51369" => {
@@ -177,6 +192,7 @@ impl Dataset for Blocks {
                     | "method_9637" | "method_29292" | "method_9564" | "method_26243"
                     | "method_26236" | "method_26235" | "method_31710" | "method_49229"
                     | "method_37362" | "method_9624" | "method_26249" | "method_26245" | "method_9617" | "method_37364"
+                    | "method_9595" | "method_11662" | "method_10205" | "method_26200"
                     | "method_9631"  // Luminance
                                      // 1.19.4
                     | "method_42327" // Drops nothing
@@ -198,6 +214,7 @@ impl Dataset for Blocks {
                     | "method_45451" // createWoodenButtonBlock
                     | "method_45453" // createStoneButtonBlock
                     | "method_26120" // createStainedGlassBlock
+                    | "method_50000" // createFlowerPotBlock
                     | "method_45477" // noBlockBreakParticles
                     | "method_26115" // createNetherStemBlock
                                      // 1.20.0
@@ -219,15 +236,15 @@ impl Dataset for Blocks {
 
         // Add a field mapping for the block names
         blocks.iter().for_each(|(key, block)| {
-            data["blocks"]["fields"][key.clone()] = block.name.clone().into();
+            data["blocks"]["blocks"]["fields"][key.clone()] = block.name.clone().into();
         });
 
         // Add the block name list
-        data["blocks"]["list"] = block_names.into();
+        data["blocks"]["blocks"]["list"] = block_names.into();
 
         // Add the block data
         blocks.values().for_each(|block| {
-            data["blocks"]["blocks"][block.name.clone()] = object! {
+            data["blocks"]["blocks"]["blocks"][block.name.clone()] = object! {
                 "id" => block.id,
                 "hardness" => block.hardness,
                 "resistance" => block.resistance,
@@ -254,6 +271,7 @@ pub struct Block {
     pub velocity_multiplier: f32,
     pub jump_velocity_multiplier: f32,
     pub random_ticks: bool,
+    pub burnable: bool,
     pub collidable: bool,
     pub opaque: bool,
     pub is_air: bool,
@@ -271,6 +289,7 @@ impl Default for Block {
             velocity_multiplier: 0.0,
             jump_velocity_multiplier: 0.0,
             random_ticks: false,
+            burnable: false,
             collidable: true,
             opaque: true,
             is_air: false,
