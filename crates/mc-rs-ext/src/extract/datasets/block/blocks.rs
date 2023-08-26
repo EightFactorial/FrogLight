@@ -119,9 +119,8 @@ impl Dataset for Blocks {
                             error!("Unable to get hardness for {}", block.name);
                         }
                     }
-                    // Fluid?
+                    // No collision
                     "method_9634" => {
-                        block.is_fluid = true;
                         block.collidable = false;
                         block.opaque = false;
                     }
@@ -159,13 +158,17 @@ impl Dataset for Blocks {
                     "method_25250" => {
                         block.is_air = true;
                     }
-                    // 1.20 - Solid block
+                    // Solid block
                     "method_51369" => {
                         block.collidable = true;
                     }
-                    // 1.20 - Non-solid block
+                    // Non-solid block
                     "method_51370" => {
                         block.collidable = false;
+                    }
+                    // Liquid
+                    "method_51177" => {
+                        block.is_fluid = true;
                     }
 
                     // Ignore these methods, we don't care about them
@@ -198,7 +201,6 @@ impl Dataset for Blocks {
                     | "method_45477" // noBlockBreakParticles
                     | "method_26115" // createNetherStemBlock
                                      // 1.20.0
-                    | "method_51177" // liquid
                     | "method_51368" // instrument
                     | "method_50012" // pistonBehavior
                     | "method_51371" // replaceable
