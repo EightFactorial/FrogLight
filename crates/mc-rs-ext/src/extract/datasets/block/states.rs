@@ -73,6 +73,7 @@ impl Dataset for States {
                         key,
                         Property {
                             kind,
+                            field: name.to_string(),
                             constant: std::mem::take(&mut constant),
                             class: std::mem::take(&mut class),
                         },
@@ -81,6 +82,10 @@ impl Dataset for States {
                 _ => {}
             }
         }
+
+        properties.iter().for_each(|(key, prop)| {
+            data["blocks"]["states"]["fields"][prop.field.clone()] = key.clone().into();
+        });
 
         data["blocks"]["states"]["list"] = properties.keys().cloned().collect_vec().into();
 
@@ -108,7 +113,7 @@ impl Dataset for States {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Display)]
 #[strum(serialize_all = "lowercase")]
-enum PropertyType {
+pub(super) enum PropertyType {
     Boolean,
     Direction,
     Enum,
@@ -117,19 +122,25 @@ enum PropertyType {
 }
 
 impl PropertyType {
+    pub const TYPES: &'static [&'static str] = &[
+        "Lnet/minecraft/class_2746;",
+        "Lnet/minecraft/class_2753;",
+        "Lnet/minecraft/class_2754;",
+        "Lnet/minecraft/class_2758;",
+    ];
+
     fn from_descriptor(descriptor: &str) -> Self {
-        match descriptor
-            .trim_start_matches("Lnet/minecraft/")
-            .trim_end_matches(';')
-        {
-            "class_2746" => Self::Boolean,
-            "class_2753" => Self::Direction,
-            "class_2754" => Self::Enum,
-            "class_2758" => Self::Integer,
-            unk => {
-                warn!("Unknown property type: {}", unk);
-                Self::Unknown(unk.to_owned())
+        if let Some(index) = Self::TYPES.iter().position(|&t| t == descriptor) {
+            match index {
+                0 => Self::Boolean,
+                1 => Self::Direction,
+                2 => Self::Enum,
+                3 => Self::Integer,
+                _ => unreachable!(),
             }
+        } else {
+            warn!("Unknown property type: {}", descriptor);
+            Self::Unknown(descriptor.to_owned())
         }
     }
 }
@@ -137,6 +148,7 @@ impl PropertyType {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Property {
     kind: PropertyType,
+    field: String,
     constant: String,
     class: Option<String>,
 }
