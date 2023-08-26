@@ -116,6 +116,24 @@ enum PropertyType {
     Unknown(String),
 }
 
+impl PropertyType {
+    fn from_descriptor(descriptor: &str) -> Self {
+        match descriptor
+            .trim_start_matches("Lnet/minecraft/")
+            .trim_end_matches(';')
+        {
+            "class_2746" => Self::Boolean,
+            "class_2753" => Self::Direction,
+            "class_2754" => Self::Enum,
+            "class_2758" => Self::Integer,
+            unk => {
+                warn!("Unknown property type: {}", unk);
+                Self::Unknown(unk.to_owned())
+            }
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct Property {
     kind: PropertyType,
@@ -257,24 +275,6 @@ impl Property {
             _ => {
                 warn!("Unknown block state: {}", field);
                 field
-            }
-        }
-    }
-}
-
-impl PropertyType {
-    fn from_descriptor(descriptor: &str) -> Self {
-        match descriptor
-            .trim_start_matches("Lnet/minecraft/")
-            .trim_end_matches(';')
-        {
-            "class_2746" => Self::Boolean,
-            "class_2753" => Self::Direction,
-            "class_2754" => Self::Enum,
-            "class_2758" => Self::Integer,
-            unk => {
-                warn!("Unknown property type: {}", unk);
-                Self::Unknown(unk.to_owned())
             }
         }
     }
