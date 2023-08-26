@@ -49,7 +49,7 @@ impl Dataset for States {
 
         let mut properties = BTreeMap::new();
         let mut constant = String::new();
-        let mut class = Option::<String>::default();
+        let mut class = Option::<PropertyClass>::default();
 
         for insn in insns.iter() {
             match insn {
@@ -61,7 +61,10 @@ impl Dataset for States {
                 Insn::Ldc(LdcInsn {
                     constant: LdcType::Class(kind),
                 }) => {
-                    class = Some(kind.clone());
+                    class = Some(PropertyClass {
+                        kind: kind.to_string(),
+                        values: PropertyClass::get_enum_values(kind, classmap),
+                    });
                 }
                 Insn::PutField(PutFieldInsn {
                     name, descriptor, ..
@@ -92,10 +95,30 @@ impl Dataset for States {
         for (key, prop) in properties {
             let obj = match prop.kind {
                 PropertyType::Enum => {
+                    let class = prop.class.unwrap();
+
+                    let mut values = JsonValue::new_object();
+                    for (key, value) in class.values {
+                        values[key] = value.into();
+                    }
+
                     json::object! {
                         "type": prop.kind.to_string(),
                         "constant": prop.constant,
-                        "class": prop.class.unwrap(),
+                        "class": class.kind,
+                        "values": values
+                    }
+                }
+                PropertyType::Direction => {
+                    let mut values = JsonValue::new_object();
+                    for value in PropertyType::DIRECTIONS {
+                        values[value.to_string()] = value.to_ascii_lowercase().into();
+                    }
+
+                    json::object! {
+                        "type": prop.kind.to_string(),
+                        "constant": prop.constant,
+                        "values": values
                     }
                 }
                 _ => {
@@ -129,6 +152,9 @@ impl PropertyType {
         "Lnet/minecraft/class_2758;",
     ];
 
+    pub const DIRECTIONS: &'static [&'static str] =
+        &["DOWN", "UP", "NORTH", "SOUTH", "WEST", "EAST"];
+
     fn from_descriptor(descriptor: &str) -> Self {
         if let Some(index) = Self::TYPES.iter().position(|&t| t == descriptor) {
             match index {
@@ -150,7 +176,13 @@ struct Property {
     kind: PropertyType,
     field: String,
     constant: String,
-    class: Option<String>,
+    class: Option<PropertyClass>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+struct PropertyClass {
+    kind: String,
+    values: Vec<(String, String)>,
 }
 
 impl Property {
@@ -294,4 +326,59 @@ impl Property {
 
 impl Default for PropertyType {
     fn default() -> Self { Self::Unknown(String::new()) }
+}
+
+impl PropertyClass {
+    fn get_enum_values(kind: &str, classmap: &ClassMap) -> Vec<(String, String)> {
+        let Some(class) = classmap.get(kind) else {
+            error!("Could not find class {}", kind);
+            return Vec::new();
+        };
+
+        let Some(method) = class.methods.iter().find(|&m| m.name == "<clinit>") else {
+            error!("Could not find method <clinit> in class {}", kind);
+            return Vec::new();
+        };
+        let mut method = method.clone();
+
+        let Some(code) = method.code() else {
+            error!("Could not get code for method <clinit> in class {}", kind);
+            return Vec::new();
+        };
+        let insns = &code.insns.insns;
+
+        let mut values = Vec::new();
+
+        let mut name = String::new();
+        let mut value = String::new();
+
+        for insn in insns.iter() {
+            match insn {
+                Insn::Ldc(LdcInsn {
+                    constant: LdcType::String(string),
+                }) => {
+                    if name.is_empty() {
+                        name = string.clone();
+                    } else if value.is_empty() {
+                        value = string.clone();
+                    } else {
+                        warn!("Unknown enum value: {}", string);
+                    }
+                }
+                Insn::PutField(PutFieldInsn { class, .. }) => {
+                    if kind != class {
+                        continue;
+                    } else if !name.is_empty() && value.is_empty() {
+                        let value = name.to_ascii_lowercase();
+                        values.push((std::mem::take(&mut name), value));
+                    } else if !name.is_empty() && !value.is_empty() {
+                        values.push((std::mem::take(&mut name), std::mem::take(&mut value)));
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        values
+    }
 }
