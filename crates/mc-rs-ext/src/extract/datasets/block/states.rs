@@ -30,22 +30,14 @@ impl Dataset for States {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get(Self::CLASS) else {
-            error!("Could not find class {}", Self::CLASS);
+        let Some(insns) = Datasets::get_code(Self::METHOD, Self::CLASS, classmap) else {
+            error!(
+                "Could not get code for method {} in class {}",
+                Self::METHOD,
+                Self::CLASS
+            );
             return;
         };
-
-        let Some(method) = class.methods.iter().find(|&m| m.name == Self::METHOD) else {
-            error!("Could not find method {}", Self::METHOD);
-            return;
-        };
-        let mut method = method.clone();
-
-        let Some(code) = method.code() else {
-            error!("Could not get code for method {}", Self::METHOD);
-            return;
-        };
-        let insns = &code.insns.insns;
 
         let mut properties = BTreeMap::new();
         let mut constant = String::new();
@@ -330,22 +322,10 @@ impl Default for PropertyType {
 
 impl PropertyClass {
     fn get_enum_values(kind: &str, classmap: &ClassMap) -> Vec<(String, String)> {
-        let Some(class) = classmap.get(kind) else {
-            error!("Could not find class {}", kind);
+        let Some(insns) = Datasets::get_code("<clinit>", kind, classmap) else {
+            error!("Could not get code for class {kind}");
             return Vec::new();
         };
-
-        let Some(method) = class.methods.iter().find(|&m| m.name == "<clinit>") else {
-            error!("Could not find method <clinit> in class {}", kind);
-            return Vec::new();
-        };
-        let mut method = method.clone();
-
-        let Some(code) = method.code() else {
-            error!("Could not get code for method <clinit> in class {}", kind);
-            return Vec::new();
-        };
-        let insns = &code.insns.insns;
 
         let mut values = Vec::new();
 

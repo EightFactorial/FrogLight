@@ -29,19 +29,12 @@ impl Dataset for Packets {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get(Self::CLASS) else {
-            error!("Failed to find Packets class");
-            return;
-        };
-
-        let Some(method) = class.methods.iter().find(|m| m.name == Self::METHOD) else {
-            error!("Failed to find Packets.{}", Self::METHOD);
-            return;
-        };
-
-        let mut method = method.clone();
-        let Some(code) = method.code() else {
-            error!("Failed to find Packets.{} code", Self::METHOD);
+        let Some(insns) = Datasets::get_code(Self::METHOD, Self::CLASS, classmap) else {
+            error!(
+                "Could not get code for method {} in class {}",
+                Self::METHOD,
+                Self::CLASS
+            );
             return;
         };
 
@@ -52,7 +45,7 @@ impl Dataset for Packets {
         let mut states = Vec::new();
         let mut prev_insn: Option<Insn> = None;
 
-        for insn in code.insns.iter() {
+        for insn in insns.iter() {
             match insn {
                 Insn::Ldc(LdcInsn { constant }) => {
                     if let LdcType::Int(int) = constant {

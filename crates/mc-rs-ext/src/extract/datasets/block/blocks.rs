@@ -28,22 +28,14 @@ impl Dataset for Blocks {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get(Self::CLASS) else {
-            error!("Could not find class {}", Self::CLASS);
+        let Some(insns) = Datasets::get_code(Self::METHOD, Self::CLASS, classmap) else {
+            error!(
+                "Could not get code for method {} in class {}",
+                Self::METHOD,
+                Self::CLASS
+            );
             return;
         };
-
-        let Some(method) = class.methods.iter().find(|&m| m.name == Self::METHOD) else {
-            error!("Could not find method {}", Self::METHOD);
-            return;
-        };
-        let mut method = method.clone();
-
-        let Some(code) = method.code() else {
-            error!("Could not get code for method {}", Self::METHOD);
-            return;
-        };
-        let insns = &code.insns.insns;
 
         let mut blocks = BTreeMap::new();
         let mut block_names = Vec::with_capacity(1024);
@@ -302,11 +294,11 @@ impl Dataset for Blocks {
         blocks.values().for_each(|block| {
             data["blocks"]["blocks"]["blocks"][block.name.clone()] = object! {
                 "id" => block.id,
-                "hardness" => block.hardness,
-                "resistance" => block.resistance,
-                "friction" => block.friction,
-                "velocity_multiplier" => block.velocity_multiplier,
-                "jump_velocity_multiplier" => block.jump_velocity_multiplier,
+                "hardness" => Datasets::round_float(block.hardness.into()),
+                "resistance" => Datasets::round_float(block.resistance.into()),
+                "friction" => Datasets::round_float(block.friction.into()),
+                "velocity_multiplier" => Datasets::round_float(block.velocity_multiplier.into()),
+                "jump_velocity_multiplier" => Datasets::round_float(block.jump_velocity_multiplier.into()),
                 "random_ticks" => block.random_ticks,
                 "burnable" => block.burnable,
                 "collidable" => block.collidable,

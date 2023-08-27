@@ -1,7 +1,9 @@
 use std::fmt::Debug;
 
+use classfile::ast::Insn;
 use enum_dispatch::enum_dispatch;
 use json::JsonValue;
+use log::error;
 use strum::{Display, EnumIter, EnumString};
 
 use crate::types::{ClassMap, Manifest, Version};
@@ -37,6 +39,31 @@ pub enum Datasets {
     Armor(item::Armor),
 }
 
+impl Datasets {
+    /// Round a float to at most 3 decimals
+    pub fn round_float(float: f64) -> f64 { (float * 1000.0).round() / 1000.0 }
+
+    /// Get the code for a class method
+    pub fn get_code(method: &str, class: &str, classmap: &ClassMap) -> Option<Vec<Insn>> {
+        let Some(class_file) = classmap.get(class) else {
+            error!("Could not find class {class}");
+            return None;
+        };
+
+        let Some(class_method) = class_file.methods.iter().find(|&m| m.name == method) else {
+            error!("Could not find method {method} in class {class}");
+            return None;
+        };
+
+        let Some(code) = class_method.clone().code().cloned() else {
+            error!("Could not get code for method {method} in class {class}");
+            return None;
+        };
+
+        Some(code.insns.insns)
+    }
+}
+
 /// The datasets that can be extracted
 ///
 /// This trait is implemented for each dataset and is used to extract the data from the jar file
@@ -57,10 +84,6 @@ pub trait Dataset: Debug {
         data: &mut JsonValue,
     );
 }
-
-/// Round a float to at most 3 decimals
-#[inline]
-fn round_float(float: f64) -> f64 { (float * 1000.0).round() / 1000.0 }
 
 // Dataset template:
 //

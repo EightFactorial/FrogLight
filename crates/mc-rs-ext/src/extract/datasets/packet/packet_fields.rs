@@ -71,7 +71,7 @@ impl PacketFields {
                 continue;
             };
 
-            data["packets"]["fields"][class.this_class.clone()] = fields.into();
+            data["packets"]["components"][class.this_class.clone()] = fields.into();
         }
     }
 

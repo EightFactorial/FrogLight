@@ -6,7 +6,7 @@ use json::JsonValue;
 use log::error;
 
 use crate::{
-    extract::datasets::{round_float, sound::SoundEvents},
+    extract::datasets::sound::SoundEvents,
     types::{ClassMap, Manifest, Version},
 };
 
@@ -38,26 +38,19 @@ impl Dataset for Armor {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get(Self::CLASS) else {
-            error!("Failed to find ArmorMaterial class");
-            return;
-        };
-
-        let Some(method) = class.methods.iter().find(|m| m.name == Self::METHOD) else {
-            error!("Failed to find ArmorMaterial.{}", Self::METHOD);
-            return;
-        };
-
-        let mut method = method.clone();
-        let Some(code) = method.code() else {
-            error!("Failed to find ArmorMaterial.{} code", Self::METHOD);
+        let Some(insns) = Datasets::get_code(Self::METHOD, Self::CLASS, classmap) else {
+            error!(
+                "Could not get code for method {} in class {}",
+                Self::METHOD,
+                Self::CLASS
+            );
             return;
         };
 
         let mut material = Material::default();
         let mut materials: Vec<Material> = Vec::new();
 
-        for insn in code.insns.iter() {
+        for insn in insns.iter() {
             match &insn {
                 Insn::Ldc(LdcInsn { constant }) => match constant {
                     LdcType::String(s) => {
@@ -99,10 +92,10 @@ impl Dataset for Armor {
                         // }
                     }
                     LdcType::Float(f) => {
-                        if material.toughness == f64::MIN {
-                            material.toughness = round_float(*f as f64);
-                        } else if material.knockback_resistance == f64::MIN {
-                            material.knockback_resistance = round_float(*f as f64);
+                        if material.toughness == f32::MIN {
+                            material.toughness = *f;
+                        } else if material.knockback_resistance == f32::MIN {
+                            material.knockback_resistance = *f;
                         }
                     }
                     _ => {}
@@ -143,8 +136,8 @@ impl Dataset for Armor {
                     "durability_multiplier": material.durability_multiplier,
                     "enchantability": material.enchantability,
                     "equip_sound": material.equip_sound,
-                    "toughness": material.toughness,
-                    "knockback_resistance": material.knockback_resistance,
+                    "toughness": Datasets::round_float(material.toughness.into()),
+                    "knockback_resistance": Datasets::round_float(material.knockback_resistance.into()),
                 };
             }
         }
@@ -163,8 +156,8 @@ struct Material {
     // protection_amounts: [i32; 4],
     enchantability: i32,
     equip_sound: String,
-    toughness: f64,
-    knockback_resistance: f64,
+    toughness: f32,
+    knockback_resistance: f32,
     // repair_ingredient: String,
 }
 
@@ -177,8 +170,8 @@ impl Default for Material {
             // protection_amounts: [i32::MIN; 4],
             enchantability: i32::MIN,
             equip_sound: Default::default(),
-            toughness: f64::MIN,
-            knockback_resistance: f64::MIN,
+            toughness: f32::MIN,
+            knockback_resistance: f32::MIN,
             // repair_ingredient: Default::default(),
         }
     }

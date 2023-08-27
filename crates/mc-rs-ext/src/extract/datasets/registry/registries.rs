@@ -29,26 +29,19 @@ impl Dataset for Registry {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get(Self::CLASS) else {
-            error!("Failed to find Registry class");
-            return;
-        };
-
-        let Some(method) = class.methods.iter().find(|m| m.name == Self::METHOD) else {
-            error!("Failed to find Registry.{}", Self::METHOD);
-            return;
-        };
-
-        let mut method = method.clone();
-        let Some(code) = method.code() else {
-            error!("Failed to find Registry.{} code", Self::METHOD);
+        let Some(insns) = Datasets::get_code(Self::METHOD, Self::CLASS, classmap) else {
+            error!(
+                "Could not get code for method {} in class {}",
+                Self::METHOD,
+                Self::CLASS
+            );
             return;
         };
 
         let mut vec = Vec::new();
         let mut constant = String::new();
 
-        for insn in code.insns.iter() {
+        for insn in insns.iter() {
             match insn {
                 Insn::Ldc(LdcInsn {
                     constant: LdcType::String(s),
@@ -67,7 +60,7 @@ impl Dataset for Registry {
         // Add registry map
         {
             for (constant, name) in vec.clone().into_iter().sorted_by(|(_, a), (_, b)| a.cmp(b)) {
-                data["registry"]["map"][name] = constant.into();
+                data["registry"]["fields"][name] = constant.into();
             }
         }
 

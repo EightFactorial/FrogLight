@@ -28,25 +28,18 @@ impl Dataset for SerializableRegistry {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get(SerializableRegistry::CLASS) else {
-            error!("Failed to find SerializableRegistry class");
-            return;
-        };
-
-        let Some(method) = class.methods.iter().find(|m| m.name == Self::METHOD) else {
-            error!("Failed to find SerializableRegistry.{}", Self::METHOD);
-            return;
-        };
-
-        let mut method = method.clone();
-        let Some(code) = method.code() else {
-            error!("Failed to find SerializableRegistry.{} code", Self::METHOD);
+        let Some(insns) = Datasets::get_code(Self::METHOD, Self::CLASS, classmap) else {
+            error!(
+                "Could not get code for method {} in class {}",
+                Self::METHOD,
+                Self::CLASS
+            );
             return;
         };
 
         data["registry"]["serializable"] = JsonValue::new_array();
 
-        for insn in code.insns.iter() {
+        for insn in insns.iter() {
             if let Insn::GetField(GetFieldInsn { class, name, .. }) = insn {
                 if class == Registry::CLASS && data["registry"]["map"].has_key(name) {
                     // Get the registry name

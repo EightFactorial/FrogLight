@@ -33,22 +33,14 @@ impl Dataset for BlockStates {
         classmap: &ClassMap,
         data: &mut JsonValue,
     ) {
-        let Some(class) = classmap.get(Self::CLASS) else {
-            error!("Could not find class {}", Self::CLASS);
+        let Some(insns) = Datasets::get_code(Self::METHOD, Self::CLASS, classmap) else {
+            error!(
+                "Could not get code for method {} in class {}",
+                Self::METHOD,
+                Self::CLASS
+            );
             return;
         };
-
-        let Some(method) = class.methods.iter().find(|&m| m.name == Self::METHOD) else {
-            error!("Could not find method {}", Self::METHOD);
-            return;
-        };
-        let mut method = method.clone();
-
-        let Some(code) = method.code() else {
-            error!("Could not get code for method {}", Self::METHOD);
-            return;
-        };
-        let insns = &code.insns.insns;
 
         // Get the NewObjectInsn class for each block class
         let mut block_classes = HashMap::with_capacity(1024);
@@ -88,7 +80,7 @@ impl Dataset for BlockStates {
                     name,
                     ..
                 }) => {
-                    if class.this_class != *class_name
+                    if *class_name != Self::CLASS
                         || matches!(
                             name.as_str(),
                             // register()
@@ -140,7 +132,7 @@ impl Dataset for BlockStates {
                         continue;
                     };
 
-                    let Some(class_name) = find_new_object(class, name) else {
+                    let Some(class_name) = find_new_object(class_name, name, classmap) else {
                         error!("Could not find class for block {}", block_name);
                         continue;
                     };
@@ -256,17 +248,8 @@ fn get_field_class(
 }
 
 /// Returns the class name of the first NewObjectInsn for the given method
-fn find_new_object(class: &ClassFile, method_name: &str) -> Option<String> {
-    let Some(method) = class.methods.iter().find(|&m| m.name == method_name) else {
-        return None;
-    };
-    let mut method = method.clone();
-
-    let Some(code) = method.code() else {
-        error!("Could not get code for {}", method_name);
-        return None;
-    };
-    let insns = &code.insns.insns;
+fn find_new_object(class: &str, method: &str, classmap: &ClassMap) -> Option<String> {
+    let insns = Datasets::get_code(method, class, classmap)?;
 
     // Get the first NewObjectInsn and return the class name
     if let Some(insn) = insns.iter().find(|insn| matches!(insn, Insn::NewObject(_))) {
@@ -276,7 +259,7 @@ fn find_new_object(class: &ClassFile, method_name: &str) -> Option<String> {
             unreachable!("NewObjectInsn was not a NewObjectInsn?")
         }
     } else {
-        error!("Could not find a NewObjectInsn for {}", method_name);
+        error!("Could not find a NewObjectInsn for {}", method);
         None
     }
 }
