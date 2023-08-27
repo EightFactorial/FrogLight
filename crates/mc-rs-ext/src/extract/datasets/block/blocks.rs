@@ -185,6 +185,73 @@ impl Dataset for Blocks {
                     "method_51177" => {
                         block.is_fluid = true;
                     }
+                     // createLogBlock
+                    "method_26117" => {
+                        block.hardness = 2.0;
+                        block.resistance = 2.0;
+                        block.burnable = true;
+                    }
+                    // createBambooBlock
+                    "method_47375" => {
+                        block.hardness = 2.0;
+                        block.resistance = 2.0;
+                        block.burnable = true;
+                    }
+                    // createLeavesBlock
+                    "method_26106" => {
+                        block.hardness = 0.2;
+                        block.resistance = 0.2;
+                        block.burnable = true;
+                        block.opaque = false;
+                        block.random_ticks = true;
+                    }
+                    // createBedBlock
+                    "method_26109"  => {
+                        block.hardness = 0.2;
+                        block.resistance = 0.2;
+                        block.opaque = false;
+                    }
+                    // createPistonBlock
+                    "method_26119"  => {
+                        block.hardness = 1.5;
+                        block.resistance = 1.5;
+                    }
+                    // createShulkerBoxBlock
+                    "method_26110" => {
+                        block.hardness = 2.0;
+                        block.resistance = 2.0;
+                        block.opaque = false;
+                    }
+                    // createWoodenButtonBlock
+                    "method_45451" => {
+                        block.hardness = 0.5;
+                        block.resistance = 0.5;
+                        block.collidable = false;
+                    }
+                    // createStoneButtonBlock
+                    "method_45453" => {
+                        block.hardness = 0.5;
+                        block.resistance = 0.5;
+                        block.collidable = false;
+                    }
+                    // createStainedGlassBlock
+                    "method_26120" => {
+                        block.hardness = 0.3;
+                        block.resistance = 0.3;
+                        block.opaque = false;
+                    }
+                    // createFlowerPotBlock
+                    "method_50000" => {
+                        block.hardness = 0.0;
+                        block.resistance = 0.0;
+                        block.opaque = false;
+                    }
+                    // createCandleBlock
+                    "method_50001" => {
+                        block.hardness = 0.1;
+                        block.resistance = 0.1;
+                        block.opaque = false;
+                    }
 
                     // Ignore these methods, we don't care about them
                     // TODO: Document what these methods do
@@ -196,12 +263,7 @@ impl Dataset for Blocks {
                     | "method_9631"  // Luminance
                                      // 1.19.4
                     | "method_42327" // Drops nothing
-                    | "method_26117" // createLogBlock
-                    | "method_47375" // createBambooBlock
-                    | "method_26106" // createLeavesBlock
                     | "method_35017" // create?
-                    | "method_26109" // createBedBlock
-                    | "method_26119" // createPistonBlock
                     | "method_26107" // createLightLevelFromLitBlockState
                     | "method_26247" // postProcess
                     | "method_16228" // dropsLike
@@ -210,11 +272,6 @@ impl Dataset for Blocks {
                     | "method_32913" // getMaxHorizontalModelOffset
                     | "method_36555" // getHardness
                     | "method_37247" // getVerticalModelOffsetMultiplier
-                    | "method_26110" // createShulkerBoxBlock
-                    | "method_45451" // createWoodenButtonBlock
-                    | "method_45453" // createStoneButtonBlock
-                    | "method_26120" // createStainedGlassBlock
-                    | "method_50000" // createFlowerPotBlock
                     | "method_45477" // noBlockBreakParticles
                     | "method_26115" // createNetherStemBlock
                                      // 1.20.0
@@ -222,7 +279,6 @@ impl Dataset for Blocks {
                     | "method_50012" // pistonBehavior
                     | "method_51371" // replaceable
                     | "method_51517" // mapColor
-                    | "method_50001" // createCandleBlock
                     | "<init>" => {}
                     _ => {
                         if name.starts_with("method") {
@@ -252,6 +308,7 @@ impl Dataset for Blocks {
                 "velocity_multiplier" => block.velocity_multiplier,
                 "jump_velocity_multiplier" => block.jump_velocity_multiplier,
                 "random_ticks" => block.random_ticks,
+                "burnable" => block.burnable,
                 "collidable" => block.collidable,
                 "opaque" => block.opaque,
                 "is_air" => block.is_air,
@@ -285,9 +342,9 @@ impl Default for Block {
             id: u32::MAX,
             hardness: 0.0,
             resistance: 0.0,
-            friction: 0.0,
-            velocity_multiplier: 0.0,
-            jump_velocity_multiplier: 0.0,
+            friction: 0.6,
+            velocity_multiplier: 1.0,
+            jump_velocity_multiplier: 1.0,
             random_ticks: false,
             burnable: false,
             collidable: true,
