@@ -103,7 +103,7 @@ impl Dataset for Blocks {
                             error!("Unable to get hardness for {}", block.name);
                         }
                     }
-                    // Reset hardness and resistance
+                    // Break instantly
                     "method_9618" => {
                         block.resistance = 0.0;
                         block.hardness = 0.0;
@@ -135,7 +135,7 @@ impl Dataset for Blocks {
                         block.collidable = false;
                         block.opaque = false;
                     }
-                    // Growable?
+                    // Ticks randomly
                     "method_9640" => {
                         block.random_ticks = true;
                     }
@@ -161,7 +161,7 @@ impl Dataset for Blocks {
                             error!("Unable to get jump velocity multiplier for {}", block.name);
                         }
                     }
-                    // Transparent?
+                    // Non-opaque
                     "method_22488" => {
                         block.opaque = false;
                     }
