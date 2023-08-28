@@ -119,7 +119,8 @@ impl BlockAttributes {
             let kind = match value["type"].as_str().unwrap() {
                 "boolean" => "bool".to_string(),
                 "integer" => "i32".to_string(),
-                "direction" | "enum" => Self::attribute_name(&name),
+                "direction" => Self::attribute_name("Direction"),
+                "enum" => Self::attribute_name(&name),
                 _ => unreachable!("Unknown kind"),
             };
             let kind_ident = Ident::new(&kind, Span::call_site());
@@ -143,7 +144,7 @@ impl BlockAttributes {
         let states = &data["blocks"]["states"]["states"];
         states.entries().for_each(|(name, value)| {
             let kind = value["type"].as_str().unwrap();
-            if !matches!(kind, "direction" | "enum") {
+            if !matches!(kind, "enum") {
                 return;
             }
 
@@ -153,6 +154,21 @@ impl BlockAttributes {
             // Create the enum
             code.items.push(Self::create_enum(name_ident, value));
         });
+
+        // Also create the `DirectionAttribute` enum
+        code.items.push(Self::create_enum(
+            Ident::new(&Self::attribute_name("Direction"), Span::call_site()),
+            &json::object! {
+                "values": {
+                    "down": {},
+                    "up": {},
+                    "north": {},
+                    "south": {},
+                    "west": {},
+                    "east": {},
+                }
+            },
+        ));
     }
 
     /// Creates an attribute enum with the given name and data.

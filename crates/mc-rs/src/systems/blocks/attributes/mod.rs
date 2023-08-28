@@ -46,7 +46,7 @@ pub struct BlockAttributes {
     pub enabled: Option<bool>,
     pub extended: Option<bool>,
     pub eye: Option<bool>,
-    pub facing: Option<FacingAttribute>,
+    pub facing: Option<DirectionAttribute>,
     pub falling: Option<bool>,
     pub flower_amount: Option<i32>,
     pub hanging: Option<bool>,
@@ -57,9 +57,9 @@ pub struct BlockAttributes {
     pub has_record: Option<bool>,
     pub hatch: Option<i32>,
     pub honey_level: Option<i32>,
-    pub hopper_facing: Option<HopperFacingAttribute>,
+    pub hopper_facing: Option<DirectionAttribute>,
     pub horizontal_axis: Option<HorizontalAxisAttribute>,
-    pub horizontal_facing: Option<HorizontalFacingAttribute>,
+    pub horizontal_facing: Option<DirectionAttribute>,
     pub instrument: Option<InstrumentAttribute>,
     pub inverted: Option<bool>,
     pub in_wall: Option<bool>,
@@ -109,7 +109,7 @@ pub struct BlockAttributes {
     pub triggered: Option<bool>,
     pub unstable: Option<bool>,
     pub up: Option<bool>,
-    pub vertical_direction: Option<VerticalDirectionAttribute>,
+    pub vertical_direction: Option<DirectionAttribute>,
     pub wall_mount_location: Option<WallMountLocationAttribute>,
     pub waterlogged: Option<bool>,
     pub west: Option<bool>,
@@ -179,37 +179,10 @@ pub enum EastWireConnectionAttribute {
     None,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum FacingAttribute {
-    Down,
-    Up,
-    North,
-    South,
-    West,
-    East,
-}
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum HopperFacingAttribute {
-    Down,
-    Up,
-    North,
-    South,
-    West,
-    East,
-}
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum HorizontalAxisAttribute {
     X,
     Y,
     Z,
-}
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum HorizontalFacingAttribute {
-    Down,
-    Up,
-    North,
-    South,
-    West,
-    East,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum InstrumentAttribute {
@@ -350,15 +323,6 @@ pub enum TiltAttribute {
     Full,
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum VerticalDirectionAttribute {
-    Down,
-    Up,
-    North,
-    South,
-    West,
-    East,
-}
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum WallMountLocationAttribute {
     Floor,
     Wall,
@@ -375,4 +339,13 @@ pub enum WestWireConnectionAttribute {
     Up,
     Side,
     None,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum DirectionAttribute {
+    Down,
+    Up,
+    North,
+    South,
+    West,
+    East,
 }
