@@ -40,12 +40,6 @@ impl Generator for BlockAttributes {
             return;
         }
 
-        Self::block_attributes(path.clone(), data);
-    }
-}
-
-impl BlockAttributes {
-    fn block_attributes(mut path: PathBuf, data: &JsonValue) {
         // Get the block attributes module
         path.push("src/systems/blocks/attributes/mod.rs");
         if !path.exists() {
@@ -110,7 +104,9 @@ impl BlockAttributes {
             error!("Failed to write `attributes.rs`, {}", e);
         }
     }
+}
 
+impl BlockAttributes {
     /// Generates the fields for the `BlockAttributes` struct.
     fn blockattributes_fields(data: &JsonValue) -> Fields {
         let mut named = Punctuated::new();
