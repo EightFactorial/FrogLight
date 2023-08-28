@@ -6,7 +6,7 @@ use nohash_hasher::IntMap;
 
 use super::block::{voxel_texture::VoxelTexture, voxel_type::VoxelType, Block, BlockType};
 
-mod list;
+mod init;
 
 /// Adds all block systems to the app
 pub(super) fn add_systems(app: &mut App) { app.add_systems(Startup, Blocks::init_blocks); }
@@ -36,7 +36,7 @@ impl Blocks {
         // Initialize the block list
         {
             let mut write = blocks.write().unwrap();
-            list::initialize(&mut write, &assets);
+            init::initialize(&mut write, &assets);
         }
 
         commands.insert_resource(blocks);

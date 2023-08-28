@@ -13,7 +13,7 @@ use mc_rs_proto::{
     },
 };
 
-use crate::systems::blocks::block_list::Blocks;
+use crate::systems::blocks::list::Blocks;
 
 use super::{
     global_palette::GlobalPalette, section::Section, task::ChunkTask, WorldType, Worlds,

@@ -5,7 +5,7 @@ use crate::{
     interface::menus::MenuRoot,
     systems::{
         app_state::{ApplicationState, InMenuSet, MenuSet},
-        blocks::block_list::Blocks,
+        blocks::list::Blocks,
     },
 };
 

@@ -7,6 +7,7 @@ use strum::{Display, EnumIter, EnumString};
 
 use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 
+mod block;
 mod format;
 mod packets;
 
@@ -15,11 +16,11 @@ mod packets;
 #[enum_dispatch(Generator)]
 pub enum Generators {
     Packets(packets::Packets),
+    BlockAttributes(block::BlockAttributes),
     Format(format::Format),
 }
 
 /// The trait that all generators implement
-
 #[enum_dispatch]
 pub trait Generator: Debug {
     /// The datasets this generator depends on

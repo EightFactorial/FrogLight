@@ -7,6 +7,7 @@ use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 
 use super::Generator;
 
+/// Runs `cargo fmt` on the repository.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Format;
 

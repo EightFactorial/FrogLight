@@ -21,7 +21,7 @@ use crate::systems::{
     app_state::GameSet,
     blocks::{
         block::{voxel_type::VoxelType, BlockType},
-        block_list::Blocks,
+        list::Blocks,
     },
 };
 
