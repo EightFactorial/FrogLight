@@ -1,7 +1,9 @@
 use bevy::prelude::{Deref, DerefMut};
 
 mod attr_trait;
-use attr_trait::BlockAttributeTrait;
+pub use attr_trait::BlockAttributeTrait;
+
+mod attr_impl;
 
 mod enums;
 pub use enums::*;
