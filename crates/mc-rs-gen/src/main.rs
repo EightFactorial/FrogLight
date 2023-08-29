@@ -10,6 +10,8 @@ use mc_rs_ext::{
 };
 use strum::IntoEnumIterator;
 
+use crate::generate::format::Format;
+
 mod cli;
 mod generate;
 mod util;
@@ -52,9 +54,14 @@ fn main() {
     };
 
     // Get the generators to run
-    let generators = cli
+    let mut generators = cli
         .generators
         .unwrap_or_else(|| Generators::iter().collect_vec());
+
+    // Add `Format` if not already present
+    if !generators.contains(&Generators::Format(Format)) {
+        generators.push(Generators::Format(Format));
+    }
 
     // Find all required datasets to use the selected generators
     let mut required = Vec::new();

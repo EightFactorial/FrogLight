@@ -9,7 +9,7 @@ use strum::{Display, EnumIter, EnumString};
 use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 
 mod block;
-mod format;
+pub mod format;
 mod packets;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter, EnumString, Display)]
