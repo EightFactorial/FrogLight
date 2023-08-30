@@ -34,7 +34,7 @@ pub(super) fn add_systems(app: &mut App) {
     app.add_systems(
         Update,
         (
-            (Chunk::update_chunk, Chunk::added_chunk)
+            Chunk::update_chunk
                 .before(ChunkTask::poll_tasks)
                 .run_if(resource_exists::<Worlds>()),
             SectionComponent::despawn_orphans.run_if(any_component_removed::<Chunk>()),

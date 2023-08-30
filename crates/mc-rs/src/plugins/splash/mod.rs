@@ -3,10 +3,7 @@ use bevy::prelude::*;
 
 use crate::{
     interface::menus::MenuRoot,
-    systems::{
-        app_state::{ApplicationState, InMenuSet, MenuSet},
-        blocks::list::Blocks,
-    },
+    systems::app_state::{ApplicationState, InMenuSet, MenuSet},
 };
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -77,15 +74,16 @@ impl SplashPlugin {
     /// Create the progress bar
     fn create(
         time: Res<Time>,
-        blocks: Res<Blocks>,
+        // blocks: Res<Blocks>,
         root: Res<MenuRoot>,
-        assets: Res<AssetServer>,
+        // assets: Res<AssetServer>,
         mut elements: Elements,
         mut commands: Commands,
     ) {
         // If the blocks are already loaded, use a timer
         // Otherwise, the main menu will be shown instantly
-        let loaded = blocks.is_loaded(&assets);
+        // let loaded = blocks.is_loaded(&assets);
+        let loaded = true;
 
         // Set the bar max value
         let max = if loaded {
@@ -130,13 +128,14 @@ impl SplashPlugin {
     fn bar_finished(
         query: Query<(&BarMax, &BarValue)>,
         root: Res<MenuRoot>,
-        blocks: Res<Blocks>,
-        asset_server: Res<AssetServer>,
+        // blocks: Res<Blocks>,
+        // asset_server: Res<AssetServer>,
     ) -> bool {
         if let Ok((max, value)) = query.get(**root) {
             value.0 >= max.0
         } else {
-            blocks.is_loaded(&asset_server)
+            // blocks.is_loaded(&asset_server)
+            true
         }
     }
 
@@ -168,32 +167,26 @@ impl BlocksLoaded {
     /// A system that checks if all the block textures are loaded
     /// and replaces any broken textures with the fallback
     fn check_loaded(
-        mut blocks: ResMut<Blocks>,
+        // mut blocks: ResMut<Blocks>,
         mut loaded: ResMut<BlocksLoaded>,
-        assets: Res<AssetServer>,
+        // assets: Res<AssetServer>,
     ) {
-        if blocks.is_loaded(&assets) {
-            // Replace any failed textures with the error block texture
-            let fixed = blocks.replace_errors(&assets);
-
-            if fixed > 0 {
-                // TODO: Some sort of error popup?
-                error!("{fixed} blocks failed to load textures");
-            } else {
-                info!(
-                    "All blocks ({}) loaded successfully",
-                    blocks.read().unwrap().len()
-                );
-            }
+        // if blocks.is_loaded(&assets) {
+        if true {
+            // TODO: Replace any failed textures with the error block texture
 
             // Set the blocks loaded resource to true
             loaded.bool = true;
             loaded.percent = 1.0;
-        } else {
-            let p = blocks.progress(&assets);
-            loaded.percent = p;
 
-            info!("Loaded {p}% of blocks");
+            info!("Loaded all blocks");
+            warn!("Fixed {} broken textures", 0);
+        } else {
+            // let per = blocks.progress(&assets);
+            let per = 1.0;
+            loaded.percent = per;
+
+            info!("Loaded {}% of blocks", per);
         }
     }
 

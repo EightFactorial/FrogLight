@@ -1,7 +1,4 @@
-use std::{
-    io::Cursor,
-    sync::{Arc, RwLock},
-};
+use std::{io::Cursor, sync::Arc};
 
 use azalea_nbt::Nbt;
 use bevy::prelude::*;
@@ -12,8 +9,9 @@ use mc_rs_proto::{
         position::{ChunkPos, ChunkSectionPos},
     },
 };
+use parking_lot::RwLock;
 
-use crate::systems::blocks::list::Blocks;
+use crate::systems::blocks::{BlockStates, Blocks};
 
 use super::{
     global_palette::GlobalPalette, section::Section, task::ChunkTask, WorldType, Worlds,
@@ -97,81 +95,100 @@ impl Chunk {
         Some((motion.to_owned(), world.to_owned()))
     }
 
-    /// Regenerate the mesh for chunks that have been updated.
+    /// Regenerate chunk meshes.
     pub(super) fn update_chunk(
-        query: Query<(Entity, &Chunk), Changed<Chunk>>,
-        worlds: Res<Worlds>,
+        query: Query<Ref<Chunk>>,
         blocks: Res<Blocks>,
+        blockstates: Res<BlockStates>,
+        mut worlds: ResMut<Worlds>,
         mut commands: Commands,
     ) {
-        for (entity, chunk) in query.iter() {
-            if chunk.block_count() == 0 {
-                continue;
-            }
+        for chunk in query.iter() {
+            if chunk.is_changed() {
+                let Some(world) = worlds.get_world_mut(&chunk.world_type) else {
+                    error!(
+                        "Failed to get world {:?} with chunk {:?}!",
+                        chunk.world_type, chunk.position
+                    );
+                    continue;
+                };
 
-            let mut neighbors = [None, None, None, None];
-            let world = worlds.get_world(&chunk.world_type).unwrap();
+                // If the chunk is empty, despawn it
+                if chunk.block_count() == 0 {
+                    if let Some(entity) = world.get_chunk_id(&chunk.position) {
+                        let entity = **entity;
+                        commands.entity(entity).despawn_recursive();
+                        world.remove(&chunk.position);
+                    } else {
+                        error!(
+                            "Failed to get chunk entity for empty chunk {:?}",
+                            chunk.position
+                        );
+                    }
+                    continue;
+                }
 
-            for (pos, val) in chunk
-                .position
-                .around()
-                .into_iter()
-                .zip(neighbors.iter_mut())
-            {
-                if let Some(entity) = world.get_chunk_id(&pos) {
-                    if let Ok((_, chunk)) = query.get(**entity) {
+                let mut neighbors = [None, None, None, None];
+                for (pos, val) in chunk
+                    .position
+                    .around()
+                    .into_iter()
+                    .zip(neighbors.iter_mut())
+                {
+                    if let Some(chunk) = world.get_chunk_ref(&query, &pos) {
                         if chunk.block_count() != 0 {
                             *val = Some(chunk.sections.clone());
                         }
                     }
                 }
-            }
 
-            commands.entity(entity).insert(ChunkTask::create(
-                chunk.sections.clone(),
-                neighbors,
-                blocks.clone(),
-            ));
-        }
-    }
-
-    /// Regenerate the mesh for chunks that have neighbors added.
-    pub(super) fn added_chunk(
-        query: Query<Ref<Chunk>>,
-        worlds: Res<Worlds>,
-        blocks: Res<Blocks>,
-        mut commands: Commands,
-    ) {
-        for chunk in query.iter() {
-            // For newly added chunks
-            if !chunk.is_added() {
-                continue;
-            }
-
-            // For each neighboring chunk
-            let world = worlds.get_world(&chunk.world_type).unwrap();
-            for neighbor_pos in chunk.position.around().into_iter() {
-                if let Some(neighbor_chunk) = world.get_chunk_ref(&query, &neighbor_pos) {
-                    // Skip chunks with no blocks
-                    if neighbor_chunk.block_count() == 0 {
-                        continue;
-                    }
-
-                    // Get that chunk's neighbors
-                    let mut neighbors = [None, None, None, None];
-                    for (pos, val) in neighbor_pos.around().into_iter().zip(neighbors.iter_mut()) {
-                        if let Some(chunk) = world.get_chunk_ref(&query, &pos) {
-                            *val = Some(chunk.sections.clone());
-                        }
-                    }
-
-                    // Update the neighbor chunk mesh
-                    let entity = world.get_chunk_id(&neighbor_pos).unwrap();
+                if let Some(entity) = world.get_chunk_id(&chunk.position) {
                     commands.entity(**entity).insert(ChunkTask::create(
-                        neighbor_chunk.sections.clone(),
+                        chunk.sections.clone(),
                         neighbors,
                         blocks.clone(),
+                        blockstates.clone(),
                     ));
+                } else {
+                    error!(
+                        "Failed to get chunk entity for changed chunk {:?}",
+                        chunk.position
+                    );
+                }
+            }
+
+            if chunk.is_added() {
+                // For each neighboring chunk
+                let world = worlds.get_world(&chunk.world_type).unwrap();
+                for neighbor_pos in chunk.position.around().into_iter() {
+                    if let Some(neighbor_chunk) = world.get_chunk_ref(&query, &neighbor_pos) {
+                        // Skip chunks with no blocks
+                        if neighbor_chunk.block_count() == 0 {
+                            continue;
+                        }
+
+                        // Get that chunk's neighbors
+                        let mut neighbors = [None, None, None, None];
+                        for (pos, val) in
+                            neighbor_pos.around().into_iter().zip(neighbors.iter_mut())
+                        {
+                            if let Some(chunk) = world.get_chunk_ref(&query, &pos) {
+                                *val = Some(chunk.sections.clone());
+                            }
+                        }
+
+                        // Update the neighbor chunk mesh
+                        if let Some(entity) = world.get_chunk_id(&neighbor_pos) {
+                            commands.entity(**entity).insert(ChunkTask::create(
+                                neighbor_chunk.sections.clone(),
+                                neighbors,
+                                blocks.clone(),
+                                blockstates.clone(),
+                            ));
+                        } else {
+                            error!("Failed to get chunk entity for added chunk {neighbor_pos:?}");
+                        }
+                    }
                 }
             }
         }
@@ -183,14 +200,13 @@ impl Chunk {
         position: ChunkSectionPos,
         data: SectionDataPacket,
     ) {
-        self.sections.write().unwrap()[position.y as usize].insert_data::<V>(data);
+        self.sections.write()[position.y as usize].insert_data::<V>(data);
     }
 
     /// Get the total number of blocks in the chunk.
     pub fn block_count(&self) -> u32 {
         self.sections
             .read()
-            .unwrap()
             .iter()
             .fold(0u32, |acc, section| acc + section.block_count as u32)
     }

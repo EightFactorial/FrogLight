@@ -2,7 +2,6 @@ use std::{io::Write, path::PathBuf};
 
 use convert_case::{Case, Casing};
 use git2::Repository;
-use itertools::Itertools;
 use json::JsonValue;
 use log::error;
 use mc_rs_ext::{extract::datasets::Datasets, types::Version};
@@ -34,12 +33,13 @@ impl Generator for BlockAttributes {
         }
 
         Self::create_enums(path.clone(), data);
-        Self::create_trait_fns(path, data);
+        Self::create_trait_fns(path.clone(), data);
+        Self::impl_trait(path, data);
     }
 }
 
 impl BlockAttributes {
-    /// Creates the attribute enums.
+    /// Create the attribute enums.
     fn create_enums(mut path: PathBuf, data: &JsonValue) {
         // Get the attribute enums module
         path.push("src/systems/blocks/attributes/enums.rs");
@@ -100,7 +100,7 @@ impl BlockAttributes {
         }
     }
 
-    /// Creates the attribute trait module.
+    /// Create the attribute trait.
     fn create_trait_fns(mut path: PathBuf, data: &JsonValue) {
         // Get the attribute trait module
         path.push("src/systems/blocks/attributes/attr_trait.rs");
@@ -185,6 +185,23 @@ impl BlockAttributes {
         if let Err(err) = std::fs::write(&path, output) {
             error!("Failed to write `attr_trait.rs`, {err}");
         }
+    }
+
+    /// Implement the trait.
+    fn impl_trait(mut path: PathBuf, data: &JsonValue) {
+        // Get the trait impl module
+        path.push("src/systems/blocks/attributes/attr_impl.rs");
+        if !path.exists() {
+            error!("`attr_impl.rs` not found at {}", path.display());
+            return;
+        }
+
+        let Some(mut code) = Generators::get_code(&path) else {
+            error!("Failed to read `attr_impl.rs`");
+            return;
+        };
+
+        todo!("Implement the trait");
     }
 }
 
