@@ -6,7 +6,6 @@ use bevy::{
 use bevy_rapier3d::prelude::{Collider, RigidBody, Sensor, Sleeping};
 use block_mesh::ndshape::ConstShape3u32;
 use futures_lite::future::{block_on, poll_once};
-use mc_rs_proto::types::enums::Direction;
 
 use crate::systems::{
     app_state::GameSet,
@@ -14,10 +13,8 @@ use crate::systems::{
 };
 
 use super::{
-    chunk::ChunkSections,
-    material::{OpagueBlockMaterial, TransparentBlockMaterial},
-    section::SectionComponent,
-    CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
+    chunk::ChunkSections, material::BlockMaterial, section::SectionComponent, CHUNK_SIZE,
+    SECTION_COUNT, SECTION_HEIGHT,
 };
 
 pub(super) fn setup(app: &mut App) {
@@ -58,8 +55,7 @@ impl ChunkTask {
     pub(super) fn poll_tasks(
         mut query: Query<(Entity, &mut ChunkTask)>,
         mut meshes: ResMut<Assets<Mesh>>,
-        mut opague_materials: ResMut<Assets<OpagueBlockMaterial>>,
-        mut transparent_materials: ResMut<Assets<TransparentBlockMaterial>>,
+        mut materials: ResMut<Assets<BlockMaterial>>,
         mut images: ResMut<Assets<Image>>,
         mut commands: Commands,
     ) {
@@ -87,10 +83,10 @@ impl ChunkTask {
                                 };
 
                                 // Create the material mesh bundle
-                                let terrain_material = MaterialMeshBundle::<OpagueBlockMaterial> {
+                                let terrain_material = MaterialMeshBundle::<BlockMaterial> {
                                     mesh: meshes.add(terrain_mesh),
-                                    material: opague_materials
-                                        .add(OpagueBlockMaterial::new(texture.texture.clone())),
+                                    material: materials
+                                        .add(BlockMaterial::new(texture.texture.clone())),
                                     transform: Transform::from_xyz(
                                         0.,
                                         (index * SECTION_HEIGHT) as f32,
@@ -112,18 +108,20 @@ impl ChunkTask {
                                 ));
 
                                 // Create the transparent mesh bundle
-                                let transparent_material =
-                                    MaterialMeshBundle::<TransparentBlockMaterial> {
-                                        mesh: meshes.add(transparent_mesh),
-                                        material: transparent_materials
-                                            .add(TransparentBlockMaterial::new(texture.texture)),
-                                        transform: Transform::from_xyz(
-                                            0.,
-                                            (index * SECTION_HEIGHT) as f32,
-                                            0.,
-                                        ),
+                                let transparent_material = MaterialMeshBundle::<BlockMaterial> {
+                                    mesh: meshes.add(transparent_mesh),
+                                    material: materials.add(BlockMaterial {
+                                        atlas: texture.texture,
+                                        alpha_mode: AlphaMode::Blend,
                                         ..Default::default()
-                                    };
+                                    }),
+                                    transform: Transform::from_xyz(
+                                        0.,
+                                        (index * SECTION_HEIGHT) as f32,
+                                        0.,
+                                    ),
+                                    ..Default::default()
+                                };
 
                                 // Spawn the transparent mesh
                                 parent.spawn((
