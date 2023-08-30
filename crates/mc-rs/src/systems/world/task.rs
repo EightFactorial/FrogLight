@@ -1,10 +1,20 @@
+use std::sync::Arc;
+
 use bevy::{
     self,
     prelude::*,
+    render::{
+        mesh::{Indices, VertexAttributeValues},
+        render_resource::PrimitiveTopology,
+    },
     tasks::{AsyncComputeTaskPool, Task},
 };
-use bevy_rapier3d::prelude::{Collider, RigidBody, Sensor, Sleeping};
-use block_mesh::ndshape::ConstShape3u32;
+use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, Sensor, Sleeping};
+use block_mesh::{
+    greedy_quads,
+    ndshape::{ConstShape, ConstShape3u32},
+    GreedyQuadsBuffer, RIGHT_HANDED_Y_UP_CONFIG,
+};
 use futures_lite::future::{block_on, poll_once};
 
 use crate::systems::{
@@ -13,8 +23,10 @@ use crate::systems::{
 };
 
 use super::{
-    chunk::ChunkSections, material::BlockMaterial, section::SectionComponent, CHUNK_SIZE,
-    SECTION_COUNT, SECTION_HEIGHT,
+    chunk::ChunkSections,
+    material::{BlockMaterial, ATTRIBUTE_BLOCK_ID, ATTRIBUTE_TEXTURE_INDEX},
+    section::SectionComponent,
+    CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
 };
 
 pub(super) fn setup(app: &mut App) {
@@ -56,7 +68,6 @@ impl ChunkTask {
         mut query: Query<(Entity, &mut ChunkTask)>,
         mut meshes: ResMut<Assets<Mesh>>,
         mut materials: ResMut<Assets<BlockMaterial>>,
-        mut images: ResMut<Assets<Image>>,
         mut commands: Commands,
     ) {
         for (entity, mut task) in query.iter_mut() {
@@ -70,23 +81,29 @@ impl ChunkTask {
                         for (index, option) in results.into_iter().enumerate() {
                             if let Some(result) = option {
                                 let SectionTaskResult {
-                                    terrain_mesh,
-                                    terrain_collider,
+                                    opaque_mesh,
                                     transparent_mesh,
+                                    terrain_collider,
                                     fluid_collider,
                                     textures,
                                 } = result;
 
-                                let Ok(texture) = textures.finish(&mut images) else {
-                                    error!("Error finishing texture atlas!");
-                                    continue;
+                                // Create the opaque mesh bundle
+                                let opaque_material = MaterialMeshBundle::<BlockMaterial> {
+                                    mesh: meshes.add(opaque_mesh),
+                                    material: materials.add(BlockMaterial::new(textures.clone())),
+                                    transform: Transform::from_xyz(
+                                        0.,
+                                        (index * SECTION_HEIGHT) as f32,
+                                        0.,
+                                    ),
+                                    ..Default::default()
                                 };
 
-                                // Create the material mesh bundle
-                                let terrain_material = MaterialMeshBundle::<BlockMaterial> {
-                                    mesh: meshes.add(terrain_mesh),
-                                    material: materials
-                                        .add(BlockMaterial::new(texture.texture.clone())),
+                                // Create the transparent mesh bundle
+                                let transparent_material = MaterialMeshBundle::<BlockMaterial> {
+                                    mesh: meshes.add(transparent_mesh),
+                                    material: materials.add(BlockMaterial::new_blend(textures)),
                                     transform: Transform::from_xyz(
                                         0.,
                                         (index * SECTION_HEIGHT) as f32,
@@ -96,37 +113,13 @@ impl ChunkTask {
                                 };
 
                                 // Spawn the terrain
+                                parent.spawn((SectionComponent, opaque_material));
+                                parent.spawn((SectionComponent, transparent_material));
+
+                                // Spawn the terrain collider
                                 parent.spawn((
                                     SectionComponent,
-                                    terrain_material,
-                                    RigidBody::Fixed,
-                                    Sleeping {
-                                        sleeping: true,
-                                        ..Default::default()
-                                    },
                                     terrain_collider,
-                                ));
-
-                                // Create the transparent mesh bundle
-                                let transparent_material = MaterialMeshBundle::<BlockMaterial> {
-                                    mesh: meshes.add(transparent_mesh),
-                                    material: materials.add(BlockMaterial {
-                                        atlas: texture.texture,
-                                        alpha_mode: AlphaMode::Blend,
-                                        ..Default::default()
-                                    }),
-                                    transform: Transform::from_xyz(
-                                        0.,
-                                        (index * SECTION_HEIGHT) as f32,
-                                        0.,
-                                    ),
-                                    ..Default::default()
-                                };
-
-                                // Spawn the transparent mesh
-                                parent.spawn((
-                                    SectionComponent,
-                                    transparent_material,
                                     RigidBody::Fixed,
                                     Sleeping {
                                         sleeping: true,
@@ -137,13 +130,13 @@ impl ChunkTask {
                                 // Spawn the fluid collider
                                 parent.spawn((
                                     SectionComponent,
+                                    fluid_collider,
                                     RigidBody::Fixed,
                                     Sensor,
                                     Sleeping {
                                         sleeping: true,
                                         ..Default::default()
                                     },
-                                    fluid_collider,
                                 ));
                             }
                         }
@@ -217,22 +210,22 @@ async fn chunk_fn(
 
 type SectionResult = Option<SectionTaskResult>;
 pub struct SectionTaskResult {
-    terrain_mesh: Mesh,
-    terrain_collider: Collider,
+    opaque_mesh: Mesh,
     transparent_mesh: Mesh,
+    terrain_collider: Collider,
     fluid_collider: Collider,
-    textures: TextureAtlasBuilder,
+    textures: Vec<Handle<Image>>,
 }
 
-const _X: u32 = CHUNK_SIZE as u32;
-const _Y: u32 = SECTION_HEIGHT as u32;
-const _Z: u32 = CHUNK_SIZE as u32;
-type _ChunkShape = ConstShape3u32<_X, _Y, _Z>;
+const X: u32 = CHUNK_SIZE as u32;
+const Y: u32 = SECTION_HEIGHT as u32;
+const Z: u32 = CHUNK_SIZE as u32;
+type ChunkShape = ConstShape3u32<X, Y, Z>;
 
-const _MESH_X: u32 = _X + 2;
-const _MESH_Y: u32 = _Y + 2;
-const _MESH_Z: u32 = _Z + 2;
-type _MeshChunkShape = ConstShape3u32<_MESH_X, _MESH_Y, _MESH_Z>;
+const MESH_X: u32 = X + 2;
+const MESH_Y: u32 = Y + 2;
+const MESH_Z: u32 = Z + 2;
+type MeshChunkShape = ConstShape3u32<MESH_X, MESH_Y, MESH_Z>;
 
 static _EMPTY_ID: u32 = 0;
 
@@ -243,106 +236,37 @@ async fn section_fn(
     blocks: Blocks,
     blockstates: BlockStates,
 ) -> SectionResult {
-    let _blocks = blocks.read();
-    let _blockstates = blockstates.read();
+    let blocks = blocks.read();
+    let blockstates = blockstates.read();
 
-    // let mut textures = Vec::new();
-    // let mut texture_map = HashMap::new();
-    // for id in section_data.iter().unique() {
-    //     let Some(block) = blocks.get(id) else {
-    //         continue;
-    //     };
+    let mut textures = Vec::new();
 
-    //     let Some(new_textures) = block.textures() else {
-    //         continue;
-    //     };
+    todo!("Write a custom greedy meshing algorithm");
 
-    //     let start = textures.len();
-    //     textures.extend(new_textures.to_vec());
-    //     texture_map.insert(*id, start);
-    // }
+    let mut shape = [0u8; MeshChunkShape::SIZE as usize];
+    for y in 0..MESH_Y {
+        for z in 0..MESH_Z {
+            for x in 0..MESH_X {
+                // Ignore all corners
+                if [
+                    (x == 0 || x == MESH_X - 1),
+                    (y == 0 || y == MESH_Y - 1),
+                    (z == 0 || z == MESH_Z - 1),
+                ]
+                .iter()
+                .fold(0u8, |acc, f| acc + *f as u8)
+                    > 1
+                {
+                    continue;
+                }
 
-    // // Insert the fallback block
-    // {
-    //     let block = blocks.get(&u32::MAX).expect("Error getting fallback block");
-    //     let start = textures.len();
-    //     textures.extend(block.textures().unwrap().to_vec());
-    //     texture_map.insert(u32::MAX, start);
-    // }
+                // TODO
+            }
+        }
+    }
 
-    // let mut shape = [VoxelType::Empty; MeshChunkShape::SIZE as usize];
-    // for y in 0..MESH_Y {
-    //     for z in 0..MESH_Z {
-    //         for x in 0..MESH_X {
-    //             // Ignore all corners
-    //             if [
-    //                 (x == 0 || x == MESH_X - 1),
-    //                 (y == 0 || y == MESH_Y - 1),
-    //                 (z == 0 || z == MESH_Z - 1),
-    //             ]
-    //             .iter()
-    //             .fold(0u8, |acc, f| acc + *f as u8)
-    //                 > 1
-    //             {
-    //                 continue;
-    //             }
-
-    //             // Get the index in the appropriate neighbor
-    //             let block_id = match (x, z, y) {
-    //                 (0, _, _) => {
-    //                     if let Some(data) = &neighbors[0] {
-    //                         &data[ChunkShape::linearize([X - 1, z - 1, y - 1]) as usize]
-    //                     } else {
-    //                         &EMPTY_ID
-    //                     }
-    //                 }
-    //                 (_, 0, _) => {
-    //                     if let Some(data) = &neighbors[2] {
-    //                         &data[ChunkShape::linearize([x - 1, Z - 1, y - 1]) as usize]
-    //                     } else {
-    //                         &EMPTY_ID
-    //                     }
-    //                 }
-    //                 (_, _, 0) => {
-    //                     if let Some(data) = &neighbors[4] {
-    //                         &data[ChunkShape::linearize([x - 1, z - 1, Y - 1]) as usize]
-    //                     } else {
-    //                         &EMPTY_ID
-    //                     }
-    //                 }
-    //                 (17, _, _) => {
-    //                     if let Some(data) = &neighbors[1] {
-    //                         &data[ChunkShape::linearize([0, z - 1, y - 1]) as usize]
-    //                     } else {
-    //                         &EMPTY_ID
-    //                     }
-    //                 }
-    //                 (_, 17, _) => {
-    //                     if let Some(data) = &neighbors[3] {
-    //                         &data[ChunkShape::linearize([x - 1, 0, y - 1]) as usize]
-    //                     } else {
-    //                         &EMPTY_ID
-    //                     }
-    //                 }
-    //                 (_, _, 17) => {
-    //                     if let Some(data) = &neighbors[5] {
-    //                         &data[ChunkShape::linearize([x - 1, z - 1, 0]) as usize]
-    //                     } else {
-    //                         &EMPTY_ID
-    //                     }
-    //                 }
-    //                 _ => &section_data[ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize],
-    //             };
-
-    //             let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
-    //             let shape_index = MeshChunkShape::linearize([x, y, z]) as usize;
-    //             shape[shape_index] = block.voxel_type();
-    //         }
-    //     }
-    // }
-
-    // let faces = RIGHT_HANDED_Y_UP_CONFIG.faces;
-    // let mut buffer = GreedyQuadsBuffer::new(shape.len());
+    let faces = RIGHT_HANDED_Y_UP_CONFIG.faces;
+    let mut buffer = GreedyQuadsBuffer::new(shape.len());
     // greedy_quads(
     //     &shape,
     //     &MeshChunkShape {},
@@ -352,135 +276,130 @@ async fn section_fn(
     //     &mut buffer,
     // );
 
-    // if buffer.quads.num_quads() == 0 {
-    //     return None;
-    // }
+    if buffer.quads.num_quads() == 0 {
+        return None;
+    }
 
-    // let num_indices = buffer.quads.num_quads() * 6;
-    // let num_vertices = buffer.quads.num_quads() * 4;
+    let num_indices = buffer.quads.num_quads() * 6;
+    let num_vertices = buffer.quads.num_quads() * 4;
 
-    // let mut collider_indices = Vec::with_capacity(num_vertices);
-    // let mut collider_positions = Vec::with_capacity(num_vertices);
+    // Terrain collider data
+    let mut collider_indices = Vec::with_capacity(num_indices);
+    let mut collider_positions = Vec::with_capacity(num_vertices);
 
-    // let mut indices = Vec::with_capacity(num_indices);
-    // let mut positions = Vec::with_capacity(num_vertices);
-    // // let mut normals = Vec::with_capacity(num_vertices);
-    // let mut tex_uvs = Vec::with_capacity(num_vertices);
-    // let mut tex_index = Vec::with_capacity(num_vertices);
-    // let mut tex_anim = Vec::with_capacity(num_vertices);
+    // Fluid collider data
+    let mut fluid_indices = Vec::with_capacity(num_indices);
+    let mut fluid_positions = Vec::with_capacity(num_vertices);
 
-    // for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
-    //     for quad in group.into_iter() {
-    //         // Get the data
-    //         let ind = face.quad_mesh_indices(positions.len() as u32);
-    //         let mut pos = face.quad_mesh_positions(&quad, 1.0);
-    //         // let norm = face.quad_mesh_normals();
-    //         let mut uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
+    // Opaque mesh data
+    let mut opaque_indices = Vec::with_capacity(num_indices);
+    let mut opaque_positions = Vec::with_capacity(num_vertices);
+    let mut opaque_normals = Vec::with_capacity(num_vertices);
+    let mut opaque_tex_uvs = Vec::with_capacity(num_vertices);
+    let mut opaque_tex_ids = Vec::with_capacity(num_vertices);
+    let mut opaque_tex_index = Vec::with_capacity(num_vertices);
 
-    //         // Get the block
-    //         let [x, y, z] = quad.minimum;
-    //         let data_index = ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize;
-    //         let block_id = &section_data[data_index];
-    //         let block = blocks.get(block_id).unwrap_or(&blocks[&u32::MAX]);
+    // Transparent mesh data
+    let mut trans_indices = Vec::with_capacity(num_indices);
+    let mut trans_positions = Vec::with_capacity(num_vertices);
+    let mut trans_normals = Vec::with_capacity(num_vertices);
+    let mut trans_tex_uvs = Vec::with_capacity(num_vertices);
+    let mut trans_tex_ids = Vec::with_capacity(num_vertices);
+    let mut trans_tex_index = Vec::with_capacity(num_vertices);
 
-    //         let direction = {
-    //             let [x, y, z] = face.signed_normal().into();
-    //             Direction::from([x, y, z])
-    //         };
+    for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
+        for quad in group.into_iter() {
+            // TODO: Insert quad data into the appropriate buffers
+        }
+    }
 
-    //         // Rotate the uvs if it is facing up
-    //         if direction == Direction::Up {
-    //             for [u, v] in uvs.iter_mut() {
-    //                 std::mem::swap(u, v);
-    //             }
-    //         }
+    // Create the meshes
+    let opaque_mesh = {
+        let mut opaque_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+        opaque_mesh.set_indices(Some(Indices::U32(opaque_indices)));
 
-    //         // Modify the quad
-    //         match &block.block_type {
-    //             BlockType::Simple { dimensions, .. } => {
-    //                 mod_quad(&direction, &mut pos, dimensions);
-    //             }
-    //             BlockType::Complex { .. } => todo!("Append complex block mesh"),
-    //             _ => {}
-    //         }
+        opaque_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            VertexAttributeValues::Float32x3(opaque_positions),
+        );
+        opaque_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_NORMAL,
+            VertexAttributeValues::Float32x3(opaque_normals),
+        );
+        opaque_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_UV_0,
+            VertexAttributeValues::Float32x2(opaque_tex_uvs),
+        );
+        opaque_mesh.insert_attribute(
+            ATTRIBUTE_BLOCK_ID,
+            VertexAttributeValues::Uint32(opaque_tex_ids),
+        );
+        opaque_mesh.insert_attribute(
+            ATTRIBUTE_TEXTURE_INDEX,
+            VertexAttributeValues::Uint32(opaque_tex_index),
+        );
 
-    //         // Get the texture index
-    //         let start = texture_map.get(block_id);
-    //         let side_index = match &block.block_type {
-    //             BlockType::Voxel { texture, .. } | BlockType::Simple { texture, .. } => {
-    //                 texture.get_direction_index(&direction)
-    //             }
-    //             BlockType::Complex { .. } => todo!(),
-    //         };
-    //         let index = match (start, side_index) {
-    //             (Some(start), Some(side_index)) => (start + side_index) as u32,
-    //             _ => texture_map[&u32::MAX] as u32,
-    //         };
+        opaque_mesh
+    };
 
-    //         // If the block has collision, add it to the collider mesh
-    //         if block.collision() {
-    //             let col_ind = face.quad_mesh_indices(collider_positions.len() as u32);
-    //             collider_indices.extend(col_ind);
-    //             collider_positions.extend(pos);
-    //         }
+    let transparent_mesh = {
+        let mut trans_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+        trans_mesh.set_indices(Some(Indices::U32(trans_indices)));
 
-    //         // Get the texture animation information
-    //         let anim = block.anim_info(&direction).unwrap_or([0, 0]);
+        trans_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            VertexAttributeValues::Float32x3(trans_positions),
+        );
+        trans_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_NORMAL,
+            VertexAttributeValues::Float32x3(trans_normals),
+        );
+        trans_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_UV_0,
+            VertexAttributeValues::Float32x2(trans_tex_uvs),
+        );
+        trans_mesh.insert_attribute(
+            ATTRIBUTE_BLOCK_ID,
+            VertexAttributeValues::Uint32(trans_tex_ids),
+        );
+        trans_mesh.insert_attribute(
+            ATTRIBUTE_TEXTURE_INDEX,
+            VertexAttributeValues::Uint32(trans_tex_index),
+        );
 
-    //         // Add the data to the mesh
-    //         indices.extend(ind);
-    //         positions.extend(pos);
-    //         // normals.extend(norm);
-    //         tex_uvs.extend(uvs);
-    //         tex_index.extend([index; 4]);
-    //         tex_anim.extend([anim; 4]);
-    //     }
-    // }
+        trans_mesh
+    };
 
-    // // Create the section mesh
-    // let render_mesh = {
-    //     let mut render_mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    //     render_mesh.set_indices(Some(Indices::U32(indices)));
+    // Create the colliders
+    let terrain_collider = {
+        let mut collision_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+        collision_mesh.set_indices(Some(Indices::U32(collider_indices)));
+        collision_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            VertexAttributeValues::Float32x3(collider_positions),
+        );
 
-    //     render_mesh.insert_attribute(
-    //         Mesh::ATTRIBUTE_POSITION,
-    //         VertexAttributeValues::Float32x3(positions),
-    //     );
-    //     // render_mesh.insert_attribute(
-    //     //     Mesh::ATTRIBUTE_NORMAL,
-    //     //     VertexAttributeValues::Float32x3(normals),
-    //     // );
-    //     render_mesh.insert_attribute(
-    //         Mesh::ATTRIBUTE_UV_0,
-    //         VertexAttributeValues::Float32x2(tex_uvs),
-    //     );
-    //     render_mesh.insert_attribute(
-    //         ATTRIBUTE_TEXTURE_INDEX,
-    //         VertexAttributeValues::Uint32(tex_index),
-    //     );
-    //     render_mesh.insert_attribute(
-    //         ATTRIBUTE_ANIMATION_INFO,
-    //         VertexAttributeValues::Uint32x2(tex_anim),
-    //     );
+        Collider::from_bevy_mesh(&collision_mesh, &ComputedColliderShape::TriMesh)
+    }?;
 
-    //     render_mesh
-    // };
+    let fluid_collider = {
+        let mut collision_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+        collision_mesh.set_indices(Some(Indices::U32(fluid_indices)));
+        collision_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            VertexAttributeValues::Float32x3(fluid_positions),
+        );
 
-    // // Create the section collider
-    // let collider = {
-    //     let mut collision_mesh = Mesh::new(PrimitiveTopology::TriangleList);
-    //     collision_mesh.set_indices(Some(Indices::U32(collider_indices)));
-    //     collision_mesh.insert_attribute(
-    //         Mesh::ATTRIBUTE_POSITION,
-    //         VertexAttributeValues::Float32x3(collider_positions),
-    //     );
+        Collider::from_bevy_mesh(&collision_mesh, &ComputedColliderShape::TriMesh)
+    }?;
 
-    //     Collider::from_bevy_mesh(&collision_mesh, &ComputedColliderShape::TriMesh)
-    // }?;
-
-    // Some((render_mesh, textures, collider))
-
-    todo!();
+    Some(SectionTaskResult {
+        opaque_mesh,
+        transparent_mesh,
+        terrain_collider,
+        fluid_collider,
+        textures,
+    })
 }
 
 // /// Modifies the quad positions to fit the block

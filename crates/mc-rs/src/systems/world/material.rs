@@ -11,16 +11,31 @@ use bevy::{
     },
 };
 
-pub(super) fn setup(app: &mut App) {
-    app.add_plugins((MaterialPlugin::<BlockMaterial>::default(),));
-}
+pub(super) fn setup(app: &mut App) { app.add_plugins(MaterialPlugin::<BlockMaterial>::default()); }
 
 #[derive(Debug, Default, Clone, TypePath, TypeUuid, AsBindGroup)]
 #[uuid = "0059fd0b-5b43-46cc-bd77-c89130562e75"]
 pub struct BlockMaterial {
-    pub atlas: Handle<Image>,
+    pub textures: Vec<Handle<Image>>,
     pub animation_info: Vec<BlockAnimation>,
     pub alpha_mode: AlphaMode,
+}
+
+impl BlockMaterial {
+    pub fn new(textures: Vec<Handle<Image>>) -> Self {
+        Self {
+            textures,
+            ..Default::default()
+        }
+    }
+
+    pub fn new_blend(textures: Vec<Handle<Image>>) -> Self {
+        Self {
+            textures,
+            alpha_mode: AlphaMode::Blend,
+            ..Default::default()
+        }
+    }
 }
 
 #[derive(Debug, Default, Clone)]
@@ -31,17 +46,11 @@ pub struct BlockAnimation {
     pub frame_order: Vec<u32>,
 }
 
-impl BlockMaterial {
-    pub fn new(atlas: Handle<Image>) -> Self {
-        Self {
-            atlas,
-            ..Default::default()
-        }
-    }
-}
-
 pub const ATTRIBUTE_BLOCK_ID: MeshVertexAttribute =
-    MeshVertexAttribute::new("TextureIndex", 978122767, VertexFormat::Uint32);
+    MeshVertexAttribute::new("BlockId", 978122767, VertexFormat::Uint32);
+
+pub const ATTRIBUTE_TEXTURE_INDEX: MeshVertexAttribute =
+    MeshVertexAttribute::new("TextureIndex", 978122780, VertexFormat::Uint32);
 
 impl Material for BlockMaterial {
     fn vertex_shader() -> ShaderRef { "shaders/terrain.wgsl".into() }
@@ -59,6 +68,7 @@ impl Material for BlockMaterial {
             Mesh::ATTRIBUTE_UV_0.at_shader_location(1),
             Mesh::ATTRIBUTE_NORMAL.at_shader_location(2),
             ATTRIBUTE_BLOCK_ID.at_shader_location(3),
+            ATTRIBUTE_TEXTURE_INDEX.at_shader_location(4),
         ])?];
 
         Ok(())
