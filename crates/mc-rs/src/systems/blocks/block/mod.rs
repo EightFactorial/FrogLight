@@ -9,8 +9,12 @@ use self::properties::BlockProperties;
 
 pub mod properties;
 
+mod blocksmap;
+pub use blocksmap::BlocksMapFn;
+
 #[derive(Debug, Clone, Deref, DerefMut, Resource)]
-pub struct Blocks(pub Arc<RwLock<IntMap<u32, Block>>>);
+pub struct Blocks(pub Arc<RwLock<BlocksMap>>);
+pub(super) type BlocksMap = IntMap<u32, Block>;
 
 #[derive(Debug, Clone)]
 pub struct Block {
@@ -31,7 +35,7 @@ impl Hash for Block {
 
 impl Blocks {
     pub(super) fn create(asset_server: Res<AssetServer>, mut commands: Commands) {
-        let mut blocks = IntMap::default();
+        let mut blocks = BlocksMap::default();
 
         commands.insert_resource(Blocks(Arc::new(RwLock::new(blocks))));
     }

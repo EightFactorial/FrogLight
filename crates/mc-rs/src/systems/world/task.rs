@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use bevy::{
     self,
     prelude::*,
@@ -19,7 +17,7 @@ use futures_lite::future::{block_on, poll_once};
 
 use crate::systems::{
     app_state::GameSet,
-    blocks::{BlockStates, Blocks},
+    blocks::{state::StatesMapFn, BlockStates, Blocks},
 };
 
 use super::{
@@ -227,12 +225,31 @@ const MESH_Y: u32 = Y + 2;
 const MESH_Z: u32 = Z + 2;
 type MeshChunkShape = ConstShape3u32<MESH_X, MESH_Y, MESH_Z>;
 
-static _EMPTY_ID: u32 = 0;
+static EMPTY_ID: u32 = 0;
+
+macro_rules! get_mesh_block {
+    ($x:expr, $y:expr, $z:expr, $data:expr, $n_data:expr) => {
+        match ($x, $y, $z) {
+            (0, _, _) => get_mesh_block!($n_data[0], [X - 1, $z - 1, $y - 1]),
+            (_, 0, _) => get_mesh_block!($n_data[2], [$x - 1, Z - 1, $z - 1]),
+            (_, _, 0) => get_mesh_block!($n_data[4], [$x - 1, $z - 1, Y - 1]),
+            (17, _, _) => get_mesh_block!($n_data[1], [0, $z - 1, $y - 1]),
+            (_, 17, _) => get_mesh_block!($n_data[3], [$x - 1, 0, $z - 1]),
+            (_, _, 17) => get_mesh_block!($n_data[5], [$x - 1, $z - 1, 0]),
+            _ => $data[ChunkShape::linearize([$x - 1, $z - 1, $y - 1]) as usize],
+        }
+    };
+    ($data:expr, $index:expr) => {
+        $data
+            .map(|d| d[ChunkShape::linearize($index) as usize])
+            .unwrap_or(EMPTY_ID)
+    };
+}
 
 /// Generates a mesh for a section
 async fn section_fn(
-    _section_data: Vec<u32>,
-    _neighbors: [Option<Vec<u32>>; 6],
+    section_data: Vec<u32>,
+    neighbor_data: [Option<Vec<u32>>; 6],
     blocks: Blocks,
     blockstates: BlockStates,
 ) -> SectionResult {
@@ -259,6 +276,10 @@ async fn section_fn(
                 {
                     continue;
                 }
+
+                let state_id = get_mesh_block!(x, y, z, section_data, neighbor_data);
+                let blockstate = blockstates.get_state(&state_id);
+                let block = blockstate.get_block(&blocks);
 
                 // TODO
             }
