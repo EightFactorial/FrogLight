@@ -21,13 +21,12 @@ impl PartialEq for BlockMesh {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Never, _) | (_, Self::Never) => false,
-            (Self::Always, Self::Always) => true,
+            (Self::Always, _) | (_, Self::Always) => true,
             (Self::Custom([l0, l1, l2, l3, l4, l5]), Self::Custom([r0, r1, r2, r3, r4, r5])) => {
                 // Sides are in order: -Y, +Y, -Z, +Z, -X, +X
                 // True if any of the opposite sides are equal
                 l0 == r1 || l1 == r0 || l2 == r3 || l3 == r2 || l4 == r5 || l5 == r4
             }
-            _ => std::mem::discriminant(self) == std::mem::discriminant(other),
         }
     }
 }

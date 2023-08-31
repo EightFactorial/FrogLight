@@ -17,8 +17,8 @@ impl BlockModel {
     pub fn mod_mesh_positions(&self, direction: &Direction, pos: &mut [[f32; 3]; 4]) {
         match self {
             Self::Simple { collision } | Self::Custom { collision, .. } => {
-                let [min_x, min_y, min_z] = collision.min().to_array();
-                let [max_x, max_y, max_z] = collision.max().to_array();
+                let [min_x, min_y, min_z] = (collision.min() / 16.0).to_array();
+                let [max_x, max_y, max_z] = (collision.max() / 16.0).to_array();
 
                 match direction {
                     Direction::Up => {

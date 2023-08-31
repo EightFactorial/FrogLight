@@ -94,32 +94,37 @@ impl ChunkTask {
                                 } = result;
 
                                 // Create the opaque mesh bundle
-                                let opaque_material = MaterialMeshBundle::<BlockMaterial> {
-                                    mesh: meshes.add(opaque_mesh),
-                                    material: materials.add(BlockMaterial::new(textures.clone())),
-                                    transform: Transform::from_xyz(
-                                        0.,
-                                        (index * SECTION_HEIGHT) as f32,
-                                        0.,
-                                    ),
-                                    ..Default::default()
-                                };
+                                if let Some(opaque_mesh) = opaque_mesh {
+                                    let opaque_material = MaterialMeshBundle::<BlockMaterial> {
+                                        mesh: meshes.add(opaque_mesh),
+                                        material: materials
+                                            .add(BlockMaterial::new(textures.clone())),
+                                        transform: Transform::from_xyz(
+                                            0.,
+                                            (index * SECTION_HEIGHT) as f32,
+                                            0.,
+                                        ),
+                                        ..Default::default()
+                                    };
+
+                                    parent.spawn((SectionComponent, opaque_material));
+                                }
 
                                 // Create the transparent mesh bundle
-                                let transparent_material = MaterialMeshBundle::<BlockMaterial> {
-                                    mesh: meshes.add(transparent_mesh),
-                                    material: materials.add(BlockMaterial::new_blend(textures)),
-                                    transform: Transform::from_xyz(
-                                        0.,
-                                        (index * SECTION_HEIGHT) as f32,
-                                        0.,
-                                    ),
-                                    ..Default::default()
-                                };
+                                if let Some(transparent_mesh) = transparent_mesh {
+                                    let transparent_material = MaterialMeshBundle::<BlockMaterial> {
+                                        mesh: meshes.add(transparent_mesh),
+                                        material: materials.add(BlockMaterial::new_blend(textures)),
+                                        transform: Transform::from_xyz(
+                                            0.,
+                                            (index * SECTION_HEIGHT) as f32,
+                                            0.,
+                                        ),
+                                        ..Default::default()
+                                    };
 
-                                // Spawn the terrain
-                                parent.spawn((SectionComponent, opaque_material));
-                                parent.spawn((SectionComponent, transparent_material));
+                                    parent.spawn((SectionComponent, transparent_material));
+                                }
 
                                 // Spawn the terrain collider
                                 if let Some(terrain_collider) = terrain_collider {
@@ -219,8 +224,8 @@ async fn chunk_fn(
 
 type SectionResult = Option<SectionTaskResult>;
 pub struct SectionTaskResult {
-    opaque_mesh: Mesh,
-    transparent_mesh: Mesh,
+    opaque_mesh: Option<Mesh>,
+    transparent_mesh: Option<Mesh>,
     terrain_collider: Option<Collider>,
     fluid_collider: Option<Collider>,
     textures: Vec<Handle<Image>>,
@@ -240,12 +245,12 @@ static EMPTY_ID: u32 = 0;
 
 macro_rules! get_mesh_blockstate {
     ($x:expr, $y:expr, $z:expr, $data:expr, $n_data:expr) => {
-        match ($x, $y, $z) {
+        match ($x, $z, $y) {
             (0, _, _) => get_mesh_blockstate!($n_data[0], [X - 1, $z - 1, $y - 1]),
-            (_, 0, _) => get_mesh_blockstate!($n_data[2], [$x - 1, Z - 1, $z - 1]),
+            (_, 0, _) => get_mesh_blockstate!($n_data[2], [$x - 1, Z - 1, $y - 1]),
             (_, _, 0) => get_mesh_blockstate!($n_data[4], [$x - 1, $z - 1, Y - 1]),
             (17, _, _) => get_mesh_blockstate!($n_data[1], [0, $z - 1, $y - 1]),
-            (_, 17, _) => get_mesh_blockstate!($n_data[3], [$x - 1, 0, $z - 1]),
+            (_, 17, _) => get_mesh_blockstate!($n_data[3], [$x - 1, 0, $y - 1]),
             (_, _, 17) => get_mesh_blockstate!($n_data[5], [$x - 1, $z - 1, 0]),
             _ => &$data[ChunkShape::linearize([$x - 1, $z - 1, $y - 1]) as usize],
         }
@@ -268,8 +273,6 @@ async fn section_fn(
     let blocks = blocks.read();
     let blockstates = blockstates.read();
 
-    let mut texture_map: HashMap<HandleId, Handle<Image>> = HashMap::new();
-
     let mut shape = [BlockMeshData::default(); MeshChunkShape::SIZE as usize];
     for y in 0..MESH_Y {
         for z in 0..MESH_Z {
@@ -280,8 +283,8 @@ async fn section_fn(
                     (y == 0 || y == MESH_Y - 1),
                     (z == 0 || z == MESH_Z - 1),
                 ]
-                .iter()
-                .fold(0u8, |acc, f| acc + *f as u8)
+                .into_iter()
+                .fold(0u8, |acc, f| acc + f as u8)
                     > 1
                 {
                     continue;
@@ -321,8 +324,8 @@ async fn section_fn(
     let collider_positions = Vec::with_capacity(num_vertices);
 
     // Fluid collider data
-    let mut fluid_indices = Vec::with_capacity(num_indices);
-    let mut fluid_positions = Vec::with_capacity(num_vertices);
+    let fluid_indices = Vec::with_capacity(num_indices);
+    let fluid_positions = Vec::with_capacity(num_vertices);
 
     // Opaque mesh data
     let mut opaque_indices = Vec::with_capacity(num_indices);
@@ -340,15 +343,16 @@ async fn section_fn(
     let mut trans_tex_ids = Vec::with_capacity(num_vertices);
     let mut trans_tex_index = Vec::with_capacity(num_vertices);
 
-    for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
-        for quad in group.into_iter() {
-            // Prepare the shape index
-            let mut shape_index = quad.minimum;
-            shape_index = shape_index.map(|i| i - 1);
-            shape_index.swap(1, 2);
+    let mut texture_map: HashMap<HandleId, Handle<Image>> = HashMap::with_capacity(8);
 
+    for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
+        let direction = Direction::from(face.signed_normal().to_array());
+        let norm = face.quad_mesh_normals();
+
+        for quad in group.into_iter() {
             // Get the blockstate data
-            let state_id = section_data[ChunkShape::linearize(shape_index) as usize];
+            let [x, y, z] = quad.minimum.map(|v| v - 1);
+            let state_id = section_data[ChunkShape::linearize([x, z, y]) as usize];
             let blockstate = blockstates.get_state(&state_id);
 
             // Get the block data
@@ -361,7 +365,6 @@ async fn section_fn(
             }
 
             // Get the quad mesh positions
-            let direction = Direction::from(face.signed_normal().to_array());
             let mut pos = face.quad_mesh_positions(&quad, 1.0);
             blockstate.model.mod_mesh_positions(&direction, &mut pos);
 
@@ -372,10 +375,10 @@ async fn section_fn(
             // }
 
             // Add the block to the fluid collider
-            if prop.is_fluid {
-                fluid_indices.extend(face.quad_mesh_indices(fluid_indices.len() as u32));
-                fluid_positions.extend_from_slice(&pos);
-            }
+            // if prop.is_fluid {
+            //     fluid_indices.extend(face.quad_mesh_indices(fluid_indices.len() as u32));
+            //     fluid_positions.extend_from_slice(&pos);
+            // }
 
             // Determine the block model
             match &blockstate.model {
@@ -391,19 +394,19 @@ async fn section_fn(
                         .unwrap_or_default();
 
                     // Get the texture index or insert it into the texture map
-                    let texture_id = texture.id();
-                    let tex_index = if let Some(tex_index) =
-                        texture_map.iter().position(|(key, _)| key == &texture_id)
-                    {
-                        tex_index
-                    } else {
-                        let i = texture_map.len();
-                        texture_map.insert(texture_id, texture);
-                        i
-                    } as u32;
+                    let tex_index = {
+                        let texture_id = texture.id();
+                        if let Some(tex_index) =
+                            texture_map.iter().position(|(key, _)| key == &texture_id)
+                        {
+                            tex_index as u32
+                        } else {
+                            let len = texture_map.len();
+                            texture_map.insert(texture_id, texture);
+                            len as u32
+                        }
+                    };
 
-                    // Get more quad data
-                    let norm = face.quad_mesh_normals();
                     let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
 
                     match prop.opaque {
@@ -434,60 +437,66 @@ async fn section_fn(
     }
 
     // Create the meshes
-    let opaque_mesh = {
-        let mut opaque_mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        opaque_mesh.set_indices(Some(Indices::U32(opaque_indices)));
+    let opaque_mesh = match opaque_indices.is_empty() {
+        true => None,
+        false => {
+            let mut opaque_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+            opaque_mesh.set_indices(Some(Indices::U32(opaque_indices)));
 
-        opaque_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_POSITION,
-            VertexAttributeValues::Float32x3(opaque_positions),
-        );
-        opaque_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_NORMAL,
-            VertexAttributeValues::Float32x3(opaque_normals),
-        );
-        opaque_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_UV_0,
-            VertexAttributeValues::Float32x2(opaque_tex_uvs),
-        );
-        opaque_mesh.insert_attribute(
-            ATTRIBUTE_BLOCK_ID,
-            VertexAttributeValues::Uint32(opaque_tex_ids),
-        );
-        opaque_mesh.insert_attribute(
-            ATTRIBUTE_TEXTURE_INDEX,
-            VertexAttributeValues::Uint32(opaque_tex_index),
-        );
+            opaque_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_POSITION,
+                VertexAttributeValues::Float32x3(opaque_positions),
+            );
+            opaque_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_NORMAL,
+                VertexAttributeValues::Float32x3(opaque_normals),
+            );
+            opaque_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_UV_0,
+                VertexAttributeValues::Float32x2(opaque_tex_uvs),
+            );
+            opaque_mesh.insert_attribute(
+                ATTRIBUTE_BLOCK_ID,
+                VertexAttributeValues::Uint32(opaque_tex_ids),
+            );
+            opaque_mesh.insert_attribute(
+                ATTRIBUTE_TEXTURE_INDEX,
+                VertexAttributeValues::Uint32(opaque_tex_index),
+            );
 
-        opaque_mesh
+            Some(opaque_mesh)
+        }
     };
 
-    let transparent_mesh = {
-        let mut trans_mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        trans_mesh.set_indices(Some(Indices::U32(trans_indices)));
+    let transparent_mesh = match !trans_indices.is_empty() {
+        true => None,
+        false => {
+            let mut trans_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+            trans_mesh.set_indices(Some(Indices::U32(trans_indices)));
 
-        trans_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_POSITION,
-            VertexAttributeValues::Float32x3(trans_positions),
-        );
-        trans_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_NORMAL,
-            VertexAttributeValues::Float32x3(trans_normals),
-        );
-        trans_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_UV_0,
-            VertexAttributeValues::Float32x2(trans_tex_uvs),
-        );
-        trans_mesh.insert_attribute(
-            ATTRIBUTE_BLOCK_ID,
-            VertexAttributeValues::Uint32(trans_tex_ids),
-        );
-        trans_mesh.insert_attribute(
-            ATTRIBUTE_TEXTURE_INDEX,
-            VertexAttributeValues::Uint32(trans_tex_index),
-        );
+            trans_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_POSITION,
+                VertexAttributeValues::Float32x3(trans_positions),
+            );
+            trans_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_NORMAL,
+                VertexAttributeValues::Float32x3(trans_normals),
+            );
+            trans_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_UV_0,
+                VertexAttributeValues::Float32x2(trans_tex_uvs),
+            );
+            trans_mesh.insert_attribute(
+                ATTRIBUTE_BLOCK_ID,
+                VertexAttributeValues::Uint32(trans_tex_ids),
+            );
+            trans_mesh.insert_attribute(
+                ATTRIBUTE_TEXTURE_INDEX,
+                VertexAttributeValues::Uint32(trans_tex_index),
+            );
 
-        trans_mesh
+            Some(trans_mesh)
+        }
     };
 
     // Create the colliders
