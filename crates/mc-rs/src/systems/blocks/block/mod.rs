@@ -38,6 +38,20 @@ impl Blocks {
         let mut blocks = BlocksMap::default();
 
         blocks.insert(
+            0u32,
+            Block {
+                block_id: 0u32,
+                block_states: 0..0,
+                name: "Air".to_string(),
+                key: ResourceLocation::new("minecraft:air"),
+                properties: BlockProperties {
+                    is_air: true,
+                    ..Default::default()
+                },
+            },
+        );
+
+        blocks.insert(
             u32::MAX,
             Block {
                 block_id: u32::MAX,

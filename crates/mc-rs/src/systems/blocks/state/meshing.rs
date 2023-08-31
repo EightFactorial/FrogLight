@@ -42,6 +42,10 @@ pub enum BlockVoxel {
 
 impl From<&Block> for BlockVoxel {
     fn from(value: &Block) -> Self {
+        if value.properties.is_air {
+            return BlockVoxel::Empty;
+        }
+
         match value.properties.opaque {
             true => BlockVoxel::Opaque(value.block_id),
             false => BlockVoxel::Translucent(value.block_id),

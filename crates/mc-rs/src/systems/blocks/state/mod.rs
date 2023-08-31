@@ -79,11 +79,24 @@ impl BlockStates {
         let mut states = StatesMap::default();
 
         states.insert(
+            0u32,
+            BlockState {
+                block_id: 0u32,
+                state_id: 0u32,
+                textures: BlockTextures::NONE,
+                model: BlockModel::None,
+            },
+        );
+
+        states.insert(
             u32::MAX,
             BlockState {
                 block_id: u32::MAX,
                 state_id: u32::MAX,
-                textures: BlockTextures::default(),
+                textures: BlockTextures::new(
+                    &["test/textures/block/light_blue_wool.png"],
+                    &asset_server,
+                ),
                 model: BlockModel::Standard,
             },
         );

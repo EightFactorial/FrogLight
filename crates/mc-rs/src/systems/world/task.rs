@@ -122,27 +122,31 @@ impl ChunkTask {
                                 parent.spawn((SectionComponent, transparent_material));
 
                                 // Spawn the terrain collider
-                                parent.spawn((
-                                    SectionComponent,
-                                    terrain_collider,
-                                    RigidBody::Fixed,
-                                    Sleeping {
-                                        sleeping: true,
-                                        ..Default::default()
-                                    },
-                                ));
+                                if let Some(terrain_collider) = terrain_collider {
+                                    parent.spawn((
+                                        SectionComponent,
+                                        terrain_collider,
+                                        RigidBody::Fixed,
+                                        Sleeping {
+                                            sleeping: true,
+                                            ..Default::default()
+                                        },
+                                    ));
+                                }
 
                                 // Spawn the fluid collider
-                                parent.spawn((
-                                    SectionComponent,
-                                    fluid_collider,
-                                    RigidBody::Fixed,
-                                    Sensor,
-                                    Sleeping {
-                                        sleeping: true,
-                                        ..Default::default()
-                                    },
-                                ));
+                                if let Some(fluid_collider) = fluid_collider {
+                                    parent.spawn((
+                                        SectionComponent,
+                                        fluid_collider,
+                                        RigidBody::Fixed,
+                                        Sensor,
+                                        Sleeping {
+                                            sleeping: true,
+                                            ..Default::default()
+                                        },
+                                    ));
+                                }
                             }
                         }
                     })
@@ -217,8 +221,8 @@ type SectionResult = Option<SectionTaskResult>;
 pub struct SectionTaskResult {
     opaque_mesh: Mesh,
     transparent_mesh: Mesh,
-    terrain_collider: Collider,
-    fluid_collider: Collider,
+    terrain_collider: Option<Collider>,
+    fluid_collider: Option<Collider>,
     textures: Vec<Handle<Image>>,
 }
 
@@ -303,6 +307,7 @@ async fn section_fn(
         &mut buffer,
     );
 
+    // Skip the section if it has no quads
     if buffer.quads.num_quads() == 0 {
         return None;
     }
@@ -338,14 +343,19 @@ async fn section_fn(
         for quad in group.into_iter() {
             // Prepare the shape index
             let mut shape_index = quad.minimum;
+            shape_index = shape_index.map(|i| i - 1);
             shape_index.swap(1, 2);
 
             // Get the blockstate data
             let state_id = section_data[ChunkShape::linearize(shape_index) as usize];
             let blockstate = blockstates.get_state(&state_id);
 
-            // Skip the block if it has no model
-            if matches!(blockstate.model, BlockModel::None) {
+            // Get the block data
+            let block = blockstate.get_block(&blocks);
+            let prop = &block.properties;
+
+            // Skip the block if it is air or has no model
+            if prop.is_air || matches!(blockstate.model, BlockModel::None) {
                 continue;
             }
 
@@ -353,10 +363,6 @@ async fn section_fn(
             let direction = Direction::from(face.signed_normal().to_array());
             let mut pos = face.quad_mesh_positions(&quad, 1.0);
             blockstate.model.mod_mesh_positions(&direction, &mut pos);
-
-            // Get the block data
-            let block = blockstate.get_block(&blocks);
-            let prop = &block.properties;
 
             // Add the block to the terrain collider
             if prop.collidable {
@@ -377,10 +383,6 @@ async fn section_fn(
                     // TODO: Append the blockstate mesh data to the terrain mesh
                 }
                 _ => {
-                    // Get the block uvs
-                    let norm = face.quad_mesh_normals();
-                    let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
-
                     // Get the block face texture
                     let texture = blockstate
                         .textures
@@ -398,6 +400,10 @@ async fn section_fn(
                         texture_map.insert(texture_id, texture);
                         i
                     } as u32;
+
+                    // Get more quad data
+                    let norm = face.quad_mesh_normals();
+                    let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
 
                     match prop.opaque {
                         // Add the block to the opaque mesh
@@ -484,27 +490,33 @@ async fn section_fn(
     };
 
     // Create the colliders
-    let terrain_collider = {
-        let mut collision_mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        collision_mesh.set_indices(Some(Indices::U32(collider_indices)));
-        collision_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_POSITION,
-            VertexAttributeValues::Float32x3(collider_positions),
-        );
+    let terrain_collider = match collider_indices.is_empty() {
+        true => None,
+        false => {
+            let mut collision_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+            collision_mesh.set_indices(Some(Indices::U32(collider_indices)));
+            collision_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_POSITION,
+                VertexAttributeValues::Float32x3(collider_positions),
+            );
 
-        Collider::from_bevy_mesh(&collision_mesh, &ComputedColliderShape::TriMesh)
-    }?;
+            Collider::from_bevy_mesh(&collision_mesh, &ComputedColliderShape::TriMesh)
+        }
+    };
 
-    let fluid_collider = {
-        let mut collision_mesh = Mesh::new(PrimitiveTopology::TriangleList);
-        collision_mesh.set_indices(Some(Indices::U32(fluid_indices)));
-        collision_mesh.insert_attribute(
-            Mesh::ATTRIBUTE_POSITION,
-            VertexAttributeValues::Float32x3(fluid_positions),
-        );
+    let fluid_collider = match fluid_indices.is_empty() {
+        true => None,
+        false => {
+            let mut fluid_mesh = Mesh::new(PrimitiveTopology::TriangleList);
+            fluid_mesh.set_indices(Some(Indices::U32(fluid_indices)));
+            fluid_mesh.insert_attribute(
+                Mesh::ATTRIBUTE_POSITION,
+                VertexAttributeValues::Float32x3(fluid_positions),
+            );
 
-        Collider::from_bevy_mesh(&collision_mesh, &ComputedColliderShape::TriMesh)
-    }?;
+            Collider::from_bevy_mesh(&fluid_mesh, &ComputedColliderShape::TriMesh)
+        }
+    };
 
     Some(SectionTaskResult {
         opaque_mesh,

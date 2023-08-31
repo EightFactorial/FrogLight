@@ -27,6 +27,42 @@ pub enum BlockTexturePattern {
 }
 
 impl BlockTextures {
+    pub const NONE: Self = Self {
+        pattern: BlockTexturePattern::None,
+        textures: vec![],
+    };
+
+    pub fn new(paths: &[&str], asset_server: &AssetServer) -> Self {
+        let textures = paths
+            .iter()
+            .map(|&path| asset_server.load(path))
+            .collect::<Vec<_>>();
+
+        match textures.len() {
+            0 => Self {
+                pattern: BlockTexturePattern::None,
+                textures,
+            },
+            1 => Self {
+                pattern: BlockTexturePattern::Single,
+                textures,
+            },
+            2 => Self {
+                pattern: BlockTexturePattern::TopBottom,
+                textures,
+            },
+            3 => Self {
+                pattern: BlockTexturePattern::TopBottomSides,
+                textures,
+            },
+            6 => Self {
+                pattern: BlockTexturePattern::All,
+                textures,
+            },
+            _ => panic!("Invalid number of textures"),
+        }
+    }
+
     pub fn get_texture(&self, direction: &Direction) -> Option<Handle<Image>> {
         match self.pattern {
             BlockTexturePattern::None => None,
