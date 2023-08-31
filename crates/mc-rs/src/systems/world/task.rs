@@ -1,11 +1,13 @@
 use bevy::{
     self,
+    asset::HandleId,
     prelude::*,
     render::{
         mesh::{Indices, VertexAttributeValues},
         render_resource::PrimitiveTopology,
     },
     tasks::{AsyncComputeTaskPool, Task},
+    utils::HashMap,
 };
 use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, Sensor, Sleeping};
 use block_mesh::{
@@ -14,10 +16,14 @@ use block_mesh::{
     GreedyQuadsBuffer, RIGHT_HANDED_Y_UP_CONFIG,
 };
 use futures_lite::future::{block_on, poll_once};
+use itertools::Itertools;
 
 use crate::systems::{
     app_state::GameSet,
-    blocks::{state::StatesMapFn, BlockStates, Blocks},
+    blocks::{
+        state::{model::BlockModel, StatesMapFn},
+        BlockStates, Blocks,
+    },
 };
 
 use super::{
@@ -227,15 +233,15 @@ type MeshChunkShape = ConstShape3u32<MESH_X, MESH_Y, MESH_Z>;
 
 static EMPTY_ID: u32 = 0;
 
-macro_rules! get_mesh_block {
+macro_rules! get_mesh_blockstate {
     ($x:expr, $y:expr, $z:expr, $data:expr, $n_data:expr) => {
         match ($x, $y, $z) {
-            (0, _, _) => get_mesh_block!($n_data[0], [X - 1, $z - 1, $y - 1]),
-            (_, 0, _) => get_mesh_block!($n_data[2], [$x - 1, Z - 1, $z - 1]),
-            (_, _, 0) => get_mesh_block!($n_data[4], [$x - 1, $z - 1, Y - 1]),
-            (17, _, _) => get_mesh_block!($n_data[1], [0, $z - 1, $y - 1]),
-            (_, 17, _) => get_mesh_block!($n_data[3], [$x - 1, 0, $z - 1]),
-            (_, _, 17) => get_mesh_block!($n_data[5], [$x - 1, $z - 1, 0]),
+            (0, _, _) => get_mesh_blockstate!($n_data[0], [X - 1, $z - 1, $y - 1]),
+            (_, 0, _) => get_mesh_blockstate!($n_data[2], [$x - 1, Z - 1, $z - 1]),
+            (_, _, 0) => get_mesh_blockstate!($n_data[4], [$x - 1, $z - 1, Y - 1]),
+            (17, _, _) => get_mesh_blockstate!($n_data[1], [0, $z - 1, $y - 1]),
+            (_, 17, _) => get_mesh_blockstate!($n_data[3], [$x - 1, 0, $z - 1]),
+            (_, _, 17) => get_mesh_blockstate!($n_data[5], [$x - 1, $z - 1, 0]),
             _ => $data[ChunkShape::linearize([$x - 1, $z - 1, $y - 1]) as usize],
         }
     };
@@ -256,7 +262,12 @@ async fn section_fn(
     let blocks = blocks.read();
     let blockstates = blockstates.read();
 
-    let mut textures = Vec::new();
+    let mut texture_map: HashMap<HandleId, Handle<Image>> = HashMap::new();
+    for state_id in section_data.iter().unique() {
+        // for texture in blockstates.get_state(state_id).textures() {
+        //     texture_map.insert(texture.id(), texture.clone());
+        // }
+    }
 
     todo!("Write a custom greedy meshing algorithm");
 
@@ -277,11 +288,11 @@ async fn section_fn(
                     continue;
                 }
 
-                let state_id = get_mesh_block!(x, y, z, section_data, neighbor_data);
+                let state_id = get_mesh_blockstate!(x, y, z, section_data, neighbor_data);
                 let blockstate = blockstates.get_state(&state_id);
-                let block = blockstate.get_block(&blocks);
 
-                // TODO
+                // TODO: Add data to the shape
+                // TODO: Add textures to the texture map
             }
         }
     }
@@ -330,7 +341,75 @@ async fn section_fn(
 
     for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
         for quad in group.into_iter() {
-            // TODO: Insert quad data into the appropriate buffers
+            // Prepare the shape index
+            let mut shape_index = quad.minimum;
+            shape_index.swap(1, 2);
+
+            // Get the blockstate data
+            let state_id = section_data[ChunkShape::linearize(shape_index) as usize];
+            let blockstate = blockstates.get_state(&state_id);
+
+            // Skip the block if it has no model
+            if matches!(blockstate.model, BlockModel::None) {
+                continue;
+            }
+
+            // Get the quad mesh positions
+            let mut pos = face.quad_mesh_positions(&quad, 1.0);
+            blockstate
+                .model
+                .mod_mesh_positions(face.signed_normal(), &mut pos);
+
+            // Get the block data
+            let block = blockstate.get_block(&blocks);
+            let prop = &block.properties;
+
+            // Add the block to the terrain collider
+            if prop.collidable {
+                collider_indices.extend(face.quad_mesh_indices(collider_indices.len() as u32));
+                collider_positions.extend_from_slice(&pos);
+            }
+
+            // Add the block to the fluid collider
+            if prop.is_fluid {
+                fluid_indices.extend(face.quad_mesh_indices(fluid_indices.len() as u32));
+                fluid_positions.extend_from_slice(&pos);
+            }
+
+            // Determine the block model
+            match &blockstate.model {
+                BlockModel::Custom { mesh: _mesh, .. } => {
+                    // TODO: Append the blockstate mesh data to the terrain mesh
+                }
+                _ => {
+                    // Get the block uvs
+                    let norm = face.quad_mesh_normals();
+                    let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
+
+                    match prop.opaque {
+                        // Add the block to the opaque mesh
+                        true => {
+                            opaque_indices
+                                .extend(face.quad_mesh_indices(opaque_indices.len() as u32));
+                            opaque_positions.extend(pos);
+                            opaque_normals.extend(norm);
+                            opaque_tex_uvs.extend(uvs);
+                            opaque_tex_ids.extend([block.block_id; 4]);
+                            opaque_tex_index.extend([0; 4]);
+                        }
+                        // Add the block to the transparent mesh
+                        false => {
+                            trans_indices
+                                .extend(face.quad_mesh_indices(trans_indices.len() as u32));
+                            trans_positions.extend(pos);
+                            trans_normals.extend(norm);
+                            trans_tex_uvs.extend(uvs);
+                            trans_tex_ids.extend([block.block_id; 4]);
+                            trans_tex_index.extend([0; 4]);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -419,110 +498,6 @@ async fn section_fn(
         transparent_mesh,
         terrain_collider,
         fluid_collider,
-        textures,
+        textures: texture_map.into_values().collect_vec(),
     })
 }
-
-// /// Modifies the quad positions to fit the block
-// fn mod_quad(direction: &Direction, pos: &mut [[f32; 3]; 4], dim: &[f32; 6]) {
-//     let [min_x, min_y, min_z, max_x, max_y, max_z] = dim;
-
-//     match direction {
-//         Direction::Up => {
-//             pos[0][0] += *min_x;
-//             pos[2][0] += *min_x;
-//             pos[1][0] -= 1. - *max_x;
-//             pos[3][0] -= 1. - *max_x;
-
-//             pos[0][1] -= 1. - *max_y;
-//             pos[1][1] -= 1. - *max_y;
-//             pos[2][1] -= 1. - *max_y;
-//             pos[3][1] -= 1. - *max_y;
-
-//             pos[0][2] += *min_z;
-//             pos[1][2] += *min_z;
-//             pos[2][2] -= 1. - *max_z;
-//             pos[3][2] -= 1. - *max_z;
-//         }
-//         Direction::Down => {
-//             pos[0][0] += *min_x;
-//             pos[2][0] += *min_x;
-//             pos[1][0] -= 1. - *max_x;
-//             pos[3][0] -= 1. - *max_x;
-
-//             pos[0][1] += *min_y;
-//             pos[1][1] += *min_y;
-//             pos[2][1] += *min_y;
-//             pos[3][1] += *min_y;
-
-//             pos[0][2] += *min_z;
-//             pos[1][2] += *min_z;
-//             pos[2][2] -= 1. - *max_z;
-//             pos[3][2] -= 1. - *max_z;
-//         }
-//         Direction::North => {
-//             pos[0][0] += *min_x;
-//             pos[1][0] += *min_x;
-//             pos[2][0] += *min_x;
-//             pos[3][0] += *min_x;
-
-//             pos[0][1] += *min_y;
-//             pos[1][1] += *min_y;
-//             pos[2][1] -= 1. - *max_y;
-//             pos[3][1] -= 1. - *max_y;
-
-//             pos[0][2] += *min_z;
-//             pos[3][2] += *min_z;
-//             pos[1][2] -= 1. - *max_z;
-//             pos[2][2] -= 1. - *max_z;
-//         }
-//         Direction::South => {
-//             pos[0][0] += *min_x;
-//             pos[1][0] += *min_x;
-//             pos[2][0] += *min_x;
-//             pos[3][0] += *min_x;
-
-//             pos[0][1] += *min_y;
-//             pos[1][1] += *min_y;
-//             pos[2][1] -= 1. - *max_y;
-//             pos[3][1] -= 1. - *max_y;
-
-//             pos[0][2] -= 1. - *max_z;
-//             pos[3][2] -= 1. - *max_z;
-//             pos[1][2] += *min_z;
-//             pos[2][2] += *min_z;
-//         }
-//         Direction::East => {
-//             pos[0][0] += *min_x;
-//             pos[2][0] += *min_x;
-//             pos[1][0] -= 1. - *max_x;
-//             pos[3][0] -= 1. - *max_x;
-
-//             pos[0][1] += *min_y;
-//             pos[1][1] += *min_y;
-//             pos[2][1] -= 1. - *max_y;
-//             pos[3][1] -= 1. - *max_y;
-
-//             pos[0][2] += *min_z;
-//             pos[1][2] += *min_z;
-//             pos[2][2] += *min_z;
-//             pos[3][2] += *min_z;
-//         }
-//         Direction::West => {
-//             pos[0][0] += *min_x;
-//             pos[2][0] += *min_x;
-//             pos[1][0] -= 1. - *max_x;
-//             pos[3][0] -= 1. - *max_x;
-
-//             pos[0][1] += *min_y;
-//             pos[1][1] += *min_y;
-//             pos[2][1] -= 1. - *max_y;
-//             pos[3][1] -= 1. - *max_y;
-
-//             pos[0][2] -= 1. - *max_z;
-//             pos[1][2] -= 1. - *max_z;
-//             pos[2][2] -= 1. - *max_z;
-//             pos[3][2] -= 1. - *max_z;
-//         }
-//     }
-// }

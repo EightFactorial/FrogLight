@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct BlockProperties {
     pub hardness: f32,
     pub resistance: f32,
