@@ -242,13 +242,14 @@ macro_rules! get_mesh_blockstate {
             (17, _, _) => get_mesh_blockstate!($n_data[1], [0, $z - 1, $y - 1]),
             (_, 17, _) => get_mesh_blockstate!($n_data[3], [$x - 1, 0, $z - 1]),
             (_, _, 17) => get_mesh_blockstate!($n_data[5], [$x - 1, $z - 1, 0]),
-            _ => $data[ChunkShape::linearize([$x - 1, $z - 1, $y - 1]) as usize],
+            _ => &$data[ChunkShape::linearize([$x - 1, $z - 1, $y - 1]) as usize],
         }
     };
     ($data:expr, $index:expr) => {
-        $data
-            .map(|d| d[ChunkShape::linearize($index) as usize])
-            .unwrap_or(EMPTY_ID)
+        match $data {
+            Some(data) => &data[ChunkShape::linearize($index) as usize],
+            None => &EMPTY_ID,
+        }
     };
 }
 
@@ -262,6 +263,7 @@ async fn section_fn(
     let blocks = blocks.read();
     let blockstates = blockstates.read();
 
+    // TODO: Add textures to the texture map
     let mut texture_map: HashMap<HandleId, Handle<Image>> = HashMap::new();
     for state_id in section_data.iter().unique() {
         // for texture in blockstates.get_state(state_id).textures() {
@@ -289,10 +291,9 @@ async fn section_fn(
                 }
 
                 let state_id = get_mesh_blockstate!(x, y, z, section_data, neighbor_data);
-                let blockstate = blockstates.get_state(&state_id);
+                let blockstate = blockstates.get_state(state_id);
 
                 // TODO: Add data to the shape
-                // TODO: Add textures to the texture map
             }
         }
     }
