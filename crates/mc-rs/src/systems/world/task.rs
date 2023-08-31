@@ -315,9 +315,10 @@ async fn section_fn(
     let num_indices = buffer.quads.num_quads() * 6;
     let num_vertices = buffer.quads.num_quads() * 4;
 
+    // TODO: Fix the quads, maybe then this will work?
     // Terrain collider data
-    let mut collider_indices = Vec::with_capacity(num_indices);
-    let mut collider_positions = Vec::with_capacity(num_vertices);
+    let collider_indices = Vec::with_capacity(num_indices);
+    let collider_positions = Vec::with_capacity(num_vertices);
 
     // Fluid collider data
     let mut fluid_indices = Vec::with_capacity(num_indices);
@@ -365,10 +366,10 @@ async fn section_fn(
             blockstate.model.mod_mesh_positions(&direction, &mut pos);
 
             // Add the block to the terrain collider
-            if prop.collidable {
-                collider_indices.extend(face.quad_mesh_indices(collider_indices.len() as u32));
-                collider_positions.extend_from_slice(&pos);
-            }
+            // if prop.collidable {
+            //     collider_indices.extend(face.quad_mesh_indices(collider_indices.len() as u32));
+            //     collider_positions.extend_from_slice(&pos);
+            // }
 
             // Add the block to the fluid collider
             if prop.is_fluid {
