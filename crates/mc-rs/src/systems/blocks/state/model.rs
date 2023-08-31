@@ -2,7 +2,6 @@ use bevy::{
     prelude::{Handle, Mesh},
     render::primitives::Aabb,
 };
-use block_mesh::ilattice::prelude::IVec3;
 use mc_rs_proto::types::enums::Direction;
 
 #[derive(Debug, Clone)]
@@ -15,10 +14,9 @@ pub enum BlockModel {
 
 impl BlockModel {
     /// Modifies the mesh positions to match the block model collision box.
-    pub fn mod_mesh_positions(&self, normal: IVec3, pos: &mut [[f32; 3]; 4]) {
+    pub fn mod_mesh_positions(&self, direction: &Direction, pos: &mut [[f32; 3]; 4]) {
         match self {
             Self::Simple { collision } | Self::Custom { collision, .. } => {
-                let direction = Direction::from(normal.to_array());
                 let [min_x, min_y, min_z] = collision.min().to_array();
                 let [max_x, max_y, max_z] = collision.max().to_array();
 

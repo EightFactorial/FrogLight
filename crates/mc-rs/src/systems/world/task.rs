@@ -17,11 +17,12 @@ use block_mesh::{
 };
 use futures_lite::future::{block_on, poll_once};
 use itertools::Itertools;
+use mc_rs_proto::types::enums::Direction;
 
 use crate::systems::{
     app_state::GameSet,
     blocks::{
-        state::{model::BlockModel, StatesMapFn},
+        state::{meshing::BlockMeshData, model::BlockModel, StatesMapFn},
         BlockStates, Blocks,
     },
 };
@@ -246,7 +247,7 @@ macro_rules! get_mesh_blockstate {
         }
     };
     ($data:expr, $index:expr) => {
-        match $data {
+        match &$data {
             Some(data) => &data[ChunkShape::linearize($index) as usize],
             None => &EMPTY_ID,
         }
@@ -263,17 +264,9 @@ async fn section_fn(
     let blocks = blocks.read();
     let blockstates = blockstates.read();
 
-    // TODO: Add textures to the texture map
     let mut texture_map: HashMap<HandleId, Handle<Image>> = HashMap::new();
-    for state_id in section_data.iter().unique() {
-        // for texture in blockstates.get_state(state_id).textures() {
-        //     texture_map.insert(texture.id(), texture.clone());
-        // }
-    }
 
-    todo!("Write a custom greedy meshing algorithm");
-
-    let mut shape = [0u8; MeshChunkShape::SIZE as usize];
+    let mut shape = [BlockMeshData::default(); MeshChunkShape::SIZE as usize];
     for y in 0..MESH_Y {
         for z in 0..MESH_Z {
             for x in 0..MESH_X {
@@ -293,21 +286,22 @@ async fn section_fn(
                 let state_id = get_mesh_blockstate!(x, y, z, section_data, neighbor_data);
                 let blockstate = blockstates.get_state(state_id);
 
-                // TODO: Add data to the shape
+                let shape_index = MeshChunkShape::linearize([x, y, z]) as usize;
+                shape[shape_index] = blockstate.get_meshing(&blocks);
             }
         }
     }
 
     let faces = RIGHT_HANDED_Y_UP_CONFIG.faces;
     let mut buffer = GreedyQuadsBuffer::new(shape.len());
-    // greedy_quads(
-    //     &shape,
-    //     &MeshChunkShape {},
-    //     [0; 3],
-    //     [MESH_X - 1, MESH_Y - 1, MESH_Z - 1],
-    //     &faces,
-    //     &mut buffer,
-    // );
+    greedy_quads(
+        &shape,
+        &MeshChunkShape {},
+        [0; 3],
+        [MESH_X - 1, MESH_Y - 1, MESH_Z - 1],
+        &faces,
+        &mut buffer,
+    );
 
     if buffer.quads.num_quads() == 0 {
         return None;
@@ -356,10 +350,9 @@ async fn section_fn(
             }
 
             // Get the quad mesh positions
+            let direction = Direction::from(face.signed_normal().to_array());
             let mut pos = face.quad_mesh_positions(&quad, 1.0);
-            blockstate
-                .model
-                .mod_mesh_positions(face.signed_normal(), &mut pos);
+            blockstate.model.mod_mesh_positions(&direction, &mut pos);
 
             // Get the block data
             let block = blockstate.get_block(&blocks);
@@ -380,12 +373,31 @@ async fn section_fn(
             // Determine the block model
             match &blockstate.model {
                 BlockModel::Custom { mesh: _mesh, .. } => {
+                    // TODO: Insert texture data into the texture map
                     // TODO: Append the blockstate mesh data to the terrain mesh
                 }
                 _ => {
                     // Get the block uvs
                     let norm = face.quad_mesh_normals();
                     let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
+
+                    // Get the block face texture
+                    let texture = blockstate
+                        .textures
+                        .get_texture(&direction)
+                        .unwrap_or_default();
+
+                    // Get the texture index or insert it into the texture map
+                    let texture_id = texture.id();
+                    let tex_index = if let Some(tex_index) =
+                        texture_map.iter().position(|(key, _)| key == &texture_id)
+                    {
+                        tex_index
+                    } else {
+                        let i = texture_map.len();
+                        texture_map.insert(texture_id, texture);
+                        i
+                    } as u32;
 
                     match prop.opaque {
                         // Add the block to the opaque mesh
@@ -396,7 +408,7 @@ async fn section_fn(
                             opaque_normals.extend(norm);
                             opaque_tex_uvs.extend(uvs);
                             opaque_tex_ids.extend([block.block_id; 4]);
-                            opaque_tex_index.extend([0; 4]);
+                            opaque_tex_index.extend([tex_index; 4]);
                         }
                         // Add the block to the transparent mesh
                         false => {
@@ -406,7 +418,7 @@ async fn section_fn(
                             trans_normals.extend(norm);
                             trans_tex_uvs.extend(uvs);
                             trans_tex_ids.extend([block.block_id; 4]);
-                            trans_tex_index.extend([0; 4]);
+                            trans_tex_index.extend([tex_index; 4]);
                         }
                     }
                 }

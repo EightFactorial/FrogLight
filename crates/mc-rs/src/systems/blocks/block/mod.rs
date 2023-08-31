@@ -37,6 +37,17 @@ impl Blocks {
     pub(super) fn create(asset_server: Res<AssetServer>, mut commands: Commands) {
         let mut blocks = BlocksMap::default();
 
+        blocks.insert(
+            u32::MAX,
+            Block {
+                block_id: u32::MAX,
+                block_states: u32::MAX..u32::MAX,
+                name: "Error".to_string(),
+                key: ResourceLocation::new("mc-rs:error"),
+                properties: Default::default(),
+            },
+        );
+
         commands.insert_resource(Blocks(Arc::new(RwLock::new(blocks))));
     }
 }
