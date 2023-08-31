@@ -34,7 +34,7 @@ impl Hash for Block {
 }
 
 impl Blocks {
-    pub(super) fn create(asset_server: Res<AssetServer>, mut commands: Commands) {
+    pub(super) fn create(mut commands: Commands) {
         let mut blocks = BlocksMap::default();
 
         blocks.insert(
@@ -58,7 +58,7 @@ impl Blocks {
                 block_states: u32::MAX..u32::MAX,
                 name: "Error".to_string(),
                 key: ResourceLocation::new("mc-rs:error"),
-                properties: Default::default(),
+                properties: BlockProperties::default(),
             },
         );
 
