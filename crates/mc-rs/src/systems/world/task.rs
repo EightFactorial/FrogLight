@@ -341,7 +341,7 @@ async fn section_fn(
     let mut trans_tex_ids = Vec::with_capacity(num_vertices);
     let mut trans_tex_index = Vec::with_capacity(num_vertices);
 
-    let mut texture_map: HashMap<HandleId, Handle<Image>> = HashMap::with_capacity(8);
+    let mut textures: Vec<Handle<Image>> = Vec::with_capacity(8);
 
     for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
         let direction = Direction::from(face.signed_normal().to_array());
@@ -357,8 +357,8 @@ async fn section_fn(
             let block = blockstate.get_block(&blocks);
             let prop = &block.properties;
 
-            // Skip the block if it is air or has no model
-            if prop.is_air || matches!(blockstate.model, BlockModel::None) {
+            // Skip the block if it has no model
+            if matches!(blockstate.model, BlockModel::None) {
                 continue;
             }
 
@@ -386,23 +386,25 @@ async fn section_fn(
                 }
                 _ => {
                     // Get the block face texture
-                    let texture = blockstate
-                        .textures
-                        .get_texture(&direction)
-                        .unwrap_or_default();
+                    let texture =
+                        blockstate
+                            .textures
+                            .get_texture(&direction)
+                            .unwrap_or_else(|| {
+                                error!(
+                                    "Block {}:{state_id} has no texture for face {direction:?}",
+                                    block.name
+                                );
+                                Handle::<Image>::default()
+                            });
 
                     // Get the texture index or insert it into the texture map
-                    let tex_index = {
-                        let texture_id = texture.id();
-                        if let Some(tex_index) =
-                            texture_map.iter().position(|(key, _)| key == &texture_id)
-                        {
-                            tex_index as u32
-                        } else {
-                            let len = texture_map.len();
-                            texture_map.insert(texture_id, texture);
-                            len as u32
-                        }
+                    let tex_index = if let Some(index) = textures.iter().position(|p| p == &texture)
+                    {
+                        index as u32
+                    } else {
+                        textures.push(texture);
+                        textures.len() as u32 - 1
                     };
 
                     let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
@@ -526,10 +528,10 @@ async fn section_fn(
         }
     };
 
-    if texture_map.len() > MAX_TEXTURE_COUNT {
+    if textures.len() > MAX_TEXTURE_COUNT {
         error!(
             "Section has {} textures, but the maximum is {}",
-            texture_map.len(),
+            textures.len(),
             MAX_TEXTURE_COUNT
         );
     }
@@ -539,6 +541,6 @@ async fn section_fn(
         transparent_mesh,
         terrain_collider,
         fluid_collider,
-        textures: texture_map.into_values().collect_vec(),
+        textures,
     })
 }
