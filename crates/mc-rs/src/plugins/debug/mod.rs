@@ -109,7 +109,10 @@ impl DebugPlugin {
     }
 
     /// Update the debug entity counter
-    fn update_entities(mut query: Query<&mut Text, With<DebugEntityCounter>>, count: Query<()>) {
+    fn update_entities(
+        mut query: Query<&mut Text, With<DebugEntityCounter>>,
+        count: Query<Entity>,
+    ) {
         query.single_mut().sections[0].value = format!("{} ENT", count.iter().count());
     }
 

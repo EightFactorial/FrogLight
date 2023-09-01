@@ -7,6 +7,7 @@ use parking_lot::RwLock;
 
 use self::properties::BlockProperties;
 
+mod list;
 pub mod properties;
 
 mod blocksmap;
@@ -37,19 +38,7 @@ impl Blocks {
     pub(super) fn create(mut commands: Commands) {
         let mut blocks = BlocksMap::default();
 
-        blocks.insert(
-            0u32,
-            Block {
-                block_id: 0u32,
-                block_states: 0..0,
-                name: "Air".to_string(),
-                key: ResourceLocation::new("minecraft:air"),
-                properties: BlockProperties {
-                    is_air: true,
-                    ..Default::default()
-                },
-            },
-        );
+        list::create_blocks(&mut blocks);
 
         blocks.insert(
             u32::MAX,

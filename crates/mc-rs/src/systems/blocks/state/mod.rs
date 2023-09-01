@@ -12,6 +12,7 @@ use self::{
 
 use super::block::{Block, BlocksMap, BlocksMapFn};
 
+mod list;
 pub mod meshing;
 pub mod model;
 pub mod textures;
@@ -78,15 +79,7 @@ impl BlockStates {
     pub(super) fn create(asset_server: Res<AssetServer>, mut commands: Commands) {
         let mut states = StatesMap::default();
 
-        states.insert(
-            0u32,
-            BlockState {
-                block_id: 0u32,
-                state_id: 0u32,
-                textures: BlockTextures::NONE,
-                model: BlockModel::None,
-            },
-        );
+        list::create_states(&mut states, &asset_server);
 
         states.insert(
             u32::MAX,

@@ -17,6 +17,8 @@ mod packets;
 #[enum_dispatch(Generator)]
 pub enum Generators {
     Packets(packets::Packets),
+    Blocks(block::Blocks),
+    BlockStates(block::BlockStates),
     BlockAttributes(block::BlockAttributes),
     Format(format::Format),
 }
@@ -66,7 +68,7 @@ impl Generators {
 // use json::JsonValue;
 // use mc_rs_ext::{extract::datasets::Datasets, types::Version};
 //
-// use super::Generator;
+// use crate::generate::Generator;
 //
 // #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 // pub struct Placeholder;

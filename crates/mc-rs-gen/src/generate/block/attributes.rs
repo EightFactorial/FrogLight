@@ -188,7 +188,7 @@ impl BlockAttributes {
     }
 
     /// Implement the trait.
-    fn impl_trait(mut path: PathBuf, data: &JsonValue) {
+    fn impl_trait(mut path: PathBuf, _data: &JsonValue) {
         // Get the trait impl module
         path.push("src/systems/blocks/attributes/attr_impl.rs");
         if !path.exists() {
@@ -196,12 +196,10 @@ impl BlockAttributes {
             return;
         }
 
-        let Some(mut code) = Generators::get_code(&path) else {
+        let Some(mut _code) = Generators::get_code(&path) else {
             error!("Failed to read `attr_impl.rs`");
             return;
         };
-
-        todo!("Implement the trait");
     }
 }
 
