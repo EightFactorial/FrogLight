@@ -85,7 +85,7 @@ impl Material for BlockMaterial {
     fn alpha_mode(&self) -> AlphaMode { self.alpha_mode }
 }
 
-const MAX_TEXTURE_COUNT: usize = 32;
+pub(super) const MAX_TEXTURE_COUNT: usize = 48;
 
 impl AsBindGroup for BlockMaterial {
     type Data = ();

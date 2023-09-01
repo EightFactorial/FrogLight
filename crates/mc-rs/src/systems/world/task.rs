@@ -29,7 +29,7 @@ use crate::systems::{
 
 use super::{
     chunk::ChunkSections,
-    material::{BlockMaterial, ATTRIBUTE_BLOCK_ID, ATTRIBUTE_TEXTURE_INDEX},
+    material::{BlockMaterial, ATTRIBUTE_BLOCK_ID, ATTRIBUTE_TEXTURE_INDEX, MAX_TEXTURE_COUNT},
     section::SectionComponent,
     CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
 };
@@ -525,6 +525,14 @@ async fn section_fn(
             Collider::from_bevy_mesh(&fluid_mesh, &ComputedColliderShape::TriMesh)
         }
     };
+
+    if texture_map.len() > MAX_TEXTURE_COUNT {
+        error!(
+            "Section has {} textures, but the maximum is {}",
+            texture_map.len(),
+            MAX_TEXTURE_COUNT
+        );
+    }
 
     Some(SectionData {
         opaque_mesh,

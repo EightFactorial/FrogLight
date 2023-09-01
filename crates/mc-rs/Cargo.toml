@@ -30,7 +30,7 @@ log = { version = "0.4.19", features = ["std"] }
 mc-rs-proto = { path = "../mc-rs-proto" }
 mc-rs-macros = { path = "../mc-rs-macros" }
 nohash-hasher = "0.2.0"
-parking_lot = { version = "0.12.1", features = ["nightly", "arc_lock"] }
+parking_lot = { version = "0.12.1", features = ["nightly"] }
 rand = { version = "0.8.5", features = ["nightly"] }
 serde = { version = "1.0.179", features = ["derive"] }
 strum = { version = "0.25.0", features = ["derive"] }
