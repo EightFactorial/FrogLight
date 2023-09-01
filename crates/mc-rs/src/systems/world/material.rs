@@ -37,7 +37,7 @@ impl BlockMaterial {
         }
     }
 
-    pub fn new_blend(textures: Vec<Handle<Image>>) -> Self {
+    pub fn new_blended(textures: Vec<Handle<Image>>) -> Self {
         Self {
             textures,
             alpha_mode: AlphaMode::Blend,
@@ -58,7 +58,7 @@ pub const ATTRIBUTE_BLOCK_ID: MeshVertexAttribute =
     MeshVertexAttribute::new("BlockId", 978122767, VertexFormat::Uint32);
 
 pub const ATTRIBUTE_TEXTURE_INDEX: MeshVertexAttribute =
-    MeshVertexAttribute::new("TextureIndex", 978122780, VertexFormat::Uint32);
+    MeshVertexAttribute::new("TextureIndex", 978122784, VertexFormat::Uint32);
 
 impl Material for BlockMaterial {
     fn vertex_shader() -> ShaderRef { "shaders/terrain.wgsl".into() }

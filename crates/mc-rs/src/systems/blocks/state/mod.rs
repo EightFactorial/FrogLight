@@ -44,7 +44,7 @@ impl BlockState {
         blocks.get_block(&self.block_id)
     }
 
-    pub fn get_meshing(&self, blocks: &BlocksMap) -> BlockMeshData {
+    pub fn get_mesh_data(&self, blocks: &BlocksMap) -> BlockMeshData {
         let meshing = match &self.model {
             BlockModel::Standard => BlockMesh::Always,
             BlockModel::Simple { collision } => {

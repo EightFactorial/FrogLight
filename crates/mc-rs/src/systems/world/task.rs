@@ -85,7 +85,7 @@ impl ChunkTask {
                     .with_children(|parent| {
                         for (index, option) in results.into_iter().enumerate() {
                             if let Some(result) = option {
-                                let SectionTaskResult {
+                                let SectionData {
                                     opaque_mesh,
                                     transparent_mesh,
                                     terrain_collider,
@@ -93,37 +93,35 @@ impl ChunkTask {
                                     textures,
                                 } = result;
 
+                                let transform =
+                                    Transform::from_xyz(0.0, (index * SECTION_HEIGHT) as f32, 0.0);
+
                                 // Create the opaque mesh bundle
                                 if let Some(opaque_mesh) = opaque_mesh {
-                                    let opaque_material = MaterialMeshBundle::<BlockMaterial> {
-                                        mesh: meshes.add(opaque_mesh),
-                                        material: materials
-                                            .add(BlockMaterial::new(textures.clone())),
-                                        transform: Transform::from_xyz(
-                                            0.,
-                                            (index * SECTION_HEIGHT) as f32,
-                                            0.,
-                                        ),
-                                        ..Default::default()
-                                    };
-
-                                    parent.spawn((SectionComponent, opaque_material));
+                                    parent.spawn((
+                                        SectionComponent,
+                                        MaterialMeshBundle::<BlockMaterial> {
+                                            mesh: meshes.add(opaque_mesh),
+                                            material: materials
+                                                .add(BlockMaterial::new(textures.clone())),
+                                            transform,
+                                            ..Default::default()
+                                        },
+                                    ));
                                 }
 
                                 // Create the transparent mesh bundle
                                 if let Some(transparent_mesh) = transparent_mesh {
-                                    let transparent_material = MaterialMeshBundle::<BlockMaterial> {
-                                        mesh: meshes.add(transparent_mesh),
-                                        material: materials.add(BlockMaterial::new_blend(textures)),
-                                        transform: Transform::from_xyz(
-                                            0.,
-                                            (index * SECTION_HEIGHT) as f32,
-                                            0.,
-                                        ),
-                                        ..Default::default()
-                                    };
-
-                                    parent.spawn((SectionComponent, transparent_material));
+                                    parent.spawn((
+                                        SectionComponent,
+                                        MaterialMeshBundle::<BlockMaterial> {
+                                            mesh: meshes.add(transparent_mesh),
+                                            material: materials
+                                                .add(BlockMaterial::new_blended(textures)),
+                                            transform,
+                                            ..Default::default()
+                                        },
+                                    ));
                                 }
 
                                 // Spawn the terrain collider
@@ -136,6 +134,7 @@ impl ChunkTask {
                                             sleeping: true,
                                             ..Default::default()
                                         },
+                                        TransformBundle::from_transform(transform),
                                     ));
                                 }
 
@@ -150,6 +149,7 @@ impl ChunkTask {
                                             sleeping: true,
                                             ..Default::default()
                                         },
+                                        TransformBundle::from_transform(transform),
                                     ));
                                 }
                             }
@@ -182,8 +182,6 @@ async fn chunk_fn(
             }
         }
 
-        let section_data = chunk.read()[index].get_blocks();
-
         let neighbors = [
             neighbors[0].as_ref().map(|c| c.read()[index].get_blocks()),
             neighbors[1].as_ref().map(|c| c.read()[index].get_blocks()),
@@ -203,11 +201,12 @@ async fn chunk_fn(
 
         // Spawn a new thread for the section
         let task = Some(pool.spawn(section_fn(
-            section_data,
+            chunk.read()[index].get_blocks(),
             neighbors,
             blocks.clone(),
             blockstates.clone(),
         )));
+
         tasks.push(task);
     }
 
@@ -222,8 +221,8 @@ async fn chunk_fn(
     results
 }
 
-type SectionResult = Option<SectionTaskResult>;
-pub struct SectionTaskResult {
+type SectionResult = Option<SectionData>;
+pub struct SectionData {
     opaque_mesh: Option<Mesh>,
     transparent_mesh: Option<Mesh>,
     terrain_collider: Option<Collider>,
@@ -294,7 +293,7 @@ async fn section_fn(
                 let blockstate = blockstates.get_state(state_id);
 
                 let shape_index = MeshChunkShape::linearize([x, y, z]) as usize;
-                shape[shape_index] = blockstate.get_meshing(&blocks);
+                shape[shape_index] = blockstate.get_mesh_data(&blocks);
             }
         }
     }
@@ -318,14 +317,13 @@ async fn section_fn(
     let num_indices = buffer.quads.num_quads() * 6;
     let num_vertices = buffer.quads.num_quads() * 4;
 
-    // TODO: Fix the quads, maybe then this will work?
     // Terrain collider data
-    let collider_indices = Vec::with_capacity(num_indices);
-    let collider_positions = Vec::with_capacity(num_vertices);
+    let mut collider_indices = Vec::with_capacity(num_indices);
+    let mut collider_positions = Vec::with_capacity(num_vertices);
 
     // Fluid collider data
-    let fluid_indices = Vec::with_capacity(num_indices);
-    let fluid_positions = Vec::with_capacity(num_vertices);
+    let mut fluid_indices = Vec::with_capacity(num_indices);
+    let mut fluid_positions = Vec::with_capacity(num_vertices);
 
     // Opaque mesh data
     let mut opaque_indices = Vec::with_capacity(num_indices);
@@ -351,8 +349,8 @@ async fn section_fn(
 
         for quad in group.into_iter() {
             // Get the blockstate data
-            let [x, y, z] = quad.minimum.map(|v| v - 1);
-            let state_id = section_data[ChunkShape::linearize([x, z, y]) as usize];
+            let [x, y, z] = quad.minimum;
+            let state_id = section_data[ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize];
             let blockstate = blockstates.get_state(&state_id);
 
             // Get the block data
@@ -369,16 +367,16 @@ async fn section_fn(
             blockstate.model.mod_mesh_positions(&direction, &mut pos);
 
             // Add the block to the terrain collider
-            // if prop.collidable {
-            //     collider_indices.extend(face.quad_mesh_indices(collider_indices.len() as u32));
-            //     collider_positions.extend_from_slice(&pos);
-            // }
+            if prop.collidable {
+                collider_indices.extend(face.quad_mesh_indices(collider_positions.len() as u32));
+                collider_positions.extend_from_slice(&pos);
+            }
 
             // Add the block to the fluid collider
-            // if prop.is_fluid {
-            //     fluid_indices.extend(face.quad_mesh_indices(fluid_indices.len() as u32));
-            //     fluid_positions.extend_from_slice(&pos);
-            // }
+            if prop.is_fluid {
+                fluid_indices.extend(face.quad_mesh_indices(fluid_positions.len() as u32));
+                fluid_positions.extend_from_slice(&pos);
+            }
 
             // Determine the block model
             match &blockstate.model {
@@ -413,7 +411,7 @@ async fn section_fn(
                         // Add the block to the opaque mesh
                         true => {
                             opaque_indices
-                                .extend(face.quad_mesh_indices(opaque_indices.len() as u32));
+                                .extend(face.quad_mesh_indices(opaque_positions.len() as u32));
                             opaque_positions.extend(pos);
                             opaque_normals.extend(norm);
                             opaque_tex_uvs.extend(uvs);
@@ -423,7 +421,7 @@ async fn section_fn(
                         // Add the block to the transparent mesh
                         false => {
                             trans_indices
-                                .extend(face.quad_mesh_indices(trans_indices.len() as u32));
+                                .extend(face.quad_mesh_indices(trans_positions.len() as u32));
                             trans_positions.extend(pos);
                             trans_normals.extend(norm);
                             trans_tex_uvs.extend(uvs);
@@ -528,7 +526,7 @@ async fn section_fn(
         }
     };
 
-    Some(SectionTaskResult {
+    Some(SectionData {
         opaque_mesh,
         transparent_mesh,
         terrain_collider,
