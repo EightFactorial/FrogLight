@@ -1,13 +1,11 @@
 use bevy::{
     self,
-    asset::HandleId,
     prelude::*,
     render::{
         mesh::{Indices, VertexAttributeValues},
         render_resource::PrimitiveTopology,
     },
     tasks::{AsyncComputeTaskPool, Task},
-    utils::HashMap,
 };
 use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, Sensor, Sleeping};
 use block_mesh::{
@@ -16,7 +14,6 @@ use block_mesh::{
     GreedyQuadsBuffer, RIGHT_HANDED_Y_UP_CONFIG,
 };
 use futures_lite::future::{block_on, poll_once};
-use itertools::Itertools;
 use mc_rs_proto::types::enums::Direction;
 
 use crate::systems::{
@@ -385,26 +382,25 @@ async fn section_fn(
                     // TODO: Append the blockstate mesh data to the terrain mesh
                 }
                 _ => {
-                    // Get the block face texture
-                    let texture =
-                        blockstate
-                            .textures
-                            .get_texture(&direction)
-                            .unwrap_or_else(|| {
-                                error!(
-                                    "Block {}:{state_id} has no texture for face {direction:?}",
-                                    block.name
-                                );
-                                Handle::<Image>::default()
-                            });
+                    // Get the blockface texture
+                    let texture = match blockstate.textures.get_texture(&direction) {
+                        Some(texture) => texture,
+                        None => {
+                            error!(
+                                "Block {}:{state_id} has no texture for face {direction:?}",
+                                block.name
+                            );
+                            Handle::<Image>::default()
+                        }
+                    };
 
-                    // Get the texture index or insert it into the texture map
-                    let tex_index = if let Some(index) = textures.iter().position(|p| p == &texture)
-                    {
-                        index as u32
-                    } else {
-                        textures.push(texture);
-                        textures.len() as u32 - 1
+                    // Get the texture index or insert it into the textures list
+                    let tex_index = match textures.iter().position(|p| p == &texture) {
+                        Some(index) => index as u32,
+                        None => {
+                            textures.push(texture);
+                            textures.len() as u32 - 1
+                        }
                     };
 
                     let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);

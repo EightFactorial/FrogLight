@@ -84,9 +84,9 @@ fn main() {
     for gen in generators.iter() {
         info!("Generating {:?}...", gen);
         gen.parse(&cli.version, &data, &repo);
+        info!("");
     }
 
-    info!("");
     info!("Generation complete!");
 
     warn!("");

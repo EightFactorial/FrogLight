@@ -12,8 +12,8 @@ async-compression = { version = "0.4.1", features = ["futures-io", "zlib"] }
 async-net = "1.7.0"
 azalea-chat = { version = "0.7.0", default-features = false }
 azalea-nbt = { git = "https://github.com/EightFactorial/azalea", branch = "nbt", default-features = false }
-bevy_ecs = "0.11.0"
-bevy_math = "0.11.0"
+bevy_ecs = "0.11.2"
+bevy_math = "0.11.2"
 byteorder = { version = "1.4.3", features = ["i128"] }
 derive_more = "0.99.17"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }

@@ -35,7 +35,7 @@ impl BlockTextures {
     pub fn new(paths: &[&str], asset_server: &AssetServer) -> Self {
         let textures = paths
             .iter()
-            .map(|&path| asset_server.load(path))
+            .map(|&path| asset_server.load(format!("test/textures/block/{path}")))
             .collect::<Vec<_>>();
 
         match textures.len() {

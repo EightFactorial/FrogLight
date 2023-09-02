@@ -49,18 +49,6 @@ static EMPTY: &[&str] = &[];
 
 pub(super) fn create_states(states: &mut StatesMap, asset_server: &AssetServer) {
     add_state!(states, asset_server, 0u32, 0u32, EMPTY);
-    add_state!(
-        states,
-        asset_server,
-        1u32,
-        1u32,
-        &["test/textures/block/stone.png"]
-    );
-    add_state!(
-        states,
-        asset_server,
-        2u32,
-        2u32,
-        &["test/textures/block/granite.png"]
-    );
+    add_state!(states, asset_server, 1u32, 1u32, &["stone.png"]);
+    add_state!(states, asset_server, 2u32, 2u32, &["granite.png"]);
 }

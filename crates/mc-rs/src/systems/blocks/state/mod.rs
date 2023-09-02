@@ -81,15 +81,13 @@ impl BlockStates {
 
         list::create_states(&mut states, &asset_server);
 
+        // Add the fallback block state
         states.insert(
             u32::MAX,
             BlockState {
                 block_id: u32::MAX,
                 state_id: u32::MAX,
-                textures: BlockTextures::new(
-                    &["test/textures/block/light_blue_wool.png"],
-                    &asset_server,
-                ),
+                textures: BlockTextures::new(&["light_blue_wool.png"], &asset_server),
                 model: BlockModel::Standard,
             },
         );

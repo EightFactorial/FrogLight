@@ -1,5 +1,5 @@
 mod blocks;
-pub use blocks::Blocks;
+pub use blocks::{Block, Blocks};
 
 mod states;
 pub use states::States;

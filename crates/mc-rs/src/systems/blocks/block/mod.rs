@@ -40,6 +40,7 @@ impl Blocks {
 
         list::create_blocks(&mut blocks);
 
+        // Add the fallback block
         blocks.insert(
             u32::MAX,
             Block {
