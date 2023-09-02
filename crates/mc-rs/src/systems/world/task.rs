@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use bevy::{
     self,
     prelude::*,
@@ -227,6 +229,18 @@ pub struct SectionData {
     textures: Vec<Handle<Image>>,
 }
 
+impl Debug for SectionData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("SectionData")
+            .field("opaque_mesh", &self.opaque_mesh.is_some())
+            .field("transparent_mesh", &self.transparent_mesh.is_some())
+            .field("terrain_collider", &self.terrain_collider.is_some())
+            .field("fluid_collider", &self.fluid_collider.is_some())
+            .field("textures", &self.textures.len())
+            .finish()
+    }
+}
+
 const X: u32 = CHUNK_SIZE as u32;
 const Y: u32 = SECTION_HEIGHT as u32;
 const Z: u32 = CHUNK_SIZE as u32;
@@ -346,8 +360,8 @@ async fn section_fn(
 
         for quad in group.into_iter() {
             // Get the blockstate data
-            let [x, y, z] = quad.minimum;
-            let state_id = section_data[ChunkShape::linearize([x - 1, z - 1, y - 1]) as usize];
+            let [x, y, z] = quad.minimum.map(|i| i - 1);
+            let state_id = section_data[ChunkShape::linearize([x, z, y]) as usize];
             let blockstate = blockstates.get_state(&state_id);
 
             // Get the block data
@@ -464,7 +478,7 @@ async fn section_fn(
         }
     };
 
-    let transparent_mesh = match !trans_indices.is_empty() {
+    let transparent_mesh = match trans_indices.is_empty() {
         true => None,
         false => {
             let mut trans_mesh = Mesh::new(PrimitiveTopology::TriangleList);
