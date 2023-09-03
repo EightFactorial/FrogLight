@@ -20,7 +20,11 @@ use crate::generate::{Generator, Generators};
 pub struct Blocks;
 
 impl Generator for Blocks {
-    fn deps(&self) -> &'static [Datasets] { &[datasets::Datasets::Blocks(datasets::block::Blocks)] }
+    fn deps(&self) -> &'static [Datasets] {
+        &[datasets::Datasets::BlockStates(
+            datasets::block::BlockStates,
+        )]
+    }
 
     fn parse(&self, _version: &Version, data: &JsonValue, repo: &Repository) {
         let mut path: PathBuf = repo.path().parent().unwrap().into();
@@ -54,6 +58,7 @@ impl Generator for Blocks {
         let default_block = Block::default();
 
         // Loop through all blocks in order
+        let mut state_id = 0;
         for block_id in 0..block_list.len() as u32 {
             let Some(index) = block_list
                 .entries()
@@ -70,11 +75,12 @@ impl Generator for Blocks {
             let mut properties = TokenStream::new();
             get_properties(&mut properties, &default_block, block_data);
 
+            let max_id = state_id + get_state_count(block_data, data) - 1;
+
             let add_block = call_add_block(quote::quote! {
                 blocks,
                 #block_id,
-                // TODO: Add block states
-                0..0,
+                #state_id..=#max_id,
                 #name,
                 BlockProperties {
                     #properties
@@ -82,6 +88,7 @@ impl Generator for Blocks {
                 }
             });
 
+            state_id = max_id + 1;
             macro_calls.push(add_block);
         }
 
@@ -178,6 +185,65 @@ fn get_properties(properties: &mut TokenStream, default_block: &Block, block_dat
             is_fluid: #val,
         });
     }
+}
+
+/// Get the number of states for a block
+fn get_state_count(block_data: &JsonValue, data: &JsonValue) -> u32 {
+    let states = &data["blocks"]["states"]["states"];
+
+    let mut state_count = 1u32;
+
+    for state in block_data["states"].members() {
+        let state = state.as_str().unwrap();
+
+        let state_data = &states[state];
+        state_count *= match state_data["type"].as_str().unwrap() {
+            "boolean" => 2,
+            "direction" | "enum" => states[state]["values"].entries().count() as u32,
+            "integer" => match state {
+                "AGE_1" => 2,
+                "AGE_2" => 3,
+                "AGE_3" => 4,
+                "AGE_4" => 5,
+                "AGE_5" => 6,
+                "AGE_7" => 8,
+                "AGE_15" => 16,
+                "AGE_25" => 26,
+                "BITES" => 6,
+                "CANDLES" => 4,
+                "CHARGES" => 5,
+                "DELAY" => 4,
+                "DISTANCE_0_7" => 8,
+                "DISTANCE_1_7" => 7,
+                "DUSTED" => 4,
+                "EGGS" => 3,
+                "FLOWER_AMOUNT" => 4,
+                "HATCH" => 3,
+                "HONEY_LEVEL" => 6,
+                "LAYERS" => 8,
+                "LEVEL_1_8" => 8,
+                "LEVEL_3" => 3,
+                "LEVEL_8" => 9,
+                "LEVEL_15" => 16,
+                "MOISTURE" => 8,
+                "NOTE" => 25,
+                "PICKLES" => 4,
+                "POWER" => 16,
+                "ROTATION" => 16,
+                "STAGE" => 2,
+                _ => {
+                    error!("Unknown integer state {state}");
+                    1
+                }
+            },
+            state => {
+                error!("Unknown state type {state}");
+                continue;
+            }
+        }
+    }
+
+    state_count
 }
 
 fn call_add_block(tokens: TokenStream) -> Stmt {

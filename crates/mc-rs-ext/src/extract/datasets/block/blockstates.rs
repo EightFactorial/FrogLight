@@ -156,10 +156,51 @@ impl Dataset for BlockStates {
 
         // Add the states to the block data
         for (&block, class) in block_classes.iter() {
-            let info = &class_info[&class];
+            let info = class_info.get_mut(&class).unwrap();
+
+            // TODO: Get these automatically
+            match block.as_str() {
+                "chiseled_bookshelf" => info.states.extend(
+                    [
+                        "HORIZONTAL_FACING",
+                        "SLOT_0_OCCUPIED",
+                        "SLOT_1_OCCUPIED",
+                        "SLOT_2_OCCUPIED",
+                        "SLOT_3_OCCUPIED",
+                        "SLOT_4_OCCUPIED",
+                        "SLOT_5_OCCUPIED",
+                    ]
+                    .map(|s| s.to_owned()),
+                ),
+                "glow_lichen" => info.states.extend(
+                    [
+                        "DOWN",
+                        "UP",
+                        "NORTH",
+                        "SOUTH",
+                        "WEST",
+                        "EAST",
+                        "WATERLOGGED",
+                    ]
+                    .map(|s| s.to_owned()),
+                ),
+                "brewing_stand" => info
+                    .states
+                    .extend(["HAS_BOTTLE_0", "HAS_BOTTLE_1", "HAS_BOTTLE_2"].map(|s| s.to_owned())),
+                "torchflower_crop" => info.states.retain(|s| s != "AGE_7"),
+                "pitcher_crop" => info.states.clear(),
+                "beetroots" => info.states.retain(|s| s != "AGE_7"),
+                _ => {}
+            }
 
             if !info.states.is_empty() {
-                data["blocks"]["blocks"]["blocks"][block]["states"] = info.states.clone().into();
+                data["blocks"]["blocks"]["blocks"][block]["states"] = info
+                    .states
+                    .iter()
+                    .unique()
+                    .cloned()
+                    .collect::<Vec<String>>()
+                    .into();
             }
         }
     }
@@ -186,6 +227,14 @@ fn get_class_info(class: &str, classmap: &ClassMap, data: &JsonValue) -> ClassIn
                 states.push(class);
             } else {
                 error!("Could not find class for field {}", field.name);
+            }
+        }
+
+        // Get the states for the super class
+        if let Some(class) = &class.super_class {
+            if !class.contains("java/lang/Object") {
+                let info = get_class_info(class, classmap, data);
+                states.extend(info.states);
             }
         }
 

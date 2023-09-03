@@ -1,4 +1,4 @@
-use std::{hash::Hash, ops::Range, sync::Arc};
+use std::{hash::Hash, ops::RangeInclusive, sync::Arc};
 
 use bevy::prelude::*;
 use mc_rs_proto::types::ResourceLocation;
@@ -20,7 +20,7 @@ pub(super) type BlocksMap = IntMap<u32, Block>;
 #[derive(Debug, Clone)]
 pub struct Block {
     pub block_id: u32,
-    pub block_states: Range<u32>,
+    pub block_states: RangeInclusive<u32>,
     pub name: String,
     pub key: ResourceLocation,
     pub properties: BlockProperties,
@@ -45,7 +45,7 @@ impl Blocks {
             u32::MAX,
             Block {
                 block_id: u32::MAX,
-                block_states: u32::MAX..u32::MAX,
+                block_states: u32::MAX..=u32::MAX,
                 name: "Error".to_string(),
                 key: ResourceLocation::new("mc-rs:error"),
                 properties: BlockProperties::default(),

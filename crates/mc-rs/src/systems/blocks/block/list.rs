@@ -36,7 +36,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         0u32,
-        0..0,
+        0u32..=0u32,
         "Air",
         BlockProperties {
             collidable: false,
@@ -48,7 +48,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         1u32,
-        0..0,
+        1u32..=1u32,
         "Stone",
         BlockProperties {
             hardness: 1.5f32,
@@ -59,7 +59,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         2u32,
-        0..0,
+        2u32..=2u32,
         "Granite",
         BlockProperties {
             hardness: 1.5f32,
@@ -70,7 +70,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         3u32,
-        0..0,
+        3u32..=3u32,
         "Polished Granite",
         BlockProperties {
             hardness: 1.5f32,
@@ -81,7 +81,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         4u32,
-        0..0,
+        4u32..=4u32,
         "Diorite",
         BlockProperties {
             hardness: 1.5f32,
@@ -92,7 +92,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         5u32,
-        0..0,
+        5u32..=5u32,
         "Polished Diorite",
         BlockProperties {
             hardness: 1.5f32,
@@ -103,7 +103,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         6u32,
-        0..0,
+        6u32..=6u32,
         "Andesite",
         BlockProperties {
             hardness: 1.5f32,
@@ -114,7 +114,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         7u32,
-        0..0,
+        7u32..=7u32,
         "Polished Andesite",
         BlockProperties {
             hardness: 1.5f32,
@@ -125,7 +125,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         8u32,
-        0..0,
+        8u32..=9u32,
         "Grass Block",
         BlockProperties {
             hardness: 0.6f32,
@@ -136,7 +136,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         9u32,
-        0..0,
+        10u32..=10u32,
         "Dirt",
         BlockProperties {
             hardness: 0.5f32,
@@ -146,7 +146,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         10u32,
-        0..0,
+        11u32..=11u32,
         "Coarse Dirt",
         BlockProperties {
             hardness: 0.5f32,
@@ -156,7 +156,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         11u32,
-        0..0,
+        12u32..=13u32,
         "Podzol",
         BlockProperties {
             hardness: 0.5f32,
@@ -166,7 +166,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         12u32,
-        0..0,
+        14u32..=14u32,
         "Cobblestone",
         BlockProperties {
             hardness: 2f32,
@@ -177,7 +177,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         13u32,
-        0..0,
+        15u32..=15u32,
         "Oak Planks",
         BlockProperties {
             hardness: 2f32,
@@ -189,7 +189,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         14u32,
-        0..0,
+        16u32..=16u32,
         "Spruce Planks",
         BlockProperties {
             hardness: 2f32,
@@ -201,7 +201,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         15u32,
-        0..0,
+        17u32..=17u32,
         "Birch Planks",
         BlockProperties {
             hardness: 2f32,
@@ -213,7 +213,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         16u32,
-        0..0,
+        18u32..=18u32,
         "Jungle Planks",
         BlockProperties {
             hardness: 2f32,
@@ -225,7 +225,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         17u32,
-        0..0,
+        19u32..=19u32,
         "Acacia Planks",
         BlockProperties {
             hardness: 2f32,
@@ -237,7 +237,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         18u32,
-        0..0,
+        20u32..=20u32,
         "Cherry Planks",
         BlockProperties {
             hardness: 2f32,
@@ -249,7 +249,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         19u32,
-        0..0,
+        21u32..=21u32,
         "Dark Oak Planks",
         BlockProperties {
             hardness: 2f32,
@@ -261,7 +261,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         20u32,
-        0..0,
+        22u32..=22u32,
         "Mangrove Planks",
         BlockProperties {
             hardness: 2f32,
@@ -273,7 +273,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         21u32,
-        0..0,
+        23u32..=23u32,
         "Bamboo Planks",
         BlockProperties {
             hardness: 2f32,
@@ -285,7 +285,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         22u32,
-        0..0,
+        24u32..=24u32,
         "Bamboo Mosaic",
         BlockProperties {
             hardness: 2f32,
@@ -297,7 +297,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         23u32,
-        0..0,
+        25u32..=26u32,
         "Oak Sapling",
         BlockProperties {
             random_ticks: true,
@@ -309,7 +309,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         24u32,
-        0..0,
+        27u32..=28u32,
         "Spruce Sapling",
         BlockProperties {
             random_ticks: true,
@@ -321,7 +321,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         25u32,
-        0..0,
+        29u32..=30u32,
         "Birch Sapling",
         BlockProperties {
             random_ticks: true,
@@ -333,7 +333,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         26u32,
-        0..0,
+        31u32..=32u32,
         "Jungle Sapling",
         BlockProperties {
             random_ticks: true,
@@ -345,7 +345,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         27u32,
-        0..0,
+        33u32..=34u32,
         "Acacia Sapling",
         BlockProperties {
             random_ticks: true,
@@ -357,7 +357,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         28u32,
-        0..0,
+        35u32..=36u32,
         "Cherry Sapling",
         BlockProperties {
             random_ticks: true,
@@ -369,7 +369,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         29u32,
-        0..0,
+        37u32..=38u32,
         "Dark Oak Sapling",
         BlockProperties {
             random_ticks: true,
@@ -381,7 +381,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         30u32,
-        0..0,
+        39u32..=78u32,
         "Mangrove Propagule",
         BlockProperties {
             random_ticks: true,
@@ -393,7 +393,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         31u32,
-        0..0,
+        79u32..=79u32,
         "Bedrock",
         BlockProperties {
             hardness: -1f32,
@@ -404,7 +404,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         32u32,
-        0..0,
+        80u32..=95u32,
         "Water",
         BlockProperties {
             hardness: 100f32,
@@ -417,7 +417,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         33u32,
-        0..0,
+        96u32..=111u32,
         "Lava",
         BlockProperties {
             hardness: 100f32,
@@ -431,7 +431,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         34u32,
-        0..0,
+        112u32..=112u32,
         "Sand",
         BlockProperties {
             hardness: 0.5f32,
@@ -441,7 +441,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         35u32,
-        0..0,
+        113u32..=116u32,
         "Suspicious Sand",
         BlockProperties {
             hardness: 0.25f32,
@@ -451,7 +451,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         36u32,
-        0..0,
+        117u32..=117u32,
         "Red Sand",
         BlockProperties {
             hardness: 0.5f32,
@@ -461,7 +461,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         37u32,
-        0..0,
+        118u32..=118u32,
         "Gravel",
         BlockProperties {
             hardness: 0.6f32,
@@ -471,7 +471,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         38u32,
-        0..0,
+        119u32..=122u32,
         "Suspicious Gravel",
         BlockProperties {
             hardness: 0.25f32,
@@ -481,7 +481,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         39u32,
-        0..0,
+        123u32..=123u32,
         "Gold Ore",
         BlockProperties {
             hardness: 3f32,
@@ -492,7 +492,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         40u32,
-        0..0,
+        124u32..=124u32,
         "Deepslate Gold Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -503,7 +503,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         41u32,
-        0..0,
+        125u32..=125u32,
         "Iron Ore",
         BlockProperties {
             hardness: 3f32,
@@ -514,7 +514,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         42u32,
-        0..0,
+        126u32..=126u32,
         "Deepslate Iron Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -525,7 +525,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         43u32,
-        0..0,
+        127u32..=127u32,
         "Coal Ore",
         BlockProperties {
             hardness: 3f32,
@@ -536,7 +536,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         44u32,
-        0..0,
+        128u32..=128u32,
         "Deepslate Coal Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -547,7 +547,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         45u32,
-        0..0,
+        129u32..=129u32,
         "Nether Gold Ore",
         BlockProperties {
             hardness: 3f32,
@@ -558,7 +558,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         46u32,
-        0..0,
+        130u32..=132u32,
         "Oak Log",
         BlockProperties {
             hardness: 2f32,
@@ -570,7 +570,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         47u32,
-        0..0,
+        133u32..=135u32,
         "Spruce Log",
         BlockProperties {
             hardness: 2f32,
@@ -582,7 +582,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         48u32,
-        0..0,
+        136u32..=138u32,
         "Birch Log",
         BlockProperties {
             hardness: 2f32,
@@ -594,7 +594,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         49u32,
-        0..0,
+        139u32..=141u32,
         "Jungle Log",
         BlockProperties {
             hardness: 2f32,
@@ -606,7 +606,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         50u32,
-        0..0,
+        142u32..=144u32,
         "Acacia Log",
         BlockProperties {
             hardness: 2f32,
@@ -618,7 +618,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         51u32,
-        0..0,
+        145u32..=147u32,
         "Cherry Log",
         BlockProperties {
             hardness: 2f32,
@@ -630,7 +630,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         52u32,
-        0..0,
+        148u32..=150u32,
         "Dark Oak Log",
         BlockProperties {
             hardness: 2f32,
@@ -642,7 +642,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         53u32,
-        0..0,
+        151u32..=153u32,
         "Mangrove Log",
         BlockProperties {
             hardness: 2f32,
@@ -654,7 +654,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         54u32,
-        0..0,
+        154u32..=155u32,
         "Mangrove Roots",
         BlockProperties {
             hardness: 0.7f32,
@@ -667,7 +667,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         55u32,
-        0..0,
+        156u32..=158u32,
         "Muddy Mangrove Roots",
         BlockProperties {
             hardness: 0.7f32,
@@ -677,7 +677,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         56u32,
-        0..0,
+        159u32..=161u32,
         "Bamboo Block",
         BlockProperties {
             hardness: 2f32,
@@ -689,7 +689,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         57u32,
-        0..0,
+        162u32..=164u32,
         "Stripped Spruce Log",
         BlockProperties {
             hardness: 2f32,
@@ -701,7 +701,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         58u32,
-        0..0,
+        165u32..=167u32,
         "Stripped Birch Log",
         BlockProperties {
             hardness: 2f32,
@@ -713,7 +713,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         59u32,
-        0..0,
+        168u32..=170u32,
         "Stripped Jungle Log",
         BlockProperties {
             hardness: 2f32,
@@ -725,7 +725,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         60u32,
-        0..0,
+        171u32..=173u32,
         "Stripped Acacia Log",
         BlockProperties {
             hardness: 2f32,
@@ -737,7 +737,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         61u32,
-        0..0,
+        174u32..=176u32,
         "Stripped Cherry Log",
         BlockProperties {
             hardness: 2f32,
@@ -749,7 +749,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         62u32,
-        0..0,
+        177u32..=179u32,
         "Stripped Dark Oak Log",
         BlockProperties {
             hardness: 2f32,
@@ -761,7 +761,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         63u32,
-        0..0,
+        180u32..=182u32,
         "Stripped Oak Log",
         BlockProperties {
             hardness: 2f32,
@@ -773,7 +773,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         64u32,
-        0..0,
+        183u32..=185u32,
         "Stripped Mangrove Log",
         BlockProperties {
             hardness: 2f32,
@@ -785,7 +785,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         65u32,
-        0..0,
+        186u32..=188u32,
         "Stripped Bamboo Block",
         BlockProperties {
             hardness: 2f32,
@@ -797,7 +797,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         66u32,
-        0..0,
+        189u32..=191u32,
         "Oak Wood",
         BlockProperties {
             hardness: 2f32,
@@ -808,7 +808,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         67u32,
-        0..0,
+        192u32..=194u32,
         "Spruce Wood",
         BlockProperties {
             hardness: 2f32,
@@ -819,7 +819,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         68u32,
-        0..0,
+        195u32..=197u32,
         "Birch Wood",
         BlockProperties {
             hardness: 2f32,
@@ -830,7 +830,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         69u32,
-        0..0,
+        198u32..=200u32,
         "Jungle Wood",
         BlockProperties {
             hardness: 2f32,
@@ -841,7 +841,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         70u32,
-        0..0,
+        201u32..=203u32,
         "Acacia Wood",
         BlockProperties {
             hardness: 2f32,
@@ -852,7 +852,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         71u32,
-        0..0,
+        204u32..=206u32,
         "Cherry Wood",
         BlockProperties {
             hardness: 2f32,
@@ -863,7 +863,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         72u32,
-        0..0,
+        207u32..=209u32,
         "Dark Oak Wood",
         BlockProperties {
             hardness: 2f32,
@@ -874,7 +874,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         73u32,
-        0..0,
+        210u32..=212u32,
         "Mangrove Wood",
         BlockProperties {
             hardness: 2f32,
@@ -885,7 +885,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         74u32,
-        0..0,
+        213u32..=215u32,
         "Stripped Oak Wood",
         BlockProperties {
             hardness: 2f32,
@@ -896,7 +896,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         75u32,
-        0..0,
+        216u32..=218u32,
         "Stripped Spruce Wood",
         BlockProperties {
             hardness: 2f32,
@@ -907,7 +907,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         76u32,
-        0..0,
+        219u32..=221u32,
         "Stripped Birch Wood",
         BlockProperties {
             hardness: 2f32,
@@ -918,7 +918,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         77u32,
-        0..0,
+        222u32..=224u32,
         "Stripped Jungle Wood",
         BlockProperties {
             hardness: 2f32,
@@ -929,7 +929,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         78u32,
-        0..0,
+        225u32..=227u32,
         "Stripped Acacia Wood",
         BlockProperties {
             hardness: 2f32,
@@ -940,7 +940,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         79u32,
-        0..0,
+        228u32..=230u32,
         "Stripped Cherry Wood",
         BlockProperties {
             hardness: 2f32,
@@ -951,7 +951,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         80u32,
-        0..0,
+        231u32..=233u32,
         "Stripped Dark Oak Wood",
         BlockProperties {
             hardness: 2f32,
@@ -962,7 +962,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         81u32,
-        0..0,
+        234u32..=236u32,
         "Stripped Mangrove Wood",
         BlockProperties {
             hardness: 2f32,
@@ -974,7 +974,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         82u32,
-        0..0,
+        237u32..=264u32,
         "Oak Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -988,7 +988,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         83u32,
-        0..0,
+        265u32..=292u32,
         "Spruce Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1002,7 +1002,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         84u32,
-        0..0,
+        293u32..=320u32,
         "Birch Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1016,7 +1016,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         85u32,
-        0..0,
+        321u32..=348u32,
         "Jungle Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1030,7 +1030,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         86u32,
-        0..0,
+        349u32..=376u32,
         "Acacia Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1044,7 +1044,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         87u32,
-        0..0,
+        377u32..=404u32,
         "Cherry Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1057,7 +1057,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         88u32,
-        0..0,
+        405u32..=432u32,
         "Dark Oak Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1071,7 +1071,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         89u32,
-        0..0,
+        433u32..=460u32,
         "Mangrove Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1084,7 +1084,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         90u32,
-        0..0,
+        461u32..=488u32,
         "Azalea Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1098,7 +1098,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         91u32,
-        0..0,
+        489u32..=516u32,
         "Flowering Azalea Leaves",
         BlockProperties {
             hardness: 0.2f32,
@@ -1112,7 +1112,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         92u32,
-        0..0,
+        517u32..=517u32,
         "Sponge",
         BlockProperties {
             hardness: 0.6f32,
@@ -1122,7 +1122,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         93u32,
-        0..0,
+        518u32..=518u32,
         "Wet Sponge",
         BlockProperties {
             hardness: 0.6f32,
@@ -1132,7 +1132,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         94u32,
-        0..0,
+        519u32..=519u32,
         "Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -1143,7 +1143,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         95u32,
-        0..0,
+        520u32..=520u32,
         "Lapis Ore",
         BlockProperties {
             hardness: 3f32,
@@ -1154,7 +1154,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         96u32,
-        0..0,
+        521u32..=521u32,
         "Deepslate Lapis Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -1165,7 +1165,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         97u32,
-        0..0,
+        522u32..=522u32,
         "Lapis Block",
         BlockProperties {
             hardness: 3f32,
@@ -1176,7 +1176,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         98u32,
-        0..0,
+        523u32..=534u32,
         "Dispenser",
         BlockProperties {
             hardness: 3.5f32,
@@ -1186,7 +1186,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         99u32,
-        0..0,
+        535u32..=535u32,
         "Sandstone",
         BlockProperties {
             hardness: 0.8f32,
@@ -1196,7 +1196,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         100u32,
-        0..0,
+        536u32..=536u32,
         "Chiseled Sandstone",
         BlockProperties {
             hardness: 0.8f32,
@@ -1206,7 +1206,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         101u32,
-        0..0,
+        537u32..=537u32,
         "Cut Sandstone",
         BlockProperties {
             hardness: 0.8f32,
@@ -1216,7 +1216,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         102u32,
-        0..0,
+        538u32..=1687u32,
         "Note Block",
         BlockProperties {
             hardness: 0.8f32,
@@ -1227,7 +1227,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         103u32,
-        0..0,
+        1688u32..=1703u32,
         "White Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1239,7 +1239,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         104u32,
-        0..0,
+        1704u32..=1719u32,
         "Orange Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1251,7 +1251,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         105u32,
-        0..0,
+        1720u32..=1735u32,
         "Magenta Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1263,7 +1263,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         106u32,
-        0..0,
+        1736u32..=1751u32,
         "Light Blue Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1275,7 +1275,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         107u32,
-        0..0,
+        1752u32..=1767u32,
         "Yellow Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1287,7 +1287,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         108u32,
-        0..0,
+        1768u32..=1783u32,
         "Lime Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1299,7 +1299,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         109u32,
-        0..0,
+        1784u32..=1799u32,
         "Pink Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1311,7 +1311,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         110u32,
-        0..0,
+        1800u32..=1815u32,
         "Gray Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1323,7 +1323,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         111u32,
-        0..0,
+        1816u32..=1831u32,
         "Light Gray Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1335,7 +1335,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         112u32,
-        0..0,
+        1832u32..=1847u32,
         "Cyan Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1347,7 +1347,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         113u32,
-        0..0,
+        1848u32..=1863u32,
         "Purple Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1359,7 +1359,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         114u32,
-        0..0,
+        1864u32..=1879u32,
         "Blue Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1371,7 +1371,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         115u32,
-        0..0,
+        1880u32..=1895u32,
         "Brown Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1383,7 +1383,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         116u32,
-        0..0,
+        1896u32..=1911u32,
         "Green Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1395,7 +1395,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         117u32,
-        0..0,
+        1912u32..=1927u32,
         "Red Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1407,7 +1407,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         118u32,
-        0..0,
+        1928u32..=1943u32,
         "Black Bed",
         BlockProperties {
             hardness: 0.2f32,
@@ -1419,7 +1419,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         119u32,
-        0..0,
+        1944u32..=1967u32,
         "Powered Rail",
         BlockProperties {
             hardness: 0.7f32,
@@ -1431,7 +1431,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         120u32,
-        0..0,
+        1968u32..=1991u32,
         "Detector Rail",
         BlockProperties {
             hardness: 0.7f32,
@@ -1443,7 +1443,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         121u32,
-        0..0,
+        1992u32..=2003u32,
         "Sticky Piston",
         BlockProperties {
             hardness: 1.5f32,
@@ -1454,7 +1454,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         122u32,
-        0..0,
+        2004u32..=2004u32,
         "Cobweb",
         BlockProperties {
             hardness: 4f32,
@@ -1466,7 +1466,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         123u32,
-        0..0,
+        2005u32..=2005u32,
         "Grass",
         BlockProperties {
             burnable: true,
@@ -1478,7 +1478,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         124u32,
-        0..0,
+        2006u32..=2006u32,
         "Fern",
         BlockProperties {
             burnable: true,
@@ -1490,7 +1490,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         125u32,
-        0..0,
+        2007u32..=2007u32,
         "Dead Bush",
         BlockProperties {
             burnable: true,
@@ -1502,7 +1502,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         126u32,
-        0..0,
+        2008u32..=2008u32,
         "Seagrass",
         BlockProperties {
             collidable: false,
@@ -1513,7 +1513,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         127u32,
-        0..0,
+        2009u32..=2010u32,
         "Tall Seagrass",
         BlockProperties {
             collidable: false,
@@ -1524,7 +1524,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         128u32,
-        0..0,
+        2011u32..=2022u32,
         "Piston",
         BlockProperties {
             hardness: 1.5f32,
@@ -1535,7 +1535,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         129u32,
-        0..0,
+        2023u32..=2046u32,
         "Piston Head",
         BlockProperties {
             hardness: 1.5f32,
@@ -1545,7 +1545,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         130u32,
-        0..0,
+        2047u32..=2047u32,
         "White Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1556,7 +1556,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         131u32,
-        0..0,
+        2048u32..=2048u32,
         "Orange Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1567,7 +1567,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         132u32,
-        0..0,
+        2049u32..=2049u32,
         "Magenta Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1578,7 +1578,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         133u32,
-        0..0,
+        2050u32..=2050u32,
         "Light Blue Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1589,7 +1589,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         134u32,
-        0..0,
+        2051u32..=2051u32,
         "Yellow Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1600,7 +1600,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         135u32,
-        0..0,
+        2052u32..=2052u32,
         "Lime Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1611,7 +1611,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         136u32,
-        0..0,
+        2053u32..=2053u32,
         "Pink Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1622,7 +1622,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         137u32,
-        0..0,
+        2054u32..=2054u32,
         "Gray Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1633,7 +1633,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         138u32,
-        0..0,
+        2055u32..=2055u32,
         "Light Gray Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1644,7 +1644,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         139u32,
-        0..0,
+        2056u32..=2056u32,
         "Cyan Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1655,7 +1655,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         140u32,
-        0..0,
+        2057u32..=2057u32,
         "Purple Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1666,7 +1666,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         141u32,
-        0..0,
+        2058u32..=2058u32,
         "Blue Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1677,7 +1677,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         142u32,
-        0..0,
+        2059u32..=2059u32,
         "Brown Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1688,7 +1688,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         143u32,
-        0..0,
+        2060u32..=2060u32,
         "Green Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1699,7 +1699,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         144u32,
-        0..0,
+        2061u32..=2061u32,
         "Red Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1710,7 +1710,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         145u32,
-        0..0,
+        2062u32..=2062u32,
         "Black Wool",
         BlockProperties {
             hardness: 0.8f32,
@@ -1721,7 +1721,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         146u32,
-        0..0,
+        2063u32..=2074u32,
         "Moving Piston",
         BlockProperties {
             hardness: -1f32,
@@ -1732,7 +1732,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         147u32,
-        0..0,
+        2075u32..=2075u32,
         "Dandelion",
         BlockProperties {
             collidable: false,
@@ -1743,7 +1743,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         148u32,
-        0..0,
+        2076u32..=2076u32,
         "Torchflower",
         BlockProperties {
             collidable: false,
@@ -1754,7 +1754,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         149u32,
-        0..0,
+        2077u32..=2077u32,
         "Poppy",
         BlockProperties {
             collidable: false,
@@ -1765,7 +1765,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         150u32,
-        0..0,
+        2078u32..=2078u32,
         "Blue Orchid",
         BlockProperties {
             collidable: false,
@@ -1776,7 +1776,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         151u32,
-        0..0,
+        2079u32..=2079u32,
         "Allium",
         BlockProperties {
             collidable: false,
@@ -1787,7 +1787,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         152u32,
-        0..0,
+        2080u32..=2080u32,
         "Azure Bluet",
         BlockProperties {
             collidable: false,
@@ -1798,7 +1798,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         153u32,
-        0..0,
+        2081u32..=2081u32,
         "Red Tulip",
         BlockProperties {
             collidable: false,
@@ -1809,7 +1809,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         154u32,
-        0..0,
+        2082u32..=2082u32,
         "Orange Tulip",
         BlockProperties {
             collidable: false,
@@ -1820,7 +1820,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         155u32,
-        0..0,
+        2083u32..=2083u32,
         "White Tulip",
         BlockProperties {
             collidable: false,
@@ -1831,7 +1831,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         156u32,
-        0..0,
+        2084u32..=2084u32,
         "Pink Tulip",
         BlockProperties {
             collidable: false,
@@ -1842,7 +1842,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         157u32,
-        0..0,
+        2085u32..=2085u32,
         "Oxeye Daisy",
         BlockProperties {
             collidable: false,
@@ -1853,7 +1853,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         158u32,
-        0..0,
+        2086u32..=2086u32,
         "Cornflower",
         BlockProperties {
             collidable: false,
@@ -1864,7 +1864,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         159u32,
-        0..0,
+        2087u32..=2087u32,
         "Wither Rose",
         BlockProperties {
             collidable: false,
@@ -1875,7 +1875,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         160u32,
-        0..0,
+        2088u32..=2088u32,
         "Lily Of The Valley",
         BlockProperties {
             collidable: false,
@@ -1886,7 +1886,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         161u32,
-        0..0,
+        2089u32..=2089u32,
         "Brown Mushroom",
         BlockProperties {
             random_ticks: true,
@@ -1898,7 +1898,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         162u32,
-        0..0,
+        2090u32..=2090u32,
         "Red Mushroom",
         BlockProperties {
             random_ticks: true,
@@ -1910,7 +1910,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         163u32,
-        0..0,
+        2091u32..=2091u32,
         "Gold Block",
         BlockProperties {
             hardness: 3f32,
@@ -1921,7 +1921,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         164u32,
-        0..0,
+        2092u32..=2092u32,
         "Iron Block",
         BlockProperties {
             hardness: 5f32,
@@ -1932,7 +1932,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         165u32,
-        0..0,
+        2093u32..=2093u32,
         "Bricks",
         BlockProperties {
             hardness: 2f32,
@@ -1943,7 +1943,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         166u32,
-        0..0,
+        2094u32..=2095u32,
         "Tnt",
         BlockProperties {
             burnable: true,
@@ -1953,7 +1953,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         167u32,
-        0..0,
+        2096u32..=2096u32,
         "Bookshelf",
         BlockProperties {
             hardness: 1.5f32,
@@ -1964,7 +1964,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         168u32,
-        0..0,
+        2097u32..=2352u32,
         "Chiseled Bookshelf",
         BlockProperties {
             hardness: 1.5f32,
@@ -1975,7 +1975,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         169u32,
-        0..0,
+        2353u32..=2353u32,
         "Mossy Cobblestone",
         BlockProperties {
             hardness: 2f32,
@@ -1986,7 +1986,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         170u32,
-        0..0,
+        2354u32..=2354u32,
         "Obsidian",
         BlockProperties {
             hardness: 50f32,
@@ -1997,7 +1997,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         171u32,
-        0..0,
+        2355u32..=2355u32,
         "Torch",
         BlockProperties {
             collidable: false,
@@ -2008,7 +2008,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         172u32,
-        0..0,
+        2356u32..=2359u32,
         "Wall Torch",
         BlockProperties {
             collidable: false,
@@ -2019,7 +2019,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         173u32,
-        0..0,
+        2360u32..=2871u32,
         "Fire",
         BlockProperties {
             collidable: false,
@@ -2030,7 +2030,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         174u32,
-        0..0,
+        2872u32..=2872u32,
         "Soul Fire",
         BlockProperties {
             collidable: false,
@@ -2041,7 +2041,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         175u32,
-        0..0,
+        2873u32..=2873u32,
         "Spawner",
         BlockProperties {
             hardness: 5f32,
@@ -2052,7 +2052,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         176u32,
-        0..0,
+        2874u32..=2953u32,
         "Oak Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -2064,7 +2064,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         177u32,
-        0..0,
+        2954u32..=2977u32,
         "Chest",
         BlockProperties {
             hardness: 2.5f32,
@@ -2075,7 +2075,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         178u32,
-        0..0,
+        2978u32..=4273u32,
         "Redstone Wire",
         BlockProperties {
             collidable: false,
@@ -2086,7 +2086,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         179u32,
-        0..0,
+        4274u32..=4274u32,
         "Diamond Ore",
         BlockProperties {
             hardness: 3f32,
@@ -2097,7 +2097,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         180u32,
-        0..0,
+        4275u32..=4275u32,
         "Deepslate Diamond Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -2108,7 +2108,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         181u32,
-        0..0,
+        4276u32..=4276u32,
         "Diamond Block",
         BlockProperties {
             hardness: 5f32,
@@ -2119,7 +2119,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         182u32,
-        0..0,
+        4277u32..=4277u32,
         "Crafting Table",
         BlockProperties {
             hardness: 2.5f32,
@@ -2130,7 +2130,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         183u32,
-        0..0,
+        4278u32..=4285u32,
         "Wheat",
         BlockProperties {
             random_ticks: true,
@@ -2142,7 +2142,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         184u32,
-        0..0,
+        4286u32..=4293u32,
         "Farmland",
         BlockProperties {
             hardness: 0.6f32,
@@ -2153,7 +2153,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         185u32,
-        0..0,
+        4294u32..=4301u32,
         "Furnace",
         BlockProperties {
             hardness: 3.5f32,
@@ -2163,7 +2163,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         186u32,
-        0..0,
+        4302u32..=4333u32,
         "Oak Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2176,7 +2176,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         187u32,
-        0..0,
+        4334u32..=4365u32,
         "Spruce Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2189,7 +2189,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         188u32,
-        0..0,
+        4366u32..=4397u32,
         "Birch Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2202,7 +2202,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         189u32,
-        0..0,
+        4398u32..=4429u32,
         "Acacia Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2215,7 +2215,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         190u32,
-        0..0,
+        4430u32..=4461u32,
         "Cherry Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2228,7 +2228,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         191u32,
-        0..0,
+        4462u32..=4493u32,
         "Jungle Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2241,7 +2241,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         192u32,
-        0..0,
+        4494u32..=4525u32,
         "Dark Oak Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2254,7 +2254,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         193u32,
-        0..0,
+        4526u32..=4557u32,
         "Mangrove Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2267,7 +2267,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         194u32,
-        0..0,
+        4558u32..=4589u32,
         "Bamboo Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2280,7 +2280,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         195u32,
-        0..0,
+        4590u32..=4653u32,
         "Oak Door",
         BlockProperties {
             hardness: 3f32,
@@ -2292,7 +2292,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         196u32,
-        0..0,
+        4654u32..=4661u32,
         "Ladder",
         BlockProperties {
             hardness: 0.4f32,
@@ -2304,7 +2304,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         197u32,
-        0..0,
+        4662u32..=4681u32,
         "Rail",
         BlockProperties {
             hardness: 0.7f32,
@@ -2316,7 +2316,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         198u32,
-        0..0,
+        4682u32..=4761u32,
         "Cobblestone Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -2327,7 +2327,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         199u32,
-        0..0,
+        4762u32..=4769u32,
         "Oak Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2340,7 +2340,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         200u32,
-        0..0,
+        4770u32..=4777u32,
         "Spruce Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2353,7 +2353,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         201u32,
-        0..0,
+        4778u32..=4785u32,
         "Birch Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2366,7 +2366,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         202u32,
-        0..0,
+        4786u32..=4793u32,
         "Acacia Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2379,7 +2379,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         203u32,
-        0..0,
+        4794u32..=4801u32,
         "Cherry Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2392,7 +2392,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         204u32,
-        0..0,
+        4802u32..=4809u32,
         "Jungle Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2405,7 +2405,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         205u32,
-        0..0,
+        4810u32..=4817u32,
         "Dark Oak Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2418,7 +2418,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         206u32,
-        0..0,
+        4818u32..=4825u32,
         "Mangrove Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2431,7 +2431,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         207u32,
-        0..0,
+        4826u32..=4833u32,
         "Bamboo Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2444,7 +2444,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         208u32,
-        0..0,
+        4834u32..=4897u32,
         "Oak Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2457,7 +2457,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         209u32,
-        0..0,
+        4898u32..=4961u32,
         "Spruce Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2470,7 +2470,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         210u32,
-        0..0,
+        4962u32..=5025u32,
         "Birch Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2483,7 +2483,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         211u32,
-        0..0,
+        5026u32..=5089u32,
         "Acacia Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2496,7 +2496,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         212u32,
-        0..0,
+        5090u32..=5153u32,
         "Cherry Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2509,7 +2509,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         213u32,
-        0..0,
+        5154u32..=5217u32,
         "Jungle Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2522,7 +2522,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         214u32,
-        0..0,
+        5218u32..=5281u32,
         "Dark Oak Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2535,7 +2535,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         215u32,
-        0..0,
+        5282u32..=5345u32,
         "Crimson Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2547,7 +2547,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         216u32,
-        0..0,
+        5346u32..=5409u32,
         "Warped Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2559,7 +2559,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         217u32,
-        0..0,
+        5410u32..=5473u32,
         "Mangrove Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2572,7 +2572,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         218u32,
-        0..0,
+        5474u32..=5537u32,
         "Bamboo Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2585,7 +2585,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         219u32,
-        0..0,
+        5538u32..=5545u32,
         "Oak Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2598,7 +2598,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         220u32,
-        0..0,
+        5546u32..=5553u32,
         "Spruce Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2611,7 +2611,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         221u32,
-        0..0,
+        5554u32..=5561u32,
         "Birch Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2624,7 +2624,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         222u32,
-        0..0,
+        5562u32..=5569u32,
         "Acacia Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2637,7 +2637,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         223u32,
-        0..0,
+        5570u32..=5577u32,
         "Cherry Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2650,7 +2650,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         224u32,
-        0..0,
+        5578u32..=5585u32,
         "Jungle Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2663,7 +2663,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         225u32,
-        0..0,
+        5586u32..=5593u32,
         "Dark Oak Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2676,7 +2676,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         226u32,
-        0..0,
+        5594u32..=5601u32,
         "Mangrove Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2689,7 +2689,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         227u32,
-        0..0,
+        5602u32..=5609u32,
         "Crimson Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2701,7 +2701,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         228u32,
-        0..0,
+        5610u32..=5617u32,
         "Warped Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2713,7 +2713,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         229u32,
-        0..0,
+        5618u32..=5625u32,
         "Bamboo Wall Hanging Sign",
         BlockProperties {
             hardness: 1f32,
@@ -2726,7 +2726,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         230u32,
-        0..0,
+        5626u32..=5649u32,
         "Lever",
         BlockProperties {
             hardness: 0.5f32,
@@ -2738,7 +2738,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         231u32,
-        0..0,
+        5650u32..=5651u32,
         "Stone Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2750,7 +2750,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         232u32,
-        0..0,
+        5652u32..=5715u32,
         "Iron Door",
         BlockProperties {
             hardness: 5f32,
@@ -2761,7 +2761,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         233u32,
-        0..0,
+        5716u32..=5717u32,
         "Oak Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2774,7 +2774,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         234u32,
-        0..0,
+        5718u32..=5719u32,
         "Spruce Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2787,7 +2787,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         235u32,
-        0..0,
+        5720u32..=5721u32,
         "Birch Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2800,7 +2800,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         236u32,
-        0..0,
+        5722u32..=5723u32,
         "Jungle Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2813,7 +2813,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         237u32,
-        0..0,
+        5724u32..=5725u32,
         "Acacia Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2826,7 +2826,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         238u32,
-        0..0,
+        5726u32..=5727u32,
         "Cherry Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2839,7 +2839,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         239u32,
-        0..0,
+        5728u32..=5729u32,
         "Dark Oak Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2852,7 +2852,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         240u32,
-        0..0,
+        5730u32..=5731u32,
         "Mangrove Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2865,7 +2865,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         241u32,
-        0..0,
+        5732u32..=5733u32,
         "Bamboo Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -2878,7 +2878,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         242u32,
-        0..0,
+        5734u32..=5735u32,
         "Redstone Ore",
         BlockProperties {
             hardness: 3f32,
@@ -2890,7 +2890,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         243u32,
-        0..0,
+        5736u32..=5737u32,
         "Deepslate Redstone Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -2902,7 +2902,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         244u32,
-        0..0,
+        5738u32..=5739u32,
         "Redstone Torch",
         BlockProperties {
             collidable: false,
@@ -2913,7 +2913,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         245u32,
-        0..0,
+        5740u32..=5747u32,
         "Redstone Wall Torch",
         BlockProperties {
             collidable: false,
@@ -2924,7 +2924,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         246u32,
-        0..0,
+        5748u32..=5771u32,
         "Stone Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -2936,7 +2936,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         247u32,
-        0..0,
+        5772u32..=5779u32,
         "Snow",
         BlockProperties {
             hardness: 0.1f32,
@@ -2948,7 +2948,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         248u32,
-        0..0,
+        5780u32..=5780u32,
         "Ice",
         BlockProperties {
             hardness: 0.5f32,
@@ -2961,7 +2961,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         249u32,
-        0..0,
+        5781u32..=5781u32,
         "Snow Block",
         BlockProperties {
             hardness: 0.2f32,
@@ -2971,7 +2971,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         250u32,
-        0..0,
+        5782u32..=5797u32,
         "Cactus",
         BlockProperties {
             hardness: 0.4f32,
@@ -2982,7 +2982,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         251u32,
-        0..0,
+        5798u32..=5798u32,
         "Clay",
         BlockProperties {
             hardness: 0.6f32,
@@ -2992,7 +2992,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         252u32,
-        0..0,
+        5799u32..=5814u32,
         "Sugar Cane",
         BlockProperties {
             random_ticks: true,
@@ -3004,7 +3004,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         253u32,
-        0..0,
+        5815u32..=5816u32,
         "Jukebox",
         BlockProperties {
             hardness: 2f32,
@@ -3016,7 +3016,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         254u32,
-        0..0,
+        5817u32..=5848u32,
         "Oak Fence",
         BlockProperties {
             hardness: 2f32,
@@ -3028,7 +3028,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         255u32,
-        0..0,
+        5849u32..=5849u32,
         "Pumpkin",
         BlockProperties {
             hardness: 1f32,
@@ -3038,7 +3038,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         256u32,
-        0..0,
+        5850u32..=5850u32,
         "Netherrack",
         BlockProperties {
             hardness: 0.4f32,
@@ -3048,7 +3048,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         257u32,
-        0..0,
+        5851u32..=5851u32,
         "Soul Sand",
         BlockProperties {
             hardness: 0.5f32,
@@ -3059,7 +3059,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         258u32,
-        0..0,
+        5852u32..=5852u32,
         "Soul Soil",
         BlockProperties {
             hardness: 0.5f32,
@@ -3069,7 +3069,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         259u32,
-        0..0,
+        5853u32..=5855u32,
         "Basalt",
         BlockProperties {
             hardness: 1.25f32,
@@ -3080,7 +3080,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         260u32,
-        0..0,
+        5856u32..=5858u32,
         "Polished Basalt",
         BlockProperties {
             hardness: 1.25f32,
@@ -3091,7 +3091,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         261u32,
-        0..0,
+        5859u32..=5859u32,
         "Soul Torch",
         BlockProperties {
             collidable: false,
@@ -3102,7 +3102,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         262u32,
-        0..0,
+        5860u32..=5863u32,
         "Soul Wall Torch",
         BlockProperties {
             collidable: false,
@@ -3113,7 +3113,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         263u32,
-        0..0,
+        5864u32..=5864u32,
         "Glowstone",
         BlockProperties {
             hardness: 0.3f32,
@@ -3123,7 +3123,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         264u32,
-        0..0,
+        5865u32..=5867u32,
         "Nether Portal",
         BlockProperties {
             hardness: -1f32,
@@ -3136,7 +3136,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         265u32,
-        0..0,
+        5868u32..=5871u32,
         "Carved Pumpkin",
         BlockProperties {
             hardness: 1f32,
@@ -3146,7 +3146,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         266u32,
-        0..0,
+        5872u32..=5875u32,
         "Jack O Lantern",
         BlockProperties {
             hardness: 1f32,
@@ -3156,7 +3156,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         267u32,
-        0..0,
+        5876u32..=5881u32,
         "Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -3166,7 +3166,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         268u32,
-        0..0,
+        5882u32..=5945u32,
         "Repeater",
         BlockProperties {
             ..Default::default()
@@ -3175,7 +3175,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         269u32,
-        0..0,
+        5946u32..=5946u32,
         "White Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3187,7 +3187,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         270u32,
-        0..0,
+        5947u32..=5947u32,
         "Orange Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3199,7 +3199,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         271u32,
-        0..0,
+        5948u32..=5948u32,
         "Magenta Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3211,7 +3211,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         272u32,
-        0..0,
+        5949u32..=5949u32,
         "Light Blue Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3223,7 +3223,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         273u32,
-        0..0,
+        5950u32..=5950u32,
         "Yellow Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3235,7 +3235,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         274u32,
-        0..0,
+        5951u32..=5951u32,
         "Lime Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3247,7 +3247,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         275u32,
-        0..0,
+        5952u32..=5952u32,
         "Pink Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3259,7 +3259,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         276u32,
-        0..0,
+        5953u32..=5953u32,
         "Gray Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3271,7 +3271,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         277u32,
-        0..0,
+        5954u32..=5954u32,
         "Light Gray Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3283,7 +3283,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         278u32,
-        0..0,
+        5955u32..=5955u32,
         "Cyan Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3295,7 +3295,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         279u32,
-        0..0,
+        5956u32..=5956u32,
         "Purple Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3307,7 +3307,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         280u32,
-        0..0,
+        5957u32..=5957u32,
         "Blue Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3319,7 +3319,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         281u32,
-        0..0,
+        5958u32..=5958u32,
         "Brown Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3331,7 +3331,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         282u32,
-        0..0,
+        5959u32..=5959u32,
         "Green Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3343,7 +3343,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         283u32,
-        0..0,
+        5960u32..=5960u32,
         "Red Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3355,7 +3355,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         284u32,
-        0..0,
+        5961u32..=5961u32,
         "Black Stained Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -3367,7 +3367,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         285u32,
-        0..0,
+        5962u32..=6025u32,
         "Oak Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3379,7 +3379,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         286u32,
-        0..0,
+        6026u32..=6089u32,
         "Spruce Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3391,7 +3391,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         287u32,
-        0..0,
+        6090u32..=6153u32,
         "Birch Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3403,7 +3403,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         288u32,
-        0..0,
+        6154u32..=6217u32,
         "Jungle Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3415,7 +3415,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         289u32,
-        0..0,
+        6218u32..=6281u32,
         "Acacia Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3427,7 +3427,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         290u32,
-        0..0,
+        6282u32..=6345u32,
         "Cherry Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3439,7 +3439,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         291u32,
-        0..0,
+        6346u32..=6409u32,
         "Dark Oak Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3451,7 +3451,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         292u32,
-        0..0,
+        6410u32..=6473u32,
         "Mangrove Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3463,7 +3463,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         293u32,
-        0..0,
+        6474u32..=6537u32,
         "Bamboo Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -3475,7 +3475,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         294u32,
-        0..0,
+        6538u32..=6538u32,
         "Stone Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -3486,7 +3486,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         295u32,
-        0..0,
+        6539u32..=6539u32,
         "Mossy Stone Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -3497,7 +3497,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         296u32,
-        0..0,
+        6540u32..=6540u32,
         "Cracked Stone Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -3508,7 +3508,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         297u32,
-        0..0,
+        6541u32..=6541u32,
         "Chiseled Stone Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -3519,7 +3519,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         298u32,
-        0..0,
+        6542u32..=6542u32,
         "Packed Mud",
         BlockProperties {
             hardness: 1f32,
@@ -3530,7 +3530,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         299u32,
-        0..0,
+        6543u32..=6543u32,
         "Mud Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -3541,7 +3541,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         300u32,
-        0..0,
+        6544u32..=6544u32,
         "Infested Stone",
         BlockProperties {
             ..Default::default()
@@ -3550,7 +3550,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         301u32,
-        0..0,
+        6545u32..=6545u32,
         "Infested Cobblestone",
         BlockProperties {
             ..Default::default()
@@ -3559,7 +3559,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         302u32,
-        0..0,
+        6546u32..=6546u32,
         "Infested Stone Bricks",
         BlockProperties {
             ..Default::default()
@@ -3568,7 +3568,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         303u32,
-        0..0,
+        6547u32..=6547u32,
         "Infested Mossy Stone Bricks",
         BlockProperties {
             ..Default::default()
@@ -3577,7 +3577,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         304u32,
-        0..0,
+        6548u32..=6548u32,
         "Infested Cracked Stone Bricks",
         BlockProperties {
             ..Default::default()
@@ -3586,7 +3586,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         305u32,
-        0..0,
+        6549u32..=6549u32,
         "Infested Chiseled Stone Bricks",
         BlockProperties {
             ..Default::default()
@@ -3595,7 +3595,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         306u32,
-        0..0,
+        6550u32..=6613u32,
         "Brown Mushroom Block",
         BlockProperties {
             hardness: 0.2f32,
@@ -3606,7 +3606,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         307u32,
-        0..0,
+        6614u32..=6677u32,
         "Red Mushroom Block",
         BlockProperties {
             hardness: 0.2f32,
@@ -3617,7 +3617,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         308u32,
-        0..0,
+        6678u32..=6741u32,
         "Mushroom Stem",
         BlockProperties {
             hardness: 0.2f32,
@@ -3628,7 +3628,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         309u32,
-        0..0,
+        6742u32..=6773u32,
         "Iron Bars",
         BlockProperties {
             hardness: 5f32,
@@ -3640,7 +3640,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         310u32,
-        0..0,
+        6774u32..=6779u32,
         "Chain",
         BlockProperties {
             hardness: 5f32,
@@ -3652,7 +3652,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         311u32,
-        0..0,
+        6780u32..=6811u32,
         "Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -3663,7 +3663,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         312u32,
-        0..0,
+        6812u32..=6812u32,
         "Melon",
         BlockProperties {
             hardness: 1f32,
@@ -3673,7 +3673,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         313u32,
-        0..0,
+        6813u32..=6816u32,
         "Attached Pumpkin Stem",
         BlockProperties {
             collidable: false,
@@ -3684,7 +3684,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         314u32,
-        0..0,
+        6817u32..=6820u32,
         "Attached Melon Stem",
         BlockProperties {
             collidable: false,
@@ -3695,7 +3695,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         315u32,
-        0..0,
+        6821u32..=6828u32,
         "Pumpkin Stem",
         BlockProperties {
             random_ticks: true,
@@ -3707,7 +3707,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         316u32,
-        0..0,
+        6829u32..=6836u32,
         "Melon Stem",
         BlockProperties {
             random_ticks: true,
@@ -3719,7 +3719,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         317u32,
-        0..0,
+        6837u32..=6868u32,
         "Vine",
         BlockProperties {
             hardness: 0.2f32,
@@ -3733,7 +3733,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         318u32,
-        0..0,
+        6869u32..=6996u32,
         "Glow Lichen",
         BlockProperties {
             hardness: 0.2f32,
@@ -3746,7 +3746,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         319u32,
-        0..0,
+        6997u32..=7028u32,
         "Oak Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -3758,7 +3758,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         320u32,
-        0..0,
+        7029u32..=7108u32,
         "Brick Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -3769,7 +3769,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         321u32,
-        0..0,
+        7109u32..=7188u32,
         "Stone Brick Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -3780,7 +3780,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         322u32,
-        0..0,
+        7189u32..=7268u32,
         "Mud Brick Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -3791,7 +3791,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         323u32,
-        0..0,
+        7269u32..=7270u32,
         "Mycelium",
         BlockProperties {
             hardness: 0.6f32,
@@ -3802,7 +3802,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         324u32,
-        0..0,
+        7271u32..=7271u32,
         "Lily Pad",
         BlockProperties {
             opaque: false,
@@ -3812,7 +3812,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         325u32,
-        0..0,
+        7272u32..=7272u32,
         "Nether Bricks",
         BlockProperties {
             hardness: 2f32,
@@ -3823,7 +3823,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         326u32,
-        0..0,
+        7273u32..=7304u32,
         "Nether Brick Fence",
         BlockProperties {
             hardness: 2f32,
@@ -3834,7 +3834,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         327u32,
-        0..0,
+        7305u32..=7384u32,
         "Nether Brick Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -3845,7 +3845,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         328u32,
-        0..0,
+        7385u32..=7388u32,
         "Nether Wart",
         BlockProperties {
             random_ticks: true,
@@ -3857,7 +3857,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         329u32,
-        0..0,
+        7389u32..=7389u32,
         "Enchanting Table",
         BlockProperties {
             hardness: 5f32,
@@ -3868,7 +3868,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         330u32,
-        0..0,
+        7390u32..=7397u32,
         "Brewing Stand",
         BlockProperties {
             hardness: 0.5f32,
@@ -3879,7 +3879,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         331u32,
-        0..0,
+        7398u32..=7398u32,
         "Cauldron",
         BlockProperties {
             hardness: 2f32,
@@ -3890,7 +3890,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         332u32,
-        0..0,
+        7399u32..=7401u32,
         "Water Cauldron",
         BlockProperties {
             hardness: 2f32,
@@ -3901,7 +3901,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         333u32,
-        0..0,
+        7402u32..=7402u32,
         "Lava Cauldron",
         BlockProperties {
             hardness: 2f32,
@@ -3912,7 +3912,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         334u32,
-        0..0,
+        7403u32..=7405u32,
         "Powder Snow Cauldron",
         BlockProperties {
             hardness: 2f32,
@@ -3923,7 +3923,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         335u32,
-        0..0,
+        7406u32..=7406u32,
         "End Portal",
         BlockProperties {
             hardness: -1f32,
@@ -3936,7 +3936,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         336u32,
-        0..0,
+        7407u32..=7414u32,
         "End Portal Frame",
         BlockProperties {
             hardness: -1f32,
@@ -3947,7 +3947,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         337u32,
-        0..0,
+        7415u32..=7415u32,
         "End Stone",
         BlockProperties {
             hardness: 3f32,
@@ -3958,7 +3958,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         338u32,
-        0..0,
+        7416u32..=7416u32,
         "Dragon Egg",
         BlockProperties {
             hardness: 3f32,
@@ -3970,7 +3970,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         339u32,
-        0..0,
+        7417u32..=7418u32,
         "Redstone Lamp",
         BlockProperties {
             hardness: 0.3f32,
@@ -3980,7 +3980,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         340u32,
-        0..0,
+        7419u32..=7430u32,
         "Cocoa",
         BlockProperties {
             hardness: 0.2f32,
@@ -3993,7 +3993,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         341u32,
-        0..0,
+        7431u32..=7510u32,
         "Sandstone Stairs",
         BlockProperties {
             hardness: 0.8f32,
@@ -4003,7 +4003,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         342u32,
-        0..0,
+        7511u32..=7511u32,
         "Emerald Ore",
         BlockProperties {
             hardness: 3f32,
@@ -4014,7 +4014,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         343u32,
-        0..0,
+        7512u32..=7512u32,
         "Deepslate Emerald Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -4025,7 +4025,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         344u32,
-        0..0,
+        7513u32..=7520u32,
         "Ender Chest",
         BlockProperties {
             hardness: 22.5f32,
@@ -4036,7 +4036,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         345u32,
-        0..0,
+        7521u32..=7536u32,
         "Tripwire Hook",
         BlockProperties {
             collidable: false,
@@ -4047,7 +4047,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         346u32,
-        0..0,
+        7537u32..=7664u32,
         "Tripwire",
         BlockProperties {
             collidable: false,
@@ -4058,7 +4058,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         347u32,
-        0..0,
+        7665u32..=7665u32,
         "Emerald Block",
         BlockProperties {
             hardness: 5f32,
@@ -4069,7 +4069,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         348u32,
-        0..0,
+        7666u32..=7745u32,
         "Spruce Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -4081,7 +4081,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         349u32,
-        0..0,
+        7746u32..=7825u32,
         "Birch Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -4093,7 +4093,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         350u32,
-        0..0,
+        7826u32..=7905u32,
         "Jungle Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -4105,7 +4105,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         351u32,
-        0..0,
+        7906u32..=7917u32,
         "Command Block",
         BlockProperties {
             hardness: -1f32,
@@ -4116,7 +4116,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         352u32,
-        0..0,
+        7918u32..=7918u32,
         "Beacon",
         BlockProperties {
             hardness: 3f32,
@@ -4127,7 +4127,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         353u32,
-        0..0,
+        7919u32..=8242u32,
         "Cobblestone Wall",
         BlockProperties {
             hardness: 2f32,
@@ -4138,7 +4138,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         354u32,
-        0..0,
+        8243u32..=8566u32,
         "Mossy Cobblestone Wall",
         BlockProperties {
             hardness: 2f32,
@@ -4149,7 +4149,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         355u32,
-        0..0,
+        8567u32..=8567u32,
         "Flower Pot",
         BlockProperties {
             opaque: false,
@@ -4159,7 +4159,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         356u32,
-        0..0,
+        8568u32..=8568u32,
         "Potted Torchflower",
         BlockProperties {
             opaque: false,
@@ -4169,7 +4169,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         357u32,
-        0..0,
+        8569u32..=8569u32,
         "Potted Oak Sapling",
         BlockProperties {
             opaque: false,
@@ -4179,7 +4179,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         358u32,
-        0..0,
+        8570u32..=8570u32,
         "Potted Spruce Sapling",
         BlockProperties {
             opaque: false,
@@ -4189,7 +4189,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         359u32,
-        0..0,
+        8571u32..=8571u32,
         "Potted Birch Sapling",
         BlockProperties {
             opaque: false,
@@ -4199,7 +4199,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         360u32,
-        0..0,
+        8572u32..=8572u32,
         "Potted Jungle Sapling",
         BlockProperties {
             opaque: false,
@@ -4209,7 +4209,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         361u32,
-        0..0,
+        8573u32..=8573u32,
         "Potted Acacia Sapling",
         BlockProperties {
             opaque: false,
@@ -4219,7 +4219,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         362u32,
-        0..0,
+        8574u32..=8574u32,
         "Potted Cherry Sapling",
         BlockProperties {
             opaque: false,
@@ -4229,7 +4229,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         363u32,
-        0..0,
+        8575u32..=8575u32,
         "Potted Dark Oak Sapling",
         BlockProperties {
             opaque: false,
@@ -4239,7 +4239,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         364u32,
-        0..0,
+        8576u32..=8576u32,
         "Potted Mangrove Propagule",
         BlockProperties {
             opaque: false,
@@ -4249,7 +4249,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         365u32,
-        0..0,
+        8577u32..=8577u32,
         "Potted Fern",
         BlockProperties {
             opaque: false,
@@ -4259,7 +4259,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         366u32,
-        0..0,
+        8578u32..=8578u32,
         "Potted Dandelion",
         BlockProperties {
             opaque: false,
@@ -4269,7 +4269,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         367u32,
-        0..0,
+        8579u32..=8579u32,
         "Potted Poppy",
         BlockProperties {
             opaque: false,
@@ -4279,7 +4279,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         368u32,
-        0..0,
+        8580u32..=8580u32,
         "Potted Blue Orchid",
         BlockProperties {
             opaque: false,
@@ -4289,7 +4289,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         369u32,
-        0..0,
+        8581u32..=8581u32,
         "Potted Allium",
         BlockProperties {
             opaque: false,
@@ -4299,7 +4299,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         370u32,
-        0..0,
+        8582u32..=8582u32,
         "Potted Azure Bluet",
         BlockProperties {
             opaque: false,
@@ -4309,7 +4309,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         371u32,
-        0..0,
+        8583u32..=8583u32,
         "Potted Red Tulip",
         BlockProperties {
             opaque: false,
@@ -4319,7 +4319,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         372u32,
-        0..0,
+        8584u32..=8584u32,
         "Potted Orange Tulip",
         BlockProperties {
             opaque: false,
@@ -4329,7 +4329,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         373u32,
-        0..0,
+        8585u32..=8585u32,
         "Potted White Tulip",
         BlockProperties {
             opaque: false,
@@ -4339,7 +4339,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         374u32,
-        0..0,
+        8586u32..=8586u32,
         "Potted Pink Tulip",
         BlockProperties {
             opaque: false,
@@ -4349,7 +4349,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         375u32,
-        0..0,
+        8587u32..=8587u32,
         "Potted Oxeye Daisy",
         BlockProperties {
             opaque: false,
@@ -4359,7 +4359,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         376u32,
-        0..0,
+        8588u32..=8588u32,
         "Potted Cornflower",
         BlockProperties {
             opaque: false,
@@ -4369,7 +4369,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         377u32,
-        0..0,
+        8589u32..=8589u32,
         "Potted Lily Of The Valley",
         BlockProperties {
             opaque: false,
@@ -4379,7 +4379,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         378u32,
-        0..0,
+        8590u32..=8590u32,
         "Potted Wither Rose",
         BlockProperties {
             opaque: false,
@@ -4389,7 +4389,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         379u32,
-        0..0,
+        8591u32..=8591u32,
         "Potted Red Mushroom",
         BlockProperties {
             opaque: false,
@@ -4399,7 +4399,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         380u32,
-        0..0,
+        8592u32..=8592u32,
         "Potted Brown Mushroom",
         BlockProperties {
             opaque: false,
@@ -4409,7 +4409,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         381u32,
-        0..0,
+        8593u32..=8593u32,
         "Potted Dead Bush",
         BlockProperties {
             opaque: false,
@@ -4419,7 +4419,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         382u32,
-        0..0,
+        8594u32..=8594u32,
         "Potted Cactus",
         BlockProperties {
             opaque: false,
@@ -4429,7 +4429,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         383u32,
-        0..0,
+        8595u32..=8602u32,
         "Carrots",
         BlockProperties {
             random_ticks: true,
@@ -4441,7 +4441,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         384u32,
-        0..0,
+        8603u32..=8610u32,
         "Potatoes",
         BlockProperties {
             random_ticks: true,
@@ -4453,7 +4453,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         385u32,
-        0..0,
+        8611u32..=8634u32,
         "Oak Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4465,7 +4465,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         386u32,
-        0..0,
+        8635u32..=8658u32,
         "Spruce Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4477,7 +4477,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         387u32,
-        0..0,
+        8659u32..=8682u32,
         "Birch Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4489,7 +4489,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         388u32,
-        0..0,
+        8683u32..=8706u32,
         "Jungle Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4501,7 +4501,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         389u32,
-        0..0,
+        8707u32..=8730u32,
         "Acacia Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4513,7 +4513,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         390u32,
-        0..0,
+        8731u32..=8754u32,
         "Cherry Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4525,7 +4525,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         391u32,
-        0..0,
+        8755u32..=8778u32,
         "Dark Oak Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4537,7 +4537,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         392u32,
-        0..0,
+        8779u32..=8802u32,
         "Mangrove Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4549,7 +4549,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         393u32,
-        0..0,
+        8803u32..=8826u32,
         "Bamboo Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -4561,7 +4561,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         394u32,
-        0..0,
+        8827u32..=8842u32,
         "Skeleton Skull",
         BlockProperties {
             hardness: 1f32,
@@ -4571,7 +4571,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         395u32,
-        0..0,
+        8843u32..=8846u32,
         "Skeleton Wall Skull",
         BlockProperties {
             hardness: 1f32,
@@ -4581,7 +4581,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         396u32,
-        0..0,
+        8847u32..=8862u32,
         "Wither Skeleton Skull",
         BlockProperties {
             hardness: 1f32,
@@ -4591,7 +4591,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         397u32,
-        0..0,
+        8863u32..=8866u32,
         "Wither Skeleton Wall Skull",
         BlockProperties {
             hardness: 1f32,
@@ -4601,7 +4601,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         398u32,
-        0..0,
+        8867u32..=8882u32,
         "Zombie Head",
         BlockProperties {
             hardness: 1f32,
@@ -4611,7 +4611,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         399u32,
-        0..0,
+        8883u32..=8886u32,
         "Zombie Wall Head",
         BlockProperties {
             hardness: 1f32,
@@ -4621,7 +4621,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         400u32,
-        0..0,
+        8887u32..=8902u32,
         "Player Head",
         BlockProperties {
             hardness: 1f32,
@@ -4631,7 +4631,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         401u32,
-        0..0,
+        8903u32..=8906u32,
         "Player Wall Head",
         BlockProperties {
             hardness: 1f32,
@@ -4641,7 +4641,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         402u32,
-        0..0,
+        8907u32..=8922u32,
         "Creeper Head",
         BlockProperties {
             hardness: 1f32,
@@ -4651,7 +4651,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         403u32,
-        0..0,
+        8923u32..=8926u32,
         "Creeper Wall Head",
         BlockProperties {
             hardness: 1f32,
@@ -4661,7 +4661,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         404u32,
-        0..0,
+        8927u32..=8942u32,
         "Dragon Head",
         BlockProperties {
             hardness: 1f32,
@@ -4671,7 +4671,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         405u32,
-        0..0,
+        8943u32..=8946u32,
         "Dragon Wall Head",
         BlockProperties {
             hardness: 1f32,
@@ -4681,7 +4681,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         406u32,
-        0..0,
+        8947u32..=8962u32,
         "Piglin Head",
         BlockProperties {
             hardness: 1f32,
@@ -4691,7 +4691,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         407u32,
-        0..0,
+        8963u32..=8966u32,
         "Piglin Wall Head",
         BlockProperties {
             hardness: 1f32,
@@ -4701,7 +4701,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         408u32,
-        0..0,
+        8967u32..=8970u32,
         "Anvil",
         BlockProperties {
             hardness: 5f32,
@@ -4712,7 +4712,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         409u32,
-        0..0,
+        8971u32..=8974u32,
         "Chipped Anvil",
         BlockProperties {
             hardness: 5f32,
@@ -4723,7 +4723,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         410u32,
-        0..0,
+        8975u32..=8978u32,
         "Damaged Anvil",
         BlockProperties {
             hardness: 5f32,
@@ -4734,7 +4734,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         411u32,
-        0..0,
+        8979u32..=9002u32,
         "Trapped Chest",
         BlockProperties {
             hardness: 2.5f32,
@@ -4745,7 +4745,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         412u32,
-        0..0,
+        9003u32..=9018u32,
         "Light Weighted Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -4757,7 +4757,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         413u32,
-        0..0,
+        9019u32..=9034u32,
         "Heavy Weighted Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -4769,7 +4769,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         414u32,
-        0..0,
+        9035u32..=9050u32,
         "Comparator",
         BlockProperties {
             ..Default::default()
@@ -4778,7 +4778,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         415u32,
-        0..0,
+        9051u32..=9082u32,
         "Daylight Detector",
         BlockProperties {
             hardness: 0.2f32,
@@ -4789,7 +4789,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         416u32,
-        0..0,
+        9083u32..=9083u32,
         "Redstone Block",
         BlockProperties {
             hardness: 5f32,
@@ -4800,7 +4800,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         417u32,
-        0..0,
+        9084u32..=9084u32,
         "Nether Quartz Ore",
         BlockProperties {
             hardness: 3f32,
@@ -4811,7 +4811,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         418u32,
-        0..0,
+        9085u32..=9094u32,
         "Hopper",
         BlockProperties {
             hardness: 3f32,
@@ -4823,7 +4823,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         419u32,
-        0..0,
+        9095u32..=9095u32,
         "Quartz Block",
         BlockProperties {
             hardness: 0.8f32,
@@ -4833,7 +4833,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         420u32,
-        0..0,
+        9096u32..=9096u32,
         "Chiseled Quartz Block",
         BlockProperties {
             hardness: 0.8f32,
@@ -4843,7 +4843,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         421u32,
-        0..0,
+        9097u32..=9099u32,
         "Quartz Pillar",
         BlockProperties {
             hardness: 0.8f32,
@@ -4853,7 +4853,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         422u32,
-        0..0,
+        9100u32..=9179u32,
         "Quartz Stairs",
         BlockProperties {
             hardness: 0.8f32,
@@ -4863,7 +4863,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         423u32,
-        0..0,
+        9180u32..=9203u32,
         "Activator Rail",
         BlockProperties {
             hardness: 0.7f32,
@@ -4875,7 +4875,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         424u32,
-        0..0,
+        9204u32..=9215u32,
         "Dropper",
         BlockProperties {
             hardness: 3.5f32,
@@ -4885,7 +4885,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         425u32,
-        0..0,
+        9216u32..=9216u32,
         "White Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4896,7 +4896,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         426u32,
-        0..0,
+        9217u32..=9217u32,
         "Orange Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4907,7 +4907,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         427u32,
-        0..0,
+        9218u32..=9218u32,
         "Magenta Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4918,7 +4918,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         428u32,
-        0..0,
+        9219u32..=9219u32,
         "Light Blue Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4929,7 +4929,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         429u32,
-        0..0,
+        9220u32..=9220u32,
         "Yellow Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4940,7 +4940,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         430u32,
-        0..0,
+        9221u32..=9221u32,
         "Lime Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4951,7 +4951,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         431u32,
-        0..0,
+        9222u32..=9222u32,
         "Pink Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4962,7 +4962,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         432u32,
-        0..0,
+        9223u32..=9223u32,
         "Gray Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4973,7 +4973,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         433u32,
-        0..0,
+        9224u32..=9224u32,
         "Light Gray Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4984,7 +4984,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         434u32,
-        0..0,
+        9225u32..=9225u32,
         "Cyan Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -4995,7 +4995,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         435u32,
-        0..0,
+        9226u32..=9226u32,
         "Purple Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -5006,7 +5006,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         436u32,
-        0..0,
+        9227u32..=9227u32,
         "Blue Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -5017,7 +5017,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         437u32,
-        0..0,
+        9228u32..=9228u32,
         "Brown Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -5028,7 +5028,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         438u32,
-        0..0,
+        9229u32..=9229u32,
         "Green Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -5039,7 +5039,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         439u32,
-        0..0,
+        9230u32..=9230u32,
         "Red Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -5050,7 +5050,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         440u32,
-        0..0,
+        9231u32..=9231u32,
         "Black Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -5061,7 +5061,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         441u32,
-        0..0,
+        9232u32..=9263u32,
         "White Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5072,7 +5072,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         442u32,
-        0..0,
+        9264u32..=9295u32,
         "Orange Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5083,7 +5083,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         443u32,
-        0..0,
+        9296u32..=9327u32,
         "Magenta Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5094,7 +5094,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         444u32,
-        0..0,
+        9328u32..=9359u32,
         "Light Blue Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5105,7 +5105,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         445u32,
-        0..0,
+        9360u32..=9391u32,
         "Yellow Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5116,7 +5116,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         446u32,
-        0..0,
+        9392u32..=9423u32,
         "Lime Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5127,7 +5127,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         447u32,
-        0..0,
+        9424u32..=9455u32,
         "Pink Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5138,7 +5138,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         448u32,
-        0..0,
+        9456u32..=9487u32,
         "Gray Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5149,7 +5149,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         449u32,
-        0..0,
+        9488u32..=9519u32,
         "Light Gray Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5160,7 +5160,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         450u32,
-        0..0,
+        9520u32..=9551u32,
         "Cyan Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5171,7 +5171,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         451u32,
-        0..0,
+        9552u32..=9583u32,
         "Purple Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5182,7 +5182,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         452u32,
-        0..0,
+        9584u32..=9615u32,
         "Blue Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5193,7 +5193,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         453u32,
-        0..0,
+        9616u32..=9647u32,
         "Brown Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5204,7 +5204,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         454u32,
-        0..0,
+        9648u32..=9679u32,
         "Green Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5215,7 +5215,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         455u32,
-        0..0,
+        9680u32..=9711u32,
         "Red Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5226,7 +5226,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         456u32,
-        0..0,
+        9712u32..=9743u32,
         "Black Stained Glass Pane",
         BlockProperties {
             hardness: 0.3f32,
@@ -5237,7 +5237,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         457u32,
-        0..0,
+        9744u32..=9823u32,
         "Acacia Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -5249,7 +5249,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         458u32,
-        0..0,
+        9824u32..=9903u32,
         "Cherry Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -5261,7 +5261,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         459u32,
-        0..0,
+        9904u32..=9983u32,
         "Dark Oak Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -5273,7 +5273,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         460u32,
-        0..0,
+        9984u32..=10063u32,
         "Mangrove Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -5285,7 +5285,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         461u32,
-        0..0,
+        10064u32..=10143u32,
         "Bamboo Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -5297,7 +5297,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         462u32,
-        0..0,
+        10144u32..=10223u32,
         "Bamboo Mosaic Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -5309,7 +5309,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         463u32,
-        0..0,
+        10224u32..=10224u32,
         "Slime Block",
         BlockProperties {
             friction: 0.8f32,
@@ -5320,7 +5320,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         464u32,
-        0..0,
+        10225u32..=10225u32,
         "Barrier",
         BlockProperties {
             hardness: -1f32,
@@ -5332,7 +5332,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         465u32,
-        0..0,
+        10226u32..=10257u32,
         "Light",
         BlockProperties {
             hardness: -1f32,
@@ -5344,7 +5344,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         466u32,
-        0..0,
+        10258u32..=10321u32,
         "Iron Trapdoor",
         BlockProperties {
             hardness: 5f32,
@@ -5355,7 +5355,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         467u32,
-        0..0,
+        10322u32..=10322u32,
         "Prismarine",
         BlockProperties {
             hardness: 1.5f32,
@@ -5366,7 +5366,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         468u32,
-        0..0,
+        10323u32..=10323u32,
         "Prismarine Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -5377,7 +5377,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         469u32,
-        0..0,
+        10324u32..=10324u32,
         "Dark Prismarine",
         BlockProperties {
             hardness: 1.5f32,
@@ -5388,7 +5388,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         470u32,
-        0..0,
+        10325u32..=10404u32,
         "Prismarine Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -5399,7 +5399,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         471u32,
-        0..0,
+        10405u32..=10484u32,
         "Prismarine Brick Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -5410,7 +5410,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         472u32,
-        0..0,
+        10485u32..=10564u32,
         "Dark Prismarine Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -5421,7 +5421,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         473u32,
-        0..0,
+        10565u32..=10570u32,
         "Prismarine Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -5432,7 +5432,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         474u32,
-        0..0,
+        10571u32..=10576u32,
         "Prismarine Brick Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -5443,7 +5443,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         475u32,
-        0..0,
+        10577u32..=10582u32,
         "Dark Prismarine Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -5454,7 +5454,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         476u32,
-        0..0,
+        10583u32..=10583u32,
         "Sea Lantern",
         BlockProperties {
             hardness: 0.3f32,
@@ -5464,7 +5464,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         477u32,
-        0..0,
+        10584u32..=10586u32,
         "Hay Block",
         BlockProperties {
             hardness: 0.5f32,
@@ -5474,7 +5474,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         478u32,
-        0..0,
+        10587u32..=10587u32,
         "White Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5485,7 +5485,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         479u32,
-        0..0,
+        10588u32..=10588u32,
         "Orange Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5496,7 +5496,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         480u32,
-        0..0,
+        10589u32..=10589u32,
         "Magenta Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5507,7 +5507,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         481u32,
-        0..0,
+        10590u32..=10590u32,
         "Light Blue Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5518,7 +5518,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         482u32,
-        0..0,
+        10591u32..=10591u32,
         "Yellow Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5529,7 +5529,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         483u32,
-        0..0,
+        10592u32..=10592u32,
         "Lime Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5540,7 +5540,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         484u32,
-        0..0,
+        10593u32..=10593u32,
         "Pink Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5551,7 +5551,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         485u32,
-        0..0,
+        10594u32..=10594u32,
         "Gray Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5562,7 +5562,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         486u32,
-        0..0,
+        10595u32..=10595u32,
         "Light Gray Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5573,7 +5573,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         487u32,
-        0..0,
+        10596u32..=10596u32,
         "Cyan Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5584,7 +5584,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         488u32,
-        0..0,
+        10597u32..=10597u32,
         "Purple Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5595,7 +5595,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         489u32,
-        0..0,
+        10598u32..=10598u32,
         "Blue Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5606,7 +5606,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         490u32,
-        0..0,
+        10599u32..=10599u32,
         "Brown Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5617,7 +5617,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         491u32,
-        0..0,
+        10600u32..=10600u32,
         "Green Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5628,7 +5628,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         492u32,
-        0..0,
+        10601u32..=10601u32,
         "Red Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5639,7 +5639,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         493u32,
-        0..0,
+        10602u32..=10602u32,
         "Black Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -5650,7 +5650,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         494u32,
-        0..0,
+        10603u32..=10603u32,
         "Terracotta",
         BlockProperties {
             hardness: 1.25f32,
@@ -5661,7 +5661,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         495u32,
-        0..0,
+        10604u32..=10604u32,
         "Coal Block",
         BlockProperties {
             hardness: 5f32,
@@ -5672,7 +5672,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         496u32,
-        0..0,
+        10605u32..=10605u32,
         "Packed Ice",
         BlockProperties {
             hardness: 0.5f32,
@@ -5683,7 +5683,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         497u32,
-        0..0,
+        10606u32..=10607u32,
         "Sunflower",
         BlockProperties {
             burnable: true,
@@ -5695,7 +5695,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         498u32,
-        0..0,
+        10608u32..=10609u32,
         "Lilac",
         BlockProperties {
             burnable: true,
@@ -5707,7 +5707,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         499u32,
-        0..0,
+        10610u32..=10611u32,
         "Rose Bush",
         BlockProperties {
             burnable: true,
@@ -5719,7 +5719,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         500u32,
-        0..0,
+        10612u32..=10613u32,
         "Peony",
         BlockProperties {
             burnable: true,
@@ -5731,7 +5731,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         501u32,
-        0..0,
+        10614u32..=10615u32,
         "Tall Grass",
         BlockProperties {
             burnable: true,
@@ -5743,7 +5743,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         502u32,
-        0..0,
+        10616u32..=10617u32,
         "Large Fern",
         BlockProperties {
             burnable: true,
@@ -5755,7 +5755,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         503u32,
-        0..0,
+        10618u32..=10633u32,
         "White Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5768,7 +5768,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         504u32,
-        0..0,
+        10634u32..=10649u32,
         "Orange Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5781,7 +5781,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         505u32,
-        0..0,
+        10650u32..=10665u32,
         "Magenta Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5794,7 +5794,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         506u32,
-        0..0,
+        10666u32..=10681u32,
         "Light Blue Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5807,7 +5807,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         507u32,
-        0..0,
+        10682u32..=10697u32,
         "Yellow Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5820,7 +5820,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         508u32,
-        0..0,
+        10698u32..=10713u32,
         "Lime Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5833,7 +5833,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         509u32,
-        0..0,
+        10714u32..=10729u32,
         "Pink Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5846,7 +5846,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         510u32,
-        0..0,
+        10730u32..=10745u32,
         "Gray Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5859,7 +5859,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         511u32,
-        0..0,
+        10746u32..=10761u32,
         "Light Gray Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5872,7 +5872,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         512u32,
-        0..0,
+        10762u32..=10777u32,
         "Cyan Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5885,7 +5885,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         513u32,
-        0..0,
+        10778u32..=10793u32,
         "Purple Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5898,7 +5898,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         514u32,
-        0..0,
+        10794u32..=10809u32,
         "Blue Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5911,7 +5911,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         515u32,
-        0..0,
+        10810u32..=10825u32,
         "Brown Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5924,7 +5924,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         516u32,
-        0..0,
+        10826u32..=10841u32,
         "Green Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5937,7 +5937,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         517u32,
-        0..0,
+        10842u32..=10857u32,
         "Red Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5950,7 +5950,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         518u32,
-        0..0,
+        10858u32..=10873u32,
         "Black Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5963,7 +5963,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         519u32,
-        0..0,
+        10874u32..=10877u32,
         "White Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5976,7 +5976,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         520u32,
-        0..0,
+        10878u32..=10881u32,
         "Orange Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -5989,7 +5989,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         521u32,
-        0..0,
+        10882u32..=10885u32,
         "Magenta Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6002,7 +6002,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         522u32,
-        0..0,
+        10886u32..=10889u32,
         "Light Blue Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6015,7 +6015,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         523u32,
-        0..0,
+        10890u32..=10893u32,
         "Yellow Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6028,7 +6028,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         524u32,
-        0..0,
+        10894u32..=10897u32,
         "Lime Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6041,7 +6041,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         525u32,
-        0..0,
+        10898u32..=10901u32,
         "Pink Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6054,7 +6054,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         526u32,
-        0..0,
+        10902u32..=10905u32,
         "Gray Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6067,7 +6067,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         527u32,
-        0..0,
+        10906u32..=10909u32,
         "Light Gray Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6080,7 +6080,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         528u32,
-        0..0,
+        10910u32..=10913u32,
         "Cyan Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6093,7 +6093,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         529u32,
-        0..0,
+        10914u32..=10917u32,
         "Purple Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6106,7 +6106,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         530u32,
-        0..0,
+        10918u32..=10921u32,
         "Blue Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6119,7 +6119,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         531u32,
-        0..0,
+        10922u32..=10925u32,
         "Brown Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6132,7 +6132,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         532u32,
-        0..0,
+        10926u32..=10929u32,
         "Green Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6145,7 +6145,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         533u32,
-        0..0,
+        10930u32..=10933u32,
         "Red Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6158,7 +6158,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         534u32,
-        0..0,
+        10934u32..=10937u32,
         "Black Wall Banner",
         BlockProperties {
             hardness: 1f32,
@@ -6171,7 +6171,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         535u32,
-        0..0,
+        10938u32..=10938u32,
         "Red Sandstone",
         BlockProperties {
             hardness: 0.8f32,
@@ -6181,7 +6181,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         536u32,
-        0..0,
+        10939u32..=10939u32,
         "Chiseled Red Sandstone",
         BlockProperties {
             hardness: 0.8f32,
@@ -6191,7 +6191,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         537u32,
-        0..0,
+        10940u32..=10940u32,
         "Cut Red Sandstone",
         BlockProperties {
             hardness: 0.8f32,
@@ -6201,7 +6201,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         538u32,
-        0..0,
+        10941u32..=11020u32,
         "Red Sandstone Stairs",
         BlockProperties {
             hardness: 0.8f32,
@@ -6211,7 +6211,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         539u32,
-        0..0,
+        11021u32..=11026u32,
         "Oak Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6223,7 +6223,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         540u32,
-        0..0,
+        11027u32..=11032u32,
         "Spruce Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6235,7 +6235,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         541u32,
-        0..0,
+        11033u32..=11038u32,
         "Birch Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6247,7 +6247,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         542u32,
-        0..0,
+        11039u32..=11044u32,
         "Jungle Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6259,7 +6259,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         543u32,
-        0..0,
+        11045u32..=11050u32,
         "Acacia Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6271,7 +6271,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         544u32,
-        0..0,
+        11051u32..=11056u32,
         "Cherry Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6283,7 +6283,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         545u32,
-        0..0,
+        11057u32..=11062u32,
         "Dark Oak Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6295,7 +6295,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         546u32,
-        0..0,
+        11063u32..=11068u32,
         "Mangrove Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6307,7 +6307,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         547u32,
-        0..0,
+        11069u32..=11074u32,
         "Bamboo Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6319,7 +6319,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         548u32,
-        0..0,
+        11075u32..=11080u32,
         "Bamboo Mosaic Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6331,7 +6331,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         549u32,
-        0..0,
+        11081u32..=11086u32,
         "Stone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6342,7 +6342,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         550u32,
-        0..0,
+        11087u32..=11092u32,
         "Smooth Stone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6353,7 +6353,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         551u32,
-        0..0,
+        11093u32..=11098u32,
         "Sandstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6364,7 +6364,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         552u32,
-        0..0,
+        11099u32..=11104u32,
         "Cut Sandstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6375,7 +6375,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         553u32,
-        0..0,
+        11105u32..=11110u32,
         "Petrified Oak Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6386,7 +6386,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         554u32,
-        0..0,
+        11111u32..=11116u32,
         "Cobblestone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6397,7 +6397,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         555u32,
-        0..0,
+        11117u32..=11122u32,
         "Brick Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6408,7 +6408,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         556u32,
-        0..0,
+        11123u32..=11128u32,
         "Stone Brick Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6419,7 +6419,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         557u32,
-        0..0,
+        11129u32..=11134u32,
         "Mud Brick Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -6430,7 +6430,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         558u32,
-        0..0,
+        11135u32..=11140u32,
         "Nether Brick Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6441,7 +6441,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         559u32,
-        0..0,
+        11141u32..=11146u32,
         "Quartz Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6452,7 +6452,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         560u32,
-        0..0,
+        11147u32..=11152u32,
         "Red Sandstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6463,7 +6463,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         561u32,
-        0..0,
+        11153u32..=11158u32,
         "Cut Red Sandstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6474,7 +6474,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         562u32,
-        0..0,
+        11159u32..=11164u32,
         "Purpur Slab",
         BlockProperties {
             hardness: 2f32,
@@ -6485,7 +6485,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         563u32,
-        0..0,
+        11165u32..=11165u32,
         "Smooth Stone",
         BlockProperties {
             hardness: 2f32,
@@ -6496,7 +6496,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         564u32,
-        0..0,
+        11166u32..=11166u32,
         "Smooth Sandstone",
         BlockProperties {
             hardness: 2f32,
@@ -6507,7 +6507,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         565u32,
-        0..0,
+        11167u32..=11167u32,
         "Smooth Quartz",
         BlockProperties {
             hardness: 2f32,
@@ -6518,7 +6518,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         566u32,
-        0..0,
+        11168u32..=11168u32,
         "Smooth Red Sandstone",
         BlockProperties {
             hardness: 2f32,
@@ -6529,7 +6529,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         567u32,
-        0..0,
+        11169u32..=11200u32,
         "Spruce Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6541,7 +6541,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         568u32,
-        0..0,
+        11201u32..=11232u32,
         "Birch Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6553,7 +6553,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         569u32,
-        0..0,
+        11233u32..=11264u32,
         "Jungle Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6565,7 +6565,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         570u32,
-        0..0,
+        11265u32..=11296u32,
         "Acacia Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6577,7 +6577,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         571u32,
-        0..0,
+        11297u32..=11328u32,
         "Cherry Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6589,7 +6589,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         572u32,
-        0..0,
+        11329u32..=11360u32,
         "Dark Oak Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6601,7 +6601,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         573u32,
-        0..0,
+        11361u32..=11392u32,
         "Mangrove Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6613,7 +6613,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         574u32,
-        0..0,
+        11393u32..=11424u32,
         "Bamboo Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -6625,7 +6625,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         575u32,
-        0..0,
+        11425u32..=11456u32,
         "Spruce Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6637,7 +6637,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         576u32,
-        0..0,
+        11457u32..=11488u32,
         "Birch Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6649,7 +6649,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         577u32,
-        0..0,
+        11489u32..=11520u32,
         "Jungle Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6661,7 +6661,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         578u32,
-        0..0,
+        11521u32..=11552u32,
         "Acacia Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6673,7 +6673,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         579u32,
-        0..0,
+        11553u32..=11584u32,
         "Cherry Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6685,7 +6685,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         580u32,
-        0..0,
+        11585u32..=11616u32,
         "Dark Oak Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6697,7 +6697,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         581u32,
-        0..0,
+        11617u32..=11648u32,
         "Mangrove Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6709,7 +6709,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         582u32,
-        0..0,
+        11649u32..=11680u32,
         "Bamboo Fence",
         BlockProperties {
             hardness: 2f32,
@@ -6721,7 +6721,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         583u32,
-        0..0,
+        11681u32..=11744u32,
         "Spruce Door",
         BlockProperties {
             hardness: 3f32,
@@ -6733,7 +6733,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         584u32,
-        0..0,
+        11745u32..=11808u32,
         "Birch Door",
         BlockProperties {
             hardness: 3f32,
@@ -6745,7 +6745,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         585u32,
-        0..0,
+        11809u32..=11872u32,
         "Jungle Door",
         BlockProperties {
             hardness: 3f32,
@@ -6757,7 +6757,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         586u32,
-        0..0,
+        11873u32..=11936u32,
         "Acacia Door",
         BlockProperties {
             hardness: 3f32,
@@ -6769,7 +6769,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         587u32,
-        0..0,
+        11937u32..=12000u32,
         "Cherry Door",
         BlockProperties {
             hardness: 3f32,
@@ -6781,7 +6781,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         588u32,
-        0..0,
+        12001u32..=12064u32,
         "Dark Oak Door",
         BlockProperties {
             hardness: 3f32,
@@ -6793,7 +6793,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         589u32,
-        0..0,
+        12065u32..=12128u32,
         "Mangrove Door",
         BlockProperties {
             hardness: 3f32,
@@ -6805,7 +6805,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         590u32,
-        0..0,
+        12129u32..=12192u32,
         "Bamboo Door",
         BlockProperties {
             hardness: 3f32,
@@ -6817,7 +6817,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         591u32,
-        0..0,
+        12193u32..=12198u32,
         "End Rod",
         BlockProperties {
             collidable: false,
@@ -6828,7 +6828,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         592u32,
-        0..0,
+        12199u32..=12262u32,
         "Chorus Plant",
         BlockProperties {
             hardness: 0.4f32,
@@ -6840,7 +6840,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         593u32,
-        0..0,
+        12263u32..=12268u32,
         "Chorus Flower",
         BlockProperties {
             hardness: 0.4f32,
@@ -6853,7 +6853,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         594u32,
-        0..0,
+        12269u32..=12269u32,
         "Purpur Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -6864,7 +6864,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         595u32,
-        0..0,
+        12270u32..=12272u32,
         "Purpur Pillar",
         BlockProperties {
             hardness: 1.5f32,
@@ -6875,7 +6875,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         596u32,
-        0..0,
+        12273u32..=12352u32,
         "Purpur Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -6886,7 +6886,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         597u32,
-        0..0,
+        12353u32..=12353u32,
         "End Stone Bricks",
         BlockProperties {
             hardness: 3f32,
@@ -6897,7 +6897,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         598u32,
-        0..0,
+        12354u32..=12355u32,
         "Torchflower Crop",
         BlockProperties {
             random_ticks: true,
@@ -6909,7 +6909,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         599u32,
-        0..0,
+        12356u32..=12356u32,
         "Pitcher Crop",
         BlockProperties {
             random_ticks: true,
@@ -6921,7 +6921,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         600u32,
-        0..0,
+        12357u32..=12358u32,
         "Pitcher Plant",
         BlockProperties {
             burnable: true,
@@ -6933,7 +6933,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         601u32,
-        0..0,
+        12359u32..=12362u32,
         "Beetroots",
         BlockProperties {
             random_ticks: true,
@@ -6942,10 +6942,18 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
             ..Default::default()
         }
     );
+    // TODO: Check values beyond this point
+    // TODO: Check values beyond this point
+    // TODO: Check values beyond this point
+    // TODO: Check values beyond this point
+    // TODO: Check values beyond this point
+    // TODO: Check values beyond this point
+    // TODO: Check values beyond this point
+    // TODO: Check values beyond this point
     add_block!(
         blocks,
         602u32,
-        0..0,
+        12363u32..=12363u32,
         "Dirt Path",
         BlockProperties {
             hardness: 0.65f32,
@@ -6955,7 +6963,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         603u32,
-        0..0,
+        12364u32..=12364u32,
         "End Gateway",
         BlockProperties {
             hardness: -1f32,
@@ -6968,7 +6976,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         604u32,
-        0..0,
+        12365u32..=12376u32,
         "Repeating Command Block",
         BlockProperties {
             hardness: -1f32,
@@ -6979,7 +6987,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         605u32,
-        0..0,
+        12377u32..=12388u32,
         "Chain Command Block",
         BlockProperties {
             hardness: -1f32,
@@ -6990,7 +6998,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         606u32,
-        0..0,
+        12389u32..=12392u32,
         "Frosted Ice",
         BlockProperties {
             hardness: 0.5f32,
@@ -7003,7 +7011,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         607u32,
-        0..0,
+        12393u32..=12393u32,
         "Magma Block",
         BlockProperties {
             hardness: 0.5f32,
@@ -7013,7 +7021,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         608u32,
-        0..0,
+        12394u32..=12394u32,
         "Nether Wart Block",
         BlockProperties {
             hardness: 1f32,
@@ -7023,7 +7031,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         609u32,
-        0..0,
+        12395u32..=12395u32,
         "Red Nether Bricks",
         BlockProperties {
             hardness: 2f32,
@@ -7034,7 +7042,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         610u32,
-        0..0,
+        12396u32..=12398u32,
         "Bone Block",
         BlockProperties {
             hardness: 2f32,
@@ -7044,7 +7052,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         611u32,
-        0..0,
+        12399u32..=12399u32,
         "Structure Void",
         BlockProperties {
             collidable: false,
@@ -7055,7 +7063,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         612u32,
-        0..0,
+        12400u32..=12411u32,
         "Observer",
         BlockProperties {
             hardness: 3f32,
@@ -7065,7 +7073,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         613u32,
-        0..0,
+        12412u32..=12417u32,
         "Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7077,7 +7085,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         614u32,
-        0..0,
+        12418u32..=12423u32,
         "White Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7089,7 +7097,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         615u32,
-        0..0,
+        12424u32..=12429u32,
         "Orange Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7101,7 +7109,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         616u32,
-        0..0,
+        12430u32..=12435u32,
         "Magenta Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7113,7 +7121,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         617u32,
-        0..0,
+        12436u32..=12441u32,
         "Light Blue Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7125,7 +7133,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         618u32,
-        0..0,
+        12442u32..=12447u32,
         "Yellow Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7137,7 +7145,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         619u32,
-        0..0,
+        12448u32..=12453u32,
         "Lime Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7149,7 +7157,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         620u32,
-        0..0,
+        12454u32..=12459u32,
         "Pink Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7161,7 +7169,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         621u32,
-        0..0,
+        12460u32..=12465u32,
         "Gray Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7173,7 +7181,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         622u32,
-        0..0,
+        12466u32..=12471u32,
         "Light Gray Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7185,7 +7193,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         623u32,
-        0..0,
+        12472u32..=12477u32,
         "Cyan Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7197,7 +7205,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         624u32,
-        0..0,
+        12478u32..=12483u32,
         "Purple Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7209,7 +7217,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         625u32,
-        0..0,
+        12484u32..=12489u32,
         "Blue Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7221,7 +7229,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         626u32,
-        0..0,
+        12490u32..=12495u32,
         "Brown Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7233,7 +7241,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         627u32,
-        0..0,
+        12496u32..=12501u32,
         "Green Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7245,7 +7253,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         628u32,
-        0..0,
+        12502u32..=12507u32,
         "Red Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7257,7 +7265,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         629u32,
-        0..0,
+        12508u32..=12513u32,
         "Black Shulker Box",
         BlockProperties {
             hardness: 2f32,
@@ -7269,7 +7277,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         630u32,
-        0..0,
+        12514u32..=12517u32,
         "White Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7279,7 +7287,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         631u32,
-        0..0,
+        12518u32..=12521u32,
         "Orange Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7289,7 +7297,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         632u32,
-        0..0,
+        12522u32..=12525u32,
         "Magenta Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7299,7 +7307,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         633u32,
-        0..0,
+        12526u32..=12529u32,
         "Light Blue Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7309,7 +7317,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         634u32,
-        0..0,
+        12530u32..=12533u32,
         "Yellow Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7319,7 +7327,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         635u32,
-        0..0,
+        12534u32..=12537u32,
         "Lime Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7329,7 +7337,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         636u32,
-        0..0,
+        12538u32..=12541u32,
         "Pink Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7339,7 +7347,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         637u32,
-        0..0,
+        12542u32..=12545u32,
         "Gray Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7349,7 +7357,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         638u32,
-        0..0,
+        12546u32..=12549u32,
         "Light Gray Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7359,7 +7367,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         639u32,
-        0..0,
+        12550u32..=12553u32,
         "Cyan Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7369,7 +7377,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         640u32,
-        0..0,
+        12554u32..=12557u32,
         "Purple Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7379,7 +7387,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         641u32,
-        0..0,
+        12558u32..=12561u32,
         "Blue Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7389,7 +7397,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         642u32,
-        0..0,
+        12562u32..=12565u32,
         "Brown Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7399,7 +7407,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         643u32,
-        0..0,
+        12566u32..=12569u32,
         "Green Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7409,7 +7417,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         644u32,
-        0..0,
+        12570u32..=12573u32,
         "Red Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7419,7 +7427,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         645u32,
-        0..0,
+        12574u32..=12577u32,
         "Black Glazed Terracotta",
         BlockProperties {
             hardness: 1.4f32,
@@ -7429,7 +7437,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         646u32,
-        0..0,
+        12578u32..=12578u32,
         "White Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7439,7 +7447,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         647u32,
-        0..0,
+        12579u32..=12579u32,
         "Orange Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7449,7 +7457,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         648u32,
-        0..0,
+        12580u32..=12580u32,
         "Magenta Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7459,7 +7467,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         649u32,
-        0..0,
+        12581u32..=12581u32,
         "Light Blue Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7469,7 +7477,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         650u32,
-        0..0,
+        12582u32..=12582u32,
         "Yellow Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7479,7 +7487,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         651u32,
-        0..0,
+        12583u32..=12583u32,
         "Lime Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7489,7 +7497,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         652u32,
-        0..0,
+        12584u32..=12584u32,
         "Pink Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7499,7 +7507,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         653u32,
-        0..0,
+        12585u32..=12585u32,
         "Gray Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7509,7 +7517,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         654u32,
-        0..0,
+        12586u32..=12586u32,
         "Light Gray Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7519,7 +7527,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         655u32,
-        0..0,
+        12587u32..=12587u32,
         "Cyan Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7529,7 +7537,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         656u32,
-        0..0,
+        12588u32..=12588u32,
         "Purple Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7539,7 +7547,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         657u32,
-        0..0,
+        12589u32..=12589u32,
         "Blue Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7549,7 +7557,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         658u32,
-        0..0,
+        12590u32..=12590u32,
         "Brown Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7559,7 +7567,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         659u32,
-        0..0,
+        12591u32..=12591u32,
         "Green Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7569,7 +7577,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         660u32,
-        0..0,
+        12592u32..=12592u32,
         "Red Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7579,7 +7587,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         661u32,
-        0..0,
+        12593u32..=12593u32,
         "Black Concrete",
         BlockProperties {
             hardness: 1.8f32,
@@ -7589,7 +7597,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         662u32,
-        0..0,
+        12594u32..=12594u32,
         "White Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7599,7 +7607,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         663u32,
-        0..0,
+        12595u32..=12595u32,
         "Orange Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7609,7 +7617,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         664u32,
-        0..0,
+        12596u32..=12596u32,
         "Magenta Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7619,7 +7627,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         665u32,
-        0..0,
+        12597u32..=12597u32,
         "Light Blue Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7629,7 +7637,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         666u32,
-        0..0,
+        12598u32..=12598u32,
         "Yellow Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7639,7 +7647,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         667u32,
-        0..0,
+        12599u32..=12599u32,
         "Lime Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7649,7 +7657,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         668u32,
-        0..0,
+        12600u32..=12600u32,
         "Pink Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7659,7 +7667,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         669u32,
-        0..0,
+        12601u32..=12601u32,
         "Gray Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7669,7 +7677,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         670u32,
-        0..0,
+        12602u32..=12602u32,
         "Light Gray Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7679,7 +7687,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         671u32,
-        0..0,
+        12603u32..=12603u32,
         "Cyan Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7689,7 +7697,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         672u32,
-        0..0,
+        12604u32..=12604u32,
         "Purple Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7699,7 +7707,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         673u32,
-        0..0,
+        12605u32..=12605u32,
         "Blue Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7709,7 +7717,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         674u32,
-        0..0,
+        12606u32..=12606u32,
         "Brown Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7719,7 +7727,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         675u32,
-        0..0,
+        12607u32..=12607u32,
         "Green Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7729,7 +7737,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         676u32,
-        0..0,
+        12608u32..=12608u32,
         "Red Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7739,7 +7747,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         677u32,
-        0..0,
+        12609u32..=12609u32,
         "Black Concrete Powder",
         BlockProperties {
             hardness: 0.5f32,
@@ -7749,7 +7757,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         678u32,
-        0..0,
+        12610u32..=12635u32,
         "Kelp",
         BlockProperties {
             random_ticks: true,
@@ -7761,7 +7769,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         679u32,
-        0..0,
+        12636u32..=12636u32,
         "Kelp Plant",
         BlockProperties {
             collidable: false,
@@ -7772,7 +7780,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         680u32,
-        0..0,
+        12637u32..=12637u32,
         "Dried Kelp Block",
         BlockProperties {
             hardness: 0.5f32,
@@ -7783,7 +7791,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         681u32,
-        0..0,
+        12638u32..=12646u32,
         "Turtle Egg",
         BlockProperties {
             hardness: 0.5f32,
@@ -7795,7 +7803,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         682u32,
-        0..0,
+        12647u32..=12649u32,
         "Sniffer Egg",
         BlockProperties {
             hardness: 0.5f32,
@@ -7806,7 +7814,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         683u32,
-        0..0,
+        12650u32..=12650u32,
         "Dead Tube Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7817,7 +7825,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         684u32,
-        0..0,
+        12651u32..=12651u32,
         "Dead Brain Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7828,7 +7836,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         685u32,
-        0..0,
+        12652u32..=12652u32,
         "Dead Bubble Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7839,7 +7847,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         686u32,
-        0..0,
+        12653u32..=12653u32,
         "Dead Fire Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7850,7 +7858,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         687u32,
-        0..0,
+        12654u32..=12654u32,
         "Dead Horn Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7861,7 +7869,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         688u32,
-        0..0,
+        12655u32..=12655u32,
         "Tube Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7872,7 +7880,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         689u32,
-        0..0,
+        12656u32..=12656u32,
         "Brain Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7883,7 +7891,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         690u32,
-        0..0,
+        12657u32..=12657u32,
         "Bubble Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7894,7 +7902,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         691u32,
-        0..0,
+        12658u32..=12658u32,
         "Fire Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7905,7 +7913,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         692u32,
-        0..0,
+        12659u32..=12659u32,
         "Horn Coral Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -7916,7 +7924,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         693u32,
-        0..0,
+        12660u32..=12661u32,
         "Dead Tube Coral",
         BlockProperties {
             collidable: false,
@@ -7927,7 +7935,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         694u32,
-        0..0,
+        12662u32..=12663u32,
         "Dead Brain Coral",
         BlockProperties {
             collidable: false,
@@ -7938,7 +7946,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         695u32,
-        0..0,
+        12664u32..=12665u32,
         "Dead Bubble Coral",
         BlockProperties {
             collidable: false,
@@ -7949,7 +7957,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         696u32,
-        0..0,
+        12666u32..=12667u32,
         "Dead Fire Coral",
         BlockProperties {
             collidable: false,
@@ -7960,7 +7968,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         697u32,
-        0..0,
+        12668u32..=12669u32,
         "Dead Horn Coral",
         BlockProperties {
             collidable: false,
@@ -7971,7 +7979,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         698u32,
-        0..0,
+        12670u32..=12671u32,
         "Tube Coral",
         BlockProperties {
             collidable: false,
@@ -7982,7 +7990,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         699u32,
-        0..0,
+        12672u32..=12673u32,
         "Brain Coral",
         BlockProperties {
             collidable: false,
@@ -7993,7 +8001,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         700u32,
-        0..0,
+        12674u32..=12675u32,
         "Bubble Coral",
         BlockProperties {
             collidable: false,
@@ -8004,7 +8012,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         701u32,
-        0..0,
+        12676u32..=12677u32,
         "Fire Coral",
         BlockProperties {
             collidable: false,
@@ -8015,7 +8023,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         702u32,
-        0..0,
+        12678u32..=12679u32,
         "Horn Coral",
         BlockProperties {
             collidable: false,
@@ -8026,7 +8034,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         703u32,
-        0..0,
+        12680u32..=12681u32,
         "Dead Tube Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8037,7 +8045,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         704u32,
-        0..0,
+        12682u32..=12683u32,
         "Dead Brain Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8048,7 +8056,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         705u32,
-        0..0,
+        12684u32..=12685u32,
         "Dead Bubble Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8059,7 +8067,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         706u32,
-        0..0,
+        12686u32..=12687u32,
         "Dead Fire Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8070,7 +8078,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         707u32,
-        0..0,
+        12688u32..=12689u32,
         "Dead Horn Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8081,7 +8089,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         708u32,
-        0..0,
+        12690u32..=12691u32,
         "Tube Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8092,7 +8100,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         709u32,
-        0..0,
+        12692u32..=12693u32,
         "Brain Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8103,7 +8111,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         710u32,
-        0..0,
+        12694u32..=12695u32,
         "Bubble Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8114,7 +8122,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         711u32,
-        0..0,
+        12696u32..=12697u32,
         "Fire Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8125,7 +8133,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         712u32,
-        0..0,
+        12698u32..=12699u32,
         "Horn Coral Fan",
         BlockProperties {
             collidable: false,
@@ -8136,7 +8144,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         713u32,
-        0..0,
+        12700u32..=12707u32,
         "Dead Tube Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8147,7 +8155,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         714u32,
-        0..0,
+        12708u32..=12715u32,
         "Dead Brain Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8158,7 +8166,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         715u32,
-        0..0,
+        12716u32..=12723u32,
         "Dead Bubble Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8169,7 +8177,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         716u32,
-        0..0,
+        12724u32..=12731u32,
         "Dead Fire Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8180,7 +8188,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         717u32,
-        0..0,
+        12732u32..=12739u32,
         "Dead Horn Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8191,7 +8199,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         718u32,
-        0..0,
+        12740u32..=12747u32,
         "Tube Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8202,7 +8210,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         719u32,
-        0..0,
+        12748u32..=12755u32,
         "Brain Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8213,7 +8221,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         720u32,
-        0..0,
+        12756u32..=12763u32,
         "Bubble Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8224,7 +8232,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         721u32,
-        0..0,
+        12764u32..=12771u32,
         "Fire Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8235,7 +8243,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         722u32,
-        0..0,
+        12772u32..=12779u32,
         "Horn Coral Wall Fan",
         BlockProperties {
             collidable: false,
@@ -8246,7 +8254,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         723u32,
-        0..0,
+        12780u32..=12787u32,
         "Sea Pickle",
         BlockProperties {
             opaque: false,
@@ -8256,7 +8264,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         724u32,
-        0..0,
+        12788u32..=12788u32,
         "Blue Ice",
         BlockProperties {
             hardness: 2.8f32,
@@ -8267,7 +8275,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         725u32,
-        0..0,
+        12789u32..=12790u32,
         "Conduit",
         BlockProperties {
             hardness: 3f32,
@@ -8278,7 +8286,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         726u32,
-        0..0,
+        12791u32..=12791u32,
         "Bamboo Sapling",
         BlockProperties {
             hardness: 1f32,
@@ -8292,7 +8300,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         727u32,
-        0..0,
+        12792u32..=12803u32,
         "Bamboo",
         BlockProperties {
             hardness: 1f32,
@@ -8305,7 +8313,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         728u32,
-        0..0,
+        12804u32..=12804u32,
         "Potted Bamboo",
         BlockProperties {
             opaque: false,
@@ -8315,7 +8323,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         729u32,
-        0..0,
+        12805u32..=12805u32,
         "Void Air",
         BlockProperties {
             collidable: false,
@@ -8327,7 +8335,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         730u32,
-        0..0,
+        12806u32..=12806u32,
         "Cave Air",
         BlockProperties {
             collidable: false,
@@ -8339,7 +8347,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         731u32,
-        0..0,
+        12807u32..=12808u32,
         "Bubble Column",
         BlockProperties {
             collidable: false,
@@ -8351,7 +8359,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         732u32,
-        0..0,
+        12809u32..=12888u32,
         "Polished Granite Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8362,7 +8370,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         733u32,
-        0..0,
+        12889u32..=12968u32,
         "Smooth Red Sandstone Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -8373,7 +8381,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         734u32,
-        0..0,
+        12969u32..=13048u32,
         "Mossy Stone Brick Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8384,7 +8392,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         735u32,
-        0..0,
+        13049u32..=13128u32,
         "Polished Diorite Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8395,7 +8403,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         736u32,
-        0..0,
+        13129u32..=13208u32,
         "Mossy Cobblestone Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -8406,7 +8414,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         737u32,
-        0..0,
+        13209u32..=13288u32,
         "End Stone Brick Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -8417,7 +8425,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         738u32,
-        0..0,
+        13289u32..=13368u32,
         "Stone Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8428,7 +8436,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         739u32,
-        0..0,
+        13369u32..=13448u32,
         "Smooth Sandstone Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -8439,7 +8447,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         740u32,
-        0..0,
+        13449u32..=13528u32,
         "Smooth Quartz Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -8450,7 +8458,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         741u32,
-        0..0,
+        13529u32..=13608u32,
         "Granite Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8461,7 +8469,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         742u32,
-        0..0,
+        13609u32..=13688u32,
         "Andesite Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8472,7 +8480,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         743u32,
-        0..0,
+        13689u32..=13768u32,
         "Red Nether Brick Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -8483,7 +8491,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         744u32,
-        0..0,
+        13769u32..=13848u32,
         "Polished Andesite Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8494,7 +8502,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         745u32,
-        0..0,
+        13849u32..=13928u32,
         "Diorite Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -8505,7 +8513,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         746u32,
-        0..0,
+        13929u32..=13934u32,
         "Polished Granite Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -8516,7 +8524,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         747u32,
-        0..0,
+        13935u32..=13940u32,
         "Smooth Red Sandstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -8527,7 +8535,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         748u32,
-        0..0,
+        13941u32..=13946u32,
         "Mossy Stone Brick Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -8538,7 +8546,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         749u32,
-        0..0,
+        13947u32..=13952u32,
         "Polished Diorite Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -8549,7 +8557,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         750u32,
-        0..0,
+        13953u32..=13958u32,
         "Mossy Cobblestone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -8560,7 +8568,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         751u32,
-        0..0,
+        13959u32..=13964u32,
         "End Stone Brick Slab",
         BlockProperties {
             hardness: 3f32,
@@ -8571,7 +8579,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         752u32,
-        0..0,
+        13965u32..=13970u32,
         "Smooth Sandstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -8582,7 +8590,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         753u32,
-        0..0,
+        13971u32..=13976u32,
         "Smooth Quartz Slab",
         BlockProperties {
             hardness: 2f32,
@@ -8593,7 +8601,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         754u32,
-        0..0,
+        13977u32..=13982u32,
         "Granite Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -8604,7 +8612,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         755u32,
-        0..0,
+        13983u32..=13988u32,
         "Andesite Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -8615,7 +8623,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         756u32,
-        0..0,
+        13989u32..=13994u32,
         "Red Nether Brick Slab",
         BlockProperties {
             hardness: 2f32,
@@ -8626,7 +8634,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         757u32,
-        0..0,
+        13995u32..=14000u32,
         "Polished Andesite Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -8637,7 +8645,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         758u32,
-        0..0,
+        14001u32..=14006u32,
         "Diorite Slab",
         BlockProperties {
             hardness: 1.5f32,
@@ -8648,7 +8656,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         759u32,
-        0..0,
+        14007u32..=14330u32,
         "Brick Wall",
         BlockProperties {
             hardness: 2f32,
@@ -8659,7 +8667,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         760u32,
-        0..0,
+        14331u32..=14654u32,
         "Prismarine Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -8670,7 +8678,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         761u32,
-        0..0,
+        14655u32..=14978u32,
         "Red Sandstone Wall",
         BlockProperties {
             hardness: 0.8f32,
@@ -8680,7 +8688,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         762u32,
-        0..0,
+        14979u32..=15302u32,
         "Mossy Stone Brick Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -8691,7 +8699,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         763u32,
-        0..0,
+        15303u32..=15626u32,
         "Granite Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -8702,7 +8710,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         764u32,
-        0..0,
+        15627u32..=15950u32,
         "Stone Brick Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -8713,7 +8721,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         765u32,
-        0..0,
+        15951u32..=16274u32,
         "Mud Brick Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -8724,7 +8732,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         766u32,
-        0..0,
+        16275u32..=16598u32,
         "Nether Brick Wall",
         BlockProperties {
             hardness: 2f32,
@@ -8735,7 +8743,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         767u32,
-        0..0,
+        16599u32..=16922u32,
         "Andesite Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -8746,7 +8754,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         768u32,
-        0..0,
+        16923u32..=17246u32,
         "Red Nether Brick Wall",
         BlockProperties {
             hardness: 2f32,
@@ -8757,7 +8765,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         769u32,
-        0..0,
+        17247u32..=17570u32,
         "Sandstone Wall",
         BlockProperties {
             hardness: 0.8f32,
@@ -8767,7 +8775,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         770u32,
-        0..0,
+        17571u32..=17894u32,
         "End Stone Brick Wall",
         BlockProperties {
             hardness: 3f32,
@@ -8778,7 +8786,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         771u32,
-        0..0,
+        17895u32..=18218u32,
         "Diorite Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -8789,7 +8797,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         772u32,
-        0..0,
+        18219u32..=18250u32,
         "Scaffolding",
         BlockProperties {
             collidable: false,
@@ -8800,7 +8808,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         773u32,
-        0..0,
+        18251u32..=18254u32,
         "Loom",
         BlockProperties {
             hardness: 2.5f32,
@@ -8811,7 +8819,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         774u32,
-        0..0,
+        18255u32..=18266u32,
         "Barrel",
         BlockProperties {
             hardness: 2.5f32,
@@ -8822,7 +8830,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         775u32,
-        0..0,
+        18267u32..=18274u32,
         "Smoker",
         BlockProperties {
             hardness: 3.5f32,
@@ -8832,7 +8840,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         776u32,
-        0..0,
+        18275u32..=18282u32,
         "Blast Furnace",
         BlockProperties {
             hardness: 3.5f32,
@@ -8842,7 +8850,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         777u32,
-        0..0,
+        18283u32..=18283u32,
         "Cartography Table",
         BlockProperties {
             hardness: 2.5f32,
@@ -8853,7 +8861,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         778u32,
-        0..0,
+        18284u32..=18284u32,
         "Fletching Table",
         BlockProperties {
             hardness: 2.5f32,
@@ -8864,7 +8872,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         779u32,
-        0..0,
+        18285u32..=18296u32,
         "Grindstone",
         BlockProperties {
             hardness: 2f32,
@@ -8875,7 +8883,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         780u32,
-        0..0,
+        18297u32..=18312u32,
         "Lectern",
         BlockProperties {
             hardness: 2.5f32,
@@ -8886,7 +8894,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         781u32,
-        0..0,
+        18313u32..=18313u32,
         "Smithing Table",
         BlockProperties {
             hardness: 2.5f32,
@@ -8897,7 +8905,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         782u32,
-        0..0,
+        18314u32..=18317u32,
         "Stonecutter",
         BlockProperties {
             hardness: 3.5f32,
@@ -8907,7 +8915,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         783u32,
-        0..0,
+        18318u32..=18349u32,
         "Bell",
         BlockProperties {
             hardness: 5f32,
@@ -8917,7 +8925,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         784u32,
-        0..0,
+        18350u32..=18353u32,
         "Lantern",
         BlockProperties {
             hardness: 3.5f32,
@@ -8928,7 +8936,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         785u32,
-        0..0,
+        18354u32..=18357u32,
         "Soul Lantern",
         BlockProperties {
             hardness: 3.5f32,
@@ -8939,7 +8947,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         786u32,
-        0..0,
+        18358u32..=18389u32,
         "Campfire",
         BlockProperties {
             hardness: 2f32,
@@ -8951,7 +8959,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         787u32,
-        0..0,
+        18390u32..=18421u32,
         "Soul Campfire",
         BlockProperties {
             hardness: 2f32,
@@ -8963,7 +8971,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         788u32,
-        0..0,
+        18422u32..=18425u32,
         "Sweet Berry Bush",
         BlockProperties {
             random_ticks: true,
@@ -8975,7 +8983,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         789u32,
-        0..0,
+        18426u32..=18428u32,
         "Warped Stem",
         BlockProperties {
             ..Default::default()
@@ -8984,7 +8992,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         790u32,
-        0..0,
+        18429u32..=18431u32,
         "Stripped Warped Stem",
         BlockProperties {
             ..Default::default()
@@ -8993,7 +9001,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         791u32,
-        0..0,
+        18432u32..=18434u32,
         "Warped Hyphae",
         BlockProperties {
             hardness: 2f32,
@@ -9003,7 +9011,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         792u32,
-        0..0,
+        18435u32..=18437u32,
         "Stripped Warped Hyphae",
         BlockProperties {
             hardness: 2f32,
@@ -9013,7 +9021,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         793u32,
-        0..0,
+        18438u32..=18438u32,
         "Warped Nylium",
         BlockProperties {
             hardness: 0.4f32,
@@ -9024,7 +9032,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         794u32,
-        0..0,
+        18439u32..=18439u32,
         "Warped Fungus",
         BlockProperties {
             collidable: false,
@@ -9035,7 +9043,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         795u32,
-        0..0,
+        18440u32..=18440u32,
         "Warped Wart Block",
         BlockProperties {
             hardness: 1f32,
@@ -9045,7 +9053,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         796u32,
-        0..0,
+        18441u32..=18441u32,
         "Warped Roots",
         BlockProperties {
             collidable: false,
@@ -9056,7 +9064,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         797u32,
-        0..0,
+        18442u32..=18442u32,
         "Nether Sprouts",
         BlockProperties {
             collidable: false,
@@ -9067,7 +9075,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         798u32,
-        0..0,
+        18443u32..=18445u32,
         "Crimson Stem",
         BlockProperties {
             ..Default::default()
@@ -9076,7 +9084,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         799u32,
-        0..0,
+        18446u32..=18448u32,
         "Stripped Crimson Stem",
         BlockProperties {
             ..Default::default()
@@ -9085,7 +9093,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         800u32,
-        0..0,
+        18449u32..=18451u32,
         "Crimson Hyphae",
         BlockProperties {
             hardness: 2f32,
@@ -9095,7 +9103,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         801u32,
-        0..0,
+        18452u32..=18454u32,
         "Stripped Crimson Hyphae",
         BlockProperties {
             hardness: 2f32,
@@ -9105,7 +9113,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         802u32,
-        0..0,
+        18455u32..=18455u32,
         "Crimson Nylium",
         BlockProperties {
             hardness: 0.4f32,
@@ -9116,7 +9124,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         803u32,
-        0..0,
+        18456u32..=18456u32,
         "Crimson Fungus",
         BlockProperties {
             collidable: false,
@@ -9127,7 +9135,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         804u32,
-        0..0,
+        18457u32..=18457u32,
         "Shroomlight",
         BlockProperties {
             hardness: 1f32,
@@ -9137,7 +9145,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         805u32,
-        0..0,
+        18458u32..=18483u32,
         "Weeping Vines",
         BlockProperties {
             random_ticks: true,
@@ -9149,7 +9157,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         806u32,
-        0..0,
+        18484u32..=18484u32,
         "Weeping Vines Plant",
         BlockProperties {
             collidable: false,
@@ -9160,7 +9168,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         807u32,
-        0..0,
+        18485u32..=18510u32,
         "Twisting Vines",
         BlockProperties {
             random_ticks: true,
@@ -9172,7 +9180,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         808u32,
-        0..0,
+        18511u32..=18511u32,
         "Twisting Vines Plant",
         BlockProperties {
             collidable: false,
@@ -9183,7 +9191,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         809u32,
-        0..0,
+        18512u32..=18512u32,
         "Crimson Roots",
         BlockProperties {
             collidable: false,
@@ -9194,7 +9202,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         810u32,
-        0..0,
+        18513u32..=18513u32,
         "Crimson Planks",
         BlockProperties {
             hardness: 2f32,
@@ -9205,7 +9213,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         811u32,
-        0..0,
+        18514u32..=18514u32,
         "Warped Planks",
         BlockProperties {
             hardness: 2f32,
@@ -9216,7 +9224,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         812u32,
-        0..0,
+        18515u32..=18520u32,
         "Crimson Slab",
         BlockProperties {
             hardness: 2f32,
@@ -9227,7 +9235,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         813u32,
-        0..0,
+        18521u32..=18526u32,
         "Warped Slab",
         BlockProperties {
             hardness: 2f32,
@@ -9238,7 +9246,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         814u32,
-        0..0,
+        18527u32..=18528u32,
         "Crimson Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -9250,7 +9258,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         815u32,
-        0..0,
+        18529u32..=18530u32,
         "Warped Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -9262,7 +9270,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         816u32,
-        0..0,
+        18531u32..=18562u32,
         "Crimson Fence",
         BlockProperties {
             hardness: 2f32,
@@ -9273,7 +9281,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         817u32,
-        0..0,
+        18563u32..=18594u32,
         "Warped Fence",
         BlockProperties {
             hardness: 2f32,
@@ -9284,7 +9292,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         818u32,
-        0..0,
+        18595u32..=18658u32,
         "Crimson Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -9295,7 +9303,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         819u32,
-        0..0,
+        18659u32..=18722u32,
         "Warped Trapdoor",
         BlockProperties {
             hardness: 3f32,
@@ -9306,7 +9314,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         820u32,
-        0..0,
+        18723u32..=18754u32,
         "Crimson Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -9317,7 +9325,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         821u32,
-        0..0,
+        18755u32..=18786u32,
         "Warped Fence Gate",
         BlockProperties {
             hardness: 2f32,
@@ -9328,7 +9336,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         822u32,
-        0..0,
+        18787u32..=18866u32,
         "Crimson Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -9339,7 +9347,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         823u32,
-        0..0,
+        18867u32..=18946u32,
         "Warped Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -9350,7 +9358,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         824u32,
-        0..0,
+        18947u32..=18970u32,
         "Crimson Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -9362,7 +9370,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         825u32,
-        0..0,
+        18971u32..=18994u32,
         "Warped Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -9374,7 +9382,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         826u32,
-        0..0,
+        18995u32..=19058u32,
         "Crimson Door",
         BlockProperties {
             hardness: 3f32,
@@ -9385,7 +9393,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         827u32,
-        0..0,
+        19059u32..=19122u32,
         "Warped Door",
         BlockProperties {
             hardness: 3f32,
@@ -9396,7 +9404,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         828u32,
-        0..0,
+        19123u32..=19154u32,
         "Crimson Sign",
         BlockProperties {
             hardness: 1f32,
@@ -9408,7 +9416,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         829u32,
-        0..0,
+        19155u32..=19186u32,
         "Warped Sign",
         BlockProperties {
             hardness: 1f32,
@@ -9420,7 +9428,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         830u32,
-        0..0,
+        19187u32..=19194u32,
         "Crimson Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -9432,7 +9440,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         831u32,
-        0..0,
+        19195u32..=19202u32,
         "Warped Wall Sign",
         BlockProperties {
             hardness: 1f32,
@@ -9444,7 +9452,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         832u32,
-        0..0,
+        19203u32..=19206u32,
         "Structure Block",
         BlockProperties {
             hardness: -1f32,
@@ -9455,7 +9463,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         833u32,
-        0..0,
+        19207u32..=19218u32,
         "Jigsaw",
         BlockProperties {
             hardness: -1f32,
@@ -9466,7 +9474,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         834u32,
-        0..0,
+        19219u32..=19227u32,
         "Composter",
         BlockProperties {
             hardness: 0.6f32,
@@ -9477,7 +9485,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         835u32,
-        0..0,
+        19228u32..=19243u32,
         "Target",
         BlockProperties {
             hardness: 0.5f32,
@@ -9487,7 +9495,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         836u32,
-        0..0,
+        19244u32..=19267u32,
         "Bee Nest",
         BlockProperties {
             hardness: 0.3f32,
@@ -9498,7 +9506,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         837u32,
-        0..0,
+        19268u32..=19291u32,
         "Beehive",
         BlockProperties {
             hardness: 0.6f32,
@@ -9509,7 +9517,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         838u32,
-        0..0,
+        19292u32..=19292u32,
         "Honey Block",
         BlockProperties {
             velocity_multiplier: 0.4f32,
@@ -9521,7 +9529,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         839u32,
-        0..0,
+        19293u32..=19293u32,
         "Honeycomb Block",
         BlockProperties {
             hardness: 0.6f32,
@@ -9531,7 +9539,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         840u32,
-        0..0,
+        19294u32..=19294u32,
         "Netherite Block",
         BlockProperties {
             hardness: 50f32,
@@ -9542,7 +9550,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         841u32,
-        0..0,
+        19295u32..=19295u32,
         "Ancient Debris",
         BlockProperties {
             hardness: 30f32,
@@ -9553,7 +9561,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         842u32,
-        0..0,
+        19296u32..=19296u32,
         "Crying Obsidian",
         BlockProperties {
             hardness: 50f32,
@@ -9564,7 +9572,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         843u32,
-        0..0,
+        19297u32..=19301u32,
         "Respawn Anchor",
         BlockProperties {
             hardness: 50f32,
@@ -9575,7 +9583,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         844u32,
-        0..0,
+        19302u32..=19302u32,
         "Potted Crimson Fungus",
         BlockProperties {
             opaque: false,
@@ -9585,7 +9593,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         845u32,
-        0..0,
+        19303u32..=19303u32,
         "Potted Warped Fungus",
         BlockProperties {
             opaque: false,
@@ -9595,7 +9603,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         846u32,
-        0..0,
+        19304u32..=19304u32,
         "Potted Crimson Roots",
         BlockProperties {
             opaque: false,
@@ -9605,7 +9613,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         847u32,
-        0..0,
+        19305u32..=19305u32,
         "Potted Warped Roots",
         BlockProperties {
             opaque: false,
@@ -9615,7 +9623,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         848u32,
-        0..0,
+        19306u32..=19306u32,
         "Lodestone",
         BlockProperties {
             hardness: 3.5f32,
@@ -9625,7 +9633,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         849u32,
-        0..0,
+        19307u32..=19307u32,
         "Blackstone",
         BlockProperties {
             hardness: 1.5f32,
@@ -9636,7 +9644,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         850u32,
-        0..0,
+        19308u32..=19387u32,
         "Blackstone Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -9647,7 +9655,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         851u32,
-        0..0,
+        19388u32..=19711u32,
         "Blackstone Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -9658,7 +9666,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         852u32,
-        0..0,
+        19712u32..=19717u32,
         "Blackstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -9669,7 +9677,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         853u32,
-        0..0,
+        19718u32..=19718u32,
         "Polished Blackstone",
         BlockProperties {
             hardness: 2f32,
@@ -9680,7 +9688,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         854u32,
-        0..0,
+        19719u32..=19719u32,
         "Polished Blackstone Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -9691,7 +9699,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         855u32,
-        0..0,
+        19720u32..=19720u32,
         "Cracked Polished Blackstone Bricks",
         BlockProperties {
             hardness: 1.5f32,
@@ -9702,7 +9710,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         856u32,
-        0..0,
+        19721u32..=19721u32,
         "Chiseled Polished Blackstone",
         BlockProperties {
             hardness: 1.5f32,
@@ -9713,7 +9721,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         857u32,
-        0..0,
+        19722u32..=19727u32,
         "Polished Blackstone Brick Slab",
         BlockProperties {
             hardness: 2f32,
@@ -9724,7 +9732,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         858u32,
-        0..0,
+        19728u32..=19807u32,
         "Polished Blackstone Brick Stairs",
         BlockProperties {
             hardness: 1.5f32,
@@ -9735,7 +9743,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         859u32,
-        0..0,
+        19808u32..=20131u32,
         "Polished Blackstone Brick Wall",
         BlockProperties {
             hardness: 1.5f32,
@@ -9746,7 +9754,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         860u32,
-        0..0,
+        20132u32..=20132u32,
         "Gilded Blackstone",
         BlockProperties {
             hardness: 1.5f32,
@@ -9757,7 +9765,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         861u32,
-        0..0,
+        20133u32..=20212u32,
         "Polished Blackstone Stairs",
         BlockProperties {
             hardness: 2f32,
@@ -9768,7 +9776,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         862u32,
-        0..0,
+        20213u32..=20218u32,
         "Polished Blackstone Slab",
         BlockProperties {
             hardness: 2f32,
@@ -9779,7 +9787,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         863u32,
-        0..0,
+        20219u32..=20220u32,
         "Polished Blackstone Pressure Plate",
         BlockProperties {
             hardness: 0.5f32,
@@ -9791,7 +9799,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         864u32,
-        0..0,
+        20221u32..=20244u32,
         "Polished Blackstone Button",
         BlockProperties {
             hardness: 0.5f32,
@@ -9803,7 +9811,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         865u32,
-        0..0,
+        20245u32..=20568u32,
         "Polished Blackstone Wall",
         BlockProperties {
             hardness: 2f32,
@@ -9814,7 +9822,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         866u32,
-        0..0,
+        20569u32..=20569u32,
         "Chiseled Nether Bricks",
         BlockProperties {
             hardness: 2f32,
@@ -9825,7 +9833,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         867u32,
-        0..0,
+        20570u32..=20570u32,
         "Cracked Nether Bricks",
         BlockProperties {
             hardness: 2f32,
@@ -9836,7 +9844,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         868u32,
-        0..0,
+        20571u32..=20571u32,
         "Quartz Bricks",
         BlockProperties {
             hardness: 0.8f32,
@@ -9846,7 +9854,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         869u32,
-        0..0,
+        20572u32..=20587u32,
         "Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9858,7 +9866,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         870u32,
-        0..0,
+        20588u32..=20603u32,
         "White Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9870,7 +9878,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         871u32,
-        0..0,
+        20604u32..=20619u32,
         "Orange Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9882,7 +9890,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         872u32,
-        0..0,
+        20620u32..=20635u32,
         "Magenta Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9894,7 +9902,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         873u32,
-        0..0,
+        20636u32..=20651u32,
         "Light Blue Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9906,7 +9914,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         874u32,
-        0..0,
+        20652u32..=20667u32,
         "Yellow Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9918,7 +9926,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         875u32,
-        0..0,
+        20668u32..=20683u32,
         "Lime Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9930,7 +9938,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         876u32,
-        0..0,
+        20684u32..=20699u32,
         "Pink Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9942,7 +9950,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         877u32,
-        0..0,
+        20700u32..=20715u32,
         "Gray Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9954,7 +9962,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         878u32,
-        0..0,
+        20716u32..=20731u32,
         "Light Gray Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9966,7 +9974,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         879u32,
-        0..0,
+        20732u32..=20747u32,
         "Cyan Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9978,7 +9986,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         880u32,
-        0..0,
+        20748u32..=20763u32,
         "Purple Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -9990,7 +9998,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         881u32,
-        0..0,
+        20764u32..=20779u32,
         "Blue Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -10002,7 +10010,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         882u32,
-        0..0,
+        20780u32..=20795u32,
         "Brown Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -10014,7 +10022,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         883u32,
-        0..0,
+        20796u32..=20811u32,
         "Green Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -10026,7 +10034,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         884u32,
-        0..0,
+        20812u32..=20827u32,
         "Red Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -10038,7 +10046,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         885u32,
-        0..0,
+        20828u32..=20843u32,
         "Black Candle",
         BlockProperties {
             hardness: 0.1f32,
@@ -10050,7 +10058,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         886u32,
-        0..0,
+        20844u32..=20845u32,
         "Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10060,7 +10068,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         887u32,
-        0..0,
+        20846u32..=20847u32,
         "White Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10070,7 +10078,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         888u32,
-        0..0,
+        20848u32..=20849u32,
         "Orange Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10080,7 +10088,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         889u32,
-        0..0,
+        20850u32..=20851u32,
         "Magenta Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10090,7 +10098,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         890u32,
-        0..0,
+        20852u32..=20853u32,
         "Light Blue Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10100,7 +10108,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         891u32,
-        0..0,
+        20854u32..=20855u32,
         "Yellow Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10110,7 +10118,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         892u32,
-        0..0,
+        20856u32..=20857u32,
         "Lime Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10120,7 +10128,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         893u32,
-        0..0,
+        20858u32..=20859u32,
         "Pink Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10130,7 +10138,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         894u32,
-        0..0,
+        20860u32..=20861u32,
         "Gray Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10140,7 +10148,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         895u32,
-        0..0,
+        20862u32..=20863u32,
         "Light Gray Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10150,7 +10158,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         896u32,
-        0..0,
+        20864u32..=20865u32,
         "Cyan Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10160,7 +10168,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         897u32,
-        0..0,
+        20866u32..=20867u32,
         "Purple Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10170,7 +10178,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         898u32,
-        0..0,
+        20868u32..=20869u32,
         "Blue Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10180,7 +10188,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         899u32,
-        0..0,
+        20870u32..=20871u32,
         "Brown Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10190,7 +10198,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         900u32,
-        0..0,
+        20872u32..=20873u32,
         "Green Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10200,7 +10208,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         901u32,
-        0..0,
+        20874u32..=20875u32,
         "Red Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10210,7 +10218,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         902u32,
-        0..0,
+        20876u32..=20877u32,
         "Black Candle Cake",
         BlockProperties {
             hardness: 0.5f32,
@@ -10220,7 +10228,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         903u32,
-        0..0,
+        20878u32..=20878u32,
         "Amethyst Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -10230,7 +10238,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         904u32,
-        0..0,
+        20879u32..=20879u32,
         "Budding Amethyst",
         BlockProperties {
             hardness: 1.5f32,
@@ -10241,7 +10249,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         905u32,
-        0..0,
+        20880u32..=20891u32,
         "Amethyst Cluster",
         BlockProperties {
             hardness: 1.5f32,
@@ -10253,7 +10261,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         906u32,
-        0..0,
+        20892u32..=20903u32,
         "Large Amethyst Bud",
         BlockProperties {
             hardness: 1.5f32,
@@ -10265,7 +10273,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         907u32,
-        0..0,
+        20904u32..=20915u32,
         "Medium Amethyst Bud",
         BlockProperties {
             hardness: 1.5f32,
@@ -10277,7 +10285,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         908u32,
-        0..0,
+        20916u32..=20927u32,
         "Small Amethyst Bud",
         BlockProperties {
             hardness: 1.5f32,
@@ -10289,7 +10297,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         909u32,
-        0..0,
+        20928u32..=20928u32,
         "Tuff",
         BlockProperties {
             hardness: 1.5f32,
@@ -10300,7 +10308,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         910u32,
-        0..0,
+        20929u32..=20929u32,
         "Calcite",
         BlockProperties {
             hardness: 0.75f32,
@@ -10310,7 +10318,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         911u32,
-        0..0,
+        20930u32..=20930u32,
         "Tinted Glass",
         BlockProperties {
             hardness: 0.3f32,
@@ -10321,7 +10329,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         912u32,
-        0..0,
+        20931u32..=20931u32,
         "Powder Snow",
         BlockProperties {
             hardness: 0.25f32,
@@ -10331,7 +10339,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         913u32,
-        0..0,
+        20932u32..=21027u32,
         "Sculk Sensor",
         BlockProperties {
             hardness: 1.5f32,
@@ -10341,7 +10349,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         914u32,
-        0..0,
+        21028u32..=21411u32,
         "Calibrated Sculk Sensor",
         BlockProperties {
             hardness: 1.5f32,
@@ -10351,7 +10359,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         915u32,
-        0..0,
+        21412u32..=21412u32,
         "Sculk",
         BlockProperties {
             hardness: 0.2f32,
@@ -10361,7 +10369,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         916u32,
-        0..0,
+        21413u32..=21414u32,
         "Sculk Vein",
         BlockProperties {
             hardness: 0.2f32,
@@ -10373,7 +10381,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         917u32,
-        0..0,
+        21415u32..=21416u32,
         "Sculk Catalyst",
         BlockProperties {
             hardness: 3f32,
@@ -10384,7 +10392,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         918u32,
-        0..0,
+        21417u32..=21424u32,
         "Sculk Shrieker",
         BlockProperties {
             hardness: 3f32,
@@ -10395,7 +10403,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         919u32,
-        0..0,
+        21425u32..=21425u32,
         "Oxidized Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10406,7 +10414,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         920u32,
-        0..0,
+        21426u32..=21426u32,
         "Weathered Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10417,7 +10425,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         921u32,
-        0..0,
+        21427u32..=21427u32,
         "Exposed Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10428,7 +10436,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         922u32,
-        0..0,
+        21428u32..=21428u32,
         "Copper Block",
         BlockProperties {
             hardness: 3f32,
@@ -10439,7 +10447,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         923u32,
-        0..0,
+        21429u32..=21429u32,
         "Copper Ore",
         BlockProperties {
             hardness: 3f32,
@@ -10450,7 +10458,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         924u32,
-        0..0,
+        21430u32..=21430u32,
         "Deepslate Copper Ore",
         BlockProperties {
             hardness: 4.5f32,
@@ -10461,7 +10469,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         925u32,
-        0..0,
+        21431u32..=21431u32,
         "Oxidized Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10472,7 +10480,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         926u32,
-        0..0,
+        21432u32..=21432u32,
         "Weathered Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10483,7 +10491,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         927u32,
-        0..0,
+        21433u32..=21433u32,
         "Exposed Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10494,7 +10502,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         928u32,
-        0..0,
+        21434u32..=21434u32,
         "Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10505,7 +10513,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         929u32,
-        0..0,
+        21435u32..=21514u32,
         "Oxidized Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10516,7 +10524,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         930u32,
-        0..0,
+        21515u32..=21594u32,
         "Weathered Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10527,7 +10535,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         931u32,
-        0..0,
+        21595u32..=21674u32,
         "Exposed Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10538,7 +10546,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         932u32,
-        0..0,
+        21675u32..=21754u32,
         "Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10549,7 +10557,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         933u32,
-        0..0,
+        21755u32..=21760u32,
         "Oxidized Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10560,7 +10568,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         934u32,
-        0..0,
+        21761u32..=21766u32,
         "Weathered Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10571,7 +10579,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         935u32,
-        0..0,
+        21767u32..=21772u32,
         "Exposed Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10582,7 +10590,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         936u32,
-        0..0,
+        21773u32..=21778u32,
         "Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10593,7 +10601,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         937u32,
-        0..0,
+        21779u32..=21779u32,
         "Waxed Copper Block",
         BlockProperties {
             hardness: 3f32,
@@ -10604,7 +10612,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         938u32,
-        0..0,
+        21780u32..=21780u32,
         "Waxed Weathered Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10615,7 +10623,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         939u32,
-        0..0,
+        21781u32..=21781u32,
         "Waxed Exposed Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10626,7 +10634,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         940u32,
-        0..0,
+        21782u32..=21782u32,
         "Waxed Oxidized Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10637,7 +10645,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         941u32,
-        0..0,
+        21783u32..=21783u32,
         "Waxed Oxidized Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10648,7 +10656,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         942u32,
-        0..0,
+        21784u32..=21784u32,
         "Waxed Weathered Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10659,7 +10667,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         943u32,
-        0..0,
+        21785u32..=21785u32,
         "Waxed Exposed Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10670,7 +10678,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         944u32,
-        0..0,
+        21786u32..=21786u32,
         "Waxed Cut Copper",
         BlockProperties {
             hardness: 3f32,
@@ -10681,7 +10689,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         945u32,
-        0..0,
+        21787u32..=21866u32,
         "Waxed Oxidized Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10692,7 +10700,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         946u32,
-        0..0,
+        21867u32..=21946u32,
         "Waxed Weathered Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10703,7 +10711,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         947u32,
-        0..0,
+        21947u32..=22026u32,
         "Waxed Exposed Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10714,7 +10722,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         948u32,
-        0..0,
+        22027u32..=22106u32,
         "Waxed Cut Copper Stairs",
         BlockProperties {
             hardness: 3f32,
@@ -10725,7 +10733,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         949u32,
-        0..0,
+        22107u32..=22112u32,
         "Waxed Oxidized Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10736,7 +10744,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         950u32,
-        0..0,
+        22113u32..=22118u32,
         "Waxed Weathered Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10747,7 +10755,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         951u32,
-        0..0,
+        22119u32..=22124u32,
         "Waxed Exposed Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10758,7 +10766,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         952u32,
-        0..0,
+        22125u32..=22130u32,
         "Waxed Cut Copper Slab",
         BlockProperties {
             hardness: 3f32,
@@ -10769,7 +10777,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         953u32,
-        0..0,
+        22131u32..=22154u32,
         "Lightning Rod",
         BlockProperties {
             hardness: 3f32,
@@ -10781,7 +10789,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         954u32,
-        0..0,
+        22155u32..=22174u32,
         "Pointed Dripstone",
         BlockProperties {
             hardness: 1.5f32,
@@ -10794,7 +10802,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         955u32,
-        0..0,
+        22175u32..=22175u32,
         "Dripstone Block",
         BlockProperties {
             hardness: 1.5f32,
@@ -10805,7 +10813,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         956u32,
-        0..0,
+        22176u32..=22201u32,
         "Cave Vines",
         BlockProperties {
             random_ticks: true,
@@ -10817,7 +10825,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         957u32,
-        0..0,
+        22202u32..=22202u32,
         "Cave Vines Plant",
         BlockProperties {
             collidable: false,
@@ -10828,7 +10836,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         958u32,
-        0..0,
+        22203u32..=22203u32,
         "Spore Blossom",
         BlockProperties {
             collidable: false,
@@ -10839,7 +10847,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         959u32,
-        0..0,
+        22204u32..=22204u32,
         "Azalea",
         BlockProperties {
             collidable: false,
@@ -10850,7 +10858,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         960u32,
-        0..0,
+        22205u32..=22205u32,
         "Flowering Azalea",
         BlockProperties {
             collidable: false,
@@ -10861,7 +10869,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         961u32,
-        0..0,
+        22206u32..=22206u32,
         "Moss Carpet",
         BlockProperties {
             hardness: 0.1f32,
@@ -10871,7 +10879,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         962u32,
-        0..0,
+        22207u32..=22222u32,
         "Pink Petals",
         BlockProperties {
             collidable: false,
@@ -10882,7 +10890,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         963u32,
-        0..0,
+        22223u32..=22223u32,
         "Moss Block",
         BlockProperties {
             hardness: 0.1f32,
@@ -10892,7 +10900,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         964u32,
-        0..0,
+        22224u32..=22255u32,
         "Big Dripleaf",
         BlockProperties {
             hardness: 0.1f32,
@@ -10903,7 +10911,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         965u32,
-        0..0,
+        22256u32..=22263u32,
         "Big Dripleaf Stem",
         BlockProperties {
             hardness: 0.1f32,
@@ -10915,7 +10923,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         966u32,
-        0..0,
+        22264u32..=22279u32,
         "Small Dripleaf",
         BlockProperties {
             collidable: false,
@@ -10926,7 +10934,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         967u32,
-        0..0,
+        22280u32..=22281u32,
         "Hanging Roots",
         BlockProperties {
             burnable: true,
@@ -10938,7 +10946,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         968u32,
-        0..0,
+        22282u32..=22282u32,
         "Rooted Dirt",
         BlockProperties {
             hardness: 0.5f32,
@@ -10948,7 +10956,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         969u32,
-        0..0,
+        22283u32..=22283u32,
         "Mud",
         BlockProperties {
             hardness: 0.5f32,
@@ -10958,7 +10966,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         970u32,
-        0..0,
+        22284u32..=22286u32,
         "Deepslate",
         BlockProperties {
             hardness: 3f32,
@@ -10969,7 +10977,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         971u32,
-        0..0,
+        22287u32..=22287u32,
         "Cobbled Deepslate",
         BlockProperties {
             hardness: 3.5f32,
@@ -10980,7 +10988,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         972u32,
-        0..0,
+        22288u32..=22367u32,
         "Cobbled Deepslate Stairs",
         BlockProperties {
             hardness: 3.5f32,
@@ -10991,7 +10999,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         973u32,
-        0..0,
+        22368u32..=22373u32,
         "Cobbled Deepslate Slab",
         BlockProperties {
             hardness: 3.5f32,
@@ -11002,7 +11010,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         974u32,
-        0..0,
+        22374u32..=22697u32,
         "Cobbled Deepslate Wall",
         BlockProperties {
             hardness: 3.5f32,
@@ -11013,7 +11021,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         975u32,
-        0..0,
+        22698u32..=22698u32,
         "Polished Deepslate",
         BlockProperties {
             hardness: 3.5f32,
@@ -11024,7 +11032,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         976u32,
-        0..0,
+        22699u32..=22778u32,
         "Polished Deepslate Stairs",
         BlockProperties {
             hardness: 3.5f32,
@@ -11035,7 +11043,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         977u32,
-        0..0,
+        22779u32..=22784u32,
         "Polished Deepslate Slab",
         BlockProperties {
             hardness: 3.5f32,
@@ -11046,7 +11054,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         978u32,
-        0..0,
+        22785u32..=23108u32,
         "Polished Deepslate Wall",
         BlockProperties {
             hardness: 3.5f32,
@@ -11057,7 +11065,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         979u32,
-        0..0,
+        23109u32..=23109u32,
         "Deepslate Tiles",
         BlockProperties {
             hardness: 3.5f32,
@@ -11068,7 +11076,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         980u32,
-        0..0,
+        23110u32..=23189u32,
         "Deepslate Tile Stairs",
         BlockProperties {
             hardness: 3.5f32,
@@ -11079,7 +11087,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         981u32,
-        0..0,
+        23190u32..=23195u32,
         "Deepslate Tile Slab",
         BlockProperties {
             hardness: 3.5f32,
@@ -11090,7 +11098,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         982u32,
-        0..0,
+        23196u32..=23519u32,
         "Deepslate Tile Wall",
         BlockProperties {
             hardness: 3.5f32,
@@ -11101,7 +11109,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         983u32,
-        0..0,
+        23520u32..=23520u32,
         "Deepslate Bricks",
         BlockProperties {
             hardness: 3.5f32,
@@ -11112,7 +11120,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         984u32,
-        0..0,
+        23521u32..=23600u32,
         "Deepslate Brick Stairs",
         BlockProperties {
             hardness: 3.5f32,
@@ -11123,7 +11131,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         985u32,
-        0..0,
+        23601u32..=23606u32,
         "Deepslate Brick Slab",
         BlockProperties {
             hardness: 3.5f32,
@@ -11134,7 +11142,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         986u32,
-        0..0,
+        23607u32..=23930u32,
         "Deepslate Brick Wall",
         BlockProperties {
             hardness: 3.5f32,
@@ -11145,7 +11153,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         987u32,
-        0..0,
+        23931u32..=23931u32,
         "Chiseled Deepslate",
         BlockProperties {
             hardness: 3.5f32,
@@ -11156,7 +11164,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         988u32,
-        0..0,
+        23932u32..=23932u32,
         "Cracked Deepslate Bricks",
         BlockProperties {
             hardness: 3.5f32,
@@ -11167,7 +11175,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         989u32,
-        0..0,
+        23933u32..=23933u32,
         "Cracked Deepslate Tiles",
         BlockProperties {
             hardness: 3.5f32,
@@ -11178,7 +11186,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         990u32,
-        0..0,
+        23934u32..=23934u32,
         "Infested Deepslate",
         BlockProperties {
             ..Default::default()
@@ -11187,7 +11195,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         991u32,
-        0..0,
+        23935u32..=23935u32,
         "Smooth Basalt",
         BlockProperties {
             hardness: 1.25f32,
@@ -11198,7 +11206,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         992u32,
-        0..0,
+        23936u32..=23936u32,
         "Raw Iron Block",
         BlockProperties {
             hardness: 5f32,
@@ -11209,7 +11217,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         993u32,
-        0..0,
+        23937u32..=23937u32,
         "Raw Copper Block",
         BlockProperties {
             hardness: 5f32,
@@ -11220,7 +11228,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         994u32,
-        0..0,
+        23938u32..=23938u32,
         "Raw Gold Block",
         BlockProperties {
             hardness: 5f32,
@@ -11231,7 +11239,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         995u32,
-        0..0,
+        23939u32..=23939u32,
         "Potted Azalea Bush",
         BlockProperties {
             opaque: false,
@@ -11241,7 +11249,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         996u32,
-        0..0,
+        23940u32..=23940u32,
         "Potted Flowering Azalea Bush",
         BlockProperties {
             opaque: false,
@@ -11251,7 +11259,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         997u32,
-        0..0,
+        23941u32..=23943u32,
         "Ochre Froglight",
         BlockProperties {
             hardness: 0.3f32,
@@ -11261,7 +11269,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         998u32,
-        0..0,
+        23944u32..=23946u32,
         "Verdant Froglight",
         BlockProperties {
             hardness: 0.3f32,
@@ -11271,7 +11279,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         999u32,
-        0..0,
+        23947u32..=23949u32,
         "Pearlescent Froglight",
         BlockProperties {
             hardness: 0.3f32,
@@ -11281,7 +11289,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         1000u32,
-        0..0,
+        23950u32..=23950u32,
         "Frogspawn",
         BlockProperties {
             collidable: false,
@@ -11292,7 +11300,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         1001u32,
-        0..0,
+        23951u32..=23951u32,
         "Reinforced Deepslate",
         BlockProperties {
             hardness: 55f32,
@@ -11303,7 +11311,7 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
     add_block!(
         blocks,
         1002u32,
-        0..0,
+        23952u32..=23967u32,
         "Decorated Pot",
         BlockProperties {
             opaque: false,

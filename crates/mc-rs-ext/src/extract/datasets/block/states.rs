@@ -90,8 +90,26 @@ impl Dataset for States {
                     let class = prop.class.unwrap();
 
                     let mut values = JsonValue::new_object();
-                    for (key, value) in class.values {
-                        values[key] = value.into();
+                    match key.as_str() {
+                        // Override the enum values with the ones we found
+                        "STRAIGHT_RAIL_SHAPE" => {
+                            for val in [
+                                "NORTH_SOUTH",
+                                "EAST_WEST",
+                                "ASCENDING_EAST",
+                                "ASCENDING_WEST",
+                                "ASCENDING_NORTH",
+                                "ASCENDING_SOUTH",
+                            ] {
+                                values[val.to_string()] = val.to_ascii_lowercase().into();
+                            }
+                        }
+                        // Use the generated values
+                        _ => {
+                            for (key, value) in class.values {
+                                values[key] = value.into();
+                            }
+                        }
                     }
 
                     json::object! {
@@ -103,7 +121,16 @@ impl Dataset for States {
                 }
                 PropertyType::Direction => {
                     let mut values = JsonValue::new_object();
-                    for value in PropertyType::DIRECTIONS {
+                    for value in match key.as_str() {
+                        "FACING" => PropertyType::DIRECTIONS,
+                        "HORIZONTAL_FACING" => PropertyType::HORIZONTAL_DIRECTIONS,
+                        "VERTICAL_DIRECTION" => PropertyType::VERTICAL_DIRECTIONS,
+                        "HOPPER_FACING" => PropertyType::HOPPER_DIRECTIONS,
+                        unk => {
+                            error!("Unknown direction: {}", unk);
+                            PropertyType::DIRECTIONS
+                        }
+                    } {
                         values[value.to_string()] = value.to_ascii_lowercase().into();
                     }
 
@@ -146,6 +173,11 @@ impl PropertyType {
 
     pub const DIRECTIONS: &'static [&'static str] =
         &["DOWN", "UP", "NORTH", "SOUTH", "WEST", "EAST"];
+    pub const HORIZONTAL_DIRECTIONS: &'static [&'static str] = &["NORTH", "SOUTH", "WEST", "EAST"];
+    pub const VERTICAL_DIRECTIONS: &'static [&'static str] = &["DOWN", "UP"];
+
+    pub const HOPPER_DIRECTIONS: &'static [&'static str] =
+        &["DOWN", "NORTH", "SOUTH", "WEST", "EAST"];
 
     fn from_descriptor(descriptor: &str) -> Self {
         if let Some(index) = Self::TYPES.iter().position(|&t| t == descriptor) {
