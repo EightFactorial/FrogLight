@@ -29,6 +29,7 @@ pub enum Datasets {
     Diagnostics(diag::Diagnostics),
     Info(info::Info),
     Blocks(block::Blocks),
+    BlockTextures(block::BlockTextures),
     States(block::States),
     BlockStates(block::BlockStates),
     Registry(registry::Registry),

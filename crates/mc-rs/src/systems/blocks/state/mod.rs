@@ -48,9 +48,9 @@ impl BlockState {
     pub fn get_mesh_data(&self, blocks: &BlocksMap) -> BlockMeshData {
         let meshing = match &self.model {
             BlockModel::Standard => BlockMesh::Always,
-            BlockModel::Simple { collision } => {
-                let [min_x, min_y, min_z] = collision.min().to_array().map(|i| i as u32);
-                let [max_x, max_y, max_z] = collision.max().to_array().map(|i| i as u32);
+            BlockModel::Simple(shape) => {
+                let [min_x, min_y, min_z] = shape.min().to_array().map(|i| i as u32);
+                let [max_x, max_y, max_z] = shape.max().to_array().map(|i| i as u32);
 
                 match (min_x, min_y, min_z, max_x, max_y, max_z) {
                     (0, 0, 0, 0, 0, 0) => BlockMesh::Never,
@@ -65,7 +65,7 @@ impl BlockState {
                     ]),
                 }
             }
-            BlockModel::None | BlockModel::Custom { .. } => BlockMesh::Never,
+            _ => BlockMesh::Never,
         };
 
         BlockMeshData {

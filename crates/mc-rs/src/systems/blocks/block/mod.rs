@@ -2,7 +2,7 @@ use std::{hash::Hash, ops::RangeInclusive, sync::Arc};
 
 use bevy::prelude::*;
 use mc_rs_proto::types::ResourceLocation;
-use nohash_hasher::IntMap;
+use nohash_hasher::{BuildNoHashHasher, IntMap};
 use parking_lot::RwLock;
 
 use self::properties::BlockProperties;
@@ -36,7 +36,7 @@ impl Hash for Block {
 
 impl Blocks {
     pub(super) fn create(mut commands: Commands) {
-        let mut blocks = BlocksMap::default();
+        let mut blocks = BlocksMap::with_capacity_and_hasher(1024, BuildNoHashHasher::default());
 
         list::create_blocks(&mut blocks);
 

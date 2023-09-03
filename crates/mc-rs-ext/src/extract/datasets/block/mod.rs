@@ -6,3 +6,6 @@ pub use states::States;
 
 mod blockstates;
 pub use blockstates::BlockStates;
+
+mod textures;
+pub use textures::BlockTextures;

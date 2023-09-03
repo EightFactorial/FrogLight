@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use itertools::Itertools;
 use mc_rs_proto::types::enums::Direction;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -24,6 +25,7 @@ pub enum BlockTexturePattern {
     TopBottom,
     TopBottomSides,
     All,
+    Custom,
 }
 
 impl BlockTextures {
@@ -32,11 +34,9 @@ impl BlockTextures {
         textures: vec![],
     };
 
+    /// Creates a new `BlockTextures` from a list of texture paths with .
     pub fn new(paths: &[&str], asset_server: &AssetServer) -> Self {
-        let textures = paths
-            .iter()
-            .map(|&path| asset_server.load(format!("test/textures/block/{path}")))
-            .collect::<Vec<_>>();
+        let textures = Self::load_paths(paths, asset_server);
 
         match textures.len() {
             0 => Self {
@@ -63,9 +63,17 @@ impl BlockTextures {
         }
     }
 
+    /// Creates a new `BlockTextures` from a list of paths with a custom pattern.
+    pub fn new_custom(paths: &[&str], asset_server: &AssetServer) -> Self {
+        Self {
+            pattern: BlockTexturePattern::Custom,
+            textures: Self::load_paths(paths, asset_server),
+        }
+    }
+
     pub fn get_texture(&self, direction: &Direction) -> Option<Handle<Image>> {
         match self.pattern {
-            BlockTexturePattern::None => None,
+            BlockTexturePattern::None | BlockTexturePattern::Custom => None,
             BlockTexturePattern::Single => self.textures.get(0).cloned(),
             BlockTexturePattern::TopBottom => match direction {
                 Direction::Up | Direction::Down => self.textures.get(0).cloned(),
@@ -85,5 +93,12 @@ impl BlockTextures {
                 Direction::East => self.textures.get(5).cloned(),
             },
         }
+    }
+
+    fn load_paths(paths: &[&str], asset_server: &AssetServer) -> Vec<Handle<Image>> {
+        paths
+            .iter()
+            .map(|&path| asset_server.load(format!("test/textures/block/{path}")))
+            .collect_vec()
     }
 }

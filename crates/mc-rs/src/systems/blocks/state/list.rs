@@ -39,7 +39,7 @@ macro_rules! add_state_range {
         }
     };
     ($states:expr, $asset_server:expr, $block_id:expr, $state_id_range:expr, $textures:expr, $models:expr) => {
-        for (textures, (state_id, model)) in $state_id_range.zip($models).zip($textures) {
+        for ((state_id, model), textures) in $state_id_range.zip($models).zip($textures) {
             add_state!($states, $asset_server, $block_id, state_id, textures, model);
         }
     };
