@@ -108,21 +108,31 @@ impl Dataset for BlockVariants {
                             match when {
                                 StateValueEnum::Or { or: data }
                                 | StateValueEnum::And { and: data } => {
-                                    let mut cond_data = JsonValue::new_array();
-                                    for conditions in data {
-                                        let mut cond = JsonValue::new_object();
-                                        for (key, value) in conditions {
-                                            cond[key] = value.into();
-                                        }
-                                        let _ = cond_data.push(cond);
-                                    }
-                                    when_data["data"] = cond_data;
+                                    when_data["data"] = data.into_iter().fold(
+                                        JsonValue::new_array(),
+                                        |mut acc, value| {
+                                            let cond = value.into_iter().fold(
+                                                JsonValue::new_object(),
+                                                |mut acc, (key, value)| {
+                                                    acc[key] = value.into();
+                                                    acc
+                                                },
+                                            );
+
+                                            let _ = acc.push(cond);
+                                            acc
+                                        },
+                                    )
                                 }
                                 StateValueEnum::Value(value) => {
-                                    let mut cond = JsonValue::new_object();
-                                    for (key, value) in value {
-                                        cond[key] = value.into();
-                                    }
+                                    let cond = value.into_iter().fold(
+                                        JsonValue::new_object(),
+                                        |mut acc, (key, value)| {
+                                            acc[key] = value.into();
+                                            acc
+                                        },
+                                    );
+
                                     when_data["data"] = vec![cond].into();
                                 }
                             }
@@ -132,12 +142,11 @@ impl Dataset for BlockVariants {
 
                         match part.apply {
                             StateVariantEnum::Multiple(variants) => {
-                                let mut vlist = JsonValue::new_array();
-                                for variant in variants {
-                                    let _ = vlist.push::<JsonValue>(variant.into());
-                                }
-
-                                data["model_data"] = vlist;
+                                data["model_data"] = variants
+                                    .into_iter()
+                                    .map(JsonValue::from)
+                                    .collect::<Vec<_>>()
+                                    .into();
                             }
                             StateVariantEnum::Single(variant) => {
                                 data["model_data"] = variant.into();
