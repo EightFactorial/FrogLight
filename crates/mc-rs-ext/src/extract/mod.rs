@@ -82,19 +82,7 @@ fn get_datasets(
         }
     }
 
-    // Add dependencies
-    for (index, set) in datasets.clone().iter().enumerate().rev() {
-        for dep in set.deps() {
-            if let Some(pos) = datasets.iter().position(|s| s == dep) {
-                if pos > index {
-                    datasets.remove(pos);
-                    datasets.insert(index, *dep);
-                }
-            } else {
-                datasets.insert(index, *dep);
-            }
-        }
-    }
+    add_deps(&mut datasets);
 
     #[cfg(debug_assertions)]
     {
@@ -102,4 +90,27 @@ fn get_datasets(
     }
 
     datasets
+}
+
+/// Recursively add dependencies before the sets that depend on them
+fn add_deps(datasets: &mut Vec<Datasets>) {
+    let mut added = false;
+    for (index, set) in datasets.clone().iter().enumerate().rev() {
+        for dep in set.deps() {
+            if let Some(pos) = datasets.iter().position(|s| s == dep) {
+                if pos > index {
+                    datasets.remove(pos);
+                    datasets.insert(index, *dep);
+                    added = true;
+                }
+            } else {
+                datasets.insert(index, *dep);
+                added = true;
+            }
+        }
+    }
+
+    if added {
+        add_deps(datasets);
+    }
 }

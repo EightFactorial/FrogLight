@@ -194,7 +194,7 @@ impl Dataset for BlockStates {
             }
 
             if !info.states.is_empty() {
-                data["blocks"]["blocks"]["blocks"][block]["states"] = info
+                data["blocks"]["blocks"]["blocks"][block]["attributes"] = info
                     .states
                     .iter()
                     .unique()

@@ -7,5 +7,8 @@ pub use states::States;
 mod blockstates;
 pub use blockstates::BlockStates;
 
-mod textures;
-pub use textures::BlockTextures;
+mod variants;
+pub use variants::BlockVariants;
+
+mod models;
+pub use models::BlockModels;

@@ -193,7 +193,7 @@ fn get_state_count(block_data: &JsonValue, data: &JsonValue) -> u32 {
 
     let mut state_count = 1u32;
 
-    for state in block_data["states"].members() {
+    for state in block_data["attributes"].members() {
         let state = state.as_str().unwrap();
 
         let state_data = &states[state];
