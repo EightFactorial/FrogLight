@@ -46,30 +46,36 @@ impl BlockState {
     }
 
     pub fn get_mesh_data(&self, blocks: &BlocksMap) -> BlockMeshData {
-        let meshing = match &self.model {
-            BlockModel::Standard => BlockMesh::Always,
-            BlockModel::Simple(shape) => {
-                let [min_x, min_y, min_z] = shape.min().to_array().map(|i| i as u32);
-                let [max_x, max_y, max_z] = shape.max().to_array().map(|i| i as u32);
+        let block = self.get_block(blocks);
 
-                match (min_x, min_y, min_z, max_x, max_y, max_z) {
-                    (0, 0, 0, 0, 0, 0) => BlockMesh::Never,
-                    (0, 0, 0, 16, 16, 16) => BlockMesh::Always,
-                    _ => BlockMesh::Custom([
-                        min_y == 0,
-                        max_y == 16,
-                        min_z == 0,
-                        max_z == 16,
-                        min_x == 0,
-                        max_x == 16,
-                    ]),
+        let meshing = if block.properties.is_fluid {
+            BlockMesh::Never(rand::random())
+        } else {
+            match &self.model {
+                BlockModel::Standard => BlockMesh::Always,
+                BlockModel::Simple(shape) => {
+                    let [min_x, min_y, min_z] = shape.min().to_array().map(|i| i as u32);
+                    let [max_x, max_y, max_z] = shape.max().to_array().map(|i| i as u32);
+
+                    match (min_x, min_y, min_z, max_x, max_y, max_z) {
+                        (0, 0, 0, 0, 0, 0) => BlockMesh::Never(rand::random()),
+                        (0, 0, 0, 16, 16, 16) => BlockMesh::Always,
+                        _ => BlockMesh::Custom([
+                            min_y == 0,
+                            max_y == 16,
+                            min_z == 0,
+                            max_z == 16,
+                            min_x == 0,
+                            max_x == 16,
+                        ]),
+                    }
                 }
+                _ => BlockMesh::Never(rand::random()),
             }
-            _ => BlockMesh::Never,
         };
 
         BlockMeshData {
-            voxel: self.get_block(blocks).into(),
+            voxel: block.into(),
             meshing,
         }
     }

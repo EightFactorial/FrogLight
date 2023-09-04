@@ -72,4 +72,114 @@ pub(super) fn create_states(states: &mut StatesMap, asset_server: &AssetServer) 
         12u32..=13u32,
         &["podzol_top.png", "dirt.png", "podzol_side.png"]
     );
+
+    // TODO: Add instructions to material for animated textures
+    add_state_range!(
+        states,
+        asset_server,
+        32u32,
+        80u32..=95u32,
+        &["water_still.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        33u32,
+        96u32..=111u32,
+        &["lava_still.png"]
+    );
+
+    add_state_range!(
+        states,
+        asset_server,
+        46u32,
+        130..=132,
+        &["oak_log_top.png", "oak_log.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        47u32,
+        133..=135,
+        &["spruce_log_top.png", "spruce_log.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        48u32,
+        136..=138,
+        &["birch_log_top.png", "birch_log.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        49u32,
+        139u32..=141u32,
+        &["jungle_log_top.png", "jungle_log.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        50u32,
+        142u32..=144u32,
+        &["acacia_log_top.png", "acacia_log.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        51u32,
+        145u32..=147u32,
+        &["cherry_log_top.png", "cherry_log.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        52u32,
+        148u32..=150u32,
+        &["dark_oak_log_top.png", "dark_oak_log.png"]
+    );
+
+    add_state_range!(states, asset_server, 82u32, 237..=264, &["oak_leaves.png"]);
+    add_state_range!(
+        states,
+        asset_server,
+        83u32,
+        265..=292,
+        &["spruce_leaves.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        84u32,
+        293..=320,
+        &["birch_leaves.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        85u32,
+        321..=348,
+        &["jungle_leaves.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        86u32,
+        349..=376,
+        &["acacia_leaves.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        87u32,
+        377..=404,
+        &["cherry_leaves.png"]
+    );
+    add_state_range!(
+        states,
+        asset_server,
+        88u32,
+        405..=432,
+        &["dark_oak_leaves.png"]
+    );
 }
