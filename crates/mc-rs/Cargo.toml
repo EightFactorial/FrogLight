@@ -38,9 +38,10 @@ toml = { version = "0.7.6", features = ["preserve_order"] }
 uuid = { version = "1.4.1", features = ["v3"] }
 
 [features]
-default = ["wayland", "splash"]
+default = ["wayland", "splash", "simd"]
 splash = []
-simd = ["bevy_rapier3d/simd-nightly", "rand/packed_simd"]
+simd = ["bevy_rapier3d/simd-stable"]
+simd-nightly = ["bevy_rapier3d/simd-nightly", "rand/packed_simd"]
 
 # Enable bevy features
 wayland = ["bevy/wayland"]
