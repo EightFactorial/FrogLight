@@ -4,14 +4,11 @@ use bevy::prelude::*;
 use nohash_hasher::IntMap;
 use parking_lot::RwLock;
 
-use self::{
-    meshing::{BlockMesh, BlockMeshData},
-    model::BlockModel,
-    textures::BlockTextures,
-};
+use self::{model::BlockModel, textures::BlockTextures};
 
 use super::block::{Block, BlocksMap, BlocksMapFn};
 
+mod fluid_model;
 mod list;
 pub mod meshing;
 pub mod model;
