@@ -274,6 +274,7 @@ macro_rules! get_mesh_blockstate {
 }
 
 /// Generates a mesh for a section
+// TODO: Write custom greedy meshing algorithm to properly handle non-cubic blocks
 async fn section_fn(
     section_data: Vec<u32>,
     neighbor_data: [Option<Vec<u32>>; 6],
@@ -302,9 +303,10 @@ async fn section_fn(
 
                 let state_id = get_mesh_blockstate!(x, y, z, section_data, neighbor_data);
                 let blockstate = blockstates.get_state(state_id);
+                let block = blockstate.get_block(&blocks);
 
                 let shape_index = MeshChunkShape::linearize([x, y, z]) as usize;
-                shape[shape_index] = blockstate.get_mesh_data(&blocks);
+                shape[shape_index] = BlockMeshData::from_state(blockstate, block);
             }
         }
     }

@@ -182,4 +182,15 @@ pub(super) fn create_states(states: &mut StatesMap, asset_server: &AssetServer) 
         405..=432,
         &["dark_oak_leaves.png"]
     );
+
+    for id in 11021..=11026 {
+        add_state!(
+            states,
+            asset_server,
+            539u32,
+            id,
+            &["oak_planks.png"],
+            BlockModel::slab_lower()
+        );
+    }
 }

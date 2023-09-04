@@ -44,41 +44,6 @@ impl BlockState {
     pub fn get_block<'a>(&self, blocks: &'a BlocksMap) -> &'a Block {
         blocks.get_block(&self.block_id)
     }
-
-    pub fn get_mesh_data(&self, blocks: &BlocksMap) -> BlockMeshData {
-        let block = self.get_block(blocks);
-
-        let meshing = if block.properties.is_fluid {
-            BlockMesh::Never(rand::random())
-        } else {
-            match &self.model {
-                BlockModel::Standard => BlockMesh::Always,
-                BlockModel::Simple(shape) => {
-                    let [min_x, min_y, min_z] = shape.min().to_array().map(|i| i as u32);
-                    let [max_x, max_y, max_z] = shape.max().to_array().map(|i| i as u32);
-
-                    match (min_x, min_y, min_z, max_x, max_y, max_z) {
-                        (0, 0, 0, 0, 0, 0) => BlockMesh::Never(rand::random()),
-                        (0, 0, 0, 16, 16, 16) => BlockMesh::Always,
-                        _ => BlockMesh::Custom([
-                            min_y == 0,
-                            max_y == 16,
-                            min_z == 0,
-                            max_z == 16,
-                            min_x == 0,
-                            max_x == 16,
-                        ]),
-                    }
-                }
-                _ => BlockMesh::Never(rand::random()),
-            }
-        };
-
-        BlockMeshData {
-            voxel: block.into(),
-            meshing,
-        }
-    }
 }
 
 impl BlockStates {

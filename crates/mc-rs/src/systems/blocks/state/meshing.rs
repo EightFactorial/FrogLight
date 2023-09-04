@@ -2,32 +2,68 @@ use block_mesh::{MergeVoxel, Voxel, VoxelVisibility};
 
 use crate::systems::blocks::block::Block;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+use super::{model::BlockModel, BlockState};
+
+#[derive(Debug, Clone, Copy)]
 pub struct BlockMeshData {
+    pub rid: u32,
     pub voxel: BlockVoxel,
     pub meshing: BlockMesh,
 }
 
+impl Default for BlockMeshData {
+    fn default() -> Self {
+        Self {
+            rid: rand::random(),
+            voxel: Default::default(),
+            meshing: Default::default(),
+        }
+    }
+}
+
+impl Eq for BlockMeshData {}
+impl PartialEq for BlockMeshData {
+    fn eq(&self, other: &Self) -> bool {
+        if self.rid == other.rid {
+            true
+        } else {
+            self.voxel == other.voxel && self.meshing == other.meshing
+        }
+    }
+}
+
+impl BlockMeshData {
+    pub fn from_state(state: &BlockState, block: &Block) -> BlockMeshData {
+        let meshing = if block.properties.is_fluid {
+            BlockMesh::Never
+        } else {
+            match &state.model {
+                BlockModel::Standard => BlockMesh::Always,
+                _ => BlockMesh::Never,
+            }
+        };
+
+        BlockMeshData {
+            rid: rand::random(),
+            voxel: block.into(),
+            meshing,
+        }
+    }
+}
+
 #[derive(Debug, Default, Clone, Copy)]
 pub enum BlockMesh {
-    Never(u32),
     #[default]
+    Never,
     Always,
-    Custom([bool; 6]),
 }
 
 impl Eq for BlockMesh {}
 impl PartialEq for BlockMesh {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::Never(l0), Self::Never(r0)) => l0 == r0,
-            (Self::Always, _) | (_, Self::Always) => true,
-            (Self::Custom([l0, l1, l2, l3, l4, l5]), Self::Custom([r0, r1, r2, r3, r4, r5])) => {
-                // Sides are in order: -Y, +Y, -Z, +Z, -X, +X
-                // True if any of the opposite sides are equal
-                l0 == r1 || l1 == r0 || l2 == r3 || l3 == r2 || l4 == r5 || l5 == r4
-            }
-            _ => std::mem::discriminant(self) == std::mem::discriminant(other),
+            (Self::Never, _) | (_, Self::Never) => false,
+            (Self::Always, Self::Always) => true,
         }
     }
 }
