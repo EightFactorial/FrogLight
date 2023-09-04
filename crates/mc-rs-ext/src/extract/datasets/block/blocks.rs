@@ -294,11 +294,11 @@ impl Dataset for Blocks {
         blocks.values().for_each(|block| {
             data["blocks"]["blocks"]["blocks"][block.name.clone()] = object! {
                 "id" => block.id,
-                "hardness" => Datasets::round_float(block.hardness.into()),
-                "resistance" => Datasets::round_float(block.resistance.into()),
-                "friction" => Datasets::round_float(block.friction.into()),
-                "velocity_multiplier" => Datasets::round_float(block.velocity_multiplier.into()),
-                "jump_velocity_multiplier" => Datasets::round_float(block.jump_velocity_multiplier.into()),
+                "hardness" => Datasets::round_float_f32(block.hardness),
+                "resistance" => Datasets::round_float_f32(block.resistance),
+                "friction" => Datasets::round_float_f32(block.friction),
+                "velocity_multiplier" => Datasets::round_float_f32(block.velocity_multiplier),
+                "jump_velocity_multiplier" => Datasets::round_float_f32(block.jump_velocity_multiplier),
                 "random_ticks" => block.random_ticks,
                 "burnable" => block.burnable,
                 "collidable" => block.collidable,

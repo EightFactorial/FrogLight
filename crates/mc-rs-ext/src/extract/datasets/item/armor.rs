@@ -136,8 +136,8 @@ impl Dataset for Armor {
                     "durability_multiplier": material.durability_multiplier,
                     "enchantability": material.enchantability,
                     "equip_sound": material.equip_sound,
-                    "toughness": Datasets::round_float(material.toughness.into()),
-                    "knockback_resistance": Datasets::round_float(material.knockback_resistance.into()),
+                    "toughness": Datasets::round_float_f32(material.toughness),
+                    "knockback_resistance": Datasets::round_float_f32(material.knockback_resistance),
                 };
             }
         }

@@ -223,20 +223,30 @@ pub enum ModelDisplayKind {
 #[serde(deny_unknown_fields)]
 pub struct ModelDisplay {
     #[serde(default)]
-    pub rotation: [i32; 3],
+    pub rotation: Option<[i32; 3]>,
     #[serde(default)]
-    pub translation: [f32; 3],
+    pub translation: Option<[f32; 3]>,
     #[serde(default)]
-    pub scale: [f32; 3],
+    pub scale: Option<[f32; 3]>,
 }
 
 impl From<ModelDisplay> for JsonValue {
     fn from(value: ModelDisplay) -> Self {
-        json::object! {
-            "rotation": value.rotation.to_vec(),
-            "translation": value.translation.to_vec(),
-            "scale": value.scale.to_vec(),
+        let mut data = JsonValue::new_object();
+
+        if let Some(rotation) = value.rotation {
+            data["rotation"] = rotation.to_vec().into();
         }
+
+        if let Some(translation) = value.translation {
+            data["translation"] = translation.map(Datasets::round_float_f32).to_vec().into();
+        }
+
+        if let Some(scale) = value.scale {
+            data["scale"] = scale.map(Datasets::round_float_f32).to_vec().into();
+        }
+
+        data
     }
 }
 

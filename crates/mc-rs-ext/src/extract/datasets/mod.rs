@@ -43,7 +43,10 @@ pub enum Datasets {
 
 impl Datasets {
     /// Round a float to at most 3 decimals
-    pub fn round_float(float: f64) -> f64 { (float * 1000.0).round() / 1000.0 }
+    pub fn round_float_f32(float: f32) -> f32 { (float * 1000.0).round() / 1000.0 }
+
+    /// Round a float to at most 3 decimals
+    pub fn round_float_f64(float: f64) -> f64 { (float * 1000.0).round() / 1000.0 }
 
     /// Get the code for a class method
     pub fn get_code(method: &str, class: &str, classmap: &ClassMap) -> Option<Vec<Insn>> {

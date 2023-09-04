@@ -3,6 +3,7 @@ use std::fs::File;
 use hashbrown::HashMap;
 use json::JsonValue;
 use log::{error, warn};
+use serde::{Deserialize, Serialize};
 use zip::ZipArchive;
 
 use crate::types::{ClassMap, Manifest, Version};
@@ -11,8 +12,6 @@ use crate::{
     extract::{Dataset, Datasets},
     util::minecraft_jar,
 };
-
-use self::blockstate::{BlockStateData, StateValueEnum, StateVariantEnum};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct BlockVariants;
@@ -199,87 +198,81 @@ fn parse_blockstates(
     blockstates
 }
 
-mod blockstate {
-    use hashbrown::HashMap;
-    use json::JsonValue;
-    use serde::{Deserialize, Serialize};
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum BlockStateData {
+    Variant {
+        variants: HashMap<String, StateVariantEnum>,
+    },
+    Multipart {
+        multipart: Vec<StateMultipart>,
+    },
+}
 
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    #[serde(untagged)]
-    pub enum BlockStateData {
-        Variant {
-            variants: HashMap<String, StateVariantEnum>,
-        },
-        Multipart {
-            multipart: Vec<StateMultipart>,
-        },
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StateMultipart {
+    #[serde(default)]
+    pub when: Option<StateValueEnum>,
+    pub apply: StateVariantEnum,
+}
 
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    #[serde(deny_unknown_fields)]
-    pub struct StateMultipart {
-        #[serde(default)]
-        pub when: Option<StateValueEnum>,
-        pub apply: StateVariantEnum,
-    }
+pub type StateValue = HashMap<String, String>;
 
-    pub type StateValue = HashMap<String, String>;
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum StateValueEnum {
+    Or {
+        #[serde(rename = "OR")]
+        or: Vec<StateValue>,
+    },
+    And {
+        #[serde(rename = "AND")]
+        and: Vec<StateValue>,
+    },
+    Value(StateValue),
+}
 
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    #[serde(untagged)]
-    pub enum StateValueEnum {
-        Or {
-            #[serde(rename = "OR")]
-            or: Vec<StateValue>,
-        },
-        And {
-            #[serde(rename = "AND")]
-            and: Vec<StateValue>,
-        },
-        Value(StateValue),
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum StateVariantEnum {
+    Single(StateVariant),
+    Multiple(Vec<StateVariant>),
+}
 
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    #[serde(untagged)]
-    pub enum StateVariantEnum {
-        Single(StateVariant),
-        Multiple(Vec<StateVariant>),
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StateVariant {
+    pub model: String,
 
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    #[serde(deny_unknown_fields)]
-    pub struct StateVariant {
-        pub model: String,
+    #[serde(default)]
+    pub x: Option<i32>,
+    #[serde(default)]
+    pub y: Option<i32>,
+    #[serde(default)]
+    pub uvlock: Option<bool>,
+    #[serde(default)]
+    pub weight: Option<i32>,
+}
 
-        #[serde(default)]
-        pub x: Option<i32>,
-        #[serde(default)]
-        pub y: Option<i32>,
-        #[serde(default)]
-        pub uvlock: Option<bool>,
-        #[serde(default)]
-        pub weight: Option<i32>,
-    }
+impl From<StateVariant> for JsonValue {
+    fn from(value: StateVariant) -> Self {
+        let mut data = JsonValue::new_object();
+        data["model"] = value.model.into();
 
-    impl From<StateVariant> for JsonValue {
-        fn from(value: StateVariant) -> Self {
-            let mut data = JsonValue::new_object();
-            data["model"] = value.model.into();
-
-            if let Some(x) = value.x {
-                data["x"] = x.into();
-            }
-            if let Some(y) = value.y {
-                data["y"] = y.into();
-            }
-            if let Some(uvlock) = value.uvlock {
-                data["uvlock"] = uvlock.into();
-            }
-            if let Some(weight) = value.weight {
-                data["weight"] = weight.into();
-            }
-
-            data
+        if let Some(x) = value.x {
+            data["x"] = x.into();
         }
+        if let Some(y) = value.y {
+            data["y"] = y.into();
+        }
+        if let Some(uvlock) = value.uvlock {
+            data["uvlock"] = uvlock.into();
+        }
+        if let Some(weight) = value.weight {
+            data["weight"] = weight.into();
+        }
+
+        data
     }
 }
