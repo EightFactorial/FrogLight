@@ -33,9 +33,10 @@ impl BlockModel {
                 ..
             } => {
                 // Offset the positions with the sides of the shape.
-                Self::mod_pos(direction, *collision, pos);
+                Self::mod_bounding_box(direction, *collision, pos);
             }
             Self::Complex(vert_pos) => {
+                // Get the index of the side of the shape.
                 let side_index = match direction {
                     Direction::Up => 0,
                     Direction::Down => 1,
@@ -47,14 +48,10 @@ impl BlockModel {
 
                 // Reset vertex positions by subtracting with the cube positions.
                 // Offset the positions with the sides of the shape.
-                for (i, (pos, cpos)) in pos
-                    .iter_mut()
-                    .zip(Self::CUBE[side_index].iter())
-                    .enumerate()
-                {
+                for (i, (pos, cpos)) in pos.iter_mut().zip(&Self::CUBE[side_index]).enumerate() {
                     pos.iter_mut()
                         .zip(cpos)
-                        .zip(vert_pos[side_index * 4 + i])
+                        .zip(&vert_pos[side_index * 4 + i])
                         .for_each(|((p, c), v)| *p -= c - v);
                 }
             }
@@ -62,7 +59,8 @@ impl BlockModel {
         }
     }
 
-    fn mod_pos(direction: &Direction, bounding_box: Aabb, pos: &mut [[f32; 3]; 4]) {
+    /// Modifies the vertex positions to match the block collision box.
+    fn mod_bounding_box(direction: &Direction, bounding_box: Aabb, pos: &mut [[f32; 3]; 4]) {
         let [min_x, min_y, min_z] = bounding_box.min().to_array();
         let [max_x, max_y, max_z] = bounding_box.max().to_array();
 
@@ -124,6 +122,7 @@ impl BlockModel {
         }
     }
 
+    /// The model of a the top slab of a block.
     pub fn slab_upper() -> BlockModel {
         BlockModel::Simple(Aabb::from_min_max(
             Vec3::new(0.0, 0.5, 0.0),
@@ -131,6 +130,7 @@ impl BlockModel {
         ))
     }
 
+    /// The model of a the bottom slab of a block.
     pub fn slab_lower() -> BlockModel {
         BlockModel::Simple(Aabb::from_min_max(
             Vec3::new(0.0, 0.0, 0.0),
@@ -138,6 +138,7 @@ impl BlockModel {
         ))
     }
 
+    /// The model of a fluid block.
     pub fn fluid_shape(fluid_level: u8) -> BlockModel {
         BlockModel::Complex(
             match fluid_level {
