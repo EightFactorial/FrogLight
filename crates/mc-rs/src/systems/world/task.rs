@@ -22,7 +22,7 @@ use crate::systems::{
     app_state::GameSet,
     blocks::{
         state::{meshing::BlockMeshData, model::BlockModel, StatesMapFn},
-        BlockStates, Blocks,
+        BlockData,
     },
 };
 
@@ -51,15 +51,9 @@ impl ChunkTask {
     pub(super) fn create(
         chunk: ChunkSections,
         neighbors: [Option<ChunkSections>; 4],
-        blocks: Blocks,
-        blockstates: BlockStates,
+        block_data: BlockData,
     ) -> Self {
-        ChunkTask(AsyncComputeTaskPool::get().spawn(chunk_fn(
-            chunk,
-            neighbors,
-            blocks,
-            blockstates,
-        )))
+        ChunkTask(AsyncComputeTaskPool::get().spawn(chunk_fn(chunk, neighbors, block_data)))
     }
 
     fn as_task(&mut self) -> &mut Task<ChunkTaskResult> { &mut self.0 }
@@ -164,8 +158,7 @@ impl ChunkTask {
 async fn chunk_fn(
     chunk: ChunkSections,
     neighbors: [Option<ChunkSections>; 4],
-    blocks: Blocks,
-    blockstates: BlockStates,
+    block_data: BlockData,
 ) -> ChunkTaskResult {
     let pool = AsyncComputeTaskPool::get();
 
@@ -202,8 +195,7 @@ async fn chunk_fn(
         let task = Some(pool.spawn(section_fn(
             chunk.read()[index].get_blocks(),
             neighbors,
-            blocks.clone(),
-            blockstates.clone(),
+            block_data.clone(),
         )));
 
         tasks.push(task);
@@ -278,11 +270,10 @@ macro_rules! get_mesh_blockstate {
 async fn section_fn(
     section_data: Vec<u32>,
     neighbor_data: [Option<Vec<u32>>; 6],
-    blocks: Blocks,
-    blockstates: BlockStates,
+    block_data: BlockData,
 ) -> SectionResult {
-    let blocks = blocks.read();
-    let blockstates = blockstates.read();
+    let blocks = block_data.blocks.read();
+    let blockstates = block_data.states.read();
 
     let mut shape = [BlockMeshData::default(); MeshChunkShape::SIZE as usize];
     for y in 0..MESH_Y {

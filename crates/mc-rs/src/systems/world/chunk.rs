@@ -11,7 +11,7 @@ use mc_rs_proto::{
 };
 use parking_lot::RwLock;
 
-use crate::systems::blocks::{BlockStates, Blocks};
+use crate::systems::blocks::BlockData;
 
 use super::{
     global_palette::GlobalPalette, section::Section, task::ChunkTask, WorldType, Worlds,
@@ -98,8 +98,7 @@ impl Chunk {
     /// Regenerate chunk meshes.
     pub(super) fn update_chunk(
         query: Query<Ref<Chunk>>,
-        blocks: Res<Blocks>,
-        blockstates: Res<BlockStates>,
+        block_data: Res<BlockData>,
         mut worlds: ResMut<Worlds>,
         mut commands: Commands,
     ) {
@@ -146,8 +145,7 @@ impl Chunk {
                     commands.entity(**entity).insert(ChunkTask::create(
                         chunk.sections.clone(),
                         neighbors,
-                        blocks.clone(),
-                        blockstates.clone(),
+                        block_data.clone(),
                     ));
                 } else {
                     error!(
@@ -182,8 +180,7 @@ impl Chunk {
                             commands.entity(**entity).insert(ChunkTask::create(
                                 neighbor_chunk.sections.clone(),
                                 neighbors,
-                                blocks.clone(),
-                                blockstates.clone(),
+                                block_data.clone(),
                             ));
                         } else {
                             error!("Failed to get chunk entity for added chunk {neighbor_pos:?}");

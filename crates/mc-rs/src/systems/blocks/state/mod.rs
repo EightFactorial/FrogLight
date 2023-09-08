@@ -8,7 +8,6 @@ use self::{model::BlockModel, textures::BlockTextures};
 
 use super::block::{Block, BlocksMap, BlocksMapFn};
 
-mod fluid_model;
 mod list;
 pub mod meshing;
 pub mod model;
@@ -17,7 +16,7 @@ pub mod textures;
 mod statesmap;
 pub use statesmap::StatesMapFn;
 
-#[derive(Debug, Clone, Deref, DerefMut, Resource)]
+#[derive(Debug, Clone, Deref, DerefMut)]
 pub struct BlockStates(pub Arc<RwLock<StatesMap>>);
 pub(super) type StatesMap = IntMap<u32, BlockState>;
 
@@ -44,10 +43,10 @@ impl BlockState {
 }
 
 impl BlockStates {
-    pub(super) fn create(asset_server: Res<AssetServer>, mut commands: Commands) {
+    pub(super) fn create(asset_server: &AssetServer) -> BlockStates {
         let mut states = StatesMap::default();
 
-        list::create_states(&mut states, &asset_server);
+        list::create_states(&mut states, asset_server);
 
         // Add the fallback block state
         states.insert(
@@ -55,11 +54,11 @@ impl BlockStates {
             BlockState {
                 block_id: u32::MAX,
                 state_id: u32::MAX,
-                textures: BlockTextures::new(&["light_blue_wool.png"], &asset_server),
+                textures: BlockTextures::new(&["light_blue_wool.png"], asset_server),
                 model: BlockModel::Standard,
             },
         );
 
-        commands.insert_resource(BlockStates(Arc::new(RwLock::new(states))));
+        BlockStates(Arc::new(RwLock::new(states)))
     }
 }

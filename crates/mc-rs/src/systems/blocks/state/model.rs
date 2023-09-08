@@ -121,7 +121,7 @@ impl BlockModel {
     }
 
     /// The model of a the top slab of a block.
-    pub fn slab_upper() -> BlockModel {
+    pub fn _slab_upper() -> BlockModel {
         BlockModel::Simple(Aabb::from_min_max(
             Vec3::new(0.0, 0.5, 0.0),
             Vec3::new(1.0, 1.0, 1.0),
@@ -137,7 +137,7 @@ impl BlockModel {
     }
 
     /// The model of a fluid block.
-    pub fn fluid_shape(fluid_level: u8) -> BlockModel {
+    pub fn fluid_shape(_fluid_level: u8) -> BlockModel {
         BlockModel::Complex(Self::CUBE.into_iter().flatten().collect())
     }
 

@@ -13,7 +13,7 @@ pub mod properties;
 mod blocksmap;
 pub use blocksmap::BlocksMapFn;
 
-#[derive(Debug, Clone, Deref, DerefMut, Resource)]
+#[derive(Debug, Clone, Deref, DerefMut)]
 pub struct Blocks(pub Arc<RwLock<BlocksMap>>);
 pub(super) type BlocksMap = IntMap<u32, Block>;
 
@@ -35,7 +35,7 @@ impl Hash for Block {
 }
 
 impl Blocks {
-    pub(super) fn create(mut commands: Commands) {
+    pub(super) fn create() -> Blocks {
         let mut blocks = BlocksMap::with_capacity_and_hasher(1024, BuildNoHashHasher::default());
 
         list::create_blocks(&mut blocks);
@@ -52,6 +52,6 @@ impl Blocks {
             },
         );
 
-        commands.insert_resource(Blocks(Arc::new(RwLock::new(blocks))));
+        Blocks(Arc::new(RwLock::new(blocks)))
     }
 }
