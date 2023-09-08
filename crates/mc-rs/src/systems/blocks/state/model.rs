@@ -4,8 +4,6 @@ use bevy::{
 };
 use mc_rs_proto::types::enums::Direction;
 
-use super::fluid_model::*;
-
 #[derive(Debug, Clone)]
 pub enum BlockModel {
     /// A block without a model.
@@ -140,30 +138,7 @@ impl BlockModel {
 
     /// The model of a fluid block.
     pub fn fluid_shape(fluid_level: u8) -> BlockModel {
-        BlockModel::Complex(
-            match fluid_level {
-                15 => FLUID_LEVEL_15,
-                14 => FLUID_LEVEL_14,
-                13 => FLUID_LEVEL_13,
-                12 => FLUID_LEVEL_12,
-                11 => FLUID_LEVEL_11,
-                10 => FLUID_LEVEL_10,
-                9 => FLUID_LEVEL_09,
-                8 => FLUID_LEVEL_08,
-                7 => FLUID_LEVEL_07,
-                6 => FLUID_LEVEL_06,
-                5 => FLUID_LEVEL_05,
-                4 => FLUID_LEVEL_04,
-                3 => FLUID_LEVEL_03,
-                2 => FLUID_LEVEL_02,
-                1 => FLUID_LEVEL_01,
-                0 => FLUID_LEVEL_00,
-                _ => panic!("Invalid fluid level: {}", fluid_level),
-            }
-            .into_iter()
-            .flatten()
-            .collect(),
-        )
+        BlockModel::Complex(Self::CUBE.into_iter().flatten().collect())
     }
 
     /// The vertices of a cube.
