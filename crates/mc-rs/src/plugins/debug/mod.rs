@@ -3,7 +3,9 @@ use bevy::{
     prelude::*,
 };
 
-use crate::networking::network::LocalPlayer;
+use crate::{
+    networking::network::LocalPlayer, systems::world::structure::section::SectionComponent,
+};
 
 /// A plugin with a debug display
 ///
@@ -20,6 +22,7 @@ impl Plugin for DebugPlugin {
             (
                 DebugPlugin::update_fps,
                 DebugPlugin::update_entities,
+                DebugPlugin::update_sections.run_if(any_with_component::<SectionComponent>()),
                 DebugPlugin::update_position.run_if(any_with_component::<LocalPlayer>()),
             ),
         );
@@ -37,6 +40,10 @@ pub struct DebugFpsDisplay;
 /// A marker component for the debug entity count display
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct DebugEntityCounter;
+
+/// A marker component for the debug section count display
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub struct DebugSectionCounter;
 
 /// A marker component for the player position display
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
@@ -91,6 +98,14 @@ impl DebugPlugin {
                     },
                 ));
                 parent.spawn((
+                    DebugSectionCounter,
+                    TextBundle {
+                        style: style.clone(),
+                        text: Text::from_section("0/0/0 SEC", text_style.clone()),
+                        ..Default::default()
+                    },
+                ));
+                parent.spawn((
                     DebugPlayerPosition,
                     TextBundle {
                         style,
@@ -114,6 +129,26 @@ impl DebugPlugin {
         count: Query<Entity>,
     ) {
         query.single_mut().sections[0].value = format!("{} ENT", count.iter().count());
+    }
+
+    /// Update the debug section counter
+    fn update_sections(
+        mut query: Query<&mut Text, With<DebugSectionCounter>>,
+        sections: Query<&ComputedVisibility, With<SectionComponent>>,
+    ) {
+        let mut total = 0;
+        let mut visible = 0;
+        let mut invisible = 0;
+
+        for section in sections.iter() {
+            total += 1;
+            match section.is_visible() {
+                true => visible += 1,
+                false => invisible += 1,
+            }
+        }
+
+        query.single_mut().sections[0].value = format!("{visible}/{invisible}/{total} SEC");
     }
 
     /// Update the player position display
