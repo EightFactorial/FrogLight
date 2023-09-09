@@ -1,6 +1,8 @@
 use mc_rs_proto::buffer::{Decode, DecodeError, VarDecode};
 
-use super::{global_palette::GlobalPalette, section::DataKind, CHUNK_SIZE, SECTION_HEIGHT};
+use crate::systems::world::{global_palette::GlobalPalette, CHUNK_SIZE, SECTION_HEIGHT};
+
+use super::section::DataKind;
 
 #[derive(Debug, Default, Clone)]
 pub struct Palette {

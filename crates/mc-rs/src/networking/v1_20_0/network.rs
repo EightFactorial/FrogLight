@@ -18,8 +18,8 @@ use crate::{
         task::ConnectionChannel,
     },
     systems::world::{
-        chunk::Chunk,
         resources::{CurrentWorld, WorldSeed},
+        structure::chunk::Chunk,
         WorldType, Worlds,
     },
 };

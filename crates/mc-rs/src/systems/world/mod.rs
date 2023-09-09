@@ -5,20 +5,20 @@ use mc_rs_proto::{
 };
 
 use self::{
-    chunk::{Chunk, ChunkEntity},
     global_palette::GlobalPalette,
-    section::SectionComponent,
+    structure::{
+        chunk::{Chunk, ChunkEntity},
+        section::SectionComponent,
+    },
     task::ChunkTask,
 };
 
 use super::app_state::{ApplicationState, GameSet};
 
-pub mod chunk;
 pub mod global_palette;
 pub mod material;
-pub mod palette;
 pub mod resources;
-pub mod section;
+pub mod structure;
 pub mod task;
 
 /// Adds the `Worlds` resource and its systems.

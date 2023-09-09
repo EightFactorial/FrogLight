@@ -1,224 +1,37 @@
 use std::fmt::Debug;
 
 use bevy::{
-    self,
     prelude::*,
     render::{
         mesh::{Indices, VertexAttributeValues},
         render_resource::PrimitiveTopology,
     },
-    tasks::{AsyncComputeTaskPool, Task},
 };
-use bevy_rapier3d::prelude::{Collider, ComputedColliderShape, RigidBody, Sensor, Sleeping};
+use bevy_rapier3d::prelude::*;
 use block_mesh::{
-    greedy_quads,
     ndshape::{ConstShape, ConstShape3u32},
     GreedyQuadsBuffer, RIGHT_HANDED_Y_UP_CONFIG,
 };
-use futures_lite::future::{block_on, poll_once};
 use mc_rs_proto::types::enums::Direction;
 
 use crate::systems::{
-    app_state::GameSet,
     blocks::{
         state::{meshing::BlockMeshData, model::BlockModel, StatesMapFn},
         BlockData,
     },
+    world::{
+        material::{ATTRIBUTE_BLOCK_ID, ATTRIBUTE_TEXTURE_INDEX, MAX_TEXTURE_COUNT},
+        CHUNK_SIZE, SECTION_HEIGHT,
+    },
 };
 
-use super::{
-    chunk::ChunkSections,
-    material::{BlockMaterial, ATTRIBUTE_BLOCK_ID, ATTRIBUTE_TEXTURE_INDEX, MAX_TEXTURE_COUNT},
-    section::SectionComponent,
-    CHUNK_SIZE, SECTION_COUNT, SECTION_HEIGHT,
-};
-
-pub(super) fn setup(app: &mut App) {
-    app.add_systems(
-        Update,
-        ChunkTask::poll_tasks
-            .run_if(ChunkTask::any_tasks_finished)
-            .in_set(GameSet),
-    );
-}
-
-/// A task that generates a mesh for a section
-#[derive(Deref, DerefMut, Component)]
-pub struct ChunkTask(pub Task<ChunkTaskResult>);
-type ChunkTaskResult = Vec<SectionResult>;
-
-impl ChunkTask {
-    pub(super) fn create(
-        chunk: ChunkSections,
-        neighbors: [Option<ChunkSections>; 4],
-        block_data: BlockData,
-    ) -> Self {
-        ChunkTask(AsyncComputeTaskPool::get().spawn(chunk_fn(chunk, neighbors, block_data)))
-    }
-
-    fn as_task(&mut self) -> &mut Task<ChunkTaskResult> { &mut self.0 }
-
-    fn any_tasks_finished(mut query: Query<&ChunkTask>) -> bool {
-        query.iter_mut().any(|task| task.is_finished())
-    }
-
-    pub(super) fn poll_tasks(
-        mut query: Query<(Entity, &mut ChunkTask)>,
-        mut meshes: ResMut<Assets<Mesh>>,
-        mut materials: ResMut<Assets<BlockMaterial>>,
-        mut commands: Commands,
-    ) {
-        for (entity, mut task) in query.iter_mut() {
-            if let Some(results) = block_on(poll_once(task.as_task())) {
-                commands
-                    .entity(entity)
-                    // Remove all children
-                    .despawn_descendants()
-                    // Add the new children
-                    .with_children(|parent| {
-                        for (index, option) in results.into_iter().enumerate() {
-                            if let Some(result) = option {
-                                let SectionData {
-                                    opaque_mesh,
-                                    transparent_mesh,
-                                    terrain_collider,
-                                    fluid_collider,
-                                    textures,
-                                } = result;
-
-                                let transform =
-                                    Transform::from_xyz(0.0, (index * SECTION_HEIGHT) as f32, 0.0);
-
-                                // Create the opaque mesh bundle
-                                if let Some(opaque_mesh) = opaque_mesh {
-                                    parent.spawn((
-                                        SectionComponent,
-                                        MaterialMeshBundle::<BlockMaterial> {
-                                            mesh: meshes.add(opaque_mesh),
-                                            material: materials
-                                                .add(BlockMaterial::new(textures.clone())),
-                                            transform,
-                                            ..Default::default()
-                                        },
-                                    ));
-                                }
-
-                                // Create the transparent mesh bundle
-                                if let Some(transparent_mesh) = transparent_mesh {
-                                    parent.spawn((
-                                        SectionComponent,
-                                        MaterialMeshBundle::<BlockMaterial> {
-                                            mesh: meshes.add(transparent_mesh),
-                                            material: materials
-                                                .add(BlockMaterial::new_blended(textures)),
-                                            transform,
-                                            ..Default::default()
-                                        },
-                                    ));
-                                }
-
-                                // Spawn the terrain collider
-                                if let Some(terrain_collider) = terrain_collider {
-                                    parent.spawn((
-                                        SectionComponent,
-                                        terrain_collider,
-                                        RigidBody::Fixed,
-                                        Sleeping {
-                                            sleeping: true,
-                                            ..Default::default()
-                                        },
-                                        TransformBundle::from_transform(transform),
-                                    ));
-                                }
-
-                                // Spawn the fluid collider
-                                if let Some(fluid_collider) = fluid_collider {
-                                    parent.spawn((
-                                        SectionComponent,
-                                        fluid_collider,
-                                        RigidBody::Fixed,
-                                        Sensor,
-                                        Sleeping {
-                                            sleeping: true,
-                                            ..Default::default()
-                                        },
-                                        TransformBundle::from_transform(transform),
-                                    ));
-                                }
-                            }
-                        }
-                    })
-                    .remove::<ChunkTask>();
-            };
-        }
-    }
-}
-
-/// Generates a mesh for all sections in a chunk
-async fn chunk_fn(
-    chunk: ChunkSections,
-    neighbors: [Option<ChunkSections>; 4],
-    block_data: BlockData,
-) -> ChunkTaskResult {
-    let pool = AsyncComputeTaskPool::get();
-
-    let mut results = Vec::with_capacity(SECTION_COUNT);
-    let mut tasks = Vec::with_capacity(SECTION_COUNT);
-
-    for index in 0..SECTION_COUNT {
-        // If the section is empty, skip it
-        if let Some(chunk) = chunk.read().get(index) {
-            if chunk.block_count == 0 {
-                tasks.push(None);
-                continue;
-            }
-        }
-
-        let neighbors = [
-            neighbors[0].as_ref().map(|c| c.read()[index].get_blocks()),
-            neighbors[1].as_ref().map(|c| c.read()[index].get_blocks()),
-            neighbors[2].as_ref().map(|c| c.read()[index].get_blocks()),
-            neighbors[3].as_ref().map(|c| c.read()[index].get_blocks()),
-            if index > 0 {
-                Some(chunk.read()[index - 1].get_blocks())
-            } else {
-                None
-            },
-            if index < SECTION_COUNT - 1 {
-                Some(chunk.read()[index + 1].get_blocks())
-            } else {
-                None
-            },
-        ];
-
-        // Spawn a new thread for the section
-        let task = Some(pool.spawn(section_fn(
-            chunk.read()[index].get_blocks(),
-            neighbors,
-            block_data.clone(),
-        )));
-
-        tasks.push(task);
-    }
-
-    // Wait for all sections to finish
-    for task in tasks {
-        match task {
-            Some(task) => results.push(task.await),
-            None => results.push(None),
-        }
-    }
-
-    results
-}
-
-type SectionResult = Option<SectionData>;
+pub(super) type SectionResult = Option<SectionData>;
 pub struct SectionData {
-    opaque_mesh: Option<Mesh>,
-    transparent_mesh: Option<Mesh>,
-    terrain_collider: Option<Collider>,
-    fluid_collider: Option<Collider>,
-    textures: Vec<Handle<Image>>,
+    pub opaque_mesh: Option<Mesh>,
+    pub transparent_mesh: Option<Mesh>,
+    pub terrain_collider: Option<Collider>,
+    pub fluid_collider: Option<Collider>,
+    pub textures: Vec<Handle<Image>>,
 }
 
 impl Debug for SectionData {
@@ -267,7 +80,7 @@ macro_rules! get_mesh_blockstate {
 
 /// Generates a mesh for a section
 // TODO: Write custom greedy meshing algorithm to properly handle non-cubic blocks
-async fn section_fn(
+pub(super) async fn section_fn(
     section_data: Vec<u32>,
     neighbor_data: [Option<Vec<u32>>; 6],
     block_data: BlockData,
@@ -304,7 +117,7 @@ async fn section_fn(
 
     let faces = RIGHT_HANDED_Y_UP_CONFIG.faces;
     let mut buffer = GreedyQuadsBuffer::new(shape.len());
-    greedy_quads(
+    block_mesh::greedy_quads(
         &shape,
         &MeshChunkShape {},
         [0; 3],

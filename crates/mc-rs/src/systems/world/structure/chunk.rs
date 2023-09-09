@@ -11,15 +11,20 @@ use mc_rs_proto::{
 };
 use parking_lot::RwLock;
 
-use crate::systems::blocks::BlockData;
-
-use super::{
-    global_palette::GlobalPalette, section::Section, task::ChunkTask, WorldType, Worlds,
-    CHUNK_SIZE, CHUNK_VERT_DISPLACEMENT, SECTION_COUNT,
+use crate::systems::{
+    blocks::BlockData,
+    world::{
+        global_palette::GlobalPalette, task::ChunkTask, WorldType, Worlds, CHUNK_SIZE,
+        CHUNK_VERT_DISPLACEMENT, SECTION_COUNT,
+    },
 };
+
+use super::section::Section;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut)]
 pub struct ChunkEntity(pub Entity);
+
+pub type ChunkSections = Arc<RwLock<[Section; SECTION_COUNT]>>;
 
 #[derive(Debug, Clone, Component)]
 pub struct Chunk {
@@ -30,12 +35,9 @@ pub struct Chunk {
     pub position: ChunkPos,
 }
 
-pub(super) type ChunkSections = Arc<RwLock<[Section; SECTION_COUNT]>>;
-
-#[allow(dead_code)]
 impl Chunk {
     /// Decodes a chunk from a chunk data packet.
-    pub(super) fn decode<V: GlobalPalette>(
+    pub fn decode<V: GlobalPalette>(
         position: ChunkPos,
         world_type: WorldType,
         chunk_data: ChunkDataPacket,
@@ -96,7 +98,7 @@ impl Chunk {
     }
 
     /// Regenerate chunk meshes.
-    pub(super) fn update_chunk(
+    pub fn update_chunk(
         query: Query<Ref<Chunk>>,
         block_data: Res<BlockData>,
         mut worlds: ResMut<Worlds>,
@@ -192,6 +194,7 @@ impl Chunk {
     }
 
     /// Insert data into a chunk section.
+    #[allow(dead_code)]
     pub fn update_section<V: GlobalPalette>(
         &mut self,
         position: ChunkSectionPos,

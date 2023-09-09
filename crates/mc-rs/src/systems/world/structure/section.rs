@@ -4,7 +4,9 @@ use mc_rs_proto::{
     types::packets::chunk_data::SectionDataPacket,
 };
 
-use super::{global_palette::GlobalPalette, palette::Palette};
+use crate::systems::world::global_palette::GlobalPalette;
+
+use super::palette::Palette;
 
 /// A marker component for sections
 #[derive(Debug, Clone, Copy, Component)]
@@ -12,7 +14,7 @@ pub struct SectionComponent;
 
 impl SectionComponent {
     /// Despawn all section entities that are not attached to a chunk
-    pub(super) fn despawn_orphans(
+    pub fn despawn_orphans(
         query: Query<Entity, (With<SectionComponent>, Without<Parent>)>,
         mut commands: Commands,
     ) {
