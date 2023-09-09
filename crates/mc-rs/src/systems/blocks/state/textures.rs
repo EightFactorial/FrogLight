@@ -2,19 +2,18 @@ use bevy::prelude::*;
 use itertools::Itertools;
 use mc_rs_proto::types::enums::Direction;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+use crate::systems::world::material::StateAnimation;
+
+#[derive(Debug, Default, Clone)]
 pub struct BlockTextures {
     pub pattern: BlockTexturePattern,
-    pub textures: Vec<Handle<Image>>,
+    pub textures: Vec<BlockTexture>,
 }
 
-impl Default for BlockTextures {
-    fn default() -> Self {
-        Self {
-            pattern: Default::default(),
-            textures: vec![Handle::<Image>::default()],
-        }
-    }
+#[derive(Debug, Default, Clone)]
+pub struct BlockTexture {
+    pub image: Handle<Image>,
+    pub animation: Option<StateAnimation>,
 }
 
 #[allow(dead_code)]
@@ -64,43 +63,87 @@ impl BlockTextures {
         }
     }
 
-    /// Creates a new `BlockTextures` from a list of paths with a custom pattern.
+    /// Creates a new `BlockTextures` from a list of texture paths with animations.
     #[allow(dead_code)]
-    pub fn new_custom(paths: &[&str], asset_server: &AssetServer) -> Self {
-        Self {
-            pattern: BlockTexturePattern::Custom,
-            textures: Self::load_paths(paths, asset_server),
+    pub fn new_with_animations(
+        data: &[(&str, StateAnimation)],
+        asset_server: &AssetServer,
+    ) -> Self {
+        let mut textures =
+            Self::load_paths(&data.iter().map(|(p, _)| *p).collect_vec(), asset_server);
+
+        textures
+            .iter_mut()
+            .zip_eq(data)
+            .for_each(|(t, (_, a))| t.animation = Some(a.clone()));
+
+        match textures.len() {
+            0 => Self {
+                pattern: BlockTexturePattern::None,
+                textures,
+            },
+            1 => Self {
+                pattern: BlockTexturePattern::Single,
+                textures,
+            },
+            2 => Self {
+                pattern: BlockTexturePattern::TopBottom,
+                textures,
+            },
+            3 => Self {
+                pattern: BlockTexturePattern::TopBottomSides,
+                textures,
+            },
+            6 => Self {
+                pattern: BlockTexturePattern::All,
+                textures,
+            },
+            _ => panic!("Invalid number of textures"),
         }
     }
 
-    pub fn get_texture(&self, direction: &Direction) -> Option<Handle<Image>> {
+    fn get_texture_object(&self, direction: &Direction) -> Option<&BlockTexture> {
         match self.pattern {
             BlockTexturePattern::None | BlockTexturePattern::Custom => None,
-            BlockTexturePattern::Single => self.textures.get(0).cloned(),
+            BlockTexturePattern::Single => self.textures.get(0),
             BlockTexturePattern::TopBottom => match direction {
-                Direction::Up | Direction::Down => self.textures.get(0).cloned(),
-                _ => self.textures.get(1).cloned(),
+                Direction::Up | Direction::Down => self.textures.get(0),
+                _ => self.textures.get(1),
             },
             BlockTexturePattern::TopBottomSides => match direction {
-                Direction::Up => self.textures.get(0).cloned(),
-                Direction::Down => self.textures.get(1).cloned(),
-                _ => self.textures.get(2).cloned(),
+                Direction::Up => self.textures.get(0),
+                Direction::Down => self.textures.get(1),
+                _ => self.textures.get(2),
             },
             BlockTexturePattern::All => match direction {
-                Direction::Up => self.textures.get(0).cloned(),
-                Direction::Down => self.textures.get(1).cloned(),
-                Direction::North => self.textures.get(2).cloned(),
-                Direction::South => self.textures.get(3).cloned(),
-                Direction::West => self.textures.get(4).cloned(),
-                Direction::East => self.textures.get(5).cloned(),
+                Direction::Up => self.textures.get(0),
+                Direction::Down => self.textures.get(1),
+                Direction::North => self.textures.get(2),
+                Direction::South => self.textures.get(3),
+                Direction::West => self.textures.get(4),
+                Direction::East => self.textures.get(5),
             },
         }
     }
 
-    fn load_paths(paths: &[&str], asset_server: &AssetServer) -> Vec<Handle<Image>> {
+    /// Returns the texture for the given direction.
+    pub fn get_texture(&self, direction: &Direction) -> Option<&Handle<Image>> {
+        self.get_texture_object(direction).map(|t| &t.image)
+    }
+
+    /// Returns the animation for the given direction.
+    pub fn get_animation(&self, direction: &Direction) -> Option<&StateAnimation> {
+        self.get_texture_object(direction)
+            .and_then(|t| t.animation.as_ref())
+    }
+
+    fn load_paths(paths: &[&str], asset_server: &AssetServer) -> Vec<BlockTexture> {
         paths
             .iter()
-            .map(|&path| asset_server.load(format!("test/textures/block/{path}")))
+            .map(|&path| BlockTexture {
+                image: asset_server.load(format!("test/textures/block/{path}")),
+                animation: None,
+            })
             .collect_vec()
     }
 }

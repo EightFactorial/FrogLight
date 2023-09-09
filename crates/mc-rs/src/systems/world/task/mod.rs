@@ -10,7 +10,7 @@ use crate::systems::{app_state::GameSet, blocks::BlockData};
 
 use self::{
     chunk::chunk_fn,
-    section::{SectionData, SectionResult},
+    section::{MeshData, SectionData, SectionResult},
 };
 
 use super::{
@@ -65,27 +65,33 @@ impl ChunkTask {
                     .despawn_descendants()
                     // Add the new children
                     .with_children(|parent| {
-                        for (index, option) in results.into_iter().enumerate() {
-                            if let Some(result) = option {
+                        for (index, data) in results.into_iter().enumerate() {
+                            if let Some(result) = data {
                                 let SectionData {
-                                    opaque_mesh,
-                                    transparent_mesh,
+                                    opaque,
+                                    transparent,
                                     terrain_collider,
                                     fluid_collider,
-                                    textures,
                                 } = result;
 
                                 let transform =
                                     Transform::from_xyz(0.0, (index * SECTION_HEIGHT) as f32, 0.0);
 
                                 // Create the opaque mesh bundle
-                                if let Some(opaque_mesh) = opaque_mesh {
+                                if let Some(opaque) = opaque {
+                                    let MeshData {
+                                        mesh,
+                                        textures,
+                                        animations,
+                                    } = opaque;
+
                                     parent.spawn((
                                         SectionComponent,
                                         MaterialMeshBundle::<BlockMaterial> {
-                                            mesh: meshes.add(opaque_mesh),
-                                            material: materials
-                                                .add(BlockMaterial::new(textures.clone())),
+                                            mesh: meshes.add(mesh),
+                                            material: materials.add(BlockMaterial::new_opaque(
+                                                textures, animations,
+                                            )),
                                             transform,
                                             ..Default::default()
                                         },
@@ -93,13 +99,20 @@ impl ChunkTask {
                                 }
 
                                 // Create the transparent mesh bundle
-                                if let Some(transparent_mesh) = transparent_mesh {
+                                if let Some(transparent_mesh) = transparent {
+                                    let MeshData {
+                                        mesh,
+                                        textures,
+                                        animations,
+                                    } = transparent_mesh;
+
                                     parent.spawn((
                                         SectionComponent,
                                         MaterialMeshBundle::<BlockMaterial> {
-                                            mesh: meshes.add(transparent_mesh),
-                                            material: materials
-                                                .add(BlockMaterial::new_blended(textures)),
+                                            mesh: meshes.add(mesh),
+                                            material: materials.add(BlockMaterial::new_blended(
+                                                textures, animations,
+                                            )),
                                             transform,
                                             ..Default::default()
                                         },

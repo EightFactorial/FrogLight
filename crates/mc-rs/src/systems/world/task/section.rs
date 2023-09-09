@@ -6,6 +6,7 @@ use bevy::{
         mesh::{Indices, VertexAttributeValues},
         render_resource::PrimitiveTopology,
     },
+    utils::HashMap,
 };
 use bevy_rapier3d::prelude::*;
 use block_mesh::{
@@ -20,27 +21,39 @@ use crate::systems::{
         BlockData,
     },
     world::{
-        material::{ATTRIBUTE_BLOCK_ID, ATTRIBUTE_TEXTURE_INDEX, MAX_TEXTURE_COUNT},
+        material::{StateAnimation, ATTRIBUTE_ANIMATION_INDEX, ATTRIBUTE_TEXTURE_INDEX},
         CHUNK_SIZE, SECTION_HEIGHT,
     },
 };
 
 pub(super) type SectionResult = Option<SectionData>;
 pub struct SectionData {
-    pub opaque_mesh: Option<Mesh>,
-    pub transparent_mesh: Option<Mesh>,
+    pub opaque: Option<MeshData>,
+    pub transparent: Option<MeshData>,
     pub terrain_collider: Option<Collider>,
     pub fluid_collider: Option<Collider>,
+}
+
+pub struct MeshData {
+    pub mesh: Mesh,
     pub textures: Vec<Handle<Image>>,
+    pub animations: Vec<StateAnimation>,
 }
 
 impl Debug for SectionData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("SectionData")
-            .field("opaque_mesh", &self.opaque_mesh.is_some())
-            .field("transparent_mesh", &self.transparent_mesh.is_some())
+            .field("opaque_mesh", &self.opaque.is_some())
+            .field("transparent_mesh", &self.transparent.is_some())
             .field("terrain_collider", &self.terrain_collider.is_some())
             .field("fluid_collider", &self.fluid_collider.is_some())
+            .finish()
+    }
+}
+
+impl Debug for MeshData {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MeshData")
             .field("textures", &self.textures.len())
             .finish()
     }
@@ -147,18 +160,25 @@ pub(super) async fn section_fn(
     let mut opaque_positions = Vec::with_capacity(num_vertices);
     let mut opaque_normals = Vec::with_capacity(num_vertices);
     let mut opaque_tex_uvs = Vec::with_capacity(num_vertices);
-    let mut opaque_tex_ids = Vec::with_capacity(num_vertices);
+
     let mut opaque_tex_index = Vec::with_capacity(num_vertices);
+    let mut opaque_textures: Vec<Handle<Image>> = Vec::with_capacity(8);
+
+    let mut opaque_anim_index = Vec::with_capacity(num_vertices);
+    let mut opaque_animations: HashMap<(u32, Direction), StateAnimation> =
+        HashMap::with_capacity(8);
 
     // Transparent mesh data
     let mut trans_indices = Vec::with_capacity(num_indices);
     let mut trans_positions = Vec::with_capacity(num_vertices);
     let mut trans_normals = Vec::with_capacity(num_vertices);
     let mut trans_tex_uvs = Vec::with_capacity(num_vertices);
-    let mut trans_tex_ids = Vec::with_capacity(num_vertices);
-    let mut trans_tex_index = Vec::with_capacity(num_vertices);
 
-    let mut textures: Vec<Handle<Image>> = Vec::with_capacity(8);
+    let mut trans_tex_index = Vec::with_capacity(num_vertices);
+    let mut trans_textures: Vec<Handle<Image>> = Vec::with_capacity(8);
+
+    let mut trans_anim_index = Vec::with_capacity(num_vertices);
+    let mut trans_animations: HashMap<(u32, Direction), StateAnimation> = HashMap::with_capacity(8);
 
     for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
         let direction = Direction::from(face.signed_normal().to_array());
@@ -204,7 +224,7 @@ pub(super) async fn section_fn(
                 _ => {
                     // Get the blockface texture
                     let texture = match blockstate.textures.get_texture(&direction) {
-                        Some(texture) => texture,
+                        Some(texture) => texture.clone(),
                         None => {
                             error!(
                                 "Block {}:{state_id} has no texture for face {direction:?}",
@@ -214,36 +234,79 @@ pub(super) async fn section_fn(
                         }
                     };
 
-                    // Get the texture index or insert it into the textures list
-                    let tex_index = match textures.iter().position(|p| p == &texture) {
-                        Some(index) => index as u32,
-                        None => {
-                            textures.push(texture);
-                            textures.len() as u32 - 1
-                        }
-                    };
-
                     let uvs = face.tex_coords(RIGHT_HANDED_Y_UP_CONFIG.u_flip_face, true, &quad);
 
                     match prop.opaque {
                         // Add the block to the opaque mesh
                         true => {
+                            // Get the texture index or insert it into the textures list
+                            let tex_index = match opaque_textures.iter().position(|p| p == &texture)
+                            {
+                                Some(index) => index as u32,
+                                None => {
+                                    opaque_textures.push(texture);
+                                    opaque_textures.len() as u32 - 1
+                                }
+                            };
+
+                            // Get the animation index or insert it into the animations list
+                            let anim_index = match blockstate.textures.get_animation(&direction) {
+                                None => 0,
+                                Some(anim) => match opaque_animations
+                                    .keys()
+                                    .position(|(id, d)| id == &state_id && d == &direction)
+                                {
+                                    Some(index) => index as u32,
+                                    None => {
+                                        opaque_animations
+                                            .insert((state_id, direction), anim.clone());
+                                        opaque_animations.len() as u32 - 1
+                                    }
+                                },
+                            };
+
                             opaque_indices
                                 .extend(face.quad_mesh_indices(opaque_positions.len() as u32));
                             opaque_positions.extend(pos);
                             opaque_normals.extend(norm);
                             opaque_tex_uvs.extend(uvs);
-                            opaque_tex_ids.extend([block.block_id; 4]);
+                            opaque_anim_index.extend([anim_index; 4]);
                             opaque_tex_index.extend([tex_index; 4]);
                         }
                         // Add the block to the transparent mesh
                         false => {
+                            // Get the texture index or insert it into the textures list
+                            let tex_index = match trans_textures.iter().position(|p| p == &texture)
+                            {
+                                Some(index) => index as u32,
+                                None => {
+                                    trans_textures.push(texture);
+                                    trans_textures.len() as u32 - 1
+                                }
+                            };
+
+                            // Get the animation index or insert it into the animations list
+                            let anim_index = match blockstate.textures.get_animation(&direction) {
+                                None => 0,
+                                Some(anim) => match trans_animations
+                                    .keys()
+                                    .position(|(id, d)| id == &state_id && d == &direction)
+                                {
+                                    Some(index) => index as u32,
+                                    None => {
+                                        trans_animations
+                                            .insert((state_id, direction), anim.clone());
+                                        trans_animations.len() as u32 - 1
+                                    }
+                                },
+                            };
+
                             trans_indices
                                 .extend(face.quad_mesh_indices(trans_positions.len() as u32));
                             trans_positions.extend(pos);
                             trans_normals.extend(norm);
                             trans_tex_uvs.extend(uvs);
-                            trans_tex_ids.extend([block.block_id; 4]);
+                            trans_anim_index.extend([anim_index; 4]);
                             trans_tex_index.extend([tex_index; 4]);
                         }
                     }
@@ -253,7 +316,7 @@ pub(super) async fn section_fn(
     }
 
     // Create the meshes
-    let opaque_mesh = match opaque_indices.is_empty() {
+    let opaque = match opaque_indices.is_empty() {
         true => None,
         false => {
             let mut opaque_mesh = Mesh::new(PrimitiveTopology::TriangleList);
@@ -272,19 +335,23 @@ pub(super) async fn section_fn(
                 VertexAttributeValues::Float32x2(opaque_tex_uvs),
             );
             opaque_mesh.insert_attribute(
-                ATTRIBUTE_BLOCK_ID,
-                VertexAttributeValues::Uint32(opaque_tex_ids),
+                ATTRIBUTE_ANIMATION_INDEX,
+                VertexAttributeValues::Uint32(opaque_anim_index),
             );
             opaque_mesh.insert_attribute(
                 ATTRIBUTE_TEXTURE_INDEX,
                 VertexAttributeValues::Uint32(opaque_tex_index),
             );
 
-            Some(opaque_mesh)
+            Some(MeshData {
+                mesh: opaque_mesh,
+                textures: opaque_textures,
+                animations: opaque_animations.into_values().collect(),
+            })
         }
     };
 
-    let transparent_mesh = match trans_indices.is_empty() {
+    let transparent = match trans_indices.is_empty() {
         true => None,
         false => {
             let mut trans_mesh = Mesh::new(PrimitiveTopology::TriangleList);
@@ -303,15 +370,19 @@ pub(super) async fn section_fn(
                 VertexAttributeValues::Float32x2(trans_tex_uvs),
             );
             trans_mesh.insert_attribute(
-                ATTRIBUTE_BLOCK_ID,
-                VertexAttributeValues::Uint32(trans_tex_ids),
+                ATTRIBUTE_ANIMATION_INDEX,
+                VertexAttributeValues::Uint32(trans_anim_index),
             );
             trans_mesh.insert_attribute(
                 ATTRIBUTE_TEXTURE_INDEX,
                 VertexAttributeValues::Uint32(trans_tex_index),
             );
 
-            Some(trans_mesh)
+            Some(MeshData {
+                mesh: trans_mesh,
+                textures: trans_textures,
+                animations: trans_animations.into_values().collect(),
+            })
         }
     };
 
@@ -344,19 +415,10 @@ pub(super) async fn section_fn(
         }
     };
 
-    if textures.len() > MAX_TEXTURE_COUNT {
-        error!(
-            "Section has {} textures, but the maximum is {}",
-            textures.len(),
-            MAX_TEXTURE_COUNT
-        );
-    }
-
     Some(SectionData {
-        opaque_mesh,
-        transparent_mesh,
+        opaque,
+        transparent,
         terrain_collider,
         fluid_collider,
-        textures,
     })
 }

@@ -24,8 +24,8 @@ pub(super) type StatesMap = IntMap<u32, BlockState>;
 pub struct BlockState {
     pub block_id: u32,
     pub state_id: u32,
-    pub textures: BlockTextures,
     pub model: BlockModel,
+    pub textures: BlockTextures,
 }
 
 impl Eq for BlockState {}
