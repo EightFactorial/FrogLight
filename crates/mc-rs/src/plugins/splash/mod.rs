@@ -102,7 +102,6 @@ impl SplashPlugin {
             eml! {
                 <div class="splash">
                     <div class="splash-text">"Loading..."</div>
-                    <br />
                     <progressbar class="splash-bar" minimum=1. maximum={max.0}
                         bind:value=from!(Time:elapsed_seconds())
                         bind:value=to!(entity, BarValue:0)
@@ -114,7 +113,6 @@ impl SplashPlugin {
             eml! {
                 <div class="splash">
                     <div class="splash-text">"Loading..."</div>
-                    <br />
                     <progressbar class="splash-bar" minimum=0. maximum=1.
                         bind:value=from!(BlocksLoaded:get_percent())
                         bind:value=to!(entity, BarValue:0)
