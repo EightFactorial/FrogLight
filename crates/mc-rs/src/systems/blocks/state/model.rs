@@ -4,6 +4,7 @@ use bevy::{
 };
 use mc_rs_proto::types::enums::Direction;
 
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub enum BlockModel {
     /// A block without a model.
@@ -137,6 +138,7 @@ impl BlockModel {
     }
 
     /// The model of a fluid block.
+    #[allow(dead_code)]
     pub fn fluid_shape(_fluid_level: u8) -> BlockModel {
         BlockModel::Complex(Self::CUBE.into_iter().flatten().collect())
     }

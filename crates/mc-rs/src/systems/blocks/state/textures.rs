@@ -17,6 +17,7 @@ impl Default for BlockTextures {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub enum BlockTexturePattern {
     None,
@@ -64,6 +65,7 @@ impl BlockTextures {
     }
 
     /// Creates a new `BlockTextures` from a list of paths with a custom pattern.
+    #[allow(dead_code)]
     pub fn new_custom(paths: &[&str], asset_server: &AssetServer) -> Self {
         Self {
             pattern: BlockTexturePattern::Custom,
