@@ -34,7 +34,7 @@ parking_lot = { version = "0.12.1", features = ["nightly"] }
 rand = { version = "0.8.5", features = ["nightly"] }
 serde = { version = "1.0.179", features = ["derive"] }
 strum = { version = "0.25.0", features = ["derive"] }
-toml = { version = "0.7.6", features = ["preserve_order"] }
+toml = { version = "0.7.8", features = ["preserve_order"] }
 uuid = { version = "1.4.1", features = ["v3"] }
 
 [features]
