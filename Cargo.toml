@@ -21,7 +21,7 @@ strip = false
 incremental = true
 
 [profile.release]
-lto = "fat"
-strip = true
-codegen-units = 1
+# lto = "fat"
+# strip = true
+# codegen-units = 1
 incremental = false
