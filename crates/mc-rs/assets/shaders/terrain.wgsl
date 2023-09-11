@@ -5,9 +5,20 @@
 @group(0) @binding(9)
 var<uniform> globals: Globals;
 
+// TODO: I love padding and stride :)
+struct StateAnimation {
+    frame_time: f32,
+    order_length: u32,
+    // frame_order: array<u32,16>,
+    _padding0: u32,
+    _padding1: u32,
+};
+
 @group(1) @binding(0)
 var textures: binding_array<texture_2d<f32>>;
 @group(1) @binding(1)
+var<uniform> animations: array<StateAnimation,16>;
+@group(1) @binding(2)
 var nearest_sampler: sampler;
 
 struct VertexIn {
@@ -48,9 +59,21 @@ struct FragmentIn {
     @location(4) tex_index: u32,
 };
 
+
 @fragment
 fn fragment(
     in: FragmentIn,
 ) -> @location(0) vec4<f32> {
-    return textureSample(textures[in.tex_index], nearest_sampler, in.uvs);
+    let tex = textures[in.tex_index];
+    let dim: vec2<u32> = textureDimensions(tex);
+
+    // TODO: Fix frame index and use it instead of texture dimensions
+    var uvs: vec2<f32> = in.uvs;
+    if in.anim_index != u32(0) {
+        let anim = animations[in.anim_index - u32(1)];
+        let frame_index = u32(globals.time / anim.frame_time) % dim.y;
+        uvs.y = (uvs.y + f32(frame_index)) / f32(dim.y);
+    }
+
+    return textureSample(tex, nearest_sampler, uvs);
 }

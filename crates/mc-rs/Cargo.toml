@@ -21,6 +21,7 @@ belly = { git = "https://github.com/EightFactorial/belly.git" }
 bevy = { version = "0.11.0", features = ["serialize"] }
 bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
 block-mesh = "0.2.0"
+bytemuck = { version = "1.14.0", features = ["derive"] }
 convert_case = "0.6.0"
 flume = "0.10.14"
 futures-lite = { version = "1.13.0", features = ["futures-io"] }
@@ -40,8 +41,8 @@ uuid = { version = "1.4.1", features = ["v3"] }
 [features]
 default = ["wayland", "splash", "simd"]
 splash = []
-simd = ["bevy_rapier3d/simd-stable"]
-simd-nightly = ["bevy_rapier3d/simd-nightly", "rand/packed_simd"]
+simd = ["bevy_rapier3d/simd-stable", "bytemuck/nightly_stdsimd"]
+simd-nightly = ["bevy_rapier3d/simd-nightly", "rand/packed_simd", "bytemuck/nightly_stdsimd"]
 
 # Enable bevy features
 wayland = ["bevy/wayland"]

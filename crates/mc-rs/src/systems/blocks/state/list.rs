@@ -1,5 +1,7 @@
 use bevy::prelude::AssetServer;
 
+use crate::systems::world::material::StateAnimation;
+
 use super::{model::BlockModel, textures::BlockTextures, BlockState, StatesMap};
 
 macro_rules! add_state {
@@ -74,13 +76,30 @@ pub(super) fn create_states(states: &mut StatesMap, asset_server: &AssetServer) 
     );
 
     // TODO: Add instructions to material for animated textures
-    add_state_range!(
-        states,
-        asset_server,
-        32u32,
-        80u32..=95u32,
-        &["water_still.png"]
-    );
+    for id in 80..=95 {
+        states.insert(
+            id,
+            BlockState {
+                block_id: 32,
+                state_id: id,
+                model: BlockModel::Standard,
+                textures: BlockTextures::new_with_animations(
+                    &[(
+                        "water_still.png",
+                        StateAnimation::new(0.2, 8, [0, 1, 2, 3, 4, 5, 6, 7]),
+                    )],
+                    asset_server,
+                ),
+            },
+        );
+    }
+    // add_state_range!(
+    //     states,
+    //     asset_server,
+    //     32u32,
+    //     80u32..=95u32,
+    //     &["water_still.png"]
+    // );
     add_state_range!(
         states,
         asset_server,

@@ -1,4 +1,4 @@
-use std::num::NonZeroU32;
+use std::num::{NonZeroU32, NonZeroU64};
 
 use bevy::{
     prelude::*,
@@ -7,6 +7,7 @@ use bevy::{
         render_resource::{
             AsBindGroup, AsBindGroupError, BindGroupDescriptor, BindGroupEntry, BindGroupLayout,
             BindGroupLayoutDescriptor, BindGroupLayoutEntry, BindingResource, BindingType,
+            BufferBinding, BufferBindingType, BufferInitDescriptor, BufferUsages,
             PreparedBindGroup, SamplerBindingType, ShaderStages, TextureSampleType,
             TextureViewDimension,
         },
@@ -15,7 +16,7 @@ use bevy::{
     },
 };
 
-use super::{BlockMaterial, MAX_TEXTURE_COUNT};
+use super::{BlockMaterial, StateAnimation, MAX_ANIMATION_COUNT, MAX_TEXTURE_COUNT};
 
 impl AsBindGroup for BlockMaterial {
     type Data = ();
@@ -43,9 +44,24 @@ impl AsBindGroup for BlockMaterial {
         // convert bevy's resource types to WGPU's references
         let mut textures: Vec<_> = textures.into_iter().map(|texture| &**texture).collect();
 
-        // fill in up to the first `MAX_TEXTURE_COUNT` textures and samplers to the arrays
-        for (id, image) in images.into_iter().enumerate() {
-            textures[id] = &*image.texture_view;
+        // fill in up to the first `MAX_TEXTURE_COUNT` textures and samplers to the array
+        for (image, texture) in images
+            .into_iter()
+            .zip(textures.iter_mut())
+            .take(MAX_TEXTURE_COUNT)
+        {
+            *texture = &*image.texture_view;
+        }
+
+        // fill in up to the first `MAX_ANIMATION_COUNT` animations to the array
+        let mut animations = vec![StateAnimation::default(); MAX_ANIMATION_COUNT];
+        for (anim, out_anim) in self
+            .animations
+            .iter()
+            .zip(animations.iter_mut())
+            .take(MAX_ANIMATION_COUNT)
+        {
+            *out_anim = *anim;
         }
 
         let bind_group = render_device.create_bind_group(&BindGroupDescriptor {
@@ -58,6 +74,18 @@ impl AsBindGroup for BlockMaterial {
                 },
                 BindGroupEntry {
                     binding: 1,
+                    resource: BindingResource::Buffer(BufferBinding {
+                        buffer: &render_device.create_buffer_with_data(&BufferInitDescriptor {
+                            label: "animation_buffer".into(),
+                            usage: BufferUsages::UNIFORM | BufferUsages::COPY_DST,
+                            contents: bytemuck::cast_slice(&animations),
+                        }),
+                        offset: 0,
+                        size: NonZeroU64::new(MAX_ANIMATION_COUNT as u64),
+                    }),
+                },
+                BindGroupEntry {
+                    binding: 2,
                     resource: BindingResource::Sampler(&fallback_image.sampler),
                 },
             ],
@@ -88,9 +116,20 @@ impl AsBindGroup for BlockMaterial {
                     },
                     count: NonZeroU32::new(MAX_TEXTURE_COUNT as u32),
                 },
-                // @group(1) @binding(1) var nearest_sampler: sampler;
+                // @group(1) @binding(1) var animations: array<StateAnimation, 16>;
                 BindGroupLayoutEntry {
                     binding: 1,
+                    visibility: ShaderStages::FRAGMENT,
+                    ty: BindingType::Buffer {
+                        ty: BufferBindingType::Uniform {},
+                        has_dynamic_offset: false,
+                        min_binding_size: None,
+                    },
+                    count: NonZeroU32::new(MAX_ANIMATION_COUNT as u32),
+                },
+                // @group(1) @binding(2) var nearest_sampler: sampler;
+                BindGroupLayoutEntry {
+                    binding: 2,
                     visibility: ShaderStages::FRAGMENT,
                     ty: BindingType::Sampler(SamplerBindingType::Filtering),
                     count: None,

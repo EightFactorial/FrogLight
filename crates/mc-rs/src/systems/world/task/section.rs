@@ -6,7 +6,6 @@ use bevy::{
         mesh::{Indices, VertexAttributeValues},
         render_resource::PrimitiveTopology,
     },
-    utils::HashMap,
 };
 use bevy_rapier3d::prelude::*;
 use block_mesh::{
@@ -55,6 +54,7 @@ impl Debug for MeshData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MeshData")
             .field("textures", &self.textures.len())
+            .field("animations", &self.animations.len())
             .finish()
     }
 }
@@ -165,8 +165,7 @@ pub(super) async fn section_fn(
     let mut opaque_textures: Vec<Handle<Image>> = Vec::with_capacity(8);
 
     let mut opaque_anim_index = Vec::with_capacity(num_vertices);
-    let mut opaque_animations: HashMap<(u32, Direction), StateAnimation> =
-        HashMap::with_capacity(8);
+    let mut opaque_animations: Vec<StateAnimation> = Vec::new();
 
     // Transparent mesh data
     let mut trans_indices = Vec::with_capacity(num_indices);
@@ -178,7 +177,7 @@ pub(super) async fn section_fn(
     let mut trans_textures: Vec<Handle<Image>> = Vec::with_capacity(8);
 
     let mut trans_anim_index = Vec::with_capacity(num_vertices);
-    let mut trans_animations: HashMap<(u32, Direction), StateAnimation> = HashMap::with_capacity(8);
+    let mut trans_animations: Vec<StateAnimation> = Vec::new();
 
     for (group, face) in buffer.quads.groups.into_iter().zip(faces) {
         let direction = Direction::from(face.signed_normal().to_array());
@@ -252,17 +251,15 @@ pub(super) async fn section_fn(
                             // Get the animation index or insert it into the animations list
                             let anim_index = match blockstate.textures.get_animation(&direction) {
                                 None => 0,
-                                Some(anim) => match opaque_animations
-                                    .keys()
-                                    .position(|(id, d)| id == &state_id && d == &direction)
-                                {
-                                    Some(index) => index as u32,
-                                    None => {
-                                        opaque_animations
-                                            .insert((state_id, direction), anim.clone());
-                                        opaque_animations.len() as u32 - 1
+                                Some(anim) => {
+                                    match opaque_animations.iter().position(|a| a == anim) {
+                                        Some(index) => index as u32,
+                                        None => {
+                                            opaque_animations.push(*anim);
+                                            opaque_animations.len() as u32
+                                        }
                                     }
-                                },
+                                }
                             };
 
                             opaque_indices
@@ -288,15 +285,12 @@ pub(super) async fn section_fn(
                             // Get the animation index or insert it into the animations list
                             let anim_index = match blockstate.textures.get_animation(&direction) {
                                 None => 0,
-                                Some(anim) => match trans_animations
-                                    .keys()
-                                    .position(|(id, d)| id == &state_id && d == &direction)
+                                Some(anim) => match trans_animations.iter().position(|a| a == anim)
                                 {
                                     Some(index) => index as u32,
                                     None => {
-                                        trans_animations
-                                            .insert((state_id, direction), anim.clone());
-                                        trans_animations.len() as u32 - 1
+                                        trans_animations.push(*anim);
+                                        trans_animations.len() as u32
                                     }
                                 },
                             };
@@ -346,7 +340,7 @@ pub(super) async fn section_fn(
             Some(MeshData {
                 mesh: opaque_mesh,
                 textures: opaque_textures,
-                animations: opaque_animations.into_values().collect(),
+                animations: opaque_animations,
             })
         }
     };
@@ -381,7 +375,7 @@ pub(super) async fn section_fn(
             Some(MeshData {
                 mesh: trans_mesh,
                 textures: trans_textures,
-                animations: trans_animations.into_values().collect(),
+                animations: trans_animations,
             })
         }
     };

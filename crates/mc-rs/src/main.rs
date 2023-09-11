@@ -1,4 +1,5 @@
 #![feature(future_join)]
+#![feature(trivial_bounds)]
 
 use bevy::app::App;
 

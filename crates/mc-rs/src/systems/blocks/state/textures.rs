@@ -75,7 +75,7 @@ impl BlockTextures {
         textures
             .iter_mut()
             .zip_eq(data)
-            .for_each(|(t, (_, a))| t.animation = Some(a.clone()));
+            .for_each(|(t, (_, a))| t.animation = Some(*a));
 
         match textures.len() {
             0 => Self {
