@@ -52,18 +52,22 @@ pub struct StateAnimation {
 }
 
 impl StateAnimation {
-    pub fn new(
-        frame_time: f32,
-        order_length: u32,
-        frame_order: impl IntoIterator<Item = u32>,
-    ) -> Self {
+    pub fn new(frame_time: f32, frame_order: impl IntoIterator<Item = u32> + Copy) -> Self {
+        let order_length = frame_order.into_iter().count() as u32;
+
+        if order_length > MAX_ANIMATION_COUNT as u32 {
+            error!(
+                "Animation order length ({order_length}) exceeds maximum ({MAX_ANIMATION_COUNT})",
+            );
+        }
+
         let mut frames = [0u32; MAX_ANIMATION_COUNT];
-        for (frame, frames) in frame_order
+        for (frame, frame_mut) in frame_order
             .into_iter()
             .zip(frames.iter_mut())
             .take(MAX_ANIMATION_COUNT)
         {
-            *frames = frame;
+            *frame_mut = frame;
         }
 
         Self {

@@ -86,7 +86,7 @@ pub(super) fn create_states(states: &mut StatesMap, asset_server: &AssetServer) 
                 textures: BlockTextures::new_with_animations(
                     &[(
                         "water_still.png",
-                        StateAnimation::new(0.2, 8, [0, 1, 2, 3, 4, 5, 6, 7]),
+                        StateAnimation::new(0.2, [0, 1, 2, 3, 4, 5, 6, 7]),
                     )],
                     asset_server,
                 ),
