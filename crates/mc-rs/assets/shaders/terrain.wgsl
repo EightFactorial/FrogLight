@@ -16,7 +16,7 @@ struct StateAnimation {
     frame_data_4: u32,
     frame_data_5: u32,
     frame_data_6: u32,
-    frame_data_7: u32,  
+    frame_data_7: u32,
 
     _padding_0: u32,
     _padding_1: u32,
@@ -95,13 +95,13 @@ fn fragment(
     let tex = textures[in.tex_index];
 
     var uvs: vec2<f32> = in.uvs;
-    if in.anim_index != u32(0) {
+    if in.anim_index != 0u {
         // Get the amount of frames
         let dim: vec2<u32> = textureDimensions(tex);
         let frame_count = dim.y / dim.x;
 
         // Get the frame from the animation and global time
-        let anim = animations[in.anim_index - u32(1)];
+        let anim = animations[in.anim_index - 1u];
         let frame_index = u32(globals.time / anim.frame_time) % frame_count;
         let frame = get_frame(anim, frame_index);
 
