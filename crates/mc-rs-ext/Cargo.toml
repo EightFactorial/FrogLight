@@ -16,21 +16,19 @@ name = "mc_rs_ext"
 path = "src/bin/main.rs"
 
 [dependencies]
-chrono = { version = "0.4.30", features = ["serde"] }
-clap = { version = "4.3.17", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4.4", features = ["derive"] }
 classfile-rs = { path = "../classfile-rs" }
-derive_more = "0.99.17"
-enum_dispatch = "0.3.12"
-env_logger = "0.10.0"
-hashbrown = { version = "0.14.0", features = ["serde"] }
-itertools = "0.11.0"
-json = "0.12.4"
-log = { version = "0.4.19", features = ["std"] }
-reqwest = { version = "0.11.18", features = ["rustls", "json", "blocking"], default-features = false }
-serde = { version = "1.0.173", features = ["derive"] }
-serde_json = { version = "1.0.103", features = ["preserve_order"] }
-strum = { version = "0.25.0", features = ["derive"] }
-thiserror = "1.0.43"
-zip = "0.6.6"
-
-[features]
+derive_more = "0.99"
+enum_dispatch = "0.3"
+env_logger = "0.10"
+hashbrown = { version = "0.14", features = ["serde"] }
+itertools = "0.11"
+json = "0.12"
+log = { version = "0.4", features = ["std"] }
+reqwest = { version = "0.11", features = ["rustls", "json", "blocking"], default-features = false }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+strum = { version = "0.25", features = ["derive"] }
+thiserror = "1.0"
+zip = "0.6"

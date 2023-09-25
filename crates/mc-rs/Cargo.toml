@@ -9,43 +9,47 @@ readme = "README.md"
 build = "build.rs"
 
 [build-dependencies]
-vergen = { version = "8.2.4", features = ["build", "cargo", "git", "gitoxide"]}
+vergen = { version = "8.2.5", features = ["build", "cargo", "git", "gitoxide"]}
 
 [dependencies]
-anyhow = "1.0.72"
-async-net = "1.7.0"
-async-trait = "0.1.72"
-azalea-chat = { version = "0.7.0", default-features = false }
+anyhow = "1.0"
+async-net = "1.7"
+async-trait = "0.1"
+azalea-chat = { version = "0.8.0", default-features = false }
 azalea-nbt = { git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 belly = { git = "https://github.com/EightFactorial/belly.git" }
-bevy = { version = "0.11.0", features = ["serialize"] }
+bevy = { version = "0.11.2", features = ["serialize"] }
 bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
 block-mesh = "0.2.0"
-bytemuck = { version = "1.14.0", features = ["derive"] }
-convert_case = "0.6.0"
-flume = "0.10.14"
-futures-lite = { version = "1.13.0", features = ["futures-io"] }
-futures-locks = { version = "0.7.1", default-features = false }
-itertools = "0.11.0"
-log = { version = "0.4.19", features = ["std"] }
+bytemuck = { version = "1.14", features = ["derive"] }
+convert_case = "0.6"
+flume = "0.11"
+futures-lite = { version = "1.13", features = ["futures-io"] }
+futures-locks = { version = "0.7", default-features = false }
+itertools = "0.11"
+log = { version = "0.4", features = ["std"] }
 mc-rs-proto = { path = "../mc-rs-proto" }
 mc-rs-macros = { path = "../mc-rs-macros" }
-nohash-hasher = "0.2.0"
-parking_lot = { version = "0.12.1", features = ["nightly"] }
-rand = { version = "0.8.5", features = ["nightly"] }
-serde = { version = "1.0.179", features = ["derive"] }
-strum = { version = "0.25.0", features = ["derive"] }
-toml = { version = "0.7.8", features = ["preserve_order"] }
-uuid = { version = "1.4.1", features = ["v3"] }
+nohash-hasher = "0.2"
+parking_lot = { version = "0.12", features = ["nightly"] }
+rand = { version = "0.8", features = ["nightly"] }
+serde = { version = "1.0", features = ["derive"] }
+strum = { version = "0.25", features = ["derive"] }
+toml = { version = "0.8", features = ["preserve_order"] }
+uuid = { version = "1.4", features = ["v3"] }
+
+# Enable wayland support on linux
+[target.'cfg(target_os = "linux")'.dependencies]
+bevy = { version = "0.11.2", features = ["wayland"] }
 
 [features]
-default = ["wayland", "splash", "simd"]
+default = ["splash", "simd"]
 splash = []
-simd = ["bevy_rapier3d/simd-stable", "bytemuck/nightly_stdsimd"]
-simd-nightly = ["bevy_rapier3d/simd-nightly", "rand/packed_simd", "bytemuck/nightly_stdsimd"]
 
-# Enable bevy features
-wayland = ["bevy/wayland"]
+# Enable simd features
+simd = ["bevy_rapier3d/simd-stable", "bytemuck/nightly_stdsimd"]
+# !! Currently broken on the latest nightly !!
+simd_advanced = ["bevy_rapier3d/simd-nightly", "bytemuck/nightly_stdsimd", "rand/packed_simd"]
 
 # Enable debug plugins
 debug = ["mc-rs-proto/debug", "mc-rs-macros/debug"]

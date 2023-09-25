@@ -8,19 +8,19 @@ repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 
 [dependencies]
-clap = { version = "4.3.17", features = ["derive"] }
-convert_case = "0.6.0"
-derive_more = "0.99.17"
-enum_dispatch = "0.3.12"
-env_logger = "0.10.0"
-git2 = "0.17.2"
-itertools = "0.11.0"
-json = "0.12.4"
-log = { version = "0.4.19", features = ["std"] }
+clap = { version = "4.4", features = ["derive"] }
+convert_case = "0.6"
+derive_more = "0.99"
+enum_dispatch = "0.3"
+env_logger = "0.10"
+git2 = "0.18"
+itertools = "0.11"
+json = "0.12"
+log = { version = "0.4", features = ["std"] }
 mc-rs-ext = { path = "../mc-rs-ext" }
-prettyplease = "0.2.12"
-proc-macro2 = { version = "1.0.66", features = ["nightly"] }
-quote = { version = "1.0.33" }
-strum = { version = "0.25.0", features = ["derive"] }
-syn = { version = "2.0.29", features = ["extra-traits"] }
+prettyplease = "0.2"
+proc-macro2 = { version = "1.0", features = ["nightly"] }
+quote = { version = "1.0" }
+strum = { version = "0.25", features = ["derive"] }
+syn = { version = "2.0", features = ["extra-traits"] }
 

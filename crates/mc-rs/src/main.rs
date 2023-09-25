@@ -28,3 +28,6 @@ fn main() {
     // Run the app
     app.run();
 }
+
+#[cfg(all(feature = "simd", feature = "simd_advanced"))]
+compile_error!("Cannot enable both the `simd` and `simd_advanced` features at the same time.");
