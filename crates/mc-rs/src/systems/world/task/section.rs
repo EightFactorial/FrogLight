@@ -253,7 +253,7 @@ pub(super) async fn section_fn(
                                 None => 0,
                                 Some(anim) => {
                                     match opaque_animations.iter().position(|a| a == anim) {
-                                        Some(index) => index as u32,
+                                        Some(index) => index as u32 + 1,
                                         None => {
                                             opaque_animations.push(*anim);
                                             opaque_animations.len() as u32
@@ -287,7 +287,7 @@ pub(super) async fn section_fn(
                                 None => 0,
                                 Some(anim) => match trans_animations.iter().position(|a| a == anim)
                                 {
-                                    Some(index) => index as u32,
+                                    Some(index) => index as u32 + 1,
                                     None => {
                                         trans_animations.push(*anim);
                                         trans_animations.len() as u32

@@ -8,7 +8,7 @@ use bevy::{
             AsBindGroup, AsBindGroupError, BindGroupDescriptor, BindGroupEntry, BindGroupLayout,
             BindGroupLayoutDescriptor, BindGroupLayoutEntry, BindingResource, BindingType,
             BufferBinding, BufferBindingType, BufferInitDescriptor, BufferUsages,
-            PreparedBindGroup, SamplerBindingType, ShaderStages, TextureSampleType,
+            PreparedBindGroup, SamplerBindingType, ShaderSize, ShaderStages, TextureSampleType,
             TextureViewDimension,
         },
         renderer::RenderDevice,
@@ -81,7 +81,9 @@ impl AsBindGroup for BlockMaterial {
                             contents: bytemuck::cast_slice(&animations),
                         }),
                         offset: 0,
-                        size: NonZeroU64::new(MAX_ANIMATION_COUNT as u64),
+                        size: NonZeroU64::new(
+                            u64::from(StateAnimation::SHADER_SIZE) * MAX_ANIMATION_COUNT as u64,
+                        ),
                     }),
                 },
                 BindGroupEntry {

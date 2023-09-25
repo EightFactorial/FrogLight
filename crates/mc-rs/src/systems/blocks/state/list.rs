@@ -41,7 +41,7 @@ macro_rules! add_state_range {
         }
     };
     ($states:expr, $asset_server:expr, $block_id:expr, $state_id_range:expr, $textures:expr, $models:expr) => {
-        for ((state_id, model), textures) in $state_id_range.zip($models).zip($textures) {
+        for ((state_id, model), textures) in $state_id_range.zip_eq($models).zip_eq($textures) {
             add_state!($states, $asset_server, $block_id, state_id, textures, model);
         }
     };
@@ -84,10 +84,7 @@ pub(super) fn create_states(states: &mut StatesMap, asset_server: &AssetServer) 
                 state_id: id,
                 model: BlockModel::Standard,
                 textures: BlockTextures::new_with_animations(
-                    &[(
-                        "water_still.png",
-                        StateAnimation::new(0.2, &[0, 1, 2, 3, 4, 5, 6, 7]),
-                    )],
+                    &[("water_still.png", StateAnimation::new(0.2, 0u32..=32u32))],
                     asset_server,
                 ),
             },

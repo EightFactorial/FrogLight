@@ -34,19 +34,13 @@ impl PartialEq for BlockMeshData {
 
 impl BlockMeshData {
     pub fn from_state(state: &BlockState, block: &Block) -> BlockMeshData {
-        let meshing = if block.properties.is_fluid {
-            BlockMesh::Never
-        } else {
-            match &state.model {
-                BlockModel::Standard => BlockMesh::Always,
-                _ => BlockMesh::Never,
-            }
-        };
-
         BlockMeshData {
             rid: rand::random(),
             voxel: block.into(),
-            meshing,
+            meshing: match &state.model {
+                BlockModel::Standard => BlockMesh::Always,
+                _ => BlockMesh::Never,
+            },
         }
     }
 }

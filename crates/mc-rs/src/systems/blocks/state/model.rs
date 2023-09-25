@@ -122,7 +122,8 @@ impl BlockModel {
     }
 
     /// The model of a the top slab of a block.
-    pub fn _slab_upper() -> BlockModel {
+    #[allow(dead_code)]
+    pub fn slab_upper() -> BlockModel {
         BlockModel::Simple(Aabb::from_min_max(
             Vec3::new(0.0, 0.5, 0.0),
             Vec3::new(1.0, 1.0, 1.0),
