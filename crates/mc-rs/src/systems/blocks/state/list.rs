@@ -84,7 +84,7 @@ pub(super) fn create_states(states: &mut StatesMap, asset_server: &AssetServer) 
                 state_id: id,
                 model: BlockModel::Standard,
                 textures: BlockTextures::new_with_animations(
-                    &[("water_still.png", StateAnimation::new(0.2, 0u32..=32u32))],
+                    &[("water_still.png", StateAnimation::new(0.2, 0..32))],
                     asset_server,
                 ),
             },

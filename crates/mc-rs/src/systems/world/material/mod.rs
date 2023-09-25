@@ -15,7 +15,9 @@ use itertools::{EitherOrBoth, Itertools};
 pub(super) fn setup(app: &mut App) { app.add_plugins(MaterialPlugin::<BlockMaterial>::default()); }
 
 pub const MAX_TEXTURE_COUNT: usize = 48;
-pub const MAX_ANIMATION_COUNT: usize = 32;
+
+pub const MAX_ANIMATION_FRAMES: usize = 32;
+pub const MAX_ANIMATION_COUNT: usize = 16;
 
 #[derive(Debug, Default, Clone, TypePath, TypeUuid)]
 #[uuid = "0059fd0b-5b43-46cc-bd77-c89130562e75"]
@@ -48,40 +50,15 @@ impl BlockMaterial {
 pub struct StateAnimation {
     pub frame_time: f32,
 
-    // :(
-    // pub frame_order: [u32; MAX_ANIMATION_COUNT],
-    pub frame_1: u32,
-    pub frame_2: u32,
-    pub frame_3: u32,
-    pub frame_4: u32,
-    pub frame_5: u32,
-    pub frame_6: u32,
-    pub frame_7: u32,
-    pub frame_8: u32,
-    pub frame_9: u32,
-    pub frame_10: u32,
-    pub frame_11: u32,
-    pub frame_12: u32,
-    pub frame_13: u32,
-    pub frame_14: u32,
-    pub frame_15: u32,
-    pub frame_16: u32,
-    pub frame_17: u32,
-    pub frame_18: u32,
-    pub frame_19: u32,
-    pub frame_20: u32,
-    pub frame_21: u32,
-    pub frame_22: u32,
-    pub frame_23: u32,
-    pub frame_24: u32,
-    pub frame_25: u32,
-    pub frame_26: u32,
-    pub frame_27: u32,
-    pub frame_28: u32,
-    pub frame_29: u32,
-    pub frame_30: u32,
-    pub frame_31: u32,
-    pub frame_32: u32,
+    // Animation frame indices
+    pub frame_data_0: u32,
+    pub frame_data_1: u32,
+    pub frame_data_2: u32,
+    pub frame_data_3: u32,
+    pub frame_data_4: u32,
+    pub frame_data_5: u32,
+    pub frame_data_6: u32,
+    pub frame_data_7: u32,
 
     _padding_0: u32,
     _padding_1: u32,
@@ -89,11 +66,12 @@ pub struct StateAnimation {
 }
 
 impl StateAnimation {
-    pub fn new(frame_time: f32, frame_order: impl IntoIterator<Item = u32>) -> Self {
+    pub fn new(frame_time: f32, frame_order: impl IntoIterator<Item = u8>) -> Self {
         #[cfg(feature = "debug")]
         StateAnimation::assert_uniform_compat();
 
-        let mut frames = [0u32; MAX_ANIMATION_COUNT];
+        // Get the order of the frames
+        let mut frames = [0u8; MAX_ANIMATION_FRAMES];
         for state in frame_order.into_iter().zip_longest(frames.iter_mut()) {
             match state {
                 EitherOrBoth::Both(state, frame) => *frame = state,
@@ -106,40 +84,25 @@ impl StateAnimation {
             }
         }
 
+        // Compress the frame data into 32-bit integers
+        let mut frame_data = [0u32; MAX_ANIMATION_FRAMES / 4];
+        for (i, frame) in frames.into_iter().enumerate() {
+            let shift = (i % 4) * 8;
+            frame_data[i / 4] |= u32::from(frame) << shift;
+        }
+
         Self {
             frame_time,
-            frame_1: frames[0],
-            frame_2: frames[1],
-            frame_3: frames[2],
-            frame_4: frames[3],
-            frame_5: frames[4],
-            frame_6: frames[5],
-            frame_7: frames[6],
-            frame_8: frames[7],
-            frame_9: frames[8],
-            frame_10: frames[9],
-            frame_11: frames[10],
-            frame_12: frames[11],
-            frame_13: frames[12],
-            frame_14: frames[13],
-            frame_15: frames[14],
-            frame_16: frames[15],
-            frame_17: frames[16],
-            frame_18: frames[17],
-            frame_19: frames[18],
-            frame_20: frames[19],
-            frame_21: frames[20],
-            frame_22: frames[21],
-            frame_23: frames[22],
-            frame_24: frames[23],
-            frame_25: frames[24],
-            frame_26: frames[25],
-            frame_27: frames[26],
-            frame_28: frames[27],
-            frame_29: frames[28],
-            frame_30: frames[29],
-            frame_31: frames[30],
-            frame_32: frames[31],
+
+            frame_data_0: frame_data[0],
+            frame_data_1: frame_data[1],
+            frame_data_2: frame_data[2],
+            frame_data_3: frame_data[3],
+            frame_data_4: frame_data[4],
+            frame_data_5: frame_data[5],
+            frame_data_6: frame_data[6],
+            frame_data_7: frame_data[7],
+
             _padding_0: 0,
             _padding_1: 0,
             _padding_2: 0,
