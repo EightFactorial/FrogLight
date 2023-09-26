@@ -141,7 +141,8 @@ impl BlockTextures {
         paths
             .iter()
             .map(|&path| BlockTexture {
-                image: asset_server.load(format!("test/textures/block/{path}")),
+                image: asset_server
+                    .load(format!("minecraft/assets/minecraft/textures/block/{path}")),
                 animation: None,
             })
             .collect_vec()

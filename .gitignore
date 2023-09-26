@@ -16,8 +16,9 @@ Cargo.lock
 # Added by cargo
 /target
 
-# Ignore assets used for testing
-crates/mc-rs/assets/test/*
+# To build the project you need to download your own assets
+crates/mc-rs/assets/resourcepacks/*
+crates/mc-rs/assets/minecraft/*/*
 
 # Ignore settings file
 settings.toml
