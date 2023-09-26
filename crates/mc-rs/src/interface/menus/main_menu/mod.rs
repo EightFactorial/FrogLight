@@ -86,15 +86,15 @@ impl MainMenu {
     }
 
     /// The list of possible subtitles
-    const SUBTITLES: &'static str = include_str!("../../../../assets/language/menu_subtitle.txt");
+    const SPLASHES: &'static str = include_str!("../../../../assets/texts/splashes.txt");
 
     /// Get a random subtitle from the list
     fn get_subtitle() -> &'static str {
         let mut rng = rand::thread_rng();
 
-        Self::SUBTITLES
+        Self::SPLASHES
             .lines()
             .choose(&mut rng)
-            .unwrap_or(Self::SUBTITLES.lines().next().expect("No subtitles found"))
+            .unwrap_or(Self::SPLASHES.lines().next().expect("No subtitles found"))
     }
 }

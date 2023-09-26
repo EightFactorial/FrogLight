@@ -103,7 +103,7 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
     plugins
 }
 
-const WINDOW_TITLES: &str = include_str!("../../assets/language/window_title.txt");
+const WINDOW_TITLES: &str = include_str!("../../assets/texts/titles.txt");
 
 /// Get a random window title.
 ///
