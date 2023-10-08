@@ -17,8 +17,8 @@ Cargo.lock
 /target
 
 # To build the project you need to download your own assets
-crates/mc-rs/assets/resourcepacks/*
-crates/mc-rs/assets/minecraft/*/*
+assets/resourcepacks/*
+assets/minecraft/*/*
 
 # Ignore settings file
 settings.toml
