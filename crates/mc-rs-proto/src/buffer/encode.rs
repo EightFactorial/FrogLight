@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use azalea_chat::FormattedText;
 use azalea_nbt::Nbt;
 use byteorder::{WriteBytesExt, BE};
+use compact_str::CompactString;
+use smallvec::SmallVec;
 use uuid::Uuid;
 
 use super::{Encode, EncodeError, VarEncode};
@@ -111,6 +113,13 @@ impl Encode for &str {
     }
 }
 
+impl Encode for CompactString {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        self.len().var_encode(buf)?;
+        buf.write_all(self.as_bytes()).map_err(EncodeError::from)
+    }
+}
+
 impl Encode for Uuid {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         self.as_u128().encode(buf)
@@ -118,6 +127,16 @@ impl Encode for Uuid {
 }
 
 impl<T: Encode> Encode for Vec<T> {
+    fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
+        self.len().var_encode(buf)?;
+        for item in self {
+            item.encode(buf)?;
+        }
+        Ok(())
+    }
+}
+
+impl<T: Encode, const N: usize> Encode for SmallVec<[T; N]> {
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         self.len().var_encode(buf)?;
         for item in self {

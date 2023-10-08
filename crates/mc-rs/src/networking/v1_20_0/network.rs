@@ -18,9 +18,9 @@ use crate::{
         task::ConnectionChannel,
     },
     systems::world::{
-        resources::{CurrentWorld, WorldSeed},
+        resources::{CurrentWorld, WorldSeed, WorldType},
         structure::chunk::Chunk,
-        WorldType, Worlds,
+        Worlds,
     },
 };
 

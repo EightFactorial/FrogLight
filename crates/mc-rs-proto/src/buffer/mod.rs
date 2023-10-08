@@ -53,7 +53,9 @@ pub enum DecodeError {
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
     #[error(transparent)]
-    Utf8(#[from] std::string::FromUtf8Error),
+    FromUtf8(#[from] std::string::FromUtf8Error),
+    #[error(transparent)]
+    Utf8(#[from] std::str::Utf8Error),
     #[error("NBT error")]
     NbtError,
     #[error("Unknown packet id: {0}")]
@@ -83,7 +85,7 @@ impl PartialEq for DecodeError {
             (Self::TryInto(l0), Self::TryInto(r0)) => l0 == r0,
             (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
             (Self::StringTooLong(l0), Self::StringTooLong(r0)) => l0 == r0,
-            (Self::Utf8(l0), Self::Utf8(r0)) => l0 == r0,
+            (Self::FromUtf8(l0), Self::FromUtf8(r0)) => l0 == r0,
             _ => false,
         }
     }

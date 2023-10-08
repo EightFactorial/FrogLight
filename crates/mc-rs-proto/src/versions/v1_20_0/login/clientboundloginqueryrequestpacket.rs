@@ -21,7 +21,7 @@ fn test_packet() {
 
     let packet = ClientboundLoginQueryRequestPacket {
         id: 1,
-        data: Some(UnsizedByteBuffer::from_bytes(vec![1, 2, 3, 4])),
+        data: Some(UnsizedByteBuffer::from(vec![1, 2, 3, 4])),
     };
 
     assert!(packet.encode(&mut buf).is_ok());

@@ -1,11 +1,12 @@
 use bevy::{prelude::*, utils::HashMap};
 use mc_rs_proto::{
     buffer::DecodeError,
-    types::{packets::chunk_data::ChunkDataPacket, position::ChunkPos, ResourceLocation},
+    types::{packets::chunk_data::ChunkDataPacket, position::ChunkPos},
 };
 
 use self::{
     global_palette::GlobalPalette,
+    resources::WorldType,
     structure::{
         chunk::{Chunk, ChunkEntity},
         section::SectionComponent,
@@ -168,27 +169,6 @@ impl Worlds {
     ) -> Option<Mut<Chunk>> {
         self.get_chunk_id(world_type, position)
             .and_then(|entity| query.get_mut(**entity).ok())
-    }
-}
-
-/// The `WorldType` enum represents the type of a world.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-pub enum WorldType {
-    Nether,
-    #[default]
-    Overworld,
-    End,
-    Other(ResourceLocation),
-}
-
-impl From<ResourceLocation> for WorldType {
-    fn from(value: ResourceLocation) -> Self {
-        match value.as_str() {
-            "minecraft:the_nether" => WorldType::Nether,
-            "minecraft:overworld" => WorldType::Overworld,
-            "minecraft:the_end" => WorldType::End,
-            _ => WorldType::Other(value),
-        }
     }
 }
 

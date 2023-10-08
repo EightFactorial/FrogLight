@@ -1,4 +1,5 @@
 use derive_more::{Deref, DerefMut};
+use smallvec::SmallVec;
 
 use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarEncode};
 
@@ -24,12 +25,12 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarEncode};
 ///
 /// If the packet length is 8 bytes, the buffer contains 7 bytes of data.
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
-pub struct UnsizedByteBuffer(Vec<u8>);
+pub struct UnsizedByteBuffer(SmallVec<[u8; 16]>);
 
 impl UnsizedByteBuffer {
-    pub fn new() -> Self { Self(Vec::new()) }
+    pub fn new() -> Self { Self(SmallVec::new()) }
 
-    pub fn with_capacity(capacity: usize) -> Self { Self(Vec::with_capacity(capacity)) }
+    pub fn with_capacity(capacity: usize) -> Self { Self(SmallVec::with_capacity(capacity)) }
 
     pub fn encode_value<T: Encode>(&mut self, value: &T) -> Result<(), EncodeError> {
         value.encode(&mut self.0)
@@ -50,20 +51,18 @@ impl UnsizedByteBuffer {
         buffer.var_encode_value(value)?;
         Ok(buffer)
     }
-
-    pub fn from_bytes(bytes: Vec<u8>) -> Self { Self(bytes) }
 }
 
 impl From<Vec<u8>> for UnsizedByteBuffer {
-    fn from(bytes: Vec<u8>) -> Self { Self(bytes) }
+    fn from(bytes: Vec<u8>) -> Self { Self(SmallVec::from_vec(bytes)) }
 }
 
 impl From<UnsizedByteBuffer> for Vec<u8> {
-    fn from(buffer: UnsizedByteBuffer) -> Self { buffer.0 }
+    fn from(buffer: UnsizedByteBuffer) -> Self { buffer.0.to_vec() }
 }
 
 impl From<&[u8]> for UnsizedByteBuffer {
-    fn from(bytes: &[u8]) -> Self { Self(bytes.to_vec()) }
+    fn from(bytes: &[u8]) -> Self { Self(SmallVec::from_slice(bytes)) }
 }
 
 impl Encode for UnsizedByteBuffer {
@@ -77,6 +76,7 @@ impl Decode for UnsizedByteBuffer {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let mut bytes = Vec::new();
         buf.read_to_end(&mut bytes)?;
-        Ok(Self(bytes))
+
+        Ok(Self(SmallVec::from_vec(bytes)))
     }
 }

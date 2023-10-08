@@ -3,6 +3,8 @@ use std::{collections::HashMap, hash::Hash};
 use azalea_chat::FormattedText;
 use azalea_nbt::Nbt;
 use byteorder::{ReadBytesExt, BE};
+use compact_str::CompactString;
+use smallvec::SmallVec;
 use uuid::Uuid;
 
 use super::{Decode, DecodeError, VarDecode};
@@ -118,6 +120,21 @@ impl Decode for String {
     }
 }
 
+impl Decode for CompactString {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        let len = u32::var_decode(buf)?;
+
+        if len > MAX_STRING_LENGTH {
+            Err(DecodeError::StringTooLong(len))
+        } else {
+            let mut vec = vec![0; len as usize];
+            buf.read_exact(&mut vec)?;
+
+            Ok(CompactString::from_utf8(vec)?)
+        }
+    }
+}
+
 impl Decode for Uuid {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         Ok(Uuid::from_u128(u128::decode(buf)?))
@@ -129,6 +146,19 @@ impl<T: Decode> Decode for Vec<T> {
         let len = u32::var_decode(buf)?;
 
         let mut vec = Vec::with_capacity(len as usize);
+        for _ in 0..len {
+            vec.push(T::decode(buf)?);
+        }
+
+        Ok(vec)
+    }
+}
+
+impl<T: Decode, const N: usize> Decode for SmallVec<[T; N]> {
+    fn decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
+        let len = u32::var_decode(buf)?;
+
+        let mut vec = SmallVec::with_capacity(len as usize);
         for _ in 0..len {
             vec.push(T::decode(buf)?);
         }

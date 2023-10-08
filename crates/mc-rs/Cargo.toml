@@ -22,6 +22,7 @@ bevy = { version = "0.11.2", features = ["serialize"] }
 bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
 block-mesh = "0.2.0"
 bytemuck = { version = "1.14", features = ["derive"] }
+compact_str = { version = "0.7", features = ["serde", "smallvec"] }
 convert_case = "0.6"
 flume = "0.11"
 futures-lite = { version = "1.13", features = ["futures-io"] }
@@ -34,6 +35,7 @@ nohash-hasher = "0.2"
 parking_lot = { version = "0.12", features = ["nightly"] }
 rand = { version = "0.8", features = ["nightly"] }
 serde = { version = "1.0", features = ["derive"] }
+smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }
 strum = { version = "0.25", features = ["derive"] }
 toml = { version = "0.8", features = ["preserve_order"] }
 uuid = { version = "1.4", features = ["v3"] }
