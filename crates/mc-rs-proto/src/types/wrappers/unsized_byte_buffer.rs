@@ -34,7 +34,10 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEnco
 /// assert!(unsized_buffer.is_empty());
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut)]
-pub struct UnsizedByteBuffer(SmallVec<[u8; 16]>);
+pub struct UnsizedByteBuffer(SmallVec<[u8; BUFFER_SIZE]>);
+
+/// The default buffer size for an `UnsizedByteBuffer`.
+const BUFFER_SIZE: usize = 16;
 
 impl UnsizedByteBuffer {
     pub fn new() -> Self { Self(SmallVec::new()) }
@@ -58,11 +61,11 @@ impl FromValue for UnsizedByteBuffer {
 
 impl std::io::Write for UnsizedByteBuffer {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        <SmallVec<[u8; 16]> as std::io::Write>::write(&mut self.0, buf)
+        <SmallVec<[u8; BUFFER_SIZE]> as std::io::Write>::write(&mut self.0, buf)
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
-        <SmallVec<[u8; 16]> as std::io::Write>::flush(&mut self.0)
+        <SmallVec<[u8; BUFFER_SIZE]> as std::io::Write>::flush(&mut self.0)
     }
 }
 
