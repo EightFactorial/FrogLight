@@ -5,7 +5,7 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEnco
 
 /// A buffer that contains encoded data.
 ///
-/// Unlike a `Vec<T>`, when encoded it is not prefixed with a length.
+/// Unlike a [Vec<T>], when encoded it is not prefixed with a length.
 ///
 /// When used as a field in a packet, the buffer takes up the entire remaining space of the packet.
 ///
@@ -34,12 +34,12 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEnco
 /// assert!(unsized_buffer.is_empty());
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut)]
-pub struct UnsizedByteBuffer(SmallVec<[u8; BUFFER_SIZE]>);
-
-/// The default buffer size for an `UnsizedByteBuffer`.
-const BUFFER_SIZE: usize = 16;
+pub struct UnsizedByteBuffer(SmallVec<[u8; Self::BUFFER_SIZE]>);
 
 impl UnsizedByteBuffer {
+    /// The default buffer size for an [UnsizedByteBuffer].
+    pub const BUFFER_SIZE: usize = 16;
+
     /// Creates a new [UnsizedByteBuffer]
     pub fn new() -> Self { Self(SmallVec::new()) }
 
@@ -59,6 +59,11 @@ impl UnsizedByteBuffer {
 
         Self(smallvec)
     }
+
+    /// Creates a new [UnsizedByteBuffer] from a const array
+    pub const fn from_const(arr: [u8; Self::BUFFER_SIZE]) -> Self {
+        Self(SmallVec::from_const(arr))
+    }
 }
 
 impl FromValue for UnsizedByteBuffer {
@@ -77,11 +82,11 @@ impl FromValue for UnsizedByteBuffer {
 
 impl std::io::Write for UnsizedByteBuffer {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        <SmallVec<[u8; BUFFER_SIZE]> as std::io::Write>::write(&mut self.0, buf)
+        <SmallVec<[u8; Self::BUFFER_SIZE]> as std::io::Write>::write(&mut self.0, buf)
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
-        <SmallVec<[u8; BUFFER_SIZE]> as std::io::Write>::flush(&mut self.0)
+        <SmallVec<[u8; Self::BUFFER_SIZE]> as std::io::Write>::flush(&mut self.0)
     }
 }
 
