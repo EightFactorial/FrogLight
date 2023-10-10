@@ -40,9 +40,25 @@ pub struct UnsizedByteBuffer(SmallVec<[u8; BUFFER_SIZE]>);
 const BUFFER_SIZE: usize = 16;
 
 impl UnsizedByteBuffer {
+    /// Creates a new [UnsizedByteBuffer]
     pub fn new() -> Self { Self(SmallVec::new()) }
 
+    /// Creates a new [UnsizedByteBuffer] with the specified capacity.
     pub fn with_capacity(capacity: usize) -> Self { Self(SmallVec::with_capacity(capacity)) }
+
+    /// Creates a new [UnsizedByteBuffer] from a vector.
+    pub fn from_vec(vec: Vec<u8>) -> Self { Self(SmallVec::from_vec(vec)) }
+
+    /// Creates a new [UnsizedByteBuffer] from a slice.
+    pub fn from_slice(slice: &[u8]) -> Self { Self(SmallVec::from_slice(slice)) }
+
+    /// Creates a new [UnsizedByteBuffer] from an array.
+    pub fn from_array<const N: usize>(arr: [u8; N]) -> Self {
+        let mut smallvec = SmallVec::with_capacity(N);
+        smallvec.extend(arr);
+
+        Self(smallvec)
+    }
 }
 
 impl FromValue for UnsizedByteBuffer {
@@ -79,19 +95,15 @@ impl std::io::Read for UnsizedByteBuffer {
 }
 
 impl From<Vec<u8>> for UnsizedByteBuffer {
-    fn from(bytes: Vec<u8>) -> Self { Self(SmallVec::from_vec(bytes)) }
+    fn from(bytes: Vec<u8>) -> Self { Self::from_vec(bytes) }
 }
 
 impl From<&[u8]> for UnsizedByteBuffer {
-    fn from(bytes: &[u8]) -> Self { Self(SmallVec::from_slice(bytes)) }
+    fn from(bytes: &[u8]) -> Self { Self::from_slice(bytes) }
 }
 
 impl<const N: usize> From<[u8; N]> for UnsizedByteBuffer {
-    fn from(value: [u8; N]) -> Self {
-        let mut smallvec = SmallVec::with_capacity(N);
-        smallvec.extend(value);
-        Self(smallvec)
-    }
+    fn from(value: [u8; N]) -> Self { Self::from_array(value) }
 }
 
 impl From<UnsizedByteBuffer> for Vec<u8> {
@@ -110,6 +122,6 @@ impl Decode for UnsizedByteBuffer {
         let mut bytes = Vec::new();
         buf.read_to_end(&mut bytes)?;
 
-        Ok(Self(SmallVec::from_vec(bytes)))
+        Ok(Self::from_vec(bytes))
     }
 }
