@@ -6,6 +6,9 @@ mod tests;
 mod var_decode;
 mod var_encode;
 
+mod from;
+pub use from::FromValue;
+
 /// A trait for types that can be encoded into a buffer.
 pub trait Encode {
     /// Encode this value into the given buffer.

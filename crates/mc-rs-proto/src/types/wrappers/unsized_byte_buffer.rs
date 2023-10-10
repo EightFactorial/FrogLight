@@ -1,55 +1,77 @@
 use derive_more::{Deref, DerefMut};
 use smallvec::SmallVec;
 
-use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarEncode};
+use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEncode};
 
 /// A buffer that contains encoded data.
 ///
-/// The buffer takes up the entire remaining space of the packet.
+/// Unlike a `Vec<T>`, when encoded it is not prefixed with a length.
 ///
-/// Unlike a `Vec<T>`, it is not prefixed with a length.
-/// For this reason, it is not possible to use this type in a packet
-/// that contains other fields after it.
+/// When used as a field in a packet, the buffer takes up the entire remaining space of the packet.
+///
+/// For this reason, it must be the last field in the packet.
 ///
 /// For example:
-/// ```rust,ignore
+/// ```rust
 /// use mc_rs_macros::Transcode;
-/// use mc_rs_proto::types::UnsizedByteBuffer;
+/// use mc_rs_proto::{types::UnsizedByteBuffer, buffer::{Encode, Decode, FromValue}};
+/// use compact_str::CompactString;
 ///
-/// #[derive(Debug, Transcode)]
-/// struct Packet {
-///     field: u8,
-///     buffer: UnsizedByteBuffer,
-/// }
+/// let string = CompactString::new("Hello, world!");
+///
+/// let unsized_buffer = UnsizedByteBuffer::from_value(&string).unwrap();
+/// let encode_buffer = Vec::from_value(&unsized_buffer);
+///
+/// // Note that the buffer is not prefixed with a length, though the contained string data is.
+/// assert_eq!(encode_buffer.unwrap(), [13, 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100, 33]);
+///
+/// // The buffer contains 16u32, which is 4 bytes.
+/// let mut unsized_buffer = UnsizedByteBuffer::from([0, 0, 0, 16]);
+/// let decoded = u32::decode(&mut unsized_buffer).unwrap();
+///
+/// // The buffer now contains 0 bytes.
+/// assert_eq!(decoded, 16);
+/// assert!(unsized_buffer.is_empty());
 /// ```
-///
-/// If the packet length is 8 bytes, the buffer contains 7 bytes of data.
-#[derive(Debug, Default, Clone, Deref, DerefMut)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut)]
 pub struct UnsizedByteBuffer(SmallVec<[u8; 16]>);
 
 impl UnsizedByteBuffer {
     pub fn new() -> Self { Self(SmallVec::new()) }
 
     pub fn with_capacity(capacity: usize) -> Self { Self(SmallVec::with_capacity(capacity)) }
+}
 
-    pub fn encode_value<T: Encode>(&mut self, value: &T) -> Result<(), EncodeError> {
-        value.encode(&mut self.0)
-    }
-
-    pub fn var_encode_value<T: VarEncode>(&mut self, value: &T) -> Result<(), EncodeError> {
-        value.var_encode(&mut self.0)
-    }
-
-    pub fn from_value<T: Encode>(value: &T) -> Result<Self, EncodeError> {
+impl FromValue for UnsizedByteBuffer {
+    fn from_value<T: Encode>(value: &T) -> Result<Self, EncodeError> {
         let mut buffer = Self::new();
-        buffer.encode_value(value)?;
+        value.encode(&mut buffer)?;
         Ok(buffer)
     }
 
-    pub fn from_var_value<T: VarEncode>(value: &T) -> Result<Self, EncodeError> {
+    fn from_var_value<T: VarEncode>(value: &T) -> Result<Self, EncodeError> {
         let mut buffer = Self::new();
-        buffer.var_encode_value(value)?;
+        value.var_encode(&mut buffer)?;
         Ok(buffer)
+    }
+}
+
+impl std::io::Write for UnsizedByteBuffer {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        <SmallVec<[u8; 16]> as std::io::Write>::write(&mut self.0, buf)
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        <SmallVec<[u8; 16]> as std::io::Write>::flush(&mut self.0)
+    }
+}
+
+impl std::io::Read for UnsizedByteBuffer {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let len = std::cmp::min(buf.len(), self.0.len());
+        buf[..len].copy_from_slice(&self.0[..len]);
+        self.0.drain(..len);
+        Ok(len)
     }
 }
 
@@ -57,12 +79,20 @@ impl From<Vec<u8>> for UnsizedByteBuffer {
     fn from(bytes: Vec<u8>) -> Self { Self(SmallVec::from_vec(bytes)) }
 }
 
-impl From<UnsizedByteBuffer> for Vec<u8> {
-    fn from(buffer: UnsizedByteBuffer) -> Self { buffer.0.to_vec() }
-}
-
 impl From<&[u8]> for UnsizedByteBuffer {
     fn from(bytes: &[u8]) -> Self { Self(SmallVec::from_slice(bytes)) }
+}
+
+impl<const N: usize> From<[u8; N]> for UnsizedByteBuffer {
+    fn from(value: [u8; N]) -> Self {
+        let mut smallvec = SmallVec::with_capacity(N);
+        smallvec.extend(value);
+        Self(smallvec)
+    }
+}
+
+impl From<UnsizedByteBuffer> for Vec<u8> {
+    fn from(buffer: UnsizedByteBuffer) -> Self { buffer.0.to_vec() }
 }
 
 impl Encode for UnsizedByteBuffer {
