@@ -41,7 +41,5 @@ pub struct ItemSlotData {
 impl ItemSlotData {
     pub fn new(kind: u32, count: i8, nbt: Nbt) -> Self { Self { kind, count, nbt } }
 
-    pub fn is_empty(&self) -> bool {
-        self.count == 0 || self.kind.to_string().as_str() == "minecraft:air"
-    }
+    pub fn is_empty(&self) -> bool { self.count == 0 || self.kind == 0 }
 }

@@ -1,4 +1,5 @@
 use bevy_ecs::prelude::Component;
+use compact_str::CompactString;
 use mc_rs_macros::Transcode;
 use uuid::Uuid;
 
@@ -10,12 +11,12 @@ use std::collections::HashMap;
 #[derive(Debug, Default, Clone, PartialEq, Eq, Transcode, Component)]
 pub struct GameProfile {
     pub uuid: Uuid,
-    pub name: String,
-    pub properties: HashMap<String, ProfileProperty>,
+    pub name: CompactString,
+    pub properties: HashMap<CompactString, ProfileProperty>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Transcode)]
 pub struct ProfileProperty {
-    pub value: String,
-    pub signature: Option<String>,
+    pub value: CompactString,
+    pub signature: Option<CompactString>,
 }

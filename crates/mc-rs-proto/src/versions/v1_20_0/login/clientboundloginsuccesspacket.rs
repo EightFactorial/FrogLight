@@ -9,14 +9,16 @@ pub struct ClientboundLoginSuccessPacket {
 
 #[test]
 fn test_packet() {
-    use crate::buffer::Encode;
+    use compact_str::CompactString;
     use uuid::Uuid;
+
+    use crate::buffer::Encode;
 
     let mut buf = Vec::new();
     let packet = ClientboundLoginSuccessPacket {
         profile: GameProfile {
             uuid: Uuid::from_u128(0x8002_0000_0000_0000_0000_0000_0000_0000),
-            name: "Herobrine".to_string(),
+            name: CompactString::from("Herobrine"),
             properties: Default::default(),
         },
     };

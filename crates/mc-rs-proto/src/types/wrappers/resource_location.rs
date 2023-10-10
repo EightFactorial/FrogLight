@@ -11,7 +11,7 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError};
 pub struct ResourceLocation(CompactString);
 
 impl ResourceLocation {
-    const DEFAULT_NAMESPACE: CompactString = CompactString::new_inline("minecraft:");
+    pub const DEFAULT_NAMESPACE: CompactString = CompactString::new_inline("minecraft:");
 
     pub fn new(s: impl Into<CompactString>) -> Self {
         let s = s.into();
@@ -28,7 +28,7 @@ impl ResourceLocation {
 
     pub fn split(&self) -> (&str, &str) {
         self.split_once(':')
-            .expect("Resource location must contain a ':'")
+            .expect("ResourceLocation must contain a ':'")
     }
 }
 

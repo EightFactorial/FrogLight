@@ -71,7 +71,7 @@ impl<T: Encode + Clone + PartialEq + Add<Output = T> + From<u8>> Encode for NonZ
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         match &self.0 {
             Some(val) => val.clone().add(T::from(1)).encode(buf),
-            None => 0u32.var_encode(buf).map_err(EncodeError::from),
+            None => 0u32.var_encode(buf),
         }
     }
 }
