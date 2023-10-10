@@ -75,7 +75,7 @@ splash = []
 # Enable simd features
 simd = ["bevy_rapier3d/simd-stable", "bytemuck/nightly_stdsimd"]
 # !! Currently broken on the latest nightly !!
-simd_advanced = ["bevy_rapier3d/simd-nightly", "bytemuck/nightly_stdsimd", "rand/packed_simd"]
+simd_advanced = ["bevy_rapier3d/simd-nightly", "bytemuck/nightly_stdsimd", "rand/simd_support"]
 
 # Enable debug plugins
 debug = ["mc-rs-proto/debug", "mc-rs-macros/debug"]
