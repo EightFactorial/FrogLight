@@ -73,17 +73,21 @@ fn default_plugins(settings: &Settings) -> PluginGroupBuilder {
 
     // Set the WindowPlugin window settings
     {
-        let title = match cfg!(debug_assertions) {
-            true => {
-                format!(
-                    "MC-RS v{} - nightly {} - {}",
-                    env!("CARGO_PKG_VERSION"),
-                    env!("VERGEN_GIT_DESCRIBE"),
-                    get_title()
-                )
-            }
-            false => format!("MC-RS v{} - {}", env!("CARGO_PKG_VERSION"), get_title()),
-        };
+        let title: String;
+
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        {
+            title = format!(
+                "MC-RS v{} - nightly {} - {}",
+                env!("CARGO_PKG_VERSION"),
+                env!("VERGEN_GIT_DESCRIBE"),
+                get_title()
+            );
+        }
+        #[cfg(not(any(debug_assertions, feature = "debug")))]
+        {
+            title = format!("MC-RS v{} - {}", env!("CARGO_PKG_VERSION"), get_title());
+        }
 
         let window = Window {
             present_mode: settings.window.present_mode,
