@@ -1,7 +1,11 @@
 #![allow(dead_code)]
 
+use std::{future::join, sync::Arc};
+
 use async_trait::async_trait;
 use flume::{Receiver, Sender};
+use futures_locks::Mutex;
+use log::error;
 use mc_rs_proto::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
@@ -25,31 +29,70 @@ where
 {
     /// Handle connections in the handshake state
     async fn handshake_handle(
-        con: Connection<Self, Handshake>,
+        conn: Connection<Self, Handshake>,
         intention: ConnectionIntent,
     ) -> Result<Connection<Self, Handshake>, ConnectionError>;
 
     /// Handle connections in the status state
     async fn status_handle(
-        con: Connection<Self, Status>,
+        conn: Connection<Self, Status>,
     ) -> Result<(StatusResponse, PingResponse), ConnectionError>;
 
     /// Handle connections in the login state
     async fn login_handle(
-        con: Connection<Self, Login>,
+        conn: Connection<Self, Login>,
     ) -> Result<(Connection<Self, Login>, GameProfile), ConnectionError>;
 
-    /// Handle connections in the configuration state
-    async fn configuration_handle(
-        con: Connection<Self, Configuration>,
-    ) -> Result<Connection<Self, Configuration>, ConnectionError>;
-
-    /// Handle connections in the play state
-    async fn play_handle(
-        con: ConnectionEnum<Self>,
+    /// Handle connections in the play/configuration states
+    async fn packet_handle(
+        conn: ConnectionEnum<Self>,
         tx: Sender<Result<ConnectionData<Self>, ConnectionError>>,
         rx: Receiver<ConnectionSend<Self>>,
-    );
+    ) {
+        let conn = Arc::new(Mutex::new(conn));
+        join!(
+            Self::conn_read(conn.clone(), tx),
+            Self::conn_write(conn, rx)
+        )
+        .await;
+    }
+
+    /// Reads packets from the connection and sends them to the channel
+    async fn conn_read(
+        conn: Arc<Mutex<ConnectionEnum<Self>>>,
+        tx: Sender<Result<ConnectionData<Self>, ConnectionError>>,
+    ) {
+        loop {
+            if let Err(err) = tx
+                .send_async(conn.lock().await.receive_packet().await)
+                .await
+            {
+                error!("Failed to send packet through channel: {err}");
+                return;
+            }
+        }
+    }
+
+    /// Writes packets from the channel and sends them to the connection
+    async fn conn_write(
+        conn: Arc<Mutex<ConnectionEnum<Self>>>,
+        rx: Receiver<ConnectionSend<Self>>,
+    ) {
+        loop {
+            match rx.recv_async().await {
+                Ok(data) => {
+                    if let Err(e) = conn.lock().await.send_packet(data).await {
+                        error!("Failed to send packet to server: {:?}", e);
+                        return;
+                    }
+                }
+                Err(err) => {
+                    error!("Failed to receive packet from channel: {err}");
+                    return;
+                }
+            }
+        }
+    }
 }
 
 /// A connection to a server

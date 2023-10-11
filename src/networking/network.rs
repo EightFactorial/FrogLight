@@ -280,7 +280,7 @@ where
 
                         match Self::HAS_CONFIGURATION_STATE {
                             true => {
-                                let task = IoTaskPool::get().spawn(Self::play_handle(
+                                let task = IoTaskPool::get().spawn(Self::packet_handle(
                                     ConnectionEnum::Configuration(conn.into()),
                                     tx1,
                                     rx2,
@@ -290,7 +290,7 @@ where
                                     .insert_resource(ConnectionChannel::new_config(rx1, tx2, task));
                             }
                             false => {
-                                let task = IoTaskPool::get().spawn(Self::play_handle(
+                                let task = IoTaskPool::get().spawn(Self::packet_handle(
                                     ConnectionEnum::Play(conn.into()),
                                     tx1,
                                     rx2,
