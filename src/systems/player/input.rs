@@ -36,7 +36,7 @@ fn any_keyboard_events(keyboard: Res<Input<KeyCode>>) -> bool {
 fn handle_keyboard(
     keyboard: Res<Input<KeyCode>>,
     mut player: Query<&mut Transform, (With<LocalPlayer>, Without<LocalPlayerHead>)>,
-    head: Query<&Transform, (Without<LocalPlayer>, With<LocalPlayerHead>)>,
+    head: Query<&GlobalTransform, (Without<LocalPlayer>, With<LocalPlayerHead>)>,
 ) {
     // TODO: Add keybindings
 
@@ -56,8 +56,13 @@ fn handle_keyboard(
     }
 
     // Rotate vector by head angle
-    let (yaw, _, _) = transform.rotation.to_euler(EulerRot::YXZ);
-    movement = Quat::from_rotation_y(yaw) * movement;
+    movement = Quat::from_rotation_y(
+        transform
+            .to_scale_rotation_translation()
+            .1
+            .to_euler(EulerRot::YXZ)
+            .0,
+    ) * movement;
 
     if keyboard.pressed(KeyCode::Space) {
         movement += Vec3::Y;
@@ -94,14 +99,11 @@ fn handle_mouse(
 
 fn middle_click(
     mut query: Query<&mut Transform, With<DirectionalLight>>,
-    head: Query<&Transform, (With<LocalPlayerHead>, Without<DirectionalLight>)>,
+    head: Query<&GlobalTransform, (With<LocalPlayerHead>, Without<DirectionalLight>)>,
     mouse: Res<Input<MouseButton>>,
 ) {
     if mouse.just_pressed(MouseButton::Middle) {
-        let head = head.single();
-
         let mut light = query.single_mut();
-        light.translation = head.translation;
-        light.rotation = head.rotation;
+        (_, light.rotation, light.translation) = head.single().to_scale_rotation_translation();
     }
 }
