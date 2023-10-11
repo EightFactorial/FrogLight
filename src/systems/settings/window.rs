@@ -24,4 +24,4 @@ impl Default for WindowSettings {
 
 /// Get the default [PresentMode].
 #[inline]
-fn default_present_mode() -> PresentMode { PresentMode::AutoVsync }
+const fn default_present_mode() -> PresentMode { PresentMode::AutoVsync }

@@ -50,6 +50,12 @@ impl Settings {
         }
     }
 
+    /// Shortcut for saving and returning self.
+    fn save_and_return(self) -> Self {
+        self.save();
+        self
+    }
+
     /// Save settings to file.
     pub fn save(&self) {
         match toml::to_string(self) {
@@ -60,12 +66,6 @@ impl Settings {
             }
             Err(e) => Self::log_err(format!("Error saving settings: {e}")),
         }
-    }
-
-    /// Shortcut for saving and returning self.
-    fn save_and_return(self) -> Self {
-        self.save();
-        self
     }
 
     // TODO: Get path based on OS
@@ -96,7 +96,8 @@ impl Settings {
     }
 }
 
-#[allow(dead_code)]
-fn default_u32<const N: u32>() -> u32 { N }
+#[inline]
+const fn default_u32<const N: u32>() -> u32 { N }
 
-fn default_f32<const N: u32>() -> f32 { N as f32 }
+#[inline]
+const fn default_f32<const N: u32>() -> f32 { N as f32 }

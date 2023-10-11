@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::interface::menus::main_menu::backgrounds::BackgroundEnum;
 
+use super::default_u32;
+
 /// Settings for the game menus.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MenuSettings {
@@ -22,4 +24,5 @@ impl Default for MenuSettings {
     }
 }
 
-fn dirt_block() -> (u32, u32) { (1, 1) }
+#[inline]
+const fn dirt_block() -> (u32, u32) { (default_u32::<0>(), default_u32::<0>()) }
