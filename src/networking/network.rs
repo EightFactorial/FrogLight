@@ -203,6 +203,8 @@ where
     ) {
         for (entity, mut task) in query.iter_mut() {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
+                let mut entity_commands = commands.entity(entity);
+
                 match result {
                     Ok(con) => {
                         debug!(
@@ -211,31 +213,31 @@ where
                             con.peer_addr().expect("Unable to get peer address")
                         );
 
-                        let mut commands = commands.entity(entity);
+                        entity_commands.remove::<ConnectionHandshakeTask<Self>>();
 
                         match task.intent {
                             ConnectionIntent::Status => {
                                 let status_task =
                                     IoTaskPool::get().spawn(Self::status_handle(con.into()));
 
-                                commands.insert(ConnectionStatusTask::new(status_task));
+                                entity_commands.insert(ConnectionStatusTask::new(status_task));
                             }
                             ConnectionIntent::Login => {
                                 let login_task =
                                     IoTaskPool::get().spawn(Self::login_handle(con.into()));
 
-                                commands.insert(ConnectionLoginTask::new(login_task));
+                                entity_commands.insert(ConnectionLoginTask::new(login_task));
                             }
                             _ => {
-                                unreachable!("Invalid connection intent!")
+                                error!("Invalid connection task intent!");
+
+                                entity_commands.despawn_recursive();
                             }
                         }
-
-                        commands.remove::<ConnectionHandshakeTask<Self>>();
                     }
                     Err(err) => {
                         error!("Failed to handshake: {}", err);
-                        commands.entity(entity).despawn_recursive();
+                        entity_commands.despawn_recursive();
                     }
                 }
             }
@@ -295,24 +297,23 @@ where
                             conn.peer_addr().expect("Unable to get peer address")
                         );
 
+                        let mut entity_commands = commands.entity(entity);
+
+                        entity_commands
+                            .insert(profile)
+                            .remove::<ConnectionLoginTask<Self>>();
+
                         match Self::HAS_CONFIGURATION_STATE {
                             true => {
                                 // Go to the configuration state
                                 let config_task = IoTaskPool::get()
                                     .spawn(Self::configuration_handle(conn.into()));
 
-                                commands
-                                    .entity(entity)
-                                    .insert(profile)
-                                    .insert(ConnectionConfigurationTask::new(config_task))
-                                    .remove::<ConnectionLoginTask<Self>>();
+                                entity_commands
+                                    .insert(ConnectionConfigurationTask::new(config_task));
                             }
                             false => {
                                 // Go to the play state
-                                commands
-                                    .entity(entity)
-                                    .insert(profile)
-                                    .remove::<ConnectionLoginTask<Self>>();
 
                                 Self::enter_play_state(
                                     entity,
@@ -340,6 +341,8 @@ where
     ) {
         for (entity, mut task) in query.iter_mut() {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
+                let mut entity_commands = commands.entity(entity);
+
                 match result {
                     Ok(conn) => {
                         debug!(
@@ -347,15 +350,13 @@ where
                             conn.peer_addr().expect("Unable to get peer address")
                         );
 
-                        commands
-                            .entity(entity)
-                            .remove::<ConnectionConfigurationTask<Self>>();
+                        entity_commands.remove::<ConnectionConfigurationTask<Self>>();
 
                         Self::enter_play_state(entity, conn.into(), &mut state, &mut commands);
                     }
                     Err(err) => {
                         error!("Failed to configure client: {}", err);
-                        commands.entity(entity).despawn_recursive();
+                        entity_commands.despawn_recursive();
                     }
                 }
             }
