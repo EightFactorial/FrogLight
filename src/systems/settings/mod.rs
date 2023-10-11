@@ -4,6 +4,8 @@ use bevy::prelude::Resource;
 use log::{error, info, log_enabled, Level};
 use serde::{Deserialize, Serialize};
 
+pub mod info;
+
 pub mod audio;
 use audio::AudioSettings;
 

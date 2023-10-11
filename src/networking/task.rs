@@ -163,29 +163,6 @@ where
     }
 }
 
-/// A task that is used to track the configuration state of a connection
-#[derive(Debug, Deref, DerefMut, Component)]
-pub struct ConnectionConfigurationTask<V: Version>(
-    pub Task<Result<Connection<V, Configuration>, ConnectionError>>,
-)
-where
-    Configuration: State<V>;
-
-impl<V: Version> ConnectionConfigurationTask<V>
-where
-    Configuration: State<V>,
-{
-    pub fn new(task: Task<Result<Connection<V, Configuration>, ConnectionError>>) -> Self {
-        Self(task)
-    }
-
-    pub fn task(&self) -> &Task<Result<Connection<V, Configuration>, ConnectionError>> { &self.0 }
-
-    pub fn task_mut(&mut self) -> &mut Task<Result<Connection<V, Configuration>, ConnectionError>> {
-        &mut self.0
-    }
-}
-
 /// A resource that communicates with the connection task
 #[derive(Debug, Deref, DerefMut, Resource)]
 pub struct ConnectionChannel<V: Version>
@@ -209,6 +186,35 @@ where
     pub fn new(
         rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
         tx: Sender<ConnectionSend<V>>,
+        state: ConnectionState,
+        task: Task<()>,
+    ) -> Self {
+        Self {
+            rx,
+            tx,
+            task,
+            state,
+            _version: PhantomData,
+        }
+    }
+
+    pub fn new_config(
+        rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
+        tx: Sender<ConnectionSend<V>>,
+        task: Task<()>,
+    ) -> Self {
+        Self {
+            rx,
+            tx,
+            task,
+            state: ConnectionState::Configuration,
+            _version: PhantomData,
+        }
+    }
+
+    pub fn new_play(
+        rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
+        tx: Sender<ConnectionSend<V>>,
         task: Task<()>,
     ) -> Self {
         Self {
@@ -225,10 +231,14 @@ where
     pub fn task_mut(&mut self) -> &mut Task<()> { &mut self.task }
 
     pub fn send_config(&mut self, packet: impl Into<<Configuration as State<V>>::Serverbound>) {
-        let _ = self.tx.send(ConnectionSend::Configuration(packet.into()));
+        if let Err(err) = self.tx.send(ConnectionSend::Configuration(packet.into())) {
+            error!("Failed to send configuration packet: {err}");
+        }
     }
 
     pub fn send_play(&mut self, packet: impl Into<<Play as State<V>>::Serverbound>) {
-        let _ = self.tx.send(ConnectionSend::Play(packet.into()));
+        if let Err(err) = self.tx.send(ConnectionSend::Play(packet.into())) {
+            error!("Failed to send play packet: {err}");
+        }
     }
 }

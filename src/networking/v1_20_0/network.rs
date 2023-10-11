@@ -1,9 +1,11 @@
 use bevy::{ecs::system::SystemState, prelude::*};
+use compact_str::CompactString;
 use mc_rs_proto::{
     types::{position::ChunkPos, EntityId},
     versions::v1_20_0::{
         configuration::ClientboundConfigurationPackets,
         play::{
+            serverboundclientsettingspacket::ServerboundClientSettingsPacket,
             serverboundkeepalivepacket::ServerboundKeepAlivePacket,
             serverboundteleportconfirmpacket::ServerboundTeleportConfirmPacket,
             ClientboundPlayPackets,
@@ -17,10 +19,13 @@ use crate::{
         network::{LocalPlayer, LocalPlayerHead, Network},
         task::ConnectionChannel,
     },
-    systems::world::{
-        resources::{CurrentWorld, WorldSeed, WorldType},
-        structure::chunk::Chunk,
-        Worlds,
+    systems::{
+        settings::info::ClientInformation,
+        world::{
+            resources::{CurrentWorld, WorldSeed, WorldType},
+            structure::chunk::Chunk,
+            Worlds,
+        },
     },
 };
 
@@ -56,7 +61,17 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::ScreenHandlerSlotUpdate(_) => {}
             ClientboundPlayPackets::CooldownUpdate(_) => {}
             ClientboundPlayPackets::ChatSuggestions(_) => {}
-            ClientboundPlayPackets::CustomPayload(_) => {}
+            ClientboundPlayPackets::CustomPayload(p) => match CompactString::from_utf8(&p.data) {
+                Ok(str) => {
+                    info!("Received custom payload: `{0} : {str}`", p.identifier);
+                }
+                Err(_) => {
+                    info!(
+                        "Received custom payload: `{0} : {1:?}`",
+                        p.identifier, p.data
+                    );
+                }
+            },
             ClientboundPlayPackets::EntityDamage(_) => {}
             ClientboundPlayPackets::RemoveMessage(_) => {}
             ClientboundPlayPackets::Disconnect(_) => {}
@@ -69,11 +84,12 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::DamageTilt(_) => {}
             ClientboundPlayPackets::WorldBorderInitialize(_) => {}
             ClientboundPlayPackets::KeepAlive(p) => {
-                log::info!("Received keep alive: {:?}", p);
+                info!("Received keep alive: {:?}", p);
 
                 let mut state = SystemState::<ResMut<ConnectionChannel<Self>>>::new(world);
-                let mut chan = state.get_mut(world);
-                chan.send_play(ServerboundKeepAlivePacket { id: p.id });
+                state
+                    .get_mut(world)
+                    .send_play(ServerboundKeepAlivePacket { id: p.id });
             }
             ClientboundPlayPackets::ChunkData(p) => {
                 let mut state = SystemState::<(Res<Worlds>, Option<Res<CurrentWorld>>)>::new(world);
@@ -88,10 +104,10 @@ impl Network for V1_20_0 {
                         p.chunk_data,
                         world,
                     ) {
-                        log::error!("Failed to insert chunk {:?} : {err}", p.position);
+                        error!("Failed to insert chunk {:?} : {err}", p.position);
                     }
                 } else {
-                    log::warn!("Received chunk data without a current world!");
+                    warn!("Received chunk data without a current world!");
                 }
 
                 {
@@ -105,17 +121,27 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::GameJoin(p) => {
                 debug!("Joined game: {:?}", p);
 
-                let mut state =
-                    SystemState::<(Query<Entity, With<LocalPlayer>>, ResMut<Worlds>)>::new(world);
-                let (player, mut worlds) = state.get_mut(world);
+                let mut state = SystemState::<(
+                    Query<Entity, With<LocalPlayer>>,
+                    Res<ClientInformation>,
+                    ResMut<ConnectionChannel<Self>>,
+                    ResMut<Worlds>,
+                )>::new(world);
+                let (player, info, mut conn, mut worlds) = state.get_mut(world);
 
+                // Send the client settings packet
+                conn.send_play(ServerboundClientSettingsPacket::from(info.clone()));
+
+                // Add all worlds to the world list
                 for world_type in p.worlds {
                     worlds.insert_empty(&WorldType::from(world_type));
                 }
 
+                // Add the player's entity id
                 let player = player.single();
                 world.entity_mut(player).insert(EntityId(p.player_id));
 
+                // Add other information to the world
                 world.insert_resource(p.game_mode);
                 world.insert_resource(CurrentWorld::new(p.world, p.world_type));
                 world.insert_resource(WorldSeed(p.seed));

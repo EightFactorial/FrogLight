@@ -14,7 +14,7 @@ use futures_lite::{io::BufReader, AsyncBufReadExt, AsyncReadExt, AsyncWriteExt};
 use thiserror::Error;
 
 use crate::{
-    buffer::{Decode, DecodeError, Encode, EncodeError, VarDecode, VarEncode},
+    buffer::{Decode, DecodeError, EncodeError, FromValue, VarDecode, VarEncode},
     versions::state::Handshake,
     State, Version,
 };
@@ -94,8 +94,20 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         &mut self,
         packet: impl Into<<S as State<V>>::Serverbound>,
     ) -> Result<(), ConnectionError> {
-        let mut buf = Vec::new();
-        packet.into().encode(&mut buf)?;
+        let packet = packet.into();
+
+        #[cfg(feature = "debug")]
+        {
+            let mut string = format!("{packet:?}");
+            if string.len() > 100 {
+                string.truncate(97);
+                string.push_str("...");
+            }
+
+            log::debug!("Sending packet: {string}");
+        }
+
+        let mut buf = Vec::from_value(&packet)?;
 
         // Compression
         if let Some(threshold) = self.compression {

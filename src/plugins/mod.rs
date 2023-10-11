@@ -10,7 +10,7 @@ pub(crate) mod splash;
 #[cfg(feature = "debug")]
 mod debug;
 
-use crate::systems::settings::Settings;
+use crate::systems::settings::{info::ClientInformation, Settings};
 
 /// Add plugins to the [App].
 ///
@@ -21,6 +21,7 @@ pub(super) fn add_plugins(app: &mut App) {
     // Add default plugins
     default::default_plugins(&settings).finish(app);
     app.insert_resource(settings);
+    app.init_resource::<ClientInformation>();
 
     // Add Belly plugin
     app.add_plugins(BellyPlugin);

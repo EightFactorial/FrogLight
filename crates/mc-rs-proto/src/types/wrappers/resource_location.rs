@@ -1,4 +1,8 @@
-use std::{convert::Infallible, str::FromStr};
+use std::{
+    convert::Infallible,
+    fmt::{Display, Formatter},
+    str::FromStr,
+};
 
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
@@ -30,6 +34,10 @@ impl ResourceLocation {
         self.split_once(':')
             .expect("ResourceLocation must contain a ':'")
     }
+}
+
+impl Display for ResourceLocation {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }
 }
 
 impl From<ResourceLocation> for CompactString {

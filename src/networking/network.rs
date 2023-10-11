@@ -21,7 +21,7 @@ use crate::{
 use super::{
     handle::{ConnectionData, ConnectionState, NetworkHandle},
     request::{PingResponse, StatusRequest, StatusResponse},
-    task::{ConnectionConfigurationTask, ConnectionTask},
+    task::ConnectionTask,
 };
 
 /// A marker component for the local player
@@ -82,53 +82,22 @@ where
                 .run_if(any_with_component::<ConnectionMarker<Self>>()),
         );
 
-        // Add systems to the set, depending on if the version has the configuration state
-        match Self::HAS_CONFIGURATION_STATE {
-            false => {
-                app.add_systems(
-                    PreUpdate,
-                    (
-                        // Handle the status and connection request events
-                        (Self::status_request, Self::connection_request).chain(),
-                        // Handle the connection tasks
-                        (
-                            Self::connection_query
-                                .run_if(any_with_component::<ConnectionTask<Self>>()),
-                            Self::handshake_query
-                                .run_if(any_with_component::<ConnectionHandshakeTask<Self>>()),
-                            Self::status_query
-                                .run_if(any_with_component::<ConnectionStatusTask<Self>>()),
-                            Self::login_query
-                                .run_if(any_with_component::<ConnectionLoginTask<Self>>()),
-                            Self::packet_query.run_if(resource_exists::<ConnectionChannel<Self>>()),
-                        )
-                            .in_set(ConnectionSystemSet::<Self>::default()),
-                    ),
-                );
-            }
-            true => {
-                app.add_systems(
-                    PreUpdate,
-                    (
-                        (Self::status_request, Self::connection_request).chain(),
-                        (
-                            Self::connection_query
-                                .run_if(any_with_component::<ConnectionTask<Self>>()),
-                            Self::handshake_query
-                                .run_if(any_with_component::<ConnectionHandshakeTask<Self>>()),
-                            Self::status_query
-                                .run_if(any_with_component::<ConnectionStatusTask<Self>>()),
-                            Self::login_query
-                                .run_if(any_with_component::<ConnectionLoginTask<Self>>()),
-                            Self::configuration_query
-                                .run_if(any_with_component::<ConnectionConfigurationTask<Self>>()),
-                            Self::packet_query.run_if(resource_exists::<ConnectionChannel<Self>>()),
-                        )
-                            .in_set(ConnectionSystemSet::<Self>::default()),
-                    ),
-                );
-            }
-        }
+        // Add systems to the set
+        app.add_systems(
+            PreUpdate,
+            (
+                (Self::status_request, Self::connection_request).chain(),
+                (
+                    Self::connection_query.run_if(any_with_component::<ConnectionTask<Self>>()),
+                    Self::handshake_query
+                        .run_if(any_with_component::<ConnectionHandshakeTask<Self>>()),
+                    Self::status_query.run_if(any_with_component::<ConnectionStatusTask<Self>>()),
+                    Self::login_query.run_if(any_with_component::<ConnectionLoginTask<Self>>()),
+                    Self::packet_query.run_if(resource_exists::<ConnectionChannel<Self>>()),
+                )
+                    .in_set(ConnectionSystemSet::<Self>::default()),
+            ),
+        );
     }
 
     /// Create a new connection to get the server status
@@ -297,30 +266,40 @@ where
                             conn.peer_addr().expect("Unable to get peer address")
                         );
 
-                        let mut entity_commands = commands.entity(entity);
-
-                        entity_commands
+                        commands
+                            .entity(entity)
                             .insert(profile)
+                            .insert((LocalPlayer, TransformBundle::default()))
+                            .with_children(|player| {
+                                player.spawn((LocalPlayerHead, TransformBundle::default()));
+                            })
                             .remove::<ConnectionLoginTask<Self>>();
+
+                        let (tx1, rx1) = flume::unbounded();
+                        let (tx2, rx2) = flume::unbounded();
 
                         match Self::HAS_CONFIGURATION_STATE {
                             true => {
-                                // Go to the configuration state
-                                let config_task = IoTaskPool::get()
-                                    .spawn(Self::configuration_handle(conn.into()));
+                                let task = IoTaskPool::get().spawn(Self::play_handle(
+                                    ConnectionEnum::Configuration(conn.into()),
+                                    tx1,
+                                    rx2,
+                                ));
 
-                                entity_commands
-                                    .insert(ConnectionConfigurationTask::new(config_task));
+                                commands
+                                    .insert_resource(ConnectionChannel::new_config(rx1, tx2, task));
                             }
                             false => {
-                                // Go to the play state
+                                let task = IoTaskPool::get().spawn(Self::play_handle(
+                                    ConnectionEnum::Play(conn.into()),
+                                    tx1,
+                                    rx2,
+                                ));
 
-                                Self::enter_play_state(
-                                    entity,
-                                    conn.into(),
-                                    &mut state,
-                                    &mut commands,
-                                );
+                                commands
+                                    .insert_resource(ConnectionChannel::new_play(rx1, tx2, task));
+
+                                state.set(ApplicationState::Game)
                             }
                         }
                     }
@@ -331,63 +310,6 @@ where
                 }
             }
         }
-    }
-
-    /// Wait for the configuration to finish and start the next state
-    fn configuration_query(
-        mut query: Query<(Entity, &mut ConnectionConfigurationTask<Self>)>,
-        mut state: ResMut<NextState<ApplicationState>>,
-        mut commands: Commands,
-    ) {
-        for (entity, mut task) in query.iter_mut() {
-            if let Some(result) = block_on(poll_once(task.task_mut())) {
-                let mut entity_commands = commands.entity(entity);
-
-                match result {
-                    Ok(conn) => {
-                        debug!(
-                            "Configuration finished with {}",
-                            conn.peer_addr().expect("Unable to get peer address")
-                        );
-
-                        entity_commands.remove::<ConnectionConfigurationTask<Self>>();
-
-                        Self::enter_play_state(entity, conn.into(), &mut state, &mut commands);
-                    }
-                    Err(err) => {
-                        error!("Failed to configure client: {}", err);
-                        entity_commands.despawn_recursive();
-                    }
-                }
-            }
-        }
-    }
-
-    /// Enter the play state
-    ///
-    /// This is a separate function so that it can be called from both the login and configuration
-    fn enter_play_state(
-        entity: Entity,
-        conn: Connection<Self, Play>,
-        state: &mut NextState<ApplicationState>,
-        commands: &mut Commands,
-    ) {
-        let (tx1, rx1) = flume::unbounded();
-        let (tx2, rx2) = flume::unbounded();
-
-        let play_task =
-            IoTaskPool::get().spawn(Self::play_handle(ConnectionEnum::Play(conn), tx1, rx2));
-
-        commands
-            .entity(entity)
-            .insert((LocalPlayer, TransformBundle::default()))
-            .with_children(|player| {
-                player.spawn((LocalPlayerHead, TransformBundle::default()));
-            });
-
-        commands.insert_resource(ConnectionChannel::new(rx1, tx2, play_task));
-
-        state.set(ApplicationState::Game);
     }
 
     /// Query the task for any packets and handle them

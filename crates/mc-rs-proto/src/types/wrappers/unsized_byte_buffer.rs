@@ -99,6 +99,10 @@ impl std::io::Read for UnsizedByteBuffer {
     }
 }
 
+impl AsRef<[u8]> for UnsizedByteBuffer {
+    fn as_ref(&self) -> &[u8] { &self.0 }
+}
+
 impl From<Vec<u8>> for UnsizedByteBuffer {
     fn from(bytes: Vec<u8>) -> Self { Self::from_vec(bytes) }
 }
