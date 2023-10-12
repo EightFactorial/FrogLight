@@ -9,10 +9,9 @@ Internally, MC-RS is written to support multiple protocol versions; however, onl
 
 More versions will be added at some point in the future.
 
-## ⚠️ Disclaimer ⚠️
-
-While the goal is to emulate Minecraft as closely as possible, it will *never* be perfect.
-
-This client, like all others, will get you **banned** from servers with anticheat.
-
-You have been warned!
+> **Warning**
+> While the goal is to emulate Minecraft as closely as possible, it will *never* be perfect.
+> 
+> Modded clients, including this one, **will get you banned** from servers with anticheat.
+> 
+> You have been warned!
