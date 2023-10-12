@@ -12,6 +12,11 @@ mod block;
 pub mod format;
 mod packets;
 
+/// These are the generators that are available to run
+///
+/// By default, only the `format` generator is selected
+///
+/// To add a new generator, implement the Generator trait and add it to this enum
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter, EnumString, Display)]
 #[strum(serialize_all = "lowercase")]
 #[enum_dispatch(Generator)]

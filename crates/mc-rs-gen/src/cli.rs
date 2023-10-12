@@ -24,7 +24,7 @@ pub(crate) struct Cli {
 
     /// The code generators to run
     ///
-    /// By default, all generators are selected
+    /// By default, only the `format` generator is run
     #[arg(short, long, value_name = "generator", default_value = "format")]
     pub generators: Option<Vec<Generators>>,
 }
