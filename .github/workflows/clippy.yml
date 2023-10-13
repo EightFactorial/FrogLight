@@ -13,24 +13,16 @@ jobs:
         with:
           submodules: recursive
       - name: Cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        uses: Swatinem/rust-cache@v2
       - name: Toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@nightly
         with:
-          override: true
-          toolchain: nightly
-          profile: minimal
           components: clippy
+      - name: Sarif
+        run: cargo install clippy-sarif sarif-fmt
       - name: Clippy
-        uses: actions-rs/clippy-check@v1
+        run: cargo clippy --workspace --all-targets --message-format=json | clippy-sarif | tee results.sarif | sarif-fmt
+      - name: Upload Results
+        uses: github/codeql-action/upload-sarif@v2
         with:
-          args: --workspace -- -D warnings
-          token: ${{ secrets.GITHUB_TOKEN }}
+          sarif_file: results.sarif
