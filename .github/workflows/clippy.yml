@@ -5,20 +5,22 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
+      - name: Libraries
+        if: runner.os == 'linux'
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Libraries
-        if: runner.os == 'linux'
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
       - name: Cache
         uses: actions/cache@v3
         with:
           path: |
-            ~/.cargo/.crates.toml
-            ~/.cargo/bin
-            ./target
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Toolchain
         uses: actions-rs/toolchain@v1
