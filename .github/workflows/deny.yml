@@ -1,0 +1,35 @@
+name: Dependencies
+on:
+  pull_request:
+    paths:
+      - '**/Cargo.toml'
+      - 'deny.toml'
+  push:
+    paths:
+      - '**/Cargo.toml'
+      - 'deny.toml'
+
+jobs:
+  deny:
+    name: Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Install
+        run: cargo install deny
+
+      - name: Deny
+        run: cargo deny check
