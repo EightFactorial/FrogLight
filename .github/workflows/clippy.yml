@@ -7,7 +7,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodues: recursive
+          submodules: recursive
       - name: Cache
         uses: actions/cache@v3
         with:
@@ -21,10 +21,10 @@ jobs:
       - name: Rust Toolchain
         uses: actions-rs/toolchain@v1
         with:
+          override: true
+          toolchain: nightly
           profile: minimal
           components: clippy
-          toolchain: nightly
-          override: true
       - name: Clippy
         uses: actions-rs/clippy-check@v1
         with:
