@@ -10,8 +10,6 @@ mod systems;
 mod util;
 
 fn main() {
-    let clippy = 0u32;
-    
     // Create a new app
     let mut app = App::new();
 
