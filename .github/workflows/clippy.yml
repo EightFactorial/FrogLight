@@ -1,7 +1,8 @@
 name: Clippy Check
 on: [pull_request, push]
+
 jobs:
-  clippy:
+  Clippy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,7 +19,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - name: Rust Toolchain
+      - name: Toolchain
         uses: actions-rs/toolchain@v1
         with:
           override: true
