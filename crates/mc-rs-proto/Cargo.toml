@@ -19,7 +19,7 @@ compact_str = { version = "0.7", features = ["serde", "smallvec"] }
 derive_more = "0.99"
 futures-lite = { version = "1.13", features = ["futures-io"] }
 hashbrown = { version = "0.14", features = ["serde"], optional = true }
-log = { version = "0.4", features = ["std"], optional = true}
+log = { version = "0.4", features = ["std"], optional = true }
 mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order", "arbitrary_precision"] }
@@ -27,7 +27,6 @@ smallvec = { version = "1.11", features = ["const_generics", "const_new", "union
 strum = { version = "0.25", features = ["derive"] }
 thiserror = "1.0"
 uuid = { version = "1.4", features = ["v3"] }
-
 
 [features]
 default = ["hashbrown"]
