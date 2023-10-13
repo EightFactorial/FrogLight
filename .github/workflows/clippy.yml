@@ -1,5 +1,5 @@
 name: Clippy
-on: [pull_request, push]
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
   clippy:
