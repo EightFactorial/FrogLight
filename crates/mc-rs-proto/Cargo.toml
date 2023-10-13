@@ -11,7 +11,7 @@ readme = "README.md"
 async-compression = { version = "0.4", features = ["futures-io", "zlib"] }
 async-net = "1.7"
 azalea-chat = { version = "0.8.0", default-features = false }
-azalea-nbt = { git = "https://github.com/EightFactorial/azalea", branch = "nbt", default-features = false }
+azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 bevy_ecs = "0.11.2"
 bevy_math = "0.11.2"
 byteorder = { version = "1.4", features = ["i128"] }
@@ -20,7 +20,7 @@ derive_more = "0.99"
 futures-lite = { version = "1.13", features = ["futures-io"] }
 hashbrown = { version = "0.14", features = ["serde"], optional = true }
 log = { version = "0.4", features = ["std"], optional = true}
-mc-rs-macros = { path = "../mc-rs-macros" }
+mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order", "arbitrary_precision"] }
 smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }

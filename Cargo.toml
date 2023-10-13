@@ -40,21 +40,21 @@ anyhow = "1.0"
 async-net = "1.8"
 async-trait = "0.1"
 azalea-chat = { version = "0.8.0", default-features = false }
-azalea-nbt = { git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
-belly = { git = "https://github.com/EightFactorial/belly.git" }
+azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
+belly = { version = "0.3.0", git = "https://github.com/EightFactorial/belly.git" }
 bevy = { version = "0.11", features = ["serialize"] }
 bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
 block-mesh = "0.2.0"
 bytemuck = { version = "1.14", features = ["derive"] }
 compact_str = { version = "0.7", features = ["serde", "smallvec"] }
-convert_case = "0.6"
+convert_case = "0.4"
 flume = "0.11"
 futures-lite = { version = "1.13", features = ["futures-io"] }
 futures-locks = { version = "0.7", default-features = false }
 itertools = "0.11"
 log = { version = "0.4", features = ["std"] }
-mc-rs-proto = { path = "crates/mc-rs-proto" }
-mc-rs-macros = { path = "crates/mc-rs-macros" }
+mc-rs-proto = { version = "0.1.0", path = "crates/mc-rs-proto" }
+mc-rs-macros = { version = "0.1.0", path = "crates/mc-rs-macros" }
 nohash-hasher = "0.2"
 parking_lot = { version = "0.12", features = ["nightly"] }
 rand = { version = "0.8", features = ["nightly"] }
