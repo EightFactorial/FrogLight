@@ -1,14 +1,30 @@
-name: clippy-action
+name: Clippy Check
 on: [pull_request, push]
 jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@nightly
-      with:
-        components: clippy
-    - uses: giraffate/clippy-action@v1
-      with:
-        reporter: 'github-pr-check'
-        clippy_flags: -- -Dwarnings
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/.crates.toml
+            ~/.cargo/bin
+            ./target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          components: clippy
+          toolchain: nightly
+          override: true
+      - name: Clippy
+        uses: actions-rs/clippy-check@v1
+        with:
+          args: --workspace -- -D warnings
+          token: ${{ secrets.GITHUB_TOKEN }}
