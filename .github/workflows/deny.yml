@@ -29,7 +29,7 @@ jobs:
           cache-on-failure: true
 
       - name: Install
-        run: cargo install deny
+        run: cargo install cargo-deny
 
       - name: Deny
         run: cargo deny check
