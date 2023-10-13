@@ -1,0 +1,44 @@
+name: Clippy
+on: [pull_request, push]
+
+jobs:
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Libraries
+        if: runner.os == 'linux'
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+
+      - name: Toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: clippy,rustfmt
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: SARIF
+        run: cargo install clippy-sarif sarif-fmt
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --message-format=json | clippy-sarif | tee results.sarif | sarif-fmt
+        continue-on-error: true
+
+      - name: Upload Results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.sarif
+          wait-for-processing: true
