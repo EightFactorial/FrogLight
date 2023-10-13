@@ -24,13 +24,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Cache
-        uses: Swatinem/rust-cache@v2
+      - name: Install Deny
+        uses: taiki-e/install-action@v2
         with:
-          cache-on-failure: true
+          tool: cargo-deny
 
-      - name: Install
-        run: cargo install cargo-deny
-
-      - name: Deny
+      - name: Check Deny
         run: cargo deny check

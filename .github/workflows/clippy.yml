@@ -30,15 +30,17 @@ jobs:
         with:
           cache-on-failure: true
 
-      - name: SARIF
-        run: cargo install clippy-sarif sarif-fmt
+      - name: Sarif
+        uses: taiki-e/install-action@v2
+        with:
+          tool: clippy-sarif,sarif-fmt
 
       - name: Clippy
-        run: cargo clippy --workspace --all-targets --message-format=json | clippy-sarif | tee results.sarif | sarif-fmt
+        run: cargo clippy --workspace --all-targets --message-format=json | clippy-sarif | tee clippy-results.sarif | sarif-fmt
         continue-on-error: true
 
       - name: Upload Results
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: results.sarif
+          sarif_file: clippy-results.sarif
           wait-for-processing: true
