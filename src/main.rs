@@ -11,6 +11,7 @@ mod util;
 
 fn main() {
     let fail_clippy = 1;
+    let fail_clippy_2 = 2;
 
     // Create a new app
     let mut app = App::new();
