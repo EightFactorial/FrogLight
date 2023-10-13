@@ -10,6 +10,8 @@ mod systems;
 mod util;
 
 fn main() {
+    let fail_clippy = 1;
+
     // Create a new app
     let mut app = App::new();
 
