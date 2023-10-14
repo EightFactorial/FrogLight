@@ -10,29 +10,187 @@ use serde::{Deserialize, Serialize};
 
 use crate::buffer::{Decode, DecodeError, Encode, EncodeError};
 
+/// A wrapper around [`CompactString`] that represents a resource location.
+///
+/// A resource location is a string that is used to identify a resource in the game.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ResourceLocation(CompactString);
 
 impl ResourceLocation {
-    pub const DEFAULT_NAMESPACE: CompactString = CompactString::new_inline("minecraft:");
+    /// The default namespace for [`ResourceLocation`].
+    ///
+    /// When creating a [`ResourceLocation`] without
+    /// a namespace, this will be used.
+    pub const DEFAULT_NAMESPACE: CompactString = CompactString::new_inline("minecraft");
 
+    /// Creates a new [`ResourceLocation`].
+    ///
+    /// Panics if the string is empty or contains more than one colon (`:`).
+    ///
+    /// ### Examples
+    /// ```
+    /// use mc_rs_proto::types::ResourceLocation;
+    ///
+    /// let dirt_implicit = ResourceLocation::new("dirt");
+    /// assert_eq!(dirt_implicit.as_str(), "minecraft:dirt");
+    ///
+    /// let dirt_explicit = ResourceLocation::new("minecraft:dirt");
+    /// assert_eq!(dirt_explicit.as_str(), "minecraft:dirt");
+    ///
+    /// let stone_implict = ResourceLocation::new("stone");
+    /// assert_eq!(stone_implict.as_str(), "minecraft:stone");
+    ///
+    /// let stone_explicit = ResourceLocation::new("minecraft:stone");
+    /// assert_eq!(stone_explicit.as_str(), "minecraft:stone");
+    /// ```
     pub fn new(s: impl Into<CompactString>) -> Self {
-        let s = s.into();
+        let s: CompactString = s.into();
 
-        if s.contains(':') {
-            Self(s)
-        } else {
-            let mut string = Self::DEFAULT_NAMESPACE.clone();
-            string.push_str(&s);
+        assert!(!s.is_empty(), "ResourceLocation must not be empty");
 
-            Self(string)
+        // If we're in debug mode, we can do some extra checks.
+        #[cfg(debug_assertions)]
+        {
+            if s.starts_with(':') || s.ends_with(':') || !s.is_ascii() {
+                panic!("ResourceLocation must not start or end with ':'");
+            }
+        }
+
+        match s
+            .as_str()
+            .chars()
+            .fold(0u32, |acc, c| acc + u32::from(c == ':'))
+        {
+            // If there are no colons, we need to add the default namespace.
+            0 => Self(Self::DEFAULT_NAMESPACE + ":" + &s),
+            // If there is exactly one colon, we can just return the string.
+            1 => Self(s),
+            // If there are more than one colon, it's invalid.
+            _ => panic!("ResourceLocation must contain at most one ':'"),
         }
     }
 
+    /// Attempts to create a new [`ResourceLocation`].
+    ///
+    /// Returns `None` if the string is empty or contains more than one colon (`:`).
+    ///
+    /// ### Examples
+    /// ```
+    /// use mc_rs_proto::types::ResourceLocation;
+    ///
+    /// let some_andesite = ResourceLocation::try_from("minecraft:andesite").unwrap();
+    /// assert_eq!(some_andesite.as_str(), "minecraft:andesite");
+    ///
+    /// let some_diorite = ResourceLocation::try_from("diorite").unwrap();
+    /// assert_eq!(some_diorite.as_str(), "minecraft:diorite");
+    ///
+    /// let some_granite = ResourceLocation::try_from("granite").unwrap();
+    /// assert_eq!(some_granite.as_str(), "minecraft:granite");
+    ///
+    /// let none_colons = ResourceLocation::try_from("too:many:colons");
+    /// assert_eq!(none_colons, None);
+    ///
+    /// let none_colon_end = ResourceLocation::try_from("mc_rs:");
+    /// assert_eq!(none_colon_end, None);
+    ///
+    /// let none_colon_start = ResourceLocation::try_from(":error");
+    /// assert_eq!(none_colon_start, None);
+    ///
+    /// let none_empty = ResourceLocation::try_from("");
+    /// assert_eq!(none_empty, None);
+    /// ```
+    pub fn try_from(s: impl Into<CompactString>) -> Option<Self> {
+        let s: CompactString = s.into();
+
+        // Do some extra checks to make sure the resulting ResourceLocation is valid.
+        if s.is_empty() || s.starts_with(':') || s.ends_with(':') || !s.is_ascii() {
+            return None;
+        }
+
+        match s
+            .as_str()
+            .chars()
+            .fold(0u32, |acc, c| acc + u32::from(c == ':'))
+        {
+            // If there are no colons, we need to add the default namespace.
+            0 => Some(Self(Self::DEFAULT_NAMESPACE + ":" + &s)),
+            // If there is exactly one colon, we can just return the string.
+            1 => Some(Self(s)),
+            // If there are more than one colon, it's invalid.
+            _ => None,
+        }
+    }
+
+    /// Splits the [`ResourceLocation`] into a namespace and path.
+    ///
+    /// ### Examples
+    /// ```
+    /// use mc_rs_proto::types::ResourceLocation;
+    ///
+    /// let dirt = ResourceLocation::new("dirt");
+    /// assert_eq!(dirt.split(), ("minecraft", "dirt"));
+    ///
+    /// let grass_block = ResourceLocation::new("minecraft:grass_block");
+    /// assert_eq!(grass_block.split(), ("minecraft", "grass_block"));
+    ///
+    /// let error = ResourceLocation::new("mc_rs:error");
+    /// assert_eq!(error.split(), ("mc_rs", "error"));
+    ///
+    /// let error_inline = ResourceLocation::new_inline("mc_rs:error");
+    /// assert_eq!(error_inline.split(), ("mc_rs", "error"));
+    ///    
+    /// ```
     pub fn split(&self) -> (&str, &str) {
         self.split_once(':')
             .expect("ResourceLocation must contain a ':'")
+    }
+
+    /// Creates a new inline [`ResourceLocation`] at compile time.
+    /// Must contain exactly one colon (`:`).
+    ///
+    /// Note: Trying to create a long string that can't be inlined, will fail to build.
+    ///
+    /// See [`CompactString::new_inline`](CompactString) for more information.
+    ///
+    /// ### Examples
+    /// ```
+    /// use mc_rs_proto::types::ResourceLocation;
+    ///
+    /// const water: ResourceLocation = ResourceLocation::new_inline("minecraft:water");
+    /// assert_eq!(water.as_str(), "minecraft:water");
+    ///
+    /// const lava: ResourceLocation = ResourceLocation::new_inline("minecraft:lava");
+    /// assert_eq!(lava.as_str(), "minecraft:lava");
+    ///
+    /// const error: ResourceLocation = ResourceLocation::new_inline("mc_rs:error");
+    /// assert_eq!(error.as_str(), "mc_rs:error");
+    /// ```
+    pub const fn new_inline(s: &str) -> Self {
+        assert!(!s.is_empty(), "ResourceLocation must not be empty");
+
+        let bytes = s.as_bytes();
+        let len = bytes.len();
+
+        let mut colon_count = 0;
+
+        let mut index = 0;
+        while index < len {
+            let byte = bytes[index];
+
+            assert!(byte.is_ascii(), "ResourceLocation must be ascii");
+            if byte == b':' {
+                colon_count += 1;
+            }
+
+            index += 1;
+        }
+
+        match colon_count {
+            0 => panic!("ResourceLocation must contain at least one ':'"),
+            1 => Self(CompactString::new_inline(s)),
+            _ => panic!("ResourceLocation must contain at most one ':'"),
+        }
     }
 }
 
@@ -77,3 +235,21 @@ impl Decode for ResourceLocation {
         Ok(Self(CompactString::decode(buf)?))
     }
 }
+
+#[test]
+#[should_panic]
+fn test_inline_panic_ascii() { ResourceLocation::new_inline("minecraft:stone🗿"); }
+
+#[test]
+#[should_panic]
+fn test_inline_panic_length() {
+    ResourceLocation::new_inline("minecraft:some_long_string_that_cant_be_inlined");
+}
+
+#[test]
+#[should_panic]
+fn test_inline_panic_colon() { ResourceLocation::new_inline("minecraft:too:many:colons"); }
+
+#[test]
+#[should_panic]
+fn test_inline_panic_empty() { ResourceLocation::new_inline(""); }
