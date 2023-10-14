@@ -32,4 +32,3 @@ jobs:
 
       - name: Tests
         run: cargo test --workspace --all-targets
-        continue-on-error: true
