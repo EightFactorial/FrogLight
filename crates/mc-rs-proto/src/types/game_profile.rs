@@ -9,6 +9,7 @@ use hashbrown::HashMap;
 use std::collections::HashMap;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Transcode, Component)]
+#[test(transcode)]
 pub struct GameProfile {
     pub uuid: Uuid,
     pub name: CompactString,

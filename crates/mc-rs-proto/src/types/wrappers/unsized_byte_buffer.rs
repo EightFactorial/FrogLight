@@ -1,4 +1,5 @@
 use derive_more::{Deref, DerefMut};
+use mc_rs_macros::Test;
 use smallvec::SmallVec;
 
 use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEncode};
@@ -33,7 +34,8 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEnco
 /// assert_eq!(decoded, 16);
 /// assert!(unsized_buffer.is_empty());
 /// ```
-#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Test)]
+#[test(transcode)]
 pub struct UnsizedByteBuffer(SmallVec<[u8; Self::BUFFER_SIZE]>);
 
 impl UnsizedByteBuffer {

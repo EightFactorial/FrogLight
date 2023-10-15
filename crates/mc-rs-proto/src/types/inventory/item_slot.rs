@@ -2,6 +2,7 @@ use azalea_nbt::Nbt;
 use mc_rs_macros::Transcode;
 
 #[derive(Debug, Default, PartialEq, Clone, Transcode)]
+#[test(transcode)]
 pub enum ItemSlot {
     #[default]
     Empty,
