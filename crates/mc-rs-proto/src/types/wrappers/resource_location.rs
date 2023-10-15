@@ -13,9 +13,13 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError};
 /// A wrapper around [`CompactString`] that represents a resource location.
 ///
 /// A resource location is a string that is used to identify a resource in the game.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ResourceLocation(CompactString);
+
+impl Default for ResourceLocation {
+    fn default() -> Self { Self::new("air") }
+}
 
 impl ResourceLocation {
     /// The default namespace for [`ResourceLocation`].
@@ -139,7 +143,6 @@ impl ResourceLocation {
     ///
     /// let error_inline = ResourceLocation::new_inline("mc_rs:error");
     /// assert_eq!(error_inline.split(), ("mc_rs", "error"));
-    ///    
     /// ```
     pub fn split(&self) -> (&str, &str) {
         self.split_once(':')
@@ -157,17 +160,18 @@ impl ResourceLocation {
     /// ```
     /// use mc_rs_proto::types::ResourceLocation;
     ///
-    /// const water: ResourceLocation = ResourceLocation::new_inline("minecraft:water");
-    /// assert_eq!(water.as_str(), "minecraft:water");
+    /// const WATER: ResourceLocation = ResourceLocation::new_inline("minecraft:water");
+    /// assert_eq!(WATER.as_str(), "minecraft:water");
     ///
-    /// const lava: ResourceLocation = ResourceLocation::new_inline("minecraft:lava");
-    /// assert_eq!(lava.as_str(), "minecraft:lava");
+    /// const LAVA: ResourceLocation = ResourceLocation::new_inline("minecraft:lava");
+    /// assert_eq!(LAVA.as_str(), "minecraft:lava");
     ///
-    /// const error: ResourceLocation = ResourceLocation::new_inline("mc_rs:error");
-    /// assert_eq!(error.as_str(), "mc_rs:error");
+    /// const ERROR: ResourceLocation = ResourceLocation::new_inline("mc_rs:error");
+    /// assert_eq!(ERROR.as_str(), "mc_rs:error");
     /// ```
     pub const fn new_inline(s: &str) -> Self {
         assert!(!s.is_empty(), "ResourceLocation must not be empty");
+        assert!(s.is_ascii(), "ResourceLocation must be ascii");
 
         let bytes = s.as_bytes();
         let len = bytes.len();
@@ -176,10 +180,7 @@ impl ResourceLocation {
 
         let mut index = 0;
         while index < len {
-            let byte = bytes[index];
-
-            assert!(byte.is_ascii(), "ResourceLocation must be ascii");
-            if byte == b':' {
+            if bytes[index] == b':' {
                 colon_count += 1;
             }
 

@@ -11,7 +11,7 @@ use crate::{
         enums::Direction,
         inventory::ItemSlot,
         position::{BlockPos, GlobalPos},
-        NonZeroOption, Vec3,
+        NonZero, Vec3,
     },
 };
 
@@ -69,11 +69,11 @@ pub enum EntityDataValue {
     Direction(Direction),
     OptionalUuid(Option<Uuid>),
     BlockState(#[var] u32),
-    OptionalBlockState(#[var] NonZeroOption<u32>),
+    OptionalBlockState(#[var] NonZero<u32>),
     CompoundTag(Nbt),
     Particle(Particle),
     VillagerData(MerchantData),
-    OptionalUnsignedInt(#[var] NonZeroOption<u32>),
+    OptionalUnsignedInt(#[var] NonZero<u32>),
     Pose(Pose),
     CatVariant(#[var] u32),
     FrogVariant(#[var] u32),
