@@ -5,18 +5,21 @@ use crate::buffer::Decode;
 use super::{DecodeError, VarDecode};
 
 impl VarDecode for i16 {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         Ok(i32::var_decode(buf)?.try_into()?)
     }
 }
 
 impl VarDecode for u16 {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         Ok(u32::var_decode(buf)?.try_into()?)
     }
 }
 
 impl VarDecode for i32 {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let mut byte = [0];
         let mut ans = 0;
@@ -32,12 +35,14 @@ impl VarDecode for i32 {
 }
 
 impl VarDecode for u32 {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         i32::var_decode(buf).map(|x| x as u32)
     }
 }
 
 impl VarDecode for i64 {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let mut byte = [0];
         let mut ans = 0;
@@ -53,24 +58,28 @@ impl VarDecode for i64 {
 }
 
 impl VarDecode for u64 {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         i64::var_decode(buf).map(|x| x as u64)
     }
 }
 
 impl VarDecode for isize {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         isize::try_from(i64::var_decode(buf)?).map_err(DecodeError::from)
     }
 }
 
 impl VarDecode for usize {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         usize::try_from(u64::var_decode(buf)?).map_err(DecodeError::from)
     }
 }
 
 impl<T: VarDecode> VarDecode for Vec<T> {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let len = u32::var_decode(buf)?;
 
@@ -84,6 +93,7 @@ impl<T: VarDecode> VarDecode for Vec<T> {
 }
 
 impl<T: VarDecode> VarDecode for Option<T> {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         match u32::var_decode(buf)? {
             0 => Ok(None),
@@ -93,6 +103,7 @@ impl<T: VarDecode> VarDecode for Option<T> {
 }
 
 impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for HashMap<K, V> {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let len = u32::var_decode(buf)?;
         let mut map = HashMap::with_capacity(len as usize);
@@ -105,6 +116,7 @@ impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for HashMap<K, V> {
 
 #[cfg(feature = "hashbrown")]
 impl<K: Decode + Eq + Hash, V: VarDecode> VarDecode for hashbrown::HashMap<K, V> {
+    #[inline]
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, DecodeError> {
         let len = u32::var_decode(buf)?;
         let mut map = hashbrown::HashMap::with_capacity(len as usize);

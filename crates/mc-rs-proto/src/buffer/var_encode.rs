@@ -5,18 +5,21 @@ use crate::buffer::Encode;
 use super::{EncodeError, VarEncode};
 
 impl VarEncode for i16 {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         i32::from(*self).var_encode(buf)
     }
 }
 
 impl VarEncode for u16 {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         i32::from(*self).var_encode(buf)
     }
 }
 
 impl VarEncode for i32 {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         let mut value = *self;
         let mut byte = [0];
@@ -37,12 +40,14 @@ impl VarEncode for i32 {
 }
 
 impl VarEncode for u32 {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         (*self as i32).var_encode(buf)
     }
 }
 
 impl VarEncode for i64 {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         let mut value = *self;
         let mut byte = [0];
@@ -64,24 +69,28 @@ impl VarEncode for i64 {
 }
 
 impl VarEncode for u64 {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         (*self as i64).var_encode(buf)
     }
 }
 
 impl VarEncode for isize {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         i64::try_from(*self)?.var_encode(buf)
     }
 }
 
 impl VarEncode for usize {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         u64::try_from(*self)?.var_encode(buf)
     }
 }
 
 impl<T: VarEncode> VarEncode for Vec<T> {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         self.len().var_encode(buf)?;
         for item in self {
@@ -92,6 +101,7 @@ impl<T: VarEncode> VarEncode for Vec<T> {
 }
 
 impl<T: VarEncode> VarEncode for Option<T> {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         match self {
             Some(value) => {
@@ -104,6 +114,7 @@ impl<T: VarEncode> VarEncode for Option<T> {
 }
 
 impl<K: Encode, V: VarEncode> VarEncode for HashMap<K, V> {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         self.len().var_encode(buf)?;
         for (key, value) in self {
@@ -116,6 +127,7 @@ impl<K: Encode, V: VarEncode> VarEncode for HashMap<K, V> {
 
 #[cfg(feature = "hashbrown")]
 impl<K: Encode, V: VarEncode> VarEncode for hashbrown::HashMap<K, V> {
+    #[inline]
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         self.len().var_encode(buf)?;
         for (key, value) in self {
