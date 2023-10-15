@@ -15,9 +15,12 @@ pub fn generate_tests(input: proc_macro::TokenStream, extra_tests: Option<&[&str
         if attr.path().is_ident("test") {
             attr.parse_nested_meta(|meta| {
                 if let Some(attr_ident) = meta.path.get_ident() {
-                    if let Some(tokens) = match_test(attr_ident.to_string().as_str(), &ident) {
-                        tests.extend(tokens);
-                    }
+                    let name = attr_ident.to_string();
+
+                    tests.extend(
+                        match_test(&name, &ident)
+                            .unwrap_or_else(|| panic!("Unknown test: `{name}`")),
+                    );
                 }
 
                 Ok(())
@@ -29,9 +32,9 @@ pub fn generate_tests(input: proc_macro::TokenStream, extra_tests: Option<&[&str
     // Add extra tests
     if let Some(extra_tests) = extra_tests {
         for &test in extra_tests {
-            if let Some(tokens) = match_test(test, &ident) {
-                tests.extend(tokens);
-            }
+            tests.extend(
+                match_test(test, &ident).unwrap_or_else(|| panic!("Unknown extra test: `{test}`")),
+            );
         }
     }
 
