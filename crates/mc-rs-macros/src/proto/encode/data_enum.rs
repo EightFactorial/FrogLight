@@ -5,7 +5,12 @@ use syn::{Attribute, DataEnum, Fields, Meta};
 use crate::proto::{encode::read_fields, get_discriminant};
 
 /// Encode an enum
-pub(super) fn encode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) -> TokenStream {
+pub(super) fn encode_enum(
+    _attrs: Vec<Attribute>,
+    ident: Ident,
+    data: DataEnum,
+    extra: Option<TokenStream>,
+) -> TokenStream {
     let mut variant_list = Vec::new();
     let mut discriminant = 0;
 
@@ -69,6 +74,8 @@ pub(super) fn encode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) 
         }
     }
 
+    let extra = extra.unwrap_or_else(|| quote! {});
+
     // Finish the impl
     quote! {
         impl crate::buffer::Encode for #ident {
@@ -79,5 +86,7 @@ pub(super) fn encode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) 
                 Ok(())
             }
         }
+
+        #extra
     }
 }

@@ -5,7 +5,12 @@ use syn::{Attribute, DataStruct, Fields, Meta};
 use crate::proto::encode::read_fields;
 
 /// Encode a struct
-pub(super) fn encode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruct) -> TokenStream {
+pub(super) fn encode_struct(
+    attrs: Vec<Attribute>,
+    ident: Ident,
+    data: DataStruct,
+    extra: Option<TokenStream>,
+) -> TokenStream {
     for attr in attrs {
         if let Meta::Path(path) = attr.meta {
             if path.is_ident("json") {
@@ -20,6 +25,8 @@ pub(super) fn encode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruc
     let mut field_list = Vec::new();
     read_fields(&data.fields, &mut field_list);
 
+    let extra = extra.unwrap_or_else(|| quote! {});
+
     quote! {
         impl crate::buffer::Encode for #ident {
             fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
@@ -27,6 +34,8 @@ pub(super) fn encode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruc
                 Ok(())
             }
         }
+
+        #extra
     }
 }
 

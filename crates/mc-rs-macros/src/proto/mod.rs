@@ -5,24 +5,19 @@ use quote::quote;
 use syn::{Expr, Lit, Token};
 
 mod encode;
-pub use encode::derive_encode;
+pub(crate) use encode::derive_encode;
 
 mod decode;
-pub use decode::derive_decode;
+pub(crate) use decode::derive_decode;
+
+mod transcode;
+pub(crate) use transcode::derive_transcode;
 
 mod state;
-pub use state::impl_state;
+pub(crate) use state::impl_state;
 
-/// Derive both `Encode` and `Decode`
-pub(super) fn derive_transcode(input: proc_macro::TokenStream) -> TokenStream {
-    let encode = derive_encode(input.clone());
-    let decode = derive_decode(input);
-
-    quote! {
-        #encode
-        #decode
-    }
-}
+mod tests;
+pub(crate) use tests::generate_tests;
 
 /// Get the discriminant for an enum variant.
 /// If no discriminant is specified, the stored discriminant is returned and incremented by 1.

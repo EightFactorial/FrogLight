@@ -5,7 +5,12 @@ use syn::{Attribute, DataEnum, Fields};
 use crate::proto::{decode::read_fields, get_discriminant};
 
 /// Decode an enum
-pub(super) fn decode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) -> TokenStream {
+pub(super) fn decode_enum(
+    _attrs: Vec<Attribute>,
+    ident: Ident,
+    data: DataEnum,
+    extra: Option<TokenStream>,
+) -> TokenStream {
     let mut variants = Vec::new();
     let mut discriminant = 0;
 
@@ -46,6 +51,8 @@ pub(super) fn decode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) 
         });
     }
 
+    let extra = extra.unwrap_or_else(|| quote! {});
+
     // Finish the impl
     quote! {
         impl crate::buffer::Decode for #ident {
@@ -56,5 +63,7 @@ pub(super) fn decode_enum(_attrs: Vec<Attribute>, ident: Ident, data: DataEnum) 
                 }
             }
         }
+
+        #extra
     }
 }

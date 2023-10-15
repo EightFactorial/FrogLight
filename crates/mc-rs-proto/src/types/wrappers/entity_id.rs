@@ -2,13 +2,15 @@ use std::{fmt::Display, num::TryFromIntError};
 
 use bevy_ecs::prelude::Component;
 use derive_more::{Deref, DerefMut};
+use mc_rs_macros::Test;
 
 use crate::buffer::{Decode, Encode, VarDecode, VarEncode};
 
 /// A Minecraft entity ID.
 ///
 /// Very different from Bevy's [Entity](bevy_ecs::entity::Entity).
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut, Test)]
+#[test(transcode)]
 pub struct EntityId(pub u32);
 
 impl From<EntityId> for u32 {

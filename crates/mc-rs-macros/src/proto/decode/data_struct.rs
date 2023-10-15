@@ -5,7 +5,12 @@ use syn::{Attribute, DataStruct, Fields, Meta};
 use crate::proto::decode::read_fields;
 
 /// Decode a struct
-pub(super) fn decode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruct) -> TokenStream {
+pub(super) fn decode_struct(
+    attrs: Vec<Attribute>,
+    ident: Ident,
+    data: DataStruct,
+    extra: Option<TokenStream>,
+) -> TokenStream {
     for attr in attrs {
         if let Meta::Path(path) = attr.meta {
             if path.is_ident("json") {
@@ -39,6 +44,8 @@ pub(super) fn decode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruc
         Fields::Unit => panic!("Cannot derive `Decode` for a unit struct"),
     };
 
+    let extra = extra.unwrap_or_else(|| quote! {});
+
     // Finish the impl
     quote! {
         impl crate::buffer::Decode for #ident {
@@ -46,6 +53,8 @@ pub(super) fn decode_struct(attrs: Vec<Attribute>, ident: Ident, data: DataStruc
                 #decode_method
             }
         }
+
+        #extra
     }
 }
 
