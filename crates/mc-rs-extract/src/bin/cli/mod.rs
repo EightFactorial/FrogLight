@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use mc_rs_ext::{extract::datasets::Datasets, types::Version};
+use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 
 /// The command line interface for the application
 #[derive(Debug, Parser)]

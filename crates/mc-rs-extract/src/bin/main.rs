@@ -3,7 +3,7 @@ use std::{fs::File, io::Write};
 use clap::Parser;
 use cli::Commands;
 use log::{error, info, warn, LevelFilter};
-use mc_rs_ext::{
+use mc_rs_extract::{
     extract::extract_data,
     print::print_data,
     search::search_data,

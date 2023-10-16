@@ -1,5 +1,5 @@
 [package]
-name = "mc-rs-ext"
+name = "mc-rs-extract"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
@@ -8,17 +8,17 @@ repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 
 [lib]
-name = "mc_rs_ext"
+name = "mc_rs_extract"
 path = "src/lib.rs"
 
 [[bin]]
-name = "mc_rs_ext"
+name = "mc_rs_extract"
 path = "src/bin/main.rs"
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "4.4", features = ["derive"] }
-classfile-rs = { path = "../classfile-rs" }
+classfile-rs = { version = "0.1", path = "../classfile-rs" }
 derive_more = "0.99"
 enum_dispatch = "0.3"
 env_logger = "0.10"

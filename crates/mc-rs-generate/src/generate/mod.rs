@@ -6,7 +6,7 @@ use json::JsonValue;
 use log::error;
 use strum::{Display, EnumIter, EnumString};
 
-use mc_rs_ext::{extract::datasets::Datasets, types::Version};
+use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 
 mod block;
 pub mod format;

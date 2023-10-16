@@ -4,7 +4,7 @@ use convert_case::{Case, Casing};
 use git2::Repository;
 use json::JsonValue;
 use log::{error, warn};
-use mc_rs_ext::{
+use mc_rs_extract::{
     extract::datasets::{self, block::Block, Datasets},
     types::Version,
 };

@@ -4,7 +4,7 @@ use generate::{Generator, Generators};
 use git2::Repository;
 use itertools::Itertools;
 use log::{error, info, warn, LevelFilter};
-use mc_rs_ext::{
+use mc_rs_extract::{
     extract::extract_data,
     types::{Manifest, Version},
 };

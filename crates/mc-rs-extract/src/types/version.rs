@@ -257,6 +257,12 @@ impl TryFrom<String> for Version {
     fn try_from(value: String) -> Result<Self, Self::Error> { Version::from_str(&value) }
 }
 
+impl TryFrom<&str> for Version {
+    type Error = VersionError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> { Version::from_str(value) }
+}
+
 impl Display for Version {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -321,4 +327,80 @@ impl<'de> Deserialize<'de> for Version {
     {
         Self::from_str(&String::deserialize(deserializer)?).map_err(serde::de::Error::custom)
     }
+}
+
+#[test]
+fn parse_string() {
+    assert_eq!(
+        Version::try_from("1.20.0").unwrap(),
+        Version::new_release(1, 20, 0)
+    );
+    assert_eq!(
+        Version::try_from("1.20.1").unwrap(),
+        Version::new_release(1, 20, 1)
+    );
+
+    assert_eq!(
+        Version::try_from("1.19").unwrap(),
+        Version::new_release(1, 19, 0)
+    );
+    assert_eq!(
+        Version::try_from("1.20").unwrap(),
+        Version::new_release(1, 20, 0)
+    );
+
+    assert_eq!(
+        Version::try_from("1.20.2-rc1").unwrap(),
+        Version::ReleaseCanidate {
+            major: 1,
+            minor: 20,
+            patch: 2,
+            rc: 1,
+        }
+    );
+    assert_eq!(
+        Version::try_from("1.20.2-rc2").unwrap(),
+        Version::ReleaseCanidate {
+            major: 1,
+            minor: 20,
+            patch: 2,
+            rc: 2,
+        }
+    );
+
+    assert_eq!(
+        Version::try_from("1.20.2-pre1").unwrap(),
+        Version::PreRelease {
+            major: 1,
+            minor: 20,
+            patch: 2,
+            pre: 1,
+        }
+    );
+    assert_eq!(
+        Version::try_from("1.20.2-pre2").unwrap(),
+        Version::PreRelease {
+            major: 1,
+            minor: 20,
+            patch: 2,
+            pre: 2,
+        }
+    );
+
+    assert_eq!(
+        Version::try_from("21w37a").unwrap(),
+        Version::Snapshot {
+            year: 21,
+            week: 37,
+            release: "a".to_owned(),
+        }
+    );
+    assert_eq!(
+        Version::try_from("21w37b").unwrap(),
+        Version::Snapshot {
+            year: 21,
+            week: 37,
+            release: "b".to_owned(),
+        }
+    );
 }

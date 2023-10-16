@@ -74,4 +74,15 @@ impl Manifest {
         let manifest: Manifest = serde_json::from_reader(file)?;
         Ok(manifest)
     }
+
+    /// Get the manifest without caching it
+    pub fn get_uncached() -> Result<Manifest, ManifestError> {
+        let response = reqwest::blocking::get(Self::MANIFEST_URL)?;
+        let manifest: Manifest = serde_json::from_reader(response)?;
+        Ok(manifest)
+    }
 }
+
+// TODO: Fix this test
+// #[test]
+// fn get_and_parse() { Manifest::get_uncached().unwrap(); }

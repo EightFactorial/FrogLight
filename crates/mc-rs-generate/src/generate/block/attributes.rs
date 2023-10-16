@@ -4,7 +4,7 @@ use convert_case::{Case, Casing};
 use git2::Repository;
 use json::JsonValue;
 use log::error;
-use mc_rs_ext::{extract::datasets::Datasets, types::Version};
+use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 use proc_macro2::Span;
 use syn::{punctuated::Punctuated, *};
 
@@ -17,7 +17,7 @@ pub struct BlockAttributes;
 impl Generator for BlockAttributes {
     fn deps(&self) -> &'static [Datasets] {
         &[Datasets::BlockStates(
-            mc_rs_ext::extract::datasets::block::BlockStates,
+            mc_rs_extract::extract::datasets::block::BlockStates,
         )]
     }
 

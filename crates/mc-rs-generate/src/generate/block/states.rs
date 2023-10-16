@@ -1,6 +1,6 @@
 use git2::Repository;
 use json::JsonValue;
-use mc_rs_ext::{
+use mc_rs_extract::{
     extract::datasets::{self, Datasets},
     types::Version,
 };

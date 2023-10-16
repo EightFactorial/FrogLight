@@ -1,5 +1,5 @@
 use clap::Parser;
-use mc_rs_ext::types::Version;
+use mc_rs_extract::types::Version;
 
 use crate::generate::Generators;
 

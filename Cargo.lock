@@ -3831,7 +3831,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mc-rs-ext"
+name = "mc-rs-extract"
 version = "0.1.0"
 dependencies = [
  "chrono",
@@ -3853,7 +3853,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mc-rs-gen"
+name = "mc-rs-generate"
 version = "0.1.0"
 dependencies = [
  "clap",
@@ -3865,7 +3865,7 @@ dependencies = [
  "itertools 0.11.0",
  "json",
  "log",
- "mc-rs-ext",
+ "mc-rs-extract",
  "prettyplease",
  "proc-macro2",
  "quote",

@@ -8,7 +8,7 @@ use git2::Repository;
 use itertools::Itertools;
 use json::JsonValue;
 use log::{error, warn};
-use mc_rs_ext::{
+use mc_rs_extract::{
     extract::datasets::{self, Datasets},
     types::Version,
 };

@@ -3,7 +3,7 @@ use std::process::Command;
 use git2::Repository;
 use json::JsonValue;
 use log::error;
-use mc_rs_ext::{extract::datasets::Datasets, types::Version};
+use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 
 use super::Generator;
 

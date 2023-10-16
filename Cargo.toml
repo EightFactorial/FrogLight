@@ -12,8 +12,8 @@ build = "build.rs"
 resolver = "2"
 members = [
     "crates/classfile-rs",
-    "crates/mc-rs-ext",
-    "crates/mc-rs-gen",
+    "crates/mc-rs-extract",
+    "crates/mc-rs-generate",
     "crates/mc-rs-macros",
     "crates/mc-rs-proto",
 ]
