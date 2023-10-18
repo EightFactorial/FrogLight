@@ -1,6 +1,6 @@
 use bevy::{ecs::system::SystemState, prelude::*};
 use compact_str::CompactString;
-use mc_rs_proto::{
+use mc_rs_protocol::{
     types::{position::ChunkPos, EntityId},
     versions::v1_20_0::{
         configuration::ClientboundConfigurationPackets,

@@ -1,10 +1,9 @@
 use bevy::prelude::*;
 use compact_str::CompactString;
-use mc_rs_proto::types::packets::client_settings::{
-    ChatVisibility, ModelCustomization, SettingsMainHand,
+use mc_rs_protocol::{
+    types::packets::client_settings::{ChatVisibility, ModelCustomization, SettingsMainHand},
+    versions::v1_20_0::play::serverboundclientsettingspacket::ServerboundClientSettingsPacket as V1_20_0_ServerboundClientSettingsPacket,
 };
-
-use mc_rs_proto::versions::v1_20_0::play::serverboundclientsettingspacket::ServerboundClientSettingsPacket as V1_20_0_ServerboundClientSettingsPacket;
 
 #[derive(Debug, Clone, Resource)]
 pub struct ClientInformation {

@@ -2,7 +2,7 @@ use std::{io::Cursor, sync::Arc};
 
 use azalea_nbt::Nbt;
 use bevy::prelude::*;
-use mc_rs_proto::{
+use mc_rs_protocol::{
     buffer::DecodeError,
     types::{
         packets::chunk_data::{ChunkDataPacket, SectionDataPacket},

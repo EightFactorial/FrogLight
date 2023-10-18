@@ -28,7 +28,7 @@ impl Generator for Blocks {
 
     fn parse(&self, _version: &Version, data: &JsonValue, repo: &Repository) {
         let mut path: PathBuf = repo.path().parent().unwrap().into();
-        path.push("crates/mc-rs/src/systems/blocks/block/list.rs");
+        path.push("src/systems/blocks/block/list.rs");
 
         if !path.exists() {
             error!("`block/list.rs` not found at {}", path.display());

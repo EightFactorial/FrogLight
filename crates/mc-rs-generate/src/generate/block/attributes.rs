@@ -22,8 +22,7 @@ impl Generator for BlockAttributes {
     }
 
     fn parse(&self, _version: &Version, data: &JsonValue, repo: &Repository) {
-        let mut path: PathBuf = repo.path().parent().unwrap().into();
-        path.push("crates/mc-rs");
+        let path: PathBuf = repo.path().parent().unwrap().into();
 
         // Check if the mc-rs crate exists
         if !path.exists() {

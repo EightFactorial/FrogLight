@@ -12,7 +12,7 @@ use block_mesh::{
     ndshape::{ConstShape, ConstShape3u32},
     GreedyQuadsBuffer, RIGHT_HANDED_Y_UP_CONFIG,
 };
-use mc_rs_proto::types::enums::Direction;
+use mc_rs_protocol::types::enums::Direction;
 
 use crate::systems::{
     blocks::{

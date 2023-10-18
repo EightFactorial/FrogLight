@@ -1,7 +1,7 @@
 use std::{hash::Hash, ops::RangeInclusive, sync::Arc};
 
 use bevy::prelude::*;
-use mc_rs_proto::types::ResourceLocation;
+use mc_rs_protocol::types::ResourceLocation;
 use nohash_hasher::{BuildNoHashHasher, IntMap};
 use parking_lot::RwLock;
 

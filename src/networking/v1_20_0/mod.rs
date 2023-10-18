@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use bevy::utils::HashMap;
 use log::{debug, error};
-use mc_rs_proto::{
+use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::{
         state::*,

@@ -3888,7 +3888,7 @@ dependencies = [
  "itertools 0.11.0",
  "log",
  "mc-rs-macros",
- "mc-rs-proto",
+ "mc-rs-protocol",
  "nohash-hasher",
  "parking_lot",
  "rand",
@@ -3957,7 +3957,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mc-rs-proto"
+name = "mc-rs-protocol"
 version = "0.1.0"
 dependencies = [
  "async-compression",

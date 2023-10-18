@@ -3,7 +3,7 @@ use std::{fs, io::Cursor, path::PathBuf};
 use azalea_nbt::{Nbt, NbtList};
 use belly::prelude::*;
 use bevy::{prelude::*, utils::HashMap};
-use mc_rs_proto::versions::DefaultVersion;
+use mc_rs_protocol::versions::DefaultVersion;
 
 use crate::{
     networking::{network::ConnectionEvent, request::StatusRequest},

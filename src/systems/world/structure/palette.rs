@@ -1,4 +1,4 @@
-use mc_rs_proto::buffer::{Decode, DecodeError, VarDecode};
+use mc_rs_protocol::buffer::{Decode, DecodeError, VarDecode};
 
 use crate::systems::world::{global_palette::GlobalPalette, CHUNK_SIZE, SECTION_HEIGHT};
 

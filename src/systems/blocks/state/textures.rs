@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use itertools::Itertools;
-use mc_rs_proto::types::enums::Direction;
+use mc_rs_protocol::types::enums::Direction;
 
 use crate::systems::world::material::StateAnimation;
 

@@ -15,7 +15,7 @@ members = [
     "crates/mc-rs-extract",
     "crates/mc-rs-generate",
     "crates/mc-rs-macros",
-    "crates/mc-rs-proto",
+    "crates/mc-rs-protocol",
 ]
 
 [profile.dev.package."*"]
@@ -54,7 +54,7 @@ futures-locks = { version = "0.7", default-features = false }
 itertools = "0.11"
 log = { version = "0.4", features = ["std"] }
 mc-rs-macros = { version = "0.1.0", path = "crates/mc-rs-macros" }
-mc-rs-proto = { version = "0.1.0", path = "crates/mc-rs-proto" }
+mc-rs-protocol = { version = "0.1.0", path = "crates/mc-rs-protocol" }
 nohash-hasher = "0.2"
 parking_lot = { version = "0.12", features = ["nightly"] }
 rand = { version = "0.8", features = ["nightly"] }
@@ -79,5 +79,5 @@ simd = ["bevy_rapier3d/simd-stable", "bytemuck/nightly_stdsimd"]
 simd_advanced = ["bevy_rapier3d/simd-nightly", "bytemuck/nightly_stdsimd", "rand/simd_support"]
 
 # Enable debug plugins
-debug = ["mc-rs-proto/debug", "mc-rs-macros/debug"]
+debug = ["mc-rs-protocol/debug", "mc-rs-macros/debug"]
 rapier_debug = ["bevy_rapier3d/debug-render-3d"]

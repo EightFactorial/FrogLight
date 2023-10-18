@@ -1,4 +1,4 @@
-use mc_rs_proto::Version;
+use mc_rs_protocol::Version;
 
 /// A trait that implements a conversion from a version's block states and biomes to a global
 /// palette.

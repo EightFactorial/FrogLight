@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use flume::{Receiver, Sender};
 use futures_locks::Mutex;
 use log::error;
-use mc_rs_proto::{
+use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
     Connection, ConnectionError, State, Version,

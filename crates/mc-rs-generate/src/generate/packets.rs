@@ -30,7 +30,7 @@ impl Generator for Packets {
 
     fn parse(&self, version: &Version, data: &JsonValue, repo: &Repository) {
         let mut path: PathBuf = repo.path().parent().unwrap().into();
-        path.push("crates/mc-rs-proto");
+        path.push("crates/mc-rs-protocol");
 
         // Check if the mc-rs-proto crate exists
         if !path.exists() {

@@ -1,5 +1,5 @@
 use bevy::{prelude::*, utils::HashMap};
-use mc_rs_proto::{
+use mc_rs_protocol::{
     buffer::DecodeError,
     types::{packets::chunk_data::ChunkDataPacket, position::ChunkPos},
 };

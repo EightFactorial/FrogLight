@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use mc_rs_proto::types::ResourceLocation;
+use mc_rs_protocol::types::ResourceLocation;
 
 /// The `WorldType` enum represents the type of a world.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]

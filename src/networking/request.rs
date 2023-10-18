@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use azalea_chat::FormattedText;
 use bevy::{prelude::*, utils::HashMap};
-use mc_rs_proto::Version;
+use mc_rs_protocol::Version;
 use uuid::Uuid;
 
 /// Add request response events to the app

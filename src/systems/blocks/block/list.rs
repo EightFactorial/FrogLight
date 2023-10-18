@@ -2,7 +2,7 @@
 // Do not manually edit it!
 
 use super::{properties::BlockProperties, Block, BlocksMap};
-use mc_rs_proto::types::ResourceLocation;
+use mc_rs_protocol::types::ResourceLocation;
 macro_rules! add_block {
     ($blocks:expr, $block_id:expr, $block_states:expr, $name:expr, $properties:expr) => {
         $blocks.insert(

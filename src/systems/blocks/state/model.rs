@@ -2,7 +2,7 @@ use bevy::{
     prelude::{Handle, Mesh, Vec3},
     render::primitives::Aabb,
 };
-use mc_rs_proto::types::enums::Direction;
+use mc_rs_protocol::types::enums::Direction;
 
 #[allow(dead_code)]
 #[derive(Debug, Clone)]

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use mc_rs_proto::versions::v1_20_0::V1_20_0;
+use mc_rs_protocol::versions::v1_20_0::V1_20_0;
 
 use self::network::Network;
 

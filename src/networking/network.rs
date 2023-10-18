@@ -2,7 +2,7 @@ use std::{fmt::Debug, hash::Hash, marker::PhantomData};
 
 use bevy::{ecs::system::SystemState, prelude::*, tasks::IoTaskPool};
 use futures_lite::future::{block_on, poll_once};
-use mc_rs_proto::{
+use mc_rs_protocol::{
     types::enums::ConnectionIntent,
     versions::state::{Configuration, Handshake, Login, Play, Status},
     Connection, ConnectionError, State, Version,

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use mc_rs_proto::{
+use mc_rs_protocol::{
     buffer::{Decode, DecodeError},
     types::packets::chunk_data::SectionDataPacket,
 };
