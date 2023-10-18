@@ -5,7 +5,7 @@ use strum::{Display, EnumString};
 #[derive(
     Debug, Default, PartialEq, Eq, Clone, Copy, Hash, Display, EnumString, Transcode, Resource,
 )]
-#[test(transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum GameMode {
     #[default]
     Survival = 0,

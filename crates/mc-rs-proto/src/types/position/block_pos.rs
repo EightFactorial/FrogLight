@@ -1,9 +1,11 @@
 use bevy_math::IVec3;
 use derive_more::{Deref, DerefMut, From, Into};
+use mc_rs_macros::Test;
 
 use crate::buffer::{Decode, Encode};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, Test)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct BlockPos(pub IVec3);
 
 impl BlockPos {

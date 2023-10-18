@@ -2,33 +2,26 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, Meta};
 
-use super::generate_tests;
+use super::macro_type::MacroTypeTrait;
+use crate::DeriveMacroAttr;
 
 mod data_enum;
 mod data_struct;
 
-/// Tests that are always generated
-static STATIC_TESTS: &[&str] = &[];
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct DecodeMacro;
 
-/// Derive `Decode`
-pub fn derive_decode(input: proc_macro::TokenStream, create_tests: bool) -> TokenStream {
-    // Generate tests if requested
-    let extra = match create_tests {
-        true => Some(generate_tests(input.clone(), Some(STATIC_TESTS))),
-        false => None,
-    };
-
-    let DeriveInput {
-        attrs, ident, data, ..
-    } = syn::parse(input).expect("Unable to DeriveInput");
-
-    match data {
-        Data::Struct(data) => data_struct::decode_struct(attrs, ident, data, extra),
-        Data::Enum(data) => data_enum::decode_enum(attrs, ident, data, extra),
-        Data::Union(_) => panic!("Cannot derive `Decode` for a union"),
+impl MacroTypeTrait for DecodeMacro {
+    fn generate_macro(&self, _attr: &DeriveMacroAttr, input: &DeriveInput) -> TokenStream {
+        match &input.data {
+            Data::Struct(_) => data_struct::decode_struct(input),
+            Data::Enum(_) => data_enum::decode_enum(input),
+            Data::Union(_) => panic!("Cannot derive `Decode` for a union"),
+        }
     }
 }
 
+/// Append instructions to read each field to the field list
 fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
     match fields {
         Fields::Named(fields) => {

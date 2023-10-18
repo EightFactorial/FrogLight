@@ -17,6 +17,7 @@ pub struct MerchantOffer {
 }
 
 #[derive(Clone, Debug, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 1, 2])]
 pub struct MerchantData {
     #[var]
     pub kind: u32,

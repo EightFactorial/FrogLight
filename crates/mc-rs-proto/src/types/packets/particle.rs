@@ -10,6 +10,7 @@ pub struct Particle {
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [21])]
 pub enum ParticleData {
     AmbientEntityEffect,
     AngryVillager,

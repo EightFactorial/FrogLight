@@ -1,7 +1,9 @@
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Copy, Transcode)]
+#[derive(Debug, Default, Clone, Copy, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum SoundSource {
+    #[default]
     Master,
     Music,
     Records,

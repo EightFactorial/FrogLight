@@ -14,7 +14,8 @@ pub struct Advancement {
     // pub telemetry_event: bool,
 }
 
-#[derive(Debug, Clone, Deref, DerefMut, Transcode)]
+#[derive(Debug, Default, Clone, Deref, DerefMut, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub struct AdvancementProgress(pub HashMap<ResourceLocation, Option<u64>>);
 
 // #[derive(Debug, Clone, Transcode)]
@@ -25,6 +26,7 @@ pub struct AdvancementProgress(pub HashMap<ResourceLocation, Option<u64>>);
 // }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0])]
 pub enum AdvancementTabAction {
     Open,
     Close,

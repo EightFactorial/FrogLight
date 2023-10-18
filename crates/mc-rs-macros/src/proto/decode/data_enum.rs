@@ -1,16 +1,20 @@
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Attribute, DataEnum, Fields};
+use syn::{Data, DeriveInput, Fields};
 
 use crate::proto::{decode::read_fields, get_discriminant};
 
 /// Decode an enum
-pub(super) fn decode_enum(
-    _attrs: Vec<Attribute>,
-    ident: Ident,
-    data: DataEnum,
-    extra: Option<TokenStream>,
-) -> TokenStream {
+pub(super) fn decode_enum(input: &DeriveInput) -> TokenStream {
+    let DeriveInput {
+        ident,
+        data: Data::Enum(data),
+        ..
+    } = input
+    else {
+        panic!("Expected enum");
+    };
+
     let mut variants = Vec::new();
     let mut discriminant = 0;
 
@@ -51,8 +55,6 @@ pub(super) fn decode_enum(
         });
     }
 
-    let extra = extra.unwrap_or_else(|| quote! {});
-
     // Finish the impl
     quote! {
         impl crate::buffer::Decode for #ident {
@@ -63,7 +65,5 @@ pub(super) fn decode_enum(
                 }
             }
         }
-
-        #extra
     }
 }

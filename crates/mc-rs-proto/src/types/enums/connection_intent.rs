@@ -2,6 +2,7 @@ use mc_rs_macros::Transcode;
 use strum::{Display, EnumString};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display, EnumString, Transcode)]
+#[mctest(tests = ["decode", "transcode"], bytes = [0])]
 pub enum ConnectionIntent {
     Handshake = -1,
     Game = 0,

@@ -46,8 +46,10 @@ impl Decode for EntityEquipment {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumString, FromRepr, Transcode)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, EnumString, FromRepr, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum EquipmentSlot {
+    #[default]
     MainHand,
     OffHand,
     Feet,

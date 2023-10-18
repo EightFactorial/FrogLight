@@ -47,12 +47,14 @@ impl Decode for EntityDataVec {
 }
 
 #[derive(Debug, Clone, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [2, 1, 127])]
 pub struct EntityDataItem {
     pub index: u8,
     pub value: EntityDataValue,
 }
 
 #[derive(Debug, Clone, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [8, 1])]
 pub enum EntityDataValue {
     Byte(u8),
     Int(#[var] i32),
@@ -85,6 +87,7 @@ pub enum EntityDataValue {
 }
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum Pose {
     #[default]
     Standing,
@@ -98,6 +101,7 @@ pub enum Pose {
 }
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum SnifferState {
     #[default]
     Idling,

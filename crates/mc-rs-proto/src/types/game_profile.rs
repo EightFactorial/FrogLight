@@ -9,7 +9,7 @@ use hashbrown::HashMap;
 use std::collections::HashMap;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Transcode, Component)]
-#[test(transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct GameProfile {
     pub uuid: Uuid,
     pub name: CompactString,

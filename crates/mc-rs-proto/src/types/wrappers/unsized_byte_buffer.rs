@@ -35,7 +35,7 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEnco
 /// assert!(unsized_buffer.is_empty());
 /// ```
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Test)]
-#[test(transcode)]
+#[mctest(tests = ["transcode"])]
 pub struct UnsizedByteBuffer(SmallVec<[u8; Self::BUFFER_SIZE]>);
 
 impl UnsizedByteBuffer {

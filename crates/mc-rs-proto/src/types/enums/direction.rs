@@ -3,7 +3,7 @@ use mc_rs_macros::Transcode;
 use strum::{Display, EnumString};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, EnumString, Display, Transcode)]
-#[test(transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum Direction {
     #[default]
     Up,

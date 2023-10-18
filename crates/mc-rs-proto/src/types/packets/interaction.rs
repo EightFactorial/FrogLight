@@ -6,6 +6,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0])]
 pub enum InteractionAction {
     Interact(InteractionHand),
     Attack,
@@ -13,6 +14,7 @@ pub enum InteractionAction {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum InteractionHand {
     #[default]
     MainHand,

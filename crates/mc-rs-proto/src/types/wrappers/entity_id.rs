@@ -10,7 +10,7 @@ use crate::buffer::{Decode, Encode, VarDecode, VarEncode};
 ///
 /// Very different from Bevy's [Entity](bevy_ecs::entity::Entity).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut, Test)]
-#[test(transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub struct EntityId(pub u32);
 
 impl From<EntityId> for u32 {

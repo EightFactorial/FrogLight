@@ -1,6 +1,7 @@
 use mc_rs_macros::Transcode;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum ChatVisibility {
     #[default]
     Full,
@@ -9,6 +10,7 @@ pub enum ChatVisibility {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [1])]
 pub enum SettingsMainHand {
     Left,
     #[default]
@@ -16,6 +18,7 @@ pub enum SettingsMainHand {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [127])]
 #[bitset]
 pub struct ModelCustomization {
     pub cape: bool,

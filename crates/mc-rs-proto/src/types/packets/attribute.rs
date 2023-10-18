@@ -18,6 +18,7 @@ pub struct AttributeModifier {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0])]
 pub enum ModifierOperation {
     Add,
     MultiplyBase,

@@ -1,7 +1,7 @@
 use mc_rs_macros::Transcode;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Transcode)]
-#[test(transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,

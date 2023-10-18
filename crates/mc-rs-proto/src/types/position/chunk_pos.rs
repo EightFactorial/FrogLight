@@ -25,6 +25,7 @@ use crate::buffer::{VarDecode, VarEncode};
     Into,
     Transcode,
 )]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ChunkPos(pub IVec2);
 
 impl ChunkPos {

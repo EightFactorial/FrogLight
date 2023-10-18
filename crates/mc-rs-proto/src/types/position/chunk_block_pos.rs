@@ -3,7 +3,8 @@ use mc_rs_macros::Transcode;
 use super::{BlockPos, ChunkPos};
 
 /// A block's position in a chunk.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Transcode)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0])]
 pub struct ChunkBlockPos {
     pub x: u8,
     pub y: i32,

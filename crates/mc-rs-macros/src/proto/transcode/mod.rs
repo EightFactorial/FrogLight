@@ -1,21 +1,20 @@
 use proc_macro2::TokenStream;
-use quote::quote;
+use syn::DeriveInput;
 
-use crate::proto::{derive_decode, derive_encode, generate_tests};
+use crate::DeriveMacroAttr;
 
-/// Tests that are always generated
-static STATIC_TESTS: &[&str] = &[];
+use super::{decode::DecodeMacro, encode::EncodeMacro, macro_type::MacroTypeTrait};
 
-/// Derive both `Encode` and `Decode`
-pub fn derive_transcode(input: proc_macro::TokenStream) -> TokenStream {
-    let encode = derive_encode(input.clone(), false);
-    let decode = derive_decode(input.clone(), false);
-    let tests = generate_tests(input, Some(STATIC_TESTS));
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct TranscodeMacro;
 
-    quote! {
-        #encode
-        #decode
+impl MacroTypeTrait for TranscodeMacro {
+    fn generate_macro(&self, attr: &DeriveMacroAttr, input: &DeriveInput) -> TokenStream {
+        let mut derives = TokenStream::new();
 
-        #tests
+        derives.extend(EncodeMacro.generate_macro(attr, input));
+        derives.extend(DecodeMacro.generate_macro(attr, input));
+
+        derives
     }
 }
