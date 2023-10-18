@@ -18,12 +18,14 @@ impl TestTrait for DecodeTest {
         let fn_name = self.test_name(&input.ident);
         let bytes = bytes_to_tokenstream(&attr.bytes);
 
+        // Decode the bytes into the type.
         quote! {
             #[test]
             fn #fn_name() {
                 use crate::{buffer::Decode, types::wrappers::UnsizedByteBuffer};
-                let mut bytes = UnsizedByteBuffer::from_vec(#bytes);
+                use pretty_assertions::assert_eq;
 
+                let mut bytes = UnsizedByteBuffer::from_vec(#bytes);
                 assert!(#ident::decode(&mut bytes).is_ok(), "Failed to decode bytes");
                 assert_eq!(bytes.len(), 0, "Not all bytes were consumed");
             }
@@ -45,12 +47,14 @@ impl TestTrait for VarDecodeTest {
         let fn_name = self.test_name(&input.ident);
         let bytes = bytes_to_tokenstream(&attr.bytes);
 
+        // Var_decode the bytes into the type.
         quote! {
             #[test]
             fn #fn_name() {
                 use crate::{buffer::VarDecode, types::wrappers::UnsizedByteBuffer};
-                let mut bytes = UnsizedByteBuffer::from_vec(#bytes);
+                use pretty_assertions::assert_eq;
 
+                let mut bytes = UnsizedByteBuffer::from_vec(#bytes);
                 assert!(#ident::var_decode(&mut bytes).is_ok(), "Failed to var-decode bytes");
                 assert_eq!(bytes.len(), 0, "Not all bytes were consumed");
             }

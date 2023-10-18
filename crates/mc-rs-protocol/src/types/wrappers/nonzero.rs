@@ -11,7 +11,7 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarDecode, VarEnco
 ///
 /// ### Examples
 /// ```rust
-/// use mc_rs_proto::{buffer::FromValue, types::NonZero};
+/// use mc_rs_protocol::{buffer::FromValue, types::NonZero};
 ///
 /// // A u32 is encoded as 4 bytes.
 /// let nonzero_none: NonZero<u32> = NonZero::new(None);
@@ -48,7 +48,7 @@ impl<T> NonZero<T> {
     ///
     /// ### Examples
     /// ```rust
-    /// use mc_rs_proto::types::NonZero;
+    /// use mc_rs_protocol::types::NonZero;
     ///
     /// let nonzero_0u32: NonZero<u32> = NonZero::new_from(0);
     /// assert_eq!(nonzero_0u32.into_inner(), Some(0));
@@ -62,7 +62,7 @@ impl<T> NonZero<T> {
     ///
     /// ### Examples
     /// ```rust
-    /// use mc_rs_proto::types::NonZero;
+    /// use mc_rs_protocol::types::NonZero;
     ///
     /// let nonzero_none: NonZero<u32> = NonZero::new(None);
     /// assert_eq!(nonzero_none.into_inner(), None);
@@ -80,7 +80,7 @@ impl<T> NonZero<T> {
     ///
     /// ### Examples
     /// ```rust
-    /// use mc_rs_proto::types::NonZero;
+    /// use mc_rs_protocol::types::NonZero;
     ///
     /// let nonzero_none: NonZero<u32> = NonZero::default();
     /// assert_eq!(nonzero_none.into_inner(), None);

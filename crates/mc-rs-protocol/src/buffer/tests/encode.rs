@@ -1,4 +1,7 @@
-#[allow(unused_imports)]
+#[cfg(test)]
+use pretty_assertions::assert_eq;
+
+#[cfg(test)]
 use crate::buffer::Encode;
 
 #[test]

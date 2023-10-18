@@ -13,6 +13,7 @@ impl TestTrait for EncodeTest {
         let fn_name = self.test_name(&input.ident);
 
         match attr.bytes.is_empty() {
+            // Get the default value of the type, encode it to bytes.
             true => {
                 quote! {
                     #[test]
@@ -22,6 +23,8 @@ impl TestTrait for EncodeTest {
                     }
                 }
             }
+            // Encode the default value of the type to bytes.
+            // Then compare the encoded bytes to the expected bytes.
             false => {
                 let bytes = bytes_to_tokenstream(&attr.bytes);
 
@@ -29,6 +32,8 @@ impl TestTrait for EncodeTest {
                     #[test]
                     fn #fn_name() {
                         use crate::buffer::FromValue;
+                        use pretty_assertions::assert_eq;
+
                         assert_eq!(Vec::from_value(&#ident::default()).unwrap(), #bytes, "Default encoded bytes do not match expected bytes");
                     }
                 }
@@ -46,6 +51,7 @@ impl TestTrait for VarEncodeTest {
         let fn_name = self.test_name(&input.ident);
 
         match attr.bytes.is_empty() {
+            // Get the default value of the type, var_encode it to bytes.
             true => {
                 quote! {
                     #[test]
@@ -55,6 +61,8 @@ impl TestTrait for VarEncodeTest {
                     }
                 }
             }
+            // Var_encode the default value of the type to bytes.
+            // Then compare the var_encoded bytes to the expected bytes.
             false => {
                 let bytes = bytes_to_tokenstream(&attr.bytes);
 
@@ -62,6 +70,8 @@ impl TestTrait for VarEncodeTest {
                     #[test]
                     fn #fn_name() {
                         use crate::buffer::FromValue;
+                        use pretty_assertions::assert_eq;
+
                         assert_eq!(Vec::from_var_value(&#ident::default()).unwrap(), #bytes, "Default var-encoded bytes do not match expected bytes");
                     }
                 }

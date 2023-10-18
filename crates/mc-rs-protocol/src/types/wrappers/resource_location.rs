@@ -36,7 +36,7 @@ impl ResourceLocation {
     ///
     /// ### Examples
     /// ```
-    /// use mc_rs_proto::types::ResourceLocation;
+    /// use mc_rs_protocol::types::ResourceLocation;
     ///
     /// let dirt_implicit = ResourceLocation::new("dirt");
     /// assert_eq!(dirt_implicit.as_str(), "minecraft:dirt");
@@ -83,7 +83,7 @@ impl ResourceLocation {
     ///
     /// ### Examples
     /// ```
-    /// use mc_rs_proto::types::ResourceLocation;
+    /// use mc_rs_protocol::types::ResourceLocation;
     ///
     /// let some_andesite = ResourceLocation::try_from("minecraft:andesite").unwrap();
     /// assert_eq!(some_andesite.as_str(), "minecraft:andesite");
@@ -132,7 +132,7 @@ impl ResourceLocation {
     ///
     /// ### Examples
     /// ```
-    /// use mc_rs_proto::types::ResourceLocation;
+    /// use mc_rs_protocol::types::ResourceLocation;
     ///
     /// let dirt = ResourceLocation::new("dirt");
     /// assert_eq!(dirt.split(), ("minecraft", "dirt"));
@@ -160,7 +160,7 @@ impl ResourceLocation {
     ///
     /// ### Examples
     /// ```
-    /// use mc_rs_proto::types::ResourceLocation;
+    /// use mc_rs_protocol::types::ResourceLocation;
     ///
     /// const WATER: ResourceLocation = ResourceLocation::new_inline("minecraft:water");
     /// assert_eq!(WATER.as_str(), "minecraft:water");

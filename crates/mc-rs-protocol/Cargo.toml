@@ -28,6 +28,9 @@ strum = { version = "0.25", features = ["derive"] }
 thiserror = "1.0"
 uuid = { version = "1.4", features = ["v3"] }
 
+[dev-dependencies]
+pretty_assertions = "1.4"
+
 [features]
 default = ["hashbrown"]
 hashbrown = ["dep:hashbrown"]

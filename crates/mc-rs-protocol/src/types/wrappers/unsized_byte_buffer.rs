@@ -15,7 +15,7 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEnco
 /// For example:
 /// ```rust
 /// use mc_rs_macros::Transcode;
-/// use mc_rs_proto::{types::UnsizedByteBuffer, buffer::{Encode, Decode, FromValue}};
+/// use mc_rs_protocol::{types::UnsizedByteBuffer, buffer::{Encode, Decode, FromValue}};
 /// use compact_str::CompactString;
 ///
 /// let string = CompactString::new("Hello, world!");

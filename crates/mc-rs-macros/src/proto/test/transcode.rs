@@ -13,17 +13,23 @@ impl TestTrait for TranscodeTest {
         let fn_name = self.test_name(&input.ident);
 
         match attr.bytes.is_empty() {
+            // Get the default value of the type,
+            // encode it to bytes, then decode it back to the type.
+            // Then compare the decoded value to the default value.
             true => quote! {
                 #[test]
                 fn #fn_name() {
                     use crate::buffer::{FromValue, Decode};
-                    let default = #ident::default();
+                    use pretty_assertions::assert_eq;
 
+                    let default = #ident::default();
                     let encoded = Vec::from_value(&default).unwrap();
                     let decoded = #ident::decode(&mut encoded.as_slice()).unwrap();
                     assert_eq!(default, decoded, "Decoded value does not match default encoded value");
                 }
             },
+            // Decode the bytes into the type, then encode the type back to bytes.
+            // Then compare the encoded bytes to the expected bytes.
             false => {
                 let bytes = bytes_to_tokenstream(&attr.bytes);
 
@@ -31,6 +37,7 @@ impl TestTrait for TranscodeTest {
                     #[test]
                     fn #fn_name() {
                         use crate::{buffer::{FromValue, Decode}, types::wrappers::UnsizedByteBuffer};
+                        use pretty_assertions::assert_eq;
 
                         let mut bytes = UnsizedByteBuffer::from_vec(#bytes);
                         let decoded = #ident::decode(&mut bytes).unwrap();
@@ -52,6 +59,9 @@ impl TestTrait for VarTranscodeTest {
         let fn_name = self.test_name(&input.ident);
 
         match attr.bytes.is_empty() {
+            // Get the default value of the type,
+            // var_encode it to bytes, then var_decode it back to the type.
+            // Then compare the var_decoded value to the default value.
             true => quote! {
                 #[test]
                 fn #fn_name() {
@@ -63,6 +73,8 @@ impl TestTrait for VarTranscodeTest {
                     assert_eq!(default, decoded, "Decoded value does not match default encoded value");
                 }
             },
+            // Var_decode the bytes into the type, then var_encode the type back to bytes.
+            // Then compare the var_encoded bytes to the expected bytes.
             false => {
                 let bytes = bytes_to_tokenstream(&attr.bytes);
 
