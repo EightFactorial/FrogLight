@@ -182,7 +182,11 @@ impl StatePackets {
 
         let content;
         braced!(content in input);
-        input.parse::<Token![,]>()?;
+
+        // If there is a comma, parse it away
+        if input.peek(Token![,]) {
+            input.parse::<Token![,]>()?;
+        }
 
         content.parse()
     }

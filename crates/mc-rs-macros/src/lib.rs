@@ -1,4 +1,4 @@
-use attribute_derive::{Attribute, FromAttr};
+use attribute_derive::Attribute;
 use proc_macro::TokenStream;
 use syn::DeriveInput;
 
@@ -64,28 +64,27 @@ struct DeriveMacroAttr {
 }
 
 impl DeriveMacroAttr {
-    fn from_input(input: TokenStream, kind: MacroType) -> proc_macro::TokenStream {
+    fn from_input(input: TokenStream, macro_type: MacroType) -> TokenStream {
+        // Parse the input into a DeriveInput
         let input: DeriveInput = syn::parse(input).expect("Unable to parse input");
 
-        let derive: Self =
-            <Self as FromAttr>::from_attributes(&input.attrs).unwrap_or_else(|err| {
-                panic!(
-                    "Invalid arguments for `{}` macro, {err}",
-                    kind.to_string().to_lowercase(),
-                );
-            });
+        // Create a DeriveMacroAttr from the input attributes
+        let derive = Self::from_attributes(&input.attrs).unwrap_or_else(|err| {
+            panic!(
+                "Invalid arguments for `{}` macro, {err}",
+                macro_type.to_string().to_lowercase(),
+            );
+        });
 
-        derive.generate(input, kind)
-    }
-
-    fn generate(&self, input: DeriveInput, kind: MacroType) -> proc_macro::TokenStream {
+        // Create the output token stream
         let mut output = proc_macro2::TokenStream::new();
 
-        output.extend(kind.generate_macro(self, &input));
-        output.extend(kind.generate_tests(self, &input));
+        // Generate the macro and tests
+        output.extend(macro_type.generate_macro(&derive, &input));
+        output.extend(macro_type.generate_tests(&derive, &input));
 
-        for test in &self.tests {
-            output.extend(test.generate_test(self, &input));
+        for test in derive.tests.iter() {
+            output.extend(test.generate_test(&derive, &input));
         }
 
         output.into()
