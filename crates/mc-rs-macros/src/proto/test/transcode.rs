@@ -66,8 +66,9 @@ impl TestTrait for VarTranscodeTest {
                 #[test]
                 fn #fn_name() {
                     use crate::buffer::{FromValue, VarDecode};
-                    let default = #ident::default();
+                    use pretty_assertions::assert_eq;
 
+                    let default = #ident::default();
                     let encoded = Vec::from_var_value(&default).unwrap();
                     let decoded = #ident::var_decode(&mut encoded.as_slice()).unwrap();
                     assert_eq!(default, decoded, "Decoded value does not match default encoded value");
@@ -82,6 +83,7 @@ impl TestTrait for VarTranscodeTest {
                     #[test]
                     fn #fn_name() {
                         use crate::{buffer::{FromValue, VarDecode}, types::wrappers::UnsizedByteBuffer};
+                        use pretty_assertions::assert_eq;
 
                         let mut bytes = UnsizedByteBuffer::from_vec(#bytes);
                         let decoded = #ident::var_decode(&mut bytes).unwrap();
