@@ -10,5 +10,5 @@ pub use game_mode::GameMode;
 mod difficulty;
 pub use difficulty::Difficulty;
 
-// mod hand;
-// pub use hand::Hand;
+mod hand;
+pub use hand::Hand;

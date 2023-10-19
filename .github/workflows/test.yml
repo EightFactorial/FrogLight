@@ -47,3 +47,6 @@ jobs:
 
       - name: Tests
         run: cargo nextest run --workspace --all-targets
+
+      - name: Doctests
+        run: cargo test --doc --workspace
