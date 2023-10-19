@@ -12,8 +12,8 @@ async-compression = { version = "0.4", features = ["futures-io", "zlib"] }
 async-net = "1.7"
 azalea-chat = { version = "0.8.0", default-features = false }
 azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
-bevy_ecs = "0.11.2"
-bevy_math = "0.11.2"
+bevy_ecs = "0.11"
+bevy_math = "0.11"
 byteorder = { version = "1.4", features = ["i128"] }
 compact_str = { version = "0.7", features = ["serde", "smallvec"] }
 derive_more = "0.99"
@@ -26,7 +26,7 @@ serde_json = { version = "1.0", features = ["preserve_order", "arbitrary_precisi
 smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }
 strum = { version = "0.25", features = ["derive"] }
 thiserror = "1.0"
-uuid = { version = "1.4", features = ["v3"] }
+uuid = { version = "1.5", features = ["v3", "bytemuck"] }
 
 [dev-dependencies]
 pretty_assertions = "1.4"

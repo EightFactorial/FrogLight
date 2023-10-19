@@ -63,7 +63,7 @@ serde_json = { version = "1.0", features = ["indexmap", "preserve_order"] }
 smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }
 strum = { version = "0.25", features = ["derive"] }
 toml = { version = "0.8", features = ["indexmap", "preserve_order"] }
-uuid = { version = "1.4", features = ["v3"] }
+uuid = { version = "1.5", features = ["v3", "bytemuck"] }
 
 # Enable wayland support on linux
 [target.'cfg(target_os = "linux")'.dependencies]
