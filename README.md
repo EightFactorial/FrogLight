@@ -1,6 +1,6 @@
 # MC-RS
 
-[![Tests](https://github.com/EightFactorial/MC-RS/actions/workflows/test.yml/badge.svg)](https://github.com/EightFactorial/MC-RS/actions/workflows/test.yml)
+[![Tests](https://github.com/EightFactorial/MC-RS/actions/workflows/test.yml/badge.svg)](https://github.com/EightFactorial/MC-RS/actions)
 
 A **highly work-in-progress** Minecraft client written in Rust using **[Bevy](https://bevyengine.org/)**.
 
