@@ -74,7 +74,7 @@ impl NetworkHandle for V1_20_0 {
         };
 
         // Get the ping
-        conn.send_packet(ServerboundQueryPingPacket::default())
+        conn.send_packet(ServerboundQueryPingPacket::unix_epoch())
             .await?;
         let ClientboundStatusPackets::QueryPong(ping_packet) = conn.receive_packet().await? else {
             error!("Expected ping response, got something else");
@@ -83,7 +83,7 @@ impl NetworkHandle for V1_20_0 {
 
         let ping = PingResponse {
             hostname: conn.hostname.clone(),
-            time: ping_packet.time,
+            time: *ping_packet,
         };
 
         Ok((status, ping))
@@ -104,10 +104,10 @@ impl NetworkHandle for V1_20_0 {
                     debug!("Received login encryption packet: {p:?}");
                 }
                 ClientboundLoginPackets::LoginSuccess(p) => {
-                    break p.profile;
+                    break p.into();
                 }
                 ClientboundLoginPackets::LoginCompression(p) => {
-                    conn.compression = Some(p.threshold);
+                    conn.compression = Some(*p);
                 }
                 ClientboundLoginPackets::LoginQueryRequest(p) => {
                     debug!("Received login query: {p:?}");

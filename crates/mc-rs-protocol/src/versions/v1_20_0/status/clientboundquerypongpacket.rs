@@ -1,17 +1,6 @@
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundQueryPongPacket {
-    pub time: u64,
-}
-
-#[test]
-fn test_packet() {
-    use crate::buffer::Encode;
-
-    let mut buf = Vec::new();
-    let packet = ClientboundQueryPongPacket { time: 1 };
-
-    assert!(packet.encode(&mut buf).is_ok());
-    assert_eq!(buf, vec![0, 0, 0, 0, 0, 0, 0, 1]);
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deref, DerefMut, From, Into, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 1])]
+pub struct ClientboundQueryPongPacket(u64);

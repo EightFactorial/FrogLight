@@ -1,13 +1,13 @@
 use azalea_chat::FormattedText;
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Transcode)]
 pub struct ClientboundLoginDisconnectPacket {
     pub reason: FormattedText,
 }
 
 #[test]
-fn test_packet() {
+fn clientbound_login_disconnect_packet_test() {
     use crate::buffer::Encode;
 
     let mut buf = Vec::new();

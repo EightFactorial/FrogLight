@@ -19,20 +19,21 @@ pub struct ClientboundQueryResponsePacket {
     pub enforces_secure_chat: Option<bool>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct QueryVersion {
     pub name: FormattedText,
     pub protocol: i32,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct QueryPlayers {
     pub max: i32,
     pub online: i32,
     #[serde(default)]
     pub sample: Vec<QuerySamplePlayer>,
 }
-#[derive(Clone, Debug, Serialize, Deserialize)]
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct QuerySamplePlayer {
     pub uuid: Uuid,
     pub name: String,

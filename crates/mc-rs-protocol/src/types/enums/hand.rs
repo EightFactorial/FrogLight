@@ -7,4 +7,3 @@ pub enum Hand {
     #[default]
     Right,
 }
- 

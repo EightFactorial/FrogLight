@@ -1,6 +1,6 @@
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Eq, Transcode)]
 pub struct ClientboundLoginHelloPacket {
     pub server_id: String,
     pub public_key: Vec<u8>,
@@ -8,7 +8,7 @@ pub struct ClientboundLoginHelloPacket {
 }
 
 #[test]
-fn test_packet() {
+fn clientbound_login_hello_packet_test() {
     use crate::buffer::Encode;
 
     let mut buf = Vec::new();

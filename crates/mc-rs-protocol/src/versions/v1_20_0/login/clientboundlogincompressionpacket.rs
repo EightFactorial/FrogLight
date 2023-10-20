@@ -1,18 +1,6 @@
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundLoginCompressionPacket {
-    #[var]
-    pub threshold: i32,
-}
-
-#[test]
-fn test_packet() {
-    use crate::buffer::Encode;
-
-    let mut buf = Vec::new();
-    let packet = ClientboundLoginCompressionPacket { threshold: 256 };
-
-    assert!(packet.encode(&mut buf).is_ok());
-    assert_eq!(buf, vec![128, 2]);
-}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deref, DerefMut, From, Into, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [128, 2])]
+pub struct ClientboundLoginCompressionPacket(#[var] i32);
