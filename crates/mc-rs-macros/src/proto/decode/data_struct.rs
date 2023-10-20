@@ -46,7 +46,11 @@ pub(super) fn decode_struct(input: &DeriveInput) -> TokenStream {
                 ))
             }
         }
-        Fields::Unit => panic!("Cannot derive `Decode` for a unit struct"),
+        Fields::Unit => {
+            quote! {
+                Ok(Self)
+            }
+        }
     };
 
     // Finish the impl
