@@ -3,7 +3,8 @@ use uuid::Uuid;
 
 use crate::types::{EntityId, Vec3};
 
-#[derive(Debug, Clone, Transcode)]
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, Copy, PartialEq, Transcode)]
 pub struct ClientboundEntitySpawnPacket {
     pub entity_id: EntityId,
     pub uuid: Uuid,

@@ -3,7 +3,8 @@ use mc_rs_macros::Transcode;
 
 use crate::types::EntityId;
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, Copy, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])]
 pub struct ClientboundEntityPositionPacket {
     pub entity_id: EntityId,
     pub position: Vec3,

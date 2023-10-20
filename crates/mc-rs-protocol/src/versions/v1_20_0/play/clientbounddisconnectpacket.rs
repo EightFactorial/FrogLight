@@ -1,6 +1,7 @@
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundDisconnectPacket {
-    pub message: String,
-}
+// TODO: Verify that this is String and not FormattedText
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, From, Into, Transcode)]
+pub struct ClientboundDisconnectPacket(String);

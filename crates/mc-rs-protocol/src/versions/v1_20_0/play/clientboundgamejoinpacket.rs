@@ -5,7 +5,8 @@ use mc_rs_macros::Transcode;
 
 use crate::types::{enums::GameMode, position::GlobalPos, ResourceLocation};
 
-#[derive(Clone, Transcode)]
+// TODO: Create tests for this packet.
+#[derive(Clone, PartialEq, Transcode)]
 pub struct ClientboundGameJoinPacket {
     pub player_id: u32,
     pub hardcore: bool,

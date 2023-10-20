@@ -89,7 +89,7 @@ impl Network for V1_20_0 {
                 let mut state = SystemState::<ResMut<ConnectionChannel<Self>>>::new(world);
                 state
                     .get_mut(world)
-                    .send_play(ServerboundKeepAlivePacket { id: p.id });
+                    .send_play(ServerboundKeepAlivePacket::from(p));
             }
             ClientboundPlayPackets::ChunkData(p) => {
                 let mut state = SystemState::<(Res<Worlds>, Option<Res<CurrentWorld>>)>::new(world);

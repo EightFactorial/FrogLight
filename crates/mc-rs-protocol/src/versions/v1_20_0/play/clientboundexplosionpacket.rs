@@ -2,7 +2,8 @@ use mc_rs_macros::Transcode;
 
 use crate::types::{position::BlockPos, Vec3};
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ClientboundExplosionPacket {
     pub position: Vec3,
     pub power: f32,

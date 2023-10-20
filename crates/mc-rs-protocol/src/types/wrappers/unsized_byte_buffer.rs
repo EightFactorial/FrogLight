@@ -6,7 +6,7 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError, FromValue, VarEnco
 
 /// A buffer that contains encoded data.
 ///
-/// Unlike a [`Vec<T>`], when encoded it is not prefixed with a length.
+/// Unlike a [`Vec<u8>`], when encoded it is not prefixed with a length.
 ///
 /// When used as a field in a packet, the buffer takes up the entire remaining space of the packet.
 ///

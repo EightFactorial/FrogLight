@@ -1,4 +1,5 @@
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundEnterCombatPacket {}
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [])]
+pub struct ClientboundEnterCombatPacket;

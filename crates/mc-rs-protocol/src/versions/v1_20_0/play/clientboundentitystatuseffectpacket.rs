@@ -3,7 +3,8 @@ use mc_rs_macros::Transcode;
 
 use crate::types::{EntityId, ResourceLocation};
 
-#[derive(Debug, Clone, Transcode)]
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, PartialEq, Transcode)]
 pub struct ClientboundEntityStatusEffectPacket {
     pub entity_id: EntityId,
     pub effect: ResourceLocation,

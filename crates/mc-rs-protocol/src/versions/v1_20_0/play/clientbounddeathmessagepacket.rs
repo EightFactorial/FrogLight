@@ -1,8 +1,12 @@
+use azalea_chat::FormattedText;
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
+use crate::types::EntityId;
+
+// TODO: Verify that this is FormattedText and not String
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, PartialEq, Transcode)]
 pub struct ClientboundDeathMessagePacket {
-    #[var]
-    pub player_id: u32,
-    pub message: String,
+    pub player_id: EntityId,
+    pub message: FormattedText,
 }

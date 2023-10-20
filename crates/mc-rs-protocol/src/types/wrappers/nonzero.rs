@@ -146,7 +146,7 @@ impl<T: Encode + Clone + PartialEq + Add<Output = T> + From<u8>> Encode for NonZ
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         match &self.0 {
             Some(val) => val.clone().add(T::from(1)).encode(buf),
-            None => 0u32.encode(buf),
+            None => T::from(0).encode(buf),
         }
     }
 }
@@ -155,7 +155,7 @@ impl<T: VarEncode + Clone + PartialEq + Add<Output = T> + From<u8>> VarEncode fo
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {
         match &self.0 {
             Some(val) => val.clone().add(T::from(1)).var_encode(buf),
-            None => 0u32.var_encode(buf),
+            None => T::from(0).var_encode(buf),
         }
     }
 }

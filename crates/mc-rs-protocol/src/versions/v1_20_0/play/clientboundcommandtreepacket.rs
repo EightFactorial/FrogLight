@@ -1,9 +1,9 @@
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
 use crate::types::UnsizedByteBuffer;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundCommandTreePacket {
-    // TODO: Parse data
-    pub data: UnsizedByteBuffer,
-}
+// TODO: Parse this packet
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, From, Into, Transcode)]
+pub struct ClientboundCommandTreePacket(UnsizedByteBuffer);

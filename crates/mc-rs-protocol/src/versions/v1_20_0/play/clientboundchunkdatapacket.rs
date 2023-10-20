@@ -4,6 +4,8 @@ use mc_rs_macros::Transcode;
 
 use crate::types::{packets::chunk_data::ChunkDataPacket, position::ChunkPos, UnsizedByteBuffer};
 
+// TODO: Parse this packet
+// TODO: Create a test for this packet
 #[derive(Clone, Transcode)]
 pub struct ClientboundChunkDataPacket {
     pub position: ChunkPos,

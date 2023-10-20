@@ -7,7 +7,7 @@ use crate::{
     types::inventory::ItemSlot,
 };
 
-#[derive(Debug, Clone, Deref, DerefMut, From, Into)]
+#[derive(Debug, Clone, PartialEq, Deref, DerefMut, From, Into)]
 pub struct EntityEquipment(pub Vec<(EquipmentSlot, ItemSlot)>);
 
 impl Encode for EntityEquipment {

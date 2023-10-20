@@ -2,7 +2,7 @@ use azalea_chat::FormattedText;
 use azalea_nbt::Nbt;
 use bevy_math::Quat;
 use derive_more::{Deref, DerefMut};
-use mc_rs_macros::Transcode;
+use mc_rs_macros::{Test, Transcode};
 use uuid::Uuid;
 
 use crate::{
@@ -17,7 +17,8 @@ use crate::{
 
 use super::{merchant::MerchantData, particle::Particle};
 
-#[derive(Debug, Clone, PartialEq, Deref, DerefMut)]
+#[derive(Debug, Clone, PartialEq, Deref, DerefMut, Test)]
+#[mctest(tests = ["transcode", "decode"], bytes = [1, 12, 1, 255])]
 pub struct EntityDataVec(pub Vec<EntityDataItem>);
 
 impl Encode for EntityDataVec {
@@ -26,7 +27,7 @@ impl Encode for EntityDataVec {
             item.index.encode(buf)?;
             item.value.encode(buf)?;
         }
-        0xff.encode(buf)?;
+        0xffu8.encode(buf)?;
         Ok(())
     }
 }

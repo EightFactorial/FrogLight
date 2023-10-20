@@ -3,14 +3,16 @@ use uuid::Uuid;
 
 use crate::types::ResourceLocation;
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct EntityAttribute {
     pub attribute: ResourceLocation,
     pub base: f64,
     pub modifiers: Vec<AttributeModifier>,
 }
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct AttributeModifier {
     pub uuid: Uuid,
     pub amount: f64,

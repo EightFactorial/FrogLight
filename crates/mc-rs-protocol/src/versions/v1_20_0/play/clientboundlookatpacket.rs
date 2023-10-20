@@ -5,7 +5,8 @@ use crate::types::{
     Vec3,
 };
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, Copy, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 32, 1])]
 pub struct ClientboundLookAtPacket {
     pub anchor: LookAnchor,
     pub position: Vec3,
