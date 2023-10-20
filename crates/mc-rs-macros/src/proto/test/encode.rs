@@ -12,9 +12,9 @@ impl TestTrait for EncodeTest {
         let ident = &input.ident;
         let fn_name = self.test_name(&input.ident);
 
-        match attr.bytes.is_empty() {
+        match &attr.bytes {
             // Get the default value of the type, encode it to bytes.
-            true => {
+            None => {
                 quote! {
                     #[test]
                     fn #fn_name() {
@@ -25,8 +25,8 @@ impl TestTrait for EncodeTest {
             }
             // Encode the default value of the type to bytes.
             // Then compare the encoded bytes to the expected bytes.
-            false => {
-                let bytes = bytes_to_tokenstream(&attr.bytes);
+            Some(bytes) => {
+                let bytes = bytes_to_tokenstream(bytes);
 
                 quote! {
                     #[test]
@@ -50,9 +50,9 @@ impl TestTrait for VarEncodeTest {
         let ident = &input.ident;
         let fn_name = self.test_name(&input.ident);
 
-        match attr.bytes.is_empty() {
+        match &attr.bytes {
             // Get the default value of the type, var_encode it to bytes.
-            true => {
+            None => {
                 quote! {
                     #[test]
                     fn #fn_name() {
@@ -63,8 +63,8 @@ impl TestTrait for VarEncodeTest {
             }
             // Var_encode the default value of the type to bytes.
             // Then compare the var_encoded bytes to the expected bytes.
-            false => {
-                let bytes = bytes_to_tokenstream(&attr.bytes);
+            Some(bytes) => {
+                let bytes = bytes_to_tokenstream(bytes);
 
                 quote! {
                     #[test]

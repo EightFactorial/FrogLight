@@ -12,11 +12,11 @@ impl TestTrait for TranscodeTest {
         let ident = &input.ident;
         let fn_name = self.test_name(&input.ident);
 
-        match attr.bytes.is_empty() {
+        match &attr.bytes {
             // Get the default value of the type,
             // encode it to bytes, then decode it back to the type.
             // Then compare the decoded value to the default value.
-            true => quote! {
+            None => quote! {
                 #[test]
                 fn #fn_name() {
                     use crate::buffer::{FromValue, Decode};
@@ -30,13 +30,13 @@ impl TestTrait for TranscodeTest {
             },
             // Decode the bytes into the type, then encode the type back to bytes.
             // Then compare the encoded bytes to the expected bytes.
-            false => {
-                let bytes = bytes_to_tokenstream(&attr.bytes);
+            Some(bytes) => {
+                let bytes = bytes_to_tokenstream(bytes);
 
                 quote! {
                     #[test]
                     fn #fn_name() {
-                        use crate::{buffer::{FromValue, Decode}, types::wrappers::UnsizedByteBuffer};
+                        use crate::{buffer::{FromValue, Decode}, types::UnsizedByteBuffer};
                         use pretty_assertions::assert_eq;
 
                         let mut bytes = UnsizedByteBuffer::from_vec(#bytes);
@@ -58,11 +58,11 @@ impl TestTrait for VarTranscodeTest {
         let ident = &input.ident;
         let fn_name = self.test_name(&input.ident);
 
-        match attr.bytes.is_empty() {
+        match &attr.bytes {
             // Get the default value of the type,
             // var_encode it to bytes, then var_decode it back to the type.
             // Then compare the var_decoded value to the default value.
-            true => quote! {
+            None => quote! {
                 #[test]
                 fn #fn_name() {
                     use crate::buffer::{FromValue, VarDecode};
@@ -76,13 +76,13 @@ impl TestTrait for VarTranscodeTest {
             },
             // Var_decode the bytes into the type, then var_encode the type back to bytes.
             // Then compare the var_encoded bytes to the expected bytes.
-            false => {
-                let bytes = bytes_to_tokenstream(&attr.bytes);
+            Some(bytes) => {
+                let bytes = bytes_to_tokenstream(bytes);
 
                 quote! {
                     #[test]
                     fn #fn_name() {
-                        use crate::{buffer::{FromValue, VarDecode}, types::wrappers::UnsizedByteBuffer};
+                        use crate::{buffer::{FromValue, VarDecode}, types::UnsizedByteBuffer};
                         use pretty_assertions::assert_eq;
 
                         let mut bytes = UnsizedByteBuffer::from_vec(#bytes);

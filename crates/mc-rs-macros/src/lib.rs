@@ -60,7 +60,7 @@ struct DeriveMacroAttr {
 
     /// Bytes to be used to verify different tests
     #[attribute(optional)]
-    bytes: Vec<u8>,
+    bytes: Option<Vec<u8>>,
 }
 
 impl DeriveMacroAttr {

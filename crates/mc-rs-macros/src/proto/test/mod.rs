@@ -82,9 +82,14 @@ impl ConvertParsed for TestType {
 
 /// Convert a byte slice to a token stream
 fn bytes_to_tokenstream(bytes: &[u8]) -> TokenStream {
-    let bytes = bytes.iter().map(|byte| quote!(#byte));
+    match bytes.len() {
+        0 => quote! { Vec::<u8>::new() },
+        _ => {
+            let bytes = bytes.iter().map(|byte| quote!(#byte));
 
-    quote! {
-        vec![#(#bytes),*]
+            quote! {
+                vec![#(#bytes),*]
+            }
+        }
     }
 }
