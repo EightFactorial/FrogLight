@@ -1,7 +1,6 @@
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundWorldBorderWarningBlocksChangedPacket {
-    #[var]
-    pub warning_distance: u32,
-}
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Deref, DerefMut, From, Into, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
+pub struct ClientboundWorldBorderWarningBlocksChangedPacket(#[var] u32);

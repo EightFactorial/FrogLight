@@ -4,7 +4,8 @@ use uuid::Uuid;
 
 use crate::types::EntityId;
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, Copy, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1])]
 pub struct ClientboundPlayerSpawnPacket {
     pub entity_id: EntityId,
     pub uuid: Uuid,

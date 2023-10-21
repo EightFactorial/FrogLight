@@ -1,7 +1,7 @@
 use mc_rs_macros::Transcode;
 use strum::EnumString;
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Eq, Transcode)]
 #[mctest(tests = ["transcode", "decode"], bytes = [2, 5, 77, 67, 45, 82, 83, 0])]
 pub enum ObjectiveUpdate {
     Add(ObjectiveInfo),

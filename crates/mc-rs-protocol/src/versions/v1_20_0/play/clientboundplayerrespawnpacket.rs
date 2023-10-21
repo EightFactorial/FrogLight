@@ -2,7 +2,8 @@ use mc_rs_macros::Transcode;
 
 use crate::types::{enums::GameMode, position::GlobalPos, ResourceLocation};
 
-#[derive(Debug, Clone, Transcode)]
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, PartialEq, Eq, Transcode)]
 pub struct ClientboundPlayerRespawnPacket {
     pub dimension_type: ResourceLocation,
     pub dimension: ResourceLocation,

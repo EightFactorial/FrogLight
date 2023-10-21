@@ -1,6 +1,7 @@
+use azalea_chat::FormattedText;
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundOverlayMessagePacket {
-    pub text: String,
-}
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, PartialEq, Deref, DerefMut, From, Into, Transcode)]
+pub struct ClientboundOverlayMessagePacket(FormattedText);

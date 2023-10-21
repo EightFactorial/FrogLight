@@ -1,6 +1,7 @@
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, Copy, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ClientboundWorldBorderInitializePacket {
     pub center_x: f64,
     pub center_z: f64,

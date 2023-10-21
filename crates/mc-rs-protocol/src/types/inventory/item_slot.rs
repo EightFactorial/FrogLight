@@ -1,12 +1,22 @@
 use azalea_nbt::Nbt;
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Default, PartialEq, Clone, Transcode)]
+#[derive(Debug, Default, Clone, Transcode)]
 #[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub enum ItemSlot {
     #[default]
     Empty,
     Item(ItemSlotData),
+}
+
+impl PartialEq for ItemSlot {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Empty, Self::Empty) => true,
+            (Self::Item(l0), Self::Item(r0)) => l0 == r0,
+            (Self::Item(item), Self::Empty) | (Self::Empty, Self::Item(item)) => item.is_empty(),
+        }
+    }
 }
 
 impl ItemSlot {

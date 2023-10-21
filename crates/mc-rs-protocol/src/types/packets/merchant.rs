@@ -2,6 +2,7 @@ use mc_rs_macros::Transcode;
 
 use crate::types::inventory::ItemSlot;
 
+// TODO: Create a test for this
 #[derive(Clone, Debug, PartialEq, Transcode)]
 pub struct MerchantOffer {
     pub base_cost_a: ItemSlot,
@@ -16,7 +17,7 @@ pub struct MerchantOffer {
     pub demand: u32,
 }
 
-#[derive(Clone, Debug, PartialEq, Transcode)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Transcode)]
 #[mctest(tests = ["transcode", "decode"], bytes = [0, 1, 2])]
 pub struct MerchantData {
     #[var]

@@ -1,6 +1,6 @@
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
-pub struct ClientboundWorldBorderSizeChangedPacket {
-    pub size: f64,
-}
+#[derive(Debug, Default, Clone, Copy, PartialEq, Deref, DerefMut, From, Into, Transcode)]
+#[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
+pub struct ClientboundWorldBorderSizeChangedPacket(f64);

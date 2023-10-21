@@ -1,8 +1,5 @@
-use mc_rs_macros::Transcode;
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Transcode)]
-#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 64])]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScoreboardUpdate {
-    Change(u32),
+    Change(i32),
     Remove,
 }

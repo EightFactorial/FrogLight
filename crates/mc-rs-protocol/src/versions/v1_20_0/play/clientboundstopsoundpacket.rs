@@ -1,7 +1,9 @@
 use crate::types::UnsizedByteBuffer;
 use mc_rs_macros::Transcode;
 
-#[derive(Debug, Clone, Transcode)]
+// TODO: Parse this packet
+// TODO: Create a test for this packet
+#[derive(Debug, Clone, PartialEq, Transcode)]
 pub struct ClientboundStopSoundPacket {
     pub data: UnsizedByteBuffer,
     // pub flags: u8,
