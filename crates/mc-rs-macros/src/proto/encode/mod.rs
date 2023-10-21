@@ -30,42 +30,70 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     continue;
                 };
 
-                if field.attrs.iter().any(|f| {
+                let mut tokens = if field.attrs.iter().any(|f| {
                     if let Meta::Path(path) = &f.meta {
                         path.is_ident("var")
                     } else {
                         false
                     }
                 }) {
-                    field_list.push(quote! {
-                        crate::buffer::VarEncode::var_encode(&self.#name, buf)?;
-                    });
+                    quote! {
+                        crate::buffer::VarEncode::var_encode(&self.#name, buf)
+                    }
                 } else {
-                    field_list.push(quote! {
-                        crate::buffer::Encode::encode(&self.#name, buf)?;
-                    });
+                    quote! {
+                        crate::buffer::Encode::encode(&self.#name, buf)
+                    }
+                };
+
+                match cfg!(feature = "debug") {
+                    false => tokens.extend(quote!(?;)),
+                    true => tokens.extend(quote! {
+                        .map_err(|e| {
+                            log::error!("Failed to encode field {}: {:?}", stringify!(#name), e);
+                            e
+                        })?;
+                    }),
                 }
+
+                field_list.push(tokens);
             }
         }
         Fields::Unnamed(fields) => {
             for (i, field) in fields.unnamed.iter().enumerate() {
                 let index = Index::from(i);
 
-                if field.attrs.iter().any(|f| {
+                let mut tokens = if field.attrs.iter().any(|f| {
                     if let Meta::Path(path) = &f.meta {
                         path.is_ident("var")
                     } else {
                         false
                     }
                 }) {
-                    field_list.push(quote! {
-                        crate::buffer::VarEncode::var_encode(&self.#index, buf)?;
-                    });
+                    quote! {
+                        crate::buffer::VarEncode::var_encode(&self.#index, buf)
+                    }
                 } else {
-                    field_list.push(quote! {
-                        crate::buffer::Encode::encode(&self.#index, buf)?;
-                    });
+                    quote! {
+                        crate::buffer::Encode::encode(&self.#index, buf)
+                    }
+                };
+
+                match cfg!(feature = "debug") {
+                    false => tokens.extend(quote!(?;)),
+                    true => {
+                        let ty = &field.ty;
+
+                        tokens.extend(quote! {
+                            .map_err(|e| {
+                                log::error!("Failed to encode type {}: {:?}", stringify!(#ty), e);
+                                e
+                            })?;
+                        });
+                    }
                 }
+
+                field_list.push(tokens);
             }
         }
         Fields::Unit => {}

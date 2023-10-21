@@ -30,40 +30,68 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     continue;
                 };
 
-                if field.attrs.iter().any(|f| {
+                let mut tokens = if field.attrs.iter().any(|f| {
                     if let Meta::Path(path) = &f.meta {
                         path.is_ident("var")
                     } else {
                         false
                     }
                 }) {
-                    field_list.push(quote! {
-                        #name: crate::buffer::VarDecode::var_decode(buf)?,
-                    });
+                    quote! {
+                        #name: crate::buffer::VarDecode::var_decode(buf)
+                    }
                 } else {
-                    field_list.push(quote! {
-                        #name: crate::buffer::Decode::decode(buf)?,
-                    });
+                    quote! {
+                        #name: crate::buffer::Decode::decode(buf)
+                    }
+                };
+
+                match cfg!(feature = "debug") {
+                    false => tokens.extend(quote!(?,)),
+                    true => tokens.extend(quote! {
+                        .map_err(|e| {
+                            log::error!("Failed to decode field {}: {:?}", stringify!(#name), e);
+                            e
+                        })?,
+                    }),
                 }
+
+                field_list.push(tokens);
             }
         }
         Fields::Unnamed(fields) => {
             for field in fields.unnamed.iter() {
-                if field.attrs.iter().any(|f| {
+                let mut tokens = if field.attrs.iter().any(|f| {
                     if let Meta::Path(path) = &f.meta {
                         path.is_ident("var")
                     } else {
                         false
                     }
                 }) {
-                    field_list.push(quote! {
-                        crate::buffer::VarDecode::var_decode(buf)?,
-                    });
+                    quote! {
+                        crate::buffer::VarDecode::var_decode(buf)
+                    }
                 } else {
-                    field_list.push(quote! {
-                        crate::buffer::Decode::decode(buf)?,
-                    });
+                    quote! {
+                        crate::buffer::Decode::decode(buf)
+                    }
+                };
+
+                match cfg!(feature = "debug") {
+                    false => tokens.extend(quote!(?,)),
+                    true => {
+                        let ty = &field.ty;
+
+                        tokens.extend(quote! {
+                            .map_err(|e| {
+                                log::error!("Failed to decode type {}: {:?}", stringify!(#ty), e);
+                                e
+                            })?,
+                        });
+                    }
                 }
+
+                field_list.push(tokens);
             }
         }
         Fields::Unit => {}
