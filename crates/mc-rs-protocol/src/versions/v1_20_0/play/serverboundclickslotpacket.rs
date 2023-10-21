@@ -3,7 +3,8 @@ use mc_rs_macros::Transcode;
 
 use crate::types::{inventory::ItemSlot, packets::inventory::ClickType};
 
-#[derive(Debug, Clone, Transcode)]
+#[derive(Debug, Clone, PartialEq, Transcode)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ServerboundClickSlotPacket {
     pub container_id: u8,
     #[var]

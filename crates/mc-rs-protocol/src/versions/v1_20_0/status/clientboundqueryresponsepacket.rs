@@ -40,7 +40,7 @@ pub struct QuerySamplePlayer {
 }
 
 #[test]
-fn test_packet() {
+fn clientbound_query_response_packet_test() {
     use crate::{buffer::Encode, traits::Version, versions::v1_20_0::V1_20_0};
 
     let mut buf = Vec::new();

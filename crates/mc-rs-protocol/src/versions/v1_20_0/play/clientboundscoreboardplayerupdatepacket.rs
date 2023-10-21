@@ -1,3 +1,4 @@
+use compact_str::CompactString;
 use mc_rs_macros::Test;
 
 use crate::{
@@ -8,9 +9,9 @@ use crate::{
 #[derive(Debug, Clone, PartialEq, Eq, Test)]
 #[mctest(tests = ["transcode", "decode"], bytes = [4, 84, 101, 115, 116, 1, 1, 4, 84, 101, 115, 116, 64])]
 pub struct ClientboundScoreboardPlayerUpdatePacket {
-    pub entity_name: String,
+    pub entity_name: CompactString,
     pub update_method: ScoreboardUpdate,
-    pub objective_name: Option<String>,
+    pub objective_name: Option<CompactString>,
 }
 
 impl Encode for ClientboundScoreboardPlayerUpdatePacket {
@@ -38,9 +39,9 @@ impl Encode for ClientboundScoreboardPlayerUpdatePacket {
 
 impl Decode for ClientboundScoreboardPlayerUpdatePacket {
     fn decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
-        let entity_name = String::decode(buf)?;
+        let entity_name = CompactString::decode(buf)?;
         let update_method = u8::decode(buf)?;
-        let objective_name = Option::<String>::decode(buf)?;
+        let objective_name = Option::<CompactString>::decode(buf)?;
 
         Ok(Self {
             entity_name,

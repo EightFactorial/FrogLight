@@ -174,7 +174,7 @@ impl Network for V1_20_0 {
                     Query<&mut Transform, (Without<LocalPlayer>, With<LocalPlayerHead>)>,
                 )>::new(world);
                 let (mut channel, mut player, mut head) = state.get_mut(world);
-                channel.send_play(ServerboundTeleportConfirmPacket { id: p.id });
+                channel.send_play(ServerboundTeleportConfirmPacket::from(p.id));
 
                 // Update the player posiiton
                 let mut transform = player.single_mut();

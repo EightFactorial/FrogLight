@@ -1,3 +1,4 @@
+use compact_str::CompactString;
 use mc_rs_macros::Transcode;
 
 #[derive(Debug, Clone, PartialEq, Transcode)]
@@ -6,14 +7,14 @@ pub enum BossBarAction {
     Add(BossAddAction),
     Remove,
     UpdateProgress(f32),
-    UpdateName(String),
+    UpdateName(CompactString),
     UpdateStyle(BossBarStyle),
     UpdateFlags(BossBarFlags),
 }
 
 #[derive(Debug, Clone, PartialEq, Transcode)]
 pub struct BossAddAction {
-    pub name: String,
+    pub name: CompactString,
     pub progress: f32,
     pub style: BossBarStyle,
     pub flags: BossBarFlags,

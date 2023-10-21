@@ -1,4 +1,4 @@
-use mc_rs_macros::Transcode;
+use mc_rs_macros::{Test, Transcode};
 
 use crate::{
     buffer::{Decode, Encode},
@@ -21,7 +21,8 @@ pub enum InteractionHand {
     OffHand,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Test)]
+#[mctest(tests = ["transcode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct BlockHitResult {
     pub position: BlockPos,
     pub direction: Direction,
