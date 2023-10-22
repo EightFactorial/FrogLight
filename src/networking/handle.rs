@@ -2,8 +2,8 @@
 
 use std::{future::join, sync::Arc};
 
-use async_trait::async_trait;
 use flume::{Receiver, Sender};
+use futures_lite::Future;
 use futures_locks::Mutex;
 use log::error;
 use mc_rs_protocol::{
@@ -18,7 +18,6 @@ use super::request::{PingResponse, StatusResponse};
 ///
 /// Each version of the protocol has a different implementation of this trait
 /// using the appropriate packets for that [Version].
-#[async_trait]
 pub trait NetworkHandle: Version + Send + Sync + 'static
 where
     Handshake: State<Self>,
@@ -28,69 +27,62 @@ where
     Play: State<Self>,
 {
     /// Handle connections in the handshake state
-    async fn handshake_handle(
+    fn handshake_handle(
         conn: Connection<Self, Handshake>,
         intention: ConnectionIntent,
-    ) -> Result<Connection<Self, Handshake>, ConnectionError>;
+    ) -> impl Future<Output = Result<Connection<Self, Handshake>, ConnectionError>> + Send;
 
     /// Handle connections in the status state
-    async fn status_handle(
+    fn status_handle(
         conn: Connection<Self, Status>,
-    ) -> Result<(StatusResponse, PingResponse), ConnectionError>;
+    ) -> impl Future<Output = Result<(StatusResponse, PingResponse), ConnectionError>> + Send;
 
     /// Handle connections in the login state
-    async fn login_handle(
+    fn login_handle(
         conn: Connection<Self, Login>,
-    ) -> Result<(Connection<Self, Login>, GameProfile), ConnectionError>;
+    ) -> impl Future<Output = Result<(Connection<Self, Login>, GameProfile), ConnectionError>> + Send;
 
     /// Handle connections in the play/configuration states
-    async fn packet_handle(
+    fn packet_handle(
         conn: ConnectionEnum<Self>,
         tx: Sender<Result<ConnectionData<Self>, ConnectionError>>,
         rx: Receiver<ConnectionSend<Self>>,
-    ) {
-        let conn = Arc::new(Mutex::new(conn));
-        join!(
-            Self::conn_read(conn.clone(), tx),
-            Self::conn_write(conn, rx)
-        )
-        .await;
-    }
+    ) -> impl Future<Output = ()> + Send {
+        async move {
+            let conn = Arc::new(Mutex::new(conn));
 
-    /// Reads packets from the connection and sends them to the channel
-    async fn conn_read(
-        conn: Arc<Mutex<ConnectionEnum<Self>>>,
-        tx: Sender<Result<ConnectionData<Self>, ConnectionError>>,
-    ) {
-        loop {
-            if let Err(err) = tx
-                .send_async(conn.lock().await.receive_packet().await)
-                .await
-            {
-                error!("Failed to send packet through channel: {err}");
-                return;
-            }
-        }
-    }
-
-    /// Writes packets from the channel and sends them to the connection
-    async fn conn_write(
-        conn: Arc<Mutex<ConnectionEnum<Self>>>,
-        rx: Receiver<ConnectionSend<Self>>,
-    ) {
-        loop {
-            match rx.recv_async().await {
-                Ok(data) => {
-                    if let Err(e) = conn.lock().await.send_packet(data).await {
-                        error!("Failed to send packet to server: {:?}", e);
-                        return;
+            join!(
+                // Receive packets from the connection and send them through the channel
+                async {
+                    loop {
+                        if let Err(err) = tx
+                            .send_async(conn.lock().await.receive_packet().await)
+                            .await
+                        {
+                            error!("Failed to send packet through channel: {err}");
+                            return;
+                        }
+                    }
+                },
+                // Receive packets from the channel and send them through the connection
+                async {
+                    loop {
+                        match rx.recv_async().await {
+                            Ok(data) => {
+                                if let Err(e) = conn.lock().await.send_packet(data).await {
+                                    error!("Failed to send packet to server: {:?}", e);
+                                    return;
+                                }
+                            }
+                            Err(err) => {
+                                error!("Failed to receive packet from channel: {err}");
+                                return;
+                            }
+                        }
                     }
                 }
-                Err(err) => {
-                    error!("Failed to receive packet from channel: {err}");
-                    return;
-                }
-            }
+            )
+            .await;
         }
     }
 }

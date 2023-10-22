@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use bevy::utils::HashMap;
 use log::{debug, error};
 use mc_rs_protocol::{
@@ -29,7 +28,6 @@ use super::{
 mod network;
 mod palette;
 
-#[async_trait]
 impl NetworkHandle for V1_20_0 {
     async fn handshake_handle(
         mut conn: Connection<Self, Handshake>,

@@ -38,7 +38,6 @@ vergen = { version = "8.2.5", features = ["build", "cargo", "git", "gitoxide"] }
 [dependencies]
 anyhow = "1.0"
 async-net = "1.8"
-async-trait = "0.1"
 azalea-chat = { version = "0.8.0", default-features = false }
 azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 belly = { version = "0.3.0", git = "https://github.com/EightFactorial/belly.git" }

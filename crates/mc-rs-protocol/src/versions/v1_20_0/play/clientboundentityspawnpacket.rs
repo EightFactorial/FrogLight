@@ -16,7 +16,7 @@ pub struct ClientboundEntitySpawnPacket {
     pub head_yaw: i8,
     #[var]
     pub data: i32,
-    pub x_vel: i16,
-    pub y_vel: i16,
-    pub z_vel: i16,
+    pub velocity_x: i16,
+    pub velocity_y: i16,
+    pub velocity_z: i16,
 }
