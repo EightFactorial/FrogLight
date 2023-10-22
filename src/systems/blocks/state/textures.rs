@@ -105,18 +105,18 @@ impl BlockTextures {
     fn get_texture_object(&self, direction: &Direction) -> Option<&BlockTexture> {
         match self.pattern {
             BlockTexturePattern::None | BlockTexturePattern::Custom => None,
-            BlockTexturePattern::Single => self.textures.get(0),
+            BlockTexturePattern::Single => self.textures.first(),
             BlockTexturePattern::TopBottom => match direction {
-                Direction::Up | Direction::Down => self.textures.get(0),
+                Direction::Up | Direction::Down => self.textures.first(),
                 _ => self.textures.get(1),
             },
             BlockTexturePattern::TopBottomSides => match direction {
-                Direction::Up => self.textures.get(0),
+                Direction::Up => self.textures.first(),
                 Direction::Down => self.textures.get(1),
                 _ => self.textures.get(2),
             },
             BlockTexturePattern::All => match direction {
-                Direction::Up => self.textures.get(0),
+                Direction::Up => self.textures.first(),
                 Direction::Down => self.textures.get(1),
                 Direction::North => self.textures.get(2),
                 Direction::South => self.textures.get(3),
