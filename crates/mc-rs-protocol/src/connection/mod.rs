@@ -1,11 +1,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use std::{
-    collections::VecDeque,
-    io::{Cursor, Read},
-    marker::PhantomData,
-};
+use std::{collections::VecDeque, io::Cursor, marker::PhantomData};
 
 use async_compression::futures::{bufread::ZlibDecoder, write::ZlibEncoder};
 use async_net::{AsyncToSocketAddrs, SocketAddr, TcpStream};
@@ -135,8 +131,10 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     /// Add the length of the buffer to the front of the buffer.
     fn add_length(buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
         let mut len_buf = Vec::with_capacity(buf.len() + 2);
+
         buf.len().var_encode(&mut len_buf)?;
         len_buf.extend_from_slice(buf);
+
         *buf = len_buf;
         Ok(())
     }
@@ -168,39 +166,23 @@ impl<V: Version, S: State<V>> Connection<V, S> {
 
         // Read the length of the packet
         let mut cursor = Cursor::new(buffer);
-        let len = u32::var_decode(&mut cursor)? as usize;
-        let len_len = cursor.position() as usize;
+        let packet_len = u32::var_decode(&mut cursor)?;
 
-        // Take the packet bytes
-        let mut buf: Vec<u8> = vec![0; len];
-
-        // If the whole packet is in the buffer, take it
-        // Otherwise repeatedly call fillbuf until the whole packet is in the buffer
-        if len <= buffer_len - len_len {
-            cursor.read_exact(&mut buf)?;
-            self.buffer.consume(len_len + len);
-        } else {
-            // I don't think this works
-            self.buffer.consume(len_len);
-
-            let mut read = 0;
-            while read < len {
-                let buffer = self.buffer.fill_buf().await?;
-                let mut cursor = Cursor::new(buffer);
-                let _ = cursor.read_exact(&mut buf[read..]);
-
-                let read_bytes = cursor.position();
-                self.buffer.consume(read_bytes as usize);
-                read += read_bytes as usize;
-            }
+        // Consume the length bytes
+        {
+            let len_byte_count = cursor.position() as usize;
+            self.buffer.consume(len_byte_count);
         }
 
-        let mut cursor = Cursor::new(buf);
+        // Read the packet bytes
+        let mut packet_buf: Vec<u8> = vec![0; packet_len as usize];
+        self.buffer.read_exact(&mut packet_buf).await?;
+        let mut packet_cursor = Cursor::new(packet_buf);
 
-        // Decompress the packet if needed
-        if self.is_compressed() && 0 != u32::var_decode(&mut cursor)? {
+        // Check if the packet is compressed
+        if self.is_compressed() && 0 != u32::var_decode(&mut packet_cursor)? {
             // Decompress the packet
-            let mut decompressor = ZlibDecoder::new(cursor.remaining_slice());
+            let mut decompressor = ZlibDecoder::new(packet_cursor.remaining_slice());
             let mut decompressed = Vec::new();
             decompressor.read_to_end(&mut decompressed).await?;
 
@@ -214,19 +196,19 @@ impl<V: Version, S: State<V>> Connection<V, S> {
             Self::trace_packet(&packet, &cursor);
 
             // Check if the packet is a bundle and read the bundled packets
-            Self::read_bundle(len, &mut cursor, &mut self.packet_buffer);
+            Self::read_bundle(packet_len, &mut cursor, &mut self.packet_buffer);
 
             // Return the packet
             Ok(packet?)
         } else {
             // Read the packet
-            let packet = <S as State<V>>::Clientbound::decode(&mut cursor);
+            let packet = <S as State<V>>::Clientbound::decode(&mut packet_cursor);
 
             #[cfg(feature = "debug")]
-            Self::trace_packet(&packet, &cursor);
+            Self::trace_packet(&packet, &packet_cursor);
 
             // Check if the packet is a bundle and read the bundled packets
-            Self::read_bundle(len, &mut cursor, &mut self.packet_buffer);
+            Self::read_bundle(packet_len, &mut packet_cursor, &mut self.packet_buffer);
 
             // Return the packet
             Ok(packet?)
@@ -235,18 +217,19 @@ impl<V: Version, S: State<V>> Connection<V, S> {
 
     /// Extracts packets from a bundle and adds them to the packet buffer.
     fn read_bundle(
-        len: usize,
-        cursor: &mut Cursor<Vec<u8>>,
-        buffer: &mut VecDeque<<S as State<V>>::Clientbound>,
+        packet_len: u32,
+        packet_cursor: &mut Cursor<Vec<u8>>,
+        packet_buffer: &mut VecDeque<<S as State<V>>::Clientbound>,
     ) {
-        while len > cursor.position() as usize {
-            let packet = <S as State<V>>::Clientbound::decode(cursor);
+        while packet_len > u32::try_from(packet_cursor.position()).expect("Bundle packet too long")
+        {
+            let packet = <S as State<V>>::Clientbound::decode(packet_cursor);
 
             #[cfg(feature = "debug")]
-            Self::trace_packet(&packet, cursor);
+            Self::trace_packet(&packet, packet_cursor);
 
             match packet {
-                Ok(packet) => buffer.push_back(packet),
+                Ok(packet) => packet_buffer.push_back(packet),
                 Err(err) => {
                     #[cfg(feature = "debug")]
                     if let DecodeError::Io(err) = err {
