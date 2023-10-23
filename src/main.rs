@@ -2,12 +2,11 @@
 
 use bevy::app::App;
 use mc_rs_core::CorePlugin;
+use mc_rs_interface::InterfacePlugin;
 use mc_rs_network::NetworkingPlugin;
 
-mod interface;
 mod plugins;
 mod systems;
-mod util;
 
 fn main() {
     // Create a new app
@@ -19,10 +18,10 @@ fn main() {
     // // Add networking systems
     // networking::setup(&mut app);
 
-    app.add_plugins((CorePlugin, NetworkingPlugin));
+    app.add_plugins((CorePlugin, NetworkingPlugin, InterfacePlugin));
 
-    // Add interface systems
-    interface::setup(&mut app);
+    // // Add interface systems
+    // interface::setup(&mut app);
 
     // Add general systems
     systems::setup(&mut app);

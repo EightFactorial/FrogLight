@@ -85,7 +85,7 @@ impl MainMenu {
     }
 
     /// The list of possible subtitles
-    const SPLASHES: &'static str = include_str!("../../../../assets/texts/splashes.txt");
+    const SPLASHES: &'static str = include_str!("../../../../../assets/texts/splashes.txt");
 
     /// Get a random subtitle from the list
     fn get_subtitle() -> &'static str {

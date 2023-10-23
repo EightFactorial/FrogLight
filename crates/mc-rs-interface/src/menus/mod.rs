@@ -5,7 +5,7 @@ use mc_rs_core::schedule::{
     state::ApplicationState,
 };
 
-use crate::interface::menus::main_menu::MainMenu;
+use crate::menus::main_menu::MainMenu;
 
 use self::server::ServerMenu;
 

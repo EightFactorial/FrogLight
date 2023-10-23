@@ -4,8 +4,7 @@ use mc_rs_core::schedule::{
     set::{InMenuSet, MenuSet},
     state::ApplicationState,
 };
-
-use crate::interface::menus::MenuRoot;
+use mc_rs_interface::menus::MenuRoot;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct SplashPlugin;

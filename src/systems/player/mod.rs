@@ -3,8 +3,7 @@ use mc_rs_core::{
     components::player::LocalPlayerHead,
     schedule::{set::GameSet, state::ApplicationState},
 };
-
-use super::settings::Settings;
+use mc_rs_interface::settings::Settings;
 
 pub mod input;
 pub mod resources;

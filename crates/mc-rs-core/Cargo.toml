@@ -6,7 +6,6 @@ license = "MIT OR Apache-2.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-azalea-chat = { version = "0.8.0", default-features = false }
 azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 bevy = { version = "0.11", features = ["serialize"] }
 bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }

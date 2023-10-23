@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::interface::menus::main_menu::backgrounds::BackgroundEnum;
+use crate::menus::main_menu::backgrounds::BackgroundEnum;
 
 use super::default_u32;
 

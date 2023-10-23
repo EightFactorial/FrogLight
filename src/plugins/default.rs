@@ -4,9 +4,8 @@ use bevy::{
     render::{render_resource::AddressMode, texture::ImageSampler},
     window::ExitCondition,
 };
+use mc_rs_interface::settings::Settings;
 use rand::seq::IteratorRandom;
-
-use crate::systems::settings::Settings;
 
 /// Configure the default Bevy [DefaultPlugins].
 pub(crate) fn default_plugins(settings: &Settings) -> PluginGroupBuilder {

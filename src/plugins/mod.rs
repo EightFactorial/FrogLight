@@ -2,8 +2,7 @@ use belly::prelude::BellyPlugin;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::RapierPhysicsPlugin;
 use mc_rs_core::resources::client_information::ClientInformation;
-
-use crate::systems::settings::Settings;
+use mc_rs_interface::settings::Settings;
 
 mod default;
 
