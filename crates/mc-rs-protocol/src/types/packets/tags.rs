@@ -1,10 +1,6 @@
 use derive_more::{Deref, DerefMut, From, Into};
-use mc_rs_macros::Transcode;
-
-#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
-#[cfg(not(feature = "hashbrown"))]
-use std::collections::HashMap;
+use mc_rs_macros::Transcode;
 
 use crate::types::ResourceLocation;
 

@@ -1,8 +1,7 @@
 use belly::prelude::*;
 use bevy::{app::AppExit, prelude::*};
+use mc_rs_core::schedule::{set::InMenuSet, state::ApplicationState};
 use rand::seq::IteratorRandom;
-
-use crate::systems::app_state::{ApplicationState, InMenuSet};
 
 use self::backgrounds::MainMenuBackground;
 

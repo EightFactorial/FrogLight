@@ -1,11 +1,10 @@
 use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
-
-use crate::networking::network::LocalPlayerHead;
-
-use super::{
-    app_state::{ApplicationState, GameSet},
-    settings::Settings,
+use mc_rs_core::{
+    components::player::LocalPlayerHead,
+    schedule::{set::GameSet, state::ApplicationState},
 };
+
+use super::settings::Settings;
 
 pub mod input;
 pub mod resources;

@@ -1,8 +1,7 @@
 use belly::prelude::Elements;
 use bevy::prelude::*;
+use mc_rs_core::schedule::{set::InMenuSet, state::ApplicationState};
 use serde::{Deserialize, Serialize};
-
-use crate::systems::app_state::{ApplicationState, InMenuSet};
 
 use self::{
     cubemap::BackgroundCubeMapEnum,

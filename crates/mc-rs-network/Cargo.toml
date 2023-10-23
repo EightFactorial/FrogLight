@@ -1,0 +1,23 @@
+[package]
+name = "mc-rs-network"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+azalea-chat = { version = "0.8.0", default-features = false }
+azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
+bevy = { version = "0.11", features = ["serialize"] }
+compact_str = "0.7"
+flume = "0.11"
+futures-lite = { version = "1.13", features = ["futures-io"] }
+futures-locks = { version = "0.7", default-features = false }
+log = { version = "0.4", features = ["std"] }
+mc-rs-core = { version = "0.1.0", path = "../mc-rs-core" }
+mc-rs-protocol = { version = "0.1.0", path = "../mc-rs-protocol" }
+uuid = "1.5"
+
+[features]
+default = []
+debug = ["mc-rs-core/debug", "mc-rs-protocol/debug"]

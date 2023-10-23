@@ -2,8 +2,7 @@ use bevy::{
     prelude::*,
     window::{CursorGrabMode, PrimaryWindow},
 };
-
-use crate::systems::app_state::{ApplicationState, GameSet};
+use mc_rs_core::schedule::{set::GameSet, state::ApplicationState};
 
 pub(super) fn add_systems(app: &mut App) {
     app.insert_resource(Paused(true));

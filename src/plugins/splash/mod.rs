@@ -1,10 +1,11 @@
 use belly::prelude::*;
 use bevy::prelude::*;
-
-use crate::{
-    interface::menus::MenuRoot,
-    systems::app_state::{ApplicationState, InMenuSet, MenuSet},
+use mc_rs_core::schedule::{
+    set::{InMenuSet, MenuSet},
+    state::ApplicationState,
 };
+
+use crate::interface::menus::MenuRoot;
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct SplashPlugin;

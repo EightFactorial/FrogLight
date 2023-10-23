@@ -2,10 +2,7 @@ use bevy::{
     diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
-
-use crate::{
-    networking::network::LocalPlayer, systems::world::structure::section::SectionComponent,
-};
+use mc_rs_core::{components::player::LocalPlayer, world::structure::section::SectionComponent};
 
 /// A plugin with a debug display
 ///

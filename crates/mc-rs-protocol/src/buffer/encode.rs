@@ -203,7 +203,6 @@ impl<K: Encode, V: Encode> Encode for HashMap<K, V> {
     }
 }
 
-#[cfg(feature = "hashbrown")]
 impl<K: Encode, V: Encode> Encode for hashbrown::HashMap<K, V> {
     #[inline]
     fn encode(&self, buf: &mut impl std::io::Write) -> Result<(), EncodeError> {

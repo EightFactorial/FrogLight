@@ -2,7 +2,7 @@
 name = "mc-rs-protocol"
 version = "0.1.0"
 edition = "2021"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
@@ -18,7 +18,7 @@ byteorder = { version = "1.4", features = ["i128"] }
 compact_str = { version = "0.7", features = ["serde", "smallvec"] }
 derive_more = "0.99"
 futures-lite = { version = "1.13", features = ["futures-io"] }
-hashbrown = { version = "0.14", features = ["serde"], optional = true }
+hashbrown = { version = "0.14", features = ["serde"] }
 log = { version = "0.4", features = ["std"], optional = true }
 mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }
 serde = { version = "1.0", features = ["derive"] }
@@ -32,6 +32,5 @@ uuid = { version = "1.5", features = ["v3"] }
 pretty_assertions = "1.4"
 
 [features]
-default = ["hashbrown"]
-hashbrown = ["dep:hashbrown"]
+default = []
 debug = ["dep:log", "mc-rs-macros/debug"]

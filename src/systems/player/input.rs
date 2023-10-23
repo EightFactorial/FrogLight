@@ -1,8 +1,7 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
-
-use crate::{
-    networking::network::{LocalPlayer, LocalPlayerHead},
-    systems::app_state::GameSet,
+use mc_rs_core::{
+    components::player::{LocalPlayer, LocalPlayerHead},
+    schedule::set::GameSet,
 };
 
 use super::resources::Paused;

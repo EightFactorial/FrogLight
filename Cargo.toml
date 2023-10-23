@@ -2,7 +2,7 @@
 name = "mc-rs"
 version = "0.1.0"
 edition = "2021"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
@@ -11,11 +11,13 @@ build = "build.rs"
 [workspace]
 resolver = "2"
 members = [
-    "crates/classfile-rs",
-    "crates/mc-rs-extract",
-    "crates/mc-rs-generate",
+    "crates/mc-rs-core",
     "crates/mc-rs-macros",
+    "crates/mc-rs-network",
     "crates/mc-rs-protocol",
+    "crates/tools/classfile-rs",
+    "crates/tools/mc-rs-extract",
+    "crates/tools/mc-rs-generate",
 ]
 
 [profile.dev.package."*"]
@@ -44,17 +46,13 @@ belly = { version = "0.3.0", git = "https://github.com/EightFactorial/belly.git"
 bevy = { version = "0.11", features = ["serialize"] }
 bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
 block-mesh = "0.2.0"
-bytemuck = { version = "1.14", features = ["derive"] }
 compact_str = { version = "0.7", features = ["serde", "smallvec"] }
-convert_case = "0.4"
-flume = "0.11"
 futures-lite = { version = "1.13", features = ["futures-io"] }
-futures-locks = { version = "0.7", default-features = false }
 itertools = "0.11"
 log = { version = "0.4", features = ["std"] }
+mc-rs-core = { version = "0.1.0", path = "crates/mc-rs-core" }
 mc-rs-macros = { version = "0.1.0", path = "crates/mc-rs-macros" }
-mc-rs-protocol = { version = "0.1.0", path = "crates/mc-rs-protocol" }
-nohash-hasher = "0.2"
+mc-rs-network = { version = "0.1.0", path = "crates/mc-rs-network" }
 parking_lot = { version = "0.12", features = ["nightly"] }
 rand = { version = "0.8", features = ["nightly"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -70,13 +68,13 @@ bevy = { version = "0.11", features = ["wayland"] }
 
 [features]
 default = ["splash", "simd"]
-splash = []
+splash = ["mc-rs-core/splash"]
 
 # Enable simd features
-simd = ["bevy_rapier3d/simd-stable", "bytemuck/nightly_stdsimd"]
+simd = ["bevy_rapier3d/simd-stable"]
 # !! Currently broken on the latest nightly !!
-simd_advanced = ["bevy_rapier3d/simd-nightly", "bytemuck/nightly_stdsimd", "rand/simd_support"]
+simd_advanced = ["bevy_rapier3d/simd-nightly", "rand/simd_support"]
 
 # Enable debug plugins
-debug = ["mc-rs-protocol/debug", "mc-rs-macros/debug"]
+debug = ["mc-rs-core/debug", "mc-rs-network/debug", "mc-rs-macros/debug"]
 rapier_debug = ["bevy_rapier3d/debug-render-3d"]

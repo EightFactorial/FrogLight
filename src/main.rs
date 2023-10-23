@@ -1,10 +1,10 @@
-#![feature(future_join)]
 #![feature(trivial_bounds)]
 
 use bevy::app::App;
+use mc_rs_core::CorePlugin;
+use mc_rs_network::NetworkingPlugin;
 
 mod interface;
-mod networking;
 mod plugins;
 mod systems;
 mod util;
@@ -16,8 +16,10 @@ fn main() {
     // Add plugins
     plugins::add_plugins(&mut app);
 
-    // Add networking systems
-    networking::setup(&mut app);
+    // // Add networking systems
+    // networking::setup(&mut app);
+
+    app.add_plugins((CorePlugin, NetworkingPlugin));
 
     // Add interface systems
     interface::setup(&mut app);

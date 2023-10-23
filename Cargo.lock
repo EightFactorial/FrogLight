@@ -3873,17 +3873,13 @@ dependencies = [
  "bevy",
  "bevy_rapier3d",
  "block-mesh",
- "bytemuck",
  "compact_str",
- "convert_case 0.4.0",
- "flume",
  "futures-lite",
- "futures-locks",
  "itertools 0.11.0",
  "log",
+ "mc-rs-core",
  "mc-rs-macros",
- "mc-rs-protocol",
- "nohash-hasher",
+ "mc-rs-network",
  "parking_lot",
  "rand",
  "serde",
@@ -3893,6 +3889,26 @@ dependencies = [
  "toml",
  "uuid",
  "vergen",
+]
+
+[[package]]
+name = "mc-rs-core"
+version = "0.1.0"
+dependencies = [
+ "azalea-chat",
+ "azalea-nbt",
+ "bevy",
+ "bevy_rapier3d",
+ "block-mesh",
+ "bytemuck",
+ "compact_str",
+ "futures-lite",
+ "itertools 0.11.0",
+ "log",
+ "mc-rs-protocol",
+ "nohash-hasher",
+ "parking_lot",
+ "rand",
 ]
 
 [[package]]
@@ -3948,6 +3964,23 @@ dependencies = [
  "quote",
  "strum",
  "syn 2.0.38",
+]
+
+[[package]]
+name = "mc-rs-network"
+version = "0.1.0"
+dependencies = [
+ "azalea-chat",
+ "azalea-nbt",
+ "bevy",
+ "compact_str",
+ "flume",
+ "futures-lite",
+ "futures-locks",
+ "log",
+ "mc-rs-core",
+ "mc-rs-protocol",
+ "uuid",
 ]
 
 [[package]]

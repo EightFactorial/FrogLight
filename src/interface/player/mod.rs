@@ -1,7 +1,10 @@
 use belly::prelude::*;
 use bevy::prelude::*;
 
-use crate::systems::app_state::{ApplicationState, GameSet, InMenuSet};
+use mc_rs_core::schedule::{
+    set::{GameSet, InMenuSet},
+    state::ApplicationState,
+};
 
 pub mod hotbar;
 pub mod inventory;

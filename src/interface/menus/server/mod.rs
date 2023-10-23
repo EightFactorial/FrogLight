@@ -3,13 +3,13 @@ use std::{fs, io::Cursor, path::PathBuf};
 use azalea_nbt::{Nbt, NbtList};
 use belly::prelude::*;
 use bevy::{prelude::*, utils::HashMap};
-use mc_rs_protocol::versions::DefaultVersion;
-
-use crate::{
-    networking::{network::ConnectionEvent, request::StatusRequest},
-    systems::app_state::{ApplicationState, InMenuSet},
-    util::mc_dir::minecraft_dir,
+use mc_rs_core::{
+    schedule::{set::InMenuSet, state::ApplicationState},
+    versions::DefaultVersion,
 };
+use mc_rs_network::{request::StatusRequest, ConnectionEvent};
+
+use crate::util::mc_dir::minecraft_dir;
 
 use super::{main_menu::MainMenu, MenuRoot};
 

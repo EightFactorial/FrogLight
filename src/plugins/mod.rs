@@ -1,6 +1,9 @@
 use belly::prelude::BellyPlugin;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::RapierPhysicsPlugin;
+use mc_rs_core::resources::client_information::ClientInformation;
+
+use crate::systems::settings::Settings;
 
 mod default;
 
@@ -9,8 +12,6 @@ pub(crate) mod splash;
 
 #[cfg(feature = "debug")]
 mod debug;
-
-use crate::systems::settings::{info::ClientInformation, Settings};
 
 /// Add plugins to the [App].
 ///
