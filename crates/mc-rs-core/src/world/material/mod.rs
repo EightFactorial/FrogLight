@@ -4,13 +4,10 @@ use bevy::{
     render::render_resource::ShaderType,
 };
 use bytemuck::{Pod, Zeroable};
-
-mod impl_bind;
-pub use impl_bind::*;
-
-mod impl_mat;
-pub use impl_mat::*;
 use itertools::{EitherOrBoth, Itertools};
+
+pub mod impl_bind;
+pub mod impl_mat;
 
 pub(super) fn setup(app: &mut App) { app.add_plugins(MaterialPlugin::<BlockMaterial>::default()); }
 

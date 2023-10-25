@@ -20,7 +20,10 @@ use crate::{
         BlockData,
     },
     world::{
-        material::{StateAnimation, ATTRIBUTE_ANIMATION_INDEX, ATTRIBUTE_TEXTURE_INDEX},
+        material::{
+            impl_mat::{ATTRIBUTE_ANIMATION_INDEX, ATTRIBUTE_TEXTURE_INDEX},
+            StateAnimation,
+        },
         CHUNK_SIZE, SECTION_HEIGHT,
     },
 };
