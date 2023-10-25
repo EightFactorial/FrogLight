@@ -5,16 +5,14 @@ use std::{fmt::Debug, marker::PhantomData};
 
 use bevy::{prelude::*, tasks::Task};
 use flume::{Receiver, Sender};
+use mc_rs_core::{PingResponse, StatusResponse};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
     Connection, ConnectionError, State, Version,
 };
 
-use super::{
-    handle::{ConnectionData, ConnectionSend, ConnectionState},
-    request::{PingResponse, StatusResponse},
-};
+use super::handle::{ConnectionData, ConnectionSend, ConnectionState};
 
 /// A task that is used to establish a connection with a server
 #[derive(Debug, Deref, DerefMut, Component)]

@@ -2,13 +2,39 @@ use std::marker::PhantomData;
 
 use azalea_chat::FormattedText;
 use bevy::{prelude::*, utils::HashMap};
-use mc_rs_protocol::Version;
+use mc_rs_protocol::{types::enums::ConnectionIntent, Version};
 use uuid::Uuid;
 
-/// Add request response events to the app
-pub(super) fn setup(app: &mut App) {
+pub(super) fn configure(app: &mut App) {
     app.add_event::<StatusResponse>();
     app.add_event::<PingResponse>();
+}
+
+/// An event that is sent to create a new connection
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
+pub struct ConnectionEvent<V: Version> {
+    pub addr: String,
+    pub intent: ConnectionIntent,
+    _version: PhantomData<V>,
+}
+
+impl<V: Version> ConnectionEvent<V> {
+    #[allow(dead_code)]
+    pub fn new(addr: impl Into<String>) -> Self {
+        Self {
+            addr: addr.into(),
+            intent: ConnectionIntent::Login,
+            _version: PhantomData,
+        }
+    }
+
+    pub fn new_with(addr: impl Into<String>, intent: ConnectionIntent) -> Self {
+        Self {
+            addr: addr.into(),
+            intent,
+            _version: PhantomData,
+        }
+    }
 }
 
 /// An event that requests the status of a server

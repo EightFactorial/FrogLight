@@ -1,5 +1,6 @@
 use bevy::utils::HashMap;
 use log::{debug, error};
+use mc_rs_core::{PingResponse, StatusResponse};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::{
@@ -20,10 +21,7 @@ use mc_rs_protocol::{
     Connection, ConnectionError, Version,
 };
 
-use super::{
-    handle::NetworkHandle,
-    request::{PingResponse, StatusResponse},
-};
+use super::handle::NetworkHandle;
 
 mod network;
 

@@ -33,4 +33,11 @@ pretty_assertions = "1.4"
 
 [features]
 default = []
+
+# Enable debug features
 debug = ["dep:log", "mc-rs-macros/debug"]
+
+# Enable simd features
+simd = []
+# !! Currently broken on the latest nightly !!
+simd_advanced = []

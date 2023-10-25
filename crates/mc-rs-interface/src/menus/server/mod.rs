@@ -6,8 +6,8 @@ use bevy::{prelude::*, utils::HashMap};
 use mc_rs_core::{
     schedule::{set::InMenuSet, state::ApplicationState},
     versions::DefaultVersion,
+    ConnectionEvent, StatusRequest,
 };
-use mc_rs_network::{request::StatusRequest, ConnectionEvent};
 
 use crate::util::mc_dir::minecraft_dir;
 

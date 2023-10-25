@@ -5,6 +5,7 @@ use futures_lite::future::{block_on, poll_once};
 use mc_rs_core::{
     components::player::{LocalPlayer, LocalPlayerHead},
     schedule::state::ApplicationState,
+    ConnectionEvent, PingResponse, StatusRequest, StatusResponse,
 };
 use mc_rs_protocol::{
     types::enums::ConnectionIntent,
@@ -19,36 +20,8 @@ use crate::{
 
 use super::{
     handle::{ConnectionData, ConnectionState, NetworkHandle},
-    request::{PingResponse, StatusRequest, StatusResponse},
     task::ConnectionTask,
 };
-
-/// An event that is sent to create a new connection
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
-pub struct ConnectionEvent<V: Version> {
-    pub addr: String,
-    pub intent: ConnectionIntent,
-    _version: PhantomData<V>,
-}
-
-impl<V: Version> ConnectionEvent<V> {
-    #[allow(dead_code)]
-    pub fn new(addr: impl Into<String>) -> Self {
-        Self {
-            addr: addr.into(),
-            intent: ConnectionIntent::Login,
-            _version: PhantomData,
-        }
-    }
-
-    pub fn new_with(addr: impl Into<String>, intent: ConnectionIntent) -> Self {
-        Self {
-            addr: addr.into(),
-            intent,
-            _version: PhantomData,
-        }
-    }
-}
 
 /// A trait that defines how to handle a network version
 ///
