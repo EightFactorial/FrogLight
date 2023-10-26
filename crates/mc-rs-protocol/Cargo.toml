@@ -9,15 +9,15 @@ readme = "README.md"
 
 [dependencies]
 async-compression = { version = "0.4", features = ["futures-io", "zlib"] }
-async-net = "1.7"
+async-net = "1.8"
 azalea-chat = { version = "0.8.0", default-features = false }
 azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 bevy_ecs = "0.11"
 bevy_math = "0.11"
-byteorder = { version = "1.4", features = ["i128"] }
+byteorder = "1.5"
 compact_str = { version = "0.7", features = ["serde", "smallvec"] }
 derive_more = "0.99"
-futures-lite = { version = "1.13", features = ["futures-io"] }
+futures-lite = { version = "2.0", features = ["futures-io"] }
 hashbrown = { version = "0.14", features = ["serde"] }
 log = { version = "0.4", features = ["std"], optional = true }
 mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }

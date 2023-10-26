@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 bevy = "0.11" 
 compact_str = "0.7"
 flume = "0.11"
-futures-lite = { version = "1.13", features = ["futures-io"] }
+futures-lite = { version = "2.0", features = ["futures-io"] }
 futures-locks = { version = "0.7", default-features = false }
 log = { version = "0.4", features = ["std"] }
 mc-rs-core = { version = "0.1.0", path = "../mc-rs-core" }

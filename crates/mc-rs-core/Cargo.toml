@@ -13,7 +13,7 @@ bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
 block-mesh = "0.2.0"
 bytemuck = { version = "1.14", features = ["derive"] }
 compact_str = "0.7"
-futures-lite = { version = "1.13", features = ["futures-io"] }
+futures-lite = { version = "2.0", features = ["futures-io"] }
 itertools = "0.11"
 log = { version = "0.4", features = ["std"] }
 mc-rs-protocol = { version = "0.1.0", path = "../mc-rs-protocol" }
