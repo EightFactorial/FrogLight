@@ -37,25 +37,20 @@ strum = { version = "0.25", features = ["derive"] }
 uuid = "1.5"
 
 [profile.dev]
-opt-level = 3
+opt-level = 1
 
 [profile.dev.package."*"]
 opt-level = 3
 
-[profile.dev.package.mc-rs-interface]
-opt-level = 1
+[profile.dev.package.mc-rs-network]
+opt-level = 3
 
-[profile.dev.package.mc-rs-macros]
-opt-level = 1
+[profile.dev.package.mc-rs-protocol]
+opt-level = 3
 
-[profile.dev.package.classfile-rs]
-opt-level = 1
+[profile.dev.package.mc-rs-render]
+opt-level = 3
 
-[profile.dev.package.mc-rs-extract]
-opt-level = 1
-
-[profile.dev.package.mc-rs-generate]
-opt-level = 1
 
 [dependencies]
 mc-rs-core = { version = "0.1.0", path = "crates/mc-rs-core" }
