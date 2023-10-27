@@ -3,13 +3,16 @@ name = "mc-rs-render"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
 
 [dependencies]
-bevy = "0.11"
-bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
+bevy = { workspace = true }
+bevy_rapier3d = { workspace = true }
 bytemuck = { version = "1.14", features = ["derive"] }
-futures-lite = { version = "2.0", features = ["futures-io"] }
-itertools = "0.11"
+futures-lite = { workspace = true }
+itertools = { workspace = true }
 mc-rs-core = { version = "0.1.0", path = "../mc-rs-core" }
 ndshape = "0.3"
 

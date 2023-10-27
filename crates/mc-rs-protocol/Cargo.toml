@@ -3,6 +3,7 @@ name = "mc-rs-protocol"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
@@ -10,23 +11,23 @@ readme = "README.md"
 [dependencies]
 async-compression = { version = "0.4", features = ["futures-io", "zlib"] }
 async-net = "1.8"
-azalea-chat = { version = "0.8.0", default-features = false }
-azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
+azalea-chat = { workspace = true }
+azalea-nbt = { workspace = true }
 bevy_ecs = "0.11"
 bevy_math = "0.11"
 byteorder = "1.5"
-compact_str = { version = "0.7", features = ["serde", "smallvec"] }
-derive_more = "0.99"
-futures-lite = { version = "2.0", features = ["futures-io"] }
+compact_str = { workspace = true }
+derive_more = { workspace = true }
+futures-lite = { workspace = true }
 hashbrown = { version = "0.14", features = ["serde"] }
-log = { version = "0.4", features = ["std"], optional = true }
+log = { workspace = true, optional = true }
 mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order", "arbitrary_precision"] }
-smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }
-strum = { version = "0.25", features = ["derive"] }
+smallvec = { workspace = true }
+strum = { workspace = true }
 thiserror = "1.0"
-uuid = { version = "1.5", features = ["v3"] }
+uuid = { workspace = true, features = ["v3"] }
 
 [dev-dependencies]
 pretty_assertions = "1.4"
