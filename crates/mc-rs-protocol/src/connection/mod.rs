@@ -6,6 +6,7 @@ use std::{collections::VecDeque, io::Cursor, marker::PhantomData};
 use async_compression::futures::{bufread::ZlibDecoder, write::ZlibEncoder};
 use async_net::{AsyncToSocketAddrs, SocketAddr, TcpStream};
 use azalea_chat::FormattedText;
+use compact_str::CompactString;
 use futures_lite::{io::BufReader, AsyncBufReadExt, AsyncReadExt, AsyncWriteExt};
 use thiserror::Error;
 
@@ -22,7 +23,7 @@ mod test;
 pub struct Connection<V: Version, S: State<V>> {
     _version: PhantomData<V>,
     _state: PhantomData<S>,
-    pub hostname: String,
+    pub hostname: CompactString,
     pub port: u16,
     pub compression: Option<i32>,
     packet_buffer: VecDeque<<S as State<V>>::Clientbound>,
@@ -35,7 +36,10 @@ where
     Handshake: State<V>,
 {
     /// Create a new connection from an address.
-    pub async fn new(version: V, address: impl Into<String>) -> Result<Self, ConnectionError> {
+    pub async fn new(
+        version: V,
+        address: impl Into<CompactString>,
+    ) -> Result<Self, ConnectionError> {
         let address = address.into();
         let mut address = address.as_str();
         if let Some(pos) = address.find("://") {
@@ -63,7 +67,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         Ok(Self {
             _version: PhantomData,
             _state: PhantomData,
-            hostname: hostname.to_owned(),
+            hostname: hostname.into(),
             port,
             compression: None,
             packet_buffer: VecDeque::new(),
@@ -331,7 +335,7 @@ impl<V: Version, S: State<V>> TryFrom<TcpStream> for Connection<V, S> {
         Ok(Connection {
             _version: PhantomData,
             _state: PhantomData,
-            hostname: stream.peer_addr()?.ip().to_string(),
+            hostname: stream.peer_addr()?.ip().to_string().into(),
             port: stream.peer_addr()?.port(),
             compression: None,
             packet_buffer: VecDeque::new(),

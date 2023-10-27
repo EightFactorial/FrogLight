@@ -6,7 +6,7 @@ use flume::{Receiver, Sender};
 use futures_lite::Future;
 use futures_locks::Mutex;
 use log::error;
-use mc_rs_core::{PingResponse, StatusResponse};
+use mc_rs_core::{resources::player::username::Username, PingResponse, StatusResponse};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
@@ -38,6 +38,7 @@ where
 
     /// Handle connections in the login state
     fn login_handle(
+        username: Username,
         conn: Connection<Self, Login>,
     ) -> impl Future<Output = Result<(Connection<Self, Login>, GameProfile), ConnectionError>> + Send;
 

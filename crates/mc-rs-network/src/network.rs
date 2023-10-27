@@ -3,8 +3,9 @@ use std::{fmt::Debug, hash::Hash, marker::PhantomData};
 use bevy::{ecs::system::SystemState, prelude::*, tasks::IoTaskPool};
 use futures_lite::future::{block_on, poll_once};
 use mc_rs_core::{
-    components::player::CreateControlledPlayerEvent, schedule::state::ApplicationState,
-    ConnectionEvent, PingResponse, StatusRequest, StatusResponse,
+    components::player::CreateControlledPlayerEvent, resources::player::username::Username,
+    schedule::state::ApplicationState, ConnectionEvent, PingResponse, StatusRequest,
+    StatusResponse,
 };
 use mc_rs_protocol::{
     types::enums::ConnectionIntent,
@@ -71,7 +72,7 @@ where
     ) {
         for request in reader.iter() {
             writer.send(ConnectionEvent::new_with(
-                request.host.clone(),
+                request.hostname.clone(),
                 ConnectionIntent::Status,
             ));
         }
@@ -80,7 +81,7 @@ where
     /// Create a new connection to the server
     fn connection_request(mut events: EventReader<ConnectionEvent<Self>>, mut commands: Commands) {
         for event in events.iter() {
-            let addr = event.addr.clone();
+            let addr = event.hostname.clone();
             let task = IoTaskPool::get().spawn(Connection::new(Self::default(), addr.clone()));
 
             match event.intent {
@@ -91,7 +92,7 @@ where
                     ));
                 }
                 _ => {
-                    warn!("Skipping making connection with invalid connection intent!");
+                    warn!("Skipping connection creation with invalid connection intent!");
                 }
             }
         }
@@ -131,6 +132,7 @@ where
 
     /// Wait for the handshake to finish and start the next state
     fn handshake_query(
+        username: Res<Username>,
         mut query: Query<(Entity, &mut ConnectionHandshakeTask<Self>)>,
         mut commands: Commands,
     ) {
@@ -156,8 +158,8 @@ where
                                 entity_commands.insert(ConnectionStatusTask::new(status_task));
                             }
                             ConnectionIntent::Login => {
-                                let login_task =
-                                    IoTaskPool::get().spawn(Self::login_handle(con.into()));
+                                let login_task = IoTaskPool::get()
+                                    .spawn(Self::login_handle(username.clone(), con.into()));
 
                                 entity_commands.insert(ConnectionLoginTask::new(login_task));
                             }

@@ -4,6 +4,7 @@
 use std::{fmt::Debug, marker::PhantomData};
 
 use bevy::{prelude::*, tasks::Task};
+use compact_str::CompactString;
 use flume::{Receiver, Sender};
 use mc_rs_core::{PingResponse, StatusResponse};
 use mc_rs_protocol::{
@@ -26,7 +27,7 @@ where
 {
     #[deref]
     pub task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
-    pub hostname: String,
+    pub hostname: CompactString,
     pub intent: ConnectionIntent,
 }
 
@@ -41,7 +42,7 @@ where
     /// Create a new connection task
     pub fn new(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
-        hostname: String,
+        hostname: CompactString,
     ) -> Self {
         Self {
             task,
@@ -53,7 +54,7 @@ where
     /// Create a new connection task with a connection intent
     pub fn new_with(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
-        hostname: String,
+        hostname: CompactString,
         intent: ConnectionIntent,
     ) -> Self {
         Self {

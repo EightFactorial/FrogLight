@@ -2,6 +2,7 @@ use std::marker::PhantomData;
 
 use azalea_chat::FormattedText;
 use bevy::{prelude::*, utils::HashMap};
+use compact_str::CompactString;
 use mc_rs_protocol::{types::enums::ConnectionIntent, Version};
 use uuid::Uuid;
 
@@ -13,63 +14,109 @@ pub(super) fn setup(app: &mut App) {
 /// An event that is sent to create a new connection
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
 pub struct ConnectionEvent<V: Version> {
-    pub addr: String,
+    pub hostname: CompactString,
     pub intent: ConnectionIntent,
     _version: PhantomData<V>,
 }
 
 impl<V: Version> ConnectionEvent<V> {
-    #[allow(dead_code)]
-    pub fn new(addr: impl Into<String>) -> Self {
+    /// Create a new connection event with the [default intent](ConnectionIntent::Login).
+    ///
+    /// ### Example
+    /// ```rust
+    /// use compact_str::CompactString;
+    /// use mc_rs_core::ConnectionEvent;
+    /// use mc_rs_protocol::versions::v1_20_0::V1_20_0;
+    ///
+    /// let hostname = CompactString::from("localhost:25565");
+    /// let event = ConnectionEvent::<V1_20_0>::new(hostname.clone());
+    ///
+    /// assert_eq!(event.hostname, hostname);
+    /// ```
+    pub fn new(hostname: impl Into<CompactString>) -> Self {
         Self {
-            addr: addr.into(),
+            hostname: hostname.into(),
             intent: ConnectionIntent::Login,
             _version: PhantomData,
         }
     }
 
-    pub fn new_with(addr: impl Into<String>, intent: ConnectionIntent) -> Self {
+    /// Create a new connection event with a [custom intent](ConnectionIntent).
+    ///
+    /// It is recommended to use the [`ConnectionEvent::new`](ConnectionEvent) method to login to a
+    /// server, or use the [StatusRequest] event to get the status of a server.
+    ///
+    /// ### Example
+    /// ```rust
+    /// use compact_str::CompactString;
+    /// use mc_rs_core::{ConnectionEvent, enums::ConnectionIntent};
+    /// use mc_rs_protocol::versions::v1_20_0::V1_20_0;
+    ///
+    /// let hostname = CompactString::from("localhost:25565");
+    /// let intent = ConnectionIntent::Status;
+    /// let event = ConnectionEvent::<V1_20_0>::new_with(hostname.clone(), intent);
+    ///
+    /// assert_eq!(event.hostname, hostname);
+    /// assert_eq!(event.intent, intent);
+    /// ```
+    pub fn new_with(hostname: impl Into<CompactString>, intent: ConnectionIntent) -> Self {
         Self {
-            addr: addr.into(),
+            hostname: hostname.into(),
             intent,
             _version: PhantomData,
         }
     }
 }
 
-/// An event that requests the status of a server
+/// An event that requests the status of a server.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
 pub struct StatusRequest<V: Version> {
-    pub host: String,
+    pub hostname: CompactString,
     _version: PhantomData<V>,
 }
 
-#[allow(dead_code)]
 impl<V: Version> StatusRequest<V> {
-    pub fn new(address: impl Into<String>) -> Self {
+    /// Create a new status request event.
+    ///
+    /// ### Example
+    /// ```rust
+    /// use compact_str::CompactString;
+    /// use mc_rs_core::StatusRequest;
+    /// use mc_rs_protocol::versions::v1_20_0::V1_20_0;
+    ///
+    /// let hostname = CompactString::from("localhost:25565");
+    /// let event = StatusRequest::<V1_20_0>::new(hostname.clone());
+    ///
+    /// assert_eq!(event.hostname, hostname);
+    /// ```
+    pub fn new(hostname: impl Into<CompactString>) -> Self {
         Self {
-            host: address.into(),
+            hostname: hostname.into(),
             _version: PhantomData,
         }
     }
 }
 
 /// A response to a status request
+///
+/// The hostname field is the same as the one in the request.
 #[derive(Debug, Clone, PartialEq, Event)]
 pub struct StatusResponse {
-    pub hostname: String,
+    pub hostname: CompactString,
     pub description: FormattedText,
     pub favicon: Option<String>,
     pub player_max: i32,
     pub player_online: i32,
-    pub sample_players: HashMap<String, Uuid>,
+    pub sample_players: HashMap<CompactString, Uuid>,
     pub version: FormattedText,
     pub protocol: i32,
 }
 
 /// A response to a ping request
+///
+/// The hostname field is the same as the one in the request.
 #[derive(Debug, Clone, PartialEq, Eq, Event)]
 pub struct PingResponse {
-    pub hostname: String,
+    pub hostname: CompactString,
     pub time: u64,
 }
