@@ -82,6 +82,7 @@ pub(super) async fn section_fn(
     let _blocks = block_data.blocks.read();
 
     let mut shape = [0u32; MeshChunkShape::SIZE as usize];
+
     for y in 0..MESH_Y {
         for z in 0..MESH_Z {
             for x in 0..MESH_X {

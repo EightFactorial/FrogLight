@@ -48,7 +48,11 @@ impl Blocks {
                 block_states: u32::MAX..=u32::MAX,
                 name: "Error".to_string(),
                 key: ResourceLocation::new("mc-rs:error"),
-                properties: BlockProperties::default(),
+                properties: BlockProperties {
+                    hardness: -1f32,
+                    resistance: 3600000f32,
+                    ..Default::default()
+                },
             },
         );
 
