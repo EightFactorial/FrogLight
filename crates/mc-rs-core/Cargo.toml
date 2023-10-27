@@ -22,7 +22,6 @@ uuid = "1.5"
 [features]
 default = ["simd"]
 
-
 # Enable debug features
 debug = ["mc-rs-protocol/debug"]
 # Enable bevy-rapier3d debug features
