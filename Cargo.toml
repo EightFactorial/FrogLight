@@ -6,7 +6,6 @@ license = "MIT OR Apache-2.0"
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
-build = "build.rs"
 
 [workspace]
 resolver = "2"
@@ -16,6 +15,7 @@ members = [
     "crates/mc-rs-macros",
     "crates/mc-rs-network",
     "crates/mc-rs-protocol",
+    "crates/mc-rs-render",
     "crates/tools/classfile-rs",
     "crates/tools/mc-rs-extract",
     "crates/tools/mc-rs-generate",
@@ -35,30 +35,26 @@ incremental = true
 # codegen-units = 1
 incremental = false
 
-[build-dependencies]
-vergen = { version = "8.2.5", features = ["build", "cargo", "git", "gitoxide"] }
-
 [dependencies]
 bevy = "0.11"
 mc-rs-core = { version = "0.1.0", path = "crates/mc-rs-core" }
 mc-rs-interface = { version = "0.1.0", path = "crates/mc-rs-interface" }
-mc-rs-macros = { version = "0.1.0", path = "crates/mc-rs-macros" }
 mc-rs-network = { version = "0.1.0", path = "crates/mc-rs-network" }
-rand = { version = "0.8", features = ["nightly"] }
 
 # Enable wayland support on linux
 [target.'cfg(target_os = "linux")'.dependencies]
 bevy = { version = "0.11", features = ["wayland"] }
 
 [features]
-default = ["splash", "simd"]
-splash = ["mc-rs-core/splash"]
+default = ["simd"]
 
 # Enable debug features
-debug = ["mc-rs-core/debug", "mc-rs-interface/debug", "mc-rs-network/debug", "mc-rs-macros/debug"]
+debug = ["mc-rs-core/debug", "mc-rs-interface/debug", "mc-rs-network/debug"]
+# Enable bevy-rapier debug features
+debug_rapier = ["mc-rs-core/debug_rapier"]
 
 # Enable simd features
 simd = ["mc-rs-core/simd", "mc-rs-interface/simd", "mc-rs-network/simd"]
 # !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-interface/simd_advanced", "mc-rs-network/simd_advanced", "rand/simd_support"]
+simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-interface/simd_advanced", "mc-rs-network/simd_advanced"]
 

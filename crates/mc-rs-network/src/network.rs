@@ -3,8 +3,7 @@ use std::{fmt::Debug, hash::Hash, marker::PhantomData};
 use bevy::{ecs::system::SystemState, prelude::*, tasks::IoTaskPool};
 use futures_lite::future::{block_on, poll_once};
 use mc_rs_core::{
-    components::player::{LocalPlayer, LocalPlayerHead},
-    schedule::state::ApplicationState,
+    components::player::CreateControlledPlayerEvent, schedule::state::ApplicationState,
     ConnectionEvent, PingResponse, StatusRequest, StatusResponse,
 };
 use mc_rs_protocol::{
@@ -220,6 +219,7 @@ where
     fn login_query(
         mut query: Query<(Entity, &mut ConnectionLoginTask<Self>)>,
         mut state: ResMut<NextState<ApplicationState>>,
+        mut events: EventWriter<CreateControlledPlayerEvent>,
         mut commands: Commands,
     ) {
         for (entity, mut task) in query.iter_mut() {
@@ -231,13 +231,11 @@ where
                             conn.peer_addr().expect("Unable to get peer address")
                         );
 
+                        events.send(CreateControlledPlayerEvent(entity));
+
                         commands
                             .entity(entity)
                             .insert(profile)
-                            .insert((LocalPlayer, TransformBundle::default()))
-                            .with_children(|player| {
-                                player.spawn((LocalPlayerHead, TransformBundle::default()));
-                            })
                             .remove::<ConnectionLoginTask<Self>>();
 
                         let (tx1, rx1) = flume::unbounded();
@@ -264,7 +262,7 @@ where
                                 commands
                                     .insert_resource(ConnectionChannel::new_play(rx1, tx2, task));
 
-                                state.set(ApplicationState::Game)
+                                state.set(ApplicationState::InGame)
                             }
                         }
                     }

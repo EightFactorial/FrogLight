@@ -2,7 +2,6 @@ use attribute_derive::Attribute;
 use proc_macro::TokenStream;
 use syn::DeriveInput;
 
-mod client;
 mod proto;
 
 use proto::{
@@ -54,11 +53,11 @@ pub fn derive_test(input: TokenStream) -> TokenStream {
 #[derive(Debug, Clone, PartialEq, Eq, Attribute)]
 #[attribute(ident = mctest)]
 struct DeriveMacroAttr {
-    /// The tests to generate
+    /// Tests to generate
     #[attribute(optional)]
     tests: Vec<TestType>,
 
-    /// Bytes to be used to verify different tests
+    /// Example bytes to verify tests
     #[attribute(optional)]
     bytes: Option<Vec<u8>>,
 }

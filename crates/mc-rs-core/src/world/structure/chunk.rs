@@ -14,7 +14,7 @@ use parking_lot::RwLock;
 use crate::{
     blocks::BlockData,
     world::{
-        palette::GlobalPalette, task::ChunkTask, WorldType, Worlds, CHUNK_SIZE,
+        palette::GlobalPalette, ChunkUpdateEvent, WorldType, Worlds, CHUNK_SIZE,
         CHUNK_VERT_DISPLACEMENT, SECTION_COUNT,
     },
 };
@@ -102,6 +102,7 @@ impl Chunk {
         query: Query<Ref<Chunk>>,
         block_data: Res<BlockData>,
         mut worlds: ResMut<Worlds>,
+        mut events: EventWriter<ChunkUpdateEvent>,
         mut commands: Commands,
     ) {
         for chunk in query.iter() {
@@ -144,7 +145,8 @@ impl Chunk {
                 }
 
                 if let Some(entity) = world.get_chunk_id(&chunk.position) {
-                    commands.entity(**entity).insert(ChunkTask::create(
+                    events.send(ChunkUpdateEvent::new(
+                        **entity,
                         chunk.sections.clone(),
                         neighbors,
                         block_data.clone(),
@@ -179,8 +181,9 @@ impl Chunk {
 
                         // Update the neighbor chunk mesh
                         if let Some(entity) = world.get_chunk_id(&neighbor_pos) {
-                            commands.entity(**entity).insert(ChunkTask::create(
-                                neighbor_chunk.sections.clone(),
+                            events.send(ChunkUpdateEvent::new(
+                                **entity,
+                                chunk.sections.clone(),
                                 neighbors,
                                 block_data.clone(),
                             ));

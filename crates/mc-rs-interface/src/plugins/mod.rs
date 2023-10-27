@@ -1,28 +1,11 @@
-use belly::prelude::BellyPlugin;
-use bevy::prelude::*;
+use bevy::prelude::App;
+use mc_rs_render::RenderPlugin;
 
-#[cfg(feature = "debug")]
-mod debug;
+mod asset;
+mod image;
+mod window;
 
-#[cfg(feature = "splash")]
-mod splash;
+mod default;
+use default::DefaultPlugin;
 
-pub(super) fn add_plugins(app: &mut App) {
-    // Add Belly plugin
-    app.add_plugins(BellyPlugin);
-
-    #[cfg(feature = "splash")]
-    {
-        use splash::SplashPlugin;
-        app.add_plugins(SplashPlugin);
-    }
-
-    #[cfg(feature = "debug")]
-    {
-        use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
-        app.add_plugins(FrameTimeDiagnosticsPlugin);
-
-        use debug::DebugPlugin;
-        app.add_plugins(DebugPlugin);
-    }
-}
+pub(super) fn setup(app: &mut App) { app.add_plugins((RenderPlugin, DefaultPlugin)); }

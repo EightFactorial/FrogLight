@@ -1,12 +1,12 @@
 use bevy::{ecs::system::SystemState, prelude::*};
 use compact_str::CompactString;
 use mc_rs_core::{
-    components::player::{LocalPlayer, LocalPlayerHead},
+    components::player::{ControlledPlayer, ControlledPlayerHead},
     resources::client_information::ClientInformation,
     world::{
         resources::{CurrentWorld, WorldSeed, WorldType},
         structure::chunk::Chunk,
-        Worlds,
+        worlds::Worlds,
     },
 };
 use mc_rs_protocol::{
@@ -118,7 +118,7 @@ impl Network for V1_20_0 {
                 debug!("Joined game: {:?}", p);
 
                 let mut state = SystemState::<(
-                    Query<Entity, With<LocalPlayer>>,
+                    Query<Entity, With<ControlledPlayer>>,
                     Res<ClientInformation>,
                     ResMut<ConnectionChannel<Self>>,
                     ResMut<Worlds>,
@@ -166,8 +166,8 @@ impl Network for V1_20_0 {
 
                 let mut state = SystemState::<(
                     ResMut<ConnectionChannel<Self>>,
-                    Query<&mut Transform, (With<LocalPlayer>, Without<LocalPlayerHead>)>,
-                    Query<&mut Transform, (Without<LocalPlayer>, With<LocalPlayerHead>)>,
+                    Query<&mut Transform, (With<ControlledPlayer>, Without<ControlledPlayerHead>)>,
+                    Query<&mut Transform, (Without<ControlledPlayer>, With<ControlledPlayerHead>)>,
                 )>::new(world);
                 let (mut channel, mut player, mut head) = state.get_mut(world);
                 channel.send_play(ServerboundTeleportConfirmPacket::from(p.id));

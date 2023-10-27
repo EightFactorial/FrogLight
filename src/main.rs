@@ -1,30 +1,15 @@
-#![feature(trivial_bounds)]
-
 use bevy::app::App;
+
 use mc_rs_core::CorePlugin;
 use mc_rs_interface::InterfacePlugin;
 use mc_rs_network::NetworkingPlugin;
-
-mod plugins;
-mod systems;
 
 fn main() {
     // Create a new app
     let mut app = App::new();
 
-    // Add plugins
-    plugins::add_plugins(&mut app);
-
-    // // Add networking systems
-    // networking::setup(&mut app);
-
-    app.add_plugins((CorePlugin, NetworkingPlugin, InterfacePlugin));
-
-    // // Add interface systems
-    // interface::setup(&mut app);
-
-    // Add general systems
-    systems::setup(&mut app);
+    // Add the plugins
+    app.add_plugins((CorePlugin, InterfacePlugin, NetworkingPlugin));
 
     // Run the app
     app.run();

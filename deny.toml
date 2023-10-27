@@ -37,8 +37,7 @@ skip = [
     { name = "linux-raw-sys" }
 ]
 skip-tree = [
-    { name = "belly", depth = 20 }
-    # { name = "bevy", depth = 20 }
+    { name = "bevy" }
 ]
 
 [sources]
@@ -47,54 +46,4 @@ unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = [
     "https://github.com/EightFactorial/azalea",
-    "https://github.com/EightFactorial/belly",
-    "https://github.com/stoically/syn-rsx",
-]
-
-[[licenses.clarify]]
-name = "belly_core"
-expression = "MIT AND Apache-2.0"
-license-files = [
-    { path = "../../LICENSE-MIT.md", hash = 0xbd0eed23 },
-    { path = "../../LICENSE-APACHE.md", hash = 0x7e9c4b7e }
-]
-
-[[licenses.clarify]]
-name = "belly_macro"
-expression = "MIT AND Apache-2.0"
-license-files = [
-    { path = "../../LICENSE-MIT.md", hash = 0xbd0eed23 },
-    { path = "../../LICENSE-APACHE.md", hash = 0x7e9c4b7e }
-]
-
-[[licenses.clarify]]
-name = "belly_widgets"
-expression = "MIT AND Apache-2.0"
-license-files = [
-    { path = "../../LICENSE-MIT.md", hash = 0xbd0eed23 },
-    { path = "../../LICENSE-APACHE.md", hash = 0x7e9c4b7e }
-]
-
-[[licenses.clarify]]
-name = "belly_stylebox"
-expression = "MIT AND Apache-2.0"
-license-files = [
-    { path = "../../LICENSE-MIT.md", hash = 0xbd0eed23 },
-    { path = "../../LICENSE-APACHE.md", hash = 0x7e9c4b7e }
-]
-
-[[licenses.clarify]]
-name = "bevy_stylebox"
-expression = "MIT AND Apache-2.0"
-license-files = [
-    { path = "../../LICENSE-MIT.md", hash = 0xbd0eed23 },
-    { path = "../../LICENSE-APACHE.md", hash = 0x7e9c4b7e }
-]
-
-[[licenses.clarify]]
-name = "tagstr"
-expression = "MIT AND Apache-2.0"
-license-files = [
-    { path = "../../LICENSE-MIT.md", hash = 0xbd0eed23 },
-    { path = "../../LICENSE-APACHE.md", hash = 0x7e9c4b7e }
 ]

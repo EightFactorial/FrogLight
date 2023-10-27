@@ -5,7 +5,7 @@ use bevy::{prelude::*, utils::HashMap};
 use mc_rs_protocol::{types::enums::ConnectionIntent, Version};
 use uuid::Uuid;
 
-pub(super) fn configure(app: &mut App) {
+pub(super) fn setup(app: &mut App) {
     app.add_event::<StatusResponse>();
     app.add_event::<PingResponse>();
 }

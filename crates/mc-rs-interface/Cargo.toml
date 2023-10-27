@@ -3,15 +3,18 @@ name = "mc-rs-interface"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+build = "build.rs"
+
+[build-dependencies]
+vergen = { version = "8.2.5", features = ["build", "cargo", "git", "gitoxide"] }
 
 [dependencies]
-anyhow = "1.0"
-azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
-belly = { version = "0.3.0", git = "https://github.com/EightFactorial/belly.git" }
 bevy = { version = "0.11", features = ["serialize"] }
-log = { version = "0.4", features = ["std"] }
 mc-rs-core = { version = "0.1.0", path = "../mc-rs-core" }
+mc-rs-render = { version = "0.1.0", path = "../mc-rs-render" }
 rand = { version = "0.8", features = ["nightly"] }
 serde = { version = "1.0", features = ["derive"] }
 strum = { version = "0.25", features = ["derive"] }
@@ -25,6 +28,6 @@ splash = []
 debug = []
 
 # Enable simd features
-simd = ["mc-rs-core/simd"]
+simd = ["mc-rs-core/simd", "mc-rs-render/simd"]
 # !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "rand/simd_support"]
+simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-render/simd_advanced", "rand/simd_support"]
