@@ -5,7 +5,6 @@
 			"type": "cargo",
 			"command": "run",
 			"args": [
-				"--release",
 				"--features=debug"
 			],
 			"env": {
@@ -24,7 +23,6 @@
 			"type": "cargo",
 			"command": "run",
 			"args": [
-				"--release",
 				"--features=debug"
 			],
 			"env": {

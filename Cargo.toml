@@ -51,15 +51,20 @@ opt-level = 3
 [profile.dev.package.mc-rs-render]
 opt-level = 3
 
+[profile.release]
+opt-level = "s"
+strip = true
+lto = true
 
 [dependencies]
+bevy = { workspace = true }
 mc-rs-core = { version = "0.1.0", path = "crates/mc-rs-core" }
 mc-rs-interface = { version = "0.1.0", path = "crates/mc-rs-interface" }
 mc-rs-network = { version = "0.1.0", path = "crates/mc-rs-network" }
 
 # Enable wayland support on linux
 [target.'cfg(target_os = "linux")'.dependencies]
-bevy = { version = "0.11", features = ["wayland"] }
+bevy = { workspace = true, features = ["wayland"] }
 
 [features]
 default = ["simd"]
