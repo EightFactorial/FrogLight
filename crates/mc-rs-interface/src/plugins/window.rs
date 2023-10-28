@@ -4,7 +4,7 @@ use bevy::{
 };
 use rand::seq::IteratorRandom;
 
-use crate::settings::window_settings::WindowSettings;
+use crate::settings::window::WindowSettings;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct WindowPlugin(WindowSettings);

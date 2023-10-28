@@ -16,7 +16,7 @@ use bevy::{
     winit::WinitPlugin,
 };
 
-use crate::settings::{window_settings::WindowSettings, Settings};
+use crate::settings::{window::WindowSettings, Settings};
 
 use super::{asset::AssetPlugin, image::ImagePlugin, window::WindowPlugin};
 

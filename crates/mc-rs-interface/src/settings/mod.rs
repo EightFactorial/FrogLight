@@ -4,8 +4,8 @@ use bevy::{app::AppExit, prelude::*};
 use compact_str::CompactString;
 use serde::{Deserialize, Serialize};
 
-pub mod window_settings;
-use window_settings::WindowSettings;
+pub mod window;
+use window::WindowSettings;
 
 pub(super) fn setup(app: &mut App) -> Settings {
     // Load settings from file
@@ -25,7 +25,7 @@ pub(super) fn setup(app: &mut App) -> Settings {
     );
 
     // Setup submodules
-    window_settings::setup(app);
+    window::setup(app);
 
     settings
 }
