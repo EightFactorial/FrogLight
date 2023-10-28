@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+// Re-export mc_rs_protocol
 pub use mc_rs_protocol::{types::*, versions};
 
 pub mod blocks;

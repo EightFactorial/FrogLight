@@ -14,7 +14,6 @@ azalea-nbt = { workspace = true }
 bevy = { workspace = true }
 bevy_rapier3d = { workspace = true }
 compact_str = { workspace = true }
-log = { workspace = true }
 mc-rs-protocol = { version = "0.1.0", path = "../mc-rs-protocol" }
 nohash-hasher = "0.2"
 parking_lot = { version = "0.12", features = ["nightly"] }

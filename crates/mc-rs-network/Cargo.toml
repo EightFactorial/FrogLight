@@ -14,7 +14,6 @@ compact_str = { workspace = true }
 flume = "0.11"
 futures-lite = { workspace = true }
 futures-locks = { version = "0.7", default-features = false }
-log = { workspace = true }
 mc-rs-core = { version = "0.1.0", path = "../mc-rs-core" }
 mc-rs-protocol = { version = "0.1.0", path = "../mc-rs-protocol" }
 

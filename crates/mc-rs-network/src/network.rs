@@ -290,7 +290,7 @@ where
             channel_state = task.state;
 
             if task.is_disconnected() {
-                log::error!("Channel disconnected");
+                error!("Channel disconnected");
                 world.remove_resource::<ConnectionChannel<Self>>();
                 return;
             }

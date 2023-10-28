@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use mc_rs_render::RenderPlugin;
 use plugins::default::DefaultPlugin;
 
+pub mod settings;
 pub mod util;
 
 mod plugins;
@@ -11,7 +12,9 @@ pub struct InterfacePlugin;
 
 impl Plugin for InterfacePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((DefaultPlugin, RenderPlugin));
+        // Load settings and plugins
+        let settings = settings::setup(app);
+        app.add_plugins((DefaultPlugin::from(settings), RenderPlugin));
 
         // TODO: Module setup fns
     }

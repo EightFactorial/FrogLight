@@ -4,8 +4,14 @@ use bevy::{
 };
 use rand::seq::IteratorRandom;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct WindowPlugin;
+use crate::settings::window_settings::WindowSettings;
+
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct WindowPlugin(WindowSettings);
+
+impl From<WindowSettings> for WindowPlugin {
+    fn from(settings: WindowSettings) -> Self { Self(settings) }
+}
 
 impl Plugin for WindowPlugin {
     fn build(&self, app: &mut App) {
@@ -26,10 +32,10 @@ impl Plugin for WindowPlugin {
         }
 
         let window = Window {
-            // present_mode: settings.window.present_mode,
-            // mode: settings.window.window_mode,
-            // resolution: settings.window.resolution.clone(),
             title,
+            present_mode: self.0.vsync_mode,
+            mode: self.0.window_mode,
+            resolution: self.0.resolution.clone(),
             ..default()
         };
 

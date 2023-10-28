@@ -1,5 +1,7 @@
-use bevy::utils::HashMap;
-use log::{debug, error};
+use bevy::{
+    prelude::{debug, error},
+    utils::HashMap,
+};
 use mc_rs_core::{resources::player::username::Username, PingResponse, StatusResponse};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},

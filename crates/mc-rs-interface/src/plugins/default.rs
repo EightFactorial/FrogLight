@@ -16,16 +16,28 @@ use bevy::{
     winit::WinitPlugin,
 };
 
+use crate::settings::{window_settings::WindowSettings, Settings};
+
 use super::{asset::AssetPlugin, image::ImagePlugin, window::WindowPlugin};
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct DefaultPlugin;
+#[derive(Debug, Default, Clone, PartialEq)]
+pub struct DefaultPlugin {
+    window: WindowSettings,
+}
+
+impl From<Settings> for DefaultPlugin {
+    fn from(value: Settings) -> Self {
+        Self {
+            window: value.window,
+        }
+    }
+}
 
 impl PluginGroup for DefaultPlugin {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(InputPlugin)
-            .add(WindowPlugin)
+            .add(WindowPlugin::from(self.window))
             .add(AccessibilityPlugin)
             .add(AssetPlugin)
             .add(ScenePlugin)

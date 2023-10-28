@@ -48,7 +48,7 @@ impl Chunk {
 
         let (motion_blocking, world_surface) = Self::unwrap_heightmaps(chunk_data.heightmaps)
             .unwrap_or_else(|| {
-                log::warn!("Failed to unwrap chunk heightmaps");
+                warn!("Failed to unwrap chunk heightmaps");
                 Default::default()
             });
 

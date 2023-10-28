@@ -2,10 +2,10 @@
 
 use std::{future::join, sync::Arc};
 
+use bevy::log::error;
 use flume::{Receiver, Sender};
 use futures_lite::Future;
 use futures_locks::Mutex;
-use log::error;
 use mc_rs_core::{resources::player::username::Username, PingResponse, StatusResponse};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
