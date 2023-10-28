@@ -16,6 +16,7 @@ use mc_rs_protocol::{
 use crate::{
     handle::ConnectionEnum,
     task::{ConnectionChannel, ConnectionHandshakeTask, ConnectionLoginTask, ConnectionStatusTask},
+    NetworkingSet,
 };
 
 use super::{
@@ -44,7 +45,9 @@ where
         app.configure_set(
             PreUpdate,
             ConnectionSystemSet::<Self>::default()
-                .run_if(any_with_component::<ConnectionMarker<Self>>()),
+                .run_if(any_with_component::<ConnectionMarker<Self>>())
+                .ambiguous_with(NetworkingSet)
+                .in_set(NetworkingSet),
         );
 
         // Add systems to the set
