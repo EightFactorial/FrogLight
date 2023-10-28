@@ -7,6 +7,9 @@ use serde::{Deserialize, Serialize};
 pub mod window;
 use window::WindowSettings;
 
+pub mod keybinds;
+use keybinds::Keybinds;
+
 pub(super) fn setup(app: &mut App) -> Settings {
     // Load settings from file
     let settings = Settings::load();
@@ -34,6 +37,8 @@ pub(super) fn setup(app: &mut App) -> Settings {
 pub struct Settings {
     #[serde(default)]
     pub window: WindowSettings,
+    #[serde(default)]
+    pub keybinds: Keybinds,
 }
 
 impl Settings {
