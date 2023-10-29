@@ -1,8 +1,7 @@
 use bevy::{prelude::App, reflect::Reflect};
 use leafwing_input_manager::{
-    prelude::{InputManagerPlugin, InputMap},
+    prelude::{InputManagerPlugin, InputMap, UserInput},
     scan_codes::QwertyScanCode,
-    user_input::InputKind,
     Actionlike,
 };
 use serde::{Deserialize, Serialize};
@@ -22,15 +21,15 @@ pub enum MovementActions {
     Sprint,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MovementKeybinds {
-    pub forward: Option<InputKind>,
-    pub backward: Option<InputKind>,
-    pub left: Option<InputKind>,
-    pub right: Option<InputKind>,
-    pub jump: Option<InputKind>,
-    pub sneak: Option<InputKind>,
-    pub sprint: Option<InputKind>,
+    pub forward: Option<UserInput>,
+    pub backward: Option<UserInput>,
+    pub left: Option<UserInput>,
+    pub right: Option<UserInput>,
+    pub jump: Option<UserInput>,
+    pub sneak: Option<UserInput>,
+    pub sprint: Option<UserInput>,
 }
 
 impl Default for MovementKeybinds {

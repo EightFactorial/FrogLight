@@ -33,6 +33,8 @@ pub struct PlayerControllerBundle {
 impl PlayerControllerBundle {
     /// Create a new bundle of player controls.
     pub fn new(keybinds: &KeyBinds) -> Self {
+        let keybinds = keybinds.clone();
+
         Self {
             movement: InputManagerBundle {
                 input_map: keybinds.movement.into(),

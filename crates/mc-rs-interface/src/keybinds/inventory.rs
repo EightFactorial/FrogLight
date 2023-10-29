@@ -2,7 +2,7 @@ use bevy::{prelude::App, reflect::Reflect};
 use leafwing_input_manager::{
     prelude::{InputManagerPlugin, InputMap},
     scan_codes::QwertyScanCode,
-    user_input::InputKind,
+    user_input::UserInput,
     Actionlike,
 };
 use serde::{Deserialize, Serialize};
@@ -27,20 +27,20 @@ pub enum InventoryActions {
     SwapItemInHand,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct InventoryKeybinds {
-    drop_item: Option<InputKind>,
-    hotbar_slot_1: Option<InputKind>,
-    hotbar_slot_2: Option<InputKind>,
-    hotbar_slot_3: Option<InputKind>,
-    hotbar_slot_4: Option<InputKind>,
-    hotbar_slot_5: Option<InputKind>,
-    hotbar_slot_6: Option<InputKind>,
-    hotbar_slot_7: Option<InputKind>,
-    hotbar_slot_8: Option<InputKind>,
-    hotbar_slot_9: Option<InputKind>,
-    toggle_inventory: Option<InputKind>,
-    swap_item_in_hand: Option<InputKind>,
+    drop_item: Option<UserInput>,
+    hotbar_slot_1: Option<UserInput>,
+    hotbar_slot_2: Option<UserInput>,
+    hotbar_slot_3: Option<UserInput>,
+    hotbar_slot_4: Option<UserInput>,
+    hotbar_slot_5: Option<UserInput>,
+    hotbar_slot_6: Option<UserInput>,
+    hotbar_slot_7: Option<UserInput>,
+    hotbar_slot_8: Option<UserInput>,
+    hotbar_slot_9: Option<UserInput>,
+    toggle_inventory: Option<UserInput>,
+    swap_item_in_hand: Option<UserInput>,
 }
 
 impl Default for InventoryKeybinds {

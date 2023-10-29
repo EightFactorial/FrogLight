@@ -4,7 +4,7 @@ use bevy::{
 };
 use leafwing_input_manager::{
     prelude::{InputManagerPlugin, InputMap},
-    user_input::InputKind,
+    user_input::UserInput,
     Actionlike,
 };
 use serde::{Deserialize, Serialize};
@@ -20,11 +20,11 @@ pub enum GameplayActions {
     UsePlace,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GameplayKeybinds {
-    pub attack_destroy: Option<InputKind>,
-    pub pick_block: Option<InputKind>,
-    pub use_place: Option<InputKind>,
+    pub attack_destroy: Option<UserInput>,
+    pub pick_block: Option<UserInput>,
+    pub use_place: Option<UserInput>,
 }
 
 impl Default for GameplayKeybinds {

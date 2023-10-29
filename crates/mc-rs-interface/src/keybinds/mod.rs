@@ -38,7 +38,7 @@ pub(super) fn setup(app: &mut App) {
 /// A set of keybinds for the player.
 ///
 /// This is a bundle of all keybinds for the player, separated into categories.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Resource)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize, Resource)]
 pub struct KeyBinds {
     #[serde(default)]
     pub movement: MovementKeybinds,
