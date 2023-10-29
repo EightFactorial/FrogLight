@@ -22,8 +22,8 @@ futures-lite = { workspace = true }
 hashbrown = { version = "0.14", features = ["serde"] }
 log = { workspace = true, optional = true }
 mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["preserve_order", "arbitrary_precision"] }
+serde = { workspace = true }
+serde_json = { version = "1.0", features = ["arbitrary_precision"] }
 smallvec = { workspace = true }
 strum = { workspace = true }
 thiserror = "1.0"
