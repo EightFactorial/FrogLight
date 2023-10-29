@@ -24,6 +24,7 @@ allow = [
 ]
 exceptions = [
     { name = "unicode-ident", allow = ["Unicode-DFS-2016"] },
+    { name = "option-ext", allow = ["MPL-2.0"] }
 ]
 
 [bans]

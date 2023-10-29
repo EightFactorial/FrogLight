@@ -15,6 +15,7 @@ vergen = { version = "8.2.5", features = ["build", "cargo", "git", "gitoxide"] }
 [dependencies]
 bevy = { workspace = true, features = ["serialize"] }
 compact_str = { workspace = true }
+dirs = "5.0.1"
 leafwing-input-manager = "0.10.0"
 mc-rs-core = { version = "0.1.0", path = "../mc-rs-core" }
 mc-rs-render = { version = "0.1.0", path = "../mc-rs-render" }

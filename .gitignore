@@ -15,6 +15,3 @@
 # To build the project you need to download your own assets
 assets/resourcepacks/*
 assets/minecraft/*/*
-
-# Ignore settings file
-settings.toml

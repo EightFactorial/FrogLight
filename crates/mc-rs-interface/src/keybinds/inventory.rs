@@ -1,9 +1,8 @@
-use bevy::{
-    prelude::{App, KeyCode},
-    reflect::Reflect,
-};
+use bevy::{prelude::App, reflect::Reflect};
 use leafwing_input_manager::{
     prelude::{InputManagerPlugin, InputMap},
+    scan_codes::QwertyScanCode,
+    user_input::InputKind,
     Actionlike,
 };
 use serde::{Deserialize, Serialize};
@@ -30,35 +29,35 @@ pub enum InventoryActions {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct InventoryKeybinds {
-    drop_item: Option<KeyCode>,
-    hotbar_slot_1: Option<KeyCode>,
-    hotbar_slot_2: Option<KeyCode>,
-    hotbar_slot_3: Option<KeyCode>,
-    hotbar_slot_4: Option<KeyCode>,
-    hotbar_slot_5: Option<KeyCode>,
-    hotbar_slot_6: Option<KeyCode>,
-    hotbar_slot_7: Option<KeyCode>,
-    hotbar_slot_8: Option<KeyCode>,
-    hotbar_slot_9: Option<KeyCode>,
-    toggle_inventory: Option<KeyCode>,
-    swap_item_in_hand: Option<KeyCode>,
+    drop_item: Option<InputKind>,
+    hotbar_slot_1: Option<InputKind>,
+    hotbar_slot_2: Option<InputKind>,
+    hotbar_slot_3: Option<InputKind>,
+    hotbar_slot_4: Option<InputKind>,
+    hotbar_slot_5: Option<InputKind>,
+    hotbar_slot_6: Option<InputKind>,
+    hotbar_slot_7: Option<InputKind>,
+    hotbar_slot_8: Option<InputKind>,
+    hotbar_slot_9: Option<InputKind>,
+    toggle_inventory: Option<InputKind>,
+    swap_item_in_hand: Option<InputKind>,
 }
 
 impl Default for InventoryKeybinds {
     fn default() -> Self {
         Self {
-            drop_item: Some(KeyCode::Q),
-            hotbar_slot_1: Some(KeyCode::Key1),
-            hotbar_slot_2: Some(KeyCode::Key2),
-            hotbar_slot_3: Some(KeyCode::Key3),
-            hotbar_slot_4: Some(KeyCode::Key4),
-            hotbar_slot_5: Some(KeyCode::Key5),
-            hotbar_slot_6: Some(KeyCode::Key6),
-            hotbar_slot_7: Some(KeyCode::Key7),
-            hotbar_slot_8: Some(KeyCode::Key8),
-            hotbar_slot_9: Some(KeyCode::Key9),
-            toggle_inventory: Some(KeyCode::E),
-            swap_item_in_hand: Some(KeyCode::F),
+            drop_item: Some(QwertyScanCode::Q.into()),
+            hotbar_slot_1: Some(QwertyScanCode::Key1.into()),
+            hotbar_slot_2: Some(QwertyScanCode::Key2.into()),
+            hotbar_slot_3: Some(QwertyScanCode::Key3.into()),
+            hotbar_slot_4: Some(QwertyScanCode::Key4.into()),
+            hotbar_slot_5: Some(QwertyScanCode::Key5.into()),
+            hotbar_slot_6: Some(QwertyScanCode::Key6.into()),
+            hotbar_slot_7: Some(QwertyScanCode::Key7.into()),
+            hotbar_slot_8: Some(QwertyScanCode::Key8.into()),
+            hotbar_slot_9: Some(QwertyScanCode::Key9.into()),
+            toggle_inventory: Some(QwertyScanCode::E.into()),
+            swap_item_in_hand: Some(QwertyScanCode::F.into()),
         }
     }
 }

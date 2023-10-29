@@ -2,10 +2,11 @@ use bevy::prelude::*;
 use mc_rs_render::RenderPlugin;
 use plugins::default::DefaultPlugin;
 
+pub mod keybinds;
 pub mod settings;
-pub mod util;
 
 mod plugins;
+mod util;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct InterfacePlugin;
@@ -16,7 +17,8 @@ impl Plugin for InterfacePlugin {
         let settings = settings::setup(app);
         app.add_plugins((DefaultPlugin::from(settings), RenderPlugin));
 
-        // TODO: Module setup fns
+        // Setup submodules
+        keybinds::setup(app);
     }
 }
 

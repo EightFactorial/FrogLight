@@ -1,9 +1,8 @@
-use bevy::{
-    prelude::{App, KeyCode},
-    reflect::Reflect,
-};
+use bevy::{prelude::App, reflect::Reflect};
 use leafwing_input_manager::{
     prelude::{InputManagerPlugin, InputMap},
+    scan_codes::QwertyScanCode,
+    user_input::InputKind,
     Actionlike,
 };
 use serde::{Deserialize, Serialize};
@@ -25,25 +24,25 @@ pub enum MovementActions {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct MovementKeybinds {
-    pub forward: Option<KeyCode>,
-    pub backward: Option<KeyCode>,
-    pub left: Option<KeyCode>,
-    pub right: Option<KeyCode>,
-    pub jump: Option<KeyCode>,
-    pub sneak: Option<KeyCode>,
-    pub sprint: Option<KeyCode>,
+    pub forward: Option<InputKind>,
+    pub backward: Option<InputKind>,
+    pub left: Option<InputKind>,
+    pub right: Option<InputKind>,
+    pub jump: Option<InputKind>,
+    pub sneak: Option<InputKind>,
+    pub sprint: Option<InputKind>,
 }
 
 impl Default for MovementKeybinds {
     fn default() -> Self {
         Self {
-            forward: Some(KeyCode::W),
-            backward: Some(KeyCode::S),
-            left: Some(KeyCode::A),
-            right: Some(KeyCode::D),
-            jump: Some(KeyCode::Space),
-            sneak: Some(KeyCode::ShiftLeft),
-            sprint: Some(KeyCode::ControlLeft),
+            forward: Some(QwertyScanCode::W.into()),
+            backward: Some(QwertyScanCode::S.into()),
+            left: Some(QwertyScanCode::A.into()),
+            right: Some(QwertyScanCode::D.into()),
+            jump: Some(QwertyScanCode::Space.into()),
+            sneak: Some(QwertyScanCode::ShiftLeft.into()),
+            sprint: Some(QwertyScanCode::ControlLeft.into()),
         }
     }
 }

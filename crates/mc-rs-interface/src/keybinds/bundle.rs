@@ -4,25 +4,12 @@ use mc_rs_core::{
     components::player::CreateControlledPlayerEvent,
     schedule::{set::GameSet, state::ApplicationState},
 };
-use serde::{Deserialize, Serialize};
 
-pub mod gameplay;
-use gameplay::{GameplayActions, GameplayKeybinds};
-
-pub mod inventory;
-use inventory::{InventoryActions, InventoryKeybinds};
-
-pub mod movement;
-use movement::{MovementActions, MovementKeybinds};
-
-use super::Settings;
+use super::{
+    gameplay::GameplayActions, inventory::InventoryActions, movement::MovementActions, KeyBinds,
+};
 
 pub(super) fn setup(app: &mut App) {
-    // Setup submodules
-    gameplay::setup(app);
-    inventory::setup(app);
-    movement::setup(app);
-
     // Add systems to add and remove controls
     app.add_systems(
         Update,
@@ -35,17 +22,6 @@ pub(super) fn setup(app: &mut App) {
     );
 }
 
-// TODO: Accept keyboard and mouse buttons as keybinds
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub struct Keybinds {
-    #[serde(default)]
-    pub movement: MovementKeybinds,
-    #[serde(default)]
-    pub gameplay: GameplayKeybinds,
-    #[serde(default)]
-    pub inventory: InventoryKeybinds,
-}
-
 /// Bundle of all player controls.
 #[derive(Bundle)]
 pub struct PlayerControllerBundle {
@@ -56,7 +32,7 @@ pub struct PlayerControllerBundle {
 
 impl PlayerControllerBundle {
     /// Create a new bundle of player controls.
-    pub fn new(keybinds: &Keybinds) -> Self {
+    pub fn new(keybinds: &KeyBinds) -> Self {
         Self {
             movement: InputManagerBundle {
                 input_map: keybinds.movement.into(),
@@ -76,7 +52,7 @@ impl PlayerControllerBundle {
     /// Add controls to the player entity.
     fn add_to_player(
         mut events: EventReader<CreateControlledPlayerEvent>,
-        settings: Res<Settings>,
+        keybinds: Res<KeyBinds>,
         mut commands: Commands,
     ) {
         events
@@ -84,7 +60,7 @@ impl PlayerControllerBundle {
             .for_each(|event| match commands.get_entity(**event) {
                 None => error!("Could not attach controls to player entity!"),
                 Some(mut commands) => {
-                    commands.insert(Self::new(&settings.keybinds));
+                    commands.insert(Self::new(&keybinds));
                 }
             });
     }

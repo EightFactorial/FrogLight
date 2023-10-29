@@ -1,14 +1,12 @@
-use std::fs;
+use std::{fs, path::PathBuf};
 
 use bevy::{app::AppExit, prelude::*};
-use compact_str::CompactString;
 use serde::{Deserialize, Serialize};
 
 pub mod window;
 use window::WindowSettings;
 
-pub mod keybinds;
-use keybinds::Keybinds;
+use crate::util::dir::config_folder;
 
 pub(super) fn setup(app: &mut App) -> Settings {
     // Load settings from file
@@ -28,7 +26,6 @@ pub(super) fn setup(app: &mut App) -> Settings {
     );
 
     // Setup submodules
-    keybinds::setup(app);
     window::setup(app);
 
     settings
@@ -38,25 +35,23 @@ pub(super) fn setup(app: &mut App) -> Settings {
 pub struct Settings {
     #[serde(default)]
     pub window: WindowSettings,
-    #[serde(default)]
-    pub keybinds: Keybinds,
 }
 
 impl Settings {
     /// Get the default path for the settings file.
     ///
     /// TODO: Find proper location for settings
-    fn default_path() -> CompactString { CompactString::new_inline("settings.toml") }
+    fn default_path() -> PathBuf { config_folder().join("settings.toml") }
 
     /// Load settings from the `settings.toml` file.
     pub fn load() -> Self {
         #[cfg(any(debug_assertions, feature = "debug"))]
         {
-            debug!("Loading settings from `{}`", Self::default_path().as_str());
+            debug!("Loading settings from `{}`", Self::default_path().display());
         }
 
         // Try to read the file
-        match fs::read_to_string(Self::default_path().as_str()) {
+        match fs::read_to_string(Self::default_path()) {
             // File does not exist, return default settings
             Err(err) => {
                 error!("Could not read settings file: {err}");
@@ -85,7 +80,7 @@ impl Settings {
             Err(err) => error!("Could not serialize settings: {err}"),
             // Try to write the settings to the file
             Ok(string) => {
-                if let Err(err) = fs::write(Self::default_path().as_str(), string) {
+                if let Err(err) = fs::write(Self::default_path(), string) {
                     // File could not be written, print error
                     error!("Could not write settings file: {err}");
                 }
@@ -111,7 +106,10 @@ impl Settings {
     fn save_settings(settings: Res<Settings>) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         {
-            debug!("Saving settings to `{}`", Settings::default_path().as_str());
+            debug!(
+                "Saving settings to `{}`",
+                Settings::default_path().display()
+            );
         }
 
         settings.save();
