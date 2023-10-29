@@ -28,6 +28,7 @@ pub(super) fn setup(app: &mut App) -> Settings {
     );
 
     // Setup submodules
+    keybinds::setup(app);
     window::setup(app);
 
     settings
