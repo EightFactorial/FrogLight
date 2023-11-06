@@ -14,6 +14,11 @@ pub struct Blocks;
 impl Blocks {
     pub const CLASS: &'static str = "net/minecraft/class_2246";
     pub const METHOD: &'static str = "<clinit>";
+
+    // TODO: Support using block keys from class
+    // Must be done to support 1.20.3+
+    pub const BLOCK_KEYS: &'static str = "net/minecraft/class_8803";
+    pub const BLOCK_KEYS_METHOD: &'static str = "<clinit>";
 }
 
 impl Dataset for Blocks {
