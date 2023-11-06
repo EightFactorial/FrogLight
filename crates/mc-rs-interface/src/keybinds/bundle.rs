@@ -1,5 +1,8 @@
 use bevy::prelude::*;
-use leafwing_input_manager::{prelude::InputMap, InputManagerBundle};
+use leafwing_input_manager::{
+    prelude::{ActionState, InputMap},
+    InputManagerBundle,
+};
 use mc_rs_core::{
     components::player::CreateControlledPlayerEvent,
     schedule::{set::GameSet, state::ApplicationState},
@@ -13,7 +16,12 @@ pub(super) fn setup(app: &mut App) {
     // Add systems to add and remove controls
     app.add_systems(
         Update,
-        PlayerControllerBundle::add_to_player.in_set(GameSet),
+        (
+            PlayerControllerBundle::add_to_player,
+            PlayerControllerBundle::update_controls
+                .run_if(resource_exists_and_changed::<KeyBinds>()),
+        )
+            .in_set(GameSet),
     );
 
     app.add_systems(
@@ -65,6 +73,17 @@ impl PlayerControllerBundle {
                     commands.insert(Self::new(&keybinds));
                 }
             });
+    }
+
+    /// Update the controls for the player entity.
+    fn update_controls(
+        query: Query<Entity, With<ActionState<MovementActions>>>,
+        keybinds: Res<KeyBinds>,
+        mut commands: Commands,
+    ) {
+        query.for_each(|entity| {
+            commands.entity(entity).insert(Self::new(&keybinds));
+        })
     }
 
     /// Remove controls from the player entity.
