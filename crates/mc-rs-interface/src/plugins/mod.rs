@@ -1,5 +1,5 @@
-mod asset;
-mod image;
-mod window;
+mod default;
+pub use default::DefaultPlugin;
 
-pub mod default;
+mod render;
+pub use render::RenderPlugin;

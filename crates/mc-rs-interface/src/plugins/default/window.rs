@@ -4,7 +4,7 @@ use bevy::{
 };
 use rand::seq::IteratorRandom;
 
-use crate::settings::window::WindowSettings;
+use crate::configs::window_settings::WindowSettings;
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct WindowPlugin(WindowSettings);
@@ -33,8 +33,8 @@ impl Plugin for WindowPlugin {
 
         let window = Window {
             title,
-            present_mode: self.0.vsync_mode,
-            mode: self.0.window_mode,
+            present_mode: self.0.vsync,
+            mode: self.0.window,
             resolution: self.0.resolution.clone(),
             ..default()
         };
@@ -47,7 +47,7 @@ impl Plugin for WindowPlugin {
     }
 }
 
-static WINDOW_TITLES: &str = include_str!("../../../../assets/texts/titles.txt");
+static WINDOW_TITLES: &str = include_str!("../../../../../assets/texts/titles.txt");
 
 /// Get a random window title.
 ///

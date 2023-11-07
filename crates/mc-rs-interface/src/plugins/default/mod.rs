@@ -16,9 +16,16 @@ use bevy::{
     winit::WinitPlugin,
 };
 
-use crate::settings::{window::WindowSettings, Settings};
+mod asset;
+use asset::AssetPlugin;
 
-use super::{asset::AssetPlugin, image::ImagePlugin, window::WindowPlugin};
+mod image;
+use image::ImagePlugin;
+
+mod window;
+use window::WindowPlugin;
+
+use crate::configs::{window_settings::WindowSettings, Settings};
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct DefaultPlugin {

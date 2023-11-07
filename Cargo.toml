@@ -16,7 +16,6 @@ members = [
     "crates/mc-rs-macros",
     "crates/mc-rs-network",
     "crates/mc-rs-protocol",
-    "crates/mc-rs-render",
     "crates/tools/classfile-rs",
     "crates/tools/mc-rs-extract",
     "crates/tools/mc-rs-generate",
@@ -47,9 +46,6 @@ opt-level = 3
 opt-level = 3
 
 [profile.dev.package.mc-rs-protocol]
-opt-level = 3
-
-[profile.dev.package.mc-rs-render]
 opt-level = 3
 
 [profile.release]
