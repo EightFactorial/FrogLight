@@ -25,7 +25,7 @@ use image::ImagePlugin;
 mod window;
 use window::WindowPlugin;
 
-use crate::configs::{window_settings::WindowSettings, Settings};
+use crate::configs::settings::{window_settings::WindowSettings, Settings};
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct DefaultPlugin {

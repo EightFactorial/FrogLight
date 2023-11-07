@@ -1,5 +1,2 @@
-mod keybinds;
-pub use keybinds::*;
-
-mod settings;
-pub use settings::*;
+pub mod keybinds;
+pub mod settings;

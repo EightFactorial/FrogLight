@@ -3,8 +3,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::traits::config::{ConfigFile, ResourceConfig};
 
-pub mod button;
-pub mod keybind;
+mod button;
+pub use button::Button;
+
+mod keybind;
+pub use keybind::KeyBind;
 
 pub mod groups;
 use groups::{GameplayKeybinds, InventoryKeybinds, MovementKeybinds};

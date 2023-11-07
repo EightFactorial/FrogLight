@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::configs::{button::Button, keybind::KeyBind};
+use crate::configs::keybinds::{Button, KeyBind};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GameplayKeybinds {

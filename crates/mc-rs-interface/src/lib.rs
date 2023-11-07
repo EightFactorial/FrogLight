@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use configs::{Keybinds, Settings};
+use configs::{keybinds::Keybinds, settings::Settings};
 use plugins::{DefaultPlugin, RenderPlugin};
 use traits::config::ResourceConfig;
 

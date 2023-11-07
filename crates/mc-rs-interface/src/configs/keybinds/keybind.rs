@@ -6,7 +6,11 @@ use super::button::Button;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum KeyBind {
+    /// A keybind that consists of one button.
     Single(Button),
+    /// A keybind that consists of two buttons.
+    ///
+    /// The first button is the primary button, and the second is the modifier button.
     Double(Button, Button),
 }
 
