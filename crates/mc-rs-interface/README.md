@@ -1,5 +1,5 @@
 # MC-RS Interface
 
-This crate contains the GUI interface for the MC-RS project.
+This crate contains the GUI interface and renderer for the MC-RS project.
 
-This includes the game settings and the player controls.
+This includes the game settings, player controls, menus, and shaders.

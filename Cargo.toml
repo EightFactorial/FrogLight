@@ -22,10 +22,10 @@ members = [
 ]
 
 [workspace.dependencies]
-azalea-chat = { version = "0.8.0", default-features = false }
-azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
+azalea-chat = { version = "0.8", default-features = false }
+azalea-nbt = { version = "0.8", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 bevy = "0.11"
-bevy_rapier3d = { version = "0.22.0", features = ["parallel"] }
+bevy_rapier3d = { version = "0.22", features = ["parallel"] }
 compact_str = { version = "0.7", features = ["serde", "smallvec"] }
 derive_more = "0.99"
 futures-lite = { version = "2.0", features = ["futures-io"] }

@@ -21,7 +21,7 @@ derive_more = { workspace = true }
 futures-lite = { workspace = true }
 hashbrown = { version = "0.14", features = ["serde"] }
 log = { workspace = true, optional = true }
-mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }
+mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
 serde = { workspace = true }
 serde_json = { version = "1.0", features = ["arbitrary_precision"] }
 smallvec = { workspace = true }

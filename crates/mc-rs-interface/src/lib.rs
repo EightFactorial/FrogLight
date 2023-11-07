@@ -1,10 +1,12 @@
 use bevy::prelude::*;
-use configs::{keybinds::Keybinds, settings::Settings};
+use configs::settings::Settings;
 use plugins::{DefaultPlugin, RenderPlugin};
 use traits::config::ResourceConfig;
 
 mod configs;
 mod plugins;
+mod resourcepacks;
+mod resources;
 mod traits;
 mod util;
 
@@ -18,7 +20,8 @@ impl Plugin for InterfacePlugin {
         app.add_plugins((DefaultPlugin::from(settings.clone()), RenderPlugin))
             .insert_resource(settings);
 
-        Keybinds::setup_resource(app);
+        resourcepacks::setup(app);
+        resources::setup(app);
     }
 }
 
