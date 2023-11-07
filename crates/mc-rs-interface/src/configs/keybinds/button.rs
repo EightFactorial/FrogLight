@@ -5,9 +5,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[repr(u32)]
 pub enum Button {
-    /// No button.
-    None,
-
     /// The `1` key over the letters.
     Key1,
     /// The `2` key over the letters.
@@ -369,6 +366,31 @@ pub enum Button {
     MouseMiddle,
     /// Another mouse button with the associated number.
     MouseOther(u16),
+}
+
+impl Button {
+    pub fn is_keyboard(&self) -> bool { !self.is_mouse() }
+
+    pub fn is_mouse(&self) -> bool {
+        matches!(
+            self,
+            Self::MouseLeft | Self::MouseRight | Self::MouseMiddle | Self::MouseOther(_)
+        )
+    }
+
+    pub fn is_modifier(&self) -> bool {
+        matches!(
+            self,
+            Self::AltLeft
+                | Self::AltRight
+                | Self::ControlLeft
+                | Self::ControlRight
+                | Self::ShiftLeft
+                | Self::ShiftRight
+                | Self::SuperLeft
+                | Self::SuperRight
+        )
+    }
 }
 
 impl From<KeyCode> for Button {
@@ -748,11 +770,7 @@ impl From<Button> for Option<KeyCode> {
             Button::Paste => Some(KeyCode::Paste),
             Button::Cut => Some(KeyCode::Cut),
 
-            Button::None
-            | Button::MouseLeft
-            | Button::MouseRight
-            | Button::MouseMiddle
-            | Button::MouseOther(_) => None,
+            _ => None,
         }
     }
 }
