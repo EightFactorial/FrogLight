@@ -19,7 +19,7 @@ pub struct NetworkingPlugin;
 
 impl Plugin for NetworkingPlugin {
     fn build(&self, app: &mut App) {
-        app.configure_set(PreUpdate, NetworkingSet);
+        app.configure_sets(PreUpdate, NetworkingSet);
 
         <V1_20_0 as Network>::register(app);
     }

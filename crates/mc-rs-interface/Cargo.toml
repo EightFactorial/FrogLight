@@ -28,7 +28,7 @@ zip = { version = "0.6", features = ["flate2"] }
 default = []
 
 # Enable debug features
-debug = []
+debug = ["bevy/file_watcher"]
 
 # Enable simd features
 simd = ["mc-rs-core/simd"]

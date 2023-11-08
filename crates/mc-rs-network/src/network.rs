@@ -42,7 +42,7 @@ where
         app.add_event::<ConnectionEvent<Self>>();
 
         // Configure the system set
-        app.configure_set(
+        app.configure_sets(
             PreUpdate,
             ConnectionSystemSet::<Self>::default()
                 .run_if(any_with_component::<ConnectionMarker<Self>>())
@@ -73,7 +73,7 @@ where
         mut reader: EventReader<StatusRequest<Self>>,
         mut writer: EventWriter<ConnectionEvent<Self>>,
     ) {
-        for request in reader.iter() {
+        for request in reader.read() {
             writer.send(ConnectionEvent::new_with(
                 request.hostname.clone(),
                 ConnectionIntent::Status,
@@ -83,7 +83,7 @@ where
 
     /// Create a new connection to the server
     fn connection_request(mut events: EventReader<ConnectionEvent<Self>>, mut commands: Commands) {
-        for event in events.iter() {
+        for event in events.read() {
             let addr = event.hostname.clone();
             let task = IoTaskPool::get().spawn(Connection::new(Self::default(), addr.clone()));
 

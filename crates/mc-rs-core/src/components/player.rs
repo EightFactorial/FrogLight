@@ -17,7 +17,7 @@ pub struct CreateControlledPlayerEvent(pub Entity);
 
 impl CreateControlledPlayerEvent {
     fn listener(mut events: EventReader<Self>, mut commands: Commands) {
-        events.iter().for_each(|Self(entity)| {
+        events.read().for_each(|Self(entity)| {
             let Some(mut commands) = commands.get_entity(*entity) else {
                 error!("Failed to get entity for controlled player!");
                 return;

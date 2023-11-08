@@ -16,9 +16,6 @@ use bevy::{
     winit::WinitPlugin,
 };
 
-mod asset;
-use asset::AssetPlugin;
-
 mod image;
 use image::ImagePlugin;
 
@@ -46,9 +43,9 @@ impl PluginGroup for DefaultPlugin {
             .add(InputPlugin)
             .add(WindowPlugin::from(self.window))
             .add(AccessibilityPlugin)
-            .add(AssetPlugin)
+            .add(AssetPlugin::default())
             .add(ScenePlugin)
-            .add(WinitPlugin)
+            .add(WinitPlugin::default())
             .add(RenderPlugin::default())
             .add(ImagePlugin)
             .add(PipelinedRenderingPlugin)
