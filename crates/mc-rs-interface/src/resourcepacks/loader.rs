@@ -226,6 +226,11 @@ impl ResourcePackLoader {
             return None;
         };
 
+        // Skip all files that are not in the textures directory.
+        if path_iter.next() != Some(OsStr::new("textures")) {
+            return None;
+        }
+
         // Remove the file extension from the path.
         let path = path_iter.as_path().to_str()?;
         let path = path.trim_end_matches(ext).trim_end_matches('.');
