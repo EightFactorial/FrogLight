@@ -15,12 +15,14 @@ pub struct InterfacePlugin;
 
 impl Plugin for InterfacePlugin {
     fn build(&self, app: &mut App) {
+        resourcepacks::register_assets(app);
+
         let settings = Settings::setup(app);
 
         app.add_plugins((DefaultPlugin::from(settings.clone()), RenderPlugin))
             .insert_resource(settings);
 
-        resourcepacks::setup(app);
+        resourcepacks::init_assets(app);
         resources::setup(app);
     }
 }
