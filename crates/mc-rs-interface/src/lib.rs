@@ -3,12 +3,12 @@ use configs::settings::Settings;
 use plugins::{DefaultPlugin, RenderPlugin};
 use traits::config::ConfigFile;
 
-mod configs;
-mod plugins;
-mod resourcepacks;
-mod resources;
-mod traits;
-mod util;
+pub mod configs;
+pub mod plugins;
+pub mod resourcepacks;
+pub mod resources;
+pub mod traits;
+pub mod util;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct InterfacePlugin;

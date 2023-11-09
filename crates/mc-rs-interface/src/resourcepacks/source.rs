@@ -13,6 +13,9 @@ use crate::util::dir::config_folder;
 ///
 /// ### Example
 /// ```rust,no_run
+/// use bevy::prelude::*;
+/// use mc_rs_interface::resourcepacks::ResourcePackAsset;
+///
 /// fn load_pack(assets: Res<AssetServer>) {
 ///     let _pack: Handle<ResourcePackAsset> = assets.load("resourcepack://minecraft.zip");
 /// }
