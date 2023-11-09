@@ -5,7 +5,7 @@ use bevy::{
     DefaultPlugins as BevyDefaultPlugins,
 };
 
-use crate::configs::settings::{window_settings::WindowSettings, Settings};
+use crate::configs::settings::{window::WindowSettings, Settings};
 
 mod window;
 

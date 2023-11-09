@@ -4,7 +4,7 @@ use bevy::{
 };
 use rand::seq::IteratorRandom;
 
-use crate::configs::settings::window_settings::WindowSettings;
+use crate::configs::settings::window::WindowSettings;
 
 pub(super) fn setup(settings: WindowSettings, plugins: PluginGroupBuilder) -> PluginGroupBuilder {
     let title: String;

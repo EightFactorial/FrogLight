@@ -3,13 +3,18 @@ use serde::{Deserialize, Serialize};
 
 use crate::traits::config::{ConfigFile, ResourceConfig};
 
-pub mod window_settings;
-use window_settings::WindowSettings;
+pub mod window;
+use window::WindowSettings;
+
+pub mod resourcepack;
+use resourcepack::ResourcePackSettings;
 
 #[derive(Debug, Default, Clone, PartialEq, Resource, Serialize, Deserialize)]
 pub struct Settings {
     #[serde(default)]
     pub window: WindowSettings,
+    #[serde(default)]
+    pub resourcepacks: ResourcePackSettings,
 }
 
 impl ConfigFile for Settings {
