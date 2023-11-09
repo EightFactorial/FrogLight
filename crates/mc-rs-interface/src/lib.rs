@@ -4,6 +4,7 @@ use plugins::{DefaultPlugin, RenderPlugin};
 use traits::config::ConfigFile;
 
 pub mod configs;
+pub mod interface;
 pub mod plugins;
 pub mod resourcepacks;
 pub mod resources;
@@ -22,6 +23,7 @@ impl Plugin for InterfacePlugin {
             .insert_resource(settings);
 
         resources::setup(app);
+        interface::setup(app);
         resourcepacks::init_assets(app);
     }
 }

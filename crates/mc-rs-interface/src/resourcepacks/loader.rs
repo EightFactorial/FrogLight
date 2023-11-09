@@ -83,8 +83,6 @@ impl ResourcePackLoader {
         zip: &mut ZipArchive<impl Read + Seek>,
         load_context: &mut LoadContext,
     ) -> Result<Option<Handle<Image>>, ResourcePackLoaderError> {
-        let mut image_context = load_context.begin_labeled_asset();
-
         // Get the pack.png file from the zip archive.
         let Ok(file) = zip.by_name("pack.png") else {
             #[cfg(any(debug_assertions, feature = "debug"))]
@@ -102,7 +100,7 @@ impl ResourcePackLoader {
         )?;
 
         // Add the image to the asset server.
-        let icon = image_context.add_labeled_asset(String::from("pack_icon"), image);
+        let icon = load_context.labeled_asset_scope(String::from("pack_icon"), |_| image);
 
         Ok(Some(icon))
     }
@@ -165,9 +163,6 @@ impl ResourcePackLoader {
                 continue;
             };
 
-            // Create a new image context for each texture.
-            let mut image_context = load_context.begin_labeled_asset();
-
             // Get the file extension.
             let Some(ext) = file_path
                 .extension()
@@ -187,7 +182,7 @@ impl ResourcePackLoader {
             )?;
 
             // Add the image to the asset server.
-            let handle = image_context.add_labeled_asset(key.to_string(), image);
+            let handle = load_context.labeled_asset_scope(key.to_string(), |_| image);
 
             // Add the texture to the hashmap.
             textures.insert(key, handle);

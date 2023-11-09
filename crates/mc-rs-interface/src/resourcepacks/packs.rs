@@ -35,17 +35,23 @@ pub(super) fn setup(app: &mut App) {
     app.add_systems(
         Update,
         (
-            ResourcePacks::resourcepack_events,
+            ResourcePacks::resourcepack_events.run_if(ResourcePacks::any_asset_events),
             ResourcePacks::update.run_if(
                 resource_exists_and_changed::<Settings>()
                     .and_then(ResourcePacks::resourcepacks_changed),
             ),
-        ),
+        )
+            .run_if(resource_exists::<ResourcePacks>()),
     );
 }
 
 impl ResourcePacks {
-    /// Listen for resourcepacks to be loaded.
+    /// Check for any [ResourcePackAsset] events.
+    fn any_asset_events(events: EventReader<AssetEvent<ResourcePackAsset>>) -> bool {
+        !events.is_empty()
+    }
+
+    /// Process [ResourcePackAsset] events.
     fn resourcepack_events(
         mut packs: ResMut<ResourcePacks>,
         mut asset_events: EventReader<AssetEvent<ResourcePackAsset>>,
@@ -63,6 +69,9 @@ impl ResourcePacks {
 
                     // If all packs are loaded, send the event
                     if packs.packs.iter().all(|pack| pack.loaded) {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        debug!("Sending ResourcePacksFinishReloadEvent!");
+
                         loaded_event.send(ResourcePacksFinishReloadEvent);
                     }
                 }
@@ -71,7 +80,7 @@ impl ResourcePacks {
         });
     }
 
-    /// Check if no resourcepacks are loaded or if the resourcepacks list has changed.
+    /// Check if no [ResourcePackAsset]s are loaded or if the [Settings] have changed.
     fn resourcepacks_changed(settings: Res<Settings>, packs: Res<ResourcePacks>) -> bool {
         packs.packs.is_empty()
             || settings
@@ -101,6 +110,9 @@ impl ResourcePacks {
                 handle,
             });
         }
+
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Sending ResourcePacksStartReloadEvent!");
 
         events.send(ResourcePacksStartReloadEvent);
     }

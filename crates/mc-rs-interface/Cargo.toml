@@ -32,6 +32,9 @@ default = []
 # Enable debug features
 debug = ["bevy/file_watcher"]
 
+# Enable wayland features
+wayland = ["bevy/wayland"]
+
 # Enable simd features
 simd = ["mc-rs-core/simd"]
 # !! Currently broken on the latest nightly !!

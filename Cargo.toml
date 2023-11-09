@@ -60,10 +60,6 @@ mc-rs-core = { version = "0.1.0", path = "crates/mc-rs-core" }
 mc-rs-interface = { version = "0.1.0", path = "crates/mc-rs-interface" }
 mc-rs-network = { version = "0.1.0", path = "crates/mc-rs-network" }
 
-# Enable wayland support on linux
-[target.'cfg(target_os = "linux")'.dependencies]
-bevy = { workspace = true, features = ["wayland"] }
-
 [features]
 default = ["simd"]
 
@@ -71,6 +67,9 @@ default = ["simd"]
 debug = ["mc-rs-core/debug", "mc-rs-interface/debug", "mc-rs-network/debug"]
 # Enable bevy-rapier debug features
 debug_rapier = ["mc-rs-core/debug_rapier"]
+
+# Enable wayland features
+wayland = ["mc-rs-interface/wayland"]
 
 # Enable simd features
 simd = ["mc-rs-core/simd", "mc-rs-interface/simd", "mc-rs-network/simd"]
