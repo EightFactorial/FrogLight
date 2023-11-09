@@ -1,28 +1,13 @@
 use bevy::{
-    a11y::AccessibilityPlugin,
     app::PluginGroupBuilder,
-    audio::AudioPlugin,
-    core_pipeline::CorePipelinePlugin,
-    gizmos::GizmoPlugin,
-    gltf::GltfPlugin,
-    input::InputPlugin,
-    pbr::PbrPlugin,
     prelude::*,
-    render::{pipelined_rendering::PipelinedRenderingPlugin, RenderPlugin},
-    scene::ScenePlugin,
-    sprite::SpritePlugin,
-    text::TextPlugin,
-    ui::UiPlugin,
-    winit::WinitPlugin,
+    render::texture::{ImageAddressMode, ImageSamplerDescriptor},
+    DefaultPlugins as BevyDefaultPlugins,
 };
 
-mod image;
-use image::ImagePlugin;
+use crate::configs::settings::{window_settings::WindowSettings, Settings};
 
 mod window;
-use window::WindowPlugin;
-
-use crate::configs::settings::{window_settings::WindowSettings, Settings};
 
 #[derive(Debug, Default, Clone, PartialEq)]
 pub struct DefaultPlugin {
@@ -39,23 +24,25 @@ impl From<Settings> for DefaultPlugin {
 
 impl PluginGroup for DefaultPlugin {
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>()
-            .add(InputPlugin)
-            .add(WindowPlugin::from(self.window))
-            .add(AccessibilityPlugin)
-            .add(AssetPlugin::default())
-            .add(ScenePlugin)
-            .add(WinitPlugin::default())
-            .add(RenderPlugin::default())
-            .add(ImagePlugin)
-            .add(PipelinedRenderingPlugin)
-            .add(CorePipelinePlugin)
-            .add(SpritePlugin)
-            .add(TextPlugin)
-            .add(UiPlugin)
-            .add(PbrPlugin::default())
-            .add(GltfPlugin::default())
-            .add(AudioPlugin::default())
-            .add(GizmoPlugin)
+        // Use the default bevy plugins
+        let mut plugins = BevyDefaultPlugins::build(BevyDefaultPlugins);
+
+        // Set the image sampler to nearest and the address mode to repeat
+        {
+            let mut default_sampler = ImageSamplerDescriptor::nearest();
+
+            default_sampler.address_mode_u = ImageAddressMode::Repeat;
+            default_sampler.address_mode_v = ImageAddressMode::Repeat;
+            default_sampler.address_mode_w = ImageAddressMode::Repeat;
+
+            plugins = plugins.set(ImagePlugin { default_sampler });
+        }
+
+        // Set the window title, resolution, vsync, etc.
+        {
+            plugins = window::setup(self.window, plugins);
+        }
+
+        plugins.build()
     }
 }
