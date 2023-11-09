@@ -35,8 +35,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
-        with:
-          cache-on-failure: true
 
       - name: Sarif
         uses: taiki-e/install-action@v2
