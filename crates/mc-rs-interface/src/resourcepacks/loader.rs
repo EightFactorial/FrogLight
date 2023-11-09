@@ -1,6 +1,7 @@
 use std::{
     ffi::OsStr,
     io::{Cursor, Read, Seek},
+    path::Path,
 };
 
 use bevy::{
@@ -9,6 +10,8 @@ use bevy::{
     render::texture::{CompressedImageFormats, ImageSampler, ImageType},
     utils::HashMap,
 };
+use compact_str::CompactString;
+use mc_rs_core::ResourceLocation;
 use thiserror::Error;
 use zip::ZipArchive;
 
@@ -71,8 +74,7 @@ impl ResourcePackLoader {
         Ok(ResourcePackAsset {
             icon: Self::read_icon(&mut zip, load_context)?,
             mcmeta: Self::read_mcmeta(&mut zip, load_context)?,
-            // TODO: Load textures
-            textures: HashMap::new(),
+            textures: Self::read_textures(&mut zip, load_context)?,
         })
     }
 
@@ -127,6 +129,121 @@ impl ResourcePackLoader {
                     load_context.asset_path()
                 );
                 Err(err.into())
+            }
+        }
+    }
+
+    /// Reads all textures from the zip archive.
+    fn read_textures(
+        zip: &mut ZipArchive<impl Read + Seek>,
+        load_context: &mut LoadContext,
+    ) -> Result<HashMap<ResourceLocation, Handle<Image>>, ResourcePackLoaderError> {
+        let mut textures = HashMap::new();
+
+        // Iterate over all files in the zip archive.
+        for file_index in 0..zip.len() {
+            let Ok(file) = zip.by_index(file_index) else {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                warn!(
+                    "Failed to read file {} in {}",
+                    file_index,
+                    load_context.asset_path()
+                );
+                continue;
+            };
+
+            // Skip all directories.
+            if file.is_dir() {
+                continue;
+            }
+
+            // Try to get the resource location from the file path.
+            let Some(file_path) = file.enclosed_name() else {
+                continue;
+            };
+            let Some(key) = Self::path_to_resource_location(file_path) else {
+                continue;
+            };
+
+            // Create a new image context for each texture.
+            let mut image_context = load_context.begin_labeled_asset();
+
+            // Get the file extension.
+            let Some(ext) = file_path
+                .extension()
+                .and_then(OsStr::to_str)
+                .map(String::from)
+            else {
+                continue;
+            };
+
+            // Load the image from the file.
+            let image = Image::from_buffer(
+                &file.bytes().collect::<Result<Vec<_>, _>>()?,
+                ImageType::Extension(&ext),
+                CompressedImageFormats::all(),
+                false,
+                ImageSampler::default(),
+            )?;
+
+            // Add the image to the asset server.
+            let handle = image_context.add_labeled_asset(key.to_string(), image);
+
+            // Add the texture to the hashmap.
+            textures.insert(key, handle);
+        }
+
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        {
+            trace!("{}:\n{textures:#?}", load_context.asset_path());
+
+            debug!(
+                "Loaded {} textures from {}",
+                textures.len(),
+                load_context.asset_path()
+            );
+        }
+
+        Ok(textures)
+    }
+
+    fn path_to_resource_location(file_path: &Path) -> Option<ResourceLocation> {
+        let ext = file_path.extension()?.to_str()?;
+
+        // Only open texture files.
+        if !matches!(ext, "png" | "jpg" | "jpeg") {
+            return None;
+        }
+
+        // Skip all files that are not in the assets directory.
+        let mut path_iter = file_path.iter();
+        if path_iter.next() != Some(OsStr::new("assets")) {
+            return None;
+        }
+
+        // Use the next path component as the namespace.
+        let Some(namespace) = path_iter.next().and_then(OsStr::to_str) else {
+            return None;
+        };
+
+        // Remove the file extension from the path.
+        let path = path_iter.as_path().to_str()?;
+        let path = path.trim_end_matches(ext).trim_end_matches('.');
+
+        // Create the resource location.
+        let mut key = CompactString::from(namespace);
+        key.push(':');
+        key.push_str(path);
+
+        match ResourceLocation::try_from(key) {
+            Some(key) => Some(key),
+            None => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                error!(
+                    "Failed to parse resource location from {}",
+                    file_path.display()
+                );
+                None
             }
         }
     }

@@ -15,7 +15,7 @@ pub struct ResourcePackAsset {
     pub icon: Option<Handle<Image>>,
     pub mcmeta: ResourcePackMetaContainer,
 
-    pub textures: HashMap<ResourceLocation, UntypedHandle>,
+    pub textures: HashMap<ResourceLocation, Handle<Image>>,
 }
 
 impl Asset for ResourcePackAsset {}
@@ -26,7 +26,7 @@ impl VisitAssetDependencies for ResourcePackAsset {
         }
 
         for texture in self.textures.values() {
-            visit(texture.id());
+            visit(texture.id().untyped());
         }
     }
 }
