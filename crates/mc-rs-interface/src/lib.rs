@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use configs::settings::Settings;
 use plugins::{DefaultPlugin, RenderPlugin};
-use traits::config::ResourceConfig;
+use traits::config::ConfigFile;
 
 mod configs;
 mod plugins;
@@ -17,13 +17,12 @@ impl Plugin for InterfacePlugin {
     fn build(&self, app: &mut App) {
         resourcepacks::register_assets(app);
 
-        let settings = Settings::setup(app);
-
-        app.add_plugins((DefaultPlugin::from(settings.clone()), RenderPlugin))
+        let settings = Settings::load();
+        app.add_plugins((DefaultPlugin::from(&settings), RenderPlugin))
             .insert_resource(settings);
 
-        resourcepacks::init_assets(app);
         resources::setup(app);
+        resourcepacks::init_assets(app);
     }
 }
 

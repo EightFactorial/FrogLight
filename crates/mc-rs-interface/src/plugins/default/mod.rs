@@ -14,10 +14,10 @@ pub struct DefaultPlugin {
     window: WindowSettings,
 }
 
-impl From<Settings> for DefaultPlugin {
-    fn from(value: Settings) -> Self {
+impl From<&Settings> for DefaultPlugin {
+    fn from(value: &Settings) -> Self {
         Self {
-            window: value.window,
+            window: value.window.clone(),
         }
     }
 }

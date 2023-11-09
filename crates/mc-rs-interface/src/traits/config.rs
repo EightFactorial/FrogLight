@@ -11,18 +11,6 @@ use crate::util::dir::config_folder;
 
 /// A trait that adds bevy systems to update a config file resource.
 pub trait ResourceConfig: ConfigFile + Resource {
-    /// Loads and inserts the config file resource, then adds systems to update it.
-    fn setup_resource(app: &mut App) {
-        let config = Self::setup(app);
-        app.insert_resource(config);
-    }
-
-    /// Loads the config file and adds systems to update it.
-    fn setup(app: &mut App) -> Self {
-        Self::add_systems(app);
-        Self::load()
-    }
-
     /// Adds systems to the app to update the config file.
     fn add_systems(app: &mut App) {
         app.add_systems(
