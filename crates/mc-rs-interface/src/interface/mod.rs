@@ -6,8 +6,6 @@ pub mod set;
 
 use crate::resourcepacks::ResourcePacksStartReloadEvent;
 
-use self::loading::LoadingInterface;
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deref, DerefMut, Resource)]
 pub struct InterfaceRoot(Entity);
 
@@ -21,7 +19,7 @@ pub(super) fn setup(app: &mut App) {
     app.add_event::<ShowInterfaceEvent>()
         .add_event::<HideInterfaceEvent>();
 
-    app.add_systems(Startup, InterfaceRoot::spawn);
+    app.add_systems(OnExit(ApplicationState::Loading), InterfaceRoot::spawn);
 
     app.add_systems(
         Update,
@@ -44,30 +42,31 @@ impl InterfaceRoot {
     fn finish_reload_event(events: EventReader<ResourcePacksStartReloadEvent>) -> bool {
         !events.is_empty()
     }
+
     /// Spawn the interface root.
     fn spawn(
         root: Option<Res<Self>>,
         camera: Query<(), With<Camera>>,
 
-        state: Res<State<ApplicationState>>,
+        _state: Res<State<ApplicationState>>,
         assets: Res<AssetServer>,
         mut commands: Commands,
     ) {
-        let root = match root {
+        let _root = match root {
             Some(root) => **root,
             None => Self::build(&assets, &mut commands),
         };
 
         #[cfg(any(debug_assertions, feature = "debug"))]
-        {
-            debug!("Spawning InterfaceRoot");
-        }
+        debug!("Spawning InterfaceRoot");
 
-        // Spawn all the sub-interfaces.
-        LoadingInterface::spawn(root, &state, &assets, &mut commands);
+        // TODO: Spawn all the sub-interfaces.
 
         // Create the camera if it doesn't exist.
         if camera.is_empty() {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("Spawning Camera2d");
+
             commands.spawn(Camera2dBundle::default());
         }
     }
@@ -95,6 +94,9 @@ impl InterfaceRoot {
     fn show_event(events: EventReader<ShowInterfaceEvent>) -> bool { !events.is_empty() }
 
     fn show(mut query: Query<&mut Visibility, With<Node>>, root: Res<Self>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Showing InterfaceRoot");
+
         if let Ok(mut vis) = query.get_mut(**root) {
             *vis = Visibility::Visible;
         }
@@ -103,6 +105,9 @@ impl InterfaceRoot {
     fn hide_event(events: EventReader<HideInterfaceEvent>) -> bool { !events.is_empty() }
 
     fn hide(mut query: Query<&mut Visibility, With<Node>>, root: Res<Self>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Hiding InterfaceRoot");
+
         if let Ok(mut vis) = query.get_mut(**root) {
             *vis = Visibility::Hidden;
         }
@@ -114,9 +119,7 @@ impl InterfaceRoot {
 
     fn destroy(root: Res<Self>, mut commands: Commands) {
         #[cfg(any(debug_assertions, feature = "debug"))]
-        {
-            debug!("Destroying InterfaceRoot");
-        }
+        debug!("Destroying InterfaceRoot");
 
         commands.entity(**root).despawn_descendants();
     }

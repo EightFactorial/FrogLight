@@ -86,7 +86,7 @@ impl ResourcePackLoader {
         // Get the pack.png file from the zip archive.
         let Ok(file) = zip.by_name("pack.png") else {
             #[cfg(any(debug_assertions, feature = "debug"))]
-            info!("No pack.png found in {}", load_context.asset_path());
+            warn!("No pack.png found in {}", load_context.asset_path());
             return Ok(None);
         };
 

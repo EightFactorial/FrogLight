@@ -7,6 +7,8 @@ use crate::resourcepacks::ResourcePacksFinishReloadEvent;
 pub struct LoadingInterface;
 
 pub(super) fn setup(app: &mut App) {
+    app.add_systems(Startup, LoadingInterface::spawn);
+
     app.add_systems(OnEnter(ApplicationState::Loading), LoadingInterface::show);
     app.add_systems(OnExit(ApplicationState::Loading), LoadingInterface::hide);
 
@@ -19,12 +21,7 @@ pub(super) fn setup(app: &mut App) {
 }
 
 impl LoadingInterface {
-    pub(super) fn spawn(
-        root: Entity,
-        state: &State<ApplicationState>,
-        _assets: &AssetServer,
-        commands: &mut Commands,
-    ) {
+    pub(super) fn spawn(camera: Query<(), With<Camera2d>>, mut commands: Commands) {
         let loading = NodeBundle {
             style: Style {
                 width: Val::Percent(100.0),
@@ -36,18 +33,24 @@ impl LoadingInterface {
                 ..Default::default()
             },
             background_color: Color::BLUE.into(),
-            visibility: match **state {
-                ApplicationState::Loading => Visibility::Visible,
-                _ => Visibility::Hidden,
-            },
+            visibility: Visibility::Visible,
+            z_index: ZIndex::Global(i32::MAX - 8),
             ..Default::default()
         };
 
-        commands.entity(root).with_children(|root| {
-            root.spawn((loading, Self)).with_children(|load| {
-                load.spawn(TextBundle::from_section("Loading...", TextStyle::default()));
-            });
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Spawning LoadingInterface");
+
+        commands.spawn((loading, Self)).with_children(|load| {
+            load.spawn(TextBundle::from_section("Loading...", TextStyle::default()));
         });
+
+        if camera.is_empty() {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("Spawning Camera2d");
+
+            commands.spawn(Camera2dBundle::default());
+        }
     }
 
     /// Check if the resourcepacks have finished reloading.
