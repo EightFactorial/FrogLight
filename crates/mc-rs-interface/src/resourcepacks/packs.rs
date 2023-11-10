@@ -7,9 +7,11 @@ use crate::configs::settings::Settings;
 use super::ResourcePackAsset;
 
 /// A collection of resourcepacks loaded.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
+#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
 pub struct ResourcePacks {
+    #[deref]
     pub packs: Vec<ResourcePackInfo>,
+    pub fallback: Handle<Image>,
 }
 
 /// Information about a resourcepack.
@@ -28,9 +30,10 @@ pub struct ResourcePacksStartReloadEvent;
 pub struct ResourcePacksFinishReloadEvent;
 
 pub(super) fn setup(app: &mut App) {
+    app.add_systems(Startup, ResourcePacks::default);
+
     app.add_event::<ResourcePacksStartReloadEvent>()
-        .add_event::<ResourcePacksFinishReloadEvent>()
-        .init_resource::<ResourcePacks>();
+        .add_event::<ResourcePacksFinishReloadEvent>();
 
     app.add_systems(
         Update,
@@ -46,6 +49,14 @@ pub(super) fn setup(app: &mut App) {
 }
 
 impl ResourcePacks {
+    fn default(assets: Res<AssetServer>, mut commands: Commands) {
+        commands.insert_resource(Self {
+            packs: Vec::new(),
+            // TODO: Use embedded_asset!() macro
+            fallback: assets.load("textures/fallback.png"),
+        })
+    }
+
     /// Check for any [ResourcePackAsset] events.
     fn any_asset_events(events: EventReader<AssetEvent<ResourcePackAsset>>) -> bool {
         !events.is_empty()
@@ -118,21 +129,22 @@ impl ResourcePacks {
     }
 
     /// Get a texture from the resourcepacks.
-    pub fn get_texture(
-        &self,
-        id: &ResourceLocation,
-        assets: &Assets<ResourcePackAsset>,
-    ) -> Option<Handle<Image>> {
+    pub fn get_texture<'a>(
+        &'a self,
+        resource: &ResourceLocation,
+        assets: &'a Assets<ResourcePackAsset>,
+    ) -> &'a Handle<Image> {
         // Loop through all pack handles
         for pack in self.packs.iter().rev() {
             if let Some(pack) = assets.get(&pack.handle) {
                 // If the pack has the texture, return it
-                if let Some(texture) = pack.textures.get(id) {
-                    return Some(texture.clone());
+                if let Some(texture) = pack.textures.get(resource) {
+                    return texture;
                 }
             }
         }
 
-        None
+        // If no pack has the texture, return the fallback
+        &self.fallback
     }
 }

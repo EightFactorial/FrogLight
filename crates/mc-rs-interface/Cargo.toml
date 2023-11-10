@@ -30,7 +30,7 @@ zip = { version = "0.6", features = ["flate2"] }
 default = []
 
 # Enable debug features
-debug = ["bevy/file_watcher"]
+debug = ["bevy/embedded_watcher", "bevy/file_watcher"]
 
 # Enable wayland features
 wayland = ["bevy/wayland"]

@@ -4,7 +4,7 @@ use mc_rs_core::schedule::state::ApplicationState;
 pub mod loading;
 pub mod set;
 
-use crate::resourcepacks::ResourcePacksStartReloadEvent;
+use crate::resourcepacks::{ResourcePackAsset, ResourcePacks, ResourcePacksStartReloadEvent};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deref, DerefMut, Resource)]
 pub struct InterfaceRoot(Entity);
@@ -47,14 +47,15 @@ impl InterfaceRoot {
     fn spawn(
         root: Option<Res<Self>>,
         camera: Query<(), With<Camera>>,
-
         _state: Res<State<ApplicationState>>,
-        assets: Res<AssetServer>,
+
+        _packs: Res<ResourcePacks>,
+        _assets: Res<Assets<ResourcePackAsset>>,
         mut commands: Commands,
     ) {
         let _root = match root {
             Some(root) => **root,
-            None => Self::build(&assets, &mut commands),
+            None => Self::build(&mut commands),
         };
 
         #[cfg(any(debug_assertions, feature = "debug"))]
@@ -72,7 +73,7 @@ impl InterfaceRoot {
     }
 
     /// Build the interface root.
-    fn build(_assets: &AssetServer, commands: &mut Commands) -> Entity {
+    fn build(commands: &mut Commands) -> Entity {
         let entity = commands
             .spawn(NodeBundle {
                 style: Style {
