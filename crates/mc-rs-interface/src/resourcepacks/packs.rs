@@ -7,10 +7,12 @@ use crate::configs::settings::Settings;
 use super::ResourcePackAsset;
 
 /// A collection of resourcepacks loaded.
-#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
+///
+/// Use this to get textures loaded from resourcepacks.
+#[derive(Debug, Clone, PartialEq, Eq, Resource)]
 pub struct ResourcePacks {
-    #[deref]
-    pub packs: Vec<ResourcePackInfo>,
+    packs: Vec<ResourcePackInfo>,
+
     pub fallback: Handle<Image>,
 }
 
@@ -70,7 +72,9 @@ impl ResourcePacks {
     ) {
         asset_events.read().for_each(|event| match event {
             AssetEvent::Removed { id } => {
-                // Remove the pack from the list
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Removing ResourcePackAsset: {id}");
+
                 packs.packs.retain(|pack| &pack.handle.id() != id);
             }
             AssetEvent::LoadedWithDependencies { id } => {
@@ -98,7 +102,7 @@ impl ResourcePacks {
                 .resourcepacks
                 .paths
                 .iter()
-                .zip(packs.iter())
+                .zip(packs.packs.iter())
                 .any(|(incoming, existing)| incoming != &existing.path)
     }
 
@@ -107,7 +111,8 @@ impl ResourcePacks {
         assets: Res<AssetServer>,
         settings: Res<Settings>,
         mut packs: ResMut<ResourcePacks>,
-        mut events: EventWriter<ResourcePacksStartReloadEvent>,
+        mut start_events: EventWriter<ResourcePacksStartReloadEvent>,
+        mut finish_events: EventWriter<ResourcePacksFinishReloadEvent>,
     ) {
         packs.packs.clear();
 
@@ -125,7 +130,14 @@ impl ResourcePacks {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Sending ResourcePacksStartReloadEvent!");
 
-        events.send(ResourcePacksStartReloadEvent);
+        start_events.send(ResourcePacksStartReloadEvent);
+
+        if packs.packs.is_empty() {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("No ResourcePackAssets, sending ResourcePacksFinishReloadEvent!");
+
+            finish_events.send(ResourcePacksFinishReloadEvent);
+        }
     }
 
     /// Get a texture from the resourcepacks.
@@ -143,6 +155,9 @@ impl ResourcePacks {
                 }
             }
         }
+
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        warn!("No resource pack has the texture: {}", resource);
 
         // If no pack has the texture, return the fallback
         &self.fallback

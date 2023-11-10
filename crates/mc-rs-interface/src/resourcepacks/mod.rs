@@ -5,8 +5,8 @@ use loader::ResourcePackLoader;
 
 mod source;
 
-mod pack;
-pub use pack::*;
+mod asset;
+pub use asset::*;
 
 mod packs;
 pub use packs::*;
