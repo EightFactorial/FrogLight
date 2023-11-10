@@ -1,5 +1,11 @@
 use bevy::prelude::*;
 
+pub(super) fn setup(app: &mut App) {
+    app.add_state::<MainMenuState>()
+        .add_state::<SettingsState>()
+        .add_state::<GuiState>();
+}
+
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
 pub enum MainMenuState {
     #[default]

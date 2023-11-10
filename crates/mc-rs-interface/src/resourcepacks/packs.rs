@@ -40,13 +40,12 @@ pub(super) fn setup(app: &mut App) {
     app.add_systems(
         Update,
         (
-            ResourcePacks::resourcepack_events.run_if(ResourcePacks::any_asset_events),
+            ResourcePacks::resourcepack_events.run_if(on_event::<AssetEvent<ResourcePackAsset>>()),
             ResourcePacks::update.run_if(
                 resource_exists_and_changed::<Settings>()
-                    .and_then(ResourcePacks::resourcepacks_changed),
+                    .and_then(ResourcePacks::resourcepack_check),
             ),
-        )
-            .run_if(resource_exists::<ResourcePacks>()),
+        ),
     );
 }
 
@@ -57,11 +56,6 @@ impl ResourcePacks {
             // TODO: Use embedded_asset!() macro
             fallback: assets.load("textures/fallback.png"),
         })
-    }
-
-    /// Check for any [ResourcePackAsset] events.
-    fn any_asset_events(events: EventReader<AssetEvent<ResourcePackAsset>>) -> bool {
-        !events.is_empty()
     }
 
     /// Process [ResourcePackAsset] events.
@@ -96,7 +90,7 @@ impl ResourcePacks {
     }
 
     /// Check if no [ResourcePackAsset]s are loaded or if the [Settings] have changed.
-    fn resourcepacks_changed(settings: Res<Settings>, packs: Res<ResourcePacks>) -> bool {
+    fn resourcepack_check(settings: Res<Settings>, packs: Res<ResourcePacks>) -> bool {
         packs.packs.is_empty()
             || settings
                 .resourcepacks
