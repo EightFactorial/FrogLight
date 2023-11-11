@@ -41,10 +41,8 @@ impl LoadingInterface {
                 // Hide the LoadingInterface when resourcepacks are finished reloading,
                 // all interface assets are loaded, and the interface has been built.
                 LoadingInterface::hide.run_if(
-                    any_with_component::<LoadingInterfaceActive>().and_then(
-                        LoadingInterface::finish_event_and_loaded
-                            .and_then(any_with_component::<InterfaceRoot>()),
-                    ),
+                    any_with_component::<LoadingInterfaceActive>()
+                        .and_then(LoadingInterface::finish_event_and_loaded),
                 ),
             ),
         );
@@ -68,6 +66,7 @@ impl LoadingInterface {
             // TODO: It loads too fast, so we'll just make it blue for now
             background_color: BackgroundColor(Color::BLUE),
             visibility: Visibility::Visible,
+            z_index: ZIndex::Global(i32::MAX - 32),
             ..Default::default()
         };
 
@@ -93,6 +92,7 @@ impl LoadingInterface {
 
     /// Returns true if the resourcepacks are finished
     /// reloading and all interface assets are loaded.
+    #[allow(clippy::too_many_arguments)]
     fn finish_event_and_loaded(
         start_event: EventReader<ResourcePacksStartReloadEvent>,
         finish_event: EventReader<ResourcePacksFinishReloadEvent>,
@@ -100,27 +100,62 @@ impl LoadingInterface {
         interface_assets: Res<InterfaceAssets>,
         assets: Res<AssetServer>,
 
+        interface: Query<(), With<InterfaceRoot>>,
+
         mut finished: Local<bool>,
+        mut exists: Local<bool>,
         mut loaded: Local<bool>,
     ) -> bool {
         // Reset finished and loaded if start event is received
         if !start_event.is_empty() {
             *finished = false;
+            *exists = false;
             *loaded = false;
         }
 
         // If not finished and finish event is received, set finished to true
-        if !*finished && !finish_event.is_empty() {
-            *finished = true;
+        if !*finished {
+            match finish_event.is_empty() {
+                true => return false,
+                false => {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
+                    debug!("ResourcePacks finished reloading");
+
+                    *finished = true;
+                }
+            }
+        }
+
+        // If exists is false and interface exists, set exists to true
+        if !*exists {
+            match interface.is_empty() {
+                true => return false,
+                false => {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
+                    debug!("InterfaceRoot exists");
+
+                    *exists = true;
+                }
+            }
         }
 
         // If not loaded and interface assets are loaded, set loaded to true
-        if !*loaded && interface_assets.loaded(&assets) {
-            *loaded = true;
+        if !*loaded {
+            match interface_assets.loaded(&assets) {
+                false => return false,
+                true => {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
+                    debug!("InterfaceAssets loaded");
+
+                    *loaded = true;
+                }
+            }
         }
 
-        // Return true if both finished and all assets are loaded
-        *finished && *loaded
+        // Return true if resourcepacks are finished loading,
+        // all interface assets are loaded,
+        // and the interface has been built.
+        true
     }
 
     /// Show the loading interface.

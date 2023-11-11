@@ -1,4 +1,7 @@
-use bevy::{asset::LoadState, prelude::*};
+use bevy::{
+    asset::{LoadState, RecursiveDependencyLoadState},
+    prelude::*,
+};
 
 mod loading;
 use loading::LoadingInterface;
@@ -108,7 +111,16 @@ pub struct InterfaceAssets(pub Vec<UntypedHandle>);
 impl InterfaceAssets {
     /// Returns true if all interface assets are loaded.
     pub fn loaded(&self, asset_server: &AssetServer) -> bool {
-        self.iter()
-            .all(|handle| asset_server.get_load_state(handle.id()) == Some(LoadState::Loaded))
+        self.iter().all(|handle| {
+            let state = asset_server.get_load_states(handle.id());
+
+            matches!(
+                state,
+                // Assets directly loaded, like a mesh from mesh::Cube
+                None | 
+                // Assets loaded from a dependency, like texture from a resourcepack
+                Some((LoadState::Loaded, _, _)) | Some((_, _, RecursiveDependencyLoadState::Loaded))
+            )
+        })
     }
 }
