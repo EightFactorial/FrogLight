@@ -76,6 +76,30 @@ impl DefaultCamera {
         });
     }
 
+    /// A system that creates a [Camera3dBundle] with a custom FoV.
+    pub fn custom_fov_camera3d<const N: usize>(mut commands: Commands) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Spawning Camera3d with FoV: {}", N);
+
+        commands.spawn(Camera3dBundle {
+            camera: Camera {
+                // Put the camera3d in the middle
+                order: 0isize,
+                is_active: true,
+                ..Default::default()
+            },
+            camera_3d: Camera3d {
+                clear_color: ClearColorConfig::Custom(Color::BLACK),
+                ..Default::default()
+            },
+            projection: Projection::Perspective(PerspectiveProjection {
+                fov: (N as f32).to_radians(),
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+    }
+
     /// A system that destroys all [Camera3d]s.
     pub fn destroy_camera3d(query: Query<Entity, With<Camera3d>>, mut commands: Commands) {
         #[cfg(any(debug_assertions, feature = "debug"))]

@@ -1,8 +1,10 @@
 use bevy::prelude::*;
+use mc_rs_core::schedule::state::ApplicationState;
 
 mod background;
 use background::MainMenuBackground;
-use mc_rs_core::schedule::state::ApplicationState;
+
+mod cube;
 
 use crate::{interface::state::MainMenuState, traits::interface::SubInterface};
 

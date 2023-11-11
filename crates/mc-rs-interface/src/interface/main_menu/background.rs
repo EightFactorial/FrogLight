@@ -1,12 +1,11 @@
 use bevy::prelude::*;
-use mc_rs_core::{
-    schedule::{set::MenuSet, state::ApplicationState},
-    ResourceLocation,
-};
+use mc_rs_core::schedule::{set::MenuSet, state::ApplicationState};
 
 use crate::{
-    interface::{camera::DefaultCamera, state::MainMenuState, InterfaceAssets},
-    resourcepacks::{ResourcePackAsset, ResourcePacks},
+    interface::{
+        camera::DefaultCamera, main_menu::cube::BackgroundCube, state::MainMenuState,
+        InterfaceAssets,
+    },
     traits::interface::SubInterface,
 };
 
@@ -18,8 +17,10 @@ impl SubInterface for MainMenuBackground {
         // Spawn a Camera3d when entering the ApplicationState::MainMenu state
         app.add_systems(
             OnEnter(ApplicationState::MainMenu),
-            DefaultCamera::create_camera3d()
-                .run_if(in_state(MainMenuState::Main))
+            DefaultCamera::custom_fov_camera3d::<75>
+                .run_if(
+                    not(any_with_component::<Camera3d>()).and_then(in_state(MainMenuState::Main)),
+                )
                 .in_set(MenuSet),
         );
 
@@ -90,26 +91,16 @@ impl MainMenuBackground {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MainMenuBackground");
 
-        // Create a cube mesh
-        let mut meshes = world.resource_mut::<Assets<Mesh>>();
-        let mesh = meshes.add(Mesh::from(shape::Cube { size: -1.0 }));
+        // Get the cube mesh
+        let mesh = BackgroundCube::create_cube_mesh(world);
 
         // Get the panorama textures
-        // TODO: Map all 6 panorama textures to the cube
-        let packs = world.resource::<ResourcePacks>();
-        let textures = world.resource::<Assets<ResourcePackAsset>>();
-
-        let panorama_0 = packs
-            .get_texture(
-                &ResourceLocation::new("minecraft:gui/title/background/panorama_0"),
-                textures,
-            )
-            .clone();
+        let panorama = BackgroundCube::create_cube_texture(world);
 
         // Create a material
         let mut materials = world.resource_mut::<Assets<StandardMaterial>>();
         let material = materials.add(StandardMaterial {
-            base_color_texture: Some(panorama_0),
+            base_color_texture: Some(panorama),
             unlit: true,
             ..Default::default()
         });

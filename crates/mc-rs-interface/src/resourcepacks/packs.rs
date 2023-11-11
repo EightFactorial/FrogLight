@@ -135,6 +135,8 @@ impl ResourcePacks {
     }
 
     /// Get a texture from the resourcepacks.
+    ///
+    /// If no resourcepack has the texture, the fallback texture is returned.
     pub fn get_texture<'a>(
         &'a self,
         resource: &ResourceLocation,
@@ -155,5 +157,28 @@ impl ResourcePacks {
 
         // If no pack has the texture, return the fallback
         &self.fallback
+    }
+
+    /// Try to get a texture from the resourcepacks.
+    pub fn try_get_texture<'a>(
+        &'a self,
+        resource: &ResourceLocation,
+        assets: &'a Assets<ResourcePackAsset>,
+    ) -> Option<&'a Handle<Image>> {
+        // Loop through all pack handles
+        for pack in self.packs.iter().rev() {
+            if let Some(pack) = assets.get(&pack.handle) {
+                // If the pack has the texture, return it
+                if let Some(texture) = pack.textures.get(resource) {
+                    return Some(texture);
+                }
+            }
+        }
+
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        warn!("No resource pack has the texture: {}", resource);
+
+        // If no pack has the texture, return the fallback
+        None
     }
 }
