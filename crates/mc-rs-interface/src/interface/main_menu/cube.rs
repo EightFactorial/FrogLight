@@ -61,8 +61,6 @@ impl BackgroundCube {
             .map(|texture| texture.unwrap())
             .collect::<Vec<_>>();
 
-        cube_textures[0] = fallback.clone();
-
         // Get the image assets
         let mut images = world.resource_mut::<Assets<Image>>();
 
