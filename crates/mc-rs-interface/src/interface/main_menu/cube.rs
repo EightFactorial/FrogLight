@@ -11,13 +11,14 @@ pub(super) struct BackgroundCube;
 
 impl BackgroundCube {
     /// Generate a cube texture from the panorama textures.
-    // TODO: Cleanup
+    // TODO: This needs to be cleaned up, it's terrible.
     pub fn create_cube_texture(world: &mut World) -> Handle<Image> {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building BackgroundCube Texture");
 
-        let packs = world.resource::<ResourcePacks>();
         let assets = world.resource::<Assets<ResourcePackAsset>>();
+        let packs = world.resource::<ResourcePacks>();
+        let fallback = packs.fallback.clone();
 
         // Get the cubemap textures
         let mut cube_textures = [
@@ -41,31 +42,63 @@ impl BackgroundCube {
 
         // If any of the textures are missing, replace all textures with the fallback texture
         if cube_textures.iter().any(|texture| texture.is_none()) {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            error!("Missing panorama textures, using fallback texture");
+
             cube_textures = vec![
-                Some(packs.fallback.clone()),
-                Some(packs.fallback.clone()),
-                Some(packs.fallback.clone()),
-                Some(packs.fallback.clone()),
-                Some(packs.fallback.clone()),
-                Some(packs.fallback.clone()),
+                Some(fallback.clone()),
+                Some(fallback.clone()),
+                Some(fallback.clone()),
+                Some(fallback.clone()),
+                Some(fallback.clone()),
+                Some(fallback.clone()),
             ]
         }
 
         // Unwrap the textures
-        let cube_textures = cube_textures
+        let mut cube_textures = cube_textures
             .into_iter()
             .map(|texture| texture.unwrap())
             .collect::<Vec<_>>();
+
+        cube_textures[0] = fallback.clone();
 
         // Get the image assets
         let mut images = world.resource_mut::<Assets<Image>>();
 
         // Get the texture size
-        let width = images.get(cube_textures[0].id()).unwrap().width();
+        let texture = images.get(cube_textures[0].id()).unwrap();
+        let mut width = texture.width();
+        let mut height = texture.height();
+
+        // Check that all textures are square and the same size,
+        // otherwise replace all textures with the fallback texture
+        if width != height
+            || cube_textures.iter().any(|texture| {
+                let texture = images.get(texture.id()).unwrap();
+                texture.width() != width || texture.height() != height
+            })
+        {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            error!("Panorama textures are not the same size, using fallback texture");
+
+            let image = images.get(fallback.id()).unwrap();
+            width = image.width();
+            height = image.height();
+
+            cube_textures = vec![
+                fallback.clone(),
+                fallback.clone(),
+                fallback.clone(),
+                fallback.clone(),
+                fallback.clone(),
+                fallback,
+            ]
+        }
 
         // Combine the cubemap textures lengthwise into a single texture
         let mut image_data: Vec<u8> = Vec::with_capacity((width * width * 6 * 4) as usize);
-        for y in 0..width {
+        for y in 0..height {
             for texture in cube_textures.iter() {
                 let texture_data = images.get(texture.id()).unwrap().data.as_slice();
 
@@ -79,7 +112,7 @@ impl BackgroundCube {
         images.add(Image::new(
             Extent3d {
                 width: width * 6,
-                height: width,
+                height,
                 depth_or_array_layers: 1,
             },
             TextureDimension::D2,
