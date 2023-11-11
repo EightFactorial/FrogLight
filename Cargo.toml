@@ -38,6 +38,7 @@ strum = { version = "0.25", features = ["derive"] }
 uuid = "1.5"
 
 [profile.dev]
+incremental = true
 opt-level = 1
 
 [profile.dev.package."*"]
@@ -49,10 +50,20 @@ opt-level = 3
 [profile.dev.package.mc-rs-protocol]
 opt-level = 3
 
+[profile.dev.package.mc-rs-interface]
+opt-level = 1
+
+[profile.dev.build-override]
+opt-level = 3
+
 [profile.release]
-opt-level = "s"
+incremental = false
+opt-level = 3
 strip = true
 lto = true
+
+[profile.release.build-override]
+opt-level = 3
 
 [dependencies]
 bevy = { workspace = true }
