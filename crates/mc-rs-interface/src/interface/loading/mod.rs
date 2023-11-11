@@ -51,17 +51,40 @@ impl LoadingInterface {
     }
 
     /// Build the loading interface.
+    // TODO: Make it look nice
     fn build(world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building LoadingInterface");
 
-        let _loading = world.spawn((
-            LoadingInterface,
-            LoadingInterfaceActive,
-            Visibility::Visible,
-        ));
+        // Create the main node
+        let node = NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                ..Default::default()
+            },
+            // TODO: It loads too fast, so we'll just make it blue for now
+            background_color: BackgroundColor(Color::BLUE),
+            visibility: Visibility::Visible,
+            ..Default::default()
+        };
 
-        // TODO: Build loading interface
+        // Add text to the main node
+        let text = TextBundle::from_section(
+            "Loading...",
+            TextStyle {
+                font_size: 32.0,
+                ..Default::default()
+            },
+        );
+
+        world
+            .spawn((LoadingInterface, LoadingInterfaceActive, node))
+            .with_children(|root| {
+                root.spawn(text);
+            });
     }
 
     fn change_state(mut state: ResMut<NextState<ApplicationState>>) {

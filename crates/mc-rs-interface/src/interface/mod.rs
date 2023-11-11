@@ -34,13 +34,22 @@ impl InterfaceRoot {
         // Initialize interface assets tracker
         app.init_resource::<InterfaceAssets>();
 
+        // Build the InterfaceRoot on startup.
+        app.add_systems(
+            OnExit(ApplicationState::Loading),
+            InterfaceRoot::build.run_if(not(any_with_component::<InterfaceRoot>())),
+        );
+
         // Destroy the InterfaceRoot when reloading
         // resourcepacks, and rebuild it when finished.
         app.add_systems(
             Update,
             (
                 InterfaceRoot::destroy.run_if(on_event::<ResourcePacksStartReloadEvent>()),
-                InterfaceRoot::build.run_if(on_event::<ResourcePacksFinishReloadEvent>()),
+                InterfaceRoot::build.run_if(
+                    on_event::<ResourcePacksFinishReloadEvent>()
+                        .and_then(not(any_with_component::<InterfaceRoot>())),
+                ),
             )
                 .run_if(not(in_state(ApplicationState::Loading))),
         );
@@ -58,12 +67,22 @@ impl InterfaceRoot {
         let mut assets = world.get_resource_mut::<InterfaceAssets>().unwrap();
         assets.clear();
 
-        let root = world.spawn(InterfaceRoot);
+        // Create the interface root ui node
+        let root_node = NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            background_color: BackgroundColor(Color::NONE),
+            visibility: Visibility::Visible,
+            ..Default::default()
+        };
 
-        // TODO: Build interface root
+        // Spawn the interface root
+        let root = world.spawn((InterfaceRoot, root_node)).id();
 
         // Build sub-interfaces
-        let root = root.id();
         MainMenuInterface::build(root, world);
     }
 

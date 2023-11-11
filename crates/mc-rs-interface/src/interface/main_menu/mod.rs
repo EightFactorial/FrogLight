@@ -2,10 +2,11 @@ use bevy::prelude::*;
 
 mod background;
 use background::MainMenuBackground;
+use mc_rs_core::schedule::state::ApplicationState;
 
-use crate::traits::interface::SubInterface;
+use crate::{interface::state::MainMenuState, traits::interface::SubInterface};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Component)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MainMenuInterface;
 
 impl SubInterface for MainMenuInterface {
@@ -19,13 +20,31 @@ impl SubInterface for MainMenuInterface {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MainMenuInterface");
 
-        let main_menu = world.spawn(MainMenuInterface);
+        // Set visibility based on current state
+        let app_state = world.resource::<State<ApplicationState>>();
+        let menu_state = world.resource::<State<MainMenuState>>();
+        let visibility = match (**app_state, **menu_state) {
+            (ApplicationState::MainMenu, MainMenuState::Main) => Visibility::Visible,
+            _ => Visibility::Hidden,
+        };
 
         // TODO: Build main menu interface
+        let menu_node = NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            background_color: BackgroundColor(Color::NONE),
+            visibility,
+            ..Default::default()
+        };
 
-        let main_menu = main_menu.id();
+        // Spawn the main menu
+        let main_menu = world.spawn((MainMenuInterface, menu_node)).id();
         world.entity_mut(root).add_child(main_menu);
 
+        // Build sub-interfaces
         MainMenuBackground::build(main_menu, world);
     }
 }
