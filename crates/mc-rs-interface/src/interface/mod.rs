@@ -114,12 +114,15 @@ impl InterfaceAssets {
         self.iter().all(|handle| {
             let state = asset_server.get_load_states(handle.id());
 
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("Interface asset {:?} is in state {:?}", handle.id(), state);
+
+            // TODO: Figure out why all assets return `None`
             matches!(
                 state,
-                // Assets directly loaded, like a mesh from mesh::Cube
-                None | 
-                // Assets loaded from a dependency, like texture from a resourcepack
-                Some((LoadState::Loaded, _, _)) | Some((_, _, RecursiveDependencyLoadState::Loaded))
+                Some((LoadState::Loaded, _, _))
+                    | Some((_, _, RecursiveDependencyLoadState::Loaded))
+                    | None
             )
         })
     }

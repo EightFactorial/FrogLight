@@ -1,8 +1,12 @@
 use bevy::prelude::*;
-use mc_rs_core::schedule::{set::MenuSet, state::ApplicationState};
+use mc_rs_core::{
+    schedule::{set::MenuSet, state::ApplicationState},
+    ResourceLocation,
+};
 
 use crate::{
     interface::{camera::DefaultCamera, state::MainMenuState, InterfaceAssets},
+    resourcepacks::{ResourcePackAsset, ResourcePacks},
     traits::interface::SubInterface,
 };
 
@@ -40,7 +44,10 @@ impl SubInterface for MainMenuBackground {
         app.add_systems(
             OnEnter(MainMenuState::Main),
             MainMenuBackground::show
-                .run_if(in_state(ApplicationState::MainMenu))
+                .run_if(
+                    in_state(ApplicationState::MainMenu)
+                        .and_then(any_with_component::<MainMenuBackground>()),
+                )
                 .in_set(MenuSet),
         );
 
@@ -61,6 +68,17 @@ impl SubInterface for MainMenuBackground {
                 .run_if(any_with_component::<MainMenuBackground>())
                 .in_set(MenuSet),
         );
+
+        // Rotate the background when in the ApplicationState::MainMenu state
+        app.add_systems(
+            Update,
+            MainMenuBackground::rotate
+                .run_if(
+                    in_state(ApplicationState::MainMenu)
+                        .and_then(any_with_component::<MainMenuBackground>()),
+                )
+                .in_set(MenuSet),
+        );
     }
 
     fn build(_main_menu: Entity, world: &mut World) { MainMenuBackground::build(world); }
@@ -76,11 +94,22 @@ impl MainMenuBackground {
         let mut meshes = world.resource_mut::<Assets<Mesh>>();
         let mesh = meshes.add(Mesh::from(shape::Cube { size: -1.0 }));
 
+        // Get the panorama textures
+        // TODO: Map all 6 panorama textures to the cube
+        let packs = world.resource::<ResourcePacks>();
+        let textures = world.resource::<Assets<ResourcePackAsset>>();
+
+        let panorama_0 = packs
+            .get_texture(
+                &ResourceLocation::new("minecraft:gui/title/background/panorama_0"),
+                textures,
+            )
+            .clone();
+
         // Create a material
-        // TODO: Use cubemap panorama from loaded resourcepacks
         let mut materials = world.resource_mut::<Assets<StandardMaterial>>();
         let material = materials.add(StandardMaterial {
-            base_color_texture: None,
+            base_color_texture: Some(panorama_0),
             unlit: true,
             ..Default::default()
         });
@@ -108,6 +137,15 @@ impl MainMenuBackground {
                 ..Default::default()
             },
         ));
+    }
+
+    /// Rotate the main menu background.
+    fn rotate(mut query: Query<&mut Transform, With<MainMenuBackground>>, time: Res<Time<Real>>) {
+        let delta = time.delta_seconds();
+
+        query.for_each_mut(|mut transform| {
+            transform.rotate(Quat::from_rotation_y(delta / 100.));
+        });
     }
 
     fn show(mut query: Query<&mut Visibility, With<MainMenuBackground>>) {

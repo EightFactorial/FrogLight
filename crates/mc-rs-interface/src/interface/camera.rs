@@ -55,7 +55,7 @@ impl DefaultCamera {
     /// You should likely use [`DefaultCamera::create_camera3d`](DefaultCamera) instead.
     pub fn default_camera3d(settings: Res<Settings>, mut commands: Commands) {
         #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Spawning Camera3d");
+        debug!("Spawning Camera3d with FoV: {}", settings.camera.fov);
 
         commands.spawn(Camera3dBundle {
             camera: Camera {
@@ -69,7 +69,7 @@ impl DefaultCamera {
                 ..Default::default()
             },
             projection: Projection::Perspective(PerspectiveProjection {
-                fov: settings.camera.fov,
+                fov: settings.camera.fov.to_radians(),
                 ..Default::default()
             }),
             ..Default::default()
