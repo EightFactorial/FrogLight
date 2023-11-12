@@ -11,7 +11,6 @@ pub(super) struct BackgroundCube;
 
 impl BackgroundCube {
     /// Generate a cube texture from the panorama textures.
-    // TODO: This needs to be cleaned up, it's terrible.
     pub fn create_cube_texture(world: &mut World) -> Handle<Image> {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building BackgroundCube Texture");

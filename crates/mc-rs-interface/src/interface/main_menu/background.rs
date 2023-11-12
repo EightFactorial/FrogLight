@@ -45,11 +45,11 @@ impl InterfaceComponent for MainMenuBackground {
         // Show the background when entering the MainMenuState::Main state
         app.add_systems(
             OnEnter(MainMenuState::Main),
-            MainMenuBackground::show
-                .run_if(
-                    in_state(ApplicationState::MainMenu)
-                        .and_then(any_with_component::<MainMenuBackground>()),
-                )
+            (
+                MainMenuBackground::show.run_if(any_with_component::<MainMenuBackground>()),
+                DefaultCamera::enable_camera3d.run_if(any_with_component::<Camera3d>()),
+            )
+                .run_if(in_state(ApplicationState::MainMenu))
                 .in_set(MenuSet),
         );
 

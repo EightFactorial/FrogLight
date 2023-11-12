@@ -10,9 +10,7 @@ pub(super) fn setup(app: &mut App) {
 pub enum MainMenuState {
     #[default]
     Main,
-    Singleplayer,
     Multiplayer,
-    Realms,
     Settings,
     Quit,
 }

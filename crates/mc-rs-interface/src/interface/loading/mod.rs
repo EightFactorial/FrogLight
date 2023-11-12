@@ -57,8 +57,11 @@ impl LoadingInterface {
         // Create the main node
         let node = NodeBundle {
             style: Style {
+                position_type: PositionType::Absolute,
+
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
+
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
                 ..Default::default()

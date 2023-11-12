@@ -1,16 +1,18 @@
 use bevy::{asset::RecursiveDependencyLoadState, prelude::*};
+use mc_rs_core::schedule::state::ApplicationState;
 
 mod loading;
 use loading::LoadingInterface;
 
 mod main_menu;
 use main_menu::MainMenuInterface;
-use mc_rs_core::schedule::state::ApplicationState;
 
-pub mod set;
-pub mod state;
+mod multiplayer;
+use multiplayer::MultiplayerInterface;
 
 pub mod camera;
+pub mod set;
+pub mod state;
 
 use crate::{
     resourcepacks::{ResourcePacksFinishReloadEvent, ResourcePacksStartReloadEvent},
@@ -56,6 +58,7 @@ impl InterfaceRoot {
 
         // Setup systems for sub-interfaces
         MainMenuInterface::setup(app);
+        MultiplayerInterface::setup(app);
     }
 
     /// Build the interface root.
@@ -67,7 +70,7 @@ impl InterfaceRoot {
         let mut assets = world.get_resource_mut::<InterfaceAssets>().unwrap();
         assets.clear();
 
-        // Create the interface root ui node
+        // Create the root ui node
         let root_node = NodeBundle {
             style: Style {
                 width: Val::Percent(100.0),
@@ -84,6 +87,7 @@ impl InterfaceRoot {
 
         // Build sub-interfaces
         MainMenuInterface::build(root, world);
+        MultiplayerInterface::build(root, world);
     }
 
     /// Destroy the interface root.

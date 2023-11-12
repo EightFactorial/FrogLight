@@ -61,9 +61,11 @@ impl InterfaceComponent for MainMenuInterface {
             _ => Visibility::Hidden,
         };
 
-        // Create the main menu node to hold all other nodes
+        // Create the main menu node
         let node = NodeBundle {
             style: Style {
+                position_type: PositionType::Absolute,
+
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
 
@@ -81,7 +83,7 @@ impl InterfaceComponent for MainMenuInterface {
         let main_menu = world.spawn((MainMenuInterface, node)).id();
         world.entity_mut(root).add_child(main_menu);
 
-        // Build sub-interfaces
+        // Build interface components
         MainMenuBackground::build(main_menu, world);
         MainMenuTitle::build(main_menu, world);
         MainMenuButtons::build(main_menu, world);

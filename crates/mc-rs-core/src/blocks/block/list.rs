@@ -6943,13 +6943,6 @@ pub(super) fn create_blocks(blocks: &mut BlocksMap) {
         }
     );
     // TODO: Check values beyond this point
-    // TODO: Check values beyond this point
-    // TODO: Check values beyond this point
-    // TODO: Check values beyond this point
-    // TODO: Check values beyond this point
-    // TODO: Check values beyond this point
-    // TODO: Check values beyond this point
-    // TODO: Check values beyond this point
     add_block!(
         blocks,
         602u32,
