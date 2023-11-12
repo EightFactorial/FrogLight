@@ -4,7 +4,7 @@ use bevy::{
 };
 use mc_rs_core::ResourceLocation;
 
-use crate::resourcepacks::{ResourcePackAsset, ResourcePacks};
+use crate::{resourcepacks::ResourcePacks, traits::textures::GetAssetFromWorld};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub(super) struct BackgroundCube;
@@ -15,10 +15,6 @@ impl BackgroundCube {
     pub fn create_cube_texture(world: &mut World) -> Handle<Image> {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building BackgroundCube Texture");
-
-        let assets = world.resource::<Assets<ResourcePackAsset>>();
-        let packs = world.resource::<ResourcePacks>();
-        let fallback = packs.fallback.clone();
 
         // Get the cubemap textures
         let mut cube_textures = [
@@ -31,37 +27,16 @@ impl BackgroundCube {
         ]
         .into_iter()
         .map(|name| {
-            packs
-                .try_get_texture(
-                    &ResourceLocation::new(format!("minecraft:gui/title/background/{name}")),
-                    assets,
-                )
-                .cloned()
+            world
+                .get_texture(&ResourceLocation::new(format!(
+                    "minecraft:gui/title/background/{name}"
+                )))
+                .clone()
         })
         .collect::<Vec<_>>();
 
-        // If any of the textures are missing, replace all textures with the fallback texture
-        if cube_textures.iter().any(|texture| texture.is_none()) {
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            error!("Missing panorama textures, using fallback texture");
-
-            cube_textures = vec![
-                Some(fallback.clone()),
-                Some(fallback.clone()),
-                Some(fallback.clone()),
-                Some(fallback.clone()),
-                Some(fallback.clone()),
-                Some(fallback.clone()),
-            ]
-        }
-
-        // Unwrap the textures
-        let mut cube_textures = cube_textures
-            .into_iter()
-            .map(|texture| texture.unwrap())
-            .collect::<Vec<_>>();
-
         // Get the image assets
+        let fallback = world.resource::<ResourcePacks>().fallback.clone();
         let mut images = world.resource_mut::<Assets<Image>>();
 
         // Get the texture size

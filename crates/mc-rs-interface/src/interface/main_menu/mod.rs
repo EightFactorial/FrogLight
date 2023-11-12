@@ -9,6 +9,9 @@ use buttons::MainMenuButtons;
 
 mod cube;
 
+mod title;
+use title::MainMenuTitle;
+
 use crate::{interface::state::MainMenuState, traits::interface::SubInterface};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
@@ -42,6 +45,7 @@ impl SubInterface for MainMenuInterface {
         );
 
         MainMenuBackground::setup(app);
+        MainMenuTitle::setup(app);
         MainMenuButtons::setup(app);
     }
 
@@ -62,6 +66,8 @@ impl SubInterface for MainMenuInterface {
             style: Style {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
+
+                flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
                 ..Default::default()
@@ -77,7 +83,7 @@ impl SubInterface for MainMenuInterface {
 
         // Build sub-interfaces
         MainMenuBackground::build(main_menu, world);
-        // MainMenuTitle::build(main_menu, world);
+        MainMenuTitle::build(main_menu, world);
         MainMenuButtons::build(main_menu, world);
     }
 }

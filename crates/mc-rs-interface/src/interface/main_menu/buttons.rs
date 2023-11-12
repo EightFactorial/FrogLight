@@ -99,7 +99,7 @@ impl MainMenuButtons {
                         height: Val::Vh(20.0),
                         max_height: Val::Px(50.0),
 
-                        margin: UiRect::all(Val::Px(5.0)),
+                        margin: UiRect::all(Val::Px(6.0)),
 
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
@@ -111,8 +111,14 @@ impl MainMenuButtons {
             ))
             .with_children(|node| {
                 node.spawn(
-                    TextBundle::from_section(text, TextStyle::default())
-                        .with_text_alignment(TextAlignment::Center),
+                    TextBundle::from_section(
+                        text,
+                        TextStyle {
+                            font_size: 20.0,
+                            ..Default::default()
+                        },
+                    )
+                    .with_text_alignment(TextAlignment::Center),
                 );
             });
     }
