@@ -30,6 +30,8 @@ pub enum ResourcePackLoaderError {
     Serde(#[from] serde_json::Error),
     #[error("Texture error: {0}")]
     Texture(#[from] bevy::render::texture::TextureError),
+    #[error("Unsupported file extension")]
+    UnsupportedExtension,
     #[error("Invalid path")]
     InvalidPath,
 }
@@ -47,19 +49,22 @@ impl AssetLoader for ResourcePackLoader {
     ) -> bevy::utils::BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
             match load_context.path().extension().map(OsStr::to_str) {
-                Some(Some("zip")) => {
-                    let mut bytes = Vec::new();
-                    reader.read_to_end(&mut bytes).await?;
+                Some(Some(ext)) => match self.extensions().contains(&ext) {
+                    false => Err(ResourcePackLoaderError::UnsupportedExtension),
+                    true => {
+                        let mut bytes = Vec::new();
+                        reader.read_to_end(&mut bytes).await?;
 
-                    let zip = ZipArchive::new(Cursor::new(bytes))?;
-                    ResourcePackLoader::load_zip(zip, load_context)
-                }
+                        let zip = ZipArchive::new(Cursor::new(bytes))?;
+                        ResourcePackLoader::load_zip(zip, load_context)
+                    }
+                },
                 _ => Err(ResourcePackLoaderError::InvalidPath),
             }
         })
     }
 
-    fn extensions(&self) -> &[&str] { &["zip"] }
+    fn extensions(&self) -> &[&str] { &["zip", "jar"] }
 }
 
 impl ResourcePackLoader {
