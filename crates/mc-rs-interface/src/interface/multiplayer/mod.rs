@@ -4,7 +4,7 @@ use mc_rs_core::schedule::state::ApplicationState;
 mod background;
 use background::MultiplayerBackground;
 
-use crate::traits::interface::InterfaceComponent;
+use crate::traits::interface::{InterfaceComponent, MenuVisibility};
 
 use super::state::MainMenuState;
 
@@ -41,14 +41,6 @@ impl InterfaceComponent for MultiplayerInterface {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MultiplayerInterface");
 
-        // Set visibility based on current state
-        let app_state = world.resource::<State<ApplicationState>>();
-        let menu_state = world.resource::<State<MainMenuState>>();
-        let visibility = match (**app_state, **menu_state) {
-            (ApplicationState::MainMenu, MainMenuState::Multiplayer) => Visibility::Visible,
-            _ => Visibility::Hidden,
-        };
-
         // Create the multiplayer node
         let node = NodeBundle {
             style: Style {
@@ -60,7 +52,8 @@ impl InterfaceComponent for MultiplayerInterface {
                 ..Default::default()
             },
             background_color: BackgroundColor(Color::NONE),
-            visibility,
+            visibility: world
+                .get_menu_visibility(ApplicationState::MainMenu, MainMenuState::Multiplayer),
             ..Default::default()
         };
 

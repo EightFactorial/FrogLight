@@ -6,7 +6,7 @@ use crate::{
         camera::DefaultCamera, main_menu::cube::BackgroundCube, state::MainMenuState,
         InterfaceAssets,
     },
-    traits::interface::InterfaceComponent,
+    traits::interface::{InterfaceComponent, MenuVisibility},
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
@@ -104,21 +104,14 @@ impl MainMenuBackground {
         interface_assets.push(mesh.clone_weak().untyped());
         interface_assets.push(material.clone_weak().untyped());
 
-        // Get the visibility based on the current state
-        let app_state = world.resource::<State<ApplicationState>>();
-        let menu_state = world.resource::<State<MainMenuState>>();
-        let visibility = match (**app_state, **menu_state) {
-            (ApplicationState::MainMenu, MainMenuState::Main) => Visibility::Visible,
-            _ => Visibility::Hidden,
-        };
-
         // Spawn the background
         world.spawn((
             MainMenuBackground,
             PbrBundle {
                 mesh,
                 material,
-                visibility,
+                visibility: world
+                    .get_menu_visibility(ApplicationState::MainMenu, MainMenuState::Main),
                 ..Default::default()
             },
         ));

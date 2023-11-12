@@ -12,7 +12,10 @@ mod cube;
 mod title;
 use title::MainMenuTitle;
 
-use crate::{interface::state::MainMenuState, traits::interface::InterfaceComponent};
+use crate::{
+    interface::state::MainMenuState,
+    traits::interface::{InterfaceComponent, MenuVisibility},
+};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MainMenuInterface;
@@ -53,14 +56,6 @@ impl InterfaceComponent for MainMenuInterface {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MainMenuInterface");
 
-        // Set visibility based on current state
-        let app_state = world.resource::<State<ApplicationState>>();
-        let menu_state = world.resource::<State<MainMenuState>>();
-        let visibility = match (**app_state, **menu_state) {
-            (ApplicationState::MainMenu, MainMenuState::Main) => Visibility::Visible,
-            _ => Visibility::Hidden,
-        };
-
         // Create the main menu node
         let node = NodeBundle {
             style: Style {
@@ -75,7 +70,7 @@ impl InterfaceComponent for MainMenuInterface {
                 ..Default::default()
             },
             background_color: BackgroundColor(Color::NONE),
-            visibility,
+            visibility: world.get_menu_visibility(ApplicationState::MainMenu, MainMenuState::Main),
             ..Default::default()
         };
 
