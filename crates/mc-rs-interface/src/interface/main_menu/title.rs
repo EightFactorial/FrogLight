@@ -3,13 +3,13 @@ use mc_rs_core::ResourceLocation;
 
 use crate::{
     interface::InterfaceAssets,
-    traits::{interface::SubInterface, textures::GetAssetFromWorld},
+    traits::{interface::InterfaceComponent, textures::GetAssetFromWorld},
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MainMenuTitle;
 
-impl SubInterface for MainMenuTitle {
+impl InterfaceComponent for MainMenuTitle {
     fn setup(_app: &mut App) {
         // TODO: Add systems
     }

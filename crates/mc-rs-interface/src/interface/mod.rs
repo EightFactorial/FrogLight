@@ -14,7 +14,7 @@ pub mod camera;
 
 use crate::{
     resourcepacks::{ResourcePacksFinishReloadEvent, ResourcePacksStartReloadEvent},
-    traits::interface::SubInterface,
+    traits::interface::InterfaceComponent,
 };
 
 pub(super) fn setup(app: &mut App) {

@@ -12,12 +12,12 @@ mod cube;
 mod title;
 use title::MainMenuTitle;
 
-use crate::{interface::state::MainMenuState, traits::interface::SubInterface};
+use crate::{interface::state::MainMenuState, traits::interface::InterfaceComponent};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MainMenuInterface;
 
-impl SubInterface for MainMenuInterface {
+impl InterfaceComponent for MainMenuInterface {
     fn setup(app: &mut App) {
         // Show the main menu when entering the ApplicationState::MainMenu state
         app.add_systems(

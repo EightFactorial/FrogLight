@@ -6,13 +6,13 @@ use crate::{
         camera::DefaultCamera, main_menu::cube::BackgroundCube, state::MainMenuState,
         InterfaceAssets,
     },
-    traits::interface::SubInterface,
+    traits::interface::InterfaceComponent,
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MainMenuBackground;
 
-impl SubInterface for MainMenuBackground {
+impl InterfaceComponent for MainMenuBackground {
     fn setup(app: &mut App) {
         // Spawn or enable a Camera3d when entering the ApplicationState::MainMenu state
         // Show or build the background when entering the ApplicationState::MainMenu state

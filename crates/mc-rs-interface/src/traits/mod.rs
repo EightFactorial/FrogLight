@@ -1,3 +1,3 @@
 pub mod config;
 pub mod interface;
-pub mod textures;
+pub(crate) mod textures;

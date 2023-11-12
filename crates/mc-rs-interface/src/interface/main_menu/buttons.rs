@@ -1,7 +1,7 @@
 use bevy::{app::AppExit, prelude::*};
 use mc_rs_core::schedule::set::MenuSet;
 
-use crate::{interface::state::MainMenuState, traits::interface::SubInterface};
+use crate::{interface::state::MainMenuState, traits::interface::InterfaceComponent};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MainMenuButtons;
@@ -15,7 +15,7 @@ pub struct ButtonSettings;
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct ButtonQuit;
 
-impl SubInterface for MainMenuButtons {
+impl InterfaceComponent for MainMenuButtons {
     fn setup(app: &mut App) {
         // Add systems to interact with the buttons
         //
