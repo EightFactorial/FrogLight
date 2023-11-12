@@ -35,6 +35,26 @@ impl DefaultCamera {
         });
     }
 
+    /// A system that enables all [Camera2d]s.
+    pub fn enable_camera2d(mut query: Query<&mut Camera, With<Camera2d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Enabling all Camera2d");
+
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = true;
+        });
+    }
+
+    /// A system that disables all [Camera2d]s.
+    pub fn disable_camera2d(mut query: Query<&mut Camera, With<Camera2d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Disabling all Camera2d");
+
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = false;
+        });
+    }
+
     /// A system that destroys all [Camera2d]s.
     pub fn destroy_camera2d(query: Query<Entity, With<Camera2d>>, mut commands: Commands) {
         #[cfg(any(debug_assertions, feature = "debug"))]

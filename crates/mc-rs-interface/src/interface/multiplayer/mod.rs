@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use mc_rs_core::schedule::state::ApplicationState;
+use mc_rs_core::schedule::{set::MenuSet, state::ApplicationState};
 
 mod background;
 use background::MultiplayerBackground;
@@ -16,25 +16,34 @@ impl InterfaceComponent for MultiplayerInterface {
         // Exit the multiplayer interface when pressing escape
         app.add_systems(
             PreUpdate,
-            MultiplayerInterface::press_escape.run_if(in_state(MainMenuState::Multiplayer)),
+            MultiplayerInterface::press_escape
+                .run_if(in_state(MainMenuState::Multiplayer))
+                .in_set(MenuSet),
         );
 
         // Show the multiplayer interface when entering the MainMenuState::Multiplayer state
         app.add_systems(
             OnEnter(MainMenuState::Multiplayer),
-            MultiplayerInterface::show.run_if(
-                in_state(ApplicationState::MainMenu)
-                    .and_then(any_with_component::<MultiplayerInterface>()),
-            ),
+            MultiplayerInterface::show
+                .run_if(
+                    in_state(ApplicationState::MainMenu)
+                        .and_then(any_with_component::<MultiplayerInterface>()),
+                )
+                .in_set(MenuSet),
         );
         // Hide the multiplayer interface when exiting the MainMenuState::Multiplayer state
         app.add_systems(
             OnExit(MainMenuState::Multiplayer),
-            MultiplayerInterface::hide.run_if(
-                in_state(ApplicationState::MainMenu)
-                    .and_then(any_with_component::<MultiplayerInterface>()),
-            ),
+            MultiplayerInterface::hide
+                .run_if(
+                    in_state(ApplicationState::MainMenu)
+                        .and_then(any_with_component::<MultiplayerInterface>()),
+                )
+                .in_set(MenuSet),
         );
+
+        // Add systems for interface components
+        MultiplayerBackground::setup(app);
     }
 
     fn build(root: Entity, world: &mut World) {

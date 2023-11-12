@@ -10,9 +10,7 @@ use crate::{
 pub struct MainMenuTitle;
 
 impl InterfaceComponent for MainMenuTitle {
-    fn setup(_app: &mut App) {
-        // TODO: Add systems
-    }
+    fn setup(_app: &mut App) {}
 
     fn build(main_menu: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]

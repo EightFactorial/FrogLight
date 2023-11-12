@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use mc_rs_core::schedule::state::ApplicationState;
+use mc_rs_core::schedule::{set::MenuSet, state::ApplicationState};
 
 mod background;
 use background::MainMenuBackground;
@@ -25,28 +25,36 @@ impl InterfaceComponent for MainMenuInterface {
         // Show the main menu when entering the ApplicationState::MainMenu state
         app.add_systems(
             OnEnter(ApplicationState::MainMenu),
-            MainMenuInterface::show.run_if(
-                any_with_component::<MainMenuInterface>().and_then(in_state(MainMenuState::Main)),
-            ),
+            MainMenuInterface::show
+                .run_if(
+                    in_state(MainMenuState::Main)
+                        .and_then(any_with_component::<MainMenuInterface>()),
+                )
+                .in_set(MenuSet),
         );
 
         // Show the main menu when entering the MainMenuState::Main state
         app.add_systems(
             OnEnter(MainMenuState::Main),
-            MainMenuInterface::show.run_if(
-                in_state(ApplicationState::MainMenu)
-                    .and_then(any_with_component::<MainMenuInterface>()),
-            ),
+            MainMenuInterface::show
+                .run_if(
+                    in_state(ApplicationState::MainMenu)
+                        .and_then(any_with_component::<MainMenuInterface>()),
+                )
+                .in_set(MenuSet),
         );
         // Hide the main menu when exiting the MainMenuState::Main state
         app.add_systems(
             OnExit(MainMenuState::Main),
-            MainMenuInterface::hide.run_if(
-                in_state(ApplicationState::MainMenu)
-                    .and_then(any_with_component::<MainMenuInterface>()),
-            ),
+            MainMenuInterface::hide
+                .run_if(
+                    in_state(ApplicationState::MainMenu)
+                        .and_then(any_with_component::<MainMenuInterface>()),
+                )
+                .in_set(MenuSet),
         );
 
+        // Add systems for interface components
         MainMenuBackground::setup(app);
         MainMenuTitle::setup(app);
         MainMenuButtons::setup(app);
