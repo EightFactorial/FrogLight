@@ -100,6 +100,26 @@ impl DefaultCamera {
         });
     }
 
+    /// A system that enables all [Camera3d]s.
+    pub fn enable_camera3d(mut query: Query<&mut Camera, With<Camera3d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Enabling all Camera3d");
+
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = true;
+        });
+    }
+
+    /// A system that disables all [Camera3d]s.
+    pub fn disable_camera3d(mut query: Query<&mut Camera, With<Camera3d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Disabling all Camera3d");
+
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = false;
+        });
+    }
+
     /// A system that destroys all [Camera3d]s.
     pub fn destroy_camera3d(query: Query<Entity, With<Camera3d>>, mut commands: Commands) {
         #[cfg(any(debug_assertions, feature = "debug"))]

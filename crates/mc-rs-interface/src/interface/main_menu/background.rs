@@ -14,33 +14,34 @@ pub struct MainMenuBackground;
 
 impl SubInterface for MainMenuBackground {
     fn setup(app: &mut App) {
-        // Spawn a Camera3d when entering the ApplicationState::MainMenu state
-        app.add_systems(
-            OnEnter(ApplicationState::MainMenu),
-            DefaultCamera::custom_fov_camera3d::<75>
-                .run_if(
-                    not(any_with_component::<Camera3d>()).and_then(in_state(MainMenuState::Main)),
-                )
-                .in_set(MenuSet),
-        );
-
-        // Destroy the Camera3d when exiting the ApplicationState::MainMenu state
-        app.add_systems(
-            OnExit(ApplicationState::MainMenu),
-            DefaultCamera::destroy_camera3d
-                .run_if(any_with_component::<Camera3d>())
-                .in_set(MenuSet),
-        );
-
+        // Spawn or enable a Camera3d when entering the ApplicationState::MainMenu state
         // Show or build the background when entering the ApplicationState::MainMenu state
         app.add_systems(
             OnEnter(ApplicationState::MainMenu),
             (
+                (
+                    DefaultCamera::custom_fov_camera3d::<75>
+                        .run_if(not(any_with_component::<Camera3d>())),
+                    DefaultCamera::enable_camera3d.run_if(any_with_component::<Camera3d>()),
+                )
+                    .run_if(in_state(MainMenuState::Main)),
                 MainMenuBackground::show.run_if(any_with_component::<MainMenuBackground>()),
                 MainMenuBackground::build.run_if(not(any_with_component::<MainMenuBackground>())),
             )
                 .in_set(MenuSet),
         );
+
+        // Destroy the Camera3d when exiting the ApplicationState::MainMenu state
+        // Destroy the background when exiting the ApplicationState::MainMenu state
+        app.add_systems(
+            OnExit(ApplicationState::MainMenu),
+            (
+                MainMenuBackground::destroy.run_if(any_with_component::<MainMenuBackground>()),
+                DefaultCamera::destroy_camera3d.run_if(any_with_component::<Camera3d>()),
+            )
+                .in_set(MenuSet),
+        );
+
         // Show the background when entering the MainMenuState::Main state
         app.add_systems(
             OnEnter(MainMenuState::Main),
@@ -55,18 +56,11 @@ impl SubInterface for MainMenuBackground {
         // Hide the background when exiting the MainMenuState::Main state
         app.add_systems(
             OnExit(MainMenuState::Main),
-            MainMenuBackground::hide
-                .run_if(
-                    in_state(ApplicationState::MainMenu)
-                        .and_then(any_with_component::<MainMenuBackground>()),
-                )
-                .in_set(MenuSet),
-        );
-        // Destroy the background when exiting the ApplicationState::MainMenu state
-        app.add_systems(
-            OnExit(ApplicationState::MainMenu),
-            MainMenuBackground::destroy
-                .run_if(any_with_component::<MainMenuBackground>())
+            (
+                MainMenuBackground::hide.run_if(any_with_component::<MainMenuBackground>()),
+                DefaultCamera::disable_camera3d.run_if(any_with_component::<Camera3d>()),
+            )
+                .run_if(in_state(ApplicationState::MainMenu))
                 .in_set(MenuSet),
         );
 

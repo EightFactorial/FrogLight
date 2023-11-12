@@ -1,7 +1,4 @@
-use bevy::{
-    asset::{LoadState, RecursiveDependencyLoadState},
-    prelude::*,
-};
+use bevy::{asset::RecursiveDependencyLoadState, prelude::*};
 
 mod loading;
 use loading::LoadingInterface;
@@ -112,18 +109,12 @@ impl InterfaceAssets {
     /// Returns true if all interface assets are loaded.
     pub fn loaded(&self, asset_server: &AssetServer) -> bool {
         self.iter().all(|handle| {
-            let state = asset_server.get_load_states(handle.id());
+            let state = asset_server.get_recursive_dependency_load_state(handle.id());
 
             #[cfg(any(debug_assertions, feature = "debug"))]
-            debug!("Interface asset {:?} is in state {:?}", handle.id(), state);
+            debug!("Asset {} is {:?}", handle.id(), state);
 
-            // TODO: Figure out why all assets return `None`
-            matches!(
-                state,
-                Some((LoadState::Loaded, _, _))
-                    | Some((_, _, RecursiveDependencyLoadState::Loaded))
-                    | None
-            )
+            matches!(state, Some(RecursiveDependencyLoadState::Loaded) | None)
         })
     }
 }
