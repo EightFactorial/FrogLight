@@ -11,6 +11,9 @@ pub use asset::*;
 mod packs;
 pub use packs::*;
 
+#[cfg(test)]
+mod test;
+
 /// This must be done *before* the AssetServer plugin is added.
 pub(super) fn register_assets(app: &mut App) { source::register(app); }
 

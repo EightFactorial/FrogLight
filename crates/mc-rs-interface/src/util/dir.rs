@@ -19,7 +19,7 @@ pub fn config_folder() -> PathBuf {
             bevy::prelude::debug!("Creating config directory at `{}`", config_dir.display());
         }
 
-        if let Err(err) = fs::create_dir(&config_dir) {
+        if let Err(err) = fs::create_dir_all(&config_dir) {
             panic!("Could not create config directory: {}", err);
         }
     }
