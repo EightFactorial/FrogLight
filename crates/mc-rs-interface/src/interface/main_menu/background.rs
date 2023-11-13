@@ -6,7 +6,7 @@ use crate::{
         camera::DefaultCamera, main_menu::cube::BackgroundCube, state::MainMenuState,
         InterfaceAssets,
     },
-    traits::interface::{InterfaceComponent, MenuVisibility},
+    traits::{interface::InterfaceComponent, world::MenuVisibility},
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]

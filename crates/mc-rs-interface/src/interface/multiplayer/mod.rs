@@ -4,7 +4,7 @@ use mc_rs_core::schedule::{set::MenuSet, state::ApplicationState};
 mod background;
 use background::MultiplayerBackground;
 
-use crate::traits::interface::{InterfaceComponent, MenuVisibility};
+use crate::traits::{interface::InterfaceComponent, world::MenuVisibility};
 
 use super::state::MainMenuState;
 

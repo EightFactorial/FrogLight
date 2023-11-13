@@ -4,7 +4,7 @@ use bevy::{
 };
 use mc_rs_core::ResourceLocation;
 
-use crate::{resourcepacks::ResourcePacks, traits::textures::GetAssetFromWorld};
+use crate::{resourcepacks::ResourcePacks, traits::world::AssetFromWorld};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub(super) struct BackgroundCube;

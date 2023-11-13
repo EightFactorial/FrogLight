@@ -3,7 +3,7 @@ use mc_rs_core::ResourceLocation;
 
 use crate::{
     interface::InterfaceAssets,
-    traits::{interface::InterfaceComponent, textures::GetAssetFromWorld},
+    traits::{interface::InterfaceComponent, world::AssetFromWorld},
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]

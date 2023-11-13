@@ -14,7 +14,7 @@ use title::MainMenuTitle;
 
 use crate::{
     interface::state::MainMenuState,
-    traits::interface::{InterfaceComponent, MenuVisibility},
+    traits::{interface::InterfaceComponent, world::MenuVisibility},
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
