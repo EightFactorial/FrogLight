@@ -10,6 +10,9 @@ use main_menu::MainMenuInterface;
 mod multiplayer;
 use multiplayer::MultiplayerInterface;
 
+mod settings;
+use settings::SettingsInterface;
+
 pub mod camera;
 pub mod set;
 pub mod state;
@@ -59,6 +62,7 @@ impl InterfaceRoot {
         // Setup systems for sub-interfaces
         MainMenuInterface::setup(app);
         MultiplayerInterface::setup(app);
+        SettingsInterface::setup(app);
     }
 
     /// Build the interface root.
@@ -88,6 +92,7 @@ impl InterfaceRoot {
         // Build sub-interfaces
         MainMenuInterface::build(root, world);
         MultiplayerInterface::build(root, world);
+        SettingsInterface::build(root, world);
     }
 
     /// Destroy the interface root.

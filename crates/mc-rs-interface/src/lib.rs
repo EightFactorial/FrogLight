@@ -3,6 +3,8 @@ use configs::settings::Settings;
 use plugins::{DefaultPlugin, RenderPlugin};
 use traits::config::ConfigFile;
 
+use mc_rs_core::CorePlugin;
+
 pub mod configs;
 pub mod interface;
 pub mod plugins;
@@ -19,7 +21,7 @@ impl Plugin for InterfacePlugin {
         resourcepacks::register_assets(app);
 
         let settings = Settings::load();
-        app.add_plugins((DefaultPlugin::from(&settings), RenderPlugin))
+        app.add_plugins((DefaultPlugin::from(&settings), CorePlugin, RenderPlugin))
             .insert_resource(settings);
 
         resources::setup(app);

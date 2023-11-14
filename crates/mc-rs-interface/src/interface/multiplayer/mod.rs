@@ -60,7 +60,7 @@ impl InterfaceComponent for MultiplayerInterface {
 
                 ..Default::default()
             },
-            background_color: BackgroundColor(Color::NONE),
+            background_color: BackgroundColor(Color::GRAY),
             visibility: world
                 .get_menu_visibility(ApplicationState::MainMenu, MainMenuState::Multiplayer),
             ..Default::default()

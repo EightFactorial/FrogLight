@@ -1,6 +1,5 @@
 use bevy::app::App;
 
-use mc_rs_core::CorePlugin;
 use mc_rs_interface::InterfacePlugin;
 use mc_rs_network::NetworkingPlugin;
 
@@ -9,7 +8,7 @@ fn main() {
     let mut app = App::new();
 
     // Add the plugins
-    app.add_plugins((CorePlugin, InterfacePlugin, NetworkingPlugin));
+    app.add_plugins((InterfacePlugin, NetworkingPlugin));
 
     // Run the app
     app.run();

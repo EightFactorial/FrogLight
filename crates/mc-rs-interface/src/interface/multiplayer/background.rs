@@ -1,10 +1,6 @@
 use bevy::prelude::*;
-use mc_rs_core::ResourceLocation;
 
-use crate::{
-    interface::InterfaceAssets,
-    traits::{interface::InterfaceComponent, world::AssetFromWorld},
-};
+use crate::traits::interface::InterfaceComponent;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MultiplayerBackground;
@@ -16,26 +12,38 @@ impl InterfaceComponent for MultiplayerBackground {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MultiplayerBackground");
 
-        let dirt_background = world
-            .get_texture(&ResourceLocation::new(
-                "minecraft:gui/light_dirt_background",
-            ))
-            .clone();
-
-        let mut interface_assets = world.resource_mut::<InterfaceAssets>();
-        interface_assets.push(dirt_background.clone().untyped());
-
-        let image = ImageBundle {
+        let node = NodeBundle {
             style: Style {
-                width: Val::Auto,
-                height: Val::Auto,
+                position_type: PositionType::Absolute,
+
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
                 ..Default::default()
             },
-            image: dirt_background.into(),
             ..Default::default()
         };
 
-        let background = world.spawn(image).id();
+        let todo = TextBundle {
+            text: Text::from_section(
+                "UI is hard :(",
+                TextStyle {
+                    font_size: 32.0,
+                    ..Default::default()
+                },
+            ),
+            ..Default::default()
+        };
+
+        let background = world
+            .spawn((MultiplayerBackground, node))
+            .with_children(|node| {
+                node.spawn(todo);
+            })
+            .id();
+
         world.entity_mut(multiplayer).add_child(background);
     }
 }
