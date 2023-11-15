@@ -18,7 +18,7 @@ pub mod set;
 pub mod state;
 
 use crate::{
-    resourcepacks::{ResourcePacksFinishReloadEvent, ResourcePacksStartReloadEvent},
+    resources::resourcepacks::events::{ResourcePacksFinishEvent, ResourcePacksStartLoadEvent},
     traits::interface::InterfaceComponent,
 };
 
@@ -50,9 +50,9 @@ impl InterfaceRoot {
         app.add_systems(
             Update,
             (
-                InterfaceRoot::destroy.run_if(on_event::<ResourcePacksStartReloadEvent>()),
+                InterfaceRoot::destroy.run_if(on_event::<ResourcePacksStartLoadEvent>()),
                 InterfaceRoot::build.run_if(
-                    on_event::<ResourcePacksFinishReloadEvent>()
+                    on_event::<ResourcePacksFinishEvent>()
                         .and_then(not(any_with_component::<InterfaceRoot>())),
                 ),
             )

@@ -21,8 +21,10 @@ impl Plugin for InterfacePlugin {
         resourcepacks::register_assets(app);
 
         let settings = Settings::load();
-        app.add_plugins((DefaultPlugin::from(&settings), CorePlugin, RenderPlugin))
-            .insert_resource(settings);
+        app.add_plugins((DefaultPlugin::from(&settings), CorePlugin, RenderPlugin));
+
+        settings.insert_resources(app);
+        app.insert_resource(settings);
 
         resources::setup(app);
         interface::setup(app);

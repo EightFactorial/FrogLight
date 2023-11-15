@@ -22,9 +22,7 @@ impl CameraSettings {
             if let Projection::Perspective(proj) = &mut *proj {
                 if settings.camera.fov != proj.fov {
                     #[cfg(any(debug_assertions, feature = "debug"))]
-                    {
-                        debug!("Updating camera fov to {:?}", settings.camera.fov);
-                    }
+                    debug!("Updating camera fov to {:?}", settings.camera.fov);
 
                     proj.fov = settings.camera.fov;
                 }

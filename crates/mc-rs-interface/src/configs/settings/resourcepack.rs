@@ -17,6 +17,6 @@ impl Default for ResourcePackSettings {
 
 impl ResourcePackSettings {
     fn default_resourcepacks() -> Vec<CompactString> {
-        vec![CompactString::new_inline("minecraft.zip")]
+        vec![CompactString::new_inline("minecraft.jar")]
     }
 }

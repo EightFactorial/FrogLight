@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 use mc_rs_core::schedule::{set::LoadingSet, state::ApplicationState};
 
-use crate::resourcepacks::{ResourcePacksFinishReloadEvent, ResourcePacksStartReloadEvent};
+use crate::resources::resourcepacks::events::{
+    ResourcePacksFinishEvent, ResourcePacksStartLoadEvent,
+};
 
 use super::{camera::DefaultCamera, InterfaceAssets, InterfaceRoot};
 
@@ -28,14 +30,14 @@ impl LoadingInterface {
                 // Show the LoadingInterface when reloading resourcepacks
                 LoadingInterface::show.run_if(
                     not(any_with_component::<LoadingInterfaceActive>())
-                        .and_then(on_event::<ResourcePacksStartReloadEvent>()),
+                        .and_then(on_event::<ResourcePacksStartLoadEvent>()),
                 ),
                 // Change state to MainMenu when resourcepacks are finished reloading,
                 // but *do not* show the main menu until all interface assets are loaded.
                 LoadingInterface::change_state
                     .run_if(
                         in_state(ApplicationState::Loading)
-                            .and_then(on_event::<ResourcePacksFinishReloadEvent>()),
+                            .and_then(on_event::<ResourcePacksFinishEvent>()),
                     )
                     .in_set(LoadingSet),
                 // Hide the LoadingInterface when resourcepacks are finished reloading,
@@ -97,8 +99,8 @@ impl LoadingInterface {
     /// reloading and all interface assets are loaded.
     #[allow(clippy::too_many_arguments)]
     fn finish_event_and_loaded(
-        start_event: EventReader<ResourcePacksStartReloadEvent>,
-        finish_event: EventReader<ResourcePacksFinishReloadEvent>,
+        start_event: EventReader<ResourcePacksStartLoadEvent>,
+        finish_event: EventReader<ResourcePacksFinishEvent>,
 
         interface_assets: Res<InterfaceAssets>,
         assets: Res<AssetServer>,

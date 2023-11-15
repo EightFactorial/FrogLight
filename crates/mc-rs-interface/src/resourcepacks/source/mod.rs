@@ -7,6 +7,9 @@ use bevy::{
 
 use crate::util::dir::config_folder;
 
+mod loaders;
+pub use loaders::ResourcePackLoader;
+
 /// Adds the resourcepack asset source to the app.
 ///
 /// This must be done *before* the AssetServer plugin is added.

@@ -12,6 +12,8 @@ use resourcepack::ResourcePackSettings;
 pub mod window;
 use window::WindowSettings;
 
+use self::window::GuiScale;
+
 #[derive(Debug, Default, Clone, PartialEq, Resource, Serialize, Deserialize)]
 pub struct Settings {
     #[serde(default)]
@@ -32,13 +34,18 @@ impl ResourceConfig for Settings {
         app.add_systems(
             Update,
             (
-                Self::save_config,
+                Settings::save_config,
                 CameraSettings::update_camera,
                 WindowSettings::update_window,
+                GuiScale::update_scale,
             )
-                .run_if(resource_exists_and_changed::<Self>()),
+                .run_if(resource_exists_and_changed::<Settings>()),
         );
     }
 }
 
-impl Settings {}
+impl Settings {
+    pub(crate) fn insert_resources(&self, app: &mut App) {
+        app.insert_resource(self.window.resolution.gui_scale);
+    }
+}

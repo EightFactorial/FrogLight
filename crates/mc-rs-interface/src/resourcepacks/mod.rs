@@ -1,15 +1,10 @@
 use bevy::prelude::*;
 
-mod loader;
-use loader::ResourcePackLoader;
-
 mod source;
+use source::ResourcePackLoader;
 
 mod asset;
 pub use asset::*;
-
-mod packs;
-pub use packs::*;
 
 #[cfg(test)]
 mod test;
@@ -19,8 +14,6 @@ pub(super) fn register_assets(app: &mut App) { source::register(app); }
 
 /// This must be done *after* the AssetServer plugin is added.
 pub(super) fn init_assets(app: &mut App) {
-    packs::setup(app);
-
     app.init_asset::<ResourcePackAsset>()
         .init_asset_loader::<ResourcePackLoader>();
 }
