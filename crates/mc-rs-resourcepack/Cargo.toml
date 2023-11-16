@@ -1,0 +1,24 @@
+[package]
+name = "mc-rs-resourcepack"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+
+[dependencies]
+bevy = { workspace = true }
+compact_str = { workspace = true }
+mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["arbitrary_precision"] }
+thiserror = "1.0"
+zip = { version = "0.6", features = ["flate2"] }
+
+[features]
+default = []
+
+# Enable debug features
+debug = ["mc-rs-core/debug"]

@@ -1,0 +1,32 @@
+[package]
+name = "mc-rs-gui"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+
+[dependencies]
+bevy = { workspace = true }
+compact_str = { workspace = true }
+mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
+mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
+strum = { workspace = true }
+
+[features]
+default = []
+
+# Enable debug features
+debug = ["mc-rs-core/debug", "mc-rs-resourcepack/debug"]
+# Enable bevy-rapier debug features
+debug_rapier = ["mc-rs-core/debug_rapier"]
+
+# Enable wayland features
+wayland = ["bevy/wayland"]
+
+# Enable simd features
+simd = ["mc-rs-core/simd"]
+# !! Currently broken on the latest nightly !!
+simd_advanced = ["mc-rs-core/simd_advanced"]
