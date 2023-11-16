@@ -37,17 +37,25 @@ impl PluginGroup for ClientPlugins {
             .add(GuiPlugin)
             .add(NetworkingPlugin);
 
-        // Disable the log plugin if the default plugins
-        // are enabled and the debug feature is disabled
-        #[cfg(all(feature = "default_plugins", feature = "debug"))]
+        #[cfg(feature = "default_plugins")]
         {
-            plugins = plugins.add_after::<bevy::log::LogPlugin, ConfigPlugin>(ConfigPlugin);
+            // Add the config plugin after the log plugin if it's enabled
+            #[cfg(feature = "debug")]
+            {
+                plugins = plugins.add_after::<bevy::log::LogPlugin, ConfigPlugin>(ConfigPlugin);
+            }
+            // Disable the log plugin if the debug feature is disabled
+            #[cfg(not(feature = "debug"))]
+            {
+                plugins = plugins.disable::<bevy::log::LogPlugin>();
+            }
         }
-        #[cfg(all(feature = "default_plugins", not(feature = "debug")))]
+        #[cfg(any(not(feature = "default_plugins"), not(feature = "debug")))]
         {
-            plugins = plugins.disable::<bevy::log::LogPlugin>().add(ConfigPlugin);
+            plugins = plugins.add(ConfigPlugin);
         }
 
+        // Add the rapier debug plugin if the debug_rapier feature is enabled
         #[cfg(feature = "debug_rapier")]
         {
             app.add_plugins(bevy_rapier3d::render::RapierDebugRenderPlugin::default());
