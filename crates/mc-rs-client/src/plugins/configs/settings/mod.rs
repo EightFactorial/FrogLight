@@ -1,4 +1,5 @@
 use bevy::{app::AppExit, prelude::*};
+use mc_rs_gui::resources::gui::GuiScale;
 use serde::{Deserialize, Serialize};
 
 pub mod camera;
@@ -61,11 +62,7 @@ impl Settings {
 
         // Insert GuiScale
         {
-            let scale = self
-                .window
-                .resolution
-                .gui_scale
-                .to_guiscale(self.window.resolution.width, self.window.resolution.height);
+            let scale: GuiScale = (&self.window.resolution).into();
 
             #[cfg(any(debug_assertions, feature = "debug"))]
             debug!("Inserting GuiScale: {scale:?}");

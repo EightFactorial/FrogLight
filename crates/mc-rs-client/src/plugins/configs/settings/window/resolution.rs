@@ -1,4 +1,5 @@
 use bevy::window::WindowResolution as BevyWindowResolution;
+use mc_rs_gui::resources::gui::GuiScale;
 use serde::{Deserialize, Serialize};
 
 use super::scale::GuiScaleSettings;
@@ -34,4 +35,10 @@ impl From<WindowResolution> for BevyWindowResolution {
 
 impl From<&WindowResolution> for BevyWindowResolution {
     fn from(value: &WindowResolution) -> Self { Self::new(value.width as f32, value.height as f32) }
+}
+
+impl From<&WindowResolution> for GuiScale {
+    fn from(value: &WindowResolution) -> Self {
+        value.gui_scale.to_guiscale(value.width, value.height)
+    }
 }
