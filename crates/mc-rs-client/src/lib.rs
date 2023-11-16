@@ -33,9 +33,9 @@ impl PluginGroup for ClientPlugins {
         plugins = plugins
             .add_before::<AssetPlugin, ResourcePackSourcePlugin>(ResourcePackSourcePlugin)
             .add(RapierPhysicsPlugin::<()>::default())
+            .add(NetworkingPlugin)
             .add(CorePlugin)
-            .add(GuiPlugin)
-            .add(NetworkingPlugin);
+            .add(GuiPlugin);
 
         #[cfg(feature = "default_plugins")]
         {
@@ -50,6 +50,7 @@ impl PluginGroup for ClientPlugins {
                 plugins = plugins.disable::<bevy::log::LogPlugin>();
             }
         }
+        // Add the config plugin without any conditions if the log plugin is disabled
         #[cfg(any(not(feature = "default_plugins"), not(feature = "debug")))]
         {
             plugins = plugins.add(ConfigPlugin);

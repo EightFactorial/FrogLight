@@ -5,15 +5,22 @@ use super::Settings;
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct CameraSettings {
+    #[serde(default = "CameraSettings::default_fov")]
     pub fov: f32,
 }
 
 impl Default for CameraSettings {
-    fn default() -> Self { Self { fov: 70.0 } }
+    fn default() -> Self {
+        Self {
+            fov: Self::default_fov(),
+        }
+    }
 }
 
 impl CameraSettings {
-    /// Update the camera settings.
+    fn default_fov() -> f32 { 70.0 }
+
+    /// Update the [Camera's](Camera) [`Projection`] when the [`Settings`] change.
     pub(super) fn update_camera(
         mut query: Query<&mut Projection, With<Camera3d>>,
         settings: Res<Settings>,
@@ -29,4 +36,12 @@ impl CameraSettings {
             }
         });
     }
+}
+
+impl From<f32> for CameraSettings {
+    fn from(fov: f32) -> Self { Self { fov } }
+}
+
+impl From<CameraSettings> for f32 {
+    fn from(settings: CameraSettings) -> Self { settings.fov }
 }

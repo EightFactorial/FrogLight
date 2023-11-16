@@ -6,5 +6,9 @@ pub mod resources;
 pub struct GuiPlugin;
 
 impl Plugin for GuiPlugin {
-    fn build(&self, _app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        resources::setup(app);
+
+        // TODO: Add systems
+    }
 }

@@ -9,7 +9,8 @@ use super::Settings;
 mod resolution;
 pub use resolution::*;
 
-pub(super) mod scale;
+mod scale;
+pub use scale::*;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WindowSettings {
@@ -32,7 +33,7 @@ impl WindowSettings {
         }
     }
 
-    /// Update the window settings.
+    /// Update the [`Window`] when the [`Settings`] change.
     pub(super) fn update_window(
         mut query: Query<&mut Window, With<PrimaryWindow>>,
         settings: Res<Settings>,

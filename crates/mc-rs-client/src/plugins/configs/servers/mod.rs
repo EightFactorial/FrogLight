@@ -17,9 +17,7 @@ pub struct ServerItem {
     pub title: CompactString,
     pub address: CompactString,
 
-    #[serde(default)]
     pub cached_status: Option<CompactString>,
-    #[serde(default)]
     pub cached_icon: Option<CompactString>,
 }
 

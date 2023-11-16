@@ -8,7 +8,7 @@ pub mod resourcepack;
 use resourcepack::ResourcePackSettings;
 
 pub mod window;
-use window::WindowSettings;
+use window::{GuiScaleSettings, WindowSettings};
 
 use super::traits::{ConfigFile, ResourceConfig};
 
@@ -27,14 +27,19 @@ impl ConfigFile for Settings {
 }
 impl ResourceConfig for Settings {
     fn add_systems(app: &mut App) {
-        app.add_systems(Update, Self::save_config.run_if(on_event::<AppExit>()));
-
         app.add_systems(
             Update,
+            (GuiScaleSettings::update_settings, Self::save_config)
+                .chain()
+                .run_if(on_event::<AppExit>()),
+        );
+
+        app.add_systems(
+            PreUpdate,
             (
                 CameraSettings::update_camera,
                 WindowSettings::update_window,
-                window::scale::update_scale,
+                GuiScaleSettings::update_scale,
             )
                 .run_if(resource_exists_and_changed::<Settings>()),
         );
@@ -43,6 +48,29 @@ impl ResourceConfig for Settings {
 
 impl Settings {
     pub(crate) fn insert_resources(&self, app: &mut App) {
-        app.insert_resource(self.window.resolution.gui_scale);
+        // Insert GuiScaleSettings
+        {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!(
+                "Inserting GuiScaleSettings: {:?}",
+                self.window.resolution.gui_scale
+            );
+
+            app.insert_resource(self.window.resolution.gui_scale);
+        }
+
+        // Insert GuiScale
+        {
+            let scale = self
+                .window
+                .resolution
+                .gui_scale
+                .to_guiscale(self.window.resolution.width, self.window.resolution.height);
+
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("Inserting GuiScale: {scale:?}");
+
+            app.insert_resource(scale);
+        }
     }
 }

@@ -1,22 +1,31 @@
 use bevy::window::WindowResolution as BevyWindowResolution;
-use mc_rs_gui::resources::gui::GuiScale;
 use serde::{Deserialize, Serialize};
+
+use super::scale::GuiScaleSettings;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WindowResolution {
+    #[serde(default = "WindowResolution::default_width")]
     pub width: u32,
+    #[serde(default = "WindowResolution::default_height")]
     pub height: u32,
-    pub gui_scale: GuiScale,
+    #[serde(default)]
+    pub gui_scale: GuiScaleSettings,
 }
 
 impl Default for WindowResolution {
     fn default() -> Self {
         Self {
-            width: 960,
-            height: 720,
-            gui_scale: GuiScale::AUTO,
+            width: WindowResolution::default_width(),
+            height: WindowResolution::default_height(),
+            gui_scale: GuiScaleSettings::Auto,
         }
     }
+}
+
+impl WindowResolution {
+    fn default_width() -> u32 { 960 }
+    fn default_height() -> u32 { 720 }
 }
 
 impl From<WindowResolution> for BevyWindowResolution {
