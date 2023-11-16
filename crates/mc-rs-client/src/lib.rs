@@ -1,7 +1,7 @@
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 
-use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*};
+use bevy::{app::PluginGroupBuilder, prelude::*};
 use bevy_rapier3d::plugin::RapierPhysicsPlugin;
 use mc_rs_core::CorePlugin;
 use mc_rs_gui::GuiPlugin;
@@ -41,7 +41,7 @@ impl PluginGroup for ClientPlugins {
         // are enabled and the debug feature is disabled
         #[cfg(all(feature = "default_plugins", feature = "debug"))]
         {
-            plugins = plugins.add_after::<LogPlugin, ConfigPlugin>(ConfigPlugin);
+            plugins = plugins.add_after::<bevy::log::LogPlugin, ConfigPlugin>(ConfigPlugin);
         }
         #[cfg(all(feature = "default_plugins", not(feature = "debug")))]
         {
