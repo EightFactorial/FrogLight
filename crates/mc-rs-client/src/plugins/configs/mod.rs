@@ -5,6 +5,9 @@ use bevy::prelude::*;
 pub mod keybinds;
 use keybinds::Keybinds;
 
+pub mod servers;
+use servers::ServerList;
+
 pub mod settings;
 use settings::Settings;
 
@@ -20,6 +23,10 @@ impl Plugin for ConfigPlugin {
         // Add the keybinds to the app
         Keybinds::add_systems(app);
         app.insert_resource(Keybinds::load());
+
+        // Add the server list to the app
+        ServerList::add_systems(app);
+        app.insert_resource(ServerList::load());
 
         // Add the settings to the app
         Settings::add_systems(app);

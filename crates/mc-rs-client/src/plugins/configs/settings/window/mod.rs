@@ -9,8 +9,7 @@ use super::Settings;
 mod resolution;
 pub use resolution::*;
 
-mod scale;
-pub use scale::*;
+pub(super) mod scale;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WindowSettings {

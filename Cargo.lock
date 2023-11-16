@@ -3991,6 +3991,7 @@ dependencies = [
  "compact_str",
  "mc-rs-core",
  "mc-rs-resourcepack",
+ "serde",
  "strum",
 ]
 

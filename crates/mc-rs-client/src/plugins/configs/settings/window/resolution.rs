@@ -1,7 +1,6 @@
 use bevy::window::WindowResolution as BevyWindowResolution;
+use mc_rs_gui::resources::gui::GuiScale;
 use serde::{Deserialize, Serialize};
-
-use super::GuiScale;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WindowResolution {

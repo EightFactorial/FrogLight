@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+pub mod resources;
+
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct GuiPlugin;
 

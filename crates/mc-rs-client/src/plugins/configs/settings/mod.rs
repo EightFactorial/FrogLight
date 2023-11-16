@@ -10,8 +10,6 @@ use resourcepack::ResourcePackSettings;
 pub mod window;
 use window::WindowSettings;
 
-use self::window::GuiScale;
-
 use super::traits::{ConfigFile, ResourceConfig};
 
 #[derive(Debug, Default, Clone, PartialEq, Resource, Serialize, Deserialize)]
@@ -36,7 +34,7 @@ impl ResourceConfig for Settings {
             (
                 CameraSettings::update_camera,
                 WindowSettings::update_window,
-                GuiScale::update_scale,
+                window::scale::update_scale,
             )
                 .run_if(resource_exists_and_changed::<Settings>()),
         );
