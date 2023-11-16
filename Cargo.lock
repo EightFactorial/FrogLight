@@ -3913,6 +3913,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bevy",
+ "bevy_rapier3d",
  "compact_str",
  "dirs",
  "mc-rs-core",

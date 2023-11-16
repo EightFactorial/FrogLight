@@ -15,6 +15,7 @@ vergen = { version = "8.2", features = ["build", "cargo", "git", "gitoxide"] }
 [dependencies]
 anyhow = "1.0"
 bevy = { workspace = true, features = ["serialize"] }
+bevy_rapier3d = { workspace = true }
 compact_str = { workspace = true }
 dirs = "5.0"
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
@@ -34,7 +35,7 @@ default_plugins = []
 # Enable debug features
 debug = ["mc-rs-core/debug", "mc-rs-gui/debug", "mc-rs-network/debug", "bevy/embedded_watcher", "bevy/file_watcher"]
 # Enable bevy-rapier debug features
-debug_rapier = ["mc-rs-core/debug_rapier"]
+debug_rapier = []
 
 # Enable simd features
 simd = ["mc-rs-core/simd", "mc-rs-network/simd"]

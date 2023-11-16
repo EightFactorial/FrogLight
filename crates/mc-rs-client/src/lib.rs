@@ -2,6 +2,7 @@
 #![feature(generic_const_exprs)]
 
 use bevy::{app::PluginGroupBuilder, log::LogPlugin, prelude::*};
+use bevy_rapier3d::plugin::RapierPhysicsPlugin;
 use mc_rs_core::CorePlugin;
 use mc_rs_gui::GuiPlugin;
 use mc_rs_network::NetworkingPlugin;
@@ -28,11 +29,28 @@ impl PluginGroup for ClientPlugins {
         #[cfg(not(feature = "default_plugins"))]
         let mut plugins = PluginGroupBuilder::start::<ClientPlugins>();
 
+        // Add required plugins
+        plugins = plugins
+            .add_before::<AssetPlugin, ResourcePackSourcePlugin>(ResourcePackSourcePlugin)
+            .add(RapierPhysicsPlugin::<()>::default())
+            .add(CorePlugin)
+            .add(GuiPlugin)
+            .add(NetworkingPlugin);
+
         // Disable the log plugin if the default plugins
         // are enabled and the debug feature is disabled
+        #[cfg(all(feature = "default_plugins", feature = "debug"))]
+        {
+            plugins = plugins.add_after::<LogPlugin, ConfigPlugin>(ConfigPlugin);
+        }
         #[cfg(all(feature = "default_plugins", not(feature = "debug")))]
         {
-            plugins = plugins.disable::<bevy::log::LogPlugin>();
+            plugins = plugins.disable::<bevy::log::LogPlugin>().add(ConfigPlugin);
+        }
+
+        #[cfg(feature = "debug_rapier")]
+        {
+            app.add_plugins(bevy_rapier3d::render::RapierDebugRenderPlugin::default());
         }
 
         // Set the default image sampler to nearest and the address mode to repeat
@@ -40,12 +58,6 @@ impl PluginGroup for ClientPlugins {
         // Set the window title, resolution, vsync, etc.
         plugins = plugins::window_plugin(plugins);
 
-        // Add required plugins
         plugins
-            .add_before::<AssetPlugin, ResourcePackSourcePlugin>(ResourcePackSourcePlugin)
-            .add_after::<LogPlugin, ConfigPlugin>(ConfigPlugin)
-            .add(CorePlugin)
-            .add(GuiPlugin)
-            .add(NetworkingPlugin)
     }
 }

@@ -20,8 +20,6 @@ default = []
 
 # Enable debug features
 debug = ["mc-rs-core/debug", "mc-rs-resourcepack/debug"]
-# Enable bevy-rapier debug features
-debug_rapier = ["mc-rs-core/debug_rapier"]
 
 # Enable wayland features
 wayland = ["bevy/wayland"]

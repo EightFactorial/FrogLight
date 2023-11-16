@@ -24,8 +24,6 @@ default = ["simd"]
 
 # Enable debug features
 debug = ["mc-rs-protocol/debug"]
-# Enable bevy-rapier3d debug features
-debug_rapier = []
 
 # Enable simd features
 simd = ["mc-rs-protocol/simd", "bevy_rapier3d/simd-stable"]

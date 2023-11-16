@@ -2,7 +2,6 @@
 #![feature(generic_const_exprs)]
 
 use bevy::prelude::*;
-use bevy_rapier3d::plugin::RapierPhysicsPlugin;
 
 // Re-export mc-rs-protocol
 pub use mc_rs_protocol::{types::*, versions};
@@ -21,14 +20,6 @@ pub struct CorePlugin;
 
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut App) {
-        // Add Rapier physics plugins
-        app.add_plugins(RapierPhysicsPlugin::<()>::default());
-
-        #[cfg(feature = "debug_rapier")]
-        {
-            app.add_plugins(bevy_rapier3d::render::RapierDebugRenderPlugin::default());
-        }
-
         blocks::setup(app);
         components::setup(app);
         net_event::setup(app);
