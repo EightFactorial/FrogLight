@@ -48,6 +48,7 @@ impl ResourceConfig for Settings {
 }
 
 impl Settings {
+    /// Insert resources derived from [Settings] into the app
     pub(crate) fn insert_resources(&self, app: &mut App) {
         // Insert GuiScaleSettings
         {

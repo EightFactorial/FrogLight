@@ -149,6 +149,9 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     ) -> Result<<S as State<V>>::Clientbound, ConnectionError> {
         // Return a packet from the buffer if possible
         if let Some(packet) = self.packet_buffer.pop_front() {
+            #[cfg(feature = "debug")]
+            log::trace!("Packet buffer len: {}", self.packet_buffer.len());
+
             return Ok(packet);
         }
 
@@ -247,6 +250,9 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                 }
             }
         }
+
+        #[cfg(feature = "debug")]
+        log::trace!("Packet buffer len: {}", packet_buffer.len());
     }
 
     /// Logs the packet if the debug feature is enabled.

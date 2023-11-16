@@ -15,10 +15,18 @@ pub mod net;
 pub mod plugins;
 pub mod res;
 
-/// A plugin group that adds all the plugins needed for the client.
+/// A [`Plugin`] that adds the systems needed for the client.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct ClientPlugin;
+
+impl Plugin for ClientPlugin {
+    fn build(&self, _app: &mut App) {}
+}
+
+/// A [`PluginGroup`] that adds all the [`Plugin`](Plugin)s needed for the client.
 ///
-/// By default this loads Bevy's [DefaultPlugins],
-/// but this can be turned off by disabling the `default-plugins` feature.
+/// By default this loads Bevy's [`DefaultPlugins`],
+/// but this can be turned off by disabling the `default_plugins` feature.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct ClientPlugins;
 
@@ -33,9 +41,10 @@ impl PluginGroup for ClientPlugins {
         plugins = plugins
             .add_before::<AssetPlugin, ResourcePackSourcePlugin>(ResourcePackSourcePlugin)
             .add(RapierPhysicsPlugin::<()>::default())
-            .add(NetworkingPlugin)
             .add(CorePlugin)
-            .add(GuiPlugin);
+            .add(GuiPlugin)
+            .add(ClientPlugin)
+            .add(NetworkingPlugin);
 
         #[cfg(feature = "default_plugins")]
         {
@@ -49,6 +58,11 @@ impl PluginGroup for ClientPlugins {
             {
                 plugins = plugins.disable::<bevy::log::LogPlugin>();
             }
+
+            // Set the default image sampler to nearest and the address mode to repeat
+            plugins = plugins::image_plugin(plugins);
+            // Set the window title, resolution, vsync, etc.
+            plugins = plugins::window_plugin(plugins);
         }
         // Add the config plugin without any conditions if the log plugin is disabled
         #[cfg(any(not(feature = "default_plugins"), not(feature = "debug")))]
@@ -61,11 +75,6 @@ impl PluginGroup for ClientPlugins {
         {
             app.add_plugins(bevy_rapier3d::render::RapierDebugRenderPlugin::default());
         }
-
-        // Set the default image sampler to nearest and the address mode to repeat
-        plugins = plugins::image_plugin(plugins);
-        // Set the window title, resolution, vsync, etc.
-        plugins = plugins::window_plugin(plugins);
 
         plugins
     }

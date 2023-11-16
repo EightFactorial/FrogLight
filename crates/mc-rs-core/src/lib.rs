@@ -15,6 +15,7 @@ pub mod world;
 mod net_event;
 pub use net_event::*;
 
+/// A plugin that adds core systems and resources.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct CorePlugin;
 
