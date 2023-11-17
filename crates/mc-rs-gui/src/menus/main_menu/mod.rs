@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::MenuComponent;
+use super::traits::MenuComponent;
 
 mod block_bg;
 
@@ -27,7 +27,7 @@ impl MenuComponent for MainMenuRoot {
 
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Building {}", std::any::type_name::<Self>());
+        debug!("Building MainMenuRoot");
 
         // Spawn MenuComponent
         let entity = world.spawn(Self).id();

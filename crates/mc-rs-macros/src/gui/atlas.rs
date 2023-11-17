@@ -95,7 +95,6 @@ impl Parse for AtlasMacro {
 
         let mut textures = Vec::new();
         while !input.is_empty() {
-            println!("{:#?}", input);
             textures.push(input.parse::<TextureDefinition>()?);
         }
 

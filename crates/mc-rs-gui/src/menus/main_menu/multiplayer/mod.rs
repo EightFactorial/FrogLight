@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menus::MenuComponent;
+use crate::menus::traits::MenuComponent;
 
 use super::{block_bg::BlockBackground, MainMenuComponent, MainMenuState};
 
@@ -23,7 +23,7 @@ impl MenuComponent for MultiplayerMenu {
 
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Building {}", std::any::type_name::<Self>());
+        debug!("Building MultiplayerMenu");
 
         // Spawn MenuComponent
         let entity = world.spawn(Self).id();

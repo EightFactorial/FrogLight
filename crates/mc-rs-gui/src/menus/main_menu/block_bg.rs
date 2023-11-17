@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menus::MenuComponent;
+use crate::menus::traits::MenuComponent;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct BlockBackground;
@@ -12,7 +12,7 @@ impl MenuComponent for BlockBackground {
 
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Building {}", std::any::type_name::<Self>());
+        debug!("Building BlockBackground");
 
         // Spawn MenuComponent
         let entity = world.spawn(Self).id();

@@ -14,6 +14,6 @@ impl Plugin for GuiPlugin {
         resources::setup(app);
         assets::setup(app);
 
-        MenuRoot::add_systems(app);
+        MenuRoot::setup(app);
     }
 }

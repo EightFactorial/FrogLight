@@ -1,4 +1,7 @@
-use bevy::{asset::embedded_asset, prelude::*};
+use bevy::{
+    asset::{embedded_asset, RecursiveDependencyLoadState},
+    prelude::*,
+};
 use compact_str::CompactString;
 use mc_rs_core::ResourceLocation;
 use mc_rs_resourcepack::ResourcePackAsset;
@@ -28,7 +31,7 @@ pub struct ResourcePackContainer {
 }
 
 impl ResourcePacks {
-    /// Adds the [ResourcePacks] resource to the world at startup.
+    /// Add the [ResourcePacks] resource to the world at startup.
     fn initialize(assets: Res<AssetServer>, mut commands: Commands) {
         let fallback: Handle<Image> =
             assets.load("embedded://mc_rs_gui/assets/resourcepacks/fallback.png");
@@ -39,7 +42,19 @@ impl ResourcePacks {
         });
     }
 
-    /// Gets a texture from the list of resource packs, in reverse order.
+    /// Returns true if all of the [`ResourcePackAsset`]s are loaded.
+    pub fn loaded(packs: Res<ResourcePacks>, assets: Res<AssetServer>) -> bool {
+        packs.list.iter().all(|pack| {
+            let state = assets.get_recursive_dependency_load_state(&pack.handle);
+
+            matches!(state, None | Some(RecursiveDependencyLoadState::Loaded))
+        })
+    }
+
+    /// Get a texture from the list of resource packs.
+    ///
+    /// Loops through the list in reverse order,
+    /// so the last pack in the list has the highest priority.
     pub fn get_texture<'a>(
         &'a self,
         texture: &ResourceLocation,
@@ -56,7 +71,10 @@ impl ResourcePacks {
         None
     }
 
-    /// Gets a texture from the list of resource packs, or the fallback if it doesn't exist.
+    /// Get a texture from the list of resource packs, or the fallback if it doesn't exist.
+    ///
+    /// Loops through the list in reverse order,
+    /// so the last pack in the list has the highest priority.
     pub fn get_texture_or_fallback<'a>(
         &'a self,
         texture: &ResourceLocation,

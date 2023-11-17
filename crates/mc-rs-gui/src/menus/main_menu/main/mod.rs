@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menus::MenuComponent;
+use crate::menus::traits::MenuComponent;
 
 use super::{MainMenuComponent, MainMenuState};
 
@@ -26,7 +26,7 @@ impl MenuComponent for MainMenu {
 
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Building {}", std::any::type_name::<Self>());
+        debug!("Building MainMenu");
 
         // Spawn MenuComponent
         let entity = world.spawn(Self).id();
