@@ -3,11 +3,12 @@ use proc_macro::TokenStream;
 use syn::DeriveInput;
 
 mod proto;
-
 use proto::{
     macro_type::{MacroType, MacroTypeTrait},
     test::{TestTrait, TestType},
 };
+
+mod gui;
 
 /// Derive `State<V>` for a network state
 ///
@@ -89,3 +90,7 @@ impl DeriveMacroAttr {
         output.into()
     }
 }
+
+/// Derive `TextureAtlasData` for a struct
+#[proc_macro]
+pub fn impl_atlasdata(input: TokenStream) -> TokenStream { gui::atlas::impl_atlasdata(input) }

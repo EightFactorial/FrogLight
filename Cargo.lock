@@ -3990,6 +3990,7 @@ dependencies = [
  "bevy",
  "compact_str",
  "mc-rs-core",
+ "mc-rs-macros",
  "mc-rs-resourcepack",
  "strum",
 ]

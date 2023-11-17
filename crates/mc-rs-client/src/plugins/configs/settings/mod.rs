@@ -28,12 +28,7 @@ impl ConfigFile for Settings {
 }
 impl ResourceConfig for Settings {
     fn add_systems(app: &mut App) {
-        app.add_systems(
-            Update,
-            (GuiScaleSettings::update_settings, Self::save_config)
-                .chain()
-                .run_if(on_event::<AppExit>()),
-        );
+        app.add_systems(Startup, ResourcePackSettings::update_resourcepacks);
 
         app.add_systems(
             PreUpdate,
@@ -41,8 +36,16 @@ impl ResourceConfig for Settings {
                 CameraSettings::update_camera,
                 WindowSettings::update_window,
                 GuiScaleSettings::update_scale,
+                ResourcePackSettings::update_resourcepacks,
             )
                 .run_if(resource_exists_and_changed::<Settings>()),
+        );
+
+        app.add_systems(
+            Update,
+            (GuiScaleSettings::update_settings, Self::save_config)
+                .chain()
+                .run_if(on_event::<AppExit>()),
         );
     }
 }

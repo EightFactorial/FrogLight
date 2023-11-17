@@ -15,7 +15,7 @@ pub fn read_icon(
     load_context: &mut LoadContext,
 ) -> Result<Option<Handle<Image>>, ResourcePackLoaderError> {
     #[cfg(any(debug_assertions, feature = "debug"))]
-    debug!("Loading pack icon: {}", load_context.asset_path());
+    trace!("Loading pack icon: {}", load_context.asset_path());
 
     // Get the pack.png file from the zip archive.
     let Ok(file) = zip.by_name("pack.png") else {

@@ -6,6 +6,7 @@ use bevy_rapier3d::plugin::RapierPhysicsPlugin;
 use mc_rs_core::CorePlugin;
 use mc_rs_gui::GuiPlugin;
 use mc_rs_network::NetworkingPlugin;
+use mc_rs_resourcepack::ResourcePackPlugin;
 use plugins::{configs::ConfigPlugin, resourcepack::ResourcePackSourcePlugin};
 
 mod dir;
@@ -41,6 +42,7 @@ impl PluginGroup for ClientPlugins {
         plugins = plugins
             .add_before::<AssetPlugin, ResourcePackSourcePlugin>(ResourcePackSourcePlugin)
             .add(RapierPhysicsPlugin::<()>::default())
+            .add(ResourcePackPlugin)
             .add(CorePlugin)
             .add(GuiPlugin)
             .add(ClientPlugin)

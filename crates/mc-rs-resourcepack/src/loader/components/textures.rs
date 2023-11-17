@@ -20,7 +20,7 @@ pub fn read_textures(
     load_context: &mut LoadContext,
 ) -> Result<HashMap<ResourceLocation, Handle<Image>>, ResourcePackLoaderError> {
     #[cfg(any(debug_assertions, feature = "debug"))]
-    debug!("Loading textures: {}", load_context.asset_path());
+    trace!("Loading textures: {}", load_context.asset_path());
 
     let mut textures = HashMap::new();
 
