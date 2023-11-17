@@ -16,7 +16,7 @@ pub trait AtlasFromWorld {
 
 impl AtlasFromWorld for World {
     fn get_atlas(&self, atlas: impl Into<TextureAtlasType>) -> Option<&Handle<TextureAtlas>> {
-        self.resource::<TextureAtlases>().get(&atlas.into())
+        self.resource::<TextureAtlases>().get(atlas)
     }
 
     fn get_atlas_and_index(
@@ -24,15 +24,7 @@ impl AtlasFromWorld for World {
         atlas: impl Into<TextureAtlasType>,
         index: usize,
     ) -> Option<(&Handle<TextureAtlas>, UiTextureAtlasImage)> {
-        self.get_atlas(atlas).map(|handle| {
-            (
-                handle,
-                UiTextureAtlasImage {
-                    index,
-                    flip_x: false,
-                    flip_y: false,
-                },
-            )
-        })
+        self.resource::<TextureAtlases>()
+            .get_and_index(atlas, index)
     }
 }

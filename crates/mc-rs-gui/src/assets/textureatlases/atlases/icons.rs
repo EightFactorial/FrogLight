@@ -4,6 +4,7 @@ use crate::assets::textureatlases::TextureAtlasType;
 
 impl_atlasdata! {
     IconAtlas,
+    (256, 256),
     "minecraft:gui/icons",
     TextureAtlasType::Icons,
     CROSSHAIR = [0, 0, 15, 15],

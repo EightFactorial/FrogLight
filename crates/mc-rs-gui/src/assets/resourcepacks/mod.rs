@@ -11,6 +11,10 @@ pub(super) fn setup(app: &mut App) {
     app.add_systems(PreStartup, ResourcePacks::initialize);
 }
 
+/// A collection of all of the loaded resource packs
+///
+/// Textures are loaded from the list in reverse order,
+/// so the last pack in the list has the highest priority.
 #[derive(Debug, Clone, PartialEq, Eq, Resource)]
 pub struct ResourcePacks {
     pub fallback: Handle<Image>,
@@ -35,12 +39,13 @@ impl ResourcePacks {
         });
     }
 
+    /// Gets a texture from the list of resource packs, in reverse order.
     pub fn get_texture<'a>(
         &'a self,
         texture: &ResourceLocation,
         assets: &'a Assets<ResourcePackAsset>,
     ) -> Option<&Handle<Image>> {
-        for pack in self.list.iter() {
+        for pack in self.list.iter().rev() {
             if let Some(pack) = assets.get(&pack.handle) {
                 if let Some(texture) = pack.textures.get(texture) {
                     return Some(texture);
@@ -51,6 +56,7 @@ impl ResourcePacks {
         None
     }
 
+    /// Gets a texture from the list of resource packs, or the fallback if it doesn't exist.
     pub fn get_texture_or_fallback<'a>(
         &'a self,
         texture: &ResourceLocation,

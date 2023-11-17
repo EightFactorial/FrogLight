@@ -2,7 +2,7 @@ use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;
 use syn::{
-    bracketed,
+    bracketed, parenthesized,
     parse::{Parse, ParseStream},
     parse_macro_input, LitInt, LitStr, Token, Type,
 };
@@ -10,6 +10,7 @@ use syn::{
 pub fn impl_atlasdata(input: TokenStream) -> TokenStream {
     let AtlasMacro {
         name,
+        size: (width, height),
         path,
         atlas,
         textures,
@@ -50,6 +51,8 @@ pub fn impl_atlasdata(input: TokenStream) -> TokenStream {
         }
 
         impl crate::assets::textureatlases::TextureAtlasData for #name {
+            fn size() -> (u32, u32) { (#width, #height) }
+
             fn path() -> mc_rs_core::ResourceLocation {
                 mc_rs_core::ResourceLocation::from(#path)
             }
@@ -66,6 +69,7 @@ pub fn impl_atlasdata(input: TokenStream) -> TokenStream {
 /// The input for the `impl_atlasdata!` macro.
 struct AtlasMacro {
     name: Ident,
+    size: (u32, u32),
     path: LitStr,
     atlas: Type,
     textures: Vec<TextureDefinition>,
@@ -74,6 +78,13 @@ struct AtlasMacro {
 impl Parse for AtlasMacro {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let name = input.parse()?;
+        input.parse::<Token![,]>()?;
+
+        let content;
+        parenthesized!(content in input);
+        let width = content.parse::<LitInt>()?.base10_parse::<u32>()?;
+        content.parse::<Token![,]>()?;
+        let height = content.parse::<LitInt>()?.base10_parse::<u32>()?;
         input.parse::<Token![,]>()?;
 
         let path = input.parse::<LitStr>()?;
@@ -90,6 +101,7 @@ impl Parse for AtlasMacro {
 
         Ok(AtlasMacro {
             name,
+            size: (width, height),
             path,
             atlas,
             textures,
