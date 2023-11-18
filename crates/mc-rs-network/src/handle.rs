@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::{future::join, sync::Arc};
 
 use bevy::log::error;
@@ -135,6 +133,7 @@ where
     }
 
     /// Consumes the connection and returns a new one with the given state
+    #[allow(dead_code)]
     pub fn with_state(self, state: ConnectionState) -> Self {
         match state {
             ConnectionState::Configuration => match self {

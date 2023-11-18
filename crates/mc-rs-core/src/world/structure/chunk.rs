@@ -94,7 +94,6 @@ impl Chunk {
     }
 
     /// Insert data into a chunk section.
-    #[allow(dead_code)]
     pub fn update_section<V: GlobalPalette>(
         &mut self,
         position: ChunkSectionPos,

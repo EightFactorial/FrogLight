@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::fs;
 
 use bevy::{app::AppExit, log::LogPlugin, prelude::*};

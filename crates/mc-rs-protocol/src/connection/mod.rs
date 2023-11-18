@@ -1,5 +1,4 @@
 #![allow(unused_variables)]
-#![allow(dead_code)]
 
 use std::{collections::VecDeque, io::Cursor, marker::PhantomData};
 

@@ -11,7 +11,6 @@ pub struct Palette {
     pub bits: u8,
 }
 
-#[allow(dead_code)]
 impl Palette {
     pub(super) fn decode<V: GlobalPalette>(
         kind: DataKind,

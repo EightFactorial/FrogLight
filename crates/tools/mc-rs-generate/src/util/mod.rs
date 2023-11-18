@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use std::{fs::File, io::Write, path::Path};
 
 /// Create the file if it doesn't exist, otherwise return None

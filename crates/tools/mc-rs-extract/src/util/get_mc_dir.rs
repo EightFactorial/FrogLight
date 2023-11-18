@@ -1,8 +1,6 @@
 //! Find out where the user's .minecraft directory is.
 // Thanks Mat :)
 
-#![allow(dead_code)]
-
 use std::path::PathBuf;
 
 /// Return the location of the user's .minecraft directory.

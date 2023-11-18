@@ -1,5 +1,4 @@
 #![allow(clippy::type_complexity)]
-#![allow(dead_code)]
 
 use std::{fmt::Debug, marker::PhantomData};
 
