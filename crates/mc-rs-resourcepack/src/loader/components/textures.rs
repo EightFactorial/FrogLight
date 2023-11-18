@@ -70,7 +70,7 @@ pub fn read_textures(
             &file.bytes().collect::<Result<Vec<_>, _>>()?,
             ImageType::Extension(&ext),
             CompressedImageFormats::all(),
-            false,
+            true,
             ImageSampler::default(),
         )?;
 

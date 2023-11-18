@@ -7,6 +7,9 @@ pub use icons::IconAtlas;
 mod sliders;
 pub use sliders::SliderAtlas;
 
+mod widgets;
+pub use widgets::WidgetAtlas;
+
 pub trait TextureAtlasData: 'static {
     fn size() -> (u32, u32);
     fn path() -> ResourceLocation;

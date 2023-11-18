@@ -51,14 +51,14 @@ impl TextureAtlases {
             // Get the image handle
             let Some(handle) = packs.get_texture(&path, &pack_assets) else {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                error!("Missing texture for atlas: {kind}");
+                error!("Missing texture for TextureAtlasType::{kind}");
                 continue;
             };
 
             // Get the image
             let Some(image) = image_assets.get(handle) else {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                error!("Missing image for atlas: {kind}");
+                error!("Missing image for TextureAtlasType::{kind}");
                 continue;
             };
 
@@ -67,13 +67,13 @@ impl TextureAtlases {
             let (coord_width, coord_height) = kind.into();
 
             // Build the atlas
-            let mut builder = TextureAtlasBuilder::default().format(TextureFormat::Rgba8Unorm);
+            let mut builder = TextureAtlasBuilder::default().format(TextureFormat::Rgba8UnormSrgb);
             builder.add_texture(handle.id(), image);
 
             let mut atlas = match builder.finish(&mut image_assets) {
                 Err(err) => {
                     #[cfg(any(debug_assertions, feature = "debug"))]
-                    error!("Failed to build atlas: {kind}: {err}");
+                    error!("Failed to build TextureAtlasType::{kind}, {err}");
                     continue;
                 }
                 Ok(atlas) => atlas,
@@ -125,6 +125,7 @@ impl TextureAtlases {
 pub enum TextureAtlasType {
     Icons,
     Slider,
+    Widget,
 }
 
 impl From<TextureAtlasType> for (u32, u32) {
@@ -132,6 +133,7 @@ impl From<TextureAtlasType> for (u32, u32) {
         match value {
             TextureAtlasType::Icons => IconAtlas::size(),
             TextureAtlasType::Slider => SliderAtlas::size(),
+            TextureAtlasType::Widget => WidgetAtlas::size(),
         }
     }
 }
@@ -141,6 +143,7 @@ impl From<TextureAtlasType> for ResourceLocation {
         match value {
             TextureAtlasType::Icons => IconAtlas::path(),
             TextureAtlasType::Slider => SliderAtlas::path(),
+            TextureAtlasType::Widget => WidgetAtlas::path(),
         }
     }
 }
@@ -150,6 +153,7 @@ impl From<TextureAtlasType> for Vec<Rect> {
         match value {
             TextureAtlasType::Icons => IconAtlas::coords(),
             TextureAtlasType::Slider => SliderAtlas::coords(),
+            TextureAtlasType::Widget => WidgetAtlas::coords(),
         }
     }
 }

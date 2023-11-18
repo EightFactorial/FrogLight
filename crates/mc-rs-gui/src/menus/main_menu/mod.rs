@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use mc_rs_core::schedule::state::ApplicationState;
 
 use crate::{
-    assets::textureatlases::{atlases::SliderAtlas, AtlasFromWorld},
+    assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld},
     menus::traits::VisibilityFromWorld,
     resources::gui::GuiScaleComponent,
 };
@@ -49,7 +49,7 @@ impl MenuComponent for MainMenuRoot {
         };
 
         let (atlas, index) = world
-            .get_atlas_and_index(SliderAtlas, SliderAtlas::SLIDER_FULL_HIGHLIGHT)
+            .get_atlas_and_index(WidgetAtlas, WidgetAtlas::BUTTON_MENU_HIGHLIGHTED)
             .unwrap();
         let atlas_node = AtlasImageBundle {
             texture_atlas: atlas.clone(),
