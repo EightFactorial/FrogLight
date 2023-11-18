@@ -6,7 +6,7 @@ use crate::menus::traits::MenuComponent;
 pub struct CubemapBackground;
 
 impl MenuComponent for CubemapBackground {
-    fn add_systems(_app: &mut App) {
+    fn setup(_app: &mut App) {
         // TODO: Add systems
     }
 
@@ -14,8 +14,18 @@ impl MenuComponent for CubemapBackground {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building CubemapBackground");
 
-        // Spawn MenuComponent
-        let entity = world.spawn(Self).id();
-        world.entity_mut(parent).add_child(entity);
+        // Create node
+        let node = NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
+        // Spawn CubemapBackground
+        world.spawn((CubemapBackground, node)).set_parent(parent);
     }
 }

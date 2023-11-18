@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 pub mod menus;
-use menus::MenuRoot;
+use menus::{loading::LoadingMenuRoot, MenuRoot};
 
 pub mod assets;
 pub mod resources;
@@ -14,6 +14,8 @@ impl Plugin for GuiPlugin {
         resources::setup(app);
         assets::setup(app);
 
+        // Setup menus
         MenuRoot::setup(app);
+        LoadingMenuRoot::setup(app);
     }
 }

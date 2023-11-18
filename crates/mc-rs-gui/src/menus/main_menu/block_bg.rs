@@ -6,7 +6,7 @@ use crate::menus::traits::MenuComponent;
 pub struct BlockBackground;
 
 impl MenuComponent for BlockBackground {
-    fn add_systems(_app: &mut App) {
+    fn setup(_app: &mut App) {
         // TODO: Add systems
     }
 
@@ -14,8 +14,18 @@ impl MenuComponent for BlockBackground {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building BlockBackground");
 
+        // Create node
+        let node = NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
         // Spawn MenuComponent
-        let entity = world.spawn(Self).id();
-        world.entity_mut(parent).add_child(entity);
+        world.spawn((BlockBackground, node)).set_parent(parent);
     }
 }

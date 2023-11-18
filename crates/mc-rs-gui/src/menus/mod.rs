@@ -2,9 +2,11 @@ use std::fmt::Debug;
 
 use bevy::{asset::RecursiveDependencyLoadState, ecs::query::QuerySingleError, prelude::*};
 
-pub mod game;
-
 pub mod loading;
+pub mod state;
+
+pub mod game;
+// use game::GameMenuRoot;
 
 pub mod main_menu;
 use main_menu::MainMenuRoot;
@@ -12,12 +14,8 @@ use main_menu::MainMenuRoot;
 pub mod settings;
 use settings::SettingsMenuRoot;
 
-pub mod state;
-
 mod traits;
 use traits::MenuComponent;
-
-use self::loading::LoadingMenuRoot;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MenuRoot;
@@ -25,30 +23,41 @@ pub struct MenuRoot;
 impl MenuRoot {
     /// Setup the [MenuRoot] and all of its submenus's systems.
     pub(super) fn setup(app: &mut App) {
-        state::setup(app);
         app.init_resource::<MenuResources>();
 
+        state::setup(app);
+
         // Add submenu systems
-        LoadingMenuRoot::add_systems(app);
-        MainMenuRoot::add_systems(app);
-        SettingsMenuRoot::add_systems(app);
+        MainMenuRoot::setup(app);
+        SettingsMenuRoot::setup(app);
     }
 
     /// Build the [MenuRoot] and all of its submenus.
     fn build(world: &mut World) {
         let entity = Self::get_or_spawn(world);
-        world.entity_mut(entity).despawn_descendants();
+        let mut entity_mut = world.entity_mut(entity);
+        entity_mut.despawn_descendants();
 
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MenuRoot");
 
+        let node = NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        entity_mut.insert(node);
+
         // Build submenus
-        LoadingMenuRoot::build(entity, world);
         MainMenuRoot::build(entity, world);
         SettingsMenuRoot::build(entity, world);
     }
 
-    /// Get the [MenuRoot] [Entity], or spawn one if it doesn't exist.
+    /// Get the [`MenuRoot`] [Entity], or spawn one if it doesn't exist.
     fn get_or_spawn(world: &mut World) -> Entity {
         match world
             .query_filtered::<Entity, With<MenuRoot>>()
@@ -73,6 +82,7 @@ impl MenuRoot {
 
                 #[cfg(any(debug_assertions, feature = "debug"))]
                 debug!("Spawning MenuRoot");
+
                 world.spawn(MenuRoot).id()
             }
         }

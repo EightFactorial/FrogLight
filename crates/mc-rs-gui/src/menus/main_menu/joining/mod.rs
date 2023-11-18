@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menus::traits::MenuComponent;
+use crate::menus::traits::{MenuComponent, VisibilityFromWorld};
 
 use super::{block_bg::BlockBackground, MainMenuComponent, MainMenuState};
 
@@ -15,18 +15,30 @@ impl MainMenuComponent for JoiningMenu {
 }
 
 impl MenuComponent for JoiningMenu {
-    fn add_systems(app: &mut App) {
+    fn setup(app: &mut App) {
         // TODO: Add systems
 
-        <Self as MainMenuComponent>::Background::add_systems(app);
+        <Self as MainMenuComponent>::Background::setup(app);
     }
 
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building JoiningMenu");
 
+        // Create node
+        let node = NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            visibility: world.get_visibility(MainMenuState::Joining),
+            ..Default::default()
+        };
+
         // Spawn MenuComponent
-        let entity = world.spawn(Self).id();
+        let entity = world.spawn((JoiningMenu, node)).id();
         world.entity_mut(parent).add_child(entity);
 
         // Build background

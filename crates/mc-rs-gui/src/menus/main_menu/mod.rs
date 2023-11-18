@@ -17,20 +17,31 @@ use multiplayer::MultiplayerMenu;
 pub struct MainMenuRoot;
 
 impl MenuComponent for MainMenuRoot {
-    fn add_systems(app: &mut App) {
-        // TODO: Add systems
+    fn setup(app: &mut App) {
+        app.add_state::<MainMenuState>();
 
-        MainMenu::add_systems(app);
-        MultiplayerMenu::add_systems(app);
-        JoiningMenu::add_systems(app);
+        MainMenu::setup(app);
+        MultiplayerMenu::setup(app);
+        JoiningMenu::setup(app);
     }
 
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MainMenuRoot");
 
+        // Create node
+        let node = NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+
         // Spawn MenuComponent
-        let entity = world.spawn(Self).id();
+        let entity = world.spawn((MainMenuRoot, node)).id();
         world.entity_mut(parent).add_child(entity);
 
         // Build main menu
@@ -46,7 +57,6 @@ pub(super) enum MainMenuState {
     Main,
     Multiplayer,
     Joining,
-    #[allow(dead_code)]
     Settings,
 }
 

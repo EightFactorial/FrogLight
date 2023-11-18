@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::menus::{main_menu::MainMenuState, traits::VisibilityFromWorld};
+
 use super::traits::MenuComponent;
 
 mod background;
@@ -10,7 +12,7 @@ mod menu;
 pub struct SettingsMenuRoot;
 
 impl MenuComponent for SettingsMenuRoot {
-    fn add_systems(_app: &mut App) {
+    fn setup(_app: &mut App) {
         // TODO: Add systems
     }
 
@@ -18,8 +20,18 @@ impl MenuComponent for SettingsMenuRoot {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building SettingsMenuRoot");
 
+        let node = NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                ..Default::default()
+            },
+            visibility: world.get_visibility(MainMenuState::Settings),
+            ..Default::default()
+        };
+
         // Spawn MenuComponent
-        let entity = world.spawn(Self).id();
+        let entity = world.spawn((SettingsMenuRoot, node)).id();
         world.entity_mut(parent).add_child(entity);
 
         // TODO: Build SettingsMenu, etc.
