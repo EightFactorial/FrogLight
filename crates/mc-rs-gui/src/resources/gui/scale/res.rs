@@ -15,7 +15,7 @@ impl Default for GuiScale {
 
 impl GuiScale {
     /// Initialize the `GuiScale` resource with the current window size if it doesn't exist.
-    pub(super) fn initialize(window: Query<&Window, With<PrimaryWindow>>, mut commands: Commands) {
+    pub(crate) fn initialize(window: Query<&Window, With<PrimaryWindow>>, mut commands: Commands) {
         let scale = match window.get_single() {
             Ok(window) => {
                 let scale = Self::new_auto(window.width() as u32, window.height() as u32);
@@ -35,7 +35,7 @@ impl GuiScale {
     }
 
     /// Update the `GuiScale` resource if the window size has changed.
-    pub(super) fn update_scale(
+    pub(crate) fn update_scale(
         window: Query<&Window, With<PrimaryWindow>>,
         mut scale: ResMut<GuiScale>,
     ) {

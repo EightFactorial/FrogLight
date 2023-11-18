@@ -16,7 +16,8 @@ impl MainMenuComponent for JoiningMenu {
 
 impl MenuComponent for JoiningMenu {
     fn setup(app: &mut App) {
-        // TODO: Add systems
+        app.add_systems(OnEnter(<Self as MainMenuComponent>::STATE), Self::show);
+        app.add_systems(OnExit(<Self as MainMenuComponent>::STATE), Self::hide);
 
         <Self as MainMenuComponent>::Background::setup(app);
     }

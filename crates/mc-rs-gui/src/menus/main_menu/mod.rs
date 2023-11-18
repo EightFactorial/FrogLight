@@ -1,4 +1,7 @@
 use bevy::prelude::*;
+use mc_rs_core::schedule::state::ApplicationState;
+
+use crate::menus::traits::VisibilityFromWorld;
 
 use super::traits::MenuComponent;
 
@@ -37,6 +40,7 @@ impl MenuComponent for MainMenuRoot {
                 height: Val::Percent(100.0),
                 ..Default::default()
             },
+            visibility: world.get_visibility(ApplicationState::MainMenu),
             ..Default::default()
         };
 

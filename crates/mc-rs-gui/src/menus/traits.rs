@@ -1,12 +1,26 @@
-use std::fmt::Debug;
-
 use bevy::prelude::*;
 
-pub(super) trait MenuComponent: Debug + Component {
+use super::MenuResources;
+
+pub(super) trait MenuComponent: Sized + Component {
     /// Setup the [`MenuComponent`] and all of its children's systems.
     fn setup(app: &mut App);
     /// Build the [`MenuComponent`] and all of its children.
     fn build(parent: Entity, world: &mut World);
+
+    /// Show this component.
+    fn show(mut query: Query<&mut Visibility, With<Self>>) {
+        query.iter_mut().for_each(|mut vis| {
+            *vis = Visibility::Visible;
+        })
+    }
+
+    /// Hide this component.
+    fn hide(mut query: Query<&mut Visibility, With<Self>>) {
+        query.iter_mut().for_each(|mut vis| {
+            *vis = Visibility::Hidden;
+        })
+    }
 }
 
 pub(super) trait VisibilityFromWorld {
@@ -26,5 +40,18 @@ impl VisibilityFromWorld for World {
             true => Visibility::Visible,
             false => Visibility::Hidden,
         }
+    }
+}
+
+pub(super) trait AddMenuResource {
+    /// Add a resource to the [`MenuResources`] resource list.
+    ///
+    /// This is used to ensure that all resources are loaded before the menu is shown.
+    fn add_menu_resource(&mut self, handle: UntypedHandle);
+}
+
+impl AddMenuResource for World {
+    fn add_menu_resource(&mut self, handle: UntypedHandle) {
+        self.resource_mut::<MenuResources>().push(handle)
     }
 }

@@ -22,6 +22,7 @@ impl MenuComponent for SettingsMenuRoot {
 
         let node = NodeBundle {
             style: Style {
+                position_type: PositionType::Absolute,
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 ..Default::default()
