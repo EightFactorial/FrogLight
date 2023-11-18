@@ -1,7 +1,11 @@
 use bevy::prelude::*;
 use mc_rs_core::schedule::state::ApplicationState;
 
-use crate::menus::traits::VisibilityFromWorld;
+use crate::{
+    assets::textureatlases::{atlases::SliderAtlas, AtlasFromWorld},
+    menus::traits::VisibilityFromWorld,
+    resources::gui::GuiScaleComponent,
+};
 
 use super::traits::MenuComponent;
 
@@ -44,8 +48,23 @@ impl MenuComponent for MainMenuRoot {
             ..Default::default()
         };
 
-        // Spawn MenuComponent
-        let entity = world.spawn((MainMenuRoot, node)).id();
+        let (atlas, index) = world
+            .get_atlas_and_index(SliderAtlas, SliderAtlas::SLIDER_FULL_HIGHLIGHT)
+            .unwrap();
+        let atlas_node = AtlasImageBundle {
+            texture_atlas: atlas.clone(),
+            texture_atlas_image: index,
+            visibility: Visibility::Visible,
+            ..Default::default()
+        };
+
+        // Spawn MainMenuRoot
+        let entity = world
+            .spawn((MainMenuRoot, node))
+            .with_children(|root| {
+                root.spawn((atlas_node, GuiScaleComponent::new(200, 20)));
+            })
+            .id();
         world.entity_mut(parent).add_child(entity);
 
         // Build main menu

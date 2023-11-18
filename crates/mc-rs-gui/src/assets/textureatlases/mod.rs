@@ -45,6 +45,9 @@ impl TextureAtlases {
             let path: ResourceLocation = kind.into();
             let coords: Vec<Rect> = kind.into();
 
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            trace!("Building TextureAtlasType::{kind} from {path}");
+
             // Get the image handle
             let Some(handle) = packs.get_texture(&path, &pack_assets) else {
                 #[cfg(any(debug_assertions, feature = "debug"))]
@@ -92,7 +95,7 @@ impl TextureAtlases {
             atlases.insert(kind, handle);
 
             #[cfg(any(debug_assertions, feature = "debug"))]
-            debug!("Added atlas: {kind}");
+            debug!("Added TextureAtlasType::{kind}");
         }
     }
 
@@ -121,12 +124,14 @@ impl TextureAtlases {
 #[derive(Debug, Display, Clone, Copy, PartialEq, Eq, Hash, EnumIter)]
 pub enum TextureAtlasType {
     Icons,
+    Slider,
 }
 
 impl From<TextureAtlasType> for (u32, u32) {
     fn from(value: TextureAtlasType) -> Self {
         match value {
             TextureAtlasType::Icons => IconAtlas::size(),
+            TextureAtlasType::Slider => SliderAtlas::size(),
         }
     }
 }
@@ -135,6 +140,7 @@ impl From<TextureAtlasType> for ResourceLocation {
     fn from(value: TextureAtlasType) -> Self {
         match value {
             TextureAtlasType::Icons => IconAtlas::path(),
+            TextureAtlasType::Slider => SliderAtlas::path(),
         }
     }
 }
@@ -143,6 +149,7 @@ impl From<TextureAtlasType> for Vec<Rect> {
     fn from(value: TextureAtlasType) -> Self {
         match value {
             TextureAtlasType::Icons => IconAtlas::coords(),
+            TextureAtlasType::Slider => SliderAtlas::coords(),
         }
     }
 }

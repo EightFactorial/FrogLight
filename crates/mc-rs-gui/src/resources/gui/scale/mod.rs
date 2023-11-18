@@ -1,10 +1,10 @@
 use bevy::{prelude::*, window::WindowResized};
 
-mod comp;
-pub use comp::*;
+mod component;
+pub use component::*;
 
-mod res;
-pub use res::*;
+mod resource;
+pub use resource::*;
 
 pub(super) fn setup(app: &mut App) {
     app.add_systems(
