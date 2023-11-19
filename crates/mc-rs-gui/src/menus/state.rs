@@ -23,16 +23,19 @@ pub(super) fn setup(app: &mut App) {
         Update,
         (
             // Exit LoadingTextures state when all ResourcePacks and MenuResources are loaded
-            (GuiLoadingTexturesSet::next
-                .run_if(ResourcePacks::loaded.and_then(MenuResources::loaded)))
-            .in_set(GuiLoadingTexturesSet),
+            GuiLoadingTexturesSet::next
+                .in_set(GuiLoadingTexturesSet)
+                .run_if(in_state(GuiLoadState::LoadingTextures).and_then(ResourcePacks::loaded)),
             // Exit CreatingAtlases state when TextureAtlases are loaded
-            (GuiCreatingAtlasesSet::next
+            GuiCreatingAtlasesSet::next
                 .after(TextureAtlases::build)
-                .run_if(TextureAtlases::loaded))
-            .in_set(GuiCreatingAtlasesSet),
+                .in_set(GuiCreatingAtlasesSet)
+                .run_if(in_state(GuiLoadState::CreatingAtlases).and_then(TextureAtlases::loaded)),
             // Exit BuildingGui state when MenuRoot is built
-            (GuiBuildingSet::next.run_if(any_with_component::<MenuRoot>())).in_set(GuiBuildingSet),
+            GuiBuildingSet::next.in_set(GuiBuildingSet).run_if(
+                in_state(GuiLoadState::BuildingGui)
+                    .and_then(MenuResources::loaded.and_then(any_with_component::<MenuRoot>())),
+            ),
         ),
     );
 

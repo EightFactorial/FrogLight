@@ -2,7 +2,10 @@ use bevy::{app::AppExit, prelude::*, ui::FocusPolicy};
 
 use crate::{
     assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld},
-    menus::{main_menu::MainMenuState, traits::MenuComponent},
+    menus::{
+        main_menu::MainMenuState,
+        traits::{AddMenuResource, MenuComponent},
+    },
     resources::{font::DefaultTextStyle, scale::GuiScaleComponent},
 };
 
@@ -79,6 +82,9 @@ impl MainMenuButtons {
             .get_atlas_and_index(WidgetAtlas, WidgetAtlas::BUTTON_MENU)
             .unwrap();
         let handle = handle.clone();
+
+        // Add the texture atlas to the menu resources.
+        world.add_menu_resource(handle.clone().untyped());
 
         // Create button
         let button = world

@@ -34,14 +34,16 @@ impl MenuRoot {
 
     /// Build the [MenuRoot] and all of its submenus.
     fn build(world: &mut World) {
-        let entity = Self::get_or_spawn(world);
-        let mut entity_mut = world.entity_mut(entity);
-        entity_mut.despawn_descendants();
-
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MenuRoot");
 
-        let node = NodeBundle {
+        // Clear the MenuResources
+        world.resource_mut::<MenuResources>().clear();
+
+        // Get/Spawn the MenuRoot entity
+        let entity = Self::get_or_spawn(world);
+        let mut entity_mut = world.entity_mut(entity);
+        entity_mut.despawn_descendants().insert(NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
                 width: Val::Percent(100.0),
@@ -49,12 +51,11 @@ impl MenuRoot {
                 ..Default::default()
             },
             ..Default::default()
-        };
-        entity_mut.insert(node);
+        });
 
         // Build submenus
         MainMenuRoot::build(entity, world);
-        // SettingsMenuRoot::build(entity, world);
+        SettingsMenuRoot::build(entity, world);
     }
 
     /// Get the [`MenuRoot`] [Entity], or spawn one if it doesn't exist.
@@ -101,6 +102,9 @@ impl MenuResources {
     fn loaded(res: Res<MenuResources>, assets: Res<AssetServer>) -> bool {
         res.iter().all(|handle| {
             let state = assets.get_recursive_dependency_load_state(handle.id());
+
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            trace!("MenuResource Asset {:?}: {state:?}", handle.id());
 
             matches!(state, None | Some(RecursiveDependencyLoadState::Loaded))
         })
