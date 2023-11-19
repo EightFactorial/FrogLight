@@ -1,5 +1,5 @@
 use bevy::window::WindowResolution as BevyWindowResolution;
-use mc_rs_gui::resources::gui::GuiScale;
+use mc_rs_gui::resources::scale::GuiScale;
 use serde::{Deserialize, Serialize};
 
 use super::scale::GuiScaleSettings;

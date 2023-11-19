@@ -34,7 +34,7 @@ impl GuiScaleComponent {
         })
     }
 
-    /// Set the size of an [Entity] based on the [GuiScale].
+    /// Set the [Style] of an [Entity] based on the [GuiScale].
     fn update_size(style: &mut Style, scale_comp: &GuiScaleComponent, scale: &GuiScale) {
         let new_size = scale.value() * **scale_comp;
 

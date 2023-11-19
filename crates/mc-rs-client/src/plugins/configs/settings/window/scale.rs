@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::PrimaryWindow};
-use mc_rs_gui::resources::gui::GuiScale;
+use mc_rs_gui::resources::scale::GuiScale;
 use serde::{Deserialize, Serialize};
 
 use super::Settings;

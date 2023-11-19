@@ -9,6 +9,9 @@ pub enum GuiScale {
     Fixed { max: u32, actual: u32 },
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Event)]
+pub struct GuiScaleEvent;
+
 impl Default for GuiScale {
     fn default() -> Self { Self::Auto(1) }
 }
@@ -38,6 +41,7 @@ impl GuiScale {
     pub(super) fn update_scale(
         window: Query<&Window, With<PrimaryWindow>>,
         mut scale: ResMut<GuiScale>,
+        mut events: EventWriter<GuiScaleEvent>,
     ) {
         let Ok(window) = window.get_single() else {
             #[cfg(any(debug_assertions, feature = "debug"))]
@@ -54,6 +58,8 @@ impl GuiScale {
                     #[cfg(any(debug_assertions, feature = "debug"))]
                     debug!("Window resize set GuiScale to {new_scale:?}");
                     *scale = new_scale;
+
+                    events.send(GuiScaleEvent);
                 }
             }
             // Set the scale to at most the minimum of the new scale and the maximum scale
@@ -64,6 +70,8 @@ impl GuiScale {
                     #[cfg(any(debug_assertions, feature = "debug"))]
                     debug!("Window resize set GuiScale to {max:?}");
                     *actual = max;
+
+                    events.send(GuiScaleEvent);
                 }
             }
         }

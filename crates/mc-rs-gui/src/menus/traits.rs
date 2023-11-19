@@ -1,8 +1,10 @@
+use std::fmt::Debug;
+
 use bevy::prelude::*;
 
 use super::MenuResources;
 
-pub(super) trait MenuComponent: Sized + Component {
+pub(super) trait MenuComponent: Debug + Sized + Default + Component {
     /// Setup the [`MenuComponent`] and all of its children's systems.
     fn setup(app: &mut App);
     /// Build the [`MenuComponent`] and all of its children.
@@ -11,6 +13,9 @@ pub(super) trait MenuComponent: Sized + Component {
     /// Show this component.
     fn show(mut query: Query<&mut Visibility, With<Self>>) {
         query.iter_mut().for_each(|mut vis| {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("Showing {:?}", Self::default());
+
             *vis = Visibility::Visible;
         })
     }
@@ -18,6 +23,9 @@ pub(super) trait MenuComponent: Sized + Component {
     /// Hide this component.
     fn hide(mut query: Query<&mut Visibility, With<Self>>) {
         query.iter_mut().for_each(|mut vis| {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("Hiding {:?}", Self::default());
+
             *vis = Visibility::Hidden;
         })
     }

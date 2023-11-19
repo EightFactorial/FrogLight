@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, ui::FocusPolicy};
 
 use crate::menus::traits::MenuComponent;
 
@@ -22,6 +22,7 @@ impl MenuComponent for CubemapBackground {
                 height: Val::Percent(100.0),
                 ..Default::default()
             },
+            focus_policy: FocusPolicy::Pass,
             ..Default::default()
         };
 

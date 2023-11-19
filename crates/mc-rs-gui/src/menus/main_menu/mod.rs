@@ -1,11 +1,7 @@
 use bevy::prelude::*;
 use mc_rs_core::schedule::state::ApplicationState;
 
-use crate::{
-    assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld},
-    menus::traits::VisibilityFromWorld,
-    resources::gui::GuiScaleComponent,
-};
+use crate::menus::traits::VisibilityFromWorld;
 
 use super::traits::MenuComponent;
 
@@ -26,6 +22,9 @@ pub struct MainMenuRoot;
 impl MenuComponent for MainMenuRoot {
     fn setup(app: &mut App) {
         app.add_state::<MainMenuState>();
+
+        app.add_systems(OnEnter(ApplicationState::MainMenu), MainMenuRoot::show);
+        app.add_systems(OnExit(ApplicationState::MainMenu), MainMenuRoot::hide);
 
         MainMenu::setup(app);
         MultiplayerMenu::setup(app);
@@ -48,23 +47,8 @@ impl MenuComponent for MainMenuRoot {
             ..Default::default()
         };
 
-        let (atlas, index) = world
-            .get_atlas_and_index(WidgetAtlas, WidgetAtlas::BUTTON_MENU_HIGHLIGHTED)
-            .unwrap();
-        let atlas_node = AtlasImageBundle {
-            texture_atlas: atlas.clone(),
-            texture_atlas_image: index,
-            visibility: Visibility::Visible,
-            ..Default::default()
-        };
-
         // Spawn MainMenuRoot
-        let entity = world
-            .spawn((MainMenuRoot, node))
-            .with_children(|root| {
-                root.spawn((atlas_node, GuiScaleComponent::new(200, 20)));
-            })
-            .id();
+        let entity = world.spawn((MainMenuRoot, node)).id();
         world.entity_mut(parent).add_child(entity);
 
         // Build main menu

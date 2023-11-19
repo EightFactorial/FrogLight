@@ -54,7 +54,7 @@ impl MenuRoot {
 
         // Build submenus
         MainMenuRoot::build(entity, world);
-        SettingsMenuRoot::build(entity, world);
+        // SettingsMenuRoot::build(entity, world);
     }
 
     /// Get the [`MenuRoot`] [Entity], or spawn one if it doesn't exist.

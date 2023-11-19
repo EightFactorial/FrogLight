@@ -1,5 +1,5 @@
 use bevy::{app::AppExit, prelude::*};
-use mc_rs_gui::resources::gui::GuiScale;
+use mc_rs_gui::resources::scale::GuiScale;
 use serde::{Deserialize, Serialize};
 
 pub mod camera;

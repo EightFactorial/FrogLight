@@ -7,6 +7,9 @@ use super::{MainMenuComponent, MainMenuState};
 mod background;
 use background::CubemapBackground;
 
+mod buttons;
+use buttons::MainMenuButtons;
+
 mod title;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
@@ -23,6 +26,7 @@ impl MenuComponent for MainMenu {
         app.add_systems(OnExit(<Self as MainMenuComponent>::STATE), Self::hide);
 
         <Self as MainMenuComponent>::Background::setup(app);
+        MainMenuButtons::setup(app);
     }
 
     fn build(parent: Entity, world: &mut World) {
@@ -32,9 +36,12 @@ impl MenuComponent for MainMenu {
         // Create node
         let node = NodeBundle {
             style: Style {
+                flex_direction: FlexDirection::Column,
                 position_type: PositionType::Absolute,
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
                 ..Default::default()
             },
             visibility: world.get_visibility(MainMenuState::Main),
@@ -42,10 +49,10 @@ impl MenuComponent for MainMenu {
         };
 
         // Spawn MenuComponent
-        let entity = world.spawn((MainMenu, node)).id();
-        world.entity_mut(parent).add_child(entity);
+        let entity = world.spawn((MainMenu, node)).set_parent(parent).id();
 
-        // Build background
+        // Build components
         <Self as MainMenuComponent>::Background::build(parent, world);
+        MainMenuButtons::build(entity, world);
     }
 }

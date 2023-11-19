@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use mc_rs_core::schedule::state::ApplicationState;
 
 use crate::{
     assets::{resourcepacks::ResourcePacks, textureatlases::TextureAtlases},
@@ -100,10 +101,20 @@ pub struct GuiBuildingSet;
 
 impl GuiBuildingSet {
     /// Advance to the [GuiLoadState::Finished] state
-    fn next(mut state: ResMut<NextState<GuiLoadState>>) {
+    fn next(
+        mut gui_state: ResMut<NextState<GuiLoadState>>,
+        mut app_state: ResMut<NextState<ApplicationState>>,
+    ) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Entering GuiFinished");
 
-        state.set(GuiLoadState::Finished)
+        gui_state.set(GuiLoadState::Finished);
+
+        if matches!(app_state.0, Some(ApplicationState::Loading)) {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("Entering MainMenu");
+
+            app_state.set(ApplicationState::MainMenu);
+        }
     }
 }

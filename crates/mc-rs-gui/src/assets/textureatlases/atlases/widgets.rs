@@ -14,7 +14,7 @@ impl_atlasdata! {
     OFFHAND_SLOT_0 = [24, 23, 46, 45],
     OFFHAND_SLOT_1 = [60, 23, 82, 45],
 
-    BUTTON_MENU_DISABLED = [0, 46, 200, 66],
+    BUTTON_MENU_SELECTED = [0, 46, 200, 66],
     BUTTON_MENU = [0, 66, 200, 86],
     BUTTON_MENU_HIGHLIGHTED = [0, 86, 200, 106],
 
