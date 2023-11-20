@@ -1,10 +1,8 @@
 use bevy::prelude::*;
 use mc_rs_core::schedule::state::ApplicationState;
+use mc_rs_resourcepack::assets::{resourcepacks::ResourcePacks, textureatlases::TextureAtlases};
 
-use crate::{
-    assets::{resourcepacks::ResourcePacks, textureatlases::TextureAtlases},
-    menus::{MenuResources, MenuRoot},
-};
+use crate::menus::{MenuResources, MenuRoot};
 
 pub(super) fn setup(app: &mut App) {
     app.add_state::<GuiLoadState>();

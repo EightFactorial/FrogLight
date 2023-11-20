@@ -8,7 +8,7 @@ use proto::{
     test::{TestTrait, TestType},
 };
 
-mod gui;
+mod pack;
 
 /// Derive `State<V>` for a network state
 ///
@@ -93,4 +93,4 @@ impl DeriveMacroAttr {
 
 /// Derive `TextureAtlasData` for a struct
 #[proc_macro]
-pub fn impl_atlasdata(input: TokenStream) -> TokenStream { gui::atlas::impl_atlasdata(input) }
+pub fn impl_atlasdata(input: TokenStream) -> TokenStream { pack::atlas::impl_atlasdata(input) }

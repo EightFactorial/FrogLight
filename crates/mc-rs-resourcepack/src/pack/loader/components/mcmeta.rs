@@ -3,7 +3,7 @@ use std::io::{Read, Seek};
 use bevy::{asset::LoadContext, prelude::*};
 use zip::ZipArchive;
 
-use crate::{asset::meta::ResourcePackMetaContainer, loader::ResourcePackLoaderError};
+use crate::pack::{ResourcePackLoaderError, ResourcePackMetaContainer};
 
 /// Reads the pack.mcmeta file from the zip archive.
 pub fn read_mcmeta(

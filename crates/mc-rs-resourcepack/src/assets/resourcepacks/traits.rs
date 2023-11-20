@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use mc_rs_core::ResourceLocation;
-use mc_rs_resourcepack::ResourcePackAsset;
+
+use crate::pack::ResourcePackAsset;
 
 use super::ResourcePacks;
 

@@ -12,8 +12,10 @@ readme = "README.md"
 bevy = { workspace = true }
 compact_str = { workspace = true }
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
+mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["arbitrary_precision"] }
+strum = { workspace = true }
 thiserror = "1.0"
 zip = { version = "0.6", features = ["flate2"] }
 

@@ -4,10 +4,11 @@ use bevy::{
 };
 use compact_str::CompactString;
 use mc_rs_core::ResourceLocation;
-use mc_rs_resourcepack::ResourcePackAsset;
 
 mod traits;
 pub use traits::TextureFromWorld;
+
+use crate::pack::ResourcePackAsset;
 
 pub(super) fn setup(app: &mut App) {
     embedded_asset!(app, "fallback.png");
@@ -34,7 +35,7 @@ impl ResourcePacks {
     /// Add the [ResourcePacks] resource to the world at startup.
     fn initialize(assets: Res<AssetServer>, mut commands: Commands) {
         let fallback: Handle<Image> =
-            assets.load("embedded://mc_rs_gui/assets/resourcepacks/fallback.png");
+            assets.load("embedded://mc_rs_resourcepack/assets/resourcepacks/fallback.png");
 
         commands.insert_resource(ResourcePacks {
             fallback,

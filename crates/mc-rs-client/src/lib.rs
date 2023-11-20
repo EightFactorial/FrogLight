@@ -6,7 +6,7 @@ use bevy_rapier3d::plugin::RapierPhysicsPlugin;
 use mc_rs_core::CorePlugin;
 use mc_rs_gui::GuiPlugin;
 use mc_rs_network::NetworkingPlugin;
-use mc_rs_resourcepack::ResourcePackPlugin;
+use mc_rs_resourcepack::{assets::ResourceAssetPlugin, pack::ResourcePackPlugin};
 use plugins::{configs::ConfigPlugin, resourcepack::ResourcePackSourcePlugin};
 
 mod dir;
@@ -15,14 +15,6 @@ pub mod core;
 pub mod net;
 pub mod plugins;
 pub mod res;
-
-/// A [`Plugin`] that adds the systems needed for the client.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct ClientPlugin;
-
-impl Plugin for ClientPlugin {
-    fn build(&self, _app: &mut App) {}
-}
 
 /// A [`PluginGroup`] that adds all the [`Plugin`](Plugin)s needed for the client.
 ///
@@ -43,9 +35,9 @@ impl PluginGroup for ClientPlugins {
             .add_before::<AssetPlugin, ResourcePackSourcePlugin>(ResourcePackSourcePlugin)
             .add(RapierPhysicsPlugin::<()>::default())
             .add(ResourcePackPlugin)
+            .add(ResourceAssetPlugin)
             .add(CorePlugin)
             .add(GuiPlugin)
-            .add(ClientPlugin)
             .add(NetworkingPlugin);
 
         #[cfg(feature = "default_plugins")]

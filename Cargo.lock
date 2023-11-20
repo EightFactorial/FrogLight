@@ -3990,7 +3990,6 @@ dependencies = [
  "bevy",
  "compact_str",
  "mc-rs-core",
- "mc-rs-macros",
  "mc-rs-resourcepack",
  "strum",
 ]
@@ -4053,8 +4052,10 @@ dependencies = [
  "bevy",
  "compact_str",
  "mc-rs-core",
+ "mc-rs-macros",
  "serde",
  "serde_json",
+ "strum",
  "thiserror",
  "zip",
 ]

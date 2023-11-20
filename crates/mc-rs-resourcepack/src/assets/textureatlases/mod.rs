@@ -3,7 +3,6 @@ use bevy::{
     utils::HashMap,
 };
 use mc_rs_core::ResourceLocation;
-use mc_rs_resourcepack::ResourcePackAsset;
 use strum::{Display, EnumIter, IntoEnumIterator};
 
 pub mod atlases;
@@ -11,6 +10,8 @@ use atlases::*;
 
 mod traits;
 pub use traits::AtlasFromWorld;
+
+use crate::pack::ResourcePackAsset;
 
 use super::resourcepacks::ResourcePacks;
 
@@ -25,7 +26,8 @@ pub struct TextureAtlases {
 }
 
 impl TextureAtlases {
-    pub(crate) fn loaded(atlases: Res<TextureAtlases>, assets: Res<AssetServer>) -> bool {
+    /// A Bevy system that returns true if all of the [`TextureAtlas`]s are loaded.
+    pub fn loaded(atlases: Res<TextureAtlases>, assets: Res<AssetServer>) -> bool {
         atlases.atlases.values().all(|handle| {
             let state = assets.get_recursive_dependency_load_state(handle);
 
@@ -33,7 +35,8 @@ impl TextureAtlases {
         })
     }
 
-    pub(crate) fn build(
+    /// A Bevy system that builds all of the [`TextureAtlas`]es from the [`ResourcePackAsset`]s.
+    pub fn build(
         packs: Res<ResourcePacks>,
         pack_assets: Res<Assets<ResourcePackAsset>>,
 

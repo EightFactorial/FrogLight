@@ -12,7 +12,7 @@ use bevy::{
 use mc_rs_core::ResourceLocation;
 use zip::ZipArchive;
 
-use crate::loader::{ResourcePackLoader, ResourcePackLoaderError};
+use crate::pack::{ResourcePackLoader, ResourcePackLoaderError};
 
 /// Reads all textures from the zip archive.
 pub fn read_textures(

@@ -1,7 +1,7 @@
 use bevy::{app::AppExit, prelude::*, ui::FocusPolicy};
+use mc_rs_resourcepack::assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld};
 
 use crate::{
-    assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld},
     menus::{
         main_menu::MainMenuState,
         traits::{AddMenuResource, MenuComponent},

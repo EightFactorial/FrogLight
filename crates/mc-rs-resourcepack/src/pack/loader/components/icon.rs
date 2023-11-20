@@ -7,7 +7,7 @@ use bevy::{
 };
 use zip::ZipArchive;
 
-use crate::loader::ResourcePackLoaderError;
+use crate::pack::ResourcePackLoaderError;
 
 /// Reads the pack.png file from the zip archive.
 pub fn read_icon(

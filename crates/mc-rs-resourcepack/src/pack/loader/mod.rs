@@ -20,7 +20,7 @@ mod components;
 mod error;
 pub use error::ResourcePackLoaderError;
 
-use crate::ResourcePackAsset;
+use super::ResourcePackAsset;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ResourcePackLoader;

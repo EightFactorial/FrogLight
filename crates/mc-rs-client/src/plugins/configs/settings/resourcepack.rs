@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use compact_str::CompactString;
-use mc_rs_gui::assets::resourcepacks::{ResourcePackContainer, ResourcePacks};
+use mc_rs_resourcepack::assets::resourcepacks::{ResourcePackContainer, ResourcePacks};
 use serde::{Deserialize, Serialize};
 
 use super::Settings;

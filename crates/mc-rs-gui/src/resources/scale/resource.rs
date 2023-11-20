@@ -1,5 +1,9 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 
+/// An event that is sent when the [GuiScale] changes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Event)]
+pub struct GuiScaleEvent;
+
 /// The GUI scale.
 ///
 /// This automatically updates when the window is resized, unless it is set to [GuiScale::Fixed].
@@ -8,9 +12,6 @@ pub enum GuiScale {
     Auto(u32),
     Fixed { max: u32, actual: u32 },
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Event)]
-pub struct GuiScaleEvent;
 
 impl Default for GuiScale {
     fn default() -> Self { Self::Auto(1) }

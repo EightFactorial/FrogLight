@@ -1,7 +1,7 @@
 use std::fs;
 
 use bevy::{app::AppExit, log::LogPlugin, prelude::*};
-use mc_rs_resourcepack::{ResourcePackAsset, ResourcePackPlugin};
+use mc_rs_resourcepack::pack::{ResourcePackAsset, ResourcePackPlugin};
 
 use crate::dir::config_folder;
 

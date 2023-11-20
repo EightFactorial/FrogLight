@@ -12,7 +12,6 @@ readme = "README.md"
 bevy = { workspace = true }
 compact_str = { workspace = true }
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
-mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
 mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
 strum = { workspace = true }
 
