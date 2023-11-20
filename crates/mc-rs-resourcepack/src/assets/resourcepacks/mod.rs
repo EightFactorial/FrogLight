@@ -32,7 +32,7 @@ pub struct ResourcePackContainer {
 }
 
 impl ResourcePacks {
-    /// Add the [ResourcePacks] resource to the world at startup.
+    /// A [bevy] system that adds the [`ResourcePacks`] resource to the world at startup.
     fn initialize(assets: Res<AssetServer>, mut commands: Commands) {
         let fallback: Handle<Image> =
             assets.load("embedded://mc_rs_resourcepack/assets/resourcepacks/fallback.png");
@@ -43,8 +43,13 @@ impl ResourcePacks {
         });
     }
 
-    /// Returns true if all of the [`ResourcePackAsset`]s are loaded.
+    /// A [bevy] system that returns `true` if all of the [`ResourcePackAsset`]s are loaded.
     pub fn loaded(packs: Res<ResourcePacks>, assets: Res<AssetServer>) -> bool {
+        // If there are no resource packs, always return false
+        if packs.list.is_empty() {
+            return false;
+        }
+
         packs.list.iter().all(|pack| {
             let state = assets.get_recursive_dependency_load_state(&pack.handle);
 

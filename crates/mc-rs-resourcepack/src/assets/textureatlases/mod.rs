@@ -26,7 +26,7 @@ pub struct TextureAtlases {
 }
 
 impl TextureAtlases {
-    /// A Bevy system that returns true if all of the [`TextureAtlas`]s are loaded.
+    /// A [bevy] system that returns true if all of the [`TextureAtlas`]s are loaded.
     pub fn loaded(atlases: Res<TextureAtlases>, assets: Res<AssetServer>) -> bool {
         atlases.atlases.values().all(|handle| {
             let state = assets.get_recursive_dependency_load_state(handle);
@@ -35,7 +35,7 @@ impl TextureAtlases {
         })
     }
 
-    /// A Bevy system that builds all of the [`TextureAtlas`]es from the [`ResourcePackAsset`]s.
+    /// A [bevy] system that builds all of the [`TextureAtlas`]es from the [`ResourcePackAsset`]s.
     pub fn build(
         packs: Res<ResourcePacks>,
         pack_assets: Res<Assets<ResourcePackAsset>>,

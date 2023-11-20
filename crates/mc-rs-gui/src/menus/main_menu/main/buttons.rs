@@ -1,4 +1,4 @@
-use bevy::{app::AppExit, prelude::*, ui::FocusPolicy};
+use bevy::{app::AppExit, prelude::*};
 use mc_rs_resourcepack::assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld};
 
 use crate::{
@@ -114,7 +114,6 @@ impl MainMenuButtons {
                     },
                     texture_atlas: handle,
                     texture_atlas_image: index,
-                    focus_policy: FocusPolicy::Pass,
                     ..Default::default()
                 },
                 GuiScaleComponent::new(200, 20),
@@ -126,11 +125,7 @@ impl MainMenuButtons {
 
         // Create button text
         world
-            .spawn(TextBundle {
-                text: Text::from_section(text, font_style.into()),
-                focus_policy: FocusPolicy::Pass,
-                ..Default::default()
-            })
+            .spawn(TextBundle::from_section(text, font_style.into()))
             .set_parent(button_background);
     }
 

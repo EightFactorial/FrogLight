@@ -44,7 +44,7 @@ impl GuiScaleSettings {
         let scale = (*scale).into();
 
         #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Updating Settings with GuiScale {scale:?}");
+        trace!("Overwriting GuiScaleSettings with {scale:?}");
 
         settings.window.resolution.gui_scale = scale;
     }
