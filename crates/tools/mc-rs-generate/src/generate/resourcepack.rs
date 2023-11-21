@@ -6,11 +6,12 @@ use std::{
 
 use git2::Repository;
 use json::JsonValue;
-use log::{error, info, trace};
+use log::{error, info, trace, warn};
 use mc_rs_extract::{
     extract::datasets::Datasets,
     types::{Manifest, Version},
 };
+use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use tempfile::tempdir;
 use zip::{ZipArchive, ZipWriter};
@@ -281,9 +282,10 @@ impl ResourcePack {
         asset_index: &AssetIndexFile,
         zip: &mut ZipWriter<File>,
     ) -> Option<()> {
+        let client = Client::builder().build().unwrap();
         let mut percent = 0f32;
 
-        for (index, (path, object)) in asset_index.objects.iter().enumerate() {
+        'asset_loop: for (index, (path, object)) in asset_index.objects.iter().enumerate() {
             let mut path = path.clone();
 
             if !path.starts_with("pack") {
@@ -296,36 +298,48 @@ impl ResourcePack {
             }
 
             let url = format!(
-                "http://resources.download.minecraft.net/{}",
-                object
-                    .hash
-                    .chars()
-                    .take(2)
-                    .chain(std::iter::once('/'))
-                    .chain(object.hash.chars().skip(2))
-                    .collect::<String>()
+                "https://resources.download.minecraft.net/{}/{}",
+                object.hash.chars().take(2).collect::<String>(),
+                object.hash
             );
+            trace!("Downloading {path} from {url}");
 
-            let mut response = match reqwest::blocking::get(&url) {
-                Ok(r) => r,
-                Err(err) => {
-                    error!("Failed to fetch {path}: {err}");
-                    continue;
+            let mut response = client.get(&url).send();
+
+            let mut errors = 0;
+            while match &response {
+                Ok(r) => {
+                    if !r.status().is_success() {
+                        error!("Error {} for {path}", r.status());
+                        true
+                    } else {
+                        false
+                    }
                 }
-            };
+                Err(err) => {
+                    warn!("Failed to download {path}: {err}");
+                    true
+                }
+            } {
+                errors += 1;
+                if errors >= 5 {
+                    error!("Skipping {path}");
+                    continue 'asset_loop;
+                }
 
-            if let Err(err) = response.copy_to(zip) {
+                response = client.get(&url).send();
+            }
+
+            if let Err(err) = response.unwrap().copy_to(zip) {
                 error!("Failed to write asset: {err}");
                 continue;
             }
 
             let new_percent = (index as f32 / asset_index.objects.len() as f32) * 100f32;
             if new_percent - percent >= 5f32 {
-                percent = new_percent;
+                percent = new_percent.floor();
                 info!("{percent}%");
             }
-
-            trace!("{path}");
         }
 
         Some(())
