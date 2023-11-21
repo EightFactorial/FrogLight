@@ -38,6 +38,6 @@ debug = ["mc-rs-core/debug", "mc-rs-gui/debug", "mc-rs-network/debug", "bevy/emb
 debug_rapier = []
 
 # Enable simd features
-simd = ["mc-rs-core/simd", "mc-rs-network/simd"]
+simd = ["mc-rs-core/simd", "mc-rs-gui/simd", "mc-rs-network/simd"]
 # !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-network/simd_advanced"]
+simd_advanced = ["mc-rs-core/simd_advanced",  "mc-rs-gui/simd_advanced", "mc-rs-network/simd_advanced"]

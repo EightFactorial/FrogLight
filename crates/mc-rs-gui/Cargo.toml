@@ -10,10 +10,8 @@ readme = "README.md"
 
 [dependencies]
 bevy = { workspace = true }
-compact_str = { workspace = true }
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
 mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
-strum = { workspace = true }
 
 [features]
 default = []
@@ -25,6 +23,6 @@ debug = ["mc-rs-core/debug", "mc-rs-resourcepack/debug"]
 wayland = ["bevy/wayland"]
 
 # Enable simd features
-simd = ["mc-rs-core/simd"]
+simd = ["mc-rs-core/simd", "mc-rs-resourcepack/simd"]
 # !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced"]
+simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-resourcepack/simd_advanced"]

@@ -37,7 +37,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
 smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }
 strum = { version = "0.25", features = ["derive"] }
-uuid = "1.5"
+uuid = "1.6"
 
 # Optimize build scripts
 [profile.dev.build-override]
@@ -78,7 +78,6 @@ incremental = false
 opt-level = 3
 strip = true
 lto = true
-
 
 [dependencies]
 bevy = { workspace = true }
