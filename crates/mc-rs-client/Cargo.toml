@@ -29,7 +29,7 @@ toml = "0.8"
 [features]
 default = ["default_plugins"]
 
-# Enable the default plugins
+# Adds bevy's default plugins to the ClientPlugins group
 default_plugins = []
 
 # Enable debug features

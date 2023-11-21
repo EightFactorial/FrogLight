@@ -24,7 +24,7 @@ impl MenuComponent for CubemapBackground {
                 CubemapBackground::show,
                 (
                     DefaultCamera::enable_camera3d,
-                    CubemapBackground::background_camera_fov,
+                    CubemapBackground::background_camera,
                 ),
             ),
         );
@@ -88,12 +88,14 @@ impl MenuComponent for CubemapBackground {
 }
 
 impl CubemapBackground {
-    /// Set the background [camera](Camera)'s [FOV](Projection) to 90 degrees.
-    fn background_camera_fov(mut query: Query<&mut Projection, With<Camera3d>>) {
+    /// Set the background [camera](Camera)'s [`Transform`] and [`FOV`](Projection).
+    fn background_camera(mut query: Query<(&mut Transform, &mut Projection), With<Camera3d>>) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Setting background camera FOV");
 
-        query.for_each_mut(|mut projection| {
+        query.for_each_mut(|(mut transform, mut projection)| {
+            *transform = Transform::default();
+
             if let Projection::Perspective(ref mut perspective) = *projection {
                 perspective.fov = 80f32.to_radians();
             }
