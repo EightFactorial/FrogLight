@@ -19,6 +19,26 @@ impl DefaultCamera {
         }
     }
 
+    /// A [bevy] system that enables all [Camera2d]s
+    pub fn enable_camera2d(mut query: Query<&mut Camera, With<Camera2d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Enabling Camera2d");
+
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = true;
+        });
+    }
+
+    /// A [bevy] system that disables all [Camera2d]s
+    pub fn disable_camera2d(mut query: Query<&mut Camera, With<Camera2d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Disabling Camera2d");
+
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = false;
+        });
+    }
+
     /// Get the default [Camera3dBundle]
     pub fn default_camera3d() -> Camera3dBundle {
         Camera3dBundle {
@@ -30,18 +50,33 @@ impl DefaultCamera {
                 clear_color: ClearColorConfig::Custom(Color::BLACK),
                 ..Default::default()
             },
+            projection: Projection::Perspective(PerspectiveProjection {
+                fov: 70f32.to_radians(),
+                near: 0.1,
+                far: 1000.0,
+                aspect_ratio: 1.0,
+            }),
             ..Default::default()
         }
     }
 
-    /// Get the default [Camera3dBundle] with a custom field of view
-    pub fn camera3d_fov<const N: usize>() -> Camera3dBundle {
-        let mut camera = Self::default_camera3d();
-        camera.projection = Projection::Perspective(PerspectiveProjection {
-            fov: N as f32,
-            ..Default::default()
-        });
+    /// A [bevy] system that enables all [Camera3d]s
+    pub fn enable_camera3d(mut query: Query<&mut Camera, With<Camera3d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Enabling Camera3d");
 
-        camera
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = true;
+        });
+    }
+
+    /// A [bevy] system that disables all [Camera3d]s
+    pub fn disable_camera3d(mut query: Query<&mut Camera, With<Camera3d>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Disabling Camera3d");
+
+        query.iter_mut().for_each(|mut camera| {
+            camera.is_active = false;
+        });
     }
 }

@@ -1,6 +1,9 @@
 use bevy::prelude::*;
 
-use crate::menus::traits::{MenuComponent, VisibilityFromWorld};
+use crate::menus::{
+    main_menu::main::title::MainMenuTitle,
+    traits::{MenuComponent, VisibilityFromWorld},
+};
 
 use super::{MainMenuComponent, MainMenuState};
 
@@ -26,6 +29,7 @@ impl MenuComponent for MainMenu {
         app.add_systems(OnExit(<Self as MainMenuComponent>::STATE), Self::hide);
 
         <Self as MainMenuComponent>::Background::setup(app);
+        MainMenuTitle::setup(app);
         MainMenuButtons::setup(app);
     }
 
@@ -53,6 +57,7 @@ impl MenuComponent for MainMenu {
 
         // Build components
         <Self as MainMenuComponent>::Background::build(parent, world);
+        MainMenuTitle::build(entity, world);
         MainMenuButtons::build(entity, world);
     }
 }

@@ -34,8 +34,6 @@ pub(super) trait MenuComponent: Debug + Sized + Default + Component {
 pub(super) trait VisibilityFromWorld {
     /// Returns true if the world is in the given state.
     fn in_state<S: States + Eq>(&self, state: S) -> bool;
-    /// Returns true if the world is not in the given state.
-    fn not_in_state<S: States + Eq>(&self, state: S) -> bool { !self.in_state(state) }
     /// Returns either [Visibility::Visible] or [Visibility::Hidden]
     /// depending on whether the world is in the given state.
     fn get_visibility<S: States + Eq>(&self, state: S) -> Visibility;

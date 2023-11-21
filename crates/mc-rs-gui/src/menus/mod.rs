@@ -17,6 +17,8 @@ use settings::SettingsMenuRoot;
 mod traits;
 use traits::MenuComponent;
 
+use crate::resources::camera::DefaultCamera;
+
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct MenuRoot;
 
@@ -24,6 +26,11 @@ impl MenuRoot {
     /// Setup the [MenuRoot] and all of its submenus's systems.
     pub(super) fn setup(app: &mut App) {
         app.init_resource::<MenuResources>();
+
+        app.add_systems(
+            Startup,
+            (MenuRoot::create_camera2d, MenuRoot::create_camera3d),
+        );
 
         state::setup(app);
 
@@ -88,6 +95,22 @@ impl MenuRoot {
             }
         }
     }
+
+    /// Create a new [Camera2d] entity.
+    fn create_camera2d(mut commands: Commands) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Creating Camera2d");
+
+        commands.spawn(DefaultCamera::default_camera2d());
+    }
+
+    /// Create a new [Camera3d] entity.
+    fn create_camera3d(mut commands: Commands) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Creating Camera3d");
+
+        commands.spawn(DefaultCamera::default_camera3d());
+    }
 }
 
 /// A collection of handles to resources used by the menus.
@@ -104,7 +127,7 @@ impl MenuResources {
             let state = assets.get_recursive_dependency_load_state(handle.id());
 
             #[cfg(any(debug_assertions, feature = "debug"))]
-            trace!("MenuResource Asset {:?}: {state:?}", handle.id());
+            debug!("MenuResource Asset {:?}: {state:?}", handle.id());
 
             matches!(state, None | Some(RecursiveDependencyLoadState::Loaded))
         })

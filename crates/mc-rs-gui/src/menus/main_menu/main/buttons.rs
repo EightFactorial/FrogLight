@@ -46,16 +46,10 @@ impl MenuComponent for MainMenuButtons {
                 NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,
-                        position_type: PositionType::Absolute,
-
-                        width: Val::Percent(50.0),
-                        height: Val::Percent(50.0),
-
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
                         ..Default::default()
                     },
-                    background_color: Color::GRAY.into(),
                     ..Default::default()
                 },
                 #[cfg(any(debug_assertions, feature = "debug"))]

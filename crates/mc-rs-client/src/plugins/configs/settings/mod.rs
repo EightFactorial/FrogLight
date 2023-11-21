@@ -1,4 +1,5 @@
 use bevy::{app::AppExit, prelude::*};
+use mc_rs_core::schedule::state::ApplicationState;
 use mc_rs_gui::resources::scale::GuiScale;
 use serde::{Deserialize, Serialize};
 
@@ -33,7 +34,7 @@ impl ResourceConfig for Settings {
         app.add_systems(
             PreUpdate,
             (
-                CameraSettings::update_camera,
+                CameraSettings::update_camera.run_if(in_state(ApplicationState::InGame)),
                 WindowSettings::update_window,
                 GuiScaleSettings::update_scale,
                 ResourcePackSettings::update_resourcepacks,
@@ -46,6 +47,11 @@ impl ResourceConfig for Settings {
             (GuiScaleSettings::update_settings, Self::save_config)
                 .chain()
                 .run_if(on_event::<AppExit>()),
+        );
+
+        app.add_systems(
+            OnEnter(ApplicationState::InGame),
+            CameraSettings::update_camera,
         );
     }
 }

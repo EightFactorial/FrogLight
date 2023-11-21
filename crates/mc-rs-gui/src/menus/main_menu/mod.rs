@@ -48,8 +48,7 @@ impl MenuComponent for MainMenuRoot {
         };
 
         // Spawn MainMenuRoot
-        let entity = world.spawn((MainMenuRoot, node)).id();
-        world.entity_mut(parent).add_child(entity);
+        let entity = world.spawn((MainMenuRoot, node)).set_parent(parent).id();
 
         // Build main menu
         MainMenu::build(entity, world);

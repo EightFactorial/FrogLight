@@ -1,11 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{
-    menus::{
-        state::GuiLoadState,
-        traits::{MenuComponent, VisibilityFromWorld},
-    },
-    resources::camera::DefaultCamera,
+use crate::menus::{
+    state::GuiLoadState,
+    traits::{MenuComponent, VisibilityFromWorld},
 };
 
 use super::{
@@ -25,12 +22,7 @@ pub struct LoadingMenuRoot;
 impl LoadingMenuRoot {
     /// Setup [LoadingMenuRoot] and it's components.
     pub(crate) fn setup(app: &mut App) {
-        app.add_systems(
-            Startup,
-            (LoadingMenuRoot::build, LoadingMenuRoot::create_camera2d)
-                .chain()
-                .before(MenuRoot::build),
-        );
+        app.add_systems(Startup, LoadingMenuRoot::build.before(MenuRoot::build));
 
         app.add_systems(
             OnEnter(GuiLoadState::LoadingTextures),
@@ -56,7 +48,7 @@ impl LoadingMenuRoot {
                 height: Val::Percent(100.0),
                 ..Default::default()
             },
-            visibility: match world.not_in_state(GuiLoadState::Finished) {
+            visibility: match !world.in_state(GuiLoadState::Finished) {
                 true => Visibility::Visible,
                 false => Visibility::Hidden,
             },
@@ -67,14 +59,6 @@ impl LoadingMenuRoot {
         // Spawn LoadingMenuRoot
         let entity = world.spawn((LoadingMenuRoot, node)).id();
         LoadingMenu::build(entity, world);
-    }
-
-    /// Create a new [Camera2d] entity.
-    fn create_camera2d(mut commands: Commands) {
-        #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Creating Camera2d");
-
-        commands.spawn(DefaultCamera::default_camera2d());
     }
 
     /// Show the [`LoadingMenuRoot`].
