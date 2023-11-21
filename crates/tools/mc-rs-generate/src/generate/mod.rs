@@ -11,6 +11,7 @@ use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 mod block;
 pub mod format;
 mod packets;
+mod resourcepack;
 
 /// These are the generators that are available to run
 ///
@@ -25,6 +26,7 @@ pub enum Generators {
     Blocks(block::Blocks),
     BlockStates(block::BlockStates),
     BlockAttributes(block::BlockAttributes),
+    ResourcePack(resourcepack::ResourcePack),
     Format(format::Format),
 }
 

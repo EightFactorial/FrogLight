@@ -21,6 +21,11 @@ mc-rs-extract = { version = "0.1", path = "../mc-rs-extract" }
 prettyplease = "0.2"
 proc-macro2 = { version = "1.0", features = ["nightly"] }
 quote = "1.0"
+reqwest = { version = "0.11", features = ["rustls-tls", "json", "blocking"], default-features = false }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
 strum = { workspace = true }
 syn = { version = "2.0", features = ["extra-traits"] }
+tempfile = { version = "3", features = ["nightly"] }
+zip = { version = "0.6", features = ["flate2"] }
 
