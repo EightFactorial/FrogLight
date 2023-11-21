@@ -18,9 +18,11 @@ impl MenuComponent for MainMenuTitle {
 
         let node = NodeBundle {
             style: Style {
+                position_type: PositionType::Absolute,
                 flex_direction: FlexDirection::Column,
-                justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                top: Val::Percent(10.0),
                 ..Default::default()
             },
             ..Default::default()
@@ -56,6 +58,7 @@ impl MenuComponent for MainMenuTitle {
                             flex_direction: FlexDirection::Column,
                             justify_content: JustifyContent::End,
                             align_items: AlignItems::Center,
+                            margin: UiRect::all(Val::Px(5.0)),
                             ..Default::default()
                         },
                         image: title.into(),

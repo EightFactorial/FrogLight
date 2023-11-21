@@ -105,7 +105,7 @@ impl CubemapBackground {
         time: Res<Time<Real>>,
         mut query: Query<&mut Transform, With<CubemapBackground>>,
     ) {
-        let rotation = Quat::from_rotation_y(time.delta_seconds() / 40.);
+        let rotation = Quat::from_rotation_y(time.delta_seconds() / 30.);
         query.iter_mut().for_each(|mut transform| {
             transform.rotate(rotation);
         });

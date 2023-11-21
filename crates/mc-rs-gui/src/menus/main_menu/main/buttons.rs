@@ -48,6 +48,9 @@ impl MenuComponent for MainMenuButtons {
                         flex_direction: FlexDirection::Column,
                         align_items: AlignItems::Center,
                         justify_content: JustifyContent::Center,
+                        margin: UiRect::all(Val::Px(5.0)),
+                        top: Val::Vw(5.0),
+                        bottom: Val::Px(50.0),
                         ..Default::default()
                     },
                     ..Default::default()
