@@ -95,7 +95,7 @@ impl CubemapBackground {
 
         query.for_each_mut(|mut projection| {
             if let Projection::Perspective(ref mut perspective) = *projection {
-                perspective.fov = 90f32.to_radians();
+                perspective.fov = 80f32.to_radians();
             }
         });
     }
@@ -138,7 +138,6 @@ impl CubemapBackground {
             || images.windows(2).any(|images| {
                 // Get the image handles
                 let (Some(a), Some(b)) = (images[0], images[1]) else {
-                    // Missing image, use fallback
                     return true;
                 };
 
@@ -150,11 +149,13 @@ impl CubemapBackground {
                     // Compare the sizes, return fallback if they are different
                     a.size() != b.size()
                 } else {
-                    // Missing image, use fallback
                     true
                 }
             })
         {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            warn!("Using fallback texture for CubemapBackground");
+
             return world.resource::<ResourcePacks>().fallback.clone();
         }
 
@@ -166,24 +167,8 @@ impl CubemapBackground {
             .collect::<Vec<_>>();
 
         // Get the width and height of the final image
-        // Images are stacked horizontally, so the width is the sum of the widths
-        let (width, height) = images.iter().fold((0, 0), |(width, _), &image| {
-            (width + image.width(), image.height())
-        });
-
-        // Create the image data buffer
-        let mut image_data: Vec<u8> = Vec::with_capacity((width * height * 4) as usize);
-
-        // Loop through the images, copying each image's rows into the final image data buffer
-        for y in 0..height {
-            for &image in images.iter() {
-                // Copy the row
-                image_data.extend_from_slice(
-                    &image.data
-                        [(y * image.width() * 4) as usize..((y + 1) * image.width() * 4) as usize],
-                );
-            }
-        }
+        let (width, mut height) = images[0].size().into();
+        height *= 6;
 
         // Create the image
         let image = Image::new(
@@ -193,9 +178,22 @@ impl CubemapBackground {
                 depth_or_array_layers: 1,
             },
             TextureDimension::D2,
-            image_data,
+            // Combine the images into one, vertically
+            images.iter().fold(
+                Vec::with_capacity((width * height * 4) as usize),
+                |mut image_data, image| {
+                    // Add the image data to the final image data
+                    image_data.extend_from_slice(&image.data);
+
+                    // Return the final image data
+                    image_data
+                },
+            ),
             TextureFormat::Rgba8UnormSrgb,
         );
+
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Created CubemapBackground Texture");
 
         // Add the image as an asset
         world.resource_mut::<Assets<Image>>().add(image)
@@ -208,34 +206,34 @@ impl CubemapBackground {
             vec![
                 // Front
                 [0., 0.],
-                [1. / 6., 0.],
-                [1. / 6., 1.],
-                [0., 1.],
+                [1., 0.],
+                [1., 1. / 6.],
+                [0., 1. / 6.],
                 // Back
-                [3. / 6., 1.],
-                [2. / 6., 1.],
-                [2. / 6., 0.],
-                [3. / 6., 0.],
-                // Left
-                [2. / 6., 0.],
-                [2. / 6., 1.],
-                [1. / 6., 1.],
-                [1. / 6., 0.],
+                [1., 3. / 6.],
+                [0., 3. / 6.],
+                [0., 2. / 6.],
+                [1., 2. / 6.],
                 // Right
-                [4. / 6., 0.],
-                [4. / 6., 1.],
-                [3. / 6., 1.],
-                [3. / 6., 0.],
+                [1., 1. / 6.],
+                [1., 2. / 6.],
+                [0., 2. / 6.],
+                [0., 1. / 6.],
+                // Left
+                [1., 3. / 6.],
+                [1., 4. / 6.],
+                [0., 4. / 6.],
+                [0., 3. / 6.],
                 // Bottom
                 [1., 1.],
-                [5. / 6., 1.],
-                [5. / 6., 0.],
-                [1., 0.],
+                [0., 1.],
+                [0., 5. / 6.],
+                [1., 5. / 6.],
                 // Top
-                [5. / 6., 1.],
-                [4. / 6., 1.],
-                [4. / 6., 0.],
-                [5. / 6., 0.],
+                [1., 5. / 6.],
+                [0., 5. / 6.],
+                [0., 4. / 6.],
+                [1., 4. / 6.],
             ],
         );
     }

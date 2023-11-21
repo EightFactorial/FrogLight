@@ -22,7 +22,7 @@ impl Default for ResourcePackSettings {
 
 impl ResourcePackSettings {
     /// The default ResourcePack paths.
-    fn default_paths() -> Vec<CompactString> { vec![CompactString::new_inline("minecraft.jar")] }
+    fn default_paths() -> Vec<CompactString> { vec![CompactString::new_inline("minecraft.zip")] }
 
     /// Load the resourcepacks listed in the [Settings],
     /// and add them to the [ResourcePacks] resource.

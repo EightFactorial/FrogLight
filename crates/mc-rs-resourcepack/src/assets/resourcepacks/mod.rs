@@ -34,6 +34,9 @@ pub struct ResourcePackContainer {
 impl ResourcePacks {
     /// A [bevy] system that adds the [`ResourcePacks`] resource to the world at startup.
     fn initialize(assets: Res<AssetServer>, mut commands: Commands) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Initializing ResourcePacks");
+
         let fallback: Handle<Image> =
             assets.load("embedded://mc_rs_resourcepack/assets/resourcepacks/fallback.png");
 
@@ -74,6 +77,9 @@ impl ResourcePacks {
             }
         }
 
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        warn!("Texture {} not found", texture.to_string());
+
         None
     }
 
@@ -88,7 +94,7 @@ impl ResourcePacks {
     ) -> &Handle<Image> {
         self.get_texture(texture, assets).unwrap_or_else(|| {
             #[cfg(any(debug_assertions, feature = "debug"))]
-            warn!("Texture {:?} not found, using fallback", texture);
+            warn!("Texture {} not found, using fallback", texture.to_string());
 
             &self.fallback
         })

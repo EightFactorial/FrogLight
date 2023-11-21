@@ -1,7 +1,4 @@
-use bevy::{
-    asset::RecursiveDependencyLoadState, prelude::*, render::render_resource::TextureFormat,
-    utils::HashMap,
-};
+use bevy::{asset::RecursiveDependencyLoadState, prelude::*, utils::HashMap};
 use mc_rs_core::ResourceLocation;
 use strum::{Display, EnumIter, IntoEnumIterator};
 
@@ -70,7 +67,8 @@ impl TextureAtlases {
             let (coord_width, coord_height) = kind.into();
 
             // Build the atlas
-            let mut builder = TextureAtlasBuilder::default().format(TextureFormat::Rgba8UnormSrgb);
+            let mut builder =
+                TextureAtlasBuilder::default().format(image.texture_descriptor.format);
             builder.add_texture(handle.id(), image);
 
             let mut atlas = match builder.finish(&mut image_assets) {

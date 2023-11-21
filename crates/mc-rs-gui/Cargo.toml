@@ -19,9 +19,6 @@ default = []
 # Enable debug features
 debug = ["mc-rs-core/debug", "mc-rs-resourcepack/debug"]
 
-# Enable wayland features
-wayland = ["bevy/wayland"]
-
 # Enable simd features
 simd = ["mc-rs-core/simd", "mc-rs-resourcepack/simd"]
 # !! Currently broken on the latest nightly !!
