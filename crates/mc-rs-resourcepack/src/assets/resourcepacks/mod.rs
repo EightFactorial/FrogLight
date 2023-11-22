@@ -11,7 +11,7 @@ pub use traits::TextureFromWorld;
 use crate::pack::ResourcePackAsset;
 
 pub(super) fn setup(app: &mut App) {
-    embedded_asset!(app, "fallback.png");
+    embedded_asset!(app, "embedded/fallback.png");
     app.add_systems(PreStartup, ResourcePacks::initialize);
 }
 
@@ -38,7 +38,7 @@ impl ResourcePacks {
         debug!("Initializing ResourcePacks");
 
         let fallback: Handle<Image> =
-            assets.load("embedded://mc_rs_resourcepack/assets/resourcepacks/fallback.png");
+            assets.load("embedded://mc_rs_resourcepack/assets/resourcepacks/embedded/fallback.png");
 
         commands.insert_resource(ResourcePacks {
             fallback,

@@ -1,25 +1,8 @@
 use bevy::prelude::*;
 
-use super::scale::{GuiScale, GuiScaleEvent};
+use crate::resources::scale::GuiScale;
 
-pub(super) fn setup(app: &mut App) {
-    app.add_systems(
-        Startup,
-        DefaultTextStyle::initialize.run_if(not(resource_exists::<DefaultTextStyle>())),
-    );
-
-    app.add_systems(
-        Update,
-        (
-            DefaultTextStyle::resize_font.run_if(on_event::<GuiScaleEvent>()),
-            DefaultTextStyle::update_styles.run_if(
-                resource_exists_and_changed::<DefaultTextStyle>()
-                    .or_else(DefaultTextStyle::any_added_texts),
-            ),
-        )
-            .chain(),
-    );
-}
+use super::DefaultFonts;
 
 /// TODO: Change font_size when [GuiScale](super::scale::GuiScale) changes.
 #[derive(Debug, Default, Clone, Deref, DerefMut, Resource)]
@@ -31,22 +14,26 @@ pub struct IgnoreDefaultTextStyle;
 
 impl DefaultTextStyle {
     // TODO: Get the actual formula for this.
-    fn font_size(scale: &GuiScale) -> f32 { 10.0 + (scale.value() * 4) as f32 }
+    pub(super) fn font_size(scale: &GuiScale) -> f32 { 8.0 + (scale.value() * 8) as f32 }
 
     /// Initialize the [`DefaultTextStyle`] resource.
-    fn initialize(scale: Res<GuiScale>, mut commands: Commands) {
+    pub(super) fn initialize(
+        scale: Res<GuiScale>,
+        fonts: Res<DefaultFonts>,
+        mut commands: Commands,
+    ) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Initializing DefaultTextStyle");
 
         commands.insert_resource(DefaultTextStyle(TextStyle {
-            font_size: Self::font_size(&scale),
             color: Color::WHITE,
-            ..Default::default()
+            font_size: Self::font_size(&scale),
+            font: fonts.regular.clone(),
         }));
     }
 
     /// Update the font size of the [`DefaultTextStyle`] when the [`GuiScale`] changes.
-    fn resize_font(scale: Res<GuiScale>, mut style: ResMut<DefaultTextStyle>) {
+    pub(super) fn resize_font(scale: Res<GuiScale>, mut style: ResMut<DefaultTextStyle>) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Resizing DefaultTextStyle");
 
@@ -54,13 +41,15 @@ impl DefaultTextStyle {
     }
 
     /// Returns true if a [`Text`] entity was added.
-    fn any_added_texts(query: Query<(), (Added<Text>, Without<IgnoreDefaultTextStyle>)>) -> bool {
+    pub(super) fn any_added_texts(
+        query: Query<(), (Added<Text>, Without<IgnoreDefaultTextStyle>)>,
+    ) -> bool {
         !query.is_empty()
     }
 
     /// Updates all [`Text`] entities with the [`DefaultTextStyle`],
     /// ignoring those with the [`IgnoreDefaultTextStyle`] component.
-    fn update_styles(
+    pub(super) fn update_styles(
         mut query: Query<&mut Text, Without<IgnoreDefaultTextStyle>>,
         style: Res<DefaultTextStyle>,
     ) {
