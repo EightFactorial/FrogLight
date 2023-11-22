@@ -71,6 +71,7 @@ impl TextureAtlases {
                 TextureAtlasBuilder::default().format(image.texture_descriptor.format);
             builder.add_texture(handle.id(), image);
 
+            #[allow(unused_variables)]
             let mut atlas = match builder.finish(&mut image_assets) {
                 Err(err) => {
                     #[cfg(any(debug_assertions, feature = "debug"))]

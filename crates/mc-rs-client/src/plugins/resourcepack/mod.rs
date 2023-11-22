@@ -1,7 +1,5 @@
 //! ResourcePack source plugin
 
-use std::time::Duration;
-
 use bevy::{
     asset::io::{AssetSource, AssetSourceId},
     prelude::*,
@@ -33,11 +31,14 @@ impl Plugin for ResourcePackSourcePlugin {
         let reader = AssetSource::get_default_reader(path.into());
         let writer = AssetSource::get_default_writer(path.into());
 
+        #[allow(unused_mut)]
         let mut source = AssetSource::build().with_reader(reader).with_writer(writer);
 
         // Add a watcher to the resourcepack asset source in debug mode.
         #[cfg(any(debug_assertions, feature = "debug"))]
         {
+            use std::time::Duration;
+
             debug!("Loading ResourcePacks from {:?}", path);
 
             let watcher = AssetSource::get_default_watcher(path.into(), Duration::from_secs(15));
