@@ -77,9 +77,6 @@ impl ResourcePacks {
             }
         }
 
-        #[cfg(any(debug_assertions, feature = "debug"))]
-        warn!("Texture {} not found", texture.to_string());
-
         None
     }
 
@@ -98,5 +95,25 @@ impl ResourcePacks {
 
             &self.fallback
         })
+    }
+
+    /// Get a sound from the list of resource packs.
+    ///
+    /// Loops through the list in reverse order,
+    /// so the last pack in the list has the highest priority.
+    pub fn get_sound<'a>(
+        &'a self,
+        sound: &ResourceLocation,
+        assets: &'a Assets<ResourcePackAsset>,
+    ) -> Option<&Handle<AudioSource>> {
+        for pack in self.list.iter().rev() {
+            if let Some(pack) = assets.get(&pack.handle) {
+                if let Some(sound) = pack.sounds.get(sound) {
+                    return Some(sound);
+                }
+            }
+        }
+
+        None
     }
 }

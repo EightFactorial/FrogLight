@@ -11,6 +11,7 @@ pub struct ResourcePackAsset {
     pub mcmeta: ResourcePackMetaContainer,
 
     pub textures: HashMap<ResourceLocation, Handle<Image>>,
+    pub sounds: HashMap<ResourceLocation, Handle<AudioSource>>,
 }
 
 impl Asset for ResourcePackAsset {}
@@ -22,6 +23,9 @@ impl VisitAssetDependencies for ResourcePackAsset {
 
         for texture in self.textures.values() {
             visit(texture.id().untyped());
+        }
+        for sound in self.sounds.values() {
+            visit(sound.id().untyped());
         }
     }
 }

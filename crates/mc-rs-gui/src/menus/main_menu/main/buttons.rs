@@ -1,5 +1,12 @@
-use bevy::{app::AppExit, prelude::*};
-use mc_rs_resourcepack::assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld};
+use bevy::{app::AppExit, audio::PlaybackMode, prelude::*};
+use mc_rs_core::ResourceLocation;
+use mc_rs_resourcepack::{
+    assets::{
+        resourcepacks::ResourcePacks,
+        textureatlases::{atlases::WidgetAtlas, AtlasFromWorld},
+    },
+    pack::ResourcePackAsset,
+};
 
 use crate::{
     menus::{
@@ -28,7 +35,7 @@ impl MenuComponent for MainMenuButtons {
         // Add a system to change the button's texture.
         app.add_systems(
             Update,
-            MainMenuButtons::button_hover
+            (MainMenuButtons::button_hover, MainMenuButton::play_click)
                 .run_if(in_state(MainMenuState::Main).and_then(MainMenuButton::any_interactions)),
         );
         // Update the button's texture immediately after the state is changed.
@@ -82,6 +89,14 @@ impl MainMenuButtons {
 
         // Add the texture atlas to the menu resources.
         world.add_menu_resource(handle.clone().untyped());
+
+        // Add the sound to the menu resources.
+        if let Some(click) = world.resource::<ResourcePacks>().get_sound(
+            &ResourceLocation::new("minecraft:random/click"),
+            world.resource::<Assets<ResourcePackAsset>>(),
+        ) {
+            world.add_menu_resource(click.clone().untyped());
+        }
 
         // Create button
         let button = world
@@ -153,6 +168,29 @@ impl MainMenuButton {
     /// Return true if any buttons have been interacted with.
     fn any_interactions(query: Query<(), (Changed<Interaction>, With<MainMenuButton>)>) -> bool {
         !query.is_empty()
+    }
+
+    fn play_click(
+        query: Query<&Interaction, (Changed<Interaction>, With<MainMenuButton>)>,
+
+        packs: Res<ResourcePacks>,
+        assets: Res<Assets<ResourcePackAsset>>,
+
+        mut commands: Commands,
+    ) {
+        if query.iter().any(|int| matches!(int, Interaction::Pressed)) {
+            if let Some(click) =
+                packs.get_sound(&ResourceLocation::new("minecraft:random/click"), &assets)
+            {
+                commands.spawn(AudioBundle {
+                    source: click.clone(),
+                    settings: PlaybackSettings {
+                        mode: PlaybackMode::Despawn,
+                        ..Default::default()
+                    },
+                });
+            }
+        }
     }
 }
 
