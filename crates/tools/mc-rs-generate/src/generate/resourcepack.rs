@@ -336,9 +336,9 @@ impl ResourcePack {
             }
 
             let new_percent = (index as f32 / asset_index.objects.len() as f32) * 100f32;
-            if new_percent - percent >= 5f32 {
+            if new_percent - percent >= 10f32 {
                 percent = new_percent.floor();
-                info!("{percent}%");
+                info!("{percent}% ...");
             }
         }
 
@@ -347,7 +347,7 @@ impl ResourcePack {
 
     fn jar_assets_to_zip(jar: &mut ZipArchive<File>, zip: &mut ZipWriter<File>) -> Option<()> {
         for i in 0..jar.len() {
-            let mut file = match jar.by_index(i) {
+            let file = match jar.by_index(i) {
                 Ok(f) => f,
                 Err(err) => {
                     error!("Failed to get file from version jar: {err}");
@@ -361,17 +361,11 @@ impl ResourcePack {
                 continue;
             }
 
-            if let Err(err) = zip.start_file(&file_name, Default::default()) {
-                error!("Failed to start file from version jar: {err}");
-                continue;
+            if let Err(err) = zip.raw_copy_file(file) {
+                error!("Failed to copy file {file_name}: {err}");
             }
 
-            if let Err(err) = std::io::copy(&mut file, zip) {
-                error!("Failed to copy file from version jar: {err}");
-                continue;
-            }
-
-            trace!("{file_name}");
+            trace!("Copied {file_name}");
         }
 
         Some(())

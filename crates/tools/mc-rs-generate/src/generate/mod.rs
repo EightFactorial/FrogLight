@@ -1,10 +1,15 @@
-use std::{fmt::Debug, fs::File, io::Read, path::Path};
+use std::{
+    fmt::{Debug, Display},
+    fs::File,
+    io::Read,
+    path::Path,
+};
 
 use enum_dispatch::enum_dispatch;
 use git2::Repository;
 use json::JsonValue;
 use log::error;
-use strum::{Display, EnumIter, EnumString};
+use strum::{EnumIter, EnumString};
 
 use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 
@@ -18,7 +23,7 @@ mod resourcepack;
 /// By default, only the `format` generator is selected
 ///
 /// To add a new generator, implement the Generator trait and add it to this enum
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter, EnumString, Display)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EnumIter, EnumString)]
 #[strum(serialize_all = "lowercase")]
 #[enum_dispatch(Generator)]
 pub enum Generators {
@@ -28,6 +33,19 @@ pub enum Generators {
     BlockAttributes(block::BlockAttributes),
     ResourcePack(resourcepack::ResourcePack),
     Format(format::Format),
+}
+
+impl Display for Generators {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Generators::Packets(_) => write!(f, "Packets"),
+            Generators::Blocks(_) => write!(f, "Blocks"),
+            Generators::BlockStates(_) => write!(f, "BlockStates"),
+            Generators::BlockAttributes(_) => write!(f, "BlockAttributes"),
+            Generators::ResourcePack(_) => write!(f, "ResourcePack"),
+            Generators::Format(_) => write!(f, "Format"),
+        }
+    }
 }
 
 /// The trait that all generators implement
