@@ -10,6 +10,7 @@ pub mod blocks;
 pub mod components;
 pub mod resources;
 pub mod schedule;
+pub mod sounds;
 pub mod world;
 
 mod net_event;
@@ -26,6 +27,7 @@ impl Plugin for CorePlugin {
         net_event::setup(app);
         resources::setup(app);
         schedule::setup(app);
+        sounds::setup(app);
         world::setup(app);
     }
 }

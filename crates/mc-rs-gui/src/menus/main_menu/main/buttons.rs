@@ -1,5 +1,8 @@
-use bevy::{app::AppExit, audio::PlaybackMode, prelude::*};
-use mc_rs_core::ResourceLocation;
+use bevy::{app::AppExit, prelude::*};
+use mc_rs_core::{
+    sounds::{SoundEvent, SoundEventKind},
+    ResourceLocation,
+};
 use mc_rs_resourcepack::{
     assets::{
         resourcepacks::ResourcePacks,
@@ -133,9 +136,8 @@ impl MainMenuButtons {
             .set_parent(button)
             .id();
 
-        let font_style = world.resource::<DefaultTextStyle>().clone();
-
         // Create button text
+        let font_style = world.resource::<DefaultTextStyle>().clone();
         world
             .spawn(TextBundle::from_section(text, font_style.into()))
             .set_parent(button_background);
@@ -172,24 +174,14 @@ impl MainMenuButton {
 
     fn play_click(
         query: Query<&Interaction, (Changed<Interaction>, With<MainMenuButton>)>,
-
-        packs: Res<ResourcePacks>,
-        assets: Res<Assets<ResourcePackAsset>>,
-
-        mut commands: Commands,
+        mut events: EventWriter<SoundEvent>,
     ) {
         if query.iter().any(|int| matches!(int, Interaction::Pressed)) {
-            if let Some(click) =
-                packs.get_sound(&ResourceLocation::new("minecraft:random/click"), &assets)
-            {
-                commands.spawn(AudioBundle {
-                    source: click.clone(),
-                    settings: PlaybackSettings {
-                        mode: PlaybackMode::Despawn,
-                        ..Default::default()
-                    },
-                });
-            }
+            events.send(SoundEvent {
+                name: ResourceLocation::new("minecraft:random/click"),
+                kind: SoundEventKind::Global,
+                position: None,
+            });
         }
     }
 }

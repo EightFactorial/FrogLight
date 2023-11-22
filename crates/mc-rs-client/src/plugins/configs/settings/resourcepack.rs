@@ -71,7 +71,7 @@ impl ResourcePackSettings {
             }
 
             // Reload the textures
-            state.set(GuiLoadState::LoadingTextures);
+            state.set(GuiLoadState::LoadingResourcePacks);
         }
     }
 }

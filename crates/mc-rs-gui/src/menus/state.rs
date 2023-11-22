@@ -10,7 +10,7 @@ pub(super) fn setup(app: &mut App) {
     app.configure_sets(
         Update,
         (
-            GuiLoadingTexturesSet.run_if(in_state(GuiLoadState::LoadingTextures)),
+            GuiLoadingResourcePacksSet.run_if(in_state(GuiLoadState::LoadingResourcePacks)),
             GuiCreatingAtlasesSet.run_if(in_state(GuiLoadState::CreatingAtlases)),
             GuiBuildingSet.run_if(in_state(GuiLoadState::BuildingGui)),
         )
@@ -21,9 +21,11 @@ pub(super) fn setup(app: &mut App) {
         Update,
         (
             // Exit LoadingTextures state when all ResourcePacks and MenuResources are loaded
-            GuiLoadingTexturesSet::next
-                .in_set(GuiLoadingTexturesSet)
-                .run_if(in_state(GuiLoadState::LoadingTextures).and_then(ResourcePacks::loaded)),
+            GuiLoadingResourcePacksSet::next
+                .in_set(GuiLoadingResourcePacksSet)
+                .run_if(
+                    in_state(GuiLoadState::LoadingResourcePacks).and_then(ResourcePacks::loaded),
+                ),
             // Exit CreatingAtlases state when TextureAtlases are loaded
             GuiCreatingAtlasesSet::next
                 .after(TextureAtlases::build)
@@ -39,8 +41,8 @@ pub(super) fn setup(app: &mut App) {
 
     #[cfg(any(debug_assertions, feature = "debug"))]
     app.add_systems(
-        OnEnter(GuiLoadState::LoadingTextures),
-        // Log when entering the LoadingTextures state
+        OnEnter(GuiLoadState::LoadingResourcePacks),
+        // Log when entering the LoadingResourcePacks state
         || debug!("Entering GuiLoadingTextures"),
     );
 
@@ -62,17 +64,17 @@ pub(super) fn setup(app: &mut App) {
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
 pub enum GuiLoadState {
     #[default]
-    LoadingTextures,
+    LoadingResourcePacks,
     CreatingAtlases,
     BuildingGui,
     Finished,
 }
 
-/// A set of systems that occurs when in the [GuiLoadState::LoadingTextures] state
+/// A set of systems that occurs when in the [GuiLoadState::LoadingResourcePacks] state
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub struct GuiLoadingTexturesSet;
+pub struct GuiLoadingResourcePacksSet;
 
-impl GuiLoadingTexturesSet {
+impl GuiLoadingResourcePacksSet {
     /// Advance to the [GuiLoadState::CreatingAtlases] state
     fn next(mut state: ResMut<NextState<GuiLoadState>>) {
         #[cfg(any(debug_assertions, feature = "debug"))]

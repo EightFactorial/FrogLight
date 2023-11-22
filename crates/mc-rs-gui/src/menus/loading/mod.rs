@@ -6,7 +6,7 @@ use crate::menus::{
 };
 
 use super::{
-    state::{GuiBuildingSet, GuiLoadingTexturesSet},
+    state::{GuiBuildingSet, GuiLoadingResourcePacksSet},
     MenuRoot,
 };
 
@@ -25,8 +25,8 @@ impl LoadingMenuRoot {
         app.add_systems(Startup, LoadingMenuRoot::build.before(MenuRoot::build));
 
         app.add_systems(
-            OnEnter(GuiLoadState::LoadingTextures),
-            LoadingMenuRoot::show.in_set(GuiLoadingTexturesSet),
+            OnEnter(GuiLoadState::LoadingResourcePacks),
+            LoadingMenuRoot::show.in_set(GuiLoadingResourcePacksSet),
         );
         app.add_systems(
             OnExit(GuiLoadState::BuildingGui),
