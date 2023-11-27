@@ -2,13 +2,14 @@ use std::{fs::File, io::Write};
 
 use clap::Parser;
 use cli::Commands;
-use log::{error, info, warn, LevelFilter};
 use mc_rs_extract::{
     extract::extract_data,
     print::print_data,
     search::search_data,
     types::{Manifest, Version},
 };
+use tracing::{error, info, level_filters::LevelFilter, warn};
+use tracing_subscriber::{fmt::SubscriberBuilder, util::SubscriberInitExt, EnvFilter};
 
 use crate::cli::Cli;
 
@@ -72,24 +73,26 @@ fn main() {
 
 /// Setup logging for the application
 fn setup_logger(quiet: bool) {
-    let mut builder = env_logger::builder();
+    let mut builder = SubscriberBuilder::default();
 
     if quiet {
-        builder.filter_level(LevelFilter::Error);
+        builder = builder.with_max_level(LevelFilter::ERROR);
     } else {
         #[cfg(debug_assertions)]
         {
-            builder.filter_level(LevelFilter::Debug);
+            builder = builder.with_max_level(LevelFilter::DEBUG);
         }
         #[cfg(not(debug_assertions))]
         {
-            builder.filter_level(LevelFilter::Info);
+            builder = builder.with_max_level(LevelFilter::INFO);
         }
     }
 
-    builder.filter_module("reqwest", LevelFilter::Off);
-    builder.format_timestamp(None);
-    builder.init()
+    // Disable reqwest logging
+    let filter = EnvFilter::from_default_env().add_directive("reqwest=off".parse().unwrap());
+    let builder = builder.with_env_filter(filter);
+
+    builder.compact().finish().init();
 }
 
 /// Print to console or write to file

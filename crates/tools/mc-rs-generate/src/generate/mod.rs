@@ -8,8 +8,8 @@ use std::{
 use enum_dispatch::enum_dispatch;
 use git2::Repository;
 use json::JsonValue;
-use log::error;
 use strum::{EnumIter, EnumString};
+use tracing::error;
 
 use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 

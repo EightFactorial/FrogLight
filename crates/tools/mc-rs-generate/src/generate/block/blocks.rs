@@ -3,7 +3,6 @@ use std::{io::Write, path::PathBuf};
 use convert_case::{Case, Casing};
 use git2::Repository;
 use json::JsonValue;
-use log::{error, warn};
 use mc_rs_extract::{
     extract::datasets::{self, block::Block, Datasets},
     types::Version,
@@ -13,6 +12,7 @@ use syn::{
     punctuated::Punctuated, Ident, Item, Macro, MacroDelimiter, Path, PathArguments, PathSegment,
     Stmt, StmtMacro,
 };
+use tracing::{error, warn};
 
 use crate::generate::{Generator, Generators};
 

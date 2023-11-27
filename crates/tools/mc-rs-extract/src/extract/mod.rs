@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use json::JsonValue;
-use log::{error, info, warn};
 use strum::IntoEnumIterator;
+use tracing::{error, info, warn};
 
 use crate::{
     extract::datasets::Dataset,
@@ -86,7 +86,7 @@ fn get_datasets(
 
     #[cfg(debug_assertions)]
     {
-        log::debug!("Datasets: {:?}", datasets);
+        tracing::debug!("Datasets: {:?}", datasets);
     }
 
     datasets

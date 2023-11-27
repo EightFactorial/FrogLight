@@ -3,12 +3,13 @@ use cli::Cli;
 use generate::{Generator, Generators};
 use git2::Repository;
 use itertools::Itertools;
-use log::{error, info, warn, LevelFilter};
 use mc_rs_extract::{
     extract::extract_data,
     types::{Manifest, Version},
 };
 use strum::IntoEnumIterator;
+use tracing::{error, info, level_filters::LevelFilter, warn};
+use tracing_subscriber::{fmt::SubscriberBuilder, util::SubscriberInitExt, EnvFilter};
 
 use crate::generate::format::Format;
 
@@ -96,19 +97,20 @@ fn main() {
 
 /// Setup logging for the application
 fn setup_logger() {
-    let mut builder = env_logger::builder();
+    let mut builder = SubscriberBuilder::default();
 
     #[cfg(debug_assertions)]
     {
-        builder.filter_level(LevelFilter::Debug);
+        builder = builder.with_max_level(LevelFilter::DEBUG);
     }
     #[cfg(not(debug_assertions))]
     {
-        builder.filter_level(LevelFilter::Info);
+        builder = builder.with_max_level(LevelFilter::INFO);
     }
 
-    builder.filter_module("reqwest", LevelFilter::Off);
+    // Disable reqwest logging
+    let filter = EnvFilter::from_default_env().add_directive("reqwest=off".parse().unwrap());
+    let builder = builder.with_env_filter(filter);
 
-    builder.format_timestamp(None);
-    builder.init()
+    builder.compact().finish().init();
 }

@@ -2,9 +2,9 @@ use std::fs::File;
 
 use hashbrown::HashMap;
 use json::JsonValue;
-use log::error;
 use serde::{Deserialize, Serialize};
 use strum::Display;
+use tracing::error;
 use zip::ZipArchive;
 
 use crate::types::{ClassMap, Manifest, Version};

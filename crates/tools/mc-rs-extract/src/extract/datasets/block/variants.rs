@@ -2,8 +2,8 @@ use std::fs::File;
 
 use hashbrown::HashMap;
 use json::JsonValue;
-use log::{error, warn};
 use serde::{Deserialize, Serialize};
+use tracing::{error, warn};
 use zip::ZipArchive;
 
 use crate::types::{ClassMap, Manifest, Version};

@@ -3,8 +3,8 @@ use std::fmt::Debug;
 use classfile::ast::Insn;
 use enum_dispatch::enum_dispatch;
 use json::JsonValue;
-use log::error;
 use strum::{Display, EnumIter, EnumString};
+use tracing::error;
 
 use crate::types::{ClassMap, Manifest, Version};
 

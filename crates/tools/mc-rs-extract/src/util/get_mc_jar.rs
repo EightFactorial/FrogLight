@@ -4,7 +4,7 @@ use std::{
     process::{Command, Stdio},
 };
 
-use log::error;
+use tracing::error;
 use zip::ZipArchive;
 
 use crate::types::{Manifest, MappingsError, Version, VersionData};

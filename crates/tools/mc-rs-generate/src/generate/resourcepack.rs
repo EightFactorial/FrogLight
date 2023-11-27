@@ -6,7 +6,6 @@ use std::{
 
 use git2::Repository;
 use json::JsonValue;
-use log::{error, info, trace, warn};
 use mc_rs_extract::{
     extract::datasets::Datasets,
     types::{Manifest, Version},
@@ -14,6 +13,7 @@ use mc_rs_extract::{
 use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use tempfile::tempdir;
+use tracing::{error, info, trace, warn};
 use zip::{ZipArchive, ZipWriter};
 
 use super::Generator;

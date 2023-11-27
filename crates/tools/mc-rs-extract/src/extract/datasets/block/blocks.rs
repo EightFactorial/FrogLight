@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use classfile::ast::{GetFieldInsn, Insn, InvokeInsn, LdcInsn, LdcType, PutFieldInsn};
 use json::{object, JsonValue};
-use log::{debug, error};
+use tracing::{debug, error};
 
 use crate::types::{ClassMap, Manifest, Version};
 

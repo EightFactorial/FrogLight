@@ -3,8 +3,8 @@ use std::collections::BTreeMap;
 use classfile::ast::{Insn, LdcInsn, LdcType, PutFieldInsn};
 use itertools::Itertools;
 use json::JsonValue;
-use log::{error, warn};
 use strum::Display;
+use tracing::{error, warn};
 
 use crate::types::{ClassMap, Manifest, Version};
 

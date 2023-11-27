@@ -8,7 +8,7 @@ use classfile::{
 };
 use itertools::Itertools;
 use json::JsonValue;
-use log::{error, warn};
+use tracing::{error, warn};
 
 use crate::types::{ClassMap, Manifest, Version};
 

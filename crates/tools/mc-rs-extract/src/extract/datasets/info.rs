@@ -1,7 +1,7 @@
 use std::{fs::File, io::read_to_string};
 
 use json::JsonValue;
-use log::error;
+use tracing::error;
 
 use crate::{
     types::{ClassMap, Manifest, Version},

@@ -38,6 +38,8 @@ pub(crate) trait MacroTypeTrait {
 }
 
 impl MacroTypeTrait for MacroType {
+    const REQUIRED_TESTS: &'static [TestType] = &[];
+
     /// Generate the macro for the given type
     fn generate_macro(&self, attr: &DeriveMacroAttr, input: &DeriveInput) -> TokenStream {
         match self {

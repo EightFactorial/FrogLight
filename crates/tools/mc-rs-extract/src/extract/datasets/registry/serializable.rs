@@ -1,6 +1,6 @@
 use classfile::ast::{GetFieldInsn, Insn};
 use json::JsonValue;
-use log::error;
+use tracing::error;
 
 use crate::types::{ClassMap, Manifest, Version};
 

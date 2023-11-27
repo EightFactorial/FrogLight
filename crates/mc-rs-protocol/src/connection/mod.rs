@@ -103,7 +103,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                 string.push_str("...");
             }
 
-            log::debug!("Sending packet: {string}");
+            tracing::debug!("Sending packet: {string}");
         }
 
         let mut buf = Vec::from_value(&packet)?;
@@ -149,7 +149,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         // Return a packet from the buffer if possible
         if let Some(packet) = self.packet_buffer.pop_front() {
             #[cfg(feature = "debug")]
-            log::trace!("Packet buffer len: {}", self.packet_buffer.len());
+            tracing::trace!("Packet buffer len: {}", self.packet_buffer.len());
 
             return Ok(packet);
         }
@@ -163,7 +163,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         }
 
         #[cfg(feature = "debug")]
-        log::trace!(
+        tracing::trace!(
             "Byte peek: {:?}",
             &buffer[0..std::cmp::min(16, buffer.len())]
         );
@@ -240,10 +240,10 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                     #[cfg(feature = "debug")]
                     if let DecodeError::Io(err) = err {
                         if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
-                            log::error!("Error reading bundled packet: {err:?}");
+                            tracing::error!("Error reading bundled packet: {err:?}");
                         }
                     } else {
-                        log::error!("Error reading bundled packet: {err:?}");
+                        tracing::error!("Error reading bundled packet: {err:?}");
                     }
                     return;
                 }
@@ -251,7 +251,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         }
 
         #[cfg(feature = "debug")]
-        log::trace!("Packet buffer len: {}", packet_buffer.len());
+        tracing::trace!("Packet buffer len: {}", packet_buffer.len());
     }
 
     /// Logs the packet if the debug feature is enabled.
@@ -267,10 +267,10 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         }
 
         if packet.is_ok() {
-            log::trace!("Read packet: {}", string);
+            tracing::trace!("Read packet: {}", string);
         } else {
-            log::error!("Read packet: {}", string);
-            log::trace!("Read buffer: {:?}", cursor.get_ref());
+            tracing::error!("Read packet: {}", string);
+            tracing::trace!("Read buffer: {:?}", cursor.get_ref());
         }
     }
 

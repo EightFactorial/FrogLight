@@ -7,11 +7,11 @@ use convert_case::{Case, Casing};
 use git2::Repository;
 use itertools::Itertools;
 use json::JsonValue;
-use log::{error, warn};
 use mc_rs_extract::{
     extract::datasets::{self, Datasets},
     types::Version,
 };
+use tracing::{error, warn};
 
 use crate::util::{create_file_with, create_module_with};
 

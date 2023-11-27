@@ -3,10 +3,10 @@ use std::{io::Write, path::PathBuf};
 use convert_case::{Case, Casing};
 use git2::Repository;
 use json::JsonValue;
-use log::error;
 use mc_rs_extract::{extract::datasets::Datasets, types::Version};
 use proc_macro2::Span;
 use syn::{punctuated::Punctuated, *};
+use tracing::error;
 
 use crate::generate::{Generator, Generators};
 

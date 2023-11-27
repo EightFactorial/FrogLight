@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, Meta};
 
-use super::macro_type::MacroTypeTrait;
+use super::{macro_type::MacroTypeTrait, test::TestType};
 use crate::DeriveMacroAttr;
 
 mod data_enum;
@@ -12,6 +12,8 @@ mod data_struct;
 pub struct DecodeMacro;
 
 impl MacroTypeTrait for DecodeMacro {
+    const REQUIRED_TESTS: &'static [TestType] = &[];
+
     fn generate_macro(&self, _attr: &DeriveMacroAttr, input: &DeriveInput) -> TokenStream {
         match &input.data {
             Data::Struct(_) => data_struct::decode_struct(input),
@@ -50,7 +52,7 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     false => tokens.extend(quote!(?,)),
                     true => tokens.extend(quote! {
                         .map_err(|e| {
-                            log::error!("Failed to decode field {}: {:?}", stringify!(#name), e);
+                            tracing::error!("Failed to decode field {}: {:?}", stringify!(#name), e);
                             e
                         })?,
                     }),
@@ -84,7 +86,7 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
 
                         tokens.extend(quote! {
                             .map_err(|e| {
-                                log::error!("Failed to decode type {}: {:?}", stringify!(#ty), e);
+                                tracing::error!("Failed to decode type {}: {:?}", stringify!(#ty), e);
                                 e
                             })?,
                         });

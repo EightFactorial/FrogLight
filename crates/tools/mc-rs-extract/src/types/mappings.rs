@@ -3,8 +3,8 @@ use std::{fs::File, path::PathBuf};
 use classfile::{classfile::ClassFile, error::ParserError};
 use derive_more::{Deref, DerefMut};
 use hashbrown::HashMap;
-use log::error;
 use thiserror::Error;
+use tracing::error;
 use zip::ZipArchive;
 
 use crate::util::{mapped_minecraft_jar, minecraft_jar};
@@ -77,7 +77,7 @@ impl ClassMap {
 
         #[cfg(debug_assertions)]
         {
-            log::debug!("Found {} classes", map.len());
+            tracing::debug!("Found {} classes", map.len());
         }
 
         Ok(map)

@@ -3,7 +3,7 @@ use std::mem;
 use classfile::ast::{GetFieldInsn, Insn, LdcInsn, LdcType, PutFieldInsn};
 use itertools::Itertools;
 use json::JsonValue;
-use log::error;
+use tracing::error;
 
 use crate::{
     extract::datasets::sound::SoundEvents,

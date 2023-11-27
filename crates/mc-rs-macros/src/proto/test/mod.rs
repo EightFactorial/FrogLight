@@ -24,6 +24,8 @@ mod transcode;
 pub struct TestMacro;
 
 impl MacroTypeTrait for TestMacro {
+    const REQUIRED_TESTS: &'static [TestType] = &[];
+
     fn generate_macro(&self, _attr: &DeriveMacroAttr, _input: &syn::DeriveInput) -> TokenStream {
         TokenStream::new()
     }
