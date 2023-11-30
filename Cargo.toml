@@ -28,7 +28,7 @@ azalea-chat = { version = "0.8", default-features = false }
 azalea-nbt = { version = "0.8", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 bevy = "0.12"
 bevy_rapier3d = { version = "0.23", features = ["parallel"] }
-compact_str = { version = "0.7", features = ["serde", "smallvec"] }
+compact_str = { version = "0.7", features = ["smallvec"] }
 derive_more = "0.99"
 futures-lite = { version = "2.0", features = ["futures-io"] }
 itertools = "0.12"
@@ -39,7 +39,7 @@ strum = { version = "0.25", features = ["derive"] }
 thiserror = "1.0"
 tracing = "0.1"
 uuid = "1.6"
-zip = { version = "0.6", features = ["deflate"] }
+zip = "0.6"
 
 # Optimize build scripts
 [profile.dev.build-override]
