@@ -17,3 +17,8 @@ More versions will be added at some point in the future.
 > Modded clients, including this one, **will get you banned** from servers with anticheat.
 > 
 > You have been warned!
+
+> [!Note]
+> The `main` branch is *mostly* stable, while the `dev` branch is unstable.
+> 
+> Development is done under `dev` and occasionally merged into `main`.
