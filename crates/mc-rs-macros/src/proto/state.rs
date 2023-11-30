@@ -9,7 +9,7 @@ use syn::{
 /// Implements the `State` trait for a state,
 /// creates the clientbound and serverbound packet enums,
 /// and implements `Encode` and `Decode` for them.
-pub fn impl_state(input: TokenStream) -> TokenStream {
+pub(crate) fn impl_state(input: TokenStream) -> TokenStream {
     let StatePackets {
         state,
         version,

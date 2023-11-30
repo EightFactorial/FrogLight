@@ -14,7 +14,7 @@ use crate::{
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct CubemapBackground;
+pub(crate) struct CubemapBackground;
 
 impl MenuComponent for CubemapBackground {
     fn setup(app: &mut App) {

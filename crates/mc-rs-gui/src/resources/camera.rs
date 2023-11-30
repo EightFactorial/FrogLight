@@ -5,7 +5,8 @@ use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 pub struct DefaultCamera;
 
 impl DefaultCamera {
-    /// Get the default [Camera2dBundle]
+    /// Get the default [`Camera2dBundle`]
+    #[must_use]
     pub fn default_camera2d() -> Camera2dBundle {
         Camera2dBundle {
             camera: Camera {
@@ -19,7 +20,7 @@ impl DefaultCamera {
         }
     }
 
-    /// A [bevy] system that enables all [Camera2d]s
+    /// A [`bevy`] system that enables all [`Camera2d`]s
     pub fn enable_camera2d(mut query: Query<&mut Camera, With<Camera2d>>) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Enabling Camera2d");
@@ -29,7 +30,7 @@ impl DefaultCamera {
         });
     }
 
-    /// A [bevy] system that disables all [Camera2d]s
+    /// A [`bevy`] system that disables all [`Camera2d`]s
     pub fn disable_camera2d(mut query: Query<&mut Camera, With<Camera2d>>) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Disabling Camera2d");
@@ -39,7 +40,8 @@ impl DefaultCamera {
         });
     }
 
-    /// Get the default [Camera3dBundle]
+    /// Get the default [`Camera3dBundle`]
+    #[must_use]
     pub fn default_camera3d() -> Camera3dBundle {
         Camera3dBundle {
             camera: Camera {

@@ -21,7 +21,7 @@ mod encode;
 mod transcode;
 
 #[derive(Debug, Default, Copy, Clone, PartialEq, Eq)]
-pub struct TestMacro;
+pub(crate) struct TestMacro;
 
 impl MacroTypeTrait for TestMacro {
     const REQUIRED_TESTS: &'static [TestType] = &[];
@@ -37,7 +37,7 @@ impl MacroTypeTrait for TestMacro {
 
 #[derive(Display, Debug, Copy, Clone, PartialEq, Eq, EnumString)]
 #[strum(serialize_all = "lowercase")]
-pub enum TestType {
+pub(crate) enum TestType {
     Encode,
     VarEncode,
     Decode,
@@ -46,7 +46,7 @@ pub enum TestType {
     VarTranscode,
 }
 
-pub trait TestTrait: Debug {
+pub(crate) trait TestTrait: Debug {
     fn test_name(&self, ident: &Ident) -> Ident {
         let item_name = ident.to_string().to_case(Case::Snake);
         let test_name = format!("{self:?}").to_case(Case::Snake);
@@ -84,14 +84,13 @@ impl ConvertParsed for TestType {
 
 /// Convert a byte slice to a token stream
 fn bytes_to_tokenstream(bytes: &[u8]) -> TokenStream {
-    match bytes.len() {
-        0 => quote! { Vec::<u8>::new() },
-        _ => {
-            let bytes = bytes.iter().map(|byte| quote!(#byte));
+    if bytes.is_empty() {
+        quote! { Vec::<u8>::new() }
+    } else {
+        let bytes = bytes.iter().map(|byte| quote!(#byte));
 
-            quote! {
-                vec![#(#bytes),*]
-            }
+        quote! {
+            vec![#(#bytes),*]
         }
     }
 }

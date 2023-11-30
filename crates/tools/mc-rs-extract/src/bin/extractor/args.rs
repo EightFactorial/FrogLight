@@ -4,38 +4,38 @@ use clap::{ArgAction, Parser};
 use mc_rs_extract::{modules::ExtractModule, Version};
 
 #[derive(Debug, Clone, PartialEq, Eq, Parser)]
-pub struct Args {
+pub(crate) struct Args {
     /// Whether to enable logging
     ///
     /// By default, logging is enabled.
     #[arg(short, long, default_value = "true", action = ArgAction::SetFalse)]
-    pub quiet: bool,
+    pub(crate) quiet: bool,
 
     /// Refresh the [`VersionManifest`](mc_rs_extract::VersionManifest)
     ///
     /// This is needed to get information about versions that have been released
     /// since the last time the [`VersionManifest`](mc_rs_extract::VersionManifest) was downloaded.
     #[arg(short, help = REFRESH_HELP, long, long_help = REFRESH_LONG_HELP)]
-    pub refresh: bool,
+    pub(crate) refresh: bool,
 
     /// The [`Version`] to extract information from
     ///
     /// If not specified, the latest release version, as determined by the
     /// [`VersionManifest`](mc_rs_extract::VersionManifest), will be used.
     #[arg(short, help = VERSION_HELP, long, long_help = VERSION_LONG_HELP)]
-    pub version: Option<Version>,
+    pub(crate) version: Option<Version>,
 
     /// The list of [`Module`s](mc_rs_extract::modules::Module) to run
     ///
     /// If none are specified, all modules will be run.
     #[arg(short, help = MODULES_HELP, long = "module", long_help = MODULES_LONG_HELP)]
-    pub modules: Vec<ExtractModule>,
+    pub(crate) modules: Vec<ExtractModule>,
 
     /// The output file
     ///
     /// If not specified, the output will be written to stdout.
     #[arg(short, help = OUTPUT_HELP, long, long_help = OUTPUT_LONG_HELP)]
-    pub output: Option<PathBuf>,
+    pub(crate) output: Option<PathBuf>,
 }
 
 const REFRESH_HELP: &str = "Refresh the VersionManifest before extracting information.";

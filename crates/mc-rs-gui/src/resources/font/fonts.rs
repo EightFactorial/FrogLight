@@ -9,6 +9,7 @@ pub struct DefaultFonts {
 }
 
 impl DefaultFonts {
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn initialize(assets: Res<AssetServer>, mut commands: Commands) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Initializing DefaultFonts");

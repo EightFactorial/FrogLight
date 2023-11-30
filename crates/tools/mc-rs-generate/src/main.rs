@@ -13,6 +13,7 @@ mod modules;
 const MIN_SUPPORTED_VERSION: Version = Version::new_release(1, 20, 0);
 
 #[tokio::main]
+#[allow(clippy::too_many_lines)]
 async fn main() {
     // Parse arguments
     let args = Args::parse();
@@ -96,7 +97,7 @@ async fn main() {
 
     // Get the ExtractModules to run
     let mut extract_modules: Vec<ExtractModule> = Vec::new();
-    for gen_mod in args.modules.iter() {
+    for gen_mod in &args.modules {
         for dep in gen_mod.deps() {
             if !extract_modules.contains(dep) {
                 debug!("Adding dependency `{dep}` for `{gen_mod}`");
@@ -129,7 +130,7 @@ async fn main() {
         info!("");
 
         // Run the ExtractModules
-        for m in extract_modules.iter() {
+        for m in &extract_modules {
             info!("Running {m}");
             m.run(&mut data);
             info!("");

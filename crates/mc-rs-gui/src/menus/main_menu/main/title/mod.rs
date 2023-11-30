@@ -7,7 +7,7 @@ use crate::{
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct MainMenuTitle;
+pub(super) struct MainMenuTitle;
 
 impl MenuComponent for MainMenuTitle {
     fn setup(_app: &mut App) {}

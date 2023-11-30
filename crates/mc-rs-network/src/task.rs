@@ -1,4 +1,5 @@
 #![allow(clippy::type_complexity)]
+#![allow(clippy::module_name_repetitions)]
 
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -39,6 +40,7 @@ where
     Play: State<V>,
 {
     /// Create a new connection task
+    #[must_use]
     pub fn new(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
         hostname: CompactString,
@@ -51,6 +53,7 @@ where
     }
 
     /// Create a new connection task with a connection intent
+    #[must_use]
     pub fn new_with(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
         hostname: CompactString,
@@ -87,6 +90,7 @@ impl<V: Version> ConnectionHandshakeTask<V>
 where
     Handshake: State<V>,
 {
+    #[must_use]
     pub fn new(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
         intent: ConnectionIntent,
@@ -116,6 +120,7 @@ impl<V: Version> ConnectionStatusTask<V>
 where
     Status: State<V>,
 {
+    #[must_use]
     pub fn new(task: Task<Result<(StatusResponse, PingResponse), ConnectionError>>) -> Self {
         Self {
             task,
@@ -146,6 +151,7 @@ impl<V: Version> ConnectionLoginTask<V>
 where
     Login: State<V>,
 {
+    #[must_use]
     pub fn new(task: Task<Result<(Connection<V, Login>, GameProfile), ConnectionError>>) -> Self {
         Self(task)
     }
@@ -181,6 +187,7 @@ where
     Configuration: State<V>,
     Play: State<V>,
 {
+    #[must_use]
     pub fn new(
         rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
         tx: Sender<ConnectionSend<V>>,
@@ -196,6 +203,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn new_config(
         rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
         tx: Sender<ConnectionSend<V>>,
@@ -210,6 +218,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn new_play(
         rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
         tx: Sender<ConnectionSend<V>>,

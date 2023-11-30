@@ -83,7 +83,7 @@ impl DeriveMacroAttr {
         output.extend(macro_type.generate_macro(&derive, &input));
         output.extend(macro_type.generate_tests(&derive, &input));
 
-        for test in derive.tests.iter() {
+        for test in &derive.tests {
             output.extend(test.generate_test(&derive, &input));
         }
 

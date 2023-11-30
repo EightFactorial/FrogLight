@@ -13,7 +13,7 @@ use mc_rs_core::ResourceLocation;
 use zip::ZipArchive;
 
 #[cfg(any(debug_assertions, feature = "debug"))]
-use bevy::log::*;
+use bevy::log::{debug, error};
 
 mod components;
 
@@ -39,18 +39,18 @@ impl AssetLoader for ResourcePackLoader {
         load_context: &'a mut LoadContext,
     ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(async move {
-            match load_context.path().extension().map(OsStr::to_str) {
-                Some(Some(ext)) => match self.extensions().contains(&ext) {
-                    false => Err(ResourcePackLoaderError::UnsupportedExtension),
-                    true => {
-                        let mut bytes = Vec::new();
-                        reader.read_to_end(&mut bytes).await?;
+            if let Some(Some(ext)) = load_context.path().extension().map(OsStr::to_str) {
+                if self.extensions().contains(&ext) {
+                    let mut bytes = Vec::new();
+                    reader.read_to_end(&mut bytes).await?;
 
-                        let zip = ZipArchive::new(Cursor::new(bytes))?;
-                        ResourcePackLoader::load_zip(zip, load_context)
-                    }
-                },
-                _ => Err(ResourcePackLoaderError::InvalidPath),
+                    let zip = ZipArchive::new(Cursor::new(bytes))?;
+                    ResourcePackLoader::load_zip(zip, load_context)
+                } else {
+                    Err(ResourcePackLoaderError::UnsupportedExtension)
+                }
+            } else {
+                Err(ResourcePackLoaderError::InvalidPath)
             }
         })
     }
@@ -105,16 +105,15 @@ impl ResourcePackLoader {
         key.push(':');
         key.push_str(path);
 
-        match ResourceLocation::try_from(key) {
-            Some(key) => Some(key),
-            None => {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                error!(
-                    "Failed to parse resource location from {}",
-                    file_path.display()
-                );
-                None
-            }
+        if let Some(key) = ResourceLocation::try_from(key) {
+            Some(key)
+        } else {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            error!(
+                "Failed to parse resource location from {}",
+                file_path.display()
+            );
+            None
         }
     }
 }

@@ -47,6 +47,7 @@ impl ResourcePacks {
     }
 
     /// A [bevy] system that returns `true` if all of the [`ResourcePackAsset`]s are loaded.
+    #[must_use]
     pub fn loaded(packs: Res<ResourcePacks>, assets: Res<AssetServer>) -> bool {
         // If there are no resource packs, always return false
         if packs.list.is_empty() {
@@ -64,6 +65,7 @@ impl ResourcePacks {
     ///
     /// Loops through the list in reverse order,
     /// so the last pack in the list has the highest priority.
+    #[must_use]
     pub fn get_texture<'a>(
         &'a self,
         texture: &ResourceLocation,
@@ -84,6 +86,7 @@ impl ResourcePacks {
     ///
     /// Loops through the list in reverse order,
     /// so the last pack in the list has the highest priority.
+    #[must_use]
     pub fn get_texture_or_fallback<'a>(
         &'a self,
         texture: &ResourceLocation,
@@ -101,6 +104,7 @@ impl ResourcePacks {
     ///
     /// Loops through the list in reverse order,
     /// so the last pack in the list has the highest priority.
+    #[must_use]
     pub fn get_sound<'a>(
         &'a self,
         sound: &ResourceLocation,

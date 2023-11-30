@@ -9,7 +9,7 @@ mod data_enum;
 mod data_struct;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct EncodeMacro;
+pub(crate) struct EncodeMacro;
 
 impl MacroTypeTrait for EncodeMacro {
     const REQUIRED_TESTS: &'static [TestType] = &[];
@@ -27,7 +27,7 @@ impl MacroTypeTrait for EncodeMacro {
 fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
     match fields {
         Fields::Named(fields) => {
-            for field in fields.named.iter() {
+            for field in &fields.named {
                 let Some(name) = &field.ident else {
                     continue;
                 };
@@ -48,14 +48,17 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     }
                 };
 
-                match cfg!(feature = "debug") {
-                    false => tokens.extend(quote!(?;)),
-                    true => tokens.extend(quote! {
+                if cfg!(feature = "debug") {
+                    tokens.extend(quote! {
                         .map_err(|e| {
                             tracing::error!("Failed to encode field {}: {:?}", stringify!(#name), e);
                             e
                         })?;
-                    }),
+                    });
+                } else {
+                    tokens.extend(quote! {
+                        ?;
+                    });
                 }
 
                 field_list.push(tokens);
@@ -81,18 +84,18 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     }
                 };
 
-                match cfg!(feature = "debug") {
-                    false => tokens.extend(quote!(?;)),
-                    true => {
-                        let ty = &field.ty;
-
-                        tokens.extend(quote! {
-                            .map_err(|e| {
-                                tracing::error!("Failed to encode type {}: {:?}", stringify!(#ty), e);
-                                e
-                            })?;
-                        });
-                    }
+                if cfg!(feature = "debug") {
+                    let ty = &field.ty;
+                    tokens.extend(quote! {
+                        .map_err(|e| {
+                            tracing::error!("Failed to encode type {}: {:?}", stringify!(#ty), e);
+                            e
+                        })?;
+                    });
+                } else {
+                    tokens.extend(quote! {
+                            ?;
+                    });
                 }
 
                 field_list.push(tokens);

@@ -5,7 +5,7 @@ use crate::menus::traits::MenuComponent;
 use super::{bar::LoadingBar, logo::LoadingLogo};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct LoadingMenu;
+pub(super) struct LoadingMenu;
 
 impl MenuComponent for LoadingMenu {
     fn setup(app: &mut App) {

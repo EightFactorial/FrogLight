@@ -20,7 +20,7 @@ use crate::{
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct MainMenuButtons;
+pub(super) struct MainMenuButtons;
 
 impl MenuComponent for MainMenuButtons {
     fn setup(app: &mut App) {
@@ -164,7 +164,7 @@ impl MainMenuButtons {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct MainMenuButton;
+pub(super) struct MainMenuButton;
 
 impl MainMenuButton {
     /// Return true if any buttons have been interacted with.
@@ -187,7 +187,7 @@ impl MainMenuButton {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct MultiplayerButton;
+pub(super) struct MultiplayerButton;
 
 impl MultiplayerButton {
     /// Set the [`MainMenuState`] to [`MainMenuState::Multiplayer`] if the button is pressed.
@@ -205,7 +205,7 @@ impl MultiplayerButton {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct OptionsButton;
+pub(super) struct OptionsButton;
 
 impl OptionsButton {
     /// Set the [`MainMenuState`] to [`MainMenuState::Settings`] if the button is pressed.
@@ -223,7 +223,7 @@ impl OptionsButton {
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct QuitButton;
+pub(super) struct QuitButton;
 
 impl QuitButton {
     /// Send an [`AppExit`] event if the button is pressed.

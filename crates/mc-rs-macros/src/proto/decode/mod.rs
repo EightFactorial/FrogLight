@@ -9,7 +9,7 @@ mod data_enum;
 mod data_struct;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct DecodeMacro;
+pub(crate) struct DecodeMacro;
 
 impl MacroTypeTrait for DecodeMacro {
     const REQUIRED_TESTS: &'static [TestType] = &[];
@@ -27,7 +27,7 @@ impl MacroTypeTrait for DecodeMacro {
 fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
     match fields {
         Fields::Named(fields) => {
-            for field in fields.named.iter() {
+            for field in &fields.named {
                 let Some(name) = &field.ident else {
                     continue;
                 };
@@ -48,21 +48,24 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     }
                 };
 
-                match cfg!(feature = "debug") {
-                    false => tokens.extend(quote!(?,)),
-                    true => tokens.extend(quote! {
+                if cfg!(feature = "debug") {
+                    tokens.extend(quote! {
                         .map_err(|e| {
                             tracing::error!("Failed to decode field {}: {:?}", stringify!(#name), e);
                             e
                         })?,
-                    }),
-                }
+                    });
+                } else {
+                    tokens.extend(quote! {
+                            ?,
+                    });
+                };
 
                 field_list.push(tokens);
             }
         }
         Fields::Unnamed(fields) => {
-            for field in fields.unnamed.iter() {
+            for field in &fields.unnamed {
                 let mut tokens = if field.attrs.iter().any(|f| {
                     if let Meta::Path(path) = &f.meta {
                         path.is_ident("var")
@@ -79,19 +82,19 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     }
                 };
 
-                match cfg!(feature = "debug") {
-                    false => tokens.extend(quote!(?,)),
-                    true => {
-                        let ty = &field.ty;
-
-                        tokens.extend(quote! {
-                            .map_err(|e| {
-                                tracing::error!("Failed to decode type {}: {:?}", stringify!(#ty), e);
-                                e
-                            })?,
-                        });
-                    }
-                }
+                if cfg!(feature = "debug") {
+                    let ty = &field.ty;
+                    tokens.extend(quote! {
+                        .map_err(|e| {
+                            tracing::error!("Failed to decode type {}: {:?}", stringify!(#ty), e);
+                            e
+                        })?,
+                    });
+                } else {
+                    tokens.extend(quote! {
+                            ?,
+                    });
+                };
 
                 field_list.push(tokens);
             }

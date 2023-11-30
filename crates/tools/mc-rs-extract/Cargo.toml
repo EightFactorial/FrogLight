@@ -8,6 +8,9 @@ homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 
+[lints]
+workspace = true
+
 [lib]
 name = "mc_rs_extract"
 path = "src/lib/lib.rs"
@@ -21,7 +24,6 @@ required-features = ["binary"]
 chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "4.4", features = ["derive", "env"], optional = true }
 classfile-rs = { version = "0.1", path = "../classfile-rs" }
-derive_more = { workspace = true }
 dirs = "5.0"
 hashbrown = { version = "0.14", features = ["serde"] }
 json = { version = "0.12" }

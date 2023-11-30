@@ -16,12 +16,23 @@ pub struct VersionManifest {
 }
 
 impl VersionManifest {
+    /// The URL to download the version manifest from.
     pub(crate) const MANIFEST_URL: &'static str =
         "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
-    pub async fn new(refresh: bool) -> Result<VersionManifest, ManifestError> {
+    /// Get the version manifest from disk or download it.
+    ///
+    /// # Errors
+    /// `Error::NoMinecraftDir` if the .minecraft directory could not be found.
+    ///
+    /// `Error::Io` if there was an error reading or writing the manifest file.
+    ///
+    /// `Error::Reqwest` if there was an error downloading the manifest.
+    ///
+    /// `Error::Serde` if there was an error parsing the manifest.
+    pub async fn new(refresh: bool) -> Result<VersionManifest, FetchError> {
         let path = minecraft_dir()
-            .ok_or(ManifestError::NoMinecraftDir)?
+            .ok_or(FetchError::NoMinecraftDir)?
             .join("versions/version_manifest_v2.json");
 
         let mut contents: String;
@@ -42,13 +53,17 @@ impl VersionManifest {
         Ok(serde_json::from_str(&contents)?)
     }
 
+    /// Get the version data for a specific version.
+    ///
+    /// Returns `None` if the version is not found in the manifest.
+    #[must_use]
     pub fn get(&self, version: &Version) -> Option<&ParsedManifestVersion> {
         self.versions.iter().find(|v| &v.id == version)
     }
 }
 
 #[derive(Debug, Error)]
-pub enum ManifestError {
+pub enum FetchError {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
     #[error("Reqwest error: {0}")]
@@ -75,6 +90,8 @@ pub struct ParsedManifestVersion {
 }
 
 impl ParsedManifestVersion {
+    /// Returns `true` if this version was released before the other version.
+    #[must_use]
     pub fn released_before(&self, other: &ParsedManifestVersion) -> bool {
         self.release_time < other.release_time
     }

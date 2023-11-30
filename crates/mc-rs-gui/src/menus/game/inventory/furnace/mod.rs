@@ -1,5 +1,5 @@
-pub mod blast;
-pub mod smoker;
+pub(crate) mod blast;
+pub(crate) mod smoker;
 
 #[allow(clippy::module_inception)]
-pub mod furnace;
+pub(crate) mod furnace;

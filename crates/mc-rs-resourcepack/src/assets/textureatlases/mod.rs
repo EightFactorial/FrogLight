@@ -3,7 +3,7 @@ use mc_rs_core::ResourceLocation;
 use strum::{Display, EnumIter, IntoEnumIterator};
 
 pub mod atlases;
-use atlases::*;
+use atlases::{IconAtlas, SliderAtlas, TextureAtlasData, WidgetAtlas};
 
 mod traits;
 pub use traits::AtlasFromWorld;
@@ -24,6 +24,7 @@ pub struct TextureAtlases {
 
 impl TextureAtlases {
     /// A [bevy] system that returns true if all of the [`TextureAtlas`]s are loaded.
+    #[must_use]
     pub fn loaded(atlases: Res<TextureAtlases>, assets: Res<AssetServer>) -> bool {
         atlases.atlases.values().all(|handle| {
             let state = assets.get_recursive_dependency_load_state(handle);
@@ -82,6 +83,7 @@ impl TextureAtlases {
             };
 
             // Add coordinates to the atlas
+            #[allow(clippy::cast_precision_loss)]
             for mut coord in coords {
                 // Scale the coordinates to the image size
                 coord.min.x *= image_width as f32 / coord_width as f32;

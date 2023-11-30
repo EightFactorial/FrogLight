@@ -51,6 +51,7 @@ pub enum Version {
 
 impl Version {
     /// Create a new [`Version::Release`]
+    #[must_use]
     pub const fn new_release(major: u8, minor: u8, patch: u8) -> Self {
         Version::Release {
             major,
@@ -83,6 +84,7 @@ impl Version {
     /// assert_eq!(v1_20_1.lossy_le(&v1_20_0), Some(false));
     /// assert_eq!(v1_20_1.lossy_le(&v1_20_1), Some(true));
     /// ```
+    #[must_use]
     pub fn lossy_le(&self, other: &Version) -> Option<bool> {
         if self == other {
             Some(true)
@@ -115,6 +117,7 @@ impl Version {
     /// assert_eq!(v1_20_1.lossy_lt(&v1_20_0), Some(false));
     /// assert_eq!(v1_20_1.lossy_lt(&v1_20_1), Some(false));
     /// ```
+    #[must_use]
     pub fn lossy_lt(&self, other: &Version) -> Option<bool> {
         match (self, other) {
             (
@@ -195,6 +198,7 @@ impl Version {
 
     /// Returns `None` if either version doesn't exist in the [`VersionManifest`],
     /// otherwise returns `true` if `self` is less than `other`.
+    #[must_use]
     pub fn lt(&self, other: &Version, manifest: &VersionManifest) -> Option<bool> {
         let self_id = manifest.get(self)?;
         let other_id = manifest.get(other)?;
@@ -203,6 +207,7 @@ impl Version {
 
     /// Returns `None` if either version doesn't exist in the [`VersionManifest`],
     /// otherwise returns `true` if `self` is less than or equal to `other`.
+    #[must_use]
     pub fn le(&self, other: &Version, manifest: &VersionManifest) -> Option<bool> {
         if self == other {
             Some(true)
@@ -213,14 +218,14 @@ impl Version {
 }
 
 #[derive(Debug, Error, PartialEq, Eq)]
-pub enum VersionParseError {
+pub enum ParseError {
     #[error("Invalid Version: {0}")]
     InvalidInteger(#[from] ParseIntError),
 }
 
 // Parse a string into a Version
 impl FromStr for Version {
-    type Err = VersionParseError;
+    type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let s = s.trim();
@@ -232,7 +237,7 @@ impl FromStr for Version {
             let mut parts = s.split('.');
             let major = parts.next().expect("Release Major").parse()?;
             let minor = parts.next().expect("Release Minor").parse()?;
-            let patch = parts.next().map(|s| s.parse()).unwrap_or(Ok(0))?;
+            let patch = parts.next().map_or(Ok(0), str::parse)?;
             Ok(Version::Release {
                 major,
                 minor,

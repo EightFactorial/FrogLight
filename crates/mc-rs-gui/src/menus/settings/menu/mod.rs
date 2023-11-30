@@ -1,13 +1,13 @@
 #![allow(unused_imports)]
 
 mod audio;
-pub use audio::*;
+pub(crate) use audio::*;
 
 mod controls;
-pub use controls::*;
+pub(crate) use controls::*;
 
 mod overview;
-pub use overview::*;
+pub(crate) use overview::*;
 
 mod video;
-pub use video::*;
+pub(crate) use video::*;

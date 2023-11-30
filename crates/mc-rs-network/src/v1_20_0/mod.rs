@@ -3,7 +3,7 @@ use mc_rs_core::{resources::player::username::Username, PingResponse, StatusResp
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::{
-        state::*,
+        state::{Handshake, Login, Status},
         v1_20_0::{
             handshake::serverboundhandshakepacket::ServerboundHandshakePacket,
             login::{

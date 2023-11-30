@@ -1,7 +1,7 @@
 use bevy::{asset::embedded_asset, prelude::*};
 
 mod default_style;
-pub use default_style::DefaultTextStyle;
+pub use default_style::{DefaultTextStyle, IgnoreDefaultTextStyle};
 
 mod fonts;
 pub use fonts::DefaultFonts;

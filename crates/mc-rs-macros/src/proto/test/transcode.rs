@@ -5,7 +5,7 @@ use super::TestTrait;
 use crate::{proto::test::bytes_to_tokenstream, DeriveMacroAttr};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct TranscodeTest;
+pub(crate) struct TranscodeTest;
 
 impl TestTrait for TranscodeTest {
     fn generate_test(&self, attr: &DeriveMacroAttr, input: &syn::DeriveInput) -> TokenStream {
@@ -51,7 +51,7 @@ impl TestTrait for TranscodeTest {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct VarTranscodeTest;
+pub(crate) struct VarTranscodeTest;
 
 impl TestTrait for VarTranscodeTest {
     fn generate_test(&self, attr: &DeriveMacroAttr, input: &syn::DeriveInput) -> TokenStream {

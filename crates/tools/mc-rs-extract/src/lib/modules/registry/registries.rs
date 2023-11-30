@@ -78,7 +78,7 @@ impl ModuleExt for RegistriesModule {
         // Add registry map of `field: constant`
         {
             let mut object = JsonValue::new_object();
-            for reg in reg_list.iter() {
+            for reg in &reg_list {
                 object[reg.name.clone()] = reg.constant.clone().into();
             }
             data.output["registry"]["field_map"] = object;

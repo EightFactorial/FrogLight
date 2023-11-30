@@ -11,7 +11,7 @@ use super::{
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct TranscodeMacro;
+pub(crate) struct TranscodeMacro;
 
 impl MacroTypeTrait for TranscodeMacro {
     const REQUIRED_TESTS: &'static [TestType] = &[];

@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::menus::traits::MenuComponent;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct LoadingBar;
+pub(super) struct LoadingBar;
 
 impl MenuComponent for LoadingBar {
     fn setup(_app: &mut App) {}

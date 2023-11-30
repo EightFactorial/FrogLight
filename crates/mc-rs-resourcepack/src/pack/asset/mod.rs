@@ -1,7 +1,7 @@
 use bevy::{asset::VisitAssetDependencies, prelude::*, utils::HashMap};
 use mc_rs_core::ResourceLocation;
 
-pub mod meta;
+pub(super) mod meta;
 use meta::ResourcePackMetaContainer;
 
 /// A Minecraft resourcepack

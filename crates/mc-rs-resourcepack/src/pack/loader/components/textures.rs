@@ -15,7 +15,7 @@ use zip::ZipArchive;
 use crate::pack::{ResourcePackLoader, ResourcePackLoaderError};
 
 /// Reads all textures from the zip archive.
-pub fn read_textures(
+pub(crate) fn read_textures(
     zip: &mut ZipArchive<impl Read + Seek>,
     load_context: &mut LoadContext,
 ) -> Result<HashMap<ResourceLocation, Handle<Image>>, ResourcePackLoaderError> {

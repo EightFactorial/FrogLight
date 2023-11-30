@@ -57,9 +57,10 @@ fn encode_bitset(ident: &Ident, data: &DataStruct) -> TokenStream {
     let Fields::Named(fields) = &data.fields else {
         panic!("Bitset must be a named struct");
     };
-    if fields.named.iter().any(|f| f.ty != syn::parse_quote!(bool)) {
-        panic!("Struct fields must all be `bool`");
-    };
+    assert!(
+        !fields.named.iter().any(|f| f.ty != syn::parse_quote!(bool)),
+        "Struct fields must all be `bool`"
+    );
 
     let field_count = fields.named.len();
     let mut field_list = Vec::new();

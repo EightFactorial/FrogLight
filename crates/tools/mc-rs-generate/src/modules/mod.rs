@@ -6,7 +6,7 @@ use mc_rs_extract::{modules::ExtractModule, ModuleData};
 use strum::{Display, EnumIter};
 
 mod format;
-pub use format::FormatModule;
+pub(crate) use format::FormatModule;
 
 /// Modules that can be run to generate data.
 ///
@@ -23,11 +23,11 @@ pub enum GenerateModule {
 
 impl GenerateModule {
     /// Get the dependencies of this module.
-    pub fn deps(&self) -> &'static [ExtractModule] { Box::<dyn ModuleExt>::from(*self).deps() }
+    pub fn deps(self) -> &'static [ExtractModule] { Box::<dyn ModuleExt>::from(self).deps() }
 
     /// Generate the data for this module.
-    pub fn run(&self, data: &ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
-        Box::<dyn ModuleExt>::from(*self).run(data, repo)
+    pub fn run(self, data: &ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
+        Box::<dyn ModuleExt>::from(self).run(data, repo)
     }
 }
 

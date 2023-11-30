@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::menus::traits::MenuComponent;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct BlockBackground;
+pub(crate) struct BlockBackground;
 
 impl MenuComponent for BlockBackground {
     fn setup(_app: &mut App) {

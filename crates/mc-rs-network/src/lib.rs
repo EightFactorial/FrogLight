@@ -11,7 +11,7 @@ mod v1_20_0;
 
 pub mod task;
 
-/// A [SystemSet] containing all of the networking systems.
+/// A [`SystemSet`] containing all of the networking systems.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct NetworkingSet;
 

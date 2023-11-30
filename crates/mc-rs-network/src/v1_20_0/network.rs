@@ -32,6 +32,7 @@ impl Network for V1_20_0 {
         unreachable!("This version does not have a configuration state");
     }
 
+    #[allow(clippy::too_many_lines, clippy::match_same_arms)]
     fn play_packet(world: &mut World, packet: ClientboundPlayPackets) {
         match packet {
             ClientboundPlayPackets::Bundle(_) => {}
@@ -175,18 +176,21 @@ impl Network for V1_20_0 {
                 // Update the player posiiton
                 let mut transform = player.single_mut();
 
+                #[allow(clippy::cast_possible_truncation)]
                 if p.relative_flags.x {
                     transform.translation.x += p.position.x as f32;
                 } else {
                     transform.translation.x = p.position.x as f32;
                 }
 
+                #[allow(clippy::cast_possible_truncation)]
                 if p.relative_flags.y {
                     transform.translation.y += p.position.y as f32;
                 } else {
                     transform.translation.y = p.position.y as f32;
                 }
 
+                #[allow(clippy::cast_possible_truncation)]
                 if p.relative_flags.z {
                     transform.translation.z += p.position.z as f32;
                 } else {

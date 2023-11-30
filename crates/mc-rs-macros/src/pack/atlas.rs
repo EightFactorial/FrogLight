@@ -7,7 +7,7 @@ use syn::{
     parse_macro_input, LitInt, LitStr, Token, Type,
 };
 
-pub fn impl_atlasdata(input: TokenStream) -> TokenStream {
+pub(crate) fn impl_atlasdata(input: TokenStream) -> TokenStream {
     let AtlasMacro {
         name,
         size: (width, height),
@@ -123,6 +123,8 @@ impl Parse for TextureDefinition {
         bracketed!(content in input);
 
         let mut tex_coords = [0f32; 4];
+
+        #[allow(clippy::cast_precision_loss)]
         for (index, coord) in tex_coords.iter_mut().enumerate() {
             *coord = content.parse::<LitInt>()?.base10_parse::<u32>()? as f32;
 

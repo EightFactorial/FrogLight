@@ -26,8 +26,8 @@ use super::{
 
 /// A trait that defines how to handle a network version
 ///
-/// A version must also have the [NetworkHandle] trait implemented
-pub trait Network: NetworkHandle + Version + Send + Sync + 'static
+/// A version must also have the [`NetworkHandle`] trait implemented
+pub(super) trait Network: NetworkHandle + Version + Send + Sync + 'static
 where
     Handshake: State<Self>,
     Status: State<Self>,
@@ -106,7 +106,7 @@ where
         mut query: Query<(Entity, &mut ConnectionTask<Self>)>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
@@ -139,7 +139,7 @@ where
         mut query: Query<(Entity, &mut ConnectionHandshakeTask<Self>)>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 let mut entity_commands = commands.entity(entity);
 
@@ -189,7 +189,7 @@ where
         mut ping_events: EventWriter<PingResponse>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok((status, ping)) => {
@@ -217,7 +217,7 @@ where
 
     /// Whether or not the version has the configuration state
     ///
-    /// Used for bevy system run_if's
+    /// Used for bevy system [`run_if`](bevy::ecs::schedule::config::IntoSystemConfigs::run_if)s
     fn has_configuration_state() -> bool { Self::HAS_CONFIGURATION_STATE }
 
     /// Wait for the login to finish and start the next state
@@ -227,7 +227,7 @@ where
         mut events: EventWriter<CreateControlledPlayerEvent>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok((conn, profile)) => {
@@ -246,29 +246,23 @@ where
                         let (tx1, rx1) = flume::unbounded();
                         let (tx2, rx2) = flume::unbounded();
 
-                        match Self::HAS_CONFIGURATION_STATE {
-                            true => {
-                                let task = IoTaskPool::get().spawn(Self::packet_handle(
-                                    ConnectionEnum::Configuration(conn.into()),
-                                    tx1,
-                                    rx2,
-                                ));
+                        if Self::HAS_CONFIGURATION_STATE {
+                            let task = IoTaskPool::get().spawn(Self::packet_handle(
+                                ConnectionEnum::Configuration(conn.into()),
+                                tx1,
+                                rx2,
+                            ));
 
-                                commands
-                                    .insert_resource(ConnectionChannel::new_config(rx1, tx2, task));
-                            }
-                            false => {
-                                let task = IoTaskPool::get().spawn(Self::packet_handle(
-                                    ConnectionEnum::Play(conn.into()),
-                                    tx1,
-                                    rx2,
-                                ));
+                            commands.insert_resource(ConnectionChannel::new_config(rx1, tx2, task));
+                        } else {
+                            let task = IoTaskPool::get().spawn(Self::packet_handle(
+                                ConnectionEnum::Play(conn.into()),
+                                tx1,
+                                rx2,
+                            ));
 
-                                commands
-                                    .insert_resource(ConnectionChannel::new_play(rx1, tx2, task));
-
-                                state.set(ApplicationState::InGame)
-                            }
+                            commands.insert_resource(ConnectionChannel::new_play(rx1, tx2, task));
+                            state.set(ApplicationState::InGame);
                         }
                     }
                     Err(err) => {
@@ -339,23 +333,18 @@ where
                         }
 
                         // Process the configuration packet
-                        Self::config_packet(world, packet)
+                        Self::config_packet(world, packet);
                     } else {
                         unreachable!("Configuration packet when connection doesn't have Configuration state!")
                     }
                 }
                 ConnectionData::Play(packet) => {
-                    if Self::HAS_CONFIGURATION_STATE {
-                        if channel_state != ConnectionState::Play {
-                            warn!("Received play packet in configuration state!");
-                        }
-
-                        // Process the play packet
-                        Self::play_packet(world, packet)
-                    } else {
-                        // Process the play packet
-                        Self::play_packet(world, packet)
+                    if Self::HAS_CONFIGURATION_STATE && channel_state != ConnectionState::Play {
+                        warn!("Received play packet in configuration state!");
                     }
+
+                    // Process the play packet
+                    Self::play_packet(world, packet);
                 }
                 ConnectionData::NewState(state) => {
                     if Self::HAS_CONFIGURATION_STATE {
@@ -392,7 +381,7 @@ where
 
 /// A system set that contains all the systems needed for a connection
 #[derive(Debug, Default, PartialEq, Eq, Hash, SystemSet)]
-pub struct ConnectionSystemSet<V: Version>(PhantomData<V>);
+pub(super) struct ConnectionSystemSet<V: Version>(PhantomData<V>);
 
 impl<V: Version> Clone for ConnectionSystemSet<V> {
     fn clone(&self) -> Self { Self(self.0) }
@@ -400,4 +389,4 @@ impl<V: Version> Clone for ConnectionSystemSet<V> {
 
 /// A marker component for entities that contain a connection
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub struct ConnectionMarker<V: Version>(PhantomData<V>);
+pub(super) struct ConnectionMarker<V: Version>(PhantomData<V>);

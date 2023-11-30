@@ -1,5 +1,3 @@
-use std::ops::Deref;
-
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Expr, ExprLit, ExprUnary, Lit, Token};
@@ -21,7 +19,7 @@ fn get_discriminant(expr: &Option<(Token![=], Expr)>, discriminant: &mut i32) ->
             Expr::Unary(ExprUnary { expr, .. }) => {
                 let Expr::Lit(ExprLit {
                     lit: Lit::Int(int), ..
-                }) = expr.deref()
+                }) = &**expr
                 else {
                     panic!("Invalid discriminant");
                 };

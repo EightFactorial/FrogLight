@@ -8,6 +8,9 @@ homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 
+[lints]
+workspace = true
+
 [dependencies]
 async-compression = { version = "0.4", features = ["futures-io", "zlib"] }
 async-net = "2.0"

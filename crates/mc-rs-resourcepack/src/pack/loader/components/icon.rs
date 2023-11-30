@@ -10,7 +10,7 @@ use zip::ZipArchive;
 use crate::pack::ResourcePackLoaderError;
 
 /// Reads the pack.png file from the zip archive.
-pub fn read_icon(
+pub(crate) fn read_icon(
     zip: &mut ZipArchive<impl Read + Seek>,
     load_context: &mut LoadContext,
 ) -> Result<Option<Handle<Image>>, ResourcePackLoaderError> {

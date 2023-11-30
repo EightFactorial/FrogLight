@@ -9,32 +9,36 @@ use super::GuiScale;
 pub struct GuiScaleComponent(pub UVec2);
 
 impl GuiScaleComponent {
-    /// Returns `true` if a [GuiScaleComponent] was added.
+    /// Returns `true` if a [`GuiScaleComponent`] was added.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn scale_added(query: Query<(), Added<GuiScaleComponent>>) -> bool {
         !query.is_empty()
     }
 
-    /// Update the size [Entity]s who had a [GuiScaleComponent] added.
+    /// Update the size [`Entity`]s who had a [`GuiScaleComponent`] added.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn added_update(
         mut query: Query<(&mut Style, &GuiScaleComponent), Added<GuiScaleComponent>>,
         scale: Res<GuiScale>,
     ) {
         query.iter_mut().for_each(|(mut style, scale_comp)| {
             Self::update_size(&mut style, scale_comp, &scale);
-        })
+        });
     }
 
-    /// Update the size of [Entity]s when [GuiScale] changes.
+    /// Update the size of [`Entity`]s when [`GuiScale`] changes.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn resize_update(
         mut query: Query<(&mut Style, &GuiScaleComponent)>,
         scale: Res<GuiScale>,
     ) {
         query.iter_mut().for_each(|(mut style, scale_comp)| {
             Self::update_size(&mut style, scale_comp, &scale);
-        })
+        });
     }
 
-    /// Set the [Style] of an [Entity] based on the [GuiScale].
+    /// Set the [`Style`] of an [`Entity`] based on the [`GuiScale`].
+    #[allow(clippy::cast_precision_loss, clippy::trivially_copy_pass_by_ref)]
     fn update_size(style: &mut Style, scale_comp: &GuiScaleComponent, scale: &GuiScale) {
         let new_size = scale.value() * **scale_comp;
 
@@ -42,7 +46,8 @@ impl GuiScaleComponent {
         style.height = Val::Px(new_size.y as f32);
     }
 
-    /// Create a new [GuiScaleComponent] with the given width and height.
+    /// Create a new [`GuiScaleComponent`] with the given width and height.
+    #[must_use]
     pub fn new(width: u32, height: u32) -> Self { Self(UVec2::new(width, height)) }
 }
 

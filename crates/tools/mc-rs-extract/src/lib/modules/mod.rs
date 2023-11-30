@@ -30,9 +30,10 @@ pub enum ExtractModule {
 
 impl ExtractModule {
     /// Get the dependencies of this module.
-    pub fn deps(&self) -> &'static [ExtractModule] { Box::<dyn ModuleExt>::from(*self).deps() }
+    #[must_use]
+    pub fn deps(self) -> &'static [ExtractModule] { Box::<dyn ModuleExt>::from(self).deps() }
     /// Generate the data for this module.
-    pub fn run(&self, data: &mut ModuleData) { Box::<dyn ModuleExt>::from(*self).run(data); }
+    pub fn run(self, data: &mut ModuleData) { Box::<dyn ModuleExt>::from(self).run(data); }
 }
 
 // Convert the module enum into a boxed module trait object.

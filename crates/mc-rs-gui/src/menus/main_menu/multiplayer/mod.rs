@@ -7,7 +7,7 @@ use super::{block_bg::BlockBackground, MainMenuComponent, MainMenuState};
 mod list;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct MultiplayerMenu;
+pub(crate) struct MultiplayerMenu;
 
 impl MainMenuComponent for MultiplayerMenu {
     type Background = BlockBackground;

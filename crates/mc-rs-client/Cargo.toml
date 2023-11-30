@@ -9,6 +9,9 @@ repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 build = "build.rs"
 
+[lints]
+workspace = true
+
 [build-dependencies]
 vergen = { version = "8.2", features = ["build", "cargo", "git", "gitoxide"] }
 

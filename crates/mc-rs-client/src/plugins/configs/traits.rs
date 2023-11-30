@@ -10,7 +10,7 @@ use serde::{de::DeserializeOwned, Serialize};
 use crate::dir::config_folder;
 
 /// A trait that adds bevy systems to update a config file resource.
-pub trait ResourceConfig: ConfigFile + Resource {
+pub(crate) trait ResourceConfig: ConfigFile + Resource {
     /// Adds systems to the app to update the config file.
     fn add_systems(app: &mut App) {
         app.add_systems(Update, Self::save_config.run_if(on_event::<AppExit>()));
@@ -25,7 +25,7 @@ pub trait ResourceConfig: ConfigFile + Resource {
 }
 
 /// A trait that adds methods to load and save a config file.
-pub trait ConfigFile: Default + Serialize + DeserializeOwned {
+pub(crate) trait ConfigFile: Default + Serialize + DeserializeOwned {
     /// The path to the config file relative to the config folder.
     const FILE_PATH: &'static str;
     /// The path to the config file

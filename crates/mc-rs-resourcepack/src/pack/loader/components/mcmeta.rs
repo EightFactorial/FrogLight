@@ -8,7 +8,7 @@ use crate::pack::{ResourcePackLoaderError, ResourcePackMetaContainer};
 
 /// Reads the pack.mcmeta file from the zip archive.
 #[allow(unused_variables)]
-pub fn read_mcmeta(
+pub(crate) fn read_mcmeta(
     zip: &mut ZipArchive<impl Read + Seek>,
     load_context: &mut LoadContext,
 ) -> Result<ResourcePackMetaContainer, ResourcePackLoaderError> {

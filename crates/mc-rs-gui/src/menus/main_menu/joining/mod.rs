@@ -7,7 +7,7 @@ use super::{block_bg::BlockBackground, MainMenuComponent, MainMenuState};
 mod message;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct JoiningMenu;
+pub(crate) struct JoiningMenu;
 
 impl MainMenuComponent for JoiningMenu {
     type Background = BlockBackground;

@@ -10,7 +10,7 @@ use tracing::debug;
 use zip::ZipArchive;
 
 use crate::{
-    manifest::{ManifestError, ParsedManifestVersion, ParsedVersionData, VersionManifest},
+    manifest::{FetchError, ParsedManifestVersion, ParsedVersionData, VersionManifest},
     path::minecraft_dir,
     Version,
 };
@@ -40,8 +40,6 @@ pub struct ModuleData {
 pub enum ModuleDataError {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
-    #[error("Serde error: {0}")]
-    Serde(#[from] serde_json::Error),
     #[error("Reqwest error: {0}")]
     Reqwest(#[from] reqwest::Error),
     #[error("Zip error: {0}")]
@@ -50,7 +48,7 @@ pub enum ModuleDataError {
     Classfile(#[from] classfile::error::ParserError),
 
     #[error("Manifest error: {0}")]
-    Manifest(#[from] ManifestError),
+    Manifest(#[from] FetchError),
     #[error("Could not find .minecraft directory")]
     NoMinecraftDir,
     #[error("Invalid Version, not in VersionManifest")]
@@ -58,6 +56,25 @@ pub enum ModuleDataError {
 }
 
 impl ModuleData {
+    /// Creates a new `ModuleData` struct.
+    ///
+    /// This will automatically retrieve the Minecraft jar, mappings, and redownload the
+    /// [`VersionManifest`] if requested.
+    ///
+    /// # Errors
+    /// `Error::NoMinecraftDir` if the .minecraft directory could not be found.
+    ///
+    /// `Error::InvalidVersion` if the given version is not in the
+    /// [`VersionManifest`].
+    ///
+    /// `Error::Io` if there was an error reading or writing files.
+    ///
+    /// `Error::Reqwest` if there was an error downloading files.
+    ///
+    /// `Error::Zip` if there was an error opening the Minecraft jar or mapped jar.
+    ///
+    /// `Error::Classfile` if there was an error parsing a mapped classfile.
+    #[allow(clippy::missing_panics_doc)]
     pub async fn new(
         version: Option<Version>,
         refresh: bool,
@@ -86,10 +103,10 @@ impl ModuleData {
             }
 
             // Get the mapped jar
-            let mapped_jar_path = folder_path.join(format!("{}-mapped.jar", version));
+            let mapped_jar_path = folder_path.join(format!("{version}-mapped.jar"));
             if !mapped_jar_path.exists() {
                 // Get the jar
-                let jar_path = folder_path.join(format!("{}.jar", version));
+                let jar_path = folder_path.join(format!("{version}.jar"));
                 if !jar_path.exists() {
                     get_mc_jar(&jar_path, manifest_version).await?;
                 }
@@ -139,7 +156,11 @@ impl ModuleData {
         // Create the ClassMap
         let mut classmap = HashMap::with_capacity(
             zip.file_names()
-                .filter(|name| name.ends_with(".class"))
+                .filter(|name| {
+                    Path::new(name)
+                        .extension()
+                        .map_or(false, |ext| ext.eq_ignore_ascii_case("class"))
+                })
                 .count(),
         );
         for index in 0..zip.len() {
@@ -148,7 +169,10 @@ impl ModuleData {
             };
 
             // Skip non-class files
-            if !file.name().ends_with(".class") {
+            if !Path::new(file.name())
+                .extension()
+                .map_or(false, |ext| ext.eq_ignore_ascii_case("class"))
+            {
                 continue;
             }
 
@@ -245,8 +269,7 @@ async fn get_mappings_jar(
 
     // Download the mappings jar
     let url = format!(
-        "https://maven.fabricmc.net/net/fabricmc/intermediary/{VER}/intermediary-{VER}-v2.jar",
-        VER = ver_string
+        "https://maven.fabricmc.net/net/fabricmc/intermediary/{ver_string}/intermediary-{ver_string}-v2.jar"
     );
     debug!("Downloading mappings from {url}");
 
@@ -296,6 +319,7 @@ async fn get_remapper(remapper_path: &Path) -> Result<(), ModuleDataError> {
     Ok(())
 }
 
+#[allow(clippy::missing_fields_in_debug)]
 impl std::fmt::Debug for ModuleData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ModuleData")

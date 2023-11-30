@@ -1,4 +1,4 @@
-pub mod armor;
-pub mod crosshair;
-pub mod health;
-pub mod hotbar;
+pub(crate) mod armor;
+pub(crate) mod crosshair;
+pub(crate) mod health;
+pub(crate) mod hotbar;

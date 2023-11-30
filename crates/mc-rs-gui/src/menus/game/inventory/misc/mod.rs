@@ -1,5 +1,5 @@
-pub mod crafting_table;
-pub mod fletching_table;
-pub mod loom;
-pub mod stone_cutter;
-pub mod villager;
+pub(crate) mod crafting_table;
+pub(crate) mod fletching_table;
+pub(crate) mod loom;
+pub(crate) mod stone_cutter;
+pub(crate) mod villager;

@@ -4,19 +4,21 @@ use crate::resources::scale::GuiScale;
 
 use super::DefaultFonts;
 
-/// TODO: Change font_size when [GuiScale](super::scale::GuiScale) changes.
+/// TODO: Change `font_size` when [`GuiScale`] changes.
 #[derive(Debug, Default, Clone, Deref, DerefMut, Resource)]
 pub struct DefaultTextStyle(pub TextStyle);
 
-/// A component that can be added to a [Text] entity to ignore the [DefaultTextStyle].
+/// A component that can be added to a [`Text`] entity to ignore the [`DefaultTextStyle`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct IgnoreDefaultTextStyle;
 
 impl DefaultTextStyle {
     // TODO: Get the actual formula for this.
+    #[allow(clippy::cast_precision_loss)]
     pub(super) fn font_size(scale: &GuiScale) -> f32 { 8.0 + (scale.value() * 8) as f32 }
 
     /// Initialize the [`DefaultTextStyle`] resource.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn initialize(
         scale: Res<GuiScale>,
         fonts: Res<DefaultFonts>,
@@ -33,6 +35,7 @@ impl DefaultTextStyle {
     }
 
     /// Update the font size of the [`DefaultTextStyle`] when the [`GuiScale`] changes.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn resize_font(scale: Res<GuiScale>, mut style: ResMut<DefaultTextStyle>) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Resizing DefaultTextStyle");
@@ -41,6 +44,7 @@ impl DefaultTextStyle {
     }
 
     /// Returns true if a [`Text`] entity was added.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn any_added_texts(
         query: Query<(), (Added<Text>, Without<IgnoreDefaultTextStyle>)>,
     ) -> bool {
@@ -49,6 +53,7 @@ impl DefaultTextStyle {
 
     /// Updates all [`Text`] entities with the [`DefaultTextStyle`],
     /// ignoring those with the [`IgnoreDefaultTextStyle`] component.
+    #[allow(clippy::needless_pass_by_value)]
     pub(super) fn update_styles(
         mut query: Query<&mut Text, Without<IgnoreDefaultTextStyle>>,
         style: Res<DefaultTextStyle>,

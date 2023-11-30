@@ -3933,7 +3933,6 @@ dependencies = [
  "chrono",
  "clap",
  "classfile-rs",
- "derive_more",
  "dirs",
  "hashbrown 0.14.3",
  "json",

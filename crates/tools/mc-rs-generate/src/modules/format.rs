@@ -8,7 +8,7 @@ use tracing::{error, info};
 use super::ModuleExt;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct FormatModule;
+pub(crate) struct FormatModule;
 
 impl ModuleExt for FormatModule {
     fn run(&self, _data: &ModuleData, _repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
@@ -32,10 +32,10 @@ impl ModuleExt for FormatModule {
                 }
             };
 
-            if !status.success() {
-                error!("Command `cargo fmt --all` failed with: {status}");
-            } else {
+            if status.success() {
                 info!("Project formatted successfully");
+            } else {
+                error!("Command `cargo fmt --all` failed with: {status}");
             }
         })
     }

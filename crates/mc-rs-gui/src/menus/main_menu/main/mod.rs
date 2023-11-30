@@ -16,7 +16,7 @@ use buttons::MainMenuButtons;
 mod title;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct MainMenu;
+pub(super) struct MainMenu;
 
 impl MainMenuComponent for MainMenu {
     type Background = CubemapBackground;

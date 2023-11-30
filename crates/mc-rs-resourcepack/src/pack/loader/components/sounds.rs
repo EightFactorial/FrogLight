@@ -10,7 +10,7 @@ use zip::ZipArchive;
 use crate::pack::{ResourcePackLoader, ResourcePackLoaderError};
 
 /// Reads the sounds from a zip archive.
-pub fn read_sounds(
+pub(crate) fn read_sounds(
     zip: &mut ZipArchive<impl Read + Seek>,
     load_context: &mut LoadContext,
 ) -> Result<HashMap<ResourceLocation, Handle<AudioSource>>, ResourcePackLoaderError> {
