@@ -10,22 +10,17 @@ readme = "README.md"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
-convert_case = "0.4"
-enum_dispatch = "0.3"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+convert_case = "0.6"
 git2 = "0.18"
 itertools = { workspace = true }
-json = "0.12"
-tracing = { workspace = true }
 mc-rs-extract = { version = "0.1", path = "../mc-rs-extract" }
 prettyplease = "0.2"
 proc-macro2 = { version = "1.0", features = ["nightly"] }
 quote = "1.0"
-reqwest = { version = "0.11", features = ["rustls-tls", "json", "blocking"], default-features = false }
 serde = { workspace = true }
-serde_json = { workspace = true, features = ["preserve_order"] }
+serde_json = { workspace = true, features = ["arbitrary_precision", "preserve_order"] }
 strum = { workspace = true }
 syn = { version = "2.0", features = ["extra-traits"] }
-tempfile = { version = "3", features = ["nightly"] }
-zip = { version = "0.6", features = ["flate2"] }
-
+tokio = { version = "1.34", features = ["full"] }
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

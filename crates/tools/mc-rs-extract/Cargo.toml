@@ -10,26 +10,34 @@ readme = "README.md"
 
 [lib]
 name = "mc_rs_extract"
-path = "src/lib.rs"
+path = "src/lib/lib.rs"
 
 [[bin]]
 name = "mc_rs_extract"
-path = "src/bin/main.rs"
+path = "src/bin/extractor/main.rs"
+required-features = ["binary"]
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "4.4", features = ["derive"] }
+clap = { version = "4.4", features = ["derive", "env"], optional = true }
 classfile-rs = { version = "0.1", path = "../classfile-rs" }
 derive_more = { workspace = true }
-enum_dispatch = "0.3"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+dirs = "5.0"
 hashbrown = { version = "0.14", features = ["serde"] }
-itertools = { workspace = true }
-json = "0.12"
-tracing = { workspace = true }
-reqwest = { version = "0.11", features = ["rustls-tls", "json", "blocking"], default-features = false }
+json = { version = "0.12" }
+regex = "1.10"
+reqwest = { version = "0.11", features = ["rustls-tls", "json"], default-features = false}
 serde = { workspace = true }
-serde_json = "1.0"
+serde_json = { workspace = true, features = ["arbitrary_precision"] }
 strum = { workspace = true }
-thiserror = "1.0"
-zip = "0.6"
+thiserror = { workspace = true }
+tokio = { version = "1.34", features = ["full"], optional = true }
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+zip = { workspace = true }
+
+[features]
+default = ["binary"]
+
+# Dependencies for the binary
+binary = ["dep:clap", "dep:tokio", "dep:tracing-subscriber"]

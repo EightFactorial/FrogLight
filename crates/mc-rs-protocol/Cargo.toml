@@ -20,13 +20,13 @@ compact_str = { workspace = true }
 derive_more = { workspace = true }
 futures-lite = { workspace = true }
 hashbrown = { version = "0.14", features = ["serde"] }
-tracing = { workspace = true, optional = true }
 mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["arbitrary_precision"] }
 smallvec = { workspace = true }
 strum = { workspace = true }
-thiserror = "1.0"
+thiserror = { workspace = true }
+tracing = { workspace = true, optional = true }
 uuid = { workspace = true, features = ["v3"] }
 
 [dev-dependencies]
