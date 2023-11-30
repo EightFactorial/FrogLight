@@ -25,7 +25,7 @@ impl<V: Version> ConnectionEvent<V> {
     /// ### Example
     /// ```rust
     /// use compact_str::CompactString;
-    /// use mc_rs_core::ConnectionEvent;
+    /// use mc_rs_core::events::ConnectionEvent;
     /// use mc_rs_protocol::versions::v1_20_0::V1_20_0;
     ///
     /// let hostname = CompactString::from("localhost:25565");
@@ -49,7 +49,7 @@ impl<V: Version> ConnectionEvent<V> {
     /// ### Example
     /// ```rust
     /// use compact_str::CompactString;
-    /// use mc_rs_core::{ConnectionEvent, enums::ConnectionIntent};
+    /// use mc_rs_core::{events::ConnectionEvent, enums::ConnectionIntent};
     /// use mc_rs_protocol::versions::v1_20_0::V1_20_0;
     ///
     /// let hostname = CompactString::from("localhost:25565");
@@ -81,7 +81,7 @@ impl<V: Version> StatusRequest<V> {
     /// ### Example
     /// ```rust
     /// use compact_str::CompactString;
-    /// use mc_rs_core::StatusRequest;
+    /// use mc_rs_core::events::StatusRequest;
     /// use mc_rs_protocol::versions::v1_20_0::V1_20_0;
     ///
     /// let hostname = CompactString::from("localhost:25565");
