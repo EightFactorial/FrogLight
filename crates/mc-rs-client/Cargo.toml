@@ -19,7 +19,7 @@ vergen = { version = "8.2", features = ["build", "cargo", "git", "gitoxide"] }
 anyhow = "1.0"
 bevy = { workspace = true, features = ["serialize"] }
 bevy_rapier3d = { workspace = true }
-compact_str = { workspace = true }
+compact_str = { workspace = true, features = ["serde"] }
 dirs = "5.0"
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
 mc-rs-gui = { version = "0.1", path = "../mc-rs-gui" }

@@ -12,14 +12,14 @@ readme = "README.md"
 workspace = true
 
 [dependencies]
-async-compression = { version = "0.4", features = ["futures-io", "zlib"] }
+async-compression = { version = "0.4", features = ["futures-io", "deflate", "zlib"] }
 async-net = "2.0"
 azalea-chat = { workspace = true }
 azalea-nbt = { workspace = true }
 bevy_ecs = "0.12"
 bevy_math = "0.12"
 byteorder = "1.5"
-compact_str = { workspace = true }
+compact_str = { workspace = true, features = ["serde", "smallvec"] }
 derive_more = { workspace = true }
 futures-lite = { workspace = true }
 hashbrown = { version = "0.14", features = ["serde"] }
