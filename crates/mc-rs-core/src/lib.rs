@@ -8,13 +8,11 @@ pub use mc_rs_protocol::{types::*, versions};
 
 pub mod blocks;
 pub mod components;
+pub mod events;
 pub mod resources;
 pub mod schedule;
 pub mod sounds;
 pub mod world;
-
-mod net_event;
-pub use net_event::*;
 
 /// A plugin that adds core systems and resources.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -24,7 +22,7 @@ impl Plugin for CorePlugin {
     fn build(&self, app: &mut App) {
         blocks::setup(app);
         components::setup(app);
-        net_event::setup(app);
+        events::setup(app);
         resources::setup(app);
         schedule::setup(app);
         sounds::setup(app);

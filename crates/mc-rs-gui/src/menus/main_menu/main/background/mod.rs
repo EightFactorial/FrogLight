@@ -51,8 +51,7 @@ impl MenuComponent for CubemapBackground {
         debug!("Building CubemapBackground");
 
         // Create cube mesh
-        let mut mesh = Mesh::from(shape::Cube::new(1.0));
-        Self::correct_uvs(&mut mesh);
+        let mesh = Self::correct_uvs(Mesh::from(shape::Cube::new(1.0)));
         let mesh = world.resource_mut::<Assets<Mesh>>().add(mesh);
 
         // Create material
@@ -201,8 +200,8 @@ impl CubemapBackground {
         world.resource_mut::<Assets<Image>>().add(image)
     }
 
-    /// Correct the UVs of the [`cube`](shape::Cube) [`mesh`](Mesh).
-    fn correct_uvs(mesh: &mut Mesh) {
+    /// Correct the UVs of a [`Cube`](shape::Cube) [`Mesh`].
+    fn correct_uvs(mut mesh: Mesh) -> Mesh {
         mesh.insert_attribute(
             Mesh::ATTRIBUTE_UV_0,
             vec![
@@ -238,5 +237,7 @@ impl CubemapBackground {
                 [1., 4. / 6.],
             ],
         );
+
+        mesh
     }
 }

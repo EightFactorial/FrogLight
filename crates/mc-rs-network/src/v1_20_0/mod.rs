@@ -1,5 +1,8 @@
 use bevy::{log::error, prelude::debug, utils::HashMap};
-use mc_rs_core::{resources::player::username::Username, PingResponse, StatusResponse};
+use mc_rs_core::{
+    events::{PingResponse, StatusResponse},
+    resources::player::username::Username,
+};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::{

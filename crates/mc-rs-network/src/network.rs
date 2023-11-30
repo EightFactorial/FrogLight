@@ -3,9 +3,10 @@ use std::{fmt::Debug, hash::Hash, marker::PhantomData};
 use bevy::{ecs::system::SystemState, prelude::*, tasks::IoTaskPool};
 use futures_lite::future::{block_on, poll_once};
 use mc_rs_core::{
-    components::player::CreateControlledPlayerEvent, resources::player::username::Username,
-    schedule::state::ApplicationState, ConnectionEvent, PingResponse, StatusRequest,
-    StatusResponse,
+    components::player::CreateControlledPlayerEvent,
+    events::{ConnectionEvent, PingResponse, StatusRequest, StatusResponse},
+    resources::player::username::Username,
+    schedule::state::ApplicationState,
 };
 use mc_rs_protocol::{
     types::enums::ConnectionIntent,

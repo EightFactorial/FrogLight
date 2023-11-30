@@ -6,7 +6,7 @@ use std::{fmt::Debug, marker::PhantomData};
 use bevy::{prelude::*, tasks::Task};
 use compact_str::CompactString;
 use flume::{Receiver, Sender};
-use mc_rs_core::{PingResponse, StatusResponse};
+use mc_rs_core::events::{PingResponse, StatusResponse};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
