@@ -39,10 +39,6 @@ impl MenuComponent for JoiningMenu {
         };
 
         // Spawn MenuComponent
-        let entity = world.spawn((JoiningMenu, node)).id();
-        world.entity_mut(parent).add_child(entity);
-
-        // Build background
-        <Self as MainMenuComponent>::Background::build(parent, world);
+        world.spawn((JoiningMenu, node)).set_parent(parent);
     }
 }

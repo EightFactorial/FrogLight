@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use mc_rs_core::schedule::state::ApplicationState;
 
-use crate::menus::traits::VisibilityFromWorld;
+use crate::menus::{main_menu::block_bg::BlockBackground, traits::VisibilityFromWorld};
 
 use super::traits::MenuComponent;
 
@@ -50,10 +50,13 @@ impl MenuComponent for MainMenuRoot {
         // Spawn MainMenuRoot
         let entity = world.spawn((MainMenuRoot, node)).set_parent(parent).id();
 
-        // Build main menu
+        // Build Sub-Menus
         MainMenu::build(entity, world);
         MultiplayerMenu::build(entity, world);
         JoiningMenu::build(entity, world);
+
+        // Build BlockBackground
+        BlockBackground::build(entity, world);
     }
 }
 

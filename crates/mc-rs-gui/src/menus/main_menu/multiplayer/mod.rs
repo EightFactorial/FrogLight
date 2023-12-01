@@ -16,8 +16,19 @@ impl MainMenuComponent for MultiplayerMenu {
 
 impl MenuComponent for MultiplayerMenu {
     fn setup(app: &mut App) {
-        app.add_systems(OnEnter(<Self as MainMenuComponent>::STATE), Self::show);
-        app.add_systems(OnExit(<Self as MainMenuComponent>::STATE), Self::hide);
+        app.add_systems(
+            OnEnter(<Self as MainMenuComponent>::STATE),
+            (Self::show, <Self as MainMenuComponent>::Background::show),
+        );
+        app.add_systems(
+            OnExit(<Self as MainMenuComponent>::STATE),
+            (Self::hide, <Self as MainMenuComponent>::Background::hide),
+        );
+
+        app.add_systems(
+            Update,
+            esc_pressed.run_if(in_state(MainMenuState::Multiplayer)),
+        );
 
         <Self as MainMenuComponent>::Background::setup(app);
     }
@@ -39,10 +50,15 @@ impl MenuComponent for MultiplayerMenu {
         };
 
         // Spawn MenuComponent
-        let entity = world.spawn((MultiplayerMenu, node)).id();
-        world.entity_mut(parent).add_child(entity);
+        world.spawn((MultiplayerMenu, node)).set_parent(parent);
+    }
+}
 
-        // Build background
-        <Self as MainMenuComponent>::Background::build(parent, world);
+fn esc_pressed(input: Res<Input<KeyCode>>, mut state: ResMut<NextState<MainMenuState>>) {
+    if input.just_pressed(KeyCode::Escape) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Esc pressed, returning to MainMenu");
+
+        state.set(MainMenuState::Main);
     }
 }

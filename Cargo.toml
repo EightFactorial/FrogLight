@@ -8,6 +8,8 @@ homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 
+# -- Workspace configuration --
+
 [workspace]
 resolver = "2"
 members = [
@@ -61,6 +63,8 @@ invalid_html_tags = "deny"
 needless_pass_by_value = "allow"
 dbg_macro = "deny"
 
+# -- Build configuration --
+
 # Optimize build scripts
 [profile.dev.build-override]
 opt-level = 3
@@ -100,6 +104,8 @@ incremental = false
 opt-level = 3
 strip = true
 lto = true
+
+# -- MC-RS crate configuration --
 
 [lints]
 workspace = true

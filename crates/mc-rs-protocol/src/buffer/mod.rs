@@ -77,8 +77,7 @@ impl PartialEq for EncodeError {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::TryInto(l0), Self::TryInto(r0)) => l0 == r0,
-            (Self::Io(_), Self::Io(_)) | (Self::Serde(_), Self::Serde(_)) => true,
-            _ => false,
+            (l0, r0) => std::mem::discriminant(l0) == std::mem::discriminant(r0),
         }
     }
 }
@@ -86,12 +85,11 @@ impl PartialEq for EncodeError {
 impl PartialEq for DecodeError {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::Io(_), Self::Io(_)) | (Self::Serde(_), Self::Serde(_)) => true,
             (Self::TryInto(l0), Self::TryInto(r0)) => l0 == r0,
             (Self::Boolean(l0), Self::Boolean(r0)) => l0 == r0,
             (Self::StringTooLong(l0), Self::StringTooLong(r0)) => l0 == r0,
             (Self::FromUtf8(l0), Self::FromUtf8(r0)) => l0 == r0,
-            _ => false,
+            (l0, r0) => std::mem::discriminant(l0) == std::mem::discriminant(r0),
         }
     }
 }
