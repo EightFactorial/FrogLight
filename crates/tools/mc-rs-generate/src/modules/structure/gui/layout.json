@@ -57,17 +57,23 @@
             "subtitles": {}
         },
         "inventory": {
+            "player": {
+                "character": {},
+                "crafting": {},
+                "inventory": {}
+            },
             "chest": {
                 "double": {},
+                "ender": {},
+                "shulker": {},
                 "single": {}
             },
             "furnace": {
                 "blast": {},
-                "normal": {},
+                "furnace": {},
                 "smoker": {}
             },
             "table": {
-                "anvil": {},
                 "cartography": {},
                 "crafting": {},
                 "enchanting": {},
@@ -77,9 +83,11 @@
                 "stonecutting": {}
             },
             "miscellaneous": {
+                "anvil": {},
                 "beacon": {},
                 "brewing": {},
                 "grindstone": {},
+                "hopper": {},
                 "horse": {},
                 "mule": {},
                 "villager": {}
