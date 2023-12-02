@@ -5,11 +5,11 @@ use mc_rs_extract::{modules::ExtractModule, Version};
 
 #[derive(Debug, Clone, PartialEq, Eq, Parser)]
 pub(crate) struct Args {
-    /// Whether to enable logging
+    /// Whether to disable logging
     ///
     /// By default, logging is enabled.
-    #[arg(short, long, default_value = "true", action = ArgAction::SetFalse)]
-    pub(crate) quiet: bool,
+    #[arg(short = 'q', long, default_value = "true", action = ArgAction::SetFalse)]
+    pub(crate) verbose: bool,
 
     /// Refresh the [`VersionManifest`](mc_rs_extract::VersionManifest)
     ///

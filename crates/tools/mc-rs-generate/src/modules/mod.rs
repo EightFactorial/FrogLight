@@ -6,7 +6,12 @@ use mc_rs_extract::{modules::ExtractModule, ModuleData};
 use strum::{Display, EnumIter};
 
 mod format;
-pub(crate) use format::FormatModule;
+use format::FormatModule;
+
+#[cfg(debug_assertions)]
+mod structure;
+#[cfg(debug_assertions)]
+use structure::GuiStructureModule;
 
 /// Modules that can be run to generate data.
 ///
@@ -19,6 +24,8 @@ pub(crate) use format::FormatModule;
 )]
 pub enum GenerateModule {
     Format,
+    #[cfg(debug_assertions)]
+    GuiStructure,
 }
 
 impl GenerateModule {
@@ -36,6 +43,8 @@ impl From<GenerateModule> for Box<dyn ModuleExt> {
     fn from(value: GenerateModule) -> Self {
         match value {
             GenerateModule::Format => Box::<FormatModule>::default(),
+            #[cfg(debug_assertions)]
+            GenerateModule::GuiStructure => Box::<GuiStructureModule>::default(),
         }
     }
 }

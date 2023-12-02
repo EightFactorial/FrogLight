@@ -19,7 +19,7 @@ async fn main() {
     let args = Args::parse();
 
     // Initialize tracing
-    if args.quiet {
+    if args.verbose {
         let builder = SubscriberBuilder::default().without_time().compact();
 
         let filter = EnvFilter::from_default_env()

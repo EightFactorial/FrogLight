@@ -50,7 +50,10 @@ impl VersionManifest {
             file.read_to_string(&mut contents).await?;
         }
 
-        Ok(serde_json::from_str(&contents)?)
+        let manifest: VersionManifest = serde_json::from_str(&contents)?;
+        debug!("{:?}", manifest.latest);
+
+        Ok(manifest)
     }
 
     /// Get the version data for a specific version.

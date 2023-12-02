@@ -15,7 +15,7 @@ path = "src/bin.rs"
 [dependencies]
 bitflags = "2.4"
 byteorder = "1.5"
-derive_more = { version = "0.99", default-features = false, features = ["constructor"] }
+derive_more = { version = "0.99", default-features = false, features = ["constructor", "display"] }
 linked-hash-map = "0.5"
 mutf8 = "0.5"
 thiserror = "1.0"

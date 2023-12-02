@@ -1,0 +1,97 @@
+{
+    "app_loading": {
+        "background": {
+            "cube_file": {}
+        },
+        "logo_file": {},
+        "progress_file": {}
+    },
+    "app_menus": {
+        "main_menu": {
+            "background": {},
+            "buttons": {},
+            "title": {},
+            "messages": {
+                "left_file": {},
+                "right_file": {}
+            }
+        },
+        "multiplayer": {
+            "background": {},
+            "buttons": {},
+            "servers": {
+                "icon_file": {},
+                "connection_file": {},
+                "ping_file": {},
+                "players_file": {},
+                "status_file": {},
+                "title_file": {},
+                "version_file": {}
+            }
+        },
+        "options": {
+            "background_file": {},
+            "buttons_file": {},
+            "menus": {
+                "audio": {},
+                "controls": {},
+                "resourcepacks": {},
+                "video": {}
+            }
+        }
+    },
+    "app_ingame": {
+        "hud": {
+            "chat": {},
+            "crosshair": {},
+            "hotbar": {
+                "experience": {},
+                "inventory": {},
+                "status": {
+                    "breath_file": {},
+                    "armor_file": {},
+                    "health_file": {},
+                    "hunger_file": {}
+                }
+            },
+            "subtitles": {}
+        },
+        "inventory": {
+            "chest": {
+                "double": {},
+                "single": {}
+            },
+            "furnace": {
+                "blast": {},
+                "normal": {},
+                "smoker": {}
+            },
+            "table": {
+                "anvil": {},
+                "cartography": {},
+                "crafting": {},
+                "enchanting": {},
+                "fleching": {},
+                "loom": {},
+                "smithing": {},
+                "stonecutting": {}
+            },
+            "miscellaneous": {
+                "beacon": {},
+                "brewing": {},
+                "grindstone": {},
+                "horse": {},
+                "mule": {},
+                "villager": {}
+            }
+        },
+        "pause": {
+            "background_file": {},
+            "buttons_file": {}
+        }
+    },
+    "notifications": {
+        "advancement": {},
+        "notice": {}
+    }
+}

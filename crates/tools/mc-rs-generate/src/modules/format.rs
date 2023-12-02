@@ -11,10 +11,12 @@ use super::ModuleExt;
 pub(crate) struct FormatModule;
 
 impl ModuleExt for FormatModule {
-    fn run(&self, _data: &ModuleData, _repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
-        Box::pin(async {
+    fn run(&self, _data: &ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
+        let dir = repo.path().parent().unwrap().to_path_buf();
+
+        Box::pin(async move {
             let mut command = Command::new("cargo");
-            command.arg("fmt").arg("--all");
+            command.current_dir(dir).arg("fmt").arg("--all");
 
             let mut child = match command.spawn() {
                 Ok(child) => child,
