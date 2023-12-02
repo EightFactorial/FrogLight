@@ -8,9 +8,7 @@ use strum::{Display, EnumIter};
 mod format;
 use format::FormatModule;
 
-#[cfg(debug_assertions)]
 mod structure;
-#[cfg(debug_assertions)]
 use structure::GuiStructureModule;
 
 /// Modules that can be run to generate data.
@@ -24,7 +22,6 @@ use structure::GuiStructureModule;
 )]
 pub enum GenerateModule {
     Format,
-    #[cfg(debug_assertions)]
     GuiStructure,
 }
 
@@ -43,7 +40,6 @@ impl From<GenerateModule> for Box<dyn ModuleExt> {
     fn from(value: GenerateModule) -> Self {
         match value {
             GenerateModule::Format => Box::<FormatModule>::default(),
-            #[cfg(debug_assertions)]
             GenerateModule::GuiStructure => Box::<GuiStructureModule>::default(),
         }
     }
