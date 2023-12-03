@@ -15,6 +15,9 @@ pub struct MainMenuNodeComponent;
 
 impl MenuComponent for MainMenuNodeComponent {
     fn setup(app: &mut App) {
+        app.add_systems(OnEnter(MainMenuState::MainMenu), Self::show);
+        app.add_systems(OnExit(MainMenuState::MainMenu), Self::hide);
+
         buttons::ButtonsNodeComponent::setup(app);
         background::BackgroundNodeComponent::setup(app);
         title::TitleNodeComponent::setup(app);

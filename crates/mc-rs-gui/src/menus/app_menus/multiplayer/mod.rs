@@ -14,6 +14,9 @@ pub struct MultiplayerNodeComponent;
 
 impl MenuComponent for MultiplayerNodeComponent {
     fn setup(app: &mut App) {
+        app.add_systems(OnEnter(MainMenuState::Multiplayer), Self::show);
+        app.add_systems(OnExit(MainMenuState::Multiplayer), Self::hide);
+
         buttons::ButtonsNodeComponent::setup(app);
         background::BackgroundNodeComponent::setup(app);
         servers::ServersNodeComponent::setup(app);

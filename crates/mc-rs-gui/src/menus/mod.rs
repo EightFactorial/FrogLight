@@ -5,11 +5,11 @@ use traits::MenuComponent;
 
 use crate::{menus::resources::MenuResources, resources::camera::DefaultCamera};
 
-use self::states::assets::AssetLoadingState;
-
 pub mod resources;
+pub mod shaders;
 
 pub mod states;
+use states::assets::AssetLoadingState;
 
 pub mod app_ingame;
 pub mod app_loading;
@@ -23,6 +23,7 @@ impl MenusNodeComponent {
     pub(super) fn setup(app: &mut App) {
         states::setup(app);
         resources::setup(app);
+        shaders::setup(app);
 
         app.add_systems(Startup, Self::create_cameras);
 

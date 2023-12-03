@@ -14,6 +14,9 @@ pub struct OptionsNodeComponent;
 
 impl MenuComponent for OptionsNodeComponent {
     fn setup(app: &mut App) {
+        app.add_systems(OnEnter(MainMenuState::Options), Self::show);
+        app.add_systems(OnExit(MainMenuState::Options), Self::hide);
+
         menus::MenusNodeComponent::setup(app);
         buttons::ButtonsNodeComponent::setup(app);
         background::BackgroundNodeComponent::setup(app);
