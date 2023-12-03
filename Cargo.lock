@@ -3959,6 +3959,7 @@ dependencies = [
  "prettyplease",
  "proc-macro2",
  "quote",
+ "reqwest",
  "serde",
  "serde_json",
  "strum",
@@ -3966,6 +3967,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "zip",
 ]
 
 [[package]]

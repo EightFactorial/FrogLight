@@ -152,7 +152,7 @@ async fn main() {
     info!("");
     for m in generate_modules {
         info!("Running {m}");
-        m.run(&data, &repo).await;
+        m.run(&mut data, &repo).await;
         info!("");
     }
     info!("Done!");

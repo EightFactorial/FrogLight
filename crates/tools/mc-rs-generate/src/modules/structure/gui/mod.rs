@@ -17,7 +17,7 @@ impl GuiStructureModule {
 }
 
 impl ModuleExt for GuiStructureModule {
-    fn run(&self, _data: &ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
+    fn run(&self, _data: &mut ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
         // Get the path to the menus folder.
         let mut dir = repo.path().parent().unwrap().to_path_buf();
         dir.push("crates/mc-rs-gui/src/menus");

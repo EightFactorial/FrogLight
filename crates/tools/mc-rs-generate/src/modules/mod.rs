@@ -11,6 +11,9 @@ use format::FormatModule;
 mod structure;
 use structure::GuiStructureModule;
 
+mod resourcepack;
+use resourcepack::ResourcePackModule;
+
 /// Modules that can be run to generate data.
 ///
 /// This enum is used to specify which modules to run on a given version of Minecraft.
@@ -22,6 +25,7 @@ use structure::GuiStructureModule;
 )]
 pub enum GenerateModule {
     Format,
+    ResourcePack,
     GuiStructure,
 }
 
@@ -30,8 +34,8 @@ impl GenerateModule {
     pub fn deps(self) -> &'static [ExtractModule] { Box::<dyn ModuleExt>::from(self).deps() }
 
     /// Generate the data for this module.
-    pub fn run(self, data: &ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
-        Box::<dyn ModuleExt>::from(self).run(data, repo)
+    pub async fn run<'a>(self, data: &'a mut ModuleData, repo: &'a Repository) {
+        Box::<dyn ModuleExt>::from(self).run(data, repo).await
     }
 }
 
@@ -40,6 +44,7 @@ impl From<GenerateModule> for Box<dyn ModuleExt> {
     fn from(value: GenerateModule) -> Self {
         match value {
             GenerateModule::Format => Box::<FormatModule>::default(),
+            GenerateModule::ResourcePack => Box::<ResourcePackModule>::default(),
             GenerateModule::GuiStructure => Box::<GuiStructureModule>::default(),
         }
     }
@@ -51,5 +56,9 @@ trait ModuleExt {
     fn deps(&self) -> &'static [ExtractModule] { &[] }
 
     /// Runs the module's code generator.
-    fn run(&self, data: &ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>>;
+    fn run<'a>(
+        &'a self,
+        data: &'a mut ModuleData,
+        repo: &'a Repository,
+    ) -> Pin<Box<dyn Future<Output = ()> + 'a>>;
 }

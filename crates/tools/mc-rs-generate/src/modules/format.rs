@@ -11,7 +11,7 @@ use super::ModuleExt;
 pub(crate) struct FormatModule;
 
 impl ModuleExt for FormatModule {
-    fn run(&self, _data: &ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
+    fn run(&self, _data: &mut ModuleData, repo: &Repository) -> Pin<Box<dyn Future<Output = ()>>> {
         let dir = repo.path().parent().unwrap().to_path_buf();
 
         Box::pin(async move {
