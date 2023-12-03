@@ -1,14 +1,14 @@
 {
     "app_loading": {
-        "background": {
-            "cube_file": {}
-        },
+        "background_file": {},
         "logo_file": {},
         "progress_file": {}
     },
     "app_menus": {
         "main_menu": {
-            "background": {},
+            "background": {
+                "cube_file": {}
+            },
             "buttons": {},
             "title": {},
             "messages": {

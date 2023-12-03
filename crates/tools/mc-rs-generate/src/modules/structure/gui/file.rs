@@ -128,6 +128,13 @@ fn impl_menu(file: &mut File, comp_name: &str, dir_name: &str, folder: &Folder) 
     let mut setup_tokens = TokenStream::new();
     let mut build_tokens = TokenStream::new();
 
+    // Add the debug message.
+    let debug_message = format!("Building {comp_name}");
+    build_tokens.extend(quote! {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        trace!(#debug_message);
+    });
+
     // Add the node bundle.
     build_tokens.extend(quote! {
         let node = NodeBundle {
@@ -156,7 +163,7 @@ fn impl_menu(file: &mut File, comp_name: &str, dir_name: &str, folder: &Folder) 
             let module_name = name.trim_end_matches("_file");
             let module_ident = Ident::new(module_name, Span::call_site());
 
-            let component_name = component_name(name, dir_name);
+            let component_name = component_name(module_name, dir_name);
             let component_ident = Ident::new(&component_name, Span::call_site());
 
             // Add child systems.

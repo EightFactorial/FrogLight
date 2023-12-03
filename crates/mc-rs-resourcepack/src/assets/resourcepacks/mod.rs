@@ -6,7 +6,7 @@ use compact_str::CompactString;
 use mc_rs_core::ResourceLocation;
 
 mod traits;
-pub use traits::TextureFromWorld;
+pub use traits::AssetFromWorld;
 
 use crate::pack::ResourcePackAsset;
 

@@ -1,8 +1,7 @@
 use bevy::prelude::*;
+use menus::MenusNodeComponent;
 
 pub mod menus;
-use menus::{loading::LoadingMenuRoot, MenuRoot};
-
 pub mod resources;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -13,7 +12,6 @@ impl Plugin for GuiPlugin {
         resources::setup(app);
 
         // Setup menus
-        MenuRoot::setup(app);
-        LoadingMenuRoot::setup(app);
+        MenusNodeComponent::setup(app);
     }
 }

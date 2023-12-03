@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use compact_str::CompactString;
-use mc_rs_gui::menus::state::GuiLoadState;
+use mc_rs_gui::menus::states::assets::AssetLoadingState;
 use mc_rs_resourcepack::assets::resourcepacks::{ResourcePackContainer, ResourcePacks};
 use serde::{Deserialize, Serialize};
 
@@ -33,7 +33,7 @@ impl ResourcePackSettings {
         assets: Res<AssetServer>,
 
         mut packs: ResMut<ResourcePacks>,
-        mut state: ResMut<NextState<GuiLoadState>>,
+        mut state: ResMut<NextState<AssetLoadingState>>,
     ) {
         let should_reload =
         // Reload if the length has changed
@@ -71,7 +71,7 @@ impl ResourcePackSettings {
             }
 
             // Reload the textures
-            state.set(GuiLoadState::LoadingResourcePacks);
+            state.set(AssetLoadingState::Unloaded);
         }
     }
 }

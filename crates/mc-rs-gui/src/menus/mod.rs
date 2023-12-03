@@ -1,135 +1,96 @@
-use std::fmt::Debug;
-
-use bevy::{asset::RecursiveDependencyLoadState, ecs::query::QuerySingleError, prelude::*};
-
-pub mod loading;
-pub mod state;
-
-pub mod game;
-// use game::GameMenuRoot;
-
-pub mod main_menu;
-use main_menu::MainMenuRoot;
-
-pub mod settings;
-use settings::SettingsMenuRoot;
+use bevy::{ecs::query::QuerySingleError, prelude::*};
 
 mod traits;
 use traits::MenuComponent;
 
-use crate::resources::camera::DefaultCamera;
+use crate::{menus::resources::MenuResources, resources::camera::DefaultCamera};
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
-pub struct MenuRoot;
+use self::states::assets::AssetLoadingState;
 
-impl MenuRoot {
-    /// Setup the [MenuRoot] and all of its submenus's systems.
+pub mod resources;
+
+pub mod states;
+
+pub mod app_ingame;
+pub mod app_loading;
+pub mod app_menus;
+pub mod notifications;
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub struct MenusNodeComponent;
+
+impl MenusNodeComponent {
     pub(super) fn setup(app: &mut App) {
-        app.init_resource::<MenuResources>();
+        states::setup(app);
+        resources::setup(app);
 
-        app.add_systems(
-            Startup,
-            (MenuRoot::create_camera2d, MenuRoot::create_camera3d),
-        );
+        app.add_systems(Startup, Self::create_cameras);
 
-        state::setup(app);
+        app.add_systems(OnEnter(AssetLoadingState::Finished), Self::build);
 
-        // Add submenu systems
-        MainMenuRoot::setup(app);
-        SettingsMenuRoot::setup(app);
+        app_ingame::AppIngameNodeComponent::setup(app);
+        app_loading::AppLoadingNodeComponent::setup(app);
+        app_menus::AppMenusNodeComponent::setup(app);
+        notifications::NotificationsNodeComponent::setup(app);
     }
 
-    /// Build the [MenuRoot] and all of its submenus.
+    /// Builds the [`MenusNodeComponent`] entity.
     fn build(world: &mut World) {
-        #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Building MenuRoot");
-
-        // Clear the MenuResources
+        // Clear the menu resources.
         world.resource_mut::<MenuResources>().clear();
 
-        // Get/Spawn the MenuRoot entity
-        let entity = Self::get_or_spawn(world);
-        let mut entity_mut = world.entity_mut(entity);
-        entity_mut.despawn_descendants().insert(NodeBundle {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Building MenusNodeComponent");
+
+        let node = NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
                 ..Default::default()
             },
+            visibility: Visibility::Visible,
             ..Default::default()
-        });
+        };
+        let entity = Self::spawn_or_despawn_children(world).insert(node).id();
 
-        // Build submenus
-        MainMenuRoot::build(entity, world);
-        SettingsMenuRoot::build(entity, world);
+        // Build the menus.
+        app_ingame::AppIngameNodeComponent::build(entity, world);
+        app_menus::AppMenusNodeComponent::build(entity, world);
+        notifications::NotificationsNodeComponent::build(entity, world);
     }
 
-    /// Get the [`MenuRoot`] [Entity], or spawn one if it doesn't exist.
-    fn get_or_spawn(world: &mut World) -> Entity {
-        match world
-            .query_filtered::<Entity, With<MenuRoot>>()
-            .get_single(world)
-        {
-            Ok(entity) => entity,
+    /// Creates a [`MenusNodeComponent`] entity if one does not exist, and despawns all of its
+    /// children.
+    fn spawn_or_despawn_children(world: &mut World) -> EntityWorldMut {
+        let mut query = world.query_filtered::<Entity, With<MenusNodeComponent>>();
+        match query.get_single(world) {
+            Ok(entity) => {
+                let mut entity = world.entity_mut(entity);
+                entity.despawn_descendants();
+
+                entity
+            }
             Err(err) => {
-                // If there are multiple MenuRoot entities, despawn them all and spawn a new one
                 if let QuerySingleError::MultipleEntities(_) = err {
-                    #[cfg(any(debug_assertions, feature = "debug"))]
-                    error!("Multiple MenuRoot entities found, despawning all");
+                    error!("Multiple MenusNodeComponent entities found!");
 
-                    let entities = world
-                        .query_filtered::<Entity, With<MenuRoot>>()
-                        .iter(world)
-                        .collect::<Vec<_>>();
-
-                    entities.into_iter().for_each(|entity| {
-                        world.entity_mut(entity).despawn_recursive();
-                    });
+                    // Despawn all of the entities.
+                    let entities = query.iter(world).collect::<Vec<_>>();
+                    entities
+                        .into_iter()
+                        .for_each(|ent| world.entity_mut(ent).despawn_recursive())
                 }
 
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                debug!("Spawning MenuRoot");
-
-                world.spawn(MenuRoot).id()
+                // Spawn a new entity.
+                world.spawn(Self)
             }
         }
     }
 
-    /// Create a new [Camera2d] entity.
-    fn create_camera2d(mut commands: Commands) {
-        #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Creating Camera2d");
-
-        commands.spawn(DefaultCamera::default_camera2d());
-    }
-
-    /// Create a new [Camera3d] entity.
-    fn create_camera3d(mut commands: Commands) {
-        #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Creating Camera3d");
-
+    /// Creates the default cameras.
+    fn create_cameras(mut commands: Commands) {
         commands.spawn(DefaultCamera::default_camera3d());
-    }
-}
-
-/// A collection of handles to resources used by the menus.
-///
-/// This is used to ensure that all of the resources are loaded
-/// before the menus are built and shown.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
-pub struct MenuResources(pub Vec<UntypedHandle>);
-
-impl MenuResources {
-    /// Returns true if all of the resources are loaded.
-    fn loaded(res: Res<MenuResources>, assets: Res<AssetServer>) -> bool {
-        res.iter().all(|handle| {
-            let state = assets.get_recursive_dependency_load_state(handle.id());
-
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            debug!("MenuResource Asset {:?}: {state:?}", handle.id());
-
-            matches!(state, None | Some(RecursiveDependencyLoadState::Loaded))
-        })
+        commands.spawn(DefaultCamera::default_camera2d());
     }
 }
