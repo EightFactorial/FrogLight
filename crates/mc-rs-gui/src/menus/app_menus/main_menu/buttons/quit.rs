@@ -75,7 +75,7 @@ impl MenuComponent for QuitButtonComponent {
 
         let font_style = world.resource::<DefaultTextStyle>().clone();
         world
-            .spawn(TextBundle::from_section("Quit", font_style.into()))
+            .spawn(TextBundle::from_section("Quit Game", font_style.into()))
             .set_parent(background);
     }
 }

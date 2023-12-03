@@ -8,14 +8,15 @@ use super::DefaultFonts;
 #[derive(Debug, Default, Clone, Deref, DerefMut, Resource)]
 pub struct DefaultTextStyle(pub TextStyle);
 
-/// A component that can be added to a [`Text`] entity to ignore the [`DefaultTextStyle`].
+/// A component that can be added to a [`Text`] entity to
+/// ignore the [`DefaultTextStyle`]'s automatic updates.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Component)]
 pub struct IgnoreDefaultTextStyle;
 
 impl DefaultTextStyle {
     // TODO: Get the actual formula for this.
     #[allow(clippy::cast_precision_loss)]
-    pub(super) fn font_size(scale: &GuiScale) -> f32 { 8.0 + (scale.value() * 8) as f32 }
+    pub(super) fn font_size(scale: &GuiScale) -> f32 { 6.0 + (scale.value() * 7) as f32 }
 
     /// Initialize the [`DefaultTextStyle`] resource.
     #[allow(clippy::needless_pass_by_value)]

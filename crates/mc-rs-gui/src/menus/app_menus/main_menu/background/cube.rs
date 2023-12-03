@@ -47,7 +47,7 @@ impl BackgroundCubeComponent {
 
     pub(super) fn build(world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Building CubemapBackground");
+        debug!("Building BackgroundCubeComponent");
 
         // Create cube mesh
         let mesh = Self::correct_uvs(Mesh::from(shape::Cube::new(1.0)));
@@ -70,7 +70,7 @@ impl BackgroundCubeComponent {
         world.add_menu_resource(material.clone().untyped());
         world.add_menu_resource(mesh.clone().untyped());
 
-        // Spawn CubemapBackground
+        // Spawn BackgroundCubeComponent
         world.spawn((
             BackgroundCubeComponent,
             PbrBundle {
@@ -142,6 +142,7 @@ impl BackgroundCubeComponent {
             || images.windows(2).any(|images| {
                 // Get the image handles
                 let (Some(a), Some(b)) = (images[0], images[1]) else {
+                    // Return fallback if the images are missing
                     return true;
                 };
 
@@ -153,6 +154,7 @@ impl BackgroundCubeComponent {
                     // Compare the sizes, return fallback if they are different
                     a.size() != b.size()
                 } else {
+                    // Return fallback if the images are missing
                     true
                 }
             })
