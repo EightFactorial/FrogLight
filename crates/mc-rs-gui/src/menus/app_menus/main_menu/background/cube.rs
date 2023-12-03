@@ -89,7 +89,7 @@ impl BackgroundCubeComponent {
         time: Res<Time<Real>>,
         mut query: Query<&mut Transform, With<BackgroundCubeComponent>>,
     ) {
-        let rads = (time.delta_seconds() / 30.0).clamp(0.0, 0.005);
+        let rads = (time.delta_seconds() / 30.0).clamp(0.0, 0.01);
         let rotation = Quat::from_rotation_y(rads);
 
         query.iter_mut().for_each(|mut transform| {

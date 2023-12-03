@@ -1,7 +1,4 @@
-use bevy::{
-    prelude::*,
-    window::{PrimaryWindow, WindowResized},
-};
+use bevy::{prelude::*, window::PrimaryWindow};
 use mc_rs_resourcepack::assets::resourcepacks::AssetFromWorld;
 
 use crate::{
@@ -21,10 +18,7 @@ impl MenuComponent for BackgroundNodeComponent {
     fn setup(app: &mut App) {
         app.add_systems(
             Update,
-            (
-                Self::pressed_escape,
-                Self::scale_background.run_if(on_event::<WindowResized>()),
-            )
+            Self::pressed_escape
                 .in_set(MenuComponentMenusSet)
                 .run_if(in_state(MainMenuState::Multiplayer)),
         );
@@ -60,14 +54,10 @@ impl MenuComponent for BackgroundNodeComponent {
             .query_filtered::<&Window, With<PrimaryWindow>>()
             .single(world);
         let (width, height) = (window.width(), window.height());
-        let scaler = Self::get_scale(world.resource::<GuiScale>().value());
+        let scaler = BlockBackgroundMaterial::get_scale(world.resource::<GuiScale>().value());
 
         // Create the material.
-        let material = BlockBackgroundMaterial {
-            scale_x: width / scaler,
-            scale_y: height / scaler,
-            texture: block,
-        };
+        let material = BlockBackgroundMaterial::with_scale(block, width / scaler, height / scaler);
         let material = world
             .resource_mut::<Assets<BlockBackgroundMaterial>>()
             .add(material);
@@ -98,31 +88,4 @@ impl BackgroundNodeComponent {
             state.set(MainMenuState::MainMenu);
         }
     }
-
-    /// Scales the background to fit the window, accounting for the GUI scale.
-    fn scale_background(
-        query: Query<&Window, With<PrimaryWindow>>,
-        gui_scale: Res<GuiScale>,
-
-        mut materials: ResMut<Assets<BlockBackgroundMaterial>>,
-    ) {
-        let Ok(window) = query.get_single() else {
-            error!("Failed to get the primary window");
-            return;
-        };
-
-        // Calculate the scaling factor.
-        let scaler = Self::get_scale(gui_scale.value());
-        let scale_width = window.width() / scaler;
-        let scale_height = window.height() / scaler;
-
-        // Update the materials.
-        for (_, mat) in materials.iter_mut() {
-            mat.scale_x = scale_width;
-            mat.scale_y = scale_height;
-        }
-    }
-
-    /// Calculates the scale of the background based on the GUI scale.
-    fn get_scale(gui_scale: u32) -> f32 { 32.0 + (gui_scale as f32 - 1.0) * 16.0 }
 }
