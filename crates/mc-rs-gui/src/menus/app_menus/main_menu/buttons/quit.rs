@@ -10,7 +10,7 @@ use crate::{
         states::menus::MenuComponentMenusSet,
         traits::{AddMenuResource, MenuComponent},
     },
-    resources::{font::DefaultTextStyle, scale::GuiScaleComponent},
+    resources::{font::shadows::TextShadow, scale::GuiScaleComponent},
 };
 
 use super::ButtonsNodeComponent;
@@ -73,10 +73,7 @@ impl MenuComponent for QuitButtonComponent {
             .set_parent(button)
             .id();
 
-        let font_style = world.resource::<DefaultTextStyle>().clone();
-        world
-            .spawn(TextBundle::from_section("Quit Game", font_style.into()))
-            .set_parent(background);
+        TextShadow::create_text_with_shadow("Quit Game", background, world);
     }
 }
 

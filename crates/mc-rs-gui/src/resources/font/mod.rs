@@ -6,6 +6,8 @@ pub use default_style::{DefaultTextStyle, IgnoreDefaultTextStyle};
 mod fonts;
 pub use fonts::DefaultFonts;
 
+pub mod shadows;
+
 use super::scale::GuiScaleEvent;
 
 pub(super) fn setup(app: &mut App) {
@@ -34,4 +36,6 @@ pub(super) fn setup(app: &mut App) {
         )
             .chain(),
     );
+
+    shadows::setup(app);
 }

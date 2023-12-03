@@ -77,7 +77,7 @@ impl BackgroundCubeComponent {
                 mesh,
                 material,
                 visibility: world.get_visibility(MainMenuState::MainMenu),
-                // Flip the cube so that the inside is right-side-up
+                // Flip the cube so that the front is facing the camera
                 transform: Transform::from_rotation(Quat::from_rotation_x(180f32.to_radians())),
                 ..Default::default()
             },

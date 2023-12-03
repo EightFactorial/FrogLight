@@ -1,6 +1,9 @@
 use bevy::{prelude::*, text::BreakLineOn};
 
-use crate::{menus::traits::MenuComponent, resources::font::DefaultTextStyle};
+use crate::{
+    menus::traits::MenuComponent,
+    resources::font::{shadows::TextShadow, DefaultTextStyle},
+};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct RightNodeComponent;
@@ -30,6 +33,14 @@ impl MenuComponent for RightNodeComponent {
             .id();
 
         let style: TextStyle = world.resource::<DefaultTextStyle>().clone().into();
+        let text = Text {
+            sections: vec![TextSection {
+                value: String::from("TODO: Copyright Notice"),
+                style,
+            }],
+            alignment: TextAlignment::Right,
+            linebreak_behavior: BreakLineOn::WordBoundary,
+        };
 
         world
             .spawn(TextBundle {
@@ -41,15 +52,12 @@ impl MenuComponent for RightNodeComponent {
                     },
                     ..Default::default()
                 },
-                text: Text {
-                    sections: vec![TextSection {
-                        value: String::from("TODO: Copyright Notice"),
-                        style,
-                    }],
-                    alignment: TextAlignment::Right,
-                    linebreak_behavior: BreakLineOn::WordBoundary,
-                },
+                text: text.clone(),
+                z_index: ZIndex::Global(i32::MAX - 128),
                 ..Default::default()
+            })
+            .with_children(|node| {
+                node.spawn(TextShadow::create_shadow_text_bundle(text));
             })
             .set_parent(node);
     }

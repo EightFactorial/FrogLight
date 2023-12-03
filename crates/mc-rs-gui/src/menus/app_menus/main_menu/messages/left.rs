@@ -1,6 +1,9 @@
 use bevy::{prelude::*, text::BreakLineOn};
 
-use crate::{menus::traits::MenuComponent, resources::font::DefaultTextStyle};
+use crate::{
+    menus::traits::MenuComponent,
+    resources::font::{shadows::TextShadow, DefaultTextStyle},
+};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct LeftNodeComponent;
@@ -29,20 +32,34 @@ impl MenuComponent for LeftNodeComponent {
             .set_parent(parent)
             .id();
 
-        let value: String;
-        #[cfg(any(debug_assertions, feature = "debug"))]
-        {
-            value = format!("MC-RS v{} - Nightly", env!("CARGO_PKG_VERSION"),);
-        }
-        #[cfg(not(any(debug_assertions, feature = "debug")))]
-        {
-            value = format!("MC-RS v{}", env!("CARGO_PKG_VERSION"));
-        }
-
         let style: TextStyle = world.resource::<DefaultTextStyle>().clone().into();
-
-        let mut style_but_red = style.clone();
-        style_but_red.color = Color::CRIMSON;
+        let text = Text {
+            sections: vec![
+                TextSection {
+                    value: String::from("Extreme Alpha!\n"),
+                    style: {
+                        let mut style = style.clone();
+                        style.color = Color::CRIMSON;
+                        style
+                    },
+                },
+                TextSection {
+                    value: {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        {
+                            format!("MC-RS v{} - Nightly", env!("CARGO_PKG_VERSION"))
+                        }
+                        #[cfg(not(any(debug_assertions, feature = "debug")))]
+                        {
+                            format!("MC-RS v{}", env!("CARGO_PKG_VERSION"))
+                        }
+                    },
+                    style,
+                },
+            ],
+            alignment: TextAlignment::Left,
+            linebreak_behavior: BreakLineOn::WordBoundary,
+        };
 
         world
             .spawn(TextBundle {
@@ -54,18 +71,12 @@ impl MenuComponent for LeftNodeComponent {
                     },
                     ..Default::default()
                 },
-                text: Text {
-                    sections: vec![
-                        TextSection {
-                            value: String::from("Extreme Alpha!\n"),
-                            style: style_but_red,
-                        },
-                        TextSection { value, style },
-                    ],
-                    alignment: TextAlignment::Left,
-                    linebreak_behavior: BreakLineOn::WordBoundary,
-                },
+                text: text.clone(),
+                z_index: ZIndex::Global(i32::MAX - 128),
                 ..Default::default()
+            })
+            .with_children(|node| {
+                node.spawn(TextShadow::create_shadow_text_bundle(text));
             })
             .set_parent(node);
     }

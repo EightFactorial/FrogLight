@@ -25,6 +25,9 @@ pub(super) fn setup(app: &mut App) {
     );
 }
 
+/// An enum of the different menus that can be shown.
+///
+/// This is used to determine which [`SystemSet`] to run.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, States)]
 pub enum MenuComponentState {
     #[default]
@@ -32,6 +35,7 @@ pub enum MenuComponentState {
     InGame,
 }
 
+/// A [`SystemSet`] that runs when the [`MenuComponentState`] is [`MenuComponentState::Menus`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct MenuComponentMenusSet;
 
@@ -42,6 +46,7 @@ impl MenuComponentMenusSet {
     }
 }
 
+/// A [`SystemSet`] that runs when the [`MenuComponentState`] is [`MenuComponentState::InGame`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct MenuComponentInGameSet;
 

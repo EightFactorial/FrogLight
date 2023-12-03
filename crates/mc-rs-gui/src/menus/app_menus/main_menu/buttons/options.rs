@@ -10,7 +10,10 @@ use crate::{
         states::menus::MenuComponentMenusSet,
         traits::{AddMenuResource, MenuComponent},
     },
-    resources::{font::DefaultTextStyle, scale::GuiScaleComponent},
+    resources::{
+        font::{shadows::TextShadow, DefaultTextStyle},
+        scale::GuiScaleComponent,
+    },
 };
 
 use super::ButtonsNodeComponent;
@@ -73,10 +76,11 @@ impl MenuComponent for OptionsButtonComponent {
             .set_parent(button)
             .id();
 
-        let font_style = world.resource::<DefaultTextStyle>().clone();
-        world
-            .spawn(TextBundle::from_section("Options", font_style.into()))
-            .set_parent(background);
+        let font_style: TextStyle = world.resource::<DefaultTextStyle>().clone().into();
+        let mut shadow_style = font_style.clone();
+        shadow_style.color = Color::BLACK;
+
+        TextShadow::create_text_with_shadow("Options", background, world);
     }
 }
 

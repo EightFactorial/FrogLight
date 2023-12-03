@@ -7,7 +7,10 @@ use crate::{
         states::menus::MenuComponentMenusSet,
         traits::{AddMenuResource, MenuComponent},
     },
-    resources::{font::DefaultTextStyle, scale::GuiScaleComponent},
+    resources::{
+        font::{shadows::TextShadow, DefaultTextStyle},
+        scale::GuiScaleComponent,
+    },
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
@@ -102,9 +105,12 @@ impl MenuComponent for TitleNodeComponent {
             .set_parent(outer_title);
 
         // Spawn the random splash text
-        // TODO: Get the random splash text
-        let mut style = world.resource::<DefaultTextStyle>().clone();
+        let value = String::from("TODO: Random Splash");
+
+        let mut style: TextStyle = world.resource::<DefaultTextStyle>().clone().into();
         style.color = Color::YELLOW;
+
+        let text = Text::from_section(value.clone(), style).with_alignment(TextAlignment::Center);
 
         world
             .spawn((
@@ -117,11 +123,14 @@ impl MenuComponent for TitleNodeComponent {
                         ..Default::default()
                     },
                     transform: Transform::from_rotation(Quat::from_rotation_z(-20f32.to_radians())),
-                    text: Text::from_section("TODO: Random Splash", style.into())
-                        .with_alignment(TextAlignment::Center),
+                    text: text.clone(),
+                    z_index: ZIndex::Global(i32::MAX - 128),
                     ..Default::default()
                 },
             ))
+            .with_children(|node| {
+                node.spawn(TextShadow::create_shadow_text_bundle(text));
+            })
             .set_parent(node);
     }
 }
