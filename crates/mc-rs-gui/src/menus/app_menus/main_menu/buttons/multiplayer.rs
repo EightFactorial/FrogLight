@@ -7,6 +7,7 @@ use crate::{
             main_menu::buttons::{MainMenuButtonAtlasComponent, MainMenuButtonTrigger},
             states::MainMenuState,
         },
+        states::menus::MenuComponentMenusSet,
         traits::{AddMenuResource, MenuComponent},
     },
     resources::{font::DefaultTextStyle, scale::GuiScaleComponent},
@@ -21,7 +22,7 @@ impl MenuComponent for MultiplayerButtonComponent {
     fn setup(app: &mut App) {
         app.add_systems(
             PreUpdate,
-            Self::pressed.run_if(
+            Self::pressed.in_set(MenuComponentMenusSet).run_if(
                 in_state(MainMenuState::MainMenu).and_then(ButtonsNodeComponent::any_interactions),
             ),
         );

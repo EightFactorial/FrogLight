@@ -8,6 +8,7 @@ use mc_rs_resourcepack::assets::resourcepacks::{AssetFromWorld, ResourcePacks};
 use crate::{
     menus::{
         app_menus::states::MainMenuState,
+        states::menus::MenuComponentMenusSet,
         traits::{AddMenuResource, InState},
     },
     resources::camera::DefaultCamera,
@@ -23,20 +24,25 @@ impl BackgroundCubeComponent {
             (
                 Self::show,
                 (DefaultCamera::enable_camera3d, Self::background_camera),
-            ),
+            )
+                .in_set(MenuComponentMenusSet),
         );
 
         app.add_systems(
             Update,
             Self::rotate_cube
+                .in_set(MenuComponentMenusSet)
                 .run_if(in_state(MainMenuState::MainMenu).and_then(any_with_component::<Self>())),
         );
 
         app.add_systems(
             OnExit(MainMenuState::MainMenu),
-            (Self::hide, DefaultCamera::disable_camera3d),
+            (Self::hide, DefaultCamera::disable_camera3d).in_set(MenuComponentMenusSet),
         );
-        app.add_systems(OnExit(ApplicationState::MainMenu), Self::destroy);
+        app.add_systems(
+            OnExit(ApplicationState::MainMenu),
+            Self::destroy.in_set(MenuComponentMenusSet),
+        );
     }
 
     pub(super) fn build(world: &mut World) {
@@ -83,7 +89,9 @@ impl BackgroundCubeComponent {
         time: Res<Time<Real>>,
         mut query: Query<&mut Transform, With<BackgroundCubeComponent>>,
     ) {
-        let rotation = Quat::from_rotation_y(time.delta_seconds() / 30.);
+        let rads = (time.delta_seconds() / 30.0).clamp(0.0, 0.005);
+        let rotation = Quat::from_rotation_y(rads);
+
         query.iter_mut().for_each(|mut transform| {
             transform.rotate(rotation);
         });

@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::menus::{
     app_menus::states::MainMenuState,
+    states::menus::MenuComponentMenusSet,
     traits::{InState, MenuComponent},
 };
 
@@ -14,8 +15,14 @@ pub struct MultiplayerNodeComponent;
 
 impl MenuComponent for MultiplayerNodeComponent {
     fn setup(app: &mut App) {
-        app.add_systems(OnEnter(MainMenuState::Multiplayer), Self::show);
-        app.add_systems(OnExit(MainMenuState::Multiplayer), Self::hide);
+        app.add_systems(
+            OnEnter(MainMenuState::Multiplayer),
+            Self::show.in_set(MenuComponentMenusSet),
+        );
+        app.add_systems(
+            OnExit(MainMenuState::Multiplayer),
+            Self::hide.in_set(MenuComponentMenusSet),
+        );
 
         buttons::ButtonsNodeComponent::setup(app);
         background::BackgroundNodeComponent::setup(app);
@@ -35,10 +42,12 @@ impl MenuComponent for MultiplayerNodeComponent {
             visibility: world.get_visibility(MainMenuState::Multiplayer),
             ..Default::default()
         };
+
         let entity = world
             .spawn((MultiplayerNodeComponent, node))
             .set_parent(parent)
             .id();
+
         buttons::ButtonsNodeComponent::build(entity, world);
         background::BackgroundNodeComponent::build(entity, world);
         servers::ServersNodeComponent::build(entity, world);

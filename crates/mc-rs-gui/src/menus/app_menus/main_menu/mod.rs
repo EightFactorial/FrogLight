@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::menus::{
     app_menus::states::MainMenuState,
+    states::menus::MenuComponentMenusSet,
     traits::{InState, MenuComponent},
 };
 
@@ -15,8 +16,14 @@ pub struct MainMenuNodeComponent;
 
 impl MenuComponent for MainMenuNodeComponent {
     fn setup(app: &mut App) {
-        app.add_systems(OnEnter(MainMenuState::MainMenu), Self::show);
-        app.add_systems(OnExit(MainMenuState::MainMenu), Self::hide);
+        app.add_systems(
+            OnEnter(MainMenuState::MainMenu),
+            Self::show.in_set(MenuComponentMenusSet),
+        );
+        app.add_systems(
+            OnExit(MainMenuState::MainMenu),
+            Self::hide.in_set(MenuComponentMenusSet),
+        );
 
         buttons::ButtonsNodeComponent::setup(app);
         background::BackgroundNodeComponent::setup(app);
@@ -40,10 +47,12 @@ impl MenuComponent for MainMenuNodeComponent {
             visibility: world.get_visibility(MainMenuState::MainMenu),
             ..Default::default()
         };
+
         let entity = world
             .spawn((MainMenuNodeComponent, node))
             .set_parent(parent)
             .id();
+
         buttons::ButtonsNodeComponent::build(entity, world);
         background::BackgroundNodeComponent::build(entity, world);
         title::TitleNodeComponent::build(entity, world);

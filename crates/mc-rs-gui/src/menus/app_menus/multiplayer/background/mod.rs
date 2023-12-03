@@ -8,6 +8,7 @@ use crate::{
     menus::{
         app_menus::states::MainMenuState,
         shaders::block_background::BlockBackgroundMaterial,
+        states::menus::MenuComponentMenusSet,
         traits::{AddMenuResource, MenuComponent},
     },
     resources::scale::GuiScale,
@@ -24,6 +25,7 @@ impl MenuComponent for BackgroundNodeComponent {
                 Self::pressed_escape,
                 Self::scale_background.run_if(on_event::<WindowResized>()),
             )
+                .in_set(MenuComponentMenusSet)
                 .run_if(in_state(MainMenuState::Multiplayer)),
         );
     }

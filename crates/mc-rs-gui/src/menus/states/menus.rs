@@ -4,7 +4,7 @@ pub(super) fn setup(app: &mut App) {
     app.add_state::<MenuComponentState>();
 
     app.configure_sets(
-        PreUpdate,
+        Update,
         (
             MenuComponentMenusSet.run_if(in_state(MenuComponentState::Menus)),
             MenuComponentInGameSet.run_if(in_state(MenuComponentState::InGame)),

@@ -27,6 +27,7 @@ impl MenuComponent for AppMenusNodeComponent {
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building AppMenusNodeComponent");
+
         let node = NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,

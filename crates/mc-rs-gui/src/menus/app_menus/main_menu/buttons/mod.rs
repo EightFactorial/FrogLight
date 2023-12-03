@@ -9,6 +9,7 @@ use mc_rs_resourcepack::assets::{
 
 use crate::menus::{
     app_menus::states::MainMenuState,
+    states::menus::MenuComponentMenusSet,
     traits::{AddMenuResource, MenuComponent},
 };
 
@@ -24,6 +25,7 @@ impl MenuComponent for ButtonsNodeComponent {
         app.add_systems(
             Update,
             (Self::button_state, Self::play_click)
+                .in_set(MenuComponentMenusSet)
                 .run_if(in_state(MainMenuState::MainMenu).and_then(Self::any_interactions)),
         );
 
