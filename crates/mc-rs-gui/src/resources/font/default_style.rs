@@ -67,6 +67,7 @@ impl DefaultTextStyle {
     }
 
     /// Updates the [`Text`] entity with the [`DefaultTextStyle`]'s font size
+    #[inline]
     pub fn set_text_style(&self, text: &mut Text) {
         text.sections
             .iter_mut()
@@ -74,6 +75,7 @@ impl DefaultTextStyle {
     }
 
     /// Updates the [`TextStyle`] with the [`DefaultTextStyle`]'s font size
+    #[inline]
     pub fn set_style(&self, style: &mut TextStyle) { style.font_size = self.font_size; }
 }
 
