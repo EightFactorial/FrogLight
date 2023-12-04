@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menus::states::menus::MenuComponentState;
+use crate::{menus::states::menus::MenuComponentState, resources::scale::GuiScaleEvent};
 
 use super::DefaultTextStyle;
 
@@ -8,7 +8,9 @@ pub(super) fn setup(app: &mut App) {
     app.add_systems(
         Update,
         TextShadow::update_shadows.run_if(
-            in_state(MenuComponentState::Menus).and_then(resource_changed::<DefaultTextStyle>()),
+            in_state(MenuComponentState::Menus).and_then(
+                resource_changed::<DefaultTextStyle>().or_else(on_event::<GuiScaleEvent>()),
+            ),
         ),
     );
 }
@@ -36,20 +38,17 @@ impl TextShadow {
         let text = Text::from_section(text, font_style);
 
         world
-            .spawn((
-                TextShadow,
-                TextBundle {
-                    style: Style {
-                        position_type: PositionType::Absolute,
-                        align_self: AlignSelf::Center,
-                        justify_self: JustifySelf::Center,
-                        ..Default::default()
-                    },
-                    text: text.clone(),
-                    z_index: ZIndex::Global(i32::MAX - 128),
+            .spawn(TextBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    align_self: AlignSelf::Center,
+                    justify_self: JustifySelf::Center,
                     ..Default::default()
                 },
-            ))
+                text: text.clone(),
+                z_index: ZIndex::Global(i32::MAX - 128),
+                ..Default::default()
+            })
             .with_children(|node| {
                 node.spawn(Self::create_shadow_text_bundle(text));
             })

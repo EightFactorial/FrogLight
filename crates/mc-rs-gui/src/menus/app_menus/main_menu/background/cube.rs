@@ -30,15 +30,26 @@ impl BackgroundCubeComponent {
 
         app.add_systems(
             Update,
-            Self::rotate_cube
-                .in_set(MenuComponentMenusSet)
-                .run_if(in_state(MainMenuState::MainMenu).and_then(any_with_component::<Self>())),
+            Self::rotate_cube.in_set(MenuComponentMenusSet).run_if(
+                in_state(MainMenuState::MainMenu)
+                    .or_else(in_state(MainMenuState::Multiplayer))
+                    .and_then(any_with_component::<Self>()),
+            ),
         );
 
         app.add_systems(
             OnExit(MainMenuState::MainMenu),
-            (Self::hide, DefaultCamera::disable_camera3d).in_set(MenuComponentMenusSet),
+            (Self::hide, DefaultCamera::disable_camera3d)
+                .in_set(MenuComponentMenusSet)
+                .run_if(not(in_state(MainMenuState::Multiplayer))),
         );
+        app.add_systems(
+            OnExit(MainMenuState::Multiplayer),
+            (Self::hide, DefaultCamera::disable_camera3d)
+                .in_set(MenuComponentMenusSet)
+                .run_if(not(in_state(MainMenuState::MainMenu))),
+        );
+
         app.add_systems(
             OnExit(ApplicationState::MainMenu),
             Self::destroy.in_set(MenuComponentMenusSet),

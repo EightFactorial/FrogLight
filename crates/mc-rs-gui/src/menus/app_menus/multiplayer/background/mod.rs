@@ -1,14 +1,7 @@
-use bevy::{prelude::*, window::PrimaryWindow};
-use mc_rs_resourcepack::assets::resourcepacks::AssetFromWorld;
+use bevy::prelude::*;
 
-use crate::{
-    menus::{
-        app_menus::states::MainMenuState,
-        shaders::block_background::BlockBackgroundMaterial,
-        states::menus::MenuComponentMenusSet,
-        traits::{AddMenuResource, MenuComponent},
-    },
-    resources::scale::GuiScale,
+use crate::menus::{
+    app_menus::states::MainMenuState, states::menus::MenuComponentMenusSet, traits::MenuComponent,
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
@@ -28,54 +21,23 @@ impl MenuComponent for BackgroundNodeComponent {
         #[cfg(any(debug_assertions, feature = "debug"))]
         trace!("Building BackgroundNodeComponent");
 
-        let node = NodeBundle {
-            style: Style {
-                position_type: PositionType::Absolute,
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        };
-
-        let node = world
-            .spawn((BackgroundNodeComponent, node))
-            .set_parent(parent)
-            .id();
-
-        // Get the menu background texture.
-        let block = world
-            .get_texture_or_fallback("minecraft:gui/light_dirt_background")
-            .clone();
-        world.add_menu_resource(block.clone().untyped());
-
-        // Get the primary window and its dimensions to scale the background.
-        let window = world
-            .query_filtered::<&Window, With<PrimaryWindow>>()
-            .single(world);
-        let (width, height) = (window.width(), window.height());
-        let scaler = BlockBackgroundMaterial::get_scale(world.resource::<GuiScale>().value());
-
-        // Create the material.
-        let material = BlockBackgroundMaterial::with_scale(block, width / scaler, height / scaler);
-        let material = world
-            .resource_mut::<Assets<BlockBackgroundMaterial>>()
-            .add(material);
-        world.add_menu_resource(material.clone().untyped());
-
         // Create the node.
         world
-            .spawn(MaterialNodeBundle::<BlockBackgroundMaterial> {
-                style: Style {
-                    position_type: PositionType::Absolute,
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
+            .spawn((
+                BackgroundNodeComponent,
+                NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        flex_direction: FlexDirection::Column,
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        ..Default::default()
+                    },
+                    background_color: Color::rgba(0.0, 0.0, 0.0, 0.5).into(),
                     ..Default::default()
                 },
-                material,
-                ..Default::default()
-            })
-            .set_parent(node);
+            ))
+            .set_parent(parent);
     }
 }
 
