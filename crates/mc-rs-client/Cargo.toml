@@ -42,5 +42,3 @@ debug_rapier = []
 
 # Enable simd features
 simd = ["mc-rs-core/simd", "mc-rs-gui/simd", "mc-rs-network/simd"]
-# !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-gui/simd_advanced", "mc-rs-network/simd_advanced"]

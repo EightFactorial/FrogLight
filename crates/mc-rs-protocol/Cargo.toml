@@ -43,5 +43,3 @@ debug = ["dep:tracing", "mc-rs-macros/debug"]
 
 # Enable simd features
 simd = []
-# !! Currently broken on the latest nightly !!
-simd_advanced = []

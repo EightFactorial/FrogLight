@@ -7,7 +7,6 @@ authors = ["EightFactorial"]
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
-
 # -- Workspace configuration --
 
 [workspace]
@@ -62,7 +61,6 @@ invalid_html_tags = "deny"
 #pedantic = "warn"
 needless_pass_by_value = "allow"
 dbg_macro = "deny"
-
 # -- Build configuration --
 
 # Optimize build scripts
@@ -104,7 +102,6 @@ incremental = false
 opt-level = 3
 strip = true
 lto = true
-
 # -- MC-RS crate configuration --
 
 [lints]
@@ -125,8 +122,6 @@ debug_rapier = ["mc-rs-client/debug_rapier"]
 
 # Enable simd features
 simd = ["mc-rs-client/simd"]
-# !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-client/simd_advanced"]
 
 # Enable wayland features
 wayland = ["bevy/wayland"]

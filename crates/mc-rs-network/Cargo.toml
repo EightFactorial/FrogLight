@@ -28,5 +28,3 @@ debug = ["mc-rs-core/debug", "mc-rs-protocol/debug"]
 
 # Enable simd features
 simd = ["mc-rs-core/simd", "mc-rs-protocol/simd"]
-# !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-protocol/simd_advanced"]

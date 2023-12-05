@@ -13,8 +13,11 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
+image = "0.24"
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
 mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
+# Wayland breaks for some reason :(
+winit = { version = "0.28", default-features = false, features = ["x11"] }
 
 [features]
 default = []
@@ -24,5 +27,3 @@ debug = ["mc-rs-core/debug", "mc-rs-resourcepack/debug"]
 
 # Enable simd features
 simd = ["mc-rs-core/simd", "mc-rs-resourcepack/simd"]
-# !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-resourcepack/simd_advanced"]

@@ -18,7 +18,7 @@ impl MenuComponent for BackgroundNodeComponent {
                 height: Val::Percent(100.0),
                 ..Default::default()
             },
-            background_color: Color::MIDNIGHT_BLUE.into(),
+            background_color: Color::BLACK.into(),
             ..Default::default()
         };
 

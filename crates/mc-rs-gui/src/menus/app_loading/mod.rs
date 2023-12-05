@@ -19,7 +19,7 @@ impl AppLoadingNodeComponent {
         app.add_systems(
             Update,
             LoadingFadeTimer::fade_in.run_if(
-                in_state(AssetLoadingState::Unloaded)
+                not(in_state(AssetLoadingState::Finished))
                     .and_then(resource_exists::<LoadingFadeTimer>())
                     .and_then(LoadingFadeTimer::is_fade_in),
             ),
@@ -149,13 +149,8 @@ impl LoadingFadeTimer {
                     *vis = Visibility::Hidden;
                 }
 
-                // Reset the alpha
                 color.0.set_a(1.0);
-
-                // Delete the timer
-                // commands.remove_resource::<LoadingFadeTimer>();
-
-                commands.insert_resource(LoadingFadeTimer::from(FadeTimerMode::FadeIn));
+                commands.remove_resource::<LoadingFadeTimer>();
             }
         }
     }

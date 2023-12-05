@@ -43,19 +43,27 @@ impl MenuComponent for RightNodeComponent {
         };
 
         world
-            .spawn(TextBundle {
-                style: Style {
-                    margin: UiRect {
-                        right: Val::Px(2.0),
-                        bottom: Val::Px(5.0),
+            .spawn((
+                TextBundle {
+                    style: Style {
+                        margin: UiRect {
+                            right: Val::Px(2.0),
+                            bottom: Val::Px(5.0),
+                            ..Default::default()
+                        },
                         ..Default::default()
                     },
+                    text: text.clone(),
+                    z_index: ZIndex::Global(i32::MAX - 128),
                     ..Default::default()
                 },
-                text: text.clone(),
-                z_index: ZIndex::Global(i32::MAX - 128),
-                ..Default::default()
-            })
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                Outline {
+                    width: Val::Px(1.0),
+                    color: Color::BLUE,
+                    ..Default::default()
+                },
+            ))
             .with_children(|node| {
                 node.spawn(TextShadow::create_shadow_text_bundle(text));
             })
