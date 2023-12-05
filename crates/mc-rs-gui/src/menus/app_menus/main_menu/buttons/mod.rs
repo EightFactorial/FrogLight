@@ -36,10 +36,9 @@ impl MenuComponent for ButtonsNodeComponent {
 
     fn build(parent: Entity, world: &mut World) {
         // Add click sound to MenuResources
-        let sound = world
-            .get_sound("minecraft:random/click")
-            .expect("click sound");
-        world.add_menu_resource(sound.clone().untyped());
+        if let Some(sound) = world.get_sound("minecraft:random/click") {
+            world.add_menu_resource(sound.clone().untyped());
+        }
 
         #[cfg(any(debug_assertions, feature = "debug"))]
         trace!("Building ButtonsNodeComponent");

@@ -49,15 +49,14 @@ impl ResourcePacks {
     /// A [bevy] system that returns `true` if all of the [`ResourcePackAsset`]s are loaded.
     #[must_use]
     pub fn loaded(packs: Res<ResourcePacks>, assets: Res<AssetServer>) -> bool {
-        // If there are no resource packs, always return false
-        if packs.list.is_empty() {
-            return false;
-        }
-
         packs.list.iter().all(|pack| {
             let state = assets.get_recursive_dependency_load_state(&pack.handle);
 
-            matches!(state, None | Some(RecursiveDependencyLoadState::Loaded))
+            !matches!(
+                state,
+                Some(RecursiveDependencyLoadState::NotLoaded)
+                    | Some(RecursiveDependencyLoadState::Loading)
+            )
         })
     }
 

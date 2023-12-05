@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, text::BreakLineOn};
 use mc_rs_resourcepack::assets::resourcepacks::AssetFromWorld;
 
 use crate::{
@@ -110,26 +110,59 @@ impl MenuComponent for TitleNodeComponent {
         let mut style: TextStyle = world.resource::<DefaultTextStyle>().clone().into();
         style.color = Color::YELLOW;
 
-        let text = Text::from_section(value.clone(), style).with_alignment(TextAlignment::Center);
+        let text = Text {
+            alignment: TextAlignment::Center,
+            linebreak_behavior: BreakLineOn::NoWrap,
+            ..Text::from_section(value.clone(), style)
+        };
 
+        // Create a node with no size to always
+        // place the text in the same position
         world
-            .spawn((
-                TitleTextNodeComponent,
-                // IgnoreDefaultTextStyle,
-                TextBundle {
-                    style: Style {
-                        position_type: PositionType::Absolute,
-                        bottom: Val::Percent(10.0),
-                        ..Default::default()
-                    },
-                    transform: Transform::from_rotation(Quat::from_rotation_z(-20f32.to_radians())),
-                    text: text.clone(),
-                    z_index: ZIndex::Global(i32::MAX - 128),
+            .spawn(NodeBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    top: Val::Percent(85.0),
+                    right: Val::Percent(0.0),
+                    width: Val::Px(0.0),
+                    height: Val::Px(0.0),
                     ..Default::default()
                 },
-            ))
+                ..Default::default()
+            })
             .with_children(|node| {
-                node.spawn(TextShadow::create_shadow_text_bundle(text));
+                // Create the text node
+                node.spawn((
+                    TitleTextNodeComponent,
+                    // IgnoreDefaultTextStyle,
+                    TextBundle {
+                        style: Style {
+                            position_type: PositionType::Absolute,
+                            align_self: AlignSelf::Center,
+                            align_items: AlignItems::Center,
+                            align_content: AlignContent::Center,
+                            justify_self: JustifySelf::Center,
+                            justify_items: JustifyItems::Center,
+                            justify_content: JustifyContent::Center,
+                            ..Default::default()
+                        },
+                        transform: Transform::from_rotation(Quat::from_rotation_z(
+                            -20f32.to_radians(),
+                        )),
+                        text: text.clone(),
+                        z_index: ZIndex::Global(i32::MAX - 128),
+                        ..Default::default()
+                    },
+                    #[cfg(any(debug_assertions, feature = "debug"))]
+                    Outline {
+                        color: Color::BLUE,
+                        width: Val::Px(1.0),
+                        ..Default::default()
+                    },
+                ))
+                .with_children(|node| {
+                    node.spawn(TextShadow::create_shadow_text_bundle(text));
+                });
             })
             .set_parent(node);
     }

@@ -1,5 +1,8 @@
 use bevy::prelude::*;
-use mc_rs_resourcepack::assets::textureatlases::{atlases::WidgetAtlas, AtlasFromWorld};
+use mc_rs_resourcepack::assets::{
+    resourcepacks::ResourcePacks,
+    textureatlases::{atlases::WidgetAtlas, AtlasFromWorld},
+};
 
 use crate::{
     menus::{
@@ -32,14 +35,6 @@ impl MenuComponent for MultiplayerButtonComponent {
         #[cfg(any(debug_assertions, feature = "debug"))]
         trace!("Building ButtonsNodeComponent");
 
-        let (handle, index) = world
-            .get_atlas_and_index(WidgetAtlas, WidgetAtlas::BUTTON_MENU)
-            .expect("texture atlas and index");
-        let handle = handle.clone();
-
-        // Add the texture atlas to the menu resources.
-        world.add_menu_resource(handle.clone().untyped());
-
         let button = world
             .spawn((
                 MultiplayerButtonComponent,
@@ -55,23 +50,20 @@ impl MenuComponent for MultiplayerButtonComponent {
             .set_parent(parent)
             .id();
 
-        let background = world
-            .spawn((
-                GuiScaleComponent::new(200, 20),
-                MainMenuButtonAtlasComponent,
-                AtlasImageBundle {
-                    style: Style {
-                        align_items: AlignItems::Center,
-                        justify_content: JustifyContent::Center,
-                        ..Default::default()
-                    },
-                    texture_atlas: handle,
-                    texture_atlas_image: index,
-                    ..Default::default()
-                },
-            ))
-            .set_parent(button)
-            .id();
+        let background = if let Some((handle, index)) =
+            world.get_atlas_and_index(WidgetAtlas, WidgetAtlas::BUTTON_MENU)
+        {
+            let bundle = Self::button_bundle(handle.clone(), index, world);
+            world.spawn(bundle).set_parent(button).id()
+        } else {
+            let bundle = Self::fallback_bundle(world);
+            world.spawn(bundle).set_parent(button).id()
+        };
+
+        world.entity_mut(background).insert((
+            GuiScaleComponent::new(200, 20),
+            MainMenuButtonAtlasComponent,
+        ));
 
         TextShadow::create_text_with_shadow("Multiplayer", background, world);
     }
@@ -87,6 +79,46 @@ impl MultiplayerButtonComponent {
             debug!("MultiplayerButtonComponent pressed");
 
             state.set(MainMenuState::Multiplayer);
+        }
+    }
+
+    fn button_bundle(
+        handle: Handle<TextureAtlas>,
+        index: UiTextureAtlasImage,
+        world: &mut World,
+    ) -> AtlasImageBundle {
+        // Add the texture atlas to the menu resources.
+        world.add_menu_resource(handle.clone().untyped());
+
+        // Create the bundle.
+        AtlasImageBundle {
+            style: Style {
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..Default::default()
+            },
+            texture_atlas: handle.clone(),
+            texture_atlas_image: index,
+            ..Default::default()
+        }
+    }
+
+    fn fallback_bundle(world: &mut World) -> ImageBundle {
+        // Get the fallback texture.
+        let fallback = world.resource::<ResourcePacks>().fallback.clone();
+
+        // Add the texture atlas to the menu resources.
+        world.add_menu_resource(fallback.clone().untyped());
+
+        // Create the bundle.
+        ImageBundle {
+            style: Style {
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..Default::default()
+            },
+            image: fallback.into(),
+            ..Default::default()
         }
     }
 }
