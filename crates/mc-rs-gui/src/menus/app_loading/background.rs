@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menus::traits::MenuComponent;
+use crate::menus::{app_loading::FadeComponent, traits::MenuComponent};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct BackgroundNodeComponent;
@@ -23,7 +23,7 @@ impl MenuComponent for BackgroundNodeComponent {
         };
 
         world
-            .spawn((BackgroundNodeComponent, node))
+            .spawn((BackgroundNodeComponent, FadeComponent, node))
             .set_parent(parent);
     }
 }
