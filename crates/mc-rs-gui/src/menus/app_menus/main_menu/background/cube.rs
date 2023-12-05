@@ -1,6 +1,9 @@
 use bevy::{
     prelude::*,
-    render::render_resource::{Extent3d, Face, TextureDimension, TextureFormat},
+    render::{
+        render_resource::{Extent3d, Face, TextureDimension, TextureFormat},
+        texture::{ImageSampler, ImageSamplerDescriptor},
+    },
 };
 use mc_rs_core::schedule::state::ApplicationState;
 use mc_rs_resourcepack::assets::resourcepacks::{AssetFromWorld, ResourcePacks};
@@ -63,23 +66,21 @@ impl BackgroundCubeComponent {
         // Create cube mesh
         let mesh = Self::correct_uvs(Mesh::from(shape::Cube::new(1.0)));
         let mesh = world.resource_mut::<Assets<Mesh>>().add(mesh);
+        world.add_menu_resource(mesh.clone().untyped());
 
         // Create material
         let material_texture = Self::create_image(world);
-        let material = StandardMaterial {
-            base_color_texture: Some(material_texture.clone()),
-            cull_mode: Some(Face::Front),
-            unlit: true,
-            ..Default::default()
-        };
+        world.add_menu_resource(material_texture.clone().untyped());
+
         let material = world
             .resource_mut::<Assets<StandardMaterial>>()
-            .add(material);
-
-        // Add handles to MenuResources
-        world.add_menu_resource(material_texture.untyped());
+            .add(StandardMaterial {
+                base_color_texture: Some(material_texture),
+                cull_mode: Some(Face::Front),
+                unlit: true,
+                ..Default::default()
+            });
         world.add_menu_resource(material.clone().untyped());
-        world.add_menu_resource(mesh.clone().untyped());
 
         // Spawn BackgroundCubeComponent
         world.spawn((
@@ -188,7 +189,7 @@ impl BackgroundCubeComponent {
         height *= 6;
 
         // Create the image
-        let image = Image::new(
+        let mut image = Image::new(
             Extent3d {
                 width,
                 height,
@@ -196,7 +197,7 @@ impl BackgroundCubeComponent {
             },
             TextureDimension::D2,
             // Combine the images into one, vertically
-            images.iter().fold(
+            images.into_iter().fold(
                 Vec::with_capacity((width * height * 4) as usize),
                 |mut image_data, image| {
                     // Add the image data to the final image data
@@ -208,6 +209,7 @@ impl BackgroundCubeComponent {
             ),
             TextureFormat::Rgba8UnormSrgb,
         );
+        image.sampler = ImageSampler::Descriptor(ImageSamplerDescriptor::nearest());
 
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Created BackgroundCubeComponent Texture");

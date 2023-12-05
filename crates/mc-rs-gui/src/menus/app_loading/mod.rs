@@ -2,7 +2,10 @@ use bevy::{prelude::*, ui::FocusPolicy};
 
 use crate::menus::traits::MenuComponent;
 
-use super::{resources::MenuResources, states::assets::AssetLoadingState};
+use super::{
+    resources::MenuResources,
+    states::{assets::AssetLoadingState, menus::MenuComponentMenusSet},
+};
 
 pub mod background;
 pub mod logo;
@@ -18,22 +21,19 @@ impl AppLoadingNodeComponent {
 
         app.add_systems(
             Update,
-            LoadingFadeTimer::fade_in.run_if(
-                not(in_state(AssetLoadingState::Finished))
-                    .and_then(resource_exists::<LoadingFadeTimer>())
-                    .and_then(LoadingFadeTimer::is_fade_in),
-            ),
-        );
-
-        app.add_systems(
-            Update,
-            LoadingFadeTimer::fade_out.run_if(
-                in_state(AssetLoadingState::Finished).and_then(
-                    resource_exists::<LoadingFadeTimer>()
+            (
+                LoadingFadeTimer::fade_in.run_if(
+                    not(in_state(AssetLoadingState::Finished))
+                        .and_then(LoadingFadeTimer::is_fade_in),
+                ),
+                LoadingFadeTimer::fade_out.run_if(
+                    in_state(AssetLoadingState::Finished)
                         .and_then(LoadingFadeTimer::is_fade_out)
                         .and_then(MenuResources::loaded),
                 ),
-            ),
+            )
+                .in_set(MenuComponentMenusSet)
+                .run_if(resource_exists::<LoadingFadeTimer>()),
         );
 
         background::BackgroundNodeComponent::setup(app);
@@ -92,7 +92,9 @@ enum FadeTimerMode {
 
 impl LoadingFadeTimer {
     /// Returns `true` if the timer is in the fade in mode
-    fn is_fade_in(timer: Res<LoadingFadeTimer>) -> bool { timer.mode == FadeTimerMode::FadeIn }
+    fn is_fade_in(timer: Option<Res<LoadingFadeTimer>>) -> bool {
+        timer.is_some_and(|timer| timer.mode == FadeTimerMode::FadeIn)
+    }
 
     /// Fades in the loading screen
     fn fade_in(
@@ -115,16 +117,21 @@ impl LoadingFadeTimer {
 
             // Set the alpha to the percent completed
             color.0.set_a(timer.timer.percent());
+        }
 
-            // Delete the timer
-            if timer.timer.finished() {
-                commands.remove_resource::<LoadingFadeTimer>();
-            }
+        // Delete the timer
+        if timer.timer.finished() {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("FadeIn: Finished");
+
+            commands.remove_resource::<LoadingFadeTimer>();
         }
     }
 
     /// Returns `true` if the timer is in the fade out mode
-    fn is_fade_out(timer: Res<LoadingFadeTimer>) -> bool { timer.mode == FadeTimerMode::FadeOut }
+    fn is_fade_out(timer: Option<Res<LoadingFadeTimer>>) -> bool {
+        timer.is_some_and(|timer| timer.mode == FadeTimerMode::FadeOut)
+    }
 
     /// Fades out the loading screen
     fn fade_out(
@@ -149,9 +156,16 @@ impl LoadingFadeTimer {
                     *vis = Visibility::Hidden;
                 }
 
+                // Reset the alpha
                 color.0.set_a(1.0);
-                commands.remove_resource::<LoadingFadeTimer>();
             }
+        }
+
+        if timer.timer.finished() {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            debug!("FadeOut: Finished");
+
+            commands.remove_resource::<LoadingFadeTimer>();
         }
     }
 }
