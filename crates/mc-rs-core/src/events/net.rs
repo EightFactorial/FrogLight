@@ -56,8 +56,9 @@ impl<V: Version> ConnectionEvent<V> {
     ///
     /// let hostname = CompactString::from("localhost:25565");
     /// let intent = ConnectionIntent::Status;
-    /// let event = ConnectionEvent::<V1_20_0>::new_with(hostname.clone(), intent);
+    /// let event = ConnectionEvent::<V1_20_0>::new_with(None, hostname.clone(), intent);
     ///
+    /// assert_eq!(event.entity, None);
     /// assert_eq!(event.hostname, hostname);
     /// assert_eq!(event.intent, intent);
     /// ```
