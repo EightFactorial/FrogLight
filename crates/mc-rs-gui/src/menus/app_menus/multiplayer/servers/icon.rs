@@ -8,7 +8,10 @@ use mc_rs_resourcepack::assets::resourcepacks::AssetFromWorld;
 
 use crate::{
     menus::states::menus::MenuComponentMenusSet,
-    resources::servers::{ServerItem, ServerList},
+    resources::{
+        scale::GuiScaleComponent,
+        servers::{ServerItem, ServerList},
+    },
 };
 
 use super::{ServerListIndex, ServersNodeComponent, ShouldRebuildServers};
@@ -17,6 +20,8 @@ use super::{ServerListIndex, ServersNodeComponent, ShouldRebuildServers};
 pub struct IconNodeComponent;
 
 impl IconNodeComponent {
+    const ICON_SIZE: u32 = 24;
+
     pub(super) fn setup(app: &mut App) {
         app.add_systems(
             Update,
@@ -33,18 +38,9 @@ impl IconNodeComponent {
         #[cfg(any(debug_assertions, feature = "debug"))]
         trace!("Building IconNodeComponent");
 
-        let node = NodeBundle {
-            style: Style {
-                position_type: PositionType::Absolute,
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        };
-
         let mut image_handle: Option<Handle<Image>> = None;
 
+        // Try to decode the base64 icon
         if let Some(base64) = &server.cached_icon {
             match STANDARD.decode(base64.trim_start_matches("data:image/png;base64,")) {
                 Err(err) => {
@@ -64,27 +60,46 @@ impl IconNodeComponent {
 
                     let image = Image::from_dynamic(image, true);
                     let handle = world.resource_mut::<Assets<Image>>().add(image);
-
                     image_handle = Some(handle);
                 }
             }
         }
 
+        // Fallback to the unknown server icon
         if image_handle.is_none() {
+            // If there is no unknown server icon, fallback to the fallback icon
             let handle = world
                 .get_texture_or_fallback("minecraft:misc/unknown_server")
                 .clone();
-
             image_handle = Some(handle);
         }
 
         world
-            .spawn((IconNodeComponent, node))
-            .with_children(|node| {
-                node.spawn(ImageBundle {
-                    image: image_handle.unwrap().into(),
+            .spawn((
+                GuiScaleComponent::new(
+                    ServersNodeComponent::SERVER_HEIGHT,
+                    ServersNodeComponent::SERVER_HEIGHT,
+                ),
+                NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
+                        ..Default::default()
+                    },
                     ..Default::default()
-                });
+                },
+            ))
+            .with_children(|node| {
+                node.spawn((
+                    GuiScaleComponent::new(Self::ICON_SIZE, Self::ICON_SIZE),
+                    IconNodeComponent,
+                    ImageBundle {
+                        image: image_handle.unwrap().into(),
+                        ..Default::default()
+                    },
+                ));
             })
             .set_parent(parent);
     }
@@ -99,30 +114,38 @@ impl IconNodeComponent {
             if let Some(entity) = event.entity {
                 let Ok(index) = query.get(entity) else {
                     error!("Failed to get ServerListIndex");
-                    continue;
+                    return Self::hostname_fallback(event, &mut servers, &mut update);
                 };
 
                 let Some(server) = servers.get_mut(index.0) else {
                     error!("Failed to get ServerItem");
-                    continue;
+                    return Self::hostname_fallback(event, &mut servers, &mut update);
                 };
 
                 Self::update_item(event, server, &mut update);
             } else {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                warn!("Received StatusResponse without entity, falling back to hostname");
-
-                if let Some(server) = servers
-                    .servers
-                    .iter_mut()
-                    .find(|s| s.address == event.hostname)
-                {
-                    Self::update_item(event, server, &mut update);
-                } else {
-                    #[cfg(any(debug_assertions, feature = "debug"))]
-                    error!("Failed to find ServerItem");
-                }
+                Self::hostname_fallback(event, &mut servers, &mut update);
             }
+        }
+    }
+
+    fn hostname_fallback(
+        event: &StatusResponse,
+        servers: &mut ServerList,
+        update: &mut ShouldRebuildServers,
+    ) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        warn!("StatusResponse falling back to hostname");
+
+        if let Some(server) = servers
+            .servers
+            .iter_mut()
+            .find(|s| s.address == event.hostname)
+        {
+            Self::update_item(event, server, update);
+        } else {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            error!("Failed to find ServerItem");
         }
     }
 
@@ -131,6 +154,16 @@ impl IconNodeComponent {
         server: &mut ServerItem,
         updater: &mut ShouldRebuildServers,
     ) {
+        // Double check that the hostname matches
+        if server.address != event.hostname {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            error!(
+                "Hostname mismatch: {} != {}",
+                server.address, event.hostname
+            );
+            return;
+        }
+
         // If the icon is not valid, skip it
         if let Some(base64) = &event.favicon {
             if let Err(err) = STANDARD.decode(base64.trim_start_matches("data:image/png;base64,")) {

@@ -5,6 +5,8 @@ use super::GuiScale;
 /// The target size of the GUI component.
 ///
 /// This is used to scale the GUI to the correct size when the [`GuiScale`] changes.
+///
+/// Only width and height are set, and only when the [`Val`] is [`Val::Auto`] or [`Val::Px`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deref, DerefMut, Component)]
 pub struct GuiScaleComponent(pub UVec2);
 

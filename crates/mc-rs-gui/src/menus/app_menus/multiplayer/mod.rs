@@ -16,6 +16,11 @@ pub mod servers;
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct MultiplayerNodeComponent;
 
+impl MultiplayerNodeComponent {
+    const MENU_WIDTH: u32 = 240;
+    const MENU_HEIGHT: u32 = 180;
+}
+
 impl MenuComponent for MultiplayerNodeComponent {
     fn setup(app: &mut App) {
         app.add_systems(
@@ -57,8 +62,8 @@ impl MenuComponent for MultiplayerNodeComponent {
 
         let centered = world
             .spawn((
-                GuiScaleComponent::new(180, 180),
                 MultiplayerCenterNodeComponent,
+                GuiScaleComponent::new(Self::MENU_WIDTH, Self::MENU_HEIGHT),
                 NodeBundle {
                     style: Style {
                         position_type: PositionType::Absolute,

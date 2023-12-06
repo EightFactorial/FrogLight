@@ -1,17 +1,21 @@
 use bevy::prelude::*;
 use compact_str::CompactString;
-use mc_rs_core::{events::StatusRequest, versions::v1_20_0::V1_20_0};
+use mc_rs_core::{
+    events::StatusRequest,
+    sounds::{SoundEvent, SoundEventKind},
+    versions::v1_20_0::V1_20_0,
+    ResourceLocation,
+};
+use mc_rs_resourcepack::assets::resourcepacks::AssetFromWorld;
 
 use crate::{
     menus::{
-        app_menus::states::MainMenuState,
-        states::menus::{MenuComponentMenusSet, MenuComponentState},
-        traits::MenuComponent,
+        app_menus::{multiplayer::MultiplayerNodeComponent, states::MainMenuState},
+        states::menus::MenuComponentMenusSet,
+        traits::{AddMenuResource, MenuComponent},
     },
     resources::{scale::GuiScaleComponent, servers::ServerList},
 };
-
-use super::MultiplayerCenterNodeComponent;
 
 /// TODO: Get this Version from somewhere
 type DefaultVersion = V1_20_0;
@@ -34,12 +38,18 @@ impl MenuComponent for ServersNodeComponent {
 
         app.add_systems(
             Update,
-            Self::rebuild
-                .run_if(
-                    in_state(MenuComponentState::Menus)
-                        .and_then(resource_equals(ShouldRebuildServers(true)))
-                        .and_then(any_with_component::<MultiplayerCenterNodeComponent>()),
+            (
+                Self::rebuild.run_if(
+                    resource_equals(ShouldRebuildServers(true))
+                        .and_then(any_with_component::<ServersOuterNodeComponent>()),
+                ),
+                (
+                    ServersNodeButtonComponent::click_sound,
+                    ServersNodeButtonComponent::join_server,
                 )
+                    .run_if(any_with_component::<ServersNodeButtonComponent>()),
+            )
+                .run_if(in_state(MainMenuState::Multiplayer))
                 .in_set(MenuComponentMenusSet),
         );
 
@@ -56,9 +66,17 @@ impl MenuComponent for ServersNodeComponent {
         #[cfg(any(debug_assertions, feature = "debug"))]
         trace!("Building ServersNodeComponent");
 
+        // Add unknown server icon
+        let unk_icon = world.get_texture_or_fallback("minecraft:misc/unknown_server");
+        world.add_menu_resource(unk_icon.clone().untyped());
+
         let outer_node = world
             .spawn((
-                GuiScaleComponent::new(180, 180),
+                GuiScaleComponent::new(
+                    MultiplayerNodeComponent::MENU_WIDTH,
+                    MultiplayerNodeComponent::MENU_WIDTH,
+                ),
+                ServersOuterNodeComponent,
                 NodeBundle {
                     style: Style {
                         position_type: PositionType::Absolute,
@@ -72,8 +90,46 @@ impl MenuComponent for ServersNodeComponent {
             .set_parent(parent)
             .id();
 
-        let server_list = world.resource::<ServerList>().clone();
-        for (index, server) in server_list.servers.into_iter().enumerate() {
+        Self::build_list(outer_node, world);
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub struct ServersOuterNodeComponent;
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Component)]
+pub struct ServerListIndex(pub usize);
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+pub struct ShouldRebuildServers(pub bool);
+
+impl ServersNodeComponent {
+    const SERVER_HEIGHT: u32 = 30;
+
+    /// Despawn all ServersNodeComponents and rebuild them
+    fn rebuild(world: &mut World) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Rebuilding ServersNodeComponent");
+
+        *world.resource_mut::<ShouldRebuildServers>() = ShouldRebuildServers(false);
+
+        let entity = world
+            .query_filtered::<Entity, With<ServersOuterNodeComponent>>()
+            .single(world);
+
+        world.entity_mut(entity).despawn_descendants();
+        Self::build_list(entity, world);
+    }
+
+    /// Iterate over all servers and build a ServerNodeComponent for each
+    fn build_list(parent: Entity, world: &mut World) {
+        for (index, server) in world
+            .resource::<ServerList>()
+            .clone()
+            .servers
+            .into_iter()
+            .enumerate()
+        {
             #[cfg(any(debug_assertions, feature = "debug"))]
             debug!("Building ServerNode: {}", server.title);
 
@@ -81,11 +137,13 @@ impl MenuComponent for ServersNodeComponent {
                 .spawn((
                     ServerListIndex(index),
                     ServersNodeComponent(server.address.clone()),
-                    GuiScaleComponent::new(180, 30),
+                    GuiScaleComponent::new(
+                        MultiplayerNodeComponent::MENU_WIDTH,
+                        Self::SERVER_HEIGHT,
+                    ),
                     NodeBundle {
                         style: Style {
                             width: Val::Percent(100.0),
-                            height: Val::Px(40.0),
                             margin: UiRect::vertical(Val::Px(4.0)),
                             ..Default::default()
                         },
@@ -93,7 +151,22 @@ impl MenuComponent for ServersNodeComponent {
                         ..Default::default()
                     },
                 ))
-                .set_parent(outer_node)
+                .with_children(|node| {
+                    node.spawn((
+                        ServersNodeButtonComponent,
+                        ButtonBundle {
+                            style: Style {
+                                position_type: PositionType::Absolute,
+                                width: Val::Percent(100.0),
+                                height: Val::Percent(100.0),
+                                ..Default::default()
+                            },
+                            background_color: Color::NONE.into(),
+                            ..Default::default()
+                        },
+                    ));
+                })
+                .set_parent(parent)
                 .id();
 
             status::StatusNodeComponent::build(&server, server_entity, world);
@@ -104,36 +177,6 @@ impl MenuComponent for ServersNodeComponent {
             connection::ConnectionNodeComponent::build(&server, server_entity, world);
             ping::PingNodeComponent::build(&server, server_entity, world);
         }
-    }
-}
-
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub struct ServerListIndex(pub usize);
-
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Resource)]
-pub struct ShouldRebuildServers(pub bool);
-
-impl ServersNodeComponent {
-    /// Despawn all ServersNodeComponents and rebuild them
-    fn rebuild(world: &mut World) {
-        #[cfg(any(debug_assertions, feature = "debug"))]
-        debug!("Rebuilding ServersNodeComponent");
-
-        *world.resource_mut::<ShouldRebuildServers>() = ShouldRebuildServers(false);
-
-        let entities = world
-            .query_filtered::<Entity, With<ServersNodeComponent>>()
-            .iter(world)
-            .collect::<Vec<_>>();
-
-        entities.into_iter().for_each(|entity| {
-            world.entity_mut(entity).despawn_recursive();
-        });
-
-        let entity = world
-            .query_filtered::<Entity, With<MultiplayerCenterNodeComponent>>()
-            .single(world);
-        Self::build(entity, world);
     }
 
     fn update_statuses(
@@ -149,5 +192,47 @@ impl ServersNodeComponent {
                 address.clone(),
             ));
         });
+    }
+}
+
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Component)]
+pub struct ServersNodeButtonComponent;
+
+impl ServersNodeButtonComponent {
+    fn click_sound(
+        query: Query<&Interaction, (Changed<Interaction>, With<Self>)>,
+        mut events: EventWriter<SoundEvent>,
+    ) {
+        if query.iter().any(|int| matches!(int, Interaction::Pressed)) {
+            events.send(SoundEvent {
+                name: ResourceLocation::new("minecraft:random/click"),
+                kind: SoundEventKind::Global,
+                position: None,
+            })
+        }
+    }
+
+    #[allow(clippy::type_complexity)]
+    fn join_server(
+        query: Query<
+            (&Parent, &Interaction),
+            (
+                Changed<Interaction>,
+                Without<ServersNodeComponent>,
+                With<Self>,
+            ),
+        >,
+        servers: Query<&ServersNodeComponent>,
+    ) {
+        for (parent, int) in query.iter() {
+            if !matches!(int, Interaction::Pressed) {
+                continue;
+            }
+
+            if let Ok(ServersNodeComponent(address)) = servers.get(**parent) {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Clicked ServerNode: {}", address);
+            }
+        }
     }
 }

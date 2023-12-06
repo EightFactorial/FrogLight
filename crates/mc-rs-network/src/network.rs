@@ -212,11 +212,11 @@ where
                         }
 
                         #[cfg(any(debug_assertions, feature = "debug"))]
-                        trace!("{} responded with {:?}", status.hostname, status);
+                        trace!("`{}` responded with {:?}", status.hostname, status);
                         status_events.send(status);
 
                         #[cfg(any(debug_assertions, feature = "debug"))]
-                        debug!("{} responsed with {:?}", ping.hostname, ping);
+                        debug!("`{}` responded with {:?}", ping.hostname, ping);
                         ping_events.send(ping);
                     }
                     Err(err) => {
