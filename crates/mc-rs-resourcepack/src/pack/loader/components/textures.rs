@@ -1,14 +1,10 @@
 use std::{
     ffi::OsStr,
-    io::{Read, Seek},
+    io::{Cursor, Read, Seek},
 };
 
-use bevy::{
-    asset::LoadContext,
-    prelude::*,
-    render::texture::{CompressedImageFormats, ImageSampler, ImageType},
-    utils::HashMap,
-};
+use bevy::{asset::LoadContext, prelude::*, utils::HashMap};
+use image::io::Reader as ImageReader;
 use mc_rs_core::ResourceLocation;
 use zip::ZipArchive;
 
@@ -66,13 +62,10 @@ pub(crate) fn read_textures(
         };
 
         // Load the image from the file.
-        let image = Image::from_buffer(
-            &file.bytes().collect::<Result<Vec<_>, _>>()?,
-            ImageType::Extension(&ext),
-            CompressedImageFormats::all(),
-            true,
-            ImageSampler::default(),
-        )?;
+        let dyn_image = ImageReader::new(Cursor::new(file.bytes().collect::<Result<Vec<_>, _>>()?))
+            .with_guessed_format()?
+            .decode()?;
+        let image = Image::from_dynamic(dyn_image, true);
 
         // Add the image to the asset server.
         let handle = load_context.labeled_asset_scope(key.to_string(), |_| image);

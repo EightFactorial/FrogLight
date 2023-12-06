@@ -1,9 +1,12 @@
 use bevy::prelude::*;
 
-use crate::menus::{
-    app_menus::states::MainMenuState,
-    states::menus::MenuComponentMenusSet,
-    traits::{InState, MenuComponent},
+use crate::{
+    menus::{
+        app_menus::states::MainMenuState,
+        states::menus::MenuComponentMenusSet,
+        traits::{InState, MenuComponent},
+    },
+    resources::scale::GuiScaleComponent,
 };
 
 pub mod background;
@@ -32,24 +35,46 @@ impl MenuComponent for MultiplayerNodeComponent {
     fn build(parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Building MultiplayerNodeComponent");
-        let node = NodeBundle {
-            style: Style {
-                position_type: PositionType::Absolute,
-                width: Val::Percent(100.0),
-                height: Val::Percent(100.0),
-                ..Default::default()
-            },
-            visibility: world.get_visibility(MainMenuState::Multiplayer),
-            ..Default::default()
-        };
 
-        let entity = world
-            .spawn((MultiplayerNodeComponent, node))
+        let node = world
+            .spawn((
+                MultiplayerNodeComponent,
+                NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
+                        ..Default::default()
+                    },
+                    visibility: world.get_visibility(MainMenuState::Multiplayer),
+                    ..Default::default()
+                },
+            ))
             .set_parent(parent)
             .id();
 
-        buttons::ButtonsNodeComponent::build(entity, world);
-        background::BackgroundNodeComponent::build(entity, world);
-        servers::ServersNodeComponent::build(entity, world);
+        let centered = world
+            .spawn((
+                GuiScaleComponent::new(180, 180),
+                MultiplayerCenterNodeComponent,
+                NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+            ))
+            .set_parent(node)
+            .id();
+
+        buttons::ButtonsNodeComponent::build(centered, world);
+        background::BackgroundNodeComponent::build(centered, world);
+        servers::ServersNodeComponent::build(centered, world);
     }
 }
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub struct MultiplayerCenterNodeComponent;

@@ -6,7 +6,8 @@ pub mod keybinds;
 use keybinds::Keybinds;
 
 pub mod servers;
-use servers::ServerList;
+use mc_rs_gui::resources::servers::ServerList;
+use servers::SettingsServerList;
 
 pub mod settings;
 use settings::Settings;
@@ -25,8 +26,8 @@ impl Plugin for ConfigPlugin {
         app.insert_resource(Keybinds::load());
 
         // Add the server list to the app
-        ServerList::add_systems(app);
-        app.insert_resource(ServerList::load());
+        SettingsServerList::add_systems(app);
+        app.insert_resource(ServerList::from(SettingsServerList::load()));
 
         // Add the settings to the app
         Settings::add_systems(app);

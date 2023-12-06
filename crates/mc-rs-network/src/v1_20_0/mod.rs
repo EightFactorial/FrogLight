@@ -66,6 +66,7 @@ impl NetworkHandle for V1_20_0 {
 
         // Create the status response event
         let status = StatusResponse {
+            entity: None,
             hostname: conn.hostname.clone(),
             description: status_packet.description,
             favicon: status_packet.favicon,
@@ -88,6 +89,7 @@ impl NetworkHandle for V1_20_0 {
 
         // Create the ping response event
         let ping = PingResponse {
+            entity: None,
             hostname: conn.hostname.clone(),
             time: *ping_packet,
         };

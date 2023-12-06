@@ -76,6 +76,7 @@ where
     ) {
         for request in reader.read() {
             writer.send(ConnectionEvent::new_with(
+                request.entity,
                 request.hostname.clone(),
                 ConnectionIntent::Status,
             ));
@@ -90,10 +91,17 @@ where
 
             match event.intent {
                 ConnectionIntent::Status | ConnectionIntent::Login => {
-                    commands.spawn((
+                    let mut entity = commands.spawn((
                         ConnectionMarker::<Self>::default(),
                         ConnectionTask::new_with(task, addr, event.intent),
                     ));
+
+                    if matches!(
+                        (event.intent, event.entity),
+                        (ConnectionIntent::Status, Some(_))
+                    ) {
+                        entity.insert(ConnectionReplyMarker(event.entity.unwrap()));
+                    }
                 }
                 _ => {
                     warn!("Skipping connection creation with invalid connection intent!");
@@ -185,19 +193,30 @@ where
 
     /// Wait for the status to finish and broadcast the results
     fn status_query(
-        mut query: Query<(Entity, &mut ConnectionStatusTask<Self>)>,
+        mut query: Query<(
+            Entity,
+            &mut ConnectionStatusTask<Self>,
+            Option<&ConnectionReplyMarker>,
+        )>,
         mut status_events: EventWriter<StatusResponse>,
         mut ping_events: EventWriter<PingResponse>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in &mut query {
+        for (entity, mut task, reply) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
-                    Ok((status, ping)) => {
-                        debug!("Status finished with {:?}", status);
+                    Ok((mut status, mut ping)) => {
+                        if let Some(entity) = reply {
+                            status.entity = Some(entity.0);
+                            ping.entity = Some(entity.0);
+                        }
+
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        trace!("{} responded with {:?}", status.hostname, status);
                         status_events.send(status);
 
-                        debug!("Ping finished with {:?}", ping);
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        debug!("{} responsed with {:?}", ping.hostname, ping);
                         ping_events.send(ping);
                     }
                     Err(err) => {
@@ -379,6 +398,9 @@ where
     /// Handle play packets, implemented individually for each version
     fn play_packet(world: &mut World, packet: <Play as State<Self>>::Clientbound);
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub(super) struct ConnectionReplyMarker(Entity);
 
 /// A system set that contains all the systems needed for a connection
 #[derive(Debug, Default, PartialEq, Eq, Hash, SystemSet)]

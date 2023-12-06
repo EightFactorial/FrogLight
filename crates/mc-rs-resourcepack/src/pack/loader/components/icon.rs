@@ -1,10 +1,7 @@
-use std::io::{Read, Seek};
+use std::io::{Cursor, Read, Seek};
 
-use bevy::{
-    asset::LoadContext,
-    prelude::*,
-    render::texture::{CompressedImageFormats, ImageSampler, ImageType},
-};
+use bevy::{asset::LoadContext, prelude::*};
+use image::io::Reader as ImageReader;
 use zip::ZipArchive;
 
 use crate::pack::ResourcePackLoaderError;
@@ -25,13 +22,10 @@ pub(crate) fn read_icon(
     };
 
     // Load the image from the file.
-    let image = Image::from_buffer(
-        &file.bytes().collect::<Result<Vec<_>, _>>()?,
-        ImageType::Extension("png"),
-        CompressedImageFormats::all(),
-        false,
-        ImageSampler::Default,
-    )?;
+    let dyn_image = ImageReader::new(Cursor::new(file.bytes().collect::<Result<Vec<_>, _>>()?))
+        .with_guessed_format()?
+        .decode()?;
+    let image = Image::from_dynamic(dyn_image, false);
 
     // Add the image to the asset server.
     let icon = load_context.labeled_asset_scope(String::from("pack_icon"), |_| image);

@@ -14,6 +14,7 @@ workspace = true
 [dependencies]
 bevy = { workspace = true }
 compact_str = { workspace = true, features = ["serde"] }
+image = { workspace = true }
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
 mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
 serde = { workspace = true }

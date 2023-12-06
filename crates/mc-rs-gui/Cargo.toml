@@ -12,8 +12,10 @@ readme = "README.md"
 workspace = true
 
 [dependencies]
+base64 = "0.21.5"
 bevy = { workspace = true }
-image = "0.24"
+compact_str = { workspace = true }
+image = { workspace = true }
 mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
 mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
 # Wayland breaks for some reason :(

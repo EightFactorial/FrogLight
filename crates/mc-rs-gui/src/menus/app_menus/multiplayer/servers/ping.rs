@@ -1,16 +1,17 @@
 use bevy::prelude::*;
 
-use crate::menus::traits::MenuComponent;
+use crate::resources::servers::ServerItem;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
 pub struct PingNodeComponent;
 
-impl MenuComponent for PingNodeComponent {
-    fn setup(_app: &mut App) {}
+impl PingNodeComponent {
+    pub(super) fn setup(_app: &mut App) {}
 
-    fn build(parent: Entity, world: &mut World) {
+    pub(super) fn build(_server: &ServerItem, parent: Entity, world: &mut World) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         trace!("Building PingNodeComponent");
+
         let node = NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
@@ -20,6 +21,7 @@ impl MenuComponent for PingNodeComponent {
             },
             ..Default::default()
         };
+
         world.spawn((PingNodeComponent, node)).set_parent(parent);
     }
 }

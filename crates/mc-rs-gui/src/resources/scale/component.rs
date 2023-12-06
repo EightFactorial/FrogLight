@@ -42,8 +42,13 @@ impl GuiScaleComponent {
     fn update_size(style: &mut Style, scale_comp: &GuiScaleComponent, scale: &GuiScale) {
         let new_size = scale.value() * **scale_comp;
 
-        style.width = Val::Px(new_size.x as f32);
-        style.height = Val::Px(new_size.y as f32);
+        if matches!(style.width, Val::Auto | Val::Px(_)) {
+            style.width = Val::Px(new_size.x as f32);
+        }
+
+        if matches!(style.height, Val::Auto | Val::Px(_)) {
+            style.height = Val::Px(new_size.y as f32);
+        }
     }
 
     /// Create a new [`GuiScaleComponent`] with the given width and height.

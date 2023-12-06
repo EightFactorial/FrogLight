@@ -9,7 +9,7 @@ use uuid::Uuid;
 pub struct ClientboundQueryResponsePacket {
     pub description: FormattedText,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub favicon: Option<String>,
+    pub favicon: Option<CompactString>,
     pub players: QueryPlayers,
     pub version: QueryVersion,
     #[serde(

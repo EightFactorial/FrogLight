@@ -36,7 +36,50 @@ impl MenuComponent for BackgroundNodeComponent {
                     background_color: Color::rgba(0.0, 0.0, 0.0, 0.5).into(),
                     ..Default::default()
                 },
+                Outline {
+                    width: Val::Px(4.0),
+                    color: Color::BLACK,
+                    ..Default::default()
+                },
             ))
+            .with_children(|node| {
+                // Create a solid white border around the node.
+                node.spawn(NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        border: UiRect::all(Val::Px(4.0)),
+                        ..Default::default()
+                    },
+                    border_color: Color::WHITE.into(),
+                    ..Default::default()
+                });
+                // Create a mostly solid dark gray border for the right and bottom
+                node.spawn(NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        border: UiRect::new(Val::Px(0.0), Val::Px(4.0), Val::Px(0.0), Val::Px(4.0)),
+                        ..Default::default()
+                    },
+                    border_color: Color::rgba(0.2, 0.2, 0.2, 0.8).into(),
+                    ..Default::default()
+                });
+                // Create a mostly solid light gray border for the left and top
+                node.spawn(NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        width: Val::Percent(100.0),
+                        height: Val::Percent(100.0),
+                        border: UiRect::new(Val::Px(4.0), Val::Px(0.0), Val::Px(4.0), Val::Px(0.0)),
+                        ..Default::default()
+                    },
+                    border_color: Color::rgba(0.7, 0.7, 0.7, 0.8).into(),
+                    ..Default::default()
+                });
+            })
             .set_parent(parent);
     }
 }
