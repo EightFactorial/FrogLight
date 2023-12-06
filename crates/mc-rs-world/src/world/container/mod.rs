@@ -15,6 +15,7 @@ pub use blocks::BlockContainer;
 pub struct Container<T: ContainerType> {
     pub bits: u8,
     pub palette: Palette,
+    pub data: Vec<u64>,
     _phantom: std::marker::PhantomData<T>,
 }
 
