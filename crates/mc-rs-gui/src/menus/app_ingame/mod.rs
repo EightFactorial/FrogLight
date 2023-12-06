@@ -14,6 +14,9 @@ pub struct AppIngameNodeComponent;
 
 impl MenuComponent for AppIngameNodeComponent {
     fn setup(app: &mut App) {
+        app.add_systems(OnEnter(MenuComponentState::InGame), Self::show);
+        app.add_systems(OnExit(MenuComponentState::InGame), Self::hide);
+
         inventory::InventoryNodeComponent::setup(app);
         hud::HudNodeComponent::setup(app);
         pause::PauseNodeComponent::setup(app);
@@ -39,5 +42,23 @@ impl MenuComponent for AppIngameNodeComponent {
         inventory::InventoryNodeComponent::build(entity, world);
         hud::HudNodeComponent::build(entity, world);
         pause::PauseNodeComponent::build(entity, world);
+    }
+
+    fn show(mut query: Query<&mut Visibility, With<Self>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Showing {Self:?}");
+
+        query.iter_mut().for_each(|mut vis| {
+            *vis = Visibility::Visible;
+        });
+    }
+
+    fn hide(mut query: Query<&mut Visibility, With<Self>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Hiding {Self:?}");
+
+        query.iter_mut().for_each(|mut vis| {
+            *vis = Visibility::Hidden;
+        });
     }
 }

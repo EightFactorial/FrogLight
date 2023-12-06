@@ -459,22 +459,23 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "azalea-chat"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa05b89d87d212abc77ba3ef14dbcaddf38a06095d2805070f31190d8b021d9b"
+checksum = "683ea0d5d1f75f0f2fc5e1ee2ba110570171c66f935f498b9fe197de439057cb"
 dependencies = [
  "azalea-language",
- "log",
  "once_cell",
  "serde",
  "serde_json",
+ "simdnbt",
+ "tracing",
 ]
 
 [[package]]
 name = "azalea-language"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2156e4b6e94de584e244f299f9b8794cb839499b64697628a41870b2c183f9ad"
+checksum = "4d3e2d5feed721a835bf69827991408e3513387fd6e6a280be9acc18c4e91a95"
 dependencies = [
  "once_cell",
  "serde",
@@ -3965,6 +3966,7 @@ dependencies = [
  "mc-rs-gui",
  "mc-rs-network",
  "mc-rs-resourcepack",
+ "mc-rs-world",
  "rand",
  "serde",
  "toml",
@@ -3976,9 +3978,7 @@ name = "mc-rs-core"
 version = "0.1.0"
 dependencies = [
  "azalea-chat",
- "azalea-nbt",
  "bevy",
- "bevy_rapier3d",
  "compact_str",
  "mc-rs-protocol",
  "nohash-hasher",
@@ -4067,6 +4067,7 @@ dependencies = [
  "futures-locks",
  "mc-rs-core",
  "mc-rs-protocol",
+ "mc-rs-world",
 ]
 
 [[package]]
@@ -4109,6 +4110,21 @@ dependencies = [
  "strum",
  "thiserror",
  "zip",
+]
+
+[[package]]
+name = "mc-rs-world"
+version = "0.1.0"
+dependencies = [
+ "azalea-nbt",
+ "bevy",
+ "bevy_rapier3d",
+ "compact_str",
+ "derive_more",
+ "mc-rs-macros",
+ "mc-rs-protocol",
+ "mc-rs-resourcepack",
+ "strum",
 ]
 
 [[package]]
@@ -5239,6 +5255,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "residua-cesu8"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ca29b145d9861719b5505602d881afc46705200144153ca9dbc0802be2938ea"
+
+[[package]]
+name = "residua-mutf8"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2adba843a48e520e7dad6d1e9c367a4f818787eaccf4530c6b90dd1f035e630d"
+dependencies = [
+ "residua-cesu8",
+]
+
+[[package]]
 name = "ring"
 version = "0.17.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5560,6 +5591,30 @@ name = "simd-adler32"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
+
+[[package]]
+name = "simdnbt"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b3d42fda2b44594e802fc92a5b3c633cd442cdb1c0a31e0b624ec5c6aab0d063"
+dependencies = [
+ "byteorder",
+ "flate2",
+ "residua-mutf8",
+ "simdnbt-derive",
+ "thiserror",
+]
+
+[[package]]
+name = "simdnbt-derive"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6241f3aeb4a7cf50ab268d21af2d0cf5d5ede8d928d3c2709e01425fc7e8d54c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.39",
+]
 
 [[package]]
 name = "slab"

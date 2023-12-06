@@ -19,13 +19,14 @@ members = [
     "crates/mc-rs-network",
     "crates/mc-rs-protocol",
     "crates/mc-rs-resourcepack",
+    "crates/mc-rs-world",
     "crates/tools/classfile-rs",
     "crates/tools/mc-rs-extract",
     "crates/tools/mc-rs-generate",
 ]
 
 [workspace.dependencies]
-azalea-chat = { version = "0.8", default-features = false }
+azalea-chat = { version = "0.9", default-features = false }
 azalea-nbt = { version = "0.8", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
 bevy = "0.12"
 bevy_rapier3d = { version = "0.23", features = ["parallel"] }
@@ -111,18 +112,22 @@ workspace = true
 [dependencies]
 bevy = { workspace = true }
 mc-rs-client = { version = "0.1", path = "crates/mc-rs-client" }
-mimalloc = "0.1"
+mimalloc = { version = "0.1", optional = true }
 
 [features]
-default = ["simd"]
+default = ["mimalloc", "simd"]
 
 # Enable debug features
 debug = ["mc-rs-client/debug"]
 # Enable bevy-rapier debug features
 debug_rapier = ["mc-rs-client/debug_rapier"]
 
+# Enable bevy plugins and features
+bevy_extra = ["mc-rs-client/bevy_extra"]
+wayland = ["bevy/wayland"]
+
 # Enable simd features
 simd = ["mc-rs-client/simd"]
 
-# Enable wayland features
-wayland = ["bevy/wayland"]
+# Enable mimalloc
+mimalloc = ["dep:mimalloc"]

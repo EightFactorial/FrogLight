@@ -5,13 +5,12 @@ use bevy::{
         texture::{ImageSampler, ImageSamplerDescriptor},
     },
 };
-use mc_rs_core::schedule::state::ApplicationState;
 use mc_rs_resourcepack::assets::resourcepacks::{AssetFromWorld, ResourcePacks};
 
 use crate::{
     menus::{
         app_menus::states::MainMenuState,
-        states::menus::MenuComponentMenusSet,
+        states::menus::{MenuComponentMenusSet, MenuComponentState},
         traits::{AddMenuResource, InState},
     },
     resources::camera::DefaultCamera,
@@ -28,14 +27,18 @@ impl BackgroundCubeComponent {
                 Self::show,
                 (DefaultCamera::enable_camera3d, Self::background_camera),
             )
+                .run_if(in_state(MenuComponentState::Menus))
                 .in_set(MenuComponentMenusSet),
         );
 
         app.add_systems(
             Update,
             Self::rotate_cube.in_set(MenuComponentMenusSet).run_if(
-                in_state(MainMenuState::MainMenu)
-                    .or_else(in_state(MainMenuState::Multiplayer))
+                in_state(MenuComponentState::Menus)
+                    .and_then(
+                        in_state(MainMenuState::MainMenu)
+                            .or_else(in_state(MainMenuState::Multiplayer)),
+                    )
                     .and_then(any_with_component::<Self>()),
             ),
         );
@@ -43,20 +46,19 @@ impl BackgroundCubeComponent {
         app.add_systems(
             OnExit(MainMenuState::MainMenu),
             (Self::hide, DefaultCamera::disable_camera3d)
-                .in_set(MenuComponentMenusSet)
-                .run_if(not(in_state(MainMenuState::Multiplayer))),
+                .run_if(not(
+                    in_state(MainMenuState::MainMenu).or_else(in_state(MenuComponentState::Menus))
+                )),
         );
         app.add_systems(
             OnExit(MainMenuState::Multiplayer),
             (Self::hide, DefaultCamera::disable_camera3d)
-                .in_set(MenuComponentMenusSet)
-                .run_if(not(in_state(MainMenuState::MainMenu))),
+                .run_if(not(
+                    in_state(MainMenuState::MainMenu).or_else(in_state(MenuComponentState::Menus))
+                )),
         );
 
-        app.add_systems(
-            OnExit(ApplicationState::MainMenu),
-            Self::destroy.in_set(MenuComponentMenusSet),
-        );
+        app.add_systems(OnExit(MenuComponentState::Menus), Self::exit_menus);
     }
 
     pub(super) fn build(world: &mut World) {
@@ -88,7 +90,13 @@ impl BackgroundCubeComponent {
             PbrBundle {
                 mesh,
                 material,
-                visibility: world.get_visibility(MainMenuState::MainMenu),
+                visibility: if world.get_visibility(MainMenuState::MainMenu)
+                    == Visibility::Inherited
+                {
+                    Visibility::Visible
+                } else {
+                    Visibility::Hidden
+                },
                 // Flip the cube so that the front is facing the camera
                 transform: Transform::from_rotation(Quat::from_rotation_x(180f32.to_radians())),
                 ..Default::default()
@@ -109,14 +117,20 @@ impl BackgroundCubeComponent {
         });
     }
 
-    /// Despawn the [`BackgroundCubeComponent`] entity.
-    fn destroy(query: Query<Entity, With<BackgroundCubeComponent>>, mut commands: Commands) {
+    /// Despawn the [`BackgroundCubeComponent`] entity and
+    /// reset the [`MainMenuState`] to [`MainMenuState::MainMenu`].
+    fn exit_menus(
+        query: Query<Entity, With<BackgroundCubeComponent>>,
+        mut state: ResMut<NextState<MainMenuState>>,
+        mut commands: Commands,
+    ) {
         #[cfg(any(debug_assertions, feature = "debug"))]
         debug!("Despawning BackgroundCubeComponent");
 
+        state.set(MainMenuState::MainMenu);
         query.for_each(|entity| {
             commands.entity(entity).despawn_recursive();
-        })
+        });
     }
 
     /// Set the background [camera](Camera)'s [`Transform`] and [`FOV`](Projection).

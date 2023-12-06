@@ -1,5 +1,5 @@
 [package]
-name = "mc-rs-network"
+name = "mc-rs-world"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
@@ -12,20 +12,21 @@ readme = "README.md"
 workspace = true
 
 [dependencies]
+azalea-nbt = { workspace = true }
 bevy = { workspace = true }
+bevy_rapier3d = { workspace = true }
 compact_str = { workspace = true }
-flume = "0.11"
-futures-lite = { workspace = true }
-futures-locks = { version = "0.7", default-features = false }
-mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
+derive_more = { workspace = true }
+mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
 mc-rs-protocol = { version = "0.1", path = "../mc-rs-protocol" }
-mc-rs-world = { version = "0.1", path = "../mc-rs-world" }
+mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
+strum = { workspace = true }
 
 [features]
 default = []
 
 # Enable debug features
-debug = ["mc-rs-core/debug", "mc-rs-protocol/debug"]
+debug = ["mc-rs-macros/debug", "mc-rs-protocol/debug", "mc-rs-resourcepack/debug"]
 
 # Enable simd features
-simd = ["mc-rs-core/simd", "mc-rs-protocol/simd"]
+simd = ["mc-rs-protocol/simd", "mc-rs-resourcepack/simd", "bevy_rapier3d/simd-stable"]

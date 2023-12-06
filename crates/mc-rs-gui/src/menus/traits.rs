@@ -15,7 +15,7 @@ pub(super) trait MenuComponent: Sized + std::fmt::Debug + Default + Component {
         debug!("Showing {:?}", Self::default());
 
         query.iter_mut().for_each(|mut vis| {
-            *vis = Visibility::Visible;
+            *vis = Visibility::Inherited;
         });
     }
 
@@ -44,7 +44,7 @@ impl AddMenuResource for World {
 pub(super) trait InState {
     /// Returns true if the world is in the given state.
     fn in_state<S: States + Eq>(&self, state: S) -> bool;
-    /// Returns either [Visibility::Visible] or [Visibility::Hidden]
+    /// Returns either [Visibility::Inherited] or [Visibility::Hidden]
     /// depending on whether the world is in the given state.
     fn get_visibility<S: States + Eq>(&self, state: S) -> Visibility;
 }
@@ -53,7 +53,7 @@ impl InState for World {
     fn in_state<S: States + Eq>(&self, state: S) -> bool { *self.resource::<State<S>>() == state }
     fn get_visibility<S: States + Eq>(&self, state: S) -> Visibility {
         match self.in_state(state) {
-            true => Visibility::Visible,
+            true => Visibility::Inherited,
             false => Visibility::Hidden,
         }
     }

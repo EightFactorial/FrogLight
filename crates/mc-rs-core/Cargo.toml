@@ -13,9 +13,7 @@ workspace = true
 
 [dependencies]
 azalea-chat = { workspace = true }
-azalea-nbt = { workspace = true }
 bevy = { workspace = true }
-bevy_rapier3d = { workspace = true }
 compact_str = { workspace = true }
 mc-rs-protocol = { version = "0.1", path = "../mc-rs-protocol" }
 nohash-hasher = "0.2"
@@ -29,4 +27,4 @@ default = ["simd"]
 debug = ["mc-rs-protocol/debug"]
 
 # Enable simd features
-simd = ["mc-rs-protocol/simd", "bevy_rapier3d/simd-stable"]
+simd = ["mc-rs-protocol/simd", "azalea-chat/simdnbt"]

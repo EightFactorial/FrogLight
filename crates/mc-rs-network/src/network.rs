@@ -3,7 +3,7 @@ use std::{fmt::Debug, hash::Hash, marker::PhantomData};
 use bevy::{ecs::system::SystemState, prelude::*, tasks::IoTaskPool};
 use futures_lite::future::{block_on, poll_once};
 use mc_rs_core::{
-    components::player::CreateControlledPlayerEvent,
+    components::player::CreateUserEvent,
     events::{ConnectionEvent, PingResponse, StatusRequest, StatusResponse},
     resources::player::username::Username,
     schedule::state::ApplicationState,
@@ -244,7 +244,7 @@ where
     fn login_query(
         mut query: Query<(Entity, &mut ConnectionLoginTask<Self>)>,
         mut state: ResMut<NextState<ApplicationState>>,
-        mut events: EventWriter<CreateControlledPlayerEvent>,
+        mut events: EventWriter<CreateUserEvent>,
         mut commands: Commands,
     ) {
         for (entity, mut task) in &mut query {
@@ -256,7 +256,7 @@ where
                             conn.peer_addr().expect("Unable to get peer address")
                         );
 
-                        events.send(CreateControlledPlayerEvent(entity));
+                        events.send(CreateUserEvent(entity));
 
                         commands
                             .entity(entity)

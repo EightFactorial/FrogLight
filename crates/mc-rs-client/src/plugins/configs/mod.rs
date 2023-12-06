@@ -6,6 +6,7 @@ pub mod keybinds;
 use keybinds::Keybinds;
 
 pub mod servers;
+use mc_rs_core::resources::client_information::ClientInformation;
 use mc_rs_gui::resources::servers::ServerList;
 use servers::SettingsServerList;
 
@@ -34,5 +35,8 @@ impl Plugin for ConfigPlugin {
         let settings = Settings::load();
         settings.insert_resources(app);
         app.insert_resource(settings);
+
+        // Add the client config to the app
+        app.init_resource::<ClientInformation>();
     }
 }

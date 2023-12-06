@@ -5,7 +5,7 @@
 			"type": "cargo",
 			"command": "run",
 			"args": [
-				"--features=debug"
+				"--features=debug,bevy_extra"
 			],
 			"env": {
 				"RUST_LOG": "warn,mc_rs=debug,mc_rs_interface=debug,mc_rs_protocol=info"
@@ -23,7 +23,7 @@
 			"type": "cargo",
 			"command": "run",
 			"args": [
-				"--features=debug"
+				"--features=debug,bevy_extra"
 			],
 			"env": {
 				"RUST_LOG": "warn,mc_rs=trace,mc_rs_interface=trace,mc_rs_protocol=trace"

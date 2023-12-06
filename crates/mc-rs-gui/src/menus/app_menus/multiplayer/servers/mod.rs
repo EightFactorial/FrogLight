@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use compact_str::CompactString;
 use mc_rs_core::{
-    events::StatusRequest,
+    events::{ConnectionEvent, StatusRequest},
     sounds::{SoundEvent, SoundEventKind},
     versions::v1_20_0::V1_20_0,
     ResourceLocation,
@@ -11,7 +11,7 @@ use mc_rs_resourcepack::assets::resourcepacks::AssetFromWorld;
 use crate::{
     menus::{
         app_menus::{multiplayer::MultiplayerNodeComponent, states::MainMenuState},
-        states::menus::MenuComponentMenusSet,
+        states::menus::{MenuComponentMenusSet, MenuComponentState},
         traits::{AddMenuResource, MenuComponent},
     },
     resources::{scale::GuiScaleComponent, servers::ServerList},
@@ -223,6 +223,9 @@ impl ServersNodeButtonComponent {
             ),
         >,
         servers: Query<&ServersNodeComponent>,
+        mut events: EventWriter<ConnectionEvent<DefaultVersion>>,
+        mut menu_state: ResMut<NextState<MenuComponentState>>,
+        mut mainmenu_state: ResMut<NextState<MainMenuState>>,
     ) {
         for (parent, int) in query.iter() {
             if !matches!(int, Interaction::Pressed) {
@@ -231,7 +234,11 @@ impl ServersNodeButtonComponent {
 
             if let Ok(ServersNodeComponent(address)) = servers.get(**parent) {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                debug!("Clicked ServerNode: {}", address);
+                debug!("Joining ServerNode: {}", address);
+                events.send(ConnectionEvent::new(address.clone()));
+
+                menu_state.set(MenuComponentState::InGame);
+                mainmenu_state.set(MainMenuState::MainMenu);
             }
         }
     }

@@ -15,6 +15,7 @@ pub mod core;
 pub mod net;
 pub mod plugins;
 pub mod res;
+pub mod world;
 
 /// A [`PluginGroup`] that adds all the [`Plugin`](Plugin)s needed for the client.
 ///

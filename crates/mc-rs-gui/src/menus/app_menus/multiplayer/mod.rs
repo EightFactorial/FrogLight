@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     menus::{
         app_menus::states::MainMenuState,
-        states::menus::MenuComponentMenusSet,
+        states::menus::{MenuComponentMenusSet, MenuComponentState},
         traits::{InState, MenuComponent},
     },
     resources::scale::GuiScaleComponent,
@@ -25,11 +25,15 @@ impl MenuComponent for MultiplayerNodeComponent {
     fn setup(app: &mut App) {
         app.add_systems(
             OnEnter(MainMenuState::Multiplayer),
-            Self::show.in_set(MenuComponentMenusSet),
+            Self::show
+                .run_if(in_state(MenuComponentState::Menus))
+                .in_set(MenuComponentMenusSet),
         );
         app.add_systems(
             OnExit(MainMenuState::Multiplayer),
-            Self::hide.in_set(MenuComponentMenusSet),
+            Self::hide
+                .run_if(in_state(MenuComponentState::Menus))
+                .in_set(MenuComponentMenusSet),
         );
 
         buttons::ButtonsNodeComponent::setup(app);

@@ -19,6 +19,9 @@ impl MenuComponent for AppMenusNodeComponent {
     fn setup(app: &mut App) {
         app.add_state::<MainMenuState>();
 
+        app.add_systems(OnEnter(MenuComponentState::Menus), Self::show);
+        app.add_systems(OnExit(MenuComponentState::Menus), Self::hide);
+
         options::OptionsNodeComponent::setup(app);
         multiplayer::MultiplayerNodeComponent::setup(app);
         main_menu::MainMenuNodeComponent::setup(app);
@@ -47,5 +50,23 @@ impl MenuComponent for AppMenusNodeComponent {
         options::OptionsNodeComponent::build(entity, world);
         multiplayer::MultiplayerNodeComponent::build(entity, world);
         main_menu::MainMenuNodeComponent::build(entity, world);
+    }
+
+    fn show(mut query: Query<&mut Visibility, With<Self>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Showing {Self:?}");
+
+        query.iter_mut().for_each(|mut vis| {
+            *vis = Visibility::Visible;
+        });
+    }
+
+    fn hide(mut query: Query<&mut Visibility, With<Self>>) {
+        #[cfg(any(debug_assertions, feature = "debug"))]
+        debug!("Hiding {Self:?}");
+
+        query.iter_mut().for_each(|mut vis| {
+            *vis = Visibility::Hidden;
+        });
     }
 }

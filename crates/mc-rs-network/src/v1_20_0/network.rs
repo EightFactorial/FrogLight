@@ -3,14 +3,9 @@ use compact_str::CompactString;
 use mc_rs_core::{
     components::player::{ControlledPlayer, ControlledPlayerHead},
     resources::client_information::ClientInformation,
-    world::{
-        resources::{CurrentWorld, WorldSeed, WorldType},
-        structure::chunk::Chunk,
-        worlds::Worlds,
-    },
 };
 use mc_rs_protocol::{
-    types::{position::ChunkPos, EntityId},
+    types::EntityId,
     versions::v1_20_0::{
         configuration::ClientboundConfigurationPackets,
         play::{
@@ -88,30 +83,7 @@ impl Network for V1_20_0 {
                     .get_mut(world)
                     .send_play(ServerboundKeepAlivePacket::from(p));
             }
-            ClientboundPlayPackets::ChunkData(p) => {
-                let mut state = SystemState::<(Res<Worlds>, Option<Res<CurrentWorld>>)>::new(world);
-                let (worlds, current) = state.get(world);
-
-                let mut worlds = worlds.clone();
-
-                if let Some(current) = current {
-                    if let Err(err) = worlds.insert_data::<V1_20_0>(
-                        &current.clone(),
-                        p.position,
-                        p.chunk_data,
-                        world,
-                    ) {
-                        error!("Failed to insert chunk {:?} : {err}", p.position);
-                    }
-                } else {
-                    warn!("Received chunk data without a current world!");
-                }
-
-                {
-                    let mut state = SystemState::<ResMut<Worlds>>::new(world);
-                    *state.get_mut(world) = worlds;
-                }
-            }
+            ClientboundPlayPackets::ChunkData(_) => {}
             ClientboundPlayPackets::WorldEvent(_) => {}
             ClientboundPlayPackets::Particle(_) => {}
             ClientboundPlayPackets::LightUpdate(_) => {}
@@ -122,17 +94,11 @@ impl Network for V1_20_0 {
                     Query<Entity, With<ControlledPlayer>>,
                     Res<ClientInformation>,
                     ResMut<ConnectionChannel<Self>>,
-                    ResMut<Worlds>,
                 )>::new(world);
-                let (player, info, mut conn, mut worlds) = state.get_mut(world);
+                let (player, info, mut conn) = state.get_mut(world);
 
                 // Send the client settings packet
                 conn.send_play(ServerboundClientSettingsPacket::from(info.clone()));
-
-                // Add all worlds to the world list
-                for world_type in p.worlds {
-                    worlds.insert_empty(&WorldType::from(world_type));
-                }
 
                 // Add the player's entity id
                 let player = player.single();
@@ -140,8 +106,6 @@ impl Network for V1_20_0 {
 
                 // Add other information to the world
                 world.insert_resource(p.game_mode);
-                world.insert_resource(CurrentWorld::new(p.world, p.world_type));
-                world.insert_resource(WorldSeed(p.seed));
             }
             ClientboundPlayPackets::MapUpdate(_) => {}
             ClientboundPlayPackets::SetTradeOffers(_) => {}
@@ -222,29 +186,7 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::ResourcePackSend(_) => {}
             ClientboundPlayPackets::PlayerRespawn(_) => {}
             ClientboundPlayPackets::EntitySetHeadYaw(_) => {}
-            ClientboundPlayPackets::ChunkDeltaUpdate(p) => {
-                let mut state = SystemState::<(
-                    Query<&mut Chunk>,
-                    Res<Worlds>,
-                    Option<Res<CurrentWorld>>,
-                )>::new(world);
-                let (mut query, worlds, current) = state.get_mut(world);
-
-                let Some(current) = current else {
-                    warn!("Received chunk delta update without a current world!");
-                    return;
-                };
-
-                if let Some(mut _chunk) =
-                    worlds.get_chunk_mut(&mut query, &current.name, &ChunkPos::from(p.position))
-                {
-                    // for update in p.updates {
-                    //     chunk.update_section::<V1_20_0>(p.position, update);
-                    // }
-                } else {
-                    warn!("Received chunk delta update for unloaded chunk!");
-                };
-            }
+            ClientboundPlayPackets::ChunkDeltaUpdate(_) => {}
             ClientboundPlayPackets::SelectAdvancementTab(_) => {}
             ClientboundPlayPackets::ServerMetadata(_) => {}
             ClientboundPlayPackets::OverlayMessage(_) => {}

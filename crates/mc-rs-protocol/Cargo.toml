@@ -42,4 +42,4 @@ default = []
 debug = ["dep:tracing", "mc-rs-macros/debug"]
 
 # Enable simd features
-simd = []
+simd = ["azalea-chat/simdnbt"]
