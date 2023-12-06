@@ -17,6 +17,10 @@ use mc_rs_protocol::{
         V1_20_0,
     },
 };
+use mc_rs_world::{
+    resources::{CurrentWorld, WorldType, Worlds},
+    world::tasks::DecodeChunkTask,
+};
 
 use crate::{network::Network, task::ConnectionChannel};
 
@@ -76,33 +80,59 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::DamageTilt(_) => {}
             ClientboundPlayPackets::WorldBorderInitialize(_) => {}
             ClientboundPlayPackets::KeepAlive(p) => {
-                info!("Received keep alive: {:?}", p);
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received keep alive: {p:?}");
 
                 let mut state = SystemState::<ResMut<ConnectionChannel<Self>>>::new(world);
                 state
                     .get_mut(world)
                     .send_play(ServerboundKeepAlivePacket::from(p));
             }
-            ClientboundPlayPackets::ChunkData(_) => {}
+            ClientboundPlayPackets::ChunkData(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received chunk data: {p:?}");
+
+                let current = world
+                    .get_resource::<CurrentWorld>()
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        error!("Unable to get CurrentWorld");
+                        CurrentWorld::from(WorldType::Overworld)
+                    });
+
+                let task = DecodeChunkTask::create(p.chunk_data);
+                let entity = world.spawn(task).id();
+
+                let mut worlds = world.resource_mut::<Worlds>();
+                worlds.insert_chunk_entity(current.into(), p.position, entity);
+            }
             ClientboundPlayPackets::WorldEvent(_) => {}
             ClientboundPlayPackets::Particle(_) => {}
             ClientboundPlayPackets::LightUpdate(_) => {}
             ClientboundPlayPackets::GameJoin(p) => {
                 debug!("Joined game: {:?}", p);
 
-                let mut state = SystemState::<(
-                    Query<Entity, With<ControlledPlayer>>,
-                    Res<ClientInformation>,
-                    ResMut<ConnectionChannel<Self>>,
-                )>::new(world);
-                let (player, info, mut conn) = state.get_mut(world);
-
-                // Send the client settings packet
-                conn.send_play(ServerboundClientSettingsPacket::from(info.clone()));
+                let mut state = SystemState::<Query<Entity, With<ControlledPlayer>>>::new(world);
+                let player = state.get_mut(world);
 
                 // Add the player's entity id
                 let player = player.single();
                 world.entity_mut(player).insert(EntityId(p.player_id));
+
+                // Send the client settings packet
+                let info = world.resource::<ClientInformation>().clone();
+                let mut conn = world.resource_mut::<ConnectionChannel<Self>>();
+                conn.send_play(ServerboundClientSettingsPacket::from(info));
+
+                // Add all of the worlds to the worlds list
+                let mut worlds = Worlds::default();
+                for name in p.worlds {
+                    worlds.insert_world(name.into(), Default::default());
+                }
+                world.insert_resource(worlds);
+
+                // Set the current world
+                world.insert_resource(CurrentWorld::from(p.world));
 
                 // Add other information to the world
                 world.insert_resource(p.game_mode);
@@ -127,6 +157,7 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::PlayerList(_) => {}
             ClientboundPlayPackets::LookAt(_) => {}
             ClientboundPlayPackets::PlayerPositionLook(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
                 info!("Received player position and look: {:?}", p);
 
                 let mut state = SystemState::<(

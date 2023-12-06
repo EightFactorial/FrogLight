@@ -14,7 +14,20 @@ use crate::buffer::{Decode, DecodeError, Encode, EncodeError};
 /// A wrapper around [`CompactString`] that represents a resource location.
 ///
 /// A resource location is a string that is used to identify a resource in the game.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Serialize, Deserialize, Test)]
+#[derive(
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deref,
+    DerefMut,
+    Serialize,
+    Deserialize,
+    Test,
+)]
 #[mctest(tests = ["transcode", "decode"], bytes = [19, 109, 105, 110, 101, 99, 114, 97, 102, 116, 58, 111, 118, 101, 114, 119, 111, 114, 108, 100])]
 #[serde(transparent)]
 pub struct ResourceLocation(CompactString);

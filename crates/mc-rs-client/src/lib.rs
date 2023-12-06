@@ -7,6 +7,7 @@ use mc_rs_core::CorePlugin;
 use mc_rs_gui::GuiPlugin;
 use mc_rs_network::NetworkingPlugin;
 use mc_rs_resourcepack::{assets::ResourceAssetPlugin, pack::ResourcePackPlugin};
+use mc_rs_world::WorldPlugin;
 use plugins::{configs::ConfigPlugin, resourcepack::ResourcePackSourcePlugin};
 
 mod dir;
@@ -39,6 +40,7 @@ impl PluginGroup for ClientPlugins {
             .add(ResourceAssetPlugin)
             .add(CorePlugin)
             .add(GuiPlugin)
+            .add(WorldPlugin)
             .add(NetworkingPlugin);
 
         #[cfg(feature = "default_plugins")]

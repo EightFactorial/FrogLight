@@ -9,21 +9,9 @@ use crate::buffer::{VarDecode, VarEncode};
 ///
 /// This is a chunk's position in the world, not how many blocks it is offset from the origin.
 ///
-/// Due to internally using an [IVec2], replace 'y' with 'z' when using this type.
+/// Due to internally using an [IVec2], `y` and `z` are interchangable.
 #[derive(
-    Debug,
-    Default,
-    Clone,
-    Copy,
-    PartialEq,
-    Eq,
-    Hash,
-    Component,
-    Deref,
-    DerefMut,
-    From,
-    Into,
-    Transcode,
+    Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut, From, Into, Transcode,
 )]
 #[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ChunkPos(pub IVec2);
@@ -40,6 +28,15 @@ impl ChunkPos {
             Self::new(self.0.x, self.0.y - 1),
             Self::new(self.0.x, self.0.y + 1),
         ]
+    }
+}
+
+impl std::fmt::Debug for ChunkPos {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ChunkPos")
+            .field("x", &self.0.x)
+            .field("z", &self.0.y)
+            .finish()
     }
 }
 
