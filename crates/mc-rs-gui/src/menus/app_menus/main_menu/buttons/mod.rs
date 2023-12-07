@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use mc_rs_core::{
-    sounds::{SoundEvent, SoundEventKind},
-    ResourceLocation,
-};
+use mc_rs_core::{enums::SoundType, sounds::SoundEvent, ResourceLocation};
 use mc_rs_resourcepack::assets::{
     resourcepacks::AssetFromWorld, textureatlases::atlases::WidgetAtlas,
 };
@@ -124,8 +121,8 @@ impl ButtonsNodeComponent {
             .any(|interaction| *interaction == Interaction::Pressed)
         {
             events.send(SoundEvent {
-                name: ResourceLocation::new("minecraft:random/click"),
-                kind: SoundEventKind::Global,
+                asset: ResourceLocation::new("minecraft:random/click"),
+                kind: SoundType::Global,
                 position: None,
             });
         }

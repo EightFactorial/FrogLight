@@ -1,16 +1,14 @@
 use mc_rs_macros::Transcode;
 
-use crate::types::UnsizedByteBuffer;
+use crate::types::{enums::SoundType, packets::sound::PacketSoundType, EntityId};
 
-// TODO: Parse this packet
-// TODO: Create a test for this packet
+// TODO: Create tests for this packet
 #[derive(Debug, Clone, PartialEq, Transcode)]
 pub struct ClientboundPlaySoundFromEntityPacket {
-    pub data: UnsizedByteBuffer,
-    // pub source: SoundSource,
-    // #[var]
-    // pub id: u32,
-    // pub volume: f32,
-    // pub pitch: f32,
-    // pub seed: u64,
+    pub data: PacketSoundType,
+    pub kind: SoundType,
+    pub entity_id: EntityId,
+    pub volume: f32,
+    pub pitch: f32,
+    pub seed: u64,
 }

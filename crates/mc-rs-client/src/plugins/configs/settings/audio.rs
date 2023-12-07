@@ -2,7 +2,7 @@ use bevy::{
     audio::{PlaybackMode, Volume},
     prelude::*,
 };
-use mc_rs_core::sounds::{SoundEvent, SoundEventKind};
+use mc_rs_core::{enums::SoundType, sounds::SoundEvent};
 use mc_rs_resourcepack::{assets::resourcepacks::ResourcePacks, pack::ResourcePackAsset};
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -109,22 +109,22 @@ impl AudioSettings {
         events.read().for_each(|event| {
             // Get the volume for the event kind.
             let volume = match event.kind {
-                SoundEventKind::Global => 1.0,
-                SoundEventKind::Music => settings.audio.music,
-                SoundEventKind::Jukebox => settings.audio.jukebox,
-                SoundEventKind::Weather => settings.audio.weather,
-                SoundEventKind::Block => settings.audio.block,
-                SoundEventKind::Hostile => settings.audio.hostile,
-                SoundEventKind::Neutral => settings.audio.neutral,
-                SoundEventKind::Player => settings.audio.player,
-                SoundEventKind::Ambient => settings.audio.ambient,
-                SoundEventKind::Voice => settings.audio.voice,
+                SoundType::Global => 1.0,
+                SoundType::Music => settings.audio.music,
+                SoundType::Jukebox => settings.audio.jukebox,
+                SoundType::Weather => settings.audio.weather,
+                SoundType::Blocks => settings.audio.block,
+                SoundType::Hostile => settings.audio.hostile,
+                SoundType::Neutral => settings.audio.neutral,
+                SoundType::Players => settings.audio.player,
+                SoundType::Ambient => settings.audio.ambient,
+                SoundType::Voice => settings.audio.voice,
             };
 
-            if let Some(sound) = packs.get_sound(&event.name, &assets) {
+            if let Some(handle) = packs.get_sound(&event.asset, &assets) {
                 // Create an entity with the sound and volume.
                 let mut entity = commands.spawn(AudioBundle {
-                    source: sound.clone(),
+                    source: handle.clone(),
                     settings: PlaybackSettings {
                         volume: Volume::new_relative(volume),
                         mode: PlaybackMode::Despawn,
@@ -138,6 +138,8 @@ impl AudioSettings {
                         Transform::from_translation(position),
                     ));
                 }
+            } else {
+                warn!("Sound `{}` not found", event.asset);
             }
         });
     }

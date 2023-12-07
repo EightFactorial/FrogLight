@@ -23,8 +23,8 @@ pub(crate) fn read_sounds(
     for file_index in 0..zip.len() {
         let Ok(mut file) = zip.by_index(file_index) else {
             #[cfg(any(debug_assertions, feature = "debug"))]
-            warn!(
-                "Failed to read file {} in {}",
+            error!(
+                "Failed to get file `{}` of `{}`",
                 file_index,
                 load_context.asset_path()
             );
@@ -57,6 +57,11 @@ pub(crate) fn read_sounds(
 
         // Get the resource location from the file path.
         let Some(key) = ResourcePackLoader::path_to_resource_location(file_path, "sounds") else {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            error!(
+                "Failed to get ResourceLocation from file path: {}",
+                file_path.display()
+            );
             continue;
         };
 

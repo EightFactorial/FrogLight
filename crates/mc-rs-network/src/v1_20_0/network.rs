@@ -1,10 +1,12 @@
 use std::ops::Deref;
 
-use bevy::{ecs::system::SystemState, prelude::*};
+use bevy::prelude::*;
 use compact_str::CompactString;
 use mc_rs_core::{
     components::player::{ControlledPlayer, ControlledPlayerHead},
+    packets::sound::PacketSoundType,
     resources::client_information::ClientInformation,
+    sounds::SoundEvent,
 };
 use mc_rs_protocol::{
     types::EntityId,
@@ -150,10 +152,8 @@ impl Network for V1_20_0 {
                 #[cfg(any(debug_assertions, feature = "debug"))]
                 info!("Received KeepAlive: {p:?}");
 
-                let mut state = SystemState::<ResMut<ConnectionChannel<Self>>>::new(world);
-                state
-                    .get_mut(world)
-                    .send_play(ServerboundKeepAlivePacket::from(p));
+                let mut conn = world.resource_mut::<ConnectionChannel<Self>>();
+                conn.send_play(ServerboundKeepAlivePacket::from(p));
             }
             ClientboundPlayPackets::ChunkData(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
@@ -180,11 +180,9 @@ impl Network for V1_20_0 {
                 #[cfg(any(debug_assertions, feature = "debug"))]
                 debug!("Received GameInfo: {:?}", p);
 
-                let mut state = SystemState::<Query<Entity, With<ControlledPlayer>>>::new(world);
-                let player = state.get_mut(world);
-
-                // Add the player's entity id
-                let player = player.single();
+                // Add the Players's EntityId
+                let mut query = world.query_filtered::<Entity, With<ControlledPlayer>>();
+                let player = query.single(world);
                 world.entity_mut(player).insert(EntityId(p.player_id));
 
                 // Send the client settings packet
@@ -489,9 +487,60 @@ impl Network for V1_20_0 {
             }
             ClientboundPlayPackets::Title(_) => {}
             ClientboundPlayPackets::TitleFade(_) => {}
-            ClientboundPlayPackets::PlaySoundFromEntity(_) => {}
-            ClientboundPlayPackets::PlaySound(_) => {}
-            ClientboundPlayPackets::StopSound(_) => {}
+            ClientboundPlayPackets::PlaySoundFromEntity(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received PlaySoundFromEntity: {:?}", p.data);
+
+                let mut query = world.query::<(&EntityId, &Transform)>();
+
+                // Find the entity with the given id
+                if let Some((_, transform)) =
+                    query.iter_mut(world).find(|(id, _)| id == &&p.entity_id)
+                {
+                    match p.data {
+                        PacketSoundType::SoundId(_) => {}
+                        PacketSoundType::SoundName { registry, .. } => {
+                            let pos = transform.translation;
+                            world.send_event(SoundEvent {
+                                // TODO: Get the name from the registry
+                                // asset: registry.into(),
+                                asset: registry,
+                                kind: p.kind,
+                                position: Some(pos),
+                            })
+                        }
+                    }
+                } else {
+                    warn!(
+                        "Received PlaySoundFromEntity for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
+            ClientboundPlayPackets::PlaySound(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received PlaySound: {:?}", p.data);
+
+                match p.data {
+                    PacketSoundType::SoundId(_) => {}
+                    PacketSoundType::SoundName { registry, .. } => {
+                        world.send_event(SoundEvent {
+                            // TODO: Get the name from the registry
+                            // asset: registry.into(),
+                            asset: registry,
+                            kind: p.kind,
+                            // TODO: Decode the position
+                            position: None,
+                        })
+                    }
+                }
+            }
+            ClientboundPlayPackets::StopSound(_) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received StopSound");
+
+                // TODO: Parse the packet
+            }
             ClientboundPlayPackets::GameMessage(_) => {}
             ClientboundPlayPackets::PlayerListHeader(_) => {}
             ClientboundPlayPackets::NbtQueryResponse(_) => {}
@@ -531,7 +580,12 @@ impl Network for V1_20_0 {
                     );
                 }
             }
-            ClientboundPlayPackets::Features(_) => {}
+            ClientboundPlayPackets::Features(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received Features: {p:?}");
+
+                // TODO: Update the FeaturesList resource
+            }
             ClientboundPlayPackets::EntityStatusEffect(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
                 trace!("Received EntityStatusEffect: {:?}", p.entity_id);

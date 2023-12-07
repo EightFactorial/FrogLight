@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 use compact_str::CompactString;
 use mc_rs_core::{
+    enums::SoundType,
     events::{ConnectionEvent, StatusRequest},
-    sounds::{SoundEvent, SoundEventKind},
+    sounds::SoundEvent,
     versions::v1_20_0::V1_20_0,
     ResourceLocation,
 };
@@ -205,8 +206,8 @@ impl ServersNodeButtonComponent {
     ) {
         if query.iter().any(|int| matches!(int, Interaction::Pressed)) {
             events.send(SoundEvent {
-                name: ResourceLocation::new("minecraft:random/click"),
-                kind: SoundEventKind::Global,
+                asset: ResourceLocation::new("minecraft:random/click"),
+                kind: SoundType::Global,
                 position: None,
             })
         }
