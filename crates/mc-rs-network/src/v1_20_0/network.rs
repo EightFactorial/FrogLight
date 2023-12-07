@@ -46,8 +46,23 @@ impl Network for V1_20_0 {
                 let transform = Transform::from_translation(p.position.into());
                 world.spawn((p.entity_id, p.uuid, transform));
             }
-            ClientboundPlayPackets::ExperienceOrbSpawn(_) => {}
-            ClientboundPlayPackets::PlayerSpawn(_) => {}
+            ClientboundPlayPackets::ExperienceOrbSpawn(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received ExperienceOrbSpawn: {:?}", p.entity_id);
+
+                let transform = Transform::from_translation(p.position.into());
+                world.spawn((p.entity_id, transform));
+            }
+            ClientboundPlayPackets::PlayerSpawn(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received PlayerSpawn: {:?}", p.entity_id);
+
+                let mut transform = Transform::from_translation(p.position.into());
+                transform.rotation =
+                    Quat::from_rotation_y(p.yaw.into()) + Quat::from_rotation_x(p.pitch.into());
+
+                world.spawn((p.entity_id, p.uuid, transform));
+            }
             ClientboundPlayPackets::EntityAnimation(_) => {}
             ClientboundPlayPackets::Statistics(_) => {}
             ClientboundPlayPackets::PlayerActionResponse(_) => {}
@@ -105,11 +120,11 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::ChatSuggestions(_) => {}
             ClientboundPlayPackets::CustomPayload(p) => match CompactString::from_utf8(&p.data) {
                 Ok(str) => {
-                    info!("Received custom payload: `{0} : {str}`", p.identifier);
+                    info!("Received CustomPayload: `{0} : {str}`", p.identifier);
                 }
                 Err(_) => {
                     info!(
-                        "Received custom payload: `{0} : {1:?}`",
+                        "Received CustomPayload: `{0} : {1:?}`",
                         p.identifier, p.data
                     );
                 }
@@ -305,7 +320,7 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::UnlockRecipes(_) => {}
             ClientboundPlayPackets::EntitiesDestroy(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                debug!("Received EntitiesDestroy: {} Entities", p.len());
+                debug!("Received EntitiesDestroy: {:?}", &*p);
 
                 let mut query = world.query::<(Entity, &EntityId)>();
 
@@ -452,13 +467,14 @@ impl Network for V1_20_0 {
                 let mut query = world.query::<&EntityId>();
 
                 // Find the entity with the given id
+                //
+                // Only for this packet, spawn the entity if it doesn't exist,
+                // sometimes the server sends this packet before the entity is spawned.
                 if query.iter_mut(world).any(|id| id == &p.entity_id) {
                     // TODO: Update the entity's equipment
                 } else {
-                    warn!(
-                        "Received EntityEquipmentUpdate for unknown entity: {:?}",
-                        p.entity_id
-                    );
+                    // TODO: Update the entity's equipment
+                    world.spawn(p.entity_id);
                 }
             }
             ClientboundPlayPackets::ExperienceBarUpdate(_) => {}
@@ -488,9 +504,6 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::Title(_) => {}
             ClientboundPlayPackets::TitleFade(_) => {}
             ClientboundPlayPackets::PlaySoundFromEntity(p) => {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                trace!("Received PlaySoundFromEntity: {:?}", p.data);
-
                 let mut query = world.query::<(&EntityId, &Transform)>();
 
                 // Find the entity with the given id
@@ -498,8 +511,26 @@ impl Network for V1_20_0 {
                     query.iter_mut(world).find(|(id, _)| id == &&p.entity_id)
                 {
                     match p.data {
-                        PacketSoundType::SoundId(_) => {}
+                        PacketSoundType::SoundId(_id) => {
+                            // let Some(registry) = SoundRegistry::try_from(id) else {
+                            //     warn!("Received PlaySoundFromEntity for unknown sound: {id:?}");
+                            //     return;
+                            // };
+
+                            // #[cfg(any(debug_assertions, feature = "debug"))]
+                            // debug!("Received PlaySoundFromEntity: {registry:?}");
+
+                            // let pos = transform.translation;
+                            // world.send_event(SoundEvent {
+                            //     asset: registry.into(),
+                            //     kind: p.kind,
+                            //     position: Some(pos),
+                            // });
+                        }
                         PacketSoundType::SoundName { registry, .. } => {
+                            #[cfg(any(debug_assertions, feature = "debug"))]
+                            debug!("Received PlaySoundFromEntity: {registry:?}");
+
                             let pos = transform.translation;
                             world.send_event(SoundEvent {
                                 // TODO: Get the name from the registry
@@ -518,12 +549,26 @@ impl Network for V1_20_0 {
                 }
             }
             ClientboundPlayPackets::PlaySound(p) => {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                debug!("Received PlaySound: {:?}", p.data);
-
                 match p.data {
-                    PacketSoundType::SoundId(_) => {}
+                    PacketSoundType::SoundId(_id) => {
+                        // let Some(registry) = SoundRegistry::try_from(id) else {
+                        //     warn!("Received PlaySound for unknown sound: {id:?}");
+                        //     return;
+                        // };
+
+                        // #[cfg(any(debug_assertions, feature = "debug"))]
+                        // debug!("Received PlaySound: {registry:?}");
+
+                        // world.send_event(SoundEvent {
+                        //     asset: registry.into(),
+                        //     kind: p.kind,
+                        //     position: None,
+                        // });
+                    }
                     PacketSoundType::SoundName { registry, .. } => {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        debug!("Received PlaySound: {registry:?}");
+
                         world.send_event(SoundEvent {
                             // TODO: Get the name from the registry
                             // asset: registry.into(),
