@@ -11,7 +11,7 @@ pub(super) fn setup(app: &mut App) {
     );
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, From, Into, Deref, DerefMut, Resource)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, From, Into, Deref, DerefMut, Resource)]
 pub struct CurrentWorld(WorldType);
 
 impl CurrentWorld {

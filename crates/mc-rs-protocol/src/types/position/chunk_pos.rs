@@ -5,6 +5,8 @@ use mc_rs_macros::Transcode;
 
 use crate::buffer::{VarDecode, VarEncode};
 
+use super::BlockPos;
+
 /// A chunk position.
 ///
 /// This is a chunk's position in the world, not how many blocks it is offset from the origin.
@@ -38,6 +40,10 @@ impl std::fmt::Debug for ChunkPos {
             .field("z", &self.0.y)
             .finish()
     }
+}
+
+impl From<BlockPos> for ChunkPos {
+    fn from(value: BlockPos) -> Self { Self::new(value.x.div_floor(16), value.z.div_floor(16)) }
 }
 
 impl From<(i32, i32)> for ChunkPos {

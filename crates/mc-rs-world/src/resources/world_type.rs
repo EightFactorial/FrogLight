@@ -2,9 +2,10 @@ use std::str::FromStr;
 
 use mc_rs_protocol::types::ResourceLocation;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum WorldType {
     Nether,
+    #[default]
     Overworld,
     End,
     Other(ResourceLocation),

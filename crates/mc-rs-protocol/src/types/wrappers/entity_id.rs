@@ -1,7 +1,7 @@
 use std::{fmt::Display, num::TryFromIntError};
 
 use bevy_ecs::prelude::Component;
-use derive_more::{Deref, DerefMut};
+use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Test;
 
 use crate::buffer::{Decode, Encode, VarDecode, VarEncode};
@@ -9,17 +9,11 @@ use crate::buffer::{Decode, Encode, VarDecode, VarEncode};
 /// A Minecraft entity ID.
 ///
 /// Very different from Bevy's [Entity](bevy_ecs::entity::Entity).
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut, Test)]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Component, Deref, DerefMut, Test,
+)]
 #[mctest(tests = ["transcode", "encode", "decode"], bytes = [0])]
 pub struct EntityId(pub u32);
-
-impl From<EntityId> for u32 {
-    fn from(id: EntityId) -> Self { id.0 }
-}
-
-impl From<u32> for EntityId {
-    fn from(id: u32) -> Self { Self(id) }
-}
 
 impl From<u16> for EntityId {
     fn from(id: u16) -> Self { Self(id.into()) }

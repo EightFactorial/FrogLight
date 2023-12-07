@@ -1,13 +1,9 @@
 use std::io::Cursor;
 
 use bevy::{prelude::*, utils::HashMap};
-use derive_more::{From, Into};
-use mc_rs_protocol::types::{packets::chunk_data::ChunkDataPacket, position::ChunkPos};
+use mc_rs_protocol::types::packets::chunk_data::ChunkDataPacket;
 
 use super::{heightmap::HeightMapType, section::Section, tasks::DecodeResult, HeightMap};
-
-#[derive(Debug, Default, Clone, PartialEq, Eq, From, Into, Deref, DerefMut, Component)]
-pub struct ChunkPosition(ChunkPos);
 
 #[derive(Debug, Clone, PartialEq, Eq, Component)]
 pub struct Chunk {

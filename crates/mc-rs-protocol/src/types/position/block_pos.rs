@@ -4,6 +4,8 @@ use mc_rs_macros::Test;
 
 use crate::buffer::{Decode, Encode};
 
+use super::ChunkPos;
+
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, Test)]
 #[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct BlockPos(pub IVec3);
@@ -21,6 +23,10 @@ impl BlockPos {
     pub const ZERO: Self = Self(IVec3::ZERO);
 
     pub fn new(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
+
+    pub fn from_chunk_pos(chunk_pos: ChunkPos, y: i32) -> Self {
+        Self::new(chunk_pos.x * 16, y, chunk_pos.y * 16)
+    }
 }
 
 impl Encode for BlockPos {

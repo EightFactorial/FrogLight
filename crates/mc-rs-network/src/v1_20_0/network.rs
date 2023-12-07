@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use bevy::{ecs::system::SystemState, prelude::*};
 use compact_str::CompactString;
 use mc_rs_core::{
@@ -19,7 +21,7 @@ use mc_rs_protocol::{
 };
 use mc_rs_world::{
     resources::{CurrentWorld, WorldType, Worlds},
-    world::tasks::DecodeChunkTask,
+    world::{tasks::DecodeChunkTask, Chunk},
 };
 
 use crate::{network::Network, task::ConnectionChannel};
@@ -35,18 +37,60 @@ impl Network for V1_20_0 {
     fn play_packet(world: &mut World, packet: ClientboundPlayPackets) {
         match packet {
             ClientboundPlayPackets::Bundle(_) => {}
-            ClientboundPlayPackets::EntitySpawn(_) => {}
+            ClientboundPlayPackets::EntitySpawn(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received EntitySpawn: {:?}", p.entity_id);
+
+                let transform = Transform::from_translation(p.position.into());
+                world.spawn((p.entity_id, p.uuid, transform));
+            }
             ClientboundPlayPackets::ExperienceOrbSpawn(_) => {}
             ClientboundPlayPackets::PlayerSpawn(_) => {}
             ClientboundPlayPackets::EntityAnimation(_) => {}
             ClientboundPlayPackets::Statistics(_) => {}
             ClientboundPlayPackets::PlayerActionResponse(_) => {}
             ClientboundPlayPackets::BlockBreakingProgress(_) => {}
-            ClientboundPlayPackets::BlockEntityUpdate(_) => {}
+            ClientboundPlayPackets::BlockEntityUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                info!("Received BlockEntityUpdate: {:?}", p.position);
+
+                let current = world
+                    .get_resource::<CurrentWorld>()
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        error!("Error getting CurrentWorld");
+                        CurrentWorld::from(WorldType::Overworld)
+                    });
+
+                let chunk_worlds = world.resource::<Worlds>();
+                if let Some(chunk_world) = chunk_worlds.get_world(&current) {
+                    if let Some(chunk_entity) = chunk_world.get_entity(&p.position.into()) {
+                        let Some(mut _chunk) = world.entity_mut(*chunk_entity).get::<Chunk>()
+                        else {
+                            error!(
+                                "Error getting Chunk for BlockEntityUpdate: {:?}",
+                                p.position
+                            );
+                            return;
+                        };
+
+                        // TODO: Update the block entity
+                    } else {
+                        error!("Error getting Entity for Chunk: {:?}", p.position);
+                    }
+                } else {
+                    error!("Error getting current World: {current:?}");
+                }
+            }
             ClientboundPlayPackets::BlockEvent(_) => {}
             ClientboundPlayPackets::BlockUpdate(_) => {}
             ClientboundPlayPackets::BossBar(_) => {}
-            ClientboundPlayPackets::Difficulty(_) => {}
+            ClientboundPlayPackets::Difficulty(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received Difficulty: {:?}", p);
+
+                // TODO: Update the WorldDifficulty resource
+            }
             ClientboundPlayPackets::ChunkBiomeData(_) => {}
             ClientboundPlayPackets::ClearTitle(_) => {}
             ClientboundPlayPackets::CommandSuggestions(_) => {}
@@ -74,14 +118,37 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::ProfilelessChatMessage(_) => {}
             ClientboundPlayPackets::EntityStatus(_) => {}
             ClientboundPlayPackets::Explosion(_) => {}
-            ClientboundPlayPackets::UnloadChunk(_) => {}
+            ClientboundPlayPackets::UnloadChunk(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received UnloadChunk: {:?}", *p);
+
+                let current = world
+                    .get_resource::<CurrentWorld>()
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        error!("Error getting CurrentWorld");
+                        CurrentWorld::from(WorldType::Overworld)
+                    });
+
+                let mut chunk_worlds = world.resource_mut::<Worlds>();
+                if let Some(chunk_world) = chunk_worlds.get_world_mut(&current) {
+                    if let Some(entity) = chunk_world.get_entity(&p).cloned() {
+                        chunk_world.remove_entity(&p);
+                        world.entity_mut(entity).despawn_recursive();
+                    } else {
+                        error!("Error getting Entity for Chunk: {:?}", *p);
+                    }
+                } else {
+                    error!("Error getting current World: {current:?}");
+                }
+            }
             ClientboundPlayPackets::GameStateChange(_) => {}
             ClientboundPlayPackets::OpenHorseScreen(_) => {}
             ClientboundPlayPackets::DamageTilt(_) => {}
             ClientboundPlayPackets::WorldBorderInitialize(_) => {}
             ClientboundPlayPackets::KeepAlive(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                debug!("Received keep alive: {p:?}");
+                info!("Received KeepAlive: {p:?}");
 
                 let mut state = SystemState::<ResMut<ConnectionChannel<Self>>>::new(world);
                 state
@@ -90,18 +157,18 @@ impl Network for V1_20_0 {
             }
             ClientboundPlayPackets::ChunkData(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                trace!("Received chunk data: {p:?}");
+                trace!("Received ChunkData: {p:?}");
 
                 let current = world
                     .get_resource::<CurrentWorld>()
                     .cloned()
                     .unwrap_or_else(|| {
-                        error!("Unable to get CurrentWorld");
+                        error!("Error getting CurrentWorld");
                         CurrentWorld::from(WorldType::Overworld)
                     });
 
                 let task = DecodeChunkTask::create(p.chunk_data);
-                let entity = world.spawn(task).id();
+                let entity = world.spawn((p.position, task)).id();
 
                 let mut worlds = world.resource_mut::<Worlds>();
                 worlds.insert_chunk_entity(current.into(), p.position, entity);
@@ -110,7 +177,8 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::Particle(_) => {}
             ClientboundPlayPackets::LightUpdate(_) => {}
             ClientboundPlayPackets::GameJoin(p) => {
-                debug!("Joined game: {:?}", p);
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received GameInfo: {:?}", p);
 
                 let mut state = SystemState::<Query<Entity, With<ControlledPlayer>>>::new(world);
                 let player = state.get_mut(world);
@@ -139,9 +207,64 @@ impl Network for V1_20_0 {
             }
             ClientboundPlayPackets::MapUpdate(_) => {}
             ClientboundPlayPackets::SetTradeOffers(_) => {}
-            ClientboundPlayPackets::EntityMoveRelative(_) => {}
-            ClientboundPlayPackets::EntityRotateAndMoveRelative(_) => {}
-            ClientboundPlayPackets::EntityRotate(_) => {}
+            ClientboundPlayPackets::EntityMoveRelative(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityMoveRelative: {:?}", p.entity_id);
+
+                let mut query = world.query::<(&EntityId, &mut Transform)>();
+
+                // Find the entity with the given id
+                if let Some((_, mut transform)) =
+                    query.iter_mut(world).find(|(id, _)| id == &&p.entity_id)
+                {
+                    transform.translation +=
+                        Vec3::from_array([p.delta_x.into(), p.delta_y.into(), p.delta_z.into()]);
+                } else {
+                    warn!(
+                        "Received EntityMoveRelative for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
+            ClientboundPlayPackets::EntityRotateAndMoveRelative(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityRotateAndMoveRelative: {:?}", p.entity_id);
+
+                let mut query = world.query::<(&EntityId, &mut Transform)>();
+
+                // Find the entity with the given id
+                if let Some((_, mut transform)) =
+                    query.iter_mut(world).find(|(id, _)| id == &&p.entity_id)
+                {
+                    transform.translation +=
+                        Vec3::from_array([p.delta_x.into(), p.delta_y.into(), p.delta_z.into()]);
+
+                    // TODO: Rotate the entity
+                } else {
+                    warn!(
+                        "Received EntityRotateAndMoveRelative for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
+            ClientboundPlayPackets::EntityRotate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityRotate: {:?}", p.entity_id);
+
+                let mut query = world.query::<(&EntityId, &mut Transform)>();
+
+                // Find the entity with the given id
+                if let Some((_, mut _transform)) =
+                    query.iter_mut(world).find(|(id, _)| id == &&p.entity_id)
+                {
+                    // TODO: Rotate the entity
+                } else {
+                    warn!(
+                        "Received EntityRotate for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
             ClientboundPlayPackets::VehicleMove(_) => {}
             ClientboundPlayPackets::OpenWrittenBook(_) => {}
             ClientboundPlayPackets::OpenScreen(_) => {}
@@ -158,66 +281,110 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::LookAt(_) => {}
             ClientboundPlayPackets::PlayerPositionLook(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                info!("Received player position and look: {:?}", p);
+                info!(
+                    "Received player PosLook: {:?}, ({:?}, {:?})",
+                    p.position, p.yaw, p.pitch
+                );
 
-                let mut state = SystemState::<(
-                    ResMut<ConnectionChannel<Self>>,
-                    Query<&mut Transform, (With<ControlledPlayer>, Without<ControlledPlayerHead>)>,
-                    Query<&mut Transform, (Without<ControlledPlayer>, With<ControlledPlayerHead>)>,
-                )>::new(world);
-                let (mut channel, mut player, mut head) = state.get_mut(world);
+                // Send the teleport confirm packet
+                let mut channel = world.resource_mut::<ConnectionChannel<Self>>();
                 channel.send_play(ServerboundTeleportConfirmPacket::from(p.id));
 
-                // Update the player posiiton
-                let mut transform = player.single_mut();
+                // Update the player's position and rotation
+                let mut query = world.query_filtered::<&mut Transform, With<ControlledPlayer>>();
+                let mut transform = query.single_mut(world);
 
-                #[allow(clippy::cast_possible_truncation)]
-                if p.relative_flags.x {
-                    transform.translation.x += p.position.x as f32;
-                } else {
-                    transform.translation.x = p.position.x as f32;
-                }
+                transform.translation = p.position.into();
+                transform.rotation = Quat::from_rotation_x(p.pitch);
 
-                #[allow(clippy::cast_possible_truncation)]
-                if p.relative_flags.y {
-                    transform.translation.y += p.position.y as f32;
-                } else {
-                    transform.translation.y = p.position.y as f32;
-                }
+                // Update the player's head rotation
+                let mut query =
+                    world.query_filtered::<&mut Transform, With<ControlledPlayerHead>>();
+                let mut transform = query.single_mut(world);
 
-                #[allow(clippy::cast_possible_truncation)]
-                if p.relative_flags.z {
-                    transform.translation.z += p.position.z as f32;
-                } else {
-                    transform.translation.z = p.position.z as f32;
-                }
-
-                // Update the player rotation
-                let mut transform = head.single_mut();
-
-                if p.relative_flags.yaw {
-                    transform.rotation *=
-                        Quat::from_rotation_z(p.yaw * std::f32::consts::PI / 180.0);
-                } else {
-                    transform.rotation =
-                        Quat::from_rotation_z(p.yaw * std::f32::consts::PI / 180.0);
-                }
-
-                if p.relative_flags.pitch {
-                    transform.rotation *=
-                        Quat::from_rotation_y(p.pitch * std::f32::consts::PI / 180.0);
-                } else {
-                    transform.rotation =
-                        Quat::from_rotation_y(p.pitch * std::f32::consts::PI / 180.0);
-                }
+                transform.rotation = Quat::from_rotation_y(p.yaw) + Quat::from_rotation_y(p.yaw);
             }
             ClientboundPlayPackets::UnlockRecipes(_) => {}
-            ClientboundPlayPackets::EntitiesDestroy(_) => {}
-            ClientboundPlayPackets::RemoveEntityStatusEffect(_) => {}
+            ClientboundPlayPackets::EntitiesDestroy(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received EntitiesDestroy: {} Entities", p.len());
+
+                let mut query = world.query::<(Entity, &EntityId)>();
+
+                // Find the entity with the given id
+                for entity_id in p.deref().iter() {
+                    if let Some((entity, _)) = query.iter(world).find(|(_, id)| id == &entity_id) {
+                        world.entity_mut(entity).despawn_recursive();
+                    } else {
+                        warn!(
+                            "Received EntitiesDestroy for unknown entity: {:?}",
+                            entity_id
+                        );
+                    }
+                }
+            }
+            ClientboundPlayPackets::RemoveEntityStatusEffect(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received RemoveEntityStatusEffect: {:?}", p.entity_id);
+
+                let mut query = world.query::<&EntityId>();
+
+                // Find the entity with the given id
+                if query.iter_mut(world).any(|id| id == &p.entity_id) {
+                    // TODO: Remove the entity's status effect
+                } else {
+                    warn!(
+                        "Received RemoveEntityStatusEffect for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
             ClientboundPlayPackets::ResourcePackSend(_) => {}
             ClientboundPlayPackets::PlayerRespawn(_) => {}
-            ClientboundPlayPackets::EntitySetHeadYaw(_) => {}
-            ClientboundPlayPackets::ChunkDeltaUpdate(_) => {}
+            ClientboundPlayPackets::EntitySetHeadYaw(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntitySetHeadYaw: {:?}", p.entity_id);
+
+                let mut query = world.query::<(&EntityId, &mut Transform)>();
+
+                // Find the entity with the given id
+                if query.iter_mut(world).any(|(id, _)| id == &p.entity_id) {
+                    // TODO: Update the entity's head rotation
+                } else {
+                    warn!(
+                        "Received EntitySetHeadYaw for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
+            ClientboundPlayPackets::ChunkDeltaUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received ChunkDeltaUpdate: {:?}", p.position);
+
+                let current = world
+                    .get_resource::<CurrentWorld>()
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        error!("Error getting CurrentWorld");
+                        CurrentWorld::from(WorldType::Overworld)
+                    });
+
+                let chunk_worlds = world.resource::<Worlds>();
+                if let Some(chunk_world) = chunk_worlds.get_world(&current) {
+                    if let Some(chunk_entity) = chunk_world.get_entity(&p.position.into()) {
+                        let Some(mut _chunk) = world.entity_mut(*chunk_entity).get::<Chunk>()
+                        else {
+                            error!("Error getting Chunk for ChunkDeltaUpdate: {:?}", p.position);
+                            return;
+                        };
+
+                        // TODO: Should this be a task?
+                        for _update in p.updates {
+                            // TODO: Update the chunk
+                        }
+                    }
+                }
+            }
             ClientboundPlayPackets::SelectAdvancementTab(_) => {}
             ClientboundPlayPackets::ServerMetadata(_) => {}
             ClientboundPlayPackets::OverlayMessage(_) => {}
@@ -228,23 +395,98 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::WorldBorderWarningBlocksChanged(_) => {}
             ClientboundPlayPackets::SetCameraEntity(_) => {}
             ClientboundPlayPackets::UpdateSelectedSlot(_) => {}
-            ClientboundPlayPackets::ChunkRenderDistanceCenter(_) => {}
-            ClientboundPlayPackets::ChunkLoadDistance(_) => {}
-            ClientboundPlayPackets::PlayerSpawnPosition(_) => {}
+            ClientboundPlayPackets::ChunkRenderDistanceCenter(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received ChunkRenderDistanceCenter: {p:?}");
+
+                // TODO: Update the ChunkRenderDistanceCenter resource
+            }
+            ClientboundPlayPackets::ChunkLoadDistance(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received ChunkLoadDistance: {p:?}");
+
+                // TODO: Update the ChunkLoadDistance resource
+            }
+            ClientboundPlayPackets::PlayerSpawnPosition(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received PlayerSpawnPosition: {p:?}");
+
+                // TODO: Update the PlayerSpawnPosition resource
+            }
             ClientboundPlayPackets::ScoreboardDisplay(_) => {}
-            ClientboundPlayPackets::EntityTrackerUpdate(_) => {}
+            ClientboundPlayPackets::EntityTrackerUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityTrackerUpdate: {:?}", p.entity_id);
+
+                let mut query = world.query::<&EntityId>();
+
+                // Find the entity with the given id
+                if query.iter_mut(world).any(|id| id == &p.entity_id) {
+                    // TODO: Update the entity's trackers
+                } else {
+                    warn!(
+                        "Received EntityTrackerUpdate for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
             ClientboundPlayPackets::EntityAttach(_) => {}
-            ClientboundPlayPackets::EntityVelocityUpdate(_) => {}
-            ClientboundPlayPackets::EntityEquipmentUpdate(_) => {}
+            ClientboundPlayPackets::EntityVelocityUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityVelocityUpdate: {:?}", p.entity_id);
+
+                let mut query = world.query::<&EntityId>();
+
+                // Find the entity with the given id
+                if query.iter_mut(world).any(|id| id == &p.entity_id) {
+                    // TODO: Update the entity's velocity
+                } else {
+                    warn!(
+                        "Received EntityVelocityUpdate for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
+            ClientboundPlayPackets::EntityEquipmentUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityEquipmentUpdate: {:?}", p.entity_id);
+
+                let mut query = world.query::<&EntityId>();
+
+                // Find the entity with the given id
+                if query.iter_mut(world).any(|id| id == &p.entity_id) {
+                    // TODO: Update the entity's equipment
+                } else {
+                    warn!(
+                        "Received EntityEquipmentUpdate for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
             ClientboundPlayPackets::ExperienceBarUpdate(_) => {}
-            ClientboundPlayPackets::HealthUpdate(_) => {}
+            ClientboundPlayPackets::HealthUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received HealthUpdate: {p:?}");
+
+                // TODO: Update the PlayerHealth resource
+            }
             ClientboundPlayPackets::ScoreboardObjectiveUpdate(_) => {}
             ClientboundPlayPackets::EntityPassengersSet(_) => {}
             ClientboundPlayPackets::Team(_) => {}
             ClientboundPlayPackets::ScoreboardPlayerUpdate(_) => {}
-            ClientboundPlayPackets::SimulationDistance(_) => {}
+            ClientboundPlayPackets::SimulationDistance(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received SimulationDistance: {p:?}");
+
+                // TODO: Update the SimulationDistance resource
+            }
             ClientboundPlayPackets::Subtitle(_) => {}
-            ClientboundPlayPackets::WorldTimeUpdate(_) => {}
+            ClientboundPlayPackets::WorldTimeUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                debug!("Received WorldTimeUpdate: {p:?}");
+
+                // TODO: Update the WorldTime resource
+            }
             ClientboundPlayPackets::Title(_) => {}
             ClientboundPlayPackets::TitleFade(_) => {}
             ClientboundPlayPackets::PlaySoundFromEntity(_) => {}
@@ -255,21 +497,57 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::NbtQueryResponse(_) => {}
             ClientboundPlayPackets::ItemPickupAnimation(_) => {}
             ClientboundPlayPackets::EntityPosition(p) => {
-                let mut state = SystemState::<Query<(&EntityId, &mut Transform)>>::new(world);
-                let mut query = state.get_mut(world);
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityPosition: {:?}", p.entity_id);
 
+                let mut query = world.query::<(&EntityId, &mut Transform)>();
+
+                // Find the entity with the given id
                 if let Some((_, mut transform)) =
-                    query.iter_mut().find(|(id, _)| **id == p.entity_id)
+                    query.iter_mut(world).find(|(id, _)| id == &&p.entity_id)
                 {
                     transform.translation = p.position.into();
                 } else {
-                    // warn!("Got EntityPosition for unknown entity {}", p.entity_id)
+                    warn!(
+                        "Received EntityPosition for unknown entity: {:?}",
+                        p.entity_id
+                    );
                 }
             }
             ClientboundPlayPackets::AdvancementUpdate(_) => {}
-            ClientboundPlayPackets::EntityAttributes(_) => {}
+            ClientboundPlayPackets::EntityAttributes(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityAttributes: {:?}", p.entity_id);
+
+                let mut query = world.query::<&EntityId>();
+
+                // Find the entity with the given id
+                if query.iter_mut(world).any(|id| id == &p.entity_id) {
+                    // TODO: Update the entity's attributes
+                } else {
+                    warn!(
+                        "Received EntityAttributes for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
             ClientboundPlayPackets::Features(_) => {}
-            ClientboundPlayPackets::EntityStatusEffect(_) => {}
+            ClientboundPlayPackets::EntityStatusEffect(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received EntityStatusEffect: {:?}", p.entity_id);
+
+                let mut query = world.query::<&EntityId>();
+
+                // Find the entity with the given id
+                if query.iter_mut(world).any(|id| id == &p.entity_id) {
+                    // TODO: Update the entity's status effects
+                } else {
+                    warn!(
+                        "Received EntityStatusEffect for unknown entity: {:?}",
+                        p.entity_id
+                    );
+                }
+            }
             ClientboundPlayPackets::SynchronizeRecipes(_) => {}
             ClientboundPlayPackets::SynchronizeTags(_) => {}
         }
