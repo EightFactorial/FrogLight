@@ -103,7 +103,7 @@ impl<T: ContainerType> Container<T> {
             );
         }
 
-        val
+        val.copied()
     }
 
     /// Set the data at the given position.
@@ -111,7 +111,7 @@ impl<T: ContainerType> Container<T> {
 }
 
 #[test]
-fn get_block() {
+fn get_data() {
     // Empty container, should return 0
     let container = Container::<BlockContainer>::default();
     assert_eq!(container.get_data(&ChunkBlockPos::new(0, 0, 0)), Some(0));

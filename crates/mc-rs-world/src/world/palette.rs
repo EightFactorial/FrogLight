@@ -45,10 +45,10 @@ impl Palette {
     /// Get the data at the given index in the [`Palette`].
     ///
     /// Returns `None` if the [`Palette`] is [`Palette::Global`].
-    pub fn get(&self, index: usize) -> Option<u32> {
+    pub fn get(&self, index: usize) -> Option<&u32> {
         match self {
-            Palette::Single(val) => Some(*val),
-            Palette::Vector(vec) => vec.get(index).copied(),
+            Palette::Single(val) => Some(val),
+            Palette::Vector(vec) => vec.get(index),
             Palette::Global => None,
         }
     }

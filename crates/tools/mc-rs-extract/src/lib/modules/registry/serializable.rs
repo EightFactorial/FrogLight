@@ -3,10 +3,8 @@ use tracing::{error, info};
 
 use crate::{
     data::ModuleData,
-    modules::{ExtractModule, ModuleExt},
+    modules::{registry::registries::RegistriesModule, ExtractModule, ModuleExt},
 };
-
-use super::RegistriesModule;
 
 /// A module that generates a list of serializable registries.
 ///

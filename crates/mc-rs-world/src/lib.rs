@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod biomes;
 pub mod blocks;
 pub mod entities;
 pub mod resources;

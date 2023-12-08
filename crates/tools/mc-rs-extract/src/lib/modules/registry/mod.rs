@@ -1,5 +1,2 @@
-mod registries;
-pub use registries::RegistriesModule;
-
-mod serializable;
-pub use serializable::SerializableRegistriesModule;
+pub(crate) mod registries;
+pub(crate) mod serializable;

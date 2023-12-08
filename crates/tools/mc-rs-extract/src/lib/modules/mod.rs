@@ -10,7 +10,10 @@ mod info;
 pub use info::InfoModule;
 
 mod registry;
-pub use registry::{RegistriesModule, SerializableRegistriesModule};
+pub use registry::{registries::RegistriesModule, serializable::SerializableRegistriesModule};
+
+mod blocks;
+pub use blocks::{block_list::BlockListModule, block_states::BlockStatesModule};
 
 /// Modules that can be run to generate data.
 ///
@@ -26,6 +29,8 @@ pub enum ExtractModule {
     Info,
     Registries,
     SerializableRegistries,
+    BlockList,
+    BlockIds,
 }
 
 impl ExtractModule {
@@ -44,6 +49,8 @@ impl From<ExtractModule> for Box<dyn ModuleExt> {
             ExtractModule::Info => Box::<InfoModule>::default(),
             ExtractModule::Registries => Box::<RegistriesModule>::default(),
             ExtractModule::SerializableRegistries => Box::<SerializableRegistriesModule>::default(),
+            ExtractModule::BlockList => Box::<BlockListModule>::default(),
+            ExtractModule::BlockIds => Box::<BlockStatesModule>::default(),
         }
     }
 }
