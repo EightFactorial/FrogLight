@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use mc_rs_core::schedule::state::ApplicationState;
 
-pub(crate) mod decode_chunk;
+mod decode_chunk;
 pub(super) use decode_chunk::DecodeResult;
 pub use decode_chunk::{ChunkDecodeError, DecodeChunkTask};
 

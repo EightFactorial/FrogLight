@@ -20,6 +20,8 @@ pub enum ChunkDecodeError {
 }
 
 /// A [Task] that decodes a [`Chunk`] from a [`ChunkDataPacket`].
+///
+/// This is used to decode chunks in parallel.
 #[derive(Debug, From, Into, Deref, DerefMut, Component)]
 pub struct DecodeChunkTask(Task<DecodeResult>);
 pub(crate) type DecodeResult = Result<Chunk, ChunkDecodeError>;

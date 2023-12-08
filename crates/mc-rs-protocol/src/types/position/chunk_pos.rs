@@ -23,7 +23,7 @@ impl ChunkPos {
 
     pub const fn new(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
 
-    pub const fn around(&self) -> [Self; 4] {
+    pub const fn sides(&self) -> [Self; 4] {
         [
             Self::new(self.0.x - 1, self.0.y),
             Self::new(self.0.x + 1, self.0.y),

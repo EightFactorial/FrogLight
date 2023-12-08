@@ -15,6 +15,7 @@ workspace = true
 azalea-nbt = { workspace = true }
 bevy = { workspace = true }
 bevy_rapier3d = { workspace = true }
+bitvec = "1.0"
 compact_str = { workspace = true }
 derive_more = { workspace = true }
 futures-lite = { workspace = true }
@@ -22,6 +23,7 @@ mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
 mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
 mc-rs-protocol = { version = "0.1", path = "../mc-rs-protocol" }
 mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
+parking_lot = { workspace = true }
 strum = { workspace = true }
 thiserror = { workspace = true }
 

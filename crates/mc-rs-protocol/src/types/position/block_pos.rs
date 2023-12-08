@@ -22,7 +22,7 @@ impl BlockPos {
 
     pub const ZERO: Self = Self(IVec3::ZERO);
 
-    pub fn new(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
+    pub const fn new(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
 
     pub fn from_chunk_pos(chunk_pos: ChunkPos, y: i32) -> Self {
         Self::new(chunk_pos.x * 16, y, chunk_pos.y * 16)

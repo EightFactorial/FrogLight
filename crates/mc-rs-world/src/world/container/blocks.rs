@@ -2,7 +2,7 @@ use crate::world::palette::Palette;
 
 use super::traits::ContainerType;
 
-/// A container for block data.
+/// A type of [`Container`](crate::world::container::Container) for block data.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct BlockContainer;
 

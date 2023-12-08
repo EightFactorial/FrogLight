@@ -497,7 +497,7 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::Subtitle(_) => {}
             ClientboundPlayPackets::WorldTimeUpdate(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                debug!("Received WorldTimeUpdate: {p:?}");
+                debug!("Received WorldTimeUpdate: GameTime {}", p.game_time);
 
                 // TODO: Update the WorldTime resource
             }
