@@ -59,7 +59,7 @@ impl Chunk {
     }
 
     /// Get the block at the given position in the [`Chunk`].
-    pub fn get_block(&self, pos: &ChunkBlockPos) -> Option<u32> {
+    pub fn get_block(&self, mut pos: ChunkBlockPos) -> Option<u32> {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to get block, horizontal position out of bounds");
@@ -67,7 +67,8 @@ impl Chunk {
             return None;
         }
 
-        let Ok(section_index): Result<usize, _> = (pos.y - Self::VERTICAL_SHIFT).try_into() else {
+        pos.y -= Self::VERTICAL_SHIFT;
+        let Ok(section_index): Result<usize, _> = pos.y.try_into() else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to get block, vertical position out of bounds");
 
@@ -75,7 +76,7 @@ impl Chunk {
         };
 
         if let Some(section) = self.sections.read().get(section_index) {
-            section.blocks.get_data(pos)
+            section.blocks.get_data(&pos)
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to get block, section index out of bounds");
@@ -85,7 +86,7 @@ impl Chunk {
     }
 
     /// Set the block at the given position in the [`Chunk`].
-    pub fn set_block(&mut self, data: u32, pos: &ChunkBlockPos) {
+    pub fn set_block(&mut self, data: u32, mut pos: ChunkBlockPos) {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to set block, horizontal position out of bounds");
@@ -93,7 +94,8 @@ impl Chunk {
             return;
         }
 
-        let Ok(section_index): Result<usize, _> = (pos.y - Self::VERTICAL_SHIFT).try_into() else {
+        pos.y -= Self::VERTICAL_SHIFT;
+        let Ok(section_index): Result<usize, _> = pos.y.try_into() else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to set block, vertical position out of bounds");
 
@@ -101,7 +103,7 @@ impl Chunk {
         };
 
         if let Some(section) = self.sections.write().get_mut(section_index) {
-            section.blocks.set_data(data, pos);
+            section.blocks.set_data(data, &pos);
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to set block, section index out of bounds");
@@ -109,7 +111,7 @@ impl Chunk {
     }
 
     /// Get the biome at the given position in the [`Chunk`].
-    pub fn get_biome(&self, pos: &ChunkBlockPos) -> Option<u32> {
+    pub fn get_biome(&self, mut pos: ChunkBlockPos) -> Option<u32> {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to get biome, horizontal position out of bounds");
@@ -117,7 +119,8 @@ impl Chunk {
             return None;
         }
 
-        let Ok(section_index): Result<usize, _> = (pos.y - Self::VERTICAL_SHIFT).try_into() else {
+        pos.y -= Self::VERTICAL_SHIFT;
+        let Ok(section_index): Result<usize, _> = pos.y.try_into() else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to get biome, vertical position out of bounds");
 
@@ -125,7 +128,7 @@ impl Chunk {
         };
 
         if let Some(section) = self.sections.read().get(section_index) {
-            section.biomes.get_data(pos)
+            section.biomes.get_data(&pos)
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to get biome, section index out of bounds");
@@ -135,7 +138,7 @@ impl Chunk {
     }
 
     /// Set the biome at the given position in the [`Chunk`].
-    pub fn set_biome(&mut self, data: u32, pos: &ChunkBlockPos) {
+    pub fn set_biome(&mut self, data: u32, mut pos: ChunkBlockPos) {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to set biome, horizontal position out of bounds");
@@ -143,7 +146,8 @@ impl Chunk {
             return;
         }
 
-        let Ok(section_index): Result<usize, _> = (pos.y - Self::VERTICAL_SHIFT).try_into() else {
+        pos.y -= Self::VERTICAL_SHIFT;
+        let Ok(section_index): Result<usize, _> = pos.y.try_into() else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to set biome, vertical position out of bounds");
 
@@ -151,7 +155,7 @@ impl Chunk {
         };
 
         if let Some(section) = self.sections.write().get_mut(section_index) {
-            section.biomes.set_data(data, pos);
+            section.biomes.set_data(data, &pos);
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!("Failed to set biome, section index out of bounds");

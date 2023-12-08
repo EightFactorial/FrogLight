@@ -37,6 +37,9 @@ impl<T: ContainerType> Container<T> {
 
 impl<T: ContainerType> Container<T> {
     /// Get the data at the given position in the [`Container`].
+    ///
+    /// This assumes that the position is within the [`Section`],
+    /// and any vertical shifting has already been applied.
     pub fn get_data(&self, pos: &ChunkBlockPos) -> Option<u32> {
         // If the bitsize is 0, the Palette is a single value
         if self.bits == 0 {
