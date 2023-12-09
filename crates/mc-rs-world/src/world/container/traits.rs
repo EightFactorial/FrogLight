@@ -1,4 +1,4 @@
-use std::io::Cursor;
+use std::{fmt::Debug, io::Cursor};
 
 use bitvec::vec::BitVec;
 use futures_lite::Future;
@@ -9,7 +9,7 @@ use crate::world::{palette::Palette, tasks::ChunkDecodeError};
 use super::Container;
 
 /// A trait for [`Container`] types.
-pub trait ContainerType: Sized + Default {
+pub trait ContainerType: Sized + Debug + Default {
     fn decode_container(
         cursor: &mut Cursor<&[u8]>,
     ) -> impl Future<Output = Result<Container<Self>, ChunkDecodeError>> {

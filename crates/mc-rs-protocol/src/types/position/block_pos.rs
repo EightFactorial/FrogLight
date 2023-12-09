@@ -6,9 +6,19 @@ use crate::buffer::{Decode, Encode};
 
 use super::ChunkPos;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, Test)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, Test)]
 #[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct BlockPos(pub IVec3);
+
+impl std::fmt::Debug for BlockPos {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("BlockPos")
+            .field("x", &self.x)
+            .field("y", &self.y)
+            .field("z", &self.z)
+            .finish()
+    }
+}
 
 impl BlockPos {
     const PACKED_X_LENGTH: u64 = 1 + 25; // minecraft does something a bit more complicated to get this 25
@@ -24,6 +34,17 @@ impl BlockPos {
 
     pub const fn new(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
 
+    /// Creates a new [`BlockPos`] from a [`ChunkPos`] and a `y` coordinate.
+    /// This assumes that chunks are `16xYx16 (X,Y,Z)`,
+    ///
+    /// # Examples
+    /// ```rust
+    /// use mc_rs_protocol::types::position::{BlockPos, ChunkPos};
+    ///
+    /// let chunk_pos = ChunkPos::new(3, -4);
+    /// let block_pos = BlockPos::from_chunk_pos(chunk_pos, 1);
+    /// assert_eq!(BlockPos::new(48, 1, -64), block_pos);
+    /// ```
     pub fn from_chunk_pos(chunk_pos: ChunkPos, y: i32) -> Self {
         Self::new(chunk_pos.x * 16, y, chunk_pos.y * 16)
     }

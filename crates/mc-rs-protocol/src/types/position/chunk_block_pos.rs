@@ -75,7 +75,7 @@ impl ChunkBlockPos {
     ///
     /// This is zero-indexed, so the first block in the chunk is 0, the second is 1, etc.
     ///
-    /// NOTE: This assumes that chunks are `16x384x16 (X,Y,Z)`.
+    /// NOTE: This assumes that chunks are `16xYx16 (X,Y,Z)`.
     ///
     /// # Examples
     /// ```rust
@@ -97,7 +97,7 @@ impl ChunkBlockPos {
         Self {
             x: (index % 16) as u8,
             z: ((index / 16) % 16) as u8,
-            y: (index / 384) as i32,
+            y: ((index / 16) / 16) as i32,
         }
     }
 
@@ -138,4 +138,68 @@ impl From<BlockPos> for ChunkBlockPos {
             z: (value.z % 16) as u8,
         }
     }
+}
+
+#[test]
+fn from_index() {
+    assert_eq!(ChunkBlockPos::new(0, 0, 0), ChunkBlockPos::from_index(0));
+    assert_eq!(ChunkBlockPos::new(1, 0, 0), ChunkBlockPos::from_index(1));
+    assert_eq!(ChunkBlockPos::new(15, 0, 0), ChunkBlockPos::from_index(15));
+    assert_eq!(ChunkBlockPos::new(0, 0, 1), ChunkBlockPos::from_index(16));
+    assert_eq!(ChunkBlockPos::new(1, 0, 1), ChunkBlockPos::from_index(17));
+    assert_eq!(ChunkBlockPos::new(15, 0, 1), ChunkBlockPos::from_index(31));
+    assert_eq!(ChunkBlockPos::new(0, 0, 15), ChunkBlockPos::from_index(240));
+    assert_eq!(ChunkBlockPos::new(1, 0, 15), ChunkBlockPos::from_index(241));
+    assert_eq!(
+        ChunkBlockPos::new(15, 0, 15),
+        ChunkBlockPos::from_index(255)
+    );
+    assert_eq!(ChunkBlockPos::new(0, 1, 0), ChunkBlockPos::from_index(256));
+    assert_eq!(ChunkBlockPos::new(1, 1, 0), ChunkBlockPos::from_index(257));
+    assert_eq!(ChunkBlockPos::new(15, 1, 0), ChunkBlockPos::from_index(271));
+    assert_eq!(ChunkBlockPos::new(0, 1, 1), ChunkBlockPos::from_index(272));
+    assert_eq!(ChunkBlockPos::new(1, 1, 1), ChunkBlockPos::from_index(273));
+    assert_eq!(ChunkBlockPos::new(15, 1, 1), ChunkBlockPos::from_index(287));
+    assert_eq!(ChunkBlockPos::new(0, 1, 15), ChunkBlockPos::from_index(496));
+    assert_eq!(ChunkBlockPos::new(1, 1, 15), ChunkBlockPos::from_index(497));
+    assert_eq!(
+        ChunkBlockPos::new(15, 1, 15),
+        ChunkBlockPos::from_index(511)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(0, 15, 0),
+        ChunkBlockPos::from_index(3840)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(1, 15, 0),
+        ChunkBlockPos::from_index(3841)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(15, 15, 0),
+        ChunkBlockPos::from_index(3855)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(0, 15, 1),
+        ChunkBlockPos::from_index(3856)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(1, 15, 1),
+        ChunkBlockPos::from_index(3857)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(15, 15, 1),
+        ChunkBlockPos::from_index(3871)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(0, 15, 15),
+        ChunkBlockPos::from_index(4080)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(1, 15, 15),
+        ChunkBlockPos::from_index(4081)
+    );
+    assert_eq!(
+        ChunkBlockPos::new(15, 15, 15),
+        ChunkBlockPos::from_index(4095)
+    );
 }

@@ -115,19 +115,37 @@ impl<T: ContainerType> Container<T> {
                     expanded_ids.push(data);
                     *ids = expanded_ids;
 
-                    // TODO: Check if the palette needs to be converted to Global
                     // Expand the Container if needed
                     if (ids.len() - 1) >= 2usize.pow(self.bits as u32) {
-                        self.expand(1);
-                    }
+                        // Check which palette type to expand into
+                        match T::palette_type(&(self.bits + 1)) {
+                            Palette::Single(_) => unreachable!("Can't expand into Single palette!"),
+                            Palette::Vector(_) => {
+                                // Expand the Container
+                                self.expand(1);
+                                // Insert the data
+                                self.insert(index, self.data_index_from_pos(pos));
+                            }
+                            Palette::Global => {
+                                // Convert the Container to Global
+                                self.vector_to_global();
 
-                    // Insert the data
-                    self.insert(index, self.data_index_from_pos(pos));
+                                // Insert the data
+                                self.insert(
+                                    data.try_into().expect("Container data overflow"),
+                                    self.data_index_from_pos(pos),
+                                );
+                            }
+                        }
+                    } else {
+                        // Insert the data
+                        self.insert(index, self.data_index_from_pos(pos));
+                    }
                 }
             }
             Palette::Global => {
                 let data_bits = BitSlice::<u32, Msb0>::from_element(&data);
-                let first_one = data_bits.iter().position(|bit| *bit).unwrap_or(0);
+                let first_one = 32 - data_bits.iter().position(|bit| *bit).unwrap_or(32);
 
                 // Expand or shrink the Container if needed
                 match first_one.cmp(&self.bits) {
@@ -178,15 +196,12 @@ impl<T: ContainerType> Container<T> {
         };
 
         // Copy the data from the old Container to the new Container
-        let mut index = 0usize;
-        for bit in self.data.as_bitslice() {
-            // Pad the index with zeros
-            if self.bits - (index % new_bits) >= count {
-                expanded.data.set(index, false);
-                index += 1;
+        for (i, chunk) in self.data.chunks_exact(self.bits).enumerate() {
+            let mut index = 0usize;
+            for (i, bit) in chunk.iter().rev().enumerate() {
+                index += if *bit { 1 << i } else { 0 };
             }
-            expanded.data.set(index, *bit);
-            index += 1;
+            expanded.insert(index, i * new_bits);
         }
 
         // Replace the old Container with the new Container
@@ -194,18 +209,51 @@ impl<T: ContainerType> Container<T> {
     }
 
     /// Insert the palette index into the data bits.
-    fn insert(&mut self, index: usize, data_index: usize) {
+    fn insert(&mut self, data: usize, data_index: usize) {
         // Get the data bits
         let slice = &mut self.data[data_index..data_index + self.bits];
 
         // Get the input bits
-        let input_slice = BitSlice::<usize, Msb0>::from_element(&index);
+        let input_slice = BitSlice::<usize, Msb0>::from_element(&data);
         let input_slice = &input_slice[usize::BITS as usize - self.bits..];
 
         // Copy the input bits to the data bits
         for (i, bit) in input_slice.into_iter().enumerate() {
             slice.set(i, *bit);
         }
+    }
+
+    /// Convert from a [`Vector`](Palette::Vector) palette to a [`Global`](Palette::Global) palette.
+    fn vector_to_global(&mut self) {
+        let Palette::Vector(ids) = self.palette.clone() else {
+            unreachable!("Can't convert non-Vector palette to Global!");
+        };
+
+        // Get the largest number in the Palette
+        let largest = ids.iter().max().copied().unwrap();
+        let new_bits = (largest as f64).log2().ceil() as usize;
+
+        // Create a new Global Container
+        let mut converted = Self {
+            bits: new_bits,
+            palette: Palette::Global,
+            data: BitVec::repeat(false, Section::SECTION_VOLUME * new_bits),
+            _phantom: std::marker::PhantomData,
+        };
+
+        // Copy the data from the old Container to the new Container
+        for (i, chunk) in self.data.chunks_exact(self.bits).enumerate() {
+            let mut index = 0usize;
+            for (i, bit) in chunk.iter().rev().enumerate() {
+                index += if *bit { 1 << i } else { 0 };
+            }
+            let data = ids[index].try_into().expect("Container data overflow");
+
+            converted.insert(data, i * new_bits);
+        }
+
+        // Replace the old Container with the new Container
+        *self = converted;
     }
 
     /// Convert a [`ChunkBlockPos`] to a data index.
@@ -327,11 +375,12 @@ fn get_data() {
 }
 
 #[test]
-fn add_data() {
+fn set_data() {
     let mut default = Container::<BlockContainer>::default();
     let first = ChunkBlockPos::new(0, 0, 0);
     let second = ChunkBlockPos::new(1, 0, 0);
     let third = ChunkBlockPos::new(2, 0, 0);
+    let fourth = ChunkBlockPos::new(3, 0, 0);
 
     assert_eq!(default.bits, 0);
     assert_eq!(default.palette, Palette::Single(0));
@@ -367,14 +416,35 @@ fn add_data() {
     assert_eq!(default.get_data(&second), Some(8));
     assert_eq!(default.get_data(&third), Some(2));
 
-    // Remove the second and third blocks from the container
-    default.set_data(0, &second);
-    default.set_data(0, &third);
+    // Add a fourth block to the container
+    default.set_data(5, &fourth);
 
-    // SHRINKING IS NOT IMPLEMENTED YET
-    assert_eq!(default.bits, 2);
-    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8, 2]));
+    assert_eq!(default.bits, 3);
+    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8, 2, 5]));
     assert_eq!(default.get_data(&first), Some(1));
-    assert_eq!(default.get_data(&second), Some(0));
-    assert_eq!(default.get_data(&third), Some(0));
+    assert_eq!(default.get_data(&second), Some(8));
+    assert_eq!(default.get_data(&third), Some(2));
+    assert_eq!(default.get_data(&fourth), Some(5));
+
+    // Fill the container with blocks until it converts to a Global palette
+    for x in 20..2u32.pow(9) {
+        default.set_data(x, &ChunkBlockPos::from_index(x as usize));
+    }
+
+    assert_eq!(default.bits, 9);
+    assert_eq!(default.palette, Palette::Global);
+    assert_eq!(default.get_data(&first), Some(1));
+    assert_eq!(default.get_data(&second), Some(8));
+    assert_eq!(default.get_data(&third), Some(2));
+    assert_eq!(default.get_data(&fourth), Some(5));
+
+    // Set the fourth block to a new value
+    default.set_data(18, &fourth);
+
+    assert_eq!(default.bits, 9);
+    assert_eq!(default.palette, Palette::Global);
+    assert_eq!(default.get_data(&first), Some(1));
+    assert_eq!(default.get_data(&second), Some(8));
+    assert_eq!(default.get_data(&third), Some(2));
+    assert_eq!(default.get_data(&fourth), Some(18));
 }
