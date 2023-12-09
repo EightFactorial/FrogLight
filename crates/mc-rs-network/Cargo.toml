@@ -25,7 +25,7 @@ mc-rs-world = { version = "0.1", path = "../mc-rs-world" }
 default = []
 
 # Enable debug features
-debug = ["mc-rs-core/debug", "mc-rs-protocol/debug"]
+debug = ["mc-rs-core/debug", "mc-rs-protocol/debug", "mc-rs-world/debug"]
 
 # Enable simd features
-simd = ["mc-rs-core/simd", "mc-rs-protocol/simd"]
+simd = ["mc-rs-core/simd", "mc-rs-protocol/simd", "mc-rs-world/simd"]

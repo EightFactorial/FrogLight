@@ -5,6 +5,7 @@ use compact_str::CompactString;
 use mc_rs_core::{
     components::player::{ControlledPlayer, ControlledPlayerHead},
     packets::sound::PacketSoundType,
+    position::ChunkBlockPos,
     resources::client_information::ClientInformation,
     sounds::SoundEvent,
 };
@@ -82,16 +83,14 @@ impl Network for V1_20_0 {
                 let chunk_worlds = world.resource::<Worlds>();
                 if let Some(chunk_world) = chunk_worlds.get_world(&current) {
                     if let Some(chunk_entity) = chunk_world.get_entity(&p.position.into()) {
-                        let Some(mut _chunk) = world.entity_mut(*chunk_entity).get::<Chunk>()
-                        else {
+                        if let Some(mut _chunk) = world.entity_mut(*chunk_entity).get::<Chunk>() {
+                            // TODO: Update the block entity
+                        } else {
                             error!(
                                 "Error getting Chunk for BlockEntityUpdate: {:?}",
                                 p.position
                             );
-                            return;
                         };
-
-                        // TODO: Update the block entity
                     } else {
                         error!("Error getting Entity for Chunk: {:?}", p.position);
                     }
@@ -100,7 +99,33 @@ impl Network for V1_20_0 {
                 }
             }
             ClientboundPlayPackets::BlockEvent(_) => {}
-            ClientboundPlayPackets::BlockUpdate(_) => {}
+            ClientboundPlayPackets::BlockUpdate(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                trace!("Received BlockUpdate: {:?}", p.position);
+
+                let current = world
+                    .get_resource::<CurrentWorld>()
+                    .cloned()
+                    .unwrap_or_else(|| {
+                        error!("Error getting CurrentWorld");
+                        CurrentWorld::from(WorldType::Overworld)
+                    });
+
+                let chunk_worlds = world.resource::<Worlds>();
+                if let Some(chunk_world) = chunk_worlds.get_world(&current) {
+                    if let Some(&chunk_entity) = chunk_world.get_entity(&p.position.into()) {
+                        if let Some(mut chunk) = world.entity_mut(chunk_entity).get_mut::<Chunk>() {
+                            chunk.set_block_id(p.block_state, ChunkBlockPos::from(p.position));
+                        } else {
+                            error!("Error getting Chunk for BlockUpdate: {:?}", p.position);
+                        };
+                    } else {
+                        error!("Error getting Entity for Chunk: {:?}", p.position);
+                    }
+                } else {
+                    error!("Error getting current World: {current:?}");
+                }
+            }
             ClientboundPlayPackets::BossBar(_) => {}
             ClientboundPlayPackets::Difficulty(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]

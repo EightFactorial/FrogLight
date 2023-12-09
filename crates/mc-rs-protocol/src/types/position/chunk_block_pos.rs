@@ -132,10 +132,20 @@ impl ChunkBlockPos {
 
 impl From<BlockPos> for ChunkBlockPos {
     fn from(value: BlockPos) -> Self {
+        let mut x = value.x % 16;
+        let mut z = value.z % 16;
+
+        if x < 0 {
+            x += 16;
+        }
+        if z < 0 {
+            z += 16;
+        }
+
         Self {
-            x: (value.x % 16) as u8,
+            x: x as u8,
             y: value.y,
-            z: (value.z % 16) as u8,
+            z: z as u8,
         }
     }
 }
