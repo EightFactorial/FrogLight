@@ -1,10 +1,10 @@
-use std::io::Cursor;
+use std::{cmp::Ordering, io::Cursor};
 
 use super::{palette::Palette, section::Section, tasks::ChunkDecodeError};
 
 pub mod traits;
 use bevy::log::error;
-use bitvec::{order::Msb0, vec::BitVec};
+use bitvec::{order::Msb0, slice::BitSlice, vec::BitVec};
 use mc_rs_core::position::ChunkBlockPos;
 use traits::ContainerType;
 
@@ -21,7 +21,7 @@ pub use blocks::BlockContainer;
 /// For [`BiomeContainer`], it contains biome data.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct Container<T: ContainerType> {
-    pub bits: u8,
+    pub bits: usize,
     pub palette: Palette,
     pub data: BitVec<u64, Msb0>,
     _phantom: std::marker::PhantomData<T>,
@@ -41,37 +41,14 @@ impl<T: ContainerType> Container<T> {
     /// This assumes that the position is within the [`Section`],
     /// and any vertical shifting has already been applied.
     pub fn get_data(&self, pos: &ChunkBlockPos) -> Option<u32> {
-        // If the bitsize is 0, the Palette is a single value
-        if self.bits == 0 {
-            if let Palette::Single(id) = &self.palette {
-                return Some(*id);
-            } else {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                error!("Palette has a bitsize of 0, but is not Single!");
-                return None;
-            }
+        // If the palette is Single, return the palette id
+        if let Palette::Single(id) = &self.palette {
+            return Some(*id);
         }
 
-        // Get the index of the block in the chunk
-        let block_index = (pos.x as usize % Section::SECTION_WIDTH)
-            + ((pos.z as usize % Section::SECTION_DEPTH) * Section::SECTION_WIDTH)
-            + ((pos.y as usize % Section::SECTION_HEIGHT)
-                * Section::SECTION_WIDTH
-                * Section::SECTION_DEPTH);
-
-        // Get the data index and length
-        let data_index = block_index * self.bits as usize;
-
         // Get the data slice
-        let Some(slice) = self.data.get(data_index..data_index + self.bits as usize) else {
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            error!(
-                "Failed to get block at {pos:?} from Container (b:{}, l:{})",
-                self.bits,
-                self.data.len()
-            );
-            return None;
-        };
+        let data_index = self.data_index_from_pos(pos);
+        let slice = &self.data[data_index..data_index + self.bits];
 
         // Create the palette index
         let mut palette_index = 0u32;
@@ -80,7 +57,7 @@ impl<T: ContainerType> Container<T> {
         }
 
         // If the palette is Global, return the palette index
-        if self.palette == Palette::Global {
+        if let Palette::Global = &self.palette {
             return Some(palette_index);
         }
 
@@ -107,7 +84,145 @@ impl<T: ContainerType> Container<T> {
     }
 
     /// Set the data at the given position.
-    pub fn set_data(&mut self, _data: u32, _pos: &ChunkBlockPos) { todo!() }
+    pub fn set_data(&mut self, data: u32, pos: &ChunkBlockPos) {
+        match &mut self.palette {
+            Palette::Single(id) => {
+                // If the data is the same as the palette id, do nothing
+                if data != *id {
+                    // Change the palette to Vector
+                    self.palette = Palette::Vector(vec![*id, data]);
+                    // Set the bits to 1
+                    self.bits = 1;
+                    // Fill the Container with zeros
+                    self.data = BitVec::repeat(false, Section::SECTION_VOLUME);
+                    // Insert the data
+                    self.insert(1, self.data_index_from_pos(pos));
+                }
+            }
+            Palette::Vector(ids) => {
+                if let Some(index) = ids.iter().position(|id| id == &data) {
+                    // Insert the data
+                    self.insert(index, self.data_index_from_pos(pos));
+
+                    // TODO: Shrink the Container if needed
+                    // Note: Requires re-encoding the Container...
+                } else {
+                    // Get the index of the new data
+                    let index = ids.len();
+
+                    // Add the data to the palette
+                    let mut expanded_ids = ids.clone();
+                    expanded_ids.push(data);
+                    *ids = expanded_ids;
+
+                    // TODO: Check if the palette needs to be converted to Global
+                    // Expand the Container if needed
+                    if (ids.len() - 1) >= 2usize.pow(self.bits as u32) {
+                        self.expand(1);
+                    }
+
+                    // Insert the data
+                    self.insert(index, self.data_index_from_pos(pos));
+                }
+            }
+            Palette::Global => {
+                let data_bits = BitSlice::<u32, Msb0>::from_element(&data);
+                let first_one = data_bits.iter().position(|bit| *bit).unwrap_or(0);
+
+                // Expand or shrink the Container if needed
+                match first_one.cmp(&self.bits) {
+                    Ordering::Greater => {
+                        // Expand the Container
+                        self.expand(first_one - self.bits);
+
+                        // Insert the data
+                        self.insert(
+                            data.try_into().expect("Container data overflow"),
+                            self.data_index_from_pos(pos),
+                        );
+                    }
+                    Ordering::Equal => {
+                        // Insert the data
+                        self.insert(
+                            data.try_into().expect("Container data overflow"),
+                            self.data_index_from_pos(pos),
+                        );
+                    }
+                    Ordering::Less => {
+                        // Insert the data
+                        self.insert(
+                            data.try_into().expect("Container data overflow"),
+                            self.data_index_from_pos(pos),
+                        );
+
+                        // TODO: Shrink the Container if needed
+                        // Note: Requires knowing the largest number in the Container...
+                    }
+                }
+            }
+        }
+    }
+
+    /// Expand the [`Container`]'s bitsize by the given amount.
+    ///
+    /// This pads every index with `count` zeros.
+    fn expand(&mut self, count: usize) {
+        let new_bits = self.bits + count;
+
+        // Create a new expanded Container
+        let mut expanded = Self {
+            bits: new_bits,
+            palette: self.palette.clone(),
+            data: BitVec::repeat(false, Section::SECTION_VOLUME * new_bits),
+            _phantom: std::marker::PhantomData,
+        };
+
+        // Copy the data from the old Container to the new Container
+        let mut index = 0usize;
+        for bit in self.data.as_bitslice() {
+            // Pad the index with zeros
+            if self.bits - (index % new_bits) >= count {
+                expanded.data.set(index, false);
+                index += 1;
+            }
+            expanded.data.set(index, *bit);
+            index += 1;
+        }
+
+        // Replace the old Container with the new Container
+        *self = expanded;
+    }
+
+    /// Insert the palette index into the data bits.
+    fn insert(&mut self, index: usize, data_index: usize) {
+        // Get the data bits
+        let slice = &mut self.data[data_index..data_index + self.bits];
+
+        // Get the input bits
+        let input_slice = BitSlice::<usize, Msb0>::from_element(&index);
+        let input_slice = &input_slice[usize::BITS as usize - self.bits..];
+
+        // Copy the input bits to the data bits
+        for (i, bit) in input_slice.into_iter().enumerate() {
+            slice.set(i, *bit);
+        }
+    }
+
+    /// Convert a [`ChunkBlockPos`] to a data index.
+    ///
+    /// # Warning
+    /// This index is invalid if the palette is modified after the index is created.
+    fn data_index_from_pos(&self, pos: &ChunkBlockPos) -> usize {
+        // Get the index of the block in the chunk
+        let block_index = (pos.x as usize % Section::SECTION_WIDTH)
+            + ((pos.z as usize % Section::SECTION_DEPTH) * Section::SECTION_WIDTH)
+            + ((pos.y as usize % Section::SECTION_HEIGHT)
+                * Section::SECTION_WIDTH
+                * Section::SECTION_DEPTH);
+
+        // Get the data index and length
+        block_index * self.bits
+    }
 }
 
 #[test]
@@ -209,4 +324,57 @@ fn get_data() {
         container.get_data(&ChunkBlockPos::from_index(192 + 56)),
         Some(8)
     );
+}
+
+#[test]
+fn add_data() {
+    let mut default = Container::<BlockContainer>::default();
+    let first = ChunkBlockPos::new(0, 0, 0);
+    let second = ChunkBlockPos::new(1, 0, 0);
+    let third = ChunkBlockPos::new(2, 0, 0);
+
+    assert_eq!(default.bits, 0);
+    assert_eq!(default.palette, Palette::Single(0));
+    assert_eq!(default.data.len(), 0);
+    assert_eq!(default.get_data(&first), Some(0));
+    assert_eq!(default.get_data(&second), Some(0));
+    assert_eq!(default.get_data(&third), Some(0));
+
+    // Add a block to an empty container
+    default.set_data(1, &first);
+
+    assert_eq!(default.bits, 1);
+    assert_eq!(default.palette, Palette::Vector(vec![0, 1]));
+    assert_eq!(default.get_data(&first), Some(1));
+    assert_eq!(default.get_data(&second), Some(0));
+    assert_eq!(default.get_data(&third), Some(0));
+
+    // Add a second block to the container
+    default.set_data(8, &second);
+
+    assert_eq!(default.bits, 2);
+    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8]));
+    assert_eq!(default.get_data(&first), Some(1));
+    assert_eq!(default.get_data(&second), Some(8));
+    assert_eq!(default.get_data(&third), Some(0));
+
+    // Add a third block to the container
+    default.set_data(2, &third);
+
+    assert_eq!(default.bits, 2);
+    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8, 2]));
+    assert_eq!(default.get_data(&first), Some(1));
+    assert_eq!(default.get_data(&second), Some(8));
+    assert_eq!(default.get_data(&third), Some(2));
+
+    // Remove the second and third blocks from the container
+    default.set_data(0, &second);
+    default.set_data(0, &third);
+
+    // SHRINKING IS NOT IMPLEMENTED YET
+    assert_eq!(default.bits, 2);
+    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8, 2]));
+    assert_eq!(default.get_data(&first), Some(1));
+    assert_eq!(default.get_data(&second), Some(0));
+    assert_eq!(default.get_data(&third), Some(0));
 }

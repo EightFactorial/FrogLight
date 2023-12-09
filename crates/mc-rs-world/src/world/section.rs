@@ -22,6 +22,9 @@ impl Section {
     pub const SECTION_WIDTH: usize = 16;
     pub const SECTION_HEIGHT: usize = 16;
     pub const SECTION_DEPTH: usize = 16;
+
+    pub const SECTION_VOLUME: usize =
+        Self::SECTION_WIDTH * Self::SECTION_HEIGHT * Self::SECTION_DEPTH;
 }
 
 impl Section {

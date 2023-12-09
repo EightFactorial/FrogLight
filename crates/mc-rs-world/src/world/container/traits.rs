@@ -15,7 +15,8 @@ pub trait ContainerType: Sized + Default {
     ) -> impl Future<Output = Result<Container<Self>, ChunkDecodeError>> {
         async {
             // Get the bits per block
-            let bits = u8::decode(cursor).map_err(|_| ChunkDecodeError::InvalidContainer)?;
+            let bits =
+                usize::from(u8::decode(cursor).map_err(|_| ChunkDecodeError::InvalidContainer)?);
 
             Ok(Container::<Self> {
                 // Decode the palette
@@ -33,5 +34,5 @@ pub trait ContainerType: Sized + Default {
     }
 
     /// Get the [`Palette`] type for the given bits per block.
-    fn palette_type(bits: &u8) -> Palette;
+    fn palette_type(bits: &usize) -> Palette;
 }
