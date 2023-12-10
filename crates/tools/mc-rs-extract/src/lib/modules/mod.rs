@@ -13,7 +13,9 @@ mod registry;
 pub use registry::{registries::RegistriesModule, serializable::SerializableRegistriesModule};
 
 mod blocks;
-pub use blocks::{block_list::BlockListModule, block_states::BlockStatesModule};
+pub use blocks::{
+    attributes::BlockAttributesModule, block_list::BlockListModule, block_states::BlockStatesModule,
+};
 
 /// Modules that can be run to generate data.
 ///
@@ -30,7 +32,8 @@ pub enum ExtractModule {
     Registries,
     SerializableRegistries,
     BlockList,
-    BlockIds,
+    BlockStates,
+    BlockAttributes,
 }
 
 impl ExtractModule {
@@ -50,7 +53,8 @@ impl From<ExtractModule> for Box<dyn ModuleExt> {
             ExtractModule::Registries => Box::<RegistriesModule>::default(),
             ExtractModule::SerializableRegistries => Box::<SerializableRegistriesModule>::default(),
             ExtractModule::BlockList => Box::<BlockListModule>::default(),
-            ExtractModule::BlockIds => Box::<BlockStatesModule>::default(),
+            ExtractModule::BlockAttributes => Box::<BlockAttributesModule>::default(),
+            ExtractModule::BlockStates => Box::<BlockStatesModule>::default(),
         }
     }
 }
