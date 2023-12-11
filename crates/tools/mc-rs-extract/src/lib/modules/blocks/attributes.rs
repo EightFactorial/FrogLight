@@ -133,7 +133,7 @@ impl ModuleExt for BlockAttributesModule {
                     object["type"] = "boolean".into();
                 }
                 AttributeType::Int { min, max } => {
-                    object["type"] = "int".into();
+                    object["type"] = "integer".into();
                     object["min"] = min.into();
                     object["max"] = max.into();
                 }
@@ -323,7 +323,7 @@ enum AttributeType {
 }
 
 #[derive(Debug, Display, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[strum(serialize_all = "lowercase")]
+#[strum(serialize_all = "UPPERCASE")]
 enum Direction {
     North,
     East,
@@ -361,7 +361,7 @@ impl Direction {
 ///
 /// This match statement can be generated with the following command:
 /// cat Properties.mapping | awk '/field_/ {print "\"" $2 "\" => \"" $3 "\","}'
-fn field_to_attribute_name(field: &str) -> &str {
+pub(crate) fn field_to_attribute_name(field: &str) -> &str {
     match field {
         "field_12480" => "FALLING",
         "field_12481" => "HORIZONTAL_FACING",

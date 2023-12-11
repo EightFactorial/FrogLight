@@ -86,8 +86,9 @@ impl ModuleExt for BlockListModule {
             data.output["blocks"]["field_map"][block.field.clone()] = block.name.clone().into();
             json_list.push(block.name.clone().into());
 
-            data.output["blocks"]["data"][block.name] = json::object! {
+            data.output["blocks"]["data"][block.name.clone()] = json::object! {
                 "id": index,
+                // "block_type": block.block_type,
                 // "map_color": block.map_color.value().1,
                 "collidable": block.collidable,
                 // "luminance": block.luminance,
@@ -110,7 +111,8 @@ impl ModuleExt for BlockListModule {
                 // "instrument": block.instrument,
                 "replaceable": block.replaceable,
                 "dynamic_bounds": block.dynamic_bounds,
-            }
+            };
+
         }
         data.output["blocks"]["list"] = JsonValue::Array(json_list);
 
@@ -143,9 +145,6 @@ impl BlockInsns {
             }
 
             match insn {
-                Insn::NewObject(_insn) => {
-                    // TODO
-                }
                 // Store constants for later use
                 Insn::Ldc(LdcInsn {
                     constant: LdcType::Float(constant),
@@ -297,6 +296,7 @@ impl BlockInsns {
                     //
                     // LeavesBlock
                     "method_26106" => {
+                        block.block_type = BlockType::Leaves;
                         block.strength(0.2);
                         block.ticks_randomly();
                         // block.sound_group()
@@ -306,6 +306,7 @@ impl BlockInsns {
                     }
                     // BedBlock
                     "method_26109" => {
+                        block.block_type = BlockType::Bed;
                         // block.sound_group()
                         block.strength(0.2);
                         block.non_opaque();
@@ -314,6 +315,7 @@ impl BlockInsns {
                     }
                     // ShulkerBoxBlock
                     "method_26110" => {
+                        block.block_type = BlockType::ShulkerBox;
                         block.solid();
                         block.strength(2.0);
                         block.dynamic_bounds();
@@ -322,22 +324,26 @@ impl BlockInsns {
                     }
                     // NetherStemBlock
                     "method_26115" => {
+                        block.block_type = BlockType::NetherStem;
                         block.strength(2.0);
                         // block.sound_group()
                     }
                     // LogBlock
                     "method_26117" => {
+                        block.block_type = BlockType::Log;
                         block.strength(2.0);
                         // block.sound_group()
                         block.burnable();
                     }
                     // PistonBlock
                     "method_26119" => {
+                        block.block_type = BlockType::Piston;
                         block.strength(1.5);
                         block.piston_behavior(PistonBehavior::Block);
                     }
                     // StainedGlassBlock
                     "method_26120" => {
+                        block.block_type = BlockType::StainedGlass;
                         // block.instrument()
                         block.strength(0.3);
                         // block.sound_group()
@@ -345,29 +351,34 @@ impl BlockInsns {
                     }
                     // WoodenButtonBlock
                     "method_45451" => {
+                        block.block_type = BlockType::WoodenButton;
                         block.no_collision();
                         block.strength(0.5);
                         block.piston_behavior(PistonBehavior::Destroy);
                     }
                     // StoneButtonBlock
                     "method_45453" => {
+                        block.block_type = BlockType::StoneButton;
                         block.no_collision();
                         block.strength(0.5);
                         block.piston_behavior(PistonBehavior::Destroy);
                     }
                     // BambooBlock
                     "method_47375" => {
+                        block.block_type = BlockType::Bamboo;
                         block.strength(2.0);
                         block.burnable();
                     }
                     // FlowerPotBlock 
                     "method_50000" => {
+                        block.block_type = BlockType::FlowerPot;
                         block.break_instantly();
                         block.non_opaque();
                         block.piston_behavior(PistonBehavior::Destroy);
                     }
                     // CandleBlock
                     "method_50001" => {
+                        block.block_type = BlockType::Candle;
                         block.non_opaque();
                         block.strength(0.1);
                         // block.sound_group()
@@ -410,6 +421,7 @@ impl BlockInsns {
 struct Block {
     name: String,
     field: String,
+    block_type: BlockType,
 
     map_color: MapColor,
     collidable: bool,
@@ -443,6 +455,7 @@ impl Default for Block {
         Self {
             name: String::from("unknown"),
             field: String::from("unknown"),
+            block_type: BlockType::Block,
 
             map_color: MapColor::Clear,
             collidable: true,
@@ -555,10 +568,36 @@ impl Block {
     }
 }
 
-#[allow(dead_code)]
+#[derive(Debug, Display, Default, Clone, Copy, PartialEq, Eq)]
+#[strum(serialize_all = "snake_case")]
+pub(crate) enum BlockType {
+    #[default]
+    Block,
+    Leaves,
+    Bed,
+    ShulkerBox,
+    NetherStem,
+    Log,
+    Piston,
+    StainedGlass,
+    WoodenButton,
+    StoneButton,
+    Bamboo,
+    FlowerPot,
+    Candle,
+}
+
+impl From<BlockType> for JsonValue {
+    fn from(value: BlockType) -> Self {
+        JsonValue::String(value.to_string())
+    }
+}
+
+
 #[derive(Debug, Display, Clone, Copy, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]
-enum PistonBehavior {
+#[allow(dead_code)]
+pub(crate) enum PistonBehavior {
     Normal,
     Destroy,
     Block,
@@ -573,18 +612,18 @@ impl From<PistonBehavior> for JsonValue {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum SoundGroup {
+pub(crate) enum SoundGroup {
     Stone,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Instrument {
+pub(crate) enum Instrument {
     Harp,
 }
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum MapColor {
+pub(crate) enum MapColor {
     Clear,
     PaleGreen,
     PaleYellow,

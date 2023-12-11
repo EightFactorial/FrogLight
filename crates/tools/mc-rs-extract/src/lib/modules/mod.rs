@@ -32,8 +32,8 @@ pub enum ExtractModule {
     Registries,
     SerializableRegistries,
     BlockList,
-    BlockStates,
     BlockAttributes,
+    BlockStates,
 }
 
 impl ExtractModule {
