@@ -93,8 +93,7 @@ impl ResourcePacks {
     ) -> &Handle<Image> {
         self.get_texture(texture, assets).unwrap_or_else(|| {
             #[cfg(any(debug_assertions, feature = "debug"))]
-            warn!("Texture {} not found, using fallback", texture.to_string());
-
+            warn!("Texture `{texture}` not found, using fallback");
             &self.fallback
         })
     }
@@ -137,7 +136,7 @@ impl ResourcePacks {
         for pack in self.list.iter().rev() {
             if let Some(pack) = assets.get(&pack.handle) {
                 if let Some(model) = pack.models.get(model) {
-                    if let Some(texture) = model.get_texture(name, &pack.models, None) {
+                    if let Some(texture) = model.get_texture(name, &pack.models) {
                         return self.get_texture(&texture, assets);
                     }
                 }
@@ -145,6 +144,29 @@ impl ResourcePacks {
         }
 
         None
+    }
+
+    /// Get a texture for a model from the list of resource packs, or the fallback if it doesn't
+    /// exist.
+    ///
+    /// This will check all resource packs for the model, and then
+    /// check all resource packs for the texture.
+    ///
+    /// Loops through the list in reverse order,
+    /// so the last pack in the list has the highest priority.
+    #[must_use]
+    pub fn get_model_texture_or_fallback<'a>(
+        &'a self,
+        model: &ResourceLocation,
+        name: &str,
+        assets: &'a Assets<ResourcePackAsset>,
+    ) -> &Handle<Image> {
+        self.get_model_texture(model, name, assets)
+            .unwrap_or_else(|| {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                warn!("Texture `{name}` for `{model}` not found, using fallback");
+                &self.fallback
+            })
     }
 
     /// Get a sound from the list of resource packs.
