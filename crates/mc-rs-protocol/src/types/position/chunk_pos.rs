@@ -1,5 +1,5 @@
 use bevy_ecs::prelude::Component;
-use bevy_math::IVec2;
+use bevy_math::{IVec2, Vec3};
 use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
@@ -60,6 +60,10 @@ impl From<[i32; 2]> for ChunkPos {
 
 impl From<ChunkPos> for [i32; 2] {
     fn from(ChunkPos(IVec2 { x, y }): ChunkPos) -> Self { [x, y] }
+}
+
+impl From<ChunkPos> for Vec3 {
+    fn from(value: ChunkPos) -> Self { Vec3::new(value.0.x as f32, 0.0, value.0.y as f32) * 16.0 }
 }
 
 impl VarEncode for ChunkPos {

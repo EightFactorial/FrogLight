@@ -75,7 +75,7 @@ impl<T: ContainerType> Container<T> {
         #[cfg(any(debug_assertions, feature = "debug"))]
         if val.is_none() {
             error!(
-                "Failed to get Index `{palette_index}` from Palette ({:?})",
+                "Failed to get Index `{palette_index}` from Palette::{:?}",
                 self.palette
             );
         }
@@ -186,26 +186,22 @@ impl<T: ContainerType> Container<T> {
     /// This pads every index with `count` zeros.
     fn expand(&mut self, count: usize) {
         let new_bits = self.bits + count;
-
-        // Create a new expanded Container
-        let mut expanded = Self {
-            bits: new_bits,
-            palette: self.palette.clone(),
-            data: BitVec::repeat(false, Section::SECTION_VOLUME * new_bits),
-            _phantom: std::marker::PhantomData,
-        };
+        let mut new_data = BitVec::repeat(false, Section::SECTION_VOLUME * new_bits);
 
         // Copy the data from the old Container to the new Container
-        for (i, chunk) in self.data.chunks_exact(self.bits).enumerate() {
-            let mut index = 0usize;
-            for (i, bit) in chunk.iter().rev().enumerate() {
-                index += if *bit { 1 << i } else { 0 };
+        for (old_chunk, new_chunk) in self
+            .data
+            .chunks_exact(self.bits)
+            .zip(new_data.chunks_exact_mut(new_bits))
+        {
+            for (i, bit) in old_chunk.into_iter().enumerate() {
+                new_chunk.set(i + count, *bit);
             }
-            expanded.insert(index, i * new_bits);
         }
 
         // Replace the old Container with the new Container
-        *self = expanded;
+        self.bits = new_bits;
+        self.data = new_data;
     }
 
     /// Insert the palette index into the data bits.
@@ -233,27 +229,32 @@ impl<T: ContainerType> Container<T> {
         let largest = ids.iter().max().copied().unwrap();
         let new_bits = (largest as f64).log2().ceil() as usize;
 
-        // Create a new Global Container
-        let mut converted = Self {
-            bits: new_bits,
-            palette: Palette::Global,
-            data: BitVec::repeat(false, Section::SECTION_VOLUME * new_bits),
-            _phantom: std::marker::PhantomData,
-        };
+        // Create the new Container data
+        let mut new_data = BitVec::repeat(false, Section::SECTION_VOLUME * new_bits);
 
         // Copy the data from the old Container to the new Container
-        for (i, chunk) in self.data.chunks_exact(self.bits).enumerate() {
+        for (old_chunk, new_chunk) in self
+            .data
+            .chunks_exact(self.bits)
+            .zip(new_data.chunks_exact_mut(new_bits))
+        {
+            // Get the data from the palette
             let mut index = 0usize;
-            for (i, bit) in chunk.iter().rev().enumerate() {
+            for (i, bit) in old_chunk.iter().rev().enumerate() {
                 index += if *bit { 1 << i } else { 0 };
             }
-            let data = ids[index].try_into().expect("Container data overflow");
 
-            converted.insert(data, i * new_bits);
+            // Insert the palette data directly into the new Container
+            let old_bits = BitSlice::<u32, Msb0>::from_element(&ids[index]);
+            for (i, bit) in old_bits.iter().skip(31 - self.bits).enumerate() {
+                new_chunk.set(i, *bit);
+            }
         }
 
         // Replace the old Container with the new Container
-        *self = converted;
+        self.bits = new_bits;
+        self.data = new_data;
+        self.palette = Palette::Global;
     }
 
     /// Convert a [`ChunkBlockPos`] to a data index.

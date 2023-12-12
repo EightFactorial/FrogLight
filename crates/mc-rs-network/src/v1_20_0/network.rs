@@ -119,7 +119,7 @@ impl Network for V1_20_0 {
                 if let Some(chunk_world) = chunk_worlds.get_world(&current) {
                     if let Some(&chunk_entity) = chunk_world.get_entity(&p.position.into()) {
                         if let Some(mut chunk) = world.entity_mut(chunk_entity).get_mut::<Chunk>() {
-                            chunk.set_block(p.block_state, ChunkBlockPos::from(p.position));
+                            chunk.set_block_id(p.block_state, ChunkBlockPos::from(p.position));
                         } else {
                             #[cfg(any(debug_assertions, feature = "debug"))]
                             error!("Error getting Chunk for BlockUpdate: {:?}", p.position);
@@ -166,7 +166,10 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::EntityDamage(_) => {}
             ClientboundPlayPackets::RemoveMessage(_) => {}
             ClientboundPlayPackets::Disconnect(_) => {}
-            ClientboundPlayPackets::ProfilelessChatMessage(_) => {}
+            ClientboundPlayPackets::ProfilelessChatMessage(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                info!("Received Server ChatMessage: {}", p.message.to_string());
+            }
             ClientboundPlayPackets::EntityStatus(_) => {}
             ClientboundPlayPackets::Explosion(_) => {}
             ClientboundPlayPackets::UnloadChunk(p) => {
@@ -209,7 +212,7 @@ impl Network for V1_20_0 {
             }
             ClientboundPlayPackets::ChunkData(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                trace!("Received ChunkData: {p:?}");
+                trace!("Received ChunkData for: {:?}", p.position);
 
                 let current = world
                     .get_resource::<CurrentWorld>()
@@ -221,7 +224,8 @@ impl Network for V1_20_0 {
                     });
 
                 let task = DecodeChunkTask::create(p.chunk_data);
-                let entity = world.spawn((p.position, task)).id();
+                let transform = Transform::from_translation(p.position.into());
+                let entity = world.spawn((task, p.position, transform)).id();
 
                 let mut worlds = world.resource_mut::<Worlds>();
                 worlds.insert_chunk_entity(current.into(), p.position, entity);
@@ -326,7 +330,10 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::PlayPing(_) => {}
             ClientboundPlayPackets::CraftFailedResponse(_) => {}
             ClientboundPlayPackets::PlayerAbilities(_) => {}
-            ClientboundPlayPackets::ChatMessage(_) => {}
+            ClientboundPlayPackets::ChatMessage(p) => {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                info!("Received ChatMessage from: {:?}", p.sender);
+            }
             ClientboundPlayPackets::EndCombat(_) => {}
             ClientboundPlayPackets::EnterCombat(_) => {}
             ClientboundPlayPackets::DeathMessage(_) => {}
@@ -440,7 +447,7 @@ impl Network for V1_20_0 {
                                     update.z,
                                 );
 
-                                chunk.set_block(update.state, block_pos);
+                                chunk.set_block_id(update.state, block_pos);
                             }
                         } else {
                             #[cfg(any(debug_assertions, feature = "debug"))]

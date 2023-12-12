@@ -1,3 +1,5 @@
+use derive_more::From;
+
 pub mod attributes;
 pub mod traits;
 mod versions;
@@ -5,8 +7,9 @@ mod versions;
 pub mod structs;
 use structs::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, From)]
 pub enum Blocks {
+    Error(BlockError),
     Air(BlockAir),
     Stone(BlockStone),
     Granite(BlockGranite),
@@ -1010,4 +1013,8 @@ pub enum Blocks {
     Frogspawn(BlockFrogspawn),
     ReinforcedDeepslate(BlockReinforcedDeepslate),
     DecoratedPot(BlockDecoratedPot),
+}
+
+impl Default for Blocks {
+    fn default() -> Self { Blocks::Air(BlockAir) }
 }

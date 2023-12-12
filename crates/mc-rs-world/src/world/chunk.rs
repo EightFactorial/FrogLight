@@ -2,10 +2,14 @@ use std::{io::Cursor, sync::Arc};
 
 use bevy::{prelude::*, utils::HashMap};
 use mc_rs_core::{position::ChunkBlockPos, ResourceLocation};
-use mc_rs_protocol::types::packets::chunk_data::ChunkDataPacket;
+use mc_rs_protocol::{types::packets::chunk_data::ChunkDataPacket, Version};
 use parking_lot::RwLock;
 
-use crate::{biomes::traits::VersionBiomeIds, world::tasks::ChunkDecodeError};
+use crate::{
+    biomes::traits::VersionBiomeIds,
+    blocks::{traits::BlocksTrait, Blocks},
+    world::tasks::ChunkDecodeError,
+};
 
 use super::{heightmap::HeightMapType, section::Section, tasks::DecodeResult, HeightMap};
 
@@ -59,7 +63,17 @@ impl Chunk {
     }
 
     /// Get the block at the given position in the [`Chunk`].
-    pub fn get_block(&self, mut pos: ChunkBlockPos) -> Option<u32> {
+    pub fn get_block<V: Version>(&self, pos: ChunkBlockPos) -> Option<Blocks>
+    where
+        Blocks: BlocksTrait<V>,
+    {
+        Some(<Blocks as BlocksTrait<V>>::from_u32(
+            self.get_block_id(pos)?,
+        ))
+    }
+
+    /// Get the block id at the given position in the [`Chunk`].
+    pub fn get_block_id(&self, mut pos: ChunkBlockPos) -> Option<u32> {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -99,7 +113,19 @@ impl Chunk {
     }
 
     /// Set the block at the given position in the [`Chunk`].
-    pub fn set_block(&mut self, block_id: u32, mut pos: ChunkBlockPos) {
+    pub fn set_block<V: Version>(&mut self, block: &Blocks, pos: ChunkBlockPos)
+    where
+        Blocks: BlocksTrait<V>,
+    {
+        self.set_block_id(<Blocks as BlocksTrait<V>>::to_u32(block), pos);
+    }
+
+    /// Set the block id at the given position in the [`Chunk`].
+    ///
+    /// # Warning
+    /// This function does not check if the block id is valid. You should use
+    /// [`Chunk::set_block`](Chunk) instead.
+    pub fn set_block_id(&mut self, block_id: u32, mut pos: ChunkBlockPos) {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -137,10 +163,26 @@ impl Chunk {
     }
 
     /// Get the biome at the given position in the [`Chunk`].
-    pub fn get_biome<V: VersionBiomeIds>(
-        &self,
-        mut pos: ChunkBlockPos,
-    ) -> Option<ResourceLocation> {
+    pub fn get_biome<V: VersionBiomeIds>(&self, pos: ChunkBlockPos) -> Option<ResourceLocation>
+    where
+        Blocks: BlocksTrait<V>,
+    {
+        if let Some(biome_id) = self.get_biome_id(pos) {
+            if let Some(biome) = V::biome_id_to_name(&biome_id) {
+                Some(ResourceLocation::new(biome))
+            } else {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                error!("Failed to get biome name, invalid biome id");
+
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+    /// Get the biome id at the given position in the [`Chunk`].
+    pub fn get_biome_id(&self, mut pos: ChunkBlockPos) -> Option<u32> {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -167,23 +209,14 @@ impl Chunk {
             .read()
             .get(section_index / Chunk::SECTION_COUNT)
         {
-            let biome_id = section.biomes.get_data(&pos);
+            let id = section.biomes.get_data(&pos);
 
-            let Some(biome_id) = biome_id else {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                error!("Failed to get biome");
-
-                return None;
-            };
-
-            if let Some(biome) = V::biome_id_to_name(&biome_id) {
-                Some(ResourceLocation::new(biome))
-            } else {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                error!("Failed to get biome, invalid biome id");
-
-                None
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            if id.is_none() {
+                error!("Failed to get biome id from section");
             }
+
+            id
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -196,11 +229,21 @@ impl Chunk {
     }
 
     /// Set the biome at the given position in the [`Chunk`].
-    pub fn set_biome<V: VersionBiomeIds>(
-        &mut self,
-        biome: &ResourceLocation,
-        mut pos: ChunkBlockPos,
-    ) {
+    pub fn set_biome<V: VersionBiomeIds>(&mut self, biome: &ResourceLocation, pos: ChunkBlockPos) {
+        if let Some(biome) = V::biome_name_to_id(biome) {
+            self.set_biome_id(*biome, pos);
+        } else {
+            #[cfg(any(debug_assertions, feature = "debug"))]
+            error!("Failed to set biome, invalid biome name");
+        }
+    }
+
+    /// Set the biome id at the given position in the [`Chunk`].
+    ///
+    /// # Warning
+    /// This function does not check if the biome id is valid. You should use
+    /// [`Chunk::set_biome`](Chunk) instead.
+    pub fn set_biome_id(&mut self, biome_id: u32, mut pos: ChunkBlockPos) {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -222,19 +265,12 @@ impl Chunk {
             return;
         };
 
-        let Some(biome_id) = V::biome_name_to_id(biome.as_str()) else {
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            error!("Failed to set biome, invalid biome name");
-
-            return;
-        };
-
         if let Some(section) = self
             .sections
             .write()
             .get_mut(section_index / Chunk::SECTION_COUNT)
         {
-            section.biomes.set_data(*biome_id, &pos);
+            section.biomes.set_data(biome_id, &pos);
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -244,6 +280,3 @@ impl Chunk {
         }
     }
 }
-
-// #[test]
-// fn get_block() {}
