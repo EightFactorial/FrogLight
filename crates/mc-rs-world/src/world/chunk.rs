@@ -15,9 +15,10 @@ use super::{heightmap::HeightMapType, section::Section, tasks::DecodeResult, Hei
 
 #[derive(Debug, Clone, Component)]
 pub struct Chunk {
-    pub sections: Arc<RwLock<[Section; Self::SECTION_COUNT]>>,
+    pub sections: ChunkSections,
     pub heightmaps: HashMap<HeightMapType, HeightMap>,
 }
+pub(crate) type ChunkSections = Arc<RwLock<[Section; Chunk::SECTION_COUNT]>>;
 
 impl Default for Chunk {
     fn default() -> Self {

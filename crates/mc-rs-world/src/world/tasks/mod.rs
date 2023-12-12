@@ -1,9 +1,14 @@
 use bevy::prelude::*;
 use mc_rs_core::schedule::state::ApplicationState;
 
-mod decode_chunk;
-pub(super) use decode_chunk::DecodeResult;
-pub use decode_chunk::{ChunkDecodeError, DecodeChunkTask};
+mod chunk_decode;
+pub(super) use chunk_decode::DecodeResult;
+pub use chunk_decode::{ChunkDecodeError, DecodeChunkTask};
+
+#[cfg(feature = "shaders")]
+mod chunk_material;
+#[cfg(feature = "shaders")]
+pub use chunk_material::{ChunkMaterialSection, ChunkMaterialTask};
 
 pub(super) fn setup(app: &mut App) {
     app.add_systems(

@@ -28,7 +28,8 @@ strum = { workspace = true }
 thiserror = { workspace = true }
 
 [features]
-default = []
+default = ["shaders"]
+shaders = []
 
 # Enable debug features
 debug = ["mc-rs-macros/debug", "mc-rs-core/debug", "mc-rs-protocol/debug", "mc-rs-resourcepack/debug"]

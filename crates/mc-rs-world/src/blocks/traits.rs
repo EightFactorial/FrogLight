@@ -9,15 +9,15 @@ use mc_rs_protocol::Version;
 /// # Example
 /// ```rust
 /// use mc_rs_protocol::versions::v1_20_0::V1_20_0;
-/// use mc_rs_world::blocks::{structs::*, traits::Block};
+/// use mc_rs_world::blocks::{structs::*, traits::BlockTrait};
 ///
 /// let air = BlockAir::default();
-/// assert_eq!(Block::<V1_20_0>::resource_location(&air), "minecraft:air");
-/// assert_eq!(Block::<V1_20_0>::state_id(&air), 0);
+/// assert_eq!(BlockTrait::<V1_20_0>::resource_location(&air), "minecraft:air");
+/// assert_eq!(BlockTrait::<V1_20_0>::to_u32(&air), 0);
 ///
 /// let stone = BlockStone::default();
-/// assert_eq!(Block::<V1_20_0>::resource_location(&stone), "minecraft:stone");
-/// assert_eq!(Block::<V1_20_0>::state_id(&stone), 1);
+/// assert_eq!(BlockTrait::<V1_20_0>::resource_location(&stone), "minecraft:stone");
+/// assert_eq!(BlockTrait::<V1_20_0>::to_u32(&stone), 1);
 /// ```
 pub trait BlockTrait<V: Version>: std::fmt::Debug + Default + Clone + Copy {
     /// Get the resource location of the block.

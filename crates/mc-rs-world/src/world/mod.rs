@@ -11,4 +11,12 @@ pub use chunk::Chunk;
 pub mod heightmap;
 pub use heightmap::HeightMap;
 
-pub(super) fn setup(app: &mut App) { tasks::setup(app); }
+#[cfg(feature = "shaders")]
+pub mod shaders;
+
+pub(super) fn setup(app: &mut App) {
+    tasks::setup(app);
+
+    #[cfg(feature = "shaders")]
+    shaders::setup(app);
+}
