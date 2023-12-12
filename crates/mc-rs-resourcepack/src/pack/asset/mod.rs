@@ -4,6 +4,9 @@ use mc_rs_core::ResourceLocation;
 pub(super) mod meta;
 use meta::ResourcePackMetaContainer;
 
+pub mod model;
+use model::Model;
+
 /// A Minecraft resourcepack
 #[derive(Debug, Clone, TypePath)]
 pub struct ResourcePackAsset {
@@ -11,6 +14,7 @@ pub struct ResourcePackAsset {
     pub mcmeta: ResourcePackMetaContainer,
 
     pub textures: HashMap<ResourceLocation, Handle<Image>>,
+    pub models: HashMap<ResourceLocation, Model>,
     pub sounds: HashMap<ResourceLocation, Handle<AudioSource>>,
 }
 

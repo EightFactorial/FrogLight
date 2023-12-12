@@ -8,7 +8,7 @@ use mc_rs_core::ResourceLocation;
 mod traits;
 pub use traits::AssetFromWorld;
 
-use crate::pack::ResourcePackAsset;
+use crate::pack::{asset::model::Model, ResourcePackAsset};
 
 pub(super) fn setup(app: &mut App) {
     embedded_asset!(app, "embedded/fallback.png");
@@ -97,6 +97,54 @@ impl ResourcePacks {
 
             &self.fallback
         })
+    }
+
+    /// Get a model from the list of resource packs.
+    ///
+    /// Loops through the list in reverse order,
+    /// so the last pack in the list has the highest priority.
+    #[must_use]
+    pub fn get_model<'a>(
+        &'a self,
+        model: &ResourceLocation,
+        assets: &'a Assets<ResourcePackAsset>,
+    ) -> Option<&Model> {
+        for pack in self.list.iter().rev() {
+            if let Some(pack) = assets.get(&pack.handle) {
+                if let Some(model) = pack.models.get(model) {
+                    return Some(model);
+                }
+            }
+        }
+
+        None
+    }
+
+    /// Get a texture for a model from the list of resource packs.
+    ///
+    /// This will check all resource packs for the model, and then
+    /// check all resource packs for the texture.
+    ///
+    /// Loops through the list in reverse order,
+    /// so the last pack in the list has the highest priority.
+    #[must_use]
+    pub fn get_model_texture<'a>(
+        &'a self,
+        model: &ResourceLocation,
+        name: &str,
+        assets: &'a Assets<ResourcePackAsset>,
+    ) -> Option<&Handle<Image>> {
+        for pack in self.list.iter().rev() {
+            if let Some(pack) = assets.get(&pack.handle) {
+                if let Some(model) = pack.models.get(model) {
+                    if let Some(texture) = model.get_texture(name, &pack.models, None) {
+                        return self.get_texture(&texture, assets);
+                    }
+                }
+            }
+        }
+
+        None
     }
 
     /// Get a sound from the list of resource packs.

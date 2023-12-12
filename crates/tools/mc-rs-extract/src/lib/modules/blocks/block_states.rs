@@ -76,7 +76,9 @@ impl ModuleExt for BlockStatesModule {
 
         info!("Parsing block classes...");
         for block in block_list {
-            let block = block.parse(&mut data.classmap, &data.output);
+            let mut block = block.parse(&mut data.classmap, &data.output);
+            block.attributes.sort();
+            block.attributes.dedup();
 
             if block.name.is_empty() {
                 warn!("Block name is empty, skipping block");

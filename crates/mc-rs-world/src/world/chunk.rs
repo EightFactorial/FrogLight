@@ -5,10 +5,7 @@ use mc_rs_core::{position::ChunkBlockPos, ResourceLocation};
 use mc_rs_protocol::types::packets::chunk_data::ChunkDataPacket;
 use parking_lot::RwLock;
 
-use crate::{
-    biomes::traits::VersionBiomeIds, blocks::traits::VersionBlockIds,
-    world::tasks::ChunkDecodeError,
-};
+use crate::{biomes::traits::VersionBiomeIds, world::tasks::ChunkDecodeError};
 
 use super::{heightmap::HeightMapType, section::Section, tasks::DecodeResult, HeightMap};
 
@@ -62,10 +59,7 @@ impl Chunk {
     }
 
     /// Get the block at the given position in the [`Chunk`].
-    pub fn get_block<V: VersionBlockIds>(
-        &self,
-        mut pos: ChunkBlockPos,
-    ) -> Option<ResourceLocation> {
+    pub fn get_block(&self, mut pos: ChunkBlockPos) -> Option<u32> {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -92,23 +86,7 @@ impl Chunk {
             .read()
             .get(section_index / Chunk::SECTION_COUNT)
         {
-            let block_id = section.blocks.get_data(&pos);
-
-            let Some(block_id) = block_id else {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                error!("Failed to get block");
-
-                return None;
-            };
-
-            if let Some(block) = V::block_id_to_name(&block_id) {
-                Some(ResourceLocation::new(block))
-            } else {
-                #[cfg(any(debug_assertions, feature = "debug"))]
-                error!("Failed to get block, invalid block id");
-
-                None
-            }
+            section.blocks.get_data(&pos)
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -121,59 +99,7 @@ impl Chunk {
     }
 
     /// Set the block at the given position in the [`Chunk`].
-    pub fn set_block<V: VersionBlockIds>(
-        &mut self,
-        block: &ResourceLocation,
-        mut pos: ChunkBlockPos,
-    ) {
-        if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            error!(
-                "Failed to set block, horizontal position ({}|{}) out of bounds",
-                pos.x, pos.z
-            );
-
-            return;
-        }
-
-        pos.y -= Self::VERTICAL_SHIFT;
-        let Ok(section_index): Result<usize, _> = pos.y.try_into() else {
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            error!(
-                "Failed to set block, vertical position ({}) out of bounds",
-                pos.y
-            );
-
-            return;
-        };
-
-        let Some(block_id) = V::block_name_to_id(block.as_str()) else {
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            error!("Failed to set block, invalid block name");
-
-            return;
-        };
-
-        if let Some(section) = self
-            .sections
-            .write()
-            .get_mut(section_index / Chunk::SECTION_COUNT)
-        {
-            section.blocks.set_data(*block_id, &pos);
-        } else {
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            error!(
-                "Failed to set block, section index ({}) out of bounds",
-                section_index / Chunk::SECTION_COUNT
-            );
-        }
-    }
-
-    /// Set the block id at the given position in the [`Chunk`].
-    ///
-    /// # Warning
-    /// This function does not check if the block id is valid.
-    pub fn set_block_id(&mut self, block_id: u32, mut pos: ChunkBlockPos) {
+    pub fn set_block(&mut self, block_id: u32, mut pos: ChunkBlockPos) {
         if pos.x >= Section::SECTION_WIDTH as u8 || pos.z >= Section::SECTION_DEPTH as u8 {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(

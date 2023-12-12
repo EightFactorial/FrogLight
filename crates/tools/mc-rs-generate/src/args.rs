@@ -28,7 +28,7 @@ pub(crate) struct Args {
 
     /// The list of [`Module`s](crate::modules::Module) to run
     ///
-    /// If none are specified, all modules will be run.
+    /// At least one module must be specified.
     #[arg(short, help = MODULES_HELP, long = "module", long_help = MODULES_LONG_HELP)]
     pub(crate) modules: Vec<GenerateModule>,
 }
@@ -50,4 +50,4 @@ const MODULES_HELP: &str = "The list of modules to run.";
 
 const MODULES_LONG_HELP: &str = r"The list of modules to run.
 
-If none are specified, all modules will be run.";
+At least one module must be specified.";

@@ -70,6 +70,7 @@ impl ResourcePackLoader {
             icon: components::icon::read_icon(&mut zip, load_context)?,
             mcmeta: components::mcmeta::read_mcmeta(&mut zip, load_context)?,
             textures: components::textures::read_textures(&mut zip, load_context)?,
+            models: components::models::read_models(&mut zip, load_context)?,
             sounds: components::sounds::read_sounds(&mut zip, load_context)?,
         })
     }

@@ -1,3 +1,5 @@
+use std::vec;
+
 use classfile::{
     access::FieldAccessFlags,
     ast::{Insn, LdcInsn, LdcType, PutFieldInsn},
@@ -89,9 +91,20 @@ impl ModuleExt for BlockAttributesModule {
                                 };
                             }
                             Self::INT_CLASS => {
-                                // Manual override for the `rotation` attribute
-                                if name.as_str() == "field_12532" {
-                                    ints.push(15);
+                                match name.as_str() {
+                                    "field_12532" => {
+                                        // Manual override for the `rotation` attribute
+                                        ints = vec![0, 15];
+                                    }
+                                    "field_42835" => {
+                                        // Manual override for the `flower_amount` attribute
+                                        ints = vec![1, 4];
+                                    }
+                                    "field_42836" => {
+                                        // Manual override for the `dusted` attribute
+                                        ints = vec![0, 3];
+                                    }
+                                    _ => {}
                                 }
 
                                 attr = AttributeType::Int {

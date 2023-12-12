@@ -14,6 +14,9 @@ use structure::GuiStructureModule;
 mod resourcepack;
 use resourcepack::ResourcePackModule;
 
+mod blocks;
+use blocks::{block_impl::BlockVersionModule, block_list::BlockListModule};
+
 /// Modules that can be run to generate data.
 ///
 /// This enum is used to specify which modules to run on a given version of Minecraft.
@@ -27,6 +30,8 @@ pub enum GenerateModule {
     Format,
     ResourcePack,
     GuiStructure,
+    BlockList,
+    BlockVersion,
 }
 
 impl GenerateModule {
@@ -46,6 +51,8 @@ impl From<GenerateModule> for Box<dyn ModuleExt> {
             GenerateModule::Format => Box::<FormatModule>::default(),
             GenerateModule::ResourcePack => Box::<ResourcePackModule>::default(),
             GenerateModule::GuiStructure => Box::<GuiStructureModule>::default(),
+            GenerateModule::BlockList => Box::<BlockListModule>::default(),
+            GenerateModule::BlockVersion => Box::<BlockVersionModule>::default(),
         }
     }
 }

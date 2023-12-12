@@ -6,7 +6,7 @@ use bevy::{
 pub(crate) mod asset;
 pub use asset::{
     meta::{ResourcePackMeta, ResourcePackMetaContainer},
-    ResourcePackAsset,
+    model, ResourcePackAsset,
 };
 
 pub(crate) mod loader;

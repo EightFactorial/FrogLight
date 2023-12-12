@@ -24,7 +24,7 @@ use mc_rs_protocol::{
 };
 use mc_rs_world::{
     resources::{CurrentWorld, WorldType, Worlds},
-    world::{tasks::DecodeChunkTask, Chunk},
+    world::{section::Section, tasks::DecodeChunkTask, Chunk},
 };
 
 use crate::{network::Network, task::ConnectionChannel};
@@ -76,6 +76,7 @@ impl Network for V1_20_0 {
                     .get_resource::<CurrentWorld>()
                     .cloned()
                     .unwrap_or_else(|| {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
                         error!("Error getting CurrentWorld");
                         CurrentWorld::from(WorldType::Overworld)
                     });
@@ -86,15 +87,18 @@ impl Network for V1_20_0 {
                         if let Some(mut _chunk) = world.entity_mut(*chunk_entity).get::<Chunk>() {
                             // TODO: Update the block entity
                         } else {
+                            #[cfg(any(debug_assertions, feature = "debug"))]
                             error!(
                                 "Error getting Chunk for BlockEntityUpdate: {:?}",
                                 p.position
                             );
                         };
                     } else {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
                         error!("Error getting Entity for Chunk: {:?}", p.position);
                     }
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     error!("Error getting current World: {current:?}");
                 }
             }
@@ -115,14 +119,17 @@ impl Network for V1_20_0 {
                 if let Some(chunk_world) = chunk_worlds.get_world(&current) {
                     if let Some(&chunk_entity) = chunk_world.get_entity(&p.position.into()) {
                         if let Some(mut chunk) = world.entity_mut(chunk_entity).get_mut::<Chunk>() {
-                            chunk.set_block_id(p.block_state, ChunkBlockPos::from(p.position));
+                            chunk.set_block(p.block_state, ChunkBlockPos::from(p.position));
                         } else {
+                            #[cfg(any(debug_assertions, feature = "debug"))]
                             error!("Error getting Chunk for BlockUpdate: {:?}", p.position);
                         };
                     } else {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
                         error!("Error getting Entity for Chunk: {:?}", p.position);
                     }
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     error!("Error getting current World: {current:?}");
                 }
             }
@@ -145,9 +152,11 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::ChatSuggestions(_) => {}
             ClientboundPlayPackets::CustomPayload(p) => match CompactString::from_utf8(&p.data) {
                 Ok(str) => {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     info!("Received CustomPayload: `{0} : {str}`", p.identifier);
                 }
                 Err(_) => {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     info!(
                         "Received CustomPayload: `{0} : {1:?}`",
                         p.identifier, p.data
@@ -168,6 +177,7 @@ impl Network for V1_20_0 {
                     .get_resource::<CurrentWorld>()
                     .cloned()
                     .unwrap_or_else(|| {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
                         error!("Error getting CurrentWorld");
                         CurrentWorld::from(WorldType::Overworld)
                     });
@@ -178,9 +188,11 @@ impl Network for V1_20_0 {
                         chunk_world.remove_entity(&p);
                         world.entity_mut(entity).despawn_recursive();
                     } else {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
                         error!("Error getting Entity for Chunk: {:?}", *p);
                     }
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     error!("Error getting current World: {current:?}");
                 }
             }
@@ -203,6 +215,7 @@ impl Network for V1_20_0 {
                     .get_resource::<CurrentWorld>()
                     .cloned()
                     .unwrap_or_else(|| {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
                         error!("Error getting CurrentWorld");
                         CurrentWorld::from(WorldType::Overworld)
                     });
@@ -258,6 +271,7 @@ impl Network for V1_20_0 {
                     transform.translation +=
                         Vec3::from_array([p.delta_x.into(), p.delta_y.into(), p.delta_z.into()]);
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityMoveRelative for unknown entity: {:?}",
                         p.entity_id
@@ -279,6 +293,7 @@ impl Network for V1_20_0 {
 
                     // TODO: Rotate the entity
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityRotateAndMoveRelative for unknown entity: {:?}",
                         p.entity_id
@@ -297,6 +312,7 @@ impl Network for V1_20_0 {
                 {
                     // TODO: Rotate the entity
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityRotate for unknown entity: {:?}",
                         p.entity_id
@@ -354,6 +370,7 @@ impl Network for V1_20_0 {
                     if let Some((entity, _)) = query.iter(world).find(|(_, id)| id == &entity_id) {
                         world.entity_mut(entity).despawn_recursive();
                     } else {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
                         warn!(
                             "Received EntitiesDestroy for unknown entity: {:?}",
                             entity_id
@@ -371,6 +388,7 @@ impl Network for V1_20_0 {
                 if query.iter_mut(world).any(|id| id == &p.entity_id) {
                     // TODO: Remove the entity's status effect
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received RemoveEntityStatusEffect for unknown entity: {:?}",
                         p.entity_id
@@ -389,6 +407,7 @@ impl Network for V1_20_0 {
                 if query.iter_mut(world).any(|(id, _)| id == &p.entity_id) {
                     // TODO: Update the entity's head rotation
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntitySetHeadYaw for unknown entity: {:?}",
                         p.entity_id
@@ -410,17 +429,30 @@ impl Network for V1_20_0 {
                 let chunk_worlds = world.resource::<Worlds>();
                 if let Some(chunk_world) = chunk_worlds.get_world(&current) {
                     if let Some(chunk_entity) = chunk_world.get_entity(&p.position.into()) {
-                        let Some(mut _chunk) = world.entity_mut(*chunk_entity).get::<Chunk>()
-                        else {
-                            error!("Error getting Chunk for ChunkDeltaUpdate: {:?}", p.position);
-                            return;
-                        };
+                        if let Some(mut chunk) = world.entity_mut(*chunk_entity).get_mut::<Chunk>()
+                        {
+                            // TODO: Should this be a task?
+                            for update in p.updates {
+                                let block_pos = ChunkBlockPos::new(
+                                    update.x,
+                                    (p.position.y * Section::SECTION_HEIGHT as i32)
+                                        + i32::from(update.y),
+                                    update.z,
+                                );
 
-                        // TODO: Should this be a task?
-                        for _update in p.updates {
-                            // TODO: Update the chunk
-                        }
+                                chunk.set_block(update.state, block_pos);
+                            }
+                        } else {
+                            #[cfg(any(debug_assertions, feature = "debug"))]
+                            error!("Error getting Chunk for ChunkDeltaUpdate: {:?}", p.position);
+                        };
+                    } else {
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        error!("Error getting Entity for Chunk: {:?}", p.position);
                     }
+                } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
+                    error!("Error getting current World: {current:?}");
                 }
             }
             ClientboundPlayPackets::SelectAdvancementTab(_) => {}
@@ -462,6 +494,7 @@ impl Network for V1_20_0 {
                 if query.iter_mut(world).any(|id| id == &p.entity_id) {
                     // TODO: Update the entity's trackers
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityTrackerUpdate for unknown entity: {:?}",
                         p.entity_id
@@ -479,6 +512,7 @@ impl Network for V1_20_0 {
                 if query.iter_mut(world).any(|id| id == &p.entity_id) {
                     // TODO: Update the entity's velocity
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityVelocityUpdate for unknown entity: {:?}",
                         p.entity_id
@@ -567,6 +601,7 @@ impl Network for V1_20_0 {
                         }
                     }
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received PlaySoundFromEntity for unknown entity: {:?}",
                         p.entity_id
@@ -627,6 +662,7 @@ impl Network for V1_20_0 {
                 {
                     transform.translation = p.position.into();
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityPosition for unknown entity: {:?}",
                         p.entity_id
@@ -644,6 +680,7 @@ impl Network for V1_20_0 {
                 if query.iter_mut(world).any(|id| id == &p.entity_id) {
                     // TODO: Update the entity's attributes
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityAttributes for unknown entity: {:?}",
                         p.entity_id
@@ -666,6 +703,7 @@ impl Network for V1_20_0 {
                 if query.iter_mut(world).any(|id| id == &p.entity_id) {
                     // TODO: Update the entity's status effects
                 } else {
+                    #[cfg(any(debug_assertions, feature = "debug"))]
                     warn!(
                         "Received EntityStatusEffect for unknown entity: {:?}",
                         p.entity_id
