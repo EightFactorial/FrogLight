@@ -8,8 +8,8 @@ pub mod tasks;
 mod chunk;
 pub use chunk::Chunk;
 
-pub mod heightmap;
-pub use heightmap::HeightMap;
+mod heightmap;
+pub use heightmap::{HeightMap, HeightMapType};
 
 #[cfg(feature = "shaders")]
 pub mod shaders;

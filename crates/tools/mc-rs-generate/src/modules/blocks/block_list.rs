@@ -341,7 +341,11 @@ impl BlockListModule {
             true
         });
 
-        // Add modules
+        // Add modules and imports
+        parsed.items.push(Item::Use(syn::parse_quote!(
+            use derive_more::From;
+        )));
+        parsed.items.push(Item::Verbatim(TokenStream::new()));
         parsed.items.push(Item::Mod(syn::parse_quote!(
             pub mod attributes;
         )));
@@ -360,9 +364,13 @@ impl BlockListModule {
         )));
         parsed.items.push(Item::Verbatim(TokenStream::new()));
 
-        // Add the new blocks enum.
+        // Parse the blocks into a list of Idents
+        let mut blocks = Vec::new();
+
         {
-            let mut variants = Punctuated::new();
+            let error_name = Ident::new("BlockError", Span::call_site());
+            let error_variant = Ident::new("Error", Span::call_site());
+            blocks.push((error_variant, error_name));
 
             for block_name in data.output["blocks"]["list"].members() {
                 let variant_name = block_name.as_str().unwrap().to_case(Case::Pascal);
@@ -371,13 +379,21 @@ impl BlockListModule {
                 let variant_name = Ident::new(&variant_name, Span::call_site());
                 let block_name = Ident::new(&block_name, Span::call_site());
 
+                blocks.push((variant_name, block_name));
+            }
+        }
+
+        // Add the new blocks enum.
+        {
+            let mut variants = Punctuated::new();
+            for (variant_name, block_name) in &blocks {
                 variants.push(syn::parse_quote! {
                     #variant_name(#block_name)
                 });
             }
 
             parsed.items.push(Item::Enum(ItemEnum {
-                attrs: vec![syn::parse_quote!(#[derive(Debug, Clone, Copy, PartialEq, Eq)])],
+                attrs: vec![syn::parse_quote!(#[derive(Debug, Clone, Copy, PartialEq, Eq, From)])],
                 vis: Visibility::Public(Default::default()),
                 enum_token: Default::default(),
                 ident: Ident::new("Blocks", Span::call_site()),
@@ -385,6 +401,17 @@ impl BlockListModule {
                 brace_token: Default::default(),
                 variants,
             }));
+        }
+
+        // Add a Default impl
+        {
+            let item: Item = syn::parse_quote! {
+                impl Default for Blocks {
+                    fn default() -> Self { Blocks::Air(BlockAir) }
+                }
+            };
+
+            parsed.items.push(item);
         }
 
         // Write the blocks enum to the file.

@@ -15,5 +15,6 @@ impl Plugin for WorldPlugin {
         world::setup(app);
     }
 
+    #[cfg(feature = "shaders")]
     fn finish(&self, app: &mut App) { world::shaders::check_bindless_texture_support(app); }
 }

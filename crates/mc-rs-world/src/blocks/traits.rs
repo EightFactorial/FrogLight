@@ -35,6 +35,13 @@ pub trait BlockTrait<V: Version>: std::fmt::Debug + Default + Clone + Copy {
 }
 
 pub trait BlocksTrait<V: Version>: std::fmt::Debug + Default + Clone + Copy {
+    /// Get the resource location of the block.
+    fn resource_location(&self) -> &'static str;
+    /// Get the block from the state id.
+    ///
+    /// This will always return a block, but if it is invalid it will be
+    /// [`BlockError`](super::structs::BlockError).
     fn from_u32(id: u32) -> Self;
+    /// Get the state id of the block.
     fn to_u32(&self) -> u32;
 }

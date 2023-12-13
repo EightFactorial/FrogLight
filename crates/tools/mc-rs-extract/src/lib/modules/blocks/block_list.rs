@@ -1,6 +1,4 @@
-use classfile::ast::{
-    GetFieldInsn, Insn, InvokeInsn, LdcInsn, LdcType, PutFieldInsn,
-};
+use classfile::ast::{GetFieldInsn, Insn, InvokeInsn, LdcInsn, LdcType, PutFieldInsn};
 use json::JsonValue;
 use strum::Display;
 use tracing::{error, info, warn};
@@ -112,13 +110,10 @@ impl ModuleExt for BlockListModule {
                 "replaceable": block.replaceable,
                 "dynamic_bounds": block.dynamic_bounds,
             };
-
         }
         data.output["blocks"]["list"] = JsonValue::Array(json_list);
-
     }
 }
-
 
 #[derive(Debug, Default, Clone, PartialEq)]
 struct BlockInsns(Vec<Insn>);
@@ -302,7 +297,7 @@ impl BlockInsns {
                         // block.sound_group()
                         block.non_opaque();
                         block.burnable();
-                        block.piston_behavior(PistonBehavior::Destroy)                        
+                        block.piston_behavior(PistonBehavior::Destroy);
                     }
                     // BedBlock
                     "method_26109" => {
@@ -311,7 +306,7 @@ impl BlockInsns {
                         block.strength(0.2);
                         block.non_opaque();
                         block.burnable();
-                        block.piston_behavior(PistonBehavior::Destroy)
+                        block.piston_behavior(PistonBehavior::Destroy);
                     }
                     // ShulkerBoxBlock
                     "method_26110" => {
@@ -588,11 +583,8 @@ pub(crate) enum BlockType {
 }
 
 impl From<BlockType> for JsonValue {
-    fn from(value: BlockType) -> Self {
-        JsonValue::String(value.to_string())
-    }
+    fn from(value: BlockType) -> Self { JsonValue::String(value.to_string()) }
 }
-
 
 #[derive(Debug, Display, Clone, Copy, PartialEq, Eq)]
 #[strum(serialize_all = "snake_case")]
@@ -606,9 +598,7 @@ pub(crate) enum PistonBehavior {
 }
 
 impl From<PistonBehavior> for JsonValue {
-    fn from(value: PistonBehavior) -> Self {
-        JsonValue::String(value.to_string())
-    }
+    fn from(value: PistonBehavior) -> Self { JsonValue::String(value.to_string()) }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

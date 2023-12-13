@@ -28,6 +28,8 @@ pub struct TerrainMaterial {
 impl TerrainMaterial {
     const MAX_TEXTURE_COUNT: usize = 64;
     const BIND_GROUP_LAYOUT: &'static str = "terrain_bind_group_layout";
+
+    pub const fn new(textures: Vec<Handle<Image>>) -> Self { Self { textures } }
 }
 
 impl Material for TerrainMaterial {

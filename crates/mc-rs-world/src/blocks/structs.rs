@@ -5168,4 +5168,3 @@ pub struct BlockDecoratedPot {
     pub horizontal_facing: HorizontalFacingAttribute,
     pub waterlogged: WaterloggedAttribute,
 }
-

@@ -6,11 +6,16 @@ use bevy::{
 };
 use derive_more::{From, Into};
 use futures_lite::future;
+use mc_rs_core::ResourceLocation;
+use mc_rs_resourcepack::{assets::resourcepacks::ResourcePacks, pack::ResourcePackAsset};
 
-use crate::world::{
-    chunk::{Chunk, ChunkSections},
-    section::Section,
-    shaders::terrain::TerrainMaterial,
+use crate::{
+    blocks::{traits::BlocksTrait, Blocks},
+    world::{
+        chunk::{Chunk, ChunkSections},
+        section::Section,
+        shaders::terrain::TerrainMaterial,
+    },
 };
 
 /// A [Task] that creates a [`TerrainMaterial`] for a [`Chunk`].
@@ -23,7 +28,7 @@ impl ChunkMaterialTask {
     pub(crate) const CHUNK_SECTION_MESHES: usize = 4;
     pub(crate) const SECTIONS_PER_MESH: usize = Chunk::SECTION_COUNT / Self::CHUNK_SECTION_MESHES;
 }
-pub(crate) type MaterialResult = Vec<(Mesh, TerrainMaterial)>;
+pub(crate) type MaterialResult = Vec<(Mesh, Vec<u32>)>;
 
 impl ChunkMaterialTask {
     pub(super) fn create(chunk: &Chunk, neighbors: [Option<&Chunk>; 4]) -> Self {
@@ -37,6 +42,9 @@ impl ChunkMaterialTask {
 
     pub(crate) fn poll_tasks(
         mut query: Query<(Entity, &mut ChunkMaterialTask)>,
+        packs: Res<ResourcePacks>,
+        pack_assets: Res<Assets<ResourcePackAsset>>,
+
         mut materials: ResMut<Assets<TerrainMaterial>>,
         mut meshes: ResMut<Assets<Mesh>>,
         mut commands: Commands,
@@ -45,17 +53,24 @@ impl ChunkMaterialTask {
             if let Some(result) = future::block_on(future::poll_once(&mut task.0)) {
                 let mut commands = commands.entity(entity);
 
-                for (index, (mesh, material)) in result.into_iter().enumerate() {
-                    let material = materials.add(material);
-                    let mesh = meshes.add(mesh);
+                for (index, (mesh, material_ids)) in result.into_iter().enumerate() {
+                    let material_textures: Vec<Handle<Image>> = material_ids
+                        .into_iter()
+                        .map(|m| {
+                            let blocks = Blocks::from_u32(m);
+                            let resource_location =
+                                ResourceLocation::from(blocks.resource_location());
+                            packs.get_texture_or_fallback(&resource_location, &pack_assets)
+                        })
+                        .cloned()
+                        .collect();
 
                     let bundle = MaterialMeshBundle::<TerrainMaterial> {
-                        material,
-                        mesh,
+                        material: materials.add(TerrainMaterial::new(material_textures)),
+                        mesh: meshes.add(mesh),
                         transform: Transform::from_translation(Vec3::new(
                             0.0,
-                            ((index * Self::SECTIONS_PER_MESH) as f32
-                                * Section::SECTION_HEIGHT as f32)
+                            (index * Self::SECTIONS_PER_MESH * Section::SECTION_HEIGHT) as f32
                                 + Chunk::VERTICAL_SHIFT as f32,
                             0.0,
                         )),
@@ -111,7 +126,7 @@ impl ChunkMaterialSection {
     fn section_task(
         _sections: &[Section],
         _neighbors: [Option<&[Section]>; 4],
-    ) -> (Mesh, TerrainMaterial) {
+    ) -> (Mesh, Vec<u32>) {
         todo!()
     }
 }

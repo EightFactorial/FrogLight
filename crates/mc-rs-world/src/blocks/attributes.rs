@@ -847,4 +847,3 @@ pub enum Distance17Attribute {
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct HasBottle1Attribute(pub bool);
-
