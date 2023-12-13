@@ -48,15 +48,15 @@ impl<T: ContainerType> Container<T> {
 
         // Get the data slice
         let data_index = self.data_index_from_pos(pos);
-        let slice = &self.data[data_index..data_index + self.bits];
+        let data_slice = &self.data[data_index..data_index + self.bits];
 
         // Create the palette index
-        let mut palette_index = 0u32;
-        for (i, bit) in slice.iter().rev().enumerate() {
-            palette_index += if *bit { 1 << i } else { 0 };
-        }
+        let mut palette_index = 0u64;
+        let index_slice = BitSlice::<u64, Msb0>::from_element_mut(&mut palette_index);
+        index_slice[usize::BITS as usize - self.bits..].copy_from_bitslice(data_slice);
 
         // If the palette is Global, return the palette index
+        let palette_index = palette_index.try_into().expect("Container data overflow");
         if let Palette::Global = &self.palette {
             return Some(palette_index);
         }
@@ -204,19 +204,18 @@ impl<T: ContainerType> Container<T> {
         self.data = new_data;
     }
 
-    /// Insert the palette index into the data bits.
-    fn insert(&mut self, data: usize, data_index: usize) {
+    /// Insert the input into the data storage at the given index.
+    fn insert(&mut self, input: usize, data_index: usize) {
         // Get the data bits
-        let slice = &mut self.data[data_index..data_index + self.bits];
+        let data_slice = &mut self.data[data_index..data_index + self.bits];
 
         // Get the input bits
-        let input_slice = BitSlice::<usize, Msb0>::from_element(&data);
+        let input = input as u64;
+        let input_slice = BitSlice::<u64, Msb0>::from_element(&input);
         let input_slice = &input_slice[usize::BITS as usize - self.bits..];
 
         // Copy the input bits to the data bits
-        for (i, bit) in input_slice.into_iter().enumerate() {
-            slice.set(i, *bit);
-        }
+        data_slice.copy_from_bitslice(input_slice);
     }
 
     /// Convert from a [`Vector`](Palette::Vector) palette to a [`Global`](Palette::Global) palette.
@@ -227,28 +226,24 @@ impl<T: ContainerType> Container<T> {
 
         // Get the largest number in the Palette
         let largest = ids.iter().max().copied().unwrap();
-        let new_bits = (largest as f64).log2().ceil() as usize;
-
-        // Create the new Container data
+        let new_bits = (largest as f64 + 1.0).log2().ceil() as usize;
         let mut new_data = BitVec::repeat(false, Section::SECTION_VOLUME * new_bits);
 
         // Copy the data from the old Container to the new Container
-        for (old_chunk, new_chunk) in self
-            .data
-            .chunks_exact(self.bits)
-            .zip(new_data.chunks_exact_mut(new_bits))
-        {
-            // Get the data from the palette
+        for (chunk_index, chunk) in self.data.chunks_exact(self.bits).enumerate() {
             let mut index = 0usize;
-            for (i, bit) in old_chunk.iter().rev().enumerate() {
+            for (i, bit) in chunk.iter().rev().enumerate() {
                 index += if *bit { 1 << i } else { 0 };
             }
 
-            // Insert the palette data directly into the new Container
-            let old_bits = BitSlice::<u32, Msb0>::from_element(&ids[index]);
-            for (i, bit) in old_bits.iter().skip(31 - self.bits).enumerate() {
-                new_chunk.set(i, *bit);
-            }
+            let data = u64::from(ids[index]);
+            let data_bits = BitSlice::<u64, Msb0>::from_element(&data);
+            let data_bits = &data_bits[usize::BITS as usize - new_bits..];
+
+            // Copy the data bits to the new Container
+            let converted_bits =
+                &mut new_data[new_bits * chunk_index..new_bits * (chunk_index + 1)];
+            converted_bits.copy_from_bitslice(data_bits);
         }
 
         // Replace the old Container with the new Container
@@ -376,76 +371,75 @@ fn get_data() {
 }
 
 #[test]
-fn set_data() {
+fn single_tests() {
+    let default = Container::<BlockContainer>::default();
+    assert_eq!(default.bits, 0);
+    assert_eq!(default.palette, Palette::Single(0));
+    assert_eq!(default.data.len(), 0);
+
+    for p in 0..Section::SECTION_VOLUME {
+        let pos = ChunkBlockPos::from_index(p);
+        assert_eq!(default.get_data(&pos), Some(0));
+    }
+}
+
+#[test]
+fn single_to_vector() {
     let mut default = Container::<BlockContainer>::default();
     let first = ChunkBlockPos::new(0, 0, 0);
     let second = ChunkBlockPos::new(1, 0, 0);
-    let third = ChunkBlockPos::new(2, 0, 0);
-    let fourth = ChunkBlockPos::new(3, 0, 0);
 
     assert_eq!(default.bits, 0);
     assert_eq!(default.palette, Palette::Single(0));
     assert_eq!(default.data.len(), 0);
     assert_eq!(default.get_data(&first), Some(0));
     assert_eq!(default.get_data(&second), Some(0));
-    assert_eq!(default.get_data(&third), Some(0));
 
     // Add a block to an empty container
-    default.set_data(1, &first);
+    default.set_data(5, &first);
 
     assert_eq!(default.bits, 1);
-    assert_eq!(default.palette, Palette::Vector(vec![0, 1]));
-    assert_eq!(default.get_data(&first), Some(1));
+    assert_eq!(default.palette, Palette::Vector(vec![0, 5]));
+    assert_eq!(default.get_data(&first), Some(5));
     assert_eq!(default.get_data(&second), Some(0));
-    assert_eq!(default.get_data(&third), Some(0));
 
     // Add a second block to the container
-    default.set_data(8, &second);
+    default.set_data(10, &second);
 
     assert_eq!(default.bits, 2);
-    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8]));
-    assert_eq!(default.get_data(&first), Some(1));
-    assert_eq!(default.get_data(&second), Some(8));
-    assert_eq!(default.get_data(&third), Some(0));
+    assert_eq!(default.palette, Palette::Vector(vec![0, 5, 10]));
+    assert_eq!(default.get_data(&first), Some(5));
+    assert_eq!(default.get_data(&second), Some(10));
+}
 
-    // Add a third block to the container
-    default.set_data(2, &third);
+#[test]
+fn vector_tests() {
+    let mut default = Container::<BlockContainer>::default();
+    let middle = ChunkBlockPos::new(8, 8, 8);
 
-    assert_eq!(default.bits, 2);
-    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8, 2]));
-    assert_eq!(default.get_data(&first), Some(1));
-    assert_eq!(default.get_data(&second), Some(8));
-    assert_eq!(default.get_data(&third), Some(2));
-
-    // Add a fourth block to the container
-    default.set_data(5, &fourth);
-
-    assert_eq!(default.bits, 3);
-    assert_eq!(default.palette, Palette::Vector(vec![0, 1, 8, 2, 5]));
-    assert_eq!(default.get_data(&first), Some(1));
-    assert_eq!(default.get_data(&second), Some(8));
-    assert_eq!(default.get_data(&third), Some(2));
-    assert_eq!(default.get_data(&fourth), Some(5));
-
-    // Fill the container with blocks until it converts to a Global palette
-    for x in 20..2u32.pow(9) {
-        default.set_data(x, &ChunkBlockPos::from_index(x as usize));
+    // Fill the container with data
+    for p in 0u32..512u32 {
+        let pos = ChunkBlockPos::from_index(p as usize);
+        default.set_data(p, &pos);
     }
 
-    assert_eq!(default.bits, 9);
-    assert_eq!(default.palette, Palette::Global);
-    assert_eq!(default.get_data(&first), Some(1));
-    assert_eq!(default.get_data(&second), Some(8));
-    assert_eq!(default.get_data(&third), Some(2));
-    assert_eq!(default.get_data(&fourth), Some(5));
+    // Check that the data is correct
+    for p in 0u32..512u32 {
+        let pos = ChunkBlockPos::from_index(p as usize);
+        assert_eq!(default.get_data(&pos), Some(p));
+    }
 
-    // Set the fourth block to a new value
-    default.set_data(18, &fourth);
+    // Change a block in the middle of the container
+    default.set_data(123, &middle);
 
-    assert_eq!(default.bits, 9);
-    assert_eq!(default.palette, Palette::Global);
-    assert_eq!(default.get_data(&first), Some(1));
-    assert_eq!(default.get_data(&second), Some(8));
-    assert_eq!(default.get_data(&third), Some(2));
-    assert_eq!(default.get_data(&fourth), Some(18));
+    // Check that only that block was changed
+    for p in 0u32..512u32 {
+        let pos = ChunkBlockPos::from_index(p as usize);
+
+        if p == 123 {
+            assert_eq!(default.get_data(&pos), Some(123));
+        } else {
+            assert_eq!(default.get_data(&pos), Some(p));
+        }
+    }
 }

@@ -10,11 +10,20 @@ mod chunk_material;
 #[cfg(feature = "shaders")]
 pub use chunk_material::{ChunkMaterialSection, ChunkMaterialTask};
 
+use super::Chunk;
+
 pub(super) fn setup(app: &mut App) {
     app.add_systems(
         PreUpdate,
-        DecodeChunkTask::poll_tasks.run_if(
-            in_state(ApplicationState::InGame).and_then(any_with_component::<DecodeChunkTask>()),
-        ),
+        (
+            DecodeChunkTask::poll_tasks.run_if(any_with_component::<DecodeChunkTask>()),
+            #[cfg(feature = "shaders")]
+            (
+                ChunkMaterialTask::chunk_updater.run_if(any_with_component::<Chunk>()),
+                ChunkMaterialTask::poll_tasks.run_if(any_with_component::<ChunkMaterialTask>()),
+            )
+                .chain(),
+        )
+            .run_if(in_state(ApplicationState::InGame)),
     );
 }

@@ -2,15 +2,20 @@
 
 use bevy::{
     prelude::*,
+    render::render_resource::PrimitiveTopology,
     tasks::{AsyncComputeTaskPool, Task},
 };
 use derive_more::{From, Into};
 use futures_lite::future;
-use mc_rs_core::ResourceLocation;
+use mc_rs_core::{
+    position::{BlockPos, ChunkBlockPos, ChunkPos},
+    ResourceLocation,
+};
 use mc_rs_resourcepack::{assets::resourcepacks::ResourcePacks, pack::ResourcePackAsset};
 
 use crate::{
     blocks::{traits::BlocksTrait, Blocks},
+    resources::{CurrentWorld, Worlds},
     world::{
         chunk::{Chunk, ChunkSections},
         section::Section,
@@ -31,12 +36,41 @@ impl ChunkMaterialTask {
 pub(crate) type MaterialResult = Vec<(Mesh, Vec<u32>)>;
 
 impl ChunkMaterialTask {
-    pub(super) fn create(chunk: &Chunk, neighbors: [Option<&Chunk>; 4]) -> Self {
-        let task = AsyncComputeTaskPool::get().spawn(Self::material_task(
-            chunk.sections.clone(),
-            neighbors.map(|c| c.map(|c| c.sections.clone())),
-        ));
+    pub(super) fn chunk_updater(
+        query: Query<(Entity, &ChunkPos, Ref<Chunk>)>,
 
+        current: Res<CurrentWorld>,
+        worlds: Res<Worlds>,
+
+        mut commands: Commands,
+    ) {
+        let Some(world) = worlds.get_world(&current) else {
+            return;
+        };
+
+        for (entity, chunk_pos, chunk_ref) in query.iter() {
+            if chunk_ref.is_added() {
+                let neighbors = chunk_pos.sides();
+
+                let mut neighbor_chunks = [None, None, None, None];
+                for (i, n) in neighbors.into_iter().enumerate() {
+                    if let Some(chunk) = world.get_entity(&n) {
+                        if let Ok((_, _, chunk)) = query.get(*chunk) {
+                            neighbor_chunks[i] = Some(chunk.sections.clone());
+                        }
+                    }
+                }
+
+                let task = Self::create(chunk_ref.sections.clone(), neighbor_chunks);
+                commands.entity(entity).insert(task);
+            } else if chunk_ref.is_changed() {
+                // TODO: Update all four neighbors
+            }
+        }
+    }
+
+    pub(super) fn create(chunk: ChunkSections, neighbors: [Option<ChunkSections>; 4]) -> Self {
+        let task = AsyncComputeTaskPool::get().spawn(Self::material_task(chunk, neighbors));
         Self(task)
     }
 
@@ -60,7 +94,13 @@ impl ChunkMaterialTask {
                             let blocks = Blocks::from_u32(m);
                             let resource_location =
                                 ResourceLocation::from(blocks.resource_location());
-                            packs.get_texture_or_fallback(&resource_location, &pack_assets)
+
+                            // TODO: Get the actual texture
+                            packs.get_model_texture_or_fallback(
+                                &resource_location,
+                                "up",
+                                &pack_assets,
+                            )
                         })
                         .cloned()
                         .collect();
@@ -123,10 +163,32 @@ impl ChunkMaterialTask {
 pub struct ChunkMaterialSection(pub usize);
 
 impl ChunkMaterialSection {
-    fn section_task(
-        _sections: &[Section],
-        _neighbors: [Option<&[Section]>; 4],
-    ) -> (Mesh, Vec<u32>) {
-        todo!()
+    pub(crate) const MESH_HEIGHT: usize =
+        ChunkMaterialTask::SECTIONS_PER_MESH * Section::SECTION_HEIGHT;
+
+    fn section_task(sections: &[Section], _neighbors: [Option<&[Section]>; 4]) -> (Mesh, Vec<u32>) {
+        let mut unique_blocks = Vec::new();
+        let mut section_mesh_data =
+            [[[0u32; Section::SECTION_WIDTH + 2]; Section::SECTION_DEPTH + 2]; Self::MESH_HEIGHT];
+
+        for (y, layer) in section_mesh_data.iter_mut().enumerate() {
+            let section = &sections[y / Section::SECTION_HEIGHT];
+
+            for (z, row) in layer.iter_mut().enumerate() {
+                for (x, block) in row.iter_mut().enumerate() {
+                    let pos = BlockPos::new(x as i32 - 1, y as i32 - 1, z as i32 - 1);
+                    let pos = ChunkBlockPos::from(pos);
+
+                    let state_id = section.blocks.get_data(&pos).unwrap_or(u32::MAX);
+                    if !unique_blocks.contains(&state_id) {
+                        unique_blocks.push(state_id);
+                    }
+
+                    *block = state_id;
+                }
+            }
+        }
+
+        (Mesh::new(PrimitiveTopology::TriangleList), unique_blocks)
     }
 }
