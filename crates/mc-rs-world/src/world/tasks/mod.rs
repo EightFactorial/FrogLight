@@ -8,7 +8,7 @@ pub use chunk_decode::{ChunkDecodeError, DecodeChunkTask};
 #[cfg(feature = "shaders")]
 mod chunk_material;
 #[cfg(feature = "shaders")]
-pub use chunk_material::{ChunkMaterialSection, ChunkMaterialTask};
+pub use chunk_material::ChunkMaterialTask;
 
 use super::Chunk;
 

@@ -101,7 +101,7 @@ impl Chunk {
             .read()
             .get(section_index / Chunk::SECTION_COUNT)
         {
-            section.blocks.get_data(&pos)
+            Some(section.blocks.get(&pos))
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -153,7 +153,7 @@ impl Chunk {
             .write()
             .get_mut(section_index / Chunk::SECTION_COUNT)
         {
-            section.blocks.set_data(block_id, &pos);
+            section.blocks.set(block_id, &pos);
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -210,14 +210,7 @@ impl Chunk {
             .read()
             .get(section_index / Chunk::SECTION_COUNT)
         {
-            let id = section.biomes.get_data(&pos);
-
-            #[cfg(any(debug_assertions, feature = "debug"))]
-            if id.is_none() {
-                error!("Failed to get biome id from section");
-            }
-
-            id
+            Some(section.biomes.get(&pos))
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(
@@ -271,7 +264,7 @@ impl Chunk {
             .write()
             .get_mut(section_index / Chunk::SECTION_COUNT)
         {
-            section.biomes.set_data(biome_id, &pos);
+            section.biomes.set(biome_id, &pos);
         } else {
             #[cfg(any(debug_assertions, feature = "debug"))]
             error!(

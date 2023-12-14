@@ -7,7 +7,7 @@ use super::traits::ContainerType;
 pub struct BiomeContainer;
 
 impl ContainerType for BiomeContainer {
-    fn palette_type(bits: &usize) -> Palette {
+    fn palette_type(bits: usize) -> Palette {
         match bits {
             0 => Palette::Single(0u32),
             1..=3 => Palette::Vector(Vec::<u32>::new()),

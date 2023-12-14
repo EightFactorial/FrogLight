@@ -129,17 +129,20 @@ impl ResourcePacks {
     #[must_use]
     pub fn get_model_texture<'a>(
         &'a self,
-        model: &ResourceLocation,
-        name: &str,
+        model_name: &ResourceLocation,
+        texture_name: &str,
         assets: &'a Assets<ResourcePackAsset>,
     ) -> Option<&Handle<Image>> {
         for pack in self.list.iter().rev() {
             if let Some(pack) = assets.get(&pack.handle) {
-                if let Some(model) = pack.models.get(model) {
-                    if let Some(texture) = model.get_texture(name, &pack.models) {
+                if let Some(model) = pack.models.get(model_name) {
+                    if let Some(texture) = model.get_texture(texture_name, &pack.models) {
                         return self.get_texture(&texture, assets);
                     }
                 }
+            } else {
+                #[cfg(any(debug_assertions, feature = "debug"))]
+                warn!("Resource pack `{}` not loaded", pack.path);
             }
         }
 
@@ -164,7 +167,7 @@ impl ResourcePacks {
         self.get_model_texture(model, name, assets)
             .unwrap_or_else(|| {
                 #[cfg(any(debug_assertions, feature = "debug"))]
-                warn!("Texture `{name}` for `{model}` not found, using fallback");
+                trace!("Texture `{name}` for `{model}` not found, using fallback");
                 &self.fallback
             })
     }

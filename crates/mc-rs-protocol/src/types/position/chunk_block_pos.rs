@@ -101,6 +101,32 @@ impl ChunkBlockPos {
         }
     }
 
+    /// Converts this [`ChunkBlockPos`] to a block index.
+    ///
+    /// This is zero-indexed, so the first block in the chunk is 0, the second is 1, etc.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use mc_rs_protocol::types::position::ChunkBlockPos;
+    ///
+    /// let default = ChunkBlockPos::default();
+    /// assert_eq!(0, default.to_index());
+    ///
+    /// let _1_0_0 = ChunkBlockPos::new(1, 0, 0);
+    /// assert_eq!(1, _1_0_0.to_index());
+    /// ```
+    pub const fn as_index(&self) -> usize {
+        let x = (self.x % 16) as usize;
+        let z = (self.z % 16) as usize;
+
+        let mut y = self.y % 16;
+        if y < 0 {
+            y += 16;
+        }
+
+        x + (z * 16) + (y as usize * 16 * 16)
+    }
+
     /// Converts this [`ChunkBlockPos`] to a [`BlockPos`] in the given [`ChunkPos`].
     ///
     /// This needs to know the [`ChunkPos`] because [`ChunkBlockPos`]es are relative to the chunk,

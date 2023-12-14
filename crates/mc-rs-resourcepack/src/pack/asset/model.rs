@@ -19,24 +19,6 @@ pub struct Model {
 }
 
 impl Model {
-    /// The default block model located at `block/block`.
-    const _BLOCK_MODEL: &'static Model = &Model {
-        parent: None,
-        textures: None,
-        display: None,
-        elements: None,
-        gui_light: None,
-    };
-
-    /// The default item model located at `block/cross`.
-    const _CROSS_MODEL: &'static Model = &Model {
-        parent: None,
-        textures: None,
-        display: None,
-        elements: None,
-        gui_light: None,
-    };
-
     /// Gets the texture for the given side of the block.
     pub fn get_texture(
         &self,

@@ -28,7 +28,7 @@ impl Default for Palette {
 
 impl Palette {
     pub(super) async fn decode_palette<T: ContainerType>(
-        bits: &usize,
+        bits: usize,
         cursor: &mut Cursor<&[u8]>,
     ) -> Result<Self, ChunkDecodeError> {
         match T::palette_type(bits) {

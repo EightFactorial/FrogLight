@@ -1,3 +1,5 @@
+#![feature(int_roundings)]
+
 use bevy::prelude::*;
 
 pub mod biomes;

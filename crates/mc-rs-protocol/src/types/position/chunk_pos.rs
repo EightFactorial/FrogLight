@@ -13,7 +13,7 @@ use super::BlockPos;
 ///
 /// Due to internally using an [IVec2], `y` and `z` are interchangable.
 #[derive(
-    Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut, From, Into, Transcode,
+    Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, Transcode, Component,
 )]
 #[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ChunkPos(pub IVec2);
@@ -66,14 +66,17 @@ impl From<ChunkPos> for Vec3 {
     fn from(value: ChunkPos) -> Self { Vec3::new(value.0.x as f32, 0.0, value.0.y as f32) * 16.0 }
 }
 
+// Swap x and z
 impl VarEncode for ChunkPos {
     fn var_encode(&self, buf: &mut impl std::io::Write) -> Result<(), crate::buffer::EncodeError> {
-        self.0.var_encode(buf)
+        IVec2::new(self.0.y, self.0.x).var_encode(buf)
     }
 }
 
+// Swap x and z
 impl VarDecode for ChunkPos {
     fn var_decode(buf: &mut impl std::io::Read) -> Result<Self, crate::buffer::DecodeError> {
-        Ok(Self(IVec2::var_decode(buf)?))
+        let vec2 = IVec2::var_decode(buf)?;
+        Ok(Self::new(vec2.y, vec2.x))
     }
 }

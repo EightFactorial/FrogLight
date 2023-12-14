@@ -20,7 +20,7 @@ pub trait ContainerType: Sized + Debug + Default {
 
             Ok(Container::<Self> {
                 // Decode the palette
-                palette: Palette::decode_palette::<Self>(&bits, cursor).await?,
+                palette: Palette::decode_palette::<Self>(bits, cursor).await?,
                 // Decode the data
                 data: BitVec::try_from_vec(
                     Vec::<u64>::decode(cursor).map_err(|_| ChunkDecodeError::InvalidContainer)?,
@@ -34,5 +34,5 @@ pub trait ContainerType: Sized + Debug + Default {
     }
 
     /// Get the [`Palette`] type for the given bits per block.
-    fn palette_type(bits: &usize) -> Palette;
+    fn palette_type(bits: usize) -> Palette;
 }

@@ -225,7 +225,14 @@ impl Network for V1_20_0 {
 
                 let task = DecodeChunkTask::create(p.chunk_data);
                 let transform = Transform::from_translation(p.position.into());
-                let entity = world.spawn((task, p.position, transform)).id();
+                let entity = world
+                    .spawn((
+                        task,
+                        p.position,
+                        TransformBundle::from_transform(transform),
+                        VisibilityBundle::default(),
+                    ))
+                    .id();
 
                 let mut worlds = world.resource_mut::<Worlds>();
                 worlds.insert_chunk_entity(current.into(), p.position, entity);

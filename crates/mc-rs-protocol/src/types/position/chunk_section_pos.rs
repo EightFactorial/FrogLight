@@ -1,4 +1,3 @@
-use bevy_ecs::prelude::Component;
 use bevy_math::IVec3;
 use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Test;
@@ -10,15 +9,14 @@ use super::ChunkPos;
 /// A chunk section position.
 ///
 /// This is a chunk's position and a section's height.
-#[derive(
-    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Deref, DerefMut, From, Into, Test,
-)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, Test)]
 #[mctest(tests = ["transcode", "encode", "decode"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ChunkSectionPos(pub IVec3);
 
 impl ChunkSectionPos {
     pub const ZERO: Self = Self(IVec3::ZERO);
 
+    /// Creates a new [`ChunkSectionPos`].
     pub const fn new(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
 }
 

@@ -27,13 +27,15 @@ use crate::{
 ///
 /// This is used to decode chunks in parallel.
 #[derive(Debug, From, Into, Deref, DerefMut, Component)]
-pub struct ChunkMaterialTask(Task<MaterialResult>);
+pub struct ChunkMaterialTask(Task<MaterialTaskResult>);
 
 impl ChunkMaterialTask {
     pub(crate) const CHUNK_SECTION_MESHES: usize = 4;
     pub(crate) const SECTIONS_PER_MESH: usize = Chunk::SECTION_COUNT / Self::CHUNK_SECTION_MESHES;
 }
-pub(crate) type MaterialResult = Vec<(Mesh, Vec<u32>)>;
+
+pub(crate) type MaterialTaskResult = Vec<MaterialResult>;
+type MaterialResult = (Mesh, Vec<BlockTexture>);
 
 impl ChunkMaterialTask {
     pub(super) fn chunk_updater(
@@ -90,17 +92,22 @@ impl ChunkMaterialTask {
                 for (index, (mesh, material_ids)) in result.into_iter().enumerate() {
                     let material_textures: Vec<Handle<Image>> = material_ids
                         .into_iter()
-                        .map(|m| {
-                            let blocks = Blocks::from_u32(m);
-                            let resource_location =
-                                ResourceLocation::from(blocks.resource_location());
+                        .filter_map(|m| {
+                            let blocks = Blocks::from_u32(m.id);
+                            if let Blocks::Air(_) = blocks {
+                                return None;
+                            }
+
+                            let mut iter = blocks.resource_location().split(':');
+                            let namespace = iter.next().unwrap();
+                            let path = iter.next().unwrap();
 
                             // TODO: Get the actual texture
-                            packs.get_model_texture_or_fallback(
-                                &resource_location,
-                                "up",
+                            Some(packs.get_model_texture_or_fallback(
+                                &ResourceLocation::from(format!("{namespace}:block/{path}")),
+                                &m.side,
                                 &pack_assets,
-                            )
+                            ))
                         })
                         .cloned()
                         .collect();
@@ -121,6 +128,8 @@ impl ChunkMaterialTask {
                         chunk.spawn((ChunkMaterialSection(index), bundle));
                     });
                 }
+
+                commands.remove::<ChunkMaterialTask>();
             }
         }
     }
@@ -128,7 +137,7 @@ impl ChunkMaterialTask {
     async fn material_task(
         chunk: ChunkSections,
         neighbors: [Option<ChunkSections>; 4],
-    ) -> MaterialResult {
+    ) -> MaterialTaskResult {
         let mut materials = Vec::with_capacity(Self::CHUNK_SECTION_MESHES);
 
         let n1_guard = neighbors[0].as_ref().map(|n| n.read());
@@ -166,8 +175,9 @@ impl ChunkMaterialSection {
     pub(crate) const MESH_HEIGHT: usize =
         ChunkMaterialTask::SECTIONS_PER_MESH * Section::SECTION_HEIGHT;
 
-    fn section_task(sections: &[Section], _neighbors: [Option<&[Section]>; 4]) -> (Mesh, Vec<u32>) {
-        let mut unique_blocks = Vec::new();
+    fn section_task(sections: &[Section], _neighbors: [Option<&[Section]>; 4]) -> MaterialResult {
+        let mut required_textures = Vec::new();
+
         let mut section_mesh_data =
             [[[0u32; Section::SECTION_WIDTH + 2]; Section::SECTION_DEPTH + 2]; Self::MESH_HEIGHT];
 
@@ -179,9 +189,11 @@ impl ChunkMaterialSection {
                     let pos = BlockPos::new(x as i32 - 1, y as i32 - 1, z as i32 - 1);
                     let pos = ChunkBlockPos::from(pos);
 
-                    let state_id = section.blocks.get_data(&pos).unwrap_or(u32::MAX);
-                    if !unique_blocks.contains(&state_id) {
-                        unique_blocks.push(state_id);
+                    let state_id = section.blocks.get(&pos);
+                    let texture = BlockTexture::new(String::from("up"), state_id);
+
+                    if !required_textures.contains(&texture) {
+                        required_textures.push(texture);
                     }
 
                     *block = state_id;
@@ -189,6 +201,19 @@ impl ChunkMaterialSection {
             }
         }
 
-        (Mesh::new(PrimitiveTopology::TriangleList), unique_blocks)
+        (
+            Mesh::new(PrimitiveTopology::TriangleList),
+            required_textures,
+        )
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BlockTexture {
+    side: String,
+    id: u32,
+}
+
+impl BlockTexture {
+    fn new(side: String, id: u32) -> Self { Self { side, id } }
 }

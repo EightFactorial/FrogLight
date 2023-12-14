@@ -7,8 +7,8 @@ use bevy::{
         render_asset::RenderAssets,
         render_resource::{
             AsBindGroup, AsBindGroupError, BindGroupEntries, BindGroupLayout, BindGroupLayoutEntry,
-            BindingType, PreparedBindGroup, SamplerBindingType, ShaderRef, ShaderStages,
-            TextureSampleType, TextureViewDimension, UnpreparedBindGroup,
+            BindingType, PreparedBindGroup, SamplerBindingType, ShaderStages, TextureSampleType,
+            TextureViewDimension, UnpreparedBindGroup,
         },
         renderer::RenderDevice,
         texture::FallbackImage,
@@ -33,13 +33,13 @@ impl TerrainMaterial {
 }
 
 impl Material for TerrainMaterial {
-    fn vertex_shader() -> ShaderRef {
-        ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
-    }
+    // fn vertex_shader() -> ShaderRef {
+    //     ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
+    // }
 
-    fn fragment_shader() -> ShaderRef {
-        ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
-    }
+    // fn fragment_shader() -> ShaderRef {
+    //     ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
+    // }
 }
 
 impl AsBindGroup for TerrainMaterial {
