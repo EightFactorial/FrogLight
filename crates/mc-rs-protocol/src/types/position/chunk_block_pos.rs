@@ -110,10 +110,10 @@ impl ChunkBlockPos {
     /// use mc_rs_protocol::types::position::ChunkBlockPos;
     ///
     /// let default = ChunkBlockPos::default();
-    /// assert_eq!(0, default.to_index());
+    /// assert_eq!(0, default.as_index());
     ///
     /// let _1_0_0 = ChunkBlockPos::new(1, 0, 0);
-    /// assert_eq!(1, _1_0_0.to_index());
+    /// assert_eq!(1, _1_0_0.as_index());
     /// ```
     pub const fn as_index(&self) -> usize {
         let x = (self.x % 16) as usize;
