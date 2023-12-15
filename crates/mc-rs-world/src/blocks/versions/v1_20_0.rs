@@ -5036,6 +5036,3030 @@ impl BlocksTrait<V1_20_0> for Blocks {
             _ => Self::Error(BlockError),
         }
     }
+    fn is_air(&self) -> bool {
+        match self {
+            Self::Error(b) => b.is_air(),
+            Self::Air(b) => b.is_air(),
+            Self::Stone(b) => b.is_air(),
+            Self::Granite(b) => b.is_air(),
+            Self::PolishedGranite(b) => b.is_air(),
+            Self::Diorite(b) => b.is_air(),
+            Self::PolishedDiorite(b) => b.is_air(),
+            Self::Andesite(b) => b.is_air(),
+            Self::PolishedAndesite(b) => b.is_air(),
+            Self::GrassBlock(b) => b.is_air(),
+            Self::Dirt(b) => b.is_air(),
+            Self::CoarseDirt(b) => b.is_air(),
+            Self::Podzol(b) => b.is_air(),
+            Self::Cobblestone(b) => b.is_air(),
+            Self::OakPlanks(b) => b.is_air(),
+            Self::SprucePlanks(b) => b.is_air(),
+            Self::BirchPlanks(b) => b.is_air(),
+            Self::JunglePlanks(b) => b.is_air(),
+            Self::AcaciaPlanks(b) => b.is_air(),
+            Self::CherryPlanks(b) => b.is_air(),
+            Self::DarkOakPlanks(b) => b.is_air(),
+            Self::MangrovePlanks(b) => b.is_air(),
+            Self::BambooPlanks(b) => b.is_air(),
+            Self::BambooMosaic(b) => b.is_air(),
+            Self::OakSapling(b) => b.is_air(),
+            Self::SpruceSapling(b) => b.is_air(),
+            Self::BirchSapling(b) => b.is_air(),
+            Self::JungleSapling(b) => b.is_air(),
+            Self::AcaciaSapling(b) => b.is_air(),
+            Self::CherrySapling(b) => b.is_air(),
+            Self::DarkOakSapling(b) => b.is_air(),
+            Self::MangrovePropagule(b) => b.is_air(),
+            Self::Bedrock(b) => b.is_air(),
+            Self::Water(b) => b.is_air(),
+            Self::Lava(b) => b.is_air(),
+            Self::Sand(b) => b.is_air(),
+            Self::SuspiciousSand(b) => b.is_air(),
+            Self::RedSand(b) => b.is_air(),
+            Self::Gravel(b) => b.is_air(),
+            Self::SuspiciousGravel(b) => b.is_air(),
+            Self::GoldOre(b) => b.is_air(),
+            Self::DeepslateGoldOre(b) => b.is_air(),
+            Self::IronOre(b) => b.is_air(),
+            Self::DeepslateIronOre(b) => b.is_air(),
+            Self::CoalOre(b) => b.is_air(),
+            Self::DeepslateCoalOre(b) => b.is_air(),
+            Self::NetherGoldOre(b) => b.is_air(),
+            Self::OakLog(b) => b.is_air(),
+            Self::SpruceLog(b) => b.is_air(),
+            Self::BirchLog(b) => b.is_air(),
+            Self::JungleLog(b) => b.is_air(),
+            Self::AcaciaLog(b) => b.is_air(),
+            Self::CherryLog(b) => b.is_air(),
+            Self::DarkOakLog(b) => b.is_air(),
+            Self::MangroveLog(b) => b.is_air(),
+            Self::MangroveRoots(b) => b.is_air(),
+            Self::MuddyMangroveRoots(b) => b.is_air(),
+            Self::BambooBlock(b) => b.is_air(),
+            Self::StrippedSpruceLog(b) => b.is_air(),
+            Self::StrippedBirchLog(b) => b.is_air(),
+            Self::StrippedJungleLog(b) => b.is_air(),
+            Self::StrippedAcaciaLog(b) => b.is_air(),
+            Self::StrippedCherryLog(b) => b.is_air(),
+            Self::StrippedDarkOakLog(b) => b.is_air(),
+            Self::StrippedOakLog(b) => b.is_air(),
+            Self::StrippedMangroveLog(b) => b.is_air(),
+            Self::StrippedBambooBlock(b) => b.is_air(),
+            Self::OakWood(b) => b.is_air(),
+            Self::SpruceWood(b) => b.is_air(),
+            Self::BirchWood(b) => b.is_air(),
+            Self::JungleWood(b) => b.is_air(),
+            Self::AcaciaWood(b) => b.is_air(),
+            Self::CherryWood(b) => b.is_air(),
+            Self::DarkOakWood(b) => b.is_air(),
+            Self::MangroveWood(b) => b.is_air(),
+            Self::StrippedOakWood(b) => b.is_air(),
+            Self::StrippedSpruceWood(b) => b.is_air(),
+            Self::StrippedBirchWood(b) => b.is_air(),
+            Self::StrippedJungleWood(b) => b.is_air(),
+            Self::StrippedAcaciaWood(b) => b.is_air(),
+            Self::StrippedCherryWood(b) => b.is_air(),
+            Self::StrippedDarkOakWood(b) => b.is_air(),
+            Self::StrippedMangroveWood(b) => b.is_air(),
+            Self::OakLeaves(b) => b.is_air(),
+            Self::SpruceLeaves(b) => b.is_air(),
+            Self::BirchLeaves(b) => b.is_air(),
+            Self::JungleLeaves(b) => b.is_air(),
+            Self::AcaciaLeaves(b) => b.is_air(),
+            Self::CherryLeaves(b) => b.is_air(),
+            Self::DarkOakLeaves(b) => b.is_air(),
+            Self::MangroveLeaves(b) => b.is_air(),
+            Self::AzaleaLeaves(b) => b.is_air(),
+            Self::FloweringAzaleaLeaves(b) => b.is_air(),
+            Self::Sponge(b) => b.is_air(),
+            Self::WetSponge(b) => b.is_air(),
+            Self::Glass(b) => b.is_air(),
+            Self::LapisOre(b) => b.is_air(),
+            Self::DeepslateLapisOre(b) => b.is_air(),
+            Self::LapisBlock(b) => b.is_air(),
+            Self::Dispenser(b) => b.is_air(),
+            Self::Sandstone(b) => b.is_air(),
+            Self::ChiseledSandstone(b) => b.is_air(),
+            Self::CutSandstone(b) => b.is_air(),
+            Self::NoteBlock(b) => b.is_air(),
+            Self::WhiteBed(b) => b.is_air(),
+            Self::OrangeBed(b) => b.is_air(),
+            Self::MagentaBed(b) => b.is_air(),
+            Self::LightBlueBed(b) => b.is_air(),
+            Self::YellowBed(b) => b.is_air(),
+            Self::LimeBed(b) => b.is_air(),
+            Self::PinkBed(b) => b.is_air(),
+            Self::GrayBed(b) => b.is_air(),
+            Self::LightGrayBed(b) => b.is_air(),
+            Self::CyanBed(b) => b.is_air(),
+            Self::PurpleBed(b) => b.is_air(),
+            Self::BlueBed(b) => b.is_air(),
+            Self::BrownBed(b) => b.is_air(),
+            Self::GreenBed(b) => b.is_air(),
+            Self::RedBed(b) => b.is_air(),
+            Self::BlackBed(b) => b.is_air(),
+            Self::PoweredRail(b) => b.is_air(),
+            Self::DetectorRail(b) => b.is_air(),
+            Self::StickyPiston(b) => b.is_air(),
+            Self::Cobweb(b) => b.is_air(),
+            Self::Grass(b) => b.is_air(),
+            Self::Fern(b) => b.is_air(),
+            Self::DeadBush(b) => b.is_air(),
+            Self::Seagrass(b) => b.is_air(),
+            Self::TallSeagrass(b) => b.is_air(),
+            Self::Piston(b) => b.is_air(),
+            Self::PistonHead(b) => b.is_air(),
+            Self::WhiteWool(b) => b.is_air(),
+            Self::OrangeWool(b) => b.is_air(),
+            Self::MagentaWool(b) => b.is_air(),
+            Self::LightBlueWool(b) => b.is_air(),
+            Self::YellowWool(b) => b.is_air(),
+            Self::LimeWool(b) => b.is_air(),
+            Self::PinkWool(b) => b.is_air(),
+            Self::GrayWool(b) => b.is_air(),
+            Self::LightGrayWool(b) => b.is_air(),
+            Self::CyanWool(b) => b.is_air(),
+            Self::PurpleWool(b) => b.is_air(),
+            Self::BlueWool(b) => b.is_air(),
+            Self::BrownWool(b) => b.is_air(),
+            Self::GreenWool(b) => b.is_air(),
+            Self::RedWool(b) => b.is_air(),
+            Self::BlackWool(b) => b.is_air(),
+            Self::MovingPiston(b) => b.is_air(),
+            Self::Dandelion(b) => b.is_air(),
+            Self::Torchflower(b) => b.is_air(),
+            Self::Poppy(b) => b.is_air(),
+            Self::BlueOrchid(b) => b.is_air(),
+            Self::Allium(b) => b.is_air(),
+            Self::AzureBluet(b) => b.is_air(),
+            Self::RedTulip(b) => b.is_air(),
+            Self::OrangeTulip(b) => b.is_air(),
+            Self::WhiteTulip(b) => b.is_air(),
+            Self::PinkTulip(b) => b.is_air(),
+            Self::OxeyeDaisy(b) => b.is_air(),
+            Self::Cornflower(b) => b.is_air(),
+            Self::WitherRose(b) => b.is_air(),
+            Self::LilyOfTheValley(b) => b.is_air(),
+            Self::BrownMushroom(b) => b.is_air(),
+            Self::RedMushroom(b) => b.is_air(),
+            Self::GoldBlock(b) => b.is_air(),
+            Self::IronBlock(b) => b.is_air(),
+            Self::Bricks(b) => b.is_air(),
+            Self::Tnt(b) => b.is_air(),
+            Self::Bookshelf(b) => b.is_air(),
+            Self::ChiseledBookshelf(b) => b.is_air(),
+            Self::MossyCobblestone(b) => b.is_air(),
+            Self::Obsidian(b) => b.is_air(),
+            Self::Torch(b) => b.is_air(),
+            Self::WallTorch(b) => b.is_air(),
+            Self::Fire(b) => b.is_air(),
+            Self::SoulFire(b) => b.is_air(),
+            Self::Spawner(b) => b.is_air(),
+            Self::OakStairs(b) => b.is_air(),
+            Self::Chest(b) => b.is_air(),
+            Self::RedstoneWire(b) => b.is_air(),
+            Self::DiamondOre(b) => b.is_air(),
+            Self::DeepslateDiamondOre(b) => b.is_air(),
+            Self::DiamondBlock(b) => b.is_air(),
+            Self::CraftingTable(b) => b.is_air(),
+            Self::Wheat(b) => b.is_air(),
+            Self::Farmland(b) => b.is_air(),
+            Self::Furnace(b) => b.is_air(),
+            Self::OakSign(b) => b.is_air(),
+            Self::SpruceSign(b) => b.is_air(),
+            Self::BirchSign(b) => b.is_air(),
+            Self::AcaciaSign(b) => b.is_air(),
+            Self::CherrySign(b) => b.is_air(),
+            Self::JungleSign(b) => b.is_air(),
+            Self::DarkOakSign(b) => b.is_air(),
+            Self::MangroveSign(b) => b.is_air(),
+            Self::BambooSign(b) => b.is_air(),
+            Self::OakDoor(b) => b.is_air(),
+            Self::Ladder(b) => b.is_air(),
+            Self::Rail(b) => b.is_air(),
+            Self::CobblestoneStairs(b) => b.is_air(),
+            Self::OakWallSign(b) => b.is_air(),
+            Self::SpruceWallSign(b) => b.is_air(),
+            Self::BirchWallSign(b) => b.is_air(),
+            Self::AcaciaWallSign(b) => b.is_air(),
+            Self::CherryWallSign(b) => b.is_air(),
+            Self::JungleWallSign(b) => b.is_air(),
+            Self::DarkOakWallSign(b) => b.is_air(),
+            Self::MangroveWallSign(b) => b.is_air(),
+            Self::BambooWallSign(b) => b.is_air(),
+            Self::OakHangingSign(b) => b.is_air(),
+            Self::SpruceHangingSign(b) => b.is_air(),
+            Self::BirchHangingSign(b) => b.is_air(),
+            Self::AcaciaHangingSign(b) => b.is_air(),
+            Self::CherryHangingSign(b) => b.is_air(),
+            Self::JungleHangingSign(b) => b.is_air(),
+            Self::DarkOakHangingSign(b) => b.is_air(),
+            Self::CrimsonHangingSign(b) => b.is_air(),
+            Self::WarpedHangingSign(b) => b.is_air(),
+            Self::MangroveHangingSign(b) => b.is_air(),
+            Self::BambooHangingSign(b) => b.is_air(),
+            Self::OakWallHangingSign(b) => b.is_air(),
+            Self::SpruceWallHangingSign(b) => b.is_air(),
+            Self::BirchWallHangingSign(b) => b.is_air(),
+            Self::AcaciaWallHangingSign(b) => b.is_air(),
+            Self::CherryWallHangingSign(b) => b.is_air(),
+            Self::JungleWallHangingSign(b) => b.is_air(),
+            Self::DarkOakWallHangingSign(b) => b.is_air(),
+            Self::MangroveWallHangingSign(b) => b.is_air(),
+            Self::CrimsonWallHangingSign(b) => b.is_air(),
+            Self::WarpedWallHangingSign(b) => b.is_air(),
+            Self::BambooWallHangingSign(b) => b.is_air(),
+            Self::Lever(b) => b.is_air(),
+            Self::StonePressurePlate(b) => b.is_air(),
+            Self::IronDoor(b) => b.is_air(),
+            Self::OakPressurePlate(b) => b.is_air(),
+            Self::SprucePressurePlate(b) => b.is_air(),
+            Self::BirchPressurePlate(b) => b.is_air(),
+            Self::JunglePressurePlate(b) => b.is_air(),
+            Self::AcaciaPressurePlate(b) => b.is_air(),
+            Self::CherryPressurePlate(b) => b.is_air(),
+            Self::DarkOakPressurePlate(b) => b.is_air(),
+            Self::MangrovePressurePlate(b) => b.is_air(),
+            Self::BambooPressurePlate(b) => b.is_air(),
+            Self::RedstoneOre(b) => b.is_air(),
+            Self::DeepslateRedstoneOre(b) => b.is_air(),
+            Self::RedstoneTorch(b) => b.is_air(),
+            Self::RedstoneWallTorch(b) => b.is_air(),
+            Self::StoneButton(b) => b.is_air(),
+            Self::Snow(b) => b.is_air(),
+            Self::Ice(b) => b.is_air(),
+            Self::SnowBlock(b) => b.is_air(),
+            Self::Cactus(b) => b.is_air(),
+            Self::Clay(b) => b.is_air(),
+            Self::SugarCane(b) => b.is_air(),
+            Self::Jukebox(b) => b.is_air(),
+            Self::OakFence(b) => b.is_air(),
+            Self::Pumpkin(b) => b.is_air(),
+            Self::Netherrack(b) => b.is_air(),
+            Self::SoulSand(b) => b.is_air(),
+            Self::SoulSoil(b) => b.is_air(),
+            Self::Basalt(b) => b.is_air(),
+            Self::PolishedBasalt(b) => b.is_air(),
+            Self::SoulTorch(b) => b.is_air(),
+            Self::SoulWallTorch(b) => b.is_air(),
+            Self::Glowstone(b) => b.is_air(),
+            Self::NetherPortal(b) => b.is_air(),
+            Self::CarvedPumpkin(b) => b.is_air(),
+            Self::JackOLantern(b) => b.is_air(),
+            Self::Cake(b) => b.is_air(),
+            Self::Repeater(b) => b.is_air(),
+            Self::WhiteStainedGlass(b) => b.is_air(),
+            Self::OrangeStainedGlass(b) => b.is_air(),
+            Self::MagentaStainedGlass(b) => b.is_air(),
+            Self::LightBlueStainedGlass(b) => b.is_air(),
+            Self::YellowStainedGlass(b) => b.is_air(),
+            Self::LimeStainedGlass(b) => b.is_air(),
+            Self::PinkStainedGlass(b) => b.is_air(),
+            Self::GrayStainedGlass(b) => b.is_air(),
+            Self::LightGrayStainedGlass(b) => b.is_air(),
+            Self::CyanStainedGlass(b) => b.is_air(),
+            Self::PurpleStainedGlass(b) => b.is_air(),
+            Self::BlueStainedGlass(b) => b.is_air(),
+            Self::BrownStainedGlass(b) => b.is_air(),
+            Self::GreenStainedGlass(b) => b.is_air(),
+            Self::RedStainedGlass(b) => b.is_air(),
+            Self::BlackStainedGlass(b) => b.is_air(),
+            Self::OakTrapdoor(b) => b.is_air(),
+            Self::SpruceTrapdoor(b) => b.is_air(),
+            Self::BirchTrapdoor(b) => b.is_air(),
+            Self::JungleTrapdoor(b) => b.is_air(),
+            Self::AcaciaTrapdoor(b) => b.is_air(),
+            Self::CherryTrapdoor(b) => b.is_air(),
+            Self::DarkOakTrapdoor(b) => b.is_air(),
+            Self::MangroveTrapdoor(b) => b.is_air(),
+            Self::BambooTrapdoor(b) => b.is_air(),
+            Self::StoneBricks(b) => b.is_air(),
+            Self::MossyStoneBricks(b) => b.is_air(),
+            Self::CrackedStoneBricks(b) => b.is_air(),
+            Self::ChiseledStoneBricks(b) => b.is_air(),
+            Self::PackedMud(b) => b.is_air(),
+            Self::MudBricks(b) => b.is_air(),
+            Self::InfestedStone(b) => b.is_air(),
+            Self::InfestedCobblestone(b) => b.is_air(),
+            Self::InfestedStoneBricks(b) => b.is_air(),
+            Self::InfestedMossyStoneBricks(b) => b.is_air(),
+            Self::InfestedCrackedStoneBricks(b) => b.is_air(),
+            Self::InfestedChiseledStoneBricks(b) => b.is_air(),
+            Self::BrownMushroomBlock(b) => b.is_air(),
+            Self::RedMushroomBlock(b) => b.is_air(),
+            Self::MushroomStem(b) => b.is_air(),
+            Self::IronBars(b) => b.is_air(),
+            Self::Chain(b) => b.is_air(),
+            Self::GlassPane(b) => b.is_air(),
+            Self::Melon(b) => b.is_air(),
+            Self::AttachedPumpkinStem(b) => b.is_air(),
+            Self::AttachedMelonStem(b) => b.is_air(),
+            Self::PumpkinStem(b) => b.is_air(),
+            Self::MelonStem(b) => b.is_air(),
+            Self::Vine(b) => b.is_air(),
+            Self::GlowLichen(b) => b.is_air(),
+            Self::OakFenceGate(b) => b.is_air(),
+            Self::BrickStairs(b) => b.is_air(),
+            Self::StoneBrickStairs(b) => b.is_air(),
+            Self::MudBrickStairs(b) => b.is_air(),
+            Self::Mycelium(b) => b.is_air(),
+            Self::LilyPad(b) => b.is_air(),
+            Self::NetherBricks(b) => b.is_air(),
+            Self::NetherBrickFence(b) => b.is_air(),
+            Self::NetherBrickStairs(b) => b.is_air(),
+            Self::NetherWart(b) => b.is_air(),
+            Self::EnchantingTable(b) => b.is_air(),
+            Self::BrewingStand(b) => b.is_air(),
+            Self::Cauldron(b) => b.is_air(),
+            Self::WaterCauldron(b) => b.is_air(),
+            Self::LavaCauldron(b) => b.is_air(),
+            Self::PowderSnowCauldron(b) => b.is_air(),
+            Self::EndPortal(b) => b.is_air(),
+            Self::EndPortalFrame(b) => b.is_air(),
+            Self::EndStone(b) => b.is_air(),
+            Self::DragonEgg(b) => b.is_air(),
+            Self::RedstoneLamp(b) => b.is_air(),
+            Self::Cocoa(b) => b.is_air(),
+            Self::SandstoneStairs(b) => b.is_air(),
+            Self::EmeraldOre(b) => b.is_air(),
+            Self::DeepslateEmeraldOre(b) => b.is_air(),
+            Self::EnderChest(b) => b.is_air(),
+            Self::TripwireHook(b) => b.is_air(),
+            Self::Tripwire(b) => b.is_air(),
+            Self::EmeraldBlock(b) => b.is_air(),
+            Self::SpruceStairs(b) => b.is_air(),
+            Self::BirchStairs(b) => b.is_air(),
+            Self::JungleStairs(b) => b.is_air(),
+            Self::CommandBlock(b) => b.is_air(),
+            Self::Beacon(b) => b.is_air(),
+            Self::CobblestoneWall(b) => b.is_air(),
+            Self::MossyCobblestoneWall(b) => b.is_air(),
+            Self::FlowerPot(b) => b.is_air(),
+            Self::PottedTorchflower(b) => b.is_air(),
+            Self::PottedOakSapling(b) => b.is_air(),
+            Self::PottedSpruceSapling(b) => b.is_air(),
+            Self::PottedBirchSapling(b) => b.is_air(),
+            Self::PottedJungleSapling(b) => b.is_air(),
+            Self::PottedAcaciaSapling(b) => b.is_air(),
+            Self::PottedCherrySapling(b) => b.is_air(),
+            Self::PottedDarkOakSapling(b) => b.is_air(),
+            Self::PottedMangrovePropagule(b) => b.is_air(),
+            Self::PottedFern(b) => b.is_air(),
+            Self::PottedDandelion(b) => b.is_air(),
+            Self::PottedPoppy(b) => b.is_air(),
+            Self::PottedBlueOrchid(b) => b.is_air(),
+            Self::PottedAllium(b) => b.is_air(),
+            Self::PottedAzureBluet(b) => b.is_air(),
+            Self::PottedRedTulip(b) => b.is_air(),
+            Self::PottedOrangeTulip(b) => b.is_air(),
+            Self::PottedWhiteTulip(b) => b.is_air(),
+            Self::PottedPinkTulip(b) => b.is_air(),
+            Self::PottedOxeyeDaisy(b) => b.is_air(),
+            Self::PottedCornflower(b) => b.is_air(),
+            Self::PottedLilyOfTheValley(b) => b.is_air(),
+            Self::PottedWitherRose(b) => b.is_air(),
+            Self::PottedRedMushroom(b) => b.is_air(),
+            Self::PottedBrownMushroom(b) => b.is_air(),
+            Self::PottedDeadBush(b) => b.is_air(),
+            Self::PottedCactus(b) => b.is_air(),
+            Self::Carrots(b) => b.is_air(),
+            Self::Potatoes(b) => b.is_air(),
+            Self::OakButton(b) => b.is_air(),
+            Self::SpruceButton(b) => b.is_air(),
+            Self::BirchButton(b) => b.is_air(),
+            Self::JungleButton(b) => b.is_air(),
+            Self::AcaciaButton(b) => b.is_air(),
+            Self::CherryButton(b) => b.is_air(),
+            Self::DarkOakButton(b) => b.is_air(),
+            Self::MangroveButton(b) => b.is_air(),
+            Self::BambooButton(b) => b.is_air(),
+            Self::SkeletonSkull(b) => b.is_air(),
+            Self::SkeletonWallSkull(b) => b.is_air(),
+            Self::WitherSkeletonSkull(b) => b.is_air(),
+            Self::WitherSkeletonWallSkull(b) => b.is_air(),
+            Self::ZombieHead(b) => b.is_air(),
+            Self::ZombieWallHead(b) => b.is_air(),
+            Self::PlayerHead(b) => b.is_air(),
+            Self::PlayerWallHead(b) => b.is_air(),
+            Self::CreeperHead(b) => b.is_air(),
+            Self::CreeperWallHead(b) => b.is_air(),
+            Self::DragonHead(b) => b.is_air(),
+            Self::DragonWallHead(b) => b.is_air(),
+            Self::PiglinHead(b) => b.is_air(),
+            Self::PiglinWallHead(b) => b.is_air(),
+            Self::Anvil(b) => b.is_air(),
+            Self::ChippedAnvil(b) => b.is_air(),
+            Self::DamagedAnvil(b) => b.is_air(),
+            Self::TrappedChest(b) => b.is_air(),
+            Self::LightWeightedPressurePlate(b) => b.is_air(),
+            Self::HeavyWeightedPressurePlate(b) => b.is_air(),
+            Self::Comparator(b) => b.is_air(),
+            Self::DaylightDetector(b) => b.is_air(),
+            Self::RedstoneBlock(b) => b.is_air(),
+            Self::NetherQuartzOre(b) => b.is_air(),
+            Self::Hopper(b) => b.is_air(),
+            Self::QuartzBlock(b) => b.is_air(),
+            Self::ChiseledQuartzBlock(b) => b.is_air(),
+            Self::QuartzPillar(b) => b.is_air(),
+            Self::QuartzStairs(b) => b.is_air(),
+            Self::ActivatorRail(b) => b.is_air(),
+            Self::Dropper(b) => b.is_air(),
+            Self::WhiteTerracotta(b) => b.is_air(),
+            Self::OrangeTerracotta(b) => b.is_air(),
+            Self::MagentaTerracotta(b) => b.is_air(),
+            Self::LightBlueTerracotta(b) => b.is_air(),
+            Self::YellowTerracotta(b) => b.is_air(),
+            Self::LimeTerracotta(b) => b.is_air(),
+            Self::PinkTerracotta(b) => b.is_air(),
+            Self::GrayTerracotta(b) => b.is_air(),
+            Self::LightGrayTerracotta(b) => b.is_air(),
+            Self::CyanTerracotta(b) => b.is_air(),
+            Self::PurpleTerracotta(b) => b.is_air(),
+            Self::BlueTerracotta(b) => b.is_air(),
+            Self::BrownTerracotta(b) => b.is_air(),
+            Self::GreenTerracotta(b) => b.is_air(),
+            Self::RedTerracotta(b) => b.is_air(),
+            Self::BlackTerracotta(b) => b.is_air(),
+            Self::WhiteStainedGlassPane(b) => b.is_air(),
+            Self::OrangeStainedGlassPane(b) => b.is_air(),
+            Self::MagentaStainedGlassPane(b) => b.is_air(),
+            Self::LightBlueStainedGlassPane(b) => b.is_air(),
+            Self::YellowStainedGlassPane(b) => b.is_air(),
+            Self::LimeStainedGlassPane(b) => b.is_air(),
+            Self::PinkStainedGlassPane(b) => b.is_air(),
+            Self::GrayStainedGlassPane(b) => b.is_air(),
+            Self::LightGrayStainedGlassPane(b) => b.is_air(),
+            Self::CyanStainedGlassPane(b) => b.is_air(),
+            Self::PurpleStainedGlassPane(b) => b.is_air(),
+            Self::BlueStainedGlassPane(b) => b.is_air(),
+            Self::BrownStainedGlassPane(b) => b.is_air(),
+            Self::GreenStainedGlassPane(b) => b.is_air(),
+            Self::RedStainedGlassPane(b) => b.is_air(),
+            Self::BlackStainedGlassPane(b) => b.is_air(),
+            Self::AcaciaStairs(b) => b.is_air(),
+            Self::CherryStairs(b) => b.is_air(),
+            Self::DarkOakStairs(b) => b.is_air(),
+            Self::MangroveStairs(b) => b.is_air(),
+            Self::BambooStairs(b) => b.is_air(),
+            Self::BambooMosaicStairs(b) => b.is_air(),
+            Self::SlimeBlock(b) => b.is_air(),
+            Self::Barrier(b) => b.is_air(),
+            Self::Light(b) => b.is_air(),
+            Self::IronTrapdoor(b) => b.is_air(),
+            Self::Prismarine(b) => b.is_air(),
+            Self::PrismarineBricks(b) => b.is_air(),
+            Self::DarkPrismarine(b) => b.is_air(),
+            Self::PrismarineStairs(b) => b.is_air(),
+            Self::PrismarineBrickStairs(b) => b.is_air(),
+            Self::DarkPrismarineStairs(b) => b.is_air(),
+            Self::PrismarineSlab(b) => b.is_air(),
+            Self::PrismarineBrickSlab(b) => b.is_air(),
+            Self::DarkPrismarineSlab(b) => b.is_air(),
+            Self::SeaLantern(b) => b.is_air(),
+            Self::HayBlock(b) => b.is_air(),
+            Self::WhiteCarpet(b) => b.is_air(),
+            Self::OrangeCarpet(b) => b.is_air(),
+            Self::MagentaCarpet(b) => b.is_air(),
+            Self::LightBlueCarpet(b) => b.is_air(),
+            Self::YellowCarpet(b) => b.is_air(),
+            Self::LimeCarpet(b) => b.is_air(),
+            Self::PinkCarpet(b) => b.is_air(),
+            Self::GrayCarpet(b) => b.is_air(),
+            Self::LightGrayCarpet(b) => b.is_air(),
+            Self::CyanCarpet(b) => b.is_air(),
+            Self::PurpleCarpet(b) => b.is_air(),
+            Self::BlueCarpet(b) => b.is_air(),
+            Self::BrownCarpet(b) => b.is_air(),
+            Self::GreenCarpet(b) => b.is_air(),
+            Self::RedCarpet(b) => b.is_air(),
+            Self::BlackCarpet(b) => b.is_air(),
+            Self::Terracotta(b) => b.is_air(),
+            Self::CoalBlock(b) => b.is_air(),
+            Self::PackedIce(b) => b.is_air(),
+            Self::Sunflower(b) => b.is_air(),
+            Self::Lilac(b) => b.is_air(),
+            Self::RoseBush(b) => b.is_air(),
+            Self::Peony(b) => b.is_air(),
+            Self::TallGrass(b) => b.is_air(),
+            Self::LargeFern(b) => b.is_air(),
+            Self::WhiteBanner(b) => b.is_air(),
+            Self::OrangeBanner(b) => b.is_air(),
+            Self::MagentaBanner(b) => b.is_air(),
+            Self::LightBlueBanner(b) => b.is_air(),
+            Self::YellowBanner(b) => b.is_air(),
+            Self::LimeBanner(b) => b.is_air(),
+            Self::PinkBanner(b) => b.is_air(),
+            Self::GrayBanner(b) => b.is_air(),
+            Self::LightGrayBanner(b) => b.is_air(),
+            Self::CyanBanner(b) => b.is_air(),
+            Self::PurpleBanner(b) => b.is_air(),
+            Self::BlueBanner(b) => b.is_air(),
+            Self::BrownBanner(b) => b.is_air(),
+            Self::GreenBanner(b) => b.is_air(),
+            Self::RedBanner(b) => b.is_air(),
+            Self::BlackBanner(b) => b.is_air(),
+            Self::WhiteWallBanner(b) => b.is_air(),
+            Self::OrangeWallBanner(b) => b.is_air(),
+            Self::MagentaWallBanner(b) => b.is_air(),
+            Self::LightBlueWallBanner(b) => b.is_air(),
+            Self::YellowWallBanner(b) => b.is_air(),
+            Self::LimeWallBanner(b) => b.is_air(),
+            Self::PinkWallBanner(b) => b.is_air(),
+            Self::GrayWallBanner(b) => b.is_air(),
+            Self::LightGrayWallBanner(b) => b.is_air(),
+            Self::CyanWallBanner(b) => b.is_air(),
+            Self::PurpleWallBanner(b) => b.is_air(),
+            Self::BlueWallBanner(b) => b.is_air(),
+            Self::BrownWallBanner(b) => b.is_air(),
+            Self::GreenWallBanner(b) => b.is_air(),
+            Self::RedWallBanner(b) => b.is_air(),
+            Self::BlackWallBanner(b) => b.is_air(),
+            Self::RedSandstone(b) => b.is_air(),
+            Self::ChiseledRedSandstone(b) => b.is_air(),
+            Self::CutRedSandstone(b) => b.is_air(),
+            Self::RedSandstoneStairs(b) => b.is_air(),
+            Self::OakSlab(b) => b.is_air(),
+            Self::SpruceSlab(b) => b.is_air(),
+            Self::BirchSlab(b) => b.is_air(),
+            Self::JungleSlab(b) => b.is_air(),
+            Self::AcaciaSlab(b) => b.is_air(),
+            Self::CherrySlab(b) => b.is_air(),
+            Self::DarkOakSlab(b) => b.is_air(),
+            Self::MangroveSlab(b) => b.is_air(),
+            Self::BambooSlab(b) => b.is_air(),
+            Self::BambooMosaicSlab(b) => b.is_air(),
+            Self::StoneSlab(b) => b.is_air(),
+            Self::SmoothStoneSlab(b) => b.is_air(),
+            Self::SandstoneSlab(b) => b.is_air(),
+            Self::CutSandstoneSlab(b) => b.is_air(),
+            Self::PetrifiedOakSlab(b) => b.is_air(),
+            Self::CobblestoneSlab(b) => b.is_air(),
+            Self::BrickSlab(b) => b.is_air(),
+            Self::StoneBrickSlab(b) => b.is_air(),
+            Self::MudBrickSlab(b) => b.is_air(),
+            Self::NetherBrickSlab(b) => b.is_air(),
+            Self::QuartzSlab(b) => b.is_air(),
+            Self::RedSandstoneSlab(b) => b.is_air(),
+            Self::CutRedSandstoneSlab(b) => b.is_air(),
+            Self::PurpurSlab(b) => b.is_air(),
+            Self::SmoothStone(b) => b.is_air(),
+            Self::SmoothSandstone(b) => b.is_air(),
+            Self::SmoothQuartz(b) => b.is_air(),
+            Self::SmoothRedSandstone(b) => b.is_air(),
+            Self::SpruceFenceGate(b) => b.is_air(),
+            Self::BirchFenceGate(b) => b.is_air(),
+            Self::JungleFenceGate(b) => b.is_air(),
+            Self::AcaciaFenceGate(b) => b.is_air(),
+            Self::CherryFenceGate(b) => b.is_air(),
+            Self::DarkOakFenceGate(b) => b.is_air(),
+            Self::MangroveFenceGate(b) => b.is_air(),
+            Self::BambooFenceGate(b) => b.is_air(),
+            Self::SpruceFence(b) => b.is_air(),
+            Self::BirchFence(b) => b.is_air(),
+            Self::JungleFence(b) => b.is_air(),
+            Self::AcaciaFence(b) => b.is_air(),
+            Self::CherryFence(b) => b.is_air(),
+            Self::DarkOakFence(b) => b.is_air(),
+            Self::MangroveFence(b) => b.is_air(),
+            Self::BambooFence(b) => b.is_air(),
+            Self::SpruceDoor(b) => b.is_air(),
+            Self::BirchDoor(b) => b.is_air(),
+            Self::JungleDoor(b) => b.is_air(),
+            Self::AcaciaDoor(b) => b.is_air(),
+            Self::CherryDoor(b) => b.is_air(),
+            Self::DarkOakDoor(b) => b.is_air(),
+            Self::MangroveDoor(b) => b.is_air(),
+            Self::BambooDoor(b) => b.is_air(),
+            Self::EndRod(b) => b.is_air(),
+            Self::ChorusPlant(b) => b.is_air(),
+            Self::ChorusFlower(b) => b.is_air(),
+            Self::PurpurBlock(b) => b.is_air(),
+            Self::PurpurPillar(b) => b.is_air(),
+            Self::PurpurStairs(b) => b.is_air(),
+            Self::EndStoneBricks(b) => b.is_air(),
+            Self::TorchflowerCrop(b) => b.is_air(),
+            Self::PitcherCrop(b) => b.is_air(),
+            Self::PitcherPlant(b) => b.is_air(),
+            Self::Beetroots(b) => b.is_air(),
+            Self::DirtPath(b) => b.is_air(),
+            Self::EndGateway(b) => b.is_air(),
+            Self::RepeatingCommandBlock(b) => b.is_air(),
+            Self::ChainCommandBlock(b) => b.is_air(),
+            Self::FrostedIce(b) => b.is_air(),
+            Self::MagmaBlock(b) => b.is_air(),
+            Self::NetherWartBlock(b) => b.is_air(),
+            Self::RedNetherBricks(b) => b.is_air(),
+            Self::BoneBlock(b) => b.is_air(),
+            Self::StructureVoid(b) => b.is_air(),
+            Self::Observer(b) => b.is_air(),
+            Self::ShulkerBox(b) => b.is_air(),
+            Self::WhiteShulkerBox(b) => b.is_air(),
+            Self::OrangeShulkerBox(b) => b.is_air(),
+            Self::MagentaShulkerBox(b) => b.is_air(),
+            Self::LightBlueShulkerBox(b) => b.is_air(),
+            Self::YellowShulkerBox(b) => b.is_air(),
+            Self::LimeShulkerBox(b) => b.is_air(),
+            Self::PinkShulkerBox(b) => b.is_air(),
+            Self::GrayShulkerBox(b) => b.is_air(),
+            Self::LightGrayShulkerBox(b) => b.is_air(),
+            Self::CyanShulkerBox(b) => b.is_air(),
+            Self::PurpleShulkerBox(b) => b.is_air(),
+            Self::BlueShulkerBox(b) => b.is_air(),
+            Self::BrownShulkerBox(b) => b.is_air(),
+            Self::GreenShulkerBox(b) => b.is_air(),
+            Self::RedShulkerBox(b) => b.is_air(),
+            Self::BlackShulkerBox(b) => b.is_air(),
+            Self::WhiteGlazedTerracotta(b) => b.is_air(),
+            Self::OrangeGlazedTerracotta(b) => b.is_air(),
+            Self::MagentaGlazedTerracotta(b) => b.is_air(),
+            Self::LightBlueGlazedTerracotta(b) => b.is_air(),
+            Self::YellowGlazedTerracotta(b) => b.is_air(),
+            Self::LimeGlazedTerracotta(b) => b.is_air(),
+            Self::PinkGlazedTerracotta(b) => b.is_air(),
+            Self::GrayGlazedTerracotta(b) => b.is_air(),
+            Self::LightGrayGlazedTerracotta(b) => b.is_air(),
+            Self::CyanGlazedTerracotta(b) => b.is_air(),
+            Self::PurpleGlazedTerracotta(b) => b.is_air(),
+            Self::BlueGlazedTerracotta(b) => b.is_air(),
+            Self::BrownGlazedTerracotta(b) => b.is_air(),
+            Self::GreenGlazedTerracotta(b) => b.is_air(),
+            Self::RedGlazedTerracotta(b) => b.is_air(),
+            Self::BlackGlazedTerracotta(b) => b.is_air(),
+            Self::WhiteConcrete(b) => b.is_air(),
+            Self::OrangeConcrete(b) => b.is_air(),
+            Self::MagentaConcrete(b) => b.is_air(),
+            Self::LightBlueConcrete(b) => b.is_air(),
+            Self::YellowConcrete(b) => b.is_air(),
+            Self::LimeConcrete(b) => b.is_air(),
+            Self::PinkConcrete(b) => b.is_air(),
+            Self::GrayConcrete(b) => b.is_air(),
+            Self::LightGrayConcrete(b) => b.is_air(),
+            Self::CyanConcrete(b) => b.is_air(),
+            Self::PurpleConcrete(b) => b.is_air(),
+            Self::BlueConcrete(b) => b.is_air(),
+            Self::BrownConcrete(b) => b.is_air(),
+            Self::GreenConcrete(b) => b.is_air(),
+            Self::RedConcrete(b) => b.is_air(),
+            Self::BlackConcrete(b) => b.is_air(),
+            Self::WhiteConcretePowder(b) => b.is_air(),
+            Self::OrangeConcretePowder(b) => b.is_air(),
+            Self::MagentaConcretePowder(b) => b.is_air(),
+            Self::LightBlueConcretePowder(b) => b.is_air(),
+            Self::YellowConcretePowder(b) => b.is_air(),
+            Self::LimeConcretePowder(b) => b.is_air(),
+            Self::PinkConcretePowder(b) => b.is_air(),
+            Self::GrayConcretePowder(b) => b.is_air(),
+            Self::LightGrayConcretePowder(b) => b.is_air(),
+            Self::CyanConcretePowder(b) => b.is_air(),
+            Self::PurpleConcretePowder(b) => b.is_air(),
+            Self::BlueConcretePowder(b) => b.is_air(),
+            Self::BrownConcretePowder(b) => b.is_air(),
+            Self::GreenConcretePowder(b) => b.is_air(),
+            Self::RedConcretePowder(b) => b.is_air(),
+            Self::BlackConcretePowder(b) => b.is_air(),
+            Self::Kelp(b) => b.is_air(),
+            Self::KelpPlant(b) => b.is_air(),
+            Self::DriedKelpBlock(b) => b.is_air(),
+            Self::TurtleEgg(b) => b.is_air(),
+            Self::SnifferEgg(b) => b.is_air(),
+            Self::DeadTubeCoralBlock(b) => b.is_air(),
+            Self::DeadBrainCoralBlock(b) => b.is_air(),
+            Self::DeadBubbleCoralBlock(b) => b.is_air(),
+            Self::DeadFireCoralBlock(b) => b.is_air(),
+            Self::DeadHornCoralBlock(b) => b.is_air(),
+            Self::TubeCoralBlock(b) => b.is_air(),
+            Self::BrainCoralBlock(b) => b.is_air(),
+            Self::BubbleCoralBlock(b) => b.is_air(),
+            Self::FireCoralBlock(b) => b.is_air(),
+            Self::HornCoralBlock(b) => b.is_air(),
+            Self::DeadTubeCoral(b) => b.is_air(),
+            Self::DeadBrainCoral(b) => b.is_air(),
+            Self::DeadBubbleCoral(b) => b.is_air(),
+            Self::DeadFireCoral(b) => b.is_air(),
+            Self::DeadHornCoral(b) => b.is_air(),
+            Self::TubeCoral(b) => b.is_air(),
+            Self::BrainCoral(b) => b.is_air(),
+            Self::BubbleCoral(b) => b.is_air(),
+            Self::FireCoral(b) => b.is_air(),
+            Self::HornCoral(b) => b.is_air(),
+            Self::DeadTubeCoralFan(b) => b.is_air(),
+            Self::DeadBrainCoralFan(b) => b.is_air(),
+            Self::DeadBubbleCoralFan(b) => b.is_air(),
+            Self::DeadFireCoralFan(b) => b.is_air(),
+            Self::DeadHornCoralFan(b) => b.is_air(),
+            Self::TubeCoralFan(b) => b.is_air(),
+            Self::BrainCoralFan(b) => b.is_air(),
+            Self::BubbleCoralFan(b) => b.is_air(),
+            Self::FireCoralFan(b) => b.is_air(),
+            Self::HornCoralFan(b) => b.is_air(),
+            Self::DeadTubeCoralWallFan(b) => b.is_air(),
+            Self::DeadBrainCoralWallFan(b) => b.is_air(),
+            Self::DeadBubbleCoralWallFan(b) => b.is_air(),
+            Self::DeadFireCoralWallFan(b) => b.is_air(),
+            Self::DeadHornCoralWallFan(b) => b.is_air(),
+            Self::TubeCoralWallFan(b) => b.is_air(),
+            Self::BrainCoralWallFan(b) => b.is_air(),
+            Self::BubbleCoralWallFan(b) => b.is_air(),
+            Self::FireCoralWallFan(b) => b.is_air(),
+            Self::HornCoralWallFan(b) => b.is_air(),
+            Self::SeaPickle(b) => b.is_air(),
+            Self::BlueIce(b) => b.is_air(),
+            Self::Conduit(b) => b.is_air(),
+            Self::BambooSapling(b) => b.is_air(),
+            Self::Bamboo(b) => b.is_air(),
+            Self::PottedBamboo(b) => b.is_air(),
+            Self::VoidAir(b) => b.is_air(),
+            Self::CaveAir(b) => b.is_air(),
+            Self::BubbleColumn(b) => b.is_air(),
+            Self::PolishedGraniteStairs(b) => b.is_air(),
+            Self::SmoothRedSandstoneStairs(b) => b.is_air(),
+            Self::MossyStoneBrickStairs(b) => b.is_air(),
+            Self::PolishedDioriteStairs(b) => b.is_air(),
+            Self::MossyCobblestoneStairs(b) => b.is_air(),
+            Self::EndStoneBrickStairs(b) => b.is_air(),
+            Self::StoneStairs(b) => b.is_air(),
+            Self::SmoothSandstoneStairs(b) => b.is_air(),
+            Self::SmoothQuartzStairs(b) => b.is_air(),
+            Self::GraniteStairs(b) => b.is_air(),
+            Self::AndesiteStairs(b) => b.is_air(),
+            Self::RedNetherBrickStairs(b) => b.is_air(),
+            Self::PolishedAndesiteStairs(b) => b.is_air(),
+            Self::DioriteStairs(b) => b.is_air(),
+            Self::PolishedGraniteSlab(b) => b.is_air(),
+            Self::SmoothRedSandstoneSlab(b) => b.is_air(),
+            Self::MossyStoneBrickSlab(b) => b.is_air(),
+            Self::PolishedDioriteSlab(b) => b.is_air(),
+            Self::MossyCobblestoneSlab(b) => b.is_air(),
+            Self::EndStoneBrickSlab(b) => b.is_air(),
+            Self::SmoothSandstoneSlab(b) => b.is_air(),
+            Self::SmoothQuartzSlab(b) => b.is_air(),
+            Self::GraniteSlab(b) => b.is_air(),
+            Self::AndesiteSlab(b) => b.is_air(),
+            Self::RedNetherBrickSlab(b) => b.is_air(),
+            Self::PolishedAndesiteSlab(b) => b.is_air(),
+            Self::DioriteSlab(b) => b.is_air(),
+            Self::BrickWall(b) => b.is_air(),
+            Self::PrismarineWall(b) => b.is_air(),
+            Self::RedSandstoneWall(b) => b.is_air(),
+            Self::MossyStoneBrickWall(b) => b.is_air(),
+            Self::GraniteWall(b) => b.is_air(),
+            Self::StoneBrickWall(b) => b.is_air(),
+            Self::MudBrickWall(b) => b.is_air(),
+            Self::NetherBrickWall(b) => b.is_air(),
+            Self::AndesiteWall(b) => b.is_air(),
+            Self::RedNetherBrickWall(b) => b.is_air(),
+            Self::SandstoneWall(b) => b.is_air(),
+            Self::EndStoneBrickWall(b) => b.is_air(),
+            Self::DioriteWall(b) => b.is_air(),
+            Self::Scaffolding(b) => b.is_air(),
+            Self::Loom(b) => b.is_air(),
+            Self::Barrel(b) => b.is_air(),
+            Self::Smoker(b) => b.is_air(),
+            Self::BlastFurnace(b) => b.is_air(),
+            Self::CartographyTable(b) => b.is_air(),
+            Self::FletchingTable(b) => b.is_air(),
+            Self::Grindstone(b) => b.is_air(),
+            Self::Lectern(b) => b.is_air(),
+            Self::SmithingTable(b) => b.is_air(),
+            Self::Stonecutter(b) => b.is_air(),
+            Self::Bell(b) => b.is_air(),
+            Self::Lantern(b) => b.is_air(),
+            Self::SoulLantern(b) => b.is_air(),
+            Self::Campfire(b) => b.is_air(),
+            Self::SoulCampfire(b) => b.is_air(),
+            Self::SweetBerryBush(b) => b.is_air(),
+            Self::WarpedStem(b) => b.is_air(),
+            Self::StrippedWarpedStem(b) => b.is_air(),
+            Self::WarpedHyphae(b) => b.is_air(),
+            Self::StrippedWarpedHyphae(b) => b.is_air(),
+            Self::WarpedNylium(b) => b.is_air(),
+            Self::WarpedFungus(b) => b.is_air(),
+            Self::WarpedWartBlock(b) => b.is_air(),
+            Self::WarpedRoots(b) => b.is_air(),
+            Self::NetherSprouts(b) => b.is_air(),
+            Self::CrimsonStem(b) => b.is_air(),
+            Self::StrippedCrimsonStem(b) => b.is_air(),
+            Self::CrimsonHyphae(b) => b.is_air(),
+            Self::StrippedCrimsonHyphae(b) => b.is_air(),
+            Self::CrimsonNylium(b) => b.is_air(),
+            Self::CrimsonFungus(b) => b.is_air(),
+            Self::Shroomlight(b) => b.is_air(),
+            Self::WeepingVines(b) => b.is_air(),
+            Self::WeepingVinesPlant(b) => b.is_air(),
+            Self::TwistingVines(b) => b.is_air(),
+            Self::TwistingVinesPlant(b) => b.is_air(),
+            Self::CrimsonRoots(b) => b.is_air(),
+            Self::CrimsonPlanks(b) => b.is_air(),
+            Self::WarpedPlanks(b) => b.is_air(),
+            Self::CrimsonSlab(b) => b.is_air(),
+            Self::WarpedSlab(b) => b.is_air(),
+            Self::CrimsonPressurePlate(b) => b.is_air(),
+            Self::WarpedPressurePlate(b) => b.is_air(),
+            Self::CrimsonFence(b) => b.is_air(),
+            Self::WarpedFence(b) => b.is_air(),
+            Self::CrimsonTrapdoor(b) => b.is_air(),
+            Self::WarpedTrapdoor(b) => b.is_air(),
+            Self::CrimsonFenceGate(b) => b.is_air(),
+            Self::WarpedFenceGate(b) => b.is_air(),
+            Self::CrimsonStairs(b) => b.is_air(),
+            Self::WarpedStairs(b) => b.is_air(),
+            Self::CrimsonButton(b) => b.is_air(),
+            Self::WarpedButton(b) => b.is_air(),
+            Self::CrimsonDoor(b) => b.is_air(),
+            Self::WarpedDoor(b) => b.is_air(),
+            Self::CrimsonSign(b) => b.is_air(),
+            Self::WarpedSign(b) => b.is_air(),
+            Self::CrimsonWallSign(b) => b.is_air(),
+            Self::WarpedWallSign(b) => b.is_air(),
+            Self::StructureBlock(b) => b.is_air(),
+            Self::Jigsaw(b) => b.is_air(),
+            Self::Composter(b) => b.is_air(),
+            Self::Target(b) => b.is_air(),
+            Self::BeeNest(b) => b.is_air(),
+            Self::Beehive(b) => b.is_air(),
+            Self::HoneyBlock(b) => b.is_air(),
+            Self::HoneycombBlock(b) => b.is_air(),
+            Self::NetheriteBlock(b) => b.is_air(),
+            Self::AncientDebris(b) => b.is_air(),
+            Self::CryingObsidian(b) => b.is_air(),
+            Self::RespawnAnchor(b) => b.is_air(),
+            Self::PottedCrimsonFungus(b) => b.is_air(),
+            Self::PottedWarpedFungus(b) => b.is_air(),
+            Self::PottedCrimsonRoots(b) => b.is_air(),
+            Self::PottedWarpedRoots(b) => b.is_air(),
+            Self::Lodestone(b) => b.is_air(),
+            Self::Blackstone(b) => b.is_air(),
+            Self::BlackstoneStairs(b) => b.is_air(),
+            Self::BlackstoneWall(b) => b.is_air(),
+            Self::BlackstoneSlab(b) => b.is_air(),
+            Self::PolishedBlackstone(b) => b.is_air(),
+            Self::PolishedBlackstoneBricks(b) => b.is_air(),
+            Self::CrackedPolishedBlackstoneBricks(b) => b.is_air(),
+            Self::ChiseledPolishedBlackstone(b) => b.is_air(),
+            Self::PolishedBlackstoneBrickSlab(b) => b.is_air(),
+            Self::PolishedBlackstoneBrickStairs(b) => b.is_air(),
+            Self::PolishedBlackstoneBrickWall(b) => b.is_air(),
+            Self::GildedBlackstone(b) => b.is_air(),
+            Self::PolishedBlackstoneStairs(b) => b.is_air(),
+            Self::PolishedBlackstoneSlab(b) => b.is_air(),
+            Self::PolishedBlackstonePressurePlate(b) => b.is_air(),
+            Self::PolishedBlackstoneButton(b) => b.is_air(),
+            Self::PolishedBlackstoneWall(b) => b.is_air(),
+            Self::ChiseledNetherBricks(b) => b.is_air(),
+            Self::CrackedNetherBricks(b) => b.is_air(),
+            Self::QuartzBricks(b) => b.is_air(),
+            Self::Candle(b) => b.is_air(),
+            Self::WhiteCandle(b) => b.is_air(),
+            Self::OrangeCandle(b) => b.is_air(),
+            Self::MagentaCandle(b) => b.is_air(),
+            Self::LightBlueCandle(b) => b.is_air(),
+            Self::YellowCandle(b) => b.is_air(),
+            Self::LimeCandle(b) => b.is_air(),
+            Self::PinkCandle(b) => b.is_air(),
+            Self::GrayCandle(b) => b.is_air(),
+            Self::LightGrayCandle(b) => b.is_air(),
+            Self::CyanCandle(b) => b.is_air(),
+            Self::PurpleCandle(b) => b.is_air(),
+            Self::BlueCandle(b) => b.is_air(),
+            Self::BrownCandle(b) => b.is_air(),
+            Self::GreenCandle(b) => b.is_air(),
+            Self::RedCandle(b) => b.is_air(),
+            Self::BlackCandle(b) => b.is_air(),
+            Self::CandleCake(b) => b.is_air(),
+            Self::WhiteCandleCake(b) => b.is_air(),
+            Self::OrangeCandleCake(b) => b.is_air(),
+            Self::MagentaCandleCake(b) => b.is_air(),
+            Self::LightBlueCandleCake(b) => b.is_air(),
+            Self::YellowCandleCake(b) => b.is_air(),
+            Self::LimeCandleCake(b) => b.is_air(),
+            Self::PinkCandleCake(b) => b.is_air(),
+            Self::GrayCandleCake(b) => b.is_air(),
+            Self::LightGrayCandleCake(b) => b.is_air(),
+            Self::CyanCandleCake(b) => b.is_air(),
+            Self::PurpleCandleCake(b) => b.is_air(),
+            Self::BlueCandleCake(b) => b.is_air(),
+            Self::BrownCandleCake(b) => b.is_air(),
+            Self::GreenCandleCake(b) => b.is_air(),
+            Self::RedCandleCake(b) => b.is_air(),
+            Self::BlackCandleCake(b) => b.is_air(),
+            Self::AmethystBlock(b) => b.is_air(),
+            Self::BuddingAmethyst(b) => b.is_air(),
+            Self::AmethystCluster(b) => b.is_air(),
+            Self::LargeAmethystBud(b) => b.is_air(),
+            Self::MediumAmethystBud(b) => b.is_air(),
+            Self::SmallAmethystBud(b) => b.is_air(),
+            Self::Tuff(b) => b.is_air(),
+            Self::Calcite(b) => b.is_air(),
+            Self::TintedGlass(b) => b.is_air(),
+            Self::PowderSnow(b) => b.is_air(),
+            Self::SculkSensor(b) => b.is_air(),
+            Self::CalibratedSculkSensor(b) => b.is_air(),
+            Self::Sculk(b) => b.is_air(),
+            Self::SculkVein(b) => b.is_air(),
+            Self::SculkCatalyst(b) => b.is_air(),
+            Self::SculkShrieker(b) => b.is_air(),
+            Self::OxidizedCopper(b) => b.is_air(),
+            Self::WeatheredCopper(b) => b.is_air(),
+            Self::ExposedCopper(b) => b.is_air(),
+            Self::CopperBlock(b) => b.is_air(),
+            Self::CopperOre(b) => b.is_air(),
+            Self::DeepslateCopperOre(b) => b.is_air(),
+            Self::OxidizedCutCopper(b) => b.is_air(),
+            Self::WeatheredCutCopper(b) => b.is_air(),
+            Self::ExposedCutCopper(b) => b.is_air(),
+            Self::CutCopper(b) => b.is_air(),
+            Self::OxidizedCutCopperStairs(b) => b.is_air(),
+            Self::WeatheredCutCopperStairs(b) => b.is_air(),
+            Self::ExposedCutCopperStairs(b) => b.is_air(),
+            Self::CutCopperStairs(b) => b.is_air(),
+            Self::OxidizedCutCopperSlab(b) => b.is_air(),
+            Self::WeatheredCutCopperSlab(b) => b.is_air(),
+            Self::ExposedCutCopperSlab(b) => b.is_air(),
+            Self::CutCopperSlab(b) => b.is_air(),
+            Self::WaxedCopperBlock(b) => b.is_air(),
+            Self::WaxedWeatheredCopper(b) => b.is_air(),
+            Self::WaxedExposedCopper(b) => b.is_air(),
+            Self::WaxedOxidizedCopper(b) => b.is_air(),
+            Self::WaxedOxidizedCutCopper(b) => b.is_air(),
+            Self::WaxedWeatheredCutCopper(b) => b.is_air(),
+            Self::WaxedExposedCutCopper(b) => b.is_air(),
+            Self::WaxedCutCopper(b) => b.is_air(),
+            Self::WaxedOxidizedCutCopperStairs(b) => b.is_air(),
+            Self::WaxedWeatheredCutCopperStairs(b) => b.is_air(),
+            Self::WaxedExposedCutCopperStairs(b) => b.is_air(),
+            Self::WaxedCutCopperStairs(b) => b.is_air(),
+            Self::WaxedOxidizedCutCopperSlab(b) => b.is_air(),
+            Self::WaxedWeatheredCutCopperSlab(b) => b.is_air(),
+            Self::WaxedExposedCutCopperSlab(b) => b.is_air(),
+            Self::WaxedCutCopperSlab(b) => b.is_air(),
+            Self::LightningRod(b) => b.is_air(),
+            Self::PointedDripstone(b) => b.is_air(),
+            Self::DripstoneBlock(b) => b.is_air(),
+            Self::CaveVines(b) => b.is_air(),
+            Self::CaveVinesPlant(b) => b.is_air(),
+            Self::SporeBlossom(b) => b.is_air(),
+            Self::Azalea(b) => b.is_air(),
+            Self::FloweringAzalea(b) => b.is_air(),
+            Self::MossCarpet(b) => b.is_air(),
+            Self::PinkPetals(b) => b.is_air(),
+            Self::MossBlock(b) => b.is_air(),
+            Self::BigDripleaf(b) => b.is_air(),
+            Self::BigDripleafStem(b) => b.is_air(),
+            Self::SmallDripleaf(b) => b.is_air(),
+            Self::HangingRoots(b) => b.is_air(),
+            Self::RootedDirt(b) => b.is_air(),
+            Self::Mud(b) => b.is_air(),
+            Self::Deepslate(b) => b.is_air(),
+            Self::CobbledDeepslate(b) => b.is_air(),
+            Self::CobbledDeepslateStairs(b) => b.is_air(),
+            Self::CobbledDeepslateSlab(b) => b.is_air(),
+            Self::CobbledDeepslateWall(b) => b.is_air(),
+            Self::PolishedDeepslate(b) => b.is_air(),
+            Self::PolishedDeepslateStairs(b) => b.is_air(),
+            Self::PolishedDeepslateSlab(b) => b.is_air(),
+            Self::PolishedDeepslateWall(b) => b.is_air(),
+            Self::DeepslateTiles(b) => b.is_air(),
+            Self::DeepslateTileStairs(b) => b.is_air(),
+            Self::DeepslateTileSlab(b) => b.is_air(),
+            Self::DeepslateTileWall(b) => b.is_air(),
+            Self::DeepslateBricks(b) => b.is_air(),
+            Self::DeepslateBrickStairs(b) => b.is_air(),
+            Self::DeepslateBrickSlab(b) => b.is_air(),
+            Self::DeepslateBrickWall(b) => b.is_air(),
+            Self::ChiseledDeepslate(b) => b.is_air(),
+            Self::CrackedDeepslateBricks(b) => b.is_air(),
+            Self::CrackedDeepslateTiles(b) => b.is_air(),
+            Self::InfestedDeepslate(b) => b.is_air(),
+            Self::SmoothBasalt(b) => b.is_air(),
+            Self::RawIronBlock(b) => b.is_air(),
+            Self::RawCopperBlock(b) => b.is_air(),
+            Self::RawGoldBlock(b) => b.is_air(),
+            Self::PottedAzaleaBush(b) => b.is_air(),
+            Self::PottedFloweringAzaleaBush(b) => b.is_air(),
+            Self::OchreFroglight(b) => b.is_air(),
+            Self::VerdantFroglight(b) => b.is_air(),
+            Self::PearlescentFroglight(b) => b.is_air(),
+            Self::Frogspawn(b) => b.is_air(),
+            Self::ReinforcedDeepslate(b) => b.is_air(),
+            Self::DecoratedPot(b) => b.is_air(),
+        }
+    }
+    fn is_opaque(&self) -> bool {
+        match self {
+            Self::Error(b) => b.is_opaque(),
+            Self::Air(b) => b.is_opaque(),
+            Self::Stone(b) => b.is_opaque(),
+            Self::Granite(b) => b.is_opaque(),
+            Self::PolishedGranite(b) => b.is_opaque(),
+            Self::Diorite(b) => b.is_opaque(),
+            Self::PolishedDiorite(b) => b.is_opaque(),
+            Self::Andesite(b) => b.is_opaque(),
+            Self::PolishedAndesite(b) => b.is_opaque(),
+            Self::GrassBlock(b) => b.is_opaque(),
+            Self::Dirt(b) => b.is_opaque(),
+            Self::CoarseDirt(b) => b.is_opaque(),
+            Self::Podzol(b) => b.is_opaque(),
+            Self::Cobblestone(b) => b.is_opaque(),
+            Self::OakPlanks(b) => b.is_opaque(),
+            Self::SprucePlanks(b) => b.is_opaque(),
+            Self::BirchPlanks(b) => b.is_opaque(),
+            Self::JunglePlanks(b) => b.is_opaque(),
+            Self::AcaciaPlanks(b) => b.is_opaque(),
+            Self::CherryPlanks(b) => b.is_opaque(),
+            Self::DarkOakPlanks(b) => b.is_opaque(),
+            Self::MangrovePlanks(b) => b.is_opaque(),
+            Self::BambooPlanks(b) => b.is_opaque(),
+            Self::BambooMosaic(b) => b.is_opaque(),
+            Self::OakSapling(b) => b.is_opaque(),
+            Self::SpruceSapling(b) => b.is_opaque(),
+            Self::BirchSapling(b) => b.is_opaque(),
+            Self::JungleSapling(b) => b.is_opaque(),
+            Self::AcaciaSapling(b) => b.is_opaque(),
+            Self::CherrySapling(b) => b.is_opaque(),
+            Self::DarkOakSapling(b) => b.is_opaque(),
+            Self::MangrovePropagule(b) => b.is_opaque(),
+            Self::Bedrock(b) => b.is_opaque(),
+            Self::Water(b) => b.is_opaque(),
+            Self::Lava(b) => b.is_opaque(),
+            Self::Sand(b) => b.is_opaque(),
+            Self::SuspiciousSand(b) => b.is_opaque(),
+            Self::RedSand(b) => b.is_opaque(),
+            Self::Gravel(b) => b.is_opaque(),
+            Self::SuspiciousGravel(b) => b.is_opaque(),
+            Self::GoldOre(b) => b.is_opaque(),
+            Self::DeepslateGoldOre(b) => b.is_opaque(),
+            Self::IronOre(b) => b.is_opaque(),
+            Self::DeepslateIronOre(b) => b.is_opaque(),
+            Self::CoalOre(b) => b.is_opaque(),
+            Self::DeepslateCoalOre(b) => b.is_opaque(),
+            Self::NetherGoldOre(b) => b.is_opaque(),
+            Self::OakLog(b) => b.is_opaque(),
+            Self::SpruceLog(b) => b.is_opaque(),
+            Self::BirchLog(b) => b.is_opaque(),
+            Self::JungleLog(b) => b.is_opaque(),
+            Self::AcaciaLog(b) => b.is_opaque(),
+            Self::CherryLog(b) => b.is_opaque(),
+            Self::DarkOakLog(b) => b.is_opaque(),
+            Self::MangroveLog(b) => b.is_opaque(),
+            Self::MangroveRoots(b) => b.is_opaque(),
+            Self::MuddyMangroveRoots(b) => b.is_opaque(),
+            Self::BambooBlock(b) => b.is_opaque(),
+            Self::StrippedSpruceLog(b) => b.is_opaque(),
+            Self::StrippedBirchLog(b) => b.is_opaque(),
+            Self::StrippedJungleLog(b) => b.is_opaque(),
+            Self::StrippedAcaciaLog(b) => b.is_opaque(),
+            Self::StrippedCherryLog(b) => b.is_opaque(),
+            Self::StrippedDarkOakLog(b) => b.is_opaque(),
+            Self::StrippedOakLog(b) => b.is_opaque(),
+            Self::StrippedMangroveLog(b) => b.is_opaque(),
+            Self::StrippedBambooBlock(b) => b.is_opaque(),
+            Self::OakWood(b) => b.is_opaque(),
+            Self::SpruceWood(b) => b.is_opaque(),
+            Self::BirchWood(b) => b.is_opaque(),
+            Self::JungleWood(b) => b.is_opaque(),
+            Self::AcaciaWood(b) => b.is_opaque(),
+            Self::CherryWood(b) => b.is_opaque(),
+            Self::DarkOakWood(b) => b.is_opaque(),
+            Self::MangroveWood(b) => b.is_opaque(),
+            Self::StrippedOakWood(b) => b.is_opaque(),
+            Self::StrippedSpruceWood(b) => b.is_opaque(),
+            Self::StrippedBirchWood(b) => b.is_opaque(),
+            Self::StrippedJungleWood(b) => b.is_opaque(),
+            Self::StrippedAcaciaWood(b) => b.is_opaque(),
+            Self::StrippedCherryWood(b) => b.is_opaque(),
+            Self::StrippedDarkOakWood(b) => b.is_opaque(),
+            Self::StrippedMangroveWood(b) => b.is_opaque(),
+            Self::OakLeaves(b) => b.is_opaque(),
+            Self::SpruceLeaves(b) => b.is_opaque(),
+            Self::BirchLeaves(b) => b.is_opaque(),
+            Self::JungleLeaves(b) => b.is_opaque(),
+            Self::AcaciaLeaves(b) => b.is_opaque(),
+            Self::CherryLeaves(b) => b.is_opaque(),
+            Self::DarkOakLeaves(b) => b.is_opaque(),
+            Self::MangroveLeaves(b) => b.is_opaque(),
+            Self::AzaleaLeaves(b) => b.is_opaque(),
+            Self::FloweringAzaleaLeaves(b) => b.is_opaque(),
+            Self::Sponge(b) => b.is_opaque(),
+            Self::WetSponge(b) => b.is_opaque(),
+            Self::Glass(b) => b.is_opaque(),
+            Self::LapisOre(b) => b.is_opaque(),
+            Self::DeepslateLapisOre(b) => b.is_opaque(),
+            Self::LapisBlock(b) => b.is_opaque(),
+            Self::Dispenser(b) => b.is_opaque(),
+            Self::Sandstone(b) => b.is_opaque(),
+            Self::ChiseledSandstone(b) => b.is_opaque(),
+            Self::CutSandstone(b) => b.is_opaque(),
+            Self::NoteBlock(b) => b.is_opaque(),
+            Self::WhiteBed(b) => b.is_opaque(),
+            Self::OrangeBed(b) => b.is_opaque(),
+            Self::MagentaBed(b) => b.is_opaque(),
+            Self::LightBlueBed(b) => b.is_opaque(),
+            Self::YellowBed(b) => b.is_opaque(),
+            Self::LimeBed(b) => b.is_opaque(),
+            Self::PinkBed(b) => b.is_opaque(),
+            Self::GrayBed(b) => b.is_opaque(),
+            Self::LightGrayBed(b) => b.is_opaque(),
+            Self::CyanBed(b) => b.is_opaque(),
+            Self::PurpleBed(b) => b.is_opaque(),
+            Self::BlueBed(b) => b.is_opaque(),
+            Self::BrownBed(b) => b.is_opaque(),
+            Self::GreenBed(b) => b.is_opaque(),
+            Self::RedBed(b) => b.is_opaque(),
+            Self::BlackBed(b) => b.is_opaque(),
+            Self::PoweredRail(b) => b.is_opaque(),
+            Self::DetectorRail(b) => b.is_opaque(),
+            Self::StickyPiston(b) => b.is_opaque(),
+            Self::Cobweb(b) => b.is_opaque(),
+            Self::Grass(b) => b.is_opaque(),
+            Self::Fern(b) => b.is_opaque(),
+            Self::DeadBush(b) => b.is_opaque(),
+            Self::Seagrass(b) => b.is_opaque(),
+            Self::TallSeagrass(b) => b.is_opaque(),
+            Self::Piston(b) => b.is_opaque(),
+            Self::PistonHead(b) => b.is_opaque(),
+            Self::WhiteWool(b) => b.is_opaque(),
+            Self::OrangeWool(b) => b.is_opaque(),
+            Self::MagentaWool(b) => b.is_opaque(),
+            Self::LightBlueWool(b) => b.is_opaque(),
+            Self::YellowWool(b) => b.is_opaque(),
+            Self::LimeWool(b) => b.is_opaque(),
+            Self::PinkWool(b) => b.is_opaque(),
+            Self::GrayWool(b) => b.is_opaque(),
+            Self::LightGrayWool(b) => b.is_opaque(),
+            Self::CyanWool(b) => b.is_opaque(),
+            Self::PurpleWool(b) => b.is_opaque(),
+            Self::BlueWool(b) => b.is_opaque(),
+            Self::BrownWool(b) => b.is_opaque(),
+            Self::GreenWool(b) => b.is_opaque(),
+            Self::RedWool(b) => b.is_opaque(),
+            Self::BlackWool(b) => b.is_opaque(),
+            Self::MovingPiston(b) => b.is_opaque(),
+            Self::Dandelion(b) => b.is_opaque(),
+            Self::Torchflower(b) => b.is_opaque(),
+            Self::Poppy(b) => b.is_opaque(),
+            Self::BlueOrchid(b) => b.is_opaque(),
+            Self::Allium(b) => b.is_opaque(),
+            Self::AzureBluet(b) => b.is_opaque(),
+            Self::RedTulip(b) => b.is_opaque(),
+            Self::OrangeTulip(b) => b.is_opaque(),
+            Self::WhiteTulip(b) => b.is_opaque(),
+            Self::PinkTulip(b) => b.is_opaque(),
+            Self::OxeyeDaisy(b) => b.is_opaque(),
+            Self::Cornflower(b) => b.is_opaque(),
+            Self::WitherRose(b) => b.is_opaque(),
+            Self::LilyOfTheValley(b) => b.is_opaque(),
+            Self::BrownMushroom(b) => b.is_opaque(),
+            Self::RedMushroom(b) => b.is_opaque(),
+            Self::GoldBlock(b) => b.is_opaque(),
+            Self::IronBlock(b) => b.is_opaque(),
+            Self::Bricks(b) => b.is_opaque(),
+            Self::Tnt(b) => b.is_opaque(),
+            Self::Bookshelf(b) => b.is_opaque(),
+            Self::ChiseledBookshelf(b) => b.is_opaque(),
+            Self::MossyCobblestone(b) => b.is_opaque(),
+            Self::Obsidian(b) => b.is_opaque(),
+            Self::Torch(b) => b.is_opaque(),
+            Self::WallTorch(b) => b.is_opaque(),
+            Self::Fire(b) => b.is_opaque(),
+            Self::SoulFire(b) => b.is_opaque(),
+            Self::Spawner(b) => b.is_opaque(),
+            Self::OakStairs(b) => b.is_opaque(),
+            Self::Chest(b) => b.is_opaque(),
+            Self::RedstoneWire(b) => b.is_opaque(),
+            Self::DiamondOre(b) => b.is_opaque(),
+            Self::DeepslateDiamondOre(b) => b.is_opaque(),
+            Self::DiamondBlock(b) => b.is_opaque(),
+            Self::CraftingTable(b) => b.is_opaque(),
+            Self::Wheat(b) => b.is_opaque(),
+            Self::Farmland(b) => b.is_opaque(),
+            Self::Furnace(b) => b.is_opaque(),
+            Self::OakSign(b) => b.is_opaque(),
+            Self::SpruceSign(b) => b.is_opaque(),
+            Self::BirchSign(b) => b.is_opaque(),
+            Self::AcaciaSign(b) => b.is_opaque(),
+            Self::CherrySign(b) => b.is_opaque(),
+            Self::JungleSign(b) => b.is_opaque(),
+            Self::DarkOakSign(b) => b.is_opaque(),
+            Self::MangroveSign(b) => b.is_opaque(),
+            Self::BambooSign(b) => b.is_opaque(),
+            Self::OakDoor(b) => b.is_opaque(),
+            Self::Ladder(b) => b.is_opaque(),
+            Self::Rail(b) => b.is_opaque(),
+            Self::CobblestoneStairs(b) => b.is_opaque(),
+            Self::OakWallSign(b) => b.is_opaque(),
+            Self::SpruceWallSign(b) => b.is_opaque(),
+            Self::BirchWallSign(b) => b.is_opaque(),
+            Self::AcaciaWallSign(b) => b.is_opaque(),
+            Self::CherryWallSign(b) => b.is_opaque(),
+            Self::JungleWallSign(b) => b.is_opaque(),
+            Self::DarkOakWallSign(b) => b.is_opaque(),
+            Self::MangroveWallSign(b) => b.is_opaque(),
+            Self::BambooWallSign(b) => b.is_opaque(),
+            Self::OakHangingSign(b) => b.is_opaque(),
+            Self::SpruceHangingSign(b) => b.is_opaque(),
+            Self::BirchHangingSign(b) => b.is_opaque(),
+            Self::AcaciaHangingSign(b) => b.is_opaque(),
+            Self::CherryHangingSign(b) => b.is_opaque(),
+            Self::JungleHangingSign(b) => b.is_opaque(),
+            Self::DarkOakHangingSign(b) => b.is_opaque(),
+            Self::CrimsonHangingSign(b) => b.is_opaque(),
+            Self::WarpedHangingSign(b) => b.is_opaque(),
+            Self::MangroveHangingSign(b) => b.is_opaque(),
+            Self::BambooHangingSign(b) => b.is_opaque(),
+            Self::OakWallHangingSign(b) => b.is_opaque(),
+            Self::SpruceWallHangingSign(b) => b.is_opaque(),
+            Self::BirchWallHangingSign(b) => b.is_opaque(),
+            Self::AcaciaWallHangingSign(b) => b.is_opaque(),
+            Self::CherryWallHangingSign(b) => b.is_opaque(),
+            Self::JungleWallHangingSign(b) => b.is_opaque(),
+            Self::DarkOakWallHangingSign(b) => b.is_opaque(),
+            Self::MangroveWallHangingSign(b) => b.is_opaque(),
+            Self::CrimsonWallHangingSign(b) => b.is_opaque(),
+            Self::WarpedWallHangingSign(b) => b.is_opaque(),
+            Self::BambooWallHangingSign(b) => b.is_opaque(),
+            Self::Lever(b) => b.is_opaque(),
+            Self::StonePressurePlate(b) => b.is_opaque(),
+            Self::IronDoor(b) => b.is_opaque(),
+            Self::OakPressurePlate(b) => b.is_opaque(),
+            Self::SprucePressurePlate(b) => b.is_opaque(),
+            Self::BirchPressurePlate(b) => b.is_opaque(),
+            Self::JunglePressurePlate(b) => b.is_opaque(),
+            Self::AcaciaPressurePlate(b) => b.is_opaque(),
+            Self::CherryPressurePlate(b) => b.is_opaque(),
+            Self::DarkOakPressurePlate(b) => b.is_opaque(),
+            Self::MangrovePressurePlate(b) => b.is_opaque(),
+            Self::BambooPressurePlate(b) => b.is_opaque(),
+            Self::RedstoneOre(b) => b.is_opaque(),
+            Self::DeepslateRedstoneOre(b) => b.is_opaque(),
+            Self::RedstoneTorch(b) => b.is_opaque(),
+            Self::RedstoneWallTorch(b) => b.is_opaque(),
+            Self::StoneButton(b) => b.is_opaque(),
+            Self::Snow(b) => b.is_opaque(),
+            Self::Ice(b) => b.is_opaque(),
+            Self::SnowBlock(b) => b.is_opaque(),
+            Self::Cactus(b) => b.is_opaque(),
+            Self::Clay(b) => b.is_opaque(),
+            Self::SugarCane(b) => b.is_opaque(),
+            Self::Jukebox(b) => b.is_opaque(),
+            Self::OakFence(b) => b.is_opaque(),
+            Self::Pumpkin(b) => b.is_opaque(),
+            Self::Netherrack(b) => b.is_opaque(),
+            Self::SoulSand(b) => b.is_opaque(),
+            Self::SoulSoil(b) => b.is_opaque(),
+            Self::Basalt(b) => b.is_opaque(),
+            Self::PolishedBasalt(b) => b.is_opaque(),
+            Self::SoulTorch(b) => b.is_opaque(),
+            Self::SoulWallTorch(b) => b.is_opaque(),
+            Self::Glowstone(b) => b.is_opaque(),
+            Self::NetherPortal(b) => b.is_opaque(),
+            Self::CarvedPumpkin(b) => b.is_opaque(),
+            Self::JackOLantern(b) => b.is_opaque(),
+            Self::Cake(b) => b.is_opaque(),
+            Self::Repeater(b) => b.is_opaque(),
+            Self::WhiteStainedGlass(b) => b.is_opaque(),
+            Self::OrangeStainedGlass(b) => b.is_opaque(),
+            Self::MagentaStainedGlass(b) => b.is_opaque(),
+            Self::LightBlueStainedGlass(b) => b.is_opaque(),
+            Self::YellowStainedGlass(b) => b.is_opaque(),
+            Self::LimeStainedGlass(b) => b.is_opaque(),
+            Self::PinkStainedGlass(b) => b.is_opaque(),
+            Self::GrayStainedGlass(b) => b.is_opaque(),
+            Self::LightGrayStainedGlass(b) => b.is_opaque(),
+            Self::CyanStainedGlass(b) => b.is_opaque(),
+            Self::PurpleStainedGlass(b) => b.is_opaque(),
+            Self::BlueStainedGlass(b) => b.is_opaque(),
+            Self::BrownStainedGlass(b) => b.is_opaque(),
+            Self::GreenStainedGlass(b) => b.is_opaque(),
+            Self::RedStainedGlass(b) => b.is_opaque(),
+            Self::BlackStainedGlass(b) => b.is_opaque(),
+            Self::OakTrapdoor(b) => b.is_opaque(),
+            Self::SpruceTrapdoor(b) => b.is_opaque(),
+            Self::BirchTrapdoor(b) => b.is_opaque(),
+            Self::JungleTrapdoor(b) => b.is_opaque(),
+            Self::AcaciaTrapdoor(b) => b.is_opaque(),
+            Self::CherryTrapdoor(b) => b.is_opaque(),
+            Self::DarkOakTrapdoor(b) => b.is_opaque(),
+            Self::MangroveTrapdoor(b) => b.is_opaque(),
+            Self::BambooTrapdoor(b) => b.is_opaque(),
+            Self::StoneBricks(b) => b.is_opaque(),
+            Self::MossyStoneBricks(b) => b.is_opaque(),
+            Self::CrackedStoneBricks(b) => b.is_opaque(),
+            Self::ChiseledStoneBricks(b) => b.is_opaque(),
+            Self::PackedMud(b) => b.is_opaque(),
+            Self::MudBricks(b) => b.is_opaque(),
+            Self::InfestedStone(b) => b.is_opaque(),
+            Self::InfestedCobblestone(b) => b.is_opaque(),
+            Self::InfestedStoneBricks(b) => b.is_opaque(),
+            Self::InfestedMossyStoneBricks(b) => b.is_opaque(),
+            Self::InfestedCrackedStoneBricks(b) => b.is_opaque(),
+            Self::InfestedChiseledStoneBricks(b) => b.is_opaque(),
+            Self::BrownMushroomBlock(b) => b.is_opaque(),
+            Self::RedMushroomBlock(b) => b.is_opaque(),
+            Self::MushroomStem(b) => b.is_opaque(),
+            Self::IronBars(b) => b.is_opaque(),
+            Self::Chain(b) => b.is_opaque(),
+            Self::GlassPane(b) => b.is_opaque(),
+            Self::Melon(b) => b.is_opaque(),
+            Self::AttachedPumpkinStem(b) => b.is_opaque(),
+            Self::AttachedMelonStem(b) => b.is_opaque(),
+            Self::PumpkinStem(b) => b.is_opaque(),
+            Self::MelonStem(b) => b.is_opaque(),
+            Self::Vine(b) => b.is_opaque(),
+            Self::GlowLichen(b) => b.is_opaque(),
+            Self::OakFenceGate(b) => b.is_opaque(),
+            Self::BrickStairs(b) => b.is_opaque(),
+            Self::StoneBrickStairs(b) => b.is_opaque(),
+            Self::MudBrickStairs(b) => b.is_opaque(),
+            Self::Mycelium(b) => b.is_opaque(),
+            Self::LilyPad(b) => b.is_opaque(),
+            Self::NetherBricks(b) => b.is_opaque(),
+            Self::NetherBrickFence(b) => b.is_opaque(),
+            Self::NetherBrickStairs(b) => b.is_opaque(),
+            Self::NetherWart(b) => b.is_opaque(),
+            Self::EnchantingTable(b) => b.is_opaque(),
+            Self::BrewingStand(b) => b.is_opaque(),
+            Self::Cauldron(b) => b.is_opaque(),
+            Self::WaterCauldron(b) => b.is_opaque(),
+            Self::LavaCauldron(b) => b.is_opaque(),
+            Self::PowderSnowCauldron(b) => b.is_opaque(),
+            Self::EndPortal(b) => b.is_opaque(),
+            Self::EndPortalFrame(b) => b.is_opaque(),
+            Self::EndStone(b) => b.is_opaque(),
+            Self::DragonEgg(b) => b.is_opaque(),
+            Self::RedstoneLamp(b) => b.is_opaque(),
+            Self::Cocoa(b) => b.is_opaque(),
+            Self::SandstoneStairs(b) => b.is_opaque(),
+            Self::EmeraldOre(b) => b.is_opaque(),
+            Self::DeepslateEmeraldOre(b) => b.is_opaque(),
+            Self::EnderChest(b) => b.is_opaque(),
+            Self::TripwireHook(b) => b.is_opaque(),
+            Self::Tripwire(b) => b.is_opaque(),
+            Self::EmeraldBlock(b) => b.is_opaque(),
+            Self::SpruceStairs(b) => b.is_opaque(),
+            Self::BirchStairs(b) => b.is_opaque(),
+            Self::JungleStairs(b) => b.is_opaque(),
+            Self::CommandBlock(b) => b.is_opaque(),
+            Self::Beacon(b) => b.is_opaque(),
+            Self::CobblestoneWall(b) => b.is_opaque(),
+            Self::MossyCobblestoneWall(b) => b.is_opaque(),
+            Self::FlowerPot(b) => b.is_opaque(),
+            Self::PottedTorchflower(b) => b.is_opaque(),
+            Self::PottedOakSapling(b) => b.is_opaque(),
+            Self::PottedSpruceSapling(b) => b.is_opaque(),
+            Self::PottedBirchSapling(b) => b.is_opaque(),
+            Self::PottedJungleSapling(b) => b.is_opaque(),
+            Self::PottedAcaciaSapling(b) => b.is_opaque(),
+            Self::PottedCherrySapling(b) => b.is_opaque(),
+            Self::PottedDarkOakSapling(b) => b.is_opaque(),
+            Self::PottedMangrovePropagule(b) => b.is_opaque(),
+            Self::PottedFern(b) => b.is_opaque(),
+            Self::PottedDandelion(b) => b.is_opaque(),
+            Self::PottedPoppy(b) => b.is_opaque(),
+            Self::PottedBlueOrchid(b) => b.is_opaque(),
+            Self::PottedAllium(b) => b.is_opaque(),
+            Self::PottedAzureBluet(b) => b.is_opaque(),
+            Self::PottedRedTulip(b) => b.is_opaque(),
+            Self::PottedOrangeTulip(b) => b.is_opaque(),
+            Self::PottedWhiteTulip(b) => b.is_opaque(),
+            Self::PottedPinkTulip(b) => b.is_opaque(),
+            Self::PottedOxeyeDaisy(b) => b.is_opaque(),
+            Self::PottedCornflower(b) => b.is_opaque(),
+            Self::PottedLilyOfTheValley(b) => b.is_opaque(),
+            Self::PottedWitherRose(b) => b.is_opaque(),
+            Self::PottedRedMushroom(b) => b.is_opaque(),
+            Self::PottedBrownMushroom(b) => b.is_opaque(),
+            Self::PottedDeadBush(b) => b.is_opaque(),
+            Self::PottedCactus(b) => b.is_opaque(),
+            Self::Carrots(b) => b.is_opaque(),
+            Self::Potatoes(b) => b.is_opaque(),
+            Self::OakButton(b) => b.is_opaque(),
+            Self::SpruceButton(b) => b.is_opaque(),
+            Self::BirchButton(b) => b.is_opaque(),
+            Self::JungleButton(b) => b.is_opaque(),
+            Self::AcaciaButton(b) => b.is_opaque(),
+            Self::CherryButton(b) => b.is_opaque(),
+            Self::DarkOakButton(b) => b.is_opaque(),
+            Self::MangroveButton(b) => b.is_opaque(),
+            Self::BambooButton(b) => b.is_opaque(),
+            Self::SkeletonSkull(b) => b.is_opaque(),
+            Self::SkeletonWallSkull(b) => b.is_opaque(),
+            Self::WitherSkeletonSkull(b) => b.is_opaque(),
+            Self::WitherSkeletonWallSkull(b) => b.is_opaque(),
+            Self::ZombieHead(b) => b.is_opaque(),
+            Self::ZombieWallHead(b) => b.is_opaque(),
+            Self::PlayerHead(b) => b.is_opaque(),
+            Self::PlayerWallHead(b) => b.is_opaque(),
+            Self::CreeperHead(b) => b.is_opaque(),
+            Self::CreeperWallHead(b) => b.is_opaque(),
+            Self::DragonHead(b) => b.is_opaque(),
+            Self::DragonWallHead(b) => b.is_opaque(),
+            Self::PiglinHead(b) => b.is_opaque(),
+            Self::PiglinWallHead(b) => b.is_opaque(),
+            Self::Anvil(b) => b.is_opaque(),
+            Self::ChippedAnvil(b) => b.is_opaque(),
+            Self::DamagedAnvil(b) => b.is_opaque(),
+            Self::TrappedChest(b) => b.is_opaque(),
+            Self::LightWeightedPressurePlate(b) => b.is_opaque(),
+            Self::HeavyWeightedPressurePlate(b) => b.is_opaque(),
+            Self::Comparator(b) => b.is_opaque(),
+            Self::DaylightDetector(b) => b.is_opaque(),
+            Self::RedstoneBlock(b) => b.is_opaque(),
+            Self::NetherQuartzOre(b) => b.is_opaque(),
+            Self::Hopper(b) => b.is_opaque(),
+            Self::QuartzBlock(b) => b.is_opaque(),
+            Self::ChiseledQuartzBlock(b) => b.is_opaque(),
+            Self::QuartzPillar(b) => b.is_opaque(),
+            Self::QuartzStairs(b) => b.is_opaque(),
+            Self::ActivatorRail(b) => b.is_opaque(),
+            Self::Dropper(b) => b.is_opaque(),
+            Self::WhiteTerracotta(b) => b.is_opaque(),
+            Self::OrangeTerracotta(b) => b.is_opaque(),
+            Self::MagentaTerracotta(b) => b.is_opaque(),
+            Self::LightBlueTerracotta(b) => b.is_opaque(),
+            Self::YellowTerracotta(b) => b.is_opaque(),
+            Self::LimeTerracotta(b) => b.is_opaque(),
+            Self::PinkTerracotta(b) => b.is_opaque(),
+            Self::GrayTerracotta(b) => b.is_opaque(),
+            Self::LightGrayTerracotta(b) => b.is_opaque(),
+            Self::CyanTerracotta(b) => b.is_opaque(),
+            Self::PurpleTerracotta(b) => b.is_opaque(),
+            Self::BlueTerracotta(b) => b.is_opaque(),
+            Self::BrownTerracotta(b) => b.is_opaque(),
+            Self::GreenTerracotta(b) => b.is_opaque(),
+            Self::RedTerracotta(b) => b.is_opaque(),
+            Self::BlackTerracotta(b) => b.is_opaque(),
+            Self::WhiteStainedGlassPane(b) => b.is_opaque(),
+            Self::OrangeStainedGlassPane(b) => b.is_opaque(),
+            Self::MagentaStainedGlassPane(b) => b.is_opaque(),
+            Self::LightBlueStainedGlassPane(b) => b.is_opaque(),
+            Self::YellowStainedGlassPane(b) => b.is_opaque(),
+            Self::LimeStainedGlassPane(b) => b.is_opaque(),
+            Self::PinkStainedGlassPane(b) => b.is_opaque(),
+            Self::GrayStainedGlassPane(b) => b.is_opaque(),
+            Self::LightGrayStainedGlassPane(b) => b.is_opaque(),
+            Self::CyanStainedGlassPane(b) => b.is_opaque(),
+            Self::PurpleStainedGlassPane(b) => b.is_opaque(),
+            Self::BlueStainedGlassPane(b) => b.is_opaque(),
+            Self::BrownStainedGlassPane(b) => b.is_opaque(),
+            Self::GreenStainedGlassPane(b) => b.is_opaque(),
+            Self::RedStainedGlassPane(b) => b.is_opaque(),
+            Self::BlackStainedGlassPane(b) => b.is_opaque(),
+            Self::AcaciaStairs(b) => b.is_opaque(),
+            Self::CherryStairs(b) => b.is_opaque(),
+            Self::DarkOakStairs(b) => b.is_opaque(),
+            Self::MangroveStairs(b) => b.is_opaque(),
+            Self::BambooStairs(b) => b.is_opaque(),
+            Self::BambooMosaicStairs(b) => b.is_opaque(),
+            Self::SlimeBlock(b) => b.is_opaque(),
+            Self::Barrier(b) => b.is_opaque(),
+            Self::Light(b) => b.is_opaque(),
+            Self::IronTrapdoor(b) => b.is_opaque(),
+            Self::Prismarine(b) => b.is_opaque(),
+            Self::PrismarineBricks(b) => b.is_opaque(),
+            Self::DarkPrismarine(b) => b.is_opaque(),
+            Self::PrismarineStairs(b) => b.is_opaque(),
+            Self::PrismarineBrickStairs(b) => b.is_opaque(),
+            Self::DarkPrismarineStairs(b) => b.is_opaque(),
+            Self::PrismarineSlab(b) => b.is_opaque(),
+            Self::PrismarineBrickSlab(b) => b.is_opaque(),
+            Self::DarkPrismarineSlab(b) => b.is_opaque(),
+            Self::SeaLantern(b) => b.is_opaque(),
+            Self::HayBlock(b) => b.is_opaque(),
+            Self::WhiteCarpet(b) => b.is_opaque(),
+            Self::OrangeCarpet(b) => b.is_opaque(),
+            Self::MagentaCarpet(b) => b.is_opaque(),
+            Self::LightBlueCarpet(b) => b.is_opaque(),
+            Self::YellowCarpet(b) => b.is_opaque(),
+            Self::LimeCarpet(b) => b.is_opaque(),
+            Self::PinkCarpet(b) => b.is_opaque(),
+            Self::GrayCarpet(b) => b.is_opaque(),
+            Self::LightGrayCarpet(b) => b.is_opaque(),
+            Self::CyanCarpet(b) => b.is_opaque(),
+            Self::PurpleCarpet(b) => b.is_opaque(),
+            Self::BlueCarpet(b) => b.is_opaque(),
+            Self::BrownCarpet(b) => b.is_opaque(),
+            Self::GreenCarpet(b) => b.is_opaque(),
+            Self::RedCarpet(b) => b.is_opaque(),
+            Self::BlackCarpet(b) => b.is_opaque(),
+            Self::Terracotta(b) => b.is_opaque(),
+            Self::CoalBlock(b) => b.is_opaque(),
+            Self::PackedIce(b) => b.is_opaque(),
+            Self::Sunflower(b) => b.is_opaque(),
+            Self::Lilac(b) => b.is_opaque(),
+            Self::RoseBush(b) => b.is_opaque(),
+            Self::Peony(b) => b.is_opaque(),
+            Self::TallGrass(b) => b.is_opaque(),
+            Self::LargeFern(b) => b.is_opaque(),
+            Self::WhiteBanner(b) => b.is_opaque(),
+            Self::OrangeBanner(b) => b.is_opaque(),
+            Self::MagentaBanner(b) => b.is_opaque(),
+            Self::LightBlueBanner(b) => b.is_opaque(),
+            Self::YellowBanner(b) => b.is_opaque(),
+            Self::LimeBanner(b) => b.is_opaque(),
+            Self::PinkBanner(b) => b.is_opaque(),
+            Self::GrayBanner(b) => b.is_opaque(),
+            Self::LightGrayBanner(b) => b.is_opaque(),
+            Self::CyanBanner(b) => b.is_opaque(),
+            Self::PurpleBanner(b) => b.is_opaque(),
+            Self::BlueBanner(b) => b.is_opaque(),
+            Self::BrownBanner(b) => b.is_opaque(),
+            Self::GreenBanner(b) => b.is_opaque(),
+            Self::RedBanner(b) => b.is_opaque(),
+            Self::BlackBanner(b) => b.is_opaque(),
+            Self::WhiteWallBanner(b) => b.is_opaque(),
+            Self::OrangeWallBanner(b) => b.is_opaque(),
+            Self::MagentaWallBanner(b) => b.is_opaque(),
+            Self::LightBlueWallBanner(b) => b.is_opaque(),
+            Self::YellowWallBanner(b) => b.is_opaque(),
+            Self::LimeWallBanner(b) => b.is_opaque(),
+            Self::PinkWallBanner(b) => b.is_opaque(),
+            Self::GrayWallBanner(b) => b.is_opaque(),
+            Self::LightGrayWallBanner(b) => b.is_opaque(),
+            Self::CyanWallBanner(b) => b.is_opaque(),
+            Self::PurpleWallBanner(b) => b.is_opaque(),
+            Self::BlueWallBanner(b) => b.is_opaque(),
+            Self::BrownWallBanner(b) => b.is_opaque(),
+            Self::GreenWallBanner(b) => b.is_opaque(),
+            Self::RedWallBanner(b) => b.is_opaque(),
+            Self::BlackWallBanner(b) => b.is_opaque(),
+            Self::RedSandstone(b) => b.is_opaque(),
+            Self::ChiseledRedSandstone(b) => b.is_opaque(),
+            Self::CutRedSandstone(b) => b.is_opaque(),
+            Self::RedSandstoneStairs(b) => b.is_opaque(),
+            Self::OakSlab(b) => b.is_opaque(),
+            Self::SpruceSlab(b) => b.is_opaque(),
+            Self::BirchSlab(b) => b.is_opaque(),
+            Self::JungleSlab(b) => b.is_opaque(),
+            Self::AcaciaSlab(b) => b.is_opaque(),
+            Self::CherrySlab(b) => b.is_opaque(),
+            Self::DarkOakSlab(b) => b.is_opaque(),
+            Self::MangroveSlab(b) => b.is_opaque(),
+            Self::BambooSlab(b) => b.is_opaque(),
+            Self::BambooMosaicSlab(b) => b.is_opaque(),
+            Self::StoneSlab(b) => b.is_opaque(),
+            Self::SmoothStoneSlab(b) => b.is_opaque(),
+            Self::SandstoneSlab(b) => b.is_opaque(),
+            Self::CutSandstoneSlab(b) => b.is_opaque(),
+            Self::PetrifiedOakSlab(b) => b.is_opaque(),
+            Self::CobblestoneSlab(b) => b.is_opaque(),
+            Self::BrickSlab(b) => b.is_opaque(),
+            Self::StoneBrickSlab(b) => b.is_opaque(),
+            Self::MudBrickSlab(b) => b.is_opaque(),
+            Self::NetherBrickSlab(b) => b.is_opaque(),
+            Self::QuartzSlab(b) => b.is_opaque(),
+            Self::RedSandstoneSlab(b) => b.is_opaque(),
+            Self::CutRedSandstoneSlab(b) => b.is_opaque(),
+            Self::PurpurSlab(b) => b.is_opaque(),
+            Self::SmoothStone(b) => b.is_opaque(),
+            Self::SmoothSandstone(b) => b.is_opaque(),
+            Self::SmoothQuartz(b) => b.is_opaque(),
+            Self::SmoothRedSandstone(b) => b.is_opaque(),
+            Self::SpruceFenceGate(b) => b.is_opaque(),
+            Self::BirchFenceGate(b) => b.is_opaque(),
+            Self::JungleFenceGate(b) => b.is_opaque(),
+            Self::AcaciaFenceGate(b) => b.is_opaque(),
+            Self::CherryFenceGate(b) => b.is_opaque(),
+            Self::DarkOakFenceGate(b) => b.is_opaque(),
+            Self::MangroveFenceGate(b) => b.is_opaque(),
+            Self::BambooFenceGate(b) => b.is_opaque(),
+            Self::SpruceFence(b) => b.is_opaque(),
+            Self::BirchFence(b) => b.is_opaque(),
+            Self::JungleFence(b) => b.is_opaque(),
+            Self::AcaciaFence(b) => b.is_opaque(),
+            Self::CherryFence(b) => b.is_opaque(),
+            Self::DarkOakFence(b) => b.is_opaque(),
+            Self::MangroveFence(b) => b.is_opaque(),
+            Self::BambooFence(b) => b.is_opaque(),
+            Self::SpruceDoor(b) => b.is_opaque(),
+            Self::BirchDoor(b) => b.is_opaque(),
+            Self::JungleDoor(b) => b.is_opaque(),
+            Self::AcaciaDoor(b) => b.is_opaque(),
+            Self::CherryDoor(b) => b.is_opaque(),
+            Self::DarkOakDoor(b) => b.is_opaque(),
+            Self::MangroveDoor(b) => b.is_opaque(),
+            Self::BambooDoor(b) => b.is_opaque(),
+            Self::EndRod(b) => b.is_opaque(),
+            Self::ChorusPlant(b) => b.is_opaque(),
+            Self::ChorusFlower(b) => b.is_opaque(),
+            Self::PurpurBlock(b) => b.is_opaque(),
+            Self::PurpurPillar(b) => b.is_opaque(),
+            Self::PurpurStairs(b) => b.is_opaque(),
+            Self::EndStoneBricks(b) => b.is_opaque(),
+            Self::TorchflowerCrop(b) => b.is_opaque(),
+            Self::PitcherCrop(b) => b.is_opaque(),
+            Self::PitcherPlant(b) => b.is_opaque(),
+            Self::Beetroots(b) => b.is_opaque(),
+            Self::DirtPath(b) => b.is_opaque(),
+            Self::EndGateway(b) => b.is_opaque(),
+            Self::RepeatingCommandBlock(b) => b.is_opaque(),
+            Self::ChainCommandBlock(b) => b.is_opaque(),
+            Self::FrostedIce(b) => b.is_opaque(),
+            Self::MagmaBlock(b) => b.is_opaque(),
+            Self::NetherWartBlock(b) => b.is_opaque(),
+            Self::RedNetherBricks(b) => b.is_opaque(),
+            Self::BoneBlock(b) => b.is_opaque(),
+            Self::StructureVoid(b) => b.is_opaque(),
+            Self::Observer(b) => b.is_opaque(),
+            Self::ShulkerBox(b) => b.is_opaque(),
+            Self::WhiteShulkerBox(b) => b.is_opaque(),
+            Self::OrangeShulkerBox(b) => b.is_opaque(),
+            Self::MagentaShulkerBox(b) => b.is_opaque(),
+            Self::LightBlueShulkerBox(b) => b.is_opaque(),
+            Self::YellowShulkerBox(b) => b.is_opaque(),
+            Self::LimeShulkerBox(b) => b.is_opaque(),
+            Self::PinkShulkerBox(b) => b.is_opaque(),
+            Self::GrayShulkerBox(b) => b.is_opaque(),
+            Self::LightGrayShulkerBox(b) => b.is_opaque(),
+            Self::CyanShulkerBox(b) => b.is_opaque(),
+            Self::PurpleShulkerBox(b) => b.is_opaque(),
+            Self::BlueShulkerBox(b) => b.is_opaque(),
+            Self::BrownShulkerBox(b) => b.is_opaque(),
+            Self::GreenShulkerBox(b) => b.is_opaque(),
+            Self::RedShulkerBox(b) => b.is_opaque(),
+            Self::BlackShulkerBox(b) => b.is_opaque(),
+            Self::WhiteGlazedTerracotta(b) => b.is_opaque(),
+            Self::OrangeGlazedTerracotta(b) => b.is_opaque(),
+            Self::MagentaGlazedTerracotta(b) => b.is_opaque(),
+            Self::LightBlueGlazedTerracotta(b) => b.is_opaque(),
+            Self::YellowGlazedTerracotta(b) => b.is_opaque(),
+            Self::LimeGlazedTerracotta(b) => b.is_opaque(),
+            Self::PinkGlazedTerracotta(b) => b.is_opaque(),
+            Self::GrayGlazedTerracotta(b) => b.is_opaque(),
+            Self::LightGrayGlazedTerracotta(b) => b.is_opaque(),
+            Self::CyanGlazedTerracotta(b) => b.is_opaque(),
+            Self::PurpleGlazedTerracotta(b) => b.is_opaque(),
+            Self::BlueGlazedTerracotta(b) => b.is_opaque(),
+            Self::BrownGlazedTerracotta(b) => b.is_opaque(),
+            Self::GreenGlazedTerracotta(b) => b.is_opaque(),
+            Self::RedGlazedTerracotta(b) => b.is_opaque(),
+            Self::BlackGlazedTerracotta(b) => b.is_opaque(),
+            Self::WhiteConcrete(b) => b.is_opaque(),
+            Self::OrangeConcrete(b) => b.is_opaque(),
+            Self::MagentaConcrete(b) => b.is_opaque(),
+            Self::LightBlueConcrete(b) => b.is_opaque(),
+            Self::YellowConcrete(b) => b.is_opaque(),
+            Self::LimeConcrete(b) => b.is_opaque(),
+            Self::PinkConcrete(b) => b.is_opaque(),
+            Self::GrayConcrete(b) => b.is_opaque(),
+            Self::LightGrayConcrete(b) => b.is_opaque(),
+            Self::CyanConcrete(b) => b.is_opaque(),
+            Self::PurpleConcrete(b) => b.is_opaque(),
+            Self::BlueConcrete(b) => b.is_opaque(),
+            Self::BrownConcrete(b) => b.is_opaque(),
+            Self::GreenConcrete(b) => b.is_opaque(),
+            Self::RedConcrete(b) => b.is_opaque(),
+            Self::BlackConcrete(b) => b.is_opaque(),
+            Self::WhiteConcretePowder(b) => b.is_opaque(),
+            Self::OrangeConcretePowder(b) => b.is_opaque(),
+            Self::MagentaConcretePowder(b) => b.is_opaque(),
+            Self::LightBlueConcretePowder(b) => b.is_opaque(),
+            Self::YellowConcretePowder(b) => b.is_opaque(),
+            Self::LimeConcretePowder(b) => b.is_opaque(),
+            Self::PinkConcretePowder(b) => b.is_opaque(),
+            Self::GrayConcretePowder(b) => b.is_opaque(),
+            Self::LightGrayConcretePowder(b) => b.is_opaque(),
+            Self::CyanConcretePowder(b) => b.is_opaque(),
+            Self::PurpleConcretePowder(b) => b.is_opaque(),
+            Self::BlueConcretePowder(b) => b.is_opaque(),
+            Self::BrownConcretePowder(b) => b.is_opaque(),
+            Self::GreenConcretePowder(b) => b.is_opaque(),
+            Self::RedConcretePowder(b) => b.is_opaque(),
+            Self::BlackConcretePowder(b) => b.is_opaque(),
+            Self::Kelp(b) => b.is_opaque(),
+            Self::KelpPlant(b) => b.is_opaque(),
+            Self::DriedKelpBlock(b) => b.is_opaque(),
+            Self::TurtleEgg(b) => b.is_opaque(),
+            Self::SnifferEgg(b) => b.is_opaque(),
+            Self::DeadTubeCoralBlock(b) => b.is_opaque(),
+            Self::DeadBrainCoralBlock(b) => b.is_opaque(),
+            Self::DeadBubbleCoralBlock(b) => b.is_opaque(),
+            Self::DeadFireCoralBlock(b) => b.is_opaque(),
+            Self::DeadHornCoralBlock(b) => b.is_opaque(),
+            Self::TubeCoralBlock(b) => b.is_opaque(),
+            Self::BrainCoralBlock(b) => b.is_opaque(),
+            Self::BubbleCoralBlock(b) => b.is_opaque(),
+            Self::FireCoralBlock(b) => b.is_opaque(),
+            Self::HornCoralBlock(b) => b.is_opaque(),
+            Self::DeadTubeCoral(b) => b.is_opaque(),
+            Self::DeadBrainCoral(b) => b.is_opaque(),
+            Self::DeadBubbleCoral(b) => b.is_opaque(),
+            Self::DeadFireCoral(b) => b.is_opaque(),
+            Self::DeadHornCoral(b) => b.is_opaque(),
+            Self::TubeCoral(b) => b.is_opaque(),
+            Self::BrainCoral(b) => b.is_opaque(),
+            Self::BubbleCoral(b) => b.is_opaque(),
+            Self::FireCoral(b) => b.is_opaque(),
+            Self::HornCoral(b) => b.is_opaque(),
+            Self::DeadTubeCoralFan(b) => b.is_opaque(),
+            Self::DeadBrainCoralFan(b) => b.is_opaque(),
+            Self::DeadBubbleCoralFan(b) => b.is_opaque(),
+            Self::DeadFireCoralFan(b) => b.is_opaque(),
+            Self::DeadHornCoralFan(b) => b.is_opaque(),
+            Self::TubeCoralFan(b) => b.is_opaque(),
+            Self::BrainCoralFan(b) => b.is_opaque(),
+            Self::BubbleCoralFan(b) => b.is_opaque(),
+            Self::FireCoralFan(b) => b.is_opaque(),
+            Self::HornCoralFan(b) => b.is_opaque(),
+            Self::DeadTubeCoralWallFan(b) => b.is_opaque(),
+            Self::DeadBrainCoralWallFan(b) => b.is_opaque(),
+            Self::DeadBubbleCoralWallFan(b) => b.is_opaque(),
+            Self::DeadFireCoralWallFan(b) => b.is_opaque(),
+            Self::DeadHornCoralWallFan(b) => b.is_opaque(),
+            Self::TubeCoralWallFan(b) => b.is_opaque(),
+            Self::BrainCoralWallFan(b) => b.is_opaque(),
+            Self::BubbleCoralWallFan(b) => b.is_opaque(),
+            Self::FireCoralWallFan(b) => b.is_opaque(),
+            Self::HornCoralWallFan(b) => b.is_opaque(),
+            Self::SeaPickle(b) => b.is_opaque(),
+            Self::BlueIce(b) => b.is_opaque(),
+            Self::Conduit(b) => b.is_opaque(),
+            Self::BambooSapling(b) => b.is_opaque(),
+            Self::Bamboo(b) => b.is_opaque(),
+            Self::PottedBamboo(b) => b.is_opaque(),
+            Self::VoidAir(b) => b.is_opaque(),
+            Self::CaveAir(b) => b.is_opaque(),
+            Self::BubbleColumn(b) => b.is_opaque(),
+            Self::PolishedGraniteStairs(b) => b.is_opaque(),
+            Self::SmoothRedSandstoneStairs(b) => b.is_opaque(),
+            Self::MossyStoneBrickStairs(b) => b.is_opaque(),
+            Self::PolishedDioriteStairs(b) => b.is_opaque(),
+            Self::MossyCobblestoneStairs(b) => b.is_opaque(),
+            Self::EndStoneBrickStairs(b) => b.is_opaque(),
+            Self::StoneStairs(b) => b.is_opaque(),
+            Self::SmoothSandstoneStairs(b) => b.is_opaque(),
+            Self::SmoothQuartzStairs(b) => b.is_opaque(),
+            Self::GraniteStairs(b) => b.is_opaque(),
+            Self::AndesiteStairs(b) => b.is_opaque(),
+            Self::RedNetherBrickStairs(b) => b.is_opaque(),
+            Self::PolishedAndesiteStairs(b) => b.is_opaque(),
+            Self::DioriteStairs(b) => b.is_opaque(),
+            Self::PolishedGraniteSlab(b) => b.is_opaque(),
+            Self::SmoothRedSandstoneSlab(b) => b.is_opaque(),
+            Self::MossyStoneBrickSlab(b) => b.is_opaque(),
+            Self::PolishedDioriteSlab(b) => b.is_opaque(),
+            Self::MossyCobblestoneSlab(b) => b.is_opaque(),
+            Self::EndStoneBrickSlab(b) => b.is_opaque(),
+            Self::SmoothSandstoneSlab(b) => b.is_opaque(),
+            Self::SmoothQuartzSlab(b) => b.is_opaque(),
+            Self::GraniteSlab(b) => b.is_opaque(),
+            Self::AndesiteSlab(b) => b.is_opaque(),
+            Self::RedNetherBrickSlab(b) => b.is_opaque(),
+            Self::PolishedAndesiteSlab(b) => b.is_opaque(),
+            Self::DioriteSlab(b) => b.is_opaque(),
+            Self::BrickWall(b) => b.is_opaque(),
+            Self::PrismarineWall(b) => b.is_opaque(),
+            Self::RedSandstoneWall(b) => b.is_opaque(),
+            Self::MossyStoneBrickWall(b) => b.is_opaque(),
+            Self::GraniteWall(b) => b.is_opaque(),
+            Self::StoneBrickWall(b) => b.is_opaque(),
+            Self::MudBrickWall(b) => b.is_opaque(),
+            Self::NetherBrickWall(b) => b.is_opaque(),
+            Self::AndesiteWall(b) => b.is_opaque(),
+            Self::RedNetherBrickWall(b) => b.is_opaque(),
+            Self::SandstoneWall(b) => b.is_opaque(),
+            Self::EndStoneBrickWall(b) => b.is_opaque(),
+            Self::DioriteWall(b) => b.is_opaque(),
+            Self::Scaffolding(b) => b.is_opaque(),
+            Self::Loom(b) => b.is_opaque(),
+            Self::Barrel(b) => b.is_opaque(),
+            Self::Smoker(b) => b.is_opaque(),
+            Self::BlastFurnace(b) => b.is_opaque(),
+            Self::CartographyTable(b) => b.is_opaque(),
+            Self::FletchingTable(b) => b.is_opaque(),
+            Self::Grindstone(b) => b.is_opaque(),
+            Self::Lectern(b) => b.is_opaque(),
+            Self::SmithingTable(b) => b.is_opaque(),
+            Self::Stonecutter(b) => b.is_opaque(),
+            Self::Bell(b) => b.is_opaque(),
+            Self::Lantern(b) => b.is_opaque(),
+            Self::SoulLantern(b) => b.is_opaque(),
+            Self::Campfire(b) => b.is_opaque(),
+            Self::SoulCampfire(b) => b.is_opaque(),
+            Self::SweetBerryBush(b) => b.is_opaque(),
+            Self::WarpedStem(b) => b.is_opaque(),
+            Self::StrippedWarpedStem(b) => b.is_opaque(),
+            Self::WarpedHyphae(b) => b.is_opaque(),
+            Self::StrippedWarpedHyphae(b) => b.is_opaque(),
+            Self::WarpedNylium(b) => b.is_opaque(),
+            Self::WarpedFungus(b) => b.is_opaque(),
+            Self::WarpedWartBlock(b) => b.is_opaque(),
+            Self::WarpedRoots(b) => b.is_opaque(),
+            Self::NetherSprouts(b) => b.is_opaque(),
+            Self::CrimsonStem(b) => b.is_opaque(),
+            Self::StrippedCrimsonStem(b) => b.is_opaque(),
+            Self::CrimsonHyphae(b) => b.is_opaque(),
+            Self::StrippedCrimsonHyphae(b) => b.is_opaque(),
+            Self::CrimsonNylium(b) => b.is_opaque(),
+            Self::CrimsonFungus(b) => b.is_opaque(),
+            Self::Shroomlight(b) => b.is_opaque(),
+            Self::WeepingVines(b) => b.is_opaque(),
+            Self::WeepingVinesPlant(b) => b.is_opaque(),
+            Self::TwistingVines(b) => b.is_opaque(),
+            Self::TwistingVinesPlant(b) => b.is_opaque(),
+            Self::CrimsonRoots(b) => b.is_opaque(),
+            Self::CrimsonPlanks(b) => b.is_opaque(),
+            Self::WarpedPlanks(b) => b.is_opaque(),
+            Self::CrimsonSlab(b) => b.is_opaque(),
+            Self::WarpedSlab(b) => b.is_opaque(),
+            Self::CrimsonPressurePlate(b) => b.is_opaque(),
+            Self::WarpedPressurePlate(b) => b.is_opaque(),
+            Self::CrimsonFence(b) => b.is_opaque(),
+            Self::WarpedFence(b) => b.is_opaque(),
+            Self::CrimsonTrapdoor(b) => b.is_opaque(),
+            Self::WarpedTrapdoor(b) => b.is_opaque(),
+            Self::CrimsonFenceGate(b) => b.is_opaque(),
+            Self::WarpedFenceGate(b) => b.is_opaque(),
+            Self::CrimsonStairs(b) => b.is_opaque(),
+            Self::WarpedStairs(b) => b.is_opaque(),
+            Self::CrimsonButton(b) => b.is_opaque(),
+            Self::WarpedButton(b) => b.is_opaque(),
+            Self::CrimsonDoor(b) => b.is_opaque(),
+            Self::WarpedDoor(b) => b.is_opaque(),
+            Self::CrimsonSign(b) => b.is_opaque(),
+            Self::WarpedSign(b) => b.is_opaque(),
+            Self::CrimsonWallSign(b) => b.is_opaque(),
+            Self::WarpedWallSign(b) => b.is_opaque(),
+            Self::StructureBlock(b) => b.is_opaque(),
+            Self::Jigsaw(b) => b.is_opaque(),
+            Self::Composter(b) => b.is_opaque(),
+            Self::Target(b) => b.is_opaque(),
+            Self::BeeNest(b) => b.is_opaque(),
+            Self::Beehive(b) => b.is_opaque(),
+            Self::HoneyBlock(b) => b.is_opaque(),
+            Self::HoneycombBlock(b) => b.is_opaque(),
+            Self::NetheriteBlock(b) => b.is_opaque(),
+            Self::AncientDebris(b) => b.is_opaque(),
+            Self::CryingObsidian(b) => b.is_opaque(),
+            Self::RespawnAnchor(b) => b.is_opaque(),
+            Self::PottedCrimsonFungus(b) => b.is_opaque(),
+            Self::PottedWarpedFungus(b) => b.is_opaque(),
+            Self::PottedCrimsonRoots(b) => b.is_opaque(),
+            Self::PottedWarpedRoots(b) => b.is_opaque(),
+            Self::Lodestone(b) => b.is_opaque(),
+            Self::Blackstone(b) => b.is_opaque(),
+            Self::BlackstoneStairs(b) => b.is_opaque(),
+            Self::BlackstoneWall(b) => b.is_opaque(),
+            Self::BlackstoneSlab(b) => b.is_opaque(),
+            Self::PolishedBlackstone(b) => b.is_opaque(),
+            Self::PolishedBlackstoneBricks(b) => b.is_opaque(),
+            Self::CrackedPolishedBlackstoneBricks(b) => b.is_opaque(),
+            Self::ChiseledPolishedBlackstone(b) => b.is_opaque(),
+            Self::PolishedBlackstoneBrickSlab(b) => b.is_opaque(),
+            Self::PolishedBlackstoneBrickStairs(b) => b.is_opaque(),
+            Self::PolishedBlackstoneBrickWall(b) => b.is_opaque(),
+            Self::GildedBlackstone(b) => b.is_opaque(),
+            Self::PolishedBlackstoneStairs(b) => b.is_opaque(),
+            Self::PolishedBlackstoneSlab(b) => b.is_opaque(),
+            Self::PolishedBlackstonePressurePlate(b) => b.is_opaque(),
+            Self::PolishedBlackstoneButton(b) => b.is_opaque(),
+            Self::PolishedBlackstoneWall(b) => b.is_opaque(),
+            Self::ChiseledNetherBricks(b) => b.is_opaque(),
+            Self::CrackedNetherBricks(b) => b.is_opaque(),
+            Self::QuartzBricks(b) => b.is_opaque(),
+            Self::Candle(b) => b.is_opaque(),
+            Self::WhiteCandle(b) => b.is_opaque(),
+            Self::OrangeCandle(b) => b.is_opaque(),
+            Self::MagentaCandle(b) => b.is_opaque(),
+            Self::LightBlueCandle(b) => b.is_opaque(),
+            Self::YellowCandle(b) => b.is_opaque(),
+            Self::LimeCandle(b) => b.is_opaque(),
+            Self::PinkCandle(b) => b.is_opaque(),
+            Self::GrayCandle(b) => b.is_opaque(),
+            Self::LightGrayCandle(b) => b.is_opaque(),
+            Self::CyanCandle(b) => b.is_opaque(),
+            Self::PurpleCandle(b) => b.is_opaque(),
+            Self::BlueCandle(b) => b.is_opaque(),
+            Self::BrownCandle(b) => b.is_opaque(),
+            Self::GreenCandle(b) => b.is_opaque(),
+            Self::RedCandle(b) => b.is_opaque(),
+            Self::BlackCandle(b) => b.is_opaque(),
+            Self::CandleCake(b) => b.is_opaque(),
+            Self::WhiteCandleCake(b) => b.is_opaque(),
+            Self::OrangeCandleCake(b) => b.is_opaque(),
+            Self::MagentaCandleCake(b) => b.is_opaque(),
+            Self::LightBlueCandleCake(b) => b.is_opaque(),
+            Self::YellowCandleCake(b) => b.is_opaque(),
+            Self::LimeCandleCake(b) => b.is_opaque(),
+            Self::PinkCandleCake(b) => b.is_opaque(),
+            Self::GrayCandleCake(b) => b.is_opaque(),
+            Self::LightGrayCandleCake(b) => b.is_opaque(),
+            Self::CyanCandleCake(b) => b.is_opaque(),
+            Self::PurpleCandleCake(b) => b.is_opaque(),
+            Self::BlueCandleCake(b) => b.is_opaque(),
+            Self::BrownCandleCake(b) => b.is_opaque(),
+            Self::GreenCandleCake(b) => b.is_opaque(),
+            Self::RedCandleCake(b) => b.is_opaque(),
+            Self::BlackCandleCake(b) => b.is_opaque(),
+            Self::AmethystBlock(b) => b.is_opaque(),
+            Self::BuddingAmethyst(b) => b.is_opaque(),
+            Self::AmethystCluster(b) => b.is_opaque(),
+            Self::LargeAmethystBud(b) => b.is_opaque(),
+            Self::MediumAmethystBud(b) => b.is_opaque(),
+            Self::SmallAmethystBud(b) => b.is_opaque(),
+            Self::Tuff(b) => b.is_opaque(),
+            Self::Calcite(b) => b.is_opaque(),
+            Self::TintedGlass(b) => b.is_opaque(),
+            Self::PowderSnow(b) => b.is_opaque(),
+            Self::SculkSensor(b) => b.is_opaque(),
+            Self::CalibratedSculkSensor(b) => b.is_opaque(),
+            Self::Sculk(b) => b.is_opaque(),
+            Self::SculkVein(b) => b.is_opaque(),
+            Self::SculkCatalyst(b) => b.is_opaque(),
+            Self::SculkShrieker(b) => b.is_opaque(),
+            Self::OxidizedCopper(b) => b.is_opaque(),
+            Self::WeatheredCopper(b) => b.is_opaque(),
+            Self::ExposedCopper(b) => b.is_opaque(),
+            Self::CopperBlock(b) => b.is_opaque(),
+            Self::CopperOre(b) => b.is_opaque(),
+            Self::DeepslateCopperOre(b) => b.is_opaque(),
+            Self::OxidizedCutCopper(b) => b.is_opaque(),
+            Self::WeatheredCutCopper(b) => b.is_opaque(),
+            Self::ExposedCutCopper(b) => b.is_opaque(),
+            Self::CutCopper(b) => b.is_opaque(),
+            Self::OxidizedCutCopperStairs(b) => b.is_opaque(),
+            Self::WeatheredCutCopperStairs(b) => b.is_opaque(),
+            Self::ExposedCutCopperStairs(b) => b.is_opaque(),
+            Self::CutCopperStairs(b) => b.is_opaque(),
+            Self::OxidizedCutCopperSlab(b) => b.is_opaque(),
+            Self::WeatheredCutCopperSlab(b) => b.is_opaque(),
+            Self::ExposedCutCopperSlab(b) => b.is_opaque(),
+            Self::CutCopperSlab(b) => b.is_opaque(),
+            Self::WaxedCopperBlock(b) => b.is_opaque(),
+            Self::WaxedWeatheredCopper(b) => b.is_opaque(),
+            Self::WaxedExposedCopper(b) => b.is_opaque(),
+            Self::WaxedOxidizedCopper(b) => b.is_opaque(),
+            Self::WaxedOxidizedCutCopper(b) => b.is_opaque(),
+            Self::WaxedWeatheredCutCopper(b) => b.is_opaque(),
+            Self::WaxedExposedCutCopper(b) => b.is_opaque(),
+            Self::WaxedCutCopper(b) => b.is_opaque(),
+            Self::WaxedOxidizedCutCopperStairs(b) => b.is_opaque(),
+            Self::WaxedWeatheredCutCopperStairs(b) => b.is_opaque(),
+            Self::WaxedExposedCutCopperStairs(b) => b.is_opaque(),
+            Self::WaxedCutCopperStairs(b) => b.is_opaque(),
+            Self::WaxedOxidizedCutCopperSlab(b) => b.is_opaque(),
+            Self::WaxedWeatheredCutCopperSlab(b) => b.is_opaque(),
+            Self::WaxedExposedCutCopperSlab(b) => b.is_opaque(),
+            Self::WaxedCutCopperSlab(b) => b.is_opaque(),
+            Self::LightningRod(b) => b.is_opaque(),
+            Self::PointedDripstone(b) => b.is_opaque(),
+            Self::DripstoneBlock(b) => b.is_opaque(),
+            Self::CaveVines(b) => b.is_opaque(),
+            Self::CaveVinesPlant(b) => b.is_opaque(),
+            Self::SporeBlossom(b) => b.is_opaque(),
+            Self::Azalea(b) => b.is_opaque(),
+            Self::FloweringAzalea(b) => b.is_opaque(),
+            Self::MossCarpet(b) => b.is_opaque(),
+            Self::PinkPetals(b) => b.is_opaque(),
+            Self::MossBlock(b) => b.is_opaque(),
+            Self::BigDripleaf(b) => b.is_opaque(),
+            Self::BigDripleafStem(b) => b.is_opaque(),
+            Self::SmallDripleaf(b) => b.is_opaque(),
+            Self::HangingRoots(b) => b.is_opaque(),
+            Self::RootedDirt(b) => b.is_opaque(),
+            Self::Mud(b) => b.is_opaque(),
+            Self::Deepslate(b) => b.is_opaque(),
+            Self::CobbledDeepslate(b) => b.is_opaque(),
+            Self::CobbledDeepslateStairs(b) => b.is_opaque(),
+            Self::CobbledDeepslateSlab(b) => b.is_opaque(),
+            Self::CobbledDeepslateWall(b) => b.is_opaque(),
+            Self::PolishedDeepslate(b) => b.is_opaque(),
+            Self::PolishedDeepslateStairs(b) => b.is_opaque(),
+            Self::PolishedDeepslateSlab(b) => b.is_opaque(),
+            Self::PolishedDeepslateWall(b) => b.is_opaque(),
+            Self::DeepslateTiles(b) => b.is_opaque(),
+            Self::DeepslateTileStairs(b) => b.is_opaque(),
+            Self::DeepslateTileSlab(b) => b.is_opaque(),
+            Self::DeepslateTileWall(b) => b.is_opaque(),
+            Self::DeepslateBricks(b) => b.is_opaque(),
+            Self::DeepslateBrickStairs(b) => b.is_opaque(),
+            Self::DeepslateBrickSlab(b) => b.is_opaque(),
+            Self::DeepslateBrickWall(b) => b.is_opaque(),
+            Self::ChiseledDeepslate(b) => b.is_opaque(),
+            Self::CrackedDeepslateBricks(b) => b.is_opaque(),
+            Self::CrackedDeepslateTiles(b) => b.is_opaque(),
+            Self::InfestedDeepslate(b) => b.is_opaque(),
+            Self::SmoothBasalt(b) => b.is_opaque(),
+            Self::RawIronBlock(b) => b.is_opaque(),
+            Self::RawCopperBlock(b) => b.is_opaque(),
+            Self::RawGoldBlock(b) => b.is_opaque(),
+            Self::PottedAzaleaBush(b) => b.is_opaque(),
+            Self::PottedFloweringAzaleaBush(b) => b.is_opaque(),
+            Self::OchreFroglight(b) => b.is_opaque(),
+            Self::VerdantFroglight(b) => b.is_opaque(),
+            Self::PearlescentFroglight(b) => b.is_opaque(),
+            Self::Frogspawn(b) => b.is_opaque(),
+            Self::ReinforcedDeepslate(b) => b.is_opaque(),
+            Self::DecoratedPot(b) => b.is_opaque(),
+        }
+    }
+    fn is_collidable(&self) -> bool {
+        match self {
+            Self::Error(b) => b.is_collidable(),
+            Self::Air(b) => b.is_collidable(),
+            Self::Stone(b) => b.is_collidable(),
+            Self::Granite(b) => b.is_collidable(),
+            Self::PolishedGranite(b) => b.is_collidable(),
+            Self::Diorite(b) => b.is_collidable(),
+            Self::PolishedDiorite(b) => b.is_collidable(),
+            Self::Andesite(b) => b.is_collidable(),
+            Self::PolishedAndesite(b) => b.is_collidable(),
+            Self::GrassBlock(b) => b.is_collidable(),
+            Self::Dirt(b) => b.is_collidable(),
+            Self::CoarseDirt(b) => b.is_collidable(),
+            Self::Podzol(b) => b.is_collidable(),
+            Self::Cobblestone(b) => b.is_collidable(),
+            Self::OakPlanks(b) => b.is_collidable(),
+            Self::SprucePlanks(b) => b.is_collidable(),
+            Self::BirchPlanks(b) => b.is_collidable(),
+            Self::JunglePlanks(b) => b.is_collidable(),
+            Self::AcaciaPlanks(b) => b.is_collidable(),
+            Self::CherryPlanks(b) => b.is_collidable(),
+            Self::DarkOakPlanks(b) => b.is_collidable(),
+            Self::MangrovePlanks(b) => b.is_collidable(),
+            Self::BambooPlanks(b) => b.is_collidable(),
+            Self::BambooMosaic(b) => b.is_collidable(),
+            Self::OakSapling(b) => b.is_collidable(),
+            Self::SpruceSapling(b) => b.is_collidable(),
+            Self::BirchSapling(b) => b.is_collidable(),
+            Self::JungleSapling(b) => b.is_collidable(),
+            Self::AcaciaSapling(b) => b.is_collidable(),
+            Self::CherrySapling(b) => b.is_collidable(),
+            Self::DarkOakSapling(b) => b.is_collidable(),
+            Self::MangrovePropagule(b) => b.is_collidable(),
+            Self::Bedrock(b) => b.is_collidable(),
+            Self::Water(b) => b.is_collidable(),
+            Self::Lava(b) => b.is_collidable(),
+            Self::Sand(b) => b.is_collidable(),
+            Self::SuspiciousSand(b) => b.is_collidable(),
+            Self::RedSand(b) => b.is_collidable(),
+            Self::Gravel(b) => b.is_collidable(),
+            Self::SuspiciousGravel(b) => b.is_collidable(),
+            Self::GoldOre(b) => b.is_collidable(),
+            Self::DeepslateGoldOre(b) => b.is_collidable(),
+            Self::IronOre(b) => b.is_collidable(),
+            Self::DeepslateIronOre(b) => b.is_collidable(),
+            Self::CoalOre(b) => b.is_collidable(),
+            Self::DeepslateCoalOre(b) => b.is_collidable(),
+            Self::NetherGoldOre(b) => b.is_collidable(),
+            Self::OakLog(b) => b.is_collidable(),
+            Self::SpruceLog(b) => b.is_collidable(),
+            Self::BirchLog(b) => b.is_collidable(),
+            Self::JungleLog(b) => b.is_collidable(),
+            Self::AcaciaLog(b) => b.is_collidable(),
+            Self::CherryLog(b) => b.is_collidable(),
+            Self::DarkOakLog(b) => b.is_collidable(),
+            Self::MangroveLog(b) => b.is_collidable(),
+            Self::MangroveRoots(b) => b.is_collidable(),
+            Self::MuddyMangroveRoots(b) => b.is_collidable(),
+            Self::BambooBlock(b) => b.is_collidable(),
+            Self::StrippedSpruceLog(b) => b.is_collidable(),
+            Self::StrippedBirchLog(b) => b.is_collidable(),
+            Self::StrippedJungleLog(b) => b.is_collidable(),
+            Self::StrippedAcaciaLog(b) => b.is_collidable(),
+            Self::StrippedCherryLog(b) => b.is_collidable(),
+            Self::StrippedDarkOakLog(b) => b.is_collidable(),
+            Self::StrippedOakLog(b) => b.is_collidable(),
+            Self::StrippedMangroveLog(b) => b.is_collidable(),
+            Self::StrippedBambooBlock(b) => b.is_collidable(),
+            Self::OakWood(b) => b.is_collidable(),
+            Self::SpruceWood(b) => b.is_collidable(),
+            Self::BirchWood(b) => b.is_collidable(),
+            Self::JungleWood(b) => b.is_collidable(),
+            Self::AcaciaWood(b) => b.is_collidable(),
+            Self::CherryWood(b) => b.is_collidable(),
+            Self::DarkOakWood(b) => b.is_collidable(),
+            Self::MangroveWood(b) => b.is_collidable(),
+            Self::StrippedOakWood(b) => b.is_collidable(),
+            Self::StrippedSpruceWood(b) => b.is_collidable(),
+            Self::StrippedBirchWood(b) => b.is_collidable(),
+            Self::StrippedJungleWood(b) => b.is_collidable(),
+            Self::StrippedAcaciaWood(b) => b.is_collidable(),
+            Self::StrippedCherryWood(b) => b.is_collidable(),
+            Self::StrippedDarkOakWood(b) => b.is_collidable(),
+            Self::StrippedMangroveWood(b) => b.is_collidable(),
+            Self::OakLeaves(b) => b.is_collidable(),
+            Self::SpruceLeaves(b) => b.is_collidable(),
+            Self::BirchLeaves(b) => b.is_collidable(),
+            Self::JungleLeaves(b) => b.is_collidable(),
+            Self::AcaciaLeaves(b) => b.is_collidable(),
+            Self::CherryLeaves(b) => b.is_collidable(),
+            Self::DarkOakLeaves(b) => b.is_collidable(),
+            Self::MangroveLeaves(b) => b.is_collidable(),
+            Self::AzaleaLeaves(b) => b.is_collidable(),
+            Self::FloweringAzaleaLeaves(b) => b.is_collidable(),
+            Self::Sponge(b) => b.is_collidable(),
+            Self::WetSponge(b) => b.is_collidable(),
+            Self::Glass(b) => b.is_collidable(),
+            Self::LapisOre(b) => b.is_collidable(),
+            Self::DeepslateLapisOre(b) => b.is_collidable(),
+            Self::LapisBlock(b) => b.is_collidable(),
+            Self::Dispenser(b) => b.is_collidable(),
+            Self::Sandstone(b) => b.is_collidable(),
+            Self::ChiseledSandstone(b) => b.is_collidable(),
+            Self::CutSandstone(b) => b.is_collidable(),
+            Self::NoteBlock(b) => b.is_collidable(),
+            Self::WhiteBed(b) => b.is_collidable(),
+            Self::OrangeBed(b) => b.is_collidable(),
+            Self::MagentaBed(b) => b.is_collidable(),
+            Self::LightBlueBed(b) => b.is_collidable(),
+            Self::YellowBed(b) => b.is_collidable(),
+            Self::LimeBed(b) => b.is_collidable(),
+            Self::PinkBed(b) => b.is_collidable(),
+            Self::GrayBed(b) => b.is_collidable(),
+            Self::LightGrayBed(b) => b.is_collidable(),
+            Self::CyanBed(b) => b.is_collidable(),
+            Self::PurpleBed(b) => b.is_collidable(),
+            Self::BlueBed(b) => b.is_collidable(),
+            Self::BrownBed(b) => b.is_collidable(),
+            Self::GreenBed(b) => b.is_collidable(),
+            Self::RedBed(b) => b.is_collidable(),
+            Self::BlackBed(b) => b.is_collidable(),
+            Self::PoweredRail(b) => b.is_collidable(),
+            Self::DetectorRail(b) => b.is_collidable(),
+            Self::StickyPiston(b) => b.is_collidable(),
+            Self::Cobweb(b) => b.is_collidable(),
+            Self::Grass(b) => b.is_collidable(),
+            Self::Fern(b) => b.is_collidable(),
+            Self::DeadBush(b) => b.is_collidable(),
+            Self::Seagrass(b) => b.is_collidable(),
+            Self::TallSeagrass(b) => b.is_collidable(),
+            Self::Piston(b) => b.is_collidable(),
+            Self::PistonHead(b) => b.is_collidable(),
+            Self::WhiteWool(b) => b.is_collidable(),
+            Self::OrangeWool(b) => b.is_collidable(),
+            Self::MagentaWool(b) => b.is_collidable(),
+            Self::LightBlueWool(b) => b.is_collidable(),
+            Self::YellowWool(b) => b.is_collidable(),
+            Self::LimeWool(b) => b.is_collidable(),
+            Self::PinkWool(b) => b.is_collidable(),
+            Self::GrayWool(b) => b.is_collidable(),
+            Self::LightGrayWool(b) => b.is_collidable(),
+            Self::CyanWool(b) => b.is_collidable(),
+            Self::PurpleWool(b) => b.is_collidable(),
+            Self::BlueWool(b) => b.is_collidable(),
+            Self::BrownWool(b) => b.is_collidable(),
+            Self::GreenWool(b) => b.is_collidable(),
+            Self::RedWool(b) => b.is_collidable(),
+            Self::BlackWool(b) => b.is_collidable(),
+            Self::MovingPiston(b) => b.is_collidable(),
+            Self::Dandelion(b) => b.is_collidable(),
+            Self::Torchflower(b) => b.is_collidable(),
+            Self::Poppy(b) => b.is_collidable(),
+            Self::BlueOrchid(b) => b.is_collidable(),
+            Self::Allium(b) => b.is_collidable(),
+            Self::AzureBluet(b) => b.is_collidable(),
+            Self::RedTulip(b) => b.is_collidable(),
+            Self::OrangeTulip(b) => b.is_collidable(),
+            Self::WhiteTulip(b) => b.is_collidable(),
+            Self::PinkTulip(b) => b.is_collidable(),
+            Self::OxeyeDaisy(b) => b.is_collidable(),
+            Self::Cornflower(b) => b.is_collidable(),
+            Self::WitherRose(b) => b.is_collidable(),
+            Self::LilyOfTheValley(b) => b.is_collidable(),
+            Self::BrownMushroom(b) => b.is_collidable(),
+            Self::RedMushroom(b) => b.is_collidable(),
+            Self::GoldBlock(b) => b.is_collidable(),
+            Self::IronBlock(b) => b.is_collidable(),
+            Self::Bricks(b) => b.is_collidable(),
+            Self::Tnt(b) => b.is_collidable(),
+            Self::Bookshelf(b) => b.is_collidable(),
+            Self::ChiseledBookshelf(b) => b.is_collidable(),
+            Self::MossyCobblestone(b) => b.is_collidable(),
+            Self::Obsidian(b) => b.is_collidable(),
+            Self::Torch(b) => b.is_collidable(),
+            Self::WallTorch(b) => b.is_collidable(),
+            Self::Fire(b) => b.is_collidable(),
+            Self::SoulFire(b) => b.is_collidable(),
+            Self::Spawner(b) => b.is_collidable(),
+            Self::OakStairs(b) => b.is_collidable(),
+            Self::Chest(b) => b.is_collidable(),
+            Self::RedstoneWire(b) => b.is_collidable(),
+            Self::DiamondOre(b) => b.is_collidable(),
+            Self::DeepslateDiamondOre(b) => b.is_collidable(),
+            Self::DiamondBlock(b) => b.is_collidable(),
+            Self::CraftingTable(b) => b.is_collidable(),
+            Self::Wheat(b) => b.is_collidable(),
+            Self::Farmland(b) => b.is_collidable(),
+            Self::Furnace(b) => b.is_collidable(),
+            Self::OakSign(b) => b.is_collidable(),
+            Self::SpruceSign(b) => b.is_collidable(),
+            Self::BirchSign(b) => b.is_collidable(),
+            Self::AcaciaSign(b) => b.is_collidable(),
+            Self::CherrySign(b) => b.is_collidable(),
+            Self::JungleSign(b) => b.is_collidable(),
+            Self::DarkOakSign(b) => b.is_collidable(),
+            Self::MangroveSign(b) => b.is_collidable(),
+            Self::BambooSign(b) => b.is_collidable(),
+            Self::OakDoor(b) => b.is_collidable(),
+            Self::Ladder(b) => b.is_collidable(),
+            Self::Rail(b) => b.is_collidable(),
+            Self::CobblestoneStairs(b) => b.is_collidable(),
+            Self::OakWallSign(b) => b.is_collidable(),
+            Self::SpruceWallSign(b) => b.is_collidable(),
+            Self::BirchWallSign(b) => b.is_collidable(),
+            Self::AcaciaWallSign(b) => b.is_collidable(),
+            Self::CherryWallSign(b) => b.is_collidable(),
+            Self::JungleWallSign(b) => b.is_collidable(),
+            Self::DarkOakWallSign(b) => b.is_collidable(),
+            Self::MangroveWallSign(b) => b.is_collidable(),
+            Self::BambooWallSign(b) => b.is_collidable(),
+            Self::OakHangingSign(b) => b.is_collidable(),
+            Self::SpruceHangingSign(b) => b.is_collidable(),
+            Self::BirchHangingSign(b) => b.is_collidable(),
+            Self::AcaciaHangingSign(b) => b.is_collidable(),
+            Self::CherryHangingSign(b) => b.is_collidable(),
+            Self::JungleHangingSign(b) => b.is_collidable(),
+            Self::DarkOakHangingSign(b) => b.is_collidable(),
+            Self::CrimsonHangingSign(b) => b.is_collidable(),
+            Self::WarpedHangingSign(b) => b.is_collidable(),
+            Self::MangroveHangingSign(b) => b.is_collidable(),
+            Self::BambooHangingSign(b) => b.is_collidable(),
+            Self::OakWallHangingSign(b) => b.is_collidable(),
+            Self::SpruceWallHangingSign(b) => b.is_collidable(),
+            Self::BirchWallHangingSign(b) => b.is_collidable(),
+            Self::AcaciaWallHangingSign(b) => b.is_collidable(),
+            Self::CherryWallHangingSign(b) => b.is_collidable(),
+            Self::JungleWallHangingSign(b) => b.is_collidable(),
+            Self::DarkOakWallHangingSign(b) => b.is_collidable(),
+            Self::MangroveWallHangingSign(b) => b.is_collidable(),
+            Self::CrimsonWallHangingSign(b) => b.is_collidable(),
+            Self::WarpedWallHangingSign(b) => b.is_collidable(),
+            Self::BambooWallHangingSign(b) => b.is_collidable(),
+            Self::Lever(b) => b.is_collidable(),
+            Self::StonePressurePlate(b) => b.is_collidable(),
+            Self::IronDoor(b) => b.is_collidable(),
+            Self::OakPressurePlate(b) => b.is_collidable(),
+            Self::SprucePressurePlate(b) => b.is_collidable(),
+            Self::BirchPressurePlate(b) => b.is_collidable(),
+            Self::JunglePressurePlate(b) => b.is_collidable(),
+            Self::AcaciaPressurePlate(b) => b.is_collidable(),
+            Self::CherryPressurePlate(b) => b.is_collidable(),
+            Self::DarkOakPressurePlate(b) => b.is_collidable(),
+            Self::MangrovePressurePlate(b) => b.is_collidable(),
+            Self::BambooPressurePlate(b) => b.is_collidable(),
+            Self::RedstoneOre(b) => b.is_collidable(),
+            Self::DeepslateRedstoneOre(b) => b.is_collidable(),
+            Self::RedstoneTorch(b) => b.is_collidable(),
+            Self::RedstoneWallTorch(b) => b.is_collidable(),
+            Self::StoneButton(b) => b.is_collidable(),
+            Self::Snow(b) => b.is_collidable(),
+            Self::Ice(b) => b.is_collidable(),
+            Self::SnowBlock(b) => b.is_collidable(),
+            Self::Cactus(b) => b.is_collidable(),
+            Self::Clay(b) => b.is_collidable(),
+            Self::SugarCane(b) => b.is_collidable(),
+            Self::Jukebox(b) => b.is_collidable(),
+            Self::OakFence(b) => b.is_collidable(),
+            Self::Pumpkin(b) => b.is_collidable(),
+            Self::Netherrack(b) => b.is_collidable(),
+            Self::SoulSand(b) => b.is_collidable(),
+            Self::SoulSoil(b) => b.is_collidable(),
+            Self::Basalt(b) => b.is_collidable(),
+            Self::PolishedBasalt(b) => b.is_collidable(),
+            Self::SoulTorch(b) => b.is_collidable(),
+            Self::SoulWallTorch(b) => b.is_collidable(),
+            Self::Glowstone(b) => b.is_collidable(),
+            Self::NetherPortal(b) => b.is_collidable(),
+            Self::CarvedPumpkin(b) => b.is_collidable(),
+            Self::JackOLantern(b) => b.is_collidable(),
+            Self::Cake(b) => b.is_collidable(),
+            Self::Repeater(b) => b.is_collidable(),
+            Self::WhiteStainedGlass(b) => b.is_collidable(),
+            Self::OrangeStainedGlass(b) => b.is_collidable(),
+            Self::MagentaStainedGlass(b) => b.is_collidable(),
+            Self::LightBlueStainedGlass(b) => b.is_collidable(),
+            Self::YellowStainedGlass(b) => b.is_collidable(),
+            Self::LimeStainedGlass(b) => b.is_collidable(),
+            Self::PinkStainedGlass(b) => b.is_collidable(),
+            Self::GrayStainedGlass(b) => b.is_collidable(),
+            Self::LightGrayStainedGlass(b) => b.is_collidable(),
+            Self::CyanStainedGlass(b) => b.is_collidable(),
+            Self::PurpleStainedGlass(b) => b.is_collidable(),
+            Self::BlueStainedGlass(b) => b.is_collidable(),
+            Self::BrownStainedGlass(b) => b.is_collidable(),
+            Self::GreenStainedGlass(b) => b.is_collidable(),
+            Self::RedStainedGlass(b) => b.is_collidable(),
+            Self::BlackStainedGlass(b) => b.is_collidable(),
+            Self::OakTrapdoor(b) => b.is_collidable(),
+            Self::SpruceTrapdoor(b) => b.is_collidable(),
+            Self::BirchTrapdoor(b) => b.is_collidable(),
+            Self::JungleTrapdoor(b) => b.is_collidable(),
+            Self::AcaciaTrapdoor(b) => b.is_collidable(),
+            Self::CherryTrapdoor(b) => b.is_collidable(),
+            Self::DarkOakTrapdoor(b) => b.is_collidable(),
+            Self::MangroveTrapdoor(b) => b.is_collidable(),
+            Self::BambooTrapdoor(b) => b.is_collidable(),
+            Self::StoneBricks(b) => b.is_collidable(),
+            Self::MossyStoneBricks(b) => b.is_collidable(),
+            Self::CrackedStoneBricks(b) => b.is_collidable(),
+            Self::ChiseledStoneBricks(b) => b.is_collidable(),
+            Self::PackedMud(b) => b.is_collidable(),
+            Self::MudBricks(b) => b.is_collidable(),
+            Self::InfestedStone(b) => b.is_collidable(),
+            Self::InfestedCobblestone(b) => b.is_collidable(),
+            Self::InfestedStoneBricks(b) => b.is_collidable(),
+            Self::InfestedMossyStoneBricks(b) => b.is_collidable(),
+            Self::InfestedCrackedStoneBricks(b) => b.is_collidable(),
+            Self::InfestedChiseledStoneBricks(b) => b.is_collidable(),
+            Self::BrownMushroomBlock(b) => b.is_collidable(),
+            Self::RedMushroomBlock(b) => b.is_collidable(),
+            Self::MushroomStem(b) => b.is_collidable(),
+            Self::IronBars(b) => b.is_collidable(),
+            Self::Chain(b) => b.is_collidable(),
+            Self::GlassPane(b) => b.is_collidable(),
+            Self::Melon(b) => b.is_collidable(),
+            Self::AttachedPumpkinStem(b) => b.is_collidable(),
+            Self::AttachedMelonStem(b) => b.is_collidable(),
+            Self::PumpkinStem(b) => b.is_collidable(),
+            Self::MelonStem(b) => b.is_collidable(),
+            Self::Vine(b) => b.is_collidable(),
+            Self::GlowLichen(b) => b.is_collidable(),
+            Self::OakFenceGate(b) => b.is_collidable(),
+            Self::BrickStairs(b) => b.is_collidable(),
+            Self::StoneBrickStairs(b) => b.is_collidable(),
+            Self::MudBrickStairs(b) => b.is_collidable(),
+            Self::Mycelium(b) => b.is_collidable(),
+            Self::LilyPad(b) => b.is_collidable(),
+            Self::NetherBricks(b) => b.is_collidable(),
+            Self::NetherBrickFence(b) => b.is_collidable(),
+            Self::NetherBrickStairs(b) => b.is_collidable(),
+            Self::NetherWart(b) => b.is_collidable(),
+            Self::EnchantingTable(b) => b.is_collidable(),
+            Self::BrewingStand(b) => b.is_collidable(),
+            Self::Cauldron(b) => b.is_collidable(),
+            Self::WaterCauldron(b) => b.is_collidable(),
+            Self::LavaCauldron(b) => b.is_collidable(),
+            Self::PowderSnowCauldron(b) => b.is_collidable(),
+            Self::EndPortal(b) => b.is_collidable(),
+            Self::EndPortalFrame(b) => b.is_collidable(),
+            Self::EndStone(b) => b.is_collidable(),
+            Self::DragonEgg(b) => b.is_collidable(),
+            Self::RedstoneLamp(b) => b.is_collidable(),
+            Self::Cocoa(b) => b.is_collidable(),
+            Self::SandstoneStairs(b) => b.is_collidable(),
+            Self::EmeraldOre(b) => b.is_collidable(),
+            Self::DeepslateEmeraldOre(b) => b.is_collidable(),
+            Self::EnderChest(b) => b.is_collidable(),
+            Self::TripwireHook(b) => b.is_collidable(),
+            Self::Tripwire(b) => b.is_collidable(),
+            Self::EmeraldBlock(b) => b.is_collidable(),
+            Self::SpruceStairs(b) => b.is_collidable(),
+            Self::BirchStairs(b) => b.is_collidable(),
+            Self::JungleStairs(b) => b.is_collidable(),
+            Self::CommandBlock(b) => b.is_collidable(),
+            Self::Beacon(b) => b.is_collidable(),
+            Self::CobblestoneWall(b) => b.is_collidable(),
+            Self::MossyCobblestoneWall(b) => b.is_collidable(),
+            Self::FlowerPot(b) => b.is_collidable(),
+            Self::PottedTorchflower(b) => b.is_collidable(),
+            Self::PottedOakSapling(b) => b.is_collidable(),
+            Self::PottedSpruceSapling(b) => b.is_collidable(),
+            Self::PottedBirchSapling(b) => b.is_collidable(),
+            Self::PottedJungleSapling(b) => b.is_collidable(),
+            Self::PottedAcaciaSapling(b) => b.is_collidable(),
+            Self::PottedCherrySapling(b) => b.is_collidable(),
+            Self::PottedDarkOakSapling(b) => b.is_collidable(),
+            Self::PottedMangrovePropagule(b) => b.is_collidable(),
+            Self::PottedFern(b) => b.is_collidable(),
+            Self::PottedDandelion(b) => b.is_collidable(),
+            Self::PottedPoppy(b) => b.is_collidable(),
+            Self::PottedBlueOrchid(b) => b.is_collidable(),
+            Self::PottedAllium(b) => b.is_collidable(),
+            Self::PottedAzureBluet(b) => b.is_collidable(),
+            Self::PottedRedTulip(b) => b.is_collidable(),
+            Self::PottedOrangeTulip(b) => b.is_collidable(),
+            Self::PottedWhiteTulip(b) => b.is_collidable(),
+            Self::PottedPinkTulip(b) => b.is_collidable(),
+            Self::PottedOxeyeDaisy(b) => b.is_collidable(),
+            Self::PottedCornflower(b) => b.is_collidable(),
+            Self::PottedLilyOfTheValley(b) => b.is_collidable(),
+            Self::PottedWitherRose(b) => b.is_collidable(),
+            Self::PottedRedMushroom(b) => b.is_collidable(),
+            Self::PottedBrownMushroom(b) => b.is_collidable(),
+            Self::PottedDeadBush(b) => b.is_collidable(),
+            Self::PottedCactus(b) => b.is_collidable(),
+            Self::Carrots(b) => b.is_collidable(),
+            Self::Potatoes(b) => b.is_collidable(),
+            Self::OakButton(b) => b.is_collidable(),
+            Self::SpruceButton(b) => b.is_collidable(),
+            Self::BirchButton(b) => b.is_collidable(),
+            Self::JungleButton(b) => b.is_collidable(),
+            Self::AcaciaButton(b) => b.is_collidable(),
+            Self::CherryButton(b) => b.is_collidable(),
+            Self::DarkOakButton(b) => b.is_collidable(),
+            Self::MangroveButton(b) => b.is_collidable(),
+            Self::BambooButton(b) => b.is_collidable(),
+            Self::SkeletonSkull(b) => b.is_collidable(),
+            Self::SkeletonWallSkull(b) => b.is_collidable(),
+            Self::WitherSkeletonSkull(b) => b.is_collidable(),
+            Self::WitherSkeletonWallSkull(b) => b.is_collidable(),
+            Self::ZombieHead(b) => b.is_collidable(),
+            Self::ZombieWallHead(b) => b.is_collidable(),
+            Self::PlayerHead(b) => b.is_collidable(),
+            Self::PlayerWallHead(b) => b.is_collidable(),
+            Self::CreeperHead(b) => b.is_collidable(),
+            Self::CreeperWallHead(b) => b.is_collidable(),
+            Self::DragonHead(b) => b.is_collidable(),
+            Self::DragonWallHead(b) => b.is_collidable(),
+            Self::PiglinHead(b) => b.is_collidable(),
+            Self::PiglinWallHead(b) => b.is_collidable(),
+            Self::Anvil(b) => b.is_collidable(),
+            Self::ChippedAnvil(b) => b.is_collidable(),
+            Self::DamagedAnvil(b) => b.is_collidable(),
+            Self::TrappedChest(b) => b.is_collidable(),
+            Self::LightWeightedPressurePlate(b) => b.is_collidable(),
+            Self::HeavyWeightedPressurePlate(b) => b.is_collidable(),
+            Self::Comparator(b) => b.is_collidable(),
+            Self::DaylightDetector(b) => b.is_collidable(),
+            Self::RedstoneBlock(b) => b.is_collidable(),
+            Self::NetherQuartzOre(b) => b.is_collidable(),
+            Self::Hopper(b) => b.is_collidable(),
+            Self::QuartzBlock(b) => b.is_collidable(),
+            Self::ChiseledQuartzBlock(b) => b.is_collidable(),
+            Self::QuartzPillar(b) => b.is_collidable(),
+            Self::QuartzStairs(b) => b.is_collidable(),
+            Self::ActivatorRail(b) => b.is_collidable(),
+            Self::Dropper(b) => b.is_collidable(),
+            Self::WhiteTerracotta(b) => b.is_collidable(),
+            Self::OrangeTerracotta(b) => b.is_collidable(),
+            Self::MagentaTerracotta(b) => b.is_collidable(),
+            Self::LightBlueTerracotta(b) => b.is_collidable(),
+            Self::YellowTerracotta(b) => b.is_collidable(),
+            Self::LimeTerracotta(b) => b.is_collidable(),
+            Self::PinkTerracotta(b) => b.is_collidable(),
+            Self::GrayTerracotta(b) => b.is_collidable(),
+            Self::LightGrayTerracotta(b) => b.is_collidable(),
+            Self::CyanTerracotta(b) => b.is_collidable(),
+            Self::PurpleTerracotta(b) => b.is_collidable(),
+            Self::BlueTerracotta(b) => b.is_collidable(),
+            Self::BrownTerracotta(b) => b.is_collidable(),
+            Self::GreenTerracotta(b) => b.is_collidable(),
+            Self::RedTerracotta(b) => b.is_collidable(),
+            Self::BlackTerracotta(b) => b.is_collidable(),
+            Self::WhiteStainedGlassPane(b) => b.is_collidable(),
+            Self::OrangeStainedGlassPane(b) => b.is_collidable(),
+            Self::MagentaStainedGlassPane(b) => b.is_collidable(),
+            Self::LightBlueStainedGlassPane(b) => b.is_collidable(),
+            Self::YellowStainedGlassPane(b) => b.is_collidable(),
+            Self::LimeStainedGlassPane(b) => b.is_collidable(),
+            Self::PinkStainedGlassPane(b) => b.is_collidable(),
+            Self::GrayStainedGlassPane(b) => b.is_collidable(),
+            Self::LightGrayStainedGlassPane(b) => b.is_collidable(),
+            Self::CyanStainedGlassPane(b) => b.is_collidable(),
+            Self::PurpleStainedGlassPane(b) => b.is_collidable(),
+            Self::BlueStainedGlassPane(b) => b.is_collidable(),
+            Self::BrownStainedGlassPane(b) => b.is_collidable(),
+            Self::GreenStainedGlassPane(b) => b.is_collidable(),
+            Self::RedStainedGlassPane(b) => b.is_collidable(),
+            Self::BlackStainedGlassPane(b) => b.is_collidable(),
+            Self::AcaciaStairs(b) => b.is_collidable(),
+            Self::CherryStairs(b) => b.is_collidable(),
+            Self::DarkOakStairs(b) => b.is_collidable(),
+            Self::MangroveStairs(b) => b.is_collidable(),
+            Self::BambooStairs(b) => b.is_collidable(),
+            Self::BambooMosaicStairs(b) => b.is_collidable(),
+            Self::SlimeBlock(b) => b.is_collidable(),
+            Self::Barrier(b) => b.is_collidable(),
+            Self::Light(b) => b.is_collidable(),
+            Self::IronTrapdoor(b) => b.is_collidable(),
+            Self::Prismarine(b) => b.is_collidable(),
+            Self::PrismarineBricks(b) => b.is_collidable(),
+            Self::DarkPrismarine(b) => b.is_collidable(),
+            Self::PrismarineStairs(b) => b.is_collidable(),
+            Self::PrismarineBrickStairs(b) => b.is_collidable(),
+            Self::DarkPrismarineStairs(b) => b.is_collidable(),
+            Self::PrismarineSlab(b) => b.is_collidable(),
+            Self::PrismarineBrickSlab(b) => b.is_collidable(),
+            Self::DarkPrismarineSlab(b) => b.is_collidable(),
+            Self::SeaLantern(b) => b.is_collidable(),
+            Self::HayBlock(b) => b.is_collidable(),
+            Self::WhiteCarpet(b) => b.is_collidable(),
+            Self::OrangeCarpet(b) => b.is_collidable(),
+            Self::MagentaCarpet(b) => b.is_collidable(),
+            Self::LightBlueCarpet(b) => b.is_collidable(),
+            Self::YellowCarpet(b) => b.is_collidable(),
+            Self::LimeCarpet(b) => b.is_collidable(),
+            Self::PinkCarpet(b) => b.is_collidable(),
+            Self::GrayCarpet(b) => b.is_collidable(),
+            Self::LightGrayCarpet(b) => b.is_collidable(),
+            Self::CyanCarpet(b) => b.is_collidable(),
+            Self::PurpleCarpet(b) => b.is_collidable(),
+            Self::BlueCarpet(b) => b.is_collidable(),
+            Self::BrownCarpet(b) => b.is_collidable(),
+            Self::GreenCarpet(b) => b.is_collidable(),
+            Self::RedCarpet(b) => b.is_collidable(),
+            Self::BlackCarpet(b) => b.is_collidable(),
+            Self::Terracotta(b) => b.is_collidable(),
+            Self::CoalBlock(b) => b.is_collidable(),
+            Self::PackedIce(b) => b.is_collidable(),
+            Self::Sunflower(b) => b.is_collidable(),
+            Self::Lilac(b) => b.is_collidable(),
+            Self::RoseBush(b) => b.is_collidable(),
+            Self::Peony(b) => b.is_collidable(),
+            Self::TallGrass(b) => b.is_collidable(),
+            Self::LargeFern(b) => b.is_collidable(),
+            Self::WhiteBanner(b) => b.is_collidable(),
+            Self::OrangeBanner(b) => b.is_collidable(),
+            Self::MagentaBanner(b) => b.is_collidable(),
+            Self::LightBlueBanner(b) => b.is_collidable(),
+            Self::YellowBanner(b) => b.is_collidable(),
+            Self::LimeBanner(b) => b.is_collidable(),
+            Self::PinkBanner(b) => b.is_collidable(),
+            Self::GrayBanner(b) => b.is_collidable(),
+            Self::LightGrayBanner(b) => b.is_collidable(),
+            Self::CyanBanner(b) => b.is_collidable(),
+            Self::PurpleBanner(b) => b.is_collidable(),
+            Self::BlueBanner(b) => b.is_collidable(),
+            Self::BrownBanner(b) => b.is_collidable(),
+            Self::GreenBanner(b) => b.is_collidable(),
+            Self::RedBanner(b) => b.is_collidable(),
+            Self::BlackBanner(b) => b.is_collidable(),
+            Self::WhiteWallBanner(b) => b.is_collidable(),
+            Self::OrangeWallBanner(b) => b.is_collidable(),
+            Self::MagentaWallBanner(b) => b.is_collidable(),
+            Self::LightBlueWallBanner(b) => b.is_collidable(),
+            Self::YellowWallBanner(b) => b.is_collidable(),
+            Self::LimeWallBanner(b) => b.is_collidable(),
+            Self::PinkWallBanner(b) => b.is_collidable(),
+            Self::GrayWallBanner(b) => b.is_collidable(),
+            Self::LightGrayWallBanner(b) => b.is_collidable(),
+            Self::CyanWallBanner(b) => b.is_collidable(),
+            Self::PurpleWallBanner(b) => b.is_collidable(),
+            Self::BlueWallBanner(b) => b.is_collidable(),
+            Self::BrownWallBanner(b) => b.is_collidable(),
+            Self::GreenWallBanner(b) => b.is_collidable(),
+            Self::RedWallBanner(b) => b.is_collidable(),
+            Self::BlackWallBanner(b) => b.is_collidable(),
+            Self::RedSandstone(b) => b.is_collidable(),
+            Self::ChiseledRedSandstone(b) => b.is_collidable(),
+            Self::CutRedSandstone(b) => b.is_collidable(),
+            Self::RedSandstoneStairs(b) => b.is_collidable(),
+            Self::OakSlab(b) => b.is_collidable(),
+            Self::SpruceSlab(b) => b.is_collidable(),
+            Self::BirchSlab(b) => b.is_collidable(),
+            Self::JungleSlab(b) => b.is_collidable(),
+            Self::AcaciaSlab(b) => b.is_collidable(),
+            Self::CherrySlab(b) => b.is_collidable(),
+            Self::DarkOakSlab(b) => b.is_collidable(),
+            Self::MangroveSlab(b) => b.is_collidable(),
+            Self::BambooSlab(b) => b.is_collidable(),
+            Self::BambooMosaicSlab(b) => b.is_collidable(),
+            Self::StoneSlab(b) => b.is_collidable(),
+            Self::SmoothStoneSlab(b) => b.is_collidable(),
+            Self::SandstoneSlab(b) => b.is_collidable(),
+            Self::CutSandstoneSlab(b) => b.is_collidable(),
+            Self::PetrifiedOakSlab(b) => b.is_collidable(),
+            Self::CobblestoneSlab(b) => b.is_collidable(),
+            Self::BrickSlab(b) => b.is_collidable(),
+            Self::StoneBrickSlab(b) => b.is_collidable(),
+            Self::MudBrickSlab(b) => b.is_collidable(),
+            Self::NetherBrickSlab(b) => b.is_collidable(),
+            Self::QuartzSlab(b) => b.is_collidable(),
+            Self::RedSandstoneSlab(b) => b.is_collidable(),
+            Self::CutRedSandstoneSlab(b) => b.is_collidable(),
+            Self::PurpurSlab(b) => b.is_collidable(),
+            Self::SmoothStone(b) => b.is_collidable(),
+            Self::SmoothSandstone(b) => b.is_collidable(),
+            Self::SmoothQuartz(b) => b.is_collidable(),
+            Self::SmoothRedSandstone(b) => b.is_collidable(),
+            Self::SpruceFenceGate(b) => b.is_collidable(),
+            Self::BirchFenceGate(b) => b.is_collidable(),
+            Self::JungleFenceGate(b) => b.is_collidable(),
+            Self::AcaciaFenceGate(b) => b.is_collidable(),
+            Self::CherryFenceGate(b) => b.is_collidable(),
+            Self::DarkOakFenceGate(b) => b.is_collidable(),
+            Self::MangroveFenceGate(b) => b.is_collidable(),
+            Self::BambooFenceGate(b) => b.is_collidable(),
+            Self::SpruceFence(b) => b.is_collidable(),
+            Self::BirchFence(b) => b.is_collidable(),
+            Self::JungleFence(b) => b.is_collidable(),
+            Self::AcaciaFence(b) => b.is_collidable(),
+            Self::CherryFence(b) => b.is_collidable(),
+            Self::DarkOakFence(b) => b.is_collidable(),
+            Self::MangroveFence(b) => b.is_collidable(),
+            Self::BambooFence(b) => b.is_collidable(),
+            Self::SpruceDoor(b) => b.is_collidable(),
+            Self::BirchDoor(b) => b.is_collidable(),
+            Self::JungleDoor(b) => b.is_collidable(),
+            Self::AcaciaDoor(b) => b.is_collidable(),
+            Self::CherryDoor(b) => b.is_collidable(),
+            Self::DarkOakDoor(b) => b.is_collidable(),
+            Self::MangroveDoor(b) => b.is_collidable(),
+            Self::BambooDoor(b) => b.is_collidable(),
+            Self::EndRod(b) => b.is_collidable(),
+            Self::ChorusPlant(b) => b.is_collidable(),
+            Self::ChorusFlower(b) => b.is_collidable(),
+            Self::PurpurBlock(b) => b.is_collidable(),
+            Self::PurpurPillar(b) => b.is_collidable(),
+            Self::PurpurStairs(b) => b.is_collidable(),
+            Self::EndStoneBricks(b) => b.is_collidable(),
+            Self::TorchflowerCrop(b) => b.is_collidable(),
+            Self::PitcherCrop(b) => b.is_collidable(),
+            Self::PitcherPlant(b) => b.is_collidable(),
+            Self::Beetroots(b) => b.is_collidable(),
+            Self::DirtPath(b) => b.is_collidable(),
+            Self::EndGateway(b) => b.is_collidable(),
+            Self::RepeatingCommandBlock(b) => b.is_collidable(),
+            Self::ChainCommandBlock(b) => b.is_collidable(),
+            Self::FrostedIce(b) => b.is_collidable(),
+            Self::MagmaBlock(b) => b.is_collidable(),
+            Self::NetherWartBlock(b) => b.is_collidable(),
+            Self::RedNetherBricks(b) => b.is_collidable(),
+            Self::BoneBlock(b) => b.is_collidable(),
+            Self::StructureVoid(b) => b.is_collidable(),
+            Self::Observer(b) => b.is_collidable(),
+            Self::ShulkerBox(b) => b.is_collidable(),
+            Self::WhiteShulkerBox(b) => b.is_collidable(),
+            Self::OrangeShulkerBox(b) => b.is_collidable(),
+            Self::MagentaShulkerBox(b) => b.is_collidable(),
+            Self::LightBlueShulkerBox(b) => b.is_collidable(),
+            Self::YellowShulkerBox(b) => b.is_collidable(),
+            Self::LimeShulkerBox(b) => b.is_collidable(),
+            Self::PinkShulkerBox(b) => b.is_collidable(),
+            Self::GrayShulkerBox(b) => b.is_collidable(),
+            Self::LightGrayShulkerBox(b) => b.is_collidable(),
+            Self::CyanShulkerBox(b) => b.is_collidable(),
+            Self::PurpleShulkerBox(b) => b.is_collidable(),
+            Self::BlueShulkerBox(b) => b.is_collidable(),
+            Self::BrownShulkerBox(b) => b.is_collidable(),
+            Self::GreenShulkerBox(b) => b.is_collidable(),
+            Self::RedShulkerBox(b) => b.is_collidable(),
+            Self::BlackShulkerBox(b) => b.is_collidable(),
+            Self::WhiteGlazedTerracotta(b) => b.is_collidable(),
+            Self::OrangeGlazedTerracotta(b) => b.is_collidable(),
+            Self::MagentaGlazedTerracotta(b) => b.is_collidable(),
+            Self::LightBlueGlazedTerracotta(b) => b.is_collidable(),
+            Self::YellowGlazedTerracotta(b) => b.is_collidable(),
+            Self::LimeGlazedTerracotta(b) => b.is_collidable(),
+            Self::PinkGlazedTerracotta(b) => b.is_collidable(),
+            Self::GrayGlazedTerracotta(b) => b.is_collidable(),
+            Self::LightGrayGlazedTerracotta(b) => b.is_collidable(),
+            Self::CyanGlazedTerracotta(b) => b.is_collidable(),
+            Self::PurpleGlazedTerracotta(b) => b.is_collidable(),
+            Self::BlueGlazedTerracotta(b) => b.is_collidable(),
+            Self::BrownGlazedTerracotta(b) => b.is_collidable(),
+            Self::GreenGlazedTerracotta(b) => b.is_collidable(),
+            Self::RedGlazedTerracotta(b) => b.is_collidable(),
+            Self::BlackGlazedTerracotta(b) => b.is_collidable(),
+            Self::WhiteConcrete(b) => b.is_collidable(),
+            Self::OrangeConcrete(b) => b.is_collidable(),
+            Self::MagentaConcrete(b) => b.is_collidable(),
+            Self::LightBlueConcrete(b) => b.is_collidable(),
+            Self::YellowConcrete(b) => b.is_collidable(),
+            Self::LimeConcrete(b) => b.is_collidable(),
+            Self::PinkConcrete(b) => b.is_collidable(),
+            Self::GrayConcrete(b) => b.is_collidable(),
+            Self::LightGrayConcrete(b) => b.is_collidable(),
+            Self::CyanConcrete(b) => b.is_collidable(),
+            Self::PurpleConcrete(b) => b.is_collidable(),
+            Self::BlueConcrete(b) => b.is_collidable(),
+            Self::BrownConcrete(b) => b.is_collidable(),
+            Self::GreenConcrete(b) => b.is_collidable(),
+            Self::RedConcrete(b) => b.is_collidable(),
+            Self::BlackConcrete(b) => b.is_collidable(),
+            Self::WhiteConcretePowder(b) => b.is_collidable(),
+            Self::OrangeConcretePowder(b) => b.is_collidable(),
+            Self::MagentaConcretePowder(b) => b.is_collidable(),
+            Self::LightBlueConcretePowder(b) => b.is_collidable(),
+            Self::YellowConcretePowder(b) => b.is_collidable(),
+            Self::LimeConcretePowder(b) => b.is_collidable(),
+            Self::PinkConcretePowder(b) => b.is_collidable(),
+            Self::GrayConcretePowder(b) => b.is_collidable(),
+            Self::LightGrayConcretePowder(b) => b.is_collidable(),
+            Self::CyanConcretePowder(b) => b.is_collidable(),
+            Self::PurpleConcretePowder(b) => b.is_collidable(),
+            Self::BlueConcretePowder(b) => b.is_collidable(),
+            Self::BrownConcretePowder(b) => b.is_collidable(),
+            Self::GreenConcretePowder(b) => b.is_collidable(),
+            Self::RedConcretePowder(b) => b.is_collidable(),
+            Self::BlackConcretePowder(b) => b.is_collidable(),
+            Self::Kelp(b) => b.is_collidable(),
+            Self::KelpPlant(b) => b.is_collidable(),
+            Self::DriedKelpBlock(b) => b.is_collidable(),
+            Self::TurtleEgg(b) => b.is_collidable(),
+            Self::SnifferEgg(b) => b.is_collidable(),
+            Self::DeadTubeCoralBlock(b) => b.is_collidable(),
+            Self::DeadBrainCoralBlock(b) => b.is_collidable(),
+            Self::DeadBubbleCoralBlock(b) => b.is_collidable(),
+            Self::DeadFireCoralBlock(b) => b.is_collidable(),
+            Self::DeadHornCoralBlock(b) => b.is_collidable(),
+            Self::TubeCoralBlock(b) => b.is_collidable(),
+            Self::BrainCoralBlock(b) => b.is_collidable(),
+            Self::BubbleCoralBlock(b) => b.is_collidable(),
+            Self::FireCoralBlock(b) => b.is_collidable(),
+            Self::HornCoralBlock(b) => b.is_collidable(),
+            Self::DeadTubeCoral(b) => b.is_collidable(),
+            Self::DeadBrainCoral(b) => b.is_collidable(),
+            Self::DeadBubbleCoral(b) => b.is_collidable(),
+            Self::DeadFireCoral(b) => b.is_collidable(),
+            Self::DeadHornCoral(b) => b.is_collidable(),
+            Self::TubeCoral(b) => b.is_collidable(),
+            Self::BrainCoral(b) => b.is_collidable(),
+            Self::BubbleCoral(b) => b.is_collidable(),
+            Self::FireCoral(b) => b.is_collidable(),
+            Self::HornCoral(b) => b.is_collidable(),
+            Self::DeadTubeCoralFan(b) => b.is_collidable(),
+            Self::DeadBrainCoralFan(b) => b.is_collidable(),
+            Self::DeadBubbleCoralFan(b) => b.is_collidable(),
+            Self::DeadFireCoralFan(b) => b.is_collidable(),
+            Self::DeadHornCoralFan(b) => b.is_collidable(),
+            Self::TubeCoralFan(b) => b.is_collidable(),
+            Self::BrainCoralFan(b) => b.is_collidable(),
+            Self::BubbleCoralFan(b) => b.is_collidable(),
+            Self::FireCoralFan(b) => b.is_collidable(),
+            Self::HornCoralFan(b) => b.is_collidable(),
+            Self::DeadTubeCoralWallFan(b) => b.is_collidable(),
+            Self::DeadBrainCoralWallFan(b) => b.is_collidable(),
+            Self::DeadBubbleCoralWallFan(b) => b.is_collidable(),
+            Self::DeadFireCoralWallFan(b) => b.is_collidable(),
+            Self::DeadHornCoralWallFan(b) => b.is_collidable(),
+            Self::TubeCoralWallFan(b) => b.is_collidable(),
+            Self::BrainCoralWallFan(b) => b.is_collidable(),
+            Self::BubbleCoralWallFan(b) => b.is_collidable(),
+            Self::FireCoralWallFan(b) => b.is_collidable(),
+            Self::HornCoralWallFan(b) => b.is_collidable(),
+            Self::SeaPickle(b) => b.is_collidable(),
+            Self::BlueIce(b) => b.is_collidable(),
+            Self::Conduit(b) => b.is_collidable(),
+            Self::BambooSapling(b) => b.is_collidable(),
+            Self::Bamboo(b) => b.is_collidable(),
+            Self::PottedBamboo(b) => b.is_collidable(),
+            Self::VoidAir(b) => b.is_collidable(),
+            Self::CaveAir(b) => b.is_collidable(),
+            Self::BubbleColumn(b) => b.is_collidable(),
+            Self::PolishedGraniteStairs(b) => b.is_collidable(),
+            Self::SmoothRedSandstoneStairs(b) => b.is_collidable(),
+            Self::MossyStoneBrickStairs(b) => b.is_collidable(),
+            Self::PolishedDioriteStairs(b) => b.is_collidable(),
+            Self::MossyCobblestoneStairs(b) => b.is_collidable(),
+            Self::EndStoneBrickStairs(b) => b.is_collidable(),
+            Self::StoneStairs(b) => b.is_collidable(),
+            Self::SmoothSandstoneStairs(b) => b.is_collidable(),
+            Self::SmoothQuartzStairs(b) => b.is_collidable(),
+            Self::GraniteStairs(b) => b.is_collidable(),
+            Self::AndesiteStairs(b) => b.is_collidable(),
+            Self::RedNetherBrickStairs(b) => b.is_collidable(),
+            Self::PolishedAndesiteStairs(b) => b.is_collidable(),
+            Self::DioriteStairs(b) => b.is_collidable(),
+            Self::PolishedGraniteSlab(b) => b.is_collidable(),
+            Self::SmoothRedSandstoneSlab(b) => b.is_collidable(),
+            Self::MossyStoneBrickSlab(b) => b.is_collidable(),
+            Self::PolishedDioriteSlab(b) => b.is_collidable(),
+            Self::MossyCobblestoneSlab(b) => b.is_collidable(),
+            Self::EndStoneBrickSlab(b) => b.is_collidable(),
+            Self::SmoothSandstoneSlab(b) => b.is_collidable(),
+            Self::SmoothQuartzSlab(b) => b.is_collidable(),
+            Self::GraniteSlab(b) => b.is_collidable(),
+            Self::AndesiteSlab(b) => b.is_collidable(),
+            Self::RedNetherBrickSlab(b) => b.is_collidable(),
+            Self::PolishedAndesiteSlab(b) => b.is_collidable(),
+            Self::DioriteSlab(b) => b.is_collidable(),
+            Self::BrickWall(b) => b.is_collidable(),
+            Self::PrismarineWall(b) => b.is_collidable(),
+            Self::RedSandstoneWall(b) => b.is_collidable(),
+            Self::MossyStoneBrickWall(b) => b.is_collidable(),
+            Self::GraniteWall(b) => b.is_collidable(),
+            Self::StoneBrickWall(b) => b.is_collidable(),
+            Self::MudBrickWall(b) => b.is_collidable(),
+            Self::NetherBrickWall(b) => b.is_collidable(),
+            Self::AndesiteWall(b) => b.is_collidable(),
+            Self::RedNetherBrickWall(b) => b.is_collidable(),
+            Self::SandstoneWall(b) => b.is_collidable(),
+            Self::EndStoneBrickWall(b) => b.is_collidable(),
+            Self::DioriteWall(b) => b.is_collidable(),
+            Self::Scaffolding(b) => b.is_collidable(),
+            Self::Loom(b) => b.is_collidable(),
+            Self::Barrel(b) => b.is_collidable(),
+            Self::Smoker(b) => b.is_collidable(),
+            Self::BlastFurnace(b) => b.is_collidable(),
+            Self::CartographyTable(b) => b.is_collidable(),
+            Self::FletchingTable(b) => b.is_collidable(),
+            Self::Grindstone(b) => b.is_collidable(),
+            Self::Lectern(b) => b.is_collidable(),
+            Self::SmithingTable(b) => b.is_collidable(),
+            Self::Stonecutter(b) => b.is_collidable(),
+            Self::Bell(b) => b.is_collidable(),
+            Self::Lantern(b) => b.is_collidable(),
+            Self::SoulLantern(b) => b.is_collidable(),
+            Self::Campfire(b) => b.is_collidable(),
+            Self::SoulCampfire(b) => b.is_collidable(),
+            Self::SweetBerryBush(b) => b.is_collidable(),
+            Self::WarpedStem(b) => b.is_collidable(),
+            Self::StrippedWarpedStem(b) => b.is_collidable(),
+            Self::WarpedHyphae(b) => b.is_collidable(),
+            Self::StrippedWarpedHyphae(b) => b.is_collidable(),
+            Self::WarpedNylium(b) => b.is_collidable(),
+            Self::WarpedFungus(b) => b.is_collidable(),
+            Self::WarpedWartBlock(b) => b.is_collidable(),
+            Self::WarpedRoots(b) => b.is_collidable(),
+            Self::NetherSprouts(b) => b.is_collidable(),
+            Self::CrimsonStem(b) => b.is_collidable(),
+            Self::StrippedCrimsonStem(b) => b.is_collidable(),
+            Self::CrimsonHyphae(b) => b.is_collidable(),
+            Self::StrippedCrimsonHyphae(b) => b.is_collidable(),
+            Self::CrimsonNylium(b) => b.is_collidable(),
+            Self::CrimsonFungus(b) => b.is_collidable(),
+            Self::Shroomlight(b) => b.is_collidable(),
+            Self::WeepingVines(b) => b.is_collidable(),
+            Self::WeepingVinesPlant(b) => b.is_collidable(),
+            Self::TwistingVines(b) => b.is_collidable(),
+            Self::TwistingVinesPlant(b) => b.is_collidable(),
+            Self::CrimsonRoots(b) => b.is_collidable(),
+            Self::CrimsonPlanks(b) => b.is_collidable(),
+            Self::WarpedPlanks(b) => b.is_collidable(),
+            Self::CrimsonSlab(b) => b.is_collidable(),
+            Self::WarpedSlab(b) => b.is_collidable(),
+            Self::CrimsonPressurePlate(b) => b.is_collidable(),
+            Self::WarpedPressurePlate(b) => b.is_collidable(),
+            Self::CrimsonFence(b) => b.is_collidable(),
+            Self::WarpedFence(b) => b.is_collidable(),
+            Self::CrimsonTrapdoor(b) => b.is_collidable(),
+            Self::WarpedTrapdoor(b) => b.is_collidable(),
+            Self::CrimsonFenceGate(b) => b.is_collidable(),
+            Self::WarpedFenceGate(b) => b.is_collidable(),
+            Self::CrimsonStairs(b) => b.is_collidable(),
+            Self::WarpedStairs(b) => b.is_collidable(),
+            Self::CrimsonButton(b) => b.is_collidable(),
+            Self::WarpedButton(b) => b.is_collidable(),
+            Self::CrimsonDoor(b) => b.is_collidable(),
+            Self::WarpedDoor(b) => b.is_collidable(),
+            Self::CrimsonSign(b) => b.is_collidable(),
+            Self::WarpedSign(b) => b.is_collidable(),
+            Self::CrimsonWallSign(b) => b.is_collidable(),
+            Self::WarpedWallSign(b) => b.is_collidable(),
+            Self::StructureBlock(b) => b.is_collidable(),
+            Self::Jigsaw(b) => b.is_collidable(),
+            Self::Composter(b) => b.is_collidable(),
+            Self::Target(b) => b.is_collidable(),
+            Self::BeeNest(b) => b.is_collidable(),
+            Self::Beehive(b) => b.is_collidable(),
+            Self::HoneyBlock(b) => b.is_collidable(),
+            Self::HoneycombBlock(b) => b.is_collidable(),
+            Self::NetheriteBlock(b) => b.is_collidable(),
+            Self::AncientDebris(b) => b.is_collidable(),
+            Self::CryingObsidian(b) => b.is_collidable(),
+            Self::RespawnAnchor(b) => b.is_collidable(),
+            Self::PottedCrimsonFungus(b) => b.is_collidable(),
+            Self::PottedWarpedFungus(b) => b.is_collidable(),
+            Self::PottedCrimsonRoots(b) => b.is_collidable(),
+            Self::PottedWarpedRoots(b) => b.is_collidable(),
+            Self::Lodestone(b) => b.is_collidable(),
+            Self::Blackstone(b) => b.is_collidable(),
+            Self::BlackstoneStairs(b) => b.is_collidable(),
+            Self::BlackstoneWall(b) => b.is_collidable(),
+            Self::BlackstoneSlab(b) => b.is_collidable(),
+            Self::PolishedBlackstone(b) => b.is_collidable(),
+            Self::PolishedBlackstoneBricks(b) => b.is_collidable(),
+            Self::CrackedPolishedBlackstoneBricks(b) => b.is_collidable(),
+            Self::ChiseledPolishedBlackstone(b) => b.is_collidable(),
+            Self::PolishedBlackstoneBrickSlab(b) => b.is_collidable(),
+            Self::PolishedBlackstoneBrickStairs(b) => b.is_collidable(),
+            Self::PolishedBlackstoneBrickWall(b) => b.is_collidable(),
+            Self::GildedBlackstone(b) => b.is_collidable(),
+            Self::PolishedBlackstoneStairs(b) => b.is_collidable(),
+            Self::PolishedBlackstoneSlab(b) => b.is_collidable(),
+            Self::PolishedBlackstonePressurePlate(b) => b.is_collidable(),
+            Self::PolishedBlackstoneButton(b) => b.is_collidable(),
+            Self::PolishedBlackstoneWall(b) => b.is_collidable(),
+            Self::ChiseledNetherBricks(b) => b.is_collidable(),
+            Self::CrackedNetherBricks(b) => b.is_collidable(),
+            Self::QuartzBricks(b) => b.is_collidable(),
+            Self::Candle(b) => b.is_collidable(),
+            Self::WhiteCandle(b) => b.is_collidable(),
+            Self::OrangeCandle(b) => b.is_collidable(),
+            Self::MagentaCandle(b) => b.is_collidable(),
+            Self::LightBlueCandle(b) => b.is_collidable(),
+            Self::YellowCandle(b) => b.is_collidable(),
+            Self::LimeCandle(b) => b.is_collidable(),
+            Self::PinkCandle(b) => b.is_collidable(),
+            Self::GrayCandle(b) => b.is_collidable(),
+            Self::LightGrayCandle(b) => b.is_collidable(),
+            Self::CyanCandle(b) => b.is_collidable(),
+            Self::PurpleCandle(b) => b.is_collidable(),
+            Self::BlueCandle(b) => b.is_collidable(),
+            Self::BrownCandle(b) => b.is_collidable(),
+            Self::GreenCandle(b) => b.is_collidable(),
+            Self::RedCandle(b) => b.is_collidable(),
+            Self::BlackCandle(b) => b.is_collidable(),
+            Self::CandleCake(b) => b.is_collidable(),
+            Self::WhiteCandleCake(b) => b.is_collidable(),
+            Self::OrangeCandleCake(b) => b.is_collidable(),
+            Self::MagentaCandleCake(b) => b.is_collidable(),
+            Self::LightBlueCandleCake(b) => b.is_collidable(),
+            Self::YellowCandleCake(b) => b.is_collidable(),
+            Self::LimeCandleCake(b) => b.is_collidable(),
+            Self::PinkCandleCake(b) => b.is_collidable(),
+            Self::GrayCandleCake(b) => b.is_collidable(),
+            Self::LightGrayCandleCake(b) => b.is_collidable(),
+            Self::CyanCandleCake(b) => b.is_collidable(),
+            Self::PurpleCandleCake(b) => b.is_collidable(),
+            Self::BlueCandleCake(b) => b.is_collidable(),
+            Self::BrownCandleCake(b) => b.is_collidable(),
+            Self::GreenCandleCake(b) => b.is_collidable(),
+            Self::RedCandleCake(b) => b.is_collidable(),
+            Self::BlackCandleCake(b) => b.is_collidable(),
+            Self::AmethystBlock(b) => b.is_collidable(),
+            Self::BuddingAmethyst(b) => b.is_collidable(),
+            Self::AmethystCluster(b) => b.is_collidable(),
+            Self::LargeAmethystBud(b) => b.is_collidable(),
+            Self::MediumAmethystBud(b) => b.is_collidable(),
+            Self::SmallAmethystBud(b) => b.is_collidable(),
+            Self::Tuff(b) => b.is_collidable(),
+            Self::Calcite(b) => b.is_collidable(),
+            Self::TintedGlass(b) => b.is_collidable(),
+            Self::PowderSnow(b) => b.is_collidable(),
+            Self::SculkSensor(b) => b.is_collidable(),
+            Self::CalibratedSculkSensor(b) => b.is_collidable(),
+            Self::Sculk(b) => b.is_collidable(),
+            Self::SculkVein(b) => b.is_collidable(),
+            Self::SculkCatalyst(b) => b.is_collidable(),
+            Self::SculkShrieker(b) => b.is_collidable(),
+            Self::OxidizedCopper(b) => b.is_collidable(),
+            Self::WeatheredCopper(b) => b.is_collidable(),
+            Self::ExposedCopper(b) => b.is_collidable(),
+            Self::CopperBlock(b) => b.is_collidable(),
+            Self::CopperOre(b) => b.is_collidable(),
+            Self::DeepslateCopperOre(b) => b.is_collidable(),
+            Self::OxidizedCutCopper(b) => b.is_collidable(),
+            Self::WeatheredCutCopper(b) => b.is_collidable(),
+            Self::ExposedCutCopper(b) => b.is_collidable(),
+            Self::CutCopper(b) => b.is_collidable(),
+            Self::OxidizedCutCopperStairs(b) => b.is_collidable(),
+            Self::WeatheredCutCopperStairs(b) => b.is_collidable(),
+            Self::ExposedCutCopperStairs(b) => b.is_collidable(),
+            Self::CutCopperStairs(b) => b.is_collidable(),
+            Self::OxidizedCutCopperSlab(b) => b.is_collidable(),
+            Self::WeatheredCutCopperSlab(b) => b.is_collidable(),
+            Self::ExposedCutCopperSlab(b) => b.is_collidable(),
+            Self::CutCopperSlab(b) => b.is_collidable(),
+            Self::WaxedCopperBlock(b) => b.is_collidable(),
+            Self::WaxedWeatheredCopper(b) => b.is_collidable(),
+            Self::WaxedExposedCopper(b) => b.is_collidable(),
+            Self::WaxedOxidizedCopper(b) => b.is_collidable(),
+            Self::WaxedOxidizedCutCopper(b) => b.is_collidable(),
+            Self::WaxedWeatheredCutCopper(b) => b.is_collidable(),
+            Self::WaxedExposedCutCopper(b) => b.is_collidable(),
+            Self::WaxedCutCopper(b) => b.is_collidable(),
+            Self::WaxedOxidizedCutCopperStairs(b) => b.is_collidable(),
+            Self::WaxedWeatheredCutCopperStairs(b) => b.is_collidable(),
+            Self::WaxedExposedCutCopperStairs(b) => b.is_collidable(),
+            Self::WaxedCutCopperStairs(b) => b.is_collidable(),
+            Self::WaxedOxidizedCutCopperSlab(b) => b.is_collidable(),
+            Self::WaxedWeatheredCutCopperSlab(b) => b.is_collidable(),
+            Self::WaxedExposedCutCopperSlab(b) => b.is_collidable(),
+            Self::WaxedCutCopperSlab(b) => b.is_collidable(),
+            Self::LightningRod(b) => b.is_collidable(),
+            Self::PointedDripstone(b) => b.is_collidable(),
+            Self::DripstoneBlock(b) => b.is_collidable(),
+            Self::CaveVines(b) => b.is_collidable(),
+            Self::CaveVinesPlant(b) => b.is_collidable(),
+            Self::SporeBlossom(b) => b.is_collidable(),
+            Self::Azalea(b) => b.is_collidable(),
+            Self::FloweringAzalea(b) => b.is_collidable(),
+            Self::MossCarpet(b) => b.is_collidable(),
+            Self::PinkPetals(b) => b.is_collidable(),
+            Self::MossBlock(b) => b.is_collidable(),
+            Self::BigDripleaf(b) => b.is_collidable(),
+            Self::BigDripleafStem(b) => b.is_collidable(),
+            Self::SmallDripleaf(b) => b.is_collidable(),
+            Self::HangingRoots(b) => b.is_collidable(),
+            Self::RootedDirt(b) => b.is_collidable(),
+            Self::Mud(b) => b.is_collidable(),
+            Self::Deepslate(b) => b.is_collidable(),
+            Self::CobbledDeepslate(b) => b.is_collidable(),
+            Self::CobbledDeepslateStairs(b) => b.is_collidable(),
+            Self::CobbledDeepslateSlab(b) => b.is_collidable(),
+            Self::CobbledDeepslateWall(b) => b.is_collidable(),
+            Self::PolishedDeepslate(b) => b.is_collidable(),
+            Self::PolishedDeepslateStairs(b) => b.is_collidable(),
+            Self::PolishedDeepslateSlab(b) => b.is_collidable(),
+            Self::PolishedDeepslateWall(b) => b.is_collidable(),
+            Self::DeepslateTiles(b) => b.is_collidable(),
+            Self::DeepslateTileStairs(b) => b.is_collidable(),
+            Self::DeepslateTileSlab(b) => b.is_collidable(),
+            Self::DeepslateTileWall(b) => b.is_collidable(),
+            Self::DeepslateBricks(b) => b.is_collidable(),
+            Self::DeepslateBrickStairs(b) => b.is_collidable(),
+            Self::DeepslateBrickSlab(b) => b.is_collidable(),
+            Self::DeepslateBrickWall(b) => b.is_collidable(),
+            Self::ChiseledDeepslate(b) => b.is_collidable(),
+            Self::CrackedDeepslateBricks(b) => b.is_collidable(),
+            Self::CrackedDeepslateTiles(b) => b.is_collidable(),
+            Self::InfestedDeepslate(b) => b.is_collidable(),
+            Self::SmoothBasalt(b) => b.is_collidable(),
+            Self::RawIronBlock(b) => b.is_collidable(),
+            Self::RawCopperBlock(b) => b.is_collidable(),
+            Self::RawGoldBlock(b) => b.is_collidable(),
+            Self::PottedAzaleaBush(b) => b.is_collidable(),
+            Self::PottedFloweringAzaleaBush(b) => b.is_collidable(),
+            Self::OchreFroglight(b) => b.is_collidable(),
+            Self::VerdantFroglight(b) => b.is_collidable(),
+            Self::PearlescentFroglight(b) => b.is_collidable(),
+            Self::Frogspawn(b) => b.is_collidable(),
+            Self::ReinforcedDeepslate(b) => b.is_collidable(),
+            Self::DecoratedPot(b) => b.is_collidable(),
+        }
+    }
 }
 
 impl BlockTrait<V1_20_0> for BlockError {
@@ -5048,6 +8072,9 @@ impl BlockTrait<V1_20_0> for BlockAir {
     fn resource_location(&self) -> &'static str { "minecraft:air" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 0u32 }
+    fn is_air(&self) -> bool { true }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockStone {
@@ -5186,48 +8213,64 @@ impl BlockTrait<V1_20_0> for BlockOakSapling {
     fn resource_location(&self) -> &'static str { "minecraft:oak_sapling" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 25u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceSapling {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_sapling" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 27u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchSapling {
     fn resource_location(&self) -> &'static str { "minecraft:birch_sapling" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 29u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleSapling {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_sapling" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 31u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaSapling {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_sapling" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 33u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherrySapling {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_sapling" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 35u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakSapling {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_sapling" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 37u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangrovePropagule {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_propagule" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 39u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBedrock {
@@ -5240,12 +8283,16 @@ impl BlockTrait<V1_20_0> for BlockWater {
     fn resource_location(&self) -> &'static str { "minecraft:water" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 80u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLava {
     fn resource_location(&self) -> &'static str { "minecraft:lava" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 96u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSand {
@@ -5372,6 +8419,7 @@ impl BlockTrait<V1_20_0> for BlockMangroveRoots {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_roots" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 154u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMuddyMangroveRoots {
@@ -5540,60 +8588,70 @@ impl BlockTrait<V1_20_0> for BlockOakLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:oak_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 237u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 265u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:birch_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 293u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 321u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 349u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 377u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 405u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 433u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAzaleaLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:azalea_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 461u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFloweringAzaleaLeaves {
     fn resource_location(&self) -> &'static str { "minecraft:flowering_azalea_leaves" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 489u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSponge {
@@ -5612,6 +8670,7 @@ impl BlockTrait<V1_20_0> for BlockGlass {
     fn resource_location(&self) -> &'static str { "minecraft:glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 519u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLapisOre {
@@ -5666,108 +8725,128 @@ impl BlockTrait<V1_20_0> for BlockWhiteBed {
     fn resource_location(&self) -> &'static str { "minecraft:white_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1688u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeBed {
     fn resource_location(&self) -> &'static str { "minecraft:orange_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1704u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagentaBed {
     fn resource_location(&self) -> &'static str { "minecraft:magenta_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1720u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightBlueBed {
     fn resource_location(&self) -> &'static str { "minecraft:light_blue_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1736u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockYellowBed {
     fn resource_location(&self) -> &'static str { "minecraft:yellow_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1752u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLimeBed {
     fn resource_location(&self) -> &'static str { "minecraft:lime_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1768u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkBed {
     fn resource_location(&self) -> &'static str { "minecraft:pink_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1784u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrayBed {
     fn resource_location(&self) -> &'static str { "minecraft:gray_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1800u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightGrayBed {
     fn resource_location(&self) -> &'static str { "minecraft:light_gray_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1816u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCyanBed {
     fn resource_location(&self) -> &'static str { "minecraft:cyan_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1832u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpleBed {
     fn resource_location(&self) -> &'static str { "minecraft:purple_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1848u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueBed {
     fn resource_location(&self) -> &'static str { "minecraft:blue_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1864u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownBed {
     fn resource_location(&self) -> &'static str { "minecraft:brown_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1880u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGreenBed {
     fn resource_location(&self) -> &'static str { "minecraft:green_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1896u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedBed {
     fn resource_location(&self) -> &'static str { "minecraft:red_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1912u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlackBed {
     fn resource_location(&self) -> &'static str { "minecraft:black_bed" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1928u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPoweredRail {
     fn resource_location(&self) -> &'static str { "minecraft:powered_rail" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1944u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDetectorRail {
     fn resource_location(&self) -> &'static str { "minecraft:detector_rail" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 1984u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockStickyPiston {
@@ -5780,36 +8859,48 @@ impl BlockTrait<V1_20_0> for BlockCobweb {
     fn resource_location(&self) -> &'static str { "minecraft:cobweb" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2036u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrass {
     fn resource_location(&self) -> &'static str { "minecraft:grass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2037u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFern {
     fn resource_location(&self) -> &'static str { "minecraft:fern" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2038u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadBush {
     fn resource_location(&self) -> &'static str { "minecraft:dead_bush" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2039u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSeagrass {
     fn resource_location(&self) -> &'static str { "minecraft:seagrass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2040u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTallSeagrass {
     fn resource_location(&self) -> &'static str { "minecraft:tall_seagrass" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 2041u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPiston {
@@ -5924,102 +9015,135 @@ impl BlockTrait<V1_20_0> for BlockMovingPiston {
     fn resource_location(&self) -> &'static str { "minecraft:moving_piston" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 2095u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDandelion {
     fn resource_location(&self) -> &'static str { "minecraft:dandelion" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2097u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTorchflower {
     fn resource_location(&self) -> &'static str { "minecraft:torchflower" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2098u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPoppy {
     fn resource_location(&self) -> &'static str { "minecraft:poppy" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2099u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueOrchid {
     fn resource_location(&self) -> &'static str { "minecraft:blue_orchid" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2100u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAllium {
     fn resource_location(&self) -> &'static str { "minecraft:allium" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2101u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAzureBluet {
     fn resource_location(&self) -> &'static str { "minecraft:azure_bluet" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2102u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedTulip {
     fn resource_location(&self) -> &'static str { "minecraft:red_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2103u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeTulip {
     fn resource_location(&self) -> &'static str { "minecraft:orange_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2104u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWhiteTulip {
     fn resource_location(&self) -> &'static str { "minecraft:white_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2105u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkTulip {
     fn resource_location(&self) -> &'static str { "minecraft:pink_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2106u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOxeyeDaisy {
     fn resource_location(&self) -> &'static str { "minecraft:oxeye_daisy" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2107u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCornflower {
     fn resource_location(&self) -> &'static str { "minecraft:cornflower" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2108u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWitherRose {
     fn resource_location(&self) -> &'static str { "minecraft:wither_rose" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2109u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLilyOfTheValley {
     fn resource_location(&self) -> &'static str { "minecraft:lily_of_the_valley" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2110u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownMushroom {
     fn resource_location(&self) -> &'static str { "minecraft:brown_mushroom" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2111u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedMushroom {
     fn resource_location(&self) -> &'static str { "minecraft:red_mushroom" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2112u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGoldBlock {
@@ -6074,30 +9198,39 @@ impl BlockTrait<V1_20_0> for BlockTorch {
     fn resource_location(&self) -> &'static str { "minecraft:torch" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2122u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWallTorch {
     fn resource_location(&self) -> &'static str { "minecraft:wall_torch" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 2123u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFire {
     fn resource_location(&self) -> &'static str { "minecraft:fire" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 2127u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSoulFire {
     fn resource_location(&self) -> &'static str { "minecraft:soul_fire" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2639u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpawner {
     fn resource_location(&self) -> &'static str { "minecraft:spawner" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 2640u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakStairs {
@@ -6116,6 +9249,8 @@ impl BlockTrait<V1_20_0> for BlockRedstoneWire {
     fn resource_location(&self) -> &'static str { "minecraft:redstone_wire" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 2745u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDiamondOre {
@@ -6146,6 +9281,8 @@ impl BlockTrait<V1_20_0> for BlockWheat {
     fn resource_location(&self) -> &'static str { "minecraft:wheat" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4045u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFarmland {
@@ -6164,72 +9301,94 @@ impl BlockTrait<V1_20_0> for BlockOakSign {
     fn resource_location(&self) -> &'static str { "minecraft:oak_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4069u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceSign {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4101u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchSign {
     fn resource_location(&self) -> &'static str { "minecraft:birch_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4133u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaSign {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4165u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherrySign {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4197u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleSign {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4229u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakSign {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4261u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveSign {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4293u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooSign {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4325u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakDoor {
     fn resource_location(&self) -> &'static str { "minecraft:oak_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4357u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLadder {
     fn resource_location(&self) -> &'static str { "minecraft:ladder" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4421u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRail {
     fn resource_location(&self) -> &'static str { "minecraft:rail" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4429u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCobblestoneStairs {
@@ -6242,258 +9401,343 @@ impl BlockTrait<V1_20_0> for BlockOakWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:oak_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4529u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4537u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:birch_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4545u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4553u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4561u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4569u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4577u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4585u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4593u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:oak_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4601u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4665u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:birch_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4729u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4793u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4857u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4921u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 4985u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5049u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:warped_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5113u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5177u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5241u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:oak_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5305u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5313u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:birch_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5321u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5329u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5337u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5345u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5353u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5361u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5369u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:warped_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5377u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooWallHangingSign {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_wall_hanging_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5385u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLever {
     fn resource_location(&self) -> &'static str { "minecraft:lever" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5393u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockStonePressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:stone_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5417u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockIronDoor {
     fn resource_location(&self) -> &'static str { "minecraft:iron_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5419u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:oak_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5483u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSprucePressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5485u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:birch_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5487u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJunglePressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5489u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5491u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5493u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5495u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangrovePressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5497u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5499u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedstoneOre {
@@ -6512,18 +9756,24 @@ impl BlockTrait<V1_20_0> for BlockRedstoneTorch {
     fn resource_location(&self) -> &'static str { "minecraft:redstone_torch" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5505u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedstoneWallTorch {
     fn resource_location(&self) -> &'static str { "minecraft:redstone_wall_torch" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5507u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockStoneButton {
     fn resource_location(&self) -> &'static str { "minecraft:stone_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5515u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSnow {
@@ -6536,6 +9786,7 @@ impl BlockTrait<V1_20_0> for BlockIce {
     fn resource_location(&self) -> &'static str { "minecraft:ice" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5547u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSnowBlock {
@@ -6560,6 +9811,8 @@ impl BlockTrait<V1_20_0> for BlockSugarCane {
     fn resource_location(&self) -> &'static str { "minecraft:sugar_cane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5566u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJukebox {
@@ -6614,12 +9867,16 @@ impl BlockTrait<V1_20_0> for BlockSoulTorch {
     fn resource_location(&self) -> &'static str { "minecraft:soul_torch" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5626u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSoulWallTorch {
     fn resource_location(&self) -> &'static str { "minecraft:soul_wall_torch" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5627u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGlowstone {
@@ -6632,6 +9889,8 @@ impl BlockTrait<V1_20_0> for BlockNetherPortal {
     fn resource_location(&self) -> &'static str { "minecraft:nether_portal" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5632u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCarvedPumpkin {
@@ -6662,150 +9921,175 @@ impl BlockTrait<V1_20_0> for BlockWhiteStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:white_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5714u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:orange_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5715u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagentaStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:magenta_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5716u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightBlueStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:light_blue_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5717u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockYellowStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:yellow_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5718u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLimeStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:lime_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5719u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:pink_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5720u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrayStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:gray_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5721u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightGrayStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:light_gray_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5722u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCyanStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:cyan_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5723u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpleStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:purple_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5724u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:blue_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5725u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:brown_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5726u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGreenStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:green_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5727u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:red_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5728u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlackStainedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:black_stained_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 5729u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:oak_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5730u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5794u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:birch_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5858u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5922u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 5986u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6050u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6114u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6178u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6242u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockStoneBricks {
@@ -6902,18 +10186,21 @@ impl BlockTrait<V1_20_0> for BlockIronBars {
     fn resource_location(&self) -> &'static str { "minecraft:iron_bars" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6510u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockChain {
     fn resource_location(&self) -> &'static str { "minecraft:chain" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6542u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6548u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMelon {
@@ -6926,36 +10213,48 @@ impl BlockTrait<V1_20_0> for BlockAttachedPumpkinStem {
     fn resource_location(&self) -> &'static str { "minecraft:attached_pumpkin_stem" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6581u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAttachedMelonStem {
     fn resource_location(&self) -> &'static str { "minecraft:attached_melon_stem" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6585u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPumpkinStem {
     fn resource_location(&self) -> &'static str { "minecraft:pumpkin_stem" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6589u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMelonStem {
     fn resource_location(&self) -> &'static str { "minecraft:melon_stem" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6597u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockVine {
     fn resource_location(&self) -> &'static str { "minecraft:vine" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6605u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGlowLichen {
     fn resource_location(&self) -> &'static str { "minecraft:glow_lichen" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 6637u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakFenceGate {
@@ -6992,6 +10291,7 @@ impl BlockTrait<V1_20_0> for BlockLilyPad {
     fn resource_location(&self) -> &'static str { "minecraft:lily_pad" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 6913u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockNetherBricks {
@@ -7016,6 +10316,8 @@ impl BlockTrait<V1_20_0> for BlockNetherWart {
     fn resource_location(&self) -> &'static str { "minecraft:nether_wart" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 7027u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockEnchantingTable {
@@ -7028,36 +10330,43 @@ impl BlockTrait<V1_20_0> for BlockBrewingStand {
     fn resource_location(&self) -> &'static str { "minecraft:brewing_stand" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 7032u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCauldron {
     fn resource_location(&self) -> &'static str { "minecraft:cauldron" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 7033u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWaterCauldron {
     fn resource_location(&self) -> &'static str { "minecraft:water_cauldron" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 7034u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLavaCauldron {
     fn resource_location(&self) -> &'static str { "minecraft:lava_cauldron" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 7037u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPowderSnowCauldron {
     fn resource_location(&self) -> &'static str { "minecraft:powder_snow_cauldron" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 7038u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockEndPortal {
     fn resource_location(&self) -> &'static str { "minecraft:end_portal" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 7041u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockEndPortalFrame {
@@ -7076,6 +10385,7 @@ impl BlockTrait<V1_20_0> for BlockDragonEgg {
     fn resource_location(&self) -> &'static str { "minecraft:dragon_egg" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 7051u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedstoneLamp {
@@ -7088,6 +10398,7 @@ impl BlockTrait<V1_20_0> for BlockCocoa {
     fn resource_location(&self) -> &'static str { "minecraft:cocoa" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 7054u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSandstoneStairs {
@@ -7118,12 +10429,16 @@ impl BlockTrait<V1_20_0> for BlockTripwireHook {
     fn resource_location(&self) -> &'static str { "minecraft:tripwire_hook" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 7156u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTripwire {
     fn resource_location(&self) -> &'static str { "minecraft:tripwire" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 7172u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockEmeraldBlock {
@@ -7160,6 +10475,7 @@ impl BlockTrait<V1_20_0> for BlockBeacon {
     fn resource_location(&self) -> &'static str { "minecraft:beacon" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 7553u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCobblestoneWall {
@@ -7178,234 +10494,284 @@ impl BlockTrait<V1_20_0> for BlockFlowerPot {
     fn resource_location(&self) -> &'static str { "minecraft:flower_pot" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8202u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedTorchflower {
     fn resource_location(&self) -> &'static str { "minecraft:potted_torchflower" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8203u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedOakSapling {
     fn resource_location(&self) -> &'static str { "minecraft:potted_oak_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8204u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedSpruceSapling {
     fn resource_location(&self) -> &'static str { "minecraft:potted_spruce_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8205u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedBirchSapling {
     fn resource_location(&self) -> &'static str { "minecraft:potted_birch_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8206u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedJungleSapling {
     fn resource_location(&self) -> &'static str { "minecraft:potted_jungle_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8207u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedAcaciaSapling {
     fn resource_location(&self) -> &'static str { "minecraft:potted_acacia_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8208u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedCherrySapling {
     fn resource_location(&self) -> &'static str { "minecraft:potted_cherry_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8209u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedDarkOakSapling {
     fn resource_location(&self) -> &'static str { "minecraft:potted_dark_oak_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8210u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedMangrovePropagule {
     fn resource_location(&self) -> &'static str { "minecraft:potted_mangrove_propagule" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8211u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedFern {
     fn resource_location(&self) -> &'static str { "minecraft:potted_fern" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8212u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedDandelion {
     fn resource_location(&self) -> &'static str { "minecraft:potted_dandelion" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8213u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedPoppy {
     fn resource_location(&self) -> &'static str { "minecraft:potted_poppy" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8214u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedBlueOrchid {
     fn resource_location(&self) -> &'static str { "minecraft:potted_blue_orchid" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8215u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedAllium {
     fn resource_location(&self) -> &'static str { "minecraft:potted_allium" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8216u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedAzureBluet {
     fn resource_location(&self) -> &'static str { "minecraft:potted_azure_bluet" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8217u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedRedTulip {
     fn resource_location(&self) -> &'static str { "minecraft:potted_red_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8218u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedOrangeTulip {
     fn resource_location(&self) -> &'static str { "minecraft:potted_orange_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8219u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedWhiteTulip {
     fn resource_location(&self) -> &'static str { "minecraft:potted_white_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8220u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedPinkTulip {
     fn resource_location(&self) -> &'static str { "minecraft:potted_pink_tulip" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8221u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedOxeyeDaisy {
     fn resource_location(&self) -> &'static str { "minecraft:potted_oxeye_daisy" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8222u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedCornflower {
     fn resource_location(&self) -> &'static str { "minecraft:potted_cornflower" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8223u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedLilyOfTheValley {
     fn resource_location(&self) -> &'static str { "minecraft:potted_lily_of_the_valley" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8224u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedWitherRose {
     fn resource_location(&self) -> &'static str { "minecraft:potted_wither_rose" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8225u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedRedMushroom {
     fn resource_location(&self) -> &'static str { "minecraft:potted_red_mushroom" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8226u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedBrownMushroom {
     fn resource_location(&self) -> &'static str { "minecraft:potted_brown_mushroom" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8227u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedDeadBush {
     fn resource_location(&self) -> &'static str { "minecraft:potted_dead_bush" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8228u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedCactus {
     fn resource_location(&self) -> &'static str { "minecraft:potted_cactus" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 8229u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCarrots {
     fn resource_location(&self) -> &'static str { "minecraft:carrots" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8230u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPotatoes {
     fn resource_location(&self) -> &'static str { "minecraft:potatoes" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8238u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOakButton {
     fn resource_location(&self) -> &'static str { "minecraft:oak_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8246u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSpruceButton {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8270u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchButton {
     fn resource_location(&self) -> &'static str { "minecraft:birch_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8294u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleButton {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8318u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaButton {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8342u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryButton {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8366u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakButton {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8390u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveButton {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8414u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooButton {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8438u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSkeletonSkull {
@@ -7520,12 +10886,16 @@ impl BlockTrait<V1_20_0> for BlockLightWeightedPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:light_weighted_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8638u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockHeavyWeightedPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:heavy_weighted_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8654u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockComparator {
@@ -7556,6 +10926,7 @@ impl BlockTrait<V1_20_0> for BlockHopper {
     fn resource_location(&self) -> &'static str { "minecraft:hopper" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8720u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockQuartzBlock {
@@ -7586,6 +10957,8 @@ impl BlockTrait<V1_20_0> for BlockActivatorRail {
     fn resource_location(&self) -> &'static str { "minecraft:activator_rail" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8815u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDropper {
@@ -7694,96 +11067,112 @@ impl BlockTrait<V1_20_0> for BlockWhiteStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:white_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8883u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:orange_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8915u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagentaStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:magenta_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8947u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightBlueStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:light_blue_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 8979u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockYellowStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:yellow_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9011u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLimeStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:lime_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9043u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:pink_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9075u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrayStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:gray_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9107u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightGrayStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:light_gray_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9139u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCyanStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:cyan_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9171u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpleStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:purple_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9203u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:blue_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9235u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:brown_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9267u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGreenStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:green_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9299u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:red_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9331u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlackStainedGlassPane {
     fn resource_location(&self) -> &'static str { "minecraft:black_stained_glass_pane" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9363u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaStairs {
@@ -7826,24 +11215,28 @@ impl BlockTrait<V1_20_0> for BlockSlimeBlock {
     fn resource_location(&self) -> &'static str { "minecraft:slime_block" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 9875u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBarrier {
     fn resource_location(&self) -> &'static str { "minecraft:barrier" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 9876u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLight {
     fn resource_location(&self) -> &'static str { "minecraft:light" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9877u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockIronTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:iron_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 9909u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPrismarine {
@@ -8030,228 +11423,304 @@ impl BlockTrait<V1_20_0> for BlockSunflower {
     fn resource_location(&self) -> &'static str { "minecraft:sunflower" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10257u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLilac {
     fn resource_location(&self) -> &'static str { "minecraft:lilac" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10259u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRoseBush {
     fn resource_location(&self) -> &'static str { "minecraft:rose_bush" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10261u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPeony {
     fn resource_location(&self) -> &'static str { "minecraft:peony" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10263u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTallGrass {
     fn resource_location(&self) -> &'static str { "minecraft:tall_grass" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10265u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLargeFern {
     fn resource_location(&self) -> &'static str { "minecraft:large_fern" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10267u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWhiteBanner {
     fn resource_location(&self) -> &'static str { "minecraft:white_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10269u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeBanner {
     fn resource_location(&self) -> &'static str { "minecraft:orange_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10285u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagentaBanner {
     fn resource_location(&self) -> &'static str { "minecraft:magenta_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10301u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightBlueBanner {
     fn resource_location(&self) -> &'static str { "minecraft:light_blue_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10317u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockYellowBanner {
     fn resource_location(&self) -> &'static str { "minecraft:yellow_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10333u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLimeBanner {
     fn resource_location(&self) -> &'static str { "minecraft:lime_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10349u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkBanner {
     fn resource_location(&self) -> &'static str { "minecraft:pink_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10365u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrayBanner {
     fn resource_location(&self) -> &'static str { "minecraft:gray_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10381u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightGrayBanner {
     fn resource_location(&self) -> &'static str { "minecraft:light_gray_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10397u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCyanBanner {
     fn resource_location(&self) -> &'static str { "minecraft:cyan_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10413u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpleBanner {
     fn resource_location(&self) -> &'static str { "minecraft:purple_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10429u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueBanner {
     fn resource_location(&self) -> &'static str { "minecraft:blue_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10445u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownBanner {
     fn resource_location(&self) -> &'static str { "minecraft:brown_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10461u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGreenBanner {
     fn resource_location(&self) -> &'static str { "minecraft:green_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10477u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedBanner {
     fn resource_location(&self) -> &'static str { "minecraft:red_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10493u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlackBanner {
     fn resource_location(&self) -> &'static str { "minecraft:black_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10509u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWhiteWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:white_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10525u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:orange_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10529u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagentaWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:magenta_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10533u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightBlueWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:light_blue_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10537u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockYellowWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:yellow_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10541u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLimeWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:lime_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10545u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:pink_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10549u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrayWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:gray_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10553u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightGrayWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:light_gray_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10557u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCyanWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:cyan_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10561u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpleWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:purple_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10565u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:blue_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10569u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:brown_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10573u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGreenWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:green_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10577u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:red_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10581u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlackWallBanner {
     fn resource_location(&self) -> &'static str { "minecraft:black_wall_banner" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 10585u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedSandstone {
@@ -8546,66 +12015,77 @@ impl BlockTrait<V1_20_0> for BlockSpruceDoor {
     fn resource_location(&self) -> &'static str { "minecraft:spruce_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11332u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBirchDoor {
     fn resource_location(&self) -> &'static str { "minecraft:birch_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11396u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockJungleDoor {
     fn resource_location(&self) -> &'static str { "minecraft:jungle_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11460u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAcaciaDoor {
     fn resource_location(&self) -> &'static str { "minecraft:acacia_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11524u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCherryDoor {
     fn resource_location(&self) -> &'static str { "minecraft:cherry_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11588u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDarkOakDoor {
     fn resource_location(&self) -> &'static str { "minecraft:dark_oak_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11652u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMangroveDoor {
     fn resource_location(&self) -> &'static str { "minecraft:mangrove_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11716u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooDoor {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11780u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockEndRod {
     fn resource_location(&self) -> &'static str { "minecraft:end_rod" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11844u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockChorusPlant {
     fn resource_location(&self) -> &'static str { "minecraft:chorus_plant" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11850u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockChorusFlower {
     fn resource_location(&self) -> &'static str { "minecraft:chorus_flower" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 11914u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpurBlock {
@@ -8636,24 +12116,32 @@ impl BlockTrait<V1_20_0> for BlockTorchflowerCrop {
     fn resource_location(&self) -> &'static str { "minecraft:torchflower_crop" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12005u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPitcherCrop {
     fn resource_location(&self) -> &'static str { "minecraft:pitcher_crop" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12021u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPitcherPlant {
     fn resource_location(&self) -> &'static str { "minecraft:pitcher_plant" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12031u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBeetroots {
     fn resource_location(&self) -> &'static str { "minecraft:beetroots" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12033u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDirtPath {
@@ -8666,6 +12154,8 @@ impl BlockTrait<V1_20_0> for BlockEndGateway {
     fn resource_location(&self) -> &'static str { "minecraft:end_gateway" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 12066u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRepeatingCommandBlock {
@@ -8684,6 +12174,7 @@ impl BlockTrait<V1_20_0> for BlockFrostedIce {
     fn resource_location(&self) -> &'static str { "minecraft:frosted_ice" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12091u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagmaBlock {
@@ -8714,6 +12205,8 @@ impl BlockTrait<V1_20_0> for BlockStructureVoid {
     fn resource_location(&self) -> &'static str { "minecraft:structure_void" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 12101u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockObserver {
@@ -8726,102 +12219,119 @@ impl BlockTrait<V1_20_0> for BlockShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12114u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWhiteShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:white_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12120u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:orange_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12126u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagentaShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:magenta_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12132u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightBlueShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:light_blue_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12138u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockYellowShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:yellow_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12144u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLimeShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:lime_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12150u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:pink_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12156u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrayShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:gray_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12162u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightGrayShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:light_gray_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12168u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCyanShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:cyan_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12174u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpleShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:purple_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12180u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:blue_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12186u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:brown_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12192u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGreenShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:green_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12198u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:red_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12204u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlackShulkerBox {
     fn resource_location(&self) -> &'static str { "minecraft:black_shulker_box" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12210u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWhiteGlazedTerracotta {
@@ -9116,12 +12626,16 @@ impl BlockTrait<V1_20_0> for BlockKelp {
     fn resource_location(&self) -> &'static str { "minecraft:kelp" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12312u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockKelpPlant {
     fn resource_location(&self) -> &'static str { "minecraft:kelp_plant" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 12338u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDriedKelpBlock {
@@ -9134,12 +12648,14 @@ impl BlockTrait<V1_20_0> for BlockTurtleEgg {
     fn resource_location(&self) -> &'static str { "minecraft:turtle_egg" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12340u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSnifferEgg {
     fn resource_location(&self) -> &'static str { "minecraft:sniffer_egg" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12352u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadTubeCoralBlock {
@@ -9206,186 +12722,247 @@ impl BlockTrait<V1_20_0> for BlockDeadTubeCoral {
     fn resource_location(&self) -> &'static str { "minecraft:dead_tube_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12365u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadBrainCoral {
     fn resource_location(&self) -> &'static str { "minecraft:dead_brain_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12367u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadBubbleCoral {
     fn resource_location(&self) -> &'static str { "minecraft:dead_bubble_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12369u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadFireCoral {
     fn resource_location(&self) -> &'static str { "minecraft:dead_fire_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12371u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadHornCoral {
     fn resource_location(&self) -> &'static str { "minecraft:dead_horn_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12373u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTubeCoral {
     fn resource_location(&self) -> &'static str { "minecraft:tube_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12375u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrainCoral {
     fn resource_location(&self) -> &'static str { "minecraft:brain_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12377u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBubbleCoral {
     fn resource_location(&self) -> &'static str { "minecraft:bubble_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12379u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFireCoral {
     fn resource_location(&self) -> &'static str { "minecraft:fire_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12381u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockHornCoral {
     fn resource_location(&self) -> &'static str { "minecraft:horn_coral" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12383u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadTubeCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_tube_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12385u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadBrainCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_brain_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12387u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadBubbleCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_bubble_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12389u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadFireCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_fire_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12391u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadHornCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_horn_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12393u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTubeCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:tube_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12395u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrainCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:brain_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12397u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBubbleCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:bubble_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12399u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFireCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:fire_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12401u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockHornCoralFan {
     fn resource_location(&self) -> &'static str { "minecraft:horn_coral_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12403u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadTubeCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_tube_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12405u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadBrainCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_brain_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12413u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadBubbleCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_bubble_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12421u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadFireCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_fire_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12429u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDeadHornCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:dead_horn_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12437u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTubeCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:tube_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12445u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrainCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:brain_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12453u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBubbleCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:bubble_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12461u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFireCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:fire_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12469u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockHornCoralWallFan {
     fn resource_location(&self) -> &'static str { "minecraft:horn_coral_wall_fan" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12477u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSeaPickle {
     fn resource_location(&self) -> &'static str { "minecraft:sea_pickle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12485u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueIce {
@@ -9398,42 +12975,55 @@ impl BlockTrait<V1_20_0> for BlockConduit {
     fn resource_location(&self) -> &'static str { "minecraft:conduit" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12494u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBambooSapling {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo_sapling" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 12496u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBamboo {
     fn resource_location(&self) -> &'static str { "minecraft:bamboo" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12497u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedBamboo {
     fn resource_location(&self) -> &'static str { "minecraft:potted_bamboo" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 12509u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockVoidAir {
     fn resource_location(&self) -> &'static str { "minecraft:void_air" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 12510u32 }
+    fn is_air(&self) -> bool { true }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCaveAir {
     fn resource_location(&self) -> &'static str { "minecraft:cave_air" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 12511u32 }
+    fn is_air(&self) -> bool { true }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBubbleColumn {
     fn resource_location(&self) -> &'static str { "minecraft:bubble_column" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 12512u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPolishedGraniteStairs {
@@ -9680,6 +13270,8 @@ impl BlockTrait<V1_20_0> for BlockScaffolding {
     fn resource_location(&self) -> &'static str { "minecraft:scaffolding" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 17924u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLoom {
@@ -9752,30 +13344,36 @@ impl BlockTrait<V1_20_0> for BlockLantern {
     fn resource_location(&self) -> &'static str { "minecraft:lantern" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18055u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSoulLantern {
     fn resource_location(&self) -> &'static str { "minecraft:soul_lantern" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18059u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCampfire {
     fn resource_location(&self) -> &'static str { "minecraft:campfire" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18063u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSoulCampfire {
     fn resource_location(&self) -> &'static str { "minecraft:soul_campfire" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18095u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSweetBerryBush {
     fn resource_location(&self) -> &'static str { "minecraft:sweet_berry_bush" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18127u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedStem {
@@ -9812,6 +13410,8 @@ impl BlockTrait<V1_20_0> for BlockWarpedFungus {
     fn resource_location(&self) -> &'static str { "minecraft:warped_fungus" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18140u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedWartBlock {
@@ -9824,12 +13424,16 @@ impl BlockTrait<V1_20_0> for BlockWarpedRoots {
     fn resource_location(&self) -> &'static str { "minecraft:warped_roots" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18142u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockNetherSprouts {
     fn resource_location(&self) -> &'static str { "minecraft:nether_sprouts" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18143u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonStem {
@@ -9866,6 +13470,8 @@ impl BlockTrait<V1_20_0> for BlockCrimsonFungus {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_fungus" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18153u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockShroomlight {
@@ -9878,30 +13484,40 @@ impl BlockTrait<V1_20_0> for BlockWeepingVines {
     fn resource_location(&self) -> &'static str { "minecraft:weeping_vines" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18155u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWeepingVinesPlant {
     fn resource_location(&self) -> &'static str { "minecraft:weeping_vines_plant" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18181u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTwistingVines {
     fn resource_location(&self) -> &'static str { "minecraft:twisting_vines" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18182u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTwistingVinesPlant {
     fn resource_location(&self) -> &'static str { "minecraft:twisting_vines_plant" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18208u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonRoots {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_roots" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18209u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonPlanks {
@@ -9932,12 +13548,16 @@ impl BlockTrait<V1_20_0> for BlockCrimsonPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18224u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedPressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:warped_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18226u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonFence {
@@ -9956,12 +13576,14 @@ impl BlockTrait<V1_20_0> for BlockCrimsonTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18292u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedTrapdoor {
     fn resource_location(&self) -> &'static str { "minecraft:warped_trapdoor" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18356u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonFenceGate {
@@ -9992,48 +13614,62 @@ impl BlockTrait<V1_20_0> for BlockCrimsonButton {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18644u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedButton {
     fn resource_location(&self) -> &'static str { "minecraft:warped_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18668u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonDoor {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18692u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedDoor {
     fn resource_location(&self) -> &'static str { "minecraft:warped_door" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18756u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonSign {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18820u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedSign {
     fn resource_location(&self) -> &'static str { "minecraft:warped_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18852u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCrimsonWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:crimson_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18884u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWarpedWallSign {
     fn resource_location(&self) -> &'static str { "minecraft:warped_wall_sign" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 18892u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockStructureBlock {
@@ -10076,6 +13712,7 @@ impl BlockTrait<V1_20_0> for BlockHoneyBlock {
     fn resource_location(&self) -> &'static str { "minecraft:honey_block" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18989u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockHoneycombBlock {
@@ -10112,24 +13749,28 @@ impl BlockTrait<V1_20_0> for BlockPottedCrimsonFungus {
     fn resource_location(&self) -> &'static str { "minecraft:potted_crimson_fungus" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 18999u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedWarpedFungus {
     fn resource_location(&self) -> &'static str { "minecraft:potted_warped_fungus" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 19000u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedCrimsonRoots {
     fn resource_location(&self) -> &'static str { "minecraft:potted_crimson_roots" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 19001u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedWarpedRoots {
     fn resource_location(&self) -> &'static str { "minecraft:potted_warped_roots" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 19002u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLodestone {
@@ -10226,12 +13867,16 @@ impl BlockTrait<V1_20_0> for BlockPolishedBlackstonePressurePlate {
     fn resource_location(&self) -> &'static str { "minecraft:polished_blackstone_pressure_plate" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 19916u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPolishedBlackstoneButton {
     fn resource_location(&self) -> &'static str { "minecraft:polished_blackstone_button" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 19918u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPolishedBlackstoneWall {
@@ -10262,102 +13907,119 @@ impl BlockTrait<V1_20_0> for BlockCandle {
     fn resource_location(&self) -> &'static str { "minecraft:candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20269u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockWhiteCandle {
     fn resource_location(&self) -> &'static str { "minecraft:white_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20285u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOrangeCandle {
     fn resource_location(&self) -> &'static str { "minecraft:orange_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20301u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMagentaCandle {
     fn resource_location(&self) -> &'static str { "minecraft:magenta_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20317u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightBlueCandle {
     fn resource_location(&self) -> &'static str { "minecraft:light_blue_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20333u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockYellowCandle {
     fn resource_location(&self) -> &'static str { "minecraft:yellow_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20349u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLimeCandle {
     fn resource_location(&self) -> &'static str { "minecraft:lime_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20365u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPinkCandle {
     fn resource_location(&self) -> &'static str { "minecraft:pink_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20381u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGrayCandle {
     fn resource_location(&self) -> &'static str { "minecraft:gray_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20397u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLightGrayCandle {
     fn resource_location(&self) -> &'static str { "minecraft:light_gray_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20413u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCyanCandle {
     fn resource_location(&self) -> &'static str { "minecraft:cyan_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20429u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPurpleCandle {
     fn resource_location(&self) -> &'static str { "minecraft:purple_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20445u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlueCandle {
     fn resource_location(&self) -> &'static str { "minecraft:blue_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20461u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBrownCandle {
     fn resource_location(&self) -> &'static str { "minecraft:brown_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20477u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockGreenCandle {
     fn resource_location(&self) -> &'static str { "minecraft:green_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20493u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRedCandle {
     fn resource_location(&self) -> &'static str { "minecraft:red_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20509u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockBlackCandle {
     fn resource_location(&self) -> &'static str { "minecraft:black_candle" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20525u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCandleCake {
@@ -10478,24 +14140,28 @@ impl BlockTrait<V1_20_0> for BlockAmethystCluster {
     fn resource_location(&self) -> &'static str { "minecraft:amethyst_cluster" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20577u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockLargeAmethystBud {
     fn resource_location(&self) -> &'static str { "minecraft:large_amethyst_bud" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20589u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMediumAmethystBud {
     fn resource_location(&self) -> &'static str { "minecraft:medium_amethyst_bud" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20601u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSmallAmethystBud {
     fn resource_location(&self) -> &'static str { "minecraft:small_amethyst_bud" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 20613u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockTuff {
@@ -10514,6 +14180,7 @@ impl BlockTrait<V1_20_0> for BlockTintedGlass {
     fn resource_location(&self) -> &'static str { "minecraft:tinted_glass" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 20627u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPowderSnow {
@@ -10544,6 +14211,8 @@ impl BlockTrait<V1_20_0> for BlockSculkVein {
     fn resource_location(&self) -> &'static str { "minecraft:sculk_vein" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21110u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSculkCatalyst {
@@ -10766,12 +14435,14 @@ impl BlockTrait<V1_20_0> for BlockLightningRod {
     fn resource_location(&self) -> &'static str { "minecraft:lightning_rod" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21828u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPointedDripstone {
     fn resource_location(&self) -> &'static str { "minecraft:pointed_dripstone" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21852u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockDripstoneBlock {
@@ -10784,30 +14455,38 @@ impl BlockTrait<V1_20_0> for BlockCaveVines {
     fn resource_location(&self) -> &'static str { "minecraft:cave_vines" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21873u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockCaveVinesPlant {
     fn resource_location(&self) -> &'static str { "minecraft:cave_vines_plant" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21925u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSporeBlossom {
     fn resource_location(&self) -> &'static str { "minecraft:spore_blossom" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 21927u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockAzalea {
     fn resource_location(&self) -> &'static str { "minecraft:azalea" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 21928u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockFloweringAzalea {
     fn resource_location(&self) -> &'static str { "minecraft:flowering_azalea" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 21929u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMossCarpet {
@@ -10820,6 +14499,8 @@ impl BlockTrait<V1_20_0> for BlockPinkPetals {
     fn resource_location(&self) -> &'static str { "minecraft:pink_petals" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21931u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockMossBlock {
@@ -10838,18 +14519,24 @@ impl BlockTrait<V1_20_0> for BlockBigDripleafStem {
     fn resource_location(&self) -> &'static str { "minecraft:big_dripleaf_stem" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21980u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockSmallDripleaf {
     fn resource_location(&self) -> &'static str { "minecraft:small_dripleaf" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 21988u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockHangingRoots {
     fn resource_location(&self) -> &'static str { "minecraft:hanging_roots" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 22004u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockRootedDirt {
@@ -11018,12 +14705,14 @@ impl BlockTrait<V1_20_0> for BlockPottedAzaleaBush {
     fn resource_location(&self) -> &'static str { "minecraft:potted_azalea_bush" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 23663u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockPottedFloweringAzaleaBush {
     fn resource_location(&self) -> &'static str { "minecraft:potted_flowering_azalea_bush" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 23664u32 }
+    fn is_opaque(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockOchreFroglight {
@@ -11048,6 +14737,8 @@ impl BlockTrait<V1_20_0> for BlockFrogspawn {
     fn resource_location(&self) -> &'static str { "minecraft:frogspawn" }
     fn try_from_u32(_: u32) -> Option<Self> { Some(Self) }
     fn to_u32(&self) -> u32 { 23674u32 }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 
 impl BlockTrait<V1_20_0> for BlockReinforcedDeepslate {
@@ -11060,4 +14751,5 @@ impl BlockTrait<V1_20_0> for BlockDecoratedPot {
     fn resource_location(&self) -> &'static str { "minecraft:decorated_pot" }
     fn try_from_u32(_id: u32) -> Option<Self> { Some(Self::default()) }
     fn to_u32(&self) -> u32 { 23676u32 }
+    fn is_opaque(&self) -> bool { false }
 }

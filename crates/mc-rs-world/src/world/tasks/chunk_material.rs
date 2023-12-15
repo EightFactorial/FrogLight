@@ -5,6 +5,7 @@ use bevy::{
     render::render_resource::PrimitiveTopology,
     tasks::{AsyncComputeTaskPool, Task},
 };
+use compact_str::CompactString;
 use derive_more::{From, Into};
 use futures_lite::future;
 use mc_rs_core::{
@@ -14,7 +15,7 @@ use mc_rs_core::{
 use mc_rs_resourcepack::{assets::resourcepacks::ResourcePacks, pack::ResourcePackAsset};
 
 use crate::{
-    blocks::{traits::BlocksTrait, Blocks},
+    blocks::{structs::BlockAir, traits::BlocksTrait, Blocks},
     resources::{CurrentWorld, Worlds},
     world::{
         chunk::{Chunk, ChunkSections},
@@ -38,7 +39,7 @@ pub(crate) type MaterialTaskResult = Vec<MaterialResult>;
 type MaterialResult = (Mesh, Vec<BlockTexture>);
 
 impl ChunkMaterialTask {
-    pub(super) fn chunk_updater(
+    pub(super) fn chunk_update(
         query: Query<(Entity, &ChunkPos, Ref<Chunk>)>,
 
         current: Res<CurrentWorld>,
@@ -51,32 +52,49 @@ impl ChunkMaterialTask {
         };
 
         for (entity, chunk_pos, chunk_ref) in query.iter() {
-            if chunk_ref.is_added() {
-                let neighbors = chunk_pos.sides();
-
+            // Create/recreate the chunk mesh if the chunk is added/changed
+            if chunk_ref.is_added() || chunk_ref.is_changed() {
                 let mut neighbor_chunks = [None, None, None, None];
-                for (i, n) in neighbors.into_iter().enumerate() {
-                    if let Some(chunk) = world.get_entity(&n) {
-                        if let Ok((_, _, chunk)) = query.get(*chunk) {
-                            neighbor_chunks[i] = Some(chunk.sections.clone());
-                        }
+                for (i, n) in chunk_pos.sides().into_iter().enumerate() {
+                    if let Some(Ok((_, _, chunk))) = world.get_entity(&n).map(|&e| query.get(e)) {
+                        neighbor_chunks[i] = Some(chunk.sections.clone());
                     }
                 }
 
                 let task = Self::create(chunk_ref.sections.clone(), neighbor_chunks);
                 commands.entity(entity).insert(task);
-            } else if chunk_ref.is_changed() {
-                // TODO: Update all four neighbors
+            }
+
+            // Update the neighbor's chunk meshes if this chunk is changed
+            if chunk_ref.is_changed() {
+                for neighbor in chunk_pos.sides() {
+                    let Some(Ok((entity, _, chunk_ref))) =
+                        world.get_entity(&neighbor).map(|&e| query.get(e))
+                    else {
+                        continue;
+                    };
+
+                    let mut neighbor_chunks = [None, None, None, None];
+                    for (i, n) in neighbor.sides().into_iter().enumerate() {
+                        if let Some(Ok((_, _, chunk))) = world.get_entity(&n).map(|&e| query.get(e))
+                        {
+                            neighbor_chunks[i] = Some(chunk.sections.clone());
+                        }
+                    }
+
+                    let task = Self::create(chunk_ref.sections.clone(), neighbor_chunks);
+                    commands.entity(entity).insert(task);
+                }
             }
         }
     }
 
-    pub(super) fn create(chunk: ChunkSections, neighbors: [Option<ChunkSections>; 4]) -> Self {
+    fn create(chunk: ChunkSections, neighbors: [Option<ChunkSections>; 4]) -> Self {
         let task = AsyncComputeTaskPool::get().spawn(Self::material_task(chunk, neighbors));
         Self(task)
     }
 
-    pub(crate) fn poll_tasks(
+    pub(super) fn poll_tasks(
         mut query: Query<(Entity, &mut ChunkMaterialTask)>,
         packs: Res<ResourcePacks>,
         pack_assets: Res<Assets<ResourcePackAsset>>,
@@ -93,18 +111,17 @@ impl ChunkMaterialTask {
                     let material_textures: Vec<Handle<Image>> = material_ids
                         .into_iter()
                         .filter_map(|m| {
-                            let blocks = Blocks::from_u32(m.id);
-                            if let Blocks::Air(_) = blocks {
+                            let block = Blocks::from_u32(m.id);
+                            if block.is_air() {
                                 return None;
                             }
 
-                            let mut iter = blocks.resource_location().split(':');
-                            let namespace = iter.next().unwrap();
-                            let path = iter.next().unwrap();
+                            let mut iter = block.resource_location().split(':');
+                            let namespace = iter.next()?;
+                            let path = iter.next()?;
 
-                            // TODO: Get the actual texture
                             Some(packs.get_model_texture_or_fallback(
-                                &ResourceLocation::from(format!("{namespace}:block/{path}")),
+                                &ResourceLocation::new(format!("{namespace}:block/{path}")),
                                 &m.side,
                                 &pack_assets,
                             ))
@@ -114,13 +131,14 @@ impl ChunkMaterialTask {
 
                     let bundle = MaterialMeshBundle::<TerrainMaterial> {
                         material: materials.add(TerrainMaterial::new(material_textures)),
-                        mesh: meshes.add(mesh),
                         transform: Transform::from_translation(Vec3::new(
                             0.0,
                             (index * Self::SECTIONS_PER_MESH * Section::SECTION_HEIGHT) as f32
                                 + Chunk::VERTICAL_SHIFT as f32,
                             0.0,
                         )),
+                        mesh: meshes.add(mesh),
+                        visibility: Visibility::Visible,
                         ..Default::default()
                     };
 
@@ -175,45 +193,58 @@ impl ChunkMaterialSection {
     pub(crate) const MESH_HEIGHT: usize =
         ChunkMaterialTask::SECTIONS_PER_MESH * Section::SECTION_HEIGHT;
 
-    fn section_task(sections: &[Section], _neighbors: [Option<&[Section]>; 4]) -> MaterialResult {
-        let mut required_textures = Vec::new();
-
-        let mut section_mesh_data =
-            [[[0u32; Section::SECTION_WIDTH + 2]; Section::SECTION_DEPTH + 2]; Self::MESH_HEIGHT];
+    fn section_task(sections: &[Section], neighbors: [Option<&[Section]>; 4]) -> MaterialResult {
+        // Store all blocks in a 3D array, with neighbors' blocks on the edges
+        let mut section_mesh_data = [[[Blocks::Air(BlockAir); Section::SECTION_WIDTH + 2];
+            Section::SECTION_DEPTH + 2]; Self::MESH_HEIGHT];
 
         for (y, layer) in section_mesh_data.iter_mut().enumerate() {
-            let section = &sections[y / Section::SECTION_HEIGHT];
+            let mut section = &sections[y / Section::SECTION_HEIGHT];
 
             for (z, row) in layer.iter_mut().enumerate() {
+                if z <= 1 {
+                    if let Some(neighbor) = neighbors[0] {
+                        section = &neighbor[y / Section::SECTION_HEIGHT];
+                    }
+                } else if z >= Section::SECTION_DEPTH {
+                    if let Some(neighbor) = neighbors[1] {
+                        section = &neighbor[y / Section::SECTION_HEIGHT];
+                    }
+                }
+
                 for (x, block) in row.iter_mut().enumerate() {
-                    let pos = BlockPos::new(x as i32 - 1, y as i32 - 1, z as i32 - 1);
-                    let pos = ChunkBlockPos::from(pos);
-
-                    let state_id = section.blocks.get(&pos);
-                    let texture = BlockTexture::new(String::from("up"), state_id);
-
-                    if !required_textures.contains(&texture) {
-                        required_textures.push(texture);
+                    if x <= 1 {
+                        if let Some(neighbor) = neighbors[2] {
+                            section = &neighbor[y / Section::SECTION_HEIGHT];
+                        }
+                    } else if x >= Section::SECTION_WIDTH {
+                        if let Some(neighbor) = neighbors[3] {
+                            section = &neighbor[y / Section::SECTION_HEIGHT];
+                        }
                     }
 
-                    *block = state_id;
+                    let pos = BlockPos::new(x as i32 - 1, y as i32 - 1, z as i32 - 1);
+                    let pos = ChunkBlockPos::from(pos);
+                    *block = Blocks::from_u32(section.blocks.get(&pos));
                 }
             }
         }
 
-        (
-            Mesh::new(PrimitiveTopology::TriangleList),
-            required_textures,
-        )
+        let mesh = Mesh::new(PrimitiveTopology::TriangleList);
+        let required_textures = Vec::new();
+
+        // TODO: Generate mesh and textures
+
+        (mesh, required_textures)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BlockTexture {
-    side: String,
+    side: CompactString,
     id: u32,
 }
 
 impl BlockTexture {
-    fn new(side: String, id: u32) -> Self { Self { side, id } }
+    pub fn new(side: CompactString, id: u32) -> Self { Self { side, id } }
 }

@@ -11,7 +11,7 @@ use serde::Deserialize;
 /// Some models are not used directly, but as templates for other models.
 #[derive(Debug, Default, Clone, PartialEq, Deserialize)]
 pub struct Model {
-    pub parent: Option<ResourceLocation>,
+    pub parent: Option<CompactString>,
     pub textures: Option<HashMap<CompactString, CompactString>>,
     pub display: Option<HashMap<CompactString, ModelDisplay>>,
     pub elements: Option<Vec<ModelElement>>,
@@ -58,7 +58,7 @@ impl Model {
 
         // Check if the parent model has the texture.
         if let Some(parent) = &self.parent {
-            if let Some(parent) = models.get(parent) {
+            if let Some(parent) = models.get(&ResourceLocation::new(parent.clone())) {
                 // Add the current model's textures to the hashmap.
                 // TODO: Prevent clone?
                 if let Some(current_textures) = &self.textures {
@@ -81,7 +81,7 @@ impl Model {
 
         // Check if the parent model has elements.
         if let Some(parent) = &self.parent {
-            if let Some(parent) = models.get(parent) {
+            if let Some(parent) = models.get(&ResourceLocation::new(parent.clone())) {
                 return parent.get_elements(models);
             }
         }
@@ -102,7 +102,7 @@ impl Model {
 
         // Check if the parent model has the display.
         if let Some(parent) = self.parent.as_ref() {
-            if let Some(parent) = models.get(parent) {
+            if let Some(parent) = models.get(&ResourceLocation::new(parent.clone())) {
                 return parent.get_display(name, models);
             }
         }
@@ -122,7 +122,7 @@ impl Model {
 
         // Check if the parent model has the gui light.
         if let Some(parent) = self.parent.as_ref() {
-            if let Some(parent) = models.get(parent) {
+            if let Some(parent) = models.get(&ResourceLocation::new(parent.clone())) {
                 return parent.get_gui_light(models);
             }
         }

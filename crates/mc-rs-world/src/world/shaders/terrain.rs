@@ -2,13 +2,16 @@ use std::num::NonZeroU32;
 
 use bevy::{
     asset::embedded_asset,
+    pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
     render::{
+        mesh::{MeshVertexAttribute, MeshVertexBufferLayout},
         render_asset::RenderAssets,
         render_resource::{
             AsBindGroup, AsBindGroupError, BindGroupEntries, BindGroupLayout, BindGroupLayoutEntry,
-            BindingType, PreparedBindGroup, SamplerBindingType, ShaderStages, TextureSampleType,
-            TextureViewDimension, UnpreparedBindGroup,
+            BindingType, PreparedBindGroup, RenderPipelineDescriptor, SamplerBindingType,
+            ShaderRef, ShaderStages, SpecializedMeshPipelineError, TextureSampleType,
+            TextureViewDimension, UnpreparedBindGroup, VertexFormat,
         },
         renderer::RenderDevice,
         texture::FallbackImage,
@@ -19,6 +22,9 @@ pub(super) fn setup(app: &mut App) {
     embedded_asset!(app, "embedded/terrain.wgsl");
     app.add_plugins(MaterialPlugin::<TerrainMaterial>::default());
 }
+
+pub const TEXTURE_INDEX: MeshVertexAttribute =
+    MeshVertexAttribute::new("TextureIndex", 422262077, VertexFormat::Uint32);
 
 #[derive(Debug, Default, Clone, Asset, TypePath)]
 pub struct TerrainMaterial {
@@ -33,13 +39,29 @@ impl TerrainMaterial {
 }
 
 impl Material for TerrainMaterial {
-    // fn vertex_shader() -> ShaderRef {
-    //     ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
-    // }
+    fn vertex_shader() -> ShaderRef {
+        ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
+    }
 
-    // fn fragment_shader() -> ShaderRef {
-    //     ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
-    // }
+    fn fragment_shader() -> ShaderRef {
+        ShaderRef::Path("embedded://mc_rs_world/world/shaders/embedded/terrain.wgsl".into())
+    }
+
+    fn specialize(
+        _pipeline: &MaterialPipeline<Self>,
+        descriptor: &mut RenderPipelineDescriptor,
+        layout: &MeshVertexBufferLayout,
+        _key: MaterialPipelineKey<Self>,
+    ) -> Result<(), SpecializedMeshPipelineError> {
+        let vertex_latout = layout.get_layout(&[
+            Mesh::ATTRIBUTE_POSITION.at_shader_location(0),
+            Mesh::ATTRIBUTE_UV_0.at_shader_location(1),
+            TEXTURE_INDEX.at_shader_location(2),
+        ])?;
+        descriptor.vertex.buffers = vec![vertex_latout];
+
+        Ok(())
+    }
 }
 
 impl AsBindGroup for TerrainMaterial {

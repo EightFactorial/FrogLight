@@ -45,9 +45,10 @@ impl ResourceLocation {
 
     /// Creates a new [`ResourceLocation`].
     ///
+    /// # Panics
     /// Panics if the string is empty or contains more than one colon (`:`).
     ///
-    /// ### Examples
+    /// # Examples
     /// ```
     /// use mc_rs_protocol::types::ResourceLocation;
     ///
@@ -94,7 +95,7 @@ impl ResourceLocation {
     ///
     /// Returns `None` if the string is empty or contains more than one colon (`:`).
     ///
-    /// ### Examples
+    /// # Examples
     /// ```
     /// use mc_rs_protocol::types::ResourceLocation;
     ///
@@ -143,7 +144,7 @@ impl ResourceLocation {
 
     /// Splits the [`ResourceLocation`] into a namespace and path.
     ///
-    /// ### Examples
+    /// # Examples
     /// ```
     /// use mc_rs_protocol::types::ResourceLocation;
     ///
@@ -171,7 +172,7 @@ impl ResourceLocation {
     ///
     /// See [`CompactString::new_inline`](CompactString) for more information.
     ///
-    /// ### Examples
+    /// # Examples
     /// ```
     /// use mc_rs_protocol::types::ResourceLocation;
     ///

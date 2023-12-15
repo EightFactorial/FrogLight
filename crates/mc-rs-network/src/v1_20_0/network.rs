@@ -153,12 +153,12 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::CustomPayload(p) => match CompactString::from_utf8(&p.data) {
                 Ok(str) => {
                     #[cfg(any(debug_assertions, feature = "debug"))]
-                    info!("Received CustomPayload: `{0} : {str}`", p.identifier);
+                    info!("Received CustomPayload: `{0} -> {str}`", p.identifier);
                 }
                 Err(_) => {
                     #[cfg(any(debug_assertions, feature = "debug"))]
                     info!(
-                        "Received CustomPayload: `{0} : {1:?}`",
+                        "Received CustomPayload: `{0} -> {1:?}`",
                         p.identifier, p.data
                     );
                 }
@@ -223,14 +223,17 @@ impl Network for V1_20_0 {
                         CurrentWorld::from(WorldType::Overworld)
                     });
 
-                let task = DecodeChunkTask::create(p.chunk_data);
-                let transform = Transform::from_translation(p.position.into());
                 let entity = world
                     .spawn((
-                        task,
+                        TransformBundle::from_transform(Transform::from_translation(
+                            p.position.into(),
+                        )),
+                        DecodeChunkTask::create(p.chunk_data),
+                        VisibilityBundle {
+                            visibility: Visibility::Visible,
+                            ..Default::default()
+                        },
                         p.position,
-                        TransformBundle::from_transform(transform),
-                        VisibilityBundle::default(),
                     ))
                     .id();
 
@@ -350,7 +353,7 @@ impl Network for V1_20_0 {
             ClientboundPlayPackets::PlayerPositionLook(p) => {
                 #[cfg(any(debug_assertions, feature = "debug"))]
                 info!(
-                    "Received player PosLook: {:?}, ({:?}, {:?})",
+                    "Received PlayerPositionLook: {:?}, ({:?}, {:?})",
                     p.position, p.yaw, p.pitch
                 );
 

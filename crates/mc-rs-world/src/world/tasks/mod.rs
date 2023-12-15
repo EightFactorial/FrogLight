@@ -19,7 +19,7 @@ pub(super) fn setup(app: &mut App) {
             DecodeChunkTask::poll_tasks.run_if(any_with_component::<DecodeChunkTask>()),
             #[cfg(feature = "shaders")]
             (
-                ChunkMaterialTask::chunk_updater.run_if(any_with_component::<Chunk>()),
+                ChunkMaterialTask::chunk_update.run_if(any_with_component::<Chunk>()),
                 ChunkMaterialTask::poll_tasks.run_if(any_with_component::<ChunkMaterialTask>()),
             )
                 .chain(),

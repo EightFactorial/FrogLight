@@ -49,14 +49,12 @@ impl DefaultCamera {
                 ..Default::default()
             },
             camera_3d: Camera3d {
-                clear_color: ClearColorConfig::Custom(Color::BLACK),
+                clear_color: ClearColorConfig::Custom(Color::rgb(0.53, 0.81, 0.92)),
                 ..Default::default()
             },
             projection: Projection::Perspective(PerspectiveProjection {
                 fov: 70f32.to_radians(),
-                near: 0.1,
-                far: 1000.0,
-                aspect_ratio: 1.0,
+                ..Default::default()
             }),
             ..Default::default()
         }

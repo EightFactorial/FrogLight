@@ -27,6 +27,10 @@ pub trait BlockTrait<V: Version>: std::fmt::Debug + Default + Clone + Copy {
     /// Get the state id of the block.
     fn to_u32(&self) -> u32;
 
+    fn is_air(&self) -> bool { false }
+    fn is_opaque(&self) -> bool { true }
+    fn is_collidable(&self) -> bool { true }
+
     /// Get the language key of the block.
     fn lang_key(&self) -> CompactString {
         let suffix = self.resource_location().split(':').last().unwrap();
@@ -44,4 +48,8 @@ pub trait BlocksTrait<V: Version>: std::fmt::Debug + Default + Clone + Copy {
     fn from_u32(id: u32) -> Self;
     /// Get the state id of the block.
     fn to_u32(&self) -> u32;
+
+    fn is_air(&self) -> bool;
+    fn is_opaque(&self) -> bool;
+    fn is_collidable(&self) -> bool;
 }

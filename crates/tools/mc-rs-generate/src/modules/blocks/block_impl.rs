@@ -186,6 +186,63 @@ impl BlockVersionModule {
                 });
             }
 
+            // Implement is_air
+            {
+                let mut tokens = TokenStream::new();
+
+                for (variant_name, _) in &blocks {
+                    tokens.extend(quote::quote! {
+                        Self::#variant_name(b) => b.is_air(),
+                    });
+                }
+
+                impl_blocks.items.push(syn::parse_quote! {
+                    fn is_air(&self) -> bool {
+                        match self {
+                            #tokens
+                        }
+                    }
+                });
+            }
+
+            // Implement is_opaque
+            {
+                let mut tokens = TokenStream::new();
+
+                for (variant_name, _) in &blocks {
+                    tokens.extend(quote::quote! {
+                        Self::#variant_name(b) => b.is_opaque(),
+                    });
+                }
+
+                impl_blocks.items.push(syn::parse_quote! {
+                    fn is_opaque(&self) -> bool {
+                        match self {
+                            #tokens
+                        }
+                    }
+                });
+            }
+
+            // Implement is_collidable
+            {
+                let mut tokens = TokenStream::new();
+
+                for (variant_name, _) in &blocks {
+                    tokens.extend(quote::quote! {
+                        Self::#variant_name(b) => b.is_collidable(),
+                    });
+                }
+
+                impl_blocks.items.push(syn::parse_quote! {
+                    fn is_collidable(&self) -> bool {
+                        match self {
+                            #tokens
+                        }
+                    }
+                });
+            }
+
             output.items.push(syn::Item::Impl(impl_blocks));
             output.items.push(Item::Verbatim(TokenStream::new()));
         }
@@ -210,50 +267,96 @@ impl BlockVersionModule {
             output.items.push(Item::Verbatim(TokenStream::new()));
 
             for (block_name, block_data) in data.output["blocks"]["data"].entries() {
-                let resource_location = format!("minecraft:{block_name}");
-
                 let block_ident = format!("Block{}", block_name.to_case(Case::Pascal));
                 let block_ident = Ident::new(&block_ident, Span::call_site());
 
-                let min = block_data["state_ids"]["min"].as_u32().unwrap();
-                let max = block_data["state_ids"]["max"].as_u32().unwrap();
+                // Implement `resource_location`
+                let resource_location = {
+                    let name = format!("minecraft:{block_name}");
+                    quote::quote! {
+                        fn resource_location(&self) -> &'static str {
+                            #name
+                        }
+                    }
+                };
 
-                let (try_from, to_u32) = if block_data["attributes"].is_empty() && min == max {
-                    (
-                        quote::quote! {
-                           fn try_from_u32(_: u32) -> Option<Self> {
-                               Some(Self)
-                           }
+                // Implement `try_from_u32` and `to_u32`
+                let (try_from, to_u32) = {
+                    let min = block_data["state_ids"]["min"].as_u32().unwrap();
+                    let max = block_data["state_ids"]["max"].as_u32().unwrap();
 
-                        },
-                        quote::quote! {
-                           fn to_u32(&self) -> u32 {
-                               #min
-                           }
-                        },
-                    )
-                } else {
+                    if block_data["attributes"].is_empty() && min == max {
+                        (
+                            quote::quote! {
+                               fn try_from_u32(_: u32) -> Option<Self> {
+                                   Some(Self)
+                               }
+
+                            },
+                            quote::quote! {
+                               fn to_u32(&self) -> u32 {
+                                   #min
+                               }
+                            },
+                        )
+                    } else {
+                        (
+                            quote::quote! {
+                               fn try_from_u32(_id: u32) -> Option<Self> {
+                                   Some(Self::default())
+                               }
+                            },
+                            quote::quote! {
+                              fn to_u32(&self) -> u32 {
+                                  #min
+                              }
+                            },
+                        )
+                    }
+                };
+
+                let (is_air, is_opaque, is_collidable) = {
+                    let is_air = block_data["is_air"].as_bool().unwrap();
+                    let is_opaque = block_data["opaque"].as_bool().unwrap();
+                    let is_collidable = block_data["collidable"].as_bool().unwrap();
+
                     (
-                        quote::quote! {
-                           fn try_from_u32(_id: u32) -> Option<Self> {
-                               Some(Self::default())
-                           }
+                        match is_air {
+                            true => quote::quote! {
+                               fn is_air(&self) -> bool {
+                                   true
+                               }
+                            },
+                            false => quote::quote!(),
                         },
-                        quote::quote! {
-                          fn to_u32(&self) -> u32 {
-                              #min
-                          }
+                        match is_opaque {
+                            true => quote::quote!(),
+                            false => quote::quote! {
+                               fn is_opaque(&self) -> bool {
+                                   false
+                               }
+                            },
+                        },
+                        match is_collidable {
+                            true => quote::quote!(),
+                            false => quote::quote! {
+                               fn is_collidable(&self) -> bool {
+                                   false
+                               }
+                            },
                         },
                     )
                 };
 
                 output.items.push(Item::Impl(syn::parse_quote! {
                     impl BlockTrait<#version_struct_ident> for #block_ident {
-                        fn resource_location(&self) -> &'static str {
-                            #resource_location
-                        }
+                        #resource_location
                         #try_from
                         #to_u32
+
+                        #is_air
+                        #is_opaque
+                        #is_collidable
                     }
                 }));
                 output.items.push(Item::Verbatim(TokenStream::new()));
