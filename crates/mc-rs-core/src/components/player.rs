@@ -12,8 +12,17 @@ pub(super) fn setup(app: &mut App) {
 pub struct CreateUserEvent(pub Entity);
 
 impl CreateUserEvent {
-    fn listener(mut events: EventReader<Self>, mut commands: Commands) {
+    fn listener(
+        query: Query<Entity, With<Camera3d>>,
+        mut events: EventReader<Self>,
+        mut commands: Commands,
+    ) {
         events.read().for_each(|Self(entity)| {
+            let Ok(camera_entity) = query.get_single() else {
+                error!("Failed to get entity for camera!");
+                return;
+            };
+
             let Some(mut commands) = commands.get_entity(*entity) else {
                 error!("Failed to get entity for user's player!");
                 return;
@@ -22,10 +31,12 @@ impl CreateUserEvent {
             // Add the player components
             commands
                 // Add the player body components
-                .insert((ControlledPlayer, TransformBundle::default()))
+                .insert((ControlledPlayer, SpatialBundle::default()))
                 .with_children(|parent| {
                     // Create the player head
-                    parent.spawn((ControlledPlayerHead, TransformBundle::default()));
+                    parent
+                        .spawn((ControlledPlayerHead, SpatialBundle::default()))
+                        .add_child(camera_entity);
                 });
         });
     }

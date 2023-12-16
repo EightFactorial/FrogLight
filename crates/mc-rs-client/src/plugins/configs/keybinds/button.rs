@@ -391,6 +391,34 @@ impl Button {
                 | Self::SuperRight
         )
     }
+
+    pub fn just_pressed(
+        &self,
+        input_keyboard: &Input<KeyCode>,
+        input_mouse: &Input<MouseButton>,
+    ) -> bool {
+        if let Some(button) = (*self).into() {
+            input_mouse.just_pressed(button)
+        } else if let Some(button) = (*self).into() {
+            input_keyboard.just_pressed(button)
+        } else {
+            false
+        }
+    }
+
+    pub fn pressed(
+        &self,
+        input_keyboard: &Input<KeyCode>,
+        input_mouse: &Input<MouseButton>,
+    ) -> bool {
+        if let Some(button) = (*self).into() {
+            input_mouse.pressed(button)
+        } else if let Some(button) = (*self).into() {
+            input_keyboard.pressed(button)
+        } else {
+            false
+        }
+    }
 }
 
 impl From<KeyCode> for Button {

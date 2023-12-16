@@ -2,7 +2,6 @@
 
 use bevy::{
     prelude::*,
-    render::render_resource::PrimitiveTopology,
     tasks::{AsyncComputeTaskPool, Task},
 };
 use compact_str::CompactString;
@@ -20,7 +19,6 @@ use crate::{
     world::{
         chunk::{Chunk, ChunkSections},
         section::Section,
-        shaders::terrain::TerrainMaterial,
     },
 };
 
@@ -99,7 +97,8 @@ impl ChunkMaterialTask {
         packs: Res<ResourcePacks>,
         pack_assets: Res<Assets<ResourcePackAsset>>,
 
-        mut materials: ResMut<Assets<TerrainMaterial>>,
+        // mut materials: ResMut<Assets<TerrainMaterial>>,
+        mut materials: ResMut<Assets<StandardMaterial>>,
         mut meshes: ResMut<Assets<Mesh>>,
         mut commands: Commands,
     ) {
@@ -108,7 +107,7 @@ impl ChunkMaterialTask {
                 let mut commands = commands.entity(entity);
 
                 for (index, (mesh, material_ids)) in result.into_iter().enumerate() {
-                    let material_textures: Vec<Handle<Image>> = material_ids
+                    let _material_textures: Vec<Handle<Image>> = material_ids
                         .into_iter()
                         .filter_map(|m| {
                             let block = Blocks::from_u32(m.id);
@@ -129,16 +128,15 @@ impl ChunkMaterialTask {
                         .cloned()
                         .collect();
 
-                    let bundle = MaterialMeshBundle::<TerrainMaterial> {
-                        material: materials.add(TerrainMaterial::new(material_textures)),
-                        transform: Transform::from_translation(Vec3::new(
+                    let bundle = MaterialMeshBundle::<StandardMaterial> {
+                        material: materials.add(Color::GRAY.into()),
+                        transform: Transform::from_xyz(
                             0.0,
-                            (index * Self::SECTIONS_PER_MESH * Section::SECTION_HEIGHT) as f32
+                            (index * ChunkMaterialSection::MESH_HEIGHT) as f32
                                 + Chunk::VERTICAL_SHIFT as f32,
                             0.0,
-                        )),
+                        ),
                         mesh: meshes.add(mesh),
-                        visibility: Visibility::Visible,
                         ..Default::default()
                     };
 
@@ -202,6 +200,7 @@ impl ChunkMaterialSection {
             let mut section = &sections[y / Section::SECTION_HEIGHT];
 
             for (z, row) in layer.iter_mut().enumerate() {
+                // Get the neighbor section if the block is on the edge
                 if z <= 1 {
                     if let Some(neighbor) = neighbors[0] {
                         section = &neighbor[y / Section::SECTION_HEIGHT];
@@ -213,6 +212,7 @@ impl ChunkMaterialSection {
                 }
 
                 for (x, block) in row.iter_mut().enumerate() {
+                    // Get the neighbor section if the block is on the edge
                     if x <= 1 {
                         if let Some(neighbor) = neighbors[2] {
                             section = &neighbor[y / Section::SECTION_HEIGHT];
@@ -230,8 +230,12 @@ impl ChunkMaterialSection {
             }
         }
 
-        let mesh = Mesh::new(PrimitiveTopology::TriangleList);
         let required_textures = Vec::new();
+        let mesh = Mesh::from(shape::Box::new(
+            Section::SECTION_WIDTH as f32,
+            Self::MESH_HEIGHT as f32,
+            Section::SECTION_DEPTH as f32,
+        ));
 
         // TODO: Generate mesh and textures
 

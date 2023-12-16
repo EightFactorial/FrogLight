@@ -1,3 +1,4 @@
+use bevy::input::{keyboard::KeyCode, mouse::MouseButton, Input};
 use serde::{Deserialize, Serialize};
 
 use super::button::Button;
@@ -12,6 +13,36 @@ pub enum KeyBind {
     ///
     /// The first button is the primary button, and the second is the modifier button.
     Double(Button, Button),
+}
+
+impl KeyBind {
+    pub fn just_pressed(
+        &self,
+        input_keyboard: &Input<KeyCode>,
+        input_mouse: &Input<MouseButton>,
+    ) -> bool {
+        match self {
+            Self::Single(button) => button.just_pressed(input_keyboard, input_mouse),
+            Self::Double(button, modifier) => {
+                button.just_pressed(input_keyboard, input_mouse)
+                    && modifier.pressed(input_keyboard, input_mouse)
+            }
+        }
+    }
+
+    pub fn pressed(
+        &self,
+        input_keyboard: &Input<KeyCode>,
+        input_mouse: &Input<MouseButton>,
+    ) -> bool {
+        match self {
+            Self::Single(button) => button.pressed(input_keyboard, input_mouse),
+            Self::Double(button, modifier) => {
+                button.pressed(input_keyboard, input_mouse)
+                    && modifier.pressed(input_keyboard, input_mouse)
+            }
+        }
+    }
 }
 
 impl From<Button> for KeyBind {

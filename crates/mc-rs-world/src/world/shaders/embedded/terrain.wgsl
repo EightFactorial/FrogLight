@@ -2,14 +2,14 @@
 @group(1) @binding(1) var textures_sampler: sampler;
 
 struct VertexInput {
-    @location(0) position: vec2<f32>,
-    @location(1) tex_coords: vec2<f32>,
+    @location(0) position: vec3<f32>,
+    @location(1) uvs: vec2<f32>,
     @location(2) tex_index: u32,
 };
 
 struct VertexOutput {
     @builtin(position) position: vec4<f32>,
-    @location(0) tex_coords: vec2<f32>,
+    @location(0) uvs: vec2<f32>,
     @location(1) tex_index: u32,
 };
 
@@ -19,8 +19,8 @@ fn vertex(
 ) -> VertexOutput {
     var out: VertexOutput;
 
-    out.position = vec4<f32>(in.position, 0.0, 1.0);
-    out.tex_coords = in.tex_coords;
+    out.position = vec4<f32>(in.position, 1.0);
+    out.uvs = in.uvs;
     out.tex_index = in.tex_index;
 
     return out;
@@ -30,5 +30,5 @@ fn vertex(
 fn fragment(
     in: VertexOutput
 ) -> @location(0) vec4<f32> {
-    textureSample(textures[in.tex_index], textures_sampler, in.tex_coords);
+    textureSample(textures[in.tex_index], textures_sampler, in.uvs);
 }

@@ -1,5 +1,5 @@
 use bevy_ecs::prelude::Component;
-use bevy_math::{IVec2, Vec3};
+use bevy_math::{IVec2, Vec3, Vec3A};
 use derive_more::{Deref, DerefMut, From, Into};
 use mc_rs_macros::Transcode;
 
@@ -64,6 +64,18 @@ impl From<ChunkPos> for [i32; 2] {
 
 impl From<ChunkPos> for Vec3 {
     fn from(value: ChunkPos) -> Self { Vec3::new(value.0.x as f32, 0.0, value.0.y as f32) * 16.0 }
+}
+
+impl From<Vec3> for ChunkPos {
+    fn from(value: Vec3) -> Self { Self::new(value.x as i32 / 16, value.z as i32 / 16) }
+}
+
+impl From<ChunkPos> for Vec3A {
+    fn from(value: ChunkPos) -> Self { Vec3A::new(value.0.x as f32, 0.0, value.0.y as f32) * 16.0 }
+}
+
+impl From<Vec3A> for ChunkPos {
+    fn from(value: Vec3A) -> Self { Self::new(value.x as i32 / 16, value.z as i32 / 16) }
 }
 
 // Swap x and z
