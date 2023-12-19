@@ -1,4 +1,5 @@
 use azalea_chat::FormattedText;
+use compact_str::CompactString;
 use mc_rs_macros::Transcode;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -8,7 +9,7 @@ use uuid::Uuid;
 pub struct ClientboundQueryResponsePacket {
     pub description: FormattedText,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub favicon: Option<String>,
+    pub favicon: Option<CompactString>,
     pub players: QueryPlayers,
     pub version: QueryVersion,
     #[serde(
@@ -36,7 +37,7 @@ pub struct QueryPlayers {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct QuerySamplePlayer {
     pub uuid: Uuid,
-    pub name: String,
+    pub name: CompactString,
 }
 
 #[test]

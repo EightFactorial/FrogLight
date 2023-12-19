@@ -3,9 +3,10 @@ use std::{fmt::Debug, hash::Hash, marker::PhantomData};
 use bevy::{ecs::system::SystemState, prelude::*, tasks::IoTaskPool};
 use futures_lite::future::{block_on, poll_once};
 use mc_rs_core::{
-    components::player::{LocalPlayer, LocalPlayerHead},
+    components::player::CreateUserEvent,
+    events::{ConnectionEvent, PingResponse, StatusRequest, StatusResponse},
+    resources::player::username::Username,
     schedule::state::ApplicationState,
-    ConnectionEvent, PingResponse, StatusRequest, StatusResponse,
 };
 use mc_rs_protocol::{
     types::enums::ConnectionIntent,
@@ -16,6 +17,7 @@ use mc_rs_protocol::{
 use crate::{
     handle::ConnectionEnum,
     task::{ConnectionChannel, ConnectionHandshakeTask, ConnectionLoginTask, ConnectionStatusTask},
+    NetworkingSet,
 };
 
 use super::{
@@ -25,8 +27,8 @@ use super::{
 
 /// A trait that defines how to handle a network version
 ///
-/// A version must also have the [NetworkHandle] trait implemented
-pub trait Network: NetworkHandle + Version + Send + Sync + 'static
+/// A version must also have the [`NetworkHandle`] trait implemented
+pub(super) trait Network: NetworkHandle + Version + Send + Sync + 'static
 where
     Handshake: State<Self>,
     Status: State<Self>,
@@ -41,10 +43,12 @@ where
         app.add_event::<ConnectionEvent<Self>>();
 
         // Configure the system set
-        app.configure_set(
+        app.configure_sets(
             PreUpdate,
             ConnectionSystemSet::<Self>::default()
-                .run_if(any_with_component::<ConnectionMarker<Self>>()),
+                .run_if(any_with_component::<ConnectionMarker<Self>>())
+                .ambiguous_with(NetworkingSet)
+                .in_set(NetworkingSet),
         );
 
         // Add systems to the set
@@ -70,9 +74,10 @@ where
         mut reader: EventReader<StatusRequest<Self>>,
         mut writer: EventWriter<ConnectionEvent<Self>>,
     ) {
-        for request in reader.iter() {
+        for request in reader.read() {
             writer.send(ConnectionEvent::new_with(
-                request.host.clone(),
+                request.entity,
+                request.hostname.clone(),
                 ConnectionIntent::Status,
             ));
         }
@@ -80,19 +85,26 @@ where
 
     /// Create a new connection to the server
     fn connection_request(mut events: EventReader<ConnectionEvent<Self>>, mut commands: Commands) {
-        for event in events.iter() {
-            let addr = event.addr.clone();
+        for event in events.read() {
+            let addr = event.hostname.clone();
             let task = IoTaskPool::get().spawn(Connection::new(Self::default(), addr.clone()));
 
             match event.intent {
                 ConnectionIntent::Status | ConnectionIntent::Login => {
-                    commands.spawn((
+                    let mut entity = commands.spawn((
                         ConnectionMarker::<Self>::default(),
                         ConnectionTask::new_with(task, addr, event.intent),
                     ));
+
+                    if matches!(
+                        (event.intent, event.entity),
+                        (ConnectionIntent::Status, Some(_))
+                    ) {
+                        entity.insert(ConnectionReplyMarker(event.entity.unwrap()));
+                    }
                 }
                 _ => {
-                    warn!("Skipping making connection with invalid connection intent!");
+                    warn!("Skipping connection creation with invalid connection intent!");
                 }
             }
         }
@@ -103,7 +115,7 @@ where
         mut query: Query<(Entity, &mut ConnectionTask<Self>)>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok(con) => {
@@ -132,10 +144,11 @@ where
 
     /// Wait for the handshake to finish and start the next state
     fn handshake_query(
+        username: Res<Username>,
         mut query: Query<(Entity, &mut ConnectionHandshakeTask<Self>)>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 let mut entity_commands = commands.entity(entity);
 
@@ -157,8 +170,8 @@ where
                                 entity_commands.insert(ConnectionStatusTask::new(status_task));
                             }
                             ConnectionIntent::Login => {
-                                let login_task =
-                                    IoTaskPool::get().spawn(Self::login_handle(con.into()));
+                                let login_task = IoTaskPool::get()
+                                    .spawn(Self::login_handle(username.clone(), con.into()));
 
                                 entity_commands.insert(ConnectionLoginTask::new(login_task));
                             }
@@ -180,19 +193,30 @@ where
 
     /// Wait for the status to finish and broadcast the results
     fn status_query(
-        mut query: Query<(Entity, &mut ConnectionStatusTask<Self>)>,
+        mut query: Query<(
+            Entity,
+            &mut ConnectionStatusTask<Self>,
+            Option<&ConnectionReplyMarker>,
+        )>,
         mut status_events: EventWriter<StatusResponse>,
         mut ping_events: EventWriter<PingResponse>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task, reply) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
-                    Ok((status, ping)) => {
-                        debug!("Status finished with {:?}", status);
+                    Ok((mut status, mut ping)) => {
+                        if let Some(entity) = reply {
+                            status.entity = Some(entity.0);
+                            ping.entity = Some(entity.0);
+                        }
+
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        trace!("`{}` responded with {:?}", status.hostname, status);
                         status_events.send(status);
 
-                        debug!("Ping finished with {:?}", ping);
+                        #[cfg(any(debug_assertions, feature = "debug"))]
+                        debug!("`{}` responded with {:?}", ping.hostname, ping);
                         ping_events.send(ping);
                     }
                     Err(err) => {
@@ -213,16 +237,17 @@ where
 
     /// Whether or not the version has the configuration state
     ///
-    /// Used for bevy system run_if's
+    /// Used for bevy system [`run_if`](bevy::ecs::schedule::config::IntoSystemConfigs::run_if)s
     fn has_configuration_state() -> bool { Self::HAS_CONFIGURATION_STATE }
 
     /// Wait for the login to finish and start the next state
     fn login_query(
         mut query: Query<(Entity, &mut ConnectionLoginTask<Self>)>,
         mut state: ResMut<NextState<ApplicationState>>,
+        mut events: EventWriter<CreateUserEvent>,
         mut commands: Commands,
     ) {
-        for (entity, mut task) in query.iter_mut() {
+        for (entity, mut task) in &mut query {
             if let Some(result) = block_on(poll_once(task.task_mut())) {
                 match result {
                     Ok((conn, profile)) => {
@@ -231,41 +256,33 @@ where
                             conn.peer_addr().expect("Unable to get peer address")
                         );
 
+                        events.send(CreateUserEvent(entity));
+
                         commands
                             .entity(entity)
                             .insert(profile)
-                            .insert((LocalPlayer, TransformBundle::default()))
-                            .with_children(|player| {
-                                player.spawn((LocalPlayerHead, TransformBundle::default()));
-                            })
                             .remove::<ConnectionLoginTask<Self>>();
 
                         let (tx1, rx1) = flume::unbounded();
                         let (tx2, rx2) = flume::unbounded();
 
-                        match Self::HAS_CONFIGURATION_STATE {
-                            true => {
-                                let task = IoTaskPool::get().spawn(Self::packet_handle(
-                                    ConnectionEnum::Configuration(conn.into()),
-                                    tx1,
-                                    rx2,
-                                ));
+                        if Self::HAS_CONFIGURATION_STATE {
+                            let task = IoTaskPool::get().spawn(Self::packet_handle(
+                                ConnectionEnum::Configuration(conn.into()),
+                                tx1,
+                                rx2,
+                            ));
 
-                                commands
-                                    .insert_resource(ConnectionChannel::new_config(rx1, tx2, task));
-                            }
-                            false => {
-                                let task = IoTaskPool::get().spawn(Self::packet_handle(
-                                    ConnectionEnum::Play(conn.into()),
-                                    tx1,
-                                    rx2,
-                                ));
+                            commands.insert_resource(ConnectionChannel::new_config(rx1, tx2, task));
+                        } else {
+                            let task = IoTaskPool::get().spawn(Self::packet_handle(
+                                ConnectionEnum::Play(conn.into()),
+                                tx1,
+                                rx2,
+                            ));
 
-                                commands
-                                    .insert_resource(ConnectionChannel::new_play(rx1, tx2, task));
-
-                                state.set(ApplicationState::Game)
-                            }
+                            commands.insert_resource(ConnectionChannel::new_play(rx1, tx2, task));
+                            state.set(ApplicationState::InGame);
                         }
                     }
                     Err(err) => {
@@ -290,7 +307,7 @@ where
             channel_state = task.state;
 
             if task.is_disconnected() {
-                log::error!("Channel disconnected");
+                error!("Channel disconnected");
                 world.remove_resource::<ConnectionChannel<Self>>();
                 return;
             }
@@ -336,23 +353,18 @@ where
                         }
 
                         // Process the configuration packet
-                        Self::config_packet(world, packet)
+                        Self::config_packet(world, packet);
                     } else {
                         unreachable!("Configuration packet when connection doesn't have Configuration state!")
                     }
                 }
                 ConnectionData::Play(packet) => {
-                    if Self::HAS_CONFIGURATION_STATE {
-                        if channel_state != ConnectionState::Play {
-                            warn!("Received play packet in configuration state!");
-                        }
-
-                        // Process the play packet
-                        Self::play_packet(world, packet)
-                    } else {
-                        // Process the play packet
-                        Self::play_packet(world, packet)
+                    if Self::HAS_CONFIGURATION_STATE && channel_state != ConnectionState::Play {
+                        warn!("Received play packet in configuration state!");
                     }
+
+                    // Process the play packet
+                    Self::play_packet(world, packet);
                 }
                 ConnectionData::NewState(state) => {
                     if Self::HAS_CONFIGURATION_STATE {
@@ -387,9 +399,12 @@ where
     fn play_packet(world: &mut World, packet: <Play as State<Self>>::Clientbound);
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
+pub(super) struct ConnectionReplyMarker(Entity);
+
 /// A system set that contains all the systems needed for a connection
 #[derive(Debug, Default, PartialEq, Eq, Hash, SystemSet)]
-pub struct ConnectionSystemSet<V: Version>(PhantomData<V>);
+pub(super) struct ConnectionSystemSet<V: Version>(PhantomData<V>);
 
 impl<V: Version> Clone for ConnectionSystemSet<V> {
     fn clone(&self) -> Self { Self(self.0) }
@@ -397,4 +412,4 @@ impl<V: Version> Clone for ConnectionSystemSet<V> {
 
 /// A marker component for entities that contain a connection
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub struct ConnectionMarker<V: Version>(PhantomData<V>);
+pub(super) struct ConnectionMarker<V: Version>(PhantomData<V>);

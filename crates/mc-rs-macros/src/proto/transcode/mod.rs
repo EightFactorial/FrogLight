@@ -4,13 +4,18 @@ use syn::DeriveInput;
 use crate::DeriveMacroAttr;
 
 use super::{
-    decode::DecodeMacro, encode::EncodeMacro, macro_type::MacroTypeTrait, test::TestTrait,
+    decode::DecodeMacro,
+    encode::EncodeMacro,
+    macro_type::MacroTypeTrait,
+    test::{TestTrait, TestType},
 };
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct TranscodeMacro;
+pub(crate) struct TranscodeMacro;
 
 impl MacroTypeTrait for TranscodeMacro {
+    const REQUIRED_TESTS: &'static [TestType] = &[];
+
     fn generate_macro(&self, attr: &DeriveMacroAttr, input: &DeriveInput) -> TokenStream {
         let mut derives = TokenStream::new();
 

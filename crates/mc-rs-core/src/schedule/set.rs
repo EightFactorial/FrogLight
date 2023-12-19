@@ -2,18 +2,18 @@ use bevy::prelude::*;
 
 use super::state::ApplicationState;
 
+/// A system set that runs when the [ApplicationState] is
+/// [Loading](ApplicationState::Loading)
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub struct LoadingSet;
+
 /// A system set that runs when the [ApplicationState] is either
-/// [InMenu](ApplicationState::InMenu) or [SplashScreen](ApplicationState::SplashScreen)
+/// [Loading](ApplicationState::Loading) or [MainMenu](ApplicationState::MainMenu)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct MenuSet;
 
 /// A system set that runs when the [ApplicationState] is
-/// [InMenu](ApplicationState::InMenu)
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub struct InMenuSet;
-
-/// A system set that runs when the [ApplicationState] is
-/// [Game](ApplicationState::Game)
+/// [InGame](ApplicationState::InGame)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub struct GameSet;
 
@@ -22,23 +22,11 @@ pub(super) fn configure(app: &mut App) {
     app.configure_sets(
         Update,
         (
-            // Splash and MainMenu
-            #[cfg(feature = "splash")]
-            {
-                MenuSet.run_if(
-                    in_state(ApplicationState::InMenu)
-                        .or_else(in_state(ApplicationState::SplashScreen)),
-                )
-            },
-            #[cfg(not(feature = "splash"))]
-            {
-                MenuSet.run_if(in_state(ApplicationState::InMenu))
-            },
-            InMenuSet
-                .run_if(in_state(ApplicationState::InMenu))
-                .in_set(MenuSet),
-            // Game
-            GameSet.run_if(in_state(ApplicationState::Game)),
+            LoadingSet.run_if(in_state(ApplicationState::Loading)),
+            MenuSet.run_if(
+                in_state(ApplicationState::Loading).or_else(in_state(ApplicationState::MainMenu)),
+            ),
+            GameSet.run_if(in_state(ApplicationState::InGame)),
         ),
     );
 }

@@ -1,0 +1,47 @@
+[package]
+name = "mc-rs-client"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+build = "build.rs"
+
+[lints]
+workspace = true
+
+[build-dependencies]
+vergen = { version = "8.2", features = ["build", "cargo", "git", "gitoxide"] }
+
+[dependencies]
+anyhow = "1.0"
+bevy = { workspace = true, features = ["serialize"] }
+bevy_rapier3d = { workspace = true }
+compact_str = { workspace = true, features = ["serde"] }
+dirs = "5.0"
+mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
+mc-rs-gui = { version = "0.1", path = "../mc-rs-gui" }
+mc-rs-network = { version = "0.1", path = "../mc-rs-network" }
+mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
+mc-rs-world = { version = "0.1", path = "../mc-rs-world" }
+rand = { version = "0.8", features = ["nightly"] }
+serde = { workspace = true }
+toml = "0.8"
+
+[features]
+default = ["default_plugins"]
+
+# Add bevy's default plugins to the ClientPlugins group
+default_plugins = []
+# Enable extra bevy plugins and features
+bevy_extra = ["bevy/embedded_watcher", "bevy/file_watcher"]
+
+# Enable debug features
+debug = ["mc-rs-core/debug", "mc-rs-gui/debug", "mc-rs-network/debug", "mc-rs-resourcepack/debug", "mc-rs-world/debug"]
+# Enable bevy-rapier debug features
+debug_rapier = []
+
+# Enable simd features
+simd = ["mc-rs-core/simd", "mc-rs-gui/simd", "mc-rs-network/simd", "mc-rs-resourcepack/debug", "mc-rs-world/debug"]

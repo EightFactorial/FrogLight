@@ -1,3 +1,4 @@
+use compact_str::CompactString;
 use mc_rs_macros::Transcode;
 
 use crate::types::enums::ConnectionIntent;
@@ -7,7 +8,7 @@ use crate::types::enums::ConnectionIntent;
 pub struct ServerboundHandshakePacket {
     #[var]
     pub protocol_version: i32,
-    pub hostname: String,
+    pub hostname: CompactString,
     pub port: u16,
     pub intention: ConnectionIntent,
 }

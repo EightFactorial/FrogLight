@@ -3,62 +3,132 @@ name = "mc-rs"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
-build = "build.rs"
+# -- Workspace configuration --
 
 [workspace]
 resolver = "2"
 members = [
+    "crates/mc-rs-client",
     "crates/mc-rs-core",
-    "crates/mc-rs-interface",
+    "crates/mc-rs-gui",
     "crates/mc-rs-macros",
     "crates/mc-rs-network",
     "crates/mc-rs-protocol",
+    "crates/mc-rs-resourcepack",
+    "crates/mc-rs-world",
     "crates/tools/classfile-rs",
     "crates/tools/mc-rs-extract",
     "crates/tools/mc-rs-generate",
 ]
 
+[workspace.dependencies]
+azalea-chat = { version = "0.9", default-features = false }
+azalea-nbt = { version = "0.8", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
+bevy = "0.12"
+bevy_rapier3d = { version = "0.23", features = ["parallel"] }
+compact_str = "0.7"
+derive_more = "0.99"
+futures-lite = { version = "2.1", features = ["futures-io"] }
+image = "0.24"
+itertools = "0.12"
+parking_lot = { version = "0.12", features = ["nightly"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }
+strum = { version = "0.25", features = ["derive"] }
+thiserror = "1.0"
+tracing = "0.1"
+uuid = "1.6"
+zip = { version = "0.6", features = ["deflate"] }
+
+[workspace.lints.rust]
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_lifetimes = "warn"
+unused_import_braces = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "deny"
+private_intra_doc_links = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_rust_codeblocks = "deny"
+bare_urls = "deny"
+invalid_html_tags = "deny"
+
+[workspace.lints.clippy]
+#pedantic = "warn"
+needless_pass_by_value = "allow"
+dbg_macro = "deny"
+# -- Build configuration --
+
+# Optimize build scripts
+[profile.dev.build-override]
+opt-level = 3
+
+[profile.release.build-override]
+opt-level = 3
+
+# Only slightly optimize the debug builds
+[profile.dev]
+incremental = true
+opt-level = 1
+
+# Optimize all dependencies
 [profile.dev.package."*"]
 opt-level = 3
 
-[profile.dev]
+# Only slightly optimize the client, core, and gui crates
+[profile.dev.package.mc-rs-client]
 opt-level = 1
-strip = false
-incremental = true
 
+[profile.dev.package.mc-rs-core]
+opt-level = 1
+
+[profile.dev.package.mc-rs-gui]
+opt-level = 1
+
+# Optimize the network and protocol crates
+[profile.dev.package.mc-rs-network]
+opt-level = 3
+
+[profile.dev.package.mc-rs-protocol]
+opt-level = 3
+
+# Optimize release builds
 [profile.release]
-# lto = "fat"
-# strip = true
-# codegen-units = 1
 incremental = false
+opt-level = 3
+strip = true
+lto = true
+# -- MC-RS crate configuration --
 
-[build-dependencies]
-vergen = { version = "8.2.5", features = ["build", "cargo", "git", "gitoxide"] }
+[lints]
+workspace = true
 
 [dependencies]
-bevy = "0.11"
-mc-rs-core = { version = "0.1.0", path = "crates/mc-rs-core" }
-mc-rs-interface = { version = "0.1.0", path = "crates/mc-rs-interface" }
-mc-rs-macros = { version = "0.1.0", path = "crates/mc-rs-macros" }
-mc-rs-network = { version = "0.1.0", path = "crates/mc-rs-network" }
-rand = { version = "0.8", features = ["nightly"] }
-
-# Enable wayland support on linux
-[target.'cfg(target_os = "linux")'.dependencies]
-bevy = { version = "0.11", features = ["wayland"] }
+bevy = { workspace = true }
+mc-rs-client = { version = "0.1", path = "crates/mc-rs-client" }
+mimalloc = { version = "0.1", optional = true }
 
 [features]
-default = ["splash", "simd"]
-splash = ["mc-rs-core/splash"]
+default = ["mimalloc", "simd"]
 
 # Enable debug features
-debug = ["mc-rs-core/debug", "mc-rs-interface/debug", "mc-rs-network/debug", "mc-rs-macros/debug"]
+debug = ["mc-rs-client/debug"]
+# Enable bevy-rapier debug features
+debug_rapier = ["mc-rs-client/debug_rapier"]
+
+# Enable bevy plugins and features
+bevy_extra = ["mc-rs-client/bevy_extra"]
+wayland = ["bevy/wayland"]
 
 # Enable simd features
-simd = ["mc-rs-core/simd", "mc-rs-interface/simd", "mc-rs-network/simd"]
-# !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-interface/simd_advanced", "mc-rs-network/simd_advanced", "rand/simd_support"]
+simd = ["mc-rs-client/simd"]
 
+# Enable mimalloc
+mimalloc = ["dep:mimalloc"]

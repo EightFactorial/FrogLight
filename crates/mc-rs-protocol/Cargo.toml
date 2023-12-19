@@ -3,30 +3,34 @@ name = "mc-rs-protocol"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 
+[lints]
+workspace = true
+
 [dependencies]
-async-compression = { version = "0.4", features = ["futures-io", "zlib"] }
-async-net = "1.8"
-azalea-chat = { version = "0.8.0", default-features = false }
-azalea-nbt = { version = "0.8.0", git = "https://github.com/EightFactorial/azalea.git", branch = "nbt", default-features = false }
-bevy_ecs = "0.11"
-bevy_math = "0.11"
+async-compression = { version = "0.4", features = ["futures-io", "deflate", "zlib"] }
+async-net = "2.0"
+azalea-chat = { workspace = true }
+azalea-nbt = { workspace = true }
+bevy_ecs = "0.12"
+bevy_math = "0.12"
 byteorder = "1.5"
-compact_str = { version = "0.7", features = ["serde", "smallvec"] }
-derive_more = "0.99"
-futures-lite = { version = "2.0", features = ["futures-io"] }
+compact_str = { workspace = true, features = ["serde", "smallvec"] }
+derive_more = { workspace = true }
+futures-lite = { workspace = true }
 hashbrown = { version = "0.14", features = ["serde"] }
-log = { version = "0.4", features = ["std"], optional = true }
-mc-rs-macros = { version = "0.1.0", path = "../mc-rs-macros" }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["preserve_order", "arbitrary_precision"] }
-smallvec = { version = "1.11", features = ["const_generics", "const_new", "union", "write"] }
-strum = { version = "0.25", features = ["derive"] }
-thiserror = "1.0"
-uuid = { version = "1.5", features = ["v3"] }
+mc-rs-macros = { version = "0.1", path = "../mc-rs-macros" }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["arbitrary_precision"] }
+smallvec = { workspace = true }
+strum = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true, optional = true }
+uuid = { workspace = true, features = ["v3"] }
 
 [dev-dependencies]
 pretty_assertions = "1.4"
@@ -35,9 +39,7 @@ pretty_assertions = "1.4"
 default = []
 
 # Enable debug features
-debug = ["dep:log", "mc-rs-macros/debug"]
+debug = ["dep:tracing", "mc-rs-macros/debug"]
 
 # Enable simd features
-simd = []
-# !! Currently broken on the latest nightly !!
-simd_advanced = []
+simd = ["azalea-chat/simdnbt"]

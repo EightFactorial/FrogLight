@@ -12,3 +12,6 @@ pub use difficulty::Difficulty;
 
 mod hand;
 pub use hand::Hand;
+
+mod sounds;
+pub use sounds::SoundType;

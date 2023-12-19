@@ -2,16 +2,18 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, Index, Meta};
 
-use super::macro_type::MacroTypeTrait;
+use super::{macro_type::MacroTypeTrait, test::TestType};
 use crate::DeriveMacroAttr;
 
 mod data_enum;
 mod data_struct;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct EncodeMacro;
+pub(crate) struct EncodeMacro;
 
 impl MacroTypeTrait for EncodeMacro {
+    const REQUIRED_TESTS: &'static [TestType] = &[];
+
     fn generate_macro(&self, _attr: &DeriveMacroAttr, input: &DeriveInput) -> TokenStream {
         match &input.data {
             Data::Struct(_) => data_struct::encode_struct(input),
@@ -25,7 +27,7 @@ impl MacroTypeTrait for EncodeMacro {
 fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
     match fields {
         Fields::Named(fields) => {
-            for field in fields.named.iter() {
+            for field in &fields.named {
                 let Some(name) = &field.ident else {
                     continue;
                 };
@@ -46,14 +48,17 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     }
                 };
 
-                match cfg!(feature = "debug") {
-                    false => tokens.extend(quote!(?;)),
-                    true => tokens.extend(quote! {
+                if cfg!(feature = "debug") {
+                    tokens.extend(quote! {
                         .map_err(|e| {
-                            log::error!("Failed to encode field {}: {:?}", stringify!(#name), e);
+                            tracing::error!("Failed to encode field {}: {:?}", stringify!(#name), e);
                             e
                         })?;
-                    }),
+                    });
+                } else {
+                    tokens.extend(quote! {
+                        ?;
+                    });
                 }
 
                 field_list.push(tokens);
@@ -79,18 +84,18 @@ fn read_fields(fields: &Fields, field_list: &mut Vec<TokenStream>) {
                     }
                 };
 
-                match cfg!(feature = "debug") {
-                    false => tokens.extend(quote!(?;)),
-                    true => {
-                        let ty = &field.ty;
-
-                        tokens.extend(quote! {
-                            .map_err(|e| {
-                                log::error!("Failed to encode type {}: {:?}", stringify!(#ty), e);
-                                e
-                            })?;
-                        });
-                    }
+                if cfg!(feature = "debug") {
+                    let ty = &field.ty;
+                    tokens.extend(quote! {
+                        .map_err(|e| {
+                            tracing::error!("Failed to encode type {}: {:?}", stringify!(#ty), e);
+                            e
+                        })?;
+                    });
+                } else {
+                    tokens.extend(quote! {
+                            ?;
+                    });
                 }
 
                 field_list.push(tokens);

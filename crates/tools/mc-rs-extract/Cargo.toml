@@ -2,33 +2,45 @@
 name = "mc-rs-extract"
 version = "0.1.0"
 edition = "2021"
-license = "MIT"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
 homepage = "https://github.com/EightFactorial/MC-RS"
 repository = "https://github.com/EightFactorial/MC-RS"
 readme = "README.md"
 
+[lints]
+workspace = true
+
 [lib]
 name = "mc_rs_extract"
-path = "src/lib.rs"
+path = "src/lib/lib.rs"
 
 [[bin]]
 name = "mc_rs_extract"
-path = "src/bin/main.rs"
+path = "src/bin/extractor/main.rs"
+required-features = ["binary"]
 
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "4.4", features = ["derive"] }
+clap = { version = "4.4", features = ["derive", "env"], optional = true }
 classfile-rs = { version = "0.1", path = "../classfile-rs" }
-derive_more = "0.99"
-enum_dispatch = "0.3"
-env_logger = "0.10"
+dirs = "5.0"
 hashbrown = { version = "0.14", features = ["serde"] }
-itertools = "0.11"
+itertools = { workspace = true }
 json = "0.12"
-log = { version = "0.4", features = ["std"] }
-reqwest = { version = "0.11", features = ["rustls", "json", "blocking"], default-features = false }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["preserve_order"] }
-strum = { version = "0.25", features = ["derive"] }
-thiserror = "1.0"
-zip = "0.6"
+regex = "1.10"
+reqwest = { version = "0.11", features = ["rustls-tls", "json"], default-features = false }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["arbitrary_precision"] }
+strum = { workspace = true }
+thiserror = { workspace = true }
+tokio = { version = "1.35", features = ["full"], optional = true }
+tracing = { workspace = true }
+tracing-subscriber = { version = "0.3", features = ["env-filter"], optional = true }
+zip = { workspace = true }
+
+[features]
+default = ["binary"]
+
+# Dependencies for the binary
+binary = ["dep:clap", "dep:tokio", "dep:tracing-subscriber"]

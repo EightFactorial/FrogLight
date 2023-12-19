@@ -5,11 +5,10 @@
 			"type": "cargo",
 			"command": "run",
 			"args": [
-				"--release",
-				"--features=debug"
+				"--features=debug,bevy_extra"
 			],
 			"env": {
-				"RUST_LOG": "warn,mc_rs=debug,mc_rs_protocol=info"
+				"RUST_LOG": "warn,mc_rs=debug,mc_rs_interface=debug,mc_rs_protocol=info"
 			},
 			"problemMatcher": [
 				"$rustc"
@@ -24,11 +23,10 @@
 			"type": "cargo",
 			"command": "run",
 			"args": [
-				"--release",
-				"--features=debug"
+				"--features=debug,bevy_extra"
 			],
 			"env": {
-				"RUST_LOG": "warn,mc_rs=trace,mc_rs_protocol=trace"
+				"RUST_LOG": "warn,mc_rs=trace,mc_rs_interface=trace,mc_rs_protocol=trace"
 			},
 			"problemMatcher": [
 				"$rustc"

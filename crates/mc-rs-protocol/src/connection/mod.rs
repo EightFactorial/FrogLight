@@ -1,11 +1,11 @@
 #![allow(unused_variables)]
-#![allow(dead_code)]
 
 use std::{collections::VecDeque, io::Cursor, marker::PhantomData};
 
 use async_compression::futures::{bufread::ZlibDecoder, write::ZlibEncoder};
 use async_net::{AsyncToSocketAddrs, SocketAddr, TcpStream};
 use azalea_chat::FormattedText;
+use compact_str::CompactString;
 use futures_lite::{io::BufReader, AsyncBufReadExt, AsyncReadExt, AsyncWriteExt};
 use thiserror::Error;
 
@@ -22,7 +22,7 @@ mod test;
 pub struct Connection<V: Version, S: State<V>> {
     _version: PhantomData<V>,
     _state: PhantomData<S>,
-    pub hostname: String,
+    pub hostname: CompactString,
     pub port: u16,
     pub compression: Option<i32>,
     packet_buffer: VecDeque<<S as State<V>>::Clientbound>,
@@ -35,7 +35,10 @@ where
     Handshake: State<V>,
 {
     /// Create a new connection from an address.
-    pub async fn new(version: V, address: impl Into<String>) -> Result<Self, ConnectionError> {
+    pub async fn new(
+        version: V,
+        address: impl Into<CompactString>,
+    ) -> Result<Self, ConnectionError> {
         let address = address.into();
         let mut address = address.as_str();
         if let Some(pos) = address.find("://") {
@@ -63,7 +66,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         Ok(Self {
             _version: PhantomData,
             _state: PhantomData,
-            hostname: hostname.to_owned(),
+            hostname: hostname.into(),
             port,
             compression: None,
             packet_buffer: VecDeque::new(),
@@ -100,7 +103,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                 string.push_str("...");
             }
 
-            log::debug!("Sending packet: {string}");
+            tracing::debug!("Sending packet: {string}");
         }
 
         let mut buf = Vec::from_value(&packet)?;
@@ -145,6 +148,9 @@ impl<V: Version, S: State<V>> Connection<V, S> {
     ) -> Result<<S as State<V>>::Clientbound, ConnectionError> {
         // Return a packet from the buffer if possible
         if let Some(packet) = self.packet_buffer.pop_front() {
+            #[cfg(feature = "debug")]
+            tracing::trace!("Packet buffer len: {}", self.packet_buffer.len());
+
             return Ok(packet);
         }
 
@@ -157,7 +163,7 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         }
 
         #[cfg(feature = "debug")]
-        log::trace!(
+        tracing::trace!(
             "Byte peek: {:?}",
             &buffer[0..std::cmp::min(16, buffer.len())]
         );
@@ -234,15 +240,18 @@ impl<V: Version, S: State<V>> Connection<V, S> {
                     #[cfg(feature = "debug")]
                     if let DecodeError::Io(err) = err {
                         if !matches!(err.kind(), std::io::ErrorKind::UnexpectedEof) {
-                            log::error!("Error reading bundled packet: {err:?}");
+                            tracing::error!("Error reading bundled packet: {err:?}");
                         }
                     } else {
-                        log::error!("Error reading bundled packet: {err:?}");
+                        tracing::error!("Error reading bundled packet: {err:?}");
                     }
                     return;
                 }
             }
         }
+
+        #[cfg(feature = "debug")]
+        tracing::trace!("Packet buffer len: {}", packet_buffer.len());
     }
 
     /// Logs the packet if the debug feature is enabled.
@@ -258,10 +267,10 @@ impl<V: Version, S: State<V>> Connection<V, S> {
         }
 
         if packet.is_ok() {
-            log::trace!("Read packet: {}", string);
+            tracing::trace!("Read packet: {}", string);
         } else {
-            log::error!("Read packet: {}", string);
-            log::trace!("Read buffer: {:?}", cursor.get_ref());
+            tracing::error!("Read packet: {}", string);
+            tracing::trace!("Read buffer: {:?}", cursor.get_ref());
         }
     }
 
@@ -331,7 +340,7 @@ impl<V: Version, S: State<V>> TryFrom<TcpStream> for Connection<V, S> {
         Ok(Connection {
             _version: PhantomData,
             _state: PhantomData,
-            hostname: stream.peer_addr()?.ip().to_string(),
+            hostname: stream.peer_addr()?.ip().to_string().into(),
             port: stream.peer_addr()?.port(),
             compression: None,
             packet_buffer: VecDeque::new(),

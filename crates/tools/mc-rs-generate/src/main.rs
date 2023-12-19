@@ -1,114 +1,163 @@
 use clap::Parser;
-use cli::Cli;
-use generate::{Generator, Generators};
 use git2::Repository;
-use itertools::Itertools;
-use log::{error, info, warn, LevelFilter};
-use mc_rs_extract::{
-    extract::extract_data,
-    types::{Manifest, Version},
-};
-use strum::IntoEnumIterator;
+use mc_rs_extract::{modules::ExtractModule, ModuleData, Version};
+use tracing::{debug, error, info, warn};
+use tracing_subscriber::{fmt::SubscriberBuilder, EnvFilter};
 
-use crate::generate::format::Format;
+mod args;
+use args::Args;
 
-mod cli;
-mod generate;
-mod util;
+mod modules;
 
-fn main() {
-    let cli = Cli::parse();
-    setup_logger();
+/// The minimum supported version supported by this tool.
+const MIN_SUPPORTED_VERSION: Version = Version::new_release(1, 20, 0);
 
-    // Get the version manifest
-    let manifest = match Manifest::get(cli.refresh) {
-        Ok(manifest) => manifest,
-        Err(err) => {
-            error!("Failed to get manifest: {}", err);
-            return;
-        }
-    };
+#[tokio::main]
+#[allow(clippy::too_many_lines)]
+async fn main() {
+    // Parse arguments
+    let args = Args::parse();
 
-    if !manifest.versions.iter().any(|v| v.id == cli.version) {
-        error!("Version {} not found in the manifest!", cli.version);
-        warn!("Use -r or --refresh to redownload the manifest if it was recently released.");
+    // Initialize tracing
+    if args.verbose {
+        let builder = SubscriberBuilder::default().without_time().compact();
+
+        let filter = EnvFilter::from_default_env()
+            .add_directive("reqwest=warn".parse().unwrap())
+            .add_directive("hyper=warn".parse().unwrap())
+            .add_directive(
+                #[cfg(debug_assertions)]
+                {
+                    "mc_rs_extract=debug".parse().unwrap()
+                },
+                #[cfg(not(debug_assertions))]
+                {
+                    "mc_rs_extract=info".parse().unwrap()
+                },
+            )
+            .add_directive(
+                #[cfg(debug_assertions)]
+                {
+                    "mc_rs_generate=debug".parse().unwrap()
+                },
+                #[cfg(not(debug_assertions))]
+                {
+                    "mc_rs_generate=info".parse().unwrap()
+                },
+            );
+
+        builder.with_env_filter(filter).init();
+    }
+    debug!("{args:?}");
+
+    // Exit if there are no modules to run
+    if args.modules.is_empty() {
+        error!("No modules specified, exiting...");
         return;
     }
 
-    if !cli.unstable && Version::new_release(1, 19, 4).is_newer(&cli.version, &manifest) {
-        error!("Only versions 1.19.4 and newer are supported!");
-        warn!("Use -u or --unstable to allow using older versions.");
-        return;
-    } else if !cli.unstable && !cli.version.is_stable() {
-        error!("Version {} is not a stable release!", cli.version);
-        warn!("Use -u or --unstable to allow using unstable versions.");
-        return;
-    }
-
+    // Get the local Repository
+    // This is used for local file paths
     let repo = match Repository::discover(".") {
         Ok(repo) => repo,
         Err(err) => {
-            error!("Failed to find git repository: {}", err);
+            error!("Could not get the local repository: {err}");
             return;
         }
     };
 
-    // Get the generators to run
-    let mut generators = cli
-        .generators
-        .unwrap_or_else(|| Generators::iter().collect_vec());
-
-    // Add `Format` if not already present
-    if !generators.contains(&Generators::Format(Format)) {
-        generators.push(Generators::Format(Format));
-    }
-
-    // Find all required datasets to use the selected generators
-    let mut required = Vec::new();
-    for gen in generators.iter() {
-        required.extend_from_slice(gen.deps());
-    }
-    required = required.into_iter().unique().collect_vec();
-
-    // Extract the required data
-    let data = match extract_data(&cli.version, &manifest, Some(required), cli.unstable) {
-        Some(data) => data,
-        None => {
-            error!("Failed to extract data for {}", cli.version);
+    // Get the ModuleData
+    let mut data = match ModuleData::new(args.version, args.refresh).await {
+        Ok(data) => data,
+        Err(err) => {
+            error!("Error while getting ModuleData: {}", err);
             return;
         }
     };
 
-    // Run the generators
+    // Output warnings if extracting from an unsupported Version
+    if let Version::Release { .. } = &data.version {
+        if let Some(true) = data.version.lt(&MIN_SUPPORTED_VERSION, &data.manifest) {
+            warn!("");
+            warn!(
+                "Version {} is older than the minimum supported version ({MIN_SUPPORTED_VERSION})",
+                data.version
+            );
+            warn!("Some things might not work correctly!");
+            warn!("");
+        }
+    } else {
+        warn!("");
+        warn!(
+            "Version {} is not a Release version. Some things might not work correctly!",
+            data.version
+        );
+        warn!("");
+    }
+
+    // Get the ExtractModules to run
+    let mut extract_modules: Vec<ExtractModule> = Vec::new();
+    for gen_mod in &args.modules {
+        for dep in gen_mod.deps() {
+            if !extract_modules.contains(dep) {
+                debug!("Adding dependency `{dep}` for `{gen_mod}`");
+                extract_modules.push(*dep);
+            }
+        }
+    }
+
+    if !extract_modules.is_empty() {
+        // Add ExtractModule dependencies, recursively
+        let mut i = 0;
+        while i < extract_modules.len() {
+            let ex_mod = extract_modules[i];
+            for dep in ex_mod.deps() {
+                if !extract_modules.contains(dep) {
+                    debug!("Adding dependency `{dep}` for `{ex_mod}`");
+                    extract_modules.push(*dep);
+                }
+            }
+
+            i += 1;
+        }
+
+        // Sort and deduplicate the ExtractModules
+        extract_modules.dedup();
+        extract_modules.sort();
+        debug!("Running Extractors: {extract_modules:?}");
+
+        info!("Extracting data...");
+        info!("");
+
+        // Run the ExtractModules
+        for m in &extract_modules {
+            info!("Running {m}");
+            m.run(&mut data);
+            info!("");
+        }
+    }
+
+    // Sort the deduplicate the GenerateModules
+    let mut generate_modules = args.modules;
+    generate_modules.dedup();
+    generate_modules.sort();
+    debug!("Running Generators: {generate_modules:?}");
+
+    // Run the GenerateModules
+    if extract_modules.is_empty() {
+        info!("Running generators...");
+    } else {
+        info!("Data extraction complete, running generators...");
+    }
     info!("");
-    for gen in generators.iter() {
-        info!("Generating {:?}...", gen);
-        gen.parse(&cli.version, &data, &repo);
+    for m in generate_modules {
+        info!("Running {m}");
+        m.run(&mut data, &repo).await;
         info!("");
     }
-
-    info!("Generation complete!");
+    info!("Done!");
 
     warn!("");
-    warn!("-- Remember to check all generated code! --");
+    warn!("Please test generated code before committing it!");
     warn!("");
-}
-
-/// Setup logging for the application
-fn setup_logger() {
-    let mut builder = env_logger::builder();
-
-    #[cfg(debug_assertions)]
-    {
-        builder.filter_level(LevelFilter::Debug);
-    }
-    #[cfg(not(debug_assertions))]
-    {
-        builder.filter_level(LevelFilter::Info);
-    }
-
-    builder.filter_module("reqwest", LevelFilter::Off);
-
-    builder.format_timestamp(None);
-    builder.init()
 }

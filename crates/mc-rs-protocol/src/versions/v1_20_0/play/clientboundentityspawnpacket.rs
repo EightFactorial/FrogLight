@@ -1,13 +1,12 @@
 use mc_rs_macros::Transcode;
-use uuid::Uuid;
 
-use crate::types::{EntityId, Vec3};
+use crate::types::{EntityId, EntityUuid, Vec3};
 
 // TODO: Create a test for this packet
 #[derive(Debug, Clone, Copy, PartialEq, Transcode)]
 pub struct ClientboundEntitySpawnPacket {
     pub entity_id: EntityId,
-    pub uuid: Uuid,
+    pub uuid: EntityUuid,
     #[var]
     pub entity_kind: u32,
     pub position: Vec3,

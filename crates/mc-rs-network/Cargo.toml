@@ -3,25 +3,29 @@ name = "mc-rs-network"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+
+[lints]
+workspace = true
 
 [dependencies]
-bevy = "0.11" 
-compact_str = "0.7"
+bevy = { workspace = true }
+compact_str = { workspace = true }
 flume = "0.11"
-futures-lite = { version = "2.0", features = ["futures-io"] }
+futures-lite = { workspace = true }
 futures-locks = { version = "0.7", default-features = false }
-log = { version = "0.4", features = ["std"] }
-mc-rs-core = { version = "0.1.0", path = "../mc-rs-core" }
-mc-rs-protocol = { version = "0.1.0", path = "../mc-rs-protocol" }
+mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
+mc-rs-protocol = { version = "0.1", path = "../mc-rs-protocol" }
+mc-rs-world = { version = "0.1", path = "../mc-rs-world" }
 
 [features]
 default = []
 
 # Enable debug features
-debug = ["mc-rs-core/debug", "mc-rs-protocol/debug"]
+debug = ["mc-rs-core/debug", "mc-rs-protocol/debug", "mc-rs-world/debug"]
 
 # Enable simd features
-simd = ["mc-rs-core/simd", "mc-rs-protocol/simd"]
-# !! Currently broken on the latest nightly !!
-simd_advanced = ["mc-rs-core/simd_advanced", "mc-rs-protocol/simd_advanced"]
+simd = ["mc-rs-core/simd", "mc-rs-protocol/simd", "mc-rs-world/simd"]

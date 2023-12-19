@@ -2,13 +2,13 @@ use attribute_derive::Attribute;
 use proc_macro::TokenStream;
 use syn::DeriveInput;
 
-mod client;
 mod proto;
-
 use proto::{
     macro_type::{MacroType, MacroTypeTrait},
     test::{TestTrait, TestType},
 };
+
+mod pack;
 
 /// Derive `State<V>` for a network state
 ///
@@ -54,11 +54,11 @@ pub fn derive_test(input: TokenStream) -> TokenStream {
 #[derive(Debug, Clone, PartialEq, Eq, Attribute)]
 #[attribute(ident = mctest)]
 struct DeriveMacroAttr {
-    /// The tests to generate
+    /// Tests to generate
     #[attribute(optional)]
     tests: Vec<TestType>,
 
-    /// Bytes to be used to verify different tests
+    /// Example bytes to verify tests
     #[attribute(optional)]
     bytes: Option<Vec<u8>>,
 }
@@ -83,10 +83,14 @@ impl DeriveMacroAttr {
         output.extend(macro_type.generate_macro(&derive, &input));
         output.extend(macro_type.generate_tests(&derive, &input));
 
-        for test in derive.tests.iter() {
+        for test in &derive.tests {
             output.extend(test.generate_test(&derive, &input));
         }
 
         output.into()
     }
 }
+
+/// Derive `TextureAtlasData` for a struct
+#[proc_macro]
+pub fn impl_atlasdata(input: TokenStream) -> TokenStream { pack::atlas::impl_atlasdata(input) }

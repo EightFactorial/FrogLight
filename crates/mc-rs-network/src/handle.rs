@@ -1,12 +1,13 @@
-#![allow(dead_code)]
-
 use std::{future::join, sync::Arc};
 
+use bevy::log::error;
 use flume::{Receiver, Sender};
 use futures_lite::Future;
 use futures_locks::Mutex;
-use log::error;
-use mc_rs_core::{PingResponse, StatusResponse};
+use mc_rs_core::{
+    events::{PingResponse, StatusResponse},
+    resources::player::username::Username,
+};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
@@ -17,7 +18,7 @@ use mc_rs_protocol::{
 ///
 /// Each version of the protocol has a different implementation of this trait
 /// using the appropriate packets for that [Version].
-pub trait NetworkHandle: Version + Send + Sync + 'static
+pub(super) trait NetworkHandle: Version + Send + Sync + 'static
 where
     Handshake: State<Self>,
     Status: State<Self>,
@@ -38,6 +39,7 @@ where
 
     /// Handle connections in the login state
     fn login_handle(
+        username: Username,
         conn: Connection<Self, Login>,
     ) -> impl Future<Output = Result<(Connection<Self, Login>, GameProfile), ConnectionError>> + Send;
 
@@ -91,7 +93,7 @@ where
 /// This is a wrapper around a connection to a server that allows for sending and receiving packets
 /// in either the configuration or play state.
 #[derive(Debug)]
-pub enum ConnectionEnum<V: Version>
+pub(super) enum ConnectionEnum<V: Version>
 where
     Play: State<V>,
     Configuration: State<V>,
@@ -106,7 +108,7 @@ where
     Configuration: State<V>,
 {
     /// Receive a packet from the connection
-    pub async fn receive_packet(&mut self) -> Result<ConnectionData<V>, ConnectionError> {
+    pub(crate) async fn receive_packet(&mut self) -> Result<ConnectionData<V>, ConnectionError> {
         match self {
             ConnectionEnum::Configuration(con) => {
                 Ok(ConnectionData::Configuration(con.receive_packet().await?))
@@ -116,17 +118,20 @@ where
     }
 
     /// Send a packet to the connection
-    pub async fn send_packet(&mut self, packet: ConnectionSend<V>) -> Result<(), ConnectionError> {
+    pub(crate) async fn send_packet(
+        &mut self,
+        packet: ConnectionSend<V>,
+    ) -> Result<(), ConnectionError> {
         match self {
             ConnectionEnum::Configuration(con) => match packet {
                 ConnectionSend::Configuration(packet) => con.send_packet(packet).await,
-                _ => {
+                ConnectionSend::Play(_) => {
                     panic!("Invalid packet for connection configuration state");
                 }
             },
             ConnectionEnum::Play(con) => match packet {
                 ConnectionSend::Play(packet) => con.send_packet(packet).await,
-                _ => {
+                ConnectionSend::Configuration(_) => {
                     panic!("Invalid packet for connection play state");
                 }
             },
@@ -134,15 +139,16 @@ where
     }
 
     /// Consumes the connection and returns a new one with the given state
-    pub fn with_state(self, state: ConnectionState) -> Self {
+    #[allow(dead_code)]
+    pub(crate) fn with_state(self, state: ConnectionState) -> Self {
         match state {
             ConnectionState::Configuration => match self {
                 ConnectionEnum::Play(con) => ConnectionEnum::Configuration(con.into()),
-                _ => self,
+                ConnectionEnum::Configuration(_) => self,
             },
             ConnectionState::Play => match self {
                 ConnectionEnum::Configuration(con) => ConnectionEnum::Play(con.into()),
-                _ => self,
+                ConnectionEnum::Play(_) => self,
             },
         }
     }

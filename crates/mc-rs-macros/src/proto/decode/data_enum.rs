@@ -19,7 +19,7 @@ pub(super) fn decode_enum(input: &DeriveInput) -> TokenStream {
     let mut discriminant = 0;
 
     // Decode each variant
-    for variant in data.variants.iter() {
+    for variant in &data.variants {
         let disc = get_discriminant(&variant.discriminant, &mut discriminant);
         let variant_ident = &variant.ident;
 

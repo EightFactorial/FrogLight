@@ -9,7 +9,7 @@ use syn::{
 /// Implements the `State` trait for a state,
 /// creates the clientbound and serverbound packet enums,
 /// and implements `Encode` and `Decode` for them.
-pub fn impl_state(input: TokenStream) -> TokenStream {
+pub(crate) fn impl_state(input: TokenStream) -> TokenStream {
     let StatePackets {
         state,
         version,
@@ -134,7 +134,7 @@ fn implement_decode(enum_name: &Ident, packets: &[PacketID]) -> proc_macro2::Tok
         quote! {
             #id => {
                 #[cfg(feature = "debug")]
-                log::trace!("Found packet 0x{:02X} ({}::{})", #id, stringify!(#module), stringify!(#name));
+                tracing::trace!("Found packet 0x{:02X} ({}::{})", #id, stringify!(#module), stringify!(#name));
                 Ok(#module::#name::decode(buf)?.into())
             }
         }

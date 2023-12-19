@@ -3,7 +3,9 @@ use std::{fmt::Debug, hash::Hash};
 use crate::buffer::{Decode, Encode};
 
 /// A Minecraft protocol version.
-pub trait Version: Sized + Debug + Default + PartialEq + Eq + Hash + Send + Sync + 'static {
+pub trait Version:
+    Debug + Default + Clone + Copy + PartialEq + Eq + Hash + Send + Sync + 'static
+{
     /// The protocol id of this version.
     const ID: i32;
 }

@@ -1,0 +1,31 @@
+[package]
+name = "mc-rs-gui"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/MC-RS"
+repository = "https://github.com/EightFactorial/MC-RS"
+readme = "README.md"
+
+[lints]
+workspace = true
+
+[dependencies]
+base64 = "0.21.5"
+bevy = { workspace = true }
+compact_str = { workspace = true }
+image = { workspace = true }
+mc-rs-core = { version = "0.1", path = "../mc-rs-core" }
+mc-rs-resourcepack = { version = "0.1", path = "../mc-rs-resourcepack" }
+# Wayland breaks for some reason :(
+winit = { version = "0.28", default-features = false, features = ["x11"] }
+
+[features]
+default = []
+
+# Enable debug features
+debug = ["mc-rs-core/debug", "mc-rs-resourcepack/debug"]
+
+# Enable simd features
+simd = ["mc-rs-core/simd", "mc-rs-resourcepack/simd"]

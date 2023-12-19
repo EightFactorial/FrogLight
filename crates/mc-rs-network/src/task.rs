@@ -1,11 +1,12 @@
 #![allow(clippy::type_complexity)]
-#![allow(dead_code)]
+#![allow(clippy::module_name_repetitions)]
 
 use std::{fmt::Debug, marker::PhantomData};
 
 use bevy::{prelude::*, tasks::Task};
+use compact_str::CompactString;
 use flume::{Receiver, Sender};
-use mc_rs_core::{PingResponse, StatusResponse};
+use mc_rs_core::events::{PingResponse, StatusResponse};
 use mc_rs_protocol::{
     types::{enums::ConnectionIntent, GameProfile},
     versions::state::{Configuration, Handshake, Login, Play, Status},
@@ -26,7 +27,7 @@ where
 {
     #[deref]
     pub task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
-    pub hostname: String,
+    pub hostname: CompactString,
     pub intent: ConnectionIntent,
 }
 
@@ -39,9 +40,10 @@ where
     Play: State<V>,
 {
     /// Create a new connection task
+    #[must_use]
     pub fn new(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
-        hostname: String,
+        hostname: CompactString,
     ) -> Self {
         Self {
             task,
@@ -51,9 +53,10 @@ where
     }
 
     /// Create a new connection task with a connection intent
+    #[must_use]
     pub fn new_with(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
-        hostname: String,
+        hostname: CompactString,
         intent: ConnectionIntent,
     ) -> Self {
         Self {
@@ -87,6 +90,7 @@ impl<V: Version> ConnectionHandshakeTask<V>
 where
     Handshake: State<V>,
 {
+    #[must_use]
     pub fn new(
         task: Task<Result<Connection<V, Handshake>, ConnectionError>>,
         intent: ConnectionIntent,
@@ -116,6 +120,7 @@ impl<V: Version> ConnectionStatusTask<V>
 where
     Status: State<V>,
 {
+    #[must_use]
     pub fn new(task: Task<Result<(StatusResponse, PingResponse), ConnectionError>>) -> Self {
         Self {
             task,
@@ -146,6 +151,7 @@ impl<V: Version> ConnectionLoginTask<V>
 where
     Login: State<V>,
 {
+    #[must_use]
     pub fn new(task: Task<Result<(Connection<V, Login>, GameProfile), ConnectionError>>) -> Self {
         Self(task)
     }
@@ -181,6 +187,7 @@ where
     Configuration: State<V>,
     Play: State<V>,
 {
+    #[must_use]
     pub fn new(
         rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
         tx: Sender<ConnectionSend<V>>,
@@ -196,6 +203,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn new_config(
         rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
         tx: Sender<ConnectionSend<V>>,
@@ -210,6 +218,7 @@ where
         }
     }
 
+    #[must_use]
     pub fn new_play(
         rx: Receiver<Result<ConnectionData<V>, ConnectionError>>,
         tx: Sender<ConnectionSend<V>>,

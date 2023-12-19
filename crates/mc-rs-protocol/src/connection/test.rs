@@ -39,7 +39,7 @@ async fn send_packets() -> Result<(), ()> {
     {
         let handshake = ServerboundHandshakePacket {
             protocol_version: V1_20_0::ID,
-            hostname: "localhost".to_string(),
+            hostname: "localhost".into(),
             port: 25566,
             intention: ConnectionIntent::Status,
         };

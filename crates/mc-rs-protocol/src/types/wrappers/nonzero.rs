@@ -7,7 +7,7 @@ use derive_more::{Deref, DerefMut};
 
 use crate::buffer::{Decode, DecodeError, Encode, EncodeError, VarDecode, VarEncode};
 
-/// `NonZero` is a wrapper that encodes `None` as 0 and `Some` as `1 + value`.
+/// `NonZero` is a wrapper that encodes `None` as `0` and `Some` as `1 + value`.
 ///
 /// ### Examples
 /// ```rust

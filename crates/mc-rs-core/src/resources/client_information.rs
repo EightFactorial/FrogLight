@@ -5,7 +5,7 @@ use crate::packets::client_settings::{ChatVisibility, ModelCustomization, Settin
 
 use mc_rs_protocol::versions::v1_20_0::play::serverboundclientsettingspacket::ServerboundClientSettingsPacket as V1_20_0_ServerboundClientSettingsPacket;
 
-#[derive(Debug, Clone, Resource)]
+#[derive(Debug, Clone, PartialEq, Resource)]
 pub struct ClientInformation {
     pub language: CompactString,
     pub view_distance: u8,
