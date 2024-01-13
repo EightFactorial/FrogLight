@@ -1,7 +1,5 @@
 # MC-RS
 
-[![Tests](https://github.com/EightFactorial/MC-RS/actions/workflows/test.yml/badge.svg)](https://github.com/EightFactorial/MC-RS/actions)
-
 A **highly work-in-progress** Minecraft client written in Rust using **[Bevy](https://bevyengine.org/)**.
 
 Currently *aiming* to support:
@@ -18,7 +16,7 @@ More versions will be added at some point in the future.
 > 
 > You have been warned!
 
-> [!Note]
-> The `main` branch is *mostly* stable, while the `dev` branch is unstable.
-> 
-> Development is done under `dev` and occasionally merged into `main`.
+> [!Important]
+> This branch will not be updated, and is not accepting issues or pull requests
+>
+> Please look at the `main` branch for the current status of the project
