@@ -1,4 +1,4 @@
-# Froglight
+# FrogLight
 
 [![Tests](https://github.com/EightFactorial/FrogLight/actions/workflows/test.yml/badge.svg)](https://github.com/EightFactorial/FrogLight/actions)
 
