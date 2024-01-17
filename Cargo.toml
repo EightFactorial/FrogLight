@@ -73,7 +73,9 @@ default = ["mimalloc"]
 
 # Enables extra debug logs
 # Enables logging in release builds
-# logging = ["froglight-client/logging"]
+logging = [
+    # "froglight-client/logging"
+]
 
 # Use mimalloc as the global allocator
 mimalloc = ["dep:mimalloc"]

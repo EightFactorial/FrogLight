@@ -3,7 +3,7 @@
 # Alias for `run`
 default: (run-profile)
 
-# -- Build Recipes --
+# ---- Build Recipes ----
 
 # Compile development build
 alias build := build-profile
@@ -17,7 +17,7 @@ build-release: (build-profile "release")
 build-profile profile="dev":
   cargo build --profile {{profile}}
 
-# -- Run Recipes --
+# ---- Run Recipes ----
 
 # Run development build
 alias run := run-profile
@@ -31,14 +31,35 @@ run-release: (run-profile "release")
 run-profile profile="dev":
   cargo run --profile {{profile}}
 
-# -- Tool Recipes --
+# ---- Tool Recipes ----
 
 # Run `just` in `tools/`
 tools args="": (fetch-tools)
   @just --justfile tools/.justfile {{args}}
 
+# ---- Test Recipes ----
+
+# Run all tests and doc-tests
+all-tests: (tests) (doc-tests) (tools "all-tests")
+
+# Run all tests
+tests: (fetch-nextest)
+  cargo nextest run --workspace
+
+# Run all doc-tests
+doc-tests:
+  cargo test --doc --workspace
+
+# ---- Fetch Recipes ----
+
 # Fetch `froglight-tools` submodule if not present
 [private]
 fetch-tools:
   @if [ ! -f tools/.justfile ]; then git submodule update; fi
- 
+
+# Fetch `nextest` if not present
+[private]
+fetch-nextest:
+  @-cargo nextest --version > /dev/null 2>&1
+  @if [ $? -ne 0 ]; then cargo install nextest; fi
+
