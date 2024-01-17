@@ -1,0 +1,79 @@
+# --- Workspace Settings ---
+
+[workspace]
+resolver = "2"
+members = [
+    # "crates/froglight-client",
+]
+
+[workspace.lints.rust]
+missing_docs = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_lifetimes = "warn"
+unused_import_braces = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.rustdoc]
+bare_urls = "deny"
+broken_intra_doc_links = "deny"
+private_intra_doc_links = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_rust_codeblocks = "deny"
+invalid_html_tags = "deny"
+
+[workspace.lints.clippy]
+cast_possible_truncation = "warn"
+cast_possible_wrap = "warn"
+module_name_repetitions = "allow"
+needless_pass_by_value = "allow"
+pedantic = "warn"
+unnecessary_cast = "warn"
+
+[workspace.dependencies]
+bevy = "0.12.1"
+bevy_xpbd_3d = { version = "0.3.3", features = [
+    "collider-from-mesh",
+    "parallel",
+    "simd",
+] }
+
+
+# --- Build Settings ---
+
+# Slightly optimize dev builds
+[profile.dev]
+opt-level = 1
+
+# Fully optimize release builds
+[profile.release]
+codegen-units = 1
+opt-level = 3
+strip = true
+lto = true
+
+# --- FrogLight Package ---
+
+[package]
+name = "froglight"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/FrogLight"
+repository = "https://github.com/EightFactorial/FrogLight"
+readme = "README.md"
+
+[dependencies]
+bevy = { workspace = true }
+mimalloc = { version = "0.1.39", optional = true }
+
+[features]
+default = ["mimalloc"]
+
+# Enables extra debug logs
+# Enables logging in release builds
+# logging = ["froglight-client/logging"]
+
+# Use mimalloc as the global allocator
+mimalloc = ["dep:mimalloc"]
