@@ -17,3 +17,22 @@ Support for more versions will be added at some point in the future.
 > Modded clients, including this one, **will get you banned** from servers with anticheat.
 > 
 > You have been warned!
+
+## Building
+
+Like most Rust projects, compilation is done using the `cargo` command.
+
+```sh
+# Clone and enter the repo
+git clone --depth 1 https://github.com/EightFactorial/FrogLight
+cd FrogLight
+
+# Build the client, or
+cargo build --release
+# Build and run the client
+cargo run --release
+```
+
+This will take some time and a lot of storage space
+
+The built client will be located at `{PROJECT_DIR}/target/release/froglight`
