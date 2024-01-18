@@ -23,10 +23,10 @@ impl PluginGroup for ClientPlugins {
 }
 
 impl ClientPlugins {
-    // TODO: Remove clippy allow
-    // TODO: Add plugins
     #[allow(clippy::unused_self)]
-    pub(super) fn build_group(self, group: PluginGroupBuilder) -> PluginGroupBuilder { group }
+    pub(super) fn build_group(self, group: PluginGroupBuilder) -> PluginGroupBuilder {
+        group.add(froglight_world::WorldPlugin)
+    }
 }
 
 #[test]

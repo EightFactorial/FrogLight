@@ -21,10 +21,16 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
+froglight-core = { version = "0.1.0", path = "../froglight-core" }
+froglight-gui = { version = "0.1.0", path = "../froglight-gui" }
+froglight-network = { version = "0.1.0", path = "../froglight-network" }
+froglight-render = { version = "0.1.0", path = "../froglight-render" }
+froglight-resourcepack = { version = "0.1.0", path = "../froglight-resourcepack" }
+froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
 [features]
 default = []
 
 # Enables extra debug logs
 # Enables logging in release builds
-logging = []
+logging = ["froglight-world/logging"]

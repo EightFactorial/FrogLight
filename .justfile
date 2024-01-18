@@ -15,7 +15,7 @@ build-release: (build-profile "release")
 # Compile build with specified profile
 [private]
 build-profile profile="dev":
-  cargo build --profile {{profile}}
+  cargo build --profile {{profile}} --features logging
 
 # ---- Run Recipes ----
 

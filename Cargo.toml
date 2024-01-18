@@ -12,6 +12,7 @@ members = [
     "crates/froglight-protocol",
     "crates/froglight-render",
     "crates/froglight-resourcepack",
+    "crates/froglight-world",
 ]
 
 [workspace.package]
@@ -50,6 +51,10 @@ unnecessary_cast = "warn"
 [workspace.dependencies]
 bevy = "0.12.1"
 bevy_xpbd_3d = "0.3.3"
+compact_str = "0.7.1"
+derive_more = "0.99.17"
+hashbrown = "0.14.3"
+serde = "1.0.195"
 
 # --- Build Settings ---
 
@@ -80,6 +85,8 @@ opt-level = 1
 [profile.dev.package.froglight-network]
 opt-level = 1
 
+[profile.dev.package.froglight-resourcepack]
+opt-level = 1
 
 # Fully optimize release builds
 [profile.release]
@@ -112,7 +119,6 @@ workspace = true
 bevy = { workspace = true }
 froglight-client = { version = "0.1.0", path = "crates/froglight-client" }
 mimalloc = { version = "0.1.39", optional = true }
-
 
 [features]
 default = ["mimalloc"]
