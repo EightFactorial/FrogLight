@@ -10,10 +10,16 @@ use crate::plugins::ClientPlugins;
 ///
 /// This is the recommended [`PluginGroup`] for most use cases.
 ///
+/// ---
+///
+/// ### Note:
+/// Bevy's [`LogPlugin`](bevy::log::LogPlugin) is disabled in release builds,
+/// unless the `logging` feature is enabled.
+///
 /// ----
 ///
-/// This group also includes several [`Plugins`](bevy::app::Plugin) that are
-/// not part of [`ClientPlugins`]:
+/// This [`PluginGroup`] includes several [`Plugins`](bevy::app::Plugin) that
+/// are not part of [`ClientPlugins`]:
 /// - TODO
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AppPlugins;
@@ -26,7 +32,11 @@ impl PluginGroup for AppPlugins {
         // Add FrogLight Client plugins.
         group = ClientPlugins::build_group(ClientPlugins, group);
 
-        // TODO: Add App specific plugins.
+        // Disable logging in release builds, unless the `logging` feature is enabled.
+        #[cfg(not(any(debug_assertions, feature = "logging")))]
+        {
+            group = group.disable::<bevy::log::LogPlugin>();
+        }
 
         group
     }

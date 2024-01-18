@@ -1693,6 +1693,10 @@ name = "froglight-protocol"
 version = "0.1.0"
 
 [[package]]
+name = "froglight-render"
+version = "0.1.0"
+
+[[package]]
 name = "froglight-resourcepack"
 version = "0.1.0"
 

@@ -10,6 +10,7 @@ members = [
     "crates/froglight-macros",
     "crates/froglight-network",
     "crates/froglight-protocol",
+    "crates/froglight-render",
     "crates/froglight-resourcepack",
 ]
 
@@ -55,6 +56,30 @@ bevy_xpbd_3d = "0.3.3"
 # Slightly optimize dev builds
 [profile.dev]
 opt-level = 1
+
+# Fully optimize dependencies
+[profile.dev.package."*"]
+opt-level = 3
+
+# Slightly optimize the some of the froglight packages
+[profile.dev.package.froglight-client]
+opt-level = 1
+
+[profile.dev.package.froglight-core]
+opt-level = 1
+
+[profile.dev.package.froglight-gui]
+opt-level = 1
+
+[profile.dev.package.froglight-loading]
+opt-level = 1
+
+[profile.dev.package.froglight-macros]
+opt-level = 1
+
+[profile.dev.package.froglight-network]
+opt-level = 1
+
 
 # Fully optimize release builds
 [profile.release]

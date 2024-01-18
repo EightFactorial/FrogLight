@@ -30,7 +30,7 @@ impl ClientPlugins {
 }
 
 #[test]
-fn test_build() { ClientPlugins::build(ClientPlugins); }
+fn test_build() { bevy::app::App::new().add_plugins(ClientPlugins); }
 
 #[test]
 fn test_run() {
@@ -47,17 +47,17 @@ fn test_run() {
     // Add the MinimalPlugins and ClientPlugins to the app.
     app.add_plugins((MinimalPlugins, group));
 
-    // Create a runner that runs for 50ms.
+    // Create a runner that runs for 75ms.
     app.set_runner(|mut app| {
         let now = std::time::Instant::now();
         let mut counter = 0u32;
 
-        while now.elapsed().as_millis() < 50 {
+        while now.elapsed().as_millis() < 75 {
             app.update();
             counter += 1;
         }
 
-        println!("Ran {counter} updates in 50ms");
+        println!("Ran {counter} updates in 75ms");
     });
 
     // Run the app.

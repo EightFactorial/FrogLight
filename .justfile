@@ -29,7 +29,7 @@ run-release: (run-profile "release")
 # Run build with specified profile
 [private]
 run-profile profile="dev":
-  cargo run --profile {{profile}}
+  cargo run --profile {{profile}} --features logging
 
 # ---- Test Recipes ----
 
