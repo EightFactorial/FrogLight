@@ -31,24 +31,36 @@ run-release: (run-profile "release")
 run-profile profile="dev":
   cargo run --profile {{profile}}
 
-# ---- Tool Recipes ----
-
-# Run `just` in `tools/`
-tools args="": (fetch-tools)
-  @just --justfile tools/.justfile {{args}}
-
 # ---- Test Recipes ----
 
+
+# Run all tests and all tool tests
+all-tests: (tests) (tools "all-tests")
+
 # Run all tests and doc-tests
-all-tests: (tests) (doc-tests) (tools "all-tests")
+tests: (deny) (clippy) (nextest) (doc-tests) 
+
+# Run cargo deny
+deny:
+  cargo deny check
+
+# Run clippy
+clippy:
+  cargo clippy --workspace
 
 # Run all tests
-tests: (fetch-nextest)
+nextest: (fetch-nextest)
   cargo nextest run --workspace
 
 # Run all doc-tests
 doc-tests:
   cargo test --doc --workspace
+
+# ---- Tool Recipes ----
+
+# Run `just` in `tools/`
+tools args="": (fetch-tools)
+  @just --justfile tools/.justfile {{args}}
 
 # ---- Fetch Recipes ----
 

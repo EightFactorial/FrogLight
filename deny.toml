@@ -1,0 +1,128 @@
+[advisories]
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+vulnerability = "deny"
+unmaintained = "deny"
+yanked = "deny"
+notice = "deny"
+
+[licenses]
+default = "deny"
+copyleft = "warn"
+unlicensed = "deny"
+allow = [
+    "MIT",
+    "MIT-0",
+    "Apache-2.0",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "0BSD",
+    "BSD-2-Clause",
+    "CC0-1.0",
+]
+
+[[licenses.exceptions]]
+name = "unicode-ident"
+allow = ["Unicode-DFS-2016"]
+
+[sources]
+unknown-git = "deny"
+unknown-registry = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+
+[bans]
+highlight = "all"
+wildcards = "deny"
+multiple-versions = "warn"
+external-default-features = "allow"
+workspace-default-features = "allow"
+
+# Crates
+[[bans.skip]]
+name = "async-channel"
+version = "=1.9.0"
+[[bans.skip]]
+name = "async-lock"
+version = "=2.8.0"
+[[bans.skip]]
+name = "base64"
+version = "=0.13.1"
+[[bans.skip]]
+name = "bitflags"
+version = "=1.3.2"
+[[bans.skip]]
+name = "event-listener"
+version = "=2.5.3"
+[[bans.skip]]
+name = "fastrand"
+version = "=1.9.0"
+[[bans.skip]]
+name = "foreign-types"
+version = "=0.3.2"
+[[bans.skip]]
+name = "foreign-types-shared"
+version = "=0.1.1"
+[[bans.skip]]
+name = "futures-lite"
+version = "=1.13.0"
+[[bans.skip]]
+name = "hashbrown"
+version = "=0.12.3"
+[[bans.skip]]
+name = "indexmap"
+version = "=1.9.3"
+[[bans.skip]]
+name = "jni"
+version = "=0.19.0"
+[[bans.skip]]
+name = "libloading"
+version = "=0.7.4"
+[[bans.skip]]
+name = "num_enum"
+version = "=0.5.11"
+[[bans.skip]]
+name = "num_enum_derive"
+version = "=0.5.11"
+[[bans.skip]]
+name = "regex-automata"
+version = "=0.1.10"
+[[bans.skip]]
+name = "regex-syntax"
+[[bans.skip]]
+name = "syn"
+version = "=1.0.109"
+[[bans.skip]]
+name = "toml_edit"
+version = "=0.19.15"
+[[bans.skip]]
+name = "tracing-log"
+version = "=0.1.4"
+
+# Other
+[[bans.skip]]
+name = "nix"
+[[bans.skip]]
+name = "redox_syscall"
+
+# Windows
+[[bans.skip]]
+name = "windows"
+[[bans.skip]]
+name = "windows-sys"
+[[bans.skip]]
+name = "windows-targets"
+[[bans.skip]]
+name = "windows_aarch64_gnullvm"
+[[bans.skip]]
+name = "windows_aarch64_msvc"
+[[bans.skip]]
+name = "windows_i686_gnu"
+[[bans.skip]]
+name = "windows_i686_msvc"
+[[bans.skip]]
+name = "windows_x86_64_gnu"
+[[bans.skip]]
+name = "windows_x86_64_gnullvm"
+[[bans.skip]]
+name = "windows_x86_64_msvc"
