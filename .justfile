@@ -35,14 +35,18 @@ run-profile profile="dev":
 
 
 # Run all tests and all tool tests
-all-tests: (tests) (tools "all-tests")
+all-tests: (test) (tools "all-tests")
 
 # Run all tests and doc-tests
-tests: (deny) (clippy) (nextest) (doc-tests) 
+test: (deny) (fmt) (nextest) (doc-test) 
 
 # Run cargo deny
 deny:
   cargo deny check
+
+# Run cargo fmt
+fmt:
+  cargo fmt --all
 
 # Run clippy
 clippy:
@@ -53,7 +57,7 @@ nextest: (fetch-nextest)
   cargo nextest run --workspace
 
 # Run all doc-tests
-doc-tests:
+doc-test:
   cargo test --doc --workspace
 
 # ---- Tool Recipes ----

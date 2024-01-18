@@ -1657,8 +1657,44 @@ name = "froglight"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "froglight-client",
  "mimalloc",
 ]
+
+[[package]]
+name = "froglight-client"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
+name = "froglight-core"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-gui"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-loading"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-macros"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-network"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-protocol"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-resourcepack"
+version = "0.1.0"
 
 [[package]]
 name = "futures-core"

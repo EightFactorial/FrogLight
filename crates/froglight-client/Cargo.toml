@@ -1,0 +1,30 @@
+[package]
+name = "froglight-client"
+
+[package.version]
+workspace = true
+[package.edition]
+workspace = true
+[package.license]
+workspace = true
+[package.authors]
+workspace = true
+[package.homepage]
+workspace = true
+[package.repository]
+workspace = true
+[package.readme]
+workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+
+[features]
+default = []
+
+# Enables extra debug logs
+# Enables logging in release builds
+logging = []

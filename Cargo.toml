@@ -3,8 +3,24 @@
 [workspace]
 resolver = "2"
 members = [
-    # "crates/froglight-client",
+    "crates/froglight-client",
+    "crates/froglight-core",
+    "crates/froglight-gui",
+    "crates/froglight-loading",
+    "crates/froglight-macros",
+    "crates/froglight-network",
+    "crates/froglight-protocol",
+    "crates/froglight-resourcepack",
 ]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/FrogLight"
+repository = "https://github.com/EightFactorial/FrogLight"
+readme = "README.md"
 
 [workspace.lints.rust]
 missing_docs = "warn"
@@ -32,12 +48,7 @@ unnecessary_cast = "warn"
 
 [workspace.dependencies]
 bevy = "0.12.1"
-bevy_xpbd_3d = { version = "0.3.3", features = [
-    "collider-from-mesh",
-    "parallel",
-    "simd",
-] }
-
+bevy_xpbd_3d = "0.3.3"
 
 # --- Build Settings ---
 
@@ -56,26 +67,34 @@ lto = true
 
 [package]
 name = "froglight"
-version = "0.1.0"
-edition = "2021"
-license = "MIT OR Apache-2.0"
-authors = ["EightFactorial"]
-homepage = "https://github.com/EightFactorial/FrogLight"
-repository = "https://github.com/EightFactorial/FrogLight"
-readme = "README.md"
+
+[package.version]
+workspace = true
+[package.edition]
+workspace = true
+[package.license]
+workspace = true
+[package.authors]
+workspace = true
+[package.homepage]
+workspace = true
+[package.repository]
+workspace = true
+[package.readme]
+workspace = true
 
 [dependencies]
 bevy = { workspace = true }
+froglight-client = { version = "0.1.0", path = "crates/froglight-client" }
 mimalloc = { version = "0.1.39", optional = true }
+
 
 [features]
 default = ["mimalloc"]
 
 # Enables extra debug logs
 # Enables logging in release builds
-logging = [
-    # "froglight-client/logging"
-]
+logging = ["froglight-client/logging"]
 
 # Use mimalloc as the global allocator
 mimalloc = ["dep:mimalloc"]

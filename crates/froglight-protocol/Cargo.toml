@@ -1,0 +1,20 @@
+[package]
+name = "froglight-protocol"
+
+[package.version]
+workspace = true
+[package.edition]
+workspace = true
+[package.license]
+workspace = true
+[package.authors]
+workspace = true
+[package.homepage]
+workspace = true
+[package.repository]
+workspace = true
+[package.readme]
+workspace = true
+
+[lints]
+workspace = true

@@ -1,5 +1,5 @@
 use bevy::app::App;
-// use froglight_client::FrogLightAppPlugins;
+use froglight_client::plugins::AppPlugins;
 
 /// The global allocator.
 ///
@@ -12,8 +12,8 @@ fn main() {
     // Create a new application.
     let mut app = App::new();
 
-    // // Add both the FrogLight plugins and the Bevy plugins.
-    // app.add_plugins(FrogLightAppPlugins);
+    // Add both the FrogLight plugins and the Bevy plugins.
+    app.add_plugins(AppPlugins);
 
     // Run the application.
     app.run();
