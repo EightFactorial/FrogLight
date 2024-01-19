@@ -737,6 +737,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_mod_debugdump"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4db8601f41ea570b7d32f3177292a608196c59bdf3298001a9e202d5e7439438"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_render",
+ "bevy_utils",
+ "once_cell",
+ "petgraph",
+ "pretty-type-name",
+]
+
+[[package]]
 name = "bevy_pbr"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1721,9 +1736,12 @@ name = "froglight-client"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "bevy_mod_debugdump",
  "froglight-core",
+ "froglight-entities",
  "froglight-gui",
  "froglight-network",
+ "froglight-physics",
  "froglight-render",
  "froglight-resourcepack",
  "froglight-world",
@@ -1731,6 +1749,10 @@ dependencies = [
 
 [[package]]
 name = "froglight-core"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-entities"
 version = "0.1.0"
 
 [[package]]
@@ -1747,6 +1769,10 @@ version = "0.1.0"
 
 [[package]]
 name = "froglight-network"
+version = "0.1.0"
+
+[[package]]
+name = "froglight-physics"
 version = "0.1.0"
 
 [[package]]
@@ -2909,6 +2935,12 @@ checksum = "bb458bb7f6e250e6eb79d5026badc10a3ebb8f9a15d1fff0f13d17c71f4d6dee"
 dependencies = [
  "unicode-xid",
 ]
+
+[[package]]
+name = "pretty-type-name"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f0f73cdaf19b52e6143685c3606206e114a4dfa969d6b14ec3894c88eb38bd4b"
 
 [[package]]
 name = "proc-macro-crate"

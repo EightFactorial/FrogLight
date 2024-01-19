@@ -36,3 +36,11 @@ default = []
 # Enables extra debug logs
 # Enables logging in release builds
 logging = ["froglight-world/logging"]
+
+[dev-dependencies]
+bevy_mod_debugdump = "0.9.0"
+
+# Creates system graphs, not an example
+# Useful for development
+[[example]]
+name = "system-graph"

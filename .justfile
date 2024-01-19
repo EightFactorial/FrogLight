@@ -33,9 +33,8 @@ run-profile profile="dev":
 
 # ---- Test Recipes ----
 
-
 # Run all tests and all tool tests
-all-tests: (test) (tools "all-tests")
+all-tests: (test) (tools "all-tests") (graph)
 
 # Run all tests and doc-tests
 test: (deny) (fmt) (nextest) (doc-test) 
@@ -65,6 +64,10 @@ doc-test:
 # Run `just` in `tools/`
 tools args="": (fetch-tools)
   @just --justfile tools/.justfile {{args}}
+
+# Generate froglight-client graphs
+graph:
+  cargo run --package=froglight-client --example=system-graph
 
 # ---- Fetch Recipes ----
 
