@@ -18,3 +18,8 @@ workspace = true
 
 [lints]
 workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+froglight-world = { version = "0.1.0", path = "../froglight-world" }
+froglight-resourcepack = { version = "0.1.0", path = "../froglight-resourcepack" }

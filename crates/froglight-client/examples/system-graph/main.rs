@@ -13,6 +13,9 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(AppPlugins.build().disable::<LogPlugin>());
 
+    save_graph("schedule_startup", Startup, &mut app);
+    save_graph("schedule_poststartup", PostStartup, &mut app);
+
     save_graph("schedule_preupdate", PreUpdate, &mut app);
     save_graph("schedule_update", Update, &mut app);
     save_graph("schedule_postupdate", PostUpdate, &mut app);

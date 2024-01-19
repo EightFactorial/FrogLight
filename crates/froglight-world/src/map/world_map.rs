@@ -79,7 +79,10 @@ impl WorldMap {
         #[cfg(feature = "logging")]
         {
             if let hashbrown::hash_map::Entry::Vacant(_) = &entry {
-                bevy_log::warn!("World `{}` does not exist, creating...", entry.key());
+                bevy_log::warn!(
+                    "World `{}` does not exist, creating...",
+                    entry.key().display_name()
+                );
             }
         }
 

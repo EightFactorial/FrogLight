@@ -28,6 +28,9 @@ bitvec = { workspace = true }
 compact_str = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
+froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
+    "world",
+] }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 hashbrown = { workspace = true }
 serde = { workspace = true }

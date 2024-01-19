@@ -1740,6 +1740,7 @@ dependencies = [
  "froglight-core",
  "froglight-entities",
  "froglight-gui",
+ "froglight-loading",
  "froglight-network",
  "froglight-physics",
  "froglight-render",
@@ -1751,6 +1752,11 @@ dependencies = [
 [[package]]
 name = "froglight-core"
 version = "0.1.0"
+dependencies = [
+ "bevy",
+ "derive_more",
+ "froglight-protocol",
+]
 
 [[package]]
 name = "froglight-entities"
@@ -1762,7 +1768,6 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "froglight-core",
- "froglight-loading",
  "froglight-resourcepack",
  "froglight-settings",
 ]
@@ -1773,15 +1778,28 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "froglight-core",
+ "froglight-gui",
 ]
 
 [[package]]
 name = "froglight-macros"
 version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.48",
+]
 
 [[package]]
 name = "froglight-network"
 version = "0.1.0"
+dependencies = [
+ "bevy",
+ "froglight-core",
+ "froglight-entities",
+ "froglight-physics",
+ "froglight-protocol",
+ "froglight-world",
+]
 
 [[package]]
 name = "froglight-physics"
@@ -1791,12 +1809,13 @@ version = "0.1.0"
 name = "froglight-protocol"
 version = "0.1.0"
 dependencies = [
- "bevy_ecs",
  "bevy_log",
+ "bevy_math",
  "bitvec",
  "bytemuck",
  "compact_str",
  "derive_more",
+ "froglight-macros",
  "futures",
  "hashbrown 0.14.3",
  "serde",
@@ -1806,6 +1825,11 @@ dependencies = [
 [[package]]
 name = "froglight-render"
 version = "0.1.0"
+dependencies = [
+ "bevy",
+ "froglight-resourcepack",
+ "froglight-world",
+]
 
 [[package]]
 name = "froglight-resourcepack"
@@ -1827,6 +1851,7 @@ dependencies = [
  "compact_str",
  "derive_more",
  "froglight-core",
+ "froglight-macros",
  "froglight-protocol",
  "hashbrown 0.14.3",
  "serde",

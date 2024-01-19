@@ -8,11 +8,5 @@ use bevy::prelude::*;
 pub struct GuiPlugin;
 
 impl Plugin for GuiPlugin {
-    fn build(&self, app: &mut App) {
-        // TODO: Build plugin
-
-        // Add the loading screen plugin if the default-loading feature is enabled
-        #[cfg(feature = "default-loading")]
-        app.add_plugins(froglight_loading::LoadingPlugin);
-    }
+    fn build(&self, _app: &mut App) {}
 }

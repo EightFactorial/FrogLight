@@ -22,5 +22,15 @@ workspace = true
 [lib]
 proc-macro = true
 
+[dependencies]
+quote = "1.0.35"
+syn = "2.0.48"
+
 [features]
 default = []
+
+# Enables `froglight-protocol` macros
+protocol = []
+
+# Enables `froglight-world` macros
+world = []

@@ -3,6 +3,7 @@ use bevy::{
     DefaultPlugins,
 };
 use froglight_gui::GuiPlugin;
+use froglight_loading::LoadingPlugin;
 
 use crate::plugins::ClientPlugins;
 
@@ -22,26 +23,34 @@ use crate::plugins::ClientPlugins;
 /// This [`PluginGroup`] includes several [`Plugins`](bevy::app::Plugin) that
 /// are not part of [`ClientPlugins`]:
 /// - [`GuiPlugin`]
-/// - `LoadingPlugin` # Enabled by the `default-loading` feature
+/// - [`LoadingPlugin`] # Enabled by the `default-loading` feature
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AppPlugins;
 
 impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
-        // Start with bevy's default plugins.
+        // Start with bevy's default plugins
         let mut group = PluginGroup::build(DefaultPlugins);
 
-        // Disable logging in release builds, unless the `logging` feature is enabled.
+        // Disable logging in release builds, unless the `logging` feature is enabled
         #[cfg(not(any(debug_assertions, feature = "logging")))]
         {
             group = group.disable::<bevy::log::LogPlugin>();
         }
 
-        // Add FrogLight Client plugins.
+        // Add Client plugins
         group = ClientPlugins::build_group(ClientPlugins, group);
 
-        // Add App-specific plugins.
-        group.add(GuiPlugin)
+        // Add App-specific plugins
+        group = group.add(GuiPlugin);
+
+        // Add LoadingPlugin if the `default-loading` feature is enabled
+        #[cfg(feature = "default-loading")]
+        {
+            group = group.add(LoadingPlugin::default());
+        }
+
+        group
     }
 }
 

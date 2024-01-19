@@ -20,12 +20,15 @@ workspace = true
 workspace = true
 
 [dependencies]
-bevy_ecs = "0.12.1"
 bevy_log = { version = "0.12.1", optional = true }
+bevy_math = "0.12.1"
 bitvec = { workspace = true }
 bytemuck = { workspace = true, features = ["derive", "nightly_stdsimd"] }
 compact_str = { workspace = true, features = ["serde", "smallvec"] }
 derive_more = { workspace = true }
+froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
+    "protocol",
+] }
 futures = { workspace = true }
 hashbrown = { workspace = true, features = ["serde"] }
 serde = { workspace = true }

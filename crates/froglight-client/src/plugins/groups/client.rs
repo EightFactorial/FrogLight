@@ -1,4 +1,6 @@
 use bevy::app::{PluginGroup, PluginGroupBuilder};
+use froglight_core::CorePlugin;
+use froglight_world::WorldPlugin;
 
 /// A [`PluginGroup`] that includes most [`FrogLight`](crate) plugins.
 ///
@@ -11,12 +13,15 @@ pub struct ClientPlugins;
 
 impl PluginGroup for ClientPlugins {
     fn build(self) -> PluginGroupBuilder {
-        let mut group = PluginGroupBuilder::start::<Self>();
-
         // Add FrogLight Client plugins.
-        group = self.build_group(group);
+        let mut group = self.build_group(PluginGroupBuilder::start::<Self>());
 
         // Add Client specific plugins.
+        // TODO: Remove clippy allow
+        #[allow(clippy::self_assignment)]
+        {
+            group = group;
+        }
 
         group
     }
@@ -25,7 +30,7 @@ impl PluginGroup for ClientPlugins {
 impl ClientPlugins {
     #[allow(clippy::unused_self)]
     pub(super) fn build_group(self, group: PluginGroupBuilder) -> PluginGroupBuilder {
-        group.add(froglight_world::WorldPlugin)
+        group.add(CorePlugin).add(WorldPlugin)
     }
 }
 
