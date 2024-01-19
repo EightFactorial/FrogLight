@@ -5,10 +5,12 @@ resolver = "2"
 members = [
     "crates/froglight-client",
     "crates/froglight-core",
+    "crates/froglight-entities",
     "crates/froglight-gui",
     "crates/froglight-loading",
     "crates/froglight-macros",
     "crates/froglight-network",
+    "crates/froglight-physics",
     "crates/froglight-protocol",
     "crates/froglight-render",
     "crates/froglight-resourcepack",
