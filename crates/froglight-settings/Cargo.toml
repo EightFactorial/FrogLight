@@ -1,5 +1,5 @@
 [package]
-name = "froglight-loading"
+name = "froglight-settings"
 
 [package.version]
 workspace = true
@@ -18,7 +18,3 @@ workspace = true
 
 [lints]
 workspace = true
-
-[dependencies]
-bevy = { workspace = true }
-froglight-core = { version = "0.1.0", path = "../froglight-core" }

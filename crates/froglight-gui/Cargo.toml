@@ -18,3 +18,16 @@ workspace = true
 
 [lints]
 workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+froglight-core = { version = "0.1.0", path = "../froglight-core" }
+froglight-loading = { version = "0.1.0", path = "../froglight-loading", optional = true }
+froglight-resourcepack = { version = "0.1.0", path = "../froglight-resourcepack" }
+froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
+
+[features]
+default = ["default-loading"]
+
+# Enables the default loading screen
+default-loading = ["dep:froglight-loading"]

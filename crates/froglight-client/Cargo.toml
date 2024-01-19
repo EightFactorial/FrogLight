@@ -23,19 +23,23 @@ workspace = true
 bevy = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
-froglight-gui = { version = "0.1.0", path = "../froglight-gui" }
+froglight-gui = { version = "0.1.0", path = "../froglight-gui", disable-default-features = true }
 froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
 froglight-render = { version = "0.1.0", path = "../froglight-render" }
 froglight-resourcepack = { version = "0.1.0", path = "../froglight-resourcepack" }
+froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
 [features]
-default = []
+default = ["default-loading"]
 
 # Enables extra debug logs
 # Enables logging in release builds
 logging = ["froglight-world/logging"]
+
+# Enables the default loading screen
+default-loading = ["froglight-gui/default-loading"]
 
 [dev-dependencies]
 bevy_mod_debugdump = "0.9.0"

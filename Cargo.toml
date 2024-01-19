@@ -14,6 +14,7 @@ members = [
     "crates/froglight-protocol",
     "crates/froglight-render",
     "crates/froglight-resourcepack",
+    "crates/froglight-settings",
     "crates/froglight-world",
 ]
 
