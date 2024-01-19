@@ -20,9 +20,11 @@ workspace = true
 workspace = true
 
 [dependencies]
+bevy_app = "0.12.1"
 bevy_ecs = "0.12.1"
 bevy_log = { version = "0.12.1", optional = true }
-bevy_app = "0.12.1"
+bevy_tasks = "0.12.1"
+bitvec = { workspace = true }
 compact_str = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }

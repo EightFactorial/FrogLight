@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 
-pub mod block;
+mod blocks;
+pub use blocks::*;
 
 mod map;
 pub use map::*;
