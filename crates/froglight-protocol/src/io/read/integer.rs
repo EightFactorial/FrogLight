@@ -74,10 +74,7 @@ fn proto_read_u128() {
     ];
     let mut cursor = std::io::Cursor::new(&buf[..]);
 
-    assert_eq!(
-        u128::frog_read(&mut cursor).unwrap(),
-        1_813_388_729_421_943_762_059_263
-    );
+    assert_eq!(u128::frog_read(&mut cursor).unwrap(), 1_813_388_729_421_943_762_059_263);
     assert_eq!(
         u128::frog_read(&mut cursor).unwrap(),
         340_282_366_920_938_463_463_374_607_431_768_211_455
@@ -102,10 +99,7 @@ fn proto_read_i128() {
     ];
     let mut cursor = std::io::Cursor::new(&buf[..]);
 
-    assert_eq!(
-        i128::frog_read(&mut cursor).unwrap(),
-        1_813_388_729_421_943_762_059_263
-    );
+    assert_eq!(i128::frog_read(&mut cursor).unwrap(), 1_813_388_729_421_943_762_059_263);
     assert_eq!(i128::frog_read(&mut cursor).unwrap(), -1);
     assert_eq!(cursor.position(), buf.len() as u64);
 }

@@ -13,8 +13,7 @@ pub trait FrogWrite {
     /// Write the type to a new buffer
     fn as_byte_vec(&self) -> Vec<u8> {
         let mut buf = Vec::new();
-        self.frog_write(&mut buf)
-            .expect("Failed to write into Vec<u8>?");
+        self.frog_write(&mut buf).expect("Failed to write into Vec<u8>?");
         buf
     }
 }

@@ -26,10 +26,7 @@ const DIRECTORY: &str = "crates/froglight-client/examples/system-graph";
 /// Saves a graph of the given schedule to the given path.
 fn save_graph(file_name: &str, schedule: impl ScheduleLabel, app: &mut App) {
     // Create the graph settings
-    let settings = Settings {
-        style: Style::dark_github(),
-        ..Default::default()
-    };
+    let settings = Settings { style: Style::dark_github(), ..Default::default() };
 
     // Create the graph
     let dot = schedule_graph_dot(app, schedule, &settings);

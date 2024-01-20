@@ -69,9 +69,7 @@ fn frog_write_u128() {
     assert_eq!(buf, vec![0; 16]);
     buf.clear();
 
-    assert!(340_282_366_920_938_463_463_374_607_431_768_211_455_u128
-        .frog_write(&mut buf)
-        .is_ok());
+    assert!(340_282_366_920_938_463_463_374_607_431_768_211_455_u128.frog_write(&mut buf).is_ok());
     assert_eq!(buf, vec![255; 16]);
     buf.clear();
 }
@@ -124,9 +122,7 @@ fn frog_write_i64() {
     assert_eq!(buf, vec![127, 255, 255, 255, 255, 255, 255, 255]);
     buf.clear();
 
-    assert!((-9_223_372_036_854_775_808_i64)
-        .frog_write(&mut buf)
-        .is_ok());
+    assert!((-9_223_372_036_854_775_808_i64).frog_write(&mut buf).is_ok());
     assert_eq!(buf, vec![128, 0, 0, 0, 0, 0, 0, 0]);
 }
 #[test]
@@ -137,9 +133,7 @@ fn frog_write_i128() {
     assert_eq!(buf, vec![0; 16]);
     buf.clear();
 
-    assert!(170_141_183_460_469_231_731_687_303_715_884_105_727_i128
-        .frog_write(&mut buf)
-        .is_ok());
+    assert!(170_141_183_460_469_231_731_687_303_715_884_105_727_i128.frog_write(&mut buf).is_ok());
     assert_eq!(
         buf,
         vec![127, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]

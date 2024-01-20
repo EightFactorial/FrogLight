@@ -1,6 +1,9 @@
 # Enable unstable features
 unstable_features = true
 
+# Formatting
+use_small_heuristics = "Max"
+
 # Files
 newline_style = "Unix"
 format_generated_files = false

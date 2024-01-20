@@ -11,7 +11,7 @@ pub(crate) struct LoadingPluginIconPath(pub(crate) String);
 impl LoadingPlugin {
     /// The asset path to the default loading icon
     pub const DEFAULT_ICON_PATH: &'static str =
-        "embedded://froglight_loading/assets/loading_icon.png";
+        "embedded://froglight_loading/assets/loading_art.png";
 
     /// Creates a new [`LoadingPlugin`] with the given asset path
     ///
@@ -42,12 +42,12 @@ impl Plugin for LoadingPlugin {
         app.insert_resource(LoadingPluginIconPath(self.0.clone()));
 
         // Setup the loading screen
-        crate::assets::setup(app);
+        crate::systemsets::setup(app);
         crate::layout::setup(app);
     }
 
-    fn finish(&self, app: &mut App) {
-        // Create the loading screen
-        crate::layout::finish(app);
+    fn cleanup(&self, app: &mut App) {
+        // Setup assets
+        crate::assets::setup(app);
     }
 }

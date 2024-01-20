@@ -9,8 +9,8 @@ digraph "" {
 	node ["shape"="box", "style"="filled"];
 	subgraph "clusternode_Set(1)" {
 		"style"="rounded,filled";
-		"label"="LoadingScreenSet";
-		"tooltip"="LoadingScreenSet";
+		"label"="LoadingScreenUpdateSet";
+		"tooltip"="LoadingScreenUpdateSet";
 		"fillcolor"="#ffffff44";
 		"fontcolor"="#ffffff";
 		"color"="#ffffff50";

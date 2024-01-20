@@ -9,11 +9,7 @@ use serde::{Deserialize, Serialize};
 pub enum WorldType {
     /// The Overworld
     #[default]
-    #[serde(
-        rename = "minecraft:overworld",
-        alias = "overworld",
-        alias = "Overworld"
-    )]
+    #[serde(rename = "minecraft:overworld", alias = "overworld", alias = "Overworld")]
     Overworld,
     /// The Nether
     #[serde(rename = "minecraft:the_nether", alias = "nether", alias = "Nether")]
@@ -89,10 +85,7 @@ impl WorldType {
     /// ```rust
     /// use froglight_world::WorldType;
     ///
-    /// assert_eq!(
-    ///     WorldType::Overworld.display_name(),
-    ///     WorldType::OVERWORLD_DISPLAY
-    /// );
+    /// assert_eq!(WorldType::Overworld.display_name(), WorldType::OVERWORLD_DISPLAY);
     /// assert_eq!(WorldType::Nether.display_name(), WorldType::NETHER_DISPLAY);
     /// assert_eq!(WorldType::End.display_name(), WorldType::END_DISPLAY);
     /// ```
