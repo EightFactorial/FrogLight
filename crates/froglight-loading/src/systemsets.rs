@@ -4,19 +4,49 @@ use froglight_core::{
     resources::loading::LoadingScreenEnable, systemsets::loading::LoadingScreenUpdateSet,
 };
 
-use crate::layout::fade_animation::FadeTimer;
+use crate::layout::{fade_animation::FadeTimer, LoadingScreenRoot};
 
 #[doc(hidden)]
 pub(super) fn setup(app: &mut App) {
+    // Configure resources
+    app.init_resource::<LoadingScreenEnableSystems>();
+
+    // Configure startup sets
     app.configure_sets(Startup, LoadingScreenStartupSet.ambiguous_with_all());
 
-    // Configure sets
+    // Configure fade in/out update sets
+    app.configure_sets(
+        Update,
+        LoadingScreenFadeInUpdateSet
+            .in_set(LoadingScreenUpdateSet)
+            .before(LoadingScreenFadeOutUpdateSet)
+            .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true))),
+    );
     app.configure_sets(
         Update,
         LoadingScreenFadeOutUpdateSet
+            .in_set(LoadingScreenUpdateSet)
+            .after(LoadingScreenFadeInUpdateSet)
+            .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true))),
+    );
+
+    // Configure systems that enable/disable systemsets
+    app.add_systems(
+        Update,
+        LoadingScreenEnableSystems::enable_fade_systems
+            .run_if(resource_exists_and_equals(LoadingScreenEnable(true)))
+            .run_if(resource_exists_and_changed::<LoadingScreenEnable>())
+            .before(LoadingScreenFadeInUpdateSet)
+            .in_set(LoadingScreenUpdateSet),
+    );
+    app.add_systems(
+        Update,
+        LoadingScreenEnableSystems::disable_fade_systems
             .run_if(resource_exists_and_equals(LoadingScreenEnable(false)))
-            .run_if(resource_exists::<FadeTimer>())
-            .after(LoadingScreenUpdateSet),
+            .run_if(not(LoadingScreenRoot::is_visible))
+            .run_if(resource_removed::<FadeTimer>())
+            .after(LoadingScreenFadeOutUpdateSet)
+            .in_set(LoadingScreenUpdateSet),
     );
 }
 
@@ -24,7 +54,28 @@ pub(super) fn setup(app: &mut App) {
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub(crate) struct LoadingScreenStartupSet;
 
-/// A [`SystemSet`] that runs loading screen systems when
-/// [`LoadingScreenEnable`] resource is set to `false`
+/// A [`Resource`] that tracks whether loading screen systems should be run.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Resource)]
+pub(crate) struct LoadingScreenEnableSystems(pub(crate) bool);
+
+impl LoadingScreenEnableSystems {
+    pub(crate) fn enable_fade_systems(mut state: ResMut<Self>) {
+        debug!("Enabling fade systems...");
+        state.0 = true;
+    }
+
+    pub(crate) fn disable_fade_systems(mut state: ResMut<Self>) {
+        debug!("Disabling fade systems...");
+        state.0 = false;
+    }
+}
+
+/// A [`SystemSet`] that runs loading screen
+/// systems when fading in.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub(crate) struct LoadingScreenFadeInUpdateSet;
+
+/// A [`SystemSet`] that runs loading screen
+/// systems when fading out.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub(crate) struct LoadingScreenFadeOutUpdateSet;

@@ -2,12 +2,11 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use froglight_core::{
-    resources::loading::LoadingScreenEnable, systemsets::loading::LoadingScreenUpdateSet,
-};
 
 use super::{progress_bar::progress::ProgressBarProgress, LoadingScreenRoot};
-use crate::systemsets::LoadingScreenFadeOutUpdateSet;
+use crate::systemsets::{
+    LoadingScreenEnableSystems, LoadingScreenFadeInUpdateSet, LoadingScreenFadeOutUpdateSet,
+};
 
 #[doc(hidden)]
 pub(super) fn setup(app: &mut App) {
@@ -16,14 +15,15 @@ pub(super) fn setup(app: &mut App) {
         Update,
         (
             FadeTimer::insert_fade_in_timer
-                .run_if(resource_exists_and_changed::<LoadingScreenEnable>())
-                .run_if(not(resource_added::<LoadingScreenEnable>()))
+                .run_if(resource_exists_and_changed::<LoadingScreenEnableSystems>())
+                .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true)))
+                .run_if(not(resource_added::<LoadingScreenEnableSystems>()))
                 .run_if(not(resource_exists::<FadeTimer>())),
             FadeAnimationMarker::fade_in
                 .run_if(resource_exists::<FadeTimer>().and_then(FadeTimer::is_fade_in)),
         )
             .chain()
-            .in_set(LoadingScreenUpdateSet),
+            .in_set(LoadingScreenFadeInUpdateSet),
     );
 
     // Add fade-out systems
@@ -68,8 +68,8 @@ impl FadeAnimationMarker {
 
         if timer.just_finished() {
             // Reset all background colors
-            for mut background_color in &mut query {
-                background_color.0.set_a(1.0);
+            for mut color in &mut query {
+                color.0.set_a(1.0);
             }
 
             // Delete the timer
@@ -80,8 +80,8 @@ impl FadeAnimationMarker {
             let progress = timer.percent();
 
             // Set the opacity of all background colors
-            for mut background_color in &mut query {
-                background_color.0.set_a(progress);
+            for mut color in &mut query {
+                color.0.set_a(progress);
             }
         }
     }
@@ -108,8 +108,8 @@ impl FadeAnimationMarker {
             }
 
             // Reset all background colors
-            for mut background_color in &mut query {
-                background_color.0.set_a(1.0);
+            for mut color in &mut query {
+                color.0.set_a(1.0);
             }
 
             // Delete the timer
@@ -120,8 +120,8 @@ impl FadeAnimationMarker {
             let progress = timer.percent_left();
 
             // Set the opacity of all background colors
-            for mut background_color in &mut query {
-                background_color.0.set_a(progress);
+            for mut color in &mut query {
+                color.0.set_a(progress);
             }
         }
     }
@@ -166,13 +166,6 @@ impl FadeTimer {
     }
 
     /// Insert a fade out timer
-    ///
-    /// This does not run because the [`LoadingScreenFadeOutUpdateSet`] requires
-    /// a `FadeTimer` resource to run.
-    ///
-    /// The actual timer is inserted in
-    /// [`ProgressBarProgress::update_current_progress`]
-    /// once the progress bar *visually* reaches 100%.
     fn insert_fade_out_timer(mut commands: Commands) {
         debug!("Inserting fade-out timer...");
         commands.insert_resource(Self::new_fade_out());

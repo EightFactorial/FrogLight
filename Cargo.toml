@@ -105,7 +105,6 @@ opt-level = 1
 
 # Fully optimize release builds
 [profile.release]
-codegen-units = 1
 opt-level = 3
 strip = true
 lto = true

@@ -84,7 +84,7 @@ impl LoadingScreenRoot {
     }
 
     /// Returns `true` if the loading screen is visible
-    fn is_visible(query: Query<&Visibility, With<Self>>) -> bool {
+    pub(crate) fn is_visible(query: Query<&Visibility, With<Self>>) -> bool {
         query.iter().any(|visibility| *visibility == Visibility::Visible)
     }
 }

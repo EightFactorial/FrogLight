@@ -2,7 +2,12 @@
 use bevy::{prelude::*, render::view::RenderLayers};
 use froglight_core::systemsets::loading::LoadingScreenUpdateSet;
 
-use crate::layout::fade_animation::{FadeAnimationMarker, FadeTimer};
+use crate::{
+    layout::fade_animation::{FadeAnimationMarker, FadeTimer},
+    systemsets::{
+        LoadingScreenEnableSystems, LoadingScreenFadeInUpdateSet, LoadingScreenFadeOutUpdateSet,
+    },
+};
 
 #[doc(hidden)]
 pub(super) fn setup(app: &mut App) {
@@ -11,8 +16,9 @@ pub(super) fn setup(app: &mut App) {
         ProgressBarProgress::update_current_progress
             .run_if(any_with_component::<ProgressBarProgress>())
             .run_if(not(resource_exists::<FadeTimer>()))
-            .after(FadeAnimationMarker::fade_in)
-            .before(FadeAnimationMarker::fade_out)
+            .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true)))
+            .after(LoadingScreenFadeInUpdateSet)
+            .before(LoadingScreenFadeOutUpdateSet)
             .in_set(LoadingScreenUpdateSet),
     );
 }
@@ -55,13 +61,10 @@ impl ProgressBarProgress {
 
     /// Update the current progress towards the target progress
     ///
-    /// Will add a fade-out timer if the progress bar is finished.
-    ///
     /// Will not run if a fade timer exists.
-    fn update_current_progress(
+    pub(crate) fn update_current_progress(
         mut query: Query<(&mut Style, &mut ProgressBarProgress)>,
         time: Res<Time<Real>>,
-        mut commands: Commands,
     ) {
         let delta = time.delta_seconds().clamp(0.0, 0.1);
         for (mut style, mut progress) in &mut query {
@@ -72,13 +75,6 @@ impl ProgressBarProgress {
             progress.current_progress = progress.current_progress.min(100.0);
 
             style.width = Val::Percent(progress.current_progress);
-
-            // Add a fade out timer if the progress bar is finished.
-            // This won't run until `LoadingScreenEnable` is set to `false`.
-            if progress.current_progress >= 100.0 {
-                debug!("Progress bar finished, adding fade-out timer...");
-                commands.insert_resource(FadeTimer::new_fade_out());
-            }
         }
     }
 }
