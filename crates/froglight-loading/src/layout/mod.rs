@@ -1,8 +1,11 @@
 //! The layout of the loading screen
 use bevy::prelude::*;
 
-pub(crate) mod loading_icon;
-use loading_icon::LoadingIcon;
+pub(crate) mod fade_animation;
+use fade_animation::FadeAnimationMarker;
+
+pub(crate) mod loading_art;
+use loading_art::LoadingArt;
 
 pub(crate) mod progress_bar;
 use progress_bar::ProgressBar;
@@ -11,9 +14,12 @@ use crate::systemsets::LoadingScreenStartupSet;
 
 #[doc(hidden)]
 pub(super) fn setup(app: &mut App) {
-    loading_icon::setup(app);
+    // Setup submodules
+    fade_animation::setup(app);
+    loading_art::setup(app);
     progress_bar::setup(app);
 
+    // Add systems
     app.add_systems(
         Startup,
         (
@@ -51,6 +57,7 @@ impl LoadingScreenRoot {
         let root = world
             .spawn((
                 LoadingScreenRoot,
+                FadeAnimationMarker,
                 NodeBundle {
                     style: Style {
                         position_type: PositionType::Absolute,
@@ -86,6 +93,7 @@ impl LoadingScreenCenter {
         let center = world
             .spawn((
                 LoadingScreenCenter,
+                FadeAnimationMarker,
                 NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,
@@ -102,7 +110,7 @@ impl LoadingScreenCenter {
             .id();
 
         // Create the loading icon
-        LoadingIcon::build_loading_icon(world, center);
+        LoadingArt::build_loading_icon(world, center);
 
         // Create the progress bar
         ProgressBar::build_loading_bar(world, center);

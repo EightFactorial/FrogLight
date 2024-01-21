@@ -1,7 +1,7 @@
 #!/usr/bin/env just --justfile
 
 # Alias for `run`
-default: (run-profile)
+default: (run-profile "dev")
 
 # ---- Build Recipes ----
 
@@ -14,8 +14,8 @@ build-release: (build-profile "release")
 
 # Compile build with specified profile
 [private]
-build-profile profile="dev":
-  cargo build --profile {{profile}} --features logging
+build-profile profile="dev" args="":
+  cargo build --profile {{profile}} --features logging {{args}}
 
 # ---- Run Recipes ----
 
@@ -28,8 +28,8 @@ run-release: (run-profile "release")
 
 # Run build with specified profile
 [private]
-run-profile profile="dev":
-  cargo run --profile {{profile}} --features logging
+run-profile profile="dev" args="":
+  cargo run --profile {{profile}} --features logging {{args}}
 
 # ---- Test Recipes ----
 

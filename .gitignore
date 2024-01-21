@@ -13,3 +13,6 @@
 
 # VS Code project files
 /.vscode
+
+# FrogLight-Client system-graph dot files
+/crates/froglight-client/examples/system-graph/*.dot
