@@ -1,17 +1,22 @@
 //! `SystemSets` for the loading screen.
 use bevy::prelude::*;
-use froglight_core::resources::loading::LoadingScreenEnable;
+use froglight_core::{
+    resources::loading::LoadingScreenEnable, systemsets::loading::LoadingScreenUpdateSet,
+};
+
+use crate::layout::fade_animation::FadeTimer;
 
 #[doc(hidden)]
 pub(super) fn setup(app: &mut App) {
-    app.configure_sets(Startup, LoadingScreenStartupSet);
+    app.configure_sets(Startup, LoadingScreenStartupSet.ambiguous_with_all());
 
     // Configure sets
     app.configure_sets(
         Update,
         LoadingScreenFadeOutUpdateSet
             .run_if(resource_exists_and_equals(LoadingScreenEnable(false)))
-            .run_if(not(resource_added::<LoadingScreenEnable>())),
+            .run_if(resource_exists::<FadeTimer>())
+            .after(LoadingScreenUpdateSet),
     );
 }
 

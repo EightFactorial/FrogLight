@@ -6,7 +6,7 @@ use froglight_core::{
     resources::loading::LoadingScreenEnable, systemsets::loading::LoadingScreenUpdateSet,
 };
 
-use super::{progress_bar::bar_progress::ProgressBarProgress, LoadingScreenRoot};
+use super::{progress_bar::progress::ProgressBarProgress, LoadingScreenRoot};
 use crate::systemsets::LoadingScreenFadeOutUpdateSet;
 
 #[doc(hidden)]
@@ -19,7 +19,8 @@ pub(super) fn setup(app: &mut App) {
                 .run_if(resource_exists_and_changed::<LoadingScreenEnable>())
                 .run_if(not(resource_added::<LoadingScreenEnable>()))
                 .run_if(not(resource_exists::<FadeTimer>())),
-            FadeAnimationMarker::fade_in.run_if(resource_exists::<FadeTimer>()),
+            FadeAnimationMarker::fade_in
+                .run_if(resource_exists::<FadeTimer>().and_then(FadeTimer::is_fade_in)),
         )
             .chain()
             .in_set(LoadingScreenUpdateSet),
@@ -30,9 +31,11 @@ pub(super) fn setup(app: &mut App) {
         Update,
         (
             FadeTimer::insert_fade_out_timer
+                .run_if(LoadingScreenRoot::is_visible)
                 .run_if(ProgressBarProgress::bar_finished)
                 .run_if(not(resource_exists::<FadeTimer>())),
-            FadeAnimationMarker::fade_out.run_if(resource_exists::<FadeTimer>()),
+            FadeAnimationMarker::fade_out
+                .run_if(resource_exists::<FadeTimer>().and_then(FadeTimer::is_fade_out)),
         )
             .chain()
             .in_set(LoadingScreenFadeOutUpdateSet),
@@ -43,7 +46,7 @@ pub(super) fn setup(app: &mut App) {
 pub(crate) struct FadeAnimationMarker;
 
 impl FadeAnimationMarker {
-    fn fade_in(
+    pub(crate) fn fade_in(
         mut query: Query<&mut BackgroundColor, With<Self>>,
         mut root_query: Query<&mut Visibility, (With<Self>, With<LoadingScreenRoot>)>,
 
@@ -83,8 +86,7 @@ impl FadeAnimationMarker {
         }
     }
 
-    #[allow(clippy::type_complexity)]
-    fn fade_out(
+    pub(crate) fn fade_out(
         mut query: Query<&mut BackgroundColor, With<Self>>,
         mut root_query: Query<&mut Visibility, (With<Self>, With<LoadingScreenRoot>)>,
 
@@ -125,26 +127,54 @@ impl FadeAnimationMarker {
     }
 }
 
+/// A timer that fades in or out
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
-struct FadeTimer(Timer);
+pub(crate) struct FadeTimer {
+    /// The timer
+    #[deref]
+    pub(crate) timer: Timer,
+    /// Direction of the timer
+    ///
+    /// `true` if the timer is fading out, `false` if the timer is fading in
+    pub(crate) dir: bool,
+}
 
 impl FadeTimer {
     const FADE_IN_DURATION: f32 = 0.5;
     const FADE_OUT_DURATION: f32 = 0.5;
 
+    /// Returns `true` if the timer is fading in
+    pub(crate) fn is_fade_in(timer: Res<Self>) -> bool { !timer.dir }
+
+    /// Create a new fade in timer
+    pub(crate) fn new_fade_in() -> Self {
+        Self { timer: Timer::from_seconds(Self::FADE_IN_DURATION, TimerMode::Once), dir: false }
+    }
+
     /// Insert a fade in timer
     fn insert_fade_in_timer(mut commands: Commands) {
         debug!("Inserting fade-in timer...");
+        commands.insert_resource(Self::new_fade_in());
+    }
 
-        commands
-            .insert_resource(Self(Timer::from_seconds(Self::FADE_IN_DURATION, TimerMode::Once)));
+    /// Returns `true` if the timer is fading out
+    pub(crate) fn is_fade_out(timer: Res<Self>) -> bool { timer.dir }
+
+    /// Create a new fade out timer
+    pub(crate) fn new_fade_out() -> Self {
+        Self { timer: Timer::from_seconds(Self::FADE_OUT_DURATION, TimerMode::Once), dir: true }
     }
 
     /// Insert a fade out timer
+    ///
+    /// This does not run because the [`LoadingScreenFadeOutUpdateSet`] requires
+    /// a `FadeTimer` resource to run.
+    ///
+    /// The actual timer is inserted in
+    /// [`ProgressBarProgress::update_current_progress`]
+    /// once the progress bar *visually* reaches 100%.
     fn insert_fade_out_timer(mut commands: Commands) {
         debug!("Inserting fade-out timer...");
-
-        commands
-            .insert_resource(Self(Timer::from_seconds(Self::FADE_OUT_DURATION, TimerMode::Once)));
+        commands.insert_resource(Self::new_fade_out());
     }
 }

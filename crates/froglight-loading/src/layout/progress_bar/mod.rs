@@ -1,13 +1,13 @@
 //! The progress bar of the loading screen
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 
-pub(crate) mod bar_progress;
-use bar_progress::ProgressBarProgress;
+pub(crate) mod progress;
+use progress::ProgressBarProgress;
 
 use crate::layout::fade_animation::FadeAnimationMarker;
 
 #[doc(hidden)]
-pub(super) fn setup(app: &mut App) { bar_progress::setup(app); }
+pub(super) fn setup(app: &mut App) { progress::setup(app); }
 
 /// The progress bar of the loading screen
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
@@ -19,6 +19,7 @@ impl ProgressBar {
         let outer_node = world
             .spawn((
                 FadeAnimationMarker,
+                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         width: Val::Percent(100.0),
@@ -41,6 +42,7 @@ impl ProgressBar {
             .spawn((
                 ProgressBar,
                 FadeAnimationMarker,
+                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         width: Val::Percent(90.0),
@@ -61,6 +63,7 @@ impl ProgressBar {
         let inner_background = world
             .spawn((
                 FadeAnimationMarker,
+                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         width: Val::Percent(100.0),

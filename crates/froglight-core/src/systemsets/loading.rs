@@ -10,7 +10,7 @@ pub(super) fn setup(app: &mut App) {
         Update,
         LoadingScreenUpdateSet
             .run_if(resource_exists_and_equals(LoadingScreenEnable(true)))
-            .run_if(not(resource_added::<LoadingScreenEnable>())),
+            .ambiguous_with_all(),
     );
 }
 

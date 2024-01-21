@@ -1,5 +1,5 @@
 //! The layout of the loading screen
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers, ui::FocusPolicy};
 
 pub(crate) mod fade_animation;
 use fade_animation::FadeAnimationMarker;
@@ -42,7 +42,7 @@ pub(crate) struct LoadingScreenRoot;
 impl LoadingScreenRoot {
     /// Create a Camera2d if one does not exist
     fn create_camera2d_if_none(mut commands: Commands) {
-        debug!("Creating a Camera2dBundle...");
+        debug!("Creating a default Camera2dBundle...");
         commands.spawn(froglight_gui::default_camera::default_camera2d_bundle());
     }
 
@@ -58,6 +58,7 @@ impl LoadingScreenRoot {
             .spawn((
                 LoadingScreenRoot,
                 FadeAnimationMarker,
+                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         position_type: PositionType::Absolute,
@@ -72,6 +73,7 @@ impl LoadingScreenRoot {
                     background_color: BackgroundColor(Color::BLACK),
                     z_index: ZIndex::Global(i32::MAX - 64),
                     visibility: Visibility::Visible,
+                    focus_policy: FocusPolicy::Block,
                     ..Default::default()
                 },
             ))
@@ -79,6 +81,11 @@ impl LoadingScreenRoot {
 
         // Create the center entity
         LoadingScreenCenter::build_loading_center(world, root);
+    }
+
+    /// Returns `true` if the loading screen is visible
+    fn is_visible(query: Query<&Visibility, With<Self>>) -> bool {
+        query.iter().any(|visibility| *visibility == Visibility::Visible)
     }
 }
 
@@ -94,6 +101,7 @@ impl LoadingScreenCenter {
             .spawn((
                 LoadingScreenCenter,
                 FadeAnimationMarker,
+                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,
