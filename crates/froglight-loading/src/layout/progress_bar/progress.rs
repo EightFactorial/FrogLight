@@ -1,12 +1,9 @@
 //! The actual progress shown on the progress bar
 use bevy::{prelude::*, render::view::RenderLayers};
-use froglight_core::systemsets::loading::LoadingScreenUpdateSet;
 
 use crate::{
     layout::fade_animation::{FadeAnimationMarker, FadeTimer},
-    systemsets::{
-        LoadingScreenEnableSystems, LoadingScreenFadeInUpdateSet, LoadingScreenFadeOutUpdateSet,
-    },
+    systemsets::{LoadingScreenFadeInSet, LoadingScreenFadeOutSet, LoadingScreenToggleSet},
 };
 
 #[doc(hidden)]
@@ -16,10 +13,9 @@ pub(super) fn setup(app: &mut App) {
         ProgressBarProgress::update_current_progress
             .run_if(any_with_component::<ProgressBarProgress>())
             .run_if(not(resource_exists::<FadeTimer>()))
-            .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true)))
-            .after(LoadingScreenFadeInUpdateSet)
-            .before(LoadingScreenFadeOutUpdateSet)
-            .in_set(LoadingScreenUpdateSet),
+            .after(LoadingScreenFadeInSet)
+            .before(LoadingScreenFadeOutSet)
+            .in_set(LoadingScreenToggleSet),
     );
 }
 

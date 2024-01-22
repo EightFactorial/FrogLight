@@ -14,29 +14,27 @@ pub(super) fn setup(app: &mut App) {
     // Configure startup sets
     app.configure_sets(Startup, LoadingScreenStartupSet.ambiguous_with_all());
 
-    // Configure fade in/out update sets
+    // Configure toggle set
     app.configure_sets(
         Update,
-        LoadingScreenFadeInUpdateSet
+        LoadingScreenToggleSet
             .in_set(LoadingScreenUpdateSet)
-            .before(LoadingScreenFadeOutUpdateSet)
-            .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true))),
-    );
-    app.configure_sets(
-        Update,
-        LoadingScreenFadeOutUpdateSet
-            .in_set(LoadingScreenUpdateSet)
-            .after(LoadingScreenFadeInUpdateSet)
             .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true))),
     );
 
-    // Configure systems that enable/disable systemsets
+    // Configure fade in/out update sets
+    app.configure_sets(
+        Update,
+        (LoadingScreenFadeInSet, LoadingScreenFadeOutSet).chain().in_set(LoadingScreenToggleSet),
+    );
+
+    // Configure systems that enable/disable toggle set
     app.add_systems(
         Update,
         LoadingScreenEnableSystems::enable_fade_systems
             .run_if(resource_exists_and_equals(LoadingScreenEnable(true)))
             .run_if(resource_exists_and_changed::<LoadingScreenEnable>())
-            .before(LoadingScreenFadeInUpdateSet)
+            .before(LoadingScreenToggleSet)
             .in_set(LoadingScreenUpdateSet),
     );
     app.add_systems(
@@ -45,8 +43,8 @@ pub(super) fn setup(app: &mut App) {
             .run_if(resource_exists_and_equals(LoadingScreenEnable(false)))
             .run_if(not(LoadingScreenRoot::is_visible))
             .run_if(resource_removed::<FadeTimer>())
-            .after(LoadingScreenFadeOutUpdateSet)
-            .in_set(LoadingScreenUpdateSet),
+            .after(LoadingScreenFadeOutSet)
+            .in_set(LoadingScreenToggleSet),
     );
 }
 
@@ -71,11 +69,16 @@ impl LoadingScreenEnableSystems {
 }
 
 /// A [`SystemSet`] that runs loading screen
+/// systems when the loading screen is enabled.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub(crate) struct LoadingScreenToggleSet;
+
+/// A [`SystemSet`] that runs loading screen
 /// systems when fading in.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub(crate) struct LoadingScreenFadeInUpdateSet;
+pub(crate) struct LoadingScreenFadeInSet;
 
 /// A [`SystemSet`] that runs loading screen
 /// systems when fading out.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub(crate) struct LoadingScreenFadeOutUpdateSet;
+pub(crate) struct LoadingScreenFadeOutSet;

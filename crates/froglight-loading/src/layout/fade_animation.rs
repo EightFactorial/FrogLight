@@ -5,7 +5,7 @@ use bevy::prelude::*;
 
 use super::{progress_bar::progress::ProgressBarProgress, LoadingScreenRoot};
 use crate::systemsets::{
-    LoadingScreenEnableSystems, LoadingScreenFadeInUpdateSet, LoadingScreenFadeOutUpdateSet,
+    LoadingScreenEnableSystems, LoadingScreenFadeInSet, LoadingScreenFadeOutSet,
 };
 
 #[doc(hidden)]
@@ -23,7 +23,7 @@ pub(super) fn setup(app: &mut App) {
                 .run_if(resource_exists::<FadeTimer>().and_then(FadeTimer::is_fade_in)),
         )
             .chain()
-            .in_set(LoadingScreenFadeInUpdateSet),
+            .in_set(LoadingScreenFadeInSet),
     );
 
     // Add fade-out systems
@@ -38,7 +38,7 @@ pub(super) fn setup(app: &mut App) {
                 .run_if(resource_exists::<FadeTimer>().and_then(FadeTimer::is_fade_out)),
         )
             .chain()
-            .in_set(LoadingScreenFadeOutUpdateSet),
+            .in_set(LoadingScreenFadeOutSet),
     );
 }
 
