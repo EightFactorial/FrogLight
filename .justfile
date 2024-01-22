@@ -34,22 +34,10 @@ run-profile profile="dev" args="":
 # ---- Test Recipes ----
 
 # Run all tests and all tool tests
-all-tests: (test) (tools "all-tests") (graph)
+all-tests: (update) (deny) (fmt) (test) (graph) (tools "all-tests")
 
 # Run all tests and doc-tests
-test: (deny) (fmt) (nextest) (doc-test) 
-
-# Run cargo deny
-deny:
-  cargo deny check
-
-# Run cargo fmt
-fmt:
-  cargo fmt --all
-
-# Run clippy
-clippy:
-  cargo clippy --workspace
+test: (nextest) (doc-test) 
 
 # Run all tests
 nextest: (fetch-nextest)
@@ -60,6 +48,22 @@ doc-test:
   cargo test --doc --workspace
 
 # ---- Tool Recipes ----
+
+# Run cargo deny
+deny:
+  cargo deny check
+
+# Run cargo update
+update:
+  cargo update
+
+# Run clippy
+clippy:
+  cargo clippy --workspace
+
+# Run cargo fmt
+fmt:
+  cargo fmt --all
 
 # Run `just` in `tools/`
 tools args="": (fetch-tools)
