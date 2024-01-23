@@ -1,4 +1,4 @@
-//! Prints a graph of the [`Update`] schedule.
+//! Creates graphs for various system schedules.
 //!
 //! Requires the `dot` command to be installed.
 
