@@ -15,7 +15,7 @@ impl_float_write!(f32, u32);
 impl_float_write!(f64, u64);
 
 #[test]
-fn frog_write_f32() {
+fn proto_write_f32() {
     let mut buf = Vec::new();
 
     assert!(0f32.frog_write(&mut buf).is_ok());
@@ -31,7 +31,7 @@ fn frog_write_f32() {
     buf.clear();
 }
 #[test]
-fn frog_write_f64() {
+fn proto_write_f64() {
     let mut buf = Vec::new();
 
     assert!(0f64.frog_write(&mut buf).is_ok());

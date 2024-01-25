@@ -21,7 +21,12 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-bevy_xpbd_3d = { workspace = true, features = ["collider-from-mesh", "simd"] }
+bevy_xpbd_3d = { workspace = true, features = [
+    "async-collider",
+    "collider-from-mesh",
+    "parallel",
+    "simd",
+] }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }

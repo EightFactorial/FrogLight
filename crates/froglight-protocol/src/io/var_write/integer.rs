@@ -35,8 +35,14 @@ impl_integer_var_write!(u64);
 impl_integer_var_write!(u128);
 impl_integer_var_write!(usize);
 
+impl_integer_var_write!(i16);
+impl_integer_var_write!(i32);
+impl_integer_var_write!(i64);
+impl_integer_var_write!(i128);
+impl_integer_var_write!(isize);
+
 #[test]
-fn frog_var_write_i32() {
+fn proto_var_write_i32() {
     let mut buf = Vec::with_capacity(5);
 
     assert!((-2_147_483_648_i32).frog_var_write(&mut buf).is_ok());
@@ -87,7 +93,7 @@ fn frog_var_write_i32() {
     assert_eq!(buf, vec![255, 255, 255, 255, 7]);
 }
 #[test]
-fn frog_var_write_i64() {
+fn proto_var_write_i64() {
     let mut buf = Vec::with_capacity(10);
 
     assert!((-9_223_372_036_854_775_808_i64).frog_var_write(&mut buf).is_ok());
@@ -150,14 +156,8 @@ fn frog_var_write_i64() {
     assert_eq!(buf, vec![255, 255, 255, 255, 255, 255, 255, 255, 127]);
 }
 
-impl_integer_var_write!(i16);
-impl_integer_var_write!(i32);
-impl_integer_var_write!(i64);
-impl_integer_var_write!(i128);
-impl_integer_var_write!(isize);
-
 #[test]
-fn frog_var_write_u32() {
+fn proto_var_write_u32() {
     let mut buf = Vec::with_capacity(5);
 
     assert!(0u32.frog_var_write(&mut buf).is_ok());
@@ -204,7 +204,7 @@ fn frog_var_write_u32() {
     assert_eq!(buf, vec![255, 255, 255, 255, 15]);
 }
 #[test]
-fn frog_var_write_u64() {
+fn proto_var_write_u64() {
     let mut buf = Vec::with_capacity(10);
 
     assert!(0u64.frog_var_write(&mut buf).is_ok());

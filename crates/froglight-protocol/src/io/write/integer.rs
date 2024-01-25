@@ -18,7 +18,7 @@ impl_integer_write!(u64);
 impl_integer_write!(u128);
 
 #[test]
-fn frog_write_u8() {
+fn proto_write_u8() {
     let mut buf = Vec::new();
 
     assert!(0u8.frog_write(&mut buf).is_ok());
@@ -29,7 +29,7 @@ fn frog_write_u8() {
     assert_eq!(buf, vec![255]);
 }
 #[test]
-fn frog_write_u16() {
+fn proto_write_u16() {
     let mut buf = Vec::new();
 
     assert!(0u16.frog_write(&mut buf).is_ok());
@@ -40,7 +40,7 @@ fn frog_write_u16() {
     assert_eq!(buf, vec![255, 255]);
 }
 #[test]
-fn frog_write_u32() {
+fn proto_write_u32() {
     let mut buf = Vec::new();
 
     assert!(0u32.frog_write(&mut buf).is_ok());
@@ -51,7 +51,7 @@ fn frog_write_u32() {
     assert_eq!(buf, vec![255, 255, 255, 255]);
 }
 #[test]
-fn frog_write_u64() {
+fn proto_write_u64() {
     let mut buf = Vec::new();
 
     assert!(0u64.frog_write(&mut buf).is_ok());
@@ -62,7 +62,7 @@ fn frog_write_u64() {
     assert_eq!(buf, vec![255, 255, 255, 255, 255, 255, 255, 255]);
 }
 #[test]
-fn frog_write_u128() {
+fn proto_write_u128() {
     let mut buf = Vec::new();
 
     assert!(0u128.frog_write(&mut buf).is_ok());
@@ -81,7 +81,7 @@ impl_integer_write!(i64);
 impl_integer_write!(i128);
 
 #[test]
-fn frog_write_i16() {
+fn proto_write_i16() {
     let mut buf = Vec::new();
 
     assert!(0i16.frog_write(&mut buf).is_ok());
@@ -96,7 +96,7 @@ fn frog_write_i16() {
     assert_eq!(buf, vec![128, 0]);
 }
 #[test]
-fn frog_write_i32() {
+fn proto_write_i32() {
     let mut buf = Vec::new();
 
     assert!(0i32.frog_write(&mut buf).is_ok());
@@ -111,7 +111,7 @@ fn frog_write_i32() {
     assert_eq!(buf, vec![128, 0, 0, 0]);
 }
 #[test]
-fn frog_write_i64() {
+fn proto_write_i64() {
     let mut buf = Vec::new();
 
     assert!(0i64.frog_write(&mut buf).is_ok());
@@ -126,7 +126,7 @@ fn frog_write_i64() {
     assert_eq!(buf, vec![128, 0, 0, 0, 0, 0, 0, 0]);
 }
 #[test]
-fn frog_write_i128() {
+fn proto_write_i128() {
     let mut buf = Vec::new();
 
     assert!(0i128.frog_write(&mut buf).is_ok());

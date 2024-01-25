@@ -1,10 +1,10 @@
-use super::FrogRead;
+use super::{FrogRead, ReadError};
 
 macro_rules! impl_float_read {
     ($ty1:ty, $ty2:ty) => {
         impl FrogRead for $ty1 {
             #[inline]
-            fn frog_read(buf: &mut std::io::Cursor<&[u8]>) -> std::io::Result<Self> {
+            fn frog_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
                 Ok(Self::from_bits(<$ty2>::frog_read(buf)?))
             }
         }

@@ -1,5 +1,13 @@
+use super::ReadError;
+
+mod bool;
 mod float;
 mod integer;
+mod map;
+mod option;
+mod other;
+mod string;
+mod vector;
 
 /// A trait for reading a type from a buffer
 pub trait FrogRead {
@@ -9,7 +17,7 @@ pub trait FrogRead {
     ///
     /// Returns an error if the cursor does not contain
     /// enough data to read the type
-    fn frog_read(buf: &mut std::io::Cursor<&[u8]>) -> std::io::Result<Self>
+    fn frog_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
     where
         Self: Sized;
 }

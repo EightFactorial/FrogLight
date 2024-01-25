@@ -1,3 +1,9 @@
+use super::ReadError;
+
+mod integer;
+mod map;
+mod option;
+
 /// A trait for reading a variable-length type from a buffer
 ///
 /// Uses LEB128 encoding
@@ -7,7 +13,7 @@ pub trait FrogVarRead {
     ///
     /// Returns an error if the cursor does not contain
     /// enough data to read the type
-    fn frog_var_read(buf: &mut std::io::Cursor<&[u8]>) -> std::io::Result<Self>
+    fn frog_var_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
     where
         Self: Sized;
 }

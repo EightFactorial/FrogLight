@@ -1,10 +1,6 @@
 #![doc = include_str!("../README.md")]
+#![feature(array_try_from_fn)]
 
-mod conn;
-pub use conn::*;
-
-mod io;
-pub use io::*;
-
+pub mod io;
 pub mod states;
 pub mod versions;

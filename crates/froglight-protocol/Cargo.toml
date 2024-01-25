@@ -33,6 +33,14 @@ futures = { workspace = true }
 hashbrown = { workspace = true, features = ["serde"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
+simdnbt = { workspace = true }
+smallvec = { workspace = true, features = [
+    "const_generics",
+    "const_new",
+    "serde",
+] }
+thiserror = { workspace = true }
+uuid = { workspace = true, features = ["serde"] }
 
 [features]
 default = []

@@ -1,21 +1,22 @@
-use super::FrogRead;
+use super::{FrogRead, ReadError};
 
 macro_rules! impl_integer_read {
     ($ty:ty) => {
-        impl_integer_read!($ty, |slice| <$ty>::from_be(*bytemuck::from_bytes(slice)));
-    };
-    ($ty:ty, $expr:expr) => {
         impl FrogRead for $ty {
             #[inline]
-            fn frog_read(buf: &mut std::io::Cursor<&[u8]>) -> std::io::Result<Self> {
-                let position = usize::try_from(buf.position()).expect("position too large");
-                let length = (Self::BITS / 8) as usize;
+            fn frog_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
+                let position = usize::try_from(buf.position()).expect("Cursor position too large");
+                let length = usize::try_from(Self::BITS / 8).expect("Integer too large");
 
                 <std::io::Cursor<_> as std::io::BufRead>::consume(buf, length);
-                let slice = &buf.get_ref()[position..position + length];
 
-                #[allow(clippy::redundant_closure_call)]
-                Ok($expr(slice))
+                if let Some(slice) = &buf.get_ref().get(position..position + length) {
+                    #[allow(clippy::redundant_closure_call)]
+                    Ok(<$ty>::from_be(bytemuck::pod_read_unaligned(slice)))
+                } else {
+                    let leftover = buf.get_ref().len() - position;
+                    Err(ReadError::EndOfBuffer(length, leftover))
+                }
             }
         }
     };

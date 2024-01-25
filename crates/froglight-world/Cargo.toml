@@ -1,5 +1,6 @@
 [package]
 name = "froglight-world"
+exclude = ["benches"]
 
 [package.version]
 workspace = true
@@ -19,24 +20,39 @@ workspace = true
 [lints]
 workspace = true
 
+[dev-dependencies]
+criterion = "0.5.1"
+
 [dependencies]
 bevy_app = "0.12.1"
 bevy_ecs = "0.12.1"
 bevy_log = { version = "0.12.1", optional = true }
 bevy_tasks = "0.12.1"
 bitvec = { workspace = true }
-compact_str = { workspace = true, features = ["serde"] }
+compact_str = { workspace = true }
 derive_more = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "world",
 ] }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
+futures = { workspace = true }
 hashbrown = { workspace = true }
+parking_lot = { workspace = true }
+phf = { workspace = true, features = ["macros"] }
 serde = { workspace = true }
+simdnbt = { workspace = true }
+strum = { workspace = true }
+thiserror = { workspace = true }
 
 [features]
 default = []
 
 # Enable debug logging
 logging = ["dep:bevy_log"]
+
+# Benchmark
+[[bench]]
+name = "chunk_decode"
+path = "benches/chunk_decode.rs"
+harness = false
