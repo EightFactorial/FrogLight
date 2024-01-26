@@ -1,11 +1,14 @@
-use super::FrogWrite;
+use super::{FrogWrite, WriteError};
 
 macro_rules! impl_float_write {
     ($ty1:ty, $ty2:ty) => {
         impl FrogWrite for $ty1 {
             #[inline]
-            fn frog_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> std::io::Result<()> {
-                <$ty2>::frog_write(&self.to_bits(), buf)
+            fn frog_write(
+                &self,
+                buf: &mut (impl std::io::Write + ?Sized),
+            ) -> Result<(), WriteError> {
+                Ok(buf.write_all(&self.to_be_bytes())?)
             }
         }
     };

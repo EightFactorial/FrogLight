@@ -3,4 +3,5 @@
 
 pub mod io;
 pub mod states;
+pub mod traits;
 pub mod versions;

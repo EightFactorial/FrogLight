@@ -1,11 +1,14 @@
-use super::FrogWrite;
+use super::{FrogWrite, WriteError};
 
 macro_rules! impl_integer_write {
     ($ty:ty) => {
         impl FrogWrite for $ty {
             #[inline]
-            fn frog_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> std::io::Result<()> {
-                buf.write_all(bytemuck::bytes_of(&self.to_be()))
+            fn frog_write(
+                &self,
+                buf: &mut (impl std::io::Write + ?Sized),
+            ) -> Result<(), WriteError> {
+                Ok(buf.write_all(bytemuck::bytes_of(&self.to_be()))?)
             }
         }
     };

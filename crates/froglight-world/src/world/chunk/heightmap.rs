@@ -23,14 +23,14 @@ impl HeightMaps {
                 heightmaps.motion_blocking = motion_blocking.clone();
             } else {
                 #[cfg(feature = "logging")]
-                bevy_log::warn!("Chunk is missing MOTION_BLOCKING heightmap");
+                bevy_log::warn!("Chunk is missing `MOTION_BLOCKING` heightmap");
             }
 
             if let Some(NbtTag::LongArray(world_surface)) = base.take("WORLD_SURFACE") {
                 heightmaps.world_surface = world_surface.clone();
             } else {
                 #[cfg(feature = "logging")]
-                bevy_log::warn!("Chunk is missing WORLD_SURFACE heightmap");
+                bevy_log::warn!("Chunk is missing `WORLD_SURFACE` heightmap");
             }
         } else {
             #[cfg(feature = "logging")]
