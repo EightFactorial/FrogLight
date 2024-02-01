@@ -24,8 +24,8 @@ impl Palette {
         buf: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, ChunkDecodeError> {
         match self {
-            Palette::Single(_) => Ok(Palette::Single(u32::frog_read(buf)?)),
-            Palette::Vector(_) => Ok(Palette::Vector(Vec::<u32>::frog_read(buf)?)),
+            Palette::Single(_) => Ok(Palette::Single(u32::fg_read(buf)?)),
+            Palette::Vector(_) => Ok(Palette::Vector(Vec::<u32>::fg_read(buf)?)),
             Palette::Global => Ok(Palette::Global),
         }
     }

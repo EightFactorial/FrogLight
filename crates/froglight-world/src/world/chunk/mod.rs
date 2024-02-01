@@ -7,7 +7,7 @@ use parking_lot::RwLock;
 use thiserror::Error;
 
 mod heightmap;
-use heightmap::HeightMaps;
+pub use heightmap::HeightMaps;
 
 use super::section::Section;
 
@@ -20,56 +20,89 @@ use super::section::Section;
 /// - Overworld: 384 (-64 to 320)
 /// - Nether: 256 (0 to 256)
 /// - End: 256 (0 to 256)
-#[derive(Debug, Clone, Component)]
-pub struct Chunk<const HEIGHT: usize>
-where
-    [(); HEIGHT / Section::HEIGHT]:,
-{
+#[derive(Debug, Default, Clone, Component)]
+pub struct Chunk {
+    /// The height of the chunk.
+    pub height: usize,
+
     /// The sections in the chunk.
-    pub sections: Arc<RwLock<[Section; HEIGHT / Section::HEIGHT]>>,
+    pub sections: Arc<RwLock<Vec<Section>>>,
     /// The heightmaps of the chunk.
     pub heightmaps: Arc<RwLock<HeightMaps>>,
 }
 
-impl<const HEIGHT: usize> Default for Chunk<HEIGHT>
-where
-    [(); HEIGHT / Section::HEIGHT]:,
-{
-    fn default() -> Self {
-        let sections = core::array::from_fn(|_| Section::default());
-        Self {
-            sections: Arc::new(RwLock::new(sections)),
-            heightmaps: Arc::new(RwLock::new(HeightMaps::default())),
-        }
-    }
-}
-
-impl<const HEIGHT: usize> Chunk<HEIGHT>
-where
-    [(); HEIGHT / Section::HEIGHT]:,
-{
+impl Chunk {
     /// The width of a [`Chunk`].
     pub const WIDTH: usize = 16;
     /// The depth of a [`Chunk`].
     pub const DEPTH: usize = 16;
-    /// The height of a [`Chunk`].
-    pub const HEIGHT: usize = HEIGHT;
 
-    /// The total volume of a [`Chunk`].
-    pub const VOLUME: usize = Self::WIDTH * Self::DEPTH * Self::HEIGHT;
+    /// Creates a new empty [`Chunk`] with the given height.
+    #[must_use]
+    pub fn new_empty(height: usize) -> Self {
+        Self {
+            height,
+            sections: Arc::new(RwLock::new(Vec::new())),
+            heightmaps: Arc::new(RwLock::new(HeightMaps::default())),
+        }
+    }
 
-    /// The total number of [`Section`]s in a [`Chunk`].
-    pub const SECTION_COUNT: usize = HEIGHT / Section::HEIGHT;
+    /// Creates a new [`Chunk`] with the given sections.
+    ///
+    /// This calculates the heightmaps from the sections.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::world::{Chunk, Section};
+    ///
+    /// // Create a new chunk with 24 sections.
+    /// let chunk = Chunk::new(vec![Section::default(); 24]);
+    ///
+    /// // The chunk has a height of (24 x 16) 384.
+    /// assert_eq!(chunk.height, 384);
+    /// ```
+    #[must_use]
+    pub fn new(sections: Vec<Section>) -> Self {
+        // TODO: Calculate heightmaps from sections.
+        let heightmaps = HeightMaps::default();
+
+        Self {
+            height: sections.len() * Section::HEIGHT,
+            sections: Arc::new(RwLock::new(sections)),
+            heightmaps: Arc::new(RwLock::new(heightmaps)),
+        }
+    }
+
+    /// Creates a new [`Chunk`] with the given sections and heightmaps.
+    #[must_use]
+    pub fn new_with_heightmaps(sections: Vec<Section>, heightmaps: HeightMaps) -> Self {
+        Self {
+            height: sections.len() * Section::HEIGHT,
+            sections: Arc::new(RwLock::new(sections)),
+            heightmaps: Arc::new(RwLock::new(heightmaps)),
+        }
+    }
 
     /// Decodes a [`Chunk`] from a buffer.
     ///
     /// # Errors
     /// If the data in the buffer is invalid, an error will be returned.
-    pub fn read_from_buffer(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ChunkDecodeError> {
-        let sections = core::array::try_from_fn(|_| Section::decode(buf))?;
-        let heightmaps = HeightMaps::decode(buf)?;
+    pub fn read_from_buffer(
+        height: usize,
+        buf: &mut std::io::Cursor<&[u8]>,
+    ) -> Result<Self, ChunkDecodeError> {
+        // Decode the sections.
+        let section_count = height / Section::HEIGHT;
+        let mut sections = Vec::with_capacity(section_count);
+        for _ in 0..section_count {
+            sections.push(Section::decode(buf)?);
+        }
+
+        // Decode the heightmaps.
+        let heightmaps = HeightMaps::decode(height, buf)?;
 
         Ok(Self {
+            height,
             sections: Arc::new(RwLock::new(sections)),
             heightmaps: Arc::new(RwLock::new(heightmaps)),
         })
@@ -88,13 +121,4 @@ pub enum ChunkDecodeError {
     /// An error occurred while reading section data.
     #[error("Could not decode bitvec")]
     BitVec,
-}
-
-#[test]
-fn test_chunk_section_count() {
-    // The Overworld has a height of 384, so it has 24 sections.
-    assert_eq!(Chunk::<384>::SECTION_COUNT, 24);
-
-    // The Nether and End have a height of 256, so they have 16 sections.
-    assert_eq!(Chunk::<256>::SECTION_COUNT, 16);
 }

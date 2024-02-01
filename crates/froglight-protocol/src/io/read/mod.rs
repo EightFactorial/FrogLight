@@ -17,7 +17,7 @@ pub trait FrogRead {
     ///
     /// Returns an error if the cursor does not contain
     /// enough data to read the type
-    fn frog_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
+    fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
     where
         Self: Sized;
 }

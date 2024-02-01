@@ -9,5 +9,14 @@ pub trait FrogVarWrite {
     /// # Errors
     ///
     /// Returns an error if the buffer cannot be written to
-    fn frog_var_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> std::io::Result<()>;
+    fn fg_var_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> std::io::Result<()>;
+
+    /// Write a variable-length type to a new byte buffer
+    #[inline]
+    fn fg_var_to_bytes(&self) -> Vec<u8> {
+        let mut buf = Vec::new();
+        self.fg_var_write(&mut buf).expect("Failed to write into new Vec<u8>");
+
+        buf
+    }
 }

@@ -3,16 +3,16 @@ use std::io::Cursor;
 use bitvec::prelude::{BitVec, Msb0};
 use froglight_protocol::io::FrogRead;
 
-use super::Palette;
-use crate::world::chunk::ChunkDecodeError;
+use crate::world::{chunk::ChunkDecodeError, Palette};
 
-/// A [`Container`] is used to store a type of data in a [`Section`].
+/// A `ChunkDataContainer` is used to store a type of data in a
+/// [`Section`](crate::world::Section).
 ///
-/// For [`BlockContainer`], it contains block data.
+/// A [`BlockContainer`] contains block data.
 ///
-/// For [`BiomeContainer`], it contains biome data.
+/// A [`BiomeContainer`] contains biome data.
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
-pub struct Container<T: ContainerType> {
+pub struct ChunkDataContainer<T: ContainerType> {
     /// The number of bits used to store each entry in the container.
     pub bits: usize,
     /// The palette type used by the container.
@@ -22,28 +22,31 @@ pub struct Container<T: ContainerType> {
     _phantom: std::marker::PhantomData<T>,
 }
 
-impl<T: ContainerType> Container<T> {
+impl<T: ContainerType> ChunkDataContainer<T> {
     /// Decodes a [`Container`] from a buffer.
     pub(crate) fn decode(buf: &mut Cursor<&[u8]>) -> Result<Self, ChunkDecodeError> {
-        let bits = usize::from(u8::frog_read(buf)?);
+        // Read the bit count
+        let bits = usize::from(u8::fg_read(buf)?);
 
+        // Decode the palette
         let mut palette = T::palette_type(bits);
         palette = palette.decode(buf)?;
 
-        let data = BitVec::try_from_vec(Vec::<u64>::frog_read(buf)?)
+        let data = BitVec::try_from_vec(Vec::<u64>::fg_read(buf)?)
             .map_err(|_| ChunkDecodeError::BitVec)?;
 
         Ok(Self { bits, palette, data, _phantom: std::marker::PhantomData })
     }
 }
 
-/// A [`ContainerType`] is a kind of data that can be stored in a [`Container`].
+/// A [`ContainerType`] is a kind of data that can be stored in a
+/// [`ChunkDataContainer`].
 pub trait ContainerType {
     /// Returns the palette type for a given number of bits.
     fn palette_type(bits: usize) -> Palette;
 }
 
-/// A [`Container`] that stores block data.
+/// A [`ChunkDataContainer`] that stores block data.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct BlockContainer;
 
@@ -57,7 +60,7 @@ impl ContainerType for BlockContainer {
     }
 }
 
-/// A [`Container`] that stores biome data.
+/// A [`ChunkDataContainer`] that stores biome data.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct BiomeContainer;
 

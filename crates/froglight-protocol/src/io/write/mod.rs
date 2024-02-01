@@ -15,13 +15,14 @@ pub trait FrogWrite {
     ///
     /// # Errors
     /// Returns an error if the buffer cannot be written to
-    fn frog_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError>;
+    fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError>;
 
-    /// Write the type to a new buffer
+    /// Write the type to a new byte buffer
     #[inline]
-    fn as_byte_vec(&self) -> Vec<u8> {
+    fn fg_to_bytes(&self) -> Vec<u8> {
         let mut buf = Vec::new();
-        self.frog_write(&mut buf).expect("Failed to write into new Vec<u8>");
+        self.fg_write(&mut buf).expect("Failed to write into new Vec<u8>");
+
         buf
     }
 }

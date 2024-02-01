@@ -4,7 +4,7 @@ use bevy_app::{App, Plugin};
 ///
 /// Adds [`Systems`](bevy_ecs::system::System) and
 /// [`Components`](bevy_ecs::component::Component) for managing
-/// [`Chunks`](crate::Chunk).
+/// [`Chunks`](crate::world::Chunk).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct WorldPlugin;
 
