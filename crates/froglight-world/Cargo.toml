@@ -29,6 +29,7 @@ bevy_ecs = "0.12.1"
 bevy_log = { version = "0.12.1", optional = true }
 bevy_tasks = "0.12.1"
 bitvec = { workspace = true }
+bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
 compact_str = { workspace = true }
 derive_more = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }

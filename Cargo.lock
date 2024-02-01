@@ -2045,6 +2045,7 @@ dependencies = [
  "bevy_log",
  "bevy_tasks",
  "bitvec",
+ "bytemuck",
  "compact_str",
  "criterion",
  "derive_more",

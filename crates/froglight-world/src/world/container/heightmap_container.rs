@@ -29,7 +29,7 @@ impl HeightMapContainer {
 
         // Convert Vec<i64> to Vec<u64>
         // Do not change bits, as the data is already in the correct format
-        let data = heightmap_data.into_iter().map(|x| x as u64).collect();
+        let data: Vec<u64> = bytemuck::cast_vec(heightmap_data);
         let data = BitVec::try_from_vec(data).map_err(|_| ChunkDecodeError::BitVec)?;
 
         Ok(Self { bits, data })
