@@ -93,6 +93,7 @@ impl Chunk {
     ) -> Result<Self, ChunkDecodeError> {
         // Decode the sections.
         let section_count = height / Section::HEIGHT;
+
         let mut sections = Vec::with_capacity(section_count);
         for _ in 0..section_count {
             sections.push(Section::decode(buf)?);

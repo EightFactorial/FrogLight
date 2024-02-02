@@ -1,20 +1,13 @@
 [package]
 name = "froglight-entities"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
 
-[package.version]
-workspace = true
-[package.edition]
-workspace = true
-[package.license]
-workspace = true
-[package.authors]
-workspace = true
-[package.homepage]
-workspace = true
-[package.repository]
-workspace = true
-[package.readme]
-workspace = true
 
 [lints]
 workspace = true

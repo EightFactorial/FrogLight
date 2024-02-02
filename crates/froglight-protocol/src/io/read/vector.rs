@@ -34,12 +34,23 @@ impl<T: FrogRead> FrogRead for Vec<T> {
 }
 
 impl<T: FrogRead, const N: usize> FrogRead for SmallVec<[T; N]> {
-    #[inline]
     fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
     where
         Self: Sized,
     {
-        Ok(SmallVec::from_vec(Vec::fg_read(buf)?))
+        let len = u32::fg_var_read(buf)?;
+        let mut vec = SmallVec::with_capacity(len as usize);
+
+        for i in 0..len {
+            match T::fg_read(buf) {
+                Ok(value) => vec.push(value),
+                Err(err) => {
+                    return Err(ReadError::ListError(len as usize, i as usize, Box::new(err)));
+                }
+            }
+        }
+
+        Ok(vec)
     }
 }
 

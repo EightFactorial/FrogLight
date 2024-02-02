@@ -5,8 +5,8 @@ use bevy::prelude::*;
 /// By default, this also adds the
 /// [`LoadingPlugin`](froglight_loading::LoadingPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct GuiPlugin;
+pub struct InterfacePlugin;
 
-impl Plugin for GuiPlugin {
+impl Plugin for InterfacePlugin {
     fn build(&self, _app: &mut App) {}
 }

@@ -43,7 +43,7 @@ impl LoadingScreenRoot {
     /// Create a Camera2d if one does not exist
     fn create_camera2d_if_none(mut commands: Commands) {
         debug!("Creating a default Camera2dBundle...");
-        commands.spawn(froglight_gui::default_camera::default_camera2d_bundle());
+        commands.spawn(froglight_interface::default_camera::default_camera2d_bundle());
     }
 
     /// Build the loading screen

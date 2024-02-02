@@ -3,4 +3,4 @@
 pub mod default_camera;
 
 mod plugin;
-pub use plugin::GuiPlugin;
+pub use plugin::InterfacePlugin;

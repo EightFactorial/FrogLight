@@ -1,20 +1,13 @@
 [package]
 name = "froglight-loading"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
 
-[package.version]
-workspace = true
-[package.edition]
-workspace = true
-[package.license]
-workspace = true
-[package.authors]
-workspace = true
-[package.homepage]
-workspace = true
-[package.repository]
-workspace = true
-[package.readme]
-workspace = true
 
 [lints]
 workspace = true
@@ -22,4 +15,4 @@ workspace = true
 [dependencies]
 bevy = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
-froglight-gui = { version = "0.1.0", path = "../froglight-gui" }
+froglight-interface = { version = "0.1.0", path = "../froglight-interface" }

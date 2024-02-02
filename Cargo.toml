@@ -6,7 +6,7 @@ members = [
     "crates/froglight-client",
     "crates/froglight-core",
     "crates/froglight-entities",
-    "crates/froglight-gui",
+    "crates/froglight-interface",
     "crates/froglight-loading",
     "crates/froglight-macros",
     "crates/froglight-network",
@@ -76,37 +76,18 @@ uuid = "1.7.0"
 [profile.dev]
 opt-level = 1
 
-# Fully optimize dependencies
-[profile.dev.package."*"]
-opt-level = 3
-
+[profile.dev.package]
 # Slightly optimize the some of the froglight packages
-[profile.dev.package.froglight-client]
-opt-level = 1
-
-[profile.dev.package.froglight-core]
-opt-level = 1
-
-[profile.dev.package.froglight-entities]
-opt-level = 1
-
-[profile.dev.package.froglight-gui]
-opt-level = 1
-
-[profile.dev.package.froglight-loading]
-opt-level = 1
-
-[profile.dev.package.froglight-macros]
-opt-level = 1
-
-[profile.dev.package.froglight-network]
-opt-level = 1
-
-[profile.dev.package.froglight-resourcepack]
-opt-level = 1
-
-[profile.dev.package.froglight-settings]
-opt-level = 1
+froglight-client = { opt-level = 1 }
+froglight-core = { opt-level = 1 }
+froglight-entities = { opt-level = 1 }
+froglight-gui = { opt-level = 1 }
+froglight-loading = { opt-level = 1 }
+froglight-macros = { opt-level = 1 }
+froglight-resourcepack = { opt-level = 1 }
+froglight-settings = { opt-level = 1 }
+# Fully optimize dependencies
+"*" = { opt-level = 3 }
 
 # Fully optimize release builds
 [profile.release]
@@ -118,21 +99,13 @@ lto = true
 
 [package]
 name = "froglight"
-
-[package.version]
-workspace = true
-[package.edition]
-workspace = true
-[package.license]
-workspace = true
-[package.authors]
-workspace = true
-[package.homepage]
-workspace = true
-[package.repository]
-workspace = true
-[package.readme]
-workspace = true
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
 
 [dependencies]
 bevy = { workspace = true }
@@ -148,3 +121,7 @@ logging = ["froglight-client/logging"]
 
 # Use mimalloc as the global allocator
 mimalloc = ["dep:mimalloc"]
+
+# Enable Wayland support
+# Only used in Linux builds
+wayland = ["bevy/wayland"]
