@@ -1,5 +1,5 @@
 //! The art displayed on the loading screen
-use bevy::{prelude::*, render::view::RenderLayers};
+use bevy::prelude::*;
 
 use crate::{layout::fade_animation::FadeAnimationMarker, plugin::LoadingPluginArtPath};
 
@@ -23,7 +23,6 @@ impl LoadingArt {
         world
             .spawn((
                 FadeAnimationMarker,
-                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         width: Val::Percent(100.0),
@@ -43,7 +42,6 @@ impl LoadingArt {
                 node.spawn((
                     LoadingArt,
                     FadeAnimationMarker,
-                    RenderLayers::layer(1),
                     ImageBundle {
                         style: Style {
                             width: Val::VMin(50.0),

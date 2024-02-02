@@ -1125,6 +1125,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "big_space"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e188fd79effffde07875b26a2999f6fabbc0695ef25316948dd09d29b6abe74d"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bindgen"
 version = "0.69.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2063,10 +2072,8 @@ version = "0.1.0"
 name = "froglight-world"
 version = "0.1.0"
 dependencies = [
- "bevy_app",
- "bevy_ecs",
- "bevy_log",
- "bevy_tasks",
+ "bevy",
+ "big_space",
  "bitvec",
  "bytemuck",
  "compact_str",
@@ -4998,9 +5005,9 @@ dependencies = [
 
 [[package]]
 name = "winnow"
-version = "0.5.36"
+version = "0.5.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "818ce546a11a9986bc24f93d0cdf38a8a1a400f1473ea8c82e59f6e0ffab9249"
+checksum = "a7cad8365489051ae9f054164e459304af2e7e9bb407c958076c8bf4aef52da5"
 dependencies = [
  "memchr",
 ]

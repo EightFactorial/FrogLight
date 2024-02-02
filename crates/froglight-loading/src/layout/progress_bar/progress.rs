@@ -1,5 +1,5 @@
 //! The actual progress shown on the progress bar
-use bevy::{prelude::*, render::view::RenderLayers};
+use bevy::prelude::*;
 
 use crate::{
     layout::fade_animation::{FadeAnimationMarker, FadeTimer},
@@ -32,7 +32,6 @@ impl ProgressBarProgress {
         world
             .spawn((
                 ProgressBarProgress::default(),
-                RenderLayers::layer(1),
                 FadeAnimationMarker,
                 NodeBundle {
                     style: Style {

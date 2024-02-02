@@ -1,19 +1,15 @@
 //! Default camera bundles.
 
-use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*, render::view::RenderLayers};
+use bevy::{core_pipeline::clear_color::ClearColorConfig, prelude::*};
 
 /// The default [`Camera2dBundle`] bundle group.
 ///
-/// ### IF YOU ARE USING THIS, ALL UI ELEMENTS MUST HAVE A LAYER OF 1!
-///
 /// Includes:
-/// - [`RenderLayers::layer(1)`]
 /// - [`UiCameraConfig`] with `show_ui` set to `true`
 /// - [`Camera2dBundle`] with order set to `1` and color set to [`Color::NONE`]
 #[must_use]
 pub fn default_camera2d_bundle() -> impl Bundle {
     (
-        RenderLayers::layer(1),
         UiCameraConfig { show_ui: true },
         Camera2dBundle {
             camera: Camera { order: 1isize, is_active: true, ..Default::default() },
@@ -26,13 +22,11 @@ pub fn default_camera2d_bundle() -> impl Bundle {
 /// The default [`Camera3dBundle`] bundle group.
 ///
 /// Includes:
-/// - [`RenderLayers::layer(0)`]
 /// - [`UiCameraConfig`] with `show_ui` set to `false`
 /// - [`Camera3dBundle`] with order set to `0` and color set to [`Color::BLACK`]
 #[must_use]
 pub fn default_camera3d_bundle() -> impl Bundle {
     (
-        RenderLayers::layer(0),
         UiCameraConfig { show_ui: false },
         Camera3dBundle {
             camera: Camera { order: 0isize, is_active: true, ..Default::default() },

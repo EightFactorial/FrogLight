@@ -33,7 +33,7 @@ default-loading = ["dep:froglight-loading"]
 
 # Enables extra debug logs
 # Enables logging in release builds
-logging = ["froglight-world/logging"]
+logging = []
 
 [dev-dependencies]
 bevy_mod_debugdump = "0.9.0"

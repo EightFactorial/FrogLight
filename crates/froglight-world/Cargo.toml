@@ -17,11 +17,9 @@ workspace = true
 criterion = "0.5.1"
 
 [dependencies]
-bevy_app = "0.12.1"
-bevy_ecs = "0.12.1"
-bevy_log = { version = "0.12.1", optional = true }
-bevy_tasks = "0.12.1"
+bevy = { workspace = true }
 bitvec = { workspace = true }
+big_space = { workspace = true }
 bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
 compact_str = { workspace = true }
 derive_more = { workspace = true }
@@ -41,9 +39,6 @@ thiserror = { workspace = true }
 
 [features]
 default = []
-
-# Enable debug logging
-logging = ["dep:bevy_log"]
 
 # Benchmark
 [[bench]]

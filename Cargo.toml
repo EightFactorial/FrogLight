@@ -55,6 +55,7 @@ unnecessary_cast = "warn"
 bevy = "0.12.1"
 bevy_xpbd_3d = "0.3.3"
 bitvec = "1.0.1"
+big_space = "0.4.0"
 bytemuck = "1.14.1"
 compact_str = "0.7.1"
 derive_more = "0.99.17"
@@ -81,7 +82,7 @@ opt-level = 1
 froglight-client = { opt-level = 1 }
 froglight-core = { opt-level = 1 }
 froglight-entities = { opt-level = 1 }
-froglight-gui = { opt-level = 1 }
+froglight-interface = { opt-level = 1 }
 froglight-loading = { opt-level = 1 }
 froglight-macros = { opt-level = 1 }
 froglight-resourcepack = { opt-level = 1 }

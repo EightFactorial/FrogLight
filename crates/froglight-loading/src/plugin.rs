@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
 /// A [`Plugin`] that shows a loading screen while assets are being loaded
+///
+/// Can be customized with a custom asset path
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct LoadingPlugin(pub String);
 

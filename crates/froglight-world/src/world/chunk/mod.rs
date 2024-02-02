@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use bevy_ecs::component::Component;
+use bevy::ecs::component::Component;
 use parking_lot::RwLock;
 use thiserror::Error;
 

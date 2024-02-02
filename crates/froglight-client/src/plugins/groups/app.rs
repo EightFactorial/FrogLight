@@ -1,5 +1,6 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
+    transform::TransformPlugin,
     DefaultPlugins,
 };
 use froglight_interface::InterfacePlugin;
@@ -30,7 +31,9 @@ pub struct AppPlugins;
 impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
         // Start with bevy's default plugins
-        let mut group = PluginGroup::build(DefaultPlugins);
+        let mut group = PluginGroup::build(DefaultPlugins)
+            // Disable bevy's TransformPlugin
+            .disable::<TransformPlugin>();
 
         // Disable logging in release builds, unless the `logging` feature is enabled
         #[cfg(not(any(debug_assertions, feature = "logging")))]

@@ -1,5 +1,5 @@
 //! The layout of the loading screen
-use bevy::{prelude::*, render::view::RenderLayers, ui::FocusPolicy};
+use bevy::{prelude::*, ui::FocusPolicy};
 
 pub(crate) mod fade_animation;
 use fade_animation::FadeAnimationMarker;
@@ -58,7 +58,6 @@ impl LoadingScreenRoot {
             .spawn((
                 LoadingScreenRoot,
                 FadeAnimationMarker,
-                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         position_type: PositionType::Absolute,
@@ -101,7 +100,6 @@ impl LoadingScreenCenter {
             .spawn((
                 LoadingScreenCenter,
                 FadeAnimationMarker,
-                RenderLayers::layer(1),
                 NodeBundle {
                     style: Style {
                         flex_direction: FlexDirection::Column,

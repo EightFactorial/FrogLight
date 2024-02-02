@@ -1,6 +1,6 @@
 //! A set of Worlds
 
-use bevy_ecs::system::Resource;
+use bevy::ecs::system::Resource;
 use hashbrown::HashMap;
 
 use super::{ChunkEntity, WorldChunkMap, WorldType};
@@ -76,10 +76,9 @@ impl WorldMap {
     ) -> Option<ChunkEntity> {
         let entry = self.0.entry(world);
 
-        #[cfg(feature = "logging")]
         {
             if let hashbrown::hash_map::Entry::Vacant(_) = &entry {
-                bevy_log::warn!(
+                bevy::log::warn!(
                     "World `{}` does not exist, creating...",
                     entry.key().display_name()
                 );
