@@ -36,7 +36,7 @@ FrogLight is multiprotocol and supports release versions 1.20.0+, including:
 
 Support for new versions may be automatically generated using the included `just` recipes
 
-There is no guarentee new versions will work out of the box, please test *extensively* before making a PR!
+There is no guarantee new versions will work out of the box, please test *extensively* before making a PR!
 
 ```sh
 # Install just if needed
