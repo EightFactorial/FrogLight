@@ -30,12 +30,12 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
       # Install the deny tool
       - name: Install Deny
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@cf31de7dc95ad7ec45538338f1baf0cebc7da5d9 # v2
         with:
           tool: cargo-deny
       # Checkout the repository
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       # Run the deny tool
       - name: Run Deny
         run: cargo deny check

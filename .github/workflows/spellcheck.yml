@@ -23,7 +23,7 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
       # Run the typos tool
       - name: Spellcheck
         uses: crate-ci/typos@master
