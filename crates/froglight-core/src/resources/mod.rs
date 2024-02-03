@@ -4,4 +4,4 @@ use bevy::prelude::*;
 pub mod loading;
 
 #[doc(hidden)]
-pub(super) fn setup(app: &mut App) { loading::setup(app); }
+pub(super) fn build(app: &mut App) { loading::setup(app); }

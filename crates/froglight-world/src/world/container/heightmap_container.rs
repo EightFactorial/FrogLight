@@ -1,14 +1,16 @@
+use bevy::reflect::Reflect;
 use bitvec::prelude::{BitVec, Msb0};
 
 use crate::world::chunk::ChunkDecodeError;
 
 /// Storage for a [`Chunk`](crate::world::Chunk)'s heightmap data
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 pub struct HeightMapContainer {
     /// Bits per entry
     ///
     /// ceil(log2(world height + 1))
     bits: usize,
+    #[reflect(ignore)]
     data: BitVec<u64, Msb0>,
 }
 

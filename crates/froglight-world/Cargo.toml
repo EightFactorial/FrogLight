@@ -19,7 +19,6 @@ criterion = "0.5.1"
 [dependencies]
 bevy = { workspace = true }
 bitvec = { workspace = true }
-big_space = { workspace = true }
 bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
 compact_str = { workspace = true }
 derive_more = { workspace = true }

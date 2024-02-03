@@ -2,6 +2,7 @@
 
 use std::io::Cursor;
 
+use bevy::reflect::Reflect;
 use froglight_protocol::io::FrogRead;
 
 use super::{chunk::ChunkDecodeError, BiomeContainer, BlockContainer, Chunk, ChunkDataContainer};
@@ -11,7 +12,7 @@ use super::{chunk::ChunkDecodeError, BiomeContainer, BlockContainer, Chunk, Chun
 /// A [`Section`] contains a counter for the number of non-air blocks in the
 /// section, and [`Containers`](super::container::Container) for blocks and
 /// biomes.
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 pub struct Section {
     /// The number of non-air blocks in the section.
     pub block_count: u16,

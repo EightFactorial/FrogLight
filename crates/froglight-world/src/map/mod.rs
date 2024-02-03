@@ -1,3 +1,5 @@
+use bevy::app::App;
+
 mod chunk_entity;
 pub use chunk_entity::ChunkEntity;
 
@@ -9,3 +11,8 @@ pub use world_map::WorldMap;
 
 mod world_type;
 pub use world_type::WorldType;
+
+#[doc(hidden)]
+pub(super) fn build(app: &mut App) {
+    app.register_type::<ChunkEntity>().register_type::<WorldChunkMap>();
+}

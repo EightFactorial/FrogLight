@@ -1,5 +1,6 @@
-use std::io::Cursor;
+use std::{io::Cursor, marker::PhantomData};
 
+use bevy::reflect::Reflect;
 use bitvec::prelude::{BitVec, Msb0};
 use froglight_protocol::io::FrogRead;
 
@@ -11,15 +12,17 @@ use crate::world::{chunk::ChunkDecodeError, Palette};
 /// A [`BlockContainer`] contains block data.
 ///
 /// A [`BiomeContainer`] contains biome data.
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 pub struct ChunkDataContainer<T: ContainerType> {
     /// The number of bits used to store each entry in the container.
     pub bits: usize,
     /// The palette type used by the container.
     pub palette: Palette,
     /// The data stored in the container.
+    #[reflect(ignore)]
     pub data: BitVec<u64, Msb0>,
-    _phantom: std::marker::PhantomData<T>,
+    #[reflect(ignore)]
+    _phantom: PhantomData<T>,
 }
 
 impl<T: ContainerType> ChunkDataContainer<T> {
@@ -35,19 +38,19 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         let data = BitVec::try_from_vec(Vec::<u64>::fg_read(buf)?)
             .map_err(|_| ChunkDecodeError::BitVec)?;
 
-        Ok(Self { bits, palette, data, _phantom: std::marker::PhantomData })
+        Ok(Self { bits, palette, data, _phantom: PhantomData })
     }
 }
 
 /// A [`ContainerType`] is a kind of data that can be stored in a
 /// [`ChunkDataContainer`].
-pub trait ContainerType {
+pub trait ContainerType: Reflect {
     /// Returns the palette type for a given number of bits.
     fn palette_type(bits: usize) -> Palette;
 }
 
 /// A [`ChunkDataContainer`] that stores block data.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct BlockContainer;
 
 impl ContainerType for BlockContainer {
@@ -61,7 +64,7 @@ impl ContainerType for BlockContainer {
 }
 
 /// A [`ChunkDataContainer`] that stores biome data.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct BiomeContainer;
 
 impl ContainerType for BiomeContainer {

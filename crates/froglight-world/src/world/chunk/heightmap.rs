@@ -1,5 +1,6 @@
 use std::io::Cursor;
 
+use bevy::reflect::Reflect;
 use froglight_protocol::io::FrogRead;
 use simdnbt::owned::{Nbt, NbtTag};
 
@@ -7,7 +8,7 @@ use super::ChunkDecodeError;
 use crate::world::container::HeightMapContainer;
 
 /// A [`HeightMap`] is a 16x16 grid of height values.
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 pub struct HeightMaps {
     /// The highest solid blocks
     pub motion_blocking: HeightMapContainer,

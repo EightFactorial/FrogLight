@@ -3,4 +3,4 @@
 use bevy::prelude::*;
 
 #[doc(hidden)]
-pub(super) fn setup(_app: &mut App) {}
+pub(super) fn build(_app: &mut App) {}

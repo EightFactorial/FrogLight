@@ -18,6 +18,8 @@ pub enum WorldType {
     #[serde(rename = "minecraft:the_end", alias = "end", alias = "End")]
     End,
     /// A custom world type
+    ///
+    /// TODO: ResourceKey
     Other(CompactString),
 }
 

@@ -1,9 +1,10 @@
+use bevy::reflect::Reflect;
 use froglight_protocol::io::FrogRead;
 
 use crate::world::chunk::ChunkDecodeError;
 
 /// Storage for the kinds of blocks in a [`Container`].
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Reflect)]
 pub enum Palette {
     /// A single block ID.
     Single(u32),
