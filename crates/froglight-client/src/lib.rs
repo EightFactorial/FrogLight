@@ -4,6 +4,8 @@
 pub mod plugins;
 pub mod prelude;
 
-// Re-exports:
+// Re-exports
 
+#[cfg(feature = "default-loading")]
+pub use froglight_loading as loading;
 pub use froglight_world as world;

@@ -87,30 +87,34 @@ For example, here is how to embed an image and use it on the loading screen:
 
 ```rust
 use bevy::{asset::embedded_asset, prelude::*};
-use froglight_client::{plugins::LoadingPlugin, prelude::*};
+use froglight_client::plugins::{AppPlugins, LoadingPlugin};
 
 fn main() {
-  // Create a new bevy App
-  let mut app = App::new();
+    // Create a new bevy App
+    let mut app = App::new();
 
-  // Create the AppPlugins group
-  let mut plugins = AppPlugins::build();
+    // Create the AppPlugins group
+    let mut plugins = AppPlugins::build(AppPlugins);
+    // Set the loading screen to use the embedded image
+    plugins = plugins.set(LoadingPlugin::new("embedded://froglight/my_custom_art.png"));
 
-  // Place the image next to the main.rs file
-  // and embed it inside the application
-  embedded_asset!(app, "my_new_icon.png");
+    // Add the plugins to the app
+    app.add_plugins(plugins);
 
-  // Set the newly embedded image's path
-  // If not using this repository, replace `froglight` with the name of your crate
-  plugins = plugins.set(LoadingPlugin::new("embedded://froglight/my_new_icon.png"));
+    // Place the image next to the main.rs file
+    // and embed it inside the application
+    embedded_asset!(app, "my_custom_art.png");
 
-  // Add the plugins and run!
-  app.add_plugins(plugins).run();
+    // Run the app!
+    app.run();
 }
 ```
-This is just a basic example, almost everything is modular and can be replaced.
+
+This is just a basic example, almost everything is modular and can be replaced!
 
 > [!Tip]
+> See more examples inside the `examples` directory
+> 
 > See the [Bevy Book](https://bevyengine.org/learn/book/getting-started/plugins/) and [Froglight Docs](https://github.com/EightFactorial/FrogLight/) for more information.
 
 ## License

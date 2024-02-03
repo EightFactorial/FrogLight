@@ -130,3 +130,12 @@ mimalloc = ["dep:mimalloc"]
 # Enable Wayland support
 # Only used in Linux builds
 wayland = ["bevy/wayland"]
+
+
+# --- FrogLight Examples ---
+
+[[example]]
+name = "loading_art"
+
+[[example]]
+name = "loading_gif"

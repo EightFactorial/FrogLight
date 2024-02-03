@@ -42,8 +42,12 @@ pub(super) fn setup(app: &mut App) {
     );
 }
 
+/// A marker [`Component`] for the fade animation.
+///
+/// All entities with this component will be faded in and out
+/// along with the loading screen.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub(crate) struct FadeAnimationMarker;
+pub struct FadeAnimationMarker;
 
 impl FadeAnimationMarker {
     pub(crate) fn fade_in(

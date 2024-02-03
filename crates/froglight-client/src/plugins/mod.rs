@@ -26,8 +26,12 @@
 //! ```
 
 // Re-export plugins
+
+#[cfg(feature = "default-loading")]
+pub use froglight_loading::LoadingPlugin;
 pub use froglight_world::WorldPlugin;
 
 // Export plugin groups
+
 mod groups;
 pub use groups::{app::AppPlugins, client::ClientPlugins};

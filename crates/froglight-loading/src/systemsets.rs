@@ -71,14 +71,14 @@ impl LoadingScreenEnableSystems {
 /// A [`SystemSet`] that runs loading screen
 /// systems when the loading screen is enabled.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub(crate) struct LoadingScreenToggleSet;
+pub struct LoadingScreenToggleSet;
 
 /// A [`SystemSet`] that runs loading screen
 /// systems when fading in.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub(crate) struct LoadingScreenFadeInSet;
+pub struct LoadingScreenFadeInSet;
 
 /// A [`SystemSet`] that runs loading screen
 /// systems when fading out.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub(crate) struct LoadingScreenFadeOutSet;
+pub struct LoadingScreenFadeOutSet;

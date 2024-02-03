@@ -8,13 +8,17 @@ pub(super) fn setup(_app: &mut App) {}
 
 /// The art displayed on the loading screen
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub(crate) struct LoadingArt;
+pub struct LoadingArt;
 
 impl LoadingArt {
     /// Create the loading art
     pub(super) fn build_loading_icon(world: &mut World, parent: Entity) {
         // Get the path to the art asset
-        let art_asset_path = world.resource::<LoadingPluginArtPath>().0.clone();
+        let Some(art_asset) = world.get_resource::<LoadingPluginArtPath>() else {
+            debug!("No art asset path found, skipping loading art");
+            return;
+        };
+        let art_asset_path = art_asset.0.clone();
 
         // Load the icon asset
         let asset_server = world.resource::<AssetServer>();

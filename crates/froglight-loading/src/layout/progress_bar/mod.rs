@@ -11,7 +11,7 @@ pub(super) fn setup(app: &mut App) { progress::setup(app); }
 
 /// The progress bar of the loading screen
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub(crate) struct ProgressBar;
+pub struct ProgressBar;
 
 impl ProgressBar {
     /// Create the progress bar

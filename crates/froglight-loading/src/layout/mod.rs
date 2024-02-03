@@ -33,11 +33,11 @@ pub(super) fn setup(app: &mut App) {
     );
 }
 
-/// The a [`Component`] of the root [`Entity`] of the loading screen
+/// A [`Component`] attached to the root [`Entity`] of the loading screen
 ///
 /// All UI elements of the loading screen should be children of this [`Entity`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub(crate) struct LoadingScreenRoot;
+pub struct LoadingScreenRoot;
 
 impl LoadingScreenRoot {
     /// Create a Camera2d if one does not exist
@@ -91,7 +91,7 @@ impl LoadingScreenRoot {
 /// A child [`Component`] of the [`LoadingScreenRoot`] [`Entity`] that centers
 /// all UI elements of the loading screen.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
-pub(crate) struct LoadingScreenCenter;
+pub struct LoadingScreenCenter;
 
 impl LoadingScreenCenter {
     /// Build the loading screen center node
