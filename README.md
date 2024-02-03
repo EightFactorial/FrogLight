@@ -2,7 +2,9 @@
 <p align="center">A Minecraft client written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
 
 <p align="center">
-  <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="GitHub Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/test.yml/badge.svg"</a>
+  <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-master-blue.svg"></a>  
+  <img alt="License" src="https://img.shields.io/github/license/EightFactorial/FrogLight">
+  <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/nextest.yml/badge.svg"</a>
 </p>
 
 ## About
