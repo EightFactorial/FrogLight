@@ -4,7 +4,7 @@
 <p align="center">
   <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>  
   <img alt="License" src="https://img.shields.io/badge/license-MIT/Apache--2.0---?color=blue">
-  <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/nextest.yml/badge.svg"></a>
+  <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/testing.yml/badge.svg"></a>
 </p>
 
 ## About
