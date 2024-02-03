@@ -4,19 +4,23 @@
 <p align="center">
   <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>  
   <img alt="License" src="https://img.shields.io/badge/license-MIT/Apache--2.0---?color=blue">
-  <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/nextest.yml/badge.svg"</a>
+  <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/nextest.yml/badge.svg"></a>
 </p>
 
 ## About
 
 FrogLight is currently in a **very early alpha state**. Not everything is functional yet!
 
+Because FrogLight does not come with any assets, you will need to provide your own resource packs!
+
+
+
 > [!Warning]
 > Modded clients, including this one, will get you **banned** from servers with anticheat!
 > 
 > You have been warned!
 
-## Supported Versions
+## Version Support
 
 FrogLight is multiprotocol and supports release versions 1.20.0+, including:
 - 1.20.0 and 1.20.1 (763)
@@ -28,77 +32,7 @@ FrogLight is multiprotocol and supports release versions 1.20.0+, including:
 > 
 > Multi-protocol is already built in, but packets have not been created!
 
-## Configuration
-
-All configuration files and resource packs can be found in the config folder
-
-| OS | Default Folder |
-| --- | --- |
-| Windows | `%APPDATA%/FrogLight` |
-| Linux | `$XDG_CONFIG_HOME/FrogLight` |
-| MacOS | `~/Library/Application Support/FrogLight` |
-
-## Building
-
-Like most Rust projects, compilation is done using the `cargo` command.
-
-```sh
-# Clone and enter the repo
-git clone --depth 1 https://github.com/EightFactorial/FrogLight
-cd FrogLight
-
-# Build the client, or
-cargo build --release
-# Build and run the client
-cargo run --release
-```
-
-This will take some time and a lot of storage space
-
-The built client will be located at `{PROJECT_DIR}/target/release/froglight`
-
-## Plugins
-
-FrogLight was written with customization in mind.
-
-For example, you can replace the loading screen art with your own!
-
-```rust
-use bevy::{asset::embedded_asset, prelude::*};
-use froglight_client::{plugins::LoadingPlugin, prelude::*};
-
-fn main() {
-  // Create a new bevy App
-  let mut app = App::new();
-
-  // Place the image next to the main.rs file
-  // and embed it inside the application
-  embedded_asset!(app, "my_new_icon.png");
-
-  // Create the AppPlugins group
-  let mut plugins = AppPlugins::build();
-
-  // Set the new image path
-  // If not using this repository, replace `froglight` with the name of your crate
-  plugins = plugins.set(LoadingPlugin::new("embedded://froglight/my_new_icon.png"));
-
-  // Add the plugins and run!
-  app.add_plugins(plugins).run();
-}
-```
-This is just a basic example, everything is replacable! Don't like the GUI, import your own!
-
-See the [Bevy Book](https://bevyengine.org/learn/book/getting-started/plugins/) and [Froglight Docs](https://github.com/EightFactorial/FrogLight/) for more information.
-
-## Contributing
-
-Too much of the internal structure is undecided, crates ~may~ *will* be rewritten!
-
-In it's current state, FrogLight is not accepting PRs *except* for:
-- ~New versions~ (Soon™)
-- Packet fixes
-
-## New Versions
+---
 
 Support for new versions may be automatically generated using the included `just` recipes
 
@@ -112,3 +46,85 @@ cargo install just
 # Manual cleanup is required!
 just tools generate {VERSION}
 ```
+
+## Configuration Files
+
+All configuration files and resource packs are stored in the following directories:
+
+| OS      | Default Folder                            |
+| ------- | ----------------------------------------- |
+| Windows | `%APPDATA%/FrogLight`                     |
+| Linux   | `$XDG_CONFIG_HOME/FrogLight`              |
+| MacOS   | `~/Library/Application Support/FrogLight` |
+
+## Building
+
+Like most Rust projects, you can build the project using `cargo`
+
+```sh
+# Clone and enter the repository
+git clone --depth 1 https://github.com/EightFactorial/FrogLight
+cd FrogLight
+
+# Build the client, or
+cargo build --release
+# Build and run the client
+cargo run --release
+```
+
+This may take a while and requires a couple of gigabytes of space!
+
+The built client will be located at `./target/release/froglight`
+
+> [!Important]
+> Make sure you are building in `release` mode, as `debug` mode will be very slow!
+
+## Plugins
+
+FrogLight was written with customization in mind.
+
+For example, here is how to embed an image and use it on the loading screen:
+
+```rust
+use bevy::{asset::embedded_asset, prelude::*};
+use froglight_client::{plugins::LoadingPlugin, prelude::*};
+
+fn main() {
+  // Create a new bevy App
+  let mut app = App::new();
+
+  // Create the AppPlugins group
+  let mut plugins = AppPlugins::build();
+
+  // Place the image next to the main.rs file
+  // and embed it inside the application
+  embedded_asset!(app, "my_new_icon.png");
+
+  // Set the newly embedded image's path
+  // If not using this repository, replace `froglight` with the name of your crate
+  plugins = plugins.set(LoadingPlugin::new("embedded://froglight/my_new_icon.png"));
+
+  // Add the plugins and run!
+  app.add_plugins(plugins).run();
+}
+```
+This is just a basic example, almost everything is modular and can be replaced.
+
+> [!Tip]
+> See the [Bevy Book](https://bevyengine.org/learn/book/getting-started/plugins/) and [Froglight Docs](https://github.com/EightFactorial/FrogLight/) for more information.
+
+## License
+
+Licensed under either of
+
+* Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+* MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+
+at your option.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally
+submitted for inclusion in the work by you, as defined in the Apache-2.0
+license, shall be dual licensed as above, without any additional terms or
+conditions.
