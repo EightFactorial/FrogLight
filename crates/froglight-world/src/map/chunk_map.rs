@@ -5,10 +5,10 @@ use hashbrown::HashMap;
 
 use super::ChunkEntity;
 
-/// A map of [`ChunkPositions`](ChunkPos) to [`ChunkEntities`](ChunkEntity).
+/// A map of `ChunkPositions` to [`ChunkEntities`](ChunkEntity).
 ///
-/// Used as a part of the [`WorldMap`](crate::WorldMap) to track which
-/// [`WorldType`](crate::WorldType) a [`ChunkEntity`] belongs to.
+/// Used as a part of the [`WorldMap`](crate::map::WorldMap) to track which
+/// [`WorldType`](crate::map::WorldType) a [`ChunkEntity`] belongs to.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
 pub struct WorldChunkMap(HashMap<u32, ChunkEntity>);
 
@@ -30,7 +30,7 @@ impl WorldChunkMap {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_world::WorldChunkMap;
+    /// use froglight_world::map::WorldChunkMap;
     ///
     /// let map = WorldChunkMap::with_radius_capacity(1);
     /// assert!(map.capacity() >= 9);

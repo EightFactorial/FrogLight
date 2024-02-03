@@ -1,15 +1,9 @@
 #![doc = include_str!("../README.md")]
-#![allow(incomplete_features)]
-#![feature(generic_const_exprs)]
-#![feature(array_try_from_fn)]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-mod blocks;
-pub use blocks::*;
-
-mod map;
-pub use map::*;
+pub mod blocks;
+pub mod map;
+pub mod world;
 
 mod plugin;
 pub use plugin::WorldPlugin;
-
-pub mod world;

@@ -1,3 +1,5 @@
+//! A series of maps storing the world's chunks and their entities.
+
 use bevy::app::App;
 
 mod chunk_entity;

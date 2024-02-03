@@ -45,7 +45,7 @@ impl WorldType {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_world::WorldType;
+    /// use froglight_world::map::WorldType;
     ///
     /// assert_eq!(WorldType::Overworld.as_key(), WorldType::OVERWORLD_KEY);
     /// assert_eq!(WorldType::Nether.as_key(), WorldType::NETHER_KEY);
@@ -65,7 +65,7 @@ impl WorldType {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_world::WorldType;
+    /// use froglight_world::map::WorldType;
     ///
     /// assert_eq!(WorldType::Overworld.into_key(), WorldType::OVERWORLD_KEY);
     /// assert_eq!(WorldType::Nether.into_key(), WorldType::NETHER_KEY);
@@ -85,7 +85,7 @@ impl WorldType {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_world::WorldType;
+    /// use froglight_world::map::WorldType;
     ///
     /// assert_eq!(WorldType::Overworld.display_name(), WorldType::OVERWORLD_DISPLAY);
     /// assert_eq!(WorldType::Nether.display_name(), WorldType::NETHER_DISPLAY);

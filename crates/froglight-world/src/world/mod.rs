@@ -1,4 +1,4 @@
-//! A [`World`], consisting of a set of [`Chunks`](Chunk).
+//! A `World`, consisting of a set of [`Chunks`](Chunk).
 use bevy::app::App;
 
 pub mod tasks;

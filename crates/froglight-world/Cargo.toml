@@ -1,6 +1,5 @@
 [package]
 name = "froglight-world"
-exclude = ["benches"]
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -8,7 +7,11 @@ authors = { workspace = true }
 homepage = { workspace = true }
 repository = { workspace = true }
 readme = { workspace = true }
+exclude = ["benches"]
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
 
 [lints]
 workspace = true

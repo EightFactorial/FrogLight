@@ -7,7 +7,7 @@ use simdnbt::owned::{Nbt, NbtTag};
 use super::ChunkDecodeError;
 use crate::world::container::HeightMapContainer;
 
-/// A [`HeightMap`] is a 16x16 grid of height values.
+/// A collection of heightmaps for a [`Chunk`](super::Chunk).
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 pub struct HeightMaps {
     /// The highest solid blocks

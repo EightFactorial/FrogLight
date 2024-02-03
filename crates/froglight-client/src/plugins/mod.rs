@@ -25,5 +25,9 @@
 //! app.run();
 //! ```
 
+// Re-export plugins
+pub use froglight_world::WorldPlugin;
+
+// Export plugin groups
 mod groups;
 pub use groups::{app::AppPlugins, client::ClientPlugins};

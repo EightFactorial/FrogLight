@@ -108,6 +108,10 @@ homepage = { workspace = true }
 repository = { workspace = true }
 readme = { workspace = true }
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [dependencies]
 bevy = { workspace = true }
 froglight-client = { version = "0.1.0", path = "crates/froglight-client" }

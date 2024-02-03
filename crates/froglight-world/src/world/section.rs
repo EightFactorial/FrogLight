@@ -10,7 +10,7 @@ use super::{chunk::ChunkDecodeError, BiomeContainer, BlockContainer, Chunk, Chun
 /// A [`Section`] is a 16x16x16 section of a [`Chunk`](super::Chunk).
 ///
 /// A [`Section`] contains a counter for the number of non-air blocks in the
-/// section, and [`Containers`](super::container::Container) for blocks and
+/// section, and [`Containers`](ChunkDataContainer) for blocks and
 /// biomes.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 pub struct Section {
