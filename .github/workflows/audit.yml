@@ -30,8 +30,6 @@ jobs:
       # Checkout the repository
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
       # Run the deny tool
       - name: Run Deny
         run: cargo deny check

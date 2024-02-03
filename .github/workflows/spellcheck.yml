@@ -24,8 +24,6 @@ jobs:
       # Checkout the repository
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
       # Run the typos tool
       - name: Spellcheck
         uses: crate-ci/typos@master
