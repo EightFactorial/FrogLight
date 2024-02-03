@@ -1,13 +1,13 @@
 name: Tests
 
 on:
-  push:
+  pull_request:
     branches:
       - main
     paths:
       - "Cargo.lock"
       - "src/**.rs"
-  pull_request:
+  push:
     branches:
       - main
     paths:
