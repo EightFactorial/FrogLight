@@ -15,7 +15,7 @@ build-release: (build-profile "release")
 # Compile build with specified profile
 [private]
 build-profile profile="dev" args="":
-  cargo build --profile {{profile}} --features logging {{args}}
+  cargo build --profile {{profile}} --features logging,inspector {{args}}
 
 # ---- Run Recipes ----
 
@@ -29,7 +29,7 @@ run-release: (run-profile "release")
 # Run build with specified profile
 [private]
 run-profile profile="dev" args="":
-  cargo run --profile {{profile}} --features logging {{args}}
+  cargo run --profile {{profile}} --features logging,inspector {{args}}
 
 # ---- Test Recipes ----
 

@@ -27,6 +27,7 @@
 
 // Re-export plugins
 
+pub use froglight_debug::DebugPlugin;
 #[cfg(feature = "default-loading")]
 pub use froglight_loading::LoadingPlugin;
 pub use froglight_world::WorldPlugin;

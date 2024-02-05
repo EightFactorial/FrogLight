@@ -1,5 +1,6 @@
 use bevy::app::{PluginGroup, PluginGroupBuilder};
 use froglight_core::CorePlugin;
+use froglight_debug::DebugPlugin;
 use froglight_physics::PhysicsPlugin;
 use froglight_world::WorldPlugin;
 
@@ -31,7 +32,7 @@ impl PluginGroup for ClientPlugins {
 impl ClientPlugins {
     #[allow(clippy::unused_self)]
     pub(super) fn build_group(self, group: PluginGroupBuilder) -> PluginGroupBuilder {
-        group.add(CorePlugin).add(WorldPlugin).add(PhysicsPlugin)
+        group.add(CorePlugin).add(WorldPlugin).add(PhysicsPlugin).add(DebugPlugin)
     }
 }
 

@@ -18,6 +18,7 @@ workspace = true
 [dependencies]
 bevy = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
+froglight-debug = { version = "0.1.0", path = "../froglight-debug" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
 froglight-interface = { version = "0.1.0", path = "../froglight-interface" }
 froglight-loading = { version = "0.1.0", path = "../froglight-loading", optional = true }
@@ -37,6 +38,9 @@ default-loading = ["dep:froglight-loading"]
 # Enables extra debug logs
 # Enables logging in release builds
 logging = []
+
+# Enables the egui inspector
+inspector = ["froglight-debug/inspector"]
 
 [dev-dependencies]
 bevy_mod_debugdump = "0.9.0"

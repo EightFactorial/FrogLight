@@ -120,10 +120,6 @@ mimalloc = { version = "0.1.39", optional = true }
 [features]
 default = ["mimalloc"]
 
-# Enables extra debug logs
-# Enables logging in release builds
-logging = ["froglight-client/logging"]
-
 # Use mimalloc as the global allocator
 mimalloc = ["dep:mimalloc"]
 
@@ -131,6 +127,12 @@ mimalloc = ["dep:mimalloc"]
 # Only used in Linux builds
 wayland = ["bevy/wayland"]
 
+# Enables extra debug logs
+# Enables logging in release builds
+logging = ["froglight-client/logging"]
+
+# Enables the egui inspector
+inspector = ["froglight-client/inspector"]
 
 # --- FrogLight Examples ---
 
