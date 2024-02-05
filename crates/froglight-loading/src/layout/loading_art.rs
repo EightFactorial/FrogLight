@@ -18,11 +18,10 @@ impl LoadingArt {
             debug!("No art asset path found, skipping loading art");
             return;
         };
-        let art_asset_path = art_asset.0.clone();
 
         // Load the icon asset
         let asset_server = world.resource::<AssetServer>();
-        let art_asset_handle: Handle<Image> = asset_server.load(art_asset_path);
+        let asset_handle: Handle<Image> = asset_server.load(&art_asset.0);
 
         world
             .spawn((
@@ -52,7 +51,7 @@ impl LoadingArt {
                             height: Val::Auto,
                             ..Default::default()
                         },
-                        image: UiImage::new(art_asset_handle),
+                        image: UiImage::new(asset_handle),
                         ..Default::default()
                     },
                 ));
