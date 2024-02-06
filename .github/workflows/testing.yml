@@ -7,12 +7,14 @@ on:
     paths:
       - "Cargo.lock"
       - "src/**.rs"
+      - "crates/**.rs"
   push:
     branches:
       - main
     paths:
       - "Cargo.lock"
       - "src/**.rs"
+      - "crates/**.rs"
       - ".github/workflows/testing.yml"
 
 env:

@@ -8,12 +8,14 @@ on:
     paths:
       - "deny.toml"
       - "Cargo.lock"
+      - "Cargo.toml"
   push:
     branches:
       - main
     paths:
       - "deny.toml"
       - "Cargo.lock"
+      - "Cargo.toml"
       - ".github/workflows/audit.yml"
 
 env:
