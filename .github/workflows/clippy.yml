@@ -1,0 +1,63 @@
+name: Clippy
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**.rs"
+      - "crates/**.rs"
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**.rs"
+      - "crates/**.rs"
+      - ".github/workflows/clippy.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+
+jobs:
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    permissions:
+      # Required to upload the results
+      security-events: write
+    steps:
+      # Get the nightly toolchain
+      - name: Toolchain
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: clippy
+      # Install clippy-sarif and sarif-fmt
+      - name: Install Sarif
+        uses: taiki-e/install-action@717ed1cb83959ef327137c2f806e1d8597bfca9f # v2
+        with:
+          tool: clippy-sarif,sarif-fmt
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      # Restore/Setup the cache
+      - name: Cache
+        uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      # Run the clippy tool
+      - name: Run Clippy
+        run: >
+          cargo clippy --workspace --all-targets -- -D warnings
+          | clippy-sarif
+          | tee clippy-results.sarif
+          | sarif-fmt
+        continue-on-error: true
+      # Upload the results
+      - name: Upload Results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: clippy-results.sarif
+          wait-for-processing: true
+      # Print the results
+      - name: Report Results
+        run: cargo clippy --workspace --all-features --all-targets -- -D warnings

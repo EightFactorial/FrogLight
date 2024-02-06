@@ -32,7 +32,9 @@ jobs:
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
       # Get the nightly toolchain
       - name: Toolchain
-        uses: dtolnay/rust-toolchain@nightly
+        uses: dtolnay/rust-toolchain@v1
+        with:
+          toolchain: nightly
       # Install the nextest tool
       - name: Install Nextest
         uses: taiki-e/install-action@717ed1cb83959ef327137c2f806e1d8597bfca9f # v2
