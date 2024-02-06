@@ -18,6 +18,7 @@ workspace = true
 
 [dev-dependencies]
 criterion = "0.5.1"
+proptest = { workspace = true }
 
 [dependencies]
 bevy = { workspace = true }

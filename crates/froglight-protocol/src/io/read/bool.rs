@@ -14,19 +14,20 @@ impl FrogRead for bool {
     }
 }
 
-#[test]
-fn proto_read_bool() {
-    let mut cursor = std::io::Cursor::new([0, 1, 0, 1, 0, 0, 1, 1, 2].as_slice());
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    assert!(!bool::fg_read(&mut cursor).unwrap());
-    assert!(bool::fg_read(&mut cursor).unwrap());
-    assert!(!bool::fg_read(&mut cursor).unwrap());
-    assert!(bool::fg_read(&mut cursor).unwrap());
-    assert!(!bool::fg_read(&mut cursor).unwrap());
-    assert!(!bool::fg_read(&mut cursor).unwrap());
-    assert!(bool::fg_read(&mut cursor).unwrap());
-    assert!(bool::fg_read(&mut cursor).unwrap());
+    #[test]
+    fn proto_read_bool(data in proptest::collection::vec(0u8..=255u8, 0..128)) {
+        let mut cursor = std::io::Cursor::new(data.as_slice());
 
-    let err = bool::fg_read(&mut cursor).unwrap_err();
-    assert!(matches!(err, ReadError::InvalidBool(2)));
+        for (index, byte) in data.iter().enumerate() {
+            match (*byte, bool::fg_read(&mut cursor)) {
+                (exp @ (0|1), Ok(read)) => assert_eq!(exp, u8::from(read)),
+                (oth, Err(ReadError::InvalidBool(err))) => assert_eq!(oth, err),
+                (oth, err) => panic!("Length: `{}`, Index: `{index}`, Data: `{oth}`, Error: `{err:?}`", data.len()),
+            }
+        }
+    }
 }

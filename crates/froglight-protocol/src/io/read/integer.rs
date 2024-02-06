@@ -28,116 +28,180 @@ impl_integer_read!(u32);
 impl_integer_read!(u64);
 impl_integer_read!(u128);
 
-#[test]
-fn proto_read_u8() {
-    let buf = [0x00, 0x01, 0x7f, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
-
-    assert_eq!(u8::fg_read(&mut cursor).unwrap(), 0);
-    assert_eq!(u8::fg_read(&mut cursor).unwrap(), 1);
-    assert_eq!(u8::fg_read(&mut cursor).unwrap(), 127);
-    assert_eq!(u8::fg_read(&mut cursor).unwrap(), 255);
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-#[test]
-fn proto_read_u16() {
-    let buf = [0x00, 0x01, 0x7f, 0xff, 0xff, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
-
-    assert_eq!(u16::fg_read(&mut cursor).unwrap(), 1);
-    assert_eq!(u16::fg_read(&mut cursor).unwrap(), 32767);
-    assert_eq!(u16::fg_read(&mut cursor).unwrap(), 65535);
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-#[test]
-fn proto_read_u32() {
-    let buf = [0x00, 0x00, 0x00, 0x01, 0x7f, 0xff, 0xff, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
-
-    assert_eq!(u32::fg_read(&mut cursor).unwrap(), 1);
-    assert_eq!(u32::fg_read(&mut cursor).unwrap(), 2_147_483_647);
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-#[test]
-fn proto_read_u64() {
-    let buf = [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7f, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
-
-    assert_eq!(u64::fg_read(&mut cursor).unwrap(), 98303);
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-#[test]
-fn proto_read_u128() {
-    let buf = [
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff,
-    ];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
-
-    assert_eq!(u128::fg_read(&mut cursor).unwrap(), 1_813_388_729_421_943_762_059_263);
-    assert_eq!(
-        u128::fg_read(&mut cursor).unwrap(),
-        340_282_366_920_938_463_463_374_607_431_768_211_455
-    );
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-
-#[test]
-fn proto_read_i64() {
-    let buf = [0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7f, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
-
-    assert_eq!(i64::fg_read(&mut cursor).unwrap(), 98303);
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-#[test]
-fn proto_read_i128() {
-    let buf = [
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff,
-    ];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
-
-    assert_eq!(i128::fg_read(&mut cursor).unwrap(), 1_813_388_729_421_943_762_059_263);
-    assert_eq!(i128::fg_read(&mut cursor).unwrap(), -1);
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-
 impl_integer_read!(i8);
 impl_integer_read!(i16);
 impl_integer_read!(i32);
 impl_integer_read!(i64);
 impl_integer_read!(i128);
 
-#[test]
-fn proto_read_i8() {
-    let buf = [0x00, 0x01, 0x7f, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    assert_eq!(i8::fg_read(&mut cursor).unwrap(), 0);
-    assert_eq!(i8::fg_read(&mut cursor).unwrap(), 1);
-    assert_eq!(i8::fg_read(&mut cursor).unwrap(), 127);
-    assert_eq!(i8::fg_read(&mut cursor).unwrap(), -1);
-    assert_eq!(cursor.position(), buf.len() as u64);
+    #[test]
+    fn proto_read_u8(data in proptest::collection::vec(u8::MIN..u8::MAX, 0..128)) {
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (index, (expected, result)) in data.iter().map(|&byte| (byte, u8::fg_read(&mut cursor))).enumerate() {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Length: `{}`, Index: `{index}`, Expected: `{expected}`, Error: `{err}`", data.len()),
+            }
+        }
+    }
+
+    #[test]
+    #[allow(clippy::cast_sign_loss, clippy::cast_possible_wrap)]
+    fn proto_read_i8(data in proptest::collection::vec(i8::MIN..i8::MAX, 0..128)) {
+        // Convert the data to bytes
+        let data = data.iter().map(|&i| i as u8).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (index, (expected, result)) in data.iter().map(|&byte| (byte, i8::fg_read(&mut cursor))).enumerate() {
+            match result {
+                Ok(read) => assert_eq!(expected as i8, read),
+                Err(err) => panic!("Length: `{}`, Index: `{index}`, Expected: `{expected}`, Error: `{err}`", data.len()),
+            }
+        }
+    }
 }
-#[test]
-fn proto_read_i16() {
-    let buf = [0x00, 0x01, 0x7f, 0xff, 0xff, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
 
-    assert_eq!(i16::fg_read(&mut cursor).unwrap(), 1);
-    assert_eq!(i16::fg_read(&mut cursor).unwrap(), 32767);
-    assert_eq!(i16::fg_read(&mut cursor).unwrap(), -1);
-    assert_eq!(cursor.position(), buf.len() as u64);
-}
-#[test]
-fn proto_read_i32() {
-    let buf = [0x00, 0x00, 0x00, 0x01, 0x7f, 0xff, 0xff, 0xff];
-    let mut cursor = std::io::Cursor::new(&buf[..]);
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(512))]
 
-    assert_eq!(i32::fg_read(&mut cursor).unwrap(), 1);
-    assert_eq!(i32::fg_read(&mut cursor).unwrap(), 2_147_483_647);
-    assert_eq!(cursor.position(), buf.len() as u64);
+    #[test]
+    fn proto_read_u16(data in proptest::collection::vec(u16::MIN..u16::MAX, 0..256)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(2).map(|chunk|
+            (u16::from_be_bytes([chunk[0], chunk[1]]), u16::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
+
+    #[test]
+    fn proto_read_u32(data in proptest::collection::vec(u32::MIN..u32::MAX, 0..512)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(4).map(|chunk|
+            (u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]), u32::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
+
+    #[test]
+    fn proto_read_u64(data in proptest::collection::vec(u64::MIN..u64::MAX, 0..512)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(8).map(|chunk|
+            (u64::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7]]), u64::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
+
+    #[test]
+    fn proto_read_u128(data in proptest::collection::vec(u128::MIN..u128::MAX, 0..512)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(16).map(|chunk|
+            (u128::from_be_bytes([
+                chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7],
+                chunk[8], chunk[9], chunk[10], chunk[11], chunk[12], chunk[13], chunk[14], chunk[15],
+            ]), u128::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
+
+    #[test]
+    fn proto_read_i16(data in proptest::collection::vec(i16::MIN..i16::MAX, 0..256)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(2).map(|chunk|
+            (i16::from_be_bytes([chunk[0], chunk[1]]), i16::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
+
+
+    #[test]
+    fn proto_read_i32(data in proptest::collection::vec(i32::MIN..i32::MAX, 0..512)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(4).map(|chunk|
+            (i32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]), i32::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
+
+    #[test]
+    fn proto_read_i64(data in proptest::collection::vec(i64::MIN..i64::MAX, 0..512)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(8).map(|chunk|
+            (i64::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7]]), i64::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
+
+    #[test]
+    fn proto_read_i128(data in proptest::collection::vec(i128::MIN..i128::MAX, 0..512)) {
+        // Convert the data to bytes
+        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+
+        for (expected, result) in data.chunks_exact(16).map(|chunk|
+            (i128::from_be_bytes([
+                chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7],
+                chunk[8], chunk[9], chunk[10], chunk[11], chunk[12], chunk[13], chunk[14], chunk[15],
+            ]), i128::fg_read(&mut cursor))
+        ) {
+            match result {
+                Ok(read) => assert_eq!(expected, read),
+                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
+            }
+        }
+    }
 }

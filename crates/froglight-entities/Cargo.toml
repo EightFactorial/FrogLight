@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+proptest = { workspace = true }
+
 [dependencies]
 bevy = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }

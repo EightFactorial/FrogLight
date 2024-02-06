@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+proptest = { workspace = true }
+
 [dependencies]
 bevy = { workspace = true }
 bevy_xpbd_3d = { workspace = true, features = [

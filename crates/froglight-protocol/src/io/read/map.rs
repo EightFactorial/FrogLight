@@ -146,73 +146,100 @@ impl<T: Ord + FrogRead> FrogRead for std::collections::BTreeSet<T> {
     }
 }
 
-#[test]
-fn proto_read_hashmap() {
-    let mut cursor = std::io::Cursor::new([0].as_slice());
-    let map: std::collections::HashMap<u8, u8> =
-        std::collections::HashMap::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    assert_eq!(map.len(), 0);
+    #[test]
+    fn proto_read_hashmap(data in proptest::collection::hash_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
 
-    let mut cursor = std::io::Cursor::new([1, 0, 0].as_slice());
-    let map: std::collections::HashMap<u8, u8> =
-        std::collections::HashMap::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+        let mut vec = Vec::with_capacity(data.len() * 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
-    assert_eq!(map.len(), 1);
-    assert_eq!(map.get(&0).unwrap(), &0);
+        for (key, val) in &data {
+            vec.extend_from_slice(&key.to_be_bytes());
+            vec.extend_from_slice(&val.to_be_bytes());
+        }
 
-    let mut cursor = std::io::Cursor::new([1, 0, 0, 0, 0, 0, 0, 0, 1].as_slice());
-    let map: std::collections::HashMap<u32, u32> =
-        std::collections::HashMap::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let map = std::collections::HashMap::fg_read(&mut cursor).unwrap();
 
-    assert_eq!(map.len(), 1);
-    assert_eq!(map.get(&0).unwrap(), &1);
+        assert_eq!(map, data);
+    }
 
-    let mut cursor =
-        std::io::Cursor::new([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0].as_slice());
-    let map: std::collections::HashMap<u32, u32> =
-        std::collections::HashMap::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+    #[test]
+    fn proto_read_hashset(data in proptest::collection::hash_set(0u8..=255u8, 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
 
-    assert_eq!(map.len(), 2);
-    assert_eq!(map.get(&0).unwrap(), &0);
-    assert_eq!(map.get(&1).unwrap(), &0);
-}
+        let mut vec = Vec::with_capacity(data.len());
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
-#[test]
-fn proto_read_hashset() {
-    let mut cursor = std::io::Cursor::new([0].as_slice());
-    let set: std::collections::HashSet<u8> =
-        std::collections::HashSet::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+        for val in &data {
+            vec.extend_from_slice(&val.to_be_bytes());
+        }
 
-    assert_eq!(set.len(), 0);
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let set = std::collections::HashSet::fg_read(&mut cursor).unwrap();
 
-    let mut cursor = std::io::Cursor::new([1, 0].as_slice());
-    let set: std::collections::HashSet<u8> =
-        std::collections::HashSet::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+        assert_eq!(set, data);
+    }
 
-    assert_eq!(set.len(), 1);
-    assert!(set.contains(&0));
+    #[test]
+    fn proto_read_btreemap(data in proptest::collection::btree_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
 
-    let mut cursor = std::io::Cursor::new([1, 0, 0, 0, 0].as_slice());
-    let set: std::collections::HashSet<u32> =
-        std::collections::HashSet::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+        let mut vec = Vec::with_capacity(data.len() * 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
-    assert_eq!(set.len(), 1);
-    assert!(set.contains(&0));
 
-    let mut cursor = std::io::Cursor::new([2, 0, 0, 0, 0, 0, 0, 0, 1].as_slice());
-    let set: std::collections::HashSet<u32> =
-        std::collections::HashSet::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
+        for (key, val) in &data {
+            vec.extend_from_slice(&key.to_be_bytes());
+            vec.extend_from_slice(&val.to_be_bytes());
+        }
 
-    assert_eq!(set.len(), 2);
-    assert!(set.contains(&0));
-    assert!(set.contains(&1));
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let map = std::collections::BTreeMap::fg_read(&mut cursor).unwrap();
+
+        assert_eq!(map, data);
+    }
+
+    #[test]
+    fn proto_read_btreeset(data in proptest::collection::btree_set(0u8..=255u8, 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
+
+        let mut vec = Vec::with_capacity(data.len());
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
+
+        for val in &data {
+            vec.extend_from_slice(&val.to_be_bytes());
+        }
+
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let set = std::collections::BTreeSet::fg_read(&mut cursor).unwrap();
+
+        assert_eq!(set, data);
+    }
+
+    #[test]
+    fn proto_read_hashmap_hashbrown(data in proptest::collection::hash_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
+
+        let mut vec = Vec::with_capacity(data.len() * 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
+
+        for (key, val) in &data {
+            vec.extend_from_slice(&key.to_be_bytes());
+            vec.extend_from_slice(&val.to_be_bytes());
+        }
+
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let map = hashbrown::HashMap::<u8, u8>::fg_read(&mut cursor).unwrap();
+
+        assert_eq!(map.len(), data.len());
+        for (key, val) in &data {
+            assert_eq!(map.get(key).unwrap(), val);
+        }
+    }
+
 }
