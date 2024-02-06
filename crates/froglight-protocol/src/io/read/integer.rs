@@ -7,11 +7,9 @@ macro_rules! impl_integer_read {
             fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
                 let position = usize::try_from(buf.position()).expect("Cursor position too large");
                 let length = usize::try_from(Self::BITS / 8).expect("Integer too large");
-
-                <std::io::Cursor<_> as std::io::BufRead>::consume(buf, length);
+                buf.consume(length);
 
                 if let Some(slice) = &buf.get_ref().get(position..position + length) {
-                    #[allow(clippy::redundant_closure_call)]
                     Ok(<$ty>::from_be(bytemuck::pod_read_unaligned(slice)))
                 } else {
                     let leftover = buf.get_ref().len() - position;
