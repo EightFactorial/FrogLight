@@ -17,7 +17,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-criterion = "0.5.1"
+criterion = { workspace = true }
 proptest = { workspace = true }
 
 [dependencies]

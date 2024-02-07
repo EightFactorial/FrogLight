@@ -2195,6 +2195,7 @@ dependencies = [
  "bitvec",
  "bytemuck",
  "compact_str",
+ "criterion",
  "derive_more",
  "froglight-macros",
  "futures",
