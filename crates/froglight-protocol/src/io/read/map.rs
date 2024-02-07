@@ -151,7 +151,7 @@ proptest::proptest! {
     #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
     #[test]
-    fn proto_read_hashmap(data in proptest::collection::hash_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
+    fn proto_read_hashmap_u8_u8(data in proptest::collection::hash_map(proptest::bits::u8::ANY, proptest::bits::u8::ANY, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
         // Prefix the data with the length
@@ -171,7 +171,29 @@ proptest::proptest! {
     }
 
     #[test]
-    fn proto_read_hashset(data in proptest::collection::hash_set(0u8..=255u8, 0..64)) {
+    fn proto_read_hashmap_u32_string(data in proptest::collection::hash_map(proptest::bits::u32::ANY, ".*", 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
+
+        // Prefix the data with the length
+        let mut vec = Vec::with_capacity(data.len() * 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
+
+        // Write the data
+        for (key, val) in &data {
+            vec.extend_from_slice(&key.to_be_bytes());
+
+            u32::try_from(val.len()).unwrap().fg_var_write(&mut vec).unwrap();
+            vec.extend_from_slice(val.as_bytes());
+        }
+
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let map = std::collections::HashMap::fg_read(&mut cursor).unwrap();
+
+        assert_eq!(map, data);
+    }
+
+    #[test]
+    fn proto_read_hashset_u16(data in proptest::collection::hash_set(proptest::bits::u16::ANY, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
         // Prefix the data with the length
@@ -190,7 +212,27 @@ proptest::proptest! {
     }
 
     #[test]
-    fn proto_read_btreemap(data in proptest::collection::btree_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
+    fn proto_read_hashset_string(data in proptest::collection::hash_set(".*", 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
+
+        // Prefix the data with the length
+        let mut vec = Vec::with_capacity(data.len());
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
+
+        // Write the data
+        for val in &data {
+            u32::try_from(val.len()).unwrap().fg_var_write(&mut vec).unwrap();
+            vec.extend_from_slice(val.as_bytes());
+        }
+
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let set = std::collections::HashSet::fg_read(&mut cursor).unwrap();
+
+        assert_eq!(set, data);
+    }
+
+    #[test]
+    fn proto_read_btreemap_u8_u8(data in proptest::collection::btree_map(proptest::bits::u8::ANY, proptest::bits::u8::ANY, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
         // Prefix the data with the length
@@ -210,7 +252,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn proto_read_btreeset(data in proptest::collection::btree_set(0u8..=255u8, 0..64)) {
+    fn proto_read_btreeset_u8(data in proptest::collection::btree_set(proptest::bits::u8::ANY, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
         // Prefix the data with the length
@@ -229,7 +271,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn proto_read_hashmap_hashbrown(data in proptest::collection::hash_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
+    fn proto_read_hashmap_hashbrown_u8_u8(data in proptest::collection::hash_map(proptest::bits::u8::ANY, proptest::bits::u8::ANY, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
         // Prefix the data with the length
@@ -252,4 +294,37 @@ proptest::proptest! {
         }
     }
 
+    #[test]
+    fn proto_read_hashmap_hashbrown_string_op_u32(data in proptest::collection::hash_map(".*", proptest::option::of(proptest::bits::u32::ANY), 0..64)) {
+        use crate::io::var_write::FrogVarWrite;
+
+        // Prefix the data with the length
+        let mut vec = Vec::with_capacity(data.len() * 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
+
+        // Write the data
+        for (key, val) in &data {
+            u32::try_from(key.len()).unwrap().fg_var_write(&mut vec).unwrap();
+            vec.extend_from_slice(key.as_bytes());
+
+            match val {
+                Some(val) => {
+                    vec.push(1);
+                    vec.extend_from_slice(&val.to_be_bytes());
+                }
+                None => {
+                    vec.push(0);
+                }
+            }
+        }
+
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let map = hashbrown::HashMap::<String, Option<u32>>::fg_read(&mut cursor).unwrap();
+
+        // Assert the map length and contents
+        assert_eq!(map.len(), data.len());
+        for (key, val) in &data {
+            assert_eq!(map.get(key).unwrap(), val);
+        }
+    }
 }
