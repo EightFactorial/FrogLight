@@ -36,172 +36,117 @@ impl_integer_read!(i128);
 
 #[cfg(test)]
 proptest::proptest! {
-    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(256))]
 
     #[test]
-    fn proto_read_u8(data in proptest::collection::vec(u8::MIN..u8::MAX, 0..128)) {
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (index, (expected, result)) in data.iter().map(|&byte| (byte, u8::fg_read(&mut cursor))).enumerate() {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Length: `{}`, Index: `{index}`, Expected: `{expected}`, Error: `{err}`", data.len()),
-            }
+    fn proto_read_u8(data in proptest::bits::u8::ANY) {
+        use bitvec::view::BitViewSized;
+        let mut cursor = std::io::Cursor::new(data.as_raw_slice());
+        match (data, u8::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
     #[test]
     #[allow(clippy::cast_sign_loss, clippy::cast_possible_wrap)]
-    fn proto_read_i8(data in proptest::collection::vec(i8::MIN..i8::MAX, 0..128)) {
-        // Convert the data to bytes
-        let data = data.iter().map(|&i| i as u8).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (index, (expected, result)) in data.iter().map(|&byte| (byte, i8::fg_read(&mut cursor))).enumerate() {
-            match result {
-                Ok(read) => assert_eq!(expected as i8, read),
-                Err(err) => panic!("Length: `{}`, Index: `{index}`, Expected: `{expected}`, Error: `{err}`", data.len()),
-            }
+    fn proto_read_i8(data in proptest::bits::i8::ANY) {
+        use bitvec::view::BitViewSized;
+        let data = data as u8;
+        let mut cursor = std::io::Cursor::new(data.as_raw_slice());
+        match (data, i8::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!((expected as i8), read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 }
 
 #[cfg(test)]
 proptest::proptest! {
-    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(512))]
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(1024))]
 
     #[test]
-    fn proto_read_u16(data in proptest::collection::vec(u16::MIN..u16::MAX, 0..256)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (expected, result) in data.chunks_exact(2).map(|chunk|
-            (u16::from_be_bytes([chunk[0], chunk[1]]), u16::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+    fn proto_read_u16(data in proptest::bits::u16::ANY) {
+        let bytes = data.to_be_bytes();
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, u16::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
     #[test]
-    fn proto_read_u32(data in proptest::collection::vec(u32::MIN..u32::MAX, 0..512)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (expected, result) in data.chunks_exact(4).map(|chunk|
-            (u32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]), u32::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+    fn proto_read_u32(data in proptest::bits::u32::ANY) {
+        let bytes = data.to_be_bytes();
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, u32::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
     #[test]
-    fn proto_read_u64(data in proptest::collection::vec(u64::MIN..u64::MAX, 0..512)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (expected, result) in data.chunks_exact(8).map(|chunk|
-            (u64::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7]]), u64::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+    fn proto_read_u64(data in proptest::bits::u64::ANY) {
+        let bytes = data.to_be_bytes();
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, u64::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
     #[test]
-    fn proto_read_u128(data in proptest::collection::vec(u128::MIN..u128::MAX, 0..512)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
+    fn proto_read_u128(data in (proptest::bits::u64::ANY, proptest::bits::u64::ANY)) {
+        let data = u128::from_be_bytes([data.0.to_be_bytes(), data.1.to_be_bytes()].concat().try_into().unwrap());
+        let bytes = data.to_be_bytes();
 
-        for (expected, result) in data.chunks_exact(16).map(|chunk|
-            (u128::from_be_bytes([
-                chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7],
-                chunk[8], chunk[9], chunk[10], chunk[11], chunk[12], chunk[13], chunk[14], chunk[15],
-            ]), u128::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, u128::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
     #[test]
-    fn proto_read_i16(data in proptest::collection::vec(i16::MIN..i16::MAX, 0..256)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (expected, result) in data.chunks_exact(2).map(|chunk|
-            (i16::from_be_bytes([chunk[0], chunk[1]]), i16::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+    fn proto_read_i16(data in proptest::bits::i16::ANY) {
+        let bytes = data.to_be_bytes();
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, i16::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
 
     #[test]
-    fn proto_read_i32(data in proptest::collection::vec(i32::MIN..i32::MAX, 0..512)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (expected, result) in data.chunks_exact(4).map(|chunk|
-            (i32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]), i32::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+    fn proto_read_i32(data in proptest::bits::i32::ANY) {
+        let bytes = data.to_be_bytes();
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, i32::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
     #[test]
-    fn proto_read_i64(data in proptest::collection::vec(i64::MIN..i64::MAX, 0..512)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
-
-        for (expected, result) in data.chunks_exact(8).map(|chunk|
-            (i64::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7]]), i64::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+    fn proto_read_i64(data in proptest::bits::i64::ANY) {
+        let bytes = data.to_be_bytes();
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, i64::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 
     #[test]
-    fn proto_read_i128(data in proptest::collection::vec(i128::MIN..i128::MAX, 0..512)) {
-        // Convert the data to bytes
-        let data = data.iter().flat_map(|i| i.to_be_bytes()).collect::<Vec<_>>();
-        let mut cursor = std::io::Cursor::new(data.as_slice());
+    fn proto_read_i128(data in (proptest::bits::i64::ANY, proptest::bits::i64::ANY)) {
+        let data = i128::from_be_bytes([data.0.to_be_bytes(), data.1.to_be_bytes()].concat().try_into().unwrap());
+        let bytes = data.to_be_bytes();
 
-        for (expected, result) in data.chunks_exact(16).map(|chunk|
-            (i128::from_be_bytes([
-                chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5], chunk[6], chunk[7],
-                chunk[8], chunk[9], chunk[10], chunk[11], chunk[12], chunk[13], chunk[14], chunk[15],
-            ]), i128::fg_read(&mut cursor))
-        ) {
-            match result {
-                Ok(read) => assert_eq!(expected, read),
-                Err(err) => panic!("Expected: `{expected}`, Error: `{err}`"),
-            }
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        match (data, i128::fg_read(&mut cursor)) {
+            (expected, Ok(read)) => assert_eq!(expected, read),
+            (expected, err) => panic!("Expected: `{expected}`, Error: `{err:?}`"),
         }
     }
 }

@@ -154,9 +154,11 @@ proptest::proptest! {
     fn proto_read_hashmap(data in proptest::collection::hash_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
+        // Prefix the data with the length
         let mut vec = Vec::with_capacity(data.len() * 2);
         u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
+        // Write the data
         for (key, val) in &data {
             vec.extend_from_slice(&key.to_be_bytes());
             vec.extend_from_slice(&val.to_be_bytes());
@@ -172,9 +174,11 @@ proptest::proptest! {
     fn proto_read_hashset(data in proptest::collection::hash_set(0u8..=255u8, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
+        // Prefix the data with the length
         let mut vec = Vec::with_capacity(data.len());
         u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
+        // Write the data
         for val in &data {
             vec.extend_from_slice(&val.to_be_bytes());
         }
@@ -189,10 +193,11 @@ proptest::proptest! {
     fn proto_read_btreemap(data in proptest::collection::btree_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
+        // Prefix the data with the length
         let mut vec = Vec::with_capacity(data.len() * 2);
         u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
-
+        // Write the data
         for (key, val) in &data {
             vec.extend_from_slice(&key.to_be_bytes());
             vec.extend_from_slice(&val.to_be_bytes());
@@ -208,9 +213,11 @@ proptest::proptest! {
     fn proto_read_btreeset(data in proptest::collection::btree_set(0u8..=255u8, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
+        // Prefix the data with the length
         let mut vec = Vec::with_capacity(data.len());
         u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
+        // Write the data
         for val in &data {
             vec.extend_from_slice(&val.to_be_bytes());
         }
@@ -225,9 +232,11 @@ proptest::proptest! {
     fn proto_read_hashmap_hashbrown(data in proptest::collection::hash_map(0u8..=255u8, 0u8..=255u8, 0..64)) {
         use crate::io::var_write::FrogVarWrite;
 
+        // Prefix the data with the length
         let mut vec = Vec::with_capacity(data.len() * 2);
         u32::try_from(data.len()).unwrap().fg_var_write(&mut vec).unwrap();
 
+        // Write the data
         for (key, val) in &data {
             vec.extend_from_slice(&key.to_be_bytes());
             vec.extend_from_slice(&val.to_be_bytes());
@@ -236,6 +245,7 @@ proptest::proptest! {
         let mut cursor = std::io::Cursor::new(vec.as_slice());
         let map = hashbrown::HashMap::<u8, u8>::fg_read(&mut cursor).unwrap();
 
+        // Assert the map length and contents
         assert_eq!(map.len(), data.len());
         for (key, val) in &data {
             assert_eq!(map.get(key).unwrap(), val);

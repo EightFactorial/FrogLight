@@ -44,52 +44,43 @@ impl FrogRead for CompactString {
     }
 }
 
-#[test]
-fn proto_read_string() {
-    let mut cursor = std::io::Cursor::new([0].as_slice());
-    let string: String = String::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "");
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    let mut cursor = std::io::Cursor::new([1, 65].as_slice());
-    let string: String = String::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "A");
+    #[test]
+    fn proto_read_string(data in ".*") {
+        use crate::io::var_write::FrogVarWrite;
 
-    let mut cursor = std::io::Cursor::new([2, 65, 66].as_slice());
-    let string: String = String::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "AB");
+        // Convert the data to bytes
+        let mut vec = Vec::new();
+        let len = u32::try_from(data.len()).unwrap();
+        len.fg_var_write(&mut vec).unwrap();
+        vec.extend_from_slice(data.as_bytes());
 
-    let mut cursor = std::io::Cursor::new(
-        [12, 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100].as_slice(),
-    );
-    let string: String = String::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "Hello, world");
-}
+        // Read the data back
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let read = String::fg_read(&mut cursor).unwrap();
 
-#[test]
-fn proto_read_compactstring() {
-    let mut cursor = std::io::Cursor::new([0].as_slice());
-    let string: CompactString = CompactString::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "");
+        assert_eq!(data, read);
+        assert_eq!(cursor.position(), vec.len() as u64);
+    }
 
-    let mut cursor = std::io::Cursor::new([1, 65].as_slice());
-    let string: CompactString = CompactString::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "A");
+    #[test]
+    fn proto_read_compact_string(data in ".*") {
+        use crate::io::var_write::FrogVarWrite;
 
-    let mut cursor = std::io::Cursor::new([2, 65, 66].as_slice());
-    let string: CompactString = CompactString::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "AB");
+        // Convert the data to bytes
+        let mut vec = Vec::new();
+        let len = u32::try_from(data.len()).unwrap();
+        len.fg_var_write(&mut vec).unwrap();
+        vec.extend_from_slice(data.as_bytes());
 
-    let mut cursor = std::io::Cursor::new(
-        [12, 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100].as_slice(),
-    );
-    let string: CompactString = CompactString::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(string, "Hello, world");
+        // Read the data back
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let read = CompactString::fg_read(&mut cursor).unwrap();
+
+        assert_eq!(data, read);
+        assert_eq!(cursor.position(), vec.len() as u64);
+    }
 }

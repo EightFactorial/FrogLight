@@ -16,18 +16,17 @@ impl FrogRead for bool {
 
 #[cfg(test)]
 proptest::proptest! {
-    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(256))]
 
     #[test]
-    fn proto_read_bool(data in proptest::collection::vec(0u8..=255u8, 0..128)) {
-        let mut cursor = std::io::Cursor::new(data.as_slice());
+    fn proto_read_bool(data in proptest::bits::u8::ANY) {
+        use bitvec::view::BitViewSized;
 
-        for (index, byte) in data.iter().enumerate() {
-            match (*byte, bool::fg_read(&mut cursor)) {
-                (exp @ (0|1), Ok(read)) => assert_eq!(exp, u8::from(read)),
-                (oth, Err(ReadError::InvalidBool(err))) => assert_eq!(oth, err),
-                (oth, err) => panic!("Length: `{}`, Index: `{index}`, Data: `{oth}`, Error: `{err:?}`", data.len()),
-            }
+        let mut cursor = std::io::Cursor::new(data.as_raw_slice());
+        match (data, bool::fg_read(&mut cursor)) {
+            (exp @ (0|1), Ok(read)) => assert_eq!(exp, u8::from(read)),
+            (oth, Err(ReadError::InvalidBool(err))) => assert_eq!(oth, err),
+            (oth, err) => panic!("Data: `{oth}`, Error: `{err:?}`"),
         }
     }
 }

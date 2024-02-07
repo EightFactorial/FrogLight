@@ -13,10 +13,6 @@ impl FrogRead for Nbt {
     }
 }
 
-// TODO: Test nbt read
-// #[test]
-// fn proto_read_nbt() {}
-
 impl FrogRead for Uuid {
     #[inline]
     fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
@@ -27,37 +23,24 @@ impl FrogRead for Uuid {
     }
 }
 
-#[test]
-fn proto_read_uuid() {
-    use std::str::FromStr;
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    let mut cursor =
-        std::io::Cursor::new([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].as_slice());
-    let uuid: Uuid = Uuid::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(uuid, Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap());
+    // TODO: Test NBT read
+    // #[test]
+    // fn proto_read_nbt() {}
 
-    let mut cursor =
-        std::io::Cursor::new([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].as_slice());
-    let uuid: Uuid = Uuid::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(uuid, Uuid::from_str("01000000-0000-0000-0000-000000000000").unwrap());
+    /// All combinations of 16 bytes are valid UUIDs, so just test that the read
+    /// function returns the same UUID as the one created from the bytes.
+    #[test]
+    fn proto_read_uuid(data in proptest::array::uniform16(proptest::num::u8::ANY)) {
+        let mut cursor = std::io::Cursor::new(data.as_slice());
 
-    let mut cursor =
-        std::io::Cursor::new([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1].as_slice());
-    let uuid: Uuid = Uuid::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(uuid, Uuid::from_str("01000000-0000-0000-0000-000000000001").unwrap());
+        let uuid = Uuid::from_slice(&data).unwrap();
+        let read = Uuid::fg_read(&mut cursor).unwrap();
 
-    let mut cursor =
-        std::io::Cursor::new([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2].as_slice());
-    let uuid: Uuid = Uuid::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(uuid, Uuid::from_str("01000000-0000-0000-0000-000000000002").unwrap());
-
-    let mut cursor =
-        std::io::Cursor::new([3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3].as_slice());
-    let uuid: Uuid = Uuid::fg_read(&mut cursor).unwrap();
-    assert_eq!(cursor.position(), cursor.get_ref().len() as u64);
-    assert_eq!(uuid, Uuid::from_str("03000000-0000-0000-0000-000000000003").unwrap());
+        assert_eq!(uuid, read);
+        assert_eq!(cursor.position(), 16);
+    }
 }

@@ -54,41 +54,79 @@ impl<T: FrogRead, const N: usize> FrogRead for SmallVec<[T; N]> {
     }
 }
 
-#[test]
-fn proto_read_array() {
-    let mut cursor = std::io::Cursor::new([0, 1, 0, 1, 0, 0, 1, 1u8].as_slice());
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    assert_eq!(<[u8; 4]>::fg_read(&mut cursor).unwrap(), [0, 1, 0, 1]);
-    assert_eq!(<[u8; 4]>::fg_read(&mut cursor).unwrap(), [0, 0, 1, 1]);
+    #[test]
+    fn proto_read_array2(data in proptest::array::uniform2(0u8..=255u8)) {
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+        let result: Result<[u8; 2], _> = <[u8; 2]>::fg_read(&mut cursor);
 
-    let err = <[u8; 4]>::fg_read(&mut cursor).unwrap_err();
-    assert!(matches!(err, ReadError::EndOfBuffer(1, 0)));
-}
-#[test]
-fn proto_read_vector() {
-    let mut cursor =
-        std::io::Cursor::new([2, 1, 1, 2, 0, 8, 0, 8, 2, 0, 0, 1, 0, 0, 0, 1, 0].as_slice());
+        assert_eq!(result.unwrap(), data);
+        assert_eq!(cursor.position(), 2);
+    }
 
-    let vec: Vec<u8> = Vec::fg_read(&mut cursor).unwrap();
-    assert_eq!(vec, [1, 1]);
+    #[test]
+    fn proto_read_array5(data in proptest::array::uniform5(0u8..=255u8)) {
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+        let result: Result<[u8; 5], _> = <[u8; 5]>::fg_read(&mut cursor);
 
-    let vec: Vec<u16> = Vec::fg_read(&mut cursor).unwrap();
-    assert_eq!(vec, [8, 8]);
+        assert_eq!(result.unwrap(), data);
+        assert_eq!(cursor.position(), 5);
+    }
 
-    let vec: Vec<u32> = Vec::fg_read(&mut cursor).unwrap();
-    assert_eq!(vec, [256, 256]);
-}
-#[test]
-fn proto_read_smallvec() {
-    let mut cursor =
-        std::io::Cursor::new([2, 1, 1, 2, 0, 8, 0, 8, 2, 0, 0, 1, 0, 0, 0, 1, 0].as_slice());
+    #[test]
+    fn proto_read_array10(data in proptest::array::uniform10(0u8..=255u8)) {
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+        let result: Result<[u8; 10], _> = <[u8; 10]>::fg_read(&mut cursor);
 
-    let vec: SmallVec<[u8; 4]> = SmallVec::fg_read(&mut cursor).unwrap();
-    assert_eq!(vec, [1, 1].into());
+        assert_eq!(result.unwrap(), data);
+        assert_eq!(cursor.position(), 10);
+    }
 
-    let vec: SmallVec<[u16; 4]> = SmallVec::fg_read(&mut cursor).unwrap();
-    assert_eq!(vec, [8, 8].into());
+    #[test]
+    fn proto_read_array20(data in proptest::array::uniform20(0u8..=255u8)) {
+        let mut cursor = std::io::Cursor::new(data.as_slice());
+        let result: Result<[u8; 20], _> = <[u8; 20]>::fg_read(&mut cursor);
 
-    let vec: SmallVec<[u32; 4]> = SmallVec::fg_read(&mut cursor).unwrap();
-    assert_eq!(vec, [256, 256].into());
+        assert_eq!(result.unwrap(), data);
+        assert_eq!(cursor.position(), 20);
+    }
+
+    #[test]
+    fn proto_read_vector(data in proptest::collection::vec(0u8..=255u8, 0..128)) {
+        use crate::io::var_write::FrogVarWrite;
+
+        // Prefix the data with the length
+        let mut vec = Vec::new();
+        let len = u32::try_from(data.len()).unwrap();
+        len.fg_var_write(&mut vec).unwrap();
+        vec.extend_from_slice(&data);
+
+        // Read the data back
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let result: Result<Vec<u8>, _> = Vec::fg_read(&mut cursor);
+
+        assert_eq!(result.unwrap(), data);
+        assert_eq!(cursor.position(), vec.len() as u64);
+    }
+
+    #[test]
+    fn proto_read_smallvec(data in proptest::collection::vec(0u8..=255u8, 0..128)) {
+        use crate::io::var_write::FrogVarWrite;
+
+        // Prefix the data with the length
+        let mut vec = Vec::new();
+        let len = u32::try_from(data.len()).unwrap();
+        len.fg_var_write(&mut vec).unwrap();
+        vec.extend_from_slice(&data);
+
+        // Read the data back
+        let mut cursor = std::io::Cursor::new(vec.as_slice());
+        let result: Result<SmallVec<[u8; 4]>, _> = SmallVec::fg_read(&mut cursor);
+
+        assert_eq!(result.unwrap().to_vec(), data);
+        assert_eq!(cursor.position(), vec.len() as u64);
+    }
 }
