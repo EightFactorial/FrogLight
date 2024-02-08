@@ -17,11 +17,11 @@ impl ResourcePackAudioSettings {
     /// # Errors
     /// If the file is not valid JSON
     /// If the file is not a valid `sounds.json` file.
-    #[allow(clippy::no_effect_underscore_binding)]
+    #[allow(unused_variables)]
     pub(crate) async fn parse(
         entry: &mut ZipEntryReader<'_, Cursor<&[u8]>, WithEntry<'_>>,
         settings: &ResourcePackLoaderSettings,
-        _load_context: &mut bevy::asset::LoadContext<'_>,
+        load_context: &mut bevy::asset::LoadContext<'_>,
     ) -> Result<(), ResourcePackLoaderError> {
         let manager = settings.0.as_ref().unwrap();
 
@@ -30,7 +30,7 @@ impl ResourcePackAudioSettings {
             #[cfg(feature = "logging")]
             bevy::log::trace!(
                 "Skipping `sounds.json` from `{}` as it already exists",
-                _load_context.path().display()
+                load_context.path().display()
             );
             return Ok(());
         }
