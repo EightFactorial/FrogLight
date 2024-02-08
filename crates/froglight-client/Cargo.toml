@@ -37,7 +37,7 @@ default-loading = ["dep:froglight-loading"]
 
 # Enables extra debug logs
 # Enables logging in release builds
-logging = []
+logging = ["froglight-resourcepack/logging"]
 
 # Enables the egui inspector
 inspector = ["froglight-debug/inspector"]

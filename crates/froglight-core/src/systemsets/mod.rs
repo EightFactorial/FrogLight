@@ -2,7 +2,8 @@
 
 use bevy::prelude::*;
 
-pub mod loading;
+mod loading;
+pub use loading::LoadingScreenUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) { loading::build(app); }

@@ -5,6 +5,7 @@ use bevy::{
 };
 use froglight_interface::InterfacePlugin;
 use froglight_loading::LoadingPlugin;
+use froglight_resourcepack::ResourcePackPlugin;
 
 use crate::plugins::ClientPlugins;
 
@@ -23,6 +24,7 @@ use crate::plugins::ClientPlugins;
 ///
 /// This [`PluginGroup`] includes several [`Plugins`](bevy::app::Plugin) that
 /// are not part of [`ClientPlugins`]:
+/// - [`ResourcePackPlugin`]
 /// - [`InterfacePlugin`]
 /// - [`LoadingPlugin`] # Enabled by the `default-loading` feature
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -45,7 +47,7 @@ impl PluginGroup for AppPlugins {
         group = ClientPlugins::build_group(ClientPlugins, group);
 
         // Add App-specific plugins
-        group = group.add(InterfacePlugin);
+        group = group.add(InterfacePlugin).add(ResourcePackPlugin::new());
 
         // Add LoadingPlugin if the `default-loading` feature is enabled
         #[cfg(feature = "default-loading")]

@@ -31,7 +31,7 @@ froglight-macros = { version = "0.1.0", path = "../froglight-macros", features =
     "world",
 ] }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
-futures = { workspace = true }
+futures-lite = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 phf = { workspace = true, features = ["macros"] }

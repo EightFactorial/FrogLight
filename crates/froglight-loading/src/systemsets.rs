@@ -1,8 +1,6 @@
 //! `SystemSets` for the loading screen.
 use bevy::prelude::*;
-use froglight_core::{
-    resources::loading::LoadingScreenEnable, systemsets::loading::LoadingScreenUpdateSet,
-};
+use froglight_core::{resources::LoadingScreenEnable, systemsets::LoadingScreenUpdateSet};
 
 use crate::layout::{fade_animation::FadeTimer, LoadingScreenRoot};
 

@@ -16,6 +16,18 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+async_zip = { version = "0.0.16", features = ["deflate"] }
 bevy = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
+futures-lite = { workspace = true }
+image = { workspace = true, features = ["jpeg", "png"] }
+parking_lot = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[features]
+default = []
+
+# Enables extra debug logs
+logging = []
