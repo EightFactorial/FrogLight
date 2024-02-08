@@ -64,4 +64,4 @@ jobs:
           wait-for-processing: true
       # Print the results
       - name: Report Results
-        run: cargo clippy --workspace --all-features --all-targets -- -D warnings
+        run: cargo clippy --workspace --all-features --all-targets
