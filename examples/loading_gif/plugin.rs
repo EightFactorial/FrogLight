@@ -9,18 +9,39 @@ use froglight_client::loading::{
 ///
 /// This requires [`froglight_client`]'s `default-loading` feature to be enabled
 /// **and** the [`LoadingPlugin`](froglight_client::loading::LoadingPlugin) to
-/// be
-/// set to [`LoadingPlugin::None`](froglight_client::loading::LoadingPlugin::None).
+/// be set to [`LoadingPlugin::None`](froglight_client::loading::LoadingPlugin::None).
 ///
 ///
 /// # Note
-/// This plugin assumes a lot about the GIF's path and resolution.
+/// This plugin is designed to be used with GIFs that have been split into
+/// individual frames. Use an online tool to split the GIF into one massive
+/// image, and then use the `embedded_asset!` macro to embed the image into the
+/// application.
 #[derive(Debug, Clone, PartialEq)]
 pub struct GifLoadingPlugin {
-    pub duration: Duration,
+    /// The path to the GIF's tiled frames
     pub path: String,
+    /// The duration of each frame
+    /// 
+    /// For example, 30 FPS would be
+    /// ```rust
+    /// Duration::from_secs_f32(1.0 / 30.0)
+    /// ```
+    pub duration: Duration,
+    /// The dimensions of each frame
+    /// 
+    /// In the provided example, each frame is 360x241 pixels
     pub frame_dimensions: Vec2,
+    /// The tiling of the frames
+    /// 
+    /// In the provided example, the GIF is 2x94 frames
     pub frame_tiling: UVec2,
+    /// The total number of frames
+    /// 
+    /// In the provided example, the GIF has 187 frames
+    /// 
+    /// This is required to prevent any issues with blank frames
+    /// if the GIF doesn't fill the entire atlas
     pub frame_count: usize,
 }
 
@@ -80,7 +101,7 @@ impl GifLoadingPlugin {
         // Create the GIF loading art inside the loading screen
         match query.get_single() {
             Ok(parent) => {
-                // Create the GIF loading art
+                // Create a node bundle to center the art
                 let child = commands
                     .spawn((
                         FadeAnimationMarker,
@@ -97,6 +118,7 @@ impl GifLoadingPlugin {
                         },
                     ))
                     .with_children(|node| {
+                        // Create the GIF loading art
                         node.spawn((
                             FadeAnimationMarker,
                             GifLoadingArt,
@@ -133,13 +155,15 @@ impl GifLoadingPlugin {
 struct GifLoadingArt;
 
 impl GifLoadingArt {
-    /// Advance the frame of the GIF
+    /// Advance the currently shown frame
     fn advance_frame(
         mut query: Query<&mut UiTextureAtlasImage, With<GifLoadingArt>>,
         mut asset: ResMut<GifAsset>,
         time: Res<Time<Real>>,
     ) {
+        // Every time the timer ticks
         if asset.timer.tick(time.delta()).just_finished() {
+            // Advance the frame, looping back to the start once the end is reached
             for mut image in query.iter_mut() {
                 image.index = (image.index + 1) % asset.frame_count;
             }

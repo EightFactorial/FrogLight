@@ -6,12 +6,11 @@ use froglight_client::plugins::{AppPlugins, LoadingPlugin};
 mod plugin;
 use plugin::GifLoadingPlugin;
 
-/// Create a new application, but disable the default [`LoadingPlugin`] and use
-/// our custom [`GifLoadingPlugin`] instead.
+/// Create a new application, but set the [`LoadingPlugin`] to
+/// [`LoadingPlugin::None`].
 ///
-/// # Note
-/// If you are importing [`froglight_client`] in your own project, you can skip
-/// disabling the [`LoadingPlugin`] by disabling the `default-loading` feature.
+/// This prevents any loading art from displaying, and allows us to set up
+/// our own custom art and animations.
 fn main() {
     // Create a new bevy App
     let mut app = App::new();
