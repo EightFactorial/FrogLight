@@ -1,3 +1,5 @@
+use super::WriteError;
+
 mod integer;
 
 /// A trait for writing a variable-length type to a buffer
@@ -9,7 +11,7 @@ pub trait FrogVarWrite {
     /// # Errors
     ///
     /// Returns an error if the buffer cannot be written to
-    fn fg_var_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> std::io::Result<()>;
+    fn fg_var_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError>;
 
     /// Write a variable-length type to a new byte buffer
     #[inline]

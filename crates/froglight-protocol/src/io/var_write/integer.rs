@@ -1,4 +1,4 @@
-use super::FrogVarWrite;
+use super::{FrogVarWrite, WriteError};
 
 macro_rules! impl_integer_var_write {
     ($ty:ty) => {
@@ -6,7 +6,7 @@ macro_rules! impl_integer_var_write {
             fn fg_var_write(
                 &self,
                 buf: &mut (impl std::io::Write + ?Sized),
-            ) -> std::io::Result<()> {
+            ) -> Result<(), WriteError> {
                 let mut value = *self;
                 let mut byte = [0];
 

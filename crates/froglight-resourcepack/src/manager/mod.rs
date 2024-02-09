@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use bevy::{asset::AssetPath, prelude::*, utils::HashMap};
+use froglight_core::data::ResourceKey;
 use parking_lot::RwLock;
 
 use crate::{
@@ -16,17 +17,13 @@ use crate::{
 #[derive(Debug, Default, Clone, Resource)]
 pub struct ResourcePackManager {
     /// A collection of loaded texture assets.
-    ///
-    /// TODO: Use `ResourceLocation` instead of `String` for the key.
-    pub texture_assets: Arc<RwLock<HashMap<String, Handle<Image>>>>,
+    pub texture_assets: Arc<RwLock<HashMap<ResourceKey, Handle<Image>>>>,
 
     /// The audio settings set by the resource packs.
     pub audio_settings: Arc<RwLock<Option<ResourcePackAudioSettings>>>,
 
     /// A collection of loaded audio assets.
-    ///
-    /// TODO: Use `ResourceLocation` instead of `String` for the key.
-    pub audio_assets: Arc<RwLock<HashMap<String, Handle<AudioSource>>>>,
+    pub audio_assets: Arc<RwLock<HashMap<ResourceKey, Handle<AudioSource>>>>,
 }
 
 impl ResourcePackManager {

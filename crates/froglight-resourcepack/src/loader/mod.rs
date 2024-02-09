@@ -7,6 +7,7 @@ use bevy::{
     prelude::*,
     utils::BoxedFuture,
 };
+use froglight_core::data::ResourceKey;
 use futures_lite::AsyncReadExt;
 use image::io::Reader as ImageReader;
 use thiserror::Error;
@@ -133,7 +134,14 @@ impl AssetLoader for ResourcePackLoader {
                     };
 
                     // Create a resource key
-                    let resource_key = format!("{namespace}:{filename}");
+                    let Ok(resource_key) = ResourceKey::try_from(format!("{namespace}:{filename}"))
+                    else {
+                        warn!(
+                            "Unable to create resource key for `{filename:?}` from `{}`",
+                            load_context.path().display()
+                        );
+                        continue;
+                    };
 
                     // Parse the `sounds.json` file
                     if filename == "sounds.json" {

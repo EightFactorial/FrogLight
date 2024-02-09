@@ -1,12 +1,13 @@
 use async_zip::base::read::{WithEntry, ZipEntryReader};
 use bevy::{asset::LoadContext, prelude::*, render::texture::Image};
+use froglight_core::data::ResourceKey;
 use futures_lite::AsyncReadExt;
 use image::io::Reader as ImageReader;
 
 use crate::{loader::ResourcePackLoaderError, settings::ResourcePackLoaderSettings};
 
 pub(super) async fn load_texture(
-    resource_key: &String,
+    resource_key: &ResourceKey,
     entry: &mut ZipEntryReader<'_, futures_lite::io::Cursor<&[u8]>, WithEntry<'_>>,
     load_context: &mut LoadContext<'_>,
     settings: &ResourcePackLoaderSettings,
@@ -35,7 +36,7 @@ pub(super) async fn load_texture(
 
     // Load the texture into the asset manager.
     // Store the strong handle in the ResourcePackManager, and return a weak handle.
-    let handle = load_context.labeled_asset_scope(resource_key.clone(), |_| image);
+    let handle = load_context.labeled_asset_scope(resource_key.to_string(), |_| image);
     let weak = handle.clone_weak();
 
     // Insert the texture into the texture assets if it doesn't exist.

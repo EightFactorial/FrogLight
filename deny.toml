@@ -55,6 +55,12 @@ version = "=1.3.2"
 name = "event-listener"
 version = "=2.5.3"
 [[bans.skip]]
+name = "event-listener"
+version = "=4.0.3"
+[[bans.skip]]
+name = "event-listener-strategy"
+version = "=0.4.0"
+[[bans.skip]]
 name = "fastrand"
 version = "=1.9.0"
 [[bans.skip]]

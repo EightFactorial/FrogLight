@@ -7,6 +7,8 @@ pub mod systemsets;
 
 // Re-export big_space
 pub use big_space;
+// Re-export protocol data
+pub use froglight_protocol::data;
 
 mod plugin;
 pub use plugin::CorePlugin;

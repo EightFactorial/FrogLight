@@ -22,24 +22,22 @@ pub struct GifLoadingPlugin {
     /// The path to the GIF's tiled frames
     pub path: String,
     /// The duration of each frame
-    /// 
+    ///
     /// For example, 30 FPS would be
-    /// ```rust
-    /// Duration::from_secs_f32(1.0 / 30.0)
-    /// ```
+    /// `Duration::from_secs_f32(1.0 / 30.0)`
     pub duration: Duration,
     /// The dimensions of each frame
-    /// 
+    ///
     /// In the provided example, each frame is 360x241 pixels
     pub frame_dimensions: Vec2,
     /// The tiling of the frames
-    /// 
+    ///
     /// In the provided example, the GIF is 2x94 frames
     pub frame_tiling: UVec2,
     /// The total number of frames
-    /// 
+    ///
     /// In the provided example, the GIF has 187 frames
-    /// 
+    ///
     /// This is required to prevent any issues with blank frames
     /// if the GIF doesn't fill the entire atlas
     pub frame_count: usize,

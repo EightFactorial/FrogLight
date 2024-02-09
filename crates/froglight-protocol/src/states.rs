@@ -4,18 +4,6 @@
 
 use bevy_reflect::Reflect;
 
-use crate::versions::Version;
-
-/// A Protocol state
-///
-/// Different states have different packets.
-pub trait State<V: Version>: 'static + Copy + Eq + Reflect {
-    /// Packets sent from the client to the server
-    type ServerboundPacket;
-    /// Packets sent from the server to the client
-    type ClientboundPacket;
-}
-
 /// The Handshake state
 ///
 /// This is the initial state of a connection,

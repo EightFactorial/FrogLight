@@ -39,6 +39,7 @@ smallvec = { workspace = true, features = [
     "const_generics",
     "const_new",
     "serde",
+    "write",
 ] }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["serde"] }
