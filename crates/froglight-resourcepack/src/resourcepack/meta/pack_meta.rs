@@ -12,7 +12,10 @@ pub struct PackMcMeta {}
 
 impl PackMcMeta {
     /// Parses the `pack.mcmeta` file for a given resource pack.
-    #[allow(clippy::missing_errors_doc)]
+    ///
+    /// # Errors
+    /// - If the file cannot be read
+    /// - If the file cannot be parsed
     pub(crate) async fn parse(
         entry: &mut ZipEntryReader<'_, Cursor<&[u8]>, WithEntry<'_>>,
     ) -> Result<Self, ResourcePackLoaderError> {

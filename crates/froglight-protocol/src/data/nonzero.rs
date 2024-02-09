@@ -4,6 +4,7 @@ use std::{
     ops::{Add, AddAssign, Sub, SubAssign},
 };
 
+use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut};
 
 use crate::io::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, WriteError};
@@ -35,7 +36,7 @@ use crate::io::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, Write
 /// Be careful when using values that are close to the minimum or maximum
 /// value of the inner type. For example, if the inner type is `u8`, then
 /// `NonZero::new_some(255u8)` will overflow and be written as `0`.
-#[derive(Deref, DerefMut)]
+#[derive(Deref, DerefMut, Reflect)]
 pub struct NonZero<T>(Option<T>);
 
 impl<T> NonZero<T> {

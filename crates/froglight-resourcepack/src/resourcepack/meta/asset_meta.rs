@@ -7,7 +7,7 @@ use crate::loader::ResourcePackLoaderError;
 /// An asset's `.mcmeta` file.
 ///
 /// This file is used to define the properties of an asset.
-#[derive(Debug, Clone, PartialEq, Eq, Reflect)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
 pub struct AssetMcMeta {}
 
 impl AssetMcMeta {

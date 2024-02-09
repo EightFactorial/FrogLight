@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use bevy::{asset::ReflectHandle, prelude::*};
 
-use crate::{manager::ResourcePackManager, ResourcePackLoader};
+use crate::{manager::ResourcePackManager, ResourcePack, ResourcePackLoader};
 
 /// The [`Plugin`] for the [`froglight-resourcepack`](crate) crate.
 ///
@@ -28,7 +28,12 @@ impl Plugin for ResourcePackPlugin {
         // Insert the manager into the app's resources
         app.insert_resource(self.0.clone());
 
-        // Register the asset loader.
+        // Register the ResourcePack type and initialize it as an asset
+        app.init_asset::<ResourcePack>()
+            .register_type::<ResourcePack>()
+            .register_type_data::<Handle<ResourcePack>, ReflectHandle>();
+
+        // Register the ResourcePackLoader
         app.register_asset_loader(ResourcePackLoader);
     }
 }

@@ -71,7 +71,7 @@ tools args="": (fetch-tools)
 
 # Generate froglight-client graphs
 graph:
-  cargo run --package=froglight-client --example=system-graph
+  cargo run --package=froglight-client --example=system-graph --features default,logging,inspector
 
 # ---- Fetch Recipes ----
 

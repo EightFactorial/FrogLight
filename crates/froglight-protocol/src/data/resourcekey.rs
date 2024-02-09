@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use bevy_reflect::TypePath;
+use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
 use serde::{Deserialize, Serialize};
@@ -25,10 +25,13 @@ use crate::io::{FrogRead, FrogWrite};
     DerefMut,
     Serialize,
     Deserialize,
-    TypePath,
+    Reflect,
 )]
+#[reflect(Serialize, Deserialize)]
 #[serde(transparent)]
-pub struct ResourceKey(CompactString);
+#[repr(transparent)]
+// Can't reflect on remote types :(
+pub struct ResourceKey(#[reflect(ignore)] CompactString);
 
 #[derive(Debug, Error)]
 pub enum ResourceKeyError {
@@ -231,7 +234,7 @@ impl Display for ResourceKey {
 }
 
 impl From<ResourceKey> for String {
-    fn from(key: ResourceKey) -> Self { key.0.into() }
+    fn from(key: ResourceKey) -> Self { key.0.into_string() }
 }
 
 impl From<ResourceKey> for CompactString {

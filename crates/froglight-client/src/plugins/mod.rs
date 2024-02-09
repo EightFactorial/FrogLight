@@ -28,6 +28,8 @@
 // Re-export plugins
 
 pub use froglight_debug::DebugPlugin;
+#[cfg(feature = "inspector")]
+pub use froglight_debug::WorldInspectorPlugin;
 #[cfg(feature = "default-loading")]
 pub use froglight_loading::LoadingPlugin;
 pub use froglight_resourcepack::ResourcePackPlugin;

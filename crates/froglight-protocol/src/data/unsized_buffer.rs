@@ -1,5 +1,6 @@
 use std::io::Read;
 
+use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut};
 use smallvec::SmallVec;
 
@@ -9,13 +10,11 @@ use crate::io::{FrogRead, FrogWrite, ReadError, WriteError};
 ///
 /// Unlike a [`Vec<u8>`], when encoded it is not prefixed with a length.
 ///
-/// When used as a field in a packet, the buffer takes up the entire remaining
-/// space of the packet.
+/// When used as a field in a packet, the buffer takes up the entire length of
+/// the packet.
 ///
-/// For this reason, it must be the last field in the packet.
-/// ```
-#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut)]
-// #[frog(tests = ["transcode"])]
+/// For this reason, it *must* be the last field in the packet.
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Reflect)]
 pub struct UnsizedByteBuffer(SmallVec<[u8; Self::BUFFER_SIZE]>);
 
 impl UnsizedByteBuffer {

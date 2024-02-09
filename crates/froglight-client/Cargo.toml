@@ -49,3 +49,4 @@ bevy_mod_debugdump = "0.9.0"
 # Useful for development
 [[example]]
 name = "system-graph"
+required-features = ["default", "logging", "inspector"]

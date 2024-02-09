@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 
 use bevy::prelude::*;
 use compact_str::CompactString;
+use serde::{Deserialize, Serialize};
 
 /// The [`Plugin`] for the [`froglight-settings`](crate) crate.
 ///
@@ -9,7 +10,7 @@ use compact_str::CompactString;
 /// `frog://` asset source.
 ///
 /// # Example
-/// ```no_run,ignore
+/// ```rust,no_run,ignore
 /// use bevy::prelude::*;
 ///
 /// // Load an image from the config directory
@@ -71,7 +72,7 @@ impl SettingsPlugin {
     /// use froglight_settings::SettingsPlugin;
     ///
     /// let plugin = SettingsPlugin::default();
-    /// let dir = plugin.get_directory();
+    /// let dir = plugin.full_path();
     ///
     /// // On Linux, the directory might be:
     /// #[cfg(target_os = "linux")]
@@ -82,7 +83,7 @@ impl SettingsPlugin {
     /// assert_eq!(dir.to_str().unwrap(), "C:\\Users\\Alice\\AppData\\Roaming\\FrogLight");
     /// ```
     #[must_use]
-    pub fn get_directory(&self) -> PathBuf { self.dir_path.join(self.dir_name.as_str()) }
+    pub fn full_path(&self) -> PathBuf { self.dir_path.join(self.dir_name.as_str()) }
 
     /// The default directory for the config directory.
     ///
@@ -115,8 +116,10 @@ impl Plugin for SettingsPlugin {
             }
         }
 
-        // Add the SettingsSource to the app
-        app.insert_resource(SettingsSource(self.dir_path.clone()));
+        // Register SettingsSource for reflection
+        app.register_type::<SettingsSource>()
+            // Add the SettingsSource to the app
+            .insert_resource(SettingsSource(self.full_path()));
 
         // Register the asset source
         crate::source::build(app);
@@ -126,8 +129,14 @@ impl Plugin for SettingsPlugin {
 /// The path to the settings directory.
 ///
 /// This is not changed after the program starts.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Resource)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Resource, Reflect, Serialize, Deserialize)]
+#[reflect(Resource, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct SettingsSource(pub(crate) PathBuf);
+
+impl Default for SettingsSource {
+    fn default() -> Self { Self(SettingsPlugin::default().full_path()) }
+}
 
 impl SettingsSource {
     /// Gets the current config directory.

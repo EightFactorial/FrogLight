@@ -12,7 +12,7 @@ use crate::{
 /// A manager for resource packs and their assets.
 ///
 /// In order to load and track assets, clone this resource and create a
-/// [`ResourcePackLoaderSettings`](crate::ResourcePackLoaderSettings) with it.
+/// [`ResourcePackLoaderSettings`] with it.
 /// Then use [`AssetServer::load_with_settings`] to load a resource pack.
 #[derive(Debug, Clone, Resource)]
 pub struct ResourcePackManager {

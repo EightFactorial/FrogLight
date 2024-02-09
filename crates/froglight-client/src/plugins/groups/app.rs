@@ -1,11 +1,14 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
+    asset::AssetPlugin,
     transform::TransformPlugin,
     DefaultPlugins,
 };
+use froglight_debug::DebugPlugin;
 use froglight_interface::InterfacePlugin;
 use froglight_loading::LoadingPlugin;
 use froglight_resourcepack::ResourcePackPlugin;
+use froglight_settings::SettingsPlugin;
 
 use crate::plugins::ClientPlugins;
 
@@ -24,9 +27,12 @@ use crate::plugins::ClientPlugins;
 ///
 /// This [`PluginGroup`] includes several [`Plugins`](bevy::app::Plugin) that
 /// are not part of [`ClientPlugins`]:
+/// - [`SettingsPlugin`]
 /// - [`ResourcePackPlugin`]
 /// - [`InterfacePlugin`]
 /// - [`LoadingPlugin`] # Enabled by the `default-loading` feature
+/// - [`DebugPlugin`]
+/// - `WorldInspectorPlugin` # Enabled by the `inspector` feature
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AppPlugins;
 
@@ -47,12 +53,28 @@ impl PluginGroup for AppPlugins {
         group = ClientPlugins::build_group(ClientPlugins, group);
 
         // Add App-specific plugins
-        group = group.add(InterfacePlugin).add(ResourcePackPlugin::new());
+        group = group
+            // Add SettingsPlugin before AssetPlugin
+            .add_before::<AssetPlugin, SettingsPlugin>(SettingsPlugin::default())
+            // Add plugins
+            .add(InterfacePlugin)
+            .add(ResourcePackPlugin::new());
 
         // Add LoadingPlugin if the `default-loading` feature is enabled
         #[cfg(feature = "default-loading")]
         {
             group = group.add(LoadingPlugin::default());
+        }
+
+        // Add WorldInspectorPlugin if the `inspector` feature is enabled
+        #[cfg(feature = "inspector")]
+        {
+            group = group.add(DebugPlugin { inspector: true });
+        }
+        #[cfg(not(feature = "inspector"))]
+        #[allow(clippy::default_constructed_unit_structs)]
+        {
+            group = group.add(DebugPlugin::default());
         }
 
         group
