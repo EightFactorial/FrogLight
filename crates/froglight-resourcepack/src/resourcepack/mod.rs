@@ -14,6 +14,8 @@ pub struct ResourcePack {
     /// The resource pack's icon
     pub icon: Option<Handle<Image>>,
 
+    /// Weak handles to the resource pack's audio
+    pub audio: HashMap<ResourceKey, Handle<AudioSource>>,
     /// Weak handles to the resource pack's textures
     pub textures: HashMap<ResourceKey, Handle<Image>>,
 }

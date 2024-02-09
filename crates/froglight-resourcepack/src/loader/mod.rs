@@ -1,6 +1,4 @@
-use std::io::Cursor;
-
-use async_zip::base::read::mem::ZipFileReader;
+use async_zip::base::read::{mem::ZipFileReader, WithEntry, ZipEntryReader};
 use bevy::{
     asset::{AssetLoader, LoadContext},
     log::warn,
@@ -18,6 +16,7 @@ use crate::{
     settings::{ResourcePackAudioSettings, ResourcePackLoaderSettings},
 };
 
+mod audio;
 mod textures;
 
 /// A loader for resource packs.
@@ -78,7 +77,7 @@ impl AssetLoader for ResourcePackLoader {
             for index in 0..size {
                 let mut entry = file.reader_with_entry(index).await?;
 
-                let filename = entry.entry().filename();
+                let filename = entry.entry().filename().clone();
                 let Ok(mut filename) = filename.as_str() else {
                     warn!(
                         "Unable to read file `{filename:?}` from `{}`",
@@ -111,8 +110,9 @@ impl AssetLoader for ResourcePackLoader {
                         entry.read_to_end(&mut bytes).await?;
 
                         // Decode the image
-                        let dyn_img =
-                            ImageReader::new(Cursor::new(bytes)).with_guessed_format()?.decode()?;
+                        let dyn_img = ImageReader::new(std::io::Cursor::new(bytes))
+                            .with_guessed_format()?
+                            .decode()?;
                         let image = Image::from_dynamic(dyn_img, false);
 
                         // Set the pack icon
@@ -133,6 +133,14 @@ impl AssetLoader for ResourcePackLoader {
                         continue;
                     };
 
+                    // Parse the `sounds.json` file
+                    if filename == "sounds.json" {
+                        ResourcePackAudioSettings::parse(&mut entry, settings, load_context)
+                            .await?;
+
+                        continue;
+                    }
+
                     // Create a resource key
                     let Ok(resource_key) = ResourceKey::try_from(format!("{namespace}:{filename}"))
                     else {
@@ -143,53 +151,16 @@ impl AssetLoader for ResourcePackLoader {
                         continue;
                     };
 
-                    // Parse the `sounds.json` file
-                    if filename == "sounds.json" {
-                        ResourcePackAudioSettings::parse(&mut entry, settings, load_context)
-                            .await?;
-
-                        continue;
-                    }
-
-                    #[allow(clippy::match_same_arms)]
-                    match namespace {
-                        "blockstates" => {
-                            // TODO: Parse and load blockstates
-                        }
-                        "font" => {
-                            // TODO: Create and load fonts
-                        }
-                        "lang" => {
-                            // TODO: Load language files
-                        }
-                        "models" => {
-                            // TODO: Parse and load models
-                        }
-                        "particles" => {
-                            // TODO: Parse and load particles
-                        }
-                        "sounds" => {
-                            // TODO: Load sounds
-                        }
-                        "texts" => {
-                            // TODO: Load text files
-                        }
-                        "textures" => {
-                            // Load the texture
-                            if let Some(handle) = textures::load_texture(
-                                &resource_key,
-                                &mut entry,
-                                load_context,
-                                settings,
-                            )
-                            .await?
-                            {
-                                // Insert the texture into the resource pack
-                                pack.textures.insert(resource_key, handle);
-                            }
-                        }
-                        _ => {}
-                    }
+                    // Load the file
+                    load_file(
+                        &mut pack,
+                        namespace,
+                        resource_key,
+                        &mut entry,
+                        load_context,
+                        settings,
+                    )
+                    .await?;
                 }
             }
 
@@ -199,4 +170,57 @@ impl AssetLoader for ResourcePackLoader {
     }
 
     fn extensions(&self) -> &[&str] { &["zip", "jar"] }
+}
+
+/// Load a file from the resource pack.
+async fn load_file(
+    pack: &mut ResourcePack,
+    namespace: &str,
+    resource_key: ResourceKey,
+    entry: &mut ZipEntryReader<'_, futures_lite::io::Cursor<&[u8]>, WithEntry<'_>>,
+    load_context: &mut LoadContext<'_>,
+    settings: &ResourcePackLoaderSettings,
+) -> Result<(), ResourcePackLoaderError> {
+    #[allow(clippy::match_same_arms)]
+    match namespace {
+        "blockstates" => {
+            // TODO: Parse and load blockstates
+        }
+        "font" => {
+            // TODO: Create and load fonts
+        }
+        "lang" => {
+            // TODO: Load language files
+        }
+        "models" => {
+            // TODO: Parse and load models
+        }
+        "particles" => {
+            // TODO: Parse and load particles
+        }
+        "sounds" => {
+            // Load the audio
+            if let Some(handle) =
+                audio::load_audio(&resource_key, entry, load_context, settings).await?
+            {
+                // Insert the audio into the resource pack
+                pack.audio.insert(resource_key, handle);
+            }
+        }
+        "texts" => {
+            // TODO: Load text files
+        }
+        "textures" => {
+            // Load the texture
+            if let Some(handle) =
+                textures::load_texture(&resource_key, entry, load_context, settings).await?
+            {
+                // Insert the texture into the resource pack
+                pack.textures.insert(resource_key, handle);
+            }
+        }
+        _ => {}
+    }
+
+    Ok(())
 }

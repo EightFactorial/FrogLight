@@ -14,7 +14,7 @@ use crate::{
 /// In order to load and track assets, clone this resource and create a
 /// [`ResourcePackLoaderSettings`](crate::ResourcePackLoaderSettings) with it.
 /// Then use [`AssetServer::load_with_settings`] to load a resource pack.
-#[derive(Debug, Default, Clone, Resource)]
+#[derive(Debug, Clone, Resource)]
 pub struct ResourcePackManager {
     /// A collection of loaded texture assets.
     pub texture_assets: Arc<RwLock<HashMap<ResourceKey, Handle<Image>>>>,
@@ -24,6 +24,16 @@ pub struct ResourcePackManager {
 
     /// A collection of loaded audio assets.
     pub audio_assets: Arc<RwLock<HashMap<ResourceKey, Handle<AudioSource>>>>,
+}
+
+impl Default for ResourcePackManager {
+    fn default() -> Self {
+        Self {
+            texture_assets: Arc::new(RwLock::new(HashMap::with_capacity(1024))),
+            audio_settings: Arc::new(RwLock::new(None)),
+            audio_assets: Arc::new(RwLock::new(HashMap::with_capacity(1024))),
+        }
+    }
 }
 
 impl ResourcePackManager {
