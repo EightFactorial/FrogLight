@@ -14,3 +14,10 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [lints]
 workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+compact_str = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+toml = "0.8.10"
+dirs = "5.0.1"

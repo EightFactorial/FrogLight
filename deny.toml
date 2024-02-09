@@ -20,6 +20,7 @@ allow = [
     "0BSD",
     "BSD-2-Clause",
     "CC0-1.0",
+    "MPL-2.0",
 ]
 
 [[licenses.exceptions]]
@@ -108,12 +109,17 @@ version = "=1.0.109"
 name = "toml_edit"
 version = "=0.19.15"
 [[bans.skip]]
+name = "toml_edit"
+version = "=0.20.7"
+[[bans.skip]]
 name = "tracing-log"
 version = "=0.1.4"
 
 # Other
 [[bans.skip]]
 name = "nix"
+[[bans.skip]]
+name = "libredox"
 [[bans.skip]]
 name = "redox_syscall"
 
