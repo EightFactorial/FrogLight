@@ -1,0 +1,17 @@
+
+# --- Version Configuration --- #
+
+[[versions]]
+version = "1.20.0"
+jar_version = "1.20.1"
+protocol = 763
+
+[[versions]]
+version = "1.20.2"
+jar_version = "1.20.2"
+protocol = 764
+
+[[versions]]
+version = "1.20.3"
+jar_version = "1.20.4"
+protocol = 765
