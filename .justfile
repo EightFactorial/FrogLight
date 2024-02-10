@@ -66,8 +66,8 @@ fmt:
   cargo fmt --all
 
 # Run `just` in `tools/`
-tools args="": (fetch-tools)
-  @just --justfile tools/.justfile {{args}}
+tools arg0="" arg1="" arg2="" arg3="" arg4="": (fetch-tools)
+  @just --justfile tools/.justfile {{arg0}} {{arg1}} {{arg2}} {{arg3}} {{arg4}}
 
 # Generate froglight-client graphs
 graph:
