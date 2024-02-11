@@ -9,7 +9,7 @@ use bevy_reflect::Reflect;
 /// This is the initial state of a connection,
 /// where the client sends a handshake packet to the server.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
-pub struct Handshake;
+pub struct Handshaking;
 
 /// The Status state
 ///
@@ -31,9 +31,9 @@ pub struct Login;
 /// exchange configuration information.
 pub struct Configuration;
 
-/// The Game state
+/// The Play state
 ///
 /// This is the state where the client is connected
 /// to the server and the game is running.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
-pub struct Game;
+pub struct Play;
