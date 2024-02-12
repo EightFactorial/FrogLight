@@ -71,7 +71,7 @@ serde_json = "1.0.113"
 simdnbt = "0.4.0"
 smallvec = "1.13.1"
 strum = "0.26.1"
-thiserror = "1.0.56"
+thiserror = "1.0.57"
 uuid = "1.7.0"
 
 # --- Build Settings ---
