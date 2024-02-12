@@ -1,0 +1,4 @@
+[default.extend-words]
+# Fix modules starting with 'entitys2c'
+# being split into 'entitys' and '2c'
+entitys = "entitys"
