@@ -27,11 +27,15 @@ impl ResourcePackPlugin {
 
     /// Adds a processing condition to the plugin.
     ///
-    /// Prevents the plugin from finishing until the condition is met.
+    /// Prevents the plugin from considering [`ResourcePack`]s done
+    /// processing until all conditions are met.
     pub fn add_condition<M>(&self, condition: impl Condition<M>) {
         self.conditions.lock().push(Self::new_condition(condition));
     }
 
+    /// Creates a new [`BoxedCondition`] from the given condition.
+    ///
+    /// Copied from `bevy_ecs::schedule::config::new_condition`.
     fn new_condition<M>(condition: impl Condition<M>) -> BoxedCondition {
         let condition_system = IntoSystem::into_system(condition);
         assert!(
@@ -42,10 +46,6 @@ impl ResourcePackPlugin {
 
         Box::new(condition_system)
     }
-}
-
-impl From<ResourcePackManager> for ResourcePackPlugin {
-    fn from(manager: ResourcePackManager) -> Self { Self::new_from(manager) }
 }
 
 impl Plugin for ResourcePackPlugin {
@@ -75,5 +75,18 @@ impl Plugin for ResourcePackPlugin {
     fn finish(&self, app: &mut App) {
         // Finish the ResourcePackState
         crate::schedule::finish(self, app);
+    }
+}
+
+impl From<ResourcePackManager> for ResourcePackPlugin {
+    fn from(manager: ResourcePackManager) -> Self { Self::new_from(manager) }
+}
+
+impl std::fmt::Debug for ResourcePackPlugin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ResourcePackPlugin")
+            .field("manager", &self.manager)
+            .field("conditions", &self.conditions.lock().len())
+            .finish()
     }
 }
