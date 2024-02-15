@@ -40,3 +40,6 @@ pub use froglight_world::WorldPlugin;
 
 mod groups;
 pub use groups::{app::AppPlugins, client::ClientPlugins};
+
+mod pack_loader;
+pub use pack_loader::ResourcePackLoaderPlugin;

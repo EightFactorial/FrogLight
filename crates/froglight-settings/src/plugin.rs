@@ -123,6 +123,9 @@ impl Plugin for SettingsPlugin {
 
         // Register the asset source
         crate::source::build(app);
+
+        // Initialize the Settings structs
+        crate::settings::build(app);
     }
 }
 

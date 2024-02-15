@@ -1,6 +1,9 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+mod tracker;
+pub use tracker::ResourcePackTracker;
+
 mod loader;
 pub use loader::ResourcePackLoader;
 

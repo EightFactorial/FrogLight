@@ -10,7 +10,7 @@ use froglight_loading::LoadingPlugin;
 use froglight_resourcepack::ResourcePackPlugin;
 use froglight_settings::SettingsPlugin;
 
-use crate::plugins::ClientPlugins;
+use crate::plugins::{ClientPlugins, ResourcePackLoaderPlugin};
 
 /// A [`PluginGroup`] that includes both [`FrogLight`](crate) plugins and
 /// [`bevy's`](bevy) [`DefaultPlugins`](bevy::DefaultPlugins).
@@ -33,6 +33,7 @@ use crate::plugins::ClientPlugins;
 /// - [`LoadingPlugin`] # Enabled by the `default-loading` feature
 /// - [`DebugPlugin`]
 /// - `WorldInspectorPlugin` # Enabled by the `inspector` feature
+/// - [`ResourcePackLoaderPlugin`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AppPlugins;
 
@@ -58,7 +59,8 @@ impl PluginGroup for AppPlugins {
             .add_before::<AssetPlugin, SettingsPlugin>(SettingsPlugin::default())
             // Add plugins
             .add(InterfacePlugin)
-            .add(ResourcePackPlugin::new());
+            .add(ResourcePackPlugin::new())
+            .add(ResourcePackLoaderPlugin);
 
         // Add LoadingPlugin if the `default-loading` feature is enabled
         #[cfg(feature = "default-loading")]

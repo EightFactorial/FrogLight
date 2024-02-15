@@ -122,6 +122,8 @@ name = "nix"
 name = "libredox"
 [[bans.skip]]
 name = "redox_syscall"
+[[bans.skip]]
+name = "winnow"
 
 # Windows
 [[bans.skip]]

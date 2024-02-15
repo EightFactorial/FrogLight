@@ -5,5 +5,6 @@ mod plugin;
 pub use plugin::{SettingsPlugin, SettingsSource};
 
 mod settings;
+pub use settings::ResourcePackSettings;
 
 mod source;

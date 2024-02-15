@@ -154,7 +154,7 @@ impl AssetLoader for ResourcePackLoader {
                     // Load the file
                     load_file(
                         &mut pack,
-                        namespace,
+                        filename,
                         resource_key,
                         &mut entry,
                         load_context,
@@ -175,14 +175,14 @@ impl AssetLoader for ResourcePackLoader {
 /// Load a file from the resource pack.
 async fn load_file(
     pack: &mut ResourcePack,
-    namespace: &str,
+    filename: &str,
     resource_key: ResourceKey,
     entry: &mut ZipEntryReader<'_, futures_lite::io::Cursor<&[u8]>, WithEntry<'_>>,
     load_context: &mut LoadContext<'_>,
     settings: &ResourcePackLoaderSettings,
 ) -> Result<(), ResourcePackLoaderError> {
     #[allow(clippy::match_same_arms)]
-    match namespace {
+    match filename.split('/').next().unwrap() {
         "blockstates" => {
             // TODO: Parse and load blockstates
         }
@@ -199,24 +199,36 @@ async fn load_file(
             // TODO: Parse and load particles
         }
         "sounds" => {
-            // Load the audio
-            if let Some(handle) =
-                audio::load_audio(&resource_key, entry, load_context, settings).await?
-            {
-                // Insert the audio into the resource pack
-                pack.audio.insert(resource_key, handle);
+            trace!("Loading file `{resource_key}` from `{}`", load_context.path().display());
+
+            if filename.ends_with(".mcmeta") {
+                // TODO: Handle mcmeta files
+            } else {
+                // Load the audio
+                if let Some(handle) =
+                    audio::load_audio(&resource_key, entry, load_context, settings).await?
+                {
+                    // Insert the audio into the resource pack
+                    pack.audio.insert(resource_key, handle);
+                }
             }
         }
         "texts" => {
             // TODO: Load text files
         }
         "textures" => {
-            // Load the texture
-            if let Some(handle) =
-                textures::load_texture(&resource_key, entry, load_context, settings).await?
-            {
-                // Insert the texture into the resource pack
-                pack.textures.insert(resource_key, handle);
+            trace!("Loading file `{resource_key}` from `{}`", load_context.path().display());
+
+            if filename.ends_with(".mcmeta") {
+                // TODO: Handle mcmeta files
+            } else {
+                // Load the texture
+                if let Some(handle) =
+                    textures::load_texture(&resource_key, entry, load_context, settings).await?
+                {
+                    // Insert the texture into the resource pack
+                    pack.textures.insert(resource_key, handle);
+                }
             }
         }
         _ => {}

@@ -18,7 +18,7 @@ pub(super) async fn load_texture(
         let textures = manager.texture_assets.read();
         if textures.contains_key(resource_key) {
             #[cfg(feature = "logging")]
-            trace!(
+            debug!(
                 "Skipping `{resource_key}` from `{}` as it already exists",
                 load_context.path().display()
             );
@@ -31,17 +31,24 @@ pub(super) async fn load_texture(
     entry.read_to_end(&mut data).await?;
 
     // Decode the image.
-    let dyn_img = ImageReader::new(std::io::Cursor::new(data)).with_guessed_format()?.decode()?;
-    let image = Image::from_dynamic(dyn_img, false);
+    if let Ok(dyn_img) =
+        ImageReader::new(std::io::Cursor::new(data)).with_guessed_format()?.decode()
+    {
+        let image = Image::from_dynamic(dyn_img, false);
 
-    // Load the texture into the asset manager.
-    // Store the strong handle in the ResourcePackManager, and return a weak handle.
-    let handle = load_context.labeled_asset_scope(resource_key.to_string(), |_| image);
-    let weak = handle.clone_weak();
+        // Load the texture into the asset manager.
+        // Store the strong handle in the ResourcePackManager, and return a weak handle.
+        let handle = load_context.labeled_asset_scope(resource_key.to_string(), |_| image);
+        let weak = handle.clone_weak();
 
-    // Insert the texture into the texture assets if it doesn't exist.
-    let mut textures = manager.texture_assets.write();
-    textures.insert(resource_key.clone(), handle);
+        // Insert the texture into the texture assets if it doesn't exist.
+        let mut textures = manager.texture_assets.write();
+        textures.insert(resource_key.clone(), handle);
 
-    Ok(Some(weak))
+        Ok(Some(weak))
+    } else {
+        warn!("Unable to decode image `{resource_key}` from `{}`", load_context.path().display());
+
+        Ok(None)
+    }
 }

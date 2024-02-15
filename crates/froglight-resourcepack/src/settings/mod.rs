@@ -22,6 +22,14 @@ impl ResourcePackLoaderSettings {
     /// [`ResourcePackManager`]. Required for tracking assets.
     #[must_use]
     pub fn new(manager: ResourcePackManager) -> Self { Self(Some(manager)) }
+
+    /// Returns a function that is used for [`AssetServer::load_with_settings`]
+    pub fn settings_fn(&self) -> impl Fn(&mut Self) + Send + Sync + 'static {
+        let new = self.clone();
+        move |old: &mut ResourcePackLoaderSettings| {
+            *old = new.clone();
+        }
+    }
 }
 
 impl PartialEq for ResourcePackLoaderSettings {
