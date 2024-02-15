@@ -1,18 +1,21 @@
 use bevy::{asset::AssetPath, prelude::*};
-use froglight_core::{
-    events::{ResourcePackEndLoadingEvent, ResourcePackStartLoadingEvent},
-    systemsets::ResourcePackUpdateSet,
-};
 
-use crate::{ResourcePack, ResourcePackManager};
+use crate::{schedule::ResourcePackState, ResourcePack, ResourcePackManager};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    // Load the first resource pack when entering the `Loading` state
+    app.add_systems(
+        OnEnter(ResourcePackState::Loading),
+        ResourcePackTracker::load_next_pack_in_queue.in_set(ResourcePackState::Loading),
+    );
+
+    // Load the next resource pack when the current one is finished
     app.add_systems(
         Update,
         ResourcePackTracker::load_next_pack_in_queue
             .run_if(ResourcePackTracker::on_load_event)
-            .in_set(ResourcePackUpdateSet),
+            .in_set(ResourcePackState::Loading),
     );
 }
 
@@ -33,16 +36,9 @@ impl ResourcePackTracker {
         self.packs.push(path.into().to_string());
     }
 
-    /// If there is an [`Event`] to start loading, or if a resource pack
-    /// was just loaded, return [`true`]
-    fn on_load_event(
-        mut load_events: EventReader<ResourcePackStartLoadingEvent>,
-        mut asset_events: EventReader<AssetEvent<ResourcePack>>,
-    ) -> bool {
-        load_events.read().next().is_some()
-            || asset_events
-                .read()
-                .any(|event| matches!(event, AssetEvent::LoadedWithDependencies { .. }))
+    /// If there a resource pack was just loaded return [`true`]
+    fn on_load_event(mut events: EventReader<AssetEvent<ResourcePack>>) -> bool {
+        events.read().any(|event| matches!(event, AssetEvent::LoadedWithDependencies { .. }))
     }
 
     /// Load the next [`ResourcePack`] in the [queue](Self::packs)
@@ -54,7 +50,7 @@ impl ResourcePackTracker {
         mut manager: ResMut<ResourcePackManager>,
         mut tracker: ResMut<Self>,
 
-        mut events: EventWriter<ResourcePackEndLoadingEvent>,
+        mut state: ResMut<NextState<ResourcePackState>>,
     ) {
         if tracker.index < tracker.packs.len() {
             // Load the next resource pack
@@ -67,10 +63,9 @@ impl ResourcePackTracker {
             manager.handles.push(handle);
             tracker.index += 1;
         } else {
-            debug!("Finished loading queued ResourcePacks");
-
-            // Send the end loading event
-            events.send(ResourcePackEndLoadingEvent);
+            // Enter the `Processing` state
+            debug!("Entering ResourcePackState::Processing");
+            state.set(ResourcePackState::Processing);
         }
     }
 }

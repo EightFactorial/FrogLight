@@ -56,12 +56,12 @@ pub(crate) struct LoadingScreenEnableSystems(pub(crate) bool);
 
 impl LoadingScreenEnableSystems {
     pub(crate) fn enable_fade_systems(mut state: ResMut<Self>) {
-        debug!("Enabling fade systems...");
+        debug!("Enabling LoadingFade systems");
         state.0 = true;
     }
 
     pub(crate) fn disable_fade_systems(mut state: ResMut<Self>) {
-        debug!("Disabling fade systems...");
+        debug!("Disabling LoadingFade systems");
         state.0 = false;
     }
 }

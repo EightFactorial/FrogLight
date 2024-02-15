@@ -15,7 +15,7 @@ impl LoadingArt {
     pub(super) fn build_loading_icon(world: &mut World, parent: Entity) {
         // Get the path to the art asset
         let Some(art_asset) = world.get_resource::<LoadingPluginArtPath>() else {
-            debug!("No art asset path found, skipping loading art");
+            debug!("No LoadingPluginArtPath, skipping loading art");
             return;
         };
 

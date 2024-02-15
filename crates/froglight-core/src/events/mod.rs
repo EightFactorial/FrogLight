@@ -3,9 +3,7 @@
 use bevy::prelude::*;
 
 mod resourcepack;
-pub use resourcepack::{
-    ResourcePackEndLoadingEvent, ResourcePackFinishLoadingEvent, ResourcePackStartLoadingEvent,
-};
+pub use resourcepack::{ResourcePackFinishedLoadingEvent, ResourcePackStartLoadingEvent};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) { resourcepack::build(app); }

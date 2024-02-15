@@ -11,7 +11,10 @@ use froglight_client::plugins::AppPlugins;
 
 fn main() {
     let mut app = App::new();
+
+    // Add and finish the plugins
     app.add_plugins(AppPlugins.build().disable::<LogPlugin>());
+    app.finish();
 
     save_graph("schedule_startup", Startup, &mut app);
     save_graph("schedule_poststartup", PostStartup, &mut app);

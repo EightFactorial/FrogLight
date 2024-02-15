@@ -1,7 +1,7 @@
 use bevy::{asset::ReflectAsset, prelude::*, utils::HashMap};
-
-pub mod meta;
 use froglight_core::data::ResourceKey;
+
+pub(crate) mod meta;
 use meta::PackMcMeta;
 
 /// A resource pack.

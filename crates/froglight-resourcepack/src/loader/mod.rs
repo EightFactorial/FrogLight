@@ -10,11 +10,7 @@ use futures_lite::AsyncReadExt;
 use image::io::Reader as ImageReader;
 use thiserror::Error;
 
-use crate::{
-    meta::PackMcMeta,
-    resourcepack::ResourcePack,
-    settings::{ResourcePackAudioSettings, ResourcePackLoaderSettings},
-};
+use crate::{PackMcMeta, ResourcePack, ResourcePackAudioSettings, ResourcePackLoaderSettings};
 
 mod audio;
 mod textures;

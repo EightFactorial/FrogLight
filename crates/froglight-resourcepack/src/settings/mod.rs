@@ -4,7 +4,7 @@
 use bevy::prelude::*;
 use serde::{de::Visitor, Deserialize, Serialize};
 
-use crate::manager::ResourcePackManager;
+use crate::ResourcePackManager;
 
 mod audio;
 pub use audio::ResourcePackAudioSettings;

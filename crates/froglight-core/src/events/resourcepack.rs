@@ -3,23 +3,16 @@ use bevy::prelude::*;
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     app.register_type::<ResourcePackStartLoadingEvent>()
-        .register_type::<ResourcePackEndLoadingEvent>()
-        .register_type::<ResourcePackFinishLoadingEvent>();
+        .add_event::<ResourcePackStartLoadingEvent>();
 
-    app.add_event::<ResourcePackStartLoadingEvent>()
-        .add_event::<ResourcePackEndLoadingEvent>()
-        .add_event::<ResourcePackFinishLoadingEvent>();
+    app.register_type::<ResourcePackFinishedLoadingEvent>()
+        .add_event::<ResourcePackFinishedLoadingEvent>();
 }
 
-/// An [`Event`]that is fired when resource packs start loading.
+/// An [`Event`] that when sent triggers resource packs to start loading.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Event, Reflect)]
 pub struct ResourcePackStartLoadingEvent;
 
-/// An [`Event`] that is fired when all resource packs have finished loading,
-/// but before they have finished processing.
+/// An [`Event`] that is sent when all resource packs are finished loading.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Event, Reflect)]
-pub struct ResourcePackEndLoadingEvent;
-
-/// An [`Event`] that is fired when all resource packs have finished processing.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Event, Reflect)]
-pub struct ResourcePackFinishLoadingEvent;
+pub struct ResourcePackFinishedLoadingEvent;

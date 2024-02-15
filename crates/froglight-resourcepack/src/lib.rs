@@ -13,7 +13,14 @@ pub use manager::ResourcePackManager;
 mod plugin;
 pub use plugin::ResourcePackPlugin;
 
-pub mod settings;
-
 mod resourcepack;
-pub use resourcepack::{meta, ResourcePack};
+pub use resourcepack::{
+    meta::{AssetMcMeta, PackMcMeta},
+    ResourcePack,
+};
+
+mod schedule;
+pub use schedule::ResourcePackState;
+
+mod settings;
+pub use settings::{ResourcePackAudioSettings, ResourcePackLoaderSettings};
