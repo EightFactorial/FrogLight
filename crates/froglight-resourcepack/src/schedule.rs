@@ -10,7 +10,7 @@ use crate::ResourcePackPlugin;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.register_type::<ResourcePackState>().add_state::<ResourcePackState>();
+    app.register_type::<ResourcePackState>().init_state::<ResourcePackState>();
 
     app.configure_sets(
         Update,

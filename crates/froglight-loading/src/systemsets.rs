@@ -31,7 +31,7 @@ pub(super) fn setup(app: &mut App) {
         Update,
         LoadingScreenEnableSystems::enable_fade_systems
             .run_if(resource_exists_and_equals(LoadingScreenEnable(true)))
-            .run_if(resource_exists_and_changed::<LoadingScreenEnable>())
+            .run_if(resource_exists_and_changed::<LoadingScreenEnable>)
             .before(LoadingScreenToggleSet)
             .in_set(LoadingScreenUpdateSet),
     );

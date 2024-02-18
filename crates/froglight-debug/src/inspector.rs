@@ -17,9 +17,9 @@ impl InspectorEnable {
     }
 
     /// Toggle the Bevy World Inspector using the `F3` + `I` key combination.
-    fn toggle_inspector(input: Res<Input<KeyCode>>, mut res: ResMut<Self>) {
-        if (input.just_pressed(KeyCode::F3) && input.pressed(KeyCode::I))
-            || (input.pressed(KeyCode::F3) && input.just_pressed(KeyCode::I))
+    fn toggle_inspector(input: Res<ButtonInput<KeyCode>>, mut res: ResMut<Self>) {
+        if input.any_just_pressed([KeyCode::F3, KeyCode::KeyI])
+            && input.all_pressed([KeyCode::F3, KeyCode::KeyI])
         {
             res.toggle();
         }

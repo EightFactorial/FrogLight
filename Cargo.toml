@@ -52,10 +52,8 @@ pedantic = "warn"
 unnecessary_cast = "warn"
 
 [workspace.dependencies]
-bevy = "0.12.1"
-bevy_xpbd_3d = "0.3.3"
+bevy = "0.13.0"
 bitvec = "1.0.1"
-big_space = "0.4.0"
 bytemuck = "1.14.3"
 compact_str = "0.7.1"
 criterion = "0.5.1"

@@ -30,6 +30,7 @@
 pub use froglight_debug::DebugPlugin;
 #[cfg(feature = "inspector")]
 pub use froglight_debug::WorldInspectorPlugin;
+pub use froglight_interface::{InterfacePlugin, UiScalePlugin};
 #[cfg(feature = "default-loading")]
 pub use froglight_loading::LoadingPlugin;
 pub use froglight_resourcepack::ResourcePackPlugin;

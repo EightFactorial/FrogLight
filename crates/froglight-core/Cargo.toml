@@ -17,6 +17,5 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-big_space = { workspace = true }
 derive_more = { workspace = true }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }

@@ -15,12 +15,12 @@ pub(super) fn setup(app: &mut App) {
         Update,
         (
             FadeTimer::insert_fade_in_timer
-                .run_if(resource_exists_and_changed::<LoadingScreenEnableSystems>())
+                .run_if(resource_exists_and_changed::<LoadingScreenEnableSystems>)
                 .run_if(resource_exists_and_equals(LoadingScreenEnableSystems(true)))
-                .run_if(not(resource_added::<LoadingScreenEnableSystems>()))
-                .run_if(not(resource_exists::<FadeTimer>())),
+                .run_if(not(resource_added::<LoadingScreenEnableSystems>))
+                .run_if(not(resource_exists::<FadeTimer>)),
             FadeAnimationMarker::fade_in
-                .run_if(resource_exists::<FadeTimer>().and_then(FadeTimer::is_fade_in)),
+                .run_if(resource_exists::<FadeTimer>.and_then(FadeTimer::is_fade_in)),
         )
             .chain()
             .in_set(LoadingScreenFadeInSet),
@@ -33,9 +33,9 @@ pub(super) fn setup(app: &mut App) {
             FadeTimer::insert_fade_out_timer
                 .run_if(LoadingScreenRoot::is_visible)
                 .run_if(ProgressBarProgress::bar_finished)
-                .run_if(not(resource_exists::<FadeTimer>())),
+                .run_if(not(resource_exists::<FadeTimer>)),
             FadeAnimationMarker::fade_out
-                .run_if(resource_exists::<FadeTimer>().and_then(FadeTimer::is_fade_out)),
+                .run_if(resource_exists::<FadeTimer>.and_then(FadeTimer::is_fade_out)),
         )
             .chain()
             .in_set(LoadingScreenFadeOutSet),
@@ -60,7 +60,7 @@ impl FadeAnimationMarker {
     ) {
         if timer.finished() {
             return;
-        } else if timer.percent() < 0.1 {
+        } else if timer.fraction() < 0.1 {
             // Show the loading screen
             for mut visibility in &mut root_query {
                 *visibility = Visibility::Visible;
@@ -81,7 +81,7 @@ impl FadeAnimationMarker {
             debug!("Fade-in timer deleted");
         } else {
             // Get the opacity from the timer progress
-            let progress = timer.percent();
+            let progress = timer.fraction();
 
             // Set the opacity of all background colors
             for mut color in &mut query {
@@ -121,7 +121,7 @@ impl FadeAnimationMarker {
             debug!("Fade-out timer deleted");
         } else {
             // Get the opacity from the timer progress
-            let progress = timer.percent_left();
+            let progress = timer.fraction_remaining();
 
             // Set the opacity of all background colors
             for mut color in &mut query {

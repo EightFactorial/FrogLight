@@ -1,5 +1,9 @@
 use async_zip::base::read::{WithEntry, ZipEntryReader};
-use bevy::{asset::LoadContext, prelude::*, render::texture::Image};
+use bevy::{
+    asset::LoadContext,
+    prelude::*,
+    render::{render_asset::RenderAssetUsages, texture::Image},
+};
 use froglight_core::data::ResourceKey;
 use futures_lite::AsyncReadExt;
 use image::io::Reader as ImageReader;
@@ -34,7 +38,7 @@ pub(super) async fn load_texture(
     if let Ok(dyn_img) =
         ImageReader::new(std::io::Cursor::new(data)).with_guessed_format()?.decode()
     {
-        let image = Image::from_dynamic(dyn_img, false);
+        let image = Image::from_dynamic(dyn_img, false, RenderAssetUsages::all());
 
         // Load the texture into the asset manager.
         // Store the strong handle in the ResourcePackManager, and return a weak handle.

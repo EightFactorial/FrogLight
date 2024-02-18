@@ -24,9 +24,8 @@ pub(super) fn setup(app: &mut App) {
         Startup,
         (
             LoadingScreenRoot::build_loading_screen
-                .run_if(not(any_with_component::<LoadingScreenRoot>())),
-            LoadingScreenRoot::create_camera2d_if_none
-                .run_if(not(any_with_component::<Camera2d>())),
+                .run_if(not(any_with_component::<LoadingScreenRoot>)),
+            LoadingScreenRoot::create_camera2d_if_none.run_if(not(any_with_component::<Camera2d>)),
         )
             .chain()
             .in_set(LoadingScreenStartupSet),

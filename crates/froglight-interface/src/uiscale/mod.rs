@@ -20,6 +20,9 @@ pub struct UiScalePlugin;
 
 impl Plugin for UiScalePlugin {
     fn build(&self, app: &mut App) {
+        // Register the `UiScale` resource
+        app.register_type_data::<UiScale, ReflectResource>();
+
         // Add and register the `UiScaleEnable` resource
         app.init_resource::<UiScaleEnable>().register_type::<UiScaleEnable>();
 
@@ -81,6 +84,7 @@ impl UiScalePlugin {
     }
 
     /// Update the [`UiScale`] based on the window size.
+    #[allow(clippy::cast_precision_loss)]
     fn update_scale(window: &Window, scale: &mut UiScale, scale_max: UiScaleMaximum) {
         // Calculate the new scale
         let mut value = Self::calculate(window.physical_width(), window.physical_height());
@@ -91,8 +95,8 @@ impl UiScalePlugin {
         }
 
         // Update the scale if it has changed
-        let value = f64::from(value);
-        if (**scale - value).abs() > f64::EPSILON {
+        let value = value as f32;
+        if (**scale - value).abs() > f32::EPSILON {
             debug!("Setting UIScale to: `{value}`");
             **scale = value;
         }

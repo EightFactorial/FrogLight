@@ -3,6 +3,7 @@ use bevy::{
     asset::{AssetLoader, LoadContext},
     log::warn,
     prelude::*,
+    render::render_asset::RenderAssetUsages,
     utils::BoxedFuture,
 };
 use froglight_core::data::ResourceKey;
@@ -109,7 +110,7 @@ impl AssetLoader for ResourcePackLoader {
                         let dyn_img = ImageReader::new(std::io::Cursor::new(bytes))
                             .with_guessed_format()?
                             .decode()?;
-                        let image = Image::from_dynamic(dyn_img, false);
+                        let image = Image::from_dynamic(dyn_img, false, RenderAssetUsages::all());
 
                         // Set the pack icon
                         pack.icon = Some(

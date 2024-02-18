@@ -11,8 +11,8 @@ pub(super) fn setup(app: &mut App) {
     app.add_systems(
         Update,
         ProgressBarProgress::update_current_progress
-            .run_if(any_with_component::<ProgressBarProgress>())
-            .run_if(not(resource_exists::<FadeTimer>()))
+            .run_if(any_with_component::<ProgressBarProgress>)
+            .run_if(not(resource_exists::<FadeTimer>))
             .after(LoadingScreenFadeInSet)
             .before(LoadingScreenFadeOutSet)
             .in_set(LoadingScreenToggleSet),
