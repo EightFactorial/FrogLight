@@ -3,18 +3,16 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/froglight-assets",
     "crates/froglight-client",
     "crates/froglight-core",
     "crates/froglight-entities",
     "crates/froglight-interface",
-    "crates/froglight-loading",
     "crates/froglight-macros",
     "crates/froglight-network",
     "crates/froglight-physics",
     "crates/froglight-protocol",
     "crates/froglight-render",
-    "crates/froglight-resourcepack",
-    "crates/froglight-settings",
     "crates/froglight-world",
 ]
 
@@ -80,14 +78,12 @@ opt-level = 1
 
 [profile.dev.package]
 # Slightly optimize the some of the froglight packages
+froglight-assets = { opt-level = 1 }
 froglight-client = { opt-level = 1 }
 froglight-core = { opt-level = 1 }
 froglight-entities = { opt-level = 1 }
 froglight-interface = { opt-level = 1 }
-froglight-loading = { opt-level = 1 }
 froglight-macros = { opt-level = 1 }
-froglight-resourcepack = { opt-level = 1 }
-froglight-settings = { opt-level = 1 }
 # Fully optimize dependencies
 "*" = { opt-level = 3 }
 
@@ -123,22 +119,3 @@ default = ["mimalloc"]
 
 # Use mimalloc as the global allocator
 mimalloc = ["dep:mimalloc"]
-
-# Enable Wayland support
-# Only used in Linux builds
-wayland = ["bevy/wayland"]
-
-# Enables extra debug logs
-# Enables logging in release builds
-logging = ["froglight-client/logging"]
-
-# Enables the egui inspector
-inspector = ["froglight-client/inspector"]
-
-# --- FrogLight Examples ---
-
-[[example]]
-name = "loading_art"
-
-[[example]]
-name = "loading_gif"

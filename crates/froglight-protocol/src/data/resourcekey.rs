@@ -33,14 +33,19 @@ use crate::io::{FrogRead, FrogWrite};
 // Can't reflect on remote types :(
 pub struct ResourceKey(#[reflect(ignore)] CompactString);
 
+/// An error that occurred while creating a [`ResourceKey`]
 #[derive(Debug, Error)]
 pub enum ResourceKeyError {
+    /// ResourceKey is empty
     #[error("ResourceKey is empty")]
     Empty,
+    /// ResourceKey starts with a colon
     #[error("ResourceKey `{0}` starts with a colon")]
     LeadingColon(CompactString),
+    /// ResourceKey ends with a colon
     #[error("ResourceKey `{0}` ends with a colon")]
     TrailingColon(CompactString),
+    /// ResourceKey contains multiple colons
     #[error("ResourceKey `{0}` contains {1} colons")]
     MultipleColons(CompactString, usize),
 }

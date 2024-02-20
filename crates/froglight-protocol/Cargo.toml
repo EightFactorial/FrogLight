@@ -46,6 +46,3 @@ uuid = { workspace = true, features = ["serde"] }
 
 [features]
 default = []
-
-# Enable debug logging
-logging = ["dep:bevy_log"]

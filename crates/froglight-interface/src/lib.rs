@@ -3,10 +3,7 @@
 
 pub mod default_camera;
 
-mod plugin;
-pub use plugin::InterfacePlugin;
+pub mod menus;
+pub mod plugins;
 
-mod systemsets;
-
-mod uiscale;
-pub use uiscale::*;
+mod systemset;

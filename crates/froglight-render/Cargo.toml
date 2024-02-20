@@ -17,7 +17,6 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
+froglight-assets = { version = "0.1.0", path = "../froglight-assets" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
-froglight-resourcepack = { version = "0.1.0", path = "../froglight-resourcepack" }
-froglight-settings = { version = "0.1.0", path = "../froglight-settings" }

@@ -15,7 +15,7 @@ build-release: (build-profile "release")
 # Compile build with specified profile
 [private]
 build-profile profile="dev" args="":
-  cargo build --profile {{profile}} --features logging,inspector {{args}}
+  cargo build --profile {{profile}} {{args}}
 
 # ---- Run Recipes ----
 
@@ -29,12 +29,12 @@ run-release: (run-profile "release")
 # Run build with specified profile
 [private]
 run-profile profile="dev" args="":
-  cargo run --profile {{profile}} --features logging,inspector {{args}}
+  cargo run --profile {{profile}} {{args}}
 
 # ---- Test Recipes ----
 
 # Run all tests and all tool tests
-all-tests: (update) (deny) (fmt) (test) (graph) (tools "all-tests")
+all-tests: (update) (deny) (fmt) (test) (tools "all-tests")
 
 # Run all tests and doc-tests
 test: (nextest) (doc-test) 
@@ -71,7 +71,7 @@ tools arg0="" arg1="" arg2="" arg3="" arg4="": (fetch-tools)
 
 # Generate froglight-client graphs
 graph:
-  cargo run --package=froglight-client --example=system-graph --features default,logging,inspector
+  cargo run --package=froglight-client --example=system-graph --features default,logging
 
 # ---- Fetch Recipes ----
 

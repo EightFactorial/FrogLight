@@ -1,0 +1,42 @@
+[package]
+name = "froglight-assets"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy = { workspace = true }
+froglight-core = { version = "0.1.0", path = "../froglight-core" }
+
+# AssetSource dependencies
+dirs = "5.0.1"
+
+# AssetManager dependencies
+parking_lot = { workspace = true, optional = true }
+
+# ResourcePack dependencies
+async_zip = { version = "0.0.16", features = ["deflate"] }
+futures-lite = { workspace = true }
+image = { workspace = true, features = ["jpeg", "png"] }
+thiserror = { workspace = true }
+
+# Settings dependencies
+serde = { workspace = true, features = ["derive"] }
+toml = "0.8.10"
+
+[features]
+default = ["asset_manager"]
+
+# Enables the `AssetManager` resource for managing assets
+asset_manager = ["dep:parking_lot"]

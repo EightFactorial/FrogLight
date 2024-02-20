@@ -2,14 +2,14 @@
 
 use bevy::prelude::*;
 
-mod loading;
-pub use loading::LoadingScreenUpdateSet;
+mod interface;
+pub use interface::{InterfacePostUpdateSet, InterfacePreUpdateSet, InterfaceUpdateSet};
 
-mod resourcepack;
-pub use resourcepack::ResourcePackUpdateSet;
+mod assets;
+pub use assets::{AssetPostUpdateSet, AssetPreStartupSet, AssetStartupSet, AssetUpdateSet};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    loading::build(app);
-    resourcepack::build(app);
+    interface::build(app);
+    assets::build(app);
 }
