@@ -34,7 +34,7 @@ run-profile profile="dev" args="":
 # ---- Test Recipes ----
 
 # Run all tests and all tool tests
-all-tests: (update) (deny) (fmt) (test) (tools "all-tests")
+all-tests: (update) (deny) (fmt) (test) (tools "all-tests") (graph)
 
 # Run all tests and doc-tests
 test: (nextest) (doc-test) 
@@ -71,7 +71,7 @@ tools arg0="" arg1="" arg2="" arg3="" arg4="": (fetch-tools)
 
 # Generate froglight-client graphs
 graph:
-  cargo run --package=froglight-client --example=system-graph --features default,logging
+  cargo run --package=froglight-client --example=system-graph --features default
 
 # ---- Fetch Recipes ----
 

@@ -4,3 +4,4 @@
 //! graphics, audio, and controls.
 
 pub(crate) mod plugin;
+pub(crate) mod systemset;

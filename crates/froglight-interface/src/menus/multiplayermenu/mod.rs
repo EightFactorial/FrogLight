@@ -4,3 +4,4 @@
 //! player can join a multiplayer game.
 
 pub(crate) mod plugin;
+pub(crate) mod systemset;

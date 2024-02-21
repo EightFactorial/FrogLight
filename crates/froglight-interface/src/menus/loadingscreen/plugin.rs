@@ -5,5 +5,9 @@ use bevy::prelude::*;
 pub struct InterfaceLoadingScreenPlugin;
 
 impl Plugin for InterfaceLoadingScreenPlugin {
-    fn build(&self, app: &mut App) { crate::systemset::build(app); }
+    fn build(&self, app: &mut App) {
+        // Build `SystemSet`s
+        crate::menus::build(app);
+        super::systemset::build(app);
+    }
 }

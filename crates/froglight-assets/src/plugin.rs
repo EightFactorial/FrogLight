@@ -13,12 +13,12 @@ pub use crate::{
 
 /// A [`PluginGroup`] for asset related plugins.
 ///
-/// Can be used to add all asset related plugins to an [`App`].
+/// Can be used to add most asset related plugins to an [`App`].
 ///
 /// ---
 ///
-/// The default directory is based on the current platform and
-/// environment variables, with the folder name [`Self::DEFAULT_FOLDER`].
+/// Does not include the [`AssetSourcePlugin`], as it requires being added
+/// before bevy's [`AssetPlugin`].
 #[derive(Default, Clone)]
 pub struct AssetPlugins {
     pub(crate) conditions: Arc<Mutex<Vec<BoxedCondition>>>,

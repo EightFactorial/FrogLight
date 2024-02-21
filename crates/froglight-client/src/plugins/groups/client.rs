@@ -13,3 +13,6 @@ impl PluginGroup for ClientPlugins {
         PluginGroupBuilder::start::<Self>().add(CorePlugin).add(PhysicsPlugin)
     }
 }
+
+#[test]
+fn client_build() { ClientPlugins.build(); }

@@ -5,5 +5,3 @@ pub mod default_camera;
 
 pub mod menus;
 pub mod plugins;
-
-mod systemset;

@@ -5,5 +5,9 @@ use bevy::prelude::*;
 pub struct InterfaceSettingsMenuPlugin;
 
 impl Plugin for InterfaceSettingsMenuPlugin {
-    fn build(&self, app: &mut App) { crate::systemset::build(app); }
+    fn build(&self, app: &mut App) {
+        // Add `SystemSet`s
+        crate::menus::build(app);
+        super::systemset::build(app);
+    }
 }

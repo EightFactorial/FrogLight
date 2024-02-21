@@ -3,7 +3,6 @@ use froglight_core::{events::ResourcePackStartLoadingEvent, systemsets::AssetSta
 use serde::{Deserialize, Serialize};
 
 use super::ConfigFile;
-use crate::AssetTracker;
 
 /// A list of paths to [`ResourcePack`]s to load.
 #[derive(
@@ -50,7 +49,7 @@ impl ConfigFile for ResourcePackSettings {
 impl ResourcePackSettings {
     fn load_resourcepacks(
         res: Res<Self>,
-        mut tracker: ResMut<AssetTracker>,
+        mut tracker: ResMut<crate::AssetTracker>,
         mut events: EventWriter<ResourcePackStartLoadingEvent>,
     ) {
         debug!("Queuing {} ResourcePack(s)", res.resourcepacks.len());

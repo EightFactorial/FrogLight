@@ -22,3 +22,6 @@ impl PluginGroup for AppPlugins {
             .add(InterfacePlugins)
     }
 }
+
+#[test]
+fn app_build() { AppPlugins.build(); }

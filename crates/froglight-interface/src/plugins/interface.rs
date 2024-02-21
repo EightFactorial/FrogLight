@@ -1,6 +1,6 @@
 use bevy::{app::PluginGroupBuilder, prelude::*};
 
-use super::UiScalePlugin;
+use super::{InspectorPlugin, UiScalePlugin};
 use crate::menus::{
     InterfaceLoadingScreenPlugin, InterfaceMainMenuPlugin, InterfaceMultiplayerMenuPlugin,
     InterfaceSettingsMenuPlugin,
@@ -25,14 +25,12 @@ impl PluginGroup for InterfacePlugins {
             .add(InterfaceMainMenuPlugin)
             .add(InterfaceMultiplayerMenuPlugin)
             .add(InterfaceSettingsMenuPlugin)
+            .add(InspectorPlugin)
     }
 }
 
 impl Plugin for InterfacePlugins {
     fn build(&self, app: &mut App) {
-        // Add `SystemSet`s
-        crate::systemset::build(app);
-
         // Add `Self` as a plugin group
         <Self as PluginGroup>::build(Self).finish(app);
     }

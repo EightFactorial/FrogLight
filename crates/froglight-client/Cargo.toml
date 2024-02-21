@@ -17,7 +17,7 @@ workspace = true
 
 [dev-dependencies]
 # Needed for the system graph example
-# bevy_mod_debugdump = "0.9.0"
+bevy_mod_debugdump = "0.10.0"
 
 [dependencies]
 bevy = { workspace = true }
@@ -35,5 +35,5 @@ default = []
 
 # Creates system graphs, not an example
 # Useful for development
-# [[example]]
-# name = "system-graph"
+[[example]]
+name = "system-graph"

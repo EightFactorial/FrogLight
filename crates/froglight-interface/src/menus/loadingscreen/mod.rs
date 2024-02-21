@@ -3,3 +3,4 @@
 //! Appears while the game is starting up or reloading resource packs.
 
 pub(crate) mod plugin;
+pub(crate) mod systemset;

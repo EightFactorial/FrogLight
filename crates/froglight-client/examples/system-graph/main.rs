@@ -3,10 +3,10 @@
 //! Requires the `dot` command to be installed.
 
 use bevy::{ecs::schedule::ScheduleLabel, log::LogPlugin, prelude::*};
-// use bevy_mod_debugdump::{
-//     schedule_graph::{settings::Style, Settings},
-//     schedule_graph_dot,
-// };
+use bevy_mod_debugdump::{
+    schedule_graph::{settings::Style, Settings},
+    schedule_graph_dot,
+};
 use froglight_client::plugins::AppPlugins;
 
 fn main() {
@@ -16,6 +16,7 @@ fn main() {
     app.add_plugins(AppPlugins.build().disable::<LogPlugin>());
     app.finish();
 
+    save_graph("schedule_prestartup", PreStartup, &mut app);
     save_graph("schedule_startup", Startup, &mut app);
     save_graph("schedule_poststartup", PostStartup, &mut app);
 

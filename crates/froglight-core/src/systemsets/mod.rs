@@ -3,7 +3,9 @@
 use bevy::prelude::*;
 
 mod interface;
-pub use interface::{InterfacePostUpdateSet, InterfacePreUpdateSet, InterfaceUpdateSet};
+pub use interface::{
+    InterfacePostUpdateSet, InterfacePreUpdateSet, InterfaceStartupSet, InterfaceUpdateSet,
+};
 
 mod assets;
 pub use assets::{AssetPostUpdateSet, AssetPreStartupSet, AssetStartupSet, AssetUpdateSet};

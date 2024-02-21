@@ -11,7 +11,9 @@ pub use enable::UiScaleEnable;
 mod maximum;
 pub use maximum::UiScaleMaximum;
 
-use crate::systemset::{InterfaceStartupSet, InterfaceUpdateSet};
+use self::systemset::{UiScaleStartupSet, UiScaleUpdateSet};
+
+pub(crate) mod systemset;
 
 /// A [`Plugin`] for managing the [`UiScale`].
 ///
@@ -22,8 +24,8 @@ pub struct UiScalePlugin;
 
 impl Plugin for UiScalePlugin {
     fn build(&self, app: &mut App) {
-        // Add `SystemSet`s
-        crate::systemset::build(app);
+        // Add the `SystemSet`s
+        systemset::build(app);
 
         // Register the `UiScale` resource
         app.register_type_data::<UiScale, ReflectResource>();
@@ -37,25 +39,32 @@ impl Plugin for UiScalePlugin {
         // Add startup systems
         app.add_systems(
             Startup,
-            UiScalePlugin::set_scale_on_startup
-                .run_if(UiScaleEnable::is_enabled)
-                .in_set(InterfaceStartupSet),
+            UiScalePlugin::set_uiscale.run_if(UiScaleEnable::is_enabled).in_set(UiScaleStartupSet),
         );
 
         // Add update systems
         app.add_systems(
             Update,
-            UiScalePlugin::set_scale_on_resize
+            UiScalePlugin::set_uiscale
+                .ambiguous_with(UiScalePlugin::set_uiscale_on_resize)
+                .run_if(UiScaleEnable::is_enabled)
+                .run_if(resource_exists_and_changed::<UiScaleMaximum>)
+                .in_set(UiScaleUpdateSet),
+        );
+        app.add_systems(
+            Update,
+            UiScalePlugin::set_uiscale_on_resize
+                .ambiguous_with(UiScalePlugin::set_uiscale)
                 .run_if(on_event::<WindowResized>())
                 .run_if(UiScaleEnable::is_enabled)
-                .in_set(InterfaceUpdateSet),
+                .in_set(UiScaleUpdateSet),
         );
     }
 }
 
 impl UiScalePlugin {
-    /// Set the [`UiScale`] based on the window size when the window is created.
-    fn set_scale_on_startup(
+    /// Set the [`UiScale`] based on the window size.
+    fn set_uiscale(
         query: Query<&Window, With<PrimaryWindow>>,
         mut scale: ResMut<UiScale>,
         scale_max: Res<UiScaleMaximum>,
@@ -70,7 +79,7 @@ impl UiScalePlugin {
     }
 
     /// Set the [`UiScale`] based on the window size when the window is resized.
-    fn set_scale_on_resize(
+    fn set_uiscale_on_resize(
         query: Query<&Window, With<PrimaryWindow>>,
         mut scale: ResMut<UiScale>,
         scale_max: Res<UiScaleMaximum>,
