@@ -639,6 +639,25 @@
 </a>
 </g>
 </g>
+<!-- node_System(40) -->
+<g id="node37" class="node">
+<title>node_System(40)</title>
+<g id="a_node37"><a xlink:title="bevy_pbr::light::add_clusters">
+<polygon fill="#abd5fc" stroke="#48a3f8" points="3116.12,-826.98 3023.62,-826.98 3023.62,-790.98 3116.12,-790.98 3116.12,-826.98"/>
+<text text-anchor="middle" x="3069.88" y="-803.56" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#011a31">add_clusters</text>
+</a>
+</g>
+</g>
+<!-- node_System(6)&#45;&gt;node_System(40) -->
+<g id="edge62" class="edge">
+<title>node_System(6)&#45;&gt;node_System(40)</title>
+<path fill="none" stroke="#c93526" stroke-width="2" d="M2542.18,-643.27C2645.46,-637.02 2802.4,-634.87 2843.88,-674.98 2874.52,-704.62 2830.35,-837.29 2861.88,-865.98 2914.53,-913.91 3003.84,-858.59 3045.8,-827.41"/>
+<g id="a_edge62&#45;label"><a xlink:title="camera_system&lt;Projection&gt; — add_clusters">
+<polygon fill="#c6e6ff" stroke="none" points="2863.88,-885.98 2863.88,-906.48 2910.62,-906.48 2910.62,-885.98 2863.88,-885.98"/>
+<text text-anchor="start" x="2865.88" y="-891.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
+</a>
+</g>
+</g>
 <!-- node_System(7) -->
 <g id="node11" class="node">
 <title>node_System(7)</title>
@@ -649,12 +668,22 @@
 </g>
 </g>
 <!-- node_System(7)&#45;&gt;node_System(25) -->
-<g id="edge62" class="edge">
+<g id="edge63" class="edge">
 <title>node_System(7)&#45;&gt;node_System(25)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M2312.98,-690.05C2214.16,-687.06 2090.13,-690.33 2050.88,-721.98 2027.87,-740.53 2056.43,-768.14 2032.88,-785.98 2014.9,-799.6 2003.78,-792.28 1982.12,-785.98 1871.03,-753.68 1761.85,-663.25 1718.4,-624.26"/>
-<g id="a_edge62&#45;label"><a xlink:title="camera_system&lt;OrthographicProjection&gt; — ui_layout_system">
+<g id="a_edge63&#45;label"><a xlink:title="camera_system&lt;OrthographicProjection&gt; — ui_layout_system">
 <polygon fill="#c6e6ff" stroke="none" points="1984.12,-794.98 1984.12,-815.48 2030.88,-815.48 2030.88,-794.98 1984.12,-794.98"/>
 <text text-anchor="start" x="1986.12" y="-800.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
+</a>
+</g>
+</g>
+<!-- node_System(7)&#45;&gt;node_System(40) -->
+<g id="edge64" class="edge">
+<title>node_System(7)&#45;&gt;node_System(40)</title>
+<path fill="none" stroke="#c93526" stroke-width="2" d="M2581.8,-689.14C2681.18,-685.58 2805.96,-688.53 2843.88,-721.98 2876.42,-750.71 2828.47,-790.26 2861.88,-817.98 2906.58,-855.09 2977.26,-841.79 3023.35,-826.93"/>
+<g id="a_edge64&#45;label"><a xlink:title="camera_system&lt;OrthographicProjection&gt; — add_clusters">
+<polygon fill="#c6e6ff" stroke="none" points="2863.88,-840.98 2863.88,-861.48 2910.62,-861.48 2910.62,-840.98 2863.88,-840.98"/>
+<text text-anchor="start" x="2865.88" y="-846.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
 </a>
 </g>
 </g>
@@ -668,12 +697,22 @@
 </g>
 </g>
 <!-- node_System(8)&#45;&gt;node_System(25) -->
-<g id="edge63" class="edge">
+<g id="edge65" class="edge">
 <title>node_System(8)&#45;&gt;node_System(25)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M2317.09,-745.91C2239.33,-744.38 2138.71,-738.71 2050.88,-721.98 1936.43,-700.19 1807.79,-651.23 1742.24,-624.41"/>
-<g id="a_edge63&#45;label"><a xlink:title="camera_system&lt;PerspectiveProjection&gt; — ui_layout_system">
+<g id="a_edge65&#45;label"><a xlink:title="camera_system&lt;PerspectiveProjection&gt; — ui_layout_system">
 <polygon fill="#c6e6ff" stroke="none" points="1984.12,-719.98 1984.12,-740.48 2030.88,-740.48 2030.88,-719.98 1984.12,-719.98"/>
 <text text-anchor="start" x="1986.12" y="-725.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
+</a>
+</g>
+</g>
+<!-- node_System(8)&#45;&gt;node_System(40) -->
+<g id="edge66" class="edge">
+<title>node_System(8)&#45;&gt;node_System(40)</title>
+<path fill="none" stroke="#c93526" stroke-width="2" d="M2577.7,-758.32C2716.75,-772.67 2930.33,-794.7 3023.17,-804.27"/>
+<g id="a_edge66&#45;label"><a xlink:title="camera_system&lt;PerspectiveProjection&gt; — add_clusters">
+<polygon fill="#c6e6ff" stroke="none" points="2863.88,-792.98 2863.88,-813.48 2910.62,-813.48 2910.62,-792.98 2863.88,-792.98"/>
+<text text-anchor="start" x="2865.88" y="-798.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
 </a>
 </g>
 </g>
@@ -866,25 +905,6 @@
 </a>
 </g>
 </g>
-<!-- node_System(30) -->
-<g id="node72" class="node">
-<title>node_System(30)</title>
-<g id="a_node72"><a xlink:title="bevy_ui::texture_slice::compute_slices_on_asset_event">
-<polygon fill="lightgrey" stroke="black" points="1792.38,-327.98 1603.12,-327.98 1603.12,-291.98 1792.38,-291.98 1792.38,-327.98"/>
-<text text-anchor="middle" x="1697.75" y="-304.93" font-family="Times,serif" font-size="14.00">compute_slices_on_asset_event</text>
-</a>
-</g>
-</g>
-<!-- node_System(25)&#45;&gt;node_System(30) -->
-<g id="edge65" class="edge">
-<title>node_System(25)&#45;&gt;node_System(30)</title>
-<path fill="none" stroke="#c93526" stroke-width="2" d="M1636.82,-620.54C1575.84,-631.1 1483.76,-635.48 1431.38,-581.98 1321.29,-469.58 1402.68,-406.58 1419.44,-384.73 1461.68,-329.65 1539.89,-312.32 1602.67,-308"/>
-<g id="a_edge65&#45;label"><a xlink:title="ui_layout_system — compute_slices_on_asset_event">
-<polygon fill="#c6e6ff" stroke="none" points="1369.5,-386.73 1369.5,-407.23 1402.75,-407.23 1402.75,-386.73 1369.5,-386.73"/>
-<text text-anchor="start" x="1371.5" y="-391.93" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
-</a>
-</g>
-</g>
 <!-- node_System(31) -->
 <g id="node73" class="node">
 <title>node_System(31)</title>
@@ -895,10 +915,10 @@
 </g>
 </g>
 <!-- node_System(25)&#45;&gt;node_System(31) -->
-<g id="edge66" class="edge">
+<g id="edge69" class="edge">
 <title>node_System(25)&#45;&gt;node_System(31)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M1636.99,-620.6C1575.92,-631.29 1483.57,-635.83 1431.38,-581.98 1388.18,-537.43 1412.23,-438.37 1419.44,-354.73 1422.1,-323.84 1408.53,-306.95 1431.38,-285.98 1475.66,-245.34 1543.31,-239.93 1599.35,-244.51"/>
-<g id="a_edge66&#45;label"><a xlink:title="ui_layout_system — compute_slices_on_image_change">
+<g id="a_edge69&#45;label"><a xlink:title="ui_layout_system — compute_slices_on_image_change">
 <polygon fill="#c6e6ff" stroke="none" points="1369.5,-356.73 1369.5,-377.23 1402.75,-377.23 1402.75,-356.73 1369.5,-356.73"/>
 <text text-anchor="start" x="1371.5" y="-361.93" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
 </a>
@@ -916,45 +936,6 @@
 <g id="a_edge36"><a xlink:title="AddClusters → AssignLightsToClusters">
 <path fill="none" stroke="#663699" stroke-width="2" d="M3100.2,-771.99C3132.44,-765.09 3184.02,-759.9 3217.12,-785.98 3254.14,-815.16 3209.02,-858.92 3246.12,-887.98 3257.54,-896.93 3271.2,-902.04 3285.47,-904.6"/>
 <polygon fill="#663699" stroke="#663699" stroke-width="2" points="3284.76,-908.03 3295.12,-905.84 3285.65,-901.09 3284.76,-908.03"/>
-</a>
-</g>
-</g>
-<!-- node_System(40) -->
-<g id="node37" class="node">
-<title>node_System(40)</title>
-<g id="a_node37"><a xlink:title="bevy_pbr::light::add_clusters">
-<polygon fill="#abd5fc" stroke="#48a3f8" points="3116.12,-826.98 3023.62,-826.98 3023.62,-790.98 3116.12,-790.98 3116.12,-826.98"/>
-<text text-anchor="middle" x="3069.88" y="-803.56" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#011a31">add_clusters</text>
-</a>
-</g>
-</g>
-<!-- node_System(40)&#45;&gt;node_System(6) -->
-<g id="edge71" class="edge">
-<title>node_System(40)&#45;&gt;node_System(6)</title>
-<path fill="none" stroke="#c93526" stroke-width="2" d="M3045.8,-827.41C3003.84,-858.59 2914.53,-913.91 2861.88,-865.98 2830.35,-837.29 2874.52,-704.62 2843.88,-674.98 2802.4,-634.87 2645.46,-637.02 2542.18,-643.27"/>
-<g id="a_edge71&#45;label"><a xlink:title="add_clusters — camera_system&lt;Projection&gt;">
-<polygon fill="#c6e6ff" stroke="none" points="2863.88,-885.98 2863.88,-906.48 2910.62,-906.48 2910.62,-885.98 2863.88,-885.98"/>
-<text text-anchor="start" x="2865.88" y="-891.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
-</a>
-</g>
-</g>
-<!-- node_System(40)&#45;&gt;node_System(7) -->
-<g id="edge72" class="edge">
-<title>node_System(40)&#45;&gt;node_System(7)</title>
-<path fill="none" stroke="#c93526" stroke-width="2" d="M3023.35,-826.93C2977.26,-841.79 2906.58,-855.09 2861.88,-817.98 2828.47,-790.26 2876.42,-750.71 2843.88,-721.98 2805.96,-688.53 2681.18,-685.58 2581.8,-689.14"/>
-<g id="a_edge72&#45;label"><a xlink:title="add_clusters — camera_system&lt;OrthographicProjection&gt;">
-<polygon fill="#c6e6ff" stroke="none" points="2863.88,-840.98 2863.88,-861.48 2910.62,-861.48 2910.62,-840.98 2863.88,-840.98"/>
-<text text-anchor="start" x="2865.88" y="-846.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
-</a>
-</g>
-</g>
-<!-- node_System(40)&#45;&gt;node_System(8) -->
-<g id="edge73" class="edge">
-<title>node_System(40)&#45;&gt;node_System(8)</title>
-<path fill="none" stroke="#c93526" stroke-width="2" d="M3023.17,-804.27C2930.33,-794.7 2716.75,-772.67 2577.7,-758.32"/>
-<g id="a_edge73&#45;label"><a xlink:title="add_clusters — camera_system&lt;PerspectiveProjection&gt;">
-<polygon fill="#c6e6ff" stroke="none" points="2863.88,-792.98 2863.88,-813.48 2910.62,-813.48 2910.62,-792.98 2863.88,-792.98"/>
-<text text-anchor="start" x="2865.88" y="-798.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Camera</text>
 </a>
 </g>
 </g>
@@ -1119,50 +1100,50 @@
 </g>
 </g>
 <!-- node_System(61)&#45;&gt;node_System(4) -->
-<g id="edge76" class="edge">
+<g id="edge77" class="edge">
 <title>node_System(61)&#45;&gt;node_System(4)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M498.95,-104.31C450.19,-161.38 304.07,-342.93 254.31,-523.73 238.77,-580.21 221.26,-641.39 280.12,-695.98 317.98,-731.09 375.47,-737.21 424.09,-734.37"/>
-<g id="a_edge76&#45;label"><a xlink:title="process_output_system — update_accessibility_nodes">
+<g id="a_edge77&#45;label"><a xlink:title="process_output_system — update_accessibility_nodes">
 <polygon fill="#c6e6ff" stroke="none" points="209.62,-525.73 209.62,-546.23 260.12,-546.23 260.12,-525.73 209.62,-525.73"/>
 <text text-anchor="start" x="211.62" y="-530.93" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
 </g>
 </g>
 <!-- node_System(61)&#45;&gt;node_System(6) -->
-<g id="edge77" class="edge">
+<g id="edge78" class="edge">
 <title>node_System(61)&#45;&gt;node_System(6)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M595.06,-104.29C644.51,-115.25 709.66,-128.78 767.88,-137.98 799.9,-143.05 808.06,-143.4 840.38,-145.98 868.13,-148.21 1321.13,-151.36 1340.88,-170.98 1391.55,-221.35 1310.08,-439.79 1358.88,-491.98 1382.01,-516.74 1932.47,-554.92 1964.12,-566.98 2007.93,-583.68 2006.57,-611.67 2050.88,-626.98 2149.7,-661.15 2270.6,-663.2 2352.52,-659.24"/>
-<g id="a_edge77&#45;label"><a xlink:title="process_output_system — camera_system&lt;Projection&gt;">
+<g id="a_edge78&#45;label"><a xlink:title="process_output_system — camera_system&lt;Projection&gt;">
 <polygon fill="#c6e6ff" stroke="none" points="1360.88,-507.98 1360.88,-528.48 1411.38,-528.48 1411.38,-507.98 1360.88,-507.98"/>
 <text text-anchor="start" x="1362.88" y="-513.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
 </g>
 </g>
 <!-- node_System(61)&#45;&gt;node_System(7) -->
-<g id="edge78" class="edge">
+<g id="edge79" class="edge">
 <title>node_System(61)&#45;&gt;node_System(7)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M594.85,-96.4C660.45,-104.72 756.34,-116.1 840.38,-122.98 868.12,-125.26 1321.1,-128.39 1340.88,-147.98 1388.8,-195.46 1316.2,-398.75 1358.88,-450.98 1374.73,-470.39 1389.45,-458 1413.38,-465.48 1421.49,-468.03 1423.16,-469.79 1431.38,-471.98 1663.71,-534.17 1757.25,-444.3 1964.12,-566.98 2017.08,-598.39 1996.15,-646.77 2050.88,-674.98 2131.11,-716.36 2233.03,-721.35 2313.31,-716.4"/>
-<g id="a_edge78&#45;label"><a xlink:title="process_output_system — camera_system&lt;OrthographicProjection&gt;">
+<g id="a_edge79&#45;label"><a xlink:title="process_output_system — camera_system&lt;OrthographicProjection&gt;">
 <polygon fill="#c6e6ff" stroke="none" points="1360.88,-467.98 1360.88,-488.48 1411.38,-488.48 1411.38,-467.98 1360.88,-467.98"/>
 <text text-anchor="start" x="1362.88" y="-473.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
 </g>
 </g>
 <!-- node_System(61)&#45;&gt;node_System(8) -->
-<g id="edge79" class="edge">
+<g id="edge80" class="edge">
 <title>node_System(61)&#45;&gt;node_System(8)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M594.97,-90.67C660.64,-94.49 756.58,-99.9 840.38,-103.98 868.17,-105.34 1320.99,-105.52 1340.88,-124.98 1386.22,-169.38 1318.63,-360.92 1358.88,-409.98 1374.77,-429.37 1394.77,-407.69 1413.38,-424.48 1430.13,-439.61 1414,-457.57 1431.38,-471.98 1616.48,-625.55 1768.17,-427.53 1964.12,-566.98 1996.28,-589.87 2017.42,-701.04 2050.88,-721.98 2141.24,-778.55 2267.16,-775.05 2352.46,-763.48"/>
-<g id="a_edge79&#45;label"><a xlink:title="process_output_system — camera_system&lt;PerspectiveProjection&gt;">
+<g id="a_edge80&#45;label"><a xlink:title="process_output_system — camera_system&lt;PerspectiveProjection&gt;">
 <polygon fill="#c6e6ff" stroke="none" points="1360.88,-426.98 1360.88,-447.48 1411.38,-447.48 1411.38,-426.98 1360.88,-426.98"/>
 <text text-anchor="start" x="1362.88" y="-432.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
 </g>
 </g>
 <!-- node_System(61)&#45;&gt;node_System(25) -->
-<g id="edge80" class="edge">
+<g id="edge81" class="edge">
 <title>node_System(61)&#45;&gt;node_System(25)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M523.32,-104.35C560.14,-195.64 727.67,-598.94 840.38,-664.98 975.38,-744.1 1465.16,-653.71 1636.81,-618.68"/>
-<g id="a_edge80&#45;label"><a xlink:title="process_output_system — ui_layout_system">
+<g id="a_edge81&#45;label"><a xlink:title="process_output_system — ui_layout_system">
 <polygon fill="#c6e6ff" stroke="none" points="1065.38,-697.98 1065.38,-718.48 1115.88,-718.48 1115.88,-697.98 1065.38,-697.98"/>
 <text text-anchor="start" x="1067.38" y="-703.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
@@ -1178,10 +1159,10 @@
 </g>
 </g>
 <!-- node_System(61)&#45;&gt;node_System(2) -->
-<g id="edge75" class="edge">
+<g id="edge76" class="edge">
 <title>node_System(61)&#45;&gt;node_System(2)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M487.9,-104.2C431.41,-144.03 302.31,-245.18 254.31,-367.73 250.34,-377.87 254.21,-381.35 254.31,-392.23 255.75,-550.89 172.73,-1703.19 280.12,-1819.98 323.48,-1867.13 401.41,-1865.66 455.56,-1857.37"/>
-<g id="a_edge75&#45;label"><a xlink:title="process_output_system — exit_on_all_closed">
+<g id="a_edge76&#45;label"><a xlink:title="process_output_system — exit_on_all_closed">
 <polygon fill="#c6e6ff" stroke="none" points="209.62,-369.73 209.62,-390.23 260.12,-390.23 260.12,-369.73 209.62,-369.73"/>
 <text text-anchor="start" x="211.62" y="-374.93" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
@@ -1217,32 +1198,12 @@
 </g>
 </g>
 <!-- node_System(61)&#45;&gt;node_System(26) -->
-<g id="edge81" class="edge">
+<g id="edge82" class="edge">
 <title>node_System(61)&#45;&gt;node_System(26)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M595.12,-81.97C640.72,-78.63 698.94,-72.64 749.88,-61.98 791.22,-53.34 798.64,-39.51 840.38,-32.98 895.32,-24.4 1296.23,0.18 1340.88,-32.98 1354.85,-43.37 1418,-321.84 1431.38,-332.98 1614.39,-485.57 1785.08,-235.76 1964.12,-392.98 1989.23,-415.03 1963.48,-438.25 1982.12,-465.98 2003.2,-497.34 2015.36,-503.08 2050.88,-515.98 2126.07,-543.3 2214.53,-551.38 2288.7,-552.06"/>
-<g id="a_edge81&#45;label"><a xlink:title="process_output_system — resolve_outlines_system">
+<g id="a_edge82&#45;label"><a xlink:title="process_output_system — resolve_outlines_system">
 <polygon fill="#c6e6ff" stroke="none" points="1360.88,-283.98 1360.88,-304.48 1411.38,-304.48 1411.38,-283.98 1360.88,-283.98"/>
 <text text-anchor="start" x="1362.88" y="-289.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
-</a>
-</g>
-</g>
-<!-- node_System(29) -->
-<g id="node91" class="node">
-<title>node_System(29)</title>
-<g id="a_node91"><a xlink:title="bevy_ui::widget::image::update_image_content_size_system">
-<polygon fill="lightgrey" stroke="black" points="1330.38,-265.48 850.88,-265.48 850.88,-224.48 1330.38,-224.48 1330.38,-265.48"/>
-<text text-anchor="middle" x="1090.62" y="-248.18" font-family="Times,serif" font-size="14.00">update_image_content_size_system</text>
-<text text-anchor="middle" x="1090.62" y="-231.68" font-family="Times,serif" font-size="14.00">In multiple sets, AmbiguousWithTextSystem, AmbiguousWithUpdateText2DLayout</text>
-</a>
-</g>
-</g>
-<!-- node_System(61)&#45;&gt;node_System(29) -->
-<g id="edge82" class="edge">
-<title>node_System(61)&#45;&gt;node_System(29)</title>
-<path fill="none" stroke="#c93526" stroke-width="2" d="M552.35,-104.38C611.19,-133.25 731.71,-188.61 840.38,-214.98 854.25,-218.35 868.65,-221.35 883.22,-224.01"/>
-<g id="a_edge82&#45;label"><a xlink:title="process_output_system — update_image_content_size_system">
-<polygon fill="#c6e6ff" stroke="none" points="769.88,-212.98 769.88,-233.48 820.38,-233.48 820.38,-212.98 769.88,-212.98"/>
-<text text-anchor="start" x="771.88" y="-218.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
 </g>
 </g>
@@ -1252,6 +1213,25 @@
 <g id="a_node65"><a xlink:title="bevy_render::mesh::morph::inherit_weights">
 <polygon fill="lightgrey" stroke="black" points="565,-40.98 465,-40.98 465,-4.98 565,-4.98 565,-40.98"/>
 <text text-anchor="middle" x="515" y="-17.93" font-family="Times,serif" font-size="14.00">inherit_weights</text>
+</a>
+</g>
+</g>
+<!-- node_System(56) -->
+<g id="node83" class="node">
+<title>node_System(56)</title>
+<g id="a_node83"><a xlink:title="bevy_animation::animation_player">
+<polygon fill="lightgrey" stroke="black" points="1753.38,-1001.98 1642.12,-1001.98 1642.12,-965.98 1753.38,-965.98 1753.38,-1001.98"/>
+<text text-anchor="middle" x="1697.75" y="-978.93" font-family="Times,serif" font-size="14.00">animation_player</text>
+</a>
+</g>
+</g>
+<!-- node_System(16)&#45;&gt;node_System(56) -->
+<g id="edge67" class="edge">
+<title>node_System(16)&#45;&gt;node_System(56)</title>
+<path fill="none" stroke="#c93526" stroke-width="2" d="M565.4,-24.51C613.14,-26.82 687.22,-32.58 749.88,-46.98 791.6,-56.58 799.32,-67.85 840.38,-79.98 1059.21,-144.64 1193.96,-19.88 1340.88,-194.48 1365.12,-223.3 1348.13,-496.89 1358.88,-532.98 1417.92,-731.3 1610.02,-909.77 1675.02,-965.82"/>
+<g id="a_edge67&#45;label"><a xlink:title="inherit_weights — animation_player">
+<polygon fill="#c6e6ff" stroke="none" points="1047.38,-196.98 1047.38,-217.48 1133.88,-217.48 1133.88,-196.98 1047.38,-196.98"/>
+<text text-anchor="start" x="1049.38" y="-202.18" font-family="Times,serif" font-size="14.00" fill="#c93526">MorphWeights</text>
 </a>
 </g>
 </g>
@@ -1274,10 +1254,10 @@
 </g>
 </g>
 <!-- node_System(21)&#45;&gt;node_System(61) -->
-<g id="edge64" class="edge">
+<g id="edge68" class="edge">
 <title>node_System(21)&#45;&gt;node_System(61)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M2380.61,-287.03C2300.98,-276.18 2163.55,-253.56 2050.88,-214.98 2010.16,-201.05 2004.49,-186.91 1964.12,-171.98 1696.1,-72.86 1624.37,-49.92 1340.88,-13.98 1112.26,14.99 1052.82,-12.43 822.38,-11.98 798.15,-11.94 787.69,1.94 767.88,-11.98 748.55,-25.57 768.48,-47.43 749.88,-61.98 706.71,-95.74 644.5,-100.7 595.09,-97.77"/>
-<g id="a_edge64&#45;label"><a xlink:title="update_text2d_layout — process_output_system">
+<g id="a_edge68&#45;label"><a xlink:title="update_text2d_layout — process_output_system">
 <polygon fill="#c6e6ff" stroke="none" points="1360.88,-24.98 1360.88,-45.48 1411.38,-45.48 1411.38,-24.98 1360.88,-24.98"/>
 <text text-anchor="start" x="1362.88" y="-30.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
 </a>
@@ -1325,6 +1305,35 @@
 <g id="a_edge24"><a xlink:title="apply_deferred → Layout">
 <path fill="none" stroke="#ee9e44" stroke-width="2" d="M1139.93,-593.68C1202.92,-593.01 1316.52,-590.86 1413.38,-583.98 1421.4,-583.41 1423.34,-582.51 1431.38,-581.98 1493.34,-577.97 1563.61,-576.79 1616.26,-576.58"/>
 <polygon fill="#ee9e44" stroke="#ee9e44" stroke-width="2" points="1616.24,-580.08 1626.23,-576.56 1616.22,-573.08 1616.24,-580.08"/>
+</a>
+</g>
+</g>
+<!-- node_System(30) -->
+<g id="node72" class="node">
+<title>node_System(30)</title>
+<g id="a_node72"><a xlink:title="bevy_ui::texture_slice::compute_slices_on_asset_event">
+<polygon fill="lightgrey" stroke="black" points="1792.38,-327.98 1603.12,-327.98 1603.12,-291.98 1792.38,-291.98 1792.38,-327.98"/>
+<text text-anchor="middle" x="1697.75" y="-304.93" font-family="Times,serif" font-size="14.00">compute_slices_on_asset_event</text>
+</a>
+</g>
+</g>
+<!-- node_System(30)&#45;&gt;node_System(25) -->
+<g id="edge74" class="edge">
+<title>node_System(30)&#45;&gt;node_System(25)</title>
+<path fill="none" stroke="#c93526" stroke-width="2" d="M1602.67,-308C1539.89,-312.32 1461.68,-329.65 1419.44,-384.73 1402.68,-406.58 1321.29,-469.58 1431.38,-581.98 1483.76,-635.48 1575.84,-631.1 1636.82,-620.54"/>
+<g id="a_edge74&#45;label"><a xlink:title="compute_slices_on_asset_event — ui_layout_system">
+<polygon fill="#c6e6ff" stroke="none" points="1369.5,-386.73 1369.5,-407.23 1402.75,-407.23 1402.75,-386.73 1369.5,-386.73"/>
+<text text-anchor="start" x="1371.5" y="-391.93" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
+</a>
+</g>
+</g>
+<!-- node_System(30)&#45;&gt;node_System(26) -->
+<g id="edge75" class="edge">
+<title>node_System(30)&#45;&gt;node_System(26)</title>
+<path fill="none" stroke="#c93526" stroke-width="2" d="M1792.68,-294.92C1849.15,-291.41 1918.64,-297.73 1964.12,-338.98 1993.05,-365.22 1956.56,-395.47 1982.12,-424.98 1997.84,-443.13 2016.82,-425.63 2032.88,-443.48 2055.07,-468.17 2025.43,-494.65 2050.88,-515.98 2135.91,-587.29 2270.74,-579.48 2358.89,-563.93"/>
+<g id="a_edge75&#45;label"><a xlink:title="compute_slices_on_asset_event — resolve_outlines_system">
+<polygon fill="#c6e6ff" stroke="none" points="1990.88,-445.98 1990.88,-466.48 2024.12,-466.48 2024.12,-445.98 1990.88,-445.98"/>
+<text text-anchor="start" x="1992.88" y="-451.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
 </a>
 </g>
 </g>
@@ -1391,31 +1400,12 @@
 </a>
 </g>
 </g>
-<!-- node_System(56) -->
-<g id="node83" class="node">
-<title>node_System(56)</title>
-<g id="a_node83"><a xlink:title="bevy_animation::animation_player">
-<polygon fill="lightgrey" stroke="black" points="1753.38,-1001.98 1642.12,-1001.98 1642.12,-965.98 1753.38,-965.98 1753.38,-1001.98"/>
-<text text-anchor="middle" x="1697.75" y="-978.93" font-family="Times,serif" font-size="14.00">animation_player</text>
-</a>
-</g>
-</g>
 <!-- node_System(56)&#45;&gt;set_marker_node_Set(1) -->
 <g id="edge57" class="edge">
 <title>node_System(56)&#45;&gt;set_marker_node_Set(1)</title>
 <g id="a_edge57"><a xlink:title="animation_player → TransformPropagate">
 <path fill="none" stroke="#ee9e44" stroke-width="2" d="M1753.72,-983.98C1878.08,-983.98 2182.61,-983.98 2343.27,-983.98"/>
 <polygon fill="#ee9e44" stroke="#ee9e44" stroke-width="2" points="2342.97,-987.48 2352.97,-983.98 2342.97,-980.48 2342.97,-987.48"/>
-</a>
-</g>
-</g>
-<!-- node_System(56)&#45;&gt;node_System(16) -->
-<g id="edge74" class="edge">
-<title>node_System(56)&#45;&gt;node_System(16)</title>
-<path fill="none" stroke="#c93526" stroke-width="2" d="M1675.02,-965.82C1610.02,-909.77 1417.92,-731.3 1358.88,-532.98 1348.13,-496.89 1365.12,-223.3 1340.88,-194.48 1193.96,-19.88 1059.21,-144.64 840.38,-79.98 799.32,-67.85 791.6,-56.58 749.88,-46.98 687.22,-32.58 613.14,-26.82 565.4,-24.51"/>
-<g id="a_edge74&#45;label"><a xlink:title="animation_player — inherit_weights">
-<polygon fill="#c6e6ff" stroke="none" points="1047.38,-196.98 1047.38,-217.48 1133.88,-217.48 1133.88,-196.98 1047.38,-196.98"/>
-<text text-anchor="start" x="1049.38" y="-202.18" font-family="Times,serif" font-size="14.00" fill="#c93526">MorphWeights</text>
 </a>
 </g>
 </g>
@@ -1447,21 +1437,11 @@
 <title>node_System(26)&#45;&gt;set_marker_node_Set(40)</title>
 <path fill="none" stroke="blue" stroke-width="2" d="M2606.18,-560.98C2682.06,-562.67 2771.92,-554.01 2843.88,-515.98 2952.31,-458.68 3025.67,-323.82 3054.8,-261.98"/>
 </g>
-<!-- node_System(26)&#45;&gt;node_System(30) -->
-<g id="edge67" class="edge">
-<title>node_System(26)&#45;&gt;node_System(30)</title>
-<path fill="none" stroke="#c93526" stroke-width="2" d="M2358.89,-563.93C2270.74,-579.48 2135.91,-587.29 2050.88,-515.98 2025.43,-494.65 2055.07,-468.17 2032.88,-443.48 2016.82,-425.63 1997.84,-443.13 1982.12,-424.98 1956.56,-395.47 1993.05,-365.22 1964.12,-338.98 1918.64,-297.73 1849.15,-291.41 1792.68,-294.92"/>
-<g id="a_edge67&#45;label"><a xlink:title="resolve_outlines_system — compute_slices_on_asset_event">
-<polygon fill="#c6e6ff" stroke="none" points="1990.88,-445.98 1990.88,-466.48 2024.12,-466.48 2024.12,-445.98 1990.88,-445.98"/>
-<text text-anchor="start" x="1992.88" y="-451.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
-</a>
-</g>
-</g>
 <!-- node_System(26)&#45;&gt;node_System(31) -->
-<g id="edge68" class="edge">
+<g id="edge70" class="edge">
 <title>node_System(26)&#45;&gt;node_System(31)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M2365.68,-563.91C2276.73,-581.67 2135.1,-593.43 2050.88,-515.98 2031.43,-498.11 2041.94,-423.3 2032.88,-398.48 2030.36,-391.6 1970.35,-289.84 1964.12,-285.98 1916.06,-256.23 1853.38,-249.64 1801.01,-250.89"/>
-<g id="a_edge68&#45;label"><a xlink:title="resolve_outlines_system — compute_slices_on_image_change">
+<g id="a_edge70&#45;label"><a xlink:title="resolve_outlines_system — compute_slices_on_image_change">
 <polygon fill="#c6e6ff" stroke="none" points="1990.88,-400.98 1990.88,-421.48 2024.12,-421.48 2024.12,-400.98 1990.88,-400.98"/>
 <text text-anchor="start" x="1992.88" y="-406.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
 </a>
@@ -1488,22 +1468,32 @@
 <path fill="none" stroke="blue" stroke-width="2" d="M2598.19,-187.29C2750.57,-185.58 2974.2,-183.05 3045.88,-182.24"/>
 </g>
 <!-- node_System(27)&#45;&gt;node_System(30) -->
-<g id="edge69" class="edge">
+<g id="edge71" class="edge">
 <title>node_System(27)&#45;&gt;node_System(30)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M2348.68,-209.94C2230.08,-235.15 2036.91,-275.41 1964.12,-285.98 1907.47,-294.22 1843.58,-300.1 1792.69,-303.98"/>
-<g id="a_edge69&#45;label"><a xlink:title="ui_stack_system — compute_slices_on_asset_event">
+<g id="a_edge71&#45;label"><a xlink:title="ui_stack_system — compute_slices_on_asset_event">
 <polygon fill="#c6e6ff" stroke="none" points="1990.88,-284.98 1990.88,-305.48 2024.12,-305.48 2024.12,-284.98 1990.88,-284.98"/>
 <text text-anchor="start" x="1992.88" y="-290.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
 </a>
 </g>
 </g>
 <!-- node_System(27)&#45;&gt;node_System(31) -->
-<g id="edge70" class="edge">
+<g id="edge72" class="edge">
 <title>node_System(27)&#45;&gt;node_System(31)</title>
 <path fill="none" stroke="#c93526" stroke-width="2" d="M2296.38,-203.83C2149.19,-218.4 1928.71,-240.22 1800.75,-252.89"/>
-<g id="a_edge70&#45;label"><a xlink:title="ui_stack_system — compute_slices_on_image_change">
+<g id="a_edge72&#45;label"><a xlink:title="ui_stack_system — compute_slices_on_image_change">
 <polygon fill="#c6e6ff" stroke="none" points="1990.88,-236.98 1990.88,-257.48 2024.12,-257.48 2024.12,-236.98 1990.88,-236.98"/>
 <text text-anchor="start" x="1992.88" y="-242.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Node</text>
+</a>
+</g>
+</g>
+<!-- node_System(29) -->
+<g id="node91" class="node">
+<title>node_System(29)</title>
+<g id="a_node91"><a xlink:title="bevy_ui::widget::image::update_image_content_size_system">
+<polygon fill="lightgrey" stroke="black" points="1330.38,-265.48 850.88,-265.48 850.88,-224.48 1330.38,-224.48 1330.38,-265.48"/>
+<text text-anchor="middle" x="1090.62" y="-248.18" font-family="Times,serif" font-size="14.00">update_image_content_size_system</text>
+<text text-anchor="middle" x="1090.62" y="-231.68" font-family="Times,serif" font-size="14.00">In multiple sets, AmbiguousWithTextSystem, AmbiguousWithUpdateText2DLayout</text>
 </a>
 </g>
 </g>
@@ -1525,6 +1515,16 @@
 <g id="edge6" class="edge">
 <title>node_System(29)&#45;&gt;set_marker_node_Set(45)</title>
 <path fill="none" stroke="blue" stroke-width="2" d="M1293.12,-224.01C1387.91,-214.14 1497.65,-202.71 1578.75,-194.27"/>
+</g>
+<!-- node_System(29)&#45;&gt;node_System(61) -->
+<g id="edge73" class="edge">
+<title>node_System(29)&#45;&gt;node_System(61)</title>
+<path fill="none" stroke="#c93526" stroke-width="2" d="M883.22,-224.01C868.65,-221.35 854.25,-218.35 840.38,-214.98 731.71,-188.61 611.19,-133.25 552.35,-104.38"/>
+<g id="a_edge73&#45;label"><a xlink:title="update_image_content_size_system — process_output_system">
+<polygon fill="#c6e6ff" stroke="none" points="769.88,-212.98 769.88,-233.48 820.38,-233.48 820.38,-212.98 769.88,-212.98"/>
+<text text-anchor="start" x="771.88" y="-218.18" font-family="Times,serif" font-size="14.00" fill="#c93526">Window</text>
+</a>
+</g>
 </g>
 <!-- node_System(29)&#45;&gt;node_System(30) -->
 <g id="edge29" class="edge">

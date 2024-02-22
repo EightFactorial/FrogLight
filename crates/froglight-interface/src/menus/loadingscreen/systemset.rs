@@ -1,12 +1,11 @@
 use bevy::prelude::*;
-use froglight_core::systemsets::InterfaceStartupSet;
 
 use crate::menus::InterfaceMenuUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     // Add basic `SystemSet`s
-    app.configure_sets(Startup, LoadingScreenStartupSet.in_set(InterfaceStartupSet));
+    app.configure_sets(PostStartup, LoadingScreenPostStartupSet);
     app.configure_sets(Update, LoadingScreenUpdateSet.in_set(InterfaceMenuUpdateSet));
 
     // Add states
@@ -31,9 +30,9 @@ pub(super) fn build(app: &mut App) {
 }
 
 /// A [`SystemSet`] for loading screen systems that should run during
-/// [`Startup`].
+/// [`PostStartup`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub(crate) struct LoadingScreenStartupSet;
+pub(crate) struct LoadingScreenPostStartupSet;
 
 /// A [`SystemSet`] for loading screen systems that should run during
 /// [`Update`].
