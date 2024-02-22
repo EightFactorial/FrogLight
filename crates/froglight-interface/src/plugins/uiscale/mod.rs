@@ -116,10 +116,13 @@ impl UiScalePlugin {
         }
     }
 
-    // max(1, min(floor(width / 320), floor(height / 240)))
+    /// max(1, min(floor(width / 320), floor(height / 240)))
+    ///
+    /// A 300x225 rectangle in the center seems to never go off the screen?
     fn calculate(width: u32, height: u32) -> u32 {
-        let width = width / 320;
-        let height = height / 240;
-        width.max(height).max(1)
+        let w_scale = width / 320;
+        let h_scale = height / 240;
+
+        w_scale.min(h_scale).max(1)
     }
 }
