@@ -275,16 +275,18 @@ dependencies = [
 
 [[package]]
 name = "async-executor"
-version = "1.8.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17ae5ebefcc48e7452b4987947920dac9450be1110cadf34d1b8c116bdbaf97c"
+checksum = "601848938f6e24595d8f63bd4c4e98ed905a3bfa832743c7b8298a73d1b0517b"
 dependencies = [
  "async-lock",
  "async-task",
+ "atomic-waker",
  "concurrent-queue",
  "fastrand",
  "futures-lite",
  "slab",
+ "thread_local",
 ]
 
 [[package]]
@@ -2147,6 +2149,7 @@ version = "0.1.0"
 dependencies = [
  "async_zip",
  "bevy",
+ "bevy-inspector-egui",
  "dirs",
  "froglight-core",
  "futures-lite",

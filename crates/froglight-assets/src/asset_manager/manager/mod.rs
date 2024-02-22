@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use bevy::prelude::*;
+use inner::AssetManagerInner;
 
 pub(crate) mod inner;
-use inner::AssetManagerInner;
 
 /// A manager for resource packs and their assets.
 #[derive(Debug, Default, Clone, Deref, Resource, Reflect)]
