@@ -7,18 +7,38 @@ use super::systemset::LoadingScreenStateSet;
 pub(super) fn build(app: &mut App) {
     app.register_type::<ProgressBarNode>().register_type::<ProgressBar>();
 
+    // React to the ResourcePackFinishedLoadingEvent event
     app.add_systems(
         Update,
-        ProgressBar::set_finished
+        ProgressBar::listen_for_finish
             .ambiguous_with_all()
             .run_if(on_event::<ResourcePackFinishedLoadingEvent>())
             .run_if(any_with_component::<ProgressBar>)
             .in_set(LoadingScreenStateSet::Shown),
     );
+    // Update the visual progress of the progress bar
     app.add_systems(
         Update,
         ProgressBar::update_visual_progress
             .ambiguous_with_all()
+            .run_if(any_with_component::<ProgressBar>)
+            .in_set(LoadingScreenStateSet::Shown),
+    );
+
+    // Hide the progress bar when it is finished
+    //
+    // TODO: Find a good way to transition to the main menu
+    // instead of just hiding the loading screen
+    app.add_systems(
+        Update,
+        ProgressBar::hide_when_finished
+            .run_if(ProgressBar::is_finished)
+            .run_if(any_with_component::<ProgressBar>)
+            .in_set(LoadingScreenStateSet::Shown),
+    );
+    app.add_systems(
+        OnExit(LoadingScreenStateSet::Shown),
+        ProgressBar::reset_progress
             .run_if(any_with_component::<ProgressBar>)
             .in_set(LoadingScreenStateSet::Shown),
     );
@@ -112,17 +132,36 @@ impl ProgressBar {
             }
 
             // Interpolate the visual progress
-            let diff = progress.current_progress - progress.visual_progress;
-            progress.visual_progress += (diff * delta).min(100.0);
+            let diff = (progress.current_progress - progress.visual_progress).max(0.1);
+            progress.visual_progress = (progress.visual_progress + (diff * delta)).min(100.0);
             style.width = Val::Percent(progress.visual_progress);
         }
     }
 
     /// Set the current progress to 100% when
     /// resource packs are finished loading.
-    fn set_finished(mut query: Query<&mut Self>) {
+    fn listen_for_finish(mut query: Query<&mut Self>) {
         for mut progress in &mut query {
             progress.current_progress = 100.0;
+        }
+    }
+
+    /// Returns `true` if the progress bar is visually finished.
+    fn is_finished(progress: Query<&Self>) -> bool {
+        progress.iter().any(|p| (p.visual_progress - 100.0).abs() < f32::EPSILON)
+    }
+
+    /// Enter the hidden state when the progress bar is finished.
+    fn hide_when_finished(mut state: ResMut<NextState<LoadingScreenStateSet>>) {
+        debug!("Entering LoadingScreenStateSet::Hidden");
+        state.set(LoadingScreenStateSet::Hidden);
+    }
+
+    /// Reset the progress of the progress bar.
+    fn reset_progress(mut query: Query<&mut Self>) {
+        for mut progress in &mut query {
+            progress.current_progress = 0.0;
+            progress.visual_progress = 0.0;
         }
     }
 }

@@ -3,6 +3,7 @@
 //! Appears while the game is starting up or reloading resource packs.
 
 use bevy::prelude::*;
+use froglight_core::events::ResourcePackStartLoadingEvent;
 
 pub(crate) mod plugin;
 
@@ -13,18 +14,37 @@ mod logo;
 pub use logo::{LoadingScreenLogo, LoadingScreenLogoNode};
 
 pub(crate) mod systemset;
-use systemset::LoadingScreenPostStartupSet;
+use systemset::{LoadingScreenPostStartupSet, LoadingScreenStateSet};
 
 #[doc(hidden)]
 fn build(app: &mut App) {
     app.register_type::<LoadingScreenRootNode>();
 
+    // Build the loading screen on startup
     app.add_systems(
         PostStartup,
         LoadingScreenRootNode::build_loadingscreen
-            .run_if(not(any_with_component::<LoadingScreenRootNode>))
             .run_if(run_once())
             .in_set(LoadingScreenPostStartupSet),
+    );
+
+    // Show/hide the loading screen
+    app.add_systems(
+        OnEnter(LoadingScreenStateSet::Shown),
+        LoadingScreenRootNode::show_loadingscreen.in_set(LoadingScreenStateSet::Shown),
+    );
+    app.add_systems(
+        OnEnter(LoadingScreenStateSet::Hidden),
+        LoadingScreenRootNode::hide_loadingscreen.in_set(LoadingScreenStateSet::Hidden),
+    );
+
+    // Show the loading screen when resource packs are being reloaded
+    app.add_systems(
+        Update,
+        LoadingScreenRootNode::listen_for_resourcepacks
+            .ambiguous_with_all()
+            .run_if(on_event::<ResourcePackStartLoadingEvent>())
+            .in_set(LoadingScreenStateSet::Hidden),
     );
 
     // Add child modules
@@ -40,6 +60,7 @@ fn build(app: &mut App) {
 pub struct LoadingScreenRootNode;
 
 impl LoadingScreenRootNode {
+    /// Builds the loading screen.
     fn build_loadingscreen(world: &mut World) {
         debug!("Building LoadingScreen");
 
@@ -56,6 +77,28 @@ impl LoadingScreenRootNode {
         // Build the children
         ProgressBarNode::build(world, background);
         LoadingScreenLogoNode::build(world, background);
+    }
+
+    /// Shows the loading screen.
+    fn show_loadingscreen(mut query: Query<&mut Visibility, With<Self>>) {
+        debug!("Showing LoadingScreen");
+        for mut visibility in &mut query {
+            *visibility = Visibility::Inherited;
+        }
+    }
+
+    /// Hides the loading screen.
+    fn hide_loadingscreen(mut query: Query<&mut Visibility, With<Self>>) {
+        debug!("Hiding LoadingScreen");
+        for mut visibility in &mut query {
+            *visibility = Visibility::Hidden;
+        }
+    }
+
+    /// Show the loading screen when resource packs are being reloaded.
+    fn listen_for_resourcepacks(mut state: ResMut<NextState<LoadingScreenStateSet>>) {
+        debug!("Entering LoadingScreenStateSet::Shown");
+        state.set(LoadingScreenStateSet::Shown);
     }
 }
 

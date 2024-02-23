@@ -111,7 +111,7 @@ impl UiScalePlugin {
         // Update the scale if it has changed
         let value = value as f32;
         if (**scale - value).abs() > f32::EPSILON {
-            debug!("Setting UIScale to: `{value}`");
+            debug!("Setting UIScale to: {value}");
             **scale = value;
         }
     }

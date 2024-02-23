@@ -2,7 +2,6 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub mod plugin;
-mod systemset;
 
 #[cfg(feature = "asset_manager")]
 mod asset_manager;
@@ -23,3 +22,6 @@ pub use resourcepack::{
 
 mod settings;
 pub use settings::resourcepack_config::ResourcePackSettings;
+
+mod systemset;
+pub use systemset::resourcepack::ResourcePackState;

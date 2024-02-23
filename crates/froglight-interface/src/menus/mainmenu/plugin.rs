@@ -9,5 +9,8 @@ impl Plugin for InterfaceMainMenuPlugin {
         // Add `SystemSet`s
         crate::menus::build(app);
         super::systemset::build(app);
+
+        // Add components and systems
+        super::build(app);
     }
 }

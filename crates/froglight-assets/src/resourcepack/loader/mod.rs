@@ -122,12 +122,8 @@ impl ResourcePackLoader {
         resourcepack: &mut ResourcePack,
         context: &mut LoadContext<'_>,
     ) -> Result<(), ResourcePackLoaderError> {
-        // Look for specific entries
-        if entry_name == "pack.png" {
-            // TODO: Load the pack icon
-            return Ok(());
-        } else if entry_name == "pack.mcmeta" {
-            // TODO: Load the pack metadata
+        // TODO: Support for ResourcePack metadata
+        if matches!(entry_name.as_str(), "pack.png" | "pack.mcmeta") {
             return Ok(());
         }
 
@@ -136,19 +132,23 @@ impl ResourcePackLoader {
             return Ok(());
         };
 
-        // Convert the entry name to a ResourceKey
-        let entry_name = entry_name.replacen('/', ":", 1);
-        let Some((entry_path, entry_ext)) = entry_name.split_once('.') else {
-            warn!("Failed to split the file extension from: `{entry_name}`");
+        // Get the namespace and file name
+        let Some((entry_namespace, entry_file)) = entry_name.split_once('/') else {
             return Ok(());
         };
 
-        // Skip hidden files
-        if entry_name.starts_with('.') {
+        // Get the asset type and path
+        let Some((entry_type, entry_path)) = entry_file.split_once('/') else {
             return Ok(());
-        }
+        };
 
-        let resourcekey = match ResourceKey::try_new(entry_path) {
+        // Split the asset path and extension
+        let Some((entry_path, entry_ext)) = entry_path.split_once('.') else {
+            return Ok(());
+        };
+
+        // Create a new ResourceKey
+        let resourcekey = match ResourceKey::try_new(format!("{entry_namespace}:{entry_path}")) {
             Ok(resourcekey) => resourcekey,
             Err(err) => {
                 warn!("Failed to create a ResourceKey from: `{entry_name}`: {err}");
@@ -156,19 +156,17 @@ impl ResourcePackLoader {
             }
         };
 
-        // Match the entry name to a file extension
-        let (_namespace, entry) = resourcekey.split();
-
         if entry_ext == ".mcmeta" {
             // TODO: Support for metadata files
-        } else if entry.starts_with("textures/") && matches!(entry_ext, "png" | "jpg" | "jpeg") {
+        } else if entry_type.starts_with("textures") && matches!(entry_ext, "png" | "jpg" | "jpeg")
+        {
             // Load the texture into the resource pack
             if let Some(texture) =
                 functions::load_texture(self, &resourcekey, entry_reader, context).await?
             {
                 resourcepack.textures.insert(resourcekey, texture);
             }
-        } else if entry.starts_with("sounds/") && matches!(entry_ext, "ogg" | "wav") {
+        } else if entry_type.starts_with("sounds") && matches!(entry_ext, "ogg" | "wav") {
             // Load the audio into the resource pack
             if let Some(sound) =
                 functions::load_audio(self, &resourcekey, entry_reader, context).await?

@@ -2,8 +2,8 @@
 
 use bevy::prelude::*;
 
-mod resourcepack;
-pub use resourcepack::{ResourcePackFinishedLoadingEvent, ResourcePackStartLoadingEvent};
+mod assets;
+pub use assets::{ResourcePackFinishedLoadingEvent, ResourcePackStartLoadingEvent};
 
 #[doc(hidden)]
-pub(super) fn build(app: &mut App) { resourcepack::build(app); }
+pub(super) fn build(app: &mut App) { assets::build(app); }

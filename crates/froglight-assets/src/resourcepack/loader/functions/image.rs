@@ -18,6 +18,8 @@ pub(crate) async fn load_texture(
     load_context: &mut LoadContext<'_>,
 ) -> Result<Option<Handle<Image>>, ResourcePackLoaderError> {
     // Check if the texture already exists in the asset manager.
+
+    use bevy::render::{render_resource::TextureDescriptor, texture::ImageSampler};
     if loader.texture_assets.read().contains_key(resource_key) {
         trace!(
             "Skipping `{resource_key}` from `{}` as it already exists",
@@ -34,7 +36,8 @@ pub(crate) async fn load_texture(
     if let Ok(dyn_img) =
         ImageReader::new(std::io::Cursor::new(data)).with_guessed_format()?.decode()
     {
-        let image = Image::from_dynamic(dyn_img, false, RenderAssetUsages::all());
+        let mut image = Image::from_dynamic(dyn_img, true, RenderAssetUsages::all());
+        image.sampler = ImageSampler::nearest();
 
         // Load the texture into the asset manager.
         // Store the strong handle in the ResourcePackManager, and return a weak handle.

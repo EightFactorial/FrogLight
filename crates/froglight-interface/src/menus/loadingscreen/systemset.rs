@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use super::LoadingScreenRootNode;
 use crate::menus::InterfaceMenuUpdateSet;
 
 #[doc(hidden)]
@@ -17,14 +18,15 @@ pub(super) fn build(app: &mut App) {
     // Add state-specific `SystemSet`s
     app.configure_sets(
         Update,
-        LoadingScreenStateSet::Hidden
-            .run_if(in_state(LoadingScreenStateSet::Hidden))
-            .in_set(LoadingScreenUpdateSet),
-    );
-    app.configure_sets(
-        Update,
-        LoadingScreenStateSet::Shown
-            .run_if(in_state(LoadingScreenStateSet::Shown))
+        (
+            LoadingScreenStateSet::Hidden
+                .run_if(in_state(LoadingScreenStateSet::Hidden))
+                .run_if(any_with_component::<LoadingScreenRootNode>),
+            LoadingScreenStateSet::Shown
+                .run_if(in_state(LoadingScreenStateSet::Shown))
+                .run_if(any_with_component::<LoadingScreenRootNode>),
+        )
+            .chain()
             .in_set(LoadingScreenUpdateSet),
     );
 }

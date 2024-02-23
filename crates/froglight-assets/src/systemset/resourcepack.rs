@@ -63,7 +63,7 @@ pub(super) fn finish(conditions: &Mutex<Vec<BoxedCondition>>, app: &mut App) {
 /// Finally, once all assets are processed, the state transitions to
 /// [`ResourcePackState::Ready`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, SystemSet, States)]
-pub(crate) enum ResourcePackState {
+pub enum ResourcePackState {
     /// The default state.
     ///
     /// Waiting for a [`ResourcePackStartLoadingEvent`] to be sent.
