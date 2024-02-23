@@ -7,10 +7,10 @@ use bevy::prelude::*;
 pub(crate) mod plugin;
 
 mod bar;
-pub use bar::ProgressBarNode;
+pub use bar::{ProgressBar, ProgressBarNode};
 
 mod logo;
-pub use logo::LoadingScreenLogoNode;
+pub use logo::{LoadingScreenLogo, LoadingScreenLogoNode};
 
 pub(crate) mod systemset;
 use systemset::LoadingScreenPostStartupSet;
@@ -46,9 +46,12 @@ impl LoadingScreenRootNode {
         // Create the root entity
         let mut background_node = center_node();
         background_node.background_color = BackgroundColor(Color::BLACK);
+        background_node.z_index = ZIndex::Global(i32::MAX / 64);
 
         // Spawn the root entity
-        let background = world.spawn((LoadingScreenRootNode, background_node)).id();
+        let background = world
+            .spawn((LoadingScreenRootNode, background_node, Name::new("LoadingScreenRootNode")))
+            .id();
 
         // Build the children
         ProgressBarNode::build(world, background);

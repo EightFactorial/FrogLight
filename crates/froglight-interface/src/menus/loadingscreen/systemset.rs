@@ -43,7 +43,7 @@ pub(crate) struct LoadingScreenUpdateSet;
 /// during [`Update`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, States, SystemSet)]
 pub(crate) enum LoadingScreenStateSet {
-    #[default]
     Hidden,
+    #[default]
     Shown,
 }
