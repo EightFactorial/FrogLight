@@ -44,7 +44,7 @@ impl PluginGroup for AssetPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut group = PluginGroupBuilder::start::<Self>()
             .add(SettingsPlugin)
-            .add(ResourcePackPlugin::from_conditions(self.conditions));
+            .add(ResourcePackPlugin::from_conditions_arc(self.conditions));
 
         // Add the `AssetManagerPlugin` if the `asset_manager` feature is enabled
         #[cfg(feature = "asset_manager")]

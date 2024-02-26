@@ -21,14 +21,21 @@ impl ResourcePackPlugin {
 
     /// Create a new `ResourcePackPlugin` with the given conditions.
     #[must_use]
-    pub(crate) fn from_conditions(conditions: Arc<Mutex<Vec<BoxedCondition>>>) -> Self {
+    pub fn from_conditions(conditions: Vec<BoxedCondition>) -> Self {
+        Self { conditions: Arc::new(Mutex::new(conditions)) }
+    }
+
+    /// Create a new `ResourcePackPlugin` with the given conditions.
+    #[must_use]
+    pub(crate) fn from_conditions_arc(conditions: Arc<Mutex<Vec<BoxedCondition>>>) -> Self {
         Self { conditions }
     }
 
     /// Add a condition that must be met before `ResourcePack`s are considered
     /// finished processing.
-    pub fn add_condition(&self, condition: BoxedCondition) {
-        self.conditions.lock().push(condition);
+    pub fn add_condition<M>(&self, condition: impl Condition<M>) {
+        let condition = IntoSystem::into_system(condition);
+        self.conditions.lock().push(Box::new(condition));
     }
 }
 
