@@ -1,8 +1,9 @@
-use std::fmt::Display;
+use std::{borrow::Borrow, fmt::Display};
 
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
+use hashbrown::Equivalent;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -232,6 +233,18 @@ impl AsRef<str> for ResourceKey {
 
 impl AsRef<CompactString> for ResourceKey {
     fn as_ref(&self) -> &CompactString { &self.0 }
+}
+
+impl Borrow<str> for ResourceKey {
+    fn borrow(&self) -> &str { self.as_str() }
+}
+
+impl Borrow<CompactString> for ResourceKey {
+    fn borrow(&self) -> &CompactString { &self.0 }
+}
+
+impl Equivalent<str> for ResourceKey {
+    fn equivalent(&self, key: &str) -> bool { self.as_str() == key }
 }
 
 impl Display for ResourceKey {

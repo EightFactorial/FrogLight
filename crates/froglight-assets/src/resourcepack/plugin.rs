@@ -57,6 +57,9 @@ impl Plugin for ResourcePackPlugin {
             debug!("Initializing ResourcePackLoader");
             app.init_asset_loader::<ResourcePackLoader>();
         }
+
+        // Add systems to load the fallback image
+        super::fallback::build(app);
     }
 
     fn finish(&self, app: &mut App) {

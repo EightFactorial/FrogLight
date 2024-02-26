@@ -27,11 +27,11 @@ pub struct AssetManagerInner {
 
     /// A collection of loaded texture assets.
     #[reflect(ignore)]
-    pub texture_assets: RwLock<HashMap<ResourceKey, Handle<Image>>>,
+    pub textures: RwLock<HashMap<ResourceKey, Handle<Image>>>,
 
     /// A collection of loaded audio assets.
     #[reflect(ignore)]
-    pub audio_assets: RwLock<HashMap<ResourceKey, Handle<AudioSource>>>,
+    pub sounds: RwLock<HashMap<ResourceKey, Handle<AudioSource>>>,
 }
 
 static MANAGER_CREATED: AtomicBool = AtomicBool::new(false);
@@ -47,8 +47,8 @@ impl Default for AssetManagerInner {
 
         Self {
             handles: RwLock::new(Vec::with_capacity(2)),
-            texture_assets: RwLock::new(HashMap::with_capacity(512)),
-            audio_assets: RwLock::new(HashMap::with_capacity(512)),
+            textures: RwLock::new(HashMap::with_capacity(512)),
+            sounds: RwLock::new(HashMap::with_capacity(512)),
         }
     }
 }
@@ -80,7 +80,7 @@ impl AssetManagerInner {
         ui.horizontal(|ui| {
             ui.label("Textures");
             ui.add_enabled_ui(false, |ui| {
-                let string = format!("{}", value.texture_assets.read().len());
+                let string = format!("{}", value.textures.read().len());
                 changed |= ui.add(Button::new(RichText::new(string))).changed();
             });
         });
@@ -88,7 +88,7 @@ impl AssetManagerInner {
         ui.horizontal(|ui| {
             ui.label("Sounds");
             ui.add_enabled_ui(false, |ui| {
-                let string = format!("{}", value.audio_assets.read().len());
+                let string = format!("{}", value.sounds.read().len());
                 changed |= ui.add(Button::new(RichText::new(string))).changed();
             });
         });

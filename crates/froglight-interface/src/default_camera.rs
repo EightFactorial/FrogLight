@@ -29,7 +29,7 @@ pub fn default_camera2d_bundle() -> impl Bundle {
 /// - [`UiCameraConfig`] with `show_ui` set to `false`
 /// - [`Camera3dBundle`] with order set to `0` and color set to [`Color::BLACK`]
 #[must_use]
-pub fn default_camera3d_bundle() -> impl Bundle {
+pub fn default_camera3d_bundle() -> Camera3dBundle {
     Camera3dBundle {
         camera: Camera {
             order: 0isize,

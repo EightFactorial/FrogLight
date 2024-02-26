@@ -132,7 +132,7 @@ impl ProgressBar {
             }
 
             // Interpolate the visual progress
-            let diff = (progress.current_progress - progress.visual_progress).max(0.1);
+            let diff = (progress.current_progress - progress.visual_progress).max(0.5);
             progress.visual_progress = (progress.visual_progress + (diff * delta)).min(100.0);
             style.width = Val::Percent(progress.visual_progress);
         }

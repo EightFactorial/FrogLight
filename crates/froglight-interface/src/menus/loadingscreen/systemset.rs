@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use froglight_core::resources::LoadingScreenEnable;
 
 use super::LoadingScreenRootNode;
 use crate::menus::InterfaceMenuUpdateSet;
@@ -6,8 +7,16 @@ use crate::menus::InterfaceMenuUpdateSet;
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     // Add basic `SystemSet`s
-    app.configure_sets(PostStartup, LoadingScreenPostStartupSet);
-    app.configure_sets(Update, LoadingScreenUpdateSet.in_set(InterfaceMenuUpdateSet));
+    app.configure_sets(
+        PostStartup,
+        LoadingScreenPostStartupSet.run_if(LoadingScreenEnable::is_enabled),
+    );
+    app.configure_sets(
+        Update,
+        LoadingScreenUpdateSet
+            .run_if(LoadingScreenEnable::is_enabled)
+            .in_set(InterfaceMenuUpdateSet),
+    );
 
     // Add states
     app.init_state::<LoadingScreenStateSet>()

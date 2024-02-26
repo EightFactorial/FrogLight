@@ -20,7 +20,7 @@ pub(crate) async fn load_texture(
     // Check if the texture already exists in the asset manager.
 
     use bevy::render::{render_resource::TextureDescriptor, texture::ImageSampler};
-    if loader.texture_assets.read().contains_key(resource_key) {
+    if loader.textures.read().contains_key(resource_key) {
         trace!(
             "Skipping `{resource_key}` from `{}` as it already exists",
             load_context.path().display()
@@ -45,7 +45,7 @@ pub(crate) async fn load_texture(
         let weak = handle.clone_weak();
 
         // Insert the texture into the texture assets if it doesn't exist.
-        let mut textures = loader.texture_assets.write();
+        let mut textures = loader.textures.write();
         textures.insert(resource_key.clone(), handle);
 
         Ok(Some(weak))

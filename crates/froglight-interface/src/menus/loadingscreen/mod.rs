@@ -2,7 +2,7 @@
 //!
 //! Appears while the game is starting up or reloading resource packs.
 
-use bevy::prelude::*;
+use bevy::{prelude::*, ui::FocusPolicy};
 use froglight_core::events::ResourcePackStartLoadingEvent;
 
 pub(crate) mod plugin;
@@ -68,6 +68,7 @@ impl LoadingScreenRootNode {
         let mut background_node = center_node();
         background_node.background_color = BackgroundColor(Color::BLACK);
         background_node.z_index = ZIndex::Global(i32::MAX / 64);
+        background_node.focus_policy = FocusPolicy::Block;
 
         // Spawn the root entity
         let background = world

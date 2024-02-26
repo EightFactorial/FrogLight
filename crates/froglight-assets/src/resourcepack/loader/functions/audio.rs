@@ -16,7 +16,7 @@ pub(crate) async fn load_audio(
 ) -> Result<Option<Handle<AudioSource>>, ResourcePackLoaderError> {
     // Check if the audio already exists in the asset manager.
 
-    if loader.audio_assets.read().contains_key(resource_key) {
+    if loader.sounds.read().contains_key(resource_key) {
         trace!(
             "Skipping `{resource_key}` from `{}` as it already exists",
             load_context.path().display()
@@ -37,7 +37,7 @@ pub(crate) async fn load_audio(
     let weak = handle.clone_weak();
 
     // Insert the texture into the texture assets if it doesn't exist.
-    let mut audio_assets = loader.audio_assets.write();
+    let mut audio_assets = loader.sounds.write();
     audio_assets.insert(resource_key.clone(), handle);
 
     Ok(Some(weak))

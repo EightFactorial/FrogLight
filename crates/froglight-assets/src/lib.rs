@@ -17,6 +17,7 @@ pub use resourcepack::{
         meta::{AssetMcMeta, PackMcMeta},
         ResourcePack,
     },
+    fallback::FallbackImage,
     loader::{ResourcePackLoader, ResourcePackLoaderError},
 };
 

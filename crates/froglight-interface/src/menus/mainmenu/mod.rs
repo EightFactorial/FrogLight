@@ -2,13 +2,16 @@
 //!
 //! The main menu is the first screen the player sees when starting the game.
 
-use bevy::prelude::*;
+use bevy::{prelude::*, ui::FocusPolicy};
 use froglight_assets::ResourcePackState;
 
-use self::systemset::MainMenuUpdateSet;
-
 pub(crate) mod plugin;
+
+pub(crate) mod background;
+pub use background::{MainMenuBackground, MainMenuBackgroundCamera};
+
 pub(crate) mod systemset;
+use systemset::MainMenuUpdateSet;
 
 #[doc(hidden)]
 fn build(app: &mut App) {
@@ -21,6 +24,8 @@ fn build(app: &mut App) {
             .run_if(not(any_with_component::<MainMenuRootNode>))
             .in_set(MainMenuUpdateSet),
     );
+
+    background::build(app);
 }
 
 /// A marker [`Component`] for the root [`Entity`] of the main menu.
@@ -43,12 +48,15 @@ impl MainMenuRootNode {
                 ..Default::default()
             },
             background_color: BackgroundColor(Color::NONE),
+            focus_policy: FocusPolicy::Block,
             ..Default::default()
         };
 
         // Spawn the root node
-        world.spawn((Self, root_node, Name::new("MainMenuRootNode")));
+        let _root = world.spawn((Self, root_node, Name::new("MainMenuRootNode"))).id();
 
         // TODO: Add the main menu UI
+
+        MainMenuBackground::build(world);
     }
 }
