@@ -2,7 +2,7 @@
 use bevy::prelude::*;
 
 mod loading;
-pub use loading::LoadingScreenEnable;
+pub use loading::{LoadingScreenEnable, LoadingScreenState};
 
 mod menus;
 pub use menus::{MainMenuEnable, MultiplayerMenuEnable, SettingsMenuEnable};

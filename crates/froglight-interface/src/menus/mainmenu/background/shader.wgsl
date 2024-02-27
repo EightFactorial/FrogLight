@@ -3,21 +3,20 @@
 @group(2) @binding(0) var texture_front: texture_2d<f32>;
 @group(2) @binding(1) var sampler_front: sampler;
 
-@group(2) @binding(2) var texture_back: texture_2d<f32>;
-@group(2) @binding(3) var sampler_back: sampler;
+@group(2) @binding(2) var texture_right: texture_2d<f32>;
+@group(2) @binding(3) var sampler_right: sampler;
 
-@group(2) @binding(4) var texture_left: texture_2d<f32>;
-@group(2) @binding(5) var sampler_left: sampler;
+@group(2) @binding(4) var texture_back: texture_2d<f32>;
+@group(2) @binding(5) var sampler_back: sampler;
 
-@group(2) @binding(6) var texture_right: texture_2d<f32>;
-@group(2) @binding(7) var sampler_right: sampler;
+@group(2) @binding(6) var texture_left: texture_2d<f32>;
+@group(2) @binding(7) var sampler_left: sampler;
 
 @group(2) @binding(8) var texture_top: texture_2d<f32>;
 @group(2) @binding(9) var sampler_top: sampler;
 
 @group(2) @binding(10) var texture_bottom: texture_2d<f32>;
 @group(2) @binding(11) var sampler_bottom: sampler;
-
 
 struct Vertex {
     @builtin(instance_index) instance_index: u32,
@@ -37,8 +36,6 @@ fn vertex(
         get_model_matrix(vertex.instance_index),
         vec4<f32>(vertex.position, 1.0),
     );
-    output.position = vertex.position;
-    output.normal = vertex.normal;
     output.uvs = vertex.uvs;
     output.sampler_index = vertex.sampler_index;
 
@@ -47,8 +44,6 @@ fn vertex(
 
 struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
-    @location(0) position: vec3<f32>,
-    @location(1) normal: vec3<f32>,
     @location(2) uvs: vec2<f32>,
     @location(3) sampler_index: u32,
 };
@@ -60,6 +55,7 @@ fn fragment(
     var color: vec4<f32>;
 
     // Sample the texture
+    // Should be in the order of the faces of a cube
     switch vertex.sampler_index {
         case 0u {
             color = textureSample(texture_front, sampler_front, vertex.uvs);
@@ -74,10 +70,10 @@ fn fragment(
             color = textureSample(texture_right, sampler_right, vertex.uvs);
         }
         case 4u {
-            color = textureSample(texture_top, sampler_top, vertex.uvs);
+            color = textureSample(texture_bottom, sampler_bottom, vertex.uvs);
         }
         case 5u {
-            color = textureSample(texture_bottom, sampler_bottom, vertex.uvs);
+            color = textureSample(texture_top, sampler_top, vertex.uvs);
         }
         default {
             color = vec4<f32>(0.0, 0.0, 0.0, 1.0);

@@ -1,5 +1,5 @@
 use bevy::{
-    asset::embedded_asset,
+    asset::{embedded_asset, ReflectAsset, ReflectHandle},
     pbr::{MaterialPipeline, MaterialPipelineKey},
     prelude::*,
     render::{
@@ -14,24 +14,28 @@ use bevy::{
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     embedded_asset!(app, "shader.wgsl");
-    app.add_plugins(MaterialPlugin::<MainMenuBackgroundShader>::default());
+    app.register_type::<MainMenuBackgroundShader>()
+        .init_asset::<MainMenuBackgroundShader>()
+        .register_type_data::<Handle<MainMenuBackgroundShader>, ReflectHandle>()
+        .add_plugins(MaterialPlugin::<MainMenuBackgroundShader>::default());
 }
 
 /// A shader that runs the main menu background.
-#[derive(Asset, Debug, Clone, PartialEq, Eq, Hash, TypePath, AsBindGroup)]
+#[derive(Asset, Debug, Clone, PartialEq, Eq, Hash, AsBindGroup, Reflect)]
+#[reflect(Asset)]
 pub(super) struct MainMenuBackgroundShader {
     #[texture(0)]
     #[sampler(1)]
     pub(super) front: Handle<Image>,
     #[texture(2)]
     #[sampler(3)]
-    pub(super) back: Handle<Image>,
+    pub(super) right: Handle<Image>,
     #[texture(4)]
     #[sampler(5)]
-    pub(super) left: Handle<Image>,
+    pub(super) back: Handle<Image>,
     #[texture(6)]
     #[sampler(7)]
-    pub(super) right: Handle<Image>,
+    pub(super) left: Handle<Image>,
     #[texture(8)]
     #[sampler(9)]
     pub(super) top: Handle<Image>,

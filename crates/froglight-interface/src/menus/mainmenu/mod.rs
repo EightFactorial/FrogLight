@@ -10,6 +10,17 @@ pub(crate) mod plugin;
 pub(crate) mod background;
 pub use background::{MainMenuBackground, MainMenuBackgroundCamera};
 
+pub(crate) mod buttons;
+pub use buttons::{
+    MainMenuButtonNode, MainMenuMultiplayerButton, MainMenuQuitButton, MainMenuSettingsButton,
+};
+
+pub(crate) mod logo;
+pub use logo::{MainMenuLogo, MainMenuLogoNode, MainMenuSubLogo};
+
+pub(crate) mod splash;
+pub use splash::MainMenuSplashText;
+
 pub(crate) mod systemset;
 use systemset::MainMenuUpdateSet;
 
@@ -26,6 +37,9 @@ fn build(app: &mut App) {
     );
 
     background::build(app);
+    buttons::build(app);
+    logo::build(app);
+    splash::build(app);
 }
 
 /// A marker [`Component`] for the root [`Entity`] of the main menu.
@@ -45,6 +59,7 @@ impl MainMenuRootNode {
                 width: Val::Percent(100.0),
                 height: Val::Percent(100.0),
 
+                justify_content: JustifyContent::Center,
                 ..Default::default()
             },
             background_color: BackgroundColor(Color::NONE),
@@ -53,10 +68,13 @@ impl MainMenuRootNode {
         };
 
         // Spawn the root node
-        let _root = world.spawn((Self, root_node, Name::new("MainMenuRootNode"))).id();
+        let root = world.spawn((Self, root_node, Name::new("MainMenuRootNode"))).id();
 
-        // TODO: Add the main menu UI
+        // Build children
+        MainMenuButtonNode::build(world, root);
+        MainMenuLogoNode::build(world, root);
 
+        // Build the background
         MainMenuBackground::build(world);
     }
 }

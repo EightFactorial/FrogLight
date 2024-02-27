@@ -3,7 +3,7 @@
 //! Appears while the game is starting up or reloading resource packs.
 
 use bevy::{prelude::*, ui::FocusPolicy};
-use froglight_core::events::ResourcePackStartLoadingEvent;
+use froglight_core::{events::ResourcePackStartLoadingEvent, resources::LoadingScreenState};
 
 pub(crate) mod plugin;
 
@@ -81,19 +81,27 @@ impl LoadingScreenRootNode {
     }
 
     /// Shows the loading screen.
-    fn show_loadingscreen(mut query: Query<&mut Visibility, With<Self>>) {
+    fn show_loadingscreen(
+        mut query: Query<&mut Visibility, With<Self>>,
+        mut res: ResMut<LoadingScreenState>,
+    ) {
         debug!("Showing LoadingScreen");
         for mut visibility in &mut query {
             *visibility = Visibility::Inherited;
         }
+        *res = LoadingScreenState(true);
     }
 
     /// Hides the loading screen.
-    fn hide_loadingscreen(mut query: Query<&mut Visibility, With<Self>>) {
+    fn hide_loadingscreen(
+        mut query: Query<&mut Visibility, With<Self>>,
+        mut res: ResMut<LoadingScreenState>,
+    ) {
         debug!("Hiding LoadingScreen");
         for mut visibility in &mut query {
             *visibility = Visibility::Hidden;
         }
+        *res = LoadingScreenState(false);
     }
 
     /// Show the loading screen when resource packs are being reloaded.

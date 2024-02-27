@@ -60,6 +60,9 @@ impl LoadingScreenLogo {
                 max_height: Val::Percent(100.0),
                 width: Val::Auto,
                 max_width: Val::Percent(100.0),
+
+                align_self: AlignSelf::Center,
+                justify_self: JustifySelf::Center,
                 ..Default::default()
             },
             image: image.into(),

@@ -1,12 +1,16 @@
 use std::ops::Mul;
 
-use bevy::{prelude::*, render::mesh::VertexAttributeValues};
-use froglight_assets::{AssetManager, FallbackImage, ResourcePackState};
+use bevy::{
+    prelude::*,
+    render::{mesh::VertexAttributeValues, view::RenderLayers},
+};
+use froglight_assets::{AssetManager, FallbackImage};
 
 mod camera;
 pub use camera::MainMenuBackgroundCamera;
 
 mod shader;
+use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
 use shader::MainMenuBackgroundShader;
 
 use super::systemset::MainMenuUpdateSet;
@@ -16,11 +20,19 @@ pub(super) fn build(app: &mut App) {
     camera::build(app);
     shader::build(app);
 
+    app.register_type::<MainMenuBackground>();
     app.add_systems(
         Update,
-        MainMenuBackground::rotate_background
+        MainMenuBackground::background_rotation
+            .run_if(LoadingScreenState::is_hidden)
             .run_if(any_with_component::<MainMenuBackground>)
-            .run_if(in_state(ResourcePackState::Ready))
+            .in_set(MainMenuUpdateSet),
+    );
+    app.add_systems(
+        Update,
+        MainMenuBackground::background_visibility
+            .run_if(resource_exists_and_changed::<MainMenuEnable>)
+            .run_if(any_with_component::<MainMenuBackground>)
             .in_set(MainMenuUpdateSet),
     );
 }
@@ -31,12 +43,23 @@ pub(super) fn build(app: &mut App) {
 pub struct MainMenuBackground;
 
 impl MainMenuBackground {
-    const ROTATION_SPEED: f32 = 6.0;
+    const ROTATION_SPEED: f32 = 5.0;
+    const RENDER_LAYER: u8 = 4;
 
-    fn rotate_background(mut query: Query<&mut Transform, With<Self>>, time: Res<Time<Virtual>>) {
+    fn background_rotation(mut query: Query<&mut Transform, With<Self>>, time: Res<Time<Virtual>>) {
         let delta = time.delta_seconds().mul(Self::ROTATION_SPEED).min(0.2).to_radians();
         for mut transform in &mut query {
             transform.rotate_y(delta);
+        }
+    }
+
+    fn background_visibility(
+        mut query: Query<&mut Visibility, With<Self>>,
+        res: Res<MainMenuEnable>,
+    ) {
+        let new = if **res { Visibility::Inherited } else { Visibility::Hidden };
+        for mut visibility in &mut query {
+            *visibility = new;
         }
     }
 
@@ -44,6 +67,7 @@ impl MainMenuBackground {
         debug!("Building MainMenuBackground");
 
         // Load the textures for the main menu background
+        // TODO: Actually select the correct textures
         let shader: MainMenuBackgroundShader;
         {
             let assets = world.resource::<AssetManager>();
@@ -66,19 +90,19 @@ impl MainMenuBackground {
             let left =
                 if let Some(texture) = left { texture.clone() } else { fallback.as_ref().clone() };
 
-            let bottom = textures.get("minecraft:gui/title/background/panorama_4");
+            let top = textures.get("minecraft:gui/title/background/panorama_4");
+            let top =
+                if let Some(texture) = top { texture.clone() } else { fallback.as_ref().clone() };
+
+            let bottom = textures.get("minecraft:gui/title/background/panorama_5");
             let bottom = if let Some(texture) = bottom {
                 texture.clone()
             } else {
                 fallback.as_ref().clone()
             };
 
-            let top = textures.get("minecraft:gui/title/background/panorama_5");
-            let top =
-                if let Some(texture) = top { texture.clone() } else { fallback.as_ref().clone() };
-
             // Create the shader struct
-            shader = MainMenuBackgroundShader { front, back, left, right, top, bottom };
+            shader = MainMenuBackgroundShader { front, right, back, left, top, bottom };
         }
 
         // Add the shader to the asset manager
@@ -116,12 +140,12 @@ impl MainMenuBackground {
                     [0.0, 1.0],
                     [1.0, 1.0],
                     [1.0, 0.0],
-                    // Bottom
+                    // Top
                     [0.0, 1.0],
                     [1.0, 1.0],
                     [1.0, 0.0],
                     [0.0, 0.0],
-                    // Top
+                    // Bottom
                     [0.0, 1.0],
                     [1.0, 1.0],
                     [1.0, 0.0],
@@ -142,6 +166,11 @@ impl MainMenuBackground {
 
         // Create the background entity
         let bundle = MaterialMeshBundle { mesh, material, ..Default::default() };
-        world.spawn((MainMenuBackground, Name::new("MainMenuBackground"), bundle));
+        world.spawn((
+            MainMenuBackground,
+            RenderLayers::layer(Self::RENDER_LAYER),
+            Name::new("MainMenuBackground"),
+            bundle,
+        ));
     }
 }
