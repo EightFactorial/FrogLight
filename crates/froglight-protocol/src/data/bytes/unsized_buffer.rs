@@ -15,7 +15,7 @@ use crate::io::{FrogRead, FrogWrite, ReadError, WriteError};
 ///
 /// For this reason, it *must* be the last field in the packet.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Reflect)]
-pub struct UnsizedByteBuffer(SmallVec<[u8; Self::BUFFER_SIZE]>);
+pub struct UnsizedByteBuffer(#[reflect(ignore)] SmallVec<[u8; Self::BUFFER_SIZE]>);
 
 impl UnsizedByteBuffer {
     /// The default buffer size for an [`UnsizedByteBuffer`].

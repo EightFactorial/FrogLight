@@ -2,7 +2,8 @@
 
 use std::sync::Arc;
 
-use bevy::ecs::component::Component;
+use bevy::{ecs::component::Component, log::warn};
+use froglight_core::data::ChunkBlockPosition;
 use parking_lot::RwLock;
 use thiserror::Error;
 
@@ -37,6 +38,10 @@ impl Chunk {
     /// The depth of a [`Chunk`].
     pub const DEPTH: usize = 16;
 
+    /// The total volume of the [`Chunk`].
+    #[must_use]
+    pub const fn volume(&self) -> usize { Self::WIDTH * Self::DEPTH * self.height }
+
     /// Creates a new empty [`Chunk`] with the given height.
     #[must_use]
     pub fn new_empty(height: usize) -> Self {
@@ -49,7 +54,7 @@ impl Chunk {
 
     /// Creates a new [`Chunk`] with the given sections.
     ///
-    /// This calculates the heightmaps from the sections.
+    /// This calculates the world height from the number of sections.
     ///
     /// # Example
     /// ```rust
@@ -74,6 +79,8 @@ impl Chunk {
     }
 
     /// Creates a new [`Chunk`] with the given sections and heightmaps.
+    ///
+    /// This calculates the world height from the number of sections.
     #[must_use]
     pub fn new_with_heightmaps(sections: Vec<Section>, heightmaps: HeightMaps) -> Self {
         Self {
@@ -81,6 +88,36 @@ impl Chunk {
             sections: Arc::new(RwLock::new(sections)),
             heightmaps: Arc::new(RwLock::new(heightmaps)),
         }
+    }
+
+    /// Gets the block at the given position in the chunk.
+    ///
+    /// Returns [`None`] if the position is out of bounds.
+    pub fn get_block(&self, pos: &ChunkBlockPosition) -> Option<usize> {
+        let section_index = pos.y() / Section::HEIGHT;
+        if let Some(section) = self.sections.read().get(section_index) {
+            let pos = pos.into();
+            return Some(section.get_block(&pos));
+        }
+
+        warn!("Attempted to get block from non-existent section");
+        None
+    }
+
+    /// Sets the block at the given position in the chunk.
+    ///
+    /// Returns the previous block id at the position.
+    ///
+    /// Returns [`None`] if the position is out of bounds.
+    pub fn set_block(&mut self, pos: &ChunkBlockPosition, value: usize) -> Option<usize> {
+        let section_index = pos.y() / Section::HEIGHT;
+        if let Some(section) = self.sections.write().get_mut(section_index) {
+            let pos = pos.into();
+            return Some(section.set_block(&pos, value));
+        }
+
+        warn!("Attempted to set block in non-existent section");
+        None
     }
 
     /// Decodes a [`Chunk`] from a buffer.
