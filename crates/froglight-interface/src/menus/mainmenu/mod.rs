@@ -16,6 +16,7 @@ pub use buttons::{
 };
 
 pub(crate) mod logo;
+use froglight_core::resources::MainMenuEnable;
 pub use logo::{MainMenuLogo, MainMenuLogoNode, MainMenuSubLogo};
 
 pub(crate) mod splash;
@@ -23,6 +24,9 @@ pub use splash::MainMenuSplashText;
 
 pub(crate) mod systemset;
 use systemset::MainMenuUpdateSet;
+
+pub(crate) mod text;
+pub use text::{MainMenuNoticeText, MainMenuVersionText};
 
 #[doc(hidden)]
 fn build(app: &mut App) {
@@ -40,6 +44,7 @@ fn build(app: &mut App) {
     buttons::build(app);
     logo::build(app);
     splash::build(app);
+    text::build(app);
 }
 
 /// A marker [`Component`] for the root [`Entity`] of the main menu.
@@ -50,6 +55,14 @@ pub struct MainMenuRootNode;
 impl MainMenuRootNode {
     fn build_mainmenu(world: &mut World) {
         debug!("Building MainMenu");
+
+        // Determine the visibility of the main menu
+        let visibility = if let Some(MainMenuEnable(true)) = world.get_resource::<MainMenuEnable>()
+        {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
 
         // Create the root node
         let root_node = NodeBundle {
@@ -64,6 +77,7 @@ impl MainMenuRootNode {
             },
             background_color: BackgroundColor(Color::NONE),
             focus_policy: FocusPolicy::Block,
+            visibility,
             ..Default::default()
         };
 
@@ -71,8 +85,10 @@ impl MainMenuRootNode {
         let root = world.spawn((Self, root_node, Name::new("MainMenuRootNode"))).id();
 
         // Build children
-        MainMenuButtonNode::build(world, root);
         MainMenuLogoNode::build(world, root);
+        MainMenuButtonNode::build(world, root);
+        MainMenuVersionText::build(world, root);
+        MainMenuNoticeText::build(world, root);
 
         // Build the background
         MainMenuBackground::build(world);

@@ -43,8 +43,8 @@ pub(super) fn build(app: &mut App) {
 pub struct MainMenuBackground;
 
 impl MainMenuBackground {
-    const ROTATION_SPEED: f32 = 5.0;
-    const RENDER_LAYER: u8 = 4;
+    const ROTATION_SPEED: f32 = 2.0;
+    const RENDER_LAYER: RenderLayers = RenderLayers::layer(4);
 
     fn background_rotation(mut query: Query<&mut Transform, With<Self>>, time: Res<Time<Virtual>>) {
         let delta = time.delta_seconds().mul(Self::ROTATION_SPEED).min(0.2).to_radians();
@@ -164,12 +164,20 @@ impl MainMenuBackground {
             world.resource_mut::<Assets<Mesh>>().add(mesh)
         };
 
+        // Determine the visibility of the background
+        let visibility = if let Some(MainMenuEnable(true)) = world.get_resource::<MainMenuEnable>()
+        {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
+
         // Create the background entity
-        let bundle = MaterialMeshBundle { mesh, material, ..Default::default() };
+        let bundle = MaterialMeshBundle { mesh, material, visibility, ..Default::default() };
         world.spawn((
-            MainMenuBackground,
-            RenderLayers::layer(Self::RENDER_LAYER),
             Name::new("MainMenuBackground"),
+            MainMenuBackground,
+            Self::RENDER_LAYER,
             bundle,
         ));
     }

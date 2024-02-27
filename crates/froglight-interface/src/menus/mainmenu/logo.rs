@@ -16,20 +16,21 @@ pub(super) fn build(app: &mut App) {
 pub struct MainMenuLogoNode;
 
 impl MainMenuLogoNode {
+    // TODO: Use accurate placement and size measurements
+    // It's close enough you'd only notice if they were side by side
     pub(crate) fn build(world: &mut World, parent: Entity) {
         // Create the logo container
-        // TODO: Resize based on accurate size
         let bundle = NodeBundle {
             style: Style {
+                align_content: AlignContent::Center,
+                justify_content: JustifyContent::Center,
+
                 width: Val::Px(240.0),
                 max_width: Val::Vw(80.0),
                 height: Val::Px(100.0),
                 max_height: Val::Vh(30.0),
 
-                align_content: AlignContent::Center,
-                justify_content: JustifyContent::Center,
-
-                top: Val::Percent(5.0),
+                top: Val::Px(7.0),
                 ..Default::default()
             },
             ..Default::default()
@@ -68,13 +69,13 @@ impl MainMenuLogo {
         };
         let bundle = ImageBundle {
             style: Style {
+                align_self: AlignSelf::Center,
+                justify_self: JustifySelf::Center,
+
                 width: Val::Auto,
                 max_width: Val::Percent(100.0),
                 height: Val::Auto,
                 max_height: Val::Percent(100.0),
-
-                align_self: AlignSelf::Center,
-                justify_self: JustifySelf::Center,
                 ..Default::default()
             },
             image: logo.into(),
@@ -143,12 +144,11 @@ fn center_node() -> NodeBundle {
     NodeBundle {
         style: Style {
             position_type: PositionType::Absolute,
+            justify_content: JustifyContent::Center,
+            align_content: AlignContent::Center,
 
             width: Val::Percent(100.0),
             height: Val::Percent(100.0),
-
-            justify_content: JustifyContent::Center,
-            align_content: AlignContent::Center,
 
             top: Val::Px(0.0),
             left: Val::Px(0.0),

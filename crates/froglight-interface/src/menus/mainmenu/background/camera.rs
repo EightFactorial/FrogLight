@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::view::RenderLayers};
+use bevy::prelude::*;
 use froglight_core::resources::MainMenuEnable;
 
 use super::MainMenuBackground;
@@ -31,7 +31,7 @@ impl MainMenuBackgroundCamera {
         if **res {
             if query.iter().count() == 0 {
                 debug!("Creating MainMenuBackgroundCamera");
-                commands.spawn(Self::create());
+                commands.spawn(Self::bundle());
             }
         } else {
             for entity in &query {
@@ -41,18 +41,19 @@ impl MainMenuBackgroundCamera {
         }
     }
 
-    pub(crate) fn create() -> impl Bundle {
-        let mut camera = default_camera3d_bundle();
-        camera.projection = Projection::Perspective(PerspectiveProjection {
-            fov: 90f32.to_radians(),
-            ..Default::default()
-        });
-
+    pub(crate) fn bundle() -> impl Bundle {
         (
-            MainMenuBackgroundCamera,
-            RenderLayers::layer(MainMenuBackground::RENDER_LAYER),
             Name::new("MainMenuBackgroundCamera"),
-            camera,
+            MainMenuBackground::RENDER_LAYER,
+            MainMenuBackgroundCamera,
+            Camera3dBundle {
+                transform: Transform::from_rotation(Quat::from_rotation_x(-7.5f32.to_radians())),
+                projection: Projection::Perspective(PerspectiveProjection {
+                    fov: 90f32.to_radians(),
+                    ..Default::default()
+                }),
+                ..default_camera3d_bundle()
+            },
         )
     }
 }
