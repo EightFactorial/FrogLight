@@ -1,6 +1,6 @@
 use std::io::Cursor;
 
-use bevy::reflect::Reflect;
+use bevy_reflect::Reflect;
 use froglight_protocol::io::FrogRead;
 use simdnbt::owned::{Nbt, NbtTag};
 
@@ -28,16 +28,16 @@ impl HeightMaps {
                 heightmaps.motion_blocking =
                     HeightMapContainer::try_from_vec(height, motion_blocking)?;
             } else {
-                bevy::log::warn!("Chunk is missing `MOTION_BLOCKING` heightmap");
+                bevy_log::warn!("Chunk is missing `MOTION_BLOCKING` heightmap");
             }
 
             if let Some(NbtTag::LongArray(world_surface)) = base.take("WORLD_SURFACE") {
                 heightmaps.world_surface = HeightMapContainer::try_from_vec(height, world_surface)?;
             } else {
-                bevy::log::warn!("Chunk is missing `WORLD_SURFACE` heightmap");
+                bevy_log::warn!("Chunk is missing `WORLD_SURFACE` heightmap");
             }
         } else {
-            bevy::log::warn!("Chunk is missing heightmaps");
+            bevy_log::warn!("Chunk is missing heightmaps");
         }
 
         Ok(heightmaps)

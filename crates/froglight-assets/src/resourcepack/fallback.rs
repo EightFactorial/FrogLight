@@ -1,4 +1,14 @@
-use bevy::{asset::embedded_asset, prelude::*};
+use bevy_app::{App, Startup};
+use bevy_asset::{embedded_asset, AssetServer, Handle};
+use bevy_ecs::{
+    schedule::{
+        common_conditions::{not, resource_exists},
+        IntoSystemConfigs,
+    },
+    system::{Commands, Res, Resource},
+};
+use bevy_render::prelude::Image;
+use derive_more::{Deref, DerefMut};
 use froglight_core::systemsets::AssetStartupSet;
 
 #[doc(hidden)]

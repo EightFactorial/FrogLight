@@ -1,6 +1,12 @@
 use std::sync::Arc;
 
-use bevy::{ecs::schedule::BoxedCondition, prelude::*};
+use bevy_app::{App, Plugin};
+use bevy_asset::AssetApp;
+use bevy_ecs::{
+    schedule::{BoxedCondition, Condition},
+    system::IntoSystem,
+};
+use bevy_log::debug;
 use parking_lot::Mutex;
 
 use crate::ResourcePack;

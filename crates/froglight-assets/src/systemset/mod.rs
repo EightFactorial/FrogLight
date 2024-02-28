@@ -1,6 +1,7 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use bevy::{ecs::schedule::BoxedCondition, prelude::*};
+use bevy_app::App;
+use bevy_ecs::schedule::BoxedCondition;
 use parking_lot::Mutex;
 
 pub(crate) mod resourcepack;

@@ -1,8 +1,9 @@
 use async_zip::base::read::{WithEntry, ZipEntryReader};
-use bevy::{
-    asset::LoadContext,
-    prelude::*,
-    render::{render_asset::RenderAssetUsages, texture::Image},
+use bevy_asset::{Handle, LoadContext};
+use bevy_log::{trace, warn};
+use bevy_render::{
+    render_asset::RenderAssetUsages,
+    texture::{Image, ImageSampler},
 };
 use froglight_core::data::ResourceKey;
 use futures_lite::{io::Take, AsyncRead, AsyncReadExt};
@@ -18,8 +19,6 @@ pub(crate) async fn load_texture(
     load_context: &mut LoadContext<'_>,
 ) -> Result<Option<Handle<Image>>, ResourcePackLoaderError> {
     // Check if the texture already exists in the asset manager.
-
-    use bevy::render::{render_resource::TextureDescriptor, texture::ImageSampler};
     if loader.textures.read().contains_key(resource_key) {
         trace!(
             "Skipping `{resource_key}` from `{}` as it already exists",

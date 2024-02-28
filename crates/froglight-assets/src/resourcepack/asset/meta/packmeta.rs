@@ -1,5 +1,5 @@
 use async_zip::base::read::{WithEntry, ZipEntryReader};
-use bevy::prelude::*;
+use bevy_reflect::Reflect;
 use futures_lite::{io::Cursor, AsyncReadExt};
 
 use crate::ResourcePackLoaderError;

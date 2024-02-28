@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy_app::{App, Plugin};
 
 /// The [`Plugin`] for the [`froglight-world`](crate) crate.
 ///

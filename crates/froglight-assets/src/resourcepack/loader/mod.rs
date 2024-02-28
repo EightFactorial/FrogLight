@@ -1,8 +1,7 @@
 use async_zip::base::read::{stream::ZipFileReader, WithEntry, ZipEntryReader};
-use bevy::{
-    asset::{io::Reader, AssetLoader, LoadContext},
-    prelude::*,
-};
+use bevy_asset::{io::Reader, AssetLoader, BoxedFuture, LoadContext};
+use bevy_log::warn;
+use derive_more::Deref;
 use froglight_core::data::{ResourceKey, ResourceKeyError};
 use futures_lite::{io::Take, AsyncRead};
 use thiserror::Error;
@@ -59,7 +58,7 @@ impl AssetLoader for ResourcePackLoader {
         reader: &'a mut Reader,
         (): &'a Self::Settings,
         load_context: &'a mut LoadContext,
-    ) -> bevy::utils::BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
+    ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
         Box::pin(Self::load(self, reader, load_context))
     }
 }

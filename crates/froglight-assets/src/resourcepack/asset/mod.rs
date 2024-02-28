@@ -1,5 +1,9 @@
-use bevy::{asset::ReflectAsset, prelude::*, utils::HashMap};
+use bevy_asset::{Asset, Handle, ReflectAsset};
+use bevy_audio::AudioSource;
+use bevy_reflect::Reflect;
+use bevy_render::prelude::Image;
 use froglight_core::data::ResourceKey;
+use hashbrown::HashMap;
 
 pub(crate) mod meta;
 use meta::PackMcMeta;

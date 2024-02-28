@@ -2,7 +2,7 @@
 
 use std::io::Cursor;
 
-use bevy::reflect::Reflect;
+use bevy_reflect::Reflect;
 use froglight_core::data::SectionBlockPosition;
 use froglight_protocol::io::FrogRead;
 

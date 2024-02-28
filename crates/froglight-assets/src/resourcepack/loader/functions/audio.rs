@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
 use async_zip::base::read::{WithEntry, ZipEntryReader};
-use bevy::{asset::LoadContext, prelude::*};
+use bevy_asset::{Handle, LoadContext};
+use bevy_audio::AudioSource;
+use bevy_log::trace;
 use froglight_core::data::ResourceKey;
 use futures_lite::{io::Take, AsyncRead, AsyncReadExt};
 

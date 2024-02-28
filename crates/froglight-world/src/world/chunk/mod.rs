@@ -2,7 +2,8 @@
 
 use std::sync::Arc;
 
-use bevy::{ecs::component::Component, log::warn};
+use bevy_ecs::component::Component;
+use bevy_log::warn;
 use froglight_core::data::ChunkBlockPosition;
 use parking_lot::RwLock;
 use thiserror::Error;
@@ -23,8 +24,15 @@ use super::section::Section;
 /// - End: 256 (0 to 256)
 #[derive(Debug, Default, Clone, Component)]
 pub struct Chunk {
-    /// The height of the chunk.
+    /// The absolute height of the chunk.
+    ///
+    /// This is equivalent to the highest y-coordinate minus the offset.
     pub height: usize,
+
+    /// The height offset of the chunk.
+    ///
+    /// This is equivalent to the lowest y-coordinate.
+    pub offset: isize,
 
     /// The sections in the chunk.
     pub sections: Arc<RwLock<Vec<Section>>>,
@@ -44,10 +52,11 @@ impl Chunk {
 
     /// Creates a new empty [`Chunk`] with the given height.
     #[must_use]
-    pub fn new_empty(height: usize) -> Self {
+    pub fn new_empty(height: usize, offset: isize) -> Self {
         Self {
             height,
-            sections: Arc::new(RwLock::new(Vec::new())),
+            offset,
+            sections: Arc::new(RwLock::new(Vec::with_capacity(height / Section::HEIGHT))),
             heightmaps: Arc::new(RwLock::new(HeightMaps::default())),
         }
     }
@@ -61,18 +70,19 @@ impl Chunk {
     /// use froglight_world::world::{Chunk, Section};
     ///
     /// // Create a new chunk with 24 sections.
-    /// let chunk = Chunk::new(vec![Section::default(); 24]);
+    /// let chunk = Chunk::new(vec![Section::default(); 24], -64);
     ///
     /// // The chunk has a height of (24 x 16) 384.
     /// assert_eq!(chunk.height, 384);
     /// ```
     #[must_use]
-    pub fn new(sections: Vec<Section>) -> Self {
+    pub fn new(sections: Vec<Section>, offset: isize) -> Self {
         // TODO: Calculate heightmaps from sections.
         let heightmaps = HeightMaps::default();
 
         Self {
             height: sections.len() * Section::HEIGHT,
+            offset,
             sections: Arc::new(RwLock::new(sections)),
             heightmaps: Arc::new(RwLock::new(heightmaps)),
         }
@@ -82,9 +92,14 @@ impl Chunk {
     ///
     /// This calculates the world height from the number of sections.
     #[must_use]
-    pub fn new_with_heightmaps(sections: Vec<Section>, heightmaps: HeightMaps) -> Self {
+    pub fn new_with_heightmaps(
+        sections: Vec<Section>,
+        offset: isize,
+        heightmaps: HeightMaps,
+    ) -> Self {
         Self {
             height: sections.len() * Section::HEIGHT,
+            offset,
             sections: Arc::new(RwLock::new(sections)),
             heightmaps: Arc::new(RwLock::new(heightmaps)),
         }
@@ -126,6 +141,7 @@ impl Chunk {
     /// If the data in the buffer is invalid, an error will be returned.
     pub fn read_from_buffer(
         height: usize,
+        offset: isize,
         buf: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, ChunkDecodeError> {
         // Decode the sections.
@@ -141,6 +157,7 @@ impl Chunk {
 
         Ok(Self {
             height,
+            offset,
             sections: Arc::new(RwLock::new(sections)),
             heightmaps: Arc::new(RwLock::new(heightmaps)),
         })

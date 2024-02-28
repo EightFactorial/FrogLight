@@ -1,6 +1,12 @@
 //! `Resources` used for loading screens
-use bevy::prelude::*;
-use derive_more::{From, Into};
+
+use bevy_app::App;
+use bevy_ecs::{
+    reflect::ReflectResource,
+    system::{Res, Resource},
+};
+use bevy_reflect::Reflect;
+use derive_more::{Deref, DerefMut, From, Into};
 
 #[doc(hidden)]
 pub(super) fn setup(app: &mut App) {

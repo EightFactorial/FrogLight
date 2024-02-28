@@ -1,7 +1,8 @@
 //! Asset plugins for `FrogLight`
 use std::sync::Arc;
 
-use bevy::{app::PluginGroupBuilder, ecs::schedule::BoxedCondition, prelude::*};
+use bevy_app::{App, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy_ecs::schedule::BoxedCondition;
 use parking_lot::Mutex;
 
 #[cfg(feature = "asset_manager")]

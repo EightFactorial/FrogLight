@@ -1,6 +1,7 @@
 //! `SystemSets` used for resource packs
 
-use bevy::prelude::*;
+use bevy_app::{App, PostUpdate, PreUpdate, Startup, Update};
+use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

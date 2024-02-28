@@ -1,4 +1,13 @@
-use bevy::{asset::AssetPath, prelude::*};
+use bevy_app::{App, Update};
+use bevy_asset::{AssetEvent, AssetPath, AssetServer};
+use bevy_ecs::{
+    event::EventReader,
+    reflect::ReflectResource,
+    schedule::{IntoSystemConfigs, NextState, OnEnter},
+    system::{Res, ResMut, Resource},
+};
+use bevy_log::debug;
+use bevy_reflect::Reflect;
 
 use crate::{systemset::resourcepack::ResourcePackState, AssetManager, ResourcePack};
 

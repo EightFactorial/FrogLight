@@ -1,4 +1,4 @@
-use bevy::reflect::Reflect;
+use bevy_reflect::Reflect;
 use froglight_protocol::io::FrogRead;
 
 use crate::world::chunk::ChunkDecodeError;

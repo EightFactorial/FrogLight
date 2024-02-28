@@ -1,9 +1,13 @@
 use std::path::{Path, PathBuf};
 
-use bevy::{
-    asset::io::{AssetSource as BevyAssetSource, AssetSourceId as BevyAssetSourceId},
-    prelude::*,
+use bevy_app::App;
+use bevy_asset::{
+    io::{AssetSource as BevyAssetSource, AssetSourceId as BevyAssetSourceId},
+    AssetApp,
 };
+use bevy_ecs::{reflect::ReflectResource, system::Resource};
+use bevy_reflect::Reflect;
+use derive_more::Deref;
 
 pub(crate) mod plugin;
 

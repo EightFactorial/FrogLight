@@ -21,7 +21,10 @@ criterion = { workspace = true }
 proptest = { workspace = true }
 
 [dependencies]
-bevy = { workspace = true }
+bevy_app = "0.13.0"
+bevy_ecs = "0.13.0"
+bevy_log = "0.13.0"
+bevy_reflect = "0.13.0"
 bitvec = { workspace = true }
 bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
 compact_str = { workspace = true }

@@ -1,6 +1,6 @@
 //! A map of [`ChunkPositions`](ChunkPos) to [`ChunkEntities`](ChunkEntity).
 
-use bevy::reflect::Reflect;
+use bevy_reflect::Reflect;
 use hashbrown::HashMap;
 
 use super::ChunkEntity;

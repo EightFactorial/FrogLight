@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
-use bevy::prelude::*;
+use bevy_app::{App, Plugin};
+use bevy_log::info;
 
 /// Adds the [`AssetSource`](super::AssetSource) resource to the app
 /// and adds the `frog://` asset source.

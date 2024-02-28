@@ -1,6 +1,16 @@
 //! Schedules for loading resource packs.
 
-use bevy::{ecs::schedule::BoxedCondition, prelude::*};
+use bevy_app::{App, Update};
+use bevy_ecs::{
+    event::EventWriter,
+    schedule::{
+        common_conditions::{in_state, on_event},
+        BoxedCondition, IntoSystemConfigs, IntoSystemSetConfigs, NextState, States, SystemSet,
+    },
+    system::ResMut,
+};
+use bevy_log::debug;
+use bevy_reflect::Reflect;
 use froglight_core::{
     events::{ResourcePackFinishedLoadingEvent, ResourcePackStartLoadingEvent},
     systemsets::AssetUpdateSet,

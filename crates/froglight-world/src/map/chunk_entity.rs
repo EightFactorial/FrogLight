@@ -1,4 +1,5 @@
-use bevy::{ecs::entity::Entity, reflect::Reflect};
+use bevy_ecs::entity::Entity;
+use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut, From, Into};
 
 /// A [`ChunkEntity`] is an [`Entity`] that holds a

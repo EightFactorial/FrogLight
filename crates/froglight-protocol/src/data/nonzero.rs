@@ -117,7 +117,7 @@ impl<T> Default for NonZero<T> {
 impl<T: Debug> Debug for NonZero<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match &self.0 {
-            Some(val) => write!(f, "NonZero({:?})", val),
+            Some(val) => write!(f, "NonZero({val:?})"),
             None => write!(f, "NonZero(None)"),
         }
     }
@@ -126,7 +126,7 @@ impl<T: Debug> Debug for NonZero<T> {
 impl<T: Display> Display for NonZero<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match &self.0 {
-            Some(val) => write!(f, "{}", val),
+            Some(val) => write!(f, "{val}"),
             None => write!(f, "None"),
         }
     }

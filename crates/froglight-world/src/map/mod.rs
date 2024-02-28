@@ -1,6 +1,6 @@
 //! A series of maps storing the world's chunks and their entities.
 
-use bevy::app::App;
+use bevy_app::App;
 
 mod chunk_entity;
 pub use chunk_entity::ChunkEntity;

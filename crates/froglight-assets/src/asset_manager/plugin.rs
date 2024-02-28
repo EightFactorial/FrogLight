@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use bevy::prelude::*;
+use bevy_app::{App, Plugin};
+use bevy_asset::AssetApp;
+use bevy_ecs::reflect::AppTypeRegistry;
+use bevy_log::debug;
 
 use super::manager::AssetManager;
 use crate::{asset_manager::manager::inner::AssetManagerInner, ResourcePackLoader};

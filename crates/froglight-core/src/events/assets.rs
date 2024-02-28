@@ -1,4 +1,6 @@
-use bevy::prelude::*;
+use bevy_app::App;
+use bevy_ecs::event::Event;
+use bevy_reflect::Reflect;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

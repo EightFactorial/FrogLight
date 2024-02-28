@@ -16,9 +16,17 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy = { workspace = true }
-froglight-core = { version = "0.1.0", path = "../froglight-core" }
+bevy_app = "0.13.0"
+bevy_asset = "0.13.0"
+bevy_audio = "0.13.0"
+bevy_ecs = "0.13.0"
+bevy_log = "0.13.0"
+bevy_reflect = "0.13.0"
+bevy_render = "0.13.0"
 bevy-inspector-egui = { version = "0.23.2", optional = true }
+derive_more = { workspace = true }
+froglight-core = { version = "0.1.0", path = "../froglight-core" }
+hashbrown = { workspace = true }
 
 # AssetSource dependencies
 dirs = "5.0.1"

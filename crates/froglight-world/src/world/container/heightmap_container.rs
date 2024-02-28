@@ -1,4 +1,4 @@
-use bevy::reflect::Reflect;
+use bevy_reflect::Reflect;
 use bitvec::prelude::{BitVec, Msb0};
 
 use crate::world::chunk::ChunkDecodeError;

@@ -1,5 +1,5 @@
 //! A `World`, consisting of a set of [`Chunks`](Chunk).
-use bevy::app::App;
+use bevy_app::App;
 
 pub mod tasks;
 

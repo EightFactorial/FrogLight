@@ -1,4 +1,13 @@
-use bevy::prelude::*;
+use bevy_app::{App, Startup};
+use bevy_ecs::{
+    event::EventWriter,
+    reflect::ReflectResource,
+    schedule::common_conditions::{resource_exists, run_once},
+    system::{Res, ResMut, Resource},
+};
+use bevy_log::debug;
+use bevy_reflect::Reflect;
+use derive_more::{Deref, DerefMut};
 use froglight_core::{events::ResourcePackStartLoadingEvent, systemsets::AssetStartupSet};
 use serde::{Deserialize, Serialize};
 
@@ -35,6 +44,8 @@ impl ConfigFile for ResourcePackSettings {
 
     #[cfg(feature = "asset_manager")]
     fn build(app: &mut App) {
+        use bevy_ecs::schedule::IntoSystemConfigs;
+
         app.add_systems(
             Startup,
             Self::load_resourcepacks

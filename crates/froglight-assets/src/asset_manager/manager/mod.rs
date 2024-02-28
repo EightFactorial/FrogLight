@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use bevy::prelude::*;
+use bevy_ecs::{reflect::ReflectResource, system::Resource};
+use bevy_reflect::Reflect;
+use derive_more::Deref;
 
 pub(crate) mod inner;
 use inner::AssetManagerInner;

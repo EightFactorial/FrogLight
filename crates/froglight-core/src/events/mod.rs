@@ -1,6 +1,6 @@
 //! [`Events`](bevy::prelude::Event) used by all `FrogLight` crates.
 
-use bevy::prelude::*;
+use bevy_app::App;
 
 mod assets;
 pub use assets::{ResourcePackFinishedLoadingEvent, ResourcePackStartLoadingEvent};

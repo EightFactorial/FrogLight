@@ -1,5 +1,6 @@
 //! [`Resources`](bevy::prelude::Resource) used by all `FrogLight` crates.
-use bevy::prelude::*;
+
+use bevy_app::App;
 
 mod loading;
 pub use loading::{LoadingScreenEnable, LoadingScreenState};

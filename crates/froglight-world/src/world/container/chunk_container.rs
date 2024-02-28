@@ -1,6 +1,6 @@
 use std::{io::Cursor, marker::PhantomData};
 
-use bevy::reflect::Reflect;
+use bevy_reflect::Reflect;
 use bitvec::prelude::{BitVec, Msb0};
 use froglight_protocol::io::FrogRead;
 
@@ -77,14 +77,16 @@ impl ContainerType for BiomeContainer {
     }
 }
 
-#[cfg(test)]
-proptest::proptest! {
-    // #[test]
-    // fn block_container_test(coordinates in proptest::collection::vec(proptest::array::uniform3(0u8..=16u8), 0..=4096)) {
-    //     let mut container = ChunkDataContainer::<BlockContainer>::default();
+// #[cfg(test)]
+// proptest::proptest! {
+//     #[test]
+//     fn block_container_test(coordinates in
+// proptest::collection::vec(proptest::array::uniform3(0u8..=16u8), 0..=4096)) {
+//         let mut container = ChunkDataContainer::<BlockContainer>::default();
 
-    //     for (index, position) in coordinates.iter().map(|[x, y, z]| UVec3::new(u32::from(*x), u32::from(*y), u32::from(*z))).enumerate() {
-    //         // container.set(position, index as u32);
-    //     }
-    // }
-}
+//         for (index, position) in coordinates.iter().map(|[x, y, z]|
+// UVec3::new(u32::from(*x), u32::from(*y), u32::from(*z))).enumerate() {
+//             // container.set(position, index as u32);
+//         }
+//     }
+// }
