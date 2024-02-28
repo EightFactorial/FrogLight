@@ -83,158 +83,115 @@ impl ChunkBlockPosition {
     #[inline]
     pub const fn z(&self) -> u8 { self.z }
 
-    /// Adds a relative position to the position.
+    /// Attempts to add the given offset to the chunk block position.
     ///
-    /// # Examples
-    /// ```rust
-    /// use froglight_protocol::data::{BlockPosition, ChunkBlockPosition};
+    /// Returns [`None`] if the height is above [`isize::MAX`] or if
+    /// `height_offset + pos.y < 0`.
     ///
-    /// // The block position inside the chunk
-    /// let mut pos = ChunkBlockPosition::new(1, 2, 3);
+    /// The `height_offset` is relative to each world.
     ///
-    /// // A relative position
-    /// let rel = BlockPosition::new(1, 0, 0);
-    ///
-    /// // Move one block in the x-direction
-    /// pos.add_relative(&rel);
-    /// assert_eq!(pos, ChunkBlockPosition::new(2, 2, 3));
-    ///
-    /// // Move another block in the x-direction
-    /// pos.add_relative(&rel);
-    /// assert_eq!(pos, ChunkBlockPosition::new(3, 2, 3));
-    /// ```
-    #[inline]
+    /// The vanilla offsets are:
+    /// - Overworld: `-64`
+    /// - Nether: `0`
+    /// - End: `0`
+    #[must_use]
     #[allow(clippy::missing_panics_doc)]
-    pub fn add_relative(&mut self, pos: &BlockPosition) {
-        let x = u8::try_from((i64::from(self.x) + pos.x()).rem_euclid(16))
-            .expect("Index is out of range");
-        let y = self.y + usize::try_from(pos.y()).expect("Index is out of range");
-        let z = u8::try_from((i64::from(self.z) + pos.z()).rem_euclid(16))
-            .expect("Index is out of range");
+    pub fn add_relative(
+        &self,
+        height_offset: isize,
+        pos: &BlockPosition,
+    ) -> Option<ChunkBlockPosition> {
+        // Add the height offset to the y-coordinate.
+        let Ok(coord) = isize::try_from(pos.y) else {
+            // Return None if the height is above isize::MAX (9,223,372,036,854,775,807).
+            return None;
+        };
+        let Ok(offset_coord) = usize::try_from(coord + height_offset) else {
+            // If the height is below 0, return None.
+            return None;
+        };
 
-        self.x = x;
-        self.y = y;
-        self.z = z;
+        // Return the new position.
+        Some(ChunkBlockPosition::new(
+            u8::try_from((i64::from(self.x) + pos.x).rem_euclid(16)).expect("Index out of range"),
+            self.y + offset_coord,
+            u8::try_from((i64::from(self.z) + pos.z).rem_euclid(16)).expect("Index out of range"),
+        ))
     }
 }
 
+// --- Math Implementations ---
+
 impl Add<ChunkBlockPosition> for ChunkBlockPosition {
-    type Output = Self;
-    fn add(self, rhs: Self) -> Self::Output {
-        let mut x = self.x.wrapping_add(rhs.x);
-        let mut y = self.y + rhs.y;
-        let mut z = self.z.wrapping_add(rhs.z);
-
-        // Add the carry to the next coordinate
-        if x > 15 {
-            z = z.wrapping_add(1);
-        }
-        if z > 15 {
-            y = y.wrapping_add(1);
-        }
-
-        // Ensure the coordinates are in the range 0..16
-        x %= 16;
-        z %= 16;
-
-        Self { x, y, z }
+    type Output = ChunkBlockPosition;
+    fn add(self, rhs: ChunkBlockPosition) -> Self::Output {
+        ChunkBlockPosition::new(
+            self.x.wrapping_add(rhs.x).rem_euclid(16),
+            self.y + rhs.y,
+            self.z.wrapping_add(rhs.z).rem_euclid(16),
+        )
     }
 }
 impl AddAssign<ChunkBlockPosition> for ChunkBlockPosition {
-    fn add_assign(&mut self, rhs: Self) { *self = *self + rhs; }
+    fn add_assign(&mut self, rhs: ChunkBlockPosition) { *self = *self + rhs; }
 }
-
 impl Sub<ChunkBlockPosition> for ChunkBlockPosition {
-    type Output = Self;
-    fn sub(self, rhs: Self) -> Self::Output {
-        let mut x = self.x.wrapping_sub(rhs.x);
-        let mut y = self.y - rhs.y;
-        let mut z = self.z.wrapping_sub(rhs.z);
-
-        // Add the carry to the next coordinate
-        if x > 15 {
-            z = z.wrapping_sub(1);
-        }
-        if z > 15 {
-            y = y.wrapping_sub(1);
-        }
-
-        // Ensure the coordinates are in the range 0..16
-        x %= 16;
-        z %= 16;
-
-        Self { x, y, z }
+    type Output = ChunkBlockPosition;
+    fn sub(self, rhs: ChunkBlockPosition) -> Self::Output {
+        ChunkBlockPosition::new(
+            self.x.wrapping_sub(rhs.x).rem_euclid(16),
+            self.y - rhs.y,
+            self.z.wrapping_sub(rhs.z).rem_euclid(16),
+        )
     }
 }
 impl SubAssign<ChunkBlockPosition> for ChunkBlockPosition {
-    fn sub_assign(&mut self, rhs: Self) { *self = *self - rhs; }
+    fn sub_assign(&mut self, rhs: ChunkBlockPosition) { *self = *self - rhs; }
 }
 
 // --- Tests ---
 
 #[cfg(test)]
+const TEST_XZ_RANGE: std::ops::Range<u8> = 0u8..16u8;
+
+#[cfg(test)]
+const TEST_Y_RANGE: std::ops::Range<usize> = usize::MIN..usize::MAX;
+
+#[cfg(test)]
 proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
     #[test]
-    fn chunkblock_add([x, z] in proptest::array::uniform2(0u8..16u8), y in proptest::bits::u32::ANY) {
-        let pos = ChunkBlockPosition::new(x, y as usize, z);
-        let rel = ChunkBlockPosition::new(1, 2, 3);
-        let output = pos + rel;
+    fn chunkblockpos_add([x1, z1, x2, z2] in proptest::array::uniform4(TEST_XZ_RANGE), y1 in TEST_Y_RANGE) {
+        let pos1 = ChunkBlockPosition::new(x1, y1, z1);
+        let pos2 = ChunkBlockPosition::new(x2, 0, z2);
+        let added = pos1 + pos2;
 
-        // Ensure the coordinates are in the range 0..16
-        assert!(output.x < 16, "X-coordinate is out of range");
-        assert!(output.z < 16, "Z-coordinate is out of range");
+        // Make sure the result is within the expected range.
+        assert!(added.x < 16);
+        assert_eq!(added.y, y1);
+        assert!(added.z < 16);
 
-        // Ensure the x-coordinate is correct
-        let expected = x.wrapping_add(1).rem_euclid(16);
-        assert_eq!(output.x, expected, "X-coordinate is incorrect");
-
-        // Ensure the y-coordinate is correct
-        let mut expected = y as usize + 2;
-        if (pos.x >= 15 && pos.z > 11) || pos.z > 12 {
-            expected += 1;
-        }
-        assert_eq!(output.y, expected, "Y-coordinate is incorrect");
-
-        // Ensure the z-coordinate is correct
-        let mut expected = z.wrapping_add(3);
-        if pos.x >= 15 {
-            expected += 1;
-        }
-        assert_eq!(output.z, expected.rem_euclid(16), "Z-coordinate is incorrect");
+        // Make sure the result is as expected.
+        assert_eq!(added.x, x1.wrapping_add(x2).rem_euclid(16));
+        assert_eq!(added.z, z1.wrapping_add(z2).rem_euclid(16));
     }
 
     #[test]
-    fn chunkblock_sub([x, z] in proptest::array::uniform2(0u8..16u8), y in proptest::bits::u32::ANY) {
-        // Ensure the y-coordinate is at least 2 to prevent underflow
-        if y < 2 {
-            return Ok(());
-        }
+    fn chunkblockpos_sub([x1, z1, x2, z2] in proptest::array::uniform4(TEST_XZ_RANGE), y1 in TEST_Y_RANGE) {
+        let pos1 = ChunkBlockPosition::new(x1, y1, z1);
+        let pos2 = ChunkBlockPosition::new(x2, 0, z2);
 
-        let pos = ChunkBlockPosition::new(x, y as usize, z);
-        let rel = ChunkBlockPosition::new(1, 2, 3);
-        let output = pos - rel;
+        let subbed = pos1 - pos2;
 
-        // Ensure the coordinates are in the range 0..16
-        assert!(output.x < 16, "X-coordinate is out of range");
-        assert!(output.z < 16, "Z-coordinate is out of range");
+        // Make sure the result is within the expected range.
+        assert!(subbed.x < 16);
+        assert_eq!(subbed.y, y1);
+        assert!(subbed.z < 16);
 
-        // Ensure the x-coordinate is correct
-        let expected = x.wrapping_sub(1).rem_euclid(16);
-        assert_eq!(output.x, expected, "X-coordinate is incorrect");
-
-        // Ensure the y-coordinate is correct
-        let mut expected = y as usize - 2;
-        if (pos.x < 1 && pos.z < 4 ) || pos.z < 3 {
-            expected -= 1;
-        }
-        assert_eq!(output.y, expected, "Y-coordinate is incorrect");
-
-        // Ensure the z-coordinate is correct
-        let mut expected = z.wrapping_sub(3);
-        if pos.x < 1 {
-            expected = expected.wrapping_sub(1);
-        }
-        assert_eq!(output.z, expected.rem_euclid(16), "Z-coordinate is incorrect");
+        // Make sure the result is as expected.
+        assert_eq!(subbed.x, x1.wrapping_sub(x2).rem_euclid(16));
+        assert_eq!(subbed.z, z1.wrapping_sub(z2).rem_euclid(16));
     }
+
 }

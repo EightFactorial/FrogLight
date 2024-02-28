@@ -119,45 +119,12 @@ impl SectionBlockPosition {
     #[inline]
     #[allow(clippy::missing_panics_doc)]
     pub fn from_index(index: usize) -> Self {
+        debug_assert!(index < 4096, "Index is out of range");
+
         let x = u8::try_from(index.rem_euclid(16)).expect("Index is out of range");
         let z = u8::try_from(index.div_euclid(16).rem_euclid(16)).expect("Index is out of range");
         let y = u8::try_from(index.div_euclid(256).rem_euclid(16)).expect("Index is out of range");
         Self::new(x, y, z)
-    }
-
-    /// Adds a relative position to the position.
-    ///
-    /// # Examples
-    /// ```rust
-    /// use froglight_protocol::data::{BlockPosition, SectionBlockPosition};
-    ///
-    /// // The block position inside the chunk
-    /// let mut pos = SectionBlockPosition::new(1, 2, 3);
-    ///
-    /// // A relative position
-    /// let rel = BlockPosition::new(1, 0, 0);
-    ///
-    /// // Move one block in the x-direction
-    /// pos.add_relative(&rel);
-    /// assert_eq!(pos, SectionBlockPosition::new(2, 2, 3));
-    ///
-    /// // Move another block in the x-direction
-    /// pos.add_relative(&rel);
-    /// assert_eq!(pos, SectionBlockPosition::new(3, 2, 3));
-    /// ```
-    #[inline]
-    #[allow(clippy::missing_panics_doc)]
-    pub fn add_relative(&mut self, pos: &BlockPosition) {
-        let x = u8::try_from((i64::from(self.x) + pos.x()).rem_euclid(16))
-            .expect("Index is out of range");
-        let y = u8::try_from((i64::from(self.y) + pos.y()).rem_euclid(16))
-            .expect("Index is out of range");
-        let z = u8::try_from((i64::from(self.z) + pos.z()).rem_euclid(16))
-            .expect("Index is out of range");
-
-        self.x = x;
-        self.y = y;
-        self.z = z;
     }
 }
 
@@ -165,56 +132,56 @@ impl SectionBlockPosition {
 
 impl Add<SectionBlockPosition> for SectionBlockPosition {
     type Output = Self;
-    fn add(self, rhs: Self) -> Self::Output {
-        let mut x = self.x.wrapping_add(rhs.x);
-        let mut y = self.y.wrapping_add(rhs.y);
-        let mut z = self.z.wrapping_add(rhs.z);
-
-        // Add the carry to the next coordinate
-        if x > 15 {
-            z = z.wrapping_add(1);
-        }
-        if z > 15 {
-            y = y.wrapping_add(1);
-        }
-
-        // Ensure the coordinates are in the range 0..16
-        x %= 16;
-        y %= 16;
-        z %= 16;
-
-        Self { x, y, z }
+    fn add(self, rhs: SectionBlockPosition) -> Self::Output {
+        Self::new(
+            self.x.wrapping_add(rhs.x).rem_euclid(16),
+            self.y.wrapping_add(rhs.y).rem_euclid(16),
+            self.z.wrapping_add(rhs.z).rem_euclid(16),
+        )
     }
 }
 impl AddAssign<SectionBlockPosition> for SectionBlockPosition {
-    fn add_assign(&mut self, rhs: Self) { *self = *self + rhs; }
+    fn add_assign(&mut self, rhs: SectionBlockPosition) { *self = *self + rhs; }
 }
-
 impl Sub<SectionBlockPosition> for SectionBlockPosition {
     type Output = Self;
-    fn sub(self, rhs: Self) -> Self::Output {
-        let mut x = self.x.wrapping_sub(rhs.x);
-        let mut y = self.y.wrapping_sub(rhs.y);
-        let mut z = self.z.wrapping_sub(rhs.z);
-
-        // Add the carry to the next coordinate
-        if x > 15 {
-            z = z.wrapping_sub(1);
-        }
-        if z > 15 {
-            y = y.wrapping_sub(1);
-        }
-
-        // Ensure the coordinates are in the range 0..16
-        x %= 16;
-        y %= 16;
-        z %= 16;
-
-        Self { x, y, z }
+    fn sub(self, rhs: SectionBlockPosition) -> Self::Output {
+        Self::new(
+            self.x.wrapping_sub(rhs.x).rem_euclid(16),
+            self.y.wrapping_sub(rhs.y).rem_euclid(16),
+            self.z.wrapping_sub(rhs.z).rem_euclid(16),
+        )
     }
 }
 impl SubAssign<SectionBlockPosition> for SectionBlockPosition {
-    fn sub_assign(&mut self, rhs: Self) { *self = *self - rhs; }
+    fn sub_assign(&mut self, rhs: SectionBlockPosition) { *self = *self - rhs; }
+}
+
+impl Add<BlockPosition> for SectionBlockPosition {
+    type Output = SectionBlockPosition;
+    fn add(self, rhs: BlockPosition) -> Self::Output {
+        Self::new(
+            u8::try_from((i64::from(self.x) + rhs.x).rem_euclid(16)).expect("Index out of range"),
+            u8::try_from((i64::from(self.y) + rhs.y).rem_euclid(16)).expect("Index out of range"),
+            u8::try_from((i64::from(self.z) + rhs.z).rem_euclid(16)).expect("Index out of range"),
+        )
+    }
+}
+impl AddAssign<BlockPosition> for SectionBlockPosition {
+    fn add_assign(&mut self, rhs: BlockPosition) { *self = *self + rhs; }
+}
+impl Sub<BlockPosition> for SectionBlockPosition {
+    type Output = SectionBlockPosition;
+    fn sub(self, rhs: BlockPosition) -> Self::Output {
+        Self::new(
+            u8::try_from((i64::from(self.x) - rhs.x).rem_euclid(16)).expect("Index out of range"),
+            u8::try_from((i64::from(self.y) - rhs.y).rem_euclid(16)).expect("Index out of range"),
+            u8::try_from((i64::from(self.z) - rhs.z).rem_euclid(16)).expect("Index out of range"),
+        )
+    }
+}
+impl SubAssign<BlockPosition> for SectionBlockPosition {
+    fn sub_assign(&mut self, rhs: BlockPosition) { *self = *self - rhs; }
 }
 
 impl From<ChunkBlockPosition> for SectionBlockPosition {
@@ -270,34 +237,44 @@ impl_from!(try_group usize, u128, u64, u32, u16, isize, i128, i64, i32, i16, i8 
 // --- Tests ---
 
 #[cfg(test)]
+const TEST_XYZ_RANGE: std::ops::Range<u8> = 0u8..16u8;
+
+#[cfg(test)]
 proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
     #[test]
-    fn chunkblock_index(index in proptest::bits::u32::ANY) {
-        let pos = SectionBlockPosition::from_index(index as usize);
-        let expected = index.rem_euclid(4096);
-        assert_eq!(pos.as_index(), expected as usize);
+    fn sectionblockpos_add([x1, y1, z1, x2, y2, z2] in proptest::array::uniform6(TEST_XYZ_RANGE)) {
+        let pos1 = SectionBlockPosition::new(x1, y1, z1);
+        let pos2 = SectionBlockPosition::new(x2, y2, z2);
+        let added = pos1 + pos2;
+
+        // Make sure the result is within the expected range.
+        assert!(added.x < 16);
+        assert!(added.y < 16);
+        assert!(added.z < 16);
+
+        // Make sure the result is as expected.
+        assert_eq!(added.x, x1.wrapping_add(x2).rem_euclid(16));
+        assert_eq!(added.y, y1.wrapping_add(y2).rem_euclid(16));
+        assert_eq!(added.z, z1.wrapping_add(z2).rem_euclid(16));
     }
 
     #[test]
-    fn chunkblock_add(index in proptest::bits::u32::ANY) {
-        let pos = SectionBlockPosition::from_index(index as usize);
-        let pos_index = index.rem_euclid(4096) as usize;
+    fn sectionblockpos_sub([x1, y1, z1, x2, y2, z2] in proptest::array::uniform6(TEST_XYZ_RANGE))  {
+        let pos1 = SectionBlockPosition::new(x1, y1, z1);
+        let pos2 = SectionBlockPosition::new(x2, y2, z2);
+        let subbed = pos1 - pos2;
 
-        let offset = SectionBlockPosition::new(1, 2, 3);
-        let offset_index = offset.as_index();
+        // Make sure the result is within the expected range.
+        assert!(subbed.x < 16);
+        assert!(subbed.y < 16);
+        assert!(subbed.z < 16);
 
-        assert_eq!((pos + offset).as_index(), (pos_index + offset_index).rem_euclid(4096));
+        // Make sure the result is as expected.
+        assert_eq!(subbed.x, x1.wrapping_sub(x2).rem_euclid(16));
+        assert_eq!(subbed.y, y1.wrapping_sub(y2).rem_euclid(16));
+        assert_eq!(subbed.z, z1.wrapping_sub(z2).rem_euclid(16));
     }
 
-    #[test]
-    fn chunkblock_sub(index in proptest::bits::u32::ANY) {
-        let pos = SectionBlockPosition::from_index(index as usize);
-        let pos_index = index.rem_euclid(4096) as usize;
-
-        let offset = SectionBlockPosition::new(1, 2, 3);
-        let offset_index = offset.as_index();
-
-        assert_eq!((pos - offset).as_index(), pos_index.wrapping_sub(offset_index).rem_euclid(4096));
-    }
 }

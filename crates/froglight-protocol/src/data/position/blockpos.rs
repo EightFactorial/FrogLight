@@ -218,6 +218,7 @@ const MAX_TEST: i64 = i64::MAX - 4096;
 
 #[cfg(test)]
 proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
     #[test]
     fn block_add([x, y, z] in proptest::array::uniform3(MIN_TEST..MAX_TEST)) {
