@@ -2198,7 +2198,12 @@ dependencies = [
 name = "froglight-entities"
 version = "0.1.0"
 dependencies = [
- "bevy",
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_log",
+ "bevy_math",
+ "bevy_reflect",
+ "bevy_transform",
  "froglight-core",
  "proptest",
 ]
@@ -2227,7 +2232,13 @@ dependencies = [
 name = "froglight-network"
 version = "0.1.0"
 dependencies = [
- "bevy",
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_log",
+ "bevy_math",
+ "bevy_reflect",
+ "bevy_time",
+ "bevy_transform",
  "froglight-core",
  "froglight-entities",
  "froglight-physics",
@@ -2243,6 +2254,9 @@ dependencies = [
  "bevy_ecs",
  "bevy_log",
  "bevy_math",
+ "bevy_reflect",
+ "bevy_time",
+ "bevy_transform",
  "froglight-core",
  "froglight-entities",
  "froglight-world",
