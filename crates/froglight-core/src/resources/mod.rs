@@ -2,14 +2,8 @@
 
 use bevy_app::App;
 
-mod loading;
-pub use loading::{LoadingScreenEnable, LoadingScreenState};
-
-mod menus;
-pub use menus::{MainMenuEnable, MultiplayerMenuEnable, SettingsMenuEnable};
+mod interface;
+pub use interface::*;
 
 #[doc(hidden)]
-pub(super) fn build(app: &mut App) {
-    loading::setup(app);
-    menus::setup(app);
-}
+pub(super) fn build(app: &mut App) { interface::setup(app); }

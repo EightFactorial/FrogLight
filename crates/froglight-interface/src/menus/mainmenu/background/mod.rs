@@ -9,16 +9,16 @@ use froglight_assets::{AssetManager, FallbackImage};
 mod camera;
 pub use camera::MainMenuBackgroundCamera;
 
-mod shader;
+mod cube;
+use cube::MainMenuBackgroundShader;
 use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
-use shader::MainMenuBackgroundShader;
 
 use super::systemset::MainMenuUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     camera::build(app);
-    shader::build(app);
+    cube::build(app);
 
     app.register_type::<MainMenuBackground>();
     app.add_systems(
@@ -158,7 +158,7 @@ impl MainMenuBackground {
             for i in 0u32..6u32 {
                 indexes.extend(vec![i; 4]);
             }
-            mesh.insert_attribute(shader::ATTRIBUTE_INDEX, indexes);
+            mesh.insert_attribute(cube::ATTRIBUTE_INDEX, indexes);
 
             // Add the mesh to the asset manager
             world.resource_mut::<Assets<Mesh>>().add(mesh)

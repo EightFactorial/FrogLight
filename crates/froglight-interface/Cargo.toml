@@ -23,6 +23,7 @@ froglight-assets = { version = "0.1.0", path = "../froglight-assets", features =
 ] }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
+froglight-render = { version = "0.1.0", path = "../froglight-render" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
 [features]

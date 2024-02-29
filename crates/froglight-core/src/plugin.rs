@@ -8,11 +8,13 @@ pub struct CorePlugin;
 
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut App) {
+        // Register components
+        crate::components::build(app);
+        // Initialize resources
+        crate::resources::build(app);
         // Register events
         crate::events::build(app);
         // Setup system sets
         crate::systemsets::build(app);
-        // Initialize resources
-        crate::resources::build(app);
     }
 }
