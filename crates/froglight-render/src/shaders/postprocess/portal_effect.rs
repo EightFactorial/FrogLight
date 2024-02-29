@@ -9,7 +9,7 @@ use bevy::{
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    // Embedd the portal shader.
+    // Embed the portal shader.
     embedded_asset!(app, "portal_effect.wgsl");
 
     // Register the portal shader.

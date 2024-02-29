@@ -9,7 +9,7 @@ use bevy::{
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    // Embedd the blur shader.
+    // Embed the blur shader.
     embedded_asset!(app, "world_blur.wgsl");
 
     // Register the blur shader.
