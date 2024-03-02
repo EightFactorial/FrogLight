@@ -16,6 +16,7 @@ mod iterator;
 pub use iterator::{ChunkBlockIterator, ChunkIdIterator};
 
 use super::section::Section;
+use crate::{biomes::Biomes, blocks::Blocks};
 
 /// A [`Chunk`] is a `16xNx16 (X,Y,Z)`  section of blocks.
 ///
@@ -137,19 +138,22 @@ impl Chunk {
         })
     }
 
-    /// Gets the [`Block`] at the given position in the chunk.
+    /// Gets the [`Block`](Blocks) at the given position in the chunk.
     ///
-    /// Returns [`None`] if the position is out of bounds.
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
     #[must_use]
     #[inline]
     #[allow(clippy::bind_instead_of_map)]
-    pub fn get_block<V: Version>(&self, pos: &ChunkBlockPosition) -> Option<usize> {
+    pub fn get_block<V: Version>(&self, pos: &ChunkBlockPosition) -> Option<Blocks> {
         self.get_blockid(pos).and_then(|_id| todo!("Block::from_id(id)"))
     }
 
-    /// Gets the block id at the given position in the chunk.
+    /// Gets the [`Block`](Blocks) ID at the given position in the chunk.
     ///
-    /// Returns [`None`] if the position is out of bounds.
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
+    #[must_use]
     pub fn get_blockid(&self, pos: &ChunkBlockPosition) -> Option<usize> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.read().get(section_index) {
@@ -160,26 +164,29 @@ impl Chunk {
         }
     }
 
-    /// Sets the [`Block`] at the given position in the chunk.
+    /// Sets the [`Block`](Blocks) at the given position in the chunk.
     ///
-    /// Returns the previous block at the position.
+    /// Returns the previous [`Block`](Blocks) at the position.
     ///
-    /// Returns [`None`] if the position is out of bounds.
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
     #[inline]
-    #[allow(clippy::bind_instead_of_map)]
+    #[allow(clippy::bind_instead_of_map, unreachable_code)]
     pub fn set_block<V: Version>(
         &mut self,
         pos: &ChunkBlockPosition,
-        value: usize,
-    ) -> Option<usize> {
-        self.set_blockid(pos, value).and_then(|_id| todo!("Block::from_id(id)"))
+        _value: Blocks,
+    ) -> Option<Blocks> {
+        self.set_blockid(pos, todo!("Block::to_id(block)"))
+            .and_then(|_id| todo!("Block::from_id(id)"))
     }
 
-    /// Sets the block id at the given position in the chunk.
+    /// Sets the [`Block`](Blocks) ID at the given position in the chunk.
     ///
-    /// Returns the previous block id at the position.
+    /// Returns the previous [`Block`](Blocks) ID at the position.
     ///
-    /// Returns [`None`] if the position is out of bounds.
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
     pub fn set_blockid(&mut self, pos: &ChunkBlockPosition, value: usize) -> Option<usize> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.write().get_mut(section_index) {
@@ -190,26 +197,55 @@ impl Chunk {
         }
     }
 
-    /// Sets the [`Biome`] at the given position in the chunk.
+    /// Gets the [`Biome`](Biomes) at the given position in the chunk.
     ///
-    /// Returns the previous biome at the position.
-    ///
-    /// Returns [`None`] if the position is out of bounds.
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
+    #[must_use]
     #[inline]
     #[allow(clippy::bind_instead_of_map)]
+    pub fn get_biome<V: Version>(&self, pos: &ChunkBlockPosition) -> Option<Biomes> {
+        self.get_biomeid(pos).and_then(|_id| todo!("Biome::from_id(id)"))
+    }
+
+    /// Gets the [`Biome`](Biomes) ID at the given position in the chunk.
+    ///
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
+    #[must_use]
+    pub fn get_biomeid(&self, pos: &ChunkBlockPosition) -> Option<usize> {
+        let section_index = pos.y / Section::HEIGHT;
+        if let Some(section) = self.sections.read().get(section_index) {
+            Some(section.get_biomeid(pos.into()))
+        } else {
+            warn!("Attempted to get biome from non-existent section");
+            None
+        }
+    }
+
+    /// Sets the [`Biome`](Biomes) at the given position in the chunk.
+    ///
+    /// Returns the previous [`Biome`](Biomes) at the position.
+    ///
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
+    #[inline]
+    #[allow(clippy::bind_instead_of_map, unreachable_code)]
     pub fn set_biome<V: Version>(
         &mut self,
         pos: &ChunkBlockPosition,
-        value: usize,
-    ) -> Option<usize> {
-        self.set_biomeid(pos, value).and_then(|_id| todo!("Biome::from_id(id)"))
+        _value: Biomes,
+    ) -> Option<Biomes> {
+        self.set_biomeid(pos, todo!("Biome::to_id(value"))
+            .and_then(|_id| todo!("Biome::from_id(id)"))
     }
 
-    /// Sets the biome id at the given position in the chunk.
+    /// Sets the [`Biome`](Biomes) ID at the given position in the chunk.
     ///
-    /// Returns the previous biome id at the position.
+    /// Returns the previous [`Biome`](Biomes) ID at the position.
     ///
-    /// Returns [`None`] if the position is out of bounds.
+    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    /// bounds.
     pub fn set_biomeid(&mut self, pos: &ChunkBlockPosition, value: usize) -> Option<usize> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.write().get_mut(section_index) {
