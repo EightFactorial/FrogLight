@@ -11,7 +11,8 @@ pub struct WorldPlugin;
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
         crate::blocks::build(app);
-        crate::map::build(app);
+        crate::biomes::build(app);
+        crate::maps::build(app);
         crate::world::build(app);
     }
 }

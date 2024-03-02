@@ -49,7 +49,7 @@ impl Iterator for ChunkIdIterator<'_> {
         }
 
         // Get the block id at the current position.
-        let result = self.chunk.get_block_id(&self.position);
+        let result = self.chunk.get_blockid(&self.position);
 
         if usize::from(self.position.x) == Section::WIDTH - 1
             && usize::from(self.position.z) == Section::DEPTH - 1

@@ -30,7 +30,7 @@ impl WorldChunkMap {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_world::map::WorldChunkMap;
+    /// use froglight_world::maps::WorldChunkMap;
     ///
     /// let map = WorldChunkMap::with_radius_capacity(1);
     /// assert!(map.capacity() >= 9);

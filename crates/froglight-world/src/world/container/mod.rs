@@ -78,7 +78,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                     // TODO: Borrow checker >:(
                     let vec = vec.clone();
 
-                    // Get the bitslice mutably and retreive the existing index.
+                    // Get the bitslice mutably and retrieve the existing index.
                     let slice = self.get_bitslice_mut(pos);
                     let old_index = slice.load_be::<usize>();
 
@@ -99,7 +99,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                 }
             }
             Palette::Global => {
-                // Get the bitslice mutably and retreive the existing value.
+                // Get the bitslice mutably and retrieve the existing value.
                 let slice = self.get_bitslice_mut(pos);
                 let old_value = slice.load_be::<usize>();
 

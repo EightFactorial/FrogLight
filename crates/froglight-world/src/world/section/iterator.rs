@@ -49,7 +49,7 @@ impl Iterator for SectionIdIterator<'_> {
         }
 
         // Get the block id at the current position.
-        let result = self.section.get_block_id(self.position);
+        let result = self.section.get_blockid(self.position);
 
         if self.position == SectionBlockPosition::MAX {
             // Mark the iterator as finished.

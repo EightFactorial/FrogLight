@@ -60,26 +60,26 @@ impl Section {
     /// Gets the block id at the given position in the section.
     #[must_use]
     #[inline]
-    pub fn get_block_id(&self, pos: SectionBlockPosition) -> usize { Self::get(&self.blocks, pos) }
+    pub fn get_blockid(&self, pos: SectionBlockPosition) -> usize { Self::get(&self.blocks, pos) }
 
     /// Sets the block id at the given position in the section.
     ///
     /// Returns the previous block id at the position.
     #[inline]
-    pub fn set_block_id(&mut self, pos: SectionBlockPosition, value: usize) -> usize {
+    pub fn set_blockid(&mut self, pos: SectionBlockPosition, value: usize) -> usize {
         Self::set(&mut self.blocks, pos, value)
     }
 
     /// Gets the biome id at the given position in the section.
     #[must_use]
     #[inline]
-    pub fn get_biome_id(&self, pos: SectionBlockPosition) -> usize { Self::get(&self.biomes, pos) }
+    pub fn get_biomeid(&self, pos: SectionBlockPosition) -> usize { Self::get(&self.biomes, pos) }
 
     /// Sets the biome id at the given position in the section.
     ///
     /// Returns the previous biome id at the position.
     #[inline]
-    pub fn set_biome_id(&mut self, pos: SectionBlockPosition, value: usize) -> usize {
+    pub fn set_biomeid(&mut self, pos: SectionBlockPosition, value: usize) -> usize {
         Self::set(&mut self.biomes, pos, value)
     }
 
