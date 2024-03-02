@@ -22,7 +22,7 @@ pub struct ChunkDataContainer<T: ContainerType> {
     #[reflect(ignore)]
     pub data: BitVec<u64, Msb0>,
     #[reflect(ignore)]
-    _phantom: PhantomData<T>,
+    pub(crate) _phantom: PhantomData<T>,
 }
 
 impl<T: ContainerType> ChunkDataContainer<T> {
@@ -40,12 +40,20 @@ impl<T: ContainerType> ChunkDataContainer<T> {
 
         Ok(Self { bits, palette, data, _phantom: PhantomData })
     }
+
+    /// Creates a new [`ChunkDataContainer`] with the given data.
+    #[must_use]
+    #[inline]
+    pub fn new(bits: usize, palette: Palette, data: BitVec<u64, Msb0>) -> Self {
+        Self { bits, palette, data, _phantom: PhantomData }
+    }
 }
 
 /// A [`ContainerType`] is a kind of data that can be stored in a
 /// [`ChunkDataContainer`].
 pub trait ContainerType: Reflect {
     /// Returns the palette type for a given number of bits.
+    #[must_use]
     fn palette_type(bits: usize) -> Palette;
 }
 

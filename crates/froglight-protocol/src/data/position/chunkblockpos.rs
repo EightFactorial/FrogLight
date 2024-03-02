@@ -7,7 +7,10 @@ use super::BlockPosition;
 /// A position in a chunk, with x, y, and z coordinates.
 ///
 /// The range of the x and z coordinates are `0..16`, not including `16`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
+///
+/// The y-coordinate is `0` at the bottom of the world,
+/// regardless of the minimum possible value.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct ChunkBlockPosition {
     /// The x-coordinate of the position.
     ///
@@ -18,12 +21,12 @@ pub struct ChunkBlockPosition {
     /// ---
     ///
     /// The y-coordinate is world-relative, so between worlds the y-coordinate
-    /// will be different.
+    /// may be different.
     ///
     /// For example:
-    /// In the Overworld where the world starts at -64, `y = 0` is at -64.
+    /// In the Overworld where the world starts at -64, `y = 0` is at `-64`.
     ///
-    /// In the Nether where the world starts at 0, `y = 0` is at 0.
+    /// In the Nether where the world starts at 0, `y = 0` is at `0`.
     pub y: usize,
     /// The z-coordinate of the position.
     ///
@@ -32,6 +35,9 @@ pub struct ChunkBlockPosition {
 }
 
 impl ChunkBlockPosition {
+    /// All zeros.
+    pub const ZERO: Self = Self::splat(0);
+
     /// Creates a new [`ChunkBlockPosition`] with the given coordinates.
     ///
     /// # Examples
@@ -43,11 +49,15 @@ impl ChunkBlockPosition {
     /// assert_eq!(pos.y(), 2);
     /// assert_eq!(pos.z(), 3);
     /// ```
+    ///
+    /// # Panics
+    /// Panics if the x or z coordinate is greater than or equal to 16.
     #[must_use]
     #[inline]
     pub const fn new(x: u8, y: usize, z: u8) -> Self {
-        debug_assert!(x < 16, "X-coordinate is out of range");
-        debug_assert!(z < 16, "Z-coordinate is out of range");
+        assert!(x < 16, "X-coordinate is out of range");
+        assert!(z < 16, "Z-coordinate is out of range");
+
         Self { x, y, z }
     }
 
@@ -63,10 +73,14 @@ impl ChunkBlockPosition {
     /// assert_eq!(pos.y(), 5);
     /// assert_eq!(pos.z(), 5);
     /// ```
+    ///
+    /// # Panics
+    /// Panics if the coordinate is greater than or equal to 16.
     #[must_use]
     #[inline]
     pub const fn splat(v: u8) -> Self {
-        debug_assert!(v < 16, "Coordinate is out of range");
+        assert!(v < 16, "Coordinate is out of range");
+
         Self::new(v, v as usize, v)
     }
 
@@ -104,10 +118,13 @@ impl ChunkBlockPosition {
         // Add the height offset to the y-coordinate.
         let Ok(coord) = isize::try_from(pos.y) else {
             // Return None if the height is above isize::MAX (9,223,372,036,854,775,807).
+            // That's probably high enough.
             return None;
         };
         let Ok(offset_coord) = usize::try_from(coord + height_offset) else {
             // If the height is below 0, return None.
+            // Zero should be equal to the bottom of the world,
+            // regardless of the actual minimum.
             return None;
         };
 

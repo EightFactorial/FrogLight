@@ -5,15 +5,19 @@ use std::sync::Arc;
 use bevy_ecs::component::Component;
 use bevy_log::warn;
 use froglight_core::data::ChunkBlockPosition;
+use froglight_protocol::traits::Version;
 use parking_lot::RwLock;
 use thiserror::Error;
 
 mod heightmap;
 pub use heightmap::HeightMaps;
 
+mod iterator;
+pub use iterator::{ChunkBlockIterator, ChunkIdIterator};
+
 use super::section::Section;
 
-/// A [`Chunk`] is a 16x16xN section of blocks.
+/// A [`Chunk`] is a `16xNx16 (X,Y,Z)`  section of blocks.
 ///
 /// Each `World` is made up of `Chunks`,
 /// with each `World` having it's own height.
@@ -22,7 +26,7 @@ use super::section::Section;
 /// - Overworld: 384 (-64 to 320)
 /// - Nether: 256 (0 to 256)
 /// - End: 256 (0 to 256)
-#[derive(Debug, Default, Clone, Component)]
+#[derive(Debug, Clone, Component)]
 pub struct Chunk {
     /// The absolute height of the chunk.
     ///
@@ -56,7 +60,7 @@ impl Chunk {
         Self {
             height,
             offset,
-            sections: Arc::new(RwLock::new(Vec::with_capacity(height / Section::HEIGHT))),
+            sections: Arc::new(RwLock::new(vec![Section::default(); height / Section::HEIGHT])),
             heightmaps: Arc::new(RwLock::new(HeightMaps::default())),
         }
     }
@@ -105,36 +109,6 @@ impl Chunk {
         }
     }
 
-    /// Gets the block at the given position in the chunk.
-    ///
-    /// Returns [`None`] if the position is out of bounds.
-    pub fn get_block(&self, pos: &ChunkBlockPosition) -> Option<usize> {
-        let section_index = pos.y() / Section::HEIGHT;
-        if let Some(section) = self.sections.read().get(section_index) {
-            let pos = pos.into();
-            return Some(section.get_block(&pos));
-        }
-
-        warn!("Attempted to get block from non-existent section");
-        None
-    }
-
-    /// Sets the block at the given position in the chunk.
-    ///
-    /// Returns the previous block id at the position.
-    ///
-    /// Returns [`None`] if the position is out of bounds.
-    pub fn set_block(&mut self, pos: &ChunkBlockPosition, value: usize) -> Option<usize> {
-        let section_index = pos.y() / Section::HEIGHT;
-        if let Some(section) = self.sections.write().get_mut(section_index) {
-            let pos = pos.into();
-            return Some(section.set_block(&pos, value));
-        }
-
-        warn!("Attempted to set block in non-existent section");
-        None
-    }
-
     /// Decodes a [`Chunk`] from a buffer.
     ///
     /// # Errors
@@ -161,6 +135,77 @@ impl Chunk {
             sections: Arc::new(RwLock::new(sections)),
             heightmaps: Arc::new(RwLock::new(heightmaps)),
         })
+    }
+
+    /// Gets the [`Block`] at the given position in the chunk.
+    ///
+    /// Returns [`None`] if the position is out of bounds.
+    #[must_use]
+    #[inline]
+    #[allow(clippy::bind_instead_of_map)]
+    pub fn get_block<V: Version>(&self, pos: &ChunkBlockPosition) -> Option<usize> {
+        self.get_block_id(pos).and_then(|_id| todo!("Block::from_id(id)"))
+    }
+
+    /// Gets the block id at the given position in the chunk.
+    ///
+    /// Returns [`None`] if the position is out of bounds.
+    pub fn get_block_id(&self, pos: &ChunkBlockPosition) -> Option<usize> {
+        let section_index = pos.y / Section::HEIGHT;
+        if let Some(section) = self.sections.read().get(section_index) {
+            Some(section.get_block_id(pos.into()))
+        } else {
+            warn!("Attempted to get block from non-existent section");
+            None
+        }
+    }
+
+    /// Sets the [`Block`] at the given position in the chunk.
+    ///
+    /// Returns the previous block at the position.
+    ///
+    /// Returns [`None`] if the position is out of bounds.
+    #[inline]
+    #[allow(clippy::bind_instead_of_map)]
+    pub fn set_block<V: Version>(
+        &mut self,
+        pos: &ChunkBlockPosition,
+        value: usize,
+    ) -> Option<usize> {
+        self.set_block_id(pos, value).and_then(|_id| todo!("Block::from_id(id)"))
+    }
+
+    /// Sets the block id at the given position in the chunk.
+    ///
+    /// Returns the previous block id at the position.
+    ///
+    /// Returns [`None`] if the position is out of bounds.
+    pub fn set_block_id(&mut self, pos: &ChunkBlockPosition, value: usize) -> Option<usize> {
+        let section_index = pos.y / Section::HEIGHT;
+        if let Some(section) = self.sections.write().get_mut(section_index) {
+            Some(section.set_block_id(pos.into(), value))
+        } else {
+            warn!("Attempted to set block in non-existent section");
+            None
+        }
+    }
+
+    /// Creates a new [`ChunkBlockIterator`] for the chunk.
+    ///
+    /// This starts at the first block in the chunk,
+    /// and iterates through all blocks in the chunk.
+    #[must_use]
+    #[inline]
+    pub const fn blockid_iter(&self) -> ChunkIdIterator { ChunkIdIterator::new(self) }
+
+    /// Creates a new [`ChunkBlockIterator`] for the chunk.
+    ///
+    /// This starts at the first block in the chunk,
+    /// and iterates through all blocks in the chunk.
+    #[must_use]
+    #[inline]
+    pub const fn block_iter<V: Version>(&self) -> ChunkBlockIterator<V> {
+        ChunkBlockIterator::new(self)
     }
 }
 

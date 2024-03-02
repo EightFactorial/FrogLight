@@ -21,6 +21,17 @@ pub struct SectionBlockPosition {
 }
 
 impl SectionBlockPosition {
+    /// All zeros.
+    pub const ZERO: Self = Self::splat(0);
+
+    /// All zeros.
+    ///
+    /// This is the same as [`SectionBlockPosition::ZERO`].
+    pub const MIN: Self = Self::ZERO;
+
+    /// All `15`s.
+    pub const MAX: Self = Self::splat(15);
+
     /// Creates a new [`SectionBlockPosition`] with the given coordinates.
     ///
     /// # Examples

@@ -4,16 +4,13 @@ use bevy_app::App;
 pub mod tasks;
 
 mod section;
-pub use section::Section;
+pub use section::{Palette, Section, SectionBlockIterator, SectionIdIterator};
 
 mod chunk;
-pub use chunk::{Chunk, HeightMaps};
+pub use chunk::{Chunk, ChunkBlockIterator, ChunkIdIterator, HeightMaps};
 
 mod container;
 pub use container::{BiomeContainer, BlockContainer, ChunkDataContainer, HeightMapContainer};
-
-mod palette;
-pub use palette::Palette;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

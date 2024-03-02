@@ -5,13 +5,13 @@ use bevy::{
     render::{mesh::VertexAttributeValues, view::RenderLayers},
 };
 use froglight_assets::{AssetManager, FallbackImage};
+use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
 
 mod camera;
 pub use camera::MainMenuBackgroundCamera;
 
 mod cube;
 use cube::MainMenuBackgroundShader;
-use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
 
 use super::systemset::MainMenuUpdateSet;
 
