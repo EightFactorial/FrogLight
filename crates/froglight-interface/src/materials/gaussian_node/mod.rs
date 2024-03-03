@@ -7,12 +7,11 @@ use bevy::{
         render_resource::{
             AsBindGroup, RenderPipelineDescriptor, ShaderRef, SpecializedRenderPipelines,
         },
-        Render, RenderApp, RenderSet,
+        RenderApp,
     },
     ui::{
-        extract_ui_material_nodes, extract_ui_materials, prepare_ui_materials,
-        prepare_uimaterial_nodes, DrawUiMaterial, ExtractedUiMaterialNodes, ExtractedUiMaterials,
-        RenderUiMaterials, RenderUiSystem, TransparentUi, UiMaterialMeta,
+        extract_ui_material_nodes, extract_ui_materials, DrawUiMaterial, ExtractedUiMaterialNodes,
+        ExtractedUiMaterials, RenderUiMaterials, RenderUiSystem, TransparentUi, UiMaterialMeta,
     },
 };
 
@@ -42,16 +41,18 @@ pub(super) fn build(app: &mut App) {
                     extract_ui_materials::<GaussianNode>,
                     extract_ui_material_nodes::<GaussianNode>.in_set(RenderUiSystem::ExtractNode),
                 ),
-            )
-            .add_systems(
-                Render,
-                (
-                    prepare_ui_materials::<GaussianNode>.in_set(RenderSet::PrepareAssets),
-                    // TODO: Manual implementation of `queue_ui_material_nodes`
-                    // queue_ui_material_nodes::<GaussianNode>.in_set(RenderSet::Queue),
-                    prepare_uimaterial_nodes::<GaussianNode>.in_set(RenderSet::PrepareBindGroups),
-                ),
             );
+        // TODO: Manual implementations
+        // .add_systems(
+        //     Render,
+        //     (
+        //         prepare_ui_materials::<GaussianNode>.
+        // in_set(RenderSet::PrepareAssets),
+        //         queue_ui_material_nodes::<GaussianNode>.
+        // in_set(RenderSet::Queue),
+        //         prepare_uimaterial_nodes::<GaussianNode>.
+        // in_set(RenderSet::PrepareBindGroups),     ),
+        // );
     }
 }
 
