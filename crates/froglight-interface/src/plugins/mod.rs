@@ -1,6 +1,6 @@
 //! Additional interface related plugins.
 
-pub mod debug;
+mod debug;
 pub use debug::plugin::DebugPlugins;
 
 pub mod uiscale;
@@ -11,6 +11,9 @@ pub use interface::InterfacePlugins;
 
 pub mod inspector;
 pub use inspector::InspectorPlugin;
+
+mod materials;
+pub use materials::MaterialPlugin;
 
 // Re-export the menu plugins
 pub use crate::menus::{

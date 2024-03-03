@@ -3,5 +3,6 @@
 
 pub mod default_camera;
 
+pub mod materials;
 pub mod menus;
 pub mod plugins;
