@@ -2,7 +2,9 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::DeriveInput;
 
-pub(crate) fn read_as_json(input: &DeriveInput) -> TokenStream {
+use crate::protocol::Attributes;
+
+pub(crate) fn read_as_json(input: &DeriveInput, _attrs: &Attributes) -> TokenStream {
     let name = &input.ident;
     quote! {
         impl FrogRead for #name {
@@ -16,7 +18,7 @@ pub(crate) fn read_as_json(input: &DeriveInput) -> TokenStream {
     }
 }
 
-pub(crate) fn write_as_json(input: &DeriveInput) -> TokenStream {
+pub(crate) fn write_as_json(input: &DeriveInput, _attrs: &Attributes) -> TokenStream {
     let name = &input.ident;
     quote! {
         impl FrogWrite for #name {

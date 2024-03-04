@@ -1,12 +1,15 @@
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
-use syn::{parse::Parse, DeriveInput, Ident};
+use syn::{DeriveInput, Ident};
+
+use crate::protocol::Attributes;
 
 /// Generate a `FrogRead` implementation for the given struct.
-pub(crate) fn read_as_bitset(input: &DeriveInput) -> TokenStream {
+pub(crate) fn read_as_bitset(input: &DeriveInput, attrs: &Attributes) -> TokenStream {
     let syn::Data::Struct(data) = &input.data else { panic!("Only structs can be bitsets") };
-    let size = BitsetAttributes::from_attributes(&input.attrs).unwrap().size;
+
     let name = &input.ident;
+    let size = attrs.bitset.expect("Bitset size is required");
 
     match &data.fields {
         syn::Fields::Named(fields) => {
@@ -73,10 +76,11 @@ pub(crate) fn read_as_bitset(input: &DeriveInput) -> TokenStream {
 }
 
 /// Generate a `FrogWrite` implementation for the given struct.
-pub(crate) fn write_as_bitset(input: &DeriveInput) -> TokenStream {
+pub(crate) fn write_as_bitset(input: &DeriveInput, attrs: &Attributes) -> TokenStream {
     let syn::Data::Struct(data) = &input.data else { panic!("Only structs can be bitsets") };
-    let size = BitsetAttributes::from_attributes(&input.attrs).unwrap().size;
+
     let name = &input.ident;
+    let size = attrs.bitset.expect("Bitset size is required");
 
     match &data.fields {
         syn::Fields::Named(fields) => {
@@ -160,56 +164,5 @@ fn generate_write(name: &Ident, tokens: TokenStream) -> TokenStream {
                 #tokens
             }
         }
-    }
-}
-
-// ---- Attribute parsing ----
-
-/// Attributes for bitset generation.
-///
-/// # Example
-/// ```rust,ignore
-/// #[frog(bitset(3))]
-/// struct MyBitset {
-///     a: bool,
-///     b: bool,
-///     c: bool,
-/// }
-/// ```
-#[derive(Debug, Clone)]
-struct BitsetAttributes {
-    size: usize,
-}
-
-impl BitsetAttributes {
-    fn from_attributes(attrs: &[syn::Attribute]) -> syn::Result<Self> {
-        let mut size = None;
-        for attr in attrs {
-            if attr.path().is_ident("frog") {
-                let attr: Self = attr.parse_args()?;
-                size = Some(attr.size);
-            }
-        }
-
-        Ok(Self {
-            size: size.ok_or_else(|| {
-                syn::Error::new(proc_macro2::Span::call_site(), "No bitset size specified")
-            })?,
-        })
-    }
-}
-
-impl Parse for BitsetAttributes {
-    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        // Parse the attribute name
-        input.parse::<syn::Ident>()?;
-
-        // Parse the attribute content
-        let content;
-        syn::parenthesized!(content in input);
-
-        // Parse the size
-        let size = content.parse::<syn::LitInt>()?;
-        Ok(Self { size: size.base10_parse::<usize>()? })
     }
 }

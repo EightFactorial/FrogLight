@@ -5,12 +5,14 @@ use std::{
 
 use bevy_math::{I64Vec2, IVec2};
 use bevy_reflect::Reflect;
-use derive_more::{Deref, DerefMut};
+use derive_more::{Deref, DerefMut, From, Into};
 
-use crate::io::FrogRead;
+use crate::io::{FrogRead, FrogWrite};
 
 /// A position in the world, measured in chunks.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Deref, DerefMut)]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, From, Into, Deref, DerefMut,
+)]
 pub struct ChunkPosition(#[reflect(ignore)] I64Vec2);
 
 impl ChunkPosition {
@@ -46,14 +48,26 @@ impl ChunkPosition {
     pub const fn z(&self) -> i64 { self.0.y }
 }
 
+/// Read as i32s and then converted to i64s.
 impl FrogRead for ChunkPosition {
     fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::io::ReadError>
     where
         Self: Sized,
     {
-        // Read the position as a 2D vector of i32s and swap X/Z.
+        // Swap the X/Z coordinates
         let pos = IVec2::fg_read(buf)?;
         Ok(Self::new(i64::from(pos.y), i64::from(pos.x)))
+    }
+}
+
+/// Converted to i32s and then written.
+impl FrogWrite for ChunkPosition {
+    fn fg_write(
+        &self,
+        buf: &mut (impl std::io::Write + ?Sized),
+    ) -> Result<(), crate::io::WriteError> {
+        // Swap the X/Z coordinates
+        IVec2::new(i32::try_from(self.y)?, i32::try_from(self.x)?).fg_write(buf)
     }
 }
 
@@ -162,21 +176,14 @@ macro_rules! impl_from {
 impl_from!(i64, i32, i16, i8 => ChunkPosition);
 impl_from!(try u128, i128, isize, usize, u64, u32, u16, u8 => ChunkPosition);
 
-impl From<I64Vec2> for ChunkPosition {
-    fn from(vec: I64Vec2) -> Self { Self(vec) }
-}
-impl From<ChunkPosition> for I64Vec2 {
-    fn from(pos: ChunkPosition) -> Self { pos.0 }
-}
-
 impl TryFrom<ChunkPosition> for IVec2 {
     type Error = TryFromIntError;
     fn try_from(pos: ChunkPosition) -> Result<Self, Self::Error> {
-        Ok(IVec2::new(TryFrom::try_from(pos.x)?, TryFrom::try_from(pos.y)?))
+        Ok(IVec2::new(i32::try_from(pos.x)?, i32::try_from(pos.y)?))
     }
 }
 impl From<IVec2> for ChunkPosition {
-    fn from(vec: IVec2) -> Self { Self::new(Into::into(vec.x), Into::into(vec.y)) }
+    fn from(vec: IVec2) -> Self { Self::new(vec.x.into(), vec.y.into()) }
 }
 
 // --- Tests ---

@@ -59,4 +59,7 @@ pub enum WriteError {
     /// An error occurred while serializing JSON.
     #[error(transparent)]
     Json(#[from] serde_json::Error),
+    /// An error occurred trying to convert integer types.
+    #[error(transparent)]
+    TryFromInt(#[from] std::num::TryFromIntError),
 }

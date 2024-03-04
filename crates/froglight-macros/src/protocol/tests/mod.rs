@@ -1,22 +1,19 @@
-use attribute_derive::FromAttr;
 use proc_macro2::TokenStream;
 use syn::{DeriveInput, Ident};
+
+use super::Attributes;
 
 mod read;
 mod write;
 
-pub(super) fn generate_tests(input: &DeriveInput) -> TokenStream {
-    let Ok(test_attrs) = TestAttributes::from_attributes(&input.attrs) else {
-        return TokenStream::new();
-    };
-
+pub(super) fn generate_tests(input: &DeriveInput, attrs: &Attributes) -> TokenStream {
     let mut output = TokenStream::new();
-    for test in &test_attrs.tests {
+    for test in &attrs.tests {
         match test.as_str() {
-            "read_default" => read::read_default(input, &test_attrs, &mut output),
-            "read_example" => read::read_example(input, &test_attrs, &mut output),
-            "write_default" => write::write_default(input, &test_attrs, &mut output),
-            "write_example" => write::write_example(input, &test_attrs, &mut output),
+            "read_example" => read::read_example(input, attrs, &mut output),
+            "read_verify" => read::read_default(input, attrs, &mut output),
+            "write_default" => write::write_default(input, attrs, &mut output),
+            "write_verify" => write::write_example(input, attrs, &mut output),
             unk => {
                 panic!("Could not generate unknown test: '{unk}'!")
             }
@@ -24,18 +21,6 @@ pub(super) fn generate_tests(input: &DeriveInput) -> TokenStream {
     }
 
     output
-}
-
-/// Attributes for test generation.
-#[derive(Debug, Clone, FromAttr)]
-#[attribute(ident = frog)]
-struct TestAttributes {
-    /// A list of tests to run.
-    tests: Vec<String>,
-
-    /// Example bytes used for test verification.
-    #[attribute(optional)]
-    bytes: Option<Vec<u8>>,
 }
 
 /// Generate a test name for the given input and test name.

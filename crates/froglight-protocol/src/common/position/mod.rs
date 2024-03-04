@@ -11,3 +11,6 @@ pub use chunkblockpos::ChunkBlockPosition;
 
 mod sectionblockpos;
 pub use sectionblockpos::SectionBlockPosition;
+
+mod globalpos;
+pub use globalpos::GlobalPosition;

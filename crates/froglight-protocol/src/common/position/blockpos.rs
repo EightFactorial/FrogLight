@@ -5,10 +5,14 @@ use std::{
 
 use bevy_math::{I64Vec3, IVec3};
 use bevy_reflect::Reflect;
-use derive_more::{Deref, DerefMut};
+use derive_more::{Deref, DerefMut, From, Into};
+
+use crate::io::{FrogRead, FrogWrite};
 
 /// A position in the world, measured in blocks.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Deref, DerefMut)]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, From, Into, Deref, DerefMut,
+)]
 pub struct BlockPosition(#[reflect(ignore)] I64Vec3);
 
 impl BlockPosition {
@@ -46,6 +50,26 @@ impl BlockPosition {
     #[must_use]
     #[inline]
     pub const fn z(&self) -> i64 { self.0.z }
+}
+
+/// Read as i32s and then converted to i64s.
+impl FrogRead for BlockPosition {
+    fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::io::ReadError>
+    where
+        Self: Sized,
+    {
+        Ok(Self::from(IVec3::fg_read(buf)?))
+    }
+}
+
+/// Converted to i32s and then written.
+impl FrogWrite for BlockPosition {
+    fn fg_write(
+        &self,
+        buf: &mut (impl std::io::Write + ?Sized),
+    ) -> Result<(), crate::io::WriteError> {
+        IVec3::try_from(*self)?.fg_write(buf)
+    }
 }
 
 // --- Math Implementations ---
@@ -178,13 +202,6 @@ macro_rules! impl_from {
 
 impl_from!(group i64, i32, i16, i8 => BlockPosition);
 impl_from!(try_group u128, i128, isize, usize, u64, u32, u16, u8 => BlockPosition);
-
-impl From<I64Vec3> for BlockPosition {
-    fn from(vec: I64Vec3) -> Self { Self(vec) }
-}
-impl From<BlockPosition> for I64Vec3 {
-    fn from(pos: BlockPosition) -> Self { pos.0 }
-}
 
 impl TryFrom<BlockPosition> for IVec3 {
     type Error = TryFromIntError;

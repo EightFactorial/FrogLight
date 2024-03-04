@@ -2,18 +2,13 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::DeriveInput;
 
-use super::TestAttributes;
+use super::Attributes;
 
-pub(super) fn read_example(
-    input: &DeriveInput,
-    test_attrs: &TestAttributes,
-    output: &mut TokenStream,
-) {
+pub(super) fn read_example(input: &DeriveInput, test_attrs: &Attributes, output: &mut TokenStream) {
     let test_name = super::test_name(input, "read_example");
     let item = input.ident.clone();
     let item_name = input.ident.to_string();
-
-    let bytes = test_attrs.bytes.as_ref().expect("No bytes provided for read_example test");
+    let bytes = &test_attrs.bytes;
 
     output.extend(quote! {
         #[test]
@@ -29,16 +24,11 @@ pub(super) fn read_example(
     });
 }
 
-pub(super) fn read_default(
-    input: &DeriveInput,
-    test_attrs: &TestAttributes,
-    output: &mut TokenStream,
-) {
-    let test_name = super::test_name(input, "read_default");
+pub(super) fn read_default(input: &DeriveInput, test_attrs: &Attributes, output: &mut TokenStream) {
+    let test_name = super::test_name(input, "read_verify");
     let item = input.ident.clone();
     let item_name = input.ident.to_string();
-
-    let bytes = test_attrs.bytes.as_ref().expect("No bytes provided for read_default test");
+    let bytes = &test_attrs.bytes;
 
     output.extend(quote! {
         #[test]
