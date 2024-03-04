@@ -32,7 +32,7 @@ froglight-macros = { version = "0.1.0", path = "../froglight-macros", features =
 ] }
 futures-lite = { workspace = true }
 hashbrown = { workspace = true, features = ["serde"] }
-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 simdnbt = { workspace = true }
 smallvec = { workspace = true, features = [

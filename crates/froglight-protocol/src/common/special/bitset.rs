@@ -1,18 +1,41 @@
-use std::io::Cursor;
+use std::io::{Cursor, Write};
 
 use bitvec::{array::BitArray, order::Msb0};
 
-use crate::io::{FrogRead, ReadError};
+use crate::io::{FrogRead, FrogWrite, ReadError, WriteError};
 
 /// A fixed-size bitset.
+///
+/// `N` is the number of bits in the bitset,
+/// and must be greater than `0`.
+///
+/// # Example
+/// ```rust
+/// use froglight_protocol::common::BitSet;
+///
+/// let mut bitset = BitSet::<3>::new();
+/// assert_eq!(bitset.get_bit(0), Some(false));
+/// assert_eq!(bitset.get_bit(1), Some(false));
+/// assert_eq!(bitset.get_bit(2), Some(false));
+///
+/// bitset.set_bit(0, false);
+/// bitset.set_bit(1, true);
+/// bitset.set_bit(2, false);
+///
+/// assert_eq!(bitset.get_bit(0), Some(false));
+/// assert_eq!(bitset.get_bit(1), Some(true));
+/// assert_eq!(bitset.get_bit(2), Some(false));
+/// ```
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct BitSet<const N: usize>(BitArray<[u8; N.div_ceil(8)], Msb0>)
 where
-    [u8; N.div_ceil(8)]:;
+    [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero;
 
 impl<const N: usize> BitSet<N>
 where
     [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero,
 {
     /// Create a new empty bitset.
     ///
@@ -206,66 +229,108 @@ where
     pub const fn byte_len(&self) -> usize { N.div_ceil(8) }
 }
 
+/// Read a [`BitSet`] from a buffer.
 impl<const N: usize> FrogRead for BitSet<N>
 where
     [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero,
 {
     fn fg_read(buf: &mut Cursor<&[u8]>) -> Result<Self, ReadError>
     where
         Self: Sized,
     {
-        let mut bitset = Self::new();
-        for i in 0..N.div_ceil(8) {
-            let _ = bitset.set_byte(i, u8::fg_read(buf)?);
-        }
-
-        Ok(bitset)
+        let arr = core::array::try_from_fn(|_| u8::fg_read(buf))?;
+        Ok(Self::from_array(arr))
     }
+}
+
+/// Write a [`BitSet`] to a buffer.
+impl<const N: usize> FrogWrite for BitSet<N>
+where
+    [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero,
+{
+    fn fg_write(&self, buf: &mut (impl Write + ?Sized)) -> Result<(), WriteError> {
+        self.0.data.fg_write(buf)
+    }
+}
+
+/// Convert a byte array to a [`BitSet`].
+impl<const N: usize> From<[u8; N.div_ceil(8)]> for BitSet<N>
+where
+    [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero,
+{
+    fn from(value: [u8; N.div_ceil(8)]) -> Self { Self::from_array(value) }
+}
+
+/// Convert a [`BitSet`] to a byte array.
+impl<const N: usize> From<BitSet<N>> for [u8; N.div_ceil(8)]
+where
+    [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero,
+{
+    fn from(value: BitSet<N>) -> Self { value.0.data }
+}
+
+/// Convert a boolean array to a [`BitSet`].
+impl<const N: usize> From<[bool; N]> for BitSet<N>
+where
+    [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero,
+{
+    fn from(value: [bool; N]) -> Self {
+        let mut bitarray = BitArray::default();
+        for (i, bit) in value.into_iter().enumerate() {
+            bitarray.set(i, bit);
+        }
+        Self(bitarray)
+    }
+}
+
+/// Convert a [`BitSet`] to a boolean array.
+impl<const N: usize> From<BitSet<N>> for [bool; N]
+where
+    [u8; N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsNotZero,
+{
+    fn from(value: BitSet<N>) -> Self { core::array::from_fn(|i| value.0[i]) }
+}
+
+use sealed::{Assert, IsNotZero};
+/// Asserts that the given value is not zero.
+mod sealed {
+    /// [`BitSet`](super::BitSet) size must be greater than 0.
+    pub trait IsNotZero {}
+    /// A trait for asserting a boolean value.
+    pub enum Assert<const CHECK: bool> {}
+    /// Only implemented for `Assert<true>`.
+    impl IsNotZero for Assert<true> {}
 }
 
 #[test]
 fn bitset_default() {
     let bitset = BitSet::<1>::default();
-    assert_eq!(bitset.get_bit(0), Some(false));
-    assert_eq!(bitset.get_bit(1), None);
-
-    assert_eq!(bitset.get_byte(0), Some(0b0000_0000));
-    assert_eq!(bitset.get_byte(1), None);
-
+    assert!(!bitset.all());
     assert_eq!(bitset.bit_len(), 1);
     assert_eq!(bitset.byte_len(), 1);
 
     let bitset = BitSet::<8>::default();
-    assert_eq!(bitset.get_bit(0), Some(false));
-    assert_eq!(bitset.get_bit(1), Some(false));
-    assert_eq!(bitset.get_bit(6), Some(false));
-    assert_eq!(bitset.get_bit(7), Some(false));
-    assert_eq!(bitset.get_bit(8), None);
-
-    assert_eq!(bitset.get_byte(0), Some(0b0000_0000));
-    assert_eq!(bitset.get_byte(1), None);
-
+    assert!(!bitset.all());
     assert_eq!(bitset.bit_len(), 8);
     assert_eq!(bitset.byte_len(), 1);
 
     let bitset = BitSet::<9>::default();
-    assert_eq!(bitset.get_bit(0), Some(false));
-    assert_eq!(bitset.get_bit(1), Some(false));
-    assert_eq!(bitset.get_bit(7), Some(false));
-    assert_eq!(bitset.get_bit(8), Some(false));
-    assert_eq!(bitset.get_bit(9), None);
-
-    assert_eq!(bitset.get_byte(0), Some(0b0000_0000));
-    assert_eq!(bitset.get_byte(1), Some(0b0000_0000));
-    assert_eq!(bitset.get_byte(2), None);
-
+    assert!(!bitset.all());
     assert_eq!(bitset.bit_len(), 9);
     assert_eq!(bitset.byte_len(), 2);
 }
 
+// TODO: Write a few tests using Proptest
 #[test]
 fn bitset_getset() {
     let mut bitset = BitSet::<24>::new();
+    assert!(!bitset.all());
 
     assert_eq!(bitset.set_bit(0, true), Ok(false));
     assert_eq!(bitset.set_bit(1, true), Ok(false));
