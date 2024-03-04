@@ -1,4 +1,5 @@
 use compact_str::CompactString;
+use froglight_core::common::ResourceKey;
 use serde::{Deserialize, Serialize};
 
 /// The type of world.
@@ -18,26 +19,22 @@ pub enum WorldType {
     #[serde(rename = "minecraft:the_end", alias = "end", alias = "End")]
     End,
     /// A custom world type
-    ///
-    /// TODO: ResourceKey
-    Other(CompactString),
+    Other(ResourceKey),
 }
 
 impl WorldType {
     /// Key for the Overworld
-    pub const OVERWORLD_KEY: &'static CompactString =
-        &CompactString::new_inline("minecraft:overworld");
+    pub const OVERWORLD_KEY: &'static ResourceKey = &ResourceKey::new_inline("minecraft:overworld");
     /// Display name for the Overworld
     pub const OVERWORLD_DISPLAY: &'static CompactString = &CompactString::new_inline("Overworld");
 
     /// Key for the Nether
-    pub const NETHER_KEY: &'static CompactString =
-        &CompactString::new_inline("minecraft:the_nether");
+    pub const NETHER_KEY: &'static ResourceKey = &ResourceKey::new_inline("minecraft:the_nether");
     /// Display name for the Nether
     pub const NETHER_DISPLAY: &'static CompactString = &CompactString::new_inline("Nether");
 
     /// Key for the End
-    pub const END_KEY: &'static CompactString = &CompactString::new_inline("minecraft:the_end");
+    pub const END_KEY: &'static ResourceKey = &ResourceKey::new_inline("minecraft:the_end");
     /// Display name for the End
     pub const END_DISPLAY: &'static CompactString = &CompactString::new_inline("End");
 
@@ -52,7 +49,7 @@ impl WorldType {
     /// assert_eq!(WorldType::End.as_key(), WorldType::END_KEY);
     /// ```
     #[must_use]
-    pub fn as_key(&self) -> &CompactString {
+    pub fn as_key(&self) -> &ResourceKey {
         match self {
             WorldType::Overworld => Self::OVERWORLD_KEY,
             WorldType::Nether => Self::NETHER_KEY,
@@ -61,18 +58,18 @@ impl WorldType {
         }
     }
 
-    /// Convert a [`WorldType`] into a [`CompactString`].
+    /// Convert a [`WorldType`] into a [`ResourceKey`].
     ///
     /// # Example
     /// ```rust
     /// use froglight_world::maps::WorldType;
     ///
-    /// assert_eq!(WorldType::Overworld.into_key(), WorldType::OVERWORLD_KEY);
-    /// assert_eq!(WorldType::Nether.into_key(), WorldType::NETHER_KEY);
-    /// assert_eq!(WorldType::End.into_key(), WorldType::END_KEY);
+    /// assert_eq!(WorldType::Overworld.into_key(), *WorldType::OVERWORLD_KEY);
+    /// assert_eq!(WorldType::Nether.into_key(), *WorldType::NETHER_KEY);
+    /// assert_eq!(WorldType::End.into_key(), *WorldType::END_KEY);
     /// ```
     #[must_use]
-    pub fn into_key(self) -> CompactString {
+    pub fn into_key(self) -> ResourceKey {
         match self {
             WorldType::Overworld => Self::OVERWORLD_KEY.clone(),
             WorldType::Nether => Self::NETHER_KEY.clone(),
@@ -102,8 +99,8 @@ impl WorldType {
     }
 }
 
-impl AsRef<CompactString> for WorldType {
-    fn as_ref(&self) -> &CompactString { self.as_key() }
+impl AsRef<ResourceKey> for WorldType {
+    fn as_ref(&self) -> &ResourceKey { self.as_key() }
 }
 
 impl AsRef<str> for WorldType {

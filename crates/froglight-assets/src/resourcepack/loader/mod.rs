@@ -39,7 +39,7 @@ pub enum ResourcePackLoaderError {
     /// An image error occurred.
     #[error(transparent)]
     Image(#[from] image::error::ImageError),
-    /// A ResourceKey error occurred.
+    /// A [`ResourceKey`] error occurred.
     #[error(transparent)]
     ResourceKey(#[from] ResourceKeyError),
 }
