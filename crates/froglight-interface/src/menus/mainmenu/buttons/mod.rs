@@ -24,11 +24,33 @@ pub struct MainMenuButtonNode;
 impl MainMenuButtonNode {
     pub(crate) fn build(world: &mut World, parent: Entity) {
         // Create the button container
-        let bundle = NodeBundle::default();
+        let bundle = NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                align_self: AlignSelf::Center,
+                justify_self: JustifySelf::Center,
+
+                top: Val::Percent(33.5),
+                width: Val::Px(184.0),
+                height: Val::Px(112.0),
+
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                ..Default::default()
+            },
+            ..Default::default()
+        };
 
         // Spawn the button container
-        let node =
-            world.spawn((Self, Name::new("MainMenuButtonNode"), bundle)).set_parent(parent).id();
+        let node = world
+            .spawn((
+                Self,
+                Name::new("MainMenuButtonNode"),
+                bundle,
+                Outline::new(Val::Px(1.0), Val::Auto, Color::WHITE),
+            ))
+            .set_parent(parent)
+            .id();
 
         // Build buttons
         MainMenuMultiplayerButton::build(world, node);

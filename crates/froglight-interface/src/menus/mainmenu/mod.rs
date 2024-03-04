@@ -8,7 +8,7 @@ use froglight_assets::ResourcePackState;
 pub(crate) mod plugin;
 
 pub(crate) mod background;
-pub use background::{MainMenuBackground, MainMenuBackgroundCamera};
+pub use background::{MainMenuBackground, MainMenuBackgroundCamera, MainMenuBackgroundEnable};
 
 pub(crate) mod buttons;
 pub use buttons::{

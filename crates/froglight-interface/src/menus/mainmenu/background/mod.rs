@@ -14,11 +14,14 @@ mod cube;
 use cube::MainMenuBackgroundShader;
 
 use super::systemset::MainMenuUpdateSet;
+use crate::menus::InterfaceMenuState;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     camera::build(app);
     cube::build(app);
+
+    app.init_resource::<MainMenuBackgroundEnable>().register_type::<MainMenuBackgroundEnable>();
 
     app.register_type::<MainMenuBackground>();
     app.add_systems(
@@ -26,12 +29,16 @@ pub(super) fn build(app: &mut App) {
         MainMenuBackground::background_rotation
             .run_if(LoadingScreenState::is_hidden)
             .run_if(any_with_component::<MainMenuBackground>)
+            .run_if(MainMenuBackgroundEnable::is_enabled)
             .in_set(MainMenuUpdateSet),
     );
     app.add_systems(
         Update,
         MainMenuBackground::background_visibility
-            .run_if(resource_exists_and_changed::<MainMenuEnable>)
+            .run_if(
+                resource_exists_and_changed::<MainMenuEnable>
+                    .or_else(resource_exists_and_changed::<MainMenuBackgroundEnable>),
+            )
             .run_if(any_with_component::<MainMenuBackground>)
             .in_set(MainMenuUpdateSet),
     );
@@ -55,9 +62,16 @@ impl MainMenuBackground {
 
     fn background_visibility(
         mut query: Query<&mut Visibility, With<Self>>,
-        res: Res<MainMenuEnable>,
+        enable: Res<MainMenuEnable>,
+
+        state: Res<State<InterfaceMenuState>>,
+        state_enable: Res<MainMenuBackgroundEnable>,
     ) {
-        let new = if **res { Visibility::Inherited } else { Visibility::Hidden };
+        let new = if **enable && state_enable.is_enabled_in(**state) {
+            Visibility::Inherited
+        } else {
+            Visibility::Hidden
+        };
         for mut visibility in &mut query {
             *visibility = new;
         }
@@ -114,7 +128,7 @@ impl MainMenuBackground {
         // Get a cube mesh
         let mesh: Handle<Mesh> = {
             // Create the mesh
-            let mut mesh = Mesh::from(Cuboid::from_size(Vec3::splat(-1.0)));
+            let mut mesh = Mesh::from(Cuboid::from_size(Vec3::splat(-16.0)));
 
             // Insert custom flipped/rotated UVs
             mesh.insert_attribute(
@@ -180,5 +194,46 @@ impl MainMenuBackground {
             Self::RENDER_LAYER,
             bundle,
         ));
+    }
+}
+
+/// Whether the [`MainMenuBackground`] is enabled for different
+/// [`InterfaceMenuState`]s.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Resource)]
+#[reflect(Resource)]
+pub struct MainMenuBackgroundEnable {
+    /// Enables the [`MainMenuBackground`] during
+    /// [`InterfaceMenuState::MainMenu`].
+    pub main_menu: bool,
+    /// Enables the [`MainMenuBackground`] during
+    /// [`InterfaceMenuState::MultiplayerMenu`].
+    pub multiplayer_menu: bool,
+    /// Enables the [`MainMenuBackground`] during
+    /// [`InterfaceMenuState::SettingsMenu`].
+    pub settings_menu: bool,
+}
+
+impl Default for MainMenuBackgroundEnable {
+    fn default() -> Self { Self { main_menu: true, multiplayer_menu: false, settings_menu: false } }
+}
+
+impl MainMenuBackgroundEnable {
+    /// Returns [`true`] if the [`MainMenuBackground`] is enabled for the
+    /// current [`InterfaceMenuState`].
+    #[must_use]
+    #[inline]
+    pub fn is_enabled(res: Res<Self>, state: Res<State<InterfaceMenuState>>) -> bool {
+        res.is_enabled_in(**state)
+    }
+
+    /// Returns [`true`] if the [`MainMenuBackground`] is enabled for the given
+    /// [`InterfaceMenuState`].
+    #[must_use]
+    pub fn is_enabled_in(&self, state: InterfaceMenuState) -> bool {
+        match state {
+            InterfaceMenuState::MainMenu => self.main_menu,
+            InterfaceMenuState::MultiplayerMenu => self.multiplayer_menu,
+            InterfaceMenuState::SettingsMenu => self.settings_menu,
+        }
     }
 }

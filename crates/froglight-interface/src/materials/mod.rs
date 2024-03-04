@@ -6,7 +6,11 @@ mod gaussian_node;
 pub use gaussian_node::GaussianNode;
 
 #[doc(hidden)]
-pub(crate) fn build(app: &mut App) { gaussian_node::build(app); }
+pub(crate) fn build(_app: &mut App) {
+    // gaussian_node::build(app);
+}
 
 #[doc(hidden)]
-pub(crate) fn finish(app: &mut App) { gaussian_node::finish(app); }
+pub(crate) fn finish(_app: &mut App) {
+    // gaussian_node::finish(app);
+}

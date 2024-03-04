@@ -28,9 +28,26 @@ fn build(app: &mut App) {
 
     app.configure_sets(Update, InterfaceMenuUpdateSet.in_set(InterfaceUpdateSet));
 
+    app.register_type::<InterfaceMenuState>()
+        .init_state::<InterfaceMenuState>()
+        .register_type::<State<InterfaceMenuState>>()
+        .register_type_data::<State<InterfaceMenuState>, ReflectResource>();
+
     // Only run build once
     BUILD_ONCE.store(true, Ordering::Relaxed);
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub(crate) struct InterfaceMenuUpdateSet;
+
+/// The state of the interface menu.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, States)]
+pub enum InterfaceMenuState {
+    /// The Main Menu
+    #[default]
+    MainMenu,
+    /// The Multiplayer Menu
+    MultiplayerMenu,
+    /// The Settings Menu
+    SettingsMenu,
+}

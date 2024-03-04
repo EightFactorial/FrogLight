@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use froglight_core::resources::MainMenuEnable;
 
-use super::MainMenuBackground;
+use super::{MainMenuBackground, MainMenuBackgroundEnable};
 use crate::{
-    default_camera::default_camera3d_bundle, menus::mainmenu::systemset::MainMenuUpdateSet,
+    default_camera::default_camera3d_bundle,
+    menus::{mainmenu::systemset::MainMenuUpdateSet, InterfaceMenuState},
 };
 
 #[doc(hidden)]
@@ -12,7 +13,10 @@ pub(super) fn build(app: &mut App) {
     app.add_systems(
         Update,
         MainMenuBackgroundCamera::background_camera
-            .run_if(resource_exists_and_changed::<MainMenuEnable>)
+            .run_if(
+                resource_exists_and_changed::<MainMenuEnable>
+                    .or_else(resource_exists_and_changed::<MainMenuBackgroundEnable>),
+            )
             .in_set(MainMenuUpdateSet),
     );
 }
@@ -25,10 +29,14 @@ pub struct MainMenuBackgroundCamera;
 impl MainMenuBackgroundCamera {
     fn background_camera(
         query: Query<Entity, With<Self>>,
-        res: Res<MainMenuEnable>,
+        enable: Res<MainMenuEnable>,
+
+        state: Res<State<InterfaceMenuState>>,
+        state_enable: Res<MainMenuBackgroundEnable>,
+
         mut commands: Commands,
     ) {
-        if **res {
+        if **enable && state_enable.is_enabled_in(**state) {
             if query.iter().count() == 0 {
                 debug!("Creating MainMenuBackgroundCamera");
                 commands.spawn(Self::bundle());
@@ -41,13 +49,15 @@ impl MainMenuBackgroundCamera {
         }
     }
 
-    pub(crate) fn bundle() -> impl Bundle {
+    fn bundle() -> impl Bundle {
         (
             Name::new("MainMenuBackgroundCamera"),
             MainMenuBackground::RENDER_LAYER,
             MainMenuBackgroundCamera,
             Camera3dBundle {
+                // Angle the camera slightly down
                 transform: Transform::from_rotation(Quat::from_rotation_x(-7.5f32.to_radians())),
+                // Set the camera fov to 90 degrees
                 projection: Projection::Perspective(PerspectiveProjection {
                     fov: 90f32.to_radians(),
                     ..Default::default()

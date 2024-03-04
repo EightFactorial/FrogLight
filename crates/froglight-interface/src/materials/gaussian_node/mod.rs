@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use bevy::{
     asset::{embedded_asset, ReflectAsset, ReflectHandle},
     prelude::*,
