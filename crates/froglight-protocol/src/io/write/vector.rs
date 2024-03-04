@@ -34,28 +34,59 @@ impl<T: FrogWrite, const N: usize> FrogWrite for SmallVec<[T; N]> {
     }
 }
 
-#[test]
-fn proto_write_array() {
-    let mut buf = Vec::new();
+#[cfg(test)]
+proptest::proptest! {
 
-    [0, 1, 0, 1u8].fg_write(&mut buf).unwrap();
-    [0, 0, 1, 1u8].fg_write(&mut buf).unwrap();
+    #[test]
+    fn proto_write_vec_u8(data in proptest::collection::vec(proptest::num::u8::ANY, 0..1024)) {
+        use crate::io::FrogVarWrite;
 
-    assert_eq!(buf, [0, 1, 0, 1, 0, 0, 1, 1]);
-}
-#[test]
-fn proto_write_vector() {
-    let mut buf = Vec::new();
+        let mut bytes = Vec::with_capacity(data.len() + 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut bytes).unwrap();
+        bytes.extend(&data);
 
-    vec![8u8, 8, 2, 1, 1].fg_write(&mut buf).unwrap();
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
 
-    assert_eq!(buf, [5, 8, 8, 2, 1, 1]);
-}
-#[test]
-fn proto_write_smallvec() {
-    let mut buf = Vec::new();
+    #[test]
+    fn proto_write_vec_u16(data in proptest::collection::vec(proptest::num::u16::ANY, 0..512)) {
+        use crate::io::FrogVarWrite;
 
-    SmallVec::<[u8; 4]>::from_vec(vec![8u8, 8, 2, 1, 1]).fg_write(&mut buf).unwrap();
+        let mut bytes = Vec::with_capacity(data.len() * 2 + 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut bytes).unwrap();
+        for &value in &data {
+            value.fg_write(&mut bytes).unwrap();
+        }
 
-    assert_eq!(buf, [5, 8, 8, 2, 1, 1]);
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
+
+    #[test]
+    fn proto_write_vec_i16(data in proptest::collection::vec(proptest::num::i16::ANY, 0..512)) {
+        use crate::io::FrogVarWrite;
+
+        let mut bytes = Vec::with_capacity(data.len() * 2 + 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut bytes).unwrap();
+        for &value in &data {
+            value.fg_write(&mut bytes).unwrap();
+        }
+
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
+
+    #[test]
+    fn proto_write_smallvec_u8(data in proptest::collection::vec(proptest::num::u8::ANY, 0..1024)) {
+        use crate::io::FrogVarWrite;
+
+        let mut bytes = Vec::with_capacity(data.len() + 2);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut bytes).unwrap();
+        bytes.extend(&data);
+
+        assert_eq!(SmallVec::<[u8; 8]>::from_vec(data).fg_to_bytes(), bytes);
+    }
+
+    #[test]
+    fn proto_write_array4_u8(data in proptest::array::uniform4(proptest::num::u8::ANY)) {
+        assert_eq!(data.fg_to_bytes(), data.to_vec());
+    }
 }

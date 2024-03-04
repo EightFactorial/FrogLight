@@ -12,3 +12,5 @@ impl<T: FrogVarRead> FrogVarRead for Option<T> {
         }
     }
 }
+
+// TODO: Create tests for Option<T>, ideally using proptest

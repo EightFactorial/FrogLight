@@ -1,6 +1,8 @@
 use super::WriteError;
 
 mod integer;
+mod map;
+mod option;
 
 /// A trait for writing a variable-length type to a buffer
 ///

@@ -101,3 +101,5 @@ impl<T: Eq + Hash + FrogVarRead, S: Default + BuildHasher> FrogVarRead
         Ok(set)
     }
 }
+
+// TODO: Create tests for the above implementations, ideally using proptest

@@ -24,29 +24,26 @@ impl FrogWrite for Uuid {
     }
 }
 
-#[test]
-fn proto_write_uuid() {
-    use std::str::FromStr;
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    let mut buf = Vec::new();
+    #[test]
+    fn proto_write_uuid(data in proptest::array::uniform2(proptest::num::u64::ANY)) {
+        let data = Uuid::from_u64_pair(data[0], data[1]);
+        assert_eq!(data.fg_to_bytes(), data.into_bytes());
+    }
 
-    Uuid::from_str("00000000-0000-0000-0000-000000000000").unwrap().fg_write(&mut buf).unwrap();
-    assert_eq!(buf, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    buf.clear();
-
-    Uuid::from_str("01000000-0000-0000-0000-000000000000").unwrap().fg_write(&mut buf).unwrap();
-    assert_eq!(buf, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-    buf.clear();
-
-    Uuid::from_str("01000000-0000-0000-0000-000000000001").unwrap().fg_write(&mut buf).unwrap();
-    assert_eq!(buf, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
-    buf.clear();
-
-    Uuid::from_str("01000000-0000-0000-0000-000000000002").unwrap().fg_write(&mut buf).unwrap();
-    assert_eq!(buf, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2]);
-    buf.clear();
-
-    Uuid::from_str("01000000-0000-0000-0000-000000000003").unwrap().fg_write(&mut buf).unwrap();
-    assert_eq!(buf, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
-    buf.clear();
+    #[test]
+    fn proto_write_option_uuid(data in proptest::option::of(proptest::array::uniform2(proptest::num::u64::ANY))) {
+        let mut bytes: Vec<u8> = Vec::with_capacity(17);
+        match &data {
+            Some(value) => {
+                bytes.extend(&[1]);
+                bytes.extend(Uuid::from_u64_pair(value[0], value[1]).into_bytes());
+            }
+            None => bytes.extend(&[0]),
+        }
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
 }

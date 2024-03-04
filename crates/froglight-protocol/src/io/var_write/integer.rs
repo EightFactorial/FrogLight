@@ -41,6 +41,8 @@ impl_integer_var_write!(i64);
 impl_integer_var_write!(i128);
 impl_integer_var_write!(isize);
 
+// TODO: Possibly rewrite with or add more tests using proptest?
+
 #[test]
 fn proto_var_write_i32() {
     let mut buf = Vec::with_capacity(5);

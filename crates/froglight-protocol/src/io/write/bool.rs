@@ -7,14 +7,23 @@ impl FrogWrite for bool {
     }
 }
 
-#[test]
-fn proto_write_bool() {
-    let mut buf = Vec::new();
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(32))]
 
-    true.fg_write(&mut buf).unwrap();
-    true.fg_write(&mut buf).unwrap();
-    false.fg_write(&mut buf).unwrap();
-    false.fg_write(&mut buf).unwrap();
+    #[test]
+    fn proto_write_bool(data in proptest::bool::ANY) {
+        assert_eq!(data.fg_to_bytes(), std::slice::from_ref(&u8::from(data)));
+    }
 
-    assert_eq!(buf, vec![1, 1, 0, 0]);
+    #[test]
+    fn proto_write_bool_vec(data in proptest::collection::vec(proptest::bool::ANY, 0..32)) {
+        use crate::io::FrogVarWrite;
+
+        let mut bytes = Vec::with_capacity(data.len() + 1);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut bytes).unwrap();
+        bytes.extend(data.iter().map(|b| u8::from(*b)));
+
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
 }

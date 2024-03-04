@@ -12,22 +12,68 @@ impl<T: FrogWrite> FrogWrite for Option<T> {
     }
 }
 
-#[test]
-fn proto_write_option() {
-    let mut buf = Vec::new();
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(128))]
 
-    Some(1u8).fg_write(&mut buf).unwrap();
-    None::<u8>.fg_write(&mut buf).unwrap();
-    Some(2u8).fg_write(&mut buf).unwrap();
+    #[test]
+    fn proto_write_option_bool(data in proptest::option::of(proptest::bool::ANY)) {
+        let mut bytes = Vec::with_capacity(2);
+        match &data {
+            Some(value) => {
+                true.fg_write(&mut bytes).unwrap();
+                value.fg_write(&mut bytes).unwrap();
+            }
+            None => false.fg_write(&mut bytes).unwrap(),
+        }
 
-    // [some, [1], none, some, [2]]
-    assert_eq!(buf, vec![1, 1, 0, 1, 2]);
-    buf.clear();
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
 
-    Some(1u16).fg_write(&mut buf).unwrap();
-    None::<u16>.fg_write(&mut buf).unwrap();
-    Some(2u16).fg_write(&mut buf).unwrap();
+    #[test]
+    fn proto_write_option_u8(data in proptest::option::of(proptest::num::u8::ANY)) {
+        let mut bytes = Vec::with_capacity(2);
+        match &data {
+            Some(value) => {
+                true.fg_write(&mut bytes).unwrap();
+                value.fg_write(&mut bytes).unwrap();
+            }
+            None => false.fg_write(&mut bytes).unwrap(),
+        }
 
-    // [some, [0, 1], none, some, [0, 2]]
-    assert_eq!(buf, vec![1, 0, 1, 0, 1, 0, 2]);
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
+
+    #[test]
+    fn proto_write_option_string(data in proptest::option::of(".*")) {
+        let mut bytes = Vec::with_capacity(2);
+        match &data {
+            Some(value) => {
+                true.fg_write(&mut bytes).unwrap();
+                value.fg_write(&mut bytes).unwrap();
+            }
+            None => false.fg_write(&mut bytes).unwrap(),
+        }
+
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
+
+    #[test]
+    fn proto_write_vec_option_i32(data in proptest::collection::vec(proptest::option::of(proptest::num::i32::ANY), 0..128)) {
+        use crate::io::FrogVarWrite;
+
+        let mut bytes = Vec::with_capacity(data.len() + 1);
+        u32::try_from(data.len()).unwrap().fg_var_write(&mut bytes).unwrap();
+        for value in &data {
+            match value {
+                Some(value) => {
+                    true.fg_write(&mut bytes).unwrap();
+                    value.fg_write(&mut bytes).unwrap();
+                }
+                None => false.fg_write(&mut bytes).unwrap(),
+            }
+        }
+
+        assert_eq!(data.fg_to_bytes(), bytes);
+    }
 }
