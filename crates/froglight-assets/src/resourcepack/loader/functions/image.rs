@@ -5,7 +5,7 @@ use bevy_render::{
     render_asset::RenderAssetUsages,
     texture::{Image, ImageSampler},
 };
-use froglight_core::data::ResourceKey;
+use froglight_core::common::ResourceKey;
 use futures_lite::{io::Take, AsyncRead, AsyncReadExt};
 use image::io::Reader as ImageReader;
 

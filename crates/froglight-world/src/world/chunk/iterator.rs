@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use froglight_core::data::ChunkBlockPosition;
+use froglight_core::common::ChunkBlockPosition;
 use froglight_protocol::traits::Version;
 
 use super::Chunk;

@@ -2,7 +2,7 @@ use async_zip::base::read::{stream::ZipFileReader, WithEntry, ZipEntryReader};
 use bevy_asset::{io::Reader, AssetLoader, BoxedFuture, LoadContext};
 use bevy_log::warn;
 use derive_more::Deref;
-use froglight_core::data::{ResourceKey, ResourceKeyError};
+use froglight_core::common::{ResourceKey, ResourceKeyError};
 use futures_lite::{io::Take, AsyncRead};
 use thiserror::Error;
 

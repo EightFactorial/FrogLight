@@ -1,3 +1,5 @@
+//! Position related types.
+
 mod blockpos;
 pub use blockpos::BlockPosition;
 

@@ -3,7 +3,7 @@
 use std::io::Cursor;
 
 use bevy_reflect::Reflect;
-use froglight_core::data::SectionBlockPosition;
+use froglight_core::common::SectionBlockPosition;
 use froglight_protocol::{io::FrogRead, traits::Version};
 
 use super::{SectionBlockIterator, SectionIdIterator};

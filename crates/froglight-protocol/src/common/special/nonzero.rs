@@ -14,7 +14,7 @@ use crate::io::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, Write
 ///
 /// # Examples
 /// ```rust
-/// use froglight_protocol::{data::NonZero, io::FrogWrite};
+/// use froglight_protocol::{common::NonZero, io::FrogWrite};
 ///
 /// let nonzero = NonZero::<u8>::new(None);
 /// assert_eq!(nonzero.fg_to_bytes(), vec![0u8]);
@@ -44,7 +44,7 @@ impl<T> NonZero<T> {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::NonZero;
+    /// use froglight_protocol::common::NonZero;
     ///
     /// let nonzero = NonZero::new(Some(5u8));
     /// assert_eq!(nonzero.into_inner(), Some(5u8));
@@ -56,7 +56,7 @@ impl<T> NonZero<T> {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::NonZero;
+    /// use froglight_protocol::common::NonZero;
     ///
     /// let nonzero = NonZero::new_some(5u8);
     /// assert_eq!(nonzero.into_inner(), Some(5u8));
@@ -68,7 +68,7 @@ impl<T> NonZero<T> {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::NonZero;
+    /// use froglight_protocol::common::NonZero;
     ///
     /// let nonzero = NonZero::<u8>::new_none();
     /// assert_eq!(nonzero.into_inner(), None);
@@ -80,7 +80,7 @@ impl<T> NonZero<T> {
     ///
     /// ### Examples
     /// ```rust
-    /// use froglight_protocol::data::NonZero;
+    /// use froglight_protocol::common::NonZero;
     ///
     /// let nonzero = NonZero::new_some(5u8);
     /// assert_eq!(nonzero.into_inner(), Some(5u8));
@@ -93,7 +93,7 @@ impl<T> NonZero<T> {
     ///
     /// ### Examples
     /// ```rust
-    /// use froglight_protocol::data::NonZero;
+    /// use froglight_protocol::common::NonZero;
     ///
     /// let nonzero = NonZero::<u8>::default_some();
     /// assert_eq!(nonzero.into_inner(), Some(0u8));

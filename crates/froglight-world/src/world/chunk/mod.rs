@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use bevy_ecs::component::Component;
 use bevy_log::warn;
-use froglight_core::data::ChunkBlockPosition;
+use froglight_core::common::ChunkBlockPosition;
 use froglight_protocol::traits::Version;
 use parking_lot::RwLock;
 use thiserror::Error;

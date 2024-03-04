@@ -34,7 +34,7 @@ run-profile profile="dev" args="":
 # ---- Test Recipes ----
 
 # Run all tests and all tool tests
-all-tests: (update) (deny) (fmt) (test) (tools "all-tests") (graph)
+all-tests: (update) (deny) (fmt) (test) (tools "all-tests")
 
 # Run all tests and doc-tests
 test: (nextest) (doc-test) 

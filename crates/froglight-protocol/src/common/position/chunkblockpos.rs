@@ -42,7 +42,7 @@ impl ChunkBlockPosition {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::ChunkBlockPosition;
+    /// use froglight_protocol::common::ChunkBlockPosition;
     ///
     /// let pos = ChunkBlockPosition::new(1, 2, 3);
     /// assert_eq!(pos.x(), 1);
@@ -66,7 +66,7 @@ impl ChunkBlockPosition {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::ChunkBlockPosition;
+    /// use froglight_protocol::common::ChunkBlockPosition;
     ///
     /// let pos = ChunkBlockPosition::splat(5);
     /// assert_eq!(pos.x(), 5);

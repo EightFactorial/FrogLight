@@ -3,17 +3,22 @@
 //! This module contains the IO functions for
 //! reading and writing data to and from buffers.
 
+use thiserror::Error;
+
+mod glam;
+
 mod read;
+pub use froglight_macros::FrogRead;
 pub use read::FrogRead;
 
 mod var_read;
-use thiserror::Error;
 pub use var_read::FrogVarRead;
 
 mod var_write;
 pub use var_write::FrogVarWrite;
 
 mod write;
+pub use froglight_macros::FrogWrite;
 pub use write::FrogWrite;
 
 /// An error that occurred while reading data.
@@ -40,6 +45,9 @@ pub enum ReadError {
     /// An error occurred while reading a bool.
     #[error("Invalid bool: {0}")]
     InvalidBool(u8),
+    /// An error occurred while reading an enum.
+    #[error("Invalid enum variant: {0} -> {1}")]
+    InvalidEnum(u8, &'static str),
 }
 
 /// An error that occurred while writing data.

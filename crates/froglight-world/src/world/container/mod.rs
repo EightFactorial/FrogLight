@@ -2,7 +2,7 @@ mod heightmap;
 use std::ops::Range;
 
 use bitvec::{field::BitField, order::Msb0, slice::BitSlice, vec::BitVec};
-use froglight_core::data::SectionBlockPosition;
+use froglight_core::common::SectionBlockPosition;
 pub use heightmap::*;
 
 mod chunk;

@@ -2,7 +2,7 @@ use bevy_asset::{Asset, Handle, ReflectAsset};
 use bevy_audio::AudioSource;
 use bevy_reflect::Reflect;
 use bevy_render::prelude::Image;
-use froglight_core::data::ResourceKey;
+use froglight_core::common::ResourceKey;
 use hashbrown::HashMap;
 
 pub(crate) mod meta;

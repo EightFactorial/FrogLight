@@ -7,6 +7,8 @@ use bevy_math::{I64Vec2, IVec2};
 use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut};
 
+use crate::io::FrogRead;
+
 /// A position in the world, measured in chunks.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Deref, DerefMut)]
 pub struct ChunkPosition(#[reflect(ignore)] I64Vec2);
@@ -42,6 +44,17 @@ impl ChunkPosition {
     #[must_use]
     #[inline]
     pub const fn z(&self) -> i64 { self.0.y }
+}
+
+impl FrogRead for ChunkPosition {
+    fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::io::ReadError>
+    where
+        Self: Sized,
+    {
+        // Read the position as a 2D vector of i32s and swap X/Z.
+        let pos = IVec2::fg_read(buf)?;
+        Ok(Self::new(i64::from(pos.y), i64::from(pos.x)))
+    }
 }
 
 // --- Math Implementations ---
@@ -114,7 +127,7 @@ impl DivAssign<i32> for ChunkPosition {
 
 // Create implementations on groups of types.
 macro_rules! impl_from {
-    (group $($from:ty),* => $to:ty) => {
+    ($($from:ty),* => $to:ty) => {
         $(
             impl From<[$from; 2]> for $to {
                 fn from([x, z]: [$from; 2]) -> Self {
@@ -128,7 +141,7 @@ macro_rules! impl_from {
             }
         )*
     };
-    (try_group $($from:ty),* => $to:ty) => {
+    (try $($from:ty),* => $to:ty) => {
         $(
             impl TryFrom<[$from; 2]> for $to {
                 type Error = TryFromIntError;
@@ -146,8 +159,8 @@ macro_rules! impl_from {
     };
 }
 
-impl_from!(group i64, i32, i16, i8 => ChunkPosition);
-impl_from!(try_group u128, i128, isize, usize, u64, u32, u16, u8 => ChunkPosition);
+impl_from!(i64, i32, i16, i8 => ChunkPosition);
+impl_from!(try u128, i128, isize, usize, u64, u32, u16, u8 => ChunkPosition);
 
 impl From<I64Vec2> for ChunkPosition {
     fn from(vec: I64Vec2) -> Self { Self(vec) }

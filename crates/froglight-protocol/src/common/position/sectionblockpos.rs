@@ -36,7 +36,7 @@ impl SectionBlockPosition {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::SectionBlockPosition;
+    /// use froglight_protocol::common::SectionBlockPosition;
     ///
     /// let pos = SectionBlockPosition::new(1, 2, 3);
     /// assert_eq!(pos.x(), 1);
@@ -57,7 +57,7 @@ impl SectionBlockPosition {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::SectionBlockPosition;
+    /// use froglight_protocol::common::SectionBlockPosition;
     ///
     /// let pos = SectionBlockPosition::splat(5);
     /// assert_eq!(pos.x(), 5);
@@ -88,7 +88,7 @@ impl SectionBlockPosition {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::SectionBlockPosition;
+    /// use froglight_protocol::common::SectionBlockPosition;
     ///
     /// // (1 * 1) + (0 * 256) + (0 * 16) = 1
     /// let pos = SectionBlockPosition::new(1, 0, 0);
@@ -112,7 +112,7 @@ impl SectionBlockPosition {
     ///
     /// Example:
     /// ```rust
-    /// use froglight_protocol::data::SectionBlockPosition;
+    /// use froglight_protocol::common::SectionBlockPosition;
     ///
     /// let pos = SectionBlockPosition::from_index(0);
     /// assert_eq!(pos, SectionBlockPosition::new(0, 0, 0));
@@ -210,7 +210,7 @@ impl From<&ChunkBlockPosition> for SectionBlockPosition {
 
 // Create implementations on groups of types.
 macro_rules! impl_from {
-    (group $($from:ty),* => $to:ty) => {
+    ($($from:ty),* => $to:ty) => {
         $(
             impl From<[$from; 3]> for $to {
                 fn from([x, y, z]: [$from; 3]) -> Self {
@@ -224,7 +224,7 @@ macro_rules! impl_from {
             }
         )*
     };
-    (try_group $($from:ty),* => $to:ty) => {
+    (try $($from:ty),* => $to:ty) => {
         $(
             impl TryFrom<[$from; 3]> for $to {
                 type Error = TryFromIntError;
@@ -242,8 +242,8 @@ macro_rules! impl_from {
     };
 }
 
-impl_from!(group u8 => SectionBlockPosition);
-impl_from!(try_group usize, u128, u64, u32, u16, isize, i128, i64, i32, i16, i8 => SectionBlockPosition);
+impl_from!(u8 => SectionBlockPosition);
+impl_from!(try usize, u128, u64, u32, u16, isize, i128, i64, i32, i16, i8 => SectionBlockPosition);
 
 // --- Tests ---
 

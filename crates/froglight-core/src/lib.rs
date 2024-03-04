@@ -7,7 +7,7 @@ pub mod resources;
 pub mod systemsets;
 
 // Re-export protocol data
-pub use froglight_protocol::data;
+pub use froglight_protocol::common;
 
 mod plugin;
 pub use plugin::CorePlugin;

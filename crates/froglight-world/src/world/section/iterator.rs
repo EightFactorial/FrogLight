@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use froglight_core::data::SectionBlockPosition;
+use froglight_core::common::SectionBlockPosition;
 use froglight_protocol::traits::Version;
 
 use super::Section;

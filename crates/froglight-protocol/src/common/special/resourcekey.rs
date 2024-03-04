@@ -65,7 +65,7 @@ impl ResourceKey {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::ResourceKey;
+    /// use froglight_protocol::common::ResourceKey;
     ///
     /// let key = ResourceKey::new("minecraft:stone");
     /// assert_eq!(key, "minecraft:stone");
@@ -133,7 +133,7 @@ impl ResourceKey {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::ResourceKey;
+    /// use froglight_protocol::common::ResourceKey;
     ///
     /// let key = ResourceKey::new("minecraft:stone");
     /// assert_eq!(key.split(), ("minecraft", "stone"));
@@ -150,7 +150,7 @@ impl ResourceKey {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::ResourceKey;
+    /// use froglight_protocol::common::ResourceKey;
     ///
     /// let key = ResourceKey::new("minecraft:dirt");
     /// assert_eq!(key.namespace(), "minecraft");
@@ -166,7 +166,7 @@ impl ResourceKey {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::ResourceKey;
+    /// use froglight_protocol::common::ResourceKey;
     ///
     /// let key = ResourceKey::new("minecraft:grass");
     /// assert_eq!(key.path(), "grass");
@@ -189,7 +189,7 @@ impl ResourceKey {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_protocol::data::ResourceKey;
+    /// use froglight_protocol::common::ResourceKey;
     ///
     /// const AIR: ResourceKey = ResourceKey::new_inline("minecraft:air");
     /// assert_eq!(AIR, "minecraft:air");

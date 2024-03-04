@@ -17,7 +17,7 @@ use bevy_inspector_egui::{
 use bevy_log::warn;
 use bevy_reflect::Reflect;
 use bevy_render::texture::Image;
-use froglight_core::data::ResourceKey;
+use froglight_core::common::ResourceKey;
 use hashbrown::HashMap;
 use parking_lot::RwLock;
 

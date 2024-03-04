@@ -26,6 +26,7 @@ bevy_render = "0.13.0"
 bevy-inspector-egui = { version = "0.23.3", optional = true }
 derive_more = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
+froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = ["assets"] }
 hashbrown = { workspace = true }
 
 # AssetSource dependencies
