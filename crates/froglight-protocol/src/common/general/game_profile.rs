@@ -14,7 +14,7 @@ pub struct GameProfile {
     /// The player's name.
     pub name: CompactString,
     /// The player's properties.
-    pub propterties: HashMap<CompactString, ProfileProperty>,
+    pub properties: HashMap<CompactString, ProfileProperty>,
 }
 
 /// A property of a player's profile.
