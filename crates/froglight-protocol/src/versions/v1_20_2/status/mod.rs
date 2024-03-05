@@ -18,7 +18,14 @@ mod querypingc2spacket;
 pub use querypingc2spacket::*;
 
 frog_state! {
-    Status, V1_20_2, Clientbound { 0u32 => QueryResponseS2CPacket, 1u32 =>
-    PingResultS2CPacket, }, Serverbound { 0u32 => QueryRequestC2SPacket, 1u32 =>
-    QueryPingC2SPacket, },
+	Status,
+	V1_20_2,
+	Clientbound {
+		0u32 => QueryResponseS2CPacket,
+		1u32 => PingResultS2CPacket,
+	},
+	Serverbound {
+		0u32 => QueryRequestC2SPacket,
+		1u32 => QueryPingC2SPacket,
+	},
 }

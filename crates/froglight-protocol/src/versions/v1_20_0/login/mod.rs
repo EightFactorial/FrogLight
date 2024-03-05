@@ -30,9 +30,18 @@ mod loginqueryresponsec2spacket;
 pub use loginqueryresponsec2spacket::*;
 
 frog_state! {
-    Login, V1_20_0, Clientbound { 0u32 => LoginDisconnectS2CPacket, 1u32 =>
-    LoginHelloS2CPacket, 2u32 => LoginSuccessS2CPacket, 3u32 =>
-    LoginCompressionS2CPacket, 4u32 => LoginQueryRequestS2CPacket, }, Serverbound { 0u32
-    => LoginHelloC2SPacket, 1u32 => LoginKeyC2SPacket, 2u32 =>
-    LoginQueryResponseC2SPacket, },
+	Login,
+	V1_20_0,
+	Clientbound {
+		0u32 => LoginDisconnectS2CPacket,
+		1u32 => LoginHelloS2CPacket,
+		2u32 => LoginSuccessS2CPacket,
+		3u32 => LoginCompressionS2CPacket,
+		4u32 => LoginQueryRequestS2CPacket,
+	},
+	Serverbound {
+		0u32 => LoginHelloC2SPacket,
+		1u32 => LoginKeyC2SPacket,
+		2u32 => LoginQueryResponseC2SPacket,
+	},
 }

@@ -9,5 +9,9 @@ mod handshakec2spacket;
 pub use handshakec2spacket::*;
 
 frog_state! {
-    Handshaking, V1_20_0, Clientbound {}, Serverbound { 0u32 => HandshakeC2SPacket, },
+    Handshaking,
+    V1_20_0,
+    Serverbound {
+        0u32 => HandshakeC2SPacket,
+    },
 }
