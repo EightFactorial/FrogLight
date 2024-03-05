@@ -87,11 +87,8 @@ fn create_packet_enum(ident: &Ident, packets: &StatePackets, output: &mut TokenS
 
 /// Get the name of the enum variant.
 fn packet_variant_name(packet: &Packet) -> Ident {
-    let name = packet.name.to_string();
-    match (name.split_once("C2S"), name.split_once("S2C")) {
-        (Some(name), None) | (None, Some(name)) => Ident::new(name.0, packet.name.span()),
-        _ => panic!("Unable to generate enum variant name for packet: {:?}", packet.name),
-    }
+    let name = packet.name.to_string().replace("S2CPacket", "").replace("C2SPacket", "");
+    Ident::new(&name, packet.name.span())
 }
 
 /// Implement the packet trait for the packet.
