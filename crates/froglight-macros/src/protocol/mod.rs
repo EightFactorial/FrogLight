@@ -4,6 +4,7 @@ use syn::DeriveInput;
 
 mod modifiers;
 mod readwrite;
+mod states;
 mod tests;
 
 /// Generates a `FrogRead` and `FrogWrite` implementation for the given struct
@@ -52,6 +53,10 @@ pub(super) fn frog_test(tokens: TokenStream) -> TokenStream {
     let input: DeriveInput = syn::parse(tokens).expect("Failed to parse input");
     let attrs = Attributes::from_attributes(&input.attrs).expect("Failed to parse attributes");
     TokenStream::from(tests::generate_tests(&input, &attrs))
+}
+
+pub(super) fn frog_state(tokens: TokenStream) -> TokenStream {
+    TokenStream::from(states::generate_state(tokens.into()))
 }
 
 /// Attributes for the `frog` attribute macro.

@@ -32,6 +32,8 @@ assets = []
 
 # Enables `froglight-protocol` macros
 protocol = []
+# Enables extra logging for `froglight-protocol` macros
+protocol_log = ["protocol"]
 
 # Enables `froglight-world` macros
 world = []

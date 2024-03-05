@@ -19,8 +19,11 @@ macro_rules! protocol_macro {
     };
 }
 
+#[cfg(feature = "protocol")]
 protocol_macro!(FrogRead, frog_read);
+#[cfg(feature = "protocol")]
 protocol_macro!(FrogWrite, frog_write);
+#[cfg(feature = "protocol")]
 protocol_macro!(FrogReadWrite, frog_read_write);
 
 /// A macro for generating tests for `FrogRead` and `FrogWrite` implementations.
@@ -28,6 +31,13 @@ protocol_macro!(FrogReadWrite, frog_read_write);
 #[proc_macro_derive(FrogTest, attributes(frog))]
 pub fn frog_test(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     protocol::frog_test(input)
+}
+
+/// A macro for generating a version state implementation.
+#[cfg(feature = "protocol")]
+#[proc_macro]
+pub fn frog_state(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    protocol::frog_state(input)
 }
 
 #[cfg(feature = "world")]
