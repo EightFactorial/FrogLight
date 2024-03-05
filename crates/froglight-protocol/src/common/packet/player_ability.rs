@@ -1,9 +1,9 @@
-use bevy_reflect::Reflect;
 use froglight_macros::FrogReadWrite;
 
 /// The player's ability flags sent from the server.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, FrogReadWrite)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[frog(bitset = 4, tests = ["read_verify", "write_verify"], bytes = [0])]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 #[allow(clippy::struct_excessive_bools)]
 pub struct ServerPlayerAbilityFlags {
     /// Whether the player is invulnerable.
@@ -17,8 +17,9 @@ pub struct ServerPlayerAbilityFlags {
 }
 
 /// The player's current state sent from the client.
-#[derive(Debug, Default, Clone, PartialEq, Reflect, FrogReadWrite)]
+#[derive(Debug, Default, Clone, PartialEq, FrogReadWrite)]
 #[frog(bitset = 2, tests = ["read_verify", "write_verify"], bytes = [0])]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ClientPlayerAbilityFlags {
     /// An empty flag.
     empty: bool,

@@ -1,5 +1,4 @@
-//! This module is solely for converting between different types of
-//! [`Connection`]s.
+//! Conversions between different types of [`Connection`]s.
 
 use bevy_log::debug;
 use froglight_protocol::{
@@ -35,7 +34,7 @@ where
         Status: State<V>,
         D: Direction<V, Status>,
     {
-        debug!("Setting Connection state to `Status`");
+        debug!("Setting `Handshaking` Connection to `Status`");
         self.set_state()
     }
 
@@ -47,7 +46,7 @@ where
         Login: State<V>,
         D: Direction<V, Login>,
     {
-        debug!("Setting Connection state to `Login`");
+        debug!("Setting `Handshaking` Connection to `Login`");
         self.set_state()
     }
 }
@@ -64,7 +63,7 @@ where
         Configuration: State<V>,
         D: Direction<V, Configuration>,
     {
-        debug!("Setting Connection state to `Configuration`");
+        debug!("Setting `Login` Connection to `Configuration`");
         self.set_state()
     }
 
@@ -76,7 +75,7 @@ where
         Play: State<V>,
         D: Direction<V, Play>,
     {
-        debug!("Setting Connection state to `Play`");
+        debug!("Setting `Login` Connection to `Play`");
         self.set_state()
     }
 }
@@ -93,7 +92,24 @@ where
         Play: State<V>,
         D: Direction<V, Play>,
     {
-        debug!("Setting Connection state to `Play`");
+        debug!("Setting `Configuration` Connection to `Play`");
+        self.set_state()
+    }
+}
+
+impl<V: Version, D: Direction<V, Play>> Connection<V, Play, D>
+where
+    Play: State<V>,
+{
+    /// Set the [`Connection`]'s state to [`Configuration`].
+    #[must_use]
+    #[inline]
+    pub fn configuration(self) -> Connection<V, Configuration, D>
+    where
+        Configuration: State<V>,
+        D: Direction<V, Configuration>,
+    {
+        debug!("Setting `Play` Connection to `Configuration`");
         self.set_state()
     }
 }

@@ -27,6 +27,9 @@ froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
 froglight-interface = { version = "0.1.0", path = "../froglight-interface" }
 froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+    "reflect",
+] }
 froglight-render = { version = "0.1.0", path = "../froglight-render" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 

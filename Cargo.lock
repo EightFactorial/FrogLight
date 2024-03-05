@@ -2222,6 +2222,7 @@ dependencies = [
  "froglight-interface",
  "froglight-network",
  "froglight-physics",
+ "froglight-protocol",
  "froglight-render",
  "froglight-world",
 ]
@@ -2315,6 +2316,7 @@ dependencies = [
 name = "froglight-protocol"
 version = "0.1.0"
 dependencies = [
+ "bevy_app",
  "bevy_log",
  "bevy_math",
  "bevy_reflect",

@@ -3,14 +3,13 @@ use std::{
     ops::{Add, AddAssign, Sub, SubAssign},
 };
 
-use bevy_reflect::Reflect;
-
 use super::{BlockPosition, ChunkBlockPosition};
 
 /// A position in a section, with x, y, and z coordinates.
 ///
 /// The range of each coordinate is `0..16`, not including `16`.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Reflect)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct SectionBlockPosition {
     /// The x-coordinate of the position.
     pub x: u8,

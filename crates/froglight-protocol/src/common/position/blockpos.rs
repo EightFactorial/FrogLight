@@ -4,16 +4,14 @@ use std::{
 };
 
 use bevy_math::{I64Vec3, IVec3};
-use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut, From, Into};
 
 use crate::io::{FrogRead, FrogWrite};
 
 /// A position in the world, measured in blocks.
-#[derive(
-    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, From, Into, Deref, DerefMut,
-)]
-pub struct BlockPosition(#[reflect(ignore)] I64Vec3);
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
+pub struct BlockPosition(#[cfg_attr(feature = "reflect", reflect(ignore))] I64Vec3);
 
 impl BlockPosition {
     /// All zeros.

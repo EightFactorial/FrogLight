@@ -1,11 +1,7 @@
 //! Traits for packets and structs that can be read and written.
 
-use bevy_reflect::Reflect;
-
-use crate::io::{FrogRead, FrogWrite};
-
 /// A Protocol version
-pub trait Version: 'static + Copy + Eq + Reflect {
+pub trait Version: 'static + Copy + Eq {
     /// The protocol version number
     const PROTOCOL_VERSION: i32;
 }
@@ -13,12 +9,12 @@ pub trait Version: 'static + Copy + Eq + Reflect {
 /// A Protocol state
 ///
 /// Different states have different packets.
-pub trait State<V: Version>: 'static + Copy + Eq + Reflect {
+pub trait State<V: Version>: 'static + Copy + Eq {
     /// Packets sent from the client to the server
-    type ServerboundPacket: FrogRead + Packet;
+    type ServerboundPacket: PacketEnum;
     /// Packets sent from the server to the client
-    type ClientboundPacket: FrogWrite + Packet;
+    type ClientboundPacket: PacketEnum;
 }
 
-/// A packet that can be sent or received.
-pub trait Packet: Send + Sync + Reflect {}
+/// A collection of packets that can be sent or received.
+pub trait PacketEnum: Send + Sync {}

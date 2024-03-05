@@ -1,6 +1,5 @@
 use std::fmt::Display;
 
-use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut, From, Into};
 
 /// An entity's unique identifier.
@@ -10,10 +9,9 @@ use derive_more::{Deref, DerefMut, From, Into};
 /// ---
 ///
 /// This is different than bevy's `Entity` type.
-#[derive(
-    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, From, Into, Deref, DerefMut, Reflect,
-)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, From, Into, Deref, DerefMut)]
 // TODO: #[frog(tests = ["read_example"], bytes = [])]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct EntityId(u32);
 
 impl AsRef<u32> for EntityId {

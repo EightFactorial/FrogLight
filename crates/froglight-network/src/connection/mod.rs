@@ -54,9 +54,12 @@ impl<V: Version, S: State<V>, D: Direction<V, S>> Connection<V, S, D> {
     /// Create a new connection from a TCP stream.
     ///
     /// # Errors
-    /// Errors if the stream cannot be made non-blocking.
+    /// Errors if the stream cannot get or set nodelay.
     pub async fn from_tcp(stream: TcpStream) -> Result<Self, ConnectionError> {
-        stream.set_nonblocking(true)?;
+        if !stream.nodelay()? {
+            stream.set_nodelay(true)?;
+        }
+
         todo!()
     }
 }

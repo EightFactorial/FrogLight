@@ -4,6 +4,11 @@
 #![feature(array_try_from_fn)]
 #![feature(generic_const_exprs)]
 
+#[cfg(feature = "reflect")]
+mod plugin;
+#[cfg(feature = "reflect")]
+pub use plugin::ReflectPlugin;
+
 pub mod common;
 pub mod io;
 pub mod states;

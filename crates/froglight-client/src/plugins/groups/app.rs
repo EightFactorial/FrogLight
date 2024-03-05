@@ -15,6 +15,7 @@ impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroup::build(DefaultPlugins)
             .add_before::<AssetPlugin, AssetSourcePlugin>(AssetSourcePlugin::default())
+            .add(ReflectPlugin)
             .add(CorePlugin)
             .add(PhysicsPlugin)
             .add(AssetPlugins::default())

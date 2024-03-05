@@ -1,6 +1,7 @@
 use std::{borrow::Borrow, fmt::Display};
 
-use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+#[cfg(feature = "reflect")]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
 use hashbrown::Equivalent;
@@ -15,24 +16,14 @@ use crate::io::{FrogRead, FrogWrite};
 ///
 /// Internally just a wrapper around a [`CompactString`]
 #[derive(
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    Hash,
-    PartialOrd,
-    Ord,
-    Deref,
-    DerefMut,
-    Serialize,
-    Deserialize,
-    Reflect,
+    Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut, Serialize, Deserialize,
 )]
-#[reflect(Serialize, Deserialize)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "reflect", reflect(Deserialize, Serialize))]
 #[serde(transparent)]
 #[repr(transparent)]
 // Can't reflect on remote types :(
-pub struct ResourceKey(#[reflect(ignore)] CompactString);
+pub struct ResourceKey(#[cfg_attr(feature = "reflect", reflect(ignore))] CompactString);
 
 /// An error that occurred while creating a [`ResourceKey`]
 #[derive(Debug, Error)]

@@ -1,4 +1,3 @@
-use bevy_reflect::Reflect;
 use froglight_macros::FrogReadWrite;
 
 /// The intent of a connection.
@@ -6,8 +5,9 @@ use froglight_macros::FrogReadWrite;
 /// # Note
 /// Versions before [`1.20.2`](crate::versions::v1_20_2::V1_20_2) did not
 /// have the [`ConnectionIntent::Configuration`] intent.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, FrogReadWrite)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 // TODO: #[frog(tests = ["read_example", "write_default"], bytes = [254])]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ConnectionIntent {
     /// The [`Handshaking`](crate::states::Handshaking) state
     #[default]

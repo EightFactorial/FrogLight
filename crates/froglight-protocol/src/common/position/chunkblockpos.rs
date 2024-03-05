@@ -1,7 +1,5 @@
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 
-use bevy_reflect::Reflect;
-
 use super::BlockPosition;
 
 /// A position in a chunk, with x, y, and z coordinates.
@@ -10,7 +8,8 @@ use super::BlockPosition;
 ///
 /// The y-coordinate is `0` at the bottom of the world,
 /// regardless of the minimum possible value.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ChunkBlockPosition {
     /// The x-coordinate of the position.
     ///

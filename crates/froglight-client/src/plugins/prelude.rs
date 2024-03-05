@@ -9,6 +9,7 @@ pub use froglight_interface::plugins::{
     InterfaceMultiplayerMenuPlugin, InterfacePlugins, InterfaceSettingsMenuPlugin, UiScalePlugin,
 };
 pub use froglight_physics::PhysicsPlugin;
+pub use froglight_protocol::ReflectPlugin;
 pub use froglight_world::WorldPlugin;
 
 // Also re-export the plugin groups for completeness

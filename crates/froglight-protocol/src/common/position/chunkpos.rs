@@ -4,16 +4,14 @@ use std::{
 };
 
 use bevy_math::{I64Vec2, IVec2};
-use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut, From, Into};
 
 use crate::io::{FrogRead, FrogWrite};
 
 /// A position in the world, measured in chunks.
-#[derive(
-    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, From, Into, Deref, DerefMut,
-)]
-pub struct ChunkPosition(#[reflect(ignore)] I64Vec2);
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
+pub struct ChunkPosition(#[cfg_attr(feature = "reflect", reflect(ignore))] I64Vec2);
 
 impl ChunkPosition {
     /// All zeros.

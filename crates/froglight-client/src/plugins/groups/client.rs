@@ -10,7 +10,11 @@ pub struct ClientPlugins;
 
 impl PluginGroup for ClientPlugins {
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>().add(CorePlugin).add(PhysicsPlugin)
+        PluginGroupBuilder::start::<Self>()
+            .add(ReflectPlugin)
+            .add(CorePlugin)
+            .add(PhysicsPlugin)
+            .add(WorldPlugin)
     }
 }
 

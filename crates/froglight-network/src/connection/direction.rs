@@ -1,14 +1,14 @@
 use froglight_protocol::{
     io::{FrogRead, FrogWrite},
-    traits::{Packet, State, Version},
+    traits::{State, Version},
 };
 
 /// A trait defining the direction in which packets are sent and received.
 pub trait Direction<V: Version, S: State<V>> {
     /// The packet type that is sent.
-    type Send: FrogRead + Packet;
+    type Send: FrogRead;
     /// The packet type that is received.
-    type Recv: FrogWrite + Packet;
+    type Recv: FrogWrite;
 }
 
 /// The clientbound [`Direction`].
@@ -30,7 +30,11 @@ where
 /// Packets are sent from the client to the server.
 pub struct Serverbound;
 
-impl<V: Version, S: State<V>> Direction<V, S> for Serverbound {
+impl<V: Version, S: State<V>> Direction<V, S> for Serverbound
+where
+    S::ClientboundPacket: FrogWrite,
+    S::ServerboundPacket: FrogRead,
+{
     type Send = S::ServerboundPacket;
     type Recv = S::ClientboundPacket;
 }
