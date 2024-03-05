@@ -29,6 +29,7 @@ pub struct Login;
 ///
 /// This is the state where the client and server
 /// exchange configuration information.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct Configuration;
 
 /// The Play state

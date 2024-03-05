@@ -28,3 +28,4 @@ froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
 froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
+thiserror = { workspace = true }
