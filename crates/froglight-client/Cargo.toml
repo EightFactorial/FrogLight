@@ -18,6 +18,10 @@ workspace = true
 [dev-dependencies]
 # Needed for the system graph example
 bevy_mod_debugdump = "0.10.0"
+# Enable extra logging for development
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+    "logging",
+] }
 
 [dependencies]
 bevy = { workspace = true }

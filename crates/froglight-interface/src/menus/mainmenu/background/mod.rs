@@ -5,7 +5,10 @@ use bevy::{
     render::{mesh::VertexAttributeValues, view::RenderLayers},
 };
 use froglight_assets::{AssetManager, FallbackImage};
-use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
+use froglight_core::{
+    resources::{LoadingScreenState, MainMenuEnable},
+    systemsets::InterfaceUpdateSet,
+};
 
 mod camera;
 pub use camera::MainMenuBackgroundCamera;
@@ -13,7 +16,6 @@ pub use camera::MainMenuBackgroundCamera;
 mod cube;
 use cube::MainMenuBackgroundShader;
 
-use super::systemset::MainMenuUpdateSet;
 use crate::menus::InterfaceMenuState;
 
 #[doc(hidden)]
@@ -30,7 +32,7 @@ pub(super) fn build(app: &mut App) {
             .run_if(LoadingScreenState::is_hidden)
             .run_if(any_with_component::<MainMenuBackground>)
             .run_if(MainMenuBackgroundEnable::is_enabled)
-            .in_set(MainMenuUpdateSet),
+            .in_set(InterfaceUpdateSet),
     );
     app.add_systems(
         Update,
@@ -40,7 +42,7 @@ pub(super) fn build(app: &mut App) {
                     .or_else(resource_exists_and_changed::<MainMenuBackgroundEnable>),
             )
             .run_if(any_with_component::<MainMenuBackground>)
-            .in_set(MainMenuUpdateSet),
+            .in_set(InterfaceUpdateSet),
     );
 }
 
@@ -199,22 +201,15 @@ impl MainMenuBackground {
 
 /// Whether the [`MainMenuBackground`] is enabled for different
 /// [`InterfaceMenuState`]s.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect, Resource)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, Resource)]
 #[reflect(Resource)]
 pub struct MainMenuBackgroundEnable {
-    /// Enables the [`MainMenuBackground`] during
-    /// [`InterfaceMenuState::MainMenu`].
-    pub main_menu: bool,
     /// Enables the [`MainMenuBackground`] during
     /// [`InterfaceMenuState::MultiplayerMenu`].
     pub multiplayer_menu: bool,
     /// Enables the [`MainMenuBackground`] during
     /// [`InterfaceMenuState::SettingsMenu`].
     pub settings_menu: bool,
-}
-
-impl Default for MainMenuBackgroundEnable {
-    fn default() -> Self { Self { main_menu: true, multiplayer_menu: false, settings_menu: false } }
 }
 
 impl MainMenuBackgroundEnable {
@@ -231,7 +226,7 @@ impl MainMenuBackgroundEnable {
     #[must_use]
     pub fn is_enabled_in(&self, state: InterfaceMenuState) -> bool {
         match state {
-            InterfaceMenuState::MainMenu => self.main_menu,
+            InterfaceMenuState::MainMenu => true,
             InterfaceMenuState::MultiplayerMenu => self.multiplayer_menu,
             InterfaceMenuState::SettingsMenu => self.settings_menu,
         }
