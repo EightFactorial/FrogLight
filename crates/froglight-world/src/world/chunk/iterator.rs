@@ -40,7 +40,7 @@ impl<'c> ChunkIdIterator<'c> {
 }
 
 impl Iterator for ChunkIdIterator<'_> {
-    type Item = usize;
+    type Item = u32;
 
     fn next(&mut self) -> Option<Self::Item> {
         // If the position is out of bounds, always return None.

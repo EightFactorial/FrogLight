@@ -40,7 +40,7 @@ impl<'s> SectionIdIterator<'s> {
 
 impl Iterator for SectionIdIterator<'_> {
     // TODO: Return blocks instead of block ids.
-    type Item = usize;
+    type Item = u32;
 
     fn next(&mut self) -> Option<Self::Item> {
         // If the iterator is finished, always return None.

@@ -154,7 +154,7 @@ impl Chunk {
     /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
     /// bounds.
     #[must_use]
-    pub fn get_blockid(&self, pos: &ChunkBlockPosition) -> Option<usize> {
+    pub fn get_blockid(&self, pos: &ChunkBlockPosition) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.read().get(section_index) {
             Some(section.get_blockid(pos.into()))
@@ -187,7 +187,7 @@ impl Chunk {
     ///
     /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
     /// bounds.
-    pub fn set_blockid(&mut self, pos: &ChunkBlockPosition, value: usize) -> Option<usize> {
+    pub fn set_blockid(&mut self, pos: &ChunkBlockPosition, value: u32) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.write().get_mut(section_index) {
             Some(section.set_blockid(pos.into(), value))
@@ -213,7 +213,7 @@ impl Chunk {
     /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
     /// bounds.
     #[must_use]
-    pub fn get_biomeid(&self, pos: &ChunkBlockPosition) -> Option<usize> {
+    pub fn get_biomeid(&self, pos: &ChunkBlockPosition) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.read().get(section_index) {
             Some(section.get_biomeid(pos.into()))
@@ -246,7 +246,7 @@ impl Chunk {
     ///
     /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
     /// bounds.
-    pub fn set_biomeid(&mut self, pos: &ChunkBlockPosition, value: usize) -> Option<usize> {
+    pub fn set_biomeid(&mut self, pos: &ChunkBlockPosition, value: u32) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.write().get_mut(section_index) {
             Some(section.set_biomeid(pos.into(), value))

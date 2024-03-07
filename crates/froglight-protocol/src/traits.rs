@@ -11,7 +11,9 @@ pub trait Version: 'static + Debug + Default + Copy + Eq {
 
 /// A Protocol version
 #[cfg(feature = "reflect")]
-pub trait Version: 'static + Debug + Default + Copy + Eq + bevy_reflect::Reflect {
+pub trait Version:
+    'static + Debug + Default + Copy + Eq + bevy_reflect::Reflect + bevy_reflect::TypePath
+{
     /// The protocol version number
     const PROTOCOL_VERSION: i32;
 }

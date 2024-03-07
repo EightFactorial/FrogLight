@@ -17,19 +17,19 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     /// # Panics
     /// Panics if the palette value is out of range.
     #[must_use]
-    pub fn get_data(&self, pos: &SectionBlockPosition) -> usize {
+    pub fn get_data(&self, pos: &SectionBlockPosition) -> u32 {
         // Skip the lookup if the palette only contains a single value.
         if let Palette::Single(v) = self.palette {
-            return usize::try_from(v).expect("Palette value is out of range");
+            return v;
         }
 
         // Load the value from the bitslice and convert it to a usize.
         let slice = self.get_bitslice(*pos);
-        let value = slice.load_be::<usize>();
+        let value = slice.load_be::<u32>();
 
         match &self.palette {
             // Get the value from the palette if it's a vector.
-            Palette::Vector(vec) => vec[value].try_into().expect("Palette value is out of range"),
+            Palette::Vector(vec) => vec[value as usize],
             // Return the value directly if the palette is global.
             Palette::Global => value,
             Palette::Single(_) => unreachable!(),
@@ -40,27 +40,26 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     ///
     /// Returns the previous value at the given coordinates.
     #[allow(clippy::missing_panics_doc)]
-    pub fn set_data(&mut self, pos: &SectionBlockPosition, value: usize) -> usize {
+    pub fn set_data(&mut self, pos: &SectionBlockPosition, value: u32) -> u32 {
         match &self.palette {
             Palette::Single(v) => {
-                if usize::try_from(*v).expect("Palette value is out of range") == value {
+                if *v == value {
                     // Do nothing, the value is already set.
                     value
                 } else {
                     // Store the old value for later.
-                    let old_value = usize::try_from(*v).expect("Palette value is out of range");
+                    let old_value = *v;
 
                     // Convert the palette to a vector and add the new value.
-                    self.palette = Palette::Vector(vec![
-                        *v,
-                        value.try_into().expect("Palette value is out of range"),
-                    ]);
+                    self.palette = Palette::Vector(vec![*v, value]);
 
                     // Set the bitsize to 1.
                     self.bits = 1;
 
-                    // Create a new bitvec and set the new value.
+                    // Create a new empty bitvec
                     let mut data = BitVec::repeat(false, Self::data_size(self.bits));
+
+                    // Set the new value in the bitslice.
                     let mut_slice = &mut data[Self::entry_range(self.bits, *pos)];
                     mut_slice.set(0, true);
 
@@ -72,9 +71,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                 }
             }
             Palette::Vector(vec) => {
-                if let Some(index) = vec.iter().position(|&v| {
-                    usize::try_from(v).expect("Palette value is out of range") == value
-                }) {
+                if let Some(index) = vec.iter().position(|&v| v == value) {
                     // TODO: Borrow checker >:(
                     let vec = vec.clone();
 
@@ -86,7 +83,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                         // Store the new index in the bitslice.
                         slice.store_be(index);
                         // Return the existing value.
-                        usize::try_from(*old_value).expect("Palette value is out of range")
+                        *old_value
                     } else {
                         // Log an error and return 0 (Air).
                         bevy_log::error!(
@@ -101,7 +98,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
             Palette::Global => {
                 // Get the bitslice mutably and retrieve the existing value.
                 let slice = self.get_bitslice_mut(*pos);
-                let old_value = slice.load_be::<usize>();
+                let old_value = slice.load_be::<u32>();
 
                 // Store the new value in the bitslice.
                 slice.store_be(value);
@@ -222,10 +219,9 @@ fn wiki_example() {
         _phantom: std::marker::PhantomData,
     };
 
-    for (i, n) in
-        [1, 2, 2, 3, 4, 4, 5, 6, 6, 4, 8, 0, 7, 4, 3, 13, 15, 16, 9, 14, 10, 12, 0, 2usize]
-            .into_iter()
-            .enumerate()
+    for (i, n) in [1, 2, 2, 3, 4, 4, 5, 6, 6, 4, 8, 0, 7, 4, 3, 13, 15, 16, 9, 14, 10, 12, 0, 2u32]
+        .into_iter()
+        .enumerate()
     {
         assert_eq!(container.get_data(&SectionBlockPosition::from_index(i)), n);
     }

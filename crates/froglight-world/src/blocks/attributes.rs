@@ -1,6 +1,15 @@
+//! All block attributes
+//!
+//! These are set on blocks to define their state and behavior.
 #![allow(missing_docs)]
 
+use bevy_app::App;
 use bevy_reflect::Reflect;
+
+#[doc(hidden)]
+pub(super) fn register(_: &mut App) {
+    // TODO: Register all block attributes for reflection
+}
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct WaterloggedAttribute(pub bool);

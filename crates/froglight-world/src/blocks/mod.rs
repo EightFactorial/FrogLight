@@ -5,19 +5,25 @@
 use bevy_app::App;
 
 pub mod attributes;
-#[allow(clippy::module_inception)]
-pub mod blocks;
 
-#[cfg(feature = "inspector")]
-mod reflect;
-
-mod registry;
-pub use registry::BlockRegistry;
+pub mod block_list;
+use block_list::BlockEnum;
 
 mod traits;
-pub use traits::BlockType;
+pub use traits::{BlockExt, BlockType};
 
-mod versions;
+mod reflect;
+pub use reflect::ReflectBlockType;
+
+pub(crate) mod registry;
+pub use registry::BlockRegistry;
 
 #[doc(hidden)]
-pub(super) fn build(app: &mut App) { registry::build(app); }
+pub(super) fn build(app: &mut App) {
+    // Register all blocks for reflection
+    BlockEnum::register(app);
+    // Register all block attributes for reflection
+    attributes::register(app);
+
+    registry::build(app);
+}

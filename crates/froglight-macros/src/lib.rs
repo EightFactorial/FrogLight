@@ -42,3 +42,10 @@ pub fn frog_state(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 
 #[cfg(feature = "world")]
 mod world;
+
+/// A macro for generating a block structs and a block enum.
+#[cfg(feature = "world")]
+#[proc_macro]
+pub fn frog_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    world::blocks::frog_blocks(input)
+}
