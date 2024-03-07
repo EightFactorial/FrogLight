@@ -27,6 +27,11 @@ impl From<AssetManager> for ResourcePackLoader {
     fn from(manager: AssetManager) -> Self { Self(manager) }
 }
 
+#[cfg(feature = "asset_manager")]
+impl From<&AssetManager> for ResourcePackLoader {
+    fn from(manager: &AssetManager) -> Self { Self(manager.clone()) }
+}
+
 /// An error that occurred while loading a resource pack.
 #[derive(Debug, Error)]
 pub enum ResourcePackLoaderError {

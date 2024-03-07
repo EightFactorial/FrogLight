@@ -89,12 +89,16 @@ impl ContainerType for BiomeContainer {
 // proptest::proptest! {
 //     #[test]
 //     fn block_container_test(coordinates in
-// proptest::collection::vec(proptest::array::uniform3(0u8..=16u8), 0..=4096)) {
-//         let mut container = ChunkDataContainer::<BlockContainer>::default();
+// proptest::collection::vec(proptest::array::uniform3(0u8..16u8), 0..4096)) {
+//         let positions: Vec<_> = coordinates.iter().map(|[x, y, z]|
+// froglight_core::common::SectionBlockPosition::new(*x, *y, *z)).collect();
 
-//         for (index, position) in coordinates.iter().map(|[x, y, z]|
-// UVec3::new(u32::from(*x), u32::from(*y), u32::from(*z))).enumerate() {
-//             // container.set(position, index as u32);
+//         let mut container = ChunkDataContainer::<BlockContainer>::default();
+//         for (index, position) in positions.iter().enumerate() {
+//             container.set_data(position, index);
+//         }
+//         for (index, position) in positions.iter().enumerate() {
+//             assert_eq!(container.get_data(position), index);
 //         }
 //     }
 // }

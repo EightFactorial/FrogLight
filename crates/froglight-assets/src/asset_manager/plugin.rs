@@ -52,5 +52,7 @@ impl Plugin for AssetManagerPlugin {
 
         // Build the `AssetTracker` resource
         super::tracker::build(app);
+        // Build the `AtlasManager` resource
+        super::textureatlas::build(app);
     }
 }

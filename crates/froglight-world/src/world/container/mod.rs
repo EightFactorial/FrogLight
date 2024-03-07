@@ -17,14 +17,14 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     /// # Panics
     /// Panics if the palette value is out of range.
     #[must_use]
-    pub fn get_data(&self, pos: SectionBlockPosition) -> usize {
+    pub fn get_data(&self, pos: &SectionBlockPosition) -> usize {
         // Skip the lookup if the palette only contains a single value.
         if let Palette::Single(v) = self.palette {
             return usize::try_from(v).expect("Palette value is out of range");
         }
 
         // Load the value from the bitslice and convert it to a usize.
-        let slice = self.get_bitslice(pos);
+        let slice = self.get_bitslice(*pos);
         let value = slice.load_be::<usize>();
 
         match &self.palette {
@@ -40,7 +40,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     ///
     /// Returns the previous value at the given coordinates.
     #[allow(clippy::missing_panics_doc)]
-    pub fn set_data(&mut self, pos: SectionBlockPosition, value: usize) -> usize {
+    pub fn set_data(&mut self, pos: &SectionBlockPosition, value: usize) -> usize {
         match &self.palette {
             Palette::Single(v) => {
                 if usize::try_from(*v).expect("Palette value is out of range") == value {
@@ -61,7 +61,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
 
                     // Create a new bitvec and set the new value.
                     let mut data = BitVec::repeat(false, Self::data_size(self.bits));
-                    let mut_slice = &mut data[Self::entry_range(self.bits, pos)];
+                    let mut_slice = &mut data[Self::entry_range(self.bits, *pos)];
                     mut_slice.set(0, true);
 
                     // Store the new data.
@@ -79,7 +79,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                     let vec = vec.clone();
 
                     // Get the bitslice mutably and retrieve the existing index.
-                    let slice = self.get_bitslice_mut(pos);
+                    let slice = self.get_bitslice_mut(*pos);
                     let old_index = slice.load_be::<usize>();
 
                     if let Some(old_value) = vec.get(old_index) {
@@ -100,7 +100,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
             }
             Palette::Global => {
                 // Get the bitslice mutably and retrieve the existing value.
-                let slice = self.get_bitslice_mut(pos);
+                let slice = self.get_bitslice_mut(*pos);
                 let old_value = slice.load_be::<usize>();
 
                 // Store the new value in the bitslice.
@@ -177,7 +177,7 @@ fn empty_container() {
         for z in 0..u8::try_from(Section::DEPTH).unwrap() {
             for x in 0..u8::try_from(Section::WIDTH).unwrap() {
                 let pos = SectionBlockPosition::new(x, y, z);
-                assert_eq!(container.get_data(pos), 0);
+                assert_eq!(container.get_data(&pos), 0);
             }
         }
     }
@@ -192,8 +192,8 @@ fn single_container() {
     let value = 5;
 
     // Set the value and check that it's set.
-    assert_eq!(container.set_data(set_pos, value), 0);
-    assert_eq!(container.get_data(set_pos), value);
+    assert_eq!(container.set_data(&set_pos, value), 0);
+    assert_eq!(container.get_data(&set_pos), value);
 
     // Check that all other values are 0.
     for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
@@ -201,7 +201,7 @@ fn single_container() {
             for x in 0..u8::try_from(Section::WIDTH).unwrap() {
                 let pos = SectionBlockPosition::new(x, y, z);
                 if pos != set_pos {
-                    assert_eq!(container.get_data(pos), 0);
+                    assert_eq!(container.get_data(&pos), 0);
                 }
             }
         }
@@ -227,6 +227,6 @@ fn wiki_example() {
             .into_iter()
             .enumerate()
     {
-        assert_eq!(container.get_data(SectionBlockPosition::from_index(i)), n);
+        assert_eq!(container.get_data(&SectionBlockPosition::from_index(i)), n);
     }
 }

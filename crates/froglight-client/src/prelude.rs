@@ -6,7 +6,7 @@ pub use froglight_assets::{
 pub use froglight_core::{common::*, events::*, resources::*, systemsets::*};
 pub use froglight_interface::plugins::uiscale::{UiScaleEnable, UiScaleMaximum};
 pub use froglight_world::{
-    blocks::Blocks,
+    blocks::{blocks, BlockRegistry, BlockType},
     maps::{ChunkEntity, WorldChunkMap, WorldMap, WorldType},
     world::Chunk,
 };

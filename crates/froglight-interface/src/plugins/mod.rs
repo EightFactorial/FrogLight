@@ -9,7 +9,9 @@ pub use uiscale::UiScalePlugin;
 mod interface;
 pub use interface::InterfacePlugins;
 
+#[cfg(feature = "inspector")]
 pub mod inspector;
+#[cfg(feature = "inspector")]
 pub use inspector::InspectorPlugin;
 
 mod materials;

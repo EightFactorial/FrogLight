@@ -1,9 +1,9 @@
 use bevy_app::{App, Update};
 use bevy_asset::{AssetEvent, AssetPath, AssetServer};
 use bevy_ecs::{
-    event::EventReader,
+    event::{Event, EventReader, EventWriter},
     reflect::ReflectResource,
-    schedule::{IntoSystemConfigs, NextState, OnEnter},
+    schedule::{IntoSystemConfigs, OnEnter},
     system::{Res, ResMut, Resource},
 };
 use bevy_log::debug;
@@ -15,6 +15,9 @@ use crate::{systemset::resourcepack::ResourcePackState, AssetManager, ResourcePa
 pub(super) fn build(app: &mut App) {
     // Register and add the `AssetTracker` resource
     app.register_type::<AssetTracker>().init_resource::<AssetTracker>();
+
+    // Add the `ResourcePacksLoadedEvent` event
+    app.add_event::<ResourcePackQueueFinished>();
 
     // Load the first resource pack when entering the `Loading` state
     app.add_systems(
@@ -53,16 +56,17 @@ impl AssetTracker {
         events.read().any(|event| matches!(event, AssetEvent::LoadedWithDependencies { .. }))
     }
 
-    /// Load the next [`ResourcePack`] in the [queue](Self::packs)
+    /// Load the next [`ResourcePack`] in the [`queue`](Self::packs)
     ///
-    /// This system runs when either a [`ResourcePackStartLoadingEvent`] is sent
-    /// or a [`ResourcePack`] is loaded.
+    /// This system runs when either a
+    /// [`ResourcePackStartLoadingEvent`](froglight_core::events::ResourcePackStartLoadingEvent)
+    /// is sent or a [`ResourcePack`] is loaded.
     fn load_next_pack_in_queue(
         server: Res<AssetServer>,
         manager: Res<AssetManager>,
         mut tracker: ResMut<Self>,
 
-        mut state: ResMut<NextState<ResourcePackState>>,
+        mut events: EventWriter<ResourcePackQueueFinished>,
     ) {
         if tracker.index < tracker.packs.len() {
             // Get the next pack
@@ -76,9 +80,12 @@ impl AssetTracker {
             // Increment the index
             tracker.index += 1;
         } else {
-            // Enter the `Processing` state
-            debug!("Entering ResourcePackState::Processing");
-            state.set(ResourcePackState::Processing);
+            debug!("Sending ResourcePacksLoadedEvent");
+            events.send(ResourcePackQueueFinished);
         }
     }
 }
+
+/// An event that is sent when all queued [`ResourcePack`]s have been loaded
+#[derive(Debug, Default, Clone, PartialEq, Eq, Event)]
+pub(crate) struct ResourcePackQueueFinished;

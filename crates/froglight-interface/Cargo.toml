@@ -17,14 +17,19 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-bevy-inspector-egui = "0.23.3"
-froglight-assets = { version = "0.1.0", path = "../froglight-assets", features = [
-    "inspector",
-] }
+bevy-inspector-egui = { version = "0.23.3", optional = true }
+froglight-assets = { version = "0.1.0", path = "../froglight-assets" }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
 froglight-render = { version = "0.1.0", path = "../froglight-render" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
 [features]
-default = []
+default = ["inspector"]
+
+# Enables bevy-inspector-egui integration
+inspector = [
+    "dep:bevy-inspector-egui",
+    "froglight-assets/inspector",
+    "froglight-world/inspector",
+]

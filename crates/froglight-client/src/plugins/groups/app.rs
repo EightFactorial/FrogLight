@@ -17,6 +17,7 @@ impl PluginGroup for AppPlugins {
             .add_before::<AssetPlugin, AssetSourcePlugin>(AssetSourcePlugin::default())
             .add(ReflectPlugin)
             .add(CorePlugin)
+            .add(WorldPlugin)
             .add(PhysicsPlugin)
             .add(AssetPlugins::default())
             .add(DebugPlugins)

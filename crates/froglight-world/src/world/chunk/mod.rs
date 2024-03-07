@@ -16,7 +16,7 @@ mod iterator;
 pub use iterator::{ChunkBlockIterator, ChunkIdIterator};
 
 use super::section::Section;
-use crate::{biomes::Biomes, blocks::Blocks};
+use crate::biomes::Biomes;
 
 /// A [`Chunk`] is a `16xNx16 (X,Y,Z)`  section of blocks.
 ///
@@ -138,16 +138,16 @@ impl Chunk {
         })
     }
 
-    /// Gets the [`Block`](Blocks) at the given position in the chunk.
-    ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
-    #[must_use]
-    #[inline]
-    #[allow(clippy::bind_instead_of_map)]
-    pub fn get_block<V: Version>(&self, pos: &ChunkBlockPosition) -> Option<Blocks> {
-        self.get_blockid(pos).and_then(|_id| todo!("Block::from_id(id)"))
-    }
+    // /// Gets the [`Block`](Blocks) at the given position in the chunk.
+    // ///
+    // /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    // /// bounds.
+    // #[must_use]
+    // #[inline]
+    // #[allow(clippy::bind_instead_of_map)]
+    // pub fn get_block<V: Version>(&self, pos: &ChunkBlockPosition) ->
+    // Option<Blocks> {     self.get_blockid(pos).and_then(|_id|
+    // todo!("Block::from_id(id)")) }
 
     /// Gets the [`Block`](Blocks) ID at the given position in the chunk.
     ///
@@ -164,22 +164,22 @@ impl Chunk {
         }
     }
 
-    /// Sets the [`Block`](Blocks) at the given position in the chunk.
-    ///
-    /// Returns the previous [`Block`](Blocks) at the position.
-    ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
-    #[inline]
-    #[allow(clippy::bind_instead_of_map, unreachable_code)]
-    pub fn set_block<V: Version>(
-        &mut self,
-        pos: &ChunkBlockPosition,
-        _value: Blocks,
-    ) -> Option<Blocks> {
-        self.set_blockid(pos, todo!("Block::to_id(block)"))
-            .and_then(|_id| todo!("Block::from_id(id)"))
-    }
+    // /// Sets the [`Block`](Blocks) at the given position in the chunk.
+    // ///
+    // /// Returns the previous [`Block`](Blocks) at the position.
+    // ///
+    // /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
+    // /// bounds.
+    // #[inline]
+    // #[allow(clippy::bind_instead_of_map, unreachable_code)]
+    // pub fn set_block<V: Version>(
+    //     &mut self,
+    //     pos: &ChunkBlockPosition,
+    //     _value: Blocks,
+    // ) -> Option<Blocks> {
+    //     self.set_blockid(pos, todo!("Block::to_id(block)"))
+    //         .and_then(|_id| todo!("Block::from_id(id)"))
+    // }
 
     /// Sets the [`Block`](Blocks) ID at the given position in the chunk.
     ///

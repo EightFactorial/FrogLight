@@ -19,6 +19,11 @@ impl PluginGroup for InterfacePlugins {
         // Add miscellaneous plugins
         group = group.add(UiScalePlugin);
 
+        #[cfg(feature = "inspector")]
+        {
+            group = group.add(InspectorPlugin);
+        }
+
         // Add menu plugins
         group
             .add(InterfaceLoadingScreenPlugin)
@@ -26,7 +31,6 @@ impl PluginGroup for InterfacePlugins {
             .add(InterfaceMultiplayerMenuPlugin)
             .add(InterfaceSettingsMenuPlugin)
             .add(MaterialPlugin)
-            .add(InspectorPlugin)
     }
 }
 

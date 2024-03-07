@@ -88,7 +88,7 @@ impl Section {
         container: &ChunkDataContainer<T>,
         pos: SectionBlockPosition,
     ) -> usize {
-        container.get_data(pos)
+        container.get_data(&pos)
     }
 
     #[must_use]
@@ -98,7 +98,7 @@ impl Section {
         pos: SectionBlockPosition,
         value: usize,
     ) -> usize {
-        container.set_data(pos, value)
+        container.set_data(&pos, value)
     }
 
     /// Creates a new [`SectionIdIterator`] for the section.

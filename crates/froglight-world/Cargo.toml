@@ -25,6 +25,7 @@ bevy_app = "0.13.0"
 bevy_ecs = "0.13.0"
 bevy_log = "0.13.0"
 bevy_reflect = "0.13.0"
+bevy-inspector-egui = { version = "0.23.3", optional = true }
 bitvec = { workspace = true }
 bytemuck = { workspace = true, features = [
     "nightly_stdsimd",
@@ -36,11 +37,14 @@ froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "world",
 ] }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+    "reflect",
+] }
 futures-lite = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 phf = { workspace = true, features = ["macros"] }
+rangemap = { version = "1.5.1", features = ["nightly", "const_fn"] }
 serde = { workspace = true }
 simdnbt = { workspace = true }
 strum = { workspace = true }
@@ -48,6 +52,9 @@ thiserror = { workspace = true }
 
 [features]
 default = []
+
+# Enables custom reflect implementations
+inspector = ["dep:bevy-inspector-egui"]
 
 # Benchmark
 [[bench]]
