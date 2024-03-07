@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
-bevy-inspector-egui = { version = "0.23.3", optional = true }
+bevy-inspector-egui = { version = "0.23.4", optional = true }
 froglight-assets = { version = "0.1.0", path = "../froglight-assets" }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
