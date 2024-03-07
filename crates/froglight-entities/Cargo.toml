@@ -19,10 +19,10 @@ workspace = true
 proptest = { workspace = true }
 
 [dependencies]
-bevy_app = "0.13.0"
-bevy_ecs = "0.13.0"
-bevy_log = "0.13.0"
-bevy_math = "0.13.0"
-bevy_reflect = "0.13.0"
-bevy_transform = "0.13.0"
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_log = { workspace = true }
+bevy_math = { workspace = true }
+bevy_reflect = { workspace = true }
+bevy_transform = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }

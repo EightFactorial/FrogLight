@@ -18,10 +18,6 @@ mod traits;
 pub use traits::BlockType;
 
 mod versions;
-pub use versions::{
-    BlockV1_20_0, BlockV1_20_2, BlockV1_20_3, ReflectBlockV1_20_0, ReflectBlockV1_20_2,
-    ReflectBlockV1_20_3,
-};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) { registry::build(app); }
