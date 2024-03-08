@@ -9,6 +9,10 @@ pub use froglight_interface::{
         uiscale::{UiScaleEnable, UiScaleMaximum},
     },
 };
+pub use froglight_network::{
+    Clientbound, Connection, ConnectionError, NetworkDirection, Serverbound,
+};
+pub use froglight_protocol::{states::*, traits::*, versions};
 pub use froglight_world::{
     blocks::{block_list as blocks, BlockExt, BlockRegistry, BlockType, ReflectBlockType},
     maps::*,

@@ -9,7 +9,7 @@ use froglight_protocol::{
 mod conversion;
 
 mod direction;
-pub use direction::{Clientbound, Direction, Serverbound};
+pub use direction::{Clientbound, NetworkDirection, Serverbound};
 
 mod error;
 pub use error::ConnectionError;
@@ -19,14 +19,14 @@ pub(super) fn build(_app: &mut App) {}
 
 /// A connection to a server or client.
 #[derive(Debug)]
-pub struct Connection<V: Version, S: State<V>, D: Direction<V, S> = Serverbound> {
+pub struct Connection<V: Version, S: State<V>, D: NetworkDirection<V, S> = Serverbound> {
     _version: PhantomData<V>,
     _state: PhantomData<S>,
     _direction: PhantomData<D>,
 }
 
 #[allow(clippy::unused_async)]
-impl<V: Version, D: Direction<V, Handshaking>> Connection<V, Handshaking, D>
+impl<V: Version, D: NetworkDirection<V, Handshaking>> Connection<V, Handshaking, D>
 where
     Handshaking: State<V>,
 {
@@ -36,7 +36,7 @@ where
 }
 
 #[allow(clippy::unused_async)]
-impl<V: Version, S: State<V>, D: Direction<V, S>> Connection<V, S, D> {
+impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
     /// Send a packet to the other side of the connection.
     ///
     /// # Errors

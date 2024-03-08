@@ -6,9 +6,9 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use super::{Connection, Direction};
+use super::{Connection, NetworkDirection};
 
-impl<V: Version, S: State<V>, D: Direction<V, S>> Connection<V, S, D> {
+impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
     /// Forcefully sets a [`Connection`]'s state.
     ///
     /// WARNING: This can cause the [`Connection`] to close if packets
@@ -16,13 +16,13 @@ impl<V: Version, S: State<V>, D: Direction<V, S>> Connection<V, S, D> {
     #[must_use]
     pub fn set_state<S2: State<V>>(self) -> Connection<V, S2, D>
     where
-        D: Direction<V, S2>,
+        D: NetworkDirection<V, S2>,
     {
         todo!()
     }
 }
 
-impl<V: Version, D: Direction<V, Handshaking>> Connection<V, Handshaking, D>
+impl<V: Version, D: NetworkDirection<V, Handshaking>> Connection<V, Handshaking, D>
 where
     Handshaking: State<V>,
 {
@@ -32,7 +32,7 @@ where
     pub fn status(self) -> Connection<V, Status, D>
     where
         Status: State<V>,
-        D: Direction<V, Status>,
+        D: NetworkDirection<V, Status>,
     {
         debug!("Setting `Handshaking` Connection to `Status`");
         self.set_state()
@@ -44,14 +44,14 @@ where
     pub fn login(self) -> Connection<V, Login, D>
     where
         Login: State<V>,
-        D: Direction<V, Login>,
+        D: NetworkDirection<V, Login>,
     {
         debug!("Setting `Handshaking` Connection to `Login`");
         self.set_state()
     }
 }
 
-impl<V: Version, D: Direction<V, Login>> Connection<V, Login, D>
+impl<V: Version, D: NetworkDirection<V, Login>> Connection<V, Login, D>
 where
     Login: State<V>,
 {
@@ -61,7 +61,7 @@ where
     pub fn configuration(self) -> Connection<V, Configuration, D>
     where
         Configuration: State<V>,
-        D: Direction<V, Configuration>,
+        D: NetworkDirection<V, Configuration>,
     {
         debug!("Setting `Login` Connection to `Configuration`");
         self.set_state()
@@ -73,14 +73,14 @@ where
     pub fn play(self) -> Connection<V, Play, D>
     where
         Play: State<V>,
-        D: Direction<V, Play>,
+        D: NetworkDirection<V, Play>,
     {
         debug!("Setting `Login` Connection to `Play`");
         self.set_state()
     }
 }
 
-impl<V: Version, D: Direction<V, Configuration>> Connection<V, Configuration, D>
+impl<V: Version, D: NetworkDirection<V, Configuration>> Connection<V, Configuration, D>
 where
     Configuration: State<V>,
 {
@@ -90,14 +90,14 @@ where
     pub fn play(self) -> Connection<V, Play, D>
     where
         Play: State<V>,
-        D: Direction<V, Play>,
+        D: NetworkDirection<V, Play>,
     {
         debug!("Setting `Configuration` Connection to `Play`");
         self.set_state()
     }
 }
 
-impl<V: Version, D: Direction<V, Play>> Connection<V, Play, D>
+impl<V: Version, D: NetworkDirection<V, Play>> Connection<V, Play, D>
 where
     Play: State<V>,
 {
@@ -107,7 +107,7 @@ where
     pub fn configuration(self) -> Connection<V, Configuration, D>
     where
         Configuration: State<V>,
-        D: Direction<V, Configuration>,
+        D: NetworkDirection<V, Configuration>,
     {
         debug!("Setting `Play` Connection to `Configuration`");
         self.set_state()
