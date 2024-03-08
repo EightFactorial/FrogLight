@@ -30,94 +30,202 @@ impl<T: ContainerType> ChunkDataContainer<T> {
 
         match &self.palette {
             // Get the value from the palette if it's a vector.
-            Palette::Vector(vec) => vec[value as usize],
+            Palette::Vector(vec) => {
+                if let Some(value) = vec.get(value as usize) {
+                    *value
+                } else {
+                    error!("Value in BitVec does not exist in Palette::Vector!");
+                    0
+                }
+            }
             // Return the value directly if the palette is global.
             Palette::Global => value,
-            Palette::Single(_) => unreachable!(),
+            Palette::Single(_) => {
+                unreachable!("Palette::Single was handled earlier")
+            }
         }
     }
 
     /// Sets the value at the given coordinates.
     ///
-    /// Returns the previous value at the given coordinates.
+    /// Returns the previous value.
     #[allow(clippy::missing_panics_doc)]
     pub fn set_data(&mut self, pos: &SectionBlockPosition, value: u32) -> u32 {
         match &self.palette {
-            Palette::Single(v) => {
-                if *v == value {
-                    // Do nothing, the value is already set.
-                    value
-                } else {
-                    // Store the old value to return later.
-                    let old_value = *v;
+            Palette::Single(_) => self.set_single(*pos, value),
+            Palette::Vector(_) => self.set_vector(*pos, value),
+            Palette::Global => self.set_global(*pos, value),
+        }
+    }
 
-                    // Convert the palette to a vector and add the new value.
-                    self.palette = Palette::Vector(vec![*v, value]);
+    /// Sets the value for [`Palette::Single`] palettes.
+    fn set_single(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
+        let Palette::Single(v) = &self.palette else {
+            unreachable!("Palette must be Palette::Single");
+        };
 
-                    // Set the bitsize to 1.
-                    self.bits = 1;
+        if *v == value {
+            // Do nothing, the value is already set.
+            value
+        } else {
+            // Store the old value to return later.
+            let old_value = *v;
 
-                    // Create a new empty bitvec
-                    let mut data = BitVec::repeat(false, Self::data_size_bits(self.bits));
+            // Convert the palette to a vector and add the new value.
+            self.palette = Palette::Vector(vec![*v, value]);
 
-                    // Set the new value in the bitslice.
-                    let mut_slice = &mut data[Self::entry_range(self.bits, *pos)];
-                    mut_slice.set(0, true);
+            // Set the bitsize to 1.
+            self.bits = 1;
 
-                    // Store the new data.
-                    self.data = data;
+            // Create a new empty bitvec
+            let mut data = BitVec::repeat(false, Self::data_size_bits(self.bits));
 
-                    // Return the old value.
-                    old_value
-                }
+            // Set the new value in the bitslice.
+            let mut_slice = &mut data[Self::entry_range(self.bits, pos)];
+            mut_slice.set(0, true);
+
+            // Store the new data.
+            self.data = data;
+
+            // Return the old value.
+            old_value
+        }
+    }
+
+    /// Sets the value for [`Palette::Global`] palettes.
+    fn set_vector(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
+        let Palette::Vector(vec) = &self.palette else {
+            unreachable!("Palette must be Palette::Vector");
+        };
+
+        if let Some(index) = vec.iter().position(|&v| v == value) {
+            // TODO: Borrow checker >:(
+            let vec = vec.clone();
+
+            // Get the bitslice mutably and retrieve the existing index.
+            let slice = self.get_bitslice_mut(pos);
+            let old_index = slice.load_be::<usize>();
+
+            if let Some(old_value) = vec.get(old_index) {
+                // Store the new index in the bitslice.
+                slice.store_be(index);
+                // Return the existing value.
+                *old_value
+            } else {
+                // Log an error and return 0 (Usually air).
+                error!("Value in BitVec does not exist in Palette::Vector!");
+                0
             }
-            Palette::Vector(vec) => {
-                if let Some(index) = vec.iter().position(|&v| v == value) {
-                    // TODO: Borrow checker >:(
-                    let vec = vec.clone();
+        } else {
+            // TODO: Borrow checker >:(
+            let mut vec = vec.clone();
+
+            // Check if the palette needs to be expanded.
+            let required_size = value.next_power_of_two().trailing_zeros() as usize - 1;
+            match T::palette_type(required_size) {
+                Palette::Vector(_) => {
+                    // Expand the bitvec to fit the new value.
+                    if required_size > self.bits {
+                        self.expand_bitvec_by(required_size - self.bits);
+                    }
+
+                    // Add the value to the palette.
+                    let new_index = vec.len();
+                    vec.push(value);
+
+                    // Set the new palette.
+                    self.palette = Palette::Vector(vec.clone());
 
                     // Get the bitslice mutably and retrieve the existing index.
-                    let slice = self.get_bitslice_mut(*pos);
+                    let slice = self.get_bitslice_mut(pos);
                     let old_index = slice.load_be::<usize>();
 
-                    if let Some(old_value) = vec.get(old_index) {
-                        // Store the new index in the bitslice.
-                        slice.store_be(index);
-                        // Return the existing value.
-                        *old_value
+                    // Store the new index in the bitslice.
+                    slice.store_be(new_index);
+
+                    // Return the existing value.
+                    if let Some(&old_value) = vec.get(old_index) {
+                        old_value
                     } else {
                         // Log an error and return 0 (Usually air).
-                        error!("Existing value in Palette::Vector does not exist in palette!");
+                        error!("Value in BitVec does not exist in Palette::Vector!");
                         0
                     }
-                } else {
-                    todo!("Add value to palette, possibly expand the bitstorage or convert to Palette::Global")
                 }
-            }
-            Palette::Global => {
-                let required_size = (u32::BITS - value.leading_zeros()) as usize;
-                if required_size > self.bits {
-                    // Expand the bitvec to fit the new value.
-                    // let expand_by = required_size - self.bits;
-                    todo!("Expand the bitvec");
+                Palette::Global => {
+                    // Convert the palette to a global palette.
+                    self.convert_global(required_size);
+
+                    // Set the value in the global palette.
+                    self.set_global(pos, value)
                 }
-
-                // Get the bitslice mutably and retrieve the existing value.
-                let slice = self.get_bitslice_mut(*pos);
-                let old_value = slice.load_be::<u32>();
-
-                // Store the new value in the bitslice.
-                slice.store_be(value);
-
-                // Return the existing value.
-                old_value
+                Palette::Single(_) => {
+                    unreachable!("Cannot create a Palette::Single from a Palette::Vector")
+                }
             }
         }
+    }
+
+    /// Sets the value for [`Palette::Global`] palettes.
+    fn set_global(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
+        let Palette::Global = &self.palette else {
+            unreachable!("Palette must be Palette::Global");
+        };
+
+        // Check if the palette needs to be expanded.
+        let required_size = (u32::BITS - value.leading_zeros()) as usize;
+        if required_size > self.bits {
+            // Expand the bitvec to fit the new value.
+            self.expand_bitvec_by(required_size - self.bits);
+        }
+
+        // Get the bitslice mutably and retrieve the existing value.
+        let slice = self.get_bitslice_mut(pos);
+        let old_value = slice.load_be::<u32>();
+
+        // Store the new value in the bitslice.
+        slice.store_be(value);
+
+        // Return the existing value.
+        old_value
+    }
+
+    /// Converts the palette from [`Palette::Global`] to [`Palette::Vector`].
+    fn convert_global(&mut self, _bits: usize) {
+        todo!("Convert Palette::Global to Palette::Vector");
+    }
+
+    /// Expands the bitvec by the given number of bits.
+    fn expand_bitvec_by(&mut self, bits: usize) {
+        // Calculate the new size.
+        let new_bits = self.bits + bits;
+
+        // Create a new bitvec with the new larger size.
+        let mut new_data = BitVec::repeat(false, Self::data_size_bits(new_bits));
+
+        // Copy the old data into the new bitvec.
+        for index in 0..Section::VOLUME {
+            let pos = SectionBlockPosition::from_index(index);
+
+            // Get the original bitslice
+            let old_slice = self.get_bitslice(pos);
+
+            // Get the new bitslice and match the size.
+            let new_slice = &mut new_data[Self::entry_range(new_bits, pos)];
+            let smaller_slice = &mut new_slice[bits..];
+
+            // Copy the old bitslice into the new bitslice.
+            smaller_slice.copy_from_bitslice(old_slice);
+        }
+
+        // Update the bits and data.
+        self.bits = new_bits;
+        self.data = new_data;
     }
 }
 
 /// Bitslice and calculation methods for accessing
-/// the data in a [`ChunkDataContainer`].
+/// data in a [`ChunkDataContainer`].
 impl<T: ContainerType> ChunkDataContainer<T> {
     const U64BITS: usize = u64::BITS as usize;
 
@@ -196,6 +304,10 @@ fn empty_container() {
     assert_eq!(container.palette, Palette::Single(0));
     assert_eq!(container.data, BitVec::<u64, Msb0>::EMPTY);
 
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+
     // Check that all values are 0.
     for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
         for z in 0..u8::try_from(Section::DEPTH).unwrap() {
@@ -210,6 +322,11 @@ fn empty_container() {
 #[test]
 fn single_container() {
     let mut container = ChunkDataContainer::<BlockContainer>::default();
+    assert_eq!(container.bits, 0);
+
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
 
     // Set the value at the given position.
     let set_pos = SectionBlockPosition::new(2, 4, 8);
@@ -218,6 +335,11 @@ fn single_container() {
     // Set the value and check that it's set.
     assert_eq!(container.set_data(&set_pos, value), 0);
     assert_eq!(container.get_data(&set_pos), value);
+    assert_eq!(container.bits, 1);
+
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
 
     // Check that all other values are 0.
     for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
@@ -225,6 +347,106 @@ fn single_container() {
             for x in 0..u8::try_from(Section::WIDTH).unwrap() {
                 let pos = SectionBlockPosition::new(x, y, z);
                 if pos != set_pos {
+                    assert_eq!(container.get_data(&pos), 0);
+                }
+            }
+        }
+    }
+
+    // Set the value again and make sure nothing changed.
+    assert_eq!(container.set_data(&set_pos, value), value);
+    assert_eq!(container.get_data(&set_pos), value);
+    assert_eq!(container.bits, 1);
+
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+
+    // Check that all other values are 0.
+    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
+        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
+            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
+                let pos = SectionBlockPosition::new(x, y, z);
+                if pos != set_pos {
+                    assert_eq!(container.get_data(&pos), 0);
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn vector_container() {
+    let mut container = ChunkDataContainer::<BlockContainer>::default();
+    assert_eq!(container.bits, 0);
+
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+
+    // Create a position and value to set.
+    let first_pos = SectionBlockPosition::new(0, 0, 0);
+    let first_val = 5;
+
+    // Set the value and check that it's set.
+    assert_eq!(container.set_data(&first_pos, first_val), 0);
+    assert_eq!(container.get_data(&first_pos), first_val);
+    assert_eq!(container.bits, 1);
+
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 5);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+
+    // Create a second position and value to set.
+    let second_pos = SectionBlockPosition::new(1, 0, 0);
+    let second_val = 6;
+
+    // Get the first value and check that it's still set.
+    assert_eq!(container.get_data(&first_pos), first_val);
+    assert_eq!(container.bits, 1);
+    // Set the second value and check that it's set.
+    assert_eq!(container.set_data(&second_pos, second_val), 0);
+    assert_eq!(container.get_data(&second_pos), second_val);
+    assert_eq!(container.bits, 2);
+
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 5);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+
+    // Check that all other values are 0.
+    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
+        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
+            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
+                let pos = SectionBlockPosition::new(x, y, z);
+                if pos != first_pos && pos != second_pos {
+                    assert_eq!(container.get_data(&pos), 0);
+                }
+            }
+        }
+    }
+
+    // Create a third position and value to set.
+    let third_pos = SectionBlockPosition::new(2, 0, 0);
+    let third_val = 7;
+
+    // Get the first and second values and check that they're still set.
+    assert_eq!(container.get_data(&first_pos), first_val);
+    assert_eq!(container.get_data(&second_pos), second_val);
+    // Set the third value and check that it's set.
+    assert_eq!(container.set_data(&third_pos, third_val), 0);
+    assert_eq!(container.get_data(&third_pos), third_val);
+    assert_eq!(container.bits, 2);
+
+    // Check that it's possible to get the first and last values.
+    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 5);
+    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+
+    // Check that all other values are 0.
+    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
+        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
+            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
+                let pos = SectionBlockPosition::new(x, y, z);
+                if pos != first_pos && pos != second_pos && pos != third_pos {
                     assert_eq!(container.get_data(&pos), 0);
                 }
             }
@@ -255,3 +477,9 @@ fn wiki_example() {
         assert_eq!(container.get_data(&SectionBlockPosition::from_index(i)), n);
     }
 }
+
+// #[test]
+// fn global_container() {
+//     let mut container = ChunkDataContainer::<BlockContainer>::default();
+//     assert_eq!(container.bits, 0);
+// }

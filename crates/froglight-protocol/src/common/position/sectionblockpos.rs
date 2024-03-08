@@ -28,8 +28,18 @@ impl SectionBlockPosition {
     /// This is the same as [`SectionBlockPosition::ZERO`].
     pub const MIN: Self = Self::ZERO;
 
+    /// The first position.
+    ///
+    /// This is the same as [`SectionBlockPosition::MIN`].
+    pub const FIRST: Self = Self::ZERO;
+
     /// All `15`s.
     pub const MAX: Self = Self::splat(15);
+
+    /// The last position.
+    ///
+    /// This is the same as [`SectionBlockPosition::MAX`].
+    pub const LAST: Self = Self::MAX;
 
     /// Creates a new [`SectionBlockPosition`] with the given coordinates.
     ///
