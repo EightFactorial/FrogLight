@@ -154,7 +154,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                 }
                 Palette::Global => {
                     // Convert the palette to a global palette.
-                    self.convert_global(required_size);
+                    self.convert_to_global(required_size);
 
                     // Set the value in the global palette.
                     self.set_global(pos, value)
@@ -190,8 +190,8 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         old_value
     }
 
-    /// Converts the palette from [`Palette::Global`] to [`Palette::Vector`].
-    fn convert_global(&mut self, _bits: usize) {
+    /// Converts the palette from [`Palette::Vector`] to [`Palette::Global`].
+    fn convert_to_global(&mut self, _bits: usize) {
         todo!("Convert Palette::Global to Palette::Vector");
     }
 
@@ -221,6 +221,31 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         // Update the bits and data.
         self.bits = new_bits;
         self.data = new_data;
+    }
+
+    /// Compresses the bitvec and palette to use the smallest possible size
+    /// while still maintaining the same data.
+    ///
+    /// Warning: This is an expensive operation and should be used sparingly.
+    pub fn compress(&mut self) {
+        match &self.palette {
+            Palette::Single(_) => {
+                // Do nothing, the bitvec is already as small as possible.
+            }
+            Palette::Vector(_) => {
+                todo! {
+                    "Check for empty Palette indexes and remove them.
+                    If there is only one value, convert to Palette::Single.
+                    Reduce the bitsize if possible"
+                };
+            }
+            Palette::Global => {
+                todo! {
+                    "Find the largest value and get the bitsize,
+                    Potentially compress back into a Palette::Vector or Palette::Single"
+                };
+            }
+        }
     }
 }
 
