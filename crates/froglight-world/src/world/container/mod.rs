@@ -121,12 +121,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
             let mut vec = vec.clone();
 
             // Get the number of bits needed to store palette indexes.
-            #[allow(
-                clippy::cast_precision_loss,
-                clippy::cast_possible_truncation,
-                clippy::cast_sign_loss
-            )]
-            let required_size = (vec.len() as f32).log2() as usize + 1;
+            let required_size = Self::vector_bits_required(vec.len());
 
             // Check if the palette needs to be expanded.
             match T::palette_type(required_size) {
@@ -180,7 +175,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         };
 
         // Check if the palette needs to be expanded.
-        let required_size = (u32::BITS - value.leading_zeros()) as usize;
+        let required_size = Self::global_bits_required(value);
         if required_size > self.bits {
             // Expand the bitvec to fit the new value.
             self.expand_bitvec_by(required_size - self.bits);
@@ -205,7 +200,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
 
         // Get the maximum value in the palette.
         let max_value = vec.iter().max().copied().unwrap();
-        let required_size = (u32::BITS - max_value.leading_zeros()) as usize;
+        let required_size = Self::global_bits_required(max_value);
 
         // Create a new empty bitvec.
         let mut new_data = BitVec::repeat(false, Self::data_size_bits(required_size));
@@ -340,6 +335,18 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     const fn data_size_longs(bits: usize) -> usize {
         Section::VOLUME.div_ceil(Self::entries_per_long(bits))
     }
+
+    /// Returns the number of bits required to store the given number of
+    /// entries.
+    #[must_use]
+    #[inline]
+    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    fn vector_bits_required(len: usize) -> usize { (len as f32).log2() as usize + 1 }
+
+    /// Returns the number of bits required to store the given maximum value.
+    #[must_use]
+    #[inline]
+    const fn global_bits_required(max: u32) -> usize { (u32::BITS - max.leading_zeros()) as usize }
 }
 
 #[test]
@@ -487,6 +494,43 @@ fn vector_container() {
     assert_eq!(container.get_data(&fourth_pos), fourth_val);
     assert!(matches!(container.palette, Palette::Vector(_)));
     assert_eq!(container.bits, 3);
+
+    // Check that all other values are 0.
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        if pos != first_pos && pos != second_pos && pos != third_pos && pos != fourth_pos {
+            assert_eq!(container.get_data(&pos), 0);
+        }
+    }
+
+    // Create a fifth position and value to set.
+    let fifth_pos = SectionBlockPosition::new(3, 15, 15);
+    let fifth_val = 8192;
+
+    // Get the first, second, third, and fourth values and check that they're still
+    // set.
+    assert_eq!(container.get_data(&first_pos), first_val);
+    assert_eq!(container.get_data(&second_pos), second_val);
+    assert_eq!(container.get_data(&third_pos), third_val);
+    assert_eq!(container.get_data(&fourth_pos), fourth_val);
+    // Set the fifth value and check that it's set.
+    assert_eq!(container.set_data(&fifth_pos, fifth_val), 0);
+    assert_eq!(container.get_data(&fifth_pos), fifth_val);
+    assert!(matches!(container.palette, Palette::Vector(_)));
+    assert_eq!(container.bits, 3);
+
+    // Check that all other values are 0.
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        if pos != first_pos
+            && pos != second_pos
+            && pos != third_pos
+            && pos != fourth_pos
+            && pos != fifth_pos
+        {
+            assert_eq!(container.get_data(&pos), 0);
+        }
+    }
 }
 
 #[test]
