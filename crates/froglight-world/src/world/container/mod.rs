@@ -120,14 +120,15 @@ impl<T: ContainerType> ChunkDataContainer<T> {
             // TODO: Borrow checker >:(
             let mut vec = vec.clone();
 
-            // Check if the palette needs to be expanded.
+            // Get the number of bits needed to store palette indexes.
             #[allow(
-                clippy::cast_sign_loss,
                 clippy::cast_precision_loss,
-                clippy::cast_possible_truncation
+                clippy::cast_possible_truncation,
+                clippy::cast_sign_loss
             )]
-            let required_size = (vec.len() as f32).log2().ceil() as usize + 1;
+            let required_size = (vec.len() as f32).log2() as usize + 1;
 
+            // Check if the palette needs to be expanded.
             match T::palette_type(required_size) {
                 Palette::Vector(_) => {
                     // Expand the bitvec to fit the new value.
@@ -364,8 +365,8 @@ fn empty_container() {
     assert_eq!(container.data, BitVec::<u64, Msb0>::EMPTY);
 
     // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::MIN), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::MAX), 0);
 
     // Check that all values are 0.
     for index in 0..Section::VOLUME {
@@ -380,8 +381,8 @@ fn single_container() {
     assert_eq!(container.bits, 0);
 
     // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::MIN), 0);
+    assert_eq!(container.get_data(&SectionBlockPosition::MAX), 0);
 
     // Set the value at the given position.
     let set_pos = SectionBlockPosition::new(2, 4, 8);
@@ -390,6 +391,7 @@ fn single_container() {
     // Set the value and check that it's set.
     assert_eq!(container.set_data(&set_pos, value), 0);
     assert_eq!(container.get_data(&set_pos), value);
+    assert!(matches!(container.palette, Palette::Vector(_)));
     assert_eq!(container.bits, 1);
 
     // Check that all other values are 0.
@@ -403,6 +405,7 @@ fn single_container() {
     // Set the value again and make sure nothing changed.
     assert_eq!(container.set_data(&set_pos, value), value);
     assert_eq!(container.get_data(&set_pos), value);
+    assert!(matches!(container.palette, Palette::Vector(_)));
     assert_eq!(container.bits, 1);
 
     // Check that all other values are 0.
@@ -426,6 +429,7 @@ fn vector_container() {
     // Set the value and check that it's set.
     assert_eq!(container.set_data(&first_pos, first_val), 0);
     assert_eq!(container.get_data(&first_pos), first_val);
+    assert!(matches!(container.palette, Palette::Vector(_)));
     assert_eq!(container.bits, 1);
 
     // Create a second position and value to set.
@@ -438,6 +442,7 @@ fn vector_container() {
     // Set the second value and check that it's set.
     assert_eq!(container.set_data(&second_pos, second_val), 0);
     assert_eq!(container.get_data(&second_pos), second_val);
+    assert!(matches!(container.palette, Palette::Vector(_)));
     assert_eq!(container.bits, 2);
 
     // Check that all other values are 0.
@@ -458,6 +463,7 @@ fn vector_container() {
     // Set the third value and check that it's set.
     assert_eq!(container.set_data(&third_pos, third_val), 0);
     assert_eq!(container.get_data(&third_pos), third_val);
+    assert!(matches!(container.palette, Palette::Vector(_)));
     assert_eq!(container.bits, 2);
 
     // Check that all other values are 0.
@@ -467,6 +473,20 @@ fn vector_container() {
             assert_eq!(container.get_data(&pos), 0);
         }
     }
+
+    // Create a fourth position and value to set.
+    let fourth_pos = SectionBlockPosition::new(2, 8, 6);
+    let fourth_val = 513;
+
+    // Get the first, second, and third values and check that they're still set.
+    assert_eq!(container.get_data(&first_pos), first_val);
+    assert_eq!(container.get_data(&second_pos), second_val);
+    assert_eq!(container.get_data(&third_pos), third_val);
+    // Set the fourth value and check that it's set.
+    assert_eq!(container.set_data(&fourth_pos, fourth_val), 0);
+    assert_eq!(container.get_data(&fourth_pos), fourth_val);
+    assert!(matches!(container.palette, Palette::Vector(_)));
+    assert_eq!(container.bits, 3);
 }
 
 #[test]

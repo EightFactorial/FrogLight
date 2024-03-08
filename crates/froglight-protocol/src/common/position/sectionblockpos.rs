@@ -23,23 +23,18 @@ impl SectionBlockPosition {
     /// All zeros.
     pub const ZERO: Self = Self::splat(0);
 
-    /// All zeros.
+    /// The minimum position.
     ///
     /// This is the same as [`SectionBlockPosition::ZERO`].
     pub const MIN: Self = Self::ZERO;
 
-    /// The first position.
-    ///
-    /// This is the same as [`SectionBlockPosition::MIN`].
-    pub const FIRST: Self = Self::ZERO;
-
     /// All `15`s.
-    pub const MAX: Self = Self::splat(15);
+    pub const FIFTEEN: Self = Self::splat(15);
 
-    /// The last position.
+    /// The maximum position.
     ///
-    /// This is the same as [`SectionBlockPosition::MAX`].
-    pub const LAST: Self = Self::MAX;
+    /// This is the same as [`SectionBlockPosition::FIFTEEN`].
+    pub const MAX: Self = Self::FIFTEEN;
 
     /// Creates a new [`SectionBlockPosition`] with the given coordinates.
     ///
