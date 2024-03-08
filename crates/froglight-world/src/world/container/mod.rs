@@ -121,7 +121,13 @@ impl<T: ContainerType> ChunkDataContainer<T> {
             let mut vec = vec.clone();
 
             // Check if the palette needs to be expanded.
-            let required_size = value.next_power_of_two().trailing_zeros() as usize - 1;
+            #[allow(
+                clippy::cast_sign_loss,
+                clippy::cast_precision_loss,
+                clippy::cast_possible_truncation
+            )]
+            let required_size = (vec.len() as f32).log2().ceil() as usize + 1;
+
             match T::palette_type(required_size) {
                 Palette::Vector(_) => {
                     // Expand the bitvec to fit the new value.
@@ -154,7 +160,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                 }
                 Palette::Global => {
                     // Convert the palette to a global palette.
-                    self.convert_to_global(required_size);
+                    self.convert_to_global();
 
                     // Set the value in the global palette.
                     self.set_global(pos, value)
@@ -191,8 +197,36 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     }
 
     /// Converts the palette from [`Palette::Vector`] to [`Palette::Global`].
-    fn convert_to_global(&mut self, _bits: usize) {
-        todo!("Convert Palette::Global to Palette::Vector");
+    fn convert_to_global(&mut self) {
+        let Palette::Vector(vec) = &self.palette else {
+            unreachable!("Only Palette::Vector can be converted to Palette::Global");
+        };
+
+        // Get the maximum value in the palette.
+        let max_value = vec.iter().max().copied().unwrap();
+        let required_size = (u32::BITS - max_value.leading_zeros()) as usize;
+
+        // Create a new empty bitvec.
+        let mut new_data = BitVec::repeat(false, Self::data_size_bits(required_size));
+
+        // Copy the old data into the new bitvec.
+        for index in 0..Section::VOLUME {
+            let pos = SectionBlockPosition::from_index(index);
+
+            // Get the original data
+            let old_slice = self.get_bitslice(pos);
+            let old_index = old_slice.load_be::<usize>();
+            let old_value = vec[old_index];
+
+            // Copy the old bitslice into the new bitslice.
+            let new_slice = &mut new_data[Self::entry_range(required_size, pos)];
+            new_slice.store_be(old_value);
+        }
+
+        // Update the bits and data.
+        self.palette = Palette::Global;
+        self.bits = required_size;
+        self.data = new_data;
     }
 
     /// Expands the bitvec by the given number of bits.
@@ -334,13 +368,9 @@ fn empty_container() {
     assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
 
     // Check that all values are 0.
-    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
-        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
-            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
-                let pos = SectionBlockPosition::new(x, y, z);
-                assert_eq!(container.get_data(&pos), 0);
-            }
-        }
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        assert_eq!(container.get_data(&pos), 0);
     }
 }
 
@@ -362,19 +392,11 @@ fn single_container() {
     assert_eq!(container.get_data(&set_pos), value);
     assert_eq!(container.bits, 1);
 
-    // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
-
     // Check that all other values are 0.
-    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
-        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
-            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
-                let pos = SectionBlockPosition::new(x, y, z);
-                if pos != set_pos {
-                    assert_eq!(container.get_data(&pos), 0);
-                }
-            }
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        if pos != set_pos {
+            assert_eq!(container.get_data(&pos), 0);
         }
     }
 
@@ -383,19 +405,11 @@ fn single_container() {
     assert_eq!(container.get_data(&set_pos), value);
     assert_eq!(container.bits, 1);
 
-    // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
-
     // Check that all other values are 0.
-    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
-        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
-            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
-                let pos = SectionBlockPosition::new(x, y, z);
-                if pos != set_pos {
-                    assert_eq!(container.get_data(&pos), 0);
-                }
-            }
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        if pos != set_pos {
+            assert_eq!(container.get_data(&pos), 0);
         }
     }
 }
@@ -405,10 +419,6 @@ fn vector_container() {
     let mut container = ChunkDataContainer::<BlockContainer>::default();
     assert_eq!(container.bits, 0);
 
-    // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 0);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
-
     // Create a position and value to set.
     let first_pos = SectionBlockPosition::new(0, 0, 0);
     let first_val = 5;
@@ -417,10 +427,6 @@ fn vector_container() {
     assert_eq!(container.set_data(&first_pos, first_val), 0);
     assert_eq!(container.get_data(&first_pos), first_val);
     assert_eq!(container.bits, 1);
-
-    // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 5);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
 
     // Create a second position and value to set.
     let second_pos = SectionBlockPosition::new(1, 0, 0);
@@ -434,19 +440,11 @@ fn vector_container() {
     assert_eq!(container.get_data(&second_pos), second_val);
     assert_eq!(container.bits, 2);
 
-    // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 5);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
-
     // Check that all other values are 0.
-    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
-        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
-            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
-                let pos = SectionBlockPosition::new(x, y, z);
-                if pos != first_pos && pos != second_pos {
-                    assert_eq!(container.get_data(&pos), 0);
-                }
-            }
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        if pos != first_pos && pos != second_pos {
+            assert_eq!(container.get_data(&pos), 0);
         }
     }
 
@@ -462,19 +460,11 @@ fn vector_container() {
     assert_eq!(container.get_data(&third_pos), third_val);
     assert_eq!(container.bits, 2);
 
-    // Check that it's possible to get the first and last values.
-    assert_eq!(container.get_data(&SectionBlockPosition::FIRST), 5);
-    assert_eq!(container.get_data(&SectionBlockPosition::LAST), 0);
-
     // Check that all other values are 0.
-    for y in 0..u8::try_from(Section::HEIGHT).unwrap() {
-        for z in 0..u8::try_from(Section::DEPTH).unwrap() {
-            for x in 0..u8::try_from(Section::WIDTH).unwrap() {
-                let pos = SectionBlockPosition::new(x, y, z);
-                if pos != first_pos && pos != second_pos && pos != third_pos {
-                    assert_eq!(container.get_data(&pos), 0);
-                }
-            }
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        if pos != first_pos && pos != second_pos && pos != third_pos {
+            assert_eq!(container.get_data(&pos), 0);
         }
     }
 }
@@ -503,8 +493,29 @@ fn wiki_example() {
     }
 }
 
-// #[test]
-// fn global_container() {
-//     let mut container = ChunkDataContainer::<BlockContainer>::default();
-//     assert_eq!(container.bits, 0);
-// }
+#[test]
+fn global_container() {
+    let mut container = ChunkDataContainer::<BlockContainer>::default();
+    assert_eq!(container.bits, 0);
+
+    // Fill the container with a bunch of values.
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        let value = u32::try_from(index).unwrap();
+
+        assert_eq!(container.set_data(&pos, value), 0);
+        assert_eq!(container.get_data(&pos), value);
+    }
+
+    // Check that the container is now a global palette.
+    assert_eq!(container.palette, Palette::Global);
+    assert_eq!(container.bits, 12);
+
+    // Check that all values are still correct.
+    for index in 0..Section::VOLUME {
+        let pos = SectionBlockPosition::from_index(index);
+        let value = u32::try_from(index).unwrap();
+
+        assert_eq!(container.get_data(&pos), value);
+    }
+}
