@@ -122,18 +122,28 @@ impl SectionBlockPosition {
     /// let pos = SectionBlockPosition::from_index(16);
     /// assert_eq!(pos, SectionBlockPosition::new(0, 0, 1));
     ///
+    /// let pos = SectionBlockPosition::from_index(17);
+    /// assert_eq!(pos, SectionBlockPosition::new(1, 0, 1));
+    ///
     /// let pos = SectionBlockPosition::from_index(256);
     /// assert_eq!(pos, SectionBlockPosition::new(0, 1, 0));
+    ///
+    /// let pos = SectionBlockPosition::from_index(4095);
+    /// assert_eq!(pos, SectionBlockPosition::new(15, 15, 15));
     /// ```
+    ///
+    /// # Panics
+    /// Panics if the index is greater than or equal to `4096`.
     #[must_use]
     #[inline]
-    #[allow(clippy::missing_panics_doc)]
-    pub fn from_index(index: usize) -> Self {
+    #[allow(clippy::cast_possible_truncation)]
+    pub const fn from_index(index: usize) -> Self {
         debug_assert!(index < 4096, "Index is out of range");
 
-        let x = u8::try_from(index.rem_euclid(16)).expect("Index is out of range");
-        let z = u8::try_from(index.div_euclid(16).rem_euclid(16)).expect("Index is out of range");
-        let y = u8::try_from(index.div_euclid(256).rem_euclid(16)).expect("Index is out of range");
+        let x = index.rem_euclid(16) as u8;
+        let z = index.div_euclid(16).rem_euclid(16) as u8;
+        let y = index.div_euclid(256).rem_euclid(16) as u8;
+
         Self::new(x, y, z)
     }
 }

@@ -1,6 +1,7 @@
 mod heightmap;
 use std::ops::Range;
 
+use bevy_log::error;
 use bitvec::{field::BitField, order::Msb0, slice::BitSlice, vec::BitVec};
 use froglight_core::common::SectionBlockPosition;
 pub use heightmap::*;
@@ -47,7 +48,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                     // Do nothing, the value is already set.
                     value
                 } else {
-                    // Store the old value for later.
+                    // Store the old value to return later.
                     let old_value = *v;
 
                     // Convert the palette to a vector and add the new value.
@@ -57,7 +58,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                     self.bits = 1;
 
                     // Create a new empty bitvec
-                    let mut data = BitVec::repeat(false, Self::data_size(self.bits));
+                    let mut data = BitVec::repeat(false, Self::data_size_bits(self.bits));
 
                     // Set the new value in the bitslice.
                     let mut_slice = &mut data[Self::entry_range(self.bits, *pos)];
@@ -85,17 +86,22 @@ impl<T: ContainerType> ChunkDataContainer<T> {
                         // Return the existing value.
                         *old_value
                     } else {
-                        // Log an error and return 0 (Air).
-                        bevy_log::error!(
-                            "Existing value in Palette::Vector does not exist in palette!"
-                        );
+                        // Log an error and return 0 (Usually air).
+                        error!("Existing value in Palette::Vector does not exist in palette!");
                         0
                     }
                 } else {
-                    todo!("Add value to palette, possibly expand the bitsize or convert to Palette::Global")
+                    todo!("Add value to palette, possibly expand the bitstorage or convert to Palette::Global")
                 }
             }
             Palette::Global => {
+                let required_size = (u32::BITS - value.leading_zeros()) as usize;
+                if required_size > self.bits {
+                    // Expand the bitvec to fit the new value.
+                    // let expand_by = required_size - self.bits;
+                    todo!("Expand the bitvec");
+                }
+
                 // Get the bitslice mutably and retrieve the existing value.
                 let slice = self.get_bitslice_mut(*pos);
                 let old_value = slice.load_be::<u32>();
@@ -132,32 +138,53 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     /// Returns the range of bits that the entry is stored in.
     #[must_use]
     #[inline]
-    fn entry_range(bits: usize, pos: SectionBlockPosition) -> Range<usize> {
+    const fn entry_range(bits: usize, pos: SectionBlockPosition) -> Range<usize> {
         let start = Self::entry_start(bits, pos);
-        start..start + bits
+        Range { start, end: start + bits }
     }
 
     /// Returns the start position of the entry in bits.
     #[must_use]
-    fn entry_start(bits: usize, pos: SectionBlockPosition) -> usize {
-        let pos_index = pos.as_index();
+    const fn entry_start(bits: usize, pos: SectionBlockPosition) -> usize {
         let entries_per_long = Self::entries_per_long(bits);
+        let pos_index = pos.as_index();
 
         let long_index = pos_index / entries_per_long;
         let long_offset = pos_index % entries_per_long;
 
+        // {     Find the long     }   {      Find the bit index in the long       }
         (long_index * Self::U64BITS) + (Self::U64BITS - (long_offset * bits)) - bits
     }
 
-    /// Returns the total length of all entries in bits.
-    const fn data_size(bits: usize) -> usize {
-        let entries_per_long = Self::entries_per_long(bits);
-        Section::VOLUME.div_ceil(entries_per_long) * Self::U64BITS
-    }
-
     /// Returns the number of entries that can be stored in a single long.
+    #[must_use]
     #[inline]
     const fn entries_per_long(bits: usize) -> usize { Self::U64BITS / bits }
+
+    /// Returns the number of bits required to store a section.
+    #[must_use]
+    #[inline]
+    const fn data_size_bits(bits: usize) -> usize { Self::data_size_longs(bits) * Self::U64BITS }
+
+    /// Returns the number of longs required to store a section.
+    #[must_use]
+    #[inline]
+    const fn data_size_longs(bits: usize) -> usize {
+        Section::VOLUME.div_ceil(Self::entries_per_long(bits))
+    }
+}
+
+#[test]
+fn data_size() {
+    let sizes: [usize; 32] = [
+        4096, 8192, 12544, 16384, 21888, 26240, 29184, 32768, 37504, 43712, 52480, 52480, 65536,
+        65536, 65536, 65536, 87424, 87424, 87424, 87424, 87424, 131_072, 131_072, 131_072, 131_072,
+        131_072, 131_072, 131_072, 131_072, 131_072, 131_072, 131_072,
+    ];
+
+    for (i, &size) in sizes.iter().enumerate() {
+        assert_eq!(ChunkDataContainer::<BlockContainer>::data_size_bits(i + 1), size);
+    }
 }
 
 #[test]
@@ -213,7 +240,9 @@ fn wiki_example() {
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
         ]),
         data: BitVec::from_slice(&[
+            //                                       ...{  4 }{  4 } {  3 }{  2 }{  2 }{  1 }
             0b0000_0000_0010_0000_1000_0110_0011_0001_0100_1000_0100_0001_1000_1000_0100_0001,
+            //                                       ...{ 16 }{ 15 } { 13 }{  3 }{  4 }{  7 }
             0b0000_0001_0000_0001_1000_1010_0111_0010_0110_0000_1111_0110_1000_1100_1000_0111,
         ]),
         _phantom: std::marker::PhantomData,

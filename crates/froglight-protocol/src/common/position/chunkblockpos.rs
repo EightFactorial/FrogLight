@@ -96,6 +96,71 @@ impl ChunkBlockPosition {
     #[inline]
     pub const fn z(&self) -> u8 { self.z }
 
+    /// Gets the index of the position in a flat array.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use froglight_protocol::common::ChunkBlockPosition;
+    ///
+    /// // (1 * 1) + (0 * 256) + (0 * 16) = 1
+    /// let pos = ChunkBlockPosition::new(1, 0, 0);
+    /// assert_eq!(pos.as_index(), 1);
+    ///
+    /// // (0 * 1) + (1 * 256) + (0 * 16) = 256
+    /// let pos = ChunkBlockPosition::new(0, 1, 0);
+    /// assert_eq!(pos.as_index(), 256);
+    ///
+    /// // (0 * 1) + (0 * 256) + (1 * 16) = 16
+    /// let pos = ChunkBlockPosition::new(0, 0, 1);
+    /// assert_eq!(pos.as_index(), 16);
+    /// ```
+    #[must_use]
+    #[inline]
+    pub const fn as_index(&self) -> usize {
+        (self.x as usize) + (self.z as usize * 16) + (self.y * 256)
+    }
+
+    /// Creates a new [`ChunkBlockPosition`] from an index in a flat array.
+    ///
+    /// Example:
+    /// ```rust
+    /// use froglight_protocol::common::ChunkBlockPosition;
+    ///
+    /// let pos = ChunkBlockPosition::from_index(0);
+    /// assert_eq!(pos, ChunkBlockPosition::new(0, 0, 0));
+    ///
+    /// let pos = ChunkBlockPosition::from_index(1);
+    /// assert_eq!(pos, ChunkBlockPosition::new(1, 0, 0));
+    ///
+    /// let pos = ChunkBlockPosition::from_index(16);
+    /// assert_eq!(pos, ChunkBlockPosition::new(0, 0, 1));
+    ///
+    /// let pos = ChunkBlockPosition::from_index(17);
+    /// assert_eq!(pos, ChunkBlockPosition::new(1, 0, 1));
+    ///
+    /// let pos = ChunkBlockPosition::from_index(256);
+    /// assert_eq!(pos, ChunkBlockPosition::new(0, 1, 0));
+    ///
+    /// let pos = ChunkBlockPosition::from_index(4095);
+    /// assert_eq!(pos, ChunkBlockPosition::new(15, 15, 15));
+    ///
+    /// let pos = ChunkBlockPosition::from_index(4096);
+    /// assert_eq!(pos, ChunkBlockPosition::new(0, 16, 0));
+    ///
+    /// let pos = ChunkBlockPosition::from_index(98303);
+    /// assert_eq!(pos, ChunkBlockPosition::new(15, 383, 15));
+    /// ```
+    #[must_use]
+    #[inline]
+    #[allow(clippy::cast_possible_truncation)]
+    pub const fn from_index(index: usize) -> Self {
+        let x = index.rem_euclid(16) as u8;
+        let z = index.div_euclid(16).rem_euclid(16) as u8;
+        let y = index.div_euclid(256);
+
+        Self::new(x, y, z)
+    }
+
     /// Attempts to add the given offset to the chunk block position.
     ///
     /// Returns [`None`] if the height is above [`isize::MAX`] or if
@@ -108,7 +173,7 @@ impl ChunkBlockPosition {
     /// - Nether: `0`
     /// - End: `0`
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn add_relative(
         &self,
         height_offset: isize,
@@ -129,9 +194,9 @@ impl ChunkBlockPosition {
 
         // Return the new position.
         Some(ChunkBlockPosition::new(
-            u8::try_from((i64::from(self.x) + pos.x).rem_euclid(16)).expect("Index out of range"),
+            (i64::from(self.x) + pos.x).rem_euclid(16) as u8,
             self.y + offset_coord,
-            u8::try_from((i64::from(self.z) + pos.z).rem_euclid(16)).expect("Index out of range"),
+            (i64::from(self.z) + pos.z).rem_euclid(16) as u8,
         ))
     }
 }

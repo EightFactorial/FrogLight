@@ -1,31 +1,18 @@
 use std::any::Any;
 
-use bevy_app::App;
 use bevy_inspector_egui::{
     egui::{Button, Id, RichText, Ui},
     inspector_egui_impls::InspectorEguiImpl,
     reflect_inspector::InspectorUi,
 };
 use bevy_reflect::Reflect;
-use froglight_protocol::traits::Version;
 
-use super::{inner::InnerRegistry, BlockRegistry};
+use super::BlockRegistry;
+use crate::blocks::traits::BlockRegistration;
 
-impl<V: Version> BlockRegistry<V>
-where
-    InnerRegistry<V>: Default,
-{
-    /// Registers an `InspectorEguiImpl` for the `BlockRegistry` type.
-    pub(super) fn egui_register(app: &mut App) {
-        let registry = app.world.resource::<bevy_ecs::prelude::AppTypeRegistry>();
-        let mut registry = registry.write();
-
-        let arc_manager = registry.get_mut(std::any::TypeId::of::<BlockRegistry<V>>()).unwrap();
-        arc_manager.insert(BlockRegistry::<V>::egui_impl());
-    }
-
+impl<V: BlockRegistration> BlockRegistry<V> {
     /// Creates an `InspectorEguiImpl` for the `BlockRegistry` type.
-    fn egui_impl() -> InspectorEguiImpl {
+    pub(super) fn inspector_egui_impl() -> InspectorEguiImpl {
         InspectorEguiImpl::new(Self::fn_mut, Self::fn_readonly, Self::fn_many)
     }
 

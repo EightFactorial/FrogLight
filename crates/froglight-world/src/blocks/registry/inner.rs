@@ -5,7 +5,7 @@ use rangemap::RangeMap;
 use crate::blocks::BlockType;
 
 /// The inner registry for the block registry.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct InnerRegistry<V: Version> {
     /// The list of blocks in the registry.
     pub(crate) blocks: Vec<Box<dyn BlockType<V>>>,
@@ -17,8 +17,7 @@ pub struct InnerRegistry<V: Version> {
 impl<V: Version> InnerRegistry<V> {
     /// Creates a new empty registry.
     #[must_use]
-    #[allow(clippy::new_without_default)]
-    pub const fn new() -> Self { Self { blocks: Vec::new(), block_states: RangeMap::new() } }
+    pub fn new() -> Self { Self::default() }
 
     /// Get the block index for the given state.
     #[must_use]
