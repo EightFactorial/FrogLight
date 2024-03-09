@@ -57,7 +57,7 @@ impl<V: BlockRegistration> FromWorld for BlockRegistry<V> {
 
         // Create an empty block registry and add all vanilla blocks
         let mut inner = InnerRegistry::default();
-        V::register_blocks(&mut inner);
+        V::register_default(&mut inner);
 
         // Return the block registry
         Self { inner: Arc::new(RwLock::new(inner)) }

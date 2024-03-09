@@ -58,7 +58,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         }
     }
 
-    /// Sets the value for [`Palette::Single`] palettes.
+    /// Set a value inside a [`Palette::Single`].
     fn set_single(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
         let Palette::Single(v) = &self.palette else {
             unreachable!("Palette must be Palette::Single");
@@ -92,7 +92,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         }
     }
 
-    /// Sets the value for [`Palette::Global`] palettes.
+    /// Set a value inside a [`Palette::Vector`].
     fn set_vector(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
         let Palette::Vector(vec) = &self.palette else {
             unreachable!("Palette must be Palette::Vector");
@@ -168,7 +168,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         }
     }
 
-    /// Sets the value for [`Palette::Global`] palettes.
+    /// Set a value inside a [`Palette::Global`].
     fn set_global(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
         let Palette::Global = &self.palette else {
             unreachable!("Palette must be Palette::Global");
@@ -192,7 +192,8 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         old_value
     }
 
-    /// Converts the palette from [`Palette::Vector`] to [`Palette::Global`].
+    /// Converts the [`Palette`] from [`Palette::Vector`] to
+    /// [`Palette::Global`].
     fn convert_to_global(&mut self) {
         let Palette::Vector(vec) = &self.palette else {
             unreachable!("Only Palette::Vector can be converted to Palette::Global");
@@ -225,7 +226,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         self.data = new_data;
     }
 
-    /// Expands the bitvec by the given number of bits.
+    /// Expands the [`BitVec`] by the given number of bits.
     fn expand_bitvec_by(&mut self, bits: usize) {
         // Calculate the new size.
         let new_bits = self.bits + bits;
@@ -253,8 +254,8 @@ impl<T: ContainerType> ChunkDataContainer<T> {
         self.data = new_data;
     }
 
-    /// Compresses the bitvec and palette to use the smallest possible size
-    /// while still maintaining the same data.
+    /// Compresses the [`BitVec`] and [`Palette`] to use the smallest possible
+    /// size while still maintaining the same data.
     ///
     /// Warning: This is an expensive operation and should be used sparingly.
     pub fn compress(&mut self) {

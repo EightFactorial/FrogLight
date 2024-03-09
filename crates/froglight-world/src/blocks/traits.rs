@@ -45,6 +45,6 @@ pub trait BlockExt<V: Version>: Sized + BlockType<V> {
 
 /// A trait that registers blocks inside the block registry.
 pub trait BlockRegistration: Version {
-    /// Register all blocks inside the block registry.
-    fn register_blocks(registry: &mut InnerRegistry<Self>);
+    /// Register the default blocks.
+    fn register_default(registry: &mut InnerRegistry<Self>);
 }
