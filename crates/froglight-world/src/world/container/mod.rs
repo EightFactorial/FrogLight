@@ -351,15 +351,37 @@ impl<T: ContainerType> ChunkDataContainer<T> {
 }
 
 #[test]
-fn data_size() {
-    let sizes: [usize; 32] = [
+fn bitvec_size() {
+    for (i, size) in [
         4096, 8192, 12544, 16384, 21888, 26240, 29184, 32768, 37504, 43712, 52480, 52480, 65536,
         65536, 65536, 65536, 87424, 87424, 87424, 87424, 87424, 131_072, 131_072, 131_072, 131_072,
         131_072, 131_072, 131_072, 131_072, 131_072, 131_072, 131_072,
-    ];
-
-    for (i, &size) in sizes.iter().enumerate() {
+    ]
+    .into_iter()
+    .enumerate()
+    {
         assert_eq!(ChunkDataContainer::<BlockContainer>::data_size_bits(i + 1), size);
+    }
+}
+
+#[test]
+fn container_bits_required() {
+    for (i, size) in [
+        1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+        5, 6,
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        // If there were `X` entries, the number of bits required would be `Y`.
+        assert_eq!(ChunkDataContainer::<BlockContainer>::vector_bits_required(i + 1), size);
+        // If the maximum value was `X`, the number of bits required would be `Y`.
+        assert_eq!(
+            ChunkDataContainer::<BlockContainer>::global_bits_required(
+                u32::try_from(i + 1).unwrap()
+            ),
+            size
+        );
     }
 }
 
