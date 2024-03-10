@@ -37,6 +37,23 @@ impl ChunkBlockPosition {
     /// All zeros.
     pub const ZERO: Self = Self::splat(0);
 
+    /// All ones.
+    pub const ONES: Self = Self::splat(1);
+
+    /// The X-axis
+    pub const X: Self = Self::new(1, 0, 0);
+
+    /// The Y-axis
+    pub const Y: Self = Self::new(0, 1, 0);
+
+    /// The Z-axis
+    pub const Z: Self = Self::new(0, 0, 1);
+
+    /// The minimum possible value.
+    ///
+    /// This is the same as [`ChunkBlockPosition::ZERO`].
+    pub const MIN: Self = Self::ZERO;
+
     /// Creates a new [`ChunkBlockPosition`] with the given coordinates.
     ///
     /// # Examples
@@ -161,10 +178,12 @@ impl ChunkBlockPosition {
         Self::new(x, y, z)
     }
 
-    /// Attempts to add the given offset to the chunk block position.
+    /// Attempts to add a [`BlockPosition`] to the [`ChunkBlockPosition`].
     ///
     /// Returns [`None`] if the height is above [`isize::MAX`] or if
     /// `height_offset + pos.y < 0`.
+    ///
+    /// ---
     ///
     /// The `height_offset` is relative to each world.
     ///
@@ -199,6 +218,39 @@ impl ChunkBlockPosition {
             (i64::from(self.z) + pos.z).rem_euclid(16) as u8,
         ))
     }
+
+    /// Adds a [`ChunkBlockPosition`] to the current position,
+    /// but wraps if the result is out of range.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::common::ChunkBlockPosition;
+    ///
+    /// let max_x = ChunkBlockPosition::new(15, 0, 0);
+    /// assert_eq!(max_x.add_wrapping(&ChunkBlockPosition::X), ChunkBlockPosition::new(0, 0, 1));
+    ///
+    /// let max_z = ChunkBlockPosition::new(0, 0, 15);
+    /// assert_eq!(max_z.add_wrapping(&ChunkBlockPosition::Z), ChunkBlockPosition::new(0, 1, 0));
+    /// ```
+    #[must_use]
+    pub const fn add_wrapping(&self, pos: &ChunkBlockPosition) -> Self {
+        // Calculate the new x-coordinate.
+        let mut x = self.x + pos.x;
+        let carry_x = (x > 15) as u8;
+        x %= 16;
+
+        // Calculate the new z-coordinate.
+        let mut z = self.z + pos.z + carry_x;
+        let carry_z = (z > 15) as u8;
+        z %= 16;
+
+        // Return the new position.
+        Self::new(x, self.y + pos.y + carry_z as usize, z)
+    }
+
+    /// Gets the next position after the current one.
+    #[must_use]
+    pub const fn next(&self) -> Self { self.add_wrapping(&Self::X) }
 }
 
 // --- Math Implementations ---
@@ -275,4 +327,18 @@ proptest::proptest! {
         assert_eq!(subbed.z, z1.wrapping_sub(z2).rem_euclid(16));
     }
 
+}
+
+#[test]
+fn chunkblockpos_next() {
+    let mut pos = ChunkBlockPosition::ZERO;
+
+    for index in 0..ChunkBlockPosition::new(15, 383, 15).as_index() {
+        assert_eq!(pos.as_index(), index);
+        pos = pos.next();
+    }
+    assert_eq!(pos, ChunkBlockPosition::new(15, 383, 15));
+
+    pos = pos.next();
+    assert_eq!(pos, ChunkBlockPosition::new(0, 384, 0));
 }

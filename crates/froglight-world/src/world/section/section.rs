@@ -4,9 +4,9 @@ use std::io::Cursor;
 
 use bevy_reflect::Reflect;
 use froglight_core::common::SectionBlockPosition;
-use froglight_protocol::{io::FrogRead, traits::Version};
+use froglight_protocol::io::FrogRead;
 
-use super::{SectionBlockIterator, SectionIdIterator};
+use super::SectionIdIterator;
 use crate::world::{
     chunk::ChunkDecodeError, container::ContainerType, BiomeContainer, BlockContainer, Chunk,
     ChunkDataContainer,
@@ -104,15 +104,5 @@ impl Section {
     /// and iterates over all of the blocks in the section.
     #[must_use]
     #[inline]
-    pub const fn blockid_iter(&self) -> SectionIdIterator<'_> { SectionIdIterator::new(self) }
-
-    /// Creates a new [`SectionBlockIterator`] for the section.
-    ///
-    /// This starts at the first block in the section,
-    /// and iterates over all of the blocks in the section.
-    #[must_use]
-    #[inline]
-    pub const fn block_iter<V: Version>(&self) -> SectionBlockIterator<'_, V> {
-        SectionBlockIterator::new(self)
-    }
+    pub const fn block_iter(&self) -> SectionIdIterator<'_> { SectionIdIterator::new(self) }
 }

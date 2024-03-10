@@ -4,10 +4,10 @@ use bevy_app::App;
 pub mod tasks;
 
 mod section;
-pub use section::{Palette, Section, SectionBlockIterator, SectionIdIterator};
+pub use section::{Palette, Section, SectionIdIterator};
 
 mod chunk;
-pub use chunk::{Chunk, ChunkBlockIterator, ChunkIdIterator, HeightMaps};
+pub use chunk::{Chunk, ChunkIdIterator, HeightMaps};
 
 mod container;
 pub use container::{BiomeContainer, BlockContainer, ChunkDataContainer, HeightMapContainer};

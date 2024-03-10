@@ -23,13 +23,25 @@ impl SectionBlockPosition {
     /// All zeros.
     pub const ZERO: Self = Self::splat(0);
 
+    /// All ones.
+    pub const ONE: Self = Self::splat(1);
+
+    /// All `15`s.
+    pub const FIFTEEN: Self = Self::splat(15);
+
+    /// The X-axis.
+    pub const X: Self = Self::new(1, 0, 0);
+
+    /// The Y-axis.
+    pub const Y: Self = Self::new(0, 1, 0);
+
+    /// The Z-axis.
+    pub const Z: Self = Self::new(0, 0, 1);
+
     /// The minimum position.
     ///
     /// This is the same as [`SectionBlockPosition::ZERO`].
     pub const MIN: Self = Self::ZERO;
-
-    /// All `15`s.
-    pub const FIFTEEN: Self = Self::splat(15);
 
     /// The maximum position.
     ///
@@ -151,6 +163,59 @@ impl SectionBlockPosition {
 
         Self::new(x, y, z)
     }
+
+    /// Adds a [`SectionBlockPosition`] to the current position,
+    /// but wraps if the result is out of range.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use froglight_protocol::common::SectionBlockPosition;
+    ///
+    /// let max_x = SectionBlockPosition::new(15, 0, 0);
+    /// assert_eq!(max_x.add_wrapping(&SectionBlockPosition::X), SectionBlockPosition::new(0, 0, 1));
+    ///
+    /// let max_z = SectionBlockPosition::new(0, 0, 15);
+    /// assert_eq!(max_z.add_wrapping(&SectionBlockPosition::Z), SectionBlockPosition::new(0, 1, 0));
+    ///
+    /// let max_y = SectionBlockPosition::new(0, 15, 0);
+    /// assert_eq!(max_y.add_wrapping(&SectionBlockPosition::Y), SectionBlockPosition::new(0, 0, 0));
+    /// ```
+    #[must_use]
+    pub const fn add_wrapping(&self, other: &Self) -> Self {
+        // Calculate the new x-coordinate.
+        let mut x = self.x + other.x;
+        let carry_x = (x > 15) as u8;
+        x %= 16;
+
+        // Calculate the new z-coordinate.
+        let mut z = self.z + other.z + carry_x;
+        let carry_z = (z > 15) as u8;
+        z %= 16;
+
+        // Calculate the new y-coordinate.
+        let y = (self.y + other.y + carry_z).rem_euclid(16);
+
+        Self::new(x, y, z)
+    }
+
+    /// Gets the next position after the current one.
+    ///
+    /// Returns `None` if the current position is the
+    /// [`SectionBlockPosition::MAX`].
+    #[must_use]
+    pub const fn next(&self) -> Option<Self> {
+        if self.as_index() == Self::MAX.as_index() {
+            None
+        } else {
+            Some(self.add_wrapping(&Self::X))
+        }
+    }
+
+    /// Gets the next position after the current one.
+    ///
+    /// Wraps if the result is out of range.
+    #[must_use]
+    pub const fn next_wrapping(&self) -> Self { self.add_wrapping(&Self::X) }
 }
 
 // --- Math Implementations ---
@@ -302,4 +367,34 @@ proptest::proptest! {
         assert_eq!(subbed.z, z1.wrapping_sub(z2).rem_euclid(16));
     }
 
+}
+
+#[test]
+fn sectionblockpos_next() {
+    let mut pos = SectionBlockPosition::ZERO;
+
+    for index in 0..SectionBlockPosition::MAX.as_index() {
+        assert_eq!(pos.as_index(), index);
+        pos = pos.next().expect("Expected next position");
+    }
+
+    assert_eq!(pos, SectionBlockPosition::MAX);
+    assert_eq!(pos.next(), None);
+}
+
+#[test]
+fn sectionblockpos_next_wrapping() {
+    let mut pos = SectionBlockPosition::ZERO;
+
+    for index in 0..SectionBlockPosition::MAX.as_index() {
+        assert_eq!(pos.as_index(), index);
+        pos = pos.next_wrapping();
+    }
+    assert_eq!(pos, SectionBlockPosition::MAX);
+
+    pos = pos.next_wrapping();
+    assert_eq!(pos, SectionBlockPosition::ZERO);
+
+    pos = pos.next_wrapping();
+    assert_eq!(pos, SectionBlockPosition::X);
 }

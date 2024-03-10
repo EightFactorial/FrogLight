@@ -6,4 +6,4 @@ mod section;
 pub use section::Section;
 
 mod iterator;
-pub use iterator::{SectionBlockIterator, SectionIdIterator};
+pub use iterator::SectionIdIterator;

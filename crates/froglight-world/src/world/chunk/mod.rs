@@ -5,7 +5,6 @@ use std::sync::Arc;
 use bevy_ecs::component::Component;
 use bevy_log::warn;
 use froglight_core::common::ChunkBlockPosition;
-use froglight_protocol::traits::Version;
 use parking_lot::RwLock;
 use thiserror::Error;
 
@@ -13,10 +12,9 @@ mod heightmap;
 pub use heightmap::HeightMaps;
 
 mod iterator;
-pub use iterator::{ChunkBlockIterator, ChunkIdIterator};
+pub use iterator::ChunkIdIterator;
 
 use super::section::Section;
-use crate::biomes::Biomes;
 
 /// A [`Chunk`] is a `16xNx16 (X,Y,Z)`  section of blocks.
 ///
@@ -74,10 +72,10 @@ impl Chunk {
     /// ```rust
     /// use froglight_world::world::{Chunk, Section};
     ///
-    /// // Create a new chunk with 24 sections.
+    /// // Create a new chunk with `24` sections.
     /// let chunk = Chunk::new(vec![Section::default(); 24], -64);
     ///
-    /// // The chunk has a height of (24 x 16) 384.
+    /// // The chunk has a height of `384` (24 x 16).
     /// assert_eq!(chunk.height, 384);
     /// ```
     #[must_use]
@@ -85,23 +83,6 @@ impl Chunk {
         // TODO: Calculate heightmaps from sections.
         let heightmaps = HeightMaps::default();
 
-        Self {
-            height: sections.len() * Section::HEIGHT,
-            offset,
-            sections: Arc::new(RwLock::new(sections)),
-            heightmaps: Arc::new(RwLock::new(heightmaps)),
-        }
-    }
-
-    /// Creates a new [`Chunk`] with the given sections and heightmaps.
-    ///
-    /// This calculates the world height from the number of sections.
-    #[must_use]
-    pub fn new_with_heightmaps(
-        sections: Vec<Section>,
-        offset: isize,
-        heightmaps: HeightMaps,
-    ) -> Self {
         Self {
             height: sections.len() * Section::HEIGHT,
             offset,
@@ -138,21 +119,9 @@ impl Chunk {
         })
     }
 
-    // /// Gets the [`Block`](Blocks) at the given position in the chunk.
-    // ///
-    // /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    // /// bounds.
-    // #[must_use]
-    // #[inline]
-    // #[allow(clippy::bind_instead_of_map)]
-    // pub fn get_block<V: Version>(&self, pos: &ChunkBlockPosition) ->
-    // Option<Blocks> {     self.get_blockid(pos).and_then(|_id|
-    // todo!("Block::from_id(id)")) }
-
-    /// Gets the [`Block`](Blocks) ID at the given position in the chunk.
+    /// Gets the block id at the given position in the chunk.
     ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
+    /// Returns [`None`] if the [`ChunkBlockPosition`] is out of bounds.
     #[must_use]
     pub fn get_blockid(&self, pos: &ChunkBlockPosition) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
@@ -164,29 +133,11 @@ impl Chunk {
         }
     }
 
-    // /// Sets the [`Block`](Blocks) at the given position in the chunk.
-    // ///
-    // /// Returns the previous [`Block`](Blocks) at the position.
-    // ///
-    // /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    // /// bounds.
-    // #[inline]
-    // #[allow(clippy::bind_instead_of_map, unreachable_code)]
-    // pub fn set_block<V: Version>(
-    //     &mut self,
-    //     pos: &ChunkBlockPosition,
-    //     _value: Blocks,
-    // ) -> Option<Blocks> {
-    //     self.set_blockid(pos, todo!("Block::to_id(block)"))
-    //         .and_then(|_id| todo!("Block::from_id(id)"))
-    // }
-
-    /// Sets the [`Block`](Blocks) ID at the given position in the chunk.
+    /// Sets the block id at the given position in the chunk.
     ///
-    /// Returns the previous [`Block`](Blocks) ID at the position.
+    /// Returns the previous block id at the position.
     ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
+    /// Returns [`None`] if the [`ChunkBlockPosition`] is out of bounds.
     pub fn set_blockid(&mut self, pos: &ChunkBlockPosition, value: u32) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.write().get_mut(section_index) {
@@ -197,21 +148,9 @@ impl Chunk {
         }
     }
 
-    /// Gets the [`Biome`](Biomes) at the given position in the chunk.
+    /// Gets the biome id at the given position in the chunk.
     ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
-    #[must_use]
-    #[inline]
-    #[allow(clippy::bind_instead_of_map)]
-    pub fn get_biome<V: Version>(&self, pos: &ChunkBlockPosition) -> Option<Biomes> {
-        self.get_biomeid(pos).and_then(|_id| todo!("Biome::from_id(id)"))
-    }
-
-    /// Gets the [`Biome`](Biomes) ID at the given position in the chunk.
-    ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
+    /// Returns [`None`] if the [`ChunkBlockPosition`] is out of bounds.
     #[must_use]
     pub fn get_biomeid(&self, pos: &ChunkBlockPosition) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
@@ -223,29 +162,11 @@ impl Chunk {
         }
     }
 
-    /// Sets the [`Biome`](Biomes) at the given position in the chunk.
+    /// Sets the biome id at the given position in the chunk.
     ///
-    /// Returns the previous [`Biome`](Biomes) at the position.
+    /// Returns the previous biome id at the position.
     ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
-    #[inline]
-    #[allow(clippy::bind_instead_of_map, unreachable_code)]
-    pub fn set_biome<V: Version>(
-        &mut self,
-        pos: &ChunkBlockPosition,
-        _value: Biomes,
-    ) -> Option<Biomes> {
-        self.set_biomeid(pos, todo!("Biome::to_id(value"))
-            .and_then(|_id| todo!("Biome::from_id(id)"))
-    }
-
-    /// Sets the [`Biome`](Biomes) ID at the given position in the chunk.
-    ///
-    /// Returns the previous [`Biome`](Biomes) ID at the position.
-    ///
-    /// Returns [`None`] if the [`position`](ChunkBlockPosition) is out of
-    /// bounds.
+    /// Returns [`None`] if the [`ChunkBlockPosition`] is out of bounds.
     pub fn set_biomeid(&mut self, pos: &ChunkBlockPosition, value: u32) -> Option<u32> {
         let section_index = pos.y / Section::HEIGHT;
         if let Some(section) = self.sections.write().get_mut(section_index) {
@@ -262,17 +183,7 @@ impl Chunk {
     /// and iterates through all blocks in the chunk.
     #[must_use]
     #[inline]
-    pub const fn blockid_iter(&self) -> ChunkIdIterator { ChunkIdIterator::new(self) }
-
-    /// Creates a new [`ChunkBlockIterator`] for the chunk.
-    ///
-    /// This starts at the first block in the chunk,
-    /// and iterates through all blocks in the chunk.
-    #[must_use]
-    #[inline]
-    pub const fn block_iter<V: Version>(&self) -> ChunkBlockIterator<V> {
-        ChunkBlockIterator::new(self)
-    }
+    pub const fn block_iter(&self) -> ChunkIdIterator { ChunkIdIterator::new(self) }
 }
 
 /// A [`ChunkDecodeError`] is an error that occurs when decoding a [`Chunk`].

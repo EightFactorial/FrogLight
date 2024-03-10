@@ -243,10 +243,10 @@ impl<T: ContainerType> ChunkDataContainer<T> {
 
             // Get the new bitslice and match the size.
             let new_slice = &mut new_data[Self::entry_range(new_bits, pos)];
-            let smaller_slice = &mut new_slice[bits..];
+            let new_slice = &mut new_slice[bits..];
 
             // Copy the old bitslice into the new bitslice.
-            smaller_slice.copy_from_bitslice(old_slice);
+            new_slice.copy_from_bitslice(old_slice);
         }
 
         // Update the bits and data.
@@ -339,10 +339,13 @@ impl<T: ContainerType> ChunkDataContainer<T> {
 
     /// Returns the number of bits required to store the given number of
     /// entries.
+    ///
+    /// # Panics
+    /// Panics if the given length is 0.
     #[must_use]
     #[inline]
-    #[allow(clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    fn vector_bits_required(len: usize) -> usize { (len as f32).log2() as usize + 1 }
+    #[allow(clippy::cast_possible_truncation)]
+    const fn vector_bits_required(len: usize) -> usize { (len as u32).ilog2() as usize + 1 }
 
     /// Returns the number of bits required to store the given maximum value.
     #[must_use]
@@ -365,7 +368,7 @@ fn bitvec_size() {
 }
 
 #[test]
-fn container_bits_required() {
+fn entry_bitsize() {
     for (i, size) in [
         1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
         5, 6,

@@ -1,8 +1,9 @@
 use std::io::Cursor;
 
+use bevy_log::warn;
 use bevy_reflect::Reflect;
 use froglight_protocol::io::FrogRead;
-use simdnbt::owned::{Nbt, NbtTag};
+use simdnbt::owned::Nbt;
 
 use super::ChunkDecodeError;
 use crate::world::container::HeightMapContainer;
@@ -11,8 +12,12 @@ use crate::world::container::HeightMapContainer;
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 pub struct HeightMaps {
     /// The highest solid blocks
+    ///
+    /// This is used for blocking rain and snow particles.
     pub motion_blocking: HeightMapContainer,
     /// The highest non-air blocks
+    ///
+    /// This is used to detect if beacons beams are blocked.
     pub world_surface: HeightMapContainer,
 }
 
@@ -21,23 +26,29 @@ impl HeightMaps {
     pub(crate) fn decode(height: usize, buf: &mut Cursor<&[u8]>) -> Result<Self, ChunkDecodeError> {
         let mut heightmaps = HeightMaps::default();
 
+        // Read NBT from buffer
         if let Nbt::Some(base) = Nbt::fg_read(buf)? {
             let mut base = base.into_inner();
 
-            if let Some(NbtTag::LongArray(motion_blocking)) = base.take("MOTION_BLOCKING") {
-                heightmaps.motion_blocking =
-                    HeightMapContainer::try_from_vec(height, motion_blocking)?;
+            // Read MOTION_BLOCKING
+            if let Ok(Some(heightmap)) =
+                HeightMapContainer::try_from_nbt(height, "MOTION_BLOCKING", &mut base)
+            {
+                heightmaps.motion_blocking = heightmap;
             } else {
-                bevy_log::warn!("Chunk is missing `MOTION_BLOCKING` heightmap");
+                warn!("Chunk is missing `MOTION_BLOCKING` heightmap");
             }
 
-            if let Some(NbtTag::LongArray(world_surface)) = base.take("WORLD_SURFACE") {
-                heightmaps.world_surface = HeightMapContainer::try_from_vec(height, world_surface)?;
+            // Read WORLD_SURFACE
+            if let Ok(Some(heightmap)) =
+                HeightMapContainer::try_from_nbt(height, "WORLD_SURFACE", &mut base)
+            {
+                heightmaps.world_surface = heightmap;
             } else {
-                bevy_log::warn!("Chunk is missing `WORLD_SURFACE` heightmap");
+                warn!("Chunk is missing `WORLD_SURFACE` heightmap");
             }
         } else {
-            bevy_log::warn!("Chunk is missing heightmaps");
+            warn!("Chunk contained no NBT data");
         }
 
         Ok(heightmaps)
