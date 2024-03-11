@@ -7,9 +7,6 @@ use froglight_assets::ResourcePackState;
 
 pub(crate) mod plugin;
 
-pub(crate) mod background;
-pub use background::{MainMenuBackground, MainMenuBackgroundCamera, MainMenuBackgroundEnable};
-
 pub(crate) mod buttons;
 pub use buttons::{
     MainMenuButtonNode, MainMenuMultiplayerButton, MainMenuQuitButton, MainMenuSettingsButton,
@@ -28,6 +25,8 @@ use systemset::MainMenuUpdateSet;
 pub(crate) mod text;
 pub use text::{MainMenuNoticeText, MainMenuVersionText};
 
+use crate::menus::panorama::MainMenuBackground;
+
 #[doc(hidden)]
 fn build(app: &mut App) {
     app.register_type::<MainMenuRootNode>();
@@ -40,7 +39,6 @@ fn build(app: &mut App) {
             .in_set(MainMenuUpdateSet),
     );
 
-    background::build(app);
     buttons::build(app);
     logo::build(app);
     splash::build(app);

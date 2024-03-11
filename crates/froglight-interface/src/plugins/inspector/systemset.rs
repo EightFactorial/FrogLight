@@ -1,9 +1,11 @@
 use bevy::prelude::*;
 use froglight_core::systemsets::InterfaceUpdateSet;
 
+use crate::plugins::debug::systemset::DebugUpdateSet;
+
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.configure_sets(Update, InspectorUpdateSet.in_set(InterfaceUpdateSet));
+    app.configure_sets(Update, InspectorUpdateSet.after(DebugUpdateSet).in_set(InterfaceUpdateSet));
 }
 
 /// A [`SystemSet`] for inspector systems that should run during [`Update`].

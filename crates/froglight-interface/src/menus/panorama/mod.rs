@@ -1,3 +1,5 @@
+//! Systems and components for the background panorama.
+
 use std::ops::Mul;
 
 use bevy::{
@@ -5,18 +7,22 @@ use bevy::{
     render::{mesh::VertexAttributeValues, view::RenderLayers},
 };
 use froglight_assets::{AssetManager, FallbackImage};
-use froglight_core::{
-    resources::{LoadingScreenState, MainMenuEnable},
-    systemsets::InterfaceUpdateSet,
-};
+use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
 
-mod camera;
-pub use camera::MainMenuBackgroundCamera;
+pub(crate) mod camera;
+pub use camera::MainMenuPanoramaCamera;
 
-mod cube;
+pub(crate) mod cube;
 use cube::MainMenuBackgroundShader;
 
-use crate::menus::InterfaceMenuState;
+pub(crate) mod plugin;
+
+use super::mainmenu::systemset::MainMenuUpdateSet;
+use crate::menus::{
+    loadingscreen::systemset::LoadingScreenUpdateSet,
+    multiplayermenu::systemset::MultiplayerMenuUpdateSet,
+    settingsmenu::systemset::SettingsMenuUpdateSet, InterfaceMenuState, InterfaceMenuUpdateSet,
+};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -24,27 +30,41 @@ pub(super) fn build(app: &mut App) {
     cube::build(app);
 
     app.init_resource::<MainMenuBackgroundEnable>().register_type::<MainMenuBackgroundEnable>();
-
     app.register_type::<MainMenuBackground>();
+
+    app.configure_sets(
+        Update,
+        MainMenuPanoramaSet
+            .ambiguous_with(LoadingScreenUpdateSet)
+            .before(MainMenuUpdateSet)
+            .before(MultiplayerMenuUpdateSet)
+            .before(SettingsMenuUpdateSet)
+            .in_set(InterfaceMenuUpdateSet),
+    );
+
     app.add_systems(
         Update,
-        MainMenuBackground::background_rotation
-            .run_if(LoadingScreenState::is_hidden)
+        MainMenuBackground::panorama_rotation
             .run_if(any_with_component::<MainMenuBackground>)
+            .run_if(LoadingScreenState::is_hidden)
             .run_if(MainMenuBackgroundEnable::is_enabled)
-            .in_set(InterfaceUpdateSet),
+            .in_set(MainMenuPanoramaSet),
     );
     app.add_systems(
         Update,
-        MainMenuBackground::background_visibility
+        MainMenuBackground::panorama_visibility
+            .run_if(any_with_component::<MainMenuBackground>)
             .run_if(
                 resource_exists_and_changed::<MainMenuEnable>
                     .or_else(resource_exists_and_changed::<MainMenuBackgroundEnable>),
             )
-            .run_if(any_with_component::<MainMenuBackground>)
-            .in_set(InterfaceUpdateSet),
+            .in_set(MainMenuPanoramaSet),
     );
 }
+
+/// A [`SystemSet`] for systems related to the main menu panorama.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub struct MainMenuPanoramaSet;
 
 /// A marker [`Component`] for the main menu background.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect, Component)]
@@ -55,14 +75,14 @@ impl MainMenuBackground {
     const ROTATION_SPEED: f32 = 2.0;
     const RENDER_LAYER: RenderLayers = RenderLayers::layer(4);
 
-    fn background_rotation(mut query: Query<&mut Transform, With<Self>>, time: Res<Time<Virtual>>) {
+    fn panorama_rotation(mut query: Query<&mut Transform, With<Self>>, time: Res<Time<Virtual>>) {
         let delta = time.delta_seconds().mul(Self::ROTATION_SPEED).min(0.2).to_radians();
         for mut transform in &mut query {
             transform.rotate_y(delta);
         }
     }
 
-    fn background_visibility(
+    fn panorama_visibility(
         mut query: Query<&mut Visibility, With<Self>>,
         enable: Res<MainMenuEnable>,
 
@@ -122,9 +142,14 @@ impl MainMenuBackground {
         }
 
         // Add the shader to the asset manager
-        let material: Handle<MainMenuBackgroundShader> = {
-            let mut assets = world.resource_mut::<Assets<MainMenuBackgroundShader>>();
-            assets.add(shader)
+        let Some(material): Option<Handle<MainMenuBackgroundShader>> = world
+            .get_resource_mut::<Assets<MainMenuBackgroundShader>>()
+            .map(|mut assets| assets.add(shader))
+        else {
+            error!(
+                "Attempted to build MainMenuBackground without adding the InterfacePanoramaPlugin"
+            );
+            return;
         };
 
         // Get a cube mesh

@@ -2,7 +2,11 @@ use bevy::prelude::*;
 use froglight_core::resources::LoadingScreenEnable;
 
 use super::LoadingScreenRootNode;
-use crate::menus::InterfaceMenuUpdateSet;
+use crate::menus::{
+    mainmenu::systemset::MainMenuUpdateSet, multiplayermenu::systemset::MultiplayerMenuUpdateSet,
+    panorama::MainMenuPanoramaSet, settingsmenu::systemset::SettingsMenuUpdateSet,
+    InterfaceMenuUpdateSet,
+};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -15,6 +19,10 @@ pub(super) fn build(app: &mut App) {
         Update,
         LoadingScreenUpdateSet
             .run_if(LoadingScreenEnable::is_enabled)
+            .ambiguous_with(MainMenuPanoramaSet)
+            .before(MainMenuUpdateSet)
+            .before(MultiplayerMenuUpdateSet)
+            .before(SettingsMenuUpdateSet)
             .in_set(InterfaceMenuUpdateSet),
     );
 

@@ -14,6 +14,9 @@ pub use mainmenu::plugin::InterfaceMainMenuPlugin;
 pub mod multiplayermenu;
 pub use multiplayermenu::plugin::InterfaceMultiplayerMenuPlugin;
 
+pub mod panorama;
+pub use panorama::plugin::InterfacePanoramaPlugin;
+
 pub mod settingsmenu;
 pub use settingsmenu::plugin::InterfaceSettingsMenuPlugin;
 

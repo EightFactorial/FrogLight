@@ -20,7 +20,6 @@ pub(super) fn build(app: &mut App) {
     app.register_type::<MainMenuBackgroundShader>()
         .init_asset::<MainMenuBackgroundShader>()
         .register_type_data::<Handle<MainMenuBackgroundShader>, ReflectHandle>()
-        // Add the cube shader plugin.
         .add_plugins(MaterialPlugin::<MainMenuBackgroundShader>::default());
 }
 
@@ -50,11 +49,11 @@ pub(super) struct MainMenuBackgroundShader {
 
 impl Material for MainMenuBackgroundShader {
     fn vertex_shader() -> ShaderRef {
-        ShaderRef::from("embedded://froglight_interface/menus/mainmenu/background/cube.wgsl")
+        ShaderRef::from("embedded://froglight_interface/menus/panorama/cube.wgsl")
     }
 
     fn fragment_shader() -> ShaderRef {
-        ShaderRef::from("embedded://froglight_interface/menus/mainmenu/background/cube.wgsl")
+        ShaderRef::from("embedded://froglight_interface/menus/panorama/cube.wgsl")
     }
 
     fn specialize(

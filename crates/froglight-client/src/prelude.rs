@@ -14,7 +14,7 @@ pub use froglight_network::{
 };
 pub use froglight_protocol::{states::*, traits::*, versions};
 pub use froglight_world::{
-    blocks::{block_list as blocks, BlockExt, BlockRegistry, BlockType, ReflectBlockType},
+    blocks::{block_list as blocks, BlockRegistry, BlockType, ReflectBlockType},
     maps::*,
     world::{Chunk, Section},
 };
