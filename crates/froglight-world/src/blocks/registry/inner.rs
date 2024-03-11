@@ -1,4 +1,4 @@
-use bevy_log::warn;
+use bevy_log::{trace, warn};
 use froglight_protocol::traits::Version;
 use rangemap::RangeMap;
 
@@ -48,7 +48,12 @@ impl<V: Version> InnerRegistry<V> {
     }
 
     /// Register a block in the registry.
+    ///
+    /// # Note
+    /// It does not matter what state the block is in when it is registered.
     pub fn register_block(&mut self, block: impl BlockType<V>) -> &mut Self {
+        trace!("Registering {:?} block: {}", V::default(), block.resource_key());
+
         let index = self.blocks.len();
         let states = block.states();
         self.blocks.push(Box::new(block));
