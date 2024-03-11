@@ -25,8 +25,6 @@ use systemset::MainMenuUpdateSet;
 pub(crate) mod text;
 pub use text::{MainMenuNoticeText, MainMenuVersionText};
 
-use crate::menus::panorama::MainMenuBackground;
-
 #[doc(hidden)]
 fn build(app: &mut App) {
     app.register_type::<MainMenuRootNode>();
@@ -87,8 +85,5 @@ impl MainMenuRootNode {
         MainMenuButtonNode::build(world, root);
         MainMenuVersionText::build(world, root);
         MainMenuNoticeText::build(world, root);
-
-        // Build the background
-        MainMenuBackground::build(world);
     }
 }

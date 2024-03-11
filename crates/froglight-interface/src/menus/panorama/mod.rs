@@ -6,7 +6,7 @@ use bevy::{
     prelude::*,
     render::{mesh::VertexAttributeValues, view::RenderLayers},
 };
-use froglight_assets::{AssetManager, FallbackImage};
+use froglight_assets::{AssetManager, FallbackImage, ResourcePackState};
 use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
 
 pub(crate) mod camera;
@@ -42,6 +42,15 @@ pub(super) fn build(app: &mut App) {
             .in_set(InterfaceMenuUpdateSet),
     );
 
+    // Build the panorama background.
+    app.add_systems(
+        OnEnter(ResourcePackState::Processing),
+        MainMenuBackground::build_panorama
+            .run_if(not(any_with_component::<MainMenuBackground>))
+            .in_set(MainMenuPanoramaSet),
+    );
+
+    // Add the systems for the panorama background.
     app.add_systems(
         Update,
         MainMenuBackground::panorama_rotation
@@ -99,7 +108,7 @@ impl MainMenuBackground {
         }
     }
 
-    pub(crate) fn build(world: &mut World) {
+    pub(crate) fn build_panorama(world: &mut World) {
         debug!("Building MainMenuBackground");
 
         // Load the textures for the main menu background

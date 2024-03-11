@@ -10,7 +10,6 @@ pub(super) fn build(app: &mut App) {
     app.add_systems(
         Update,
         MainMenuPanoramaCamera::panorama_camera
-            .run_if(any_with_component::<MainMenuBackground>)
             .run_if(
                 resource_exists_and_changed::<MainMenuEnable>
                     .or_else(resource_exists_and_changed::<MainMenuBackgroundEnable>),
