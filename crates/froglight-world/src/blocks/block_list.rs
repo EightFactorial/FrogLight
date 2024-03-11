@@ -13,13 +13,13 @@ frog_blocks! {
     PolishedDiorite,
     Andesite,
     PolishedAndesite,
-    GrassBlock,
-    Dirt {
-        snowy: SnowyAttribute,
+    GrassBlock {
+        pub snowy: SnowyAttribute,
     },
+    Dirt,
     CoarseDirt,
     Podzol {
-        snowy: SnowyAttribute,
+        pub snowy: SnowyAttribute,
     },
     Cobblestone,
 }

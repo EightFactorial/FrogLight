@@ -10,7 +10,7 @@ pub mod block_list;
 use block_list::BlockEnum;
 
 mod traits;
-pub use traits::{BlockExt, BlockType};
+pub use traits::BlockType;
 
 mod reflect;
 pub use reflect::ReflectBlockType;
@@ -25,5 +25,6 @@ pub(super) fn build(app: &mut App) {
     // Register all block attributes for reflection
     attributes::register(app);
 
+    // Build and register the block registry
     registry::build(app);
 }

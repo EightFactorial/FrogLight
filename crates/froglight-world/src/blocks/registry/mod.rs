@@ -6,8 +6,10 @@ use bevy_ecs::{
     system::Resource,
     world::{FromWorld, World},
 };
+use bevy_log::debug;
 use bevy_reflect::{GetTypeRegistration, Reflect};
 use derive_more::Deref;
+use froglight_protocol::versions::v1_20_0::V1_20_0;
 use parking_lot::RwLock;
 
 mod inner;
@@ -21,9 +23,7 @@ mod egui;
 mod versions;
 
 #[doc(hidden)]
-pub(super) fn build(_app: &mut App) {
-    // TODO: Initialize block registries
-}
+pub(super) fn build(app: &mut App) { app.init_resource::<BlockRegistry<V1_20_0>>(); }
 
 /// A registry containing all of the blocks in the game.
 #[derive(Debug, Clone, Deref, Reflect, Resource)]
@@ -38,8 +38,9 @@ impl<V: BlockRegistration> FromWorld for BlockRegistry<V> {
         // Add a type registration for the block registry if it doesn't exist
         if let Some(registry) = world.get_resource::<AppTypeRegistry>() {
             let registry_exists = registry.read().get(TypeId::of::<Self>()).is_none();
+            if registry_exists {
+                debug!("Registering BlockRegistry<{:?}>", V::default());
 
-            if !registry_exists {
                 // Create the type registration
                 #[allow(unused_mut)]
                 let mut registration = Self::get_type_registration();
@@ -47,6 +48,7 @@ impl<V: BlockRegistration> FromWorld for BlockRegistry<V> {
                 // Add the `InspectorEguiImpl` to the type registration
                 #[cfg(feature = "inspector")]
                 {
+                    debug!("Adding InspectorEguiImpl for BlockRegistry<{:?}>", V::default());
                     registration.insert(Self::inspector_egui_impl());
                 }
 

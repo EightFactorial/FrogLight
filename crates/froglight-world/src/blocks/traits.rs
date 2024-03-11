@@ -22,16 +22,6 @@ pub trait BlockType<V: Version>: Debug + Reflect {
     /// respectively, the total number of states is `4 * 2 * 3 = 24`.
     fn states(&self) -> u32 { 1 }
 
-    /// Returns `true` if the block is air.
-    fn is_air(&self) -> bool { false }
-    /// Returns `true` if the block is opaque.
-    fn is_opaque(&self) -> bool { true }
-    /// Returns `true` if the block is collidable.
-    fn is_collidable(&self) -> bool { true }
-}
-
-/// A block with additional methods.
-pub trait BlockExt<V: Version>: Sized + BlockType<V> {
     /// Get the block from the relative state id.
     ///
     /// ---
@@ -40,7 +30,23 @@ pub trait BlockExt<V: Version>: Sized + BlockType<V> {
     ///
     /// For example, if the minimum state id is `2` and the state id is `4`,
     /// the relative state id is `4 - 2 = 2`.
-    fn from_relative_state(id: usize) -> Option<Self>;
+    #[allow(clippy::wrong_self_convention)]
+    fn from_relative_state(&self, id: usize) -> Option<Self>
+    where
+        Self: Sized + Default,
+    {
+        match id {
+            0 => Some(Self::default()),
+            _ => None,
+        }
+    }
+
+    /// Returns `true` if the block is air.
+    fn is_air(&self) -> bool { false }
+    /// Returns `true` if the block is opaque.
+    fn is_opaque(&self) -> bool { true }
+    /// Returns `true` if the block is collidable.
+    fn is_collidable(&self) -> bool { true }
 }
 
 /// A trait that registers blocks inside the block registry.
