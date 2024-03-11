@@ -9,6 +9,7 @@ use super::{block_list::BlockEnum, registry::InnerRegistry};
 /// A block
 pub trait BlockType<V: Version>: Debug + Reflect {
     /// Get the [`ResourceKey`] of the block.
+    #[must_use]
     fn resource_key(&self) -> ResourceKey;
 
     /// Get the total number of states for the block.
@@ -20,13 +21,17 @@ pub trait BlockType<V: Version>: Debug + Reflect {
     ///
     /// For example, if a block has 3 attributes with 4, 2, and 3 states
     /// respectively, the total number of states is `4 * 2 * 3 = 24`.
+    #[must_use]
     fn states(&self) -> u32 { 1 }
 
     /// Returns `true` if the block is air.
+    #[must_use]
     fn is_air(&self) -> bool { false }
     /// Returns `true` if the block is opaque.
+    #[must_use]
     fn is_opaque(&self) -> bool { true }
     /// Returns `true` if the block is collidable.
+    #[must_use]
     fn is_collidable(&self) -> bool { true }
 }
 
@@ -41,7 +46,6 @@ pub trait BlockExt<V: Version>: Sized + BlockType<V> + Default {
     /// For example, if the minimum state id is `3` and the state id is `4`,
     /// the relative state id is `4 - 3 = 1`.
     #[must_use]
-    #[inline]
     fn from_relative_state(rel: u32) -> Option<Self> {
         match rel {
             0 => Some(Self::default()),
@@ -68,8 +72,10 @@ pub trait BlockRegistration: Version {
     fn register_default(registry: &mut InnerRegistry<Self>);
 }
 
-/// A list of blocks.
+/// A collection of blocks specific to a version.
+#[allow(unreachable_pub)]
 pub trait BlockEnumTrait<V: BlockRegistration>: Sized + Debug + Reflect {
     /// Get the block using a state id and the block registry.
+    #[must_use]
     fn get_block(state: u32, registry: &InnerRegistry<V>) -> Option<Self>;
 }

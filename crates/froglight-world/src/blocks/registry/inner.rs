@@ -17,7 +17,7 @@ use crate::blocks::{
 /// ```rust
 /// use froglight_protocol::versions::v1_20_0::V1_20_0;
 /// use froglight_world::blocks::{
-///     block_list::{BlockAir, BlockCobblestone, BlockStone},
+///     block_list::{BlockAir, BlockCobblestone, BlockEnum, BlockStone},
 ///     BlockRegistry,
 /// };
 ///
@@ -25,19 +25,21 @@ use crate::blocks::{
 /// let registry = BlockRegistry::<V1_20_0>::new_default();
 /// let registry = registry.read();
 ///
-/// // Note: Ranges are exclusive, so `1..2` only contains the block state id `1`.
+/// // Note: Ranges are exclusive, so `0..1` only contains the block state id `0`.
 ///
 /// // Get the block state id range for air
 /// let block_range = registry.range_of::<BlockAir>();
 /// assert_eq!(block_range, Some(&(0..1)));
 ///
-/// // Get the block state id range for stone
-/// let block_range = registry.range_of::<BlockStone>();
-/// assert_eq!(block_range, Some(&(1..2)));
+/// // Get the block from a block state id
+/// let block_state = registry.get_block(0).unwrap();
+/// assert_eq!(block_state, BlockEnum::Air(BlockAir));
 ///
-/// // Get the block state id range for cobblestone
-/// let block_range = registry.range_of::<BlockCobblestone>();
-/// assert_eq!(block_range, Some(&(14..15)));
+/// let block_state = registry.get_block(1).unwrap();
+/// assert_eq!(block_state, BlockEnum::Stone(BlockStone));
+///
+/// let block_state = registry.get_block(14).unwrap();
+/// assert_eq!(block_state, BlockEnum::Cobblestone(BlockCobblestone));
 /// ```
 #[derive(Debug, Default)]
 pub struct InnerRegistry<V: Version> {
@@ -54,6 +56,7 @@ pub struct InnerRegistry<V: Version> {
 impl<V: Version> InnerRegistry<V> {
     /// Creates a new empty registry.
     #[must_use]
+    #[inline]
     pub fn new() -> Self { Self::default() }
 
     /// Gets the block state id range for a block type.
@@ -70,6 +73,7 @@ impl<V: Version> InnerRegistry<V> {
     /// assert_eq!(range, Some(&(0..1)));
     /// ```
     #[must_use]
+    #[inline]
     pub fn range_of<T: BlockType<V>>(&self) -> Option<&Range<u32>> {
         self.type_map.get(&TypeId::of::<T>())
     }
@@ -105,6 +109,7 @@ impl<V: Version> InnerRegistry<V> {
     /// assert_eq!(blockstate, Some(BlockGrassBlock { snowy: SnowyAttribute(true) }));
     /// ```
     #[must_use]
+    #[inline]
     pub fn relative_state_of<T: BlockType<V>>(&self, state: u32) -> Option<u32> {
         let range = self.range_of::<T>()?;
         state.checked_sub(range.start)
@@ -128,20 +133,42 @@ impl<V: Version> InnerRegistry<V> {
     /// let registry = BlockRegistry::<V1_20_0>::new_default();
     /// let registry = registry.read();
     ///
-    /// // `BlockAir` is the first block in the registry, so the block state id is 0.
+    /// // `BlockAir` is the first block in the registry, so the block state id is `0`.
     /// let block = registry.get_dyn(0).unwrap();
     ///
     /// // The `ResourceKey` for air will always be the same.
     /// assert_eq!(block.resource_key(), "minecraft:air");
     /// ```
     #[must_use]
+    #[inline]
     pub fn get_dyn(&self, state: u32) -> Option<&dyn BlockType<V>> {
         let block_index = self.range_map.get(&state)?;
         self.dyn_blocks.get(*block_index).map(AsRef::as_ref)
     }
 
     /// Gets a block from the registry.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_20_0::V1_20_0;
+    /// use froglight_world::blocks::{
+    ///     block_list::{BlockAir, BlockEnum, BlockStone},
+    ///     BlockRegistry,
+    /// };
+    ///
+    /// let registry = BlockRegistry::<V1_20_0>::new_default();
+    /// let registry = registry.read();
+    ///
+    /// // `BlockAir` is the first block in the registry, so the block state id is `0`.
+    /// let block = registry.get_block(0).unwrap();
+    /// assert_eq!(block, BlockEnum::Air(BlockAir));
+    ///
+    /// // `BlockStone` is the second block in the registry, so the block state id is `1`.
+    /// let block = registry.get_block(1).unwrap();
+    /// assert_eq!(block, BlockEnum::Stone(BlockStone));
+    /// ```
     #[must_use]
+    #[inline]
     pub fn get_block(&self, state: u32) -> Option<BlockEnum>
     where
         V: BlockRegistration,
