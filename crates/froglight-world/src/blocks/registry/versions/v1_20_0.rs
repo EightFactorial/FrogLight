@@ -9,103 +9,114 @@ use crate::blocks::{
         BlockPolishedGranite, BlockStone,
     },
     registry::InnerRegistry,
-    traits::BlockRegistration,
+    traits::{BlockExt, BlockRegistration},
     BlockType,
 };
 
 impl BlockRegistration for V1_20_0 {
     fn register_default(registry: &mut InnerRegistry<Self>) {
         registry
-            .register_block(BlockAir)
-            .register_block(BlockStone)
-            .register_block(BlockGranite)
-            .register_block(BlockPolishedGranite)
-            .register_block(BlockDiorite)
-            .register_block(BlockPolishedDiorite)
-            .register_block(BlockAndesite)
-            .register_block(BlockPolishedAndesite)
-            .register_block(BlockGrassBlock::default())
-            .register_block(BlockDirt)
-            .register_block(BlockCoarseDirt)
-            .register_block(BlockPodzol::default())
-            .register_block(BlockCobblestone);
+            .register_block::<BlockAir>()
+            .register_block::<BlockStone>()
+            .register_block::<BlockGranite>()
+            .register_block::<BlockPolishedGranite>()
+            .register_block::<BlockDiorite>()
+            .register_block::<BlockPolishedDiorite>()
+            .register_block::<BlockAndesite>()
+            .register_block::<BlockPolishedAndesite>()
+            .register_block::<BlockGrassBlock>()
+            .register_block::<BlockDirt>()
+            .register_block::<BlockCoarseDirt>()
+            .register_block::<BlockPodzol>()
+            .register_block::<BlockCobblestone>();
     }
 }
 
 impl BlockType<V1_20_0> for BlockAir {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:air") }
 }
+impl BlockExt<V1_20_0> for BlockAir {}
 
 impl BlockType<V1_20_0> for BlockStone {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:stone") }
 }
+impl BlockExt<V1_20_0> for BlockStone {}
 
 impl BlockType<V1_20_0> for BlockGranite {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:granite") }
 }
+impl BlockExt<V1_20_0> for BlockGranite {}
 
 impl BlockType<V1_20_0> for BlockPolishedGranite {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:polished_granite") }
 }
+impl BlockExt<V1_20_0> for BlockPolishedGranite {}
 
 impl BlockType<V1_20_0> for BlockDiorite {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:diorite") }
 }
+impl BlockExt<V1_20_0> for BlockDiorite {}
 
 impl BlockType<V1_20_0> for BlockPolishedDiorite {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:polished_diorite") }
 }
+impl BlockExt<V1_20_0> for BlockPolishedDiorite {}
 
 impl BlockType<V1_20_0> for BlockAndesite {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:andesite") }
 }
+impl BlockExt<V1_20_0> for BlockAndesite {}
 
 impl BlockType<V1_20_0> for BlockPolishedAndesite {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:polished_andesite") }
 }
+impl BlockExt<V1_20_0> for BlockPolishedAndesite {}
 
 impl BlockType<V1_20_0> for BlockGrassBlock {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:grass_block") }
 
     fn states(&self) -> u32 { 2 }
-
-    fn from_relative_state(&self, id: usize) -> Option<Self>
-    where
-        Self: Sized + Default,
-    {
-        match id {
+}
+impl BlockExt<V1_20_0> for BlockGrassBlock {
+    fn from_relative_state(state: u32) -> Option<Self> {
+        match state {
             0 => Some(Self { snowy: SnowyAttribute(false) }),
             1 => Some(Self { snowy: SnowyAttribute(true) }),
             _ => None,
         }
     }
+
+    fn to_relative_state(&self) -> u32 { u32::from(self.snowy.0) }
 }
 
 impl BlockType<V1_20_0> for BlockDirt {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:dirt") }
 }
+impl BlockExt<V1_20_0> for BlockDirt {}
 
 impl BlockType<V1_20_0> for BlockCoarseDirt {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:coarse_dirt") }
 }
+impl BlockExt<V1_20_0> for BlockCoarseDirt {}
 
 impl BlockType<V1_20_0> for BlockPodzol {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:podzol") }
 
     fn states(&self) -> u32 { 2 }
-
-    fn from_relative_state(&self, id: usize) -> Option<Self>
-    where
-        Self: Sized + Default,
-    {
-        match id {
+}
+impl BlockExt<V1_20_0> for BlockPodzol {
+    fn from_relative_state(state: u32) -> Option<Self> {
+        match state {
             0 => Some(Self { snowy: SnowyAttribute(false) }),
             1 => Some(Self { snowy: SnowyAttribute(true) }),
             _ => None,
         }
     }
+
+    fn to_relative_state(&self) -> u32 { u32::from(self.snowy.0) }
 }
 
 impl BlockType<V1_20_0> for BlockCobblestone {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:cobblestone") }
 }
+impl BlockExt<V1_20_0> for BlockCobblestone {}

@@ -1,6 +1,7 @@
+use proc_macro2::Span;
 use syn::{
     parse::{Parse, ParseStream},
-    Fields, Ident, Token,
+    Fields, Ident, ItemStruct, Token,
 };
 
 #[derive(Debug, Clone)]
@@ -47,5 +48,26 @@ impl Parse for BlockDeclaration {
         }
 
         Ok(Self { name: ident, fields: Fields::Named(input.parse()?) })
+    }
+}
+
+/// Converts a `BlockDeclaration` into a `ItemStruct`
+impl From<BlockDeclaration> for ItemStruct {
+    fn from(value: BlockDeclaration) -> Self {
+        ItemStruct {
+            attrs: vec![
+                syn::parse_quote! { #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
+            ],
+            vis: syn::Visibility::Public(syn::Token![pub](Span::call_site())),
+            struct_token: syn::Token![struct](Span::call_site()),
+            ident: Ident::new(&format!("Block{}", value.name), value.name.span()),
+            generics: syn::Generics::default(),
+            semi_token: if value.fields.is_empty() {
+                Some(syn::Token![;](Span::call_site()))
+            } else {
+                None
+            },
+            fields: value.fields,
+        }
     }
 }

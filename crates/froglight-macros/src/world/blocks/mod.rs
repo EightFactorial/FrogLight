@@ -61,12 +61,13 @@ fn create_block_enum(blocks: &[BlockDeclaration], tokens: &mut TokenStream2) -> 
 
 fn create_block_enum_impl(
     ident: Ident,
-    _blocks: &[BlockDeclaration],
+    blocks: &[BlockDeclaration],
     structs: &[ItemStruct],
     tokens: &mut TokenStream2,
 ) {
     let mut impl_tokens = TokenStream2::new();
 
+    // Generate the `register` function
     {
         let struct_idents: Vec<_> = structs.iter().map(|s| &s.ident).collect();
         impl_tokens.extend(quote! {
@@ -81,6 +82,48 @@ fn create_block_enum_impl(
         });
     }
 
+    // Generate the `from_dyn` function
+    {
+        // Collect the `where` conditions
+        let where_tokens = structs
+            .iter()
+            .map(|struct_| {
+                let struct_ident = &struct_.ident;
+                quote! { #struct_ident: crate::blocks::traits::BlockExt<V>, }
+            })
+            .collect::<TokenStream2>();
+
+        // Collect the match tokens
+        let mut match_tokens = TokenStream2::new();
+        for (block, struct_) in blocks.iter().zip(structs) {
+            let block_ident = &block.name;
+            let struct_ident = &struct_.ident;
+
+            match_tokens.extend(quote! {
+                type_id if type_id == std::any::TypeId::of::<#struct_ident>() => {
+                    crate::blocks::traits::BlockExt::<V>::from_relative_state(relative_state).map(Self::#block_ident)
+                }
+            });
+        }
+
+        impl_tokens.extend(quote! {
+            /// Converts a dynamic block into a static block.
+            ///
+            /// # Warning
+            /// This function only works for blocks inside the `BlockEnum`.
+            pub(crate) fn from_dyn<V: froglight_protocol::traits::Version>(block: &dyn crate::blocks::traits::BlockType<V>, state_id: u32, registry: &crate::blocks::registry::InnerRegistry<V>) -> Option<Self>
+            where
+                #where_tokens
+            {
+                let relative_state = registry.relative_state(state_id)?;
+                match block.type_id() {
+                    #match_tokens
+                    _ => None,
+                }
+            }
+        });
+    }
+
     tokens.extend(
         Item::Impl(syn::parse_quote! {
             impl #ident {
@@ -89,25 +132,4 @@ fn create_block_enum_impl(
         })
         .into_token_stream(),
     );
-}
-
-/// Converts a `BlockDeclaration` into a `ItemStruct`
-impl From<BlockDeclaration> for ItemStruct {
-    fn from(value: BlockDeclaration) -> Self {
-        ItemStruct {
-            attrs: vec![
-                syn::parse_quote! { #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
-            ],
-            vis: syn::Visibility::Public(syn::Token![pub](Span::call_site())),
-            struct_token: syn::Token![struct](Span::call_site()),
-            ident: Ident::new(&format!("Block{}", value.name), value.name.span()),
-            generics: syn::Generics::default(),
-            semi_token: if value.fields.is_empty() {
-                Some(syn::Token![;](Span::call_site()))
-            } else {
-                None
-            },
-            fields: value.fields,
-        }
-    }
 }

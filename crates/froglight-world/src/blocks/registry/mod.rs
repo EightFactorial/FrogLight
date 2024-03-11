@@ -20,6 +20,9 @@ use super::traits::BlockRegistration;
 #[cfg(feature = "inspector")]
 mod egui;
 
+#[cfg(test)]
+mod tests;
+
 mod versions;
 
 #[doc(hidden)]

@@ -22,31 +22,42 @@ pub trait BlockType<V: Version>: Debug + Reflect {
     /// respectively, the total number of states is `4 * 2 * 3 = 24`.
     fn states(&self) -> u32 { 1 }
 
-    /// Get the block from the relative state id.
-    ///
-    /// ---
-    ///
-    /// The relative state id is the state id minus the minimum state id.
-    ///
-    /// For example, if the minimum state id is `2` and the state id is `4`,
-    /// the relative state id is `4 - 2 = 2`.
-    #[allow(clippy::wrong_self_convention)]
-    fn from_relative_state(&self, id: usize) -> Option<Self>
-    where
-        Self: Sized + Default,
-    {
-        match id {
-            0 => Some(Self::default()),
-            _ => None,
-        }
-    }
-
     /// Returns `true` if the block is air.
     fn is_air(&self) -> bool { false }
     /// Returns `true` if the block is opaque.
     fn is_opaque(&self) -> bool { true }
     /// Returns `true` if the block is collidable.
     fn is_collidable(&self) -> bool { true }
+}
+
+/// Extra methods for blocks.
+pub trait BlockExt<V: Version>: Sized + BlockType<V> + Default {
+    /// Get the block from the `relative state id`.
+    ///
+    /// ---
+    ///
+    /// The relative state id is the state id minus the minimum state id.
+    ///
+    /// For example, if the minimum state id is `3` and the state id is `4`,
+    /// the relative state id is `4 - 3 = 1`.
+    #[must_use]
+    #[inline]
+    fn from_relative_state(rel: u32) -> Option<Self> {
+        match rel {
+            0 => Some(Self::default()),
+            _ => None,
+        }
+    }
+
+    /// Get the `relative state id` from the block.
+    ///
+    /// ---
+    ///
+    /// The relative state id is the state id minus the minimum state id.
+    ///
+    /// For example, if the minimum state id is `6` and the state id is `6`,
+    /// the relative state id is `6 - 6 = 0`.
+    fn to_relative_state(&self) -> u32 { 0 }
 }
 
 /// A trait that registers blocks inside the block registry.
