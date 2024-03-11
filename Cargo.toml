@@ -77,7 +77,7 @@ serde = "1.0.197"
 serde_json = "1.0.114"
 simdnbt = "0.4.1"
 smallvec = "1.13.1"
-strum = "0.26.1"
+strum = "0.26.2"
 thiserror = "1.0.57"
 uuid = "1.7.0"
 
