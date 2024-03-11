@@ -4,9 +4,7 @@ use quote::{quote, ToTokens};
 use syn::{punctuated::Punctuated, Ident, Item, ItemEnum, ItemStruct};
 
 mod parse;
-use parse::BlockMacro;
-
-use self::parse::BlockDeclaration;
+use parse::{BlockDeclaration, BlockMacro};
 
 pub(crate) fn frog_blocks(input: TokenStream) -> TokenStream {
     // Parse the input
@@ -61,7 +59,7 @@ fn create_block_enum(blocks: &[BlockDeclaration], tokens: &mut TokenStream2) -> 
 
 fn create_block_enum_impl(
     ident: Ident,
-    blocks: &[BlockDeclaration],
+    _blocks: &[BlockDeclaration],
     structs: &[ItemStruct],
     tokens: &mut TokenStream2,
 ) {
@@ -78,48 +76,6 @@ fn create_block_enum_impl(
                     .register_type::<#struct_idents>()
                 )*
                 ;
-            }
-        });
-    }
-
-    // Generate the `from_dyn` function
-    {
-        // Collect the `where` conditions
-        let where_tokens = structs
-            .iter()
-            .map(|struct_| {
-                let struct_ident = &struct_.ident;
-                quote! { #struct_ident: crate::blocks::traits::BlockExt<V>, }
-            })
-            .collect::<TokenStream2>();
-
-        // Collect the match tokens
-        let mut match_tokens = TokenStream2::new();
-        for (block, struct_) in blocks.iter().zip(structs) {
-            let block_ident = &block.name;
-            let struct_ident = &struct_.ident;
-
-            match_tokens.extend(quote! {
-                type_id if type_id == std::any::TypeId::of::<#struct_ident>() => {
-                    crate::blocks::traits::BlockExt::<V>::from_relative_state(relative_state).map(Self::#block_ident)
-                }
-            });
-        }
-
-        impl_tokens.extend(quote! {
-            /// Converts a dynamic block into a static block.
-            ///
-            /// # Warning
-            /// This function only works for blocks inside the `BlockEnum`.
-            pub(crate) fn from_dyn<V: froglight_protocol::traits::Version>(block: &dyn crate::blocks::traits::BlockType<V>, state_id: u32, registry: &crate::blocks::registry::InnerRegistry<V>) -> Option<Self>
-            where
-                #where_tokens
-            {
-                let relative_state = registry.relative_state(state_id)?;
-                match block.type_id() {
-                    #match_tokens
-                    _ => None,
-                }
             }
         });
     }

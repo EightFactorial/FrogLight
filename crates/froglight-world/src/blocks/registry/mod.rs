@@ -13,7 +13,7 @@ use froglight_protocol::versions::v1_20_0::V1_20_0;
 use parking_lot::RwLock;
 
 mod inner;
-pub(crate) use inner::InnerRegistry;
+pub use inner::InnerRegistry;
 
 use super::traits::BlockRegistration;
 
@@ -24,6 +24,7 @@ mod egui;
 mod tests;
 
 mod versions;
+pub use versions::*;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) { app.init_resource::<BlockRegistry<V1_20_0>>(); }
@@ -34,6 +35,22 @@ pub(super) fn build(app: &mut App) { app.init_resource::<BlockRegistry<V1_20_0>>
 pub struct BlockRegistry<V: BlockRegistration> {
     #[reflect(ignore)]
     pub(crate) inner: Arc<RwLock<InnerRegistry<V>>>,
+}
+
+impl<V: BlockRegistration> BlockRegistry<V> {
+    /// Creates a new empty block registry.
+    #[must_use]
+    pub fn new_empty() -> Self { Self { inner: Arc::new(RwLock::new(InnerRegistry::default())) } }
+
+    /// Creates a new block registry with all of the default blocks.
+    #[must_use]
+    pub fn new_default() -> Self {
+        // Create an empty block registry and add all vanilla blocks
+        let mut inner = InnerRegistry::default();
+        V::register_default(&mut inner);
+
+        Self { inner: Arc::new(RwLock::new(inner)) }
+    }
 }
 
 impl<V: BlockRegistration> FromWorld for BlockRegistry<V> {
@@ -60,11 +77,7 @@ impl<V: BlockRegistration> FromWorld for BlockRegistry<V> {
             }
         }
 
-        // Create an empty block registry and add all vanilla blocks
-        let mut inner = InnerRegistry::default();
-        V::register_default(&mut inner);
-
-        // Return the block registry
-        Self { inner: Arc::new(RwLock::new(inner)) }
+        // Create a new block registry with all of the default blocks
+        Self::new_default()
     }
 }

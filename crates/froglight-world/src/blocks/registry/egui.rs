@@ -26,8 +26,8 @@ impl<V: BlockRegistration> BlockRegistry<V> {
         let value = value.downcast_mut::<Self>().unwrap();
         let mut changed = false;
 
-        for (state_range, block_id) in value.read().block_states.iter() {
-            if let Some(block) = value.read().blocks.get(*block_id) {
+        for (state_range, block_id) in value.read().range_map.iter() {
+            if let Some(block) = value.read().dyn_blocks.get(*block_id) {
                 ui.horizontal(|ui| {
                     ui.label(block.resource_key().as_str());
                     ui.add_enabled_ui(false, |ui| {

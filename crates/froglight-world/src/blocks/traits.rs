@@ -4,7 +4,7 @@ use bevy_reflect::Reflect;
 use froglight_core::common::ResourceKey;
 use froglight_protocol::traits::Version;
 
-use super::registry::InnerRegistry;
+use super::{block_list::BlockEnum, registry::InnerRegistry};
 
 /// A block
 pub trait BlockType<V: Version>: Debug + Reflect {
@@ -62,6 +62,14 @@ pub trait BlockExt<V: Version>: Sized + BlockType<V> + Default {
 
 /// A trait that registers blocks inside the block registry.
 pub trait BlockRegistration: Version {
+    type Blocks: BlockEnumTrait<Self> + Into<BlockEnum>;
+
     /// Register the default blocks.
     fn register_default(registry: &mut InnerRegistry<Self>);
+}
+
+/// A list of blocks.
+pub trait BlockEnumTrait<V: BlockRegistration>: Sized + Debug + Reflect {
+    /// Get the block using a state id and the block registry.
+    fn get_block(state: u32, registry: &InnerRegistry<V>) -> Option<Self>;
 }

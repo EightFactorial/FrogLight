@@ -1,4 +1,6 @@
+use bevy_reflect::Typed;
 use froglight_core::common::ResourceKey;
+use froglight_macros::frog_version_blocks;
 use froglight_protocol::versions::v1_20_0::V1_20_0;
 
 use crate::blocks::{
@@ -13,27 +15,29 @@ use crate::blocks::{
     BlockType,
 };
 
-impl BlockRegistration for V1_20_0 {
-    fn register_default(registry: &mut InnerRegistry<Self>) {
-        registry
-            .register_block::<BlockAir>()
-            .register_block::<BlockStone>()
-            .register_block::<BlockGranite>()
-            .register_block::<BlockPolishedGranite>()
-            .register_block::<BlockDiorite>()
-            .register_block::<BlockPolishedDiorite>()
-            .register_block::<BlockAndesite>()
-            .register_block::<BlockPolishedAndesite>()
-            .register_block::<BlockGrassBlock>()
-            .register_block::<BlockDirt>()
-            .register_block::<BlockCoarseDirt>()
-            .register_block::<BlockPodzol>()
-            .register_block::<BlockCobblestone>();
-    }
+frog_version_blocks! {
+    V1_20_0,
+    Air,
+    Stone,
+    Granite,
+    PolishedGranite,
+    Diorite,
+    PolishedDiorite,
+    Andesite,
+    PolishedAndesite,
+    GrassBlock,
+    Dirt,
+    CoarseDirt,
+    Podzol,
+    Cobblestone,
 }
 
 impl BlockType<V1_20_0> for BlockAir {
     fn resource_key(&self) -> ResourceKey { ResourceKey::new("minecraft:air") }
+
+    fn is_air(&self) -> bool { true }
+    fn is_opaque(&self) -> bool { false }
+    fn is_collidable(&self) -> bool { false }
 }
 impl BlockExt<V1_20_0> for BlockAir {}
 

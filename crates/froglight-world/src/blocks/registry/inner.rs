@@ -1,23 +1,54 @@
-use std::any::TypeId;
+use std::{any::TypeId, ops::Range};
 
-use bevy_log::{trace, warn};
+use bevy_log::trace;
 use froglight_protocol::traits::Version;
 use hashbrown::HashMap;
 use rangemap::RangeMap;
 
-use crate::blocks::BlockType;
+use crate::blocks::{
+    block_list::BlockEnum,
+    traits::{BlockEnumTrait, BlockRegistration},
+    BlockType,
+};
 
 /// The inner registry for the block registry.
+///
+/// # Example
+/// ```rust
+/// use froglight_protocol::versions::v1_20_0::V1_20_0;
+/// use froglight_world::blocks::{
+///     block_list::{BlockAir, BlockCobblestone, BlockStone},
+///     BlockRegistry,
+/// };
+///
+/// // Create a new block registry from the world.
+/// let registry = BlockRegistry::<V1_20_0>::new_default();
+/// let registry = registry.read();
+///
+/// // Note: Ranges are exclusive, so `1..2` only contains the block state id `1`.
+///
+/// // Get the block state id range for air
+/// let block_range = registry.range_of::<BlockAir>();
+/// assert_eq!(block_range, Some(&(0..1)));
+///
+/// // Get the block state id range for stone
+/// let block_range = registry.range_of::<BlockStone>();
+/// assert_eq!(block_range, Some(&(1..2)));
+///
+/// // Get the block state id range for cobblestone
+/// let block_range = registry.range_of::<BlockCobblestone>();
+/// assert_eq!(block_range, Some(&(14..15)));
+/// ```
 #[derive(Debug, Default)]
 pub struct InnerRegistry<V: Version> {
-    /// The list of blocks in the registry.
-    pub(crate) blocks: Vec<Box<dyn BlockType<V>>>,
+    /// A collection of blocks inside the registry.
+    pub(crate) dyn_blocks: Vec<Box<dyn BlockType<V>>>,
 
-    /// A map of block states to their index in the block list.
-    pub(crate) block_states: RangeMap<u32, usize>,
+    /// A map of block state ids to block indices.
+    pub(crate) range_map: RangeMap<u32, usize>,
 
-    /// A map of block type ids to their index in the block list.
-    pub(crate) block_info: HashMap<TypeId, u32>,
+    /// A map of block type ids to block id ranges.
+    pub(crate) type_map: HashMap<TypeId, Range<u32>>,
 }
 
 impl<V: Version> InnerRegistry<V> {
@@ -25,95 +56,144 @@ impl<V: Version> InnerRegistry<V> {
     #[must_use]
     pub fn new() -> Self { Self::default() }
 
-    /// Get the block state id range for the given state.
-    #[must_use]
-    pub fn state_range(&self, state: u32) -> Option<&std::ops::Range<u32>> {
-        self.block_states.get_key_value(&state).map(|(range, _)| range)
-    }
-
-    /// Get the relative state id for the given state.
+    /// Gets the block state id range for a block type.
     ///
-    /// This is shorthand for `state - range.start`.
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_20_0::V1_20_0;
+    /// use froglight_world::blocks::{block_list::BlockAir, BlockRegistry};
+    ///
+    /// let registry = BlockRegistry::<V1_20_0>::new_default();
+    /// let registry = registry.read();
+    ///
+    /// let range = registry.range_of::<BlockAir>();
+    /// assert_eq!(range, Some(&(0..1)));
+    /// ```
     #[must_use]
-    pub fn relative_state(&self, state: u32) -> Option<u32> {
-        self.block_states.get_key_value(&state).map(|(range, _)| state - range.start)
+    pub fn range_of<T: BlockType<V>>(&self) -> Option<&Range<u32>> {
+        self.type_map.get(&TypeId::of::<T>())
     }
 
-    /// Get the block state id range for the given block type.
+    /// Gets the relative state id from the block type and block state id.
+    ///
+    /// This is useful if you already know what block type the block state id is
+    /// from.
+    ///
+    /// # Example
+    /// ```rust
+    /// use std::ops::Range;
+    ///
+    /// use froglight_protocol::versions::v1_20_0::V1_20_0;
+    /// use froglight_world::blocks::{
+    ///     attributes::SnowyAttribute, block_list::BlockGrassBlock, BlockExt, BlockRegistry,
+    /// };
+    ///
+    /// let registry = BlockRegistry::<V1_20_0>::new_default();
+    /// let registry = registry.read();
+    ///
+    /// // Ranges are exclusive, so the range `X..X+2` contains the block state ids `X` and `X+1`.
+    /// let Range { start, end } = registry.range_of::<BlockGrassBlock>().unwrap();
+    ///
+    /// // The first block state is the grass block without snow.
+    /// let state_zero = registry.relative_state_of::<BlockGrassBlock>(*start).unwrap();
+    /// let blockstate = BlockGrassBlock::from_relative_state(state_zero);
+    /// assert_eq!(blockstate, Some(BlockGrassBlock { snowy: SnowyAttribute(false) }));
+    ///
+    /// // The second block state is the grass block with snow.
+    /// let state_one = registry.relative_state_of::<BlockGrassBlock>(end - 1).unwrap();
+    /// let blockstate = BlockGrassBlock::from_relative_state(state_one);
+    /// assert_eq!(blockstate, Some(BlockGrassBlock { snowy: SnowyAttribute(true) }));
+    /// ```
     #[must_use]
-    pub fn type_range<T: BlockType<V>>(&self) -> Option<&std::ops::Range<u32>> {
-        self.block_info.get(&TypeId::of::<T>()).and_then(|index| self.state_range(*index))
+    pub fn relative_state_of<T: BlockType<V>>(&self, state: u32) -> Option<u32> {
+        let range = self.range_of::<T>()?;
+        state.checked_sub(range.start)
     }
 
-    /// Get the block state for the given block index.
-    #[must_use]
-    #[allow(clippy::wrong_self_convention)]
-    pub fn get_block_type(&self, index: usize) -> Option<&dyn BlockType<V>> {
-        if let Some(block) = self.blocks.get(index) {
-            Some(block.as_ref())
-        } else {
-            warn!("Attempted to get block with unknown index: {index}");
-            None
-        }
-    }
-
-    /// Get the block index for the given state.
-    #[must_use]
-    pub fn block_index(&self, state: u32) -> Option<usize> {
-        if let Some(index) = self.block_states.get(&state) {
-            Some(*index)
-        } else {
-            warn!("Attempted to get block id for unregistered state: {state}");
-            None
-        }
-    }
-
-    /// Get the block for the given state.
+    /// Gets a dyn block from the registry.
     ///
     /// # Note
-    /// This will always return a trait object pointing towards the block's
-    /// default state.
+    /// This returns a reference to the default block and it's properties
+    /// likely do not match the actual block state.
     ///
-    /// This is useful for when you're sure that the block
-    /// you want doesn't change if the state changes, like the
-    /// [`BlockType<V>::resource_key`] and [`BlockType<V>::is_air`] methods.
+    /// This is useful if you want to get the default block properties,
+    /// or if you want to get properties you are sure are the same for all block
+    /// states.
     ///
-    /// If you need information about a block with a specific state, use
-    /// [`BlockEnum::from_dyn`](`crate::blocks::BlockEnum::from_dyn`).
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_20_0::V1_20_0;
+    /// use froglight_world::blocks::BlockRegistry;
+    ///
+    /// let registry = BlockRegistry::<V1_20_0>::new_default();
+    /// let registry = registry.read();
+    ///
+    /// // `BlockAir` is the first block in the registry, so the block state id is 0.
+    /// let block = registry.get_dyn(0).unwrap();
+    ///
+    /// // The `ResourceKey` for air will always be the same.
+    /// assert_eq!(block.resource_key(), "minecraft:air");
+    /// ```
     #[must_use]
-    pub fn get_block(&self, state: u32) -> Option<&dyn BlockType<V>> {
-        self.block_index(state).and_then(|i| self.get_block_type(i))
+    pub fn get_dyn(&self, state: u32) -> Option<&dyn BlockType<V>> {
+        let block_index = self.range_map.get(&state)?;
+        self.dyn_blocks.get(*block_index).map(AsRef::as_ref)
+    }
+
+    /// Gets a block from the registry.
+    #[must_use]
+    pub fn get_block(&self, state: u32) -> Option<BlockEnum>
+    where
+        V: BlockRegistration,
+    {
+        V::Blocks::get_block(state, self).map(Into::into)
     }
 
     /// Register a block in the registry.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_20_0::V1_20_0;
+    /// use froglight_world::blocks::{
+    ///     block_list::{BlockAir, BlockStone},
+    ///     InnerRegistry,
+    /// };
+    ///
+    /// // Create an empty inner registry
+    /// let mut registry = InnerRegistry::<V1_20_0>::new();
+    ///
+    /// // Register the stone block
+    /// registry.register_block::<BlockStone>();
+    ///
+    /// // Get the block index for the stone block
+    /// let block_range = registry.range_of::<BlockStone>().unwrap();
+    ///
+    /// // Because `BlockStone` is the first block in the registry, the range is `0..1`.
+    /// assert_eq!(block_range, &(0..1));
+    ///
+    /// // `BlockAir` is not in the registry, so the range is `None`.
+    /// assert_eq!(registry.range_of::<BlockAir>(), None);
+    /// ```
     pub fn register_block<B: BlockType<V> + Default>(&mut self) -> &mut Self {
         let block = B::default();
+        let states = block.states();
 
         #[cfg(debug_assertions)]
         {
-            trace!("Registering {:?} block: {}", V::default(), block.resource_key());
+            trace!("Registering block `{}`", block.resource_key());
         }
 
-        // Get the block information
-        let index = self.blocks.len();
-        let states = block.states();
+        // Insert the block into the dyn_blocks
+        let index = self.dyn_blocks.len();
+        self.dyn_blocks.push(Box::new(block));
 
-        // Add the block to the list of blocks.
-        self.blocks.push(Box::new(block));
+        // Use the last range in the range map to calculate the new range
+        let (last_range, _) = self.range_map.last_range_value().unwrap_or((&(0..0), &0));
+        let new_range = last_range.end..(last_range.end + states);
 
-        if let Some((range, _)) = self.block_states.last_range_value() {
-            // Add the block to the block info map.
-            self.block_info.insert(TypeId::of::<B>(), range.end);
-
-            // Add the new block after the last block.
-            self.block_states.insert(range.end..range.end + states, index);
-        } else {
-            // Add the block to the block info map.
-            self.block_info.insert(TypeId::of::<B>(), 0);
-
-            // Add the new block at the start of the map.
-            self.block_states.insert(0..states, index);
-        }
+        // Insert the block id range into the range map and type map
+        self.range_map.insert(new_range.clone(), index);
+        self.type_map.insert(TypeId::of::<B>(), new_range);
 
         self
     }

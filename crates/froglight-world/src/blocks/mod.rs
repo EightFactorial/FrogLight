@@ -10,13 +10,13 @@ pub mod block_list;
 use block_list::BlockEnum;
 
 mod traits;
-pub use traits::{BlockExt, BlockType};
+pub use traits::{BlockEnumTrait, BlockExt, BlockType};
 
 mod reflect;
 pub use reflect::ReflectBlockType;
 
 pub(crate) mod registry;
-pub use registry::BlockRegistry;
+pub use registry::{BlockEnumV1_20_0, BlockRegistry, InnerRegistry};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

@@ -47,5 +47,12 @@ mod world;
 #[cfg(feature = "world")]
 #[proc_macro]
 pub fn frog_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    world::blocks::frog_blocks(input)
+    world::block_list::frog_blocks(input)
+}
+
+/// A macro for generating a version specific block enum.
+#[cfg(feature = "world")]
+#[proc_macro]
+pub fn frog_version_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    world::block_enums::frog_version_blocks(input)
 }
