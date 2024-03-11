@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, ui::FocusPolicy};
 
 mod multiplayer;
 pub use multiplayer::MainMenuMultiplayerButton;
@@ -34,6 +34,7 @@ impl MainMenuButtonNode {
                 width: Val::Px(184.0),
                 height: Val::Px(112.0),
 
+                flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::Center,
                 ..Default::default()
@@ -45,8 +46,8 @@ impl MainMenuButtonNode {
         let node = world
             .spawn((
                 Self,
-                Name::new("MainMenuButtonNode"),
                 bundle,
+                Name::new("MainMenuButtonNode"),
                 Outline::new(Val::Px(1.0), Val::Auto, Color::WHITE),
             ))
             .set_parent(parent)
@@ -56,5 +57,39 @@ impl MainMenuButtonNode {
         MainMenuMultiplayerButton::build(world, node);
         MainMenuSettingsButton::build(world, node);
         MainMenuQuitButton::build(world, node);
+    }
+}
+
+// TODO: Get the correct button size
+fn create_button() -> ButtonBundle {
+    ButtonBundle {
+        style: Style {
+            width: Val::Px(100.0),
+            height: Val::Px(20.0),
+
+            align_content: AlignContent::Center,
+            justify_content: JustifyContent::Center,
+            margin: UiRect::all(Val::Px(4.0)),
+            ..Default::default()
+        },
+        background_color: BackgroundColor(Color::NONE),
+        focus_policy: FocusPolicy::Block,
+        ..Default::default()
+    }
+}
+
+// TODO: Get the actual font
+fn create_text(text: &str, _world: &mut World) -> TextBundle {
+    text_bundle(text, Handle::<Font>::default())
+}
+
+// TODO: Get the correct font size
+fn text_bundle(text: &str, font: Handle<Font>) -> TextBundle {
+    TextBundle {
+        style: Style::default(),
+        text: Text::from_section(text, TextStyle { font, font_size: 20.0, color: Color::WHITE }),
+        background_color: BackgroundColor(Color::NONE),
+        focus_policy: FocusPolicy::Pass,
+        ..Default::default()
     }
 }

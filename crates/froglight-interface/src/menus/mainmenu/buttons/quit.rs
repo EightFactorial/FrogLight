@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use super::{create_button, create_text};
+
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) { app.register_type::<MainMenuQuitButton>(); }
 
@@ -11,9 +13,20 @@ pub struct MainMenuQuitButton;
 impl MainMenuQuitButton {
     pub(crate) fn build(world: &mut World, parent: Entity) {
         // Create the button
-        let bundle = ButtonBundle::default();
+        let button = create_button();
+        let text = create_text("Quit", world);
 
         // Spawn the button
-        world.spawn((Self, Name::new("MainMenuQuitButton"), bundle)).set_parent(parent);
+        world
+            .spawn((
+                Self,
+                button,
+                Name::new("MainMenuQuitButton"),
+                Outline::new(Val::Px(1.0), Val::Auto, Color::GRAY),
+            ))
+            .with_children(|button| {
+                button.spawn(text);
+            })
+            .set_parent(parent);
     }
 }
