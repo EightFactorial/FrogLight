@@ -1,4 +1,4 @@
-//! [`Events`](bevy::prelude::Event) used by all `FrogLight` crates.
+//! [`Events`](bevy_ecs::event::Event) used by all `FrogLight` crates.
 
 use bevy_app::App;
 

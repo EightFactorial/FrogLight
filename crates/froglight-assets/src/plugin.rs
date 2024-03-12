@@ -19,7 +19,7 @@ pub use crate::{
 /// ---
 ///
 /// Does not include the [`AssetSourcePlugin`], as it requires being added
-/// before bevy's [`AssetPlugin`].
+/// before bevy's [`AssetPlugin`](bevy_asset::AssetPlugin).
 #[derive(Default, Clone)]
 pub struct AssetPlugins {
     pub(crate) conditions: Arc<Mutex<Vec<BoxedCondition>>>,

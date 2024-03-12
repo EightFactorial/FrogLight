@@ -13,7 +13,7 @@ use serde::{Deserialize, Serialize};
 
 use super::ConfigFile;
 
-/// A list of paths to [`ResourcePack`]s to load.
+/// A list of paths to [`ResourcePack`](crate::ResourcePack)s to load.
 #[derive(
     Debug,
     Default,
@@ -30,7 +30,7 @@ use super::ConfigFile;
 )]
 #[reflect(Resource)]
 pub struct ResourcePackSettings {
-    /// A list of paths to [`ResourcePack`]s to load.
+    /// A list of paths to [`ResourcePack`](crate::ResourcePack)s to load.
     pub resourcepacks: Vec<ResourcePackPath>,
 }
 

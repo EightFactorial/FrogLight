@@ -1,6 +1,10 @@
 //! use `froglight-client::prelude::*;` to import common types and traits.
 
-pub use froglight_assets::*;
+pub use froglight_assets::{
+    AssetManager, AssetMcMeta, AssetSource, AssetTracker, AtlasManager, FallbackImage,
+    ResourcePack, ResourcePackLoader, ResourcePackLoaderError, ResourcePackSettings,
+    ResourcePackState,
+};
 pub use froglight_core::{common::*, components::*, events::*, resources::*, systemsets::*};
 pub use froglight_interface::{
     materials::*,

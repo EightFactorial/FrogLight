@@ -11,7 +11,7 @@ pub trait NetworkDirection<V: Version, S: State<V>> {
     type Recv: FrogWrite;
 }
 
-/// The clientbound [`Direction`].
+/// The clientbound [`NetworkDirection`].
 ///
 /// Packets are sent from the server to the client.
 pub struct Clientbound;
@@ -25,7 +25,7 @@ where
     type Recv = S::ServerboundPacket;
 }
 
-/// The serverbound [`Direction`].
+/// The serverbound [`NetworkDirection`].
 ///
 /// Packets are sent from the client to the server.
 pub struct Serverbound;

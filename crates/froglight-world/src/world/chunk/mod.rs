@@ -177,7 +177,7 @@ impl Chunk {
         }
     }
 
-    /// Creates a new [`ChunkBlockIterator`] for the chunk.
+    /// Creates a new [`ChunkIdIterator`] for the chunk.
     ///
     /// This starts at the first block in the chunk,
     /// and iterates through all blocks in the chunk.

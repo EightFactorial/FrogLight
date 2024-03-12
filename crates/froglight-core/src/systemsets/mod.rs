@@ -1,4 +1,4 @@
-//! [`SystemSets`](bevy::prelude::SystemSet) used by all `FrogLight` crates.
+//! [`SystemSets`](bevy_ecs::prelude::SystemSet) used by all `FrogLight` crates.
 
 use bevy_app::App;
 

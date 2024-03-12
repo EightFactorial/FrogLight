@@ -5,7 +5,7 @@ use bevy::prelude::*;
 /// The default [`Camera2dBundle`] bundle group.
 ///
 /// Includes:
-/// - [`UiCameraConfig`] with `show_ui` set to `true`
+/// - [`IsDefaultUiCamera`]
 /// - [`Camera2dBundle`] with order set to `1` and color set to [`Color::NONE`]
 #[must_use]
 pub fn default_camera2d_bundle() -> impl Bundle {
@@ -26,7 +26,6 @@ pub fn default_camera2d_bundle() -> impl Bundle {
 /// The default [`Camera3dBundle`] bundle group.
 ///
 /// Includes:
-/// - [`UiCameraConfig`] with `show_ui` set to `false`
 /// - [`Camera3dBundle`] with order set to `0` and color set to [`Color::BLACK`]
 #[must_use]
 pub fn default_camera3d_bundle() -> Camera3dBundle {

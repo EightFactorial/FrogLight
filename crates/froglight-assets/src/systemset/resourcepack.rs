@@ -67,8 +67,8 @@ pub(super) fn finish(conditions: &Mutex<Vec<BoxedCondition>>, app: &mut App) {
 /// After a [`ResourcePackStartLoadingEvent`] is sent, the state transitions to
 /// [`ResourcePackState::Loading`].
 ///
-/// Once all [`ResourcePack`]s are loaded, the state transitions to
-/// [`ResourcePackState::Processing`].
+/// Once all [`ResourcePack`](crate::ResourcePack)s are loaded, the state
+/// transitions to [`ResourcePackState::Processing`].
 ///
 /// Finally, once all assets are processed, the state transitions to
 /// [`ResourcePackState::Ready`].

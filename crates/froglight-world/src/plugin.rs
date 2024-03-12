@@ -2,8 +2,8 @@ use bevy_app::{App, Plugin};
 
 /// The [`Plugin`] for the [`froglight-world`](crate) crate.
 ///
-/// Adds [`Systems`](bevy::ecs::system::System) and
-/// [`Components`](bevy::ecs::component::Component) for managing
+/// Adds [`Systems`](bevy_ecs::system::System) and
+/// [`Components`](bevy_ecs::component::Component) for managing
 /// [`Chunks`](crate::world::Chunk).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct WorldPlugin;

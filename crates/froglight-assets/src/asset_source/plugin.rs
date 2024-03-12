@@ -6,7 +6,8 @@ use bevy_log::info;
 /// Adds the [`AssetSource`](super::AssetSource) resource to the app
 /// and adds the `frog://` asset source.
 ///
-/// Must be added to the [`App`] before bevy's [`AssetPlugin`].
+/// Must be added to the [`App`] before bevy's
+/// [`AssetPlugin`](bevy_asset::AssetPlugin).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssetSourcePlugin(PathBuf);
 

@@ -2,7 +2,8 @@ use bevy_app::{App, Plugin};
 
 /// The [`Plugin`] for the [`froglight-core`](crate) crate.
 ///
-/// Adds [`Events`](Event) and [`Schedules`](Schedule)
+/// Adds [`Events`](bevy_ecs::event::Event) and
+/// [`Schedules`](bevy_ecs::prelude::Schedule)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct CorePlugin;
 

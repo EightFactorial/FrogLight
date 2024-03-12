@@ -1,4 +1,5 @@
-//! [`Components`](bevy::prelude::Component) used by all `FrogLight` crates.
+//! [`Components`](bevy_ecs::component::Component) used by all `FrogLight`
+//! crates.
 
 use bevy_app::App;
 

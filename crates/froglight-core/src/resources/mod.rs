@@ -1,4 +1,4 @@
-//! [`Resources`](bevy::prelude::Resource) used by all `FrogLight` crates.
+//! [`Resources`](bevy_ecs::prelude::Resource) used by all `FrogLight` crates.
 
 use bevy_app::App;
 
