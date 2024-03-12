@@ -111,7 +111,7 @@ fn impl_blockenum(
 
         match_tokens.extend(
             quote! {
-                type_id if type_id == crate::blocks::block_list::#block_struct::type_info().type_id() => {
+                type_id if type_id == std::any::TypeId::of::<crate::blocks::block_list::#block_struct>() => {
                     let relative = registry.relative_state_of::<#block_struct>(state)?;
                     Some(Self::#block(crate::blocks::block_list::#block_struct::from_relative_state(relative)?))
                 }

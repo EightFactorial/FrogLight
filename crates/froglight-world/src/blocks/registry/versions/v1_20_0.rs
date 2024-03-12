@@ -1,4 +1,3 @@
-use bevy_reflect::Typed;
 use froglight_core::common::ResourceKey;
 use froglight_macros::frog_version_blocks;
 use froglight_protocol::versions::v1_20_0::V1_20_0;

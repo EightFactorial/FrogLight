@@ -56,3 +56,10 @@ pub fn frog_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 pub fn frog_version_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     world::block_enums::frog_version_blocks(input)
 }
+
+/// A macro for generating block attributes.
+#[cfg(feature = "world")]
+#[proc_macro]
+pub fn frog_block_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    world::block_attributes::frog_block_attributes(input)
+}
