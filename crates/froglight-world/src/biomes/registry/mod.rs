@@ -77,6 +77,9 @@ impl<V: BiomeRegistration> FromWorld for BiomeRegistry<V> {
 
                 // Add the registration to the app type registry
                 registry.write().add_registration(registration);
+
+                // Register all biomes with type data
+                V::register_reflect(world);
             }
         }
 

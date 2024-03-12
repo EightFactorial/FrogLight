@@ -61,6 +61,7 @@ fn impl_biomeregistration(
     tokens: &mut TokenStream2,
 ) {
     let mut register_tokens = TokenStream2::new();
+    let mut reflect_tokens = TokenStream2::new();
 
     for biome in biomes {
         let biome_struct = Ident::new(&format!("Biome{biome}"), biome.span());
@@ -68,6 +69,13 @@ fn impl_biomeregistration(
         register_tokens.extend(
             quote! {
                 .register_biome::<crate::biomes::biome_list::#biome_struct>()
+            }
+            .into_token_stream(),
+        );
+
+        reflect_tokens.extend(
+            quote! {
+                registry.register_type_data::<crate::biomes::biome_list::#biome_struct, crate::biomes::reflect::ReflectBiomeType<Self>>();
             }
             .into_token_stream(),
         );
@@ -90,6 +98,14 @@ fn impl_biomeregistration(
                 registry
                 #register_tokens
                 ;
+            }
+
+            fn register_reflect(world: &mut bevy_ecs::world::World) {
+                let Some(registry) = world.get_resource::<bevy_ecs::prelude::AppTypeRegistry>() else { return; };
+                bevy_log::debug!("Registering ReflectBiomeType for {:?} biomes.", #version);
+
+                let mut registry = registry.write();
+                #reflect_tokens
             }
         }
     });

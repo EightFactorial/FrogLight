@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use bevy_ecs::world::World;
 use bevy_reflect::Reflect;
 use froglight_core::common::ResourceKey;
 use froglight_protocol::traits::Version;
@@ -70,6 +71,9 @@ pub trait BlockRegistration: Version {
 
     /// Register the default blocks.
     fn register_default(registry: &mut InnerBlockRegistry<Self>);
+
+    /// Register versioned block reflecton.
+    fn register_reflect(world: &mut World);
 }
 
 /// A collection of blocks specific to a version.

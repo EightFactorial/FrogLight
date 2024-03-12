@@ -76,6 +76,9 @@ impl<V: BlockRegistration> FromWorld for BlockRegistry<V> {
 
                 // Add the registration to the app type registry
                 registry.write().add_registration(registration);
+
+                // Register all blocks with type data
+                V::register_reflect(world);
             }
         }
 

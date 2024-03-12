@@ -61,6 +61,7 @@ fn impl_blockregistration(
     tokens: &mut TokenStream2,
 ) {
     let mut register_tokens = TokenStream2::new();
+    let mut reflect_tokens = TokenStream2::new();
 
     for block in blocks {
         let block_struct = Ident::new(&format!("Block{block}"), block.span());
@@ -68,6 +69,13 @@ fn impl_blockregistration(
         register_tokens.extend(
             quote! {
                 .register_block::<crate::blocks::block_list::#block_struct>()
+            }
+            .into_token_stream(),
+        );
+
+        reflect_tokens.extend(
+            quote! {
+                registry.register_type_data::<crate::blocks::block_list::#block_struct, crate::blocks::reflect::ReflectBlockType<Self>>();
             }
             .into_token_stream(),
         );
@@ -92,6 +100,14 @@ fn impl_blockregistration(
                     registry
                     #register_tokens
                     ;
+                }
+
+                fn register_reflect(world: &mut bevy_ecs::world::World) {
+                    let Some(registry) = world.get_resource::<bevy_ecs::prelude::AppTypeRegistry>() else { return; };
+                    bevy_log::debug!("Registering ReflectBlockType for {:?} blocks.", #version);
+
+                    let mut registry = registry.write();
+                    #reflect_tokens
                 }
             }
         }

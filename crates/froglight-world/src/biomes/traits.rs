@@ -1,5 +1,6 @@
 use std::fmt::Debug;
 
+use bevy_ecs::world::World;
 use bevy_reflect::Reflect;
 use froglight_core::common::ResourceKey;
 use froglight_protocol::traits::Version;
@@ -21,6 +22,9 @@ pub trait BiomeRegistration: Version {
 
     /// Register the default biomes.
     fn register_default(registry: &mut InnerBiomeRegistry<Self>);
+
+    /// Register versioned biome reflecton.
+    fn register_reflect(world: &mut World);
 }
 
 /// A collection of biomes specific to a version.
