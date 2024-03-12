@@ -9,7 +9,9 @@ pub(crate) mod plugin;
 
 pub(crate) mod buttons;
 pub use buttons::{
-    MainMenuButtonNode, MainMenuMultiplayerButton, MainMenuQuitButton, MainMenuSettingsButton,
+    MainMenuButtonNode, MainMenuMultiplayerButton, MainMenuMultiplayerButtonEvent,
+    MainMenuQuitButton, MainMenuQuitButtonEvent, MainMenuSettingsButton,
+    MainMenuSettingsButtonEvent,
 };
 
 pub(crate) mod logo;
@@ -25,6 +27,8 @@ use systemset::MainMenuUpdateSet;
 pub(crate) mod text;
 pub use text::{MainMenuNoticeText, MainMenuVersionText};
 
+use super::InterfaceMenuState;
+
 #[doc(hidden)]
 fn build(app: &mut App) {
     app.register_type::<MainMenuRootNode>();
@@ -34,6 +38,20 @@ fn build(app: &mut App) {
         OnEnter(ResourcePackState::Processing),
         MainMenuRootNode::build_mainmenu
             .run_if(not(any_with_component::<MainMenuRootNode>))
+            .in_set(MainMenuUpdateSet),
+    );
+
+    // Show and hide the main menu
+    app.add_systems(
+        OnEnter(InterfaceMenuState::MainMenu),
+        MainMenuRootNode::show_mainmenu
+            .run_if(any_with_component::<MainMenuRootNode>)
+            .in_set(MainMenuUpdateSet),
+    );
+    app.add_systems(
+        OnExit(InterfaceMenuState::MainMenu),
+        MainMenuRootNode::hide_mainmenu
+            .run_if(any_with_component::<MainMenuRootNode>)
             .in_set(MainMenuUpdateSet),
     );
 
@@ -85,5 +103,21 @@ impl MainMenuRootNode {
         MainMenuButtonNode::build(world, root);
         MainMenuVersionText::build(world, root);
         MainMenuNoticeText::build(world, root);
+    }
+
+    /// Shows the main menu.
+    fn show_mainmenu(mut query: Query<&mut Visibility, With<Self>>) {
+        debug!("Showing MainMenuRootNode");
+        for mut vis in &mut query {
+            *vis = Visibility::Inherited;
+        }
+    }
+
+    /// Hides the main menu.
+    fn hide_mainmenu(mut query: Query<&mut Visibility, With<Self>>) {
+        debug!("Hiding MainMenuRootNode");
+        for mut vis in &mut query {
+            *vis = Visibility::Hidden;
+        }
     }
 }

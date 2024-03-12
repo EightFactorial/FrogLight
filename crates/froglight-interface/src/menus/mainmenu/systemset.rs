@@ -3,7 +3,7 @@ use froglight_core::resources::MainMenuEnable;
 
 use crate::menus::{
     multiplayermenu::systemset::MultiplayerMenuUpdateSet,
-    settingsmenu::systemset::SettingsMenuUpdateSet, InterfaceMenuUpdateSet,
+    settingsmenu::systemset::SettingsMenuUpdateSet, InterfaceMenuState, InterfaceMenuUpdateSet,
 };
 
 #[doc(hidden)]
@@ -12,6 +12,7 @@ pub(super) fn build(app: &mut App) {
         Update,
         MainMenuUpdateSet
             .run_if(MainMenuEnable::is_enabled)
+            .run_if(in_state(InterfaceMenuState::MainMenu))
             .ambiguous_with(MultiplayerMenuUpdateSet)
             .ambiguous_with(SettingsMenuUpdateSet)
             .in_set(InterfaceMenuUpdateSet),

@@ -11,6 +11,10 @@ pub use settings::MainMenuSettingsButton;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    app.add_event::<MainMenuMultiplayerButtonEvent>()
+        .add_event::<MainMenuSettingsButtonEvent>()
+        .add_event::<MainMenuQuitButtonEvent>();
+
     multiplayer::build(app);
     quit::build(app);
     settings::build(app);
@@ -60,7 +64,60 @@ impl MainMenuButtonNode {
     }
 }
 
-// TODO: Get the correct button size
+impl MainMenuButtonNode {
+    /// Highlights the buttons of the main menu when the mouse hovers over them.
+    #[allow(clippy::type_complexity)]
+    fn _highlight_buttons(
+        query_container_buttons: Query<&Children, With<Self>>,
+        query_button_children: Query<
+            (&Children, &Interaction),
+            (With<Button>, Changed<Interaction>),
+        >,
+        mut query_atlas: Query<&mut TextureAtlas>,
+    ) {
+        let Ok(node_children) = query_container_buttons.get_single() else {
+            warn!("MainMenuButtonNode either not found or has multiple entities");
+            return;
+        };
+
+        // For each child of the button container
+        for node_child in node_children {
+            // If the child is a button and it's interaction has changed
+            if let Ok((button_children, button_interaction)) =
+                query_button_children.get(*node_child)
+            {
+                // TODO: Use the correct atlas indexes
+                let _atlas_index = match button_interaction {
+                    Interaction::Pressed => 0,
+                    Interaction::Hovered => 1,
+                    Interaction::None => 2,
+                };
+
+                // For each child of the button
+                for button_child in button_children {
+                    // If the child has a texture atlas
+                    if let Ok(mut _atlas) = query_atlas.get_mut(*button_child) {
+                        // TODO: Change the texture atlas index
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// An [`Event`] sent when the multiplayer button of the main menu is clicked.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Event)]
+pub struct MainMenuMultiplayerButtonEvent;
+
+/// An [`Event`] sent when the settings button of the main menu is clicked.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Event)]
+pub struct MainMenuSettingsButtonEvent;
+
+/// An [`Event`] sent when the quit button of the main menu is clicked.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Event)]
+pub struct MainMenuQuitButtonEvent;
+
+// TODO: Find the correct button size
 fn create_button() -> ButtonBundle {
     ButtonBundle {
         style: Style {
@@ -78,16 +135,16 @@ fn create_button() -> ButtonBundle {
     }
 }
 
-// TODO: Get the actual font
+// TODO: Use the actual font
 fn create_text(text: &str, _world: &mut World) -> TextBundle {
     text_bundle(text, Handle::<Font>::default())
 }
 
-// TODO: Get the correct font size
+// TODO: Use the correct font size
 fn text_bundle(text: &str, font: Handle<Font>) -> TextBundle {
     TextBundle {
         style: Style::default(),
-        text: Text::from_section(text, TextStyle { font, font_size: 20.0, color: Color::WHITE }),
+        text: Text::from_section(text, TextStyle { font, font_size: 18.0, color: Color::WHITE }),
         background_color: BackgroundColor(Color::NONE),
         focus_policy: FocusPolicy::Pass,
         ..Default::default()

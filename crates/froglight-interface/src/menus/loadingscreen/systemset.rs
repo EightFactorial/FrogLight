@@ -43,7 +43,6 @@ pub(super) fn build(app: &mut App) {
                 .run_if(in_state(LoadingScreenStateSet::Shown))
                 .run_if(any_with_component::<LoadingScreenRootNode>),
         )
-            .chain()
             .in_set(LoadingScreenUpdateSet),
     );
 }

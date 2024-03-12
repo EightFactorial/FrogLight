@@ -59,7 +59,6 @@ trait ConfigFile: Default + Resource + GetTypeRegistration + Serialize + Deseria
             save_config_on_exit::<Self>
                 .run_if(resource_exists::<Self>)
                 .run_if(on_event::<AppExit>())
-                .run_if(run_once())
                 .in_set(AssetPostUpdateSet),
         );
 
