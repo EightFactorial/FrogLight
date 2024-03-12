@@ -44,7 +44,7 @@ jobs:
           tool: clippy-sarif,sarif-fmt
       # Checkout the repository
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4
       # Restore/Setup the cache
       - name: Cache
         uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
