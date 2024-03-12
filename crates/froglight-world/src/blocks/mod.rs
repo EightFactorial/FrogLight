@@ -16,7 +16,7 @@ mod reflect;
 pub use reflect::ReflectBlockType;
 
 pub(crate) mod registry;
-pub use registry::{BlockEnumV1_20_0, BlockRegistry, InnerRegistry};
+pub use registry::{BlockEnumV1_20_0, BlockRegistry, InnerBlockRegistry};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

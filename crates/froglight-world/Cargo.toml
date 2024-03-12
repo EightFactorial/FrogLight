@@ -43,7 +43,6 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", featur
 futures-lite = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
-phf = { workspace = true, features = ["macros"] }
 rangemap = { version = "1.5.1", features = ["nightly", "const_fn"] }
 serde = { workspace = true }
 simdnbt = { workspace = true }

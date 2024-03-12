@@ -42,7 +42,7 @@ use crate::blocks::{
 /// assert_eq!(block_state, BlockEnum::Cobblestone(BlockCobblestone));
 /// ```
 #[derive(Debug, Default)]
-pub struct InnerRegistry<V: Version> {
+pub struct InnerBlockRegistry<V: Version> {
     /// A collection of blocks inside the registry.
     pub(crate) dyn_blocks: Vec<Box<dyn BlockType<V>>>,
 
@@ -53,7 +53,7 @@ pub struct InnerRegistry<V: Version> {
     pub(crate) type_map: HashMap<TypeId, Range<u32>>,
 }
 
-impl<V: Version> InnerRegistry<V> {
+impl<V: Version> InnerBlockRegistry<V> {
     /// Creates a new empty registry.
     #[must_use]
     #[inline]
@@ -115,7 +115,7 @@ impl<V: Version> InnerRegistry<V> {
         state.checked_sub(range.start)
     }
 
-    /// Gets a dyn block from the registry.
+    /// Gets a `dyn block` from the registry.
     ///
     /// # Note
     /// This returns a reference to the default block and it's properties
@@ -183,11 +183,11 @@ impl<V: Version> InnerRegistry<V> {
     /// use froglight_protocol::versions::v1_20_0::V1_20_0;
     /// use froglight_world::blocks::{
     ///     block_list::{BlockAir, BlockStone},
-    ///     InnerRegistry,
+    ///     InnerBlockRegistry,
     /// };
     ///
     /// // Create an empty inner registry
-    /// let mut registry = InnerRegistry::<V1_20_0>::new();
+    /// let mut registry = InnerBlockRegistry::<V1_20_0>::new();
     ///
     /// // Register the stone block
     /// registry.register_block::<BlockStone>();

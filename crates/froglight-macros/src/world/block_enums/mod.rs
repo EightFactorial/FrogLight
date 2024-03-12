@@ -63,7 +63,7 @@ fn impl_blockregistration(
     let mut register_tokens = TokenStream2::new();
 
     for block in blocks {
-        let block_struct = Ident::new(&format!("Block{}", block), block.span());
+        let block_struct = Ident::new(&format!("Block{block}"), block.span());
 
         register_tokens.extend(
             quote! {
@@ -88,7 +88,7 @@ fn impl_blockregistration(
             impl BlockRegistration for #version {
                 type Blocks = #enum_ident;
 
-                fn register_default(registry: &mut InnerRegistry<Self>) {
+                fn register_default(registry: &mut crate::blocks::registry::InnerBlockRegistry<Self>) {
                     registry
                     #register_tokens
                     ;
@@ -107,7 +107,7 @@ fn impl_blockenum(
 ) {
     let mut match_tokens = TokenStream2::new();
     for block in blocks {
-        let block_struct = Ident::new(&format!("Block{}", block), block.span());
+        let block_struct = Ident::new(&format!("Block{block}"), block.span());
 
         match_tokens.extend(
             quote! {
@@ -123,7 +123,7 @@ fn impl_blockenum(
     tokens.extend(
         quote! {
             impl crate::blocks::traits::BlockEnumTrait<#version> for #enum_ident {
-                fn get_block(state: u32, registry: &InnerRegistry<#version>) -> Option<Self> {
+                fn get_block(state: u32, registry: &crate::blocks::registry::InnerBlockRegistry<#version>) -> Option<Self> {
                     let dyn_block = registry.get_dyn(state)?;
                     match dyn_block.type_id() {
                         #match_tokens

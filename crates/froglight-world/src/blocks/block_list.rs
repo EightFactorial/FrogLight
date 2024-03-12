@@ -4,8 +4,6 @@ use froglight_macros::frog_blocks;
 
 use super::attributes::SnowyAttribute;
 
-// TODO: Move `BlockEnum::from_dyn` somewhere else to avoid
-// every block needing a where clause
 frog_blocks! {
     Air,
     Stone,

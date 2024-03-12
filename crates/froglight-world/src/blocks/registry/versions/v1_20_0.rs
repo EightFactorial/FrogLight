@@ -9,7 +9,6 @@ use crate::blocks::{
         BlockGranite, BlockGrassBlock, BlockPodzol, BlockPolishedAndesite, BlockPolishedDiorite,
         BlockPolishedGranite, BlockStone,
     },
-    registry::InnerRegistry,
     traits::{BlockExt, BlockRegistration},
     BlockType,
 };

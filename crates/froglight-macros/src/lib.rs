@@ -50,11 +50,25 @@ pub fn frog_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     world::block_list::frog_blocks(input)
 }
 
+/// A macro for generating a biome structs and a biome enum.
+#[cfg(feature = "world")]
+#[proc_macro]
+pub fn frog_biomes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    world::biome_list::frog_biomes(input)
+}
+
 /// A macro for generating a version specific block enum.
 #[cfg(feature = "world")]
 #[proc_macro]
 pub fn frog_version_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     world::block_enums::frog_version_blocks(input)
+}
+
+/// A macro for generating a version specific biome enum.
+#[cfg(feature = "world")]
+#[proc_macro]
+pub fn frog_version_biomes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    world::biome_enums::frog_version_biomes(input)
 }
 
 /// A macro for generating block attributes.
