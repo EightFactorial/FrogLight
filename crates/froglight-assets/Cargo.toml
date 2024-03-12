@@ -45,7 +45,7 @@ thiserror = { workspace = true }
 
 # Settings dependencies
 serde = { workspace = true, features = ["derive"] }
-toml = "0.8.10"
+toml = "0.8.11"
 
 [features]
 default = ["asset_manager"]
