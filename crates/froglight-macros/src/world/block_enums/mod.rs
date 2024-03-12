@@ -26,11 +26,11 @@ pub(crate) fn frog_version_blocks(input: TokenStream) -> TokenStream {
 
 /// Creates a block enum from a version and a list of blocks.
 fn create_block_enum(version: &Ident, blocks: &[Ident], tokens: &mut TokenStream2) -> Ident {
-    let ident = Ident::new(&format!("BlockEnum{}", version.to_string()), Span::call_site());
+    let ident = Ident::new(&format!("BlockEnum{version}"), Span::call_site());
     let mut variants = Punctuated::new();
 
     for block in blocks {
-        let block_struct = Ident::new(&format!("Block{}", block), block.span());
+        let block_struct = Ident::new(&format!("Block{block}"), block.span());
 
         variants.push(syn::parse_quote! { #block(crate::blocks::block_list::#block_struct) });
     }
