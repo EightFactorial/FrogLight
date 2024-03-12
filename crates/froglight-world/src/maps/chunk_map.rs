@@ -1,4 +1,4 @@
-//! A map of [`ChunkPositions`](ChunkPos) to [`ChunkEntities`](ChunkEntity).
+//! A map of `ChunkPositions` to [`ChunkEntities`](ChunkEntity).
 
 use bevy_reflect::Reflect;
 use hashbrown::HashMap;
@@ -7,8 +7,8 @@ use super::ChunkEntity;
 
 /// A map of `ChunkPositions` to [`ChunkEntities`](ChunkEntity).
 ///
-/// Used as a part of the [`WorldMap`](crate::map::WorldMap) to track which
-/// [`WorldType`](crate::map::WorldType) a [`ChunkEntity`] belongs to.
+/// Used as a part of the [`WorldMap`](super::WorldMap) to track which
+/// [`WorldType`](super::WorldType) a [`ChunkEntity`] belongs to.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
 pub struct WorldChunkMap(HashMap<u32, ChunkEntity>);
 

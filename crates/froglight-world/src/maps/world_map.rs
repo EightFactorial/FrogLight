@@ -1,13 +1,15 @@
 //! A set of Worlds
 
-use bevy_ecs::system::Resource;
+use bevy_ecs::{reflect::ReflectResource, system::Resource};
+use bevy_reflect::Reflect;
 use hashbrown::HashMap;
 
 use super::{ChunkEntity, WorldChunkMap, WorldType};
 
 /// A set of worlds.
-#[derive(Debug, Clone, PartialEq, Eq, Resource)]
-pub struct WorldMap(HashMap<WorldType, WorldChunkMap>);
+#[derive(Debug, Clone, PartialEq, Eq, Resource, Reflect)]
+#[reflect(Resource)]
+pub struct WorldMap(#[reflect(ignore)] HashMap<WorldType, WorldChunkMap>);
 
 // By default, reserve space for the 3 vanilla worlds.
 impl Default for WorldMap {

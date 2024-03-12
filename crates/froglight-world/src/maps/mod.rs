@@ -16,5 +16,8 @@ pub use world_type::WorldType;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.register_type::<ChunkEntity>().register_type::<WorldChunkMap>();
+    app.register_type::<ChunkEntity>()
+        .register_type::<WorldChunkMap>()
+        .register_type::<WorldType>()
+        .register_type::<WorldMap>();
 }

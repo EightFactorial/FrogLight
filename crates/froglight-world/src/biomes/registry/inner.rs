@@ -35,19 +35,19 @@ impl<V: Version> InnerBiomeRegistry<V> {
     /// Gets a `dyn biome` from the registry.
     #[must_use]
     #[inline]
-    pub fn get_dyn(&self, biome_id: u32) -> Option<&dyn BiomeType<V>> {
-        let biome_id = usize::try_from(biome_id).ok()?;
+    pub fn get_dyn(&self, biome: u32) -> Option<&dyn BiomeType<V>> {
+        let biome_id = usize::try_from(biome).ok()?;
         self.dyn_biomes.get(biome_id).map(AsRef::as_ref)
     }
 
     /// Gets a biome from the registry.
     #[must_use]
     #[inline]
-    pub fn get_biome(&self, state: u32) -> Option<BiomeEnum>
+    pub fn get_biome(&self, biome: u32) -> Option<BiomeEnum>
     where
         V: BiomeRegistration,
     {
-        V::Biomes::get_biome(state, self).map(Into::into)
+        V::Biomes::get_biome(biome, self).map(Into::into)
     }
 
     /// Register a biome into the biome registry.

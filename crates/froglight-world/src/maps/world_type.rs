@@ -1,3 +1,4 @@
+use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use froglight_core::common::ResourceKey;
 use serde::{Deserialize, Serialize};
@@ -5,8 +6,9 @@ use serde::{Deserialize, Serialize};
 /// The type of world.
 ///
 /// By default, the world type is [`WorldType::Overworld`].
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(untagged)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect, Serialize, Deserialize)]
+#[serde(untagged, rename_all = "lowercase")]
+#[reflect(Serialize, Deserialize)]
 pub enum WorldType {
     /// The Overworld
     #[default]

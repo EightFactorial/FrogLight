@@ -4,7 +4,7 @@ use derive_more::{Deref, DerefMut, From, Into};
 
 /// A [`ChunkEntity`] is an [`Entity`] that holds a
 /// [`Chunk`](crate::world::Chunk)
-/// [`Component`](bevy::ecs::component::Component).
+/// [`Component`](bevy_ecs::component::Component).
 ///
 /// Just a wrapper around [`Entity`].
 #[derive(

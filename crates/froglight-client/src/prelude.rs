@@ -14,7 +14,8 @@ pub use froglight_network::{
 };
 pub use froglight_protocol::{states::*, traits::*, versions};
 pub use froglight_world::{
+    biomes::{biome_list as biomes, BiomeRegistry, BiomeType, ReflectBiomeType},
     blocks::{block_list as blocks, BlockRegistry, BlockType, ReflectBlockType},
-    maps::*,
+    maps::{ChunkEntity, WorldChunkMap, WorldMap, WorldType},
     world::{Chunk, Section},
 };
