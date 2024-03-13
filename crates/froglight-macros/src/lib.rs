@@ -1,8 +1,12 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+// --- Asset Macros ---
+
 #[cfg(feature = "assets")]
 mod assets;
+
+// --- Protocol Macros ---
 
 #[cfg(feature = "protocol")]
 mod protocol;
@@ -40,40 +44,35 @@ pub fn frog_state(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     protocol::frog_state(input)
 }
 
+// --- World Macros ---
+
 #[cfg(feature = "world")]
 mod world;
 
-/// A macro for generating a block structs and a block enum.
 #[cfg(feature = "world")]
-#[proc_macro]
-pub fn frog_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    world::block_list::frog_blocks(input)
+macro_rules! world_macro {
+    ($name:ident, $fn:ident) => {
+        #[allow(missing_docs)]
+        #[cfg(feature = "world")]
+        #[proc_macro]
+        pub fn $fn(input: proc_macro::TokenStream) -> proc_macro::TokenStream { world::$fn(input) }
+    };
 }
 
-/// A macro for generating a biome structs and a biome enum.
 #[cfg(feature = "world")]
-#[proc_macro]
-pub fn frog_biomes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    world::biome_list::frog_biomes(input)
-}
+world_macro!(frog_blocks, frog_blocks);
+#[cfg(feature = "world")]
+world_macro!(frog_biomes, frog_biomes);
+#[cfg(feature = "world")]
+world_macro!(frog_version_blocks, frog_version_blocks);
+#[cfg(feature = "world")]
+world_macro!(frog_version_biomes, frog_version_biomes);
+#[cfg(feature = "world")]
+world_macro!(frog_block_attributes, frog_block_attributes);
 
-/// A macro for generating a version specific block enum.
+/// A macro for counting the number of states a block attribute has
 #[cfg(feature = "world")]
-#[proc_macro]
-pub fn frog_version_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    world::block_enums::frog_version_blocks(input)
-}
-
-/// A macro for generating a version specific biome enum.
-#[cfg(feature = "world")]
-#[proc_macro]
-pub fn frog_version_biomes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    world::biome_enums::frog_version_biomes(input)
-}
-
-/// A macro for generating block attributes.
-#[cfg(feature = "world")]
-#[proc_macro]
-pub fn frog_block_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    world::block_attributes::frog_block_attributes(input)
+#[proc_macro_derive(BlockAttribute)]
+pub fn frog_attribute_states(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    world::frog_attribute_states(input)
 }

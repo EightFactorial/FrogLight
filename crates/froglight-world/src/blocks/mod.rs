@@ -10,7 +10,7 @@ pub mod block_list;
 use block_list::BlockEnum;
 
 mod traits;
-pub use traits::{BlockExt, BlockType};
+pub use traits::{BlockAttribute, BlockExt, BlockType};
 
 mod reflect;
 pub use reflect::ReflectBlockType;

@@ -83,3 +83,9 @@ pub trait BlockEnumTrait<V: BlockRegistration>: Sized + Debug + Reflect {
     #[must_use]
     fn get_block(state: u32, registry: &InnerBlockRegistry<V>) -> Option<Self>;
 }
+
+/// A block attribute.
+pub trait BlockAttribute {
+    /// The total number of states the block attribute has.
+    const STATES: u32;
+}

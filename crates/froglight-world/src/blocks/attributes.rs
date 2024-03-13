@@ -638,3 +638,23 @@ frog_block_attributes! {
     },
     HasBottle1(pub bool),
 }
+
+#[test]
+fn attribute_state_count() {
+    use crate::blocks::traits::BlockAttribute;
+
+    assert_eq!(<SnowyAttribute as BlockAttribute>::STATES, 2);
+    assert_eq!(<WaterloggedAttribute as BlockAttribute>::STATES, 2);
+    assert_eq!(<HasRecordAttribute as BlockAttribute>::STATES, 2);
+
+    assert_eq!(<ThicknessAttribute as BlockAttribute>::STATES, 5);
+
+    assert_eq!(<Age25Attribute as BlockAttribute>::STATES, 26);
+    assert_eq!(<Age15Attribute as BlockAttribute>::STATES, 16);
+    assert_eq!(<Age7Attribute as BlockAttribute>::STATES, 8);
+    assert_eq!(<Age5Attribute as BlockAttribute>::STATES, 6);
+    assert_eq!(<Age4Attribute as BlockAttribute>::STATES, 5);
+    assert_eq!(<Age3Attribute as BlockAttribute>::STATES, 4);
+    assert_eq!(<Age2Attribute as BlockAttribute>::STATES, 3);
+    assert_eq!(<Age1Attribute as BlockAttribute>::STATES, 2);
+}

@@ -74,7 +74,7 @@ impl From<AttributeDeclaration> for Item {
         match value.fields {
             AttributeFields::Struct(fields) => Item::Struct(ItemStruct {
                 attrs: vec![
-                    syn::parse_quote! { #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
+                    syn::parse_quote! { #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect, froglight_macros::BlockAttribute)] },
                 ],
                 vis: Visibility::Public(Token![pub](Span::call_site())),
                 struct_token: Token![struct](Span::call_site()),
@@ -85,7 +85,7 @@ impl From<AttributeDeclaration> for Item {
             }),
             AttributeFields::Enum(variants) => Item::Enum(ItemEnum {
                 attrs: vec![
-                    syn::parse_quote! { #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
+                    syn::parse_quote! { #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect, froglight_macros::BlockAttribute)] },
                 ],
                 vis: Visibility::Public(Token![pub](Span::call_site())),
                 enum_token: Token![enum](Span::call_site()),
