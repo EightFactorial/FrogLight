@@ -1,2 +1,5 @@
-// Re-export all of froglight_client
+#![doc = include_str!("README.md")]
+#![cfg_attr(docsrs, feature(doc_auto_cfg))]
+
+// Re-export the client.
 pub use froglight_client::*;
