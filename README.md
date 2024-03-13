@@ -68,7 +68,7 @@ Using the [Bevy Engine](https://github.com/bevyengine/bevy/), plugins are very e
 
 ```rust
 use bevy::{asset::embedded_asset, prelude::*};
-use froglight_client::plugins::{AppPlugins, LoadingPlugin};
+use froglight::plugins::{AppPlugins, LoadingPlugin};
 
 fn main() {
     // Create a new bevy App

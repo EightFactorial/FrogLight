@@ -15,7 +15,7 @@ build-release: (build-profile "release")
 # Compile build with specified profile
 [private]
 build-profile profile="dev" args="":
-  cargo build --profile {{profile}} {{args}}
+  cargo build --profile {{profile}} --features mimalloc {{args}}
 
 # ---- Run Recipes ----
 
@@ -29,7 +29,7 @@ run-release: (run-profile "release")
 # Run build with specified profile
 [private]
 run-profile profile="dev" args="":
-  cargo run --profile {{profile}} {{args}}
+  cargo run --profile {{profile}} --features mimalloc {{args}}
 
 # ---- Test Recipes ----
 
@@ -43,9 +43,13 @@ test: (nextest) (doc-test)
 nextest: (fetch-nextest)
   cargo nextest run --workspace
 
+# Get number of threads
+threads := `nproc --all`
+
 # Run all doc-tests
-doc-test:
-  cargo test --doc --workspace
+# Uses at most 4 threads
+doc-test: 
+  cargo test --doc --workspace -- --test-threads=$(( {{threads}} > 4 ? 4 : {{threads}} ))
 
 # ---- Tool Recipes ----
 

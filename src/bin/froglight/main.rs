@@ -1,4 +1,4 @@
-use bevy::app::App;
+use bevy::{app::App, log::debug};
 use froglight_client::plugins::AppPlugins;
 
 /// The global allocator.
@@ -14,6 +14,17 @@ fn main() {
 
     // Add both the FrogLight plugins and the Bevy plugins.
     app.add_plugins(AppPlugins);
+
+    #[cfg(feature = "mimalloc")]
+    {
+        // Log that we are using mimalloc.
+        debug!("Using mimalloc as the global allocator");
+    }
+    #[cfg(not(feature = "mimalloc"))]
+    {
+        // Log that we are using the default allocator.
+        debug!("Using the system default global allocator");
+    }
 
     // Run the application.
     app.run();

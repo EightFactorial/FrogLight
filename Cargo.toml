@@ -124,8 +124,17 @@ bevy = { workspace = true }
 froglight-client = { version = "0.1.0", path = "crates/froglight-client" }
 mimalloc = { version = "0.1.39", optional = true }
 
+[[bin]]
+name = "froglight"
+path = "src/bin/froglight/main.rs"
+
+[lib]
+name = "froglight"
+path = "src/lib/froglight/lib.rs"
+
 [features]
-default = ["mimalloc"]
+default = []
 
 # Use mimalloc as the global allocator
+# Only applies to the froglight binary
 mimalloc = ["dep:mimalloc"]
