@@ -11,12 +11,10 @@
 
 FrogLight is currently in a **very early alpha state**. Not everything is functional yet!
 
-Because FrogLight does not come with any assets, you will need to provide your own resource packs!
-
-
+This project does not include any assets, all assets must be loaded from resource packs!
 
 > [!Warning]
-> Modded clients, including this one, will get you **banned** from servers with anticheat!
+> Modded clients will get you **banned** from servers with anticheat!
 > 
 > You have been warned!
 
@@ -28,30 +26,15 @@ FrogLight is multiprotocol and supports release versions 1.20.0+, including:
 - ~1.20.3 and 1.20.4~ (765)
 
 > [!Note]
-> Version support will be added after core client functions
+> Support for more versions will be added after core features and functionality.
 > 
-> Multi-protocol is already built in, but packets have not been created!
-
----
-
-Support for new versions may be automatically generated using the included `just` recipes
-
-There is no guarantee new versions will work out of the box, please test *extensively* before making a PR!
-
-```sh
-# Install just if needed
-cargo install just
-
-# Run the generator tool
-# Manual cleanup is required!
-just tools generate {VERSION}
-```
+> Everything is built with support for multiple versions in mind!
 
 ## Configuration Files
 
 All configuration files and resource packs are stored in the following directories:
 
-| OS      | Default Folder                            |
+| OS      | Config Folder                             |
 | ------- | ----------------------------------------- |
 | Windows | `%APPDATA%/FrogLight`                     |
 | Linux   | `$XDG_CONFIG_HOME/FrogLight`              |
@@ -72,18 +55,16 @@ cargo build --release
 cargo run --release
 ```
 
-This may take a while and requires a couple of gigabytes of space!
+This will take a while the first time and requires a couple of gigabytes of space!
 
-The built client will be located at `./target/release/froglight`
+After building, FrogLight can be found at `./target/release/froglight[.exe]`
 
 > [!Important]
-> Make sure you are building in `release` mode, as `debug` mode will be very slow!
+> Make sure you are building in `--release` mode!
 
 ## Plugins
 
-FrogLight was written with customization in mind.
-
-For example, here is how to embed an image and use it on the loading screen:
+Using the [Bevy Engine](https://github.com/bevyengine/bevy/), plugins are very easy to create.
 
 ```rust
 use bevy::{asset::embedded_asset, prelude::*};
@@ -93,29 +74,24 @@ fn main() {
     // Create a new bevy App
     let mut app = App::new();
 
-    // Create the AppPlugins group
-    let mut plugins = AppPlugins::build(AppPlugins);
-    // Set the loading screen to use the embedded image
-    plugins = plugins.set(LoadingPlugin::new("embedded://froglight/my_custom_art.png"));
+    // Add the FrogLight app plugins
+    app.add_plugins(AppPlugins);
 
-    // Add the plugins to the app
-    app.add_plugins(plugins);
+    // Add your own custom plugins here!
+    // app.add_plugins(MyCustomPlugin);
 
-    // Place the image next to the main.rs file
-    // and embed it inside the application
-    embedded_asset!(app, "my_custom_art.png");
-
-    // Run the app!
+    // Run the client!
     app.run();
 }
 ```
 
-This is just a basic example, almost everything is modular and can be replaced!
-
 > [!Tip]
-> See more examples inside the `examples` directory
-> 
-> See the [Bevy Book](https://bevyengine.org/learn/book/getting-started/plugins/) and [Froglight Docs](https://github.com/EightFactorial/FrogLight/) for more information.
+> For more information, see the following links:
+>  * [FrogLight Examples](examples)
+>  * [FrogLight Docs](https://github.com/EightFactorial/FrogLight/)
+>  * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
+>  * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/)
+>  * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
 
 ## License
 
