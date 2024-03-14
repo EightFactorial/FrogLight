@@ -20,6 +20,8 @@ impl PluginGroup for AppPlugins {
             .add(WorldPlugin)
             .add(PhysicsPlugin)
             .add(AssetPlugins::default())
+            .add(ResolverPlugin::default())
+            .add(NetworkPlugin)
             .add(DebugPlugins)
             .add(InterfacePlugins)
     }

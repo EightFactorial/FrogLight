@@ -9,6 +9,7 @@ pub use froglight_protocol::{
     traits::{PacketEnum, State, Version},
     versions,
 };
+pub mod resolver;
 
 mod plugin;
 pub use plugin::NetworkPlugin;
