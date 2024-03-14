@@ -51,8 +51,8 @@
 <g id="clust6" class="cluster">
 <title>clusternode_Set(7)</title>
 <g id="a_clust6"><a xlink:title="InterfaceUpdateSet">
-<path fill="#ffffff" fill-opacity="0.266667" stroke="#ffffff" stroke-width="2" stroke-opacity="0.313725" d="M20,-190C20,-190 435.75,-190 435.75,-190 441.75,-190 447.75,-196 447.75,-202 447.75,-202 447.75,-977 447.75,-977 447.75,-983 441.75,-989 435.75,-989 435.75,-989 20,-989 20,-989 14,-989 8,-983 8,-977 8,-977 8,-202 8,-202 8,-196 14,-190 20,-190"/>
-<text text-anchor="middle" x="227.88" y="-971.7" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#ffffff">InterfaceUpdateSet</text>
+<path fill="#ffffff" fill-opacity="0.266667" stroke="#ffffff" stroke-width="2" stroke-opacity="0.313725" d="M20,-190C20,-190 435.5,-190 435.5,-190 441.5,-190 447.5,-196 447.5,-202 447.5,-202 447.5,-977 447.5,-977 447.5,-983 441.5,-989 435.5,-989 435.5,-989 20,-989 20,-989 14,-989 8,-983 8,-977 8,-977 8,-202 8,-202 8,-196 14,-190 20,-190"/>
+<text text-anchor="middle" x="227.75" y="-971.7" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#ffffff">InterfaceUpdateSet</text>
 </a>
 </g>
 </g>
@@ -83,8 +83,8 @@
 <g id="clust10" class="cluster">
 <title>clusternode_Set(17)</title>
 <g id="a_clust10"><a xlink:title="InterfaceMenuUpdateSet">
-<path fill="#ffffff" fill-opacity="0.266667" stroke="#ffffff" stroke-width="2" stroke-opacity="0.313725" d="M28,-388C28,-388 427.75,-388 427.75,-388 433.75,-388 439.75,-394 439.75,-400 439.75,-400 439.75,-937 439.75,-937 439.75,-943 433.75,-949 427.75,-949 427.75,-949 28,-949 28,-949 22,-949 16,-943 16,-937 16,-937 16,-400 16,-400 16,-394 22,-388 28,-388"/>
-<text text-anchor="middle" x="227.88" y="-931.7" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#ffffff">InterfaceMenuUpdateSet</text>
+<path fill="#ffffff" fill-opacity="0.266667" stroke="#ffffff" stroke-width="2" stroke-opacity="0.313725" d="M28,-388C28,-388 427.5,-388 427.5,-388 433.5,-388 439.5,-394 439.5,-400 439.5,-400 439.5,-937 439.5,-937 439.5,-943 433.5,-949 427.5,-949 427.5,-949 28,-949 28,-949 22,-949 16,-943 16,-937 16,-937 16,-400 16,-400 16,-394 22,-388 28,-388"/>
+<text text-anchor="middle" x="227.75" y="-931.7" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#ffffff">InterfaceMenuUpdateSet</text>
 </a>
 </g>
 </g>
@@ -123,7 +123,7 @@
 <g id="clust15" class="cluster">
 <title>clusternode_Set(20)</title>
 <g id="a_clust15"><a xlink:title="MultiplayerMenuUpdateSet">
-<path fill="#ffffff" fill-opacity="0.266667" stroke="#ffffff" stroke-width="2" stroke-opacity="0.313725" d="M263.75,-636C263.75,-636 419.75,-636 419.75,-636 425.75,-636 431.75,-642 431.75,-648 431.75,-648 431.75,-664 431.75,-664 431.75,-670 425.75,-676 419.75,-676 419.75,-676 263.75,-676 263.75,-676 257.75,-676 251.75,-670 251.75,-664 251.75,-664 251.75,-648 251.75,-648 251.75,-642 257.75,-636 263.75,-636"/>
+<path fill="#ffffff" fill-opacity="0.266667" stroke="#ffffff" stroke-width="2" stroke-opacity="0.313725" d="M264,-589C264,-589 419.5,-589 419.5,-589 425.5,-589 431.5,-595 431.5,-601 431.5,-601 431.5,-664 431.5,-664 431.5,-670 425.5,-676 419.5,-676 419.5,-676 264,-676 264,-676 258,-676 252,-670 252,-664 252,-664 252,-601 252,-601 252,-595 258,-589 264,-589"/>
 <text text-anchor="middle" x="341.75" y="-658.7" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#ffffff">MultiplayerMenuUpdateSet</text>
 </a>
 </g>
@@ -203,9 +203,9 @@
 </a>
 </g>
 </g>
-<!-- node_System(18) -->
+<!-- node_System(19) -->
 <g id="node8" class="node">
-<title>node_System(18)</title>
+<title>node_System(19)</title>
 <g id="a_node8"><a xlink:title="froglight_assets::systemset::resourcepack::ResourcePackState::enter_ready_state">
 <polygon fill="#eff1f3" stroke="#b4bec7" points="596.25,-71 471.5,-71 471.5,-35 596.25,-35 596.25,-71"/>
 <text text-anchor="middle" x="533.88" y="-47.58" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#15191d">enter_ready_state</text>
@@ -269,8 +269,8 @@
 <g id="edge6" class="edge">
 <title>set_marker_node_Set(18)&#45;&gt;set_marker_node_Set(20)</title>
 <g id="a_edge6"><a xlink:title="LoadingScreenUpdateSet → MultiplayerMenuUpdateSet">
-<path fill="none" stroke="#0090cc" stroke-width="2" d="M222,-682C227.63,-680.94 233.37,-679.7 239.13,-678.32"/>
-<polygon fill="#0090cc" stroke="#0090cc" stroke-width="2" points="240,-681.71 248.82,-675.84 238.26,-674.93 240,-681.71"/>
+<path fill="none" stroke="#0090cc" stroke-width="2" d="M222,-682C247.74,-661.91 224.69,-633.18 242.84,-608.7"/>
+<polygon fill="#0090cc" stroke="#0090cc" stroke-width="2" points="245.26,-611.23 249.86,-601.69 240.31,-606.28 245.26,-611.23"/>
 </a>
 </g>
 </g>
@@ -349,6 +349,15 @@
 </a>
 </g>
 </g>
+<!-- node_System(18) -->
+<g id="node30" class="node">
+<title>node_System(18)</title>
+<g id="a_node30"><a xlink:title="froglight_interface::menus::multiplayermenu::MultiplayerMenuRootNode::handle_escape">
+<polygon fill="#eff1f3" stroke="#b4bec7" points="395.5,-644 288,-644 288,-608 395.5,-608 395.5,-644"/>
+<text text-anchor="middle" x="341.75" y="-620.58" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#15191d">handle_escape</text>
+</a>
+</g>
+</g>
 <!-- set_marker_node_Set(22) -->
 <!-- set_marker_node_Set(22)&#45;&gt;set_marker_node_Set(19) -->
 <g id="edge8" class="edge">
@@ -363,8 +372,8 @@
 <g id="edge9" class="edge">
 <title>set_marker_node_Set(22)&#45;&gt;set_marker_node_Set(20)</title>
 <g id="a_edge9"><a xlink:title="MainMenuPanoramaSet → MultiplayerMenuUpdateSet">
-<path fill="none" stroke="#3363bb" stroke-width="2" d="M204.75,-730.41C210.83,-728.23 216.67,-725.47 222,-722 236.82,-712.35 233,-700.11 245.82,-684.81"/>
-<polygon fill="#3363bb" stroke="#3363bb" stroke-width="2" points="247.98,-687.59 252.71,-678.11 243.1,-682.58 247.98,-687.59"/>
+<path fill="none" stroke="#3363bb" stroke-width="2" d="M204.75,-733C211.07,-730.31 216.95,-726.73 222,-722 258.36,-687.94 214.21,-645.62 243.01,-608.53"/>
+<polygon fill="#3363bb" stroke="#3363bb" stroke-width="2" points="245.47,-611.03 249.9,-601.4 240.43,-606.16 245.47,-611.03"/>
 </a>
 </g>
 </g>
@@ -378,54 +387,54 @@
 </g>
 </g>
 <!-- node_System(12) -->
-<g id="node32" class="node">
+<g id="node33" class="node">
 <title>node_System(12)</title>
-<g id="a_node32"><a xlink:title="froglight_interface::menus::panorama::camera::MainMenuPanoramaCamera::panorama_camera">
+<g id="a_node33"><a xlink:title="froglight_interface::menus::panorama::camera::MainMenuPanoramaCamera::panorama_camera">
 <polygon fill="#eff1f3" stroke="#b4bec7" points="188.38,-783 57.62,-783 57.62,-747 188.38,-747 188.38,-783"/>
 <text text-anchor="middle" x="123" y="-759.58" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#15191d">panorama_camera</text>
 </a>
 </g>
 </g>
 <!-- node_System(13) -->
-<g id="node33" class="node">
+<g id="node34" class="node">
 <title>node_System(13)</title>
-<g id="a_node33"><a xlink:title="froglight_interface::menus::panorama::MainMenuBackground::panorama_rotation">
+<g id="a_node34"><a xlink:title="froglight_interface::menus::panorama::MainMenuBackground::panorama_rotation">
 <polygon fill="#eff1f3" stroke="#b4bec7" points="188,-830 58,-830 58,-794 188,-794 188,-830"/>
 <text text-anchor="middle" x="123" y="-806.58" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#15191d">panorama_rotation</text>
 </a>
 </g>
 </g>
 <!-- node_System(14) -->
-<g id="node34" class="node">
+<g id="node35" class="node">
 <title>node_System(14)</title>
-<g id="a_node34"><a xlink:title="froglight_interface::menus::panorama::MainMenuBackground::panorama_visibility">
+<g id="a_node35"><a xlink:title="froglight_interface::menus::panorama::MainMenuBackground::panorama_visibility">
 <polygon fill="#eff1f3" stroke="#b4bec7" points="188.75,-877 57.25,-877 57.25,-841 188.75,-841 188.75,-877"/>
 <text text-anchor="middle" x="123" y="-853.58" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#15191d">panorama_visibility</text>
 </a>
 </g>
 </g>
 <!-- node_System(0) -->
-<g id="node35" class="node">
+<g id="node36" class="node">
 <title>node_System(0)</title>
-<g id="a_node35"><a xlink:title="bevy_window::system::close_when_requested">
+<g id="a_node36"><a xlink:title="bevy_window::system::close_when_requested">
 <polygon fill="lightgrey" stroke="black" points="192.12,-1033 53.88,-1033 53.88,-997 192.12,-997 192.12,-1033"/>
 <text text-anchor="middle" x="123" y="-1009.95" font-family="Times,serif" font-size="14.00">close_when_requested</text>
 </a>
 </g>
 </g>
 <!-- node_System(7) -->
-<g id="node36" class="node">
+<g id="node37" class="node">
 <title>node_System(7)</title>
-<g id="a_node36"><a xlink:title="bevy_inspector_egui::quick::world_inspector_ui">
+<g id="a_node37"><a xlink:title="bevy_inspector_egui::quick::world_inspector_ui">
 <polygon fill="lightgrey" stroke="black" points="183.5,-1080 62.5,-1080 62.5,-1044 183.5,-1044 183.5,-1080"/>
 <text text-anchor="middle" x="123" y="-1056.95" font-family="Times,serif" font-size="14.00">world_inspector_ui</text>
 </a>
 </g>
 </g>
-<!-- node_System(19) -->
-<g id="node37" class="node">
-<title>node_System(19)</title>
-<g id="a_node37"><a xlink:title="bevy_ecs::schedule::executor::apply_deferred">
+<!-- node_System(20) -->
+<g id="node38" class="node">
+<title>node_System(20)</title>
+<g id="a_node38"><a xlink:title="bevy_ecs::schedule::executor::apply_deferred">
 <polygon fill="lightgrey" stroke="black" points="171.88,-1127 74.12,-1127 74.12,-1091 171.88,-1091 171.88,-1127"/>
 <text text-anchor="middle" x="123" y="-1103.95" font-family="Times,serif" font-size="14.00">apply_deferred</text>
 </a>

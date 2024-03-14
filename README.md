@@ -50,7 +50,7 @@ git clone --depth 1 https://github.com/EightFactorial/FrogLight
 cd FrogLight
 
 # Build the client, or
-cargo build --release
+cargo build --release --bin froglight
 # Build and run the client
 cargo run --release
 ```

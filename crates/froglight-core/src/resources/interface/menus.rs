@@ -3,7 +3,7 @@
 use bevy_app::App;
 use bevy_ecs::{
     reflect::ReflectResource,
-    system::{Res, Resource},
+    system::{Res, ResMut, Resource},
 };
 use bevy_reflect::Reflect;
 use derive_more::{Deref, DerefMut, From, Into};
@@ -28,6 +28,12 @@ impl MainMenuEnable {
     /// Returns `true` if the main menu is enabled.
     #[must_use]
     pub fn is_enabled(res: Res<Self>) -> bool { **res }
+
+    /// Enables the main menu.
+    pub fn enable(mut res: ResMut<Self>) { *res = Self(true) }
+
+    /// Disables the main menu.
+    pub fn disable(mut res: ResMut<Self>) { *res = Self(false) }
 }
 
 impl Default for MainMenuEnable {
@@ -45,6 +51,12 @@ impl MultiplayerMenuEnable {
     /// Returns `true` if the multiplayer menu is enabled.
     #[must_use]
     pub fn is_enabled(res: Res<Self>) -> bool { **res }
+
+    /// Enables the multiplayer menu.
+    pub fn enable(mut res: ResMut<Self>) { *res = Self(true) }
+
+    /// Disables the multiplayer menu.
+    pub fn disable(mut res: ResMut<Self>) { *res = Self(false) }
 }
 
 /// A [`Resource`] that enables or disables the settings menu.
@@ -58,4 +70,10 @@ impl SettingsMenuEnable {
     /// Returns `true` if the settings menu is enabled.
     #[must_use]
     pub fn is_enabled(res: Res<Self>) -> bool { **res }
+
+    /// Enables the settings menu.
+    pub fn enable(mut res: ResMut<Self>) { *res = Self(true) }
+
+    /// Disables the settings menu.
+    pub fn disable(mut res: ResMut<Self>) { *res = Self(false) }
 }

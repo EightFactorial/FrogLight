@@ -44,17 +44,22 @@ fn build(app: &mut App) {
     // Show and hide the main menu
     app.add_systems(
         OnEnter(InterfaceMenuState::MainMenu),
-        MainMenuRootNode::show_mainmenu
-            .run_if(any_with_component::<MainMenuRootNode>)
+        (
+            MainMenuRootNode::show_mainmenu.run_if(any_with_component::<MainMenuRootNode>),
+            MainMenuEnable::enable,
+        )
             .in_set(MainMenuUpdateSet),
     );
     app.add_systems(
         OnExit(InterfaceMenuState::MainMenu),
-        MainMenuRootNode::hide_mainmenu
-            .run_if(any_with_component::<MainMenuRootNode>)
+        (
+            MainMenuRootNode::hide_mainmenu.run_if(any_with_component::<MainMenuRootNode>),
+            MainMenuEnable::disable,
+        )
             .in_set(MainMenuUpdateSet),
     );
 
+    // Build the sub-components
     buttons::build(app);
     logo::build(app);
     splash::build(app);

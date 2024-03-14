@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use froglight_core::resources::MultiplayerMenuEnable;
 
 use crate::menus::{
     mainmenu::systemset::MainMenuUpdateSet, settingsmenu::systemset::SettingsMenuUpdateSet,
@@ -10,6 +11,7 @@ pub(super) fn build(app: &mut App) {
     app.configure_sets(
         Update,
         MultiplayerMenuUpdateSet
+            .run_if(MultiplayerMenuEnable::is_enabled)
             .ambiguous_with(MainMenuUpdateSet)
             .ambiguous_with(SettingsMenuUpdateSet)
             .in_set(InterfaceMenuUpdateSet),

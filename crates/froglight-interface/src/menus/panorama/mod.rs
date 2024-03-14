@@ -7,7 +7,7 @@ use bevy::{
     render::{mesh::VertexAttributeValues, view::RenderLayers},
 };
 use froglight_assets::{AssetManager, FallbackImage, ResourcePackState};
-use froglight_core::resources::{LoadingScreenState, MainMenuEnable};
+use froglight_core::resources::LoadingScreenState;
 
 pub(crate) mod camera;
 pub use camera::MainMenuPanoramaCamera;
@@ -63,10 +63,7 @@ pub(super) fn build(app: &mut App) {
         Update,
         MainMenuBackground::panorama_visibility
             .run_if(any_with_component::<MainMenuBackground>)
-            .run_if(
-                resource_exists_and_changed::<MainMenuEnable>
-                    .or_else(resource_exists_and_changed::<MainMenuBackgroundEnable>),
-            )
+            .run_if(resource_exists_and_changed::<MainMenuBackgroundEnable>)
             .in_set(MainMenuPanoramaSet),
     );
 }
@@ -84,6 +81,7 @@ impl MainMenuBackground {
     const ROTATION_SPEED: f32 = 2.0;
     const RENDER_LAYER: RenderLayers = RenderLayers::layer(4);
 
+    /// Rotates the panorama background.
     fn panorama_rotation(mut query: Query<&mut Transform, With<Self>>, time: Res<Time<Virtual>>) {
         let delta = time.delta_seconds().mul(Self::ROTATION_SPEED).min(0.2).to_radians();
         for mut transform in &mut query {
@@ -91,23 +89,22 @@ impl MainMenuBackground {
         }
     }
 
+    /// Sets the visibility of the panorama background.
     fn panorama_visibility(
         mut query: Query<&mut Visibility, With<Self>>,
-        enable: Res<MainMenuEnable>,
 
         state: Res<State<InterfaceMenuState>>,
-        state_enable: Res<MainMenuBackgroundEnable>,
+        enable: Res<MainMenuBackgroundEnable>,
     ) {
-        let new = if **enable && state_enable.is_enabled_in(**state) {
-            Visibility::Inherited
-        } else {
-            Visibility::Hidden
-        };
-        for mut visibility in &mut query {
-            *visibility = new;
+        let new =
+            if enable.is_enabled_in(**state) { Visibility::Inherited } else { Visibility::Hidden };
+
+        for mut vis in &mut query {
+            *vis = new;
         }
     }
 
+    /// Builds the main menu panorama background.
     pub(crate) fn build_panorama(world: &mut World) {
         debug!("Building MainMenuBackground");
 
@@ -215,11 +212,18 @@ impl MainMenuBackground {
         };
 
         // Determine the visibility of the background
-        let visibility = if let Some(MainMenuEnable(true)) = world.get_resource::<MainMenuEnable>()
-        {
-            Visibility::Inherited
-        } else {
-            Visibility::Hidden
+        let enable = world.get_resource::<MainMenuBackgroundEnable>();
+        let state = world.get_resource::<State<InterfaceMenuState>>();
+
+        let visibility = match (enable, state) {
+            (Some(enable), Some(state)) => {
+                if enable.is_enabled_in(**state) {
+                    Visibility::Inherited
+                } else {
+                    Visibility::Hidden
+                }
+            }
+            _ => Visibility::Hidden,
         };
 
         // Create the background entity

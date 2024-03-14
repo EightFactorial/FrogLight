@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use froglight_core::resources::MainMenuEnable;
 
 use super::{MainMenuBackground, MainMenuBackgroundEnable, MainMenuPanoramaSet};
 use crate::{default_camera::default_camera3d_bundle, menus::InterfaceMenuState};
@@ -10,10 +9,7 @@ pub(super) fn build(app: &mut App) {
     app.add_systems(
         Update,
         MainMenuPanoramaCamera::panorama_camera
-            .run_if(
-                resource_exists_and_changed::<MainMenuEnable>
-                    .or_else(resource_exists_and_changed::<MainMenuBackgroundEnable>),
-            )
+            .run_if(resource_exists_and_changed::<MainMenuBackgroundEnable>)
             .in_set(MainMenuPanoramaSet),
     );
 }
@@ -26,14 +22,13 @@ pub struct MainMenuPanoramaCamera;
 impl MainMenuPanoramaCamera {
     fn panorama_camera(
         query: Query<Entity, With<Self>>,
-        enable: Res<MainMenuEnable>,
 
         state: Res<State<InterfaceMenuState>>,
-        state_enable: Res<MainMenuBackgroundEnable>,
+        enable: Res<MainMenuBackgroundEnable>,
 
         mut commands: Commands,
     ) {
-        if **enable && state_enable.is_enabled_in(**state) {
+        if enable.is_enabled_in(**state) {
             if query.iter().count() == 0 {
                 debug!("Creating MainMenuBackgroundCamera");
                 commands.spawn(Self::bundle());

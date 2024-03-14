@@ -11,6 +11,9 @@ impl Plugin for InterfaceMultiplayerMenuPlugin {
         // Add `SystemSet`s
         crate::menus::build(app);
         super::systemset::build(app);
+
+        // Add components and systems
+        super::build(app);
     }
 
     fn finish(&self, app: &mut App) {
