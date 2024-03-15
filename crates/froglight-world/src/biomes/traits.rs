@@ -18,8 +18,6 @@ pub trait BiomeExt<V: Version>: Sized + BiomeType<V> + Default {}
 
 /// A trait that registers biomes inside the biome registry.
 pub trait BiomeRegistration: Version {
-    type Biomes: BiomeEnumTrait<Self> + Into<BiomeEnum>;
-
     /// Register the default biomes.
     fn register_default(registry: &mut InnerBiomeRegistry<Self>);
 
@@ -28,9 +26,8 @@ pub trait BiomeRegistration: Version {
 }
 
 /// A collection of biomes specific to a version.
-#[allow(unreachable_pub)]
-pub trait BiomeEnumTrait<V: BiomeRegistration>: Sized + Debug + Reflect {
+pub trait BiomeResolution: Version {
     /// Get the biome using a biome id and the biome registry.
     #[must_use]
-    fn get_biome(id: u32, registry: &InnerBiomeRegistry<V>) -> Option<Self>;
+    fn get_biome(id: u32, registry: &InnerBiomeRegistry<Self>) -> Option<BiomeEnum>;
 }

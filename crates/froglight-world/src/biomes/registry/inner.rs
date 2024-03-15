@@ -4,10 +4,7 @@ use bevy_log::trace;
 use froglight_protocol::traits::Version;
 use hashbrown::HashMap;
 
-use crate::biomes::{
-    traits::{BiomeEnumTrait, BiomeRegistration},
-    BiomeEnum, BiomeType,
-};
+use crate::biomes::{traits::BiomeResolution, BiomeEnum, BiomeType};
 
 /// The inner registry for the biome registry.
 #[derive(Debug, Default)]
@@ -45,9 +42,9 @@ impl<V: Version> InnerBiomeRegistry<V> {
     #[inline]
     pub fn get_biome(&self, biome: u32) -> Option<BiomeEnum>
     where
-        V: BiomeRegistration,
+        V: BiomeResolution,
     {
-        V::Biomes::get_biome(biome, self).map(Into::into)
+        V::get_biome(biome, self)
     }
 
     /// Register a biome into the biome registry.

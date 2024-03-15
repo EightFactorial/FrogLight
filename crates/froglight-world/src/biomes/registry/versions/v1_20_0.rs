@@ -2,7 +2,7 @@ use froglight_core::common::ResourceKey;
 use froglight_macros::frog_version_biomes;
 use froglight_protocol::versions::v1_20_0::V1_20_0;
 
-use crate::biomes::{biome_list::BiomePlains, traits::BiomeRegistration, BiomeType};
+use crate::biomes::{biome_list::BiomePlains, BiomeType};
 
 frog_version_biomes! {
     V1_20_0,

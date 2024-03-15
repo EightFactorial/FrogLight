@@ -14,7 +14,7 @@ mod reflect;
 pub use reflect::ReflectBiomeType;
 
 pub(crate) mod registry;
-pub use registry::{BiomeEnumV1_20_0, BiomeRegistry, InnerBiomeRegistry};
+pub use registry::{BiomeRegistry, InnerBiomeRegistry};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

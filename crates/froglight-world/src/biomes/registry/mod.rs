@@ -25,7 +25,6 @@ mod egui;
 mod tests;
 
 mod versions;
-pub use versions::*;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) { app.init_resource::<BiomeRegistry<V1_20_0>>(); }
