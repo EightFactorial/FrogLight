@@ -4,11 +4,10 @@ use std::{borrow::Borrow, fmt::Display};
 use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
+use froglight_macros::FrogReadWrite;
 use hashbrown::Equivalent;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-
-use crate::io::{FrogRead, FrogWrite};
 
 /// A string used to identify a resource.
 ///
@@ -16,13 +15,23 @@ use crate::io::{FrogRead, FrogWrite};
 ///
 /// Internally just a wrapper around a [`CompactString`]
 #[derive(
-    Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut, Serialize, Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    Deref,
+    DerefMut,
+    Serialize,
+    Deserialize,
+    FrogReadWrite,
 )]
+#[frog(tests = ["read_example"], bytes = [19, 109, 105, 110, 101, 99, 114, 97, 102, 116, 58, 111, 118, 101, 114, 119, 111, 114, 108, 100])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "reflect", reflect(Deserialize, Serialize))]
 #[serde(transparent)]
-#[repr(transparent)]
-// Can't reflect on remote types :(
 pub struct ResourceKey(#[cfg_attr(feature = "reflect", reflect(ignore))] CompactString);
 
 /// An error that occurred while creating a [`ResourceKey`]
@@ -282,24 +291,6 @@ impl PartialEq<String> for ResourceKey {
 
 impl PartialEq<CompactString> for ResourceKey {
     fn eq(&self, other: &CompactString) -> bool { self.as_str() == other.as_str() }
-}
-
-impl FrogRead for ResourceKey {
-    fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::io::ReadError>
-    where
-        Self: Sized,
-    {
-        Ok(Self(CompactString::fg_read(buf)?))
-    }
-}
-
-impl FrogWrite for ResourceKey {
-    fn fg_write(
-        &self,
-        buf: &mut (impl std::io::Write + ?Sized),
-    ) -> Result<(), crate::io::WriteError> {
-        self.0.fg_write(buf)
-    }
 }
 
 #[cfg(test)]

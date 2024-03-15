@@ -8,7 +8,7 @@ use thiserror::Error;
 mod glam;
 
 mod read;
-pub use froglight_macros::FrogRead;
+pub(crate) use froglight_macros::FrogRead;
 pub use read::FrogRead;
 
 mod var_read;
@@ -18,7 +18,7 @@ mod var_write;
 pub use var_write::FrogVarWrite;
 
 mod write;
-pub use froglight_macros::FrogWrite;
+pub(crate) use froglight_macros::FrogWrite;
 pub use write::FrogWrite;
 
 /// An error that occurred while reading data.
@@ -47,7 +47,10 @@ pub enum ReadError {
     InvalidBool(u8),
     /// An error occurred while reading an enum.
     #[error("Invalid enum variant: {0} -> {1}")]
-    InvalidEnum(u8, &'static str),
+    InvalidEnum(i32, &'static str),
+    /// An error occurred while reading a packet.
+    #[error("Error reading {1} ({0}): {2}")]
+    PacketError(u32, &'static str, Box<ReadError>),
 }
 
 /// An error that occurred while writing data.

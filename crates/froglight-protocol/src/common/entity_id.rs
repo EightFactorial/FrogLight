@@ -1,6 +1,7 @@
 use std::fmt::Display;
 
 use derive_more::{Deref, DerefMut, From, Into};
+use froglight_macros::FrogReadWrite;
 
 /// An entity's unique identifier.
 ///
@@ -9,10 +10,24 @@ use derive_more::{Deref, DerefMut, From, Into};
 /// ---
 ///
 /// This is different than bevy's `Entity` type.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, From, Into, Deref, DerefMut)]
-// TODO: #[frog(tests = ["read_example"], bytes = [])]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    From,
+    Into,
+    Deref,
+    DerefMut,
+    FrogReadWrite,
+)]
+#[frog(tests = ["read_example"], bytes = [0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct EntityId(u32);
+pub struct EntityId(#[frog(var)] u32);
 
 impl AsRef<u32> for EntityId {
     fn as_ref(&self) -> &u32 { &self.0 }

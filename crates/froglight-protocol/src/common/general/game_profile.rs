@@ -7,7 +7,7 @@ use uuid::Uuid;
 ///
 /// Stores information about a player, like their UUID, name, skin, cape, etc.
 #[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
-// TODO: #[frog(tests = ["read_example"], bytes = [])]
+#[frog(tests = ["read_example"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct GameProfile {
     /// The player's UUID.
     pub uuid: Uuid,
@@ -21,7 +21,7 @@ pub struct GameProfile {
 ///
 /// Optionally signed by Mojang.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
-// TODO: #[frog(tests = ["read_example"], bytes = [])]
+#[frog(tests = ["read_example"], bytes = [0, 0])]
 pub struct ProfileProperty {
     /// The value of the property.
     pub value: CompactString,

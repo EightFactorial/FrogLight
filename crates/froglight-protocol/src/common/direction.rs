@@ -1,10 +1,11 @@
 use std::{fmt::Display, str::FromStr};
 
 use bevy_math::IVec3;
+use froglight_macros::FrogReadWrite;
 
 /// A direction in 3D space.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-// #[frog(tests = ["read_default", "write_example"], bytes = [0])]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum Direction {
     #[default]

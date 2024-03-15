@@ -13,20 +13,17 @@ pub struct ItemSlot {
     #[frog(var)]
     pub kind: u32,
     /// The number of items in the slot.
-    pub count: NonZero<i8>,
+    pub count: NonZero<u8>,
     /// The item's data.
     pub data: Nbt,
 }
 
 impl ItemSlot {
     /// Creates a new item slot.
-    ///
-    /// # Panics
-    /// Panics if `count` is [`i8::MIN`].
     #[must_use]
     #[inline]
-    pub fn new(kind: u32, count: i8, data: Nbt) -> Self {
-        Self { kind, count: NonZero::new_some(count - 1), data }
+    pub fn new(kind: u32, count: Option<u8>, data: Nbt) -> Self {
+        Self { kind, count: NonZero::new(count), data }
     }
 
     /// Returns `true` if the item slot is empty.
