@@ -1,6 +1,5 @@
 use std::any::TypeId;
 
-use bevy_log::trace;
 use froglight_protocol::traits::Version;
 use hashbrown::HashMap;
 
@@ -54,7 +53,7 @@ impl<V: Version> InnerBiomeRegistry<V> {
 
         #[cfg(debug_assertions)]
         {
-            trace!("Registering biome `{}`", biome.resource_key());
+            bevy_log::trace!("Registering biome `{}`", biome.resource_key());
         }
 
         // Insert the biome into the dyn_biomes list

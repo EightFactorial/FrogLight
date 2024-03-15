@@ -1,6 +1,5 @@
 use std::{any::TypeId, ops::Range};
 
-use bevy_log::trace;
 use froglight_protocol::traits::Version;
 use hashbrown::HashMap;
 use rangemap::RangeMap;
@@ -203,7 +202,7 @@ impl<V: Version> InnerBlockRegistry<V> {
 
         #[cfg(debug_assertions)]
         {
-            trace!("Registering block `{}`", block.resource_key());
+            bevy_log::trace!("Registering block `{}`", block.resource_key());
         }
 
         // Insert the block into the dyn_blocks
