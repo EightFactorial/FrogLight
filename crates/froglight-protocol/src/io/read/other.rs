@@ -3,6 +3,11 @@ use uuid::Uuid;
 
 use super::{FrogRead, ReadError};
 
+impl FrogRead for () {
+    #[inline]
+    fn fg_read(_: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> { Ok(()) }
+}
+
 impl FrogRead for Nbt {
     #[inline]
     fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>

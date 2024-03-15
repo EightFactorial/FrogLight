@@ -3,6 +3,7 @@ use super::ReadError;
 mod integer;
 mod map;
 mod option;
+mod tuple;
 
 /// A trait for reading a variable-length type from a buffer
 ///

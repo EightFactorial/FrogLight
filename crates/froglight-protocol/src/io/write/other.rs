@@ -3,6 +3,11 @@ use uuid::Uuid;
 
 use super::{FrogWrite, WriteError};
 
+impl FrogWrite for () {
+    #[inline]
+    fn fg_write(&self, _: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> { Ok(()) }
+}
+
 impl FrogWrite for Nbt {
     #[inline]
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {

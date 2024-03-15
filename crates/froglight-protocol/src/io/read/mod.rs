@@ -7,6 +7,7 @@ mod map;
 mod option;
 mod other;
 mod string;
+mod tuple;
 mod vector;
 
 /// A trait for reading a type from a buffer
