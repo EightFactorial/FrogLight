@@ -17,7 +17,7 @@ pub(super) fn read_example(input: &DeriveInput, test_attrs: &Attributes, output:
             let mut cursor = std::io::Cursor::new(data.as_slice());
 
             if let Err(err) = <#item as crate::io::FrogRead>::fg_read(&mut cursor) {
-                panic!("Failed to read {}: {}", #item_name, err)
+                panic!("Failed to read `{}`: {err}", #item_name)
             }
             assert_eq!(cursor.position() as usize, data.len());
         }
@@ -37,7 +37,7 @@ pub(super) fn read_default(input: &DeriveInput, test_attrs: &Attributes, output:
             let mut cursor = std::io::Cursor::new(data.as_slice());
 
             match <#item as crate::io::FrogRead>::fg_read(&mut cursor) {
-                Err(err) => panic!("Failed to read {}: {}", #item_name, err),
+                Err(err) => panic!("Failed to read `{}`: {err}", #item_name),
                 Ok(value) => assert_eq!(value, #item::default()),
             }
             assert_eq!(cursor.position() as usize, data.len());

@@ -138,8 +138,17 @@ impl Parse for StatePackets {
 /// ```
 #[derive(Debug)]
 pub(super) struct Packet {
-    pub(super) _id: u32,
+    pub(super) id: u32,
     pub(super) name: Ident,
+    pub(super) variant: Ident,
+}
+
+impl Packet {
+    /// Get the name of the enum variant.
+    fn variant_name(packet: &Ident) -> Ident {
+        let name = packet.to_string().replace("S2CPacket", "").replace("C2SPacket", "");
+        Ident::new(&name, packet.span())
+    }
 }
 
 impl Parse for Packet {
@@ -154,6 +163,6 @@ impl Parse for Packet {
         // Parse the packet name.
         let name = input.parse::<Ident>()?;
 
-        Ok(Self { _id: id, name })
+        Ok(Self { id, variant: Self::variant_name(&name), name })
     }
 }

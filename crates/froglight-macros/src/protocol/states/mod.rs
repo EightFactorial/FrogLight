@@ -6,7 +6,7 @@ mod read;
 mod write;
 
 mod parse;
-use parse::{Direction, Packet, StateMacro, StatePackets};
+use parse::{Direction, StateMacro, StatePackets};
 
 pub(super) fn generate_state(tokens: TokenStream) -> TokenStream {
     let mut output = TokenStream::new();
@@ -62,12 +62,11 @@ fn create_packet_enum(ident: &Ident, packets: &StatePackets, output: &mut TokenS
 
     // Gather the enum variants and packet names.
     for packet in &packets.packets {
-        let variant = packet_variant_name(packet);
+        let variant = &packet.variant;
         let name = &packet.name;
 
         variants.extend(quote! {
             #variant(#name),
-
         });
     }
 
@@ -83,12 +82,6 @@ fn create_packet_enum(ident: &Ident, packets: &StatePackets, output: &mut TokenS
     // Implement `FrogRead` and `FrogWrite` for the enum.
     read::impl_enum_read(ident, packets, output);
     write::impl_enum_write(ident, packets, output);
-}
-
-/// Get the name of the enum variant.
-fn packet_variant_name(packet: &Packet) -> Ident {
-    let name = packet.name.to_string().replace("S2CPacket", "").replace("C2SPacket", "");
-    Ident::new(&name, packet.name.span())
 }
 
 /// Implement the packet trait for the packet.
