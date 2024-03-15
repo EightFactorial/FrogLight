@@ -1,3 +1,6 @@
+mod client_information;
+pub use client_information::{ChatVisibility, ClientInformation, ModelCustomization};
+
 mod entity_animation;
 pub use entity_animation::EntityAnimation;
 
@@ -12,3 +15,6 @@ pub use player_ability::{ClientPlayerAbilityFlags, ServerPlayerAbilityFlags};
 
 mod query_status;
 pub use query_status::{ServerPlayers, ServerSamplePlayer, ServerStatus, ServerVersion};
+
+mod resource_pack;
+pub use resource_pack::ResourcePackAction;

@@ -72,7 +72,7 @@ fn create_packet_enum(ident: &Ident, packets: &StatePackets, output: &mut TokenS
 
     // Create the enum.
     output.extend(quote! {
-        #[derive(Debug, Clone, PartialEq)]
+        #[derive(Debug, Clone, PartialEq, derive_more::From)]
         #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
         pub enum #ident {
             #variants
