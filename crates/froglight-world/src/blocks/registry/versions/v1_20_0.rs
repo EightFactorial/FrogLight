@@ -9,7 +9,7 @@ use crate::blocks::{
         BlockGranite, BlockGrassBlock, BlockPodzol, BlockPolishedAndesite, BlockPolishedDiorite,
         BlockPolishedGranite, BlockStone,
     },
-    traits::{BlockExt, BlockRegistration},
+    traits::BlockExt,
     BlockType,
 };
 

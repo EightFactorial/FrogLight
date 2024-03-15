@@ -67,8 +67,6 @@ pub trait BlockExt<V: Version>: Sized + BlockType<V> + Default {
 
 /// A trait that registers blocks inside the block registry.
 pub trait BlockRegistration: Version {
-    type Blocks: BlockEnumTrait<Self> + Into<BlockEnum>;
-
     /// Register the default blocks.
     fn register_default(registry: &mut InnerBlockRegistry<Self>);
 
@@ -76,12 +74,11 @@ pub trait BlockRegistration: Version {
     fn register_reflect(world: &mut World);
 }
 
-/// A collection of blocks specific to a version.
-#[allow(unreachable_pub)]
-pub trait BlockEnumTrait<V: BlockRegistration>: Sized + Debug + Reflect {
+/// A trait that allows getting a block from a state id.
+pub trait BlockResolution: Version {
     /// Get the block using a state id and the block registry.
     #[must_use]
-    fn get_block(state: u32, registry: &InnerBlockRegistry<V>) -> Option<Self>;
+    fn get_block(state: u32, registry: &InnerBlockRegistry<Self>) -> Option<BlockEnum>;
 }
 
 /// A block attribute.

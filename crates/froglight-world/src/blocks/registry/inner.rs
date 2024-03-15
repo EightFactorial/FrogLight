@@ -5,11 +5,7 @@ use froglight_protocol::traits::Version;
 use hashbrown::HashMap;
 use rangemap::RangeMap;
 
-use crate::blocks::{
-    block_list::BlockEnum,
-    traits::{BlockEnumTrait, BlockRegistration},
-    BlockType,
-};
+use crate::blocks::{block_list::BlockEnum, traits::BlockResolution, BlockType};
 
 /// The inner registry for the block registry.
 ///
@@ -171,9 +167,9 @@ impl<V: Version> InnerBlockRegistry<V> {
     #[inline]
     pub fn get_block(&self, state: u32) -> Option<BlockEnum>
     where
-        V: BlockRegistration,
+        V: BlockResolution,
     {
-        V::Blocks::get_block(state, self).map(Into::into)
+        V::get_block(state, self)
     }
 
     /// Register a block in the registry.

@@ -12,19 +12,18 @@ use derive_more::Deref;
 use froglight_protocol::versions::v1_20_0::V1_20_0;
 use parking_lot::RwLock;
 
-mod inner;
-pub use inner::InnerBlockRegistry;
-
 use super::traits::BlockRegistration;
 
 #[cfg(feature = "inspector")]
 mod egui;
 
+mod inner;
+pub use inner::InnerBlockRegistry;
+
 #[cfg(test)]
 mod tests;
 
 mod versions;
-pub use versions::*;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) { app.init_resource::<BlockRegistry<V1_20_0>>(); }
@@ -77,7 +76,7 @@ impl<V: BlockRegistration> FromWorld for BlockRegistry<V> {
                 // Add the registration to the app type registry
                 registry.write().add_registration(registration);
 
-                // Register all blocks with type data
+                // Register all blocks with version specific type data
                 V::register_reflect(world);
             }
         }
