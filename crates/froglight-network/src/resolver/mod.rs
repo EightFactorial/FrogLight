@@ -10,9 +10,7 @@ use bevy_app::{App, Plugin};
 use bevy_log::debug;
 
 mod resource;
-pub use resource::{
-    ResolverIpTask, ResolverIpv4Task, ResolverIpv6Task, ResolverResource, ResolverSrvTask,
-};
+pub use resource::{Resolver, ResolverIpTask, ResolverIpv4Task, ResolverIpv6Task, ResolverSrvTask};
 
 /// A [`Plugin`] that resolves domain names to IP addresses.
 ///
@@ -138,6 +136,6 @@ impl Plugin for ResolverPlugin {
         // Create the resolver client and insert it into the app
         #[allow(clippy::default_trait_access)]
         let resolver = AsyncStdResolver::new(config, options, Default::default());
-        app.insert_resource(ResolverResource::new(resolver));
+        app.insert_resource(Resolver::new(resolver));
     }
 }

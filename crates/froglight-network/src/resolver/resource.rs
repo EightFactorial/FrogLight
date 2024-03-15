@@ -13,11 +13,11 @@ use bevy_tasks::{IoTaskPool, Task};
 /// Lookups are performed asynchronously and functions return
 /// tasks that can be polled to get the result.
 #[derive(Debug, Resource)]
-pub struct ResolverResource {
+pub struct Resolver {
     resolver: Arc<AsyncStdResolver>,
 }
 
-impl ResolverResource {
+impl Resolver {
     /// Creates a new [`ResolverResource`] from the given client.
     #[must_use]
     pub fn new(resolver: AsyncStdResolver) -> Self { Self { resolver: Arc::new(resolver) } }

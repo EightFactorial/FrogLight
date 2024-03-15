@@ -14,7 +14,7 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
     /// WARNING: This can cause the [`Connection`] to close if packets
     /// are sent or received that are not valid for the new [`State`].
     #[must_use]
-    pub fn set_state<S2: State<V>>(self) -> Connection<V, S2, D>
+    pub fn into_state<S2: State<V>>(self) -> Connection<V, S2, D>
     where
         D: NetworkDirection<V, S2>,
     {
@@ -35,7 +35,7 @@ where
         D: NetworkDirection<V, Status>,
     {
         debug!("Setting `Handshaking` Connection to `Status`");
-        self.set_state()
+        self.into_state()
     }
 
     /// Set the [`Connection`]'s state to [`Login`].
@@ -47,7 +47,7 @@ where
         D: NetworkDirection<V, Login>,
     {
         debug!("Setting `Handshaking` Connection to `Login`");
-        self.set_state()
+        self.into_state()
     }
 }
 
@@ -64,7 +64,7 @@ where
         D: NetworkDirection<V, Configuration>,
     {
         debug!("Setting `Login` Connection to `Configuration`");
-        self.set_state()
+        self.into_state()
     }
 
     /// Set the [`Connection`]'s state to [`Play`].
@@ -76,7 +76,7 @@ where
         D: NetworkDirection<V, Play>,
     {
         debug!("Setting `Login` Connection to `Play`");
-        self.set_state()
+        self.into_state()
     }
 }
 
@@ -93,7 +93,7 @@ where
         D: NetworkDirection<V, Play>,
     {
         debug!("Setting `Configuration` Connection to `Play`");
-        self.set_state()
+        self.into_state()
     }
 }
 
@@ -110,6 +110,6 @@ where
         D: NetworkDirection<V, Configuration>,
     {
         debug!("Setting `Play` Connection to `Configuration`");
-        self.set_state()
+        self.into_state()
     }
 }
