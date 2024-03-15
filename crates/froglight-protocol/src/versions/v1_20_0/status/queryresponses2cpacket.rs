@@ -1,7 +1,7 @@
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::ServerStatus;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct QueryResponseS2CPacket {
-    pub field_0: (),
-}
+pub struct QueryResponseS2CPacket(pub ServerStatus);

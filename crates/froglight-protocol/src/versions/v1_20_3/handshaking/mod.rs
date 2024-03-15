@@ -6,13 +6,12 @@
 
 use froglight_macros::frog_state;
 
-mod handshakec2spacket;
-pub use handshakec2spacket::*;
+pub use crate::versions::v1_20_0::handshaking::HandshakeC2SPacket;
 
 frog_state! {
-	Handshaking,
-	V1_20_3,
-	Serverbound {
-		0u32 => HandshakeC2SPacket,
-	},
+    Handshaking,
+    V1_20_3,
+    Serverbound {
+        0u32 => HandshakeC2SPacket,
+    },
 }

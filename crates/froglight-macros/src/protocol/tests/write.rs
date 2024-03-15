@@ -11,7 +11,7 @@ pub(super) fn write_default(input: &DeriveInput, _: &Attributes, output: &mut To
     output.extend(quote! {
         #[test]
         fn #test_name() {
-            let mut data = Vec::new();
+            let mut data: Vec<u8> = Vec::new();
             if let Err(err) = <Self as crate::io::FrogWrite>::fg_write(&Self::default(), &mut data) {
                 panic!("Failed to write `{}`: {err}", #item_name);
             }
@@ -32,12 +32,14 @@ pub(super) fn write_example(
     output.extend(quote! {
         #[test]
         fn #test_name() {
-            let mut data = Vec::new();
+            let mut data: Vec<u8> = Vec::new();
+            let expected: Vec<u8> = vec![#(#bytes),*];
+
             if let Err(err) = <#item as crate::io::FrogWrite>::fg_write(&#item::default(), &mut data) {
                 panic!("Failed to write `{}`: {err}", #item_name);
             }
 
-            assert_eq!(data, vec![#(#bytes),*]);
+            assert_eq!(data, expected);
         }
     });
 }

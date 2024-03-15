@@ -6,27 +6,20 @@
 
 use froglight_macros::frog_state;
 
-mod queryresponses2cpacket;
-pub use queryresponses2cpacket::*;
-
-mod pingresults2cpacket;
-pub use pingresults2cpacket::*;
-
-mod queryrequestc2spacket;
-pub use queryrequestc2spacket::*;
-
-mod querypingc2spacket;
-pub use querypingc2spacket::*;
+pub use crate::versions::v1_20_0::status::{
+    QueryPingC2SPacket, QueryPongS2CPacket as PingResultS2CPacket, QueryRequestC2SPacket,
+    QueryResponseS2CPacket,
+};
 
 frog_state! {
-	Status,
-	V1_20_2,
-	Clientbound {
-		0u32 => QueryResponseS2CPacket,
-		1u32 => PingResultS2CPacket,
-	},
-	Serverbound {
-		0u32 => QueryRequestC2SPacket,
-		1u32 => QueryPingC2SPacket,
-	},
+    Status,
+    V1_20_2,
+    Clientbound {
+        0u32 => QueryResponseS2CPacket,
+        1u32 => PingResultS2CPacket,
+    },
+    Serverbound {
+        0u32 => QueryRequestC2SPacket,
+        1u32 => QueryPingC2SPacket,
+    },
 }

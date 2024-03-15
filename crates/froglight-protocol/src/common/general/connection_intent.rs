@@ -6,17 +6,17 @@ use froglight_macros::FrogReadWrite;
 /// Versions before [`1.20.2`](crate::versions::v1_20_2::V1_20_2) did not
 /// have the [`ConnectionIntent::Configuration`] intent.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
-#[frog(tests = ["read_verify", "write_verify"], bytes = [255, 255, 255, 255, 15])]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [2])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ConnectionIntent {
     /// The [`Handshaking`](crate::states::Handshaking) state
-    #[default]
     Handshaking = -1,
     /// The [`Play`](crate::states::Play) state
     Play = 0,
     /// The [`Status`](crate::states::Status) state
     Status = 1,
     /// The [`Login`](crate::states::Login) state
+    #[default]
     Login = 2,
     /// The [`Configuration`](crate::states::Configuration) state
     Configuration = 3,

@@ -3,6 +3,7 @@
 #![allow(incomplete_features)]
 #![feature(array_try_from_fn)]
 #![feature(generic_const_exprs)]
+#![feature(trivial_bounds)]
 
 #[cfg(feature = "reflect")]
 mod plugin;

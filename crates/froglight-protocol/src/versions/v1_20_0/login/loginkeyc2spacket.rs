@@ -1,8 +1,9 @@
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
+#[frog(tests = ["read_example"], bytes = [8, 8, 7, 6, 5, 4, 3, 2, 1, 8, 1, 2, 3, 4, 5, 6, 7, 8])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct LoginKeyC2SPacket {
-    pub encrypted_secret_key: (),
-    pub nonce: (),
+    pub encrypted_secret_key: Vec<u8>,
+    pub nonce: Vec<u8>,
 }
