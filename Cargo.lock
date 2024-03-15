@@ -4581,15 +4581,16 @@ checksum = "d66dc143e6b11c1eddc06d5c423cfc97062865baf299914ab64caa38182078fe"
 
 [[package]]
 name = "simdnbt"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c83255e672555f98e48adeafab95b0773ce33ca47f6d1387134083805794fc7c"
+checksum = "fb95596ab43601d8f81981640b5c29962a859039eace993b2584f09ea9923eca"
 dependencies = [
  "byteorder",
  "flate2",
  "residua-mutf8",
  "simdnbt-derive",
  "thiserror",
+ "valence_nbt",
 ]
 
 [[package]]
@@ -5044,6 +5045,16 @@ checksum = "f00cc9702ca12d3c81455259621e676d0f7251cec66a21e98fe2e9a37db93b2a"
 dependencies = [
  "getrandom",
  "serde",
+]
+
+[[package]]
+name = "valence_nbt"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3cddc3222ed5ead4fa446881b3deeeee0dba60b0088b2bf12fedbac7eda2312"
+dependencies = [
+ "byteorder",
+ "cesu8",
 ]
 
 [[package]]
