@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-async-std = { version = "1.12.0", features = ["default", "unstable", "std"] }
+async-std = { version = "1.12.0", features = ["unstable", "std"] }
 async-std-resolver = "0.24.0"
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
@@ -33,3 +33,4 @@ froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 thiserror = { workspace = true }
+tldextract = "0.6.0"
