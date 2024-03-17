@@ -22,7 +22,7 @@ pub use resource::{
 ///
 /// # Example
 /// ```rust,no_run
-/// use froglight_network::ResolverPlugin;
+/// use froglight_network::resolver::ResolverPlugin;
 ///
 /// // Use cloudflare and prefer IPv4 addresses
 /// let cloudflare_ipv4_prefer = ResolverPlugin::default();

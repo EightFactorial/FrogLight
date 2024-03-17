@@ -6,9 +6,9 @@ use froglight_protocol::{
 /// A trait defining the direction in which packets are sent and received.
 pub trait NetworkDirection<V: Version, S: State<V>> {
     /// The packet type that is sent.
-    type Send: FrogRead;
+    type Send: FrogWrite;
     /// The packet type that is received.
-    type Recv: FrogWrite;
+    type Recv: FrogRead;
 }
 
 /// The clientbound [`NetworkDirection`].
@@ -18,8 +18,8 @@ pub struct Clientbound;
 
 impl<V: Version, S: State<V>> NetworkDirection<V, S> for Clientbound
 where
-    S::ClientboundPacket: FrogRead,
-    S::ServerboundPacket: FrogWrite,
+    S::ClientboundPacket: FrogWrite,
+    S::ServerboundPacket: FrogRead,
 {
     type Send = S::ClientboundPacket;
     type Recv = S::ServerboundPacket;
@@ -32,8 +32,8 @@ pub struct Serverbound;
 
 impl<V: Version, S: State<V>> NetworkDirection<V, S> for Serverbound
 where
-    S::ClientboundPacket: FrogWrite,
-    S::ServerboundPacket: FrogRead,
+    S::ClientboundPacket: FrogRead,
+    S::ServerboundPacket: FrogWrite,
 {
     type Send = S::ServerboundPacket;
     type Recv = S::ClientboundPacket;

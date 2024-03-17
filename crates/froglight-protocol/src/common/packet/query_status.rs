@@ -35,7 +35,7 @@ pub struct ServerVersion {
 }
 
 /// The server's player information
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ServerPlayers {
     /// The maximum number of players

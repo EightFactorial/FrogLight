@@ -14,10 +14,10 @@ use tldextract::{TldExtractor, TldOption};
 ///
 /// Lookups are performed asynchronously and functions return
 /// tasks that can be polled to get the result.
-#[derive(Debug, Resource)]
+#[derive(Debug, Clone, Resource)]
 pub struct Resolver {
-    resolver: Arc<AsyncStdResolver>,
-    extractor: Arc<TldExtractor>,
+    pub(crate) resolver: Arc<AsyncStdResolver>,
+    pub(crate) extractor: Arc<TldExtractor>,
 }
 
 impl Resolver {
@@ -159,7 +159,7 @@ impl ResolverServerTask {
     }
 
     /// Determines if a lookup is required and performs it.
-    async fn url_lookup(
+    pub(crate) async fn url_lookup(
         resolver: Arc<AsyncStdResolver>,
         extractor: Arc<TldExtractor>,
         query: String,

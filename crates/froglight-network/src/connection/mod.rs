@@ -1,10 +1,10 @@
-use std::{marker::PhantomData, net::SocketAddr};
+use std::{collections::VecDeque, marker::PhantomData, net::SocketAddr};
 
-use async_std::net::TcpStream;
+use async_std::{io::WriteExt, net::TcpStream};
 use async_std_resolver::{lookup::Lookup, proto::rr::RData};
-use bevy_app::App;
 use bevy_log::{debug, error};
 use froglight_protocol::{
+    io::{FrogVarWrite, FrogWrite},
     states::Handshaking,
     traits::{State, Version},
 };
@@ -17,13 +17,10 @@ pub use direction::{Clientbound, NetworkDirection, Serverbound};
 mod error;
 pub use error::ConnectionError;
 
-#[doc(hidden)]
-pub(super) fn build(_app: &mut App) {}
-
 /// A connection to a server or client.
 #[derive(Debug)]
 pub struct Connection<V: Version, S: State<V>, D: NetworkDirection<V, S> = Serverbound> {
-    pub(crate) _stream: TcpStream,
+    pub(crate) stream: TcpStream,
     _version: PhantomData<V>,
     _state: PhantomData<S>,
     _direction: PhantomData<D>,
@@ -102,8 +99,18 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
     ///
     /// # Errors
     /// If a packet cannot be sent.
-    pub async fn send(&mut self, _packet: impl Into<D::Send>) -> Result<(), ConnectionError> {
-        todo!()
+    pub async fn send(&mut self, packet: impl Into<D::Send>) -> Result<(), ConnectionError> {
+        let packet: Vec<u8> = packet.into().fg_to_bytes();
+        let mut buffer = VecDeque::new();
+
+        // Write the length of the packet
+        packet.len().fg_var_write(&mut buffer)?;
+
+        // Write the packet
+        buffer.extend(packet);
+
+        // Write the buffer to the stream
+        self.stream.write_all(buffer.make_contiguous()).await.map_err(Into::into)
     }
 
     /// Receive a packet from the other side of the connection.
@@ -121,12 +128,6 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
             stream.set_nodelay(true)?;
         }
 
-        debug!("Connected to {}", stream.peer_addr()?);
-        Ok(Self {
-            _stream: stream,
-            _version: PhantomData,
-            _state: PhantomData,
-            _direction: PhantomData,
-        })
+        Ok(Self { stream, _version: PhantomData, _state: PhantomData, _direction: PhantomData })
     }
 }

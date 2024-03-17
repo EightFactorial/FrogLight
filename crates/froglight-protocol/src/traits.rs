@@ -1,6 +1,6 @@
 //! Traits for packets and structs that can be read and written.
 
-use std::fmt::Debug;
+use std::{fmt::Debug, hash::Hash};
 
 /// A Protocol version
 #[cfg(not(feature = "reflect"))]
@@ -12,7 +12,7 @@ pub trait Version: 'static + Debug + Default + Copy + Eq {
 /// A Protocol version
 #[cfg(feature = "reflect")]
 pub trait Version:
-    'static + Debug + Default + Copy + Eq + bevy_reflect::Reflect + bevy_reflect::TypePath
+    'static + Debug + Default + Copy + Eq + Hash + bevy_reflect::Reflect + bevy_reflect::TypePath
 {
     /// The protocol version number
     const PROTOCOL_VERSION: i32;
