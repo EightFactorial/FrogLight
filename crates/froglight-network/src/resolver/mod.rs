@@ -11,8 +11,8 @@ use bevy_log::debug;
 
 mod resource;
 pub use resource::{
-    Resolver, ResolverIpTask, ResolverIpv4Task, ResolverIpv6Task, ResolverServerTask,
-    ResolverSrvTask,
+    Resolver, ResolverError, ResolverIpTask, ResolverIpv4Task, ResolverIpv6Task,
+    ResolverServerTask, ResolverSrvTask,
 };
 
 /// A [`Plugin`] that resolves domain names to IP addresses.

@@ -1,8 +1,6 @@
 use std::{collections::VecDeque, marker::PhantomData, net::SocketAddr};
 
 use async_std::{io::WriteExt, net::TcpStream};
-use async_std_resolver::{lookup::Lookup, proto::rr::RData};
-use bevy_log::{debug, error};
 use froglight_protocol::{
     io::{FrogVarWrite, FrogWrite},
     states::Handshaking,
@@ -17,6 +15,8 @@ pub use direction::{Clientbound, NetworkDirection, Serverbound};
 mod error;
 pub use error::ConnectionError;
 
+use crate::resolver::{Resolver, ResolverServerTask};
+
 /// A connection to a server or client.
 #[derive(Debug)]
 pub struct Connection<V: Version, S: State<V>, D: NetworkDirection<V, S> = Serverbound> {
@@ -30,66 +30,35 @@ impl<V: Version, D: NetworkDirection<V, Handshaking>> Connection<V, Handshaking,
 where
     Handshaking: State<V>,
 {
+    /// Connect to a server at an address resolved by the given resolver.
+    ///
+    /// # Errors
+    /// If the address cannot be resolved.
+    /// If the connection cannot be established.
+    /// If the connection cannot be set to nodelay.
+    pub async fn connect_to(
+        address: &(impl AsRef<str> + ?Sized),
+        resolver: &Resolver,
+    ) -> Result<Self, ConnectionError> {
+        let address = ResolverServerTask::url_lookup(
+            resolver.resolver.clone(),
+            resolver.extractor.clone(),
+            address.as_ref().to_string(),
+        )
+        .await?;
+
+        Self::connect(address).await
+    }
+
     /// Connect to a server at the given address.
     ///
     /// # Errors
     /// If the connection cannot be established.
     /// If the connection cannot be set to nodelay.
     #[inline]
-    pub async fn connect(address: SocketAddr) -> Result<Self, ConnectionError> {
-        let stream = TcpStream::connect(address).await?;
+    pub async fn connect(socket: SocketAddr) -> Result<Self, ConnectionError> {
+        let stream = TcpStream::connect(socket).await?;
         Self::from_stream(stream).await
-    }
-
-    /// Connect to a server using a DNS lookup, using the first valid address
-    /// record.
-    ///
-    /// If no `port` is given, the default port `25565` is used.
-    ///
-    /// # Errors
-    /// If there are no `A` or `AAAA` address records.
-    /// If the connection cannot be established.
-    /// If the connection cannot be set to nodelay.
-    pub async fn from_lookup(lookup: &Lookup, port: Option<u16>) -> Result<Self, ConnectionError> {
-        let port = port.unwrap_or(25565);
-
-        // Keep track of whether a connection was attempted
-        let mut attempted_connection = false;
-
-        for record in lookup.record_iter() {
-            match record.data() {
-                Some(RData::A(data)) => {
-                    debug!("Attempting to connect to {}", data.0);
-                    attempted_connection = true;
-
-                    match Self::connect(SocketAddr::new(data.0.into(), port)).await {
-                        Ok(connection) => return Ok(connection),
-                        Err(err) => {
-                            error!("Failed to connect to {}: {err}", data.0);
-                        }
-                    }
-                }
-                Some(RData::AAAA(data)) => {
-                    debug!("Attempting to connect to {}", data.0);
-                    attempted_connection = true;
-
-                    match Self::connect(SocketAddr::new(data.0.into(), port)).await {
-                        Ok(connection) => return Ok(connection),
-                        Err(err) => {
-                            error!("Failed to connect to {}: {err}", data.0);
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
-
-        // Return the appropriate error
-        if attempted_connection {
-            Err(ConnectionError::NoConnection)
-        } else {
-            Err(ConnectionError::NoAddressRecords)
-        }
     }
 }
 

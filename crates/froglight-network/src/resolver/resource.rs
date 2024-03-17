@@ -217,16 +217,22 @@ impl ResolverServerTask {
     }
 }
 
+/// An error that occurred during a resolver lookup.
 #[derive(Debug, Error)]
 pub enum ResolverError {
+    /// An error occurred getting the top-level domain.
     #[error(transparent)]
     TldError(#[from] tldextract::TldExtractError),
+    /// An error occurred resolving the query.
     #[error(transparent)]
     ResolveError(#[from] ResolveError),
+    /// No SRV records found.
     #[error("No SRV records found")]
     NoSrvRecordsFound,
+    /// No A/AAAA records found.
     #[error("No A/AAAA records found")]
     NoAddressFound,
+    /// Query has either no host or domain.
     #[error("Query has either no host or domain")]
     NoHostOrDomain,
 }

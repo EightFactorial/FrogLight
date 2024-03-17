@@ -102,9 +102,7 @@ where
                         events.send(ping);
                     }
                     Err(err) => {
-                        if !matches!(&err, &ConnectionError::NoConnection) {
-                            error!("Connection error during ping: {err}");
-                        }
+                        error!("Connection error during ping: {err}");
                     }
                 }
 

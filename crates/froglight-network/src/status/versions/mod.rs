@@ -8,7 +8,7 @@ use froglight_protocol::{
 
 use super::{PingRequest, PingResponse, StatusRequest, StatusResponse};
 use crate::{
-    resolver::{Resolver, ResolverServerTask},
+    resolver::{Resolver, ResolverError, ResolverServerTask},
     Connection, ConnectionError,
 };
 
@@ -79,8 +79,6 @@ where
 }
 
 /// Use the resolver to get the address of the given URL.
-async fn get_address(url: &str, resolver: Resolver) -> Result<SocketAddr, ConnectionError> {
-    ResolverServerTask::url_lookup(resolver.resolver, resolver.extractor, url.to_string())
-        .await
-        .map_err(|_| ConnectionError::NoAddressRecords)
+async fn get_address(url: &str, resolver: Resolver) -> Result<SocketAddr, ResolverError> {
+    ResolverServerTask::url_lookup(resolver.resolver, resolver.extractor, url.to_string()).await
 }
