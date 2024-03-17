@@ -1,16 +1,17 @@
 use compact_str::CompactString;
 use froglight_macros::FrogReadWrite;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use uuid::Uuid;
 
 /// A status response from a server
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, FrogReadWrite)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 #[frog(json)]
 pub struct ServerStatus {
     // TODO: FormattedText
     /// The server's description
-    pub description: String,
+    pub description: Value,
     /// The server's icon
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub favicon: Option<String>,
@@ -24,12 +25,12 @@ pub struct ServerStatus {
 }
 
 /// The server's version information
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ServerVersion {
     // TODO: FormattedText
     /// The version's name
-    pub name: String,
+    pub name: Value,
     /// The version's protocol id
     pub protocol: i32,
 }

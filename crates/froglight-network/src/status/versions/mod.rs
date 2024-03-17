@@ -1,35 +1,29 @@
-use std::{future::Future, net::SocketAddr};
+use std::future::Future;
 
 use froglight_protocol::{
-    io::{FrogRead, FrogWrite},
     states::{Handshaking, Status},
     traits::{State, Version},
 };
 
 use super::{PingRequest, PingResponse, StatusRequest, StatusResponse};
-use crate::{
-    resolver::{Resolver, ResolverError, ResolverServerTask},
-    Connection, ConnectionError,
-};
+use crate::{resolver::Resolver, Connection, ConnectionError, NetworkDirection, Serverbound};
 
 mod v1_20_0;
 
 pub trait Queryable: Version
 where
     Handshaking: State<Self>,
-    <Handshaking as State<Self>>::ClientboundPacket: FrogRead,
-    <Handshaking as State<Self>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<Self, Handshaking>,
 
     Status: State<Self>,
-    <Status as State<Self>>::ClientboundPacket: FrogRead,
-    <Status as State<Self>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<Self, Status>,
 {
     fn get_status(
         event: StatusRequest<Self>,
         resolver: Resolver,
     ) -> impl Future<Output = Result<StatusResponse, ConnectionError>> + Send {
         async move {
-            let addr = get_address(&event.url, resolver).await?;
+            let addr = resolver.url_lookup(&event.url).await?;
 
             // Connect to the server and perform the handshake
             let mut connection = Connection::<Self, Handshaking>::connect(addr).await?;
@@ -46,7 +40,7 @@ where
         resolver: Resolver,
     ) -> impl Future<Output = Result<PingResponse, ConnectionError>> + Send {
         async move {
-            let addr = get_address(&event.url, resolver).await?;
+            let addr = resolver.url_lookup(&event.url).await?;
 
             // Connect to the server and perform the handshake
             let mut connection = Connection::<Self, Handshaking>::connect(addr).await?;
@@ -76,9 +70,4 @@ where
         event: PingRequest<Self>,
         connection: &mut Connection<Self, Status>,
     ) -> impl Future<Output = Result<PingResponse, ConnectionError>> + Send;
-}
-
-/// Use the resolver to get the address of the given URL.
-async fn get_address(url: &str, resolver: Resolver) -> Result<SocketAddr, ResolverError> {
-    ResolverServerTask::url_lookup(resolver.resolver, resolver.extractor, url.to_string()).await
 }

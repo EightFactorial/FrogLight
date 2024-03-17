@@ -10,10 +10,7 @@ use bevy_app::{App, Plugin};
 use bevy_log::debug;
 
 mod resource;
-pub use resource::{
-    Resolver, ResolverError, ResolverIpTask, ResolverIpv4Task, ResolverIpv6Task,
-    ResolverServerTask, ResolverSrvTask,
-};
+pub use resource::{Resolver, ResolverError};
 
 /// A [`Plugin`] that resolves domain names to IP addresses.
 ///

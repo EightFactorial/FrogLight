@@ -16,25 +16,22 @@ use bevy_tasks::{IoTaskPool, Task};
 use compact_str::CompactString;
 use froglight_core::common::ServerStatus;
 use froglight_protocol::{
-    io::{FrogRead, FrogWrite},
     states::{Handshaking, Status},
     traits::{State, Version},
 };
 
 use super::{versions::Queryable, NetworkStatusVersionSet};
-use crate::{resolver::Resolver, ConnectionError};
+use crate::{resolver::Resolver, ConnectionError, NetworkDirection, Serverbound};
 
 /// An [`Event`] that sends a status request to a server.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
 pub struct StatusRequest<V: Queryable>
 where
     Handshaking: State<V>,
-    <Handshaking as State<V>>::ClientboundPacket: FrogRead,
-    <Handshaking as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Handshaking>,
 
     Status: State<V>,
-    <Status as State<V>>::ClientboundPacket: FrogRead,
-    <Status as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Status>,
 {
     /// The entity that is sending the request.
     pub entity: Entity,
@@ -46,12 +43,10 @@ where
 impl<V: Queryable> StatusRequest<V>
 where
     Handshaking: State<V>,
-    <Handshaking as State<V>>::ClientboundPacket: FrogRead,
-    <Handshaking as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Handshaking>,
 
     Status: State<V>,
-    <Status as State<V>>::ClientboundPacket: FrogRead,
-    <Status as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Status>,
 {
     /// Create a new [`StatusRequest`] with the given URL.
     #[must_use]
@@ -126,7 +121,7 @@ impl<V: Version> StatusRequestTask<V> {
 }
 
 /// An [`Event`] that is received in response to a [`StatusRequest`].
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
+#[derive(Debug, Clone, PartialEq, Eq, Event)]
 pub struct StatusResponse {
     /// The entity that sent the request.
     pub entity: Entity,

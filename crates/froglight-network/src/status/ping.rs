@@ -15,25 +15,22 @@ use bevy_log::error;
 use bevy_tasks::{IoTaskPool, Task};
 use compact_str::CompactString;
 use froglight_protocol::{
-    io::{FrogRead, FrogWrite},
     states::{Handshaking, Status},
     traits::{State, Version},
 };
 
 use super::{versions::Queryable, NetworkStatusVersionSet};
-use crate::{resolver::Resolver, ConnectionError};
+use crate::{resolver::Resolver, ConnectionError, NetworkDirection, Serverbound};
 
 /// An [`Event`] that sends a ping request to a server.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Event)]
 pub struct PingRequest<V: Queryable>
 where
     Handshaking: State<V>,
-    <Handshaking as State<V>>::ClientboundPacket: FrogRead,
-    <Handshaking as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Handshaking>,
 
     Status: State<V>,
-    <Status as State<V>>::ClientboundPacket: FrogRead,
-    <Status as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Status>,
 {
     /// The entity that is sending the request.
     pub entity: Entity,
@@ -45,12 +42,10 @@ where
 impl<V: Queryable> PingRequest<V>
 where
     Handshaking: State<V>,
-    <Handshaking as State<V>>::ClientboundPacket: FrogRead,
-    <Handshaking as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Handshaking>,
 
     Status: State<V>,
-    <Status as State<V>>::ClientboundPacket: FrogRead,
-    <Status as State<V>>::ServerboundPacket: FrogWrite,
+    Serverbound: NetworkDirection<V, Status>,
 {
     /// Create a new [`PingRequest`] with the given URL.
     #[must_use]
