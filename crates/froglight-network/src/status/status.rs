@@ -60,8 +60,10 @@ where
         app.add_systems(
             PostUpdate,
             (
-                Self::receive_requests.run_if(on_event::<Self>()),
-                Self::receive_responses.run_if(any_with_component::<StatusRequestTask<V>>),
+                Self::receive_requests.run_if(on_event::<Self>()).ambiguous_with_all(),
+                Self::receive_responses
+                    .run_if(any_with_component::<StatusRequestTask<V>>)
+                    .ambiguous_with_all(),
             )
                 .chain()
                 .in_set(NetworkStatusVersionSet::<V>::default()),

@@ -1,4 +1,6 @@
 //! Server pinging and status requests
+use std::marker::PhantomData;
+
 use bevy_app::{App, Plugin, PostUpdate};
 use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
 use froglight_protocol::{
@@ -57,4 +59,4 @@ where
 pub(crate) struct NetworkStatusPostUpdateSet;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-struct NetworkStatusVersionSet<V: Version>(std::marker::PhantomData<V>);
+struct NetworkStatusVersionSet<V: Version>(PhantomData<V>);
