@@ -26,6 +26,7 @@ bevy_reflect = { workspace = true }
 bevy_tasks = { workspace = true }
 bevy_time = { workspace = true }
 bevy_transform = { workspace = true }
+compact_str = { workspace = true }
 derive_more = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }

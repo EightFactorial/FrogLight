@@ -11,7 +11,8 @@ pub use froglight_protocol::{
 };
 
 mod plugin;
-pub use plugin::NetworkPlugin;
+pub use plugin::NetworkPlugins;
 
 pub mod resolver;
-pub use resolver::ResolverPlugin;
+
+pub mod status;

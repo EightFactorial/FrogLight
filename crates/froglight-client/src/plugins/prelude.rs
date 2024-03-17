@@ -8,7 +8,7 @@ pub use froglight_interface::plugins::{
     DebugPlugins, InterfaceLoadingScreenPlugin, InterfaceMainMenuPlugin,
     InterfaceMultiplayerMenuPlugin, InterfacePlugins, InterfaceSettingsMenuPlugin, UiScalePlugin,
 };
-pub use froglight_network::{NetworkPlugin, ResolverPlugin};
+pub use froglight_network::{resolver::ResolverPlugin, status::StatusPlugin, NetworkPlugins};
 pub use froglight_physics::PhysicsPlugin;
 pub use froglight_protocol::ReflectPlugin;
 pub use froglight_world::WorldPlugin;

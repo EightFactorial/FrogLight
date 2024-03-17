@@ -15,8 +15,7 @@ impl PluginGroup for ClientPlugins {
             .add(CorePlugin)
             .add(PhysicsPlugin)
             .add(WorldPlugin)
-            .add(ResolverPlugin::default())
-            .add(NetworkPlugin)
+            .add(NetworkPlugins)
     }
 }
 
