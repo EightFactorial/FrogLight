@@ -293,7 +293,7 @@ dependencies = [
  "async-task",
  "concurrent-queue",
  "fastrand 2.0.1",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "slab",
 ]
 
@@ -305,7 +305,7 @@ checksum = "bc19683171f287921f2405677dd2ed2549c3b3bda697a563ebc3a121ace2aba1"
 dependencies = [
  "async-lock 3.3.0",
  "blocking",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
 ]
 
 [[package]]
@@ -319,7 +319,7 @@ dependencies = [
  "async-io 2.3.2",
  "async-lock 3.3.0",
  "blocking",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "once_cell",
 ]
 
@@ -353,7 +353,7 @@ dependencies = [
  "cfg-if",
  "concurrent-queue",
  "futures-io",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "parking",
  "polling 3.5.0",
  "rustix 0.38.31",
@@ -484,7 +484,7 @@ checksum = "527207465fb6dcafbf661b0d4a51d0d2306c9d0c2975423079a6caa807930daf"
 dependencies = [
  "async-compression",
  "crc32fast",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "pin-project",
  "thiserror",
 ]
@@ -652,7 +652,7 @@ dependencies = [
  "crossbeam-channel",
  "downcast-rs",
  "futures-io",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "js-sys",
  "parking_lot",
  "ron",
@@ -1115,7 +1115,7 @@ dependencies = [
  "codespan-reporting",
  "downcast-rs",
  "encase",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "hexasphere",
  "image",
  "js-sys",
@@ -1199,7 +1199,7 @@ dependencies = [
  "async-executor",
  "async-task",
  "concurrent-queue",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "wasm-bindgen-futures",
 ]
 
@@ -1489,7 +1489,7 @@ dependencies = [
  "async-task",
  "fastrand 2.0.1",
  "futures-io",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "piper",
  "tracing",
 ]
@@ -2395,7 +2395,7 @@ dependencies = [
  "dirs",
  "froglight-core",
  "froglight-macros",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "hashbrown",
  "image",
  "parking_lot",
@@ -2474,6 +2474,7 @@ dependencies = [
 name = "froglight-network"
 version = "0.1.0"
 dependencies = [
+ "async-compression",
  "async-std",
  "async-std-resolver",
  "bevy_app",
@@ -2526,7 +2527,7 @@ dependencies = [
  "criterion",
  "derive_more",
  "froglight-macros",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "hashbrown",
  "proptest",
  "serde",
@@ -2565,7 +2566,7 @@ dependencies = [
  "froglight-core",
  "froglight-macros",
  "froglight-protocol",
- "futures-lite 2.2.0",
+ "futures-lite 2.3.0",
  "hashbrown",
  "parking_lot",
  "proptest",
@@ -2620,9 +2621,9 @@ dependencies = [
 
 [[package]]
 name = "futures-lite"
-version = "2.2.0"
+version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "445ba825b27408685aaecefd65178908c36c6e96aaf6d8599419d46e624192ba"
+checksum = "52527eb5074e35e9339c6b4e8d12600c7128b68fb25dcb9fa9dec18f7c25f3a5"
 dependencies = [
  "fastrand 2.0.1",
  "futures-core",

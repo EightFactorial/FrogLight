@@ -1,5 +1,7 @@
 //! Conversions between different types of [`Connection`]s.
 
+use std::{collections::VecDeque, marker::PhantomData};
+
 use bevy_log::debug;
 use froglight_protocol::{
     states::{Configuration, Handshaking, Login, Play, Status},
@@ -18,7 +20,15 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
     where
         D: NetworkDirection<V, S2>,
     {
-        todo!()
+        Connection {
+            stream: self.stream,
+            buffer: self.buffer,
+            bundle: VecDeque::with_capacity(8),
+            compression: self.compression,
+            _version: PhantomData,
+            _state: PhantomData,
+            _direction: PhantomData,
+        }
     }
 }
 

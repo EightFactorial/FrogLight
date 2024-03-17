@@ -1,14 +1,14 @@
 use froglight_protocol::{
     io::{FrogRead, FrogWrite},
-    traits::{State, Version},
+    traits::{PacketEnum, State, Version},
 };
 
 /// A trait defining the direction in which packets are sent and received.
 pub trait NetworkDirection<V: Version, S: State<V>> {
     /// The packet type that is sent.
-    type Send: FrogWrite;
+    type Send: PacketEnum + FrogWrite;
     /// The packet type that is received.
-    type Recv: FrogRead;
+    type Recv: PacketEnum + FrogRead;
 }
 
 /// The clientbound [`NetworkDirection`].

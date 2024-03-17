@@ -6,6 +6,9 @@ use crate::resolver::ResolverError;
 /// An error that occurs when creating or using a connection.
 #[derive(Debug, Error)]
 pub enum ConnectionError {
+    /// Connection was closed.
+    #[error("Connection was closed")]
+    ConnecionClosed,
     /// An I/O error occurred.
     #[error(transparent)]
     Io(#[from] std::io::Error),
