@@ -5,7 +5,7 @@ use froglight_protocol::{
     io::{FrogRead, FrogWrite},
     states::{Handshaking, Status},
     traits::{State, Version},
-    versions::v1_20_0::V1_20_0,
+    versions::{v1_20_0::V1_20_0, v1_20_2::V1_20_2, v1_20_3::V1_20_3},
 };
 
 mod ping;
@@ -28,6 +28,8 @@ impl Plugin for StatusPlugin {
         app.add_event::<StatusResponse>().add_event::<PingResponse>();
 
         setup_version::<V1_20_0>(app);
+        setup_version::<V1_20_2>(app);
+        setup_version::<V1_20_3>(app);
     }
 }
 

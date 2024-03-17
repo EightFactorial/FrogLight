@@ -9,6 +9,8 @@ use super::{PingRequest, PingResponse, StatusRequest, StatusResponse};
 use crate::{resolver::Resolver, Connection, ConnectionError, NetworkDirection, Serverbound};
 
 mod v1_20_0;
+mod v1_20_2;
+mod v1_20_3;
 
 pub trait Queryable: Version
 where
