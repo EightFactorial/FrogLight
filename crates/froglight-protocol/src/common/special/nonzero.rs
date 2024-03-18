@@ -205,7 +205,7 @@ impl<T: FrogVarRead + PartialEq + Sub<Output = T> + From<u8>> FrogVarRead for No
 
 #[cfg(test)]
 proptest::proptest! {
-    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(256))]
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(512))]
 
     #[test]
     fn nonzero_u8_read(val in 0u8..=u8::MAX) {
@@ -215,7 +215,7 @@ proptest::proptest! {
         if val == 0 {
             assert_eq!(nonzero.into_inner(), None);
         } else {
-            assert_eq!(nonzero.into_inner(), Some(val.wrapping_sub(1)));
+            assert_eq!(nonzero.into_inner(), Some(val - 1));
         }
 
     }
@@ -225,17 +225,13 @@ proptest::proptest! {
         let nonzero = NonZero::new_some(val);
         let buf = nonzero.fg_to_bytes();
 
-        if val == 0 {
-            assert_eq!(buf, vec![0]);
-        } else {
-            assert_eq!(buf, vec![val.wrapping_add(1)]);
-        }
+        assert_eq!(buf, (val + 1).fg_to_bytes());
     }
 }
 
 #[cfg(test)]
 proptest::proptest! {
-    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(256))]
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(512))]
 
     #[test]
     fn nonzero_u32_read(val in 0u32..=u32::MAX) {
@@ -246,7 +242,7 @@ proptest::proptest! {
         if val == 0 {
             assert_eq!(nonzero.into_inner(), None);
         } else {
-            assert_eq!(nonzero.into_inner(), Some(val.wrapping_sub(1)));
+            assert_eq!(nonzero.into_inner(), Some(val - 1));
         }
     }
 
@@ -255,11 +251,8 @@ proptest::proptest! {
         let nonzero = NonZero::new_some(val);
         let buf = nonzero.fg_to_bytes();
 
-        if val == 0 {
-            assert_eq!(buf, vec![0, 0, 0, 1]);
-        } else {
-            assert_eq!(buf, val.wrapping_add(1).fg_to_bytes());
-        }
+
+        assert_eq!(buf, (val + 1u32).fg_to_bytes());
     }
 
     #[test]
@@ -271,7 +264,7 @@ proptest::proptest! {
         if val == 0 {
             assert_eq!(nonzero.into_inner(), None);
         } else {
-            assert_eq!(nonzero.into_inner(), Some(val.wrapping_sub(1)));
+            assert_eq!(nonzero.into_inner(), Some(val - 1));
         }
     }
 
@@ -280,10 +273,6 @@ proptest::proptest! {
         let nonzero = NonZero::new_some(val);
         let buf = nonzero.fg_var_to_bytes();
 
-        if val == 0 {
-            assert_eq!(buf, vec![1]);
-        } else {
-            assert_eq!(buf, val.wrapping_add(1).fg_var_to_bytes());
-        }
+        assert_eq!(buf, (val + 1).fg_var_to_bytes());
     }
 }

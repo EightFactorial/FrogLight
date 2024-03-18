@@ -13,8 +13,8 @@ pub use client_information::{ChatVisibility, ClientInformation, ModelCustomizati
 mod entity_animation;
 pub use entity_animation::EntityAnimation;
 
-mod game_state_change;
-pub use game_state_change::GameStateEvent;
+mod game_state_event;
+pub use game_state_event::GameStateEvent;
 
 mod item_slot;
 pub use item_slot::ItemSlot;
