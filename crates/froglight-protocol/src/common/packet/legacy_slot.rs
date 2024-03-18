@@ -8,7 +8,7 @@ use simdnbt::owned::Nbt;
 /// # Note
 /// This is used in versions before `1.20.4 (TODO)`.
 #[derive(Debug, Default, Clone, PartialEq, FrogReadWrite)]
-// TODO: #[frog(tests = ["read_example", "write_default"], bytes = [0])]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
 pub enum LegacyItemSlot {
     /// An empty item slot.
     #[default]

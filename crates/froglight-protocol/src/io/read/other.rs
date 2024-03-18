@@ -1,3 +1,4 @@
+use serde_json::Value;
 use simdnbt::owned::Nbt;
 use uuid::Uuid;
 
@@ -25,6 +26,17 @@ impl FrogRead for Uuid {
         Self: Sized,
     {
         Ok(Uuid::from_u128(u128::fg_read(buf)?))
+    }
+}
+
+impl FrogRead for Value {
+    #[inline]
+    fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
+    where
+        Self: Sized,
+    {
+        let content: String = String::fg_read(buf)?;
+        Ok(serde_json::from_str(&content)?)
     }
 }
 

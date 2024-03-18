@@ -60,3 +60,21 @@ macro_rules! impl_from {
 }
 impl_from!(u8, u16);
 impl_from!(try u64, u128, usize, i8, i16, i32, i64, i128, isize);
+
+impl std::ops::Add for EntityId {
+    type Output = EntityId;
+    fn add(self, rhs: EntityId) -> Self::Output { EntityId(self.0 + rhs.0) }
+}
+
+impl std::ops::AddAssign for EntityId {
+    fn add_assign(&mut self, rhs: EntityId) { self.0 += rhs.0; }
+}
+
+impl std::ops::Sub for EntityId {
+    type Output = EntityId;
+    fn sub(self, rhs: EntityId) -> Self::Output { EntityId(self.0 - rhs.0) }
+}
+
+impl std::ops::SubAssign for EntityId {
+    fn sub_assign(&mut self, rhs: EntityId) { self.0 -= rhs.0; }
+}

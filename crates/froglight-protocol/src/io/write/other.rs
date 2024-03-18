@@ -1,3 +1,4 @@
+use serde_json::Value;
 use simdnbt::owned::Nbt;
 use uuid::Uuid;
 
@@ -18,14 +19,18 @@ impl FrogWrite for Nbt {
     }
 }
 
-// TODO: Write NBT tests
-// #[test]
-// fn proto_write_nbt() {}
-
 impl FrogWrite for Uuid {
     #[inline]
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         self.as_u128().fg_write(buf)
+    }
+}
+
+impl FrogWrite for Value {
+    #[inline]
+    fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+        let content = serde_json::to_string(self)?;
+        content.fg_write(buf)
     }
 }
 

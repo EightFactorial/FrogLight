@@ -1,8 +1,11 @@
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::GameStateEvent;
+
+#[derive(Debug, Clone, Copy, PartialEq, FrogReadWrite)]
+#[frog(tests = ["read_example"], bytes = [3, 0, 0, 0, 0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct GameStateChangeS2CPacket {
-    pub reason: (),
-    pub value: (),
+    pub event: GameStateEvent,
+    pub value: f32,
 }

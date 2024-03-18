@@ -1,14 +1,14 @@
+use bevy_math::{DVec3, Vec3};
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::BlockPosition;
+
+#[derive(Debug, Clone, PartialEq, FrogReadWrite)]
+#[frog(tests = ["read_example"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ExplosionS2CPacket {
-    pub x: (),
-    pub y: (),
-    pub z: (),
-    pub radius: (),
-    pub affected_blocks: (),
-    pub player_velocity_x: (),
-    pub player_velocity_y: (),
-    pub player_velocity_z: (),
+    pub position: DVec3,
+    pub radius: f32,
+    pub affected_blocks: Vec<BlockPosition>,
+    pub player_velocity: Vec3,
 }

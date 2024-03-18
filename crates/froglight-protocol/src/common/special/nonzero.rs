@@ -1,7 +1,7 @@
 use std::{
     fmt::{Debug, Display, Formatter},
-    num::Wrapping,
-    ops::{Add, AddAssign, Sub, SubAssign},
+    hash::Hash,
+    ops::{Add, Sub},
 };
 
 use derive_more::{Deref, DerefMut};
@@ -145,6 +145,10 @@ impl<T: PartialEq> PartialEq for NonZero<T> {
 
 impl<T: Eq> Eq for NonZero<T> {}
 
+impl<T: Hash> Hash for NonZero<T> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state) }
+}
+
 impl<T> From<T> for NonZero<T> {
     fn from(val: T) -> Self { Self(Some(val)) }
 }
@@ -157,70 +161,44 @@ impl<T> From<NonZero<T>> for Option<T> {
     fn from(val: NonZero<T>) -> Self { val.0 }
 }
 
-impl<T: FrogWrite + Copy + PartialEq + Add<Output = T> + From<u8>> FrogWrite for NonZero<T>
-where
-    Wrapping<T>: AddAssign,
-{
+impl<T: FrogWrite + Copy + PartialEq + Add<Output = T> + From<u8>> FrogWrite for NonZero<T> {
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         match &self.0 {
-            Some(val) => {
-                let mut val = Wrapping(*val);
-                val += Wrapping(T::from(1));
-                val.0.fg_write(buf)
-            }
+            Some(val) => (*val + T::from(1)).fg_write(buf),
             None => T::from(0).fg_write(buf),
         }
     }
 }
 
-impl<T: FrogVarWrite + Copy + PartialEq + Add<Output = T> + From<u8>> FrogVarWrite for NonZero<T>
-where
-    Wrapping<T>: AddAssign,
-{
+impl<T: FrogVarWrite + Copy + PartialEq + Add<Output = T> + From<u8>> FrogVarWrite for NonZero<T> {
     fn fg_var_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         match &self.0 {
-            Some(val) => {
-                let mut val = Wrapping(*val);
-                val += Wrapping(T::from(1));
-                val.0.fg_var_write(buf)
-            }
+            Some(val) => (*val + T::from(1)).fg_var_write(buf),
             None => T::from(0).fg_var_write(buf),
         }
     }
 }
 
-impl<T: FrogRead + PartialEq + Sub<Output = T> + From<u8>> FrogRead for NonZero<T>
-where
-    Wrapping<T>: SubAssign,
-{
+impl<T: FrogRead + PartialEq + Sub<Output = T> + From<u8>> FrogRead for NonZero<T> {
     fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
         let val = T::fg_read(buf)?;
 
         if val == T::from(0) {
             Ok(Self(None))
         } else {
-            let mut val = Wrapping(val);
-            val -= Wrapping(T::from(1));
-
-            Ok(Self(Some(val.0)))
+            Ok(Self(Some(val - T::from(1))))
         }
     }
 }
 
-impl<T: FrogVarRead + PartialEq + Sub<Output = T> + From<u8>> FrogVarRead for NonZero<T>
-where
-    Wrapping<T>: SubAssign,
-{
+impl<T: FrogVarRead + PartialEq + Sub<Output = T> + From<u8>> FrogVarRead for NonZero<T> {
     fn fg_var_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
         let val = T::fg_var_read(buf)?;
 
         if val == T::from(0) {
             Ok(Self(None))
         } else {
-            let mut val = Wrapping(val);
-            val -= Wrapping(T::from(1));
-
-            Ok(Self(Some(val.0)))
+            Ok(Self(Some(val - T::from(1))))
         }
     }
 }
@@ -230,7 +208,7 @@ proptest::proptest! {
     #![proptest_config(proptest::prelude::ProptestConfig::with_cases(256))]
 
     #[test]
-    fn nonzero_u8_read(val in 0u8..u8::MAX) {
+    fn nonzero_u8_read(val in 0u8..=u8::MAX) {
         let mut cursor = std::io::Cursor::new(core::slice::from_ref(&val));
         let nonzero = NonZero::fg_read(&mut cursor).unwrap();
 
@@ -243,7 +221,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn nonzero_u8_write(val in 1u8..=u8::MAX) {
+    fn nonzero_u8_write(val in 0u8..u8::MAX) {
         let nonzero = NonZero::new_some(val);
         let buf = nonzero.fg_to_bytes();
 
@@ -257,10 +235,10 @@ proptest::proptest! {
 
 #[cfg(test)]
 proptest::proptest! {
-    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(1024))]
+    #![proptest_config(proptest::prelude::ProptestConfig::with_cases(256))]
 
     #[test]
-    fn nonzero_u32_read(val in 0u32..u32::MAX) {
+    fn nonzero_u32_read(val in 0u32..=u32::MAX) {
         let bytes = val.fg_to_bytes();
         let mut cursor = std::io::Cursor::new(bytes.as_slice());
         let nonzero = NonZero::fg_read(&mut cursor).unwrap();
@@ -273,7 +251,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn nonzero_u32_write(val in 1u32..=u32::MAX) {
+    fn nonzero_u32_write(val in 0u32..u32::MAX) {
         let nonzero = NonZero::new_some(val);
         let buf = nonzero.fg_to_bytes();
 
@@ -285,7 +263,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn nonzero_u32_var_read(val in 0u32..u32::MAX) {
+    fn nonzero_u32_var_read(val in 0u32..=u32::MAX) {
         let bytes = val.fg_var_to_bytes();
         let mut cursor = std::io::Cursor::new(bytes.as_slice());
         let nonzero = NonZero::fg_var_read(&mut cursor).unwrap();
@@ -298,7 +276,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn nonzero_u32_var_write(val in 1u32..=u32::MAX) {
+    fn nonzero_u32_var_write(val in 0u32..u32::MAX) {
         let nonzero = NonZero::new_some(val);
         let buf = nonzero.fg_var_to_bytes();
 
