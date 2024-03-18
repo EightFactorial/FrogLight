@@ -32,7 +32,7 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
       # Install the deny tool
       - name: Install Deny
-        uses: taiki-e/install-action@4abee32ddd6d3482e57ba21814317997e6268efe # v2
+        uses: taiki-e/install-action@ffad14352befc011a07601bbf501b672acbc18e6 # v2
         with:
           tool: cargo-deny
       # Checkout the repository
