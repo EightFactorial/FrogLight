@@ -4,6 +4,7 @@
 #![feature(array_try_from_fn)]
 #![feature(generic_const_exprs)]
 #![feature(trivial_bounds)]
+#![allow(clippy::struct_excessive_bools)]
 
 #[cfg(feature = "reflect")]
 mod plugin;

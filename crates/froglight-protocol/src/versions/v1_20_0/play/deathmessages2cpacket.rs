@@ -1,8 +1,11 @@
 use froglight_macros::FrogReadWrite;
+use serde_json::Value;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::EntityId;
+
+#[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct DeathMessageS2CPacket {
-    pub entity_id: (),
-    pub message: (),
+    pub id: EntityId,
+    pub message: Value,
 }

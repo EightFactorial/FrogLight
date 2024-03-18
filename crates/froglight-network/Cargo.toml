@@ -33,6 +33,7 @@ bevy_time = { workspace = true }
 bevy_transform = { workspace = true }
 compact_str = { workspace = true }
 derive_more = { workspace = true }
+flume = "0.11.0"
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entities = { version = "0.1.0", path = "../froglight-entities" }
 froglight-physics = { version = "0.1.0", path = "../froglight-physics" }

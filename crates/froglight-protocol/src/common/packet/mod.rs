@@ -22,11 +22,20 @@ pub use item_slot::ItemSlot;
 mod legacy_slot;
 pub use legacy_slot::{LegacyItemSlot, LegacyItemSlotData};
 
+mod look_at;
+pub use look_at::{LookAnchor, LookEntity};
+
 mod player_ability;
 pub use player_ability::{ClientPlayerAbilityFlags, ServerPlayerAbilityFlags};
+
+mod position_flags;
+pub use position_flags::RelativePositionFlags;
 
 mod query_status;
 pub use query_status::{ServerPlayers, ServerSamplePlayer, ServerStatus, ServerVersion};
 
 mod resource_pack;
 pub use resource_pack::ResourcePackAction;
+
+mod trade_offer;
+pub use trade_offer::{LegacyTradeOffer, TradeOffer};

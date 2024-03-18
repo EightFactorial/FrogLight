@@ -1,8 +1,10 @@
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::UnsizedByteBuffer;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct PlayerListS2CPacket {
-    pub field_0: (),
-    pub field_1: (),
+    pub actions: u8,
+    pub data: UnsizedByteBuffer,
 }

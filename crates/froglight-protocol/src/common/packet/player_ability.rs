@@ -4,7 +4,6 @@ use froglight_macros::FrogReadWrite;
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[frog(bitset = 4, tests = ["read_verify", "write_verify"], bytes = [0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-#[allow(clippy::struct_excessive_bools)]
 pub struct ServerPlayerAbilityFlags {
     /// Whether the player is invulnerable.
     pub invulnerable: bool,

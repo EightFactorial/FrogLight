@@ -32,7 +32,6 @@ pub enum ChatVisibility {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[frog(bitset = 7, tests = ["read_example"], bytes = [0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-#[allow(clippy::struct_excessive_bools)]
 pub struct ModelCustomization {
     pub cape: bool,
     pub jacket: bool,
