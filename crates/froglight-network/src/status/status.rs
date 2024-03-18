@@ -36,8 +36,8 @@ where
     /// The entity that is sending the request.
     pub entity: Entity,
     /// The URL to query.
-    pub url: CompactString,
-    _phantom: PhantomData<V>,
+    pub address: CompactString,
+    pub(crate) _phantom: PhantomData<V>,
 }
 
 impl<V: Queryable> StatusRequest<V>
@@ -50,8 +50,8 @@ where
 {
     /// Create a new [`StatusRequest`] with the given URL.
     #[must_use]
-    pub fn new(entity: Entity, url: &(impl AsRef<str> + ?Sized)) -> Self {
-        Self { entity, url: url.as_ref().into(), _phantom: PhantomData }
+    pub fn new(entity: Entity, address: &(impl AsRef<str> + ?Sized)) -> Self {
+        Self { entity, address: address.as_ref().into(), _phantom: PhantomData }
     }
 
     pub(super) fn build(app: &mut App) {

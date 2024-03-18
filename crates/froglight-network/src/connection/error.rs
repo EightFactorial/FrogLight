@@ -8,7 +8,7 @@ use crate::resolver::ResolverError;
 pub enum ConnectionError {
     /// Connection was closed.
     #[error("Connection was closed")]
-    ConnecionClosed,
+    ConnectionClosed,
     /// An I/O error occurred.
     #[error(transparent)]
     Io(#[from] std::io::Error),

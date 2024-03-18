@@ -126,7 +126,7 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
 
         // If the buffer is empty, the connection is closed
         if buffer_len == 0 {
-            return Err(ConnectionError::ConnecionClosed);
+            return Err(ConnectionError::ConnectionClosed);
         }
 
         // TODO: Decryption

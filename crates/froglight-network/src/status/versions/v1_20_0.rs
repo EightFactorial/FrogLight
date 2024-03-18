@@ -44,7 +44,7 @@ impl Queryable for V1_20_0 {
         match connection.recv().await? {
             StatusClientboundPackets::QueryResponse(status) => {
                 let response =
-                    StatusResponse { entity: event.entity, url: event.url, status: status.0 };
+                    StatusResponse { entity: event.entity, url: event.address, status: status.0 };
 
                 Ok(response)
             }
@@ -62,7 +62,8 @@ impl Queryable for V1_20_0 {
 
         match connection.recv().await? {
             StatusClientboundPackets::QueryPong(pong) => {
-                let response = PingResponse { entity: event.entity, url: event.url, time: pong.0 };
+                let response =
+                    PingResponse { entity: event.entity, url: event.address, time: pong.0 };
 
                 Ok(response)
             }
