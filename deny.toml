@@ -71,9 +71,6 @@ version = "=0.2.3"
 name = "idna"
 version = "=0.4.0"
 [[bans.skip]]
-name = "num-derive"
-version = "=0.3.3"
-[[bans.skip]]
 name = "polling"
 version = "=2.8.0"
 [[bans.skip]]
