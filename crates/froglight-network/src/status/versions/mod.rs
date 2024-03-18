@@ -25,11 +25,10 @@ where
         resolver: Resolver,
     ) -> impl Future<Output = Result<StatusResponse, ConnectionError>> + Send {
         async move {
-            let addr = resolver.url_lookup(&event.address).await?;
-
             // Connect to the server and perform the handshake
-            let mut connection = Connection::<Self, Handshaking>::connect(addr).await?;
-            Self::handshake(&event.address, addr.port(), &mut connection).await?;
+            let mut connection =
+                Connection::<Self, Handshaking>::connect_to(&event.address, &resolver).await?;
+            Self::handshake(&mut connection).await?;
 
             // Query the status of the server
             let mut connection = connection.status();
@@ -42,11 +41,10 @@ where
         resolver: Resolver,
     ) -> impl Future<Output = Result<PingResponse, ConnectionError>> + Send {
         async move {
-            let addr = resolver.url_lookup(&event.address).await?;
-
             // Connect to the server and perform the handshake
-            let mut connection = Connection::<Self, Handshaking>::connect(addr).await?;
-            Self::handshake(&event.address, addr.port(), &mut connection).await?;
+            let mut connection =
+                Connection::<Self, Handshaking>::connect_to(&event.address, &resolver).await?;
+            Self::handshake(&mut connection).await?;
 
             // Query the latency of the server
             let mut connection = connection.status();
@@ -56,8 +54,6 @@ where
 
     /// Perform a handshake with the server.
     fn handshake(
-        url: &str,
-        port: u16,
         connection: &mut Connection<Self, Handshaking>,
     ) -> impl Future<Output = Result<(), ConnectionError>> + Send;
 

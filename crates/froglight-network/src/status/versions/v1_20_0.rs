@@ -1,4 +1,5 @@
 use bevy_reflect::TypePath;
+use compact_str::CompactString;
 use froglight_core::common::ConnectionIntent;
 use froglight_protocol::{
     states::{Handshaking, Status},
@@ -20,15 +21,18 @@ use crate::{
 
 impl Queryable for V1_20_0 {
     async fn handshake(
-        url: &str,
-        port: u16,
         connection: &mut Connection<Self, Handshaking>,
     ) -> Result<(), ConnectionError> {
+        let (hostname, port) = match connection.info.as_ref() {
+            Some(info) => (info.address.clone().unwrap_or_default(), info.socket.port()),
+            None => (CompactString::default(), 25565),
+        };
+
         let intent = HandshakeC2SPacket {
             protocol_version: V1_20_0::PROTOCOL_VERSION,
-            hostname: url.into(),
-            port,
             intention: ConnectionIntent::Status,
+            hostname,
+            port,
         };
         connection.send(intent).await?;
 

@@ -50,6 +50,9 @@ impl Resolver {
         srv_query: &str,
         mut port: Option<NonZeroU16>,
     ) -> Result<SocketAddr, ResolverError> {
+        #[cfg(debug_assertions)]
+        bevy_log::trace!("Performing SRV lookup for `{srv_query}`");
+
         let Ok(srv_lookup) = self.resolver.srv_lookup(srv_query).await else {
             return self.lookup_ip(query, port).await;
         };
@@ -71,6 +74,9 @@ impl Resolver {
         target: &str,
         port: Option<NonZeroU16>,
     ) -> Result<SocketAddr, ResolverError> {
+        #[cfg(debug_assertions)]
+        bevy_log::trace!("Performing A/AAAA lookup for `{target}`");
+
         let lookup = self.resolver.lookup_ip(target).await?;
         let address = lookup.iter().next().ok_or(ResolverError::NoAddressFound)?;
         let port = port.map_or(25565, NonZeroU16::get);

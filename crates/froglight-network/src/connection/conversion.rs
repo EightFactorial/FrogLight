@@ -23,8 +23,9 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
         Connection {
             stream: self.stream,
             buffer: self.buffer,
-            bundle: VecDeque::with_capacity(8),
             compression: self.compression,
+            info: self.info,
+            bundle: VecDeque::with_capacity(8),
             _version: PhantomData,
             _state: PhantomData,
             _direction: PhantomData,
