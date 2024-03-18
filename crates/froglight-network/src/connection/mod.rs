@@ -148,12 +148,15 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
             let mut decompressed = Vec::with_capacity(packet_length);
             decompressor.read_to_end(&mut decompressed).await?;
 
+            // Get the length of the decompressed packet
+            let packet_length = decompressed.len();
+
             // Read the packet from the decompressed buffer
             let mut cursor = Cursor::new(decompressed.as_slice());
-            let packet = D::Recv::fg_read(&mut cursor)?;
+            let packet = D::Recv::fg_read(&mut cursor);
 
             // Read any bundled packets from the decompressed buffer
-            if cursor.position() < 1 {
+            if packet.is_ok() && cursor.position() == 0u64 {
                 Self::read_bundled(packet_length, &mut cursor, &mut self.bundle)?;
             }
 
@@ -161,13 +164,13 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
             self.buffer.consume(packet_length_bytes + packet_length);
 
             // Return the packet
-            Ok(packet)
+            packet.map_err(ConnectionError::from)
         } else {
             // Read the packet from the buffer
-            let packet = D::Recv::fg_read(&mut cursor)?;
+            let packet = D::Recv::fg_read(&mut cursor);
 
             // Read any bundled packets from the buffer
-            if cursor.position() < 1 {
+            if packet.is_ok() && cursor.position() == 0u64 {
                 Self::read_bundled(packet_length, &mut cursor, &mut self.bundle)?;
             }
 
@@ -175,7 +178,7 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
             self.buffer.consume(packet_length_bytes + packet_length);
 
             // Return the packet
-            Ok(packet)
+            packet.map_err(ConnectionError::from)
         }
     }
 
