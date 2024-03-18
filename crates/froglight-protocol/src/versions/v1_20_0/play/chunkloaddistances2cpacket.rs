@@ -1,7 +1,11 @@
+use derive_more::{Deref, DerefMut, From, Into};
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogReadWrite)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [8])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct ChunkLoadDistanceS2CPacket {
-    pub distance: (),
+pub struct ChunkLoadDistanceS2CPacket(#[frog(var)] pub u32);
+
+impl Default for ChunkLoadDistanceS2CPacket {
+    fn default() -> Self { Self(8) }
 }

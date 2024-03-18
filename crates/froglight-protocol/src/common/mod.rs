@@ -21,6 +21,7 @@ pub use packet::*;
 mod position;
 pub use position::{
     BlockPosition, ChunkBlockPosition, ChunkPosition, GlobalPosition, SectionBlockPosition,
+    SectionPosition,
 };
 
 mod special;

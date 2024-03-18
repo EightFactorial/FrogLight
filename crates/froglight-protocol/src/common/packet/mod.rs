@@ -5,7 +5,7 @@ mod chunk_biome_data;
 pub use chunk_biome_data::ChunkBiomeData;
 
 mod chunk_data;
-pub use chunk_data::ChunkDataPacket;
+pub use chunk_data::{BlockEntity, ChunkDataPacket, SectionDataPacket};
 
 mod client_information;
 pub use client_information::{ChatVisibility, ClientInformation, ModelCustomization};

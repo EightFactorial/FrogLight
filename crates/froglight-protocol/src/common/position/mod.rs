@@ -9,8 +9,11 @@ pub use chunkpos::ChunkPosition;
 mod chunkblockpos;
 pub use chunkblockpos::ChunkBlockPosition;
 
+mod globalpos;
+pub use globalpos::GlobalPosition;
+
 mod sectionblockpos;
 pub use sectionblockpos::SectionBlockPosition;
 
-mod globalpos;
-pub use globalpos::GlobalPosition;
+mod sectionpos;
+pub use sectionpos::SectionPosition;

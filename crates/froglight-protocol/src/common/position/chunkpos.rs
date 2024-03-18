@@ -6,7 +6,7 @@ use std::{
 use bevy_math::{I64Vec2, IVec2};
 use derive_more::{Deref, DerefMut, From, Into};
 
-use crate::io::{FrogRead, FrogWrite};
+use crate::io::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite};
 
 /// A position in the world, measured in chunks.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut)]
@@ -58,6 +58,18 @@ impl FrogRead for ChunkPosition {
     }
 }
 
+/// Read as variable i32s and then converted to i64s.
+impl FrogVarRead for ChunkPosition {
+    fn fg_var_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::io::ReadError>
+    where
+        Self: Sized,
+    {
+        // Swap the X/Z coordinates
+        let pos = IVec2::fg_var_read(buf)?;
+        Ok(Self::new(i64::from(pos.y), i64::from(pos.x)))
+    }
+}
+
 /// Converted to i32s and then written.
 impl FrogWrite for ChunkPosition {
     fn fg_write(
@@ -66,6 +78,17 @@ impl FrogWrite for ChunkPosition {
     ) -> Result<(), crate::io::WriteError> {
         // Swap the X/Z coordinates
         IVec2::new(i32::try_from(self.y)?, i32::try_from(self.x)?).fg_write(buf)
+    }
+}
+
+/// Converted to i32s and then variably written.
+impl FrogVarWrite for ChunkPosition {
+    fn fg_var_write(
+        &self,
+        buf: &mut (impl std::io::Write + ?Sized),
+    ) -> Result<(), crate::io::WriteError> {
+        // Swap the X/Z coordinates
+        IVec2::new(i32::try_from(self.y)?, i32::try_from(self.x)?).fg_var_write(buf)
     }
 }
 
