@@ -80,7 +80,7 @@ simdnbt = "0.4.2"
 smallvec = "1.13.1"
 strum = "0.26.2"
 thiserror = "1.0.58"
-uuid = "1.7.0"
+uuid = "1.8.0"
 
 # --- Build Settings ---
 
