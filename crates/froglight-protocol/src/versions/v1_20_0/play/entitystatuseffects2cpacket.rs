@@ -1,12 +1,16 @@
 use froglight_macros::FrogReadWrite;
+use simdnbt::owned::Nbt;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::{EntityId, ResourceKey};
+
+#[derive(Debug, Clone, PartialEq, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct EntityStatusEffectS2CPacket {
-    pub field_0: (),
-    pub field_1: (),
-    pub field_2: (),
-    pub field_3: (),
-    pub field_4: (),
-    pub field_5: (),
+    pub entity_id: EntityId,
+    pub effect: ResourceKey,
+    pub amplifier: u8,
+    #[frog(var)]
+    pub duration: u32,
+    pub flags: u8,
+    pub data: Option<Nbt>,
 }

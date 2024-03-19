@@ -1,10 +1,14 @@
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::UnsizedByteBuffer;
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct AdvancementUpdateS2CPacket {
-    pub field_0: (),
-    pub field_1: (),
-    pub field_2: (),
-    pub field_3: (),
+    pub reset: bool,
+    // TODO: Implement advancements
+    pub data: UnsizedByteBuffer,
+    // pub added: HashMap<ResourceLocation, Advancement>,
+    // pub removed: Vec<ResourceLocation>,
+    // pub progress: HashMap<ResourceLocation, AdvancementProgress>,
 }
