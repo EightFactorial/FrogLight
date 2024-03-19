@@ -78,7 +78,6 @@ fn read_unnamed(discriminant: i32, var_ident: &Ident, fields: &syn::FieldsUnname
     let mut field_tokens = TokenStream::new();
 
     for field in &fields.unnamed {
-        let field_type = &field.ty;
         let field_attrs = field.attrs.as_slice();
 
         // Read the field normally, or read as a variable length field
@@ -88,7 +87,7 @@ fn read_unnamed(discriminant: i32, var_ident: &Ident, fields: &syn::FieldsUnname
             });
         } else {
             field_tokens.extend(quote! {
-                <#field_type as crate::io::FrogRead>::fg_read(buf)?,
+                crate::io::FrogRead::fg_read(buf)?,
             });
         }
     }
@@ -101,7 +100,7 @@ fn read_unnamed(discriminant: i32, var_ident: &Ident, fields: &syn::FieldsUnname
     } else {
         // Read as a tuple
         quote! {
-            #discriminant => Ok(Self::#var_ident((#field_tokens))),
+            #discriminant => Ok(Self::#var_ident(#field_tokens)),
         }
     }
 }

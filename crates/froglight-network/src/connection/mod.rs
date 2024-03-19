@@ -1,6 +1,7 @@
 use std::{collections::VecDeque, marker::PhantomData, net::SocketAddr};
 
 use async_std::{io::BufReader, net::TcpStream};
+use bevy_log::debug;
 use froglight_protocol::{
     states::Handshaking,
     traits::{State, Version},
@@ -51,8 +52,7 @@ where
     ) -> Result<Self, ConnectionError> {
         let socket = resolver.url_lookup(address.as_ref()).await?;
 
-        #[cfg(debug_assertions)]
-        bevy_log::trace!("Connecting to `{}` ({socket})", address.as_ref());
+        debug!("Connecting to `{}` ({socket})", address.as_ref());
 
         let mut connection = Self::connect(socket).await?;
         if let Some(info) = &mut connection.info {
@@ -82,6 +82,17 @@ where
 }
 
 impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> Connection<V, S, D> {
+    /// Set the compression threshold.
+    ///
+    /// If the threshold is `None` or less than 0, compression will be disabled.
+    #[inline]
+    pub fn set_compression(&mut self, threshold: Option<i32>) { self.compression = threshold; }
+
+    /// Get the compression threshold.
+    #[inline]
+    #[must_use]
+    pub fn get_compression(&self) -> Option<i32> { self.compression }
+
     /// Create a new connection from a TCP stream.
     ///
     /// [`Connection::info`]'s `socket` will be set if the peer's

@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Data, DataEnum, DeriveInput, Fields, Ident, Variant};
+use syn::{spanned::Spanned, Data, DataEnum, DeriveInput, Fields, Ident, Variant};
 
 use crate::protocol::Attributes;
 
@@ -89,28 +89,30 @@ fn write_unnamed(
     fields: &syn::FieldsUnnamed,
 ) -> TokenStream {
     let mut field_tokens = TokenStream::new();
+    let mut variant_tokens = TokenStream::new();
 
-    for field in &fields.unnamed {
+    for (i, field) in fields.unnamed.iter().enumerate() {
         let field_attrs = field.attrs.as_slice();
-        let field_type = &field.ty;
+
+        let field_name = Ident::new(&format!("field_{i}"), field.span());
+        variant_tokens.extend(quote!(#field_name,));
 
         // Write the field normally, or write as a variable length field
         if super::is_variable(field_attrs) {
             field_tokens.extend(quote! {
-                Self::#var_ident(data) => {
-                    <i32 as crate::io::FrogVarWrite>::fg_var_write(&#discriminant, buf)?;
-                    <#field_type as crate::io::FrogVarWrite>::fg_var_write(data, buf)?;
-                }
+                crate::io::FrogVarWrite::fg_var_write(#field_name, buf)?;
             });
         } else {
             field_tokens.extend(quote! {
-                Self::#var_ident(data) => {
-                    <i32 as crate::io::FrogVarWrite>::fg_var_write(&#discriminant, buf)?;
-                    <#field_type as crate::io::FrogWrite>::fg_write(data, buf)?;
-                }
+                crate::io::FrogWrite::fg_write(#field_name, buf)?;
             });
         }
     }
 
-    field_tokens
+    quote! {
+        Self::#var_ident(#variant_tokens) => {
+            <i32 as crate::io::FrogVarWrite>::fg_var_write(&#discriminant, buf)?;
+            #field_tokens
+        }
+    }
 }

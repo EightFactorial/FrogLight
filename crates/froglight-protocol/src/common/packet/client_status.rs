@@ -1,8 +1,13 @@
 use froglight_macros::FrogReadWrite;
 
-use crate::common::ClientStatusAction;
-
+/// A client status action.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct ClientStatusC2SPacket(pub ClientStatusAction);
+pub enum ClientStatusAction {
+    /// Perform a respawn.
+    #[default]
+    PerformRespawn,
+    /// Request statistics.
+    RequestStats,
+}

@@ -122,7 +122,7 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-bevy = { workspace = true }
+bevy = { workspace = true, features = ["wayland"] }
 froglight-client = { version = "0.1.0", path = "crates/froglight-client" }
 mimalloc = { version = "0.1.39", optional = true }
 

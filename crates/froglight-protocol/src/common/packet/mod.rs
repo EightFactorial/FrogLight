@@ -10,11 +10,20 @@ pub use chunk_data::{BlockEntity, ChunkDataPacket, SectionDataPacket};
 mod client_information;
 pub use client_information::{ChatVisibility, ClientInformation, ModelCustomization};
 
+mod client_status;
+pub use client_status::ClientStatusAction;
+
 mod entity_animation;
 pub use entity_animation::EntityAnimation;
 
 mod game_state_event;
 pub use game_state_event::GameStateEvent;
+
+mod interaction_action;
+pub use interaction_action::InteractionAction;
+
+mod item_action;
+pub use item_action::ItemAction;
 
 mod item_slot;
 pub use item_slot::ItemSlot;

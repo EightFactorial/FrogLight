@@ -1,9 +1,10 @@
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, FrogReadWrite)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct PlayerMoveC2SPacketLookAndOnGround {
-    pub field_0: (),
-    pub field_1: (),
-    pub field_2: (),
+    pub yaw: f32,
+    pub pitch: f32,
+    pub on_ground: bool,
 }
