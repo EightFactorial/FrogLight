@@ -60,9 +60,10 @@ pub(crate) fn frog_version_blocks(input: TokenStream) -> TokenStream {
 
             fn register_reflect(world: &mut bevy_ecs::world::World) {
                 let Some(registry) = world.get_resource::<bevy_ecs::prelude::AppTypeRegistry>() else { return; };
-                bevy_log::debug!("Registering ReflectBlockType for {:?} blocks.", #version);
-
                 let mut registry = registry.write();
+
+                bevy_log::debug!("Registering ReflectBlockType<{:?}>", #version);
+
                 #reflect_tokens
             }
         }

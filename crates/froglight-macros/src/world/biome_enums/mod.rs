@@ -51,9 +51,10 @@ pub(crate) fn frog_version_biomes(input: TokenStream) -> TokenStream {
 
             fn register_reflect(world: &mut bevy_ecs::world::World) {
                 let Some(registry) = world.get_resource::<bevy_ecs::prelude::AppTypeRegistry>() else { return; };
-                bevy_log::debug!("Registering ReflectBiomeType for {:?} biomes.", #version);
-
                 let mut registry = registry.write();
+
+                bevy_log::debug!("Registering ReflectBiomeType<{:?}>", #version);
+
                 #reflect_tokens
             }
         }

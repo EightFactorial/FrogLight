@@ -111,6 +111,13 @@ impl UiScalePlugin {
         // Update the scale if it has changed
         let value = value as f32;
         if (**scale - value).abs() > f32::EPSILON {
+            #[cfg(debug_assertions)]
+            bevy::log::trace!(
+                "Window size: {}x{}",
+                window.physical_width(),
+                window.physical_height()
+            );
+
             debug!("Setting UIScale to: {value}");
             **scale = value;
         }

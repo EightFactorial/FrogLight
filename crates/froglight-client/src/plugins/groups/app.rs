@@ -1,4 +1,4 @@
-use bevy::{app::PluginGroupBuilder, prelude::*};
+use bevy::{app::PluginGroupBuilder, prelude::*, winit::WinitPlugin};
 
 use crate::plugins::prelude::*;
 
@@ -14,6 +14,7 @@ pub struct AppPlugins;
 impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroup::build(DefaultPlugins)
+            .set(WinitPlugin { run_on_any_thread: true })
             .add_before::<AssetPlugin, AssetSourcePlugin>(AssetSourcePlugin::default())
             .add(ReflectPlugin)
             .add(CorePlugin)

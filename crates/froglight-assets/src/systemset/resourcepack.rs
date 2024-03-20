@@ -44,11 +44,14 @@ pub(super) fn build(app: &mut App) {
 #[doc(hidden)]
 pub(super) fn finish(conditions: &Mutex<Vec<BoxedCondition>>, app: &mut App) {
     let conditions: Vec<BoxedCondition> = std::mem::take(&mut conditions.lock());
-    debug!("Adding {} ResourcePackState::Processing conditions", conditions.len());
+    debug!("Adding {} ResourcePackState::Processing condition(s)", conditions.len());
 
     // Add the conditions to the system.
     let mut system = ResourcePackState::enter_ready_state.into_configs();
     for cond in conditions {
+        #[cfg(debug_assertions)]
+        bevy_log::trace!("Adding: `{}`", cond.name());
+
         system.run_if_dyn(cond);
     }
 

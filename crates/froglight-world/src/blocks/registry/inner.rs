@@ -201,9 +201,7 @@ impl<V: Version> InnerBlockRegistry<V> {
         let states = block.states();
 
         #[cfg(debug_assertions)]
-        {
-            bevy_log::trace!("Registering block `{}`", block.resource_key());
-        }
+        bevy_log::trace!("Registering block `{}`", block.resource_key());
 
         // Insert the block into the dyn_blocks
         let index = self.dyn_blocks.len();

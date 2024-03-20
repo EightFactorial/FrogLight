@@ -52,9 +52,7 @@ impl<V: Version> InnerBiomeRegistry<V> {
         let biome = B::default();
 
         #[cfg(debug_assertions)]
-        {
-            bevy_log::trace!("Registering biome `{}`", biome.resource_key());
-        }
+        bevy_log::trace!("Registering biome `{}`", biome.resource_key());
 
         // Insert the biome into the dyn_biomes list
         let index = self.dyn_biomes.len();

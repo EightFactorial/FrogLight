@@ -61,18 +61,13 @@ impl<V: BiomeRegistration> FromWorld for BiomeRegistry<V> {
         if let Some(registry) = world.get_resource::<AppTypeRegistry>() {
             let registry_exists = registry.read().get(TypeId::of::<Self>()).is_none();
             if registry_exists {
-                debug!("Registering BiomeRegistry<{:?}>", V::default());
-
                 // Create the type registration
                 #[allow(unused_mut)]
                 let mut registration = Self::get_type_registration();
 
                 // Add the `InspectorEguiImpl` to the type registration
                 #[cfg(feature = "inspector")]
-                {
-                    debug!("Adding InspectorEguiImpl for BiomeRegistry<{:?}>", V::default());
-                    registration.insert(Self::inspector_egui_impl());
-                }
+                registration.insert(Self::inspector_egui_impl());
 
                 // Add the registration to the app type registry
                 registry.write().add_registration(registration);
@@ -81,6 +76,8 @@ impl<V: BiomeRegistration> FromWorld for BiomeRegistry<V> {
                 V::register_reflect(world);
             }
         }
+
+        debug!("Initializing BiomeRegistry<{:?}>", V::default());
 
         // Create a new biome registry with all of the default biomes
         Self::new_default()
