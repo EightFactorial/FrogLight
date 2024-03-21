@@ -73,12 +73,16 @@ impl FrogRead for BlockPosition {
         Self: Sized,
     {
         let val = i64::fg_read(buf)?;
-        let x = (val << (64 - Self::X_OFFSET - Self::PACKED_X_LENGTH)
-            >> (64 - Self::PACKED_X_LENGTH)) as i32;
-        let y = (val << (64 - Self::PACKED_Y_LENGTH) >> (64 - Self::PACKED_Y_LENGTH)) as i32;
-        let z = (val << (64 - Self::Z_OFFSET - Self::PACKED_Z_LENGTH)
-            >> (64 - Self::PACKED_Z_LENGTH)) as i32;
-        Ok(Self::new(i64::from(x), i64::from(y), i64::from(z)))
+
+        let x =
+            val << (64 - Self::X_OFFSET - Self::PACKED_X_LENGTH) >> (64 - Self::PACKED_X_LENGTH);
+
+        let y = val << (64 - Self::PACKED_Y_LENGTH) >> (64 - Self::PACKED_Y_LENGTH);
+
+        let z =
+            val << (64 - Self::Z_OFFSET - Self::PACKED_Z_LENGTH) >> (64 - Self::PACKED_Z_LENGTH);
+
+        Ok(Self::new(x, y, z))
     }
 }
 

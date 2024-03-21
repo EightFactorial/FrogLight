@@ -14,11 +14,14 @@ pub enum InteractionAction {
     InteractAt(DVec3, InteractionHand),
 }
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, FrogReadWrite)]
+/// The hand the player is using to interact with
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum InteractionHand {
+    /// The player's main hand
     #[default]
     MainHand,
+    /// The player's off hand
     OffHand,
 }

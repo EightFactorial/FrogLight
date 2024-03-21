@@ -1,9 +1,12 @@
+use bevy_math::Vec2;
 use froglight_macros::FrogReadWrite;
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+use crate::common::PlayerInputFlags;
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, FrogReadWrite)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct PlayerInputC2SPacket {
-    pub field_0: (),
-    pub field_1: (),
-    pub field_2: (),
+    pub velocity: Vec2,
+    pub flags: PlayerInputFlags,
 }

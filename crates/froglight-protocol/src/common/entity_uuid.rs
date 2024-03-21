@@ -7,6 +7,7 @@ use uuid::Uuid;
 /// This value is unique for every entity in the world.
 #[derive(
     Debug,
+    Default,
     Clone,
     Copy,
     PartialEq,
