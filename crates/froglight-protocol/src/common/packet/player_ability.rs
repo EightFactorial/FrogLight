@@ -16,7 +16,7 @@ pub struct ServerPlayerAbilityFlags {
 }
 
 /// The player's current state sent from the client.
-#[derive(Debug, Default, Clone, PartialEq, FrogReadWrite)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[frog(bitset = 2, tests = ["read_verify", "write_verify"], bytes = [0])]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ClientPlayerAbilityFlags {

@@ -17,6 +17,10 @@ build-release: (build-profile "release")
 build-profile profile="dev" args="":
   cargo build --profile {{profile}} --features mimalloc {{args}}
 
+# Clean build artifacts
+clean: (fetch-tools) (tools "clean")
+  cargo clean
+
 # ---- Run Recipes ----
 
 # Run development build
