@@ -1,5 +1,6 @@
 use compact_str::CompactString;
 use froglight_macros::FrogReadWrite;
+use hashbrown::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
@@ -22,6 +23,10 @@ pub struct ServerStatus {
     /// Whether the server enforces secure chat
     #[serde(default, rename = "enforcesSecureChat", skip_serializing_if = "Option::is_none")]
     pub enforces_secure_chat: Option<bool>,
+
+    /// Other fields that are not part of the standard status response
+    #[serde(default, flatten, skip_serializing_if = "HashMap::is_empty")]
+    pub other: HashMap<CompactString, Value>,
 }
 
 /// The server's version information
