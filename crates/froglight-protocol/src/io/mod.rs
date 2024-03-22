@@ -6,6 +6,7 @@
 use thiserror::Error;
 
 mod glam;
+mod integer;
 
 mod read;
 pub(crate) use froglight_macros::FrogRead;
