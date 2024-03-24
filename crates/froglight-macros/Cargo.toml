@@ -22,7 +22,7 @@ proc-macro = true
 attribute-derive = { version = "0.9.1", features = ["syn-full"] }
 proc-macro2 = { version = "1.0.79", features = ["nightly"] }
 quote = { version = "1.0.35", features = ["proc-macro"] }
-syn = { version = "2.0.53", features = ["full", "printing", "quote"] }
+syn = { version = "2.0.55", features = ["full", "printing", "quote"] }
 
 [features]
 default = []
