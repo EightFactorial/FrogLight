@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-async-compression = { version = "0.4.6", default-features = false, features = [
+async-compression = { version = "0.4.7", default-features = false, features = [
     "flate2",
     "futures-io",
     "zlib",
