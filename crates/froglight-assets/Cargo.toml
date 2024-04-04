@@ -38,7 +38,7 @@ dirs = "5.0.1"
 parking_lot = { workspace = true, optional = true }
 
 # ResourcePack dependencies
-async_zip = { version = "0.0.16", features = ["deflate"] }
+async_zip = { version = "0.0.17", features = ["deflate"] }
 futures-lite = { workspace = true }
 image = { workspace = true, features = ["jpeg", "png"] }
 thiserror = { workspace = true }

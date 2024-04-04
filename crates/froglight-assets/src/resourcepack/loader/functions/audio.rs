@@ -5,7 +5,10 @@ use bevy_asset::{Handle, LoadContext};
 use bevy_audio::AudioSource;
 use bevy_log::trace;
 use froglight_core::common::ResourceKey;
-use futures_lite::{io::Take, AsyncRead, AsyncReadExt};
+use futures_lite::{
+    io::{BufReader, Take},
+    AsyncRead, AsyncReadExt,
+};
 
 use crate::{AssetManager, ResourcePackLoader, ResourcePackLoaderError};
 
@@ -13,7 +16,11 @@ use crate::{AssetManager, ResourcePackLoader, ResourcePackLoaderError};
 pub(crate) async fn load_audio(
     loader: &ResourcePackLoader,
     resource_key: &ResourceKey,
-    entry: &mut ZipEntryReader<'_, Take<&mut (dyn AsyncRead + Sync + Send + Unpin)>, WithEntry<'_>>,
+    entry: &mut ZipEntryReader<
+        '_,
+        BufReader<&mut (dyn AsyncRead + Sync + Send + Unpin)>,
+        WithEntry<'_>,
+    >,
     load_context: &mut LoadContext<'_>,
 ) -> Result<Option<Handle<AudioSource>>, ResourcePackLoaderError> {
     // Check if the audio already exists in the asset manager.

@@ -93,6 +93,7 @@ impl<T: ContainerType> ChunkDataContainer<T> {
     }
 
     /// Set a value inside a [`Palette::Vector`].
+    #[allow(clippy::manual_unwrap_or_default)]
     fn set_vector(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
         let Palette::Vector(vec) = &self.palette else {
             unreachable!("Palette must be Palette::Vector");

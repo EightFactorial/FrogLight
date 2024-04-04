@@ -3,7 +3,7 @@ use bevy_asset::{io::Reader, AssetLoader, BoxedFuture, LoadContext};
 use bevy_log::warn;
 use derive_more::Deref;
 use froglight_core::common::{ResourceKey, ResourceKeyError};
-use futures_lite::{io::Take, AsyncRead};
+use futures_lite::{io::BufReader, AsyncRead};
 use thiserror::Error;
 
 use crate::{asset_manager::manager::AssetManager, ResourcePack};
@@ -64,7 +64,7 @@ impl AssetLoader for ResourcePackLoader {
         (): &'a Self::Settings,
         load_context: &'a mut LoadContext,
     ) -> BoxedFuture<'a, Result<Self::Asset, Self::Error>> {
-        Box::pin(Self::load(self, reader, load_context))
+        Box::pin(Self::load(self, BufReader::new(reader), load_context))
     }
 }
 
@@ -73,7 +73,7 @@ impl ResourcePackLoader {
     /// and load them into a [`ResourcePack`].
     async fn load<'a>(
         &self,
-        reader: &'a mut Reader<'a>,
+        reader: BufReader<&'a mut Reader<'a>>,
         context: &mut LoadContext<'_>,
     ) -> Result<ResourcePack, ResourcePackLoaderError> {
         // Create a new ZIP file reader
@@ -120,7 +120,7 @@ impl ResourcePackLoader {
         entry_name: String,
         entry_reader: &mut ZipEntryReader<
             '_,
-            Take<&'_ mut (dyn AsyncRead + Sync + Send + Unpin)>,
+            BufReader<&'_ mut (dyn AsyncRead + Sync + Send + Unpin)>,
             WithEntry<'_>,
         >,
         resourcepack: &mut ResourcePack,

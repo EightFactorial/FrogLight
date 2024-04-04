@@ -6,7 +6,10 @@ use bevy_render::{
     texture::{Image, ImageSampler},
 };
 use froglight_core::common::ResourceKey;
-use futures_lite::{io::Take, AsyncRead, AsyncReadExt};
+use futures_lite::{
+    io::{BufReader, Take},
+    AsyncRead, AsyncReadExt,
+};
 use image::io::Reader as ImageReader;
 
 use crate::{AssetManager, ResourcePackLoader, ResourcePackLoaderError};
@@ -15,10 +18,15 @@ use crate::{AssetManager, ResourcePackLoader, ResourcePackLoaderError};
 pub(crate) async fn load_texture(
     loader: &ResourcePackLoader,
     resource_key: &ResourceKey,
-    entry: &mut ZipEntryReader<'_, Take<&mut (dyn AsyncRead + Sync + Send + Unpin)>, WithEntry<'_>>,
+    entry: &mut ZipEntryReader<
+        '_,
+        BufReader<&mut (dyn AsyncRead + Sync + Send + Unpin)>,
+        WithEntry<'_>,
+    >,
     load_context: &mut LoadContext<'_>,
 ) -> Result<Option<Handle<Image>>, ResourcePackLoaderError> {
     // Check if the texture already exists in the asset manager.
+
     if loader.textures.read().contains_key(resource_key) {
         trace!(
             "Skipping `{resource_key}` from `{}` as it already exists",
