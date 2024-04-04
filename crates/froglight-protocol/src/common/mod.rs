@@ -24,5 +24,8 @@ pub use position::{
     SectionPosition,
 };
 
+mod registries;
+pub use registries::*;
+
 mod special;
 pub use special::{BitSet, NonZero, ResourceKey, ResourceKeyError, UnsizedByteBuffer};
