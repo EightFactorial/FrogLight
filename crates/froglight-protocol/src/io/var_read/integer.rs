@@ -7,15 +7,15 @@ macro_rules! impl_integer_var_read {
         impl FrogVarRead for $ty {
             fn fg_var_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<$ty, ReadError> {
                 let mut byte = [0];
-                let mut ans: $ty = 0;
+                let mut number: $ty = 0;
                 for i in 0..$bytes {
                     buf.read_exact(&mut byte)?;
-                    ans |= ((byte[0] & 0b0111_1111) as $ty) << (7 * i);
+                    number |= ((byte[0] & 0b0111_1111) as $ty) << (7 * i);
                     if byte[0] & 0b1000_0000 == 0 {
                         break;
                     }
                 }
-                Ok(ans)
+                Ok(number)
             }
         }
     };
