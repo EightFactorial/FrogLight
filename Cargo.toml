@@ -50,7 +50,7 @@ pedantic = "warn"
 unnecessary_cast = "warn"
 
 [workspace.dependencies]
-bevy = "0.13.1"
+bevy = "0.13.2"
 bevy_app = "0.13.1"
 bevy_asset = "0.13.1"
 bevy_audio = "0.13.1"
