@@ -4,6 +4,10 @@ use crate::{common::ResourceKey, traits::Version};
 pub trait FromId<V: Version> {
     /// Converts an ID to a type.
     fn from_id(id: u32);
+
+    /// Converts a type to an ID.
+    #[must_use]
+    fn as_id(&self) -> u32;
 }
 
 /// A trait for converting a key to a type.
@@ -13,6 +17,10 @@ pub trait TryFromKey: Sized {
     /// # Errors
     /// Returns an [`UnknownKeyError`] if the key is not recognized.
     fn try_from_key(key: &impl AsRef<str>) -> Result<Self, UnknownKeyError>;
+
+    /// Converts a type to a key.
+    #[must_use]
+    fn as_key(&self) -> ResourceKey;
 }
 
 /// An error that occurs when an unknown key is encountered.
