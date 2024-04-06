@@ -1,0 +1,13 @@
+# --- Version Configuration --- #
+
+[[versions]]
+base_version = "1.20.0"
+jar_version = "1.20.1"
+
+[[versions]]
+base_version = "1.20.2"
+jar_version = "1.20.2"
+
+[[versions]]
+base_version = "1.20.3"
+jar_version = "1.20.4"

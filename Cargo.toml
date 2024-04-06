@@ -1,0 +1,130 @@
+# --- Workspace Settings ---
+
+[workspace]
+resolver = "2"
+members = ["crates/froglight-core"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/FrogLight"
+repository = "https://github.com/EightFactorial/FrogLight"
+readme = "README.md"
+
+[workspace.lints.rust]
+missing_docs = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_lifetimes = "warn"
+unused_import_braces = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.rustdoc]
+bare_urls = "deny"
+broken_intra_doc_links = "deny"
+private_intra_doc_links = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_rust_codeblocks = "deny"
+invalid_html_tags = "deny"
+
+[workspace.lints.clippy]
+cast_possible_truncation = "warn"
+cast_possible_wrap = "warn"
+module_name_repetitions = "allow"
+needless_pass_by_value = "allow"
+pedantic = "warn"
+unnecessary_cast = "warn"
+
+[workspace.dependencies]
+bevy = "0.13.2"
+bevy_app = "0.13.2"
+bevy_asset = "0.13.2"
+bevy_audio = "0.13.2"
+bevy_core = "0.13.2"
+bevy_ecs = "0.13.2"
+bevy_log = "0.13.2"
+bevy_math = "0.13.2"
+bevy_reflect = "0.13.2"
+bevy_render = "0.13.2"
+bevy_tasks = "0.13.2"
+bevy_time = "0.13.2"
+bevy_transform = "0.13.2"
+bevy-inspector-egui = "0.23.4"
+bitvec = "1.0.1"
+bytemuck = "1.15.0"
+compact_str = "0.7.1"
+criterion = "0.5.1"
+derive_more = "0.99.17"
+futures-lite = "2.3.0"
+hashbrown = "0.14.3"
+image = "0.24.9"
+parking_lot = "0.12.1"
+proptest = "1.4.0"
+serde = "1.0.197"
+serde_json = "1.0.115"
+simdnbt = "0.4.2"
+smallvec = "1.13.2"
+strum = "0.26.2"
+thiserror = "1.0.58"
+uuid = "1.8.0"
+
+# --- Build Settings ---
+
+# Slightly optimize dev builds
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package]
+# Slightly optimize the some of the froglight packages
+froglight-assets = { opt-level = 1 }
+froglight-client = { opt-level = 1 }
+froglight-core = { opt-level = 1 }
+froglight-entities = { opt-level = 1 }
+froglight-interface = { opt-level = 1 }
+froglight-macros = { opt-level = 1 }
+# Fully optimize dependencies
+"*" = { opt-level = 3 }
+
+# Fully optimize release builds
+[profile.release]
+opt-level = 3
+strip = true
+lto = true
+
+# --- FrogLight Package ---
+
+[package]
+name = "froglight"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+bevy = { workspace = true, features = ["wayland"] }
+# froglight-client = { version = "0.1.0", path = "crates/froglight-client" }
+mimalloc = { version = "0.1.39", optional = true }
+
+[[bin]]
+name = "froglight"
+path = "src/bin/froglight/main.rs"
+
+[lib]
+name = "froglight"
+path = "src/lib/froglight/lib.rs"
+
+[features]
+default = []
+
+# Use mimalloc as the global allocator
+# Only applies to the froglight binary
+mimalloc = ["dep:mimalloc"]

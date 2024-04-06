@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "Cargo.lock"
+      - "src/**.rs"
+      - "crates/**.rs"
+  push:
+    branches:
+      - main
+    paths:
+      - "Cargo.lock"
+      - "src/**.rs"
+      - "crates/**.rs"
+      - ".github/workflows/testing.yml"
+
+env:
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      # Install required libraries
+      - name: Libraries
+        if: runner.os == 'linux'
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev libwayland-dev libxkbcommon-dev
+      # Get the nightly toolchain
+      - name: Toolchain
+        uses: dtolnay/rust-toolchain@1482605bfc5719782e1267fd0c0cc350fe7646b8 # v1
+        with:
+          toolchain: nightly
+      # Install the nextest tool
+      - name: Install Nextest
+        uses: taiki-e/install-action@882330fb2472a0660b5c990be7c5ccd3cbdf3282 # v2
+        with:
+          tool: nextest
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      # Restore/Setup the cache
+      - name: Cache
+        uses: Swatinem/rust-cache@23bce251a8cd2ffc3c1075eaa2367cf899916d84 # v2
+      # Run the nextest tool
+      - name: Run Nextest
+        run: cargo nextest run --workspace --all-targets
+      # Run doctests separately
+      - name: Run Doctests
+        run: cargo test --doc --workspace
