@@ -18,3 +18,4 @@ workspace = true
 [dependencies]
 bevy = { workspace = true, default-features = false }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
+froglight-network = { version = "0.1.0", path = "../froglight-network" }

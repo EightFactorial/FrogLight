@@ -12,5 +12,7 @@ use crate::prelude::plugins::*;
 pub struct HeadlessPlugins;
 
 impl PluginGroup for HeadlessPlugins {
-    fn build(self) -> PluginGroupBuilder { MinimalPlugins::build(MinimalPlugins).add(CorePlugin) }
+    fn build(self) -> PluginGroupBuilder {
+        MinimalPlugins::build(MinimalPlugins).add(CorePlugin).add(NetworkPlugins)
+    }
 }

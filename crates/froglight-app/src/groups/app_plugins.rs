@@ -12,5 +12,7 @@ use crate::prelude::plugins::*;
 pub struct AppPlugins;
 
 impl PluginGroup for AppPlugins {
-    fn build(self) -> PluginGroupBuilder { DefaultPlugins::build(DefaultPlugins).add(CorePlugin) }
+    fn build(self) -> PluginGroupBuilder {
+        DefaultPlugins::build(DefaultPlugins).add(CorePlugin).add(NetworkPlugins)
+    }
 }
