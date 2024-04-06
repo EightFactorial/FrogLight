@@ -15,13 +15,20 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+criterion = { workspace = true }
+froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
+    "froglight-protocol-debug",
+] }
+proptest = { workspace = true }
+
 [dependencies]
 bevy_derive = { workspace = true }
 bevy_math = { workspace = true }
-bevy_utils = { workspace = true }
 bitvec = { workspace = true }
 bytemuck = { workspace = true, features = ["derive", "nightly_stdsimd"] }
 compact_str = { workspace = true, features = ["serde", "smallvec"] }
+derive_more = { workspace = true }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-protocol",
 ] }

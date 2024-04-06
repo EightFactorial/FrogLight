@@ -2,6 +2,7 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder};
+use connection::ConnectionPlugin;
 
 pub mod connection;
 #[cfg(feature = "resolver")]
@@ -10,6 +11,11 @@ pub mod resolver;
 /// The `Network` Froglight plugin group.
 ///
 /// Adds DNS resolution and networking capabilities.
+///
+/// Adds the following plugins:
+/// - [`ConnectionPlugin`](connection::ConnectionPlugin)
+/// - [`ResolverPlugin`](resolver::ResolverPlugin) (if the `resolver` feature is
+///   enabled)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NetworkPlugins;
 
@@ -20,7 +26,7 @@ impl Plugin for NetworkPlugins {
 impl PluginGroup for NetworkPlugins {
     #[allow(unused_mut)]
     fn build(self) -> PluginGroupBuilder {
-        let mut builder = PluginGroupBuilder::start::<Self>();
+        let mut builder = PluginGroupBuilder::start::<Self>().add(ConnectionPlugin);
 
         #[cfg(feature = "resolver")]
         {

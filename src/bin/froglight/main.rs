@@ -15,5 +15,5 @@ static GLOBAL: MiMalloc = MiMalloc;
 
 /// The main function.
 ///
-/// Creates a new [`App`], adds the [`AppPlugins`], and runs it.
+/// Create a new [`App`], add the [`AppPlugins`], and run it.
 fn main() { App::new().add_plugins(AppPlugins).run(); }
