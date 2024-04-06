@@ -1,7 +1,7 @@
 use bevy_app::App;
+use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{reflect::ReflectResource, system::Resource};
 use bevy_reflect::Reflect;
-use derive_more::{Deref, DerefMut};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

@@ -2,7 +2,11 @@
 
 [workspace]
 resolver = "2"
-members = ["crates/froglight-app", "crates/froglight-core"]
+members = [
+    "crates/froglight-app",
+    "crates/froglight-core",
+    "crates/froglight-macros",
+]
 
 [workspace.package]
 version = "0.1.0"
@@ -43,6 +47,7 @@ bevy_app = "0.13.2"
 bevy_asset = "0.13.2"
 bevy_audio = "0.13.2"
 bevy_core = "0.13.2"
+bevy_derive = "0.13.2"
 bevy_ecs = "0.13.2"
 bevy_log = "0.13.2"
 bevy_math = "0.13.2"
