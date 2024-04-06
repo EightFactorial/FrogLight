@@ -2,7 +2,7 @@
 
 [workspace]
 resolver = "2"
-members = ["crates/froglight-core"]
+members = ["crates/froglight-app", "crates/froglight-core"]
 
 [workspace.package]
 version = "0.1.0"
@@ -78,12 +78,8 @@ opt-level = 1
 
 [profile.dev.package]
 # Slightly optimize the some of the froglight packages
-froglight-assets = { opt-level = 1 }
-froglight-client = { opt-level = 1 }
+froglight-app = { opt-level = 1 }
 froglight-core = { opt-level = 1 }
-froglight-entities = { opt-level = 1 }
-froglight-interface = { opt-level = 1 }
-froglight-macros = { opt-level = 1 }
 # Fully optimize dependencies
 "*" = { opt-level = 3 }
 
@@ -111,7 +107,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 bevy = { workspace = true, features = ["wayland"] }
-# froglight-client = { version = "0.1.0", path = "crates/froglight-client" }
+froglight-app = { version = "0.1.0", path = "crates/froglight-app" }
 mimalloc = { version = "0.1.39", optional = true }
 
 [[bin]]
