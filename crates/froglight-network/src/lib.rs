@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder};
+use bevy_app::{App, Plugin, PluginGroup, PluginGroupBuilder};
 use connection::ConnectionPlugin;
 
 pub mod connection;

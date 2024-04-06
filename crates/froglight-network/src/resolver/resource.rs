@@ -7,7 +7,8 @@ use async_std_resolver::{
     config::{ResolverConfig, ResolverOpts},
     AsyncStdResolver, ResolveError,
 };
-use bevy::{ecs::system::Resource, log::debug};
+use bevy_ecs::system::Resource;
+use bevy_log::debug;
 use thiserror::Error;
 use tldextract::{TldExtractor, TldOption};
 

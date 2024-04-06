@@ -1,6 +1,6 @@
 use std::{collections::VecDeque, marker::PhantomData};
 
-use bevy::log::debug;
+use bevy_log::debug;
 use froglight_protocol::{
     states::{Configuration, Handshaking, Login, Play, Status},
     traits::{State, Version},

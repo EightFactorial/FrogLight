@@ -1,4 +1,4 @@
-use bevy::app::{App, Plugin};
+use bevy_app::{App, Plugin};
 
 /// The `Connection` Froglight plugin.
 ///

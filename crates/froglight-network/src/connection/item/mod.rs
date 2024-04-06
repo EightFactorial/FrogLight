@@ -42,6 +42,7 @@ impl<V> Connection<V, Handshaking, Serverbound>
 where
     V: Version,
     Handshaking: State<V>,
+    Serverbound: NetworkDirection<V, Handshaking>,
 {
     /// Connect to a remote host using a
     /// [`Resolver`](crate::resolver::Resolver).
@@ -55,15 +56,15 @@ where
         resolver: &crate::resolver::Resolver,
     ) -> Result<Option<Self>, ConnectionError> {
         let address = compact_str::CompactString::from(address.as_ref());
-        bevy::log::debug!("Resolving address: `{address}`");
+        bevy_log::debug!("Resolving address: `{address}`");
 
         if let Some(socket) = resolver.lookup_mc(&address).await? {
-            bevy::log::debug!("Connecting to `{address}`: {socket}");
+            bevy_log::debug!("Connecting to `{address}`: {socket}");
             let mut connection = Self::connect(socket).await?;
             connection.info.address = Some(address);
             Ok(Some(connection))
         } else {
-            bevy::log::debug!("No records found for `{address}`");
+            bevy_log::debug!("No records found for `{address}`");
             Ok(None)
         }
     }

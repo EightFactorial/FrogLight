@@ -6,7 +6,7 @@ pub use async_std_resolver::{
     config::{LookupIpStrategy, ResolverConfig, ResolverOpts},
     AsyncStdResolver, ResolveError as AsyncStdResolveError,
 };
-use bevy::app::{App, Plugin};
+use bevy_app::{App, Plugin};
 pub use tldextract::{TldExtractError, TldExtractor, TldOption};
 
 mod resource;

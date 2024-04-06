@@ -2,6 +2,8 @@
 
 mod errors;
 pub use errors::{ReadError, WriteError};
+
+mod integer;
 pub use froglight_macros::FrogReadWrite;
 
 mod read;
