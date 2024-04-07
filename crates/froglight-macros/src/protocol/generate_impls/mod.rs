@@ -43,10 +43,7 @@ pub(super) fn generate_write(input: &DeriveInput, attrs: &Attributes) -> TokenSt
 }
 
 /// Set the discriminant for the variant
-fn _set_discriminant(
-    variant_discriminant: &Option<(syn::Token![=], Expr)>,
-    discriminant: &mut i32,
-) {
+fn set_discriminant(variant_discriminant: &Option<(syn::Token![=], Expr)>, discriminant: &mut i32) {
     if let Some((_, expr)) = variant_discriminant {
         match expr {
             // Detect positive discriminants
