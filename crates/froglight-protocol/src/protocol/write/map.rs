@@ -3,8 +3,6 @@ use std::{
     io::Write,
 };
 
-use bevy_utils::hashbrown;
-
 use super::{FrogWrite, WriteError};
 use crate::protocol::FrogVarWrite;
 

@@ -2,6 +2,7 @@ use super::WriteError;
 
 mod bool;
 mod float;
+mod glam;
 mod integer;
 mod map;
 mod option;

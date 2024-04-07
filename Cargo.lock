@@ -2118,13 +2118,13 @@ name = "froglight-protocol"
 version = "0.1.0"
 dependencies = [
  "bevy_derive",
- "bevy_math",
- "bevy_utils",
  "bitvec",
  "bytemuck",
  "compact_str",
  "derive_more",
  "froglight-macros",
+ "glam",
+ "hashbrown",
  "proptest",
  "serde",
  "serde_json",

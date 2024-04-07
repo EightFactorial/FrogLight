@@ -1,26 +1,21 @@
 use std::io::BufRead;
 
 use super::{FrogRead, ReadError};
-use crate::protocol::integer::IntegerSize;
 
 macro_rules! impl_integer_read {
     ($($ty:ty),*) => {
         $(
-            impl IntegerSize for $ty {
-                const BYTES: usize = (<$ty>::BITS / 8) as usize;
-            }
-
             impl FrogRead for $ty {
                 #[inline]
                 fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
                     let position = usize::try_from(buf.position()).expect("Cursor position too large");
-                    buf.consume(<$ty>::BYTES);
+                    buf.consume(std::mem::size_of::<$ty>());
 
-                    if let Some(slice) = &buf.get_ref().get(position..position + <$ty>::BYTES) {
+                    if let Some(slice) = &buf.get_ref().get(position..position + std::mem::size_of::<$ty>()) {
                         Ok(<$ty>::from_be(bytemuck::pod_read_unaligned(slice)))
                     } else {
                         let leftover = buf.get_ref().len() - position;
-                        Err(ReadError::EndOfBuffer(<$ty>::BYTES, leftover))
+                        Err(ReadError::EndOfBuffer(std::mem::size_of::<$ty>(), leftover))
                     }
                 }
             }

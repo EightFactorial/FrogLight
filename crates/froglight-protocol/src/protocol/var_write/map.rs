@@ -1,7 +1,5 @@
 use std::hash::{BuildHasher, Hash};
 
-use bevy_utils::hashbrown;
-
 use crate::protocol::{FrogVarWrite, FrogWrite};
 
 impl<K: FrogWrite + Hash + Eq, V: FrogVarWrite, S: BuildHasher> FrogVarWrite

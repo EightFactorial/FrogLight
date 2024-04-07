@@ -1,5 +1,4 @@
 use super::{FrogWrite, WriteError};
-use crate::protocol::integer::IntegerSize;
 
 macro_rules! impl_integer_write {
     ($($ty:ty),*) => {
@@ -7,7 +6,7 @@ macro_rules! impl_integer_write {
             impl FrogWrite for $ty {
                 #[inline]
                 fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
-                    buf.write_all(bytemuck::cast_ref::<$ty, [u8; <$ty>::BYTES]>(&self.to_be())).map_err(WriteError::Io)
+                    buf.write_all(bytemuck::cast_ref::<$ty, [u8; std::mem::size_of::<$ty>()]>(&self.to_be())).map_err(WriteError::Io)
                 }
             }
         )*
