@@ -4,8 +4,10 @@
 #![feature(const_type_name)]
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
+#![allow(clippy::struct_excessive_bools)]
 
 pub mod common;
+pub mod packet;
 pub mod protocol;
 pub mod registries;
 pub mod states;

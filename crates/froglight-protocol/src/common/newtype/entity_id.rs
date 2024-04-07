@@ -1,4 +1,5 @@
 use derive_more::{Deref, DerefMut, From, Into};
+use froglight_macros::FrogReadWrite;
 
 /// An entity's identifier.
 ///
@@ -16,10 +17,10 @@ use derive_more::{Deref, DerefMut, From, Into};
     Into,
     Deref,
     DerefMut,
-    /* FrogReadWrite, */
+    FrogReadWrite,
 )]
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
-// #[frog(tests = ["read_example"], bytes = [0])]
+#[frog(tests = ["read_example"], bytes = [0])]
 pub struct EntityId(pub u32);
 
 impl std::fmt::Display for EntityId {

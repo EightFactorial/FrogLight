@@ -82,10 +82,11 @@ uuid = "1.8.0"
 opt-level = 1
 
 [profile.dev.package]
-# Slightly optimize the some of the froglight packages
+# Slightly optimize most froglight packages
 froglight-app = { opt-level = 1 }
 froglight-core = { opt-level = 1 }
-# Fully optimize dependencies
+froglight-macros = { opt-level = 1 }
+# Fully all other packages
 "*" = { opt-level = 3 }
 
 # Fully optimize release builds

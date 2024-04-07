@@ -1,4 +1,5 @@
 use derive_more::{Deref, DerefMut, From, Into};
+use froglight_macros::FrogReadWrite;
 use uuid::Uuid;
 
 /// An entity's universally unique identifier.
@@ -17,11 +18,10 @@ use uuid::Uuid;
     Into,
     Deref,
     DerefMut,
-    /* FrogReadWrite, */
+    FrogReadWrite,
 )]
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
-// #[frog(tests = ["read_example"], bytes = [0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0, 0,
-// 0, 0, 0, 0])]
+#[frog(tests = ["read_example"], bytes = [0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct EntityUuid(Uuid);
 
 impl std::fmt::Display for EntityUuid {

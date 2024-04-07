@@ -23,8 +23,10 @@ macro_rules! impl_read_glam {
                     values.iter_mut().for_each(|v| *v = v.to_be());
                     Ok(bytemuck::cast(values))
                 } else {
-                    let leftover = buf.get_ref().len() - position;
-                    Err(ReadError::EndOfBuffer(std::mem::size_of::<$ty>(), leftover))
+                    Err(ReadError::EndOfBuffer(
+                        std::mem::size_of::<$ty>(),
+                        buf.get_ref().len() - position,
+                    ))
                 }
             }
         }

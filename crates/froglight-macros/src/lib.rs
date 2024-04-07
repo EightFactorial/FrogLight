@@ -13,29 +13,24 @@ mod protocol;
 
 #[cfg(feature = "froglight-protocol")]
 macro_rules! protocol_macro {
-    ($name:ident, $fn:ident) => {
+    ($macro:ident, $name:ident, $kind:expr) => {
         #[allow(missing_docs)]
         #[cfg(feature = "froglight-protocol")]
-        #[proc_macro_derive($name, attributes(frog))]
-        pub fn $fn(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-            protocol::$fn(input, true)
+        #[proc_macro_derive($macro, attributes(frog))]
+        pub fn $name(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+            protocol::frog_protocol(input, $kind)
         }
     };
 }
 
 #[cfg(feature = "froglight-protocol")]
-protocol_macro!(FrogRead, frog_read);
+protocol_macro!(FrogRead, frog_read, protocol::GenerateType::Read);
 #[cfg(feature = "froglight-protocol")]
-protocol_macro!(FrogWrite, frog_write);
+protocol_macro!(FrogWrite, frog_write, protocol::GenerateType::Write);
 #[cfg(feature = "froglight-protocol")]
-protocol_macro!(FrogReadWrite, frog_read_write);
-
-/// A macro for generating tests for `FrogRead` and `FrogWrite` implementations.
+protocol_macro!(FrogReadWrite, frog_readwrite, protocol::GenerateType::ReadWrite);
 #[cfg(feature = "froglight-protocol")]
-#[proc_macro_derive(FrogTest, attributes(frog))]
-pub fn frog_test(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    protocol::frog_test(input)
-}
+protocol_macro!(FrogTests, frog_test, protocol::GenerateType::Tests);
 
 /// A macro for generating a version state implementation.
 #[cfg(feature = "froglight-protocol")]

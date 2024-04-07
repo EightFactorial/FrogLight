@@ -14,8 +14,7 @@ macro_rules! impl_integer_read {
                     if let Some(slice) = &buf.get_ref().get(position..position + std::mem::size_of::<$ty>()) {
                         Ok(<$ty>::from_be(bytemuck::pod_read_unaligned(slice)))
                     } else {
-                        let leftover = buf.get_ref().len() - position;
-                        Err(ReadError::EndOfBuffer(std::mem::size_of::<$ty>(), leftover))
+                        Err(ReadError::EndOfBuffer(std::mem::size_of::<$ty>(), buf.get_ref().len() - position))
                     }
                 }
             }
