@@ -22,12 +22,12 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Read the field using `FrogVarRead`
                     field_tokens.extend(quote! {
-                        #field_ident: crate::protocol::FrogVarRead::fg_var_read(buf)?,
+                        #field_ident: ::froglight::protocol::FrogVarRead::fg_var_read(buf)?,
                     });
                 } else {
                     // Read the field using `FrogRead`
                     field_tokens.extend(quote! {
-                        #field_ident: crate::protocol::FrogRead::fg_read(buf)?,
+                        #field_ident: ::froglight::protocol::FrogRead::fg_read(buf)?,
                     });
                 }
             }
@@ -46,12 +46,12 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Read the field using `FrogVarRead`
                     field_tokens.extend(quote! {
-                        crate::protocol::FrogVarRead::fg_var_read(buf)?,
+                        ::froglight::protocol::FrogVarRead::fg_var_read(buf)?,
                     });
                 } else {
                     // Read the field using `FrogRead`
                     field_tokens.extend(quote! {
-                        crate::protocol::FrogRead::fg_read(buf)?,
+                        ::froglight::protocol::FrogRead::fg_read(buf)?,
                     });
                 }
             }
@@ -72,8 +72,8 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
     }
 
     quote! {
-        impl crate::protocol::FrogRead for #struct_ident {
-            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::protocol::ReadError>
+        impl ::froglight::protocol::FrogRead for #struct_ident {
+            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ::froglight::protocol::ReadError>
             where
                 Self: Sized,
             {
@@ -101,12 +101,12 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Write the field using `FrogVarWrite`
                     write_tokens.extend(quote! {
-                        crate::protocol::FrogVarWrite::fg_var_write(&self.#field_ident, buf)?;
+                        ::froglight::protocol::FrogVarWrite::fg_var_write(&self.#field_ident, buf)?;
                     });
                 } else {
                     // Write the field using `FrogWrite`
                     write_tokens.extend(quote! {
-                        crate::protocol::FrogWrite::fg_write(&self.#field_ident, buf)?;
+                        ::froglight::protocol::FrogWrite::fg_write(&self.#field_ident, buf)?;
                     });
                 }
             }
@@ -119,12 +119,12 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Write the field using `FrogVarWrite`
                     write_tokens.extend(quote! {
-                        crate::protocol::FrogVarWrite::fg_var_write(&self.#index_indent, buf)?;
+                        ::froglight::protocol::FrogVarWrite::fg_var_write(&self.#index_indent, buf)?;
                     });
                 } else {
                     // Write the field using `FrogWrite`
                     write_tokens.extend(quote! {
-                        crate::protocol::FrogWrite::fg_write(&self.#index_indent, buf)?;
+                        ::froglight::protocol::FrogWrite::fg_write(&self.#index_indent, buf)?;
                     });
                 }
             }
@@ -139,8 +139,8 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
     });
 
     quote! {
-        impl crate::protocol::FrogWrite for #struct_ident {
-            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), crate::protocol::WriteError> {
+        impl ::froglight::protocol::FrogWrite for #struct_ident {
+            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), ::froglight::protocol::WriteError> {
                 #write_tokens
             }
         }

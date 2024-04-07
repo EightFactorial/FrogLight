@@ -1,6 +1,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 use derive_more::{Deref, DerefMut, From, Into};
+use froglight_macros::FrogTest;
 use glam::{DVec3, I64Vec3, IVec3, Vec3};
 
 use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
@@ -24,9 +25,10 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 /// origin -= BlockPosition::new(0, 0, 1);
 /// assert_eq!(origin, BlockPosition::new(1, 0, -1));
 /// ```
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut)]
-// #[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0,
-// 0])]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut, FrogTest,
+)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct BlockPosition(I64Vec3);
 
 impl BlockPosition {

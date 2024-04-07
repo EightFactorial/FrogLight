@@ -1,8 +1,8 @@
-// use froglight_macros::FrogReadWrite;
+use froglight_macros::FrogReadWrite;
 
 /// The game mode of a player.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-// #[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogReadWrite)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
 pub enum GameMode {
     /// Survival mode.

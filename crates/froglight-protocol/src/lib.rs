@@ -6,6 +6,9 @@
 #![feature(generic_const_exprs)]
 #![allow(clippy::struct_excessive_bools)]
 
+// Allow using `::froglight` in macros
+extern crate self as froglight;
+
 pub mod common;
 pub mod packet;
 pub mod protocol;

@@ -1,12 +1,12 @@
-// use froglight_macros::FrogReadWrite;
+use froglight_macros::FrogReadWrite;
 
 /// The intent of a connection.
 ///
 /// # Note
 /// Versions before [`1.20.2`](crate::versions::v1_20_2::V1_20_2) did not
 /// have the [`ConnectionIntent::Configuration`] intent.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-// #[frog(tests = ["read_verify", "write_verify"], bytes = [2])]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [2])]
 pub enum ConnectionIntent {
     /// The [`Handshaking`](crate::states::Handshaking) state
     Handshaking = -1,

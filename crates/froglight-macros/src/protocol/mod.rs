@@ -30,7 +30,7 @@ pub(super) fn frog_protocol(tokens: TokenStream, kind: GenerateType) -> TokenStr
             output.extend(generate_impls::generate_read(&input, &attrs));
             output.extend(generate_impls::generate_write(&input, &attrs));
         }
-        GenerateType::Tests => {}
+        GenerateType::Test => {}
     }
 
     // Generate tests
@@ -47,13 +47,12 @@ pub(super) enum GenerateType {
     Read,
     Write,
     ReadWrite,
-    Tests,
+    Test,
 }
 
 /// Attributes for the `frog` attribute macro.
 #[derive(Debug, Clone, FromAttr)]
 #[attribute(ident = frog)]
-#[allow(dead_code)]
 struct Attributes {
     /// A list of tests to run.
     #[attribute(optional)]

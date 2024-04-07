@@ -30,7 +30,7 @@ protocol_macro!(FrogWrite, frog_write, protocol::GenerateType::Write);
 #[cfg(feature = "froglight-protocol")]
 protocol_macro!(FrogReadWrite, frog_readwrite, protocol::GenerateType::ReadWrite);
 #[cfg(feature = "froglight-protocol")]
-protocol_macro!(FrogTests, frog_test, protocol::GenerateType::Tests);
+protocol_macro!(FrogTest, frog_test, protocol::GenerateType::Test);
 
 /// A macro for generating a version state implementation.
 #[cfg(feature = "froglight-protocol")]

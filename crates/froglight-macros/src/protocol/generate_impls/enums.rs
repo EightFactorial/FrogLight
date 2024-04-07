@@ -31,12 +31,12 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
                     if is_variable(&field.attrs) {
                         // Read the field using `FrogVarRead`
                         field_tokens.extend(quote! {
-                            #field_ident: crate::protocol::FrogVarRead::fg_var_read(buf)?,
+                            #field_ident: ::froglight::protocol::FrogVarRead::fg_var_read(buf)?,
                         });
                     } else {
                         // Read the field using `FrogRead`
                         field_tokens.extend(quote! {
-                            #field_ident: crate::protocol::FrogRead::fg_read(buf)?,
+                            #field_ident: ::froglight::protocol::FrogRead::fg_read(buf)?,
                         });
                     }
                 }
@@ -55,12 +55,12 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
                     if is_variable(&field.attrs) {
                         // Read the field using `FrogVarRead`
                         field_tokens.extend(quote! {
-                            crate::protocol::FrogVarRead::fg_var_read(buf)?,
+                            ::froglight::protocol::FrogVarRead::fg_var_read(buf)?,
                         });
                     } else {
                         // Read the field using `FrogRead`
                         field_tokens.extend(quote! {
-                            crate::protocol::FrogRead::fg_read(buf)?,
+                            ::froglight::protocol::FrogRead::fg_read(buf)?,
                         });
                     }
                 }
@@ -89,14 +89,14 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
     }
 
     quote! {
-        impl crate::protocol::FrogRead for #enum_ident {
-            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::protocol::ReadError>
+        impl ::froglight::protocol::FrogRead for #enum_ident {
+            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ::froglight::protocol::ReadError>
             where
                 Self: Sized,
             {
-                match crate::protocol::FrogVarRead::fg_var_read(buf)? {
+                match ::froglight::protocol::FrogVarRead::fg_var_read(buf)? {
                     #read_tokens
-                    unk => Err(crate::protocol::ReadError::InvalidEnum(unk, std::any::type_name::<Self>())),
+                    unk => Err(::froglight::protocol::ReadError::InvalidEnum(unk, std::any::type_name::<Self>())),
                 }
             }
         }
@@ -140,12 +140,12 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                     if is_variable(&field.attrs) {
                         // Write the field using `FrogVarWrite`
                         field_tokens.extend(quote! {
-                            crate::protocol::FrogVarWrite::fg_var_write(#field_ident, buf)?;
+                            ::froglight::protocol::FrogVarWrite::fg_var_write(#field_ident, buf)?;
                         });
                     } else {
                         // Write the field using `FrogWrite`
                         field_tokens.extend(quote! {
-                            crate::protocol::FrogWrite::fg_write(#field_ident, buf)?;
+                            ::froglight::protocol::FrogWrite::fg_write(#field_ident, buf)?;
                         });
                     }
                 }
@@ -153,7 +153,7 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 // Add the variant to the write tokens
                 write_tokens.extend(quote! {
                     Self::#variant_ident { #field_ident_tokens } => {
-                        crate::protocol::FrogVarWrite::fg_var_write(&#discriminant, buf)?;
+                        ::froglight::protocol::FrogVarWrite::fg_var_write(&#discriminant, buf)?;
                         #field_tokens
                     }
                 });
@@ -177,12 +177,12 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                     if is_variable(&field.attrs) {
                         // Write the field using `FrogVarWrite`
                         field_tokens.extend(quote! {
-                            crate::protocol::FrogVarWrite::fg_var_write(#field_ident, buf)?;
+                            ::froglight::protocol::FrogVarWrite::fg_var_write(#field_ident, buf)?;
                         });
                     } else {
                         // Write the field using `FrogWrite`
                         field_tokens.extend(quote! {
-                            crate::protocol::FrogWrite::fg_write(#field_ident, buf)?;
+                            ::froglight::protocol::FrogWrite::fg_write(#field_ident, buf)?;
                         });
                     }
                 }
@@ -190,7 +190,7 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 // Add the variant to the write tokens
                 write_tokens.extend(quote! {
                     Self::#variant_ident(#field_ident_tokens) => {
-                        crate::protocol::FrogVarWrite::fg_var_write(&#discriminant, buf)?;
+                        ::froglight::protocol::FrogVarWrite::fg_var_write(&#discriminant, buf)?;
                         #field_tokens
                     }
                 });
@@ -199,7 +199,7 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 // Write only the discriminant
                 write_tokens.extend(quote! {
                     Self::#variant_ident => {
-                        crate::protocol::FrogVarWrite::fg_var_write(&#discriminant, buf)?;
+                        ::froglight::protocol::FrogVarWrite::fg_var_write(&#discriminant, buf)?;
                     }
                 });
             }
@@ -210,8 +210,8 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
     }
 
     quote! {
-        impl crate::protocol::FrogWrite for #enum_ident {
-            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), crate::protocol::WriteError> {
+        impl ::froglight::protocol::FrogWrite for #enum_ident {
+            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), ::froglight::protocol::WriteError> {
                 match self {
                     #write_tokens
                 }

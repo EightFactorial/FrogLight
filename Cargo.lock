@@ -2068,6 +2068,7 @@ dependencies = [
  "bevy",
  "froglight-core",
  "froglight-network",
+ "froglight-protocol",
 ]
 
 [[package]]

@@ -2,7 +2,7 @@ use std::{borrow::Borrow, fmt::Display};
 
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
-// use froglight_macros::FrogReadWrite;
+use froglight_macros::FrogReadWrite;
 use hashbrown::Equivalent;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
@@ -24,10 +24,9 @@ use thiserror::Error;
     DerefMut,
     Serialize,
     Deserialize,
-    /* FrogReadWrite, */
+    FrogReadWrite,
 )]
-// #[frog(tests = ["read_example"], bytes = [19, 109, 105, 110, 101, 99, 114, 97, 102, 116, 58, 111,
-// 118, 101, 114, 119, 111, 114, 108, 100])]
+#[frog(tests = ["read_example"], bytes = [19, 109, 105, 110, 101, 99, 114, 97, 102, 116, 58, 111, 118, 101, 114, 119, 111, 114, 108, 100])]
 #[serde(transparent)]
 pub struct ResourceKey(CompactString);
 

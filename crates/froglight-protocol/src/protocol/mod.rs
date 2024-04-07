@@ -1,8 +1,8 @@
-//! Froglight protocol implementation.
+//! Protocol traits and macros.
 
 mod errors;
 pub use errors::{ReadError, WriteError};
-pub use froglight_macros::FrogReadWrite;
+pub use froglight_macros::{FrogReadWrite, FrogTest};
 
 mod read;
 pub use froglight_macros::FrogRead;

@@ -3,15 +3,13 @@
 
 use bevy::app::App;
 use froglight::AppPlugins;
-#[cfg(feature = "mimalloc")]
-use mimalloc::MiMalloc;
 
 /// The global allocator.
 ///
 /// This is completely optional, but might improve performance.
 #[cfg(feature = "mimalloc")]
 #[global_allocator]
-static GLOBAL: MiMalloc = MiMalloc;
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 /// The main function.
 ///

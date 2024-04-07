@@ -21,7 +21,7 @@ use froglight_macros::FrogReadWrite;
 )]
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
 #[frog(tests = ["read_example"], bytes = [0])]
-pub struct EntityId(pub u32);
+pub struct EntityId(#[frog(var)] pub u32);
 
 impl std::fmt::Display for EntityId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }

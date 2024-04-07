@@ -8,8 +8,8 @@ pub mod connection;
 #[cfg(feature = "resolver")]
 pub mod resolver;
 
-// Re-export `froglight-protocol` for convenience.
-pub use froglight_protocol as protocol;
+// Re-export most of `froglight-protocol` for convenience.
+pub use froglight_protocol::{common, packet, registries, states, traits, versions};
 
 /// The `Network` Froglight plugin group.
 ///

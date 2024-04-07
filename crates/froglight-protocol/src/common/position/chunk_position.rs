@@ -1,12 +1,16 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 use derive_more::{Deref, DerefMut, From, Into};
+use froglight_macros::FrogTest;
 use glam::{DVec2, I64Vec2, IVec2, Vec2};
 
 use crate::protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, WriteError};
 
 /// A position in the world, measured in chunks.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut)]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut, FrogTest,
+)]
+#[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ChunkPosition(I64Vec2);
 
 impl ChunkPosition {
