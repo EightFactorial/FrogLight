@@ -8,6 +8,9 @@ pub mod connection;
 #[cfg(feature = "resolver")]
 pub mod resolver;
 
+// Re-export `froglight-protocol` for convenience.
+pub use froglight_protocol as protocol;
+
 /// The `Network` Froglight plugin group.
 ///
 /// Adds DNS resolution and networking capabilities.

@@ -22,7 +22,7 @@ froglight-macros = { version = "0.1.0", path = "../froglight-macros", features =
 proptest = { workspace = true }
 
 [dependencies]
-bevy_derive = { workspace = true }
+bevy_ecs = { workspace = true, optional = true }
 bitvec = { workspace = true }
 bytemuck = { workspace = true, features = ["derive", "nightly_stdsimd"] }
 compact_str = { workspace = true, features = ["serde", "smallvec"] }
@@ -43,3 +43,9 @@ smallvec = { workspace = true, features = [
 ] }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["serde"] }
+
+[features]
+default = ["bevy"]
+
+# Derives `Component` for some types.
+bevy = ["dep:bevy_ecs"]

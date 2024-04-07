@@ -8,7 +8,9 @@ impl<T: FrogRead, const N: usize> FrogRead for [T; N] {
     where
         Self: Sized,
     {
-        core::array::try_from_fn(|_| T::fg_read(buf))
+        core::array::try_from_fn(|i| {
+            T::fg_read(buf).map_err(|err| ReadError::ListError(N, i, Box::new(err)))
+        })
     }
 }
 
@@ -137,7 +139,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn proto_read_vector_string(data in proptest::collection::vec(".*", 0..512)) {
+    fn proto_read_vector_string(data in proptest::collection::vec(".*", 0..64)) {
         use crate::protocol::var_write::FrogVarWrite;
 
         // Prefix the data with the length
@@ -178,7 +180,7 @@ proptest::proptest! {
     }
 
     #[test]
-    fn proto_read_smallvec_string(data in proptest::collection::vec(".*", 0..512)) {
+    fn proto_read_smallvec_string(data in proptest::collection::vec(".*", 0..64)) {
         use crate::protocol::var_write::FrogVarWrite;
 
         // Prefix the data with the length

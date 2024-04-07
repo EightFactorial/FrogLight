@@ -1,5 +1,6 @@
 use super::ReadError;
 
+mod glam;
 mod integer;
 mod map;
 mod option;

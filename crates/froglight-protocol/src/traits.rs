@@ -1,17 +1,17 @@
 //! Traits used for versioning and serialization of data.
 
-use std::{fmt::Debug, hash::Hash};
+use std::fmt::Debug;
 
 /// A Protocol version
-pub trait Version: 'static + Debug + Default + Copy + Eq + Hash {
-    /// The protocol version number
-    const PROTOCOL_VERSION: i32;
+pub trait Version: 'static + Debug + Default + Copy + Eq {
+    /// The protocol id
+    const ID: i32;
 }
 
 /// A Protocol state
 ///
 /// Different states have different packets.
-pub trait State<V: Version>: 'static + Default + Copy + Eq {
+pub trait State<V: Version>: 'static + Debug + Default + Copy + Eq {
     /// Packets sent from the client to the server
     type ServerboundPacket: PacketEnum;
     /// Packets sent from the server to the client

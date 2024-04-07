@@ -7,10 +7,15 @@
 
 pub mod plugins;
 
-pub use froglight_core as core;
-pub use froglight_core::{components::*, events::*, resources::*, systemsets::*};
-pub use froglight_network as network;
+pub use froglight_core::{components::*, events::*, resources::*};
 pub use froglight_network::{
     connection::{Clientbound, Connection, ConnectionError, Serverbound},
+    protocol::{
+        common::*,
+        protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite},
+        registries::*,
+        states::*,
+        traits::{State, Version},
+    },
     resolver::{Resolver, ResolverError},
 };

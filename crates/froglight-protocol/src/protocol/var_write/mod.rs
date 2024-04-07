@@ -1,5 +1,6 @@
 use super::WriteError;
 
+mod glam;
 mod integer;
 mod map;
 mod option;

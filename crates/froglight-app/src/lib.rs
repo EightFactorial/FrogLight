@@ -3,5 +3,9 @@
 
 pub mod prelude;
 
+// Re-export all sub-crates.
+pub use froglight_core as core;
+pub use froglight_network as network;
+
 mod groups;
 pub use groups::{app_plugins::AppPlugins, headless_plugins::HeadlessPlugins};
