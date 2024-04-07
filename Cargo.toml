@@ -129,3 +129,12 @@ default = []
 # Use mimalloc as the global allocator
 # Only applies to the froglight binary
 mimalloc = ["dep:mimalloc"]
+
+[[example]]
+name = "console_hello"
+
+[[example]]
+name = "default_client"
+
+[[example]]
+name = "main_menu_button"

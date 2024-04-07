@@ -3,7 +3,7 @@ use std::fmt::Display;
 // use froglight_macros::FrogReadWrite;
 
 /// The difficulty of the game.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 // #[frog(tests = ["read_verify", "write_verify"], bytes = [2])]
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::system::Resource))]
 pub enum Difficulty {
