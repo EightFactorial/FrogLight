@@ -9,7 +9,6 @@ use crate::protocol::{FrogWrite, WriteError};
 macro_rules! impl_write_glam {
     ($ty:ty, $parts:ty) => {
         impl FrogWrite for $ty {
-            #[inline]
             fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
                 let mut values: $parts = bytemuck::cast(*self);
                 values.iter_mut().for_each(|v| *v = v.to_be());
