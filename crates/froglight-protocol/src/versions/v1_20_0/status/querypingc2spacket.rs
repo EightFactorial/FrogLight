@@ -15,6 +15,6 @@ impl QueryPingC2SPacket {
     #[must_use]
     #[allow(clippy::missing_panics_doc)]
     pub fn unix_epoch() -> Self {
-        Self(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs())
+        Self::from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs())
     }
 }

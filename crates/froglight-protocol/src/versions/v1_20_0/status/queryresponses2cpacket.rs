@@ -1,6 +1,6 @@
 use froglight_macros::FrogReadWrite;
 
-use crate::common::ServerStatus;
+use crate::packet::ServerStatus;
 
 #[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
 pub struct QueryResponseS2CPacket {

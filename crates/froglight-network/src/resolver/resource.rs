@@ -8,7 +8,6 @@ use async_std_resolver::{
     AsyncStdResolver, ResolveError,
 };
 use bevy_ecs::system::Resource;
-use bevy_log::debug;
 use thiserror::Error;
 use tldextract::{TldExtractor, TldOption};
 
@@ -74,7 +73,7 @@ impl Resolver {
     /// If an error occurs while resolving the address.
     pub async fn lookup_mc(&self, mut address: &str) -> Result<Option<SocketAddr>, ResolverError> {
         #[cfg(debug_assertions)]
-        debug!("Looking for a server for `{address}`");
+        bevy_log::debug!("Looking for a server for `{address}`");
 
         let mut port: u16 = 25565;
         if let Some((split_host, split_port)) = address.split_once(':') {
@@ -114,7 +113,7 @@ impl Resolver {
         let result = self.resolver.srv_lookup(address).await?.ip_iter().next();
 
         #[cfg(debug_assertions)]
-        debug!("Found SRV for `{}`: `{:?}`", address, result);
+        bevy_log::debug!("Found SRV for `{}`: `{:?}`", address, result);
 
         Ok(result)
     }
@@ -127,9 +126,8 @@ impl Resolver {
         let result = self.resolver.lookup_ip(address).await?.iter().next();
 
         #[cfg(debug_assertions)]
-        debug!("Resolved `{}` to `{:?}`", address, result);
+        bevy_log::debug!("Resolved `{}` to `{:?}`", address, result);
 
-        #[cfg(debug_assertions)]
         Ok(result)
     }
 }

@@ -1,12 +1,12 @@
 use froglight_macros::FrogReadWrite;
 
 use super::CustomPayloadS2CPacket;
-use crate::common::{ResourceKey, UnsizedByteBuffer};
+use crate::common::{ResourceKey, UnsizedBuffer};
 
 #[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
 pub struct CustomPayloadC2SPacket {
     pub identifier: ResourceKey,
-    pub data: UnsizedByteBuffer,
+    pub data: UnsizedBuffer,
 }
 
 impl From<CustomPayloadS2CPacket> for CustomPayloadC2SPacket {

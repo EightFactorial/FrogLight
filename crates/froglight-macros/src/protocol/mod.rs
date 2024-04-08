@@ -72,4 +72,6 @@ struct Attributes {
 }
 
 /// Generate a version state implementation and packet enums.
-pub(super) fn frog_state(_tokens: TokenStream) -> TokenStream { todo!() }
+pub(super) fn frog_state(tokens: TokenStream) -> TokenStream {
+    generate_state::generate_state(tokens).into()
+}

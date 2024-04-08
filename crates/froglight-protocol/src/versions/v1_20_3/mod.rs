@@ -16,9 +16,8 @@ pub mod status;
 ///
 /// Used by Minecraft 1.20.3 - 1.20.4
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct V1_20_3;
 
 impl Version for V1_20_3 {
-    const PROTOCOL_VERSION: i32 = 765i32;
+    const ID: i32 = 765i32;
 }

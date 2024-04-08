@@ -166,7 +166,7 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 let mut field_tokens = TokenStream::new();
 
                 for (i, field) in fields.unnamed.iter().enumerate() {
-                    let field_ident = syn::Ident::new(&format!("field_{}", i), field.span());
+                    let field_ident = syn::Ident::new(&format!("field_{i}"), field.span());
 
                     // Add the field to the field ident tokens
                     field_ident_tokens.extend(quote! {

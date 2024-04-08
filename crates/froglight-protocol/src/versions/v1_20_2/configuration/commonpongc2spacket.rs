@@ -12,5 +12,5 @@ pub struct CommonPongC2SPacket {
 }
 
 impl From<CommonPingS2CPacket> for CommonPongC2SPacket {
-    fn from(packet: CommonPingS2CPacket) -> Self { Self(packet.0) }
+    fn from(packet: CommonPingS2CPacket) -> Self { Self::from(packet.ping) }
 }
