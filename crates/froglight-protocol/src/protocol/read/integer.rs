@@ -6,7 +6,6 @@ macro_rules! impl_integer_read {
     ($($ty:ty),*) => {
         $(
             impl FrogRead for $ty {
-                #[inline]
                 fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
                     let position = usize::try_from(buf.position()).expect("Cursor position too large");
                     buf.consume(std::mem::size_of::<$ty>());
