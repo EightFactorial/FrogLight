@@ -4,7 +4,6 @@ use simdnbt::owned::Nbt;
 use crate::common::{GameMode, GlobalPosition, ResourceKey};
 
 #[derive(Debug, Clone, PartialEq, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct GameJoinS2CPacket {
     pub player_id: u32,
     pub hardcore: bool,

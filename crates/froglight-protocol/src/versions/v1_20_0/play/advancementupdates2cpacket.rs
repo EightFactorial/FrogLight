@@ -3,7 +3,6 @@ use froglight_macros::FrogReadWrite;
 use crate::common::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct AdvancementUpdateS2CPacket {
     pub reset: bool,
     // TODO: Implement advancements

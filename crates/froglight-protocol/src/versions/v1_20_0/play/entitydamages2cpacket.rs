@@ -1,11 +1,10 @@
-use bevy_math::DVec3;
 use froglight_macros::FrogReadWrite;
+use glam::DVec3;
 
 use crate::common::{EntityId, NonZero};
 
 #[derive(Debug, Clone, Copy, PartialEq, FrogReadWrite)]
 #[frog(tests = ["read_example"], bytes = [42, 0, 0, 0, 0])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct EntityDamageS2CPacket {
     pub entity_id: EntityId,
     #[frog(var)]

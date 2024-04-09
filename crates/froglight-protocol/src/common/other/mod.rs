@@ -12,3 +12,6 @@ pub use gameprofile::GameProfile;
 
 mod intent;
 pub use intent::ConnectionIntent;
+
+mod player_hand;
+pub use player_hand::{InteractionHand, PlayerHand};

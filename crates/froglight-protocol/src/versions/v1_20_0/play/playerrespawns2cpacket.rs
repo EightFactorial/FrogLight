@@ -3,7 +3,6 @@ use froglight_macros::FrogReadWrite;
 use crate::common::{GameMode, GlobalPosition, ResourceKey};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct PlayerRespawnS2CPacket {
     pub dimension_type: ResourceKey,
     pub dimension: ResourceKey,

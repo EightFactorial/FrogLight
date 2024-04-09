@@ -7,5 +7,6 @@ use crate::common::EntityId;
     Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogReadWrite,
 )]
 #[frog(tests = ["read_example"], bytes = [1, 42])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct EntitiesDestroyS2CPacket(pub Vec<EntityId>);
+pub struct EntitiesDestroyS2CPacket {
+    pub entities: Vec<EntityId>,
+}

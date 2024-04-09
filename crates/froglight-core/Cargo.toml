@@ -19,9 +19,5 @@ workspace = true
 bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
-bevy_log = { workspace = true, optional = true }
+bevy_log = { workspace = true }
 bevy_reflect = { workspace = true }
-
-# Only depend on `bevy_log` for debug builds
-[target.'cfg(debug_assertions)'.dependencies]
-bevy_log = { workspace = true, optional = false }

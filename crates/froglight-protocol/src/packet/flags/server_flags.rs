@@ -14,14 +14,3 @@ pub struct ServerPlayerAbilityFlags {
     /// Whether the player instant breaks blocks.
     pub instant_break: bool,
 }
-
-/// The player's current state sent from the client.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
-#[frog(bitset, tests = ["read_verify", "write_verify"], bytes = [0])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct ClientPlayerAbilityFlags {
-    /// An empty flag.
-    empty: bool,
-    /// Whether the player is flying.
-    pub flying: bool,
-}

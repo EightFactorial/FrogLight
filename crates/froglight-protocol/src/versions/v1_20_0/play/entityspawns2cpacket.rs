@@ -1,10 +1,9 @@
-use bevy_math::{DVec3, I16Vec3};
 use froglight_macros::FrogReadWrite;
+use glam::{DVec3, I16Vec3};
 
 use crate::common::{EntityId, EntityUuid};
 
 #[derive(Debug, Clone, Copy, PartialEq, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct EntitySpawnS2CPacket {
     pub id: EntityId,
     pub uuid: EntityUuid,

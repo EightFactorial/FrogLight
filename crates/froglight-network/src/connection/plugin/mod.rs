@@ -1,5 +1,7 @@
 use bevy_app::{App, Plugin};
 
+mod traits;
+
 /// The `Connection` Froglight plugin.
 ///
 /// Adds networking capabilities.

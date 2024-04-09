@@ -1,12 +1,11 @@
 use froglight_macros::FrogReadWrite;
 
-use crate::common::UnsizedByteBuffer;
+use crate::common::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct PlaySoundS2CPacket {
     // TODO: Implement sound types and categories
-    pub data: UnsizedByteBuffer,
+    pub data: UnsizedBuffer,
     // pub sound: (),
     // pub category: (),
     // pub fixed_position: IVec3,

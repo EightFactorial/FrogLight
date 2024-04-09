@@ -1,13 +1,16 @@
 use froglight_macros::FrogReadWrite;
 
-use crate::common::{ChunkDataPacket, ChunkPosition, UnsizedByteBuffer};
+use crate::{
+    common::{ChunkPosition, UnsizedBuffer},
+    packet::ChunkDataPacket,
+};
 
 #[derive(Clone, PartialEq, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ChunkDataS2CPacket {
     pub position: ChunkPosition,
     pub chunk_data: ChunkDataPacket,
-    pub light_data: UnsizedByteBuffer,
+    pub light_data: UnsizedBuffer,
 }
 
 #[allow(clippy::missing_fields_in_debug)]

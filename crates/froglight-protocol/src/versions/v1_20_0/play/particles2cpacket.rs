@@ -1,10 +1,9 @@
-use bevy_math::{DVec3, Vec3};
 use froglight_macros::FrogReadWrite;
+use glam::{DVec3, Vec3};
 
-use crate::common::UnsizedByteBuffer;
+use crate::common::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ParticleS2CPacket {
     #[frog(var)]
     pub particle_id: u32,
@@ -13,5 +12,5 @@ pub struct ParticleS2CPacket {
     pub distance: Vec3,
     pub max_speed: f32,
     pub particle_count: u32,
-    pub data: UnsizedByteBuffer,
+    pub data: UnsizedBuffer,
 }

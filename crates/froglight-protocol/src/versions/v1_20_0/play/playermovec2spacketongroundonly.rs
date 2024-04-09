@@ -4,5 +4,6 @@ use froglight_macros::FrogReadWrite;
 #[derive(
     Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogReadWrite,
 )]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct PlayerMoveC2SPacketOnGroundOnly(pub bool);
+pub struct PlayerMoveC2SPacketOnGroundOnly {
+    pub on_ground: bool,
+}
