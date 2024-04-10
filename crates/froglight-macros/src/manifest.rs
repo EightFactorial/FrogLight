@@ -52,23 +52,19 @@ impl ProjectManifest {
     /// Attempt to retrieve the [path](syn::Path) of a particular package in
     /// the [manifest](Self) by [name](str).
     pub(crate) fn maybe_get_path(&self, name: &str) -> Option<syn::Path> {
-        fn dep_package(dep: &Item) -> Option<&str> {
-            if dep.as_str().is_some() {
-                None
-            } else {
-                dep.get("package").map(|name| name.as_str().unwrap())
-            }
-        }
-
         let find_in_deps = |deps: &Item| -> Option<syn::Path> {
             let package = if let Some(dep) = deps.get(name) {
-                return Some(Self::parse_str(dep_package(dep).unwrap_or(name)));
+                return Some(Self::parse_str(Self::dep_package(dep).unwrap_or(name)));
             } else if let Some(dep) = deps.get(Self::FROGLIGHT) {
-                dep_package(dep).unwrap_or(Self::FROGLIGHT)
+                Self::dep_package(dep).unwrap_or(Self::FROGLIGHT)
             } else {
                 return None;
             };
 
+            // Stip the prefix from the package name
+            //
+            // For example, if the package name is `froglight_protocol`, the
+            // path will be `froglight::protocol`.
             let mut path = Self::parse_str::<syn::Path>(package);
             if let Some(module) = name.strip_prefix(Self::PREFIX) {
                 path.segments.push(Self::parse_str(module));
@@ -83,15 +79,32 @@ impl ProjectManifest {
         deps.and_then(find_in_deps).or_else(|| deps_dev.and_then(find_in_deps))
     }
 
+    /// Attempt to retrieve the package name from a [dependency](Item).
+    fn dep_package(dep: &Item) -> Option<&str> {
+        if dep.as_str().is_some() {
+            None
+        } else {
+            dep.get("package").map(|name| name.as_str().unwrap())
+        }
+    }
+
     const CURRENT_CRATE: &'static str = "crate";
 
     /// Returns the path for the crate with the given name.
     pub(crate) fn get_path(&self, name: &str) -> syn::Path {
         // Check if the crate is imported as a dependency
         if let Some(path) = self.maybe_get_path(name) {
-            path
-        // Check if the requested crate has the same name
-        } else if self.crate_name().replace('-', "_") == name.replace('-', "_") {
+            return path;
+        }
+
+        // Get the name of the current crate
+        let crate_name = self.crate_name();
+
+        // Check if the current crate is `froglight`
+        if crate_name == Self::FROGLIGHT {
+            Self::parse_str::<syn::Path>(Self::FROGLIGHT)
+        // Check if the current crate is the same as the package name
+        } else if crate_name.replace('-', "_") == name {
             Self::parse_str::<syn::Path>(Self::CURRENT_CRATE)
         // If the package is not found, just return the name as a path
         } else {
