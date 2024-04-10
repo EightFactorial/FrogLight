@@ -1,7 +1,7 @@
 use froglight_macros::FrogReadWrite;
 use uuid::Uuid;
 
-use crate::common::ResourcePackAction;
+use crate::packet::ResourcePackAction;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]

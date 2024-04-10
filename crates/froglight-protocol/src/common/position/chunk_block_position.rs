@@ -26,7 +26,7 @@ pub struct ChunkBlockPosition {
     /// In the Overworld where the world starts at -64, `y = 0` is at `-64`.
     ///
     /// In the Nether where the world starts at 0, `y = 0` is at `0`.
-    pub y: usize,
+    pub y: u32,
     /// The z-coordinate of the position.
     ///
     /// The range possible values is `0..16`, not including `16`.
@@ -70,7 +70,7 @@ impl ChunkBlockPosition {
     /// Panics if the x or z coordinate is greater than or equal to 16.
     #[must_use]
     #[inline]
-    pub const fn new(x: u8, y: usize, z: u8) -> Self {
+    pub const fn new(x: u8, y: u32, z: u8) -> Self {
         assert!(x < 16, "X-coordinate is out of range");
         assert!(z < 16, "Z-coordinate is out of range");
 
@@ -97,7 +97,7 @@ impl ChunkBlockPosition {
     pub const fn splat(v: u8) -> Self {
         assert!(v < 16, "Coordinate is out of range");
 
-        Self::new(v, v as usize, v)
+        Self::new(v, v as u32, v)
     }
 
     /// Gets the x-coordinate of the position.
@@ -107,7 +107,7 @@ impl ChunkBlockPosition {
     /// Gets the y-coordinate of the position.
     #[must_use]
     #[inline]
-    pub const fn y(&self) -> usize { self.y }
+    pub const fn y(&self) -> u32 { self.y }
     /// Gets the z-coordinate of the position.
     #[must_use]
     #[inline]
@@ -134,7 +134,7 @@ impl ChunkBlockPosition {
     #[must_use]
     #[inline]
     pub const fn as_index(&self) -> usize {
-        (self.x as usize) + (self.z as usize * 16) + (self.y * 256)
+        (self.x as usize) + (self.z as usize * 16) + (self.y as usize * 256)
     }
 
     /// Creates a new [`ChunkBlockPosition`] from an index in a flat array.
@@ -173,7 +173,7 @@ impl ChunkBlockPosition {
     pub const fn from_index(index: usize) -> Self {
         let x = index.rem_euclid(16) as u8;
         let z = index.div_euclid(16).rem_euclid(16) as u8;
-        let y = index.div_euclid(256);
+        let y = index.div_euclid(256) as u32;
 
         Self::new(x, y, z)
     }
@@ -204,7 +204,7 @@ impl ChunkBlockPosition {
             // That's probably high enough.
             return None;
         };
-        let Ok(offset_coord) = usize::try_from(coord + height_offset) else {
+        let Ok(offset_coord) = u32::try_from(coord + height_offset) else {
             // If the height is below 0, return None.
             // Zero should be equal to the bottom of the world,
             // regardless of the actual minimum.
@@ -245,7 +245,7 @@ impl ChunkBlockPosition {
         z %= 16;
 
         // Return the new position.
-        Self::new(x, self.y + pos.y + carry_z as usize, z)
+        Self::new(x, self.y + pos.y + carry_z as u32, z)
     }
 
     /// Gets the next position after the current one.
@@ -288,7 +288,7 @@ impl SubAssign<ChunkBlockPosition> for ChunkBlockPosition {
 const TEST_XZ_RANGE: std::ops::Range<u8> = 0u8..16u8;
 
 #[cfg(test)]
-const TEST_Y_RANGE: std::ops::Range<usize> = usize::MIN..usize::MAX;
+const TEST_Y_RANGE: std::ops::Range<u32> = u32::MIN..u32::MAX;
 
 #[cfg(test)]
 proptest::proptest! {

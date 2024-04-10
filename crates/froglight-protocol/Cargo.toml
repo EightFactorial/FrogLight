@@ -24,7 +24,7 @@ proptest = { workspace = true }
 [dependencies]
 bevy_ecs = { workspace = true, optional = true }
 bitvec = { workspace = true }
-bytemuck = { workspace = true, features = ["derive", "nightly_stdsimd"] }
+bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
 compact_str = { workspace = true, features = ["serde", "smallvec"] }
 derive_more = { workspace = true }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [

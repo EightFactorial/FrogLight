@@ -8,6 +8,8 @@ members = [
     "crates/froglight-macros",
     "crates/froglight-network",
     "crates/froglight-protocol",
+    "crates/froglight-utils",
+    "crates/froglight-world",
 ]
 
 [workspace.package]

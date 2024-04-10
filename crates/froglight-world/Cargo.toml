@@ -1,0 +1,36 @@
+[package]
+name = "froglight-world"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+proptest = { workspace = true }
+
+[dependencies]
+bevy_ecs = { workspace = true, optional = true }
+bevy_log = { workspace = true, optional = true }
+bitvec = { workspace = true }
+froglight-core = { version = "0.1.0", path = "../froglight-core" }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
+parking_lot = { workspace = true }
+rangemap = { version = "1.5.1", features = ["nightly", "const_fn"] }
+simdnbt = { workspace = true }
+thiserror = { workspace = true }
+
+[features]
+default = ["bevy"]
+
+# Derives `Component` for `Chunk` and enables some logs.
+bevy = ["dep:bevy_ecs", "dep:bevy_log"]

@@ -32,7 +32,7 @@ impl FrogRead for BlockEntity {
         Self: Sized,
     {
         let byte = u8::fg_read(buf)?;
-        let y = usize::try_from(i16::fg_read(buf)?).expect("Invalid block entity position");
+        let y = u32::try_from(i16::fg_read(buf)?).expect("Invalid block entity position");
 
         Ok(Self {
             position: ChunkBlockPosition { x: (byte >> 4) & 0x0F, y, z: byte & 0x0F },
