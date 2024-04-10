@@ -21,7 +21,7 @@ workspace = true
 [dependencies]
 attribute-derive = { version = "0.9.1", features = ["syn-full"] }
 proc-macro2 = { version = "1.0.79", features = ["nightly"] }
-quote = { version = "1.0.35", features = ["proc-macro"] }
+quote = { version = "1.0.36", features = ["proc-macro"] }
 syn = { version = "2.0.58", features = ["full", "printing", "proc-macro"] }
 
 [features]
