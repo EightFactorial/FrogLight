@@ -2,9 +2,29 @@ use attribute_derive::FromAttr;
 use proc_macro::TokenStream;
 use syn::DeriveInput;
 
+use crate::manifest::ProjectManifest;
+
 mod generate_impls;
 mod generate_state;
 mod generate_tests;
+
+/// Get the path to the `froglight_protocol` or `froglight` crate.
+///
+/// Used for generating `FrogRead` and `FrogWrite` implementations with the
+/// correct path to the traits.
+fn get_protocol_path() -> syn::Path {
+    let mut path = ProjectManifest::get().get_path("froglight_protocol");
+
+    if let Some(segment) = path.segments.first() {
+        // If the path is `froglight`, remove an extra `protocol` module segment.
+        if segment.ident == "froglight" {
+            let segments = path.segments.into_iter().enumerate().filter(|(i, _)| i != &1);
+            path.segments = segments.map(|(_, s)| s).collect();
+        }
+    }
+
+    path
+}
 
 /// Generate a `FrogRead`, `FrogWrite`, or both implementations.
 ///

@@ -4,6 +4,8 @@ use syn::{Data, DeriveInput, Fields, Index};
 
 /// Generate a `FrogRead` implementation.
 pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
+    let crate_path = crate::protocol::get_protocol_path();
+
     let struct_ident = &input.ident;
     let Data::Struct(data) = &input.data else {
         unreachable!("Bitset items must be structs");
@@ -16,7 +18,7 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
 
             // Read the bitset from the buffer
             read_tokens.extend(quote! {
-                let bitset: ::froglight::common::BitSet::<#field_count> = ::froglight::protocol::FrogRead::fg_read(buf)?;
+                let bitset: #crate_path::common::BitSet::<#field_count> = #crate_path::protocol::FrogRead::fg_read(buf)?;
             });
 
             // Collect tokens for reading each field
@@ -40,7 +42,7 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
 
             // Read the bitset from the buffer
             read_tokens.extend(quote! {
-                let bitset: ::froglight::common::BitSet::<#field_count> = ::froglight::protocol::FrogRead::fg_read(buf)?;
+                let bitset: #crate_path::common::BitSet::<#field_count> = #crate_path::protocol::FrogRead::fg_read(buf)?;
             });
 
             // Collect tokens for reading each field
@@ -62,8 +64,8 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
     }
 
     quote! {
-        impl ::froglight::protocol::FrogRead for #struct_ident {
-            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ::froglight::protocol::ReadError>
+        impl #crate_path::protocol::FrogRead for #struct_ident {
+            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, #crate_path::protocol::ReadError>
             where
                 Self: Sized,
             {
@@ -76,6 +78,8 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
 
 /// Generate a `FrogWrite` implementation.
 pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
+    let crate_path = crate::protocol::get_protocol_path();
+
     let struct_ident = &input.ident;
     let Data::Struct(data) = &input.data else {
         unreachable!("Bitset items must be structs");
@@ -88,7 +92,7 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
 
             // Create the bitset
             write_tokens.extend(quote! {
-                let mut bitset = ::froglight::common::BitSet::<#field_count>::new();
+                let mut bitset = #crate_path::common::BitSet::<#field_count>::new();
             });
 
             // Collect tokens for writing each field
@@ -111,7 +115,7 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
 
             // Create the bitset
             write_tokens.extend(quote! {
-                let mut bitset = ::froglight::common::BitSet::<#field_count>::new();
+                let mut bitset = #crate_path::common::BitSet::<#field_count>::new();
             });
 
             // Collect tokens for writing each field
@@ -133,8 +137,8 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
     }
 
     quote! {
-        impl ::froglight::protocol::FrogWrite for #struct_ident {
-            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), ::froglight::protocol::WriteError> {
+        impl #crate_path::protocol::FrogWrite for #struct_ident {
+            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), #crate_path::protocol::WriteError> {
                 #write_tokens
             }
         }

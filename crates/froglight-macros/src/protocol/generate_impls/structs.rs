@@ -6,6 +6,8 @@ use super::is_variable;
 
 /// Generate a `FrogRead` implementation.
 pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
+    let crate_path = crate::protocol::get_protocol_path();
+
     let struct_ident = &input.ident;
     let Data::Struct(data) = &input.data else {
         unreachable!("Struct generator called on non-struct type");
@@ -22,12 +24,12 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Read the field using `FrogVarRead`
                     field_tokens.extend(quote! {
-                        #field_ident: ::froglight::protocol::FrogVarRead::fg_var_read(buf)?,
+                        #field_ident: #crate_path::protocol::FrogVarRead::fg_var_read(buf)?,
                     });
                 } else {
                     // Read the field using `FrogRead`
                     field_tokens.extend(quote! {
-                        #field_ident: ::froglight::protocol::FrogRead::fg_read(buf)?,
+                        #field_ident: #crate_path::protocol::FrogRead::fg_read(buf)?,
                     });
                 }
             }
@@ -46,12 +48,12 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Read the field using `FrogVarRead`
                     field_tokens.extend(quote! {
-                        ::froglight::protocol::FrogVarRead::fg_var_read(buf)?,
+                        #crate_path::protocol::FrogVarRead::fg_var_read(buf)?,
                     });
                 } else {
                     // Read the field using `FrogRead`
                     field_tokens.extend(quote! {
-                        ::froglight::protocol::FrogRead::fg_read(buf)?,
+                        #crate_path::protocol::FrogRead::fg_read(buf)?,
                     });
                 }
             }
@@ -72,8 +74,8 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
     }
 
     quote! {
-        impl ::froglight::protocol::FrogRead for #struct_ident {
-            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ::froglight::protocol::ReadError>
+        impl #crate_path::protocol::FrogRead for #struct_ident {
+            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, #crate_path::protocol::ReadError>
             where
                 Self: Sized,
             {
@@ -86,6 +88,8 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
 
 /// Generate a `FrogWrite` implementation.
 pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
+    let crate_path = crate::protocol::get_protocol_path();
+
     let struct_ident = &input.ident;
     let Data::Struct(data) = &input.data else {
         unreachable!("Struct generator called on non-struct type");
@@ -101,12 +105,12 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Write the field using `FrogVarWrite`
                     write_tokens.extend(quote! {
-                        ::froglight::protocol::FrogVarWrite::fg_var_write(&self.#field_ident, buf)?;
+                        #crate_path::protocol::FrogVarWrite::fg_var_write(&self.#field_ident, buf)?;
                     });
                 } else {
                     // Write the field using `FrogWrite`
                     write_tokens.extend(quote! {
-                        ::froglight::protocol::FrogWrite::fg_write(&self.#field_ident, buf)?;
+                        #crate_path::protocol::FrogWrite::fg_write(&self.#field_ident, buf)?;
                     });
                 }
             }
@@ -119,12 +123,12 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
                 if is_variable(&field.attrs) {
                     // Write the field using `FrogVarWrite`
                     write_tokens.extend(quote! {
-                        ::froglight::protocol::FrogVarWrite::fg_var_write(&self.#index_indent, buf)?;
+                        #crate_path::protocol::FrogVarWrite::fg_var_write(&self.#index_indent, buf)?;
                     });
                 } else {
                     // Write the field using `FrogWrite`
                     write_tokens.extend(quote! {
-                        ::froglight::protocol::FrogWrite::fg_write(&self.#index_indent, buf)?;
+                        #crate_path::protocol::FrogWrite::fg_write(&self.#index_indent, buf)?;
                     });
                 }
             }
@@ -139,8 +143,8 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
     });
 
     quote! {
-        impl ::froglight::protocol::FrogWrite for #struct_ident {
-            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), ::froglight::protocol::WriteError> {
+        impl #crate_path::protocol::FrogWrite for #struct_ident {
+            fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), #crate_path::protocol::WriteError> {
                 #write_tokens
             }
         }

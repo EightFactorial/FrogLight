@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+pub(crate) mod manifest;
+
 // --- Asset Macros ---
 
 #[cfg(feature = "asset")]

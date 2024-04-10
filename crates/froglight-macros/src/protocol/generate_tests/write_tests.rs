@@ -5,6 +5,8 @@ use syn::DeriveInput;
 use super::Attributes;
 
 pub(super) fn write_default(input: &DeriveInput, _: &Attributes, output: &mut TokenStream) {
+    let crate_path = crate::protocol::get_protocol_path();
+
     let test_name = super::test_name(input, "write_default");
     let item = input.ident.clone();
     let item_name = input.ident.to_string();
@@ -13,7 +15,7 @@ pub(super) fn write_default(input: &DeriveInput, _: &Attributes, output: &mut To
         #[test]
         fn #test_name() {
             let mut data: Vec<u8> = Vec::new();
-            if let Err(err) = <#item as ::froglight::protocol::FrogWrite>::fg_write(&#item::default(), &mut data) {
+            if let Err(err) = <#item as #crate_path::protocol::FrogWrite>::fg_write(&#item::default(), &mut data) {
                 panic!("Failed to write `{}`: {err}", #item_name);
             }
         }
@@ -25,6 +27,8 @@ pub(super) fn write_example(
     test_attrs: &Attributes,
     output: &mut TokenStream,
 ) {
+    let crate_path = crate::protocol::get_protocol_path();
+
     let test_name = super::test_name(input, "write_verify");
     let item = input.ident.clone();
     let item_name = input.ident.to_string();
@@ -36,7 +40,7 @@ pub(super) fn write_example(
             let mut data: Vec<u8> = Vec::new();
             let expected: Vec<u8> = vec![#(#bytes),*];
 
-            if let Err(err) = <#item as ::froglight::protocol::FrogWrite>::fg_write(&#item::default(), &mut data) {
+            if let Err(err) = <#item as #crate_path::protocol::FrogWrite>::fg_write(&#item::default(), &mut data) {
                 panic!("Failed to write `{}`: {err}", #item_name);
             }
 
