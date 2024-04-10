@@ -4,7 +4,6 @@ use froglight_macros::FrogReadWrite;
 use crate::common::{BlockPosition, ResourceKey};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct UpdateJigsawC2SPacket {
     pub pos: BlockPosition,
     pub name: ResourceKey,

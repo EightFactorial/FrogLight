@@ -1,6 +1,9 @@
 mod client_flags;
 pub use client_flags::ClientPlayerAbilityFlags;
 
+mod command_block_flags;
+pub use command_block_flags::CommandBlockFlags;
+
 mod input_flags;
 pub use input_flags::PlayerInputFlags;
 

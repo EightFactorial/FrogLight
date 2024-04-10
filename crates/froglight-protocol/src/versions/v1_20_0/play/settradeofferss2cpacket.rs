@@ -1,10 +1,9 @@
 use froglight_macros::FrogReadWrite;
 
-use crate::common::LegacyTradeOffer;
+use crate::packet::LegacyTradeOffer;
 
 #[derive(Debug, Clone, PartialEq, FrogReadWrite)]
 #[frog(tests = ["read_example"], bytes = [4, 0, 0, 0, 1, 1])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct SetTradeOffersS2CPacket {
     #[frog(var)]
     pub container_id: u32,

@@ -5,7 +5,6 @@ use crate::common::EntityUuid;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogReadWrite)]
 #[frog(tests = ["read_example"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct SpectatorTeleportC2SPacket {
     pub target_uuid: EntityUuid,
 }

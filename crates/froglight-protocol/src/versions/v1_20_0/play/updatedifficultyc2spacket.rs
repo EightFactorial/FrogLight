@@ -5,5 +5,6 @@ use crate::common::Difficulty;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogReadWrite)]
 #[frog(tests = ["read_example"], bytes = [2])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct UpdateDifficultyC2SPacket(pub Difficulty);
+pub struct UpdateDifficultyC2SPacket {
+    pub difficulty: Difficulty,
+}

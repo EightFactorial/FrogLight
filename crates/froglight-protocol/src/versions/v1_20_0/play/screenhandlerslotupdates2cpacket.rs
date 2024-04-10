@@ -1,6 +1,6 @@
 use froglight_macros::FrogReadWrite;
 
-use crate::common::LegacyItemSlot;
+use crate::packet::LegacyItemSlot;
 
 #[derive(Debug, Clone, PartialEq, FrogReadWrite)]
 #[frog(tests = ["read_example"], bytes = [0, 0, 0, 2, 0])]

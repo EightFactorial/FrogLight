@@ -8,7 +8,7 @@ use crate::traits::Version;
 
 pub mod handshaking;
 pub mod login;
-// pub mod play;
+pub mod play;
 pub mod status;
 
 /// Protocol 763

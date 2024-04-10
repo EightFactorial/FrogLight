@@ -12,6 +12,9 @@ pub use chat_suggestion::ChatSuggestionAction;
 mod chunk_data;
 pub use chunk_data::{BiomeDataPacket, BlockEntity, ChunkDataPacket, SectionDataPacket};
 
+mod command_block;
+pub use command_block::CommandBlockMode;
+
 mod client;
 pub use client::*;
 
@@ -19,10 +22,7 @@ mod entity_animation;
 pub use entity_animation::EntityAnimation;
 
 mod flags;
-pub use flags::{
-    ClientPlayerAbilityFlags, PlayerInputFlags, PlayerModelFlags, RelativePositionFlags,
-    ServerPlayerAbilityFlags,
-};
+pub use flags::*;
 
 mod game_event;
 pub use game_event::GameEvent;
@@ -36,5 +36,14 @@ pub use look_anchor::{LookAnchor, LookEntity};
 mod player_interaction;
 pub use player_interaction::PlayerInteraction;
 
+mod recipe_book;
+pub use recipe_book::RecipeBookCategory;
+
+mod resource_pack;
+pub use resource_pack::ResourcePackAction;
+
 mod server_status;
 pub use server_status::{ServerPlayers, ServerSamplePlayer, ServerStatus, ServerVersion};
+
+mod trade_offer;
+pub use trade_offer::{LegacyTradeOffer, TradeOffer};

@@ -7,5 +7,6 @@ use crate::common::ChunkPosition;
     Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogReadWrite,
 )]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
-pub struct UnloadChunkS2CPacket(pub ChunkPosition);
+pub struct UnloadChunkS2CPacket {
+    pub position: ChunkPosition,
+}
