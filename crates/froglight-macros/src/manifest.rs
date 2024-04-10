@@ -46,7 +46,12 @@ impl ProjectManifest {
         Self { manifest }
     }
 
+    /// The package name of the `froglight` crate.
     const FROGLIGHT: &'static str = "froglight";
+    /// The package name of the `froglight_app` crate.
+    const FROGLIGHT_APP: &'static str = "froglight_app";
+
+    /// The prefix for all `froglight` crates.
     const PREFIX: &'static str = "froglight_";
 
     /// Attempt to retrieve the [path](syn::Path) of a particular package in
@@ -57,6 +62,8 @@ impl ProjectManifest {
                 return Some(Self::parse_str(Self::dep_package(dep).unwrap_or(name)));
             } else if let Some(dep) = deps.get(Self::FROGLIGHT) {
                 Self::dep_package(dep).unwrap_or(Self::FROGLIGHT)
+            } else if let Some(dep) = deps.get(Self::FROGLIGHT_APP) {
+                Self::dep_package(dep).unwrap_or(Self::FROGLIGHT_APP)
             } else {
                 return None;
             };
@@ -88,6 +95,7 @@ impl ProjectManifest {
         }
     }
 
+    /// The path to the current crate.
     const CURRENT_CRATE: &'static str = "crate";
 
     /// Returns the path for the crate with the given name.
@@ -103,6 +111,9 @@ impl ProjectManifest {
         // Check if the current crate is `froglight`
         if crate_name == Self::FROGLIGHT {
             Self::parse_str::<syn::Path>(Self::FROGLIGHT)
+            // Check if the current crate is `froglight_app`
+        } else if crate_name == Self::FROGLIGHT_APP {
+            Self::parse_str::<syn::Path>(Self::FROGLIGHT_APP)
         // Check if the current crate is the same as the package name
         } else if crate_name.replace('-', "_") == name {
             Self::parse_str::<syn::Path>(Self::CURRENT_CRATE)
