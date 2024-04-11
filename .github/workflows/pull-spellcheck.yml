@@ -22,6 +22,8 @@ jobs:
       # Checkout the repository
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       # Get all changed .rs files
       - name: Get changed files
         id: changed-files
