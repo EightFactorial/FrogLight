@@ -3,6 +3,11 @@ use froglight_protocol::common::SectionBlockPosition;
 use crate::ChunkSection;
 
 /// An iterator over the blocks of a [`ChunkSection`].
+///
+/// # Note
+/// Reading from the iterator will acquire a
+/// [`read lock`](parking_lot::RwLock::read),
+/// and may block other threads.
 #[derive(Debug, Clone)]
 pub struct SectionBlockIter<'s> {
     section: &'s ChunkSection,

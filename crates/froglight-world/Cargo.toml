@@ -15,9 +15,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
-[dev-dependencies]
-proptest = { workspace = true }
-
 [dependencies]
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
@@ -25,7 +22,6 @@ bitvec = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 parking_lot = { workspace = true }
-rangemap = { version = "1.5.1", features = ["nightly", "const_fn"] }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }
 

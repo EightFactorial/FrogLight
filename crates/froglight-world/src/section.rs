@@ -44,10 +44,24 @@ impl ChunkSection {
         self.blocks.get_data(&position)
     }
 
+    /// Sets the `Block ID` at the given position.
+    ///
+    /// Returns the previous `Block ID` at the position.
+    #[inline]
+    pub fn set_block(&mut self, position: SectionBlockPosition, block_id: u32) -> u32 {
+        self.blocks.set_data(&position, block_id)
+    }
+
     /// Returns the `Biome ID` at the given position.
     #[inline]
     #[must_use]
     pub fn get_biome(&self, position: SectionBlockPosition) -> u32 {
         self.biomes.get_data(&position)
+    }
+
+    /// Sets the `Biome ID` at the given position.
+    #[inline]
+    pub fn set_biome(&mut self, position: SectionBlockPosition, biome_id: u32) -> u32 {
+        self.biomes.set_data(&position, biome_id)
     }
 }

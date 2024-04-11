@@ -3,6 +3,11 @@ use froglight_protocol::common::ChunkBlockPosition;
 use crate::Chunk;
 
 /// An iterator over the blocks of a [`Chunk`].
+///
+/// # Note
+/// Reading from the iterator will acquire a
+/// [`read lock`](parking_lot::RwLock::read),
+/// and may block other threads.
 #[derive(Debug, Clone)]
 pub struct ChunkBlockIter<'c> {
     chunk: &'c Chunk,
@@ -20,6 +25,10 @@ impl<'c> ChunkBlockIter<'c> {
     /// Returns the current index of the iterator.
     #[must_use]
     pub fn index(&self) -> ChunkBlockPosition { self.index }
+
+    /// Returns whether the iterator has finished.
+    #[must_use]
+    pub fn finished(&self) -> bool { self.finished }
 
     /// Resets the iterator to the
     /// [`default position`](ChunkBlockPosition::default).
@@ -72,6 +81,7 @@ fn chunkid_iter() {
     }
 
     // Check that the iterator is finished.
+    assert!(iter.finished(), "Iterator is not finished");
     assert_eq!(iter.next(), None, "Iterator returned a value after finishing");
     assert_eq!(
         iter.index(),
