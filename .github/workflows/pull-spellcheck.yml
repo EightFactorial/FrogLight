@@ -1,8 +1,6 @@
-name: Spellcheck
+name: Pull Spellcheck
 
 on:
-  schedule:
-    - cron: "0 0 * * SAT"
   pull_request:
     branches:
       - main
@@ -24,6 +22,17 @@ jobs:
       # Checkout the repository
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      # Run the typos tool
+      # Get all changed .rs files
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          since_last_remote_commit: true
+          files: |
+             **.rs
+      # Run Spellcheck (typos) on changed files
       - name: Spellcheck
+        if: steps.changed-files.outputs.any_changed == 'true'
         uses: crate-ci/typos@master
+        with:
+          files: ${{ steps.changed-files.outputs.all_changed_files }}
