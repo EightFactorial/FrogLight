@@ -18,9 +18,12 @@ pub use error::ConnectionError;
 mod information;
 pub use information::ConnectionInformation;
 
+#[cfg(test)]
+mod compile_test;
+
 /// A connection to a remote host.
 #[derive(Debug)]
-pub struct Connection<V, S, D>
+pub struct Connection<V, S, D = Serverbound>
 where
     V: Version,
     S: State<V>,
@@ -123,6 +126,9 @@ where
             _direction: PhantomData,
         })
     }
+
+    #[cfg(test)]
+    fn nothing() {}
 }
 
 impl<V, S, D> TryFrom<std::net::TcpStream> for Connection<V, S, D>
