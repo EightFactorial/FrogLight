@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  checks: write
+  issues: write
+  pull-requests: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -23,18 +29,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         with:
-          fetch-depth: 2
-      # Get all changed .rs files
-      - name: Get changed files
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      # Get all changed files
+      - name: Get Changes
         id: changed-files
         uses: tj-actions/changed-files@635f118699dd888d737c15018cd30aff2e0274f8 # v44
-        with:
-          since_last_remote_commit: true
-          files: |
-             **.rs
-      # Run Spellcheck (typos) on changed files
+      # Run Spellcheck (typos)
       - name: Spellcheck
         if: steps.changed-files.outputs.any_changed == 'true'
         uses: crate-ci/typos@master
         with:
           files: ${{ steps.changed-files.outputs.all_changed_files }}
+          write_changes: true
+      # Suggest Changes
+      - uses: reviewdog/action-suggester@v1
+        if: steps.changed-files.outputs.any_changed == 'true'
+        with:
+          tool_name: typos
