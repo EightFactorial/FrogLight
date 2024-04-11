@@ -1,4 +1,4 @@
-name: Pull Spellcheck
+name: Spellcheck Pull
 
 on:
   pull_request:
