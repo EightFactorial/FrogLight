@@ -2142,6 +2142,19 @@ dependencies = [
 [[package]]
 name = "froglight-utils"
 version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_log",
+ "bevy_time",
+ "derive_more",
+ "froglight-core",
+ "froglight-world",
+ "futures-lite 2.3.0",
+ "hashbrown",
+ "parking_lot",
+ "rangemap",
+]
 
 [[package]]
 name = "froglight-world"
@@ -2153,8 +2166,6 @@ dependencies = [
  "froglight-core",
  "froglight-protocol",
  "parking_lot",
- "proptest",
- "rangemap",
  "simdnbt",
  "thiserror",
 ]

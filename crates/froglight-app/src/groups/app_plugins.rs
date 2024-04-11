@@ -13,6 +13,6 @@ pub struct AppPlugins;
 
 impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
-        DefaultPlugins::build(DefaultPlugins).add(CorePlugin).add(NetworkPlugins)
+        DefaultPlugins::build(DefaultPlugins).add(CorePlugin).add(UtilityPlugin).add(NetworkPlugins)
     }
 }

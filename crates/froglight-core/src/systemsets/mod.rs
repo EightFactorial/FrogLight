@@ -14,10 +14,18 @@ pub use networking::*;
 mod physics;
 pub use physics::*;
 
+mod utility;
+pub use utility::*;
+
+mod world;
+pub use world::*;
+
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     assets::build(app);
     interface::build(app);
     networking::build(app);
     physics::build(app);
+    utility::build(app);
+    world::build(app);
 }
