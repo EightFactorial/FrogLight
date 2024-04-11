@@ -1,10 +1,16 @@
-use bevy_app::{App, PostUpdate, Update};
+use bevy_app::{App, PostUpdate, PreUpdate, Update};
 use bevy_ecs::schedule::SystemSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.configure_sets(Update, WorldUpdateSet).configure_sets(PostUpdate, WorldPostUpdateSet);
+    app.configure_sets(PreUpdate, WorldPreUpdateSet)
+        .configure_sets(Update, WorldUpdateSet)
+        .configure_sets(PostUpdate, WorldPostUpdateSet);
 }
+
+/// A [`SystemSet`] that runs during the [`PreUpdate`] phase.
+#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
+pub struct WorldPreUpdateSet;
 
 /// A [`SystemSet`] that runs during the [`Update`] phase.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]

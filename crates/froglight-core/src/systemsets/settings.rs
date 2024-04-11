@@ -1,23 +1,21 @@
 use bevy_app::{App, PreStartup, Startup, Update};
-use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
+use bevy_ecs::schedule::SystemSet;
 
-/// All `Asset` [`SystemSets`](SystemSet) run after `Settings`
-/// [`SystemSets`](SystemSet).
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.configure_sets(PreStartup, AssetPreStartupSet.after(super::SettingsPreStartupSet))
-        .configure_sets(Startup, AssetStartupSet.after(super::SettingsStartupSet))
-        .configure_sets(Update, AssetUpdateSet.after(super::SettingsUpdateSet));
+    app.configure_sets(PreStartup, SettingsPreStartupSet)
+        .configure_sets(Startup, SettingsStartupSet)
+        .configure_sets(Update, SettingsUpdateSet);
 }
 
 /// A [`SystemSet`] that runs during the [`PreStartup`] phase.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
-pub struct AssetPreStartupSet;
+pub struct SettingsPreStartupSet;
 
 /// A [`SystemSet`] that runs during the [`Startup`] phase.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
-pub struct AssetStartupSet;
+pub struct SettingsStartupSet;
 
 /// A [`SystemSet`] that runs during the [`Update`] phase.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
-pub struct AssetUpdateSet;
+pub struct SettingsUpdateSet;
