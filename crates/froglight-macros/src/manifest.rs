@@ -68,7 +68,7 @@ impl ProjectManifest {
                 return None;
             };
 
-            // Stip the prefix from the package name
+            // Strip the prefix from the package name
             //
             // For example, if the package name is `froglight_protocol`, the
             // path will be `froglight::protocol`.
