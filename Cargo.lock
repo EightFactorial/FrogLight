@@ -436,9 +436,9 @@ checksum = "fbb36e985947064623dbd357f727af08ffd077f93d696782f3c56365fa2e2799"
 
 [[package]]
 name = "async-trait"
-version = "0.1.79"
+version = "0.1.80"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a507401cad91ec6a857ed5513a2073c82a9b9048762b885bb98655b306964681"
+checksum = "c6fa2087f2753a7da8cc1c0dbfcf89579dd57458e36769de5ac750b4671737ca"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2069,6 +2069,7 @@ dependencies = [
  "froglight-core",
  "froglight-network",
  "froglight-protocol",
+ "froglight-registry",
  "froglight-utils",
  "froglight-world",
 ]
@@ -2114,6 +2115,7 @@ dependencies = [
  "flume",
  "froglight-core",
  "froglight-protocol",
+ "froglight-registry",
  "thiserror",
  "tldextract",
 ]
@@ -2140,6 +2142,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "froglight-registry"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_log",
+ "compact_str",
+ "froglight-protocol",
+ "hashbrown",
+ "parking_lot",
+ "rangemap",
+]
+
+[[package]]
 name = "froglight-utils"
 version = "0.1.0"
 dependencies = [
@@ -2153,7 +2170,6 @@ dependencies = [
  "futures-lite 2.3.0",
  "hashbrown",
  "parking_lot",
- "rangemap",
 ]
 
 [[package]]
@@ -2165,6 +2181,7 @@ dependencies = [
  "bitvec",
  "froglight-core",
  "froglight-protocol",
+ "froglight-registry",
  "parking_lot",
  "simdnbt",
  "thiserror",
@@ -2774,9 +2791,9 @@ checksum = "8eaf4bc02d17cbdd7ff4c7438cafcdf7fb9a4613313ad11b4f8fefe7d3fa0130"
 
 [[package]]
 name = "jobserver"
-version = "0.1.28"
+version = "0.1.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab46a6e9526ddef3ae7f787c06f0f2600639ba80ea3eade3d8e670a2230f51d6"
+checksum = "f08474e32172238f2827bd160c67871cdb2801430f65c3979184dc362e3ca118"
 dependencies = [
  "libc",
 ]
@@ -4313,7 +4330,7 @@ checksum = "8e40bb779c5187258fd7aad0eb68cb8706a0a81fa712fbea808ab43c4b8374c4"
 dependencies = [
  "indexmap",
  "toml_datetime",
- "winnow 0.6.5",
+ "winnow 0.6.6",
 ]
 
 [[package]]
@@ -5222,9 +5239,9 @@ dependencies = [
 
 [[package]]
 name = "winnow"
-version = "0.6.5"
+version = "0.6.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dffa400e67ed5a4dd237983829e66475f0a4a26938c4b04c21baede6262215b8"
+checksum = "f0c976aaaa0e1f90dbb21e9587cdaf1d9679a1cde8875c0d6bd83ab96a208352"
 dependencies = [
  "memchr",
 ]

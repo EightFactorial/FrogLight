@@ -19,6 +19,7 @@ impl PluginGroup for HeadlessPlugins {
         MinimalPlugins::build(MinimalPlugins)
             .add(DiagnosticsPlugin)
             .add(CorePlugin)
+            .add(RegistryPlugin)
             .add(UtilityPlugin)
             .add(NetworkPlugins)
     }

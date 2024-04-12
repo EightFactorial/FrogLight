@@ -21,6 +21,7 @@ bevy_log = { workspace = true, optional = true }
 bitvec = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
+froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 parking_lot = { workspace = true }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }

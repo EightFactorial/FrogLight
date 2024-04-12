@@ -1,5 +1,5 @@
 [package]
-name = "froglight-utils"
+name = "froglight-registry"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -19,12 +19,11 @@ workspace = true
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
-bevy_time = { workspace = true }
-derive_more = { workspace = true }
-froglight-core = { version = "0.1.0", path = "../froglight-core" }
-froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
+bevy_derive = { workspace = true }
+compact_str = { workspace = true }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
     "bevy",
 ] }
-futures-lite = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
+rangemap = { version = "1.5.1", features = ["nightly", "const_fn"] }

@@ -3,7 +3,7 @@
 use std::fmt::Debug;
 
 /// A Protocol version
-pub trait Version: 'static + Debug + Default + Copy + Eq {
+pub trait Version: 'static + Debug + Default + Copy + Eq + Send + Sync {
     /// The protocol id
     const ID: i32;
 }
@@ -11,7 +11,7 @@ pub trait Version: 'static + Debug + Default + Copy + Eq {
 /// A Protocol state
 ///
 /// Different states have different packets.
-pub trait State<V: Version>: 'static + Debug + Default + Copy + Eq {
+pub trait State<V: Version>: 'static + Debug + Default + Copy + Eq + Send + Sync {
     /// Packets sent from the client to the server
     type ServerboundPacket: PacketEnum;
     /// Packets sent from the server to the client

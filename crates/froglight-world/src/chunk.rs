@@ -14,10 +14,10 @@ use crate::{ChunkBlockIter, ChunkSection};
 /// belonging to different `Worlds` can have a different amount of
 /// [`ChunkSections`](ChunkSection).
 ///
-/// Examples:
-/// - `minecraft:overworld`: 384 (-64 to 320)
-/// - `minecraft:the_nether`: 256 (0 to 256)
-/// - `minecraft:the_end`: 256 (0 to 256)
+/// Height Examples:
+/// - `minecraft:overworld`: 384 (offset: -64, height: 320)
+/// - `minecraft:the_nether`: 256 (offset: 0, height: 256)
+/// - `minecraft:the_end`: 256 (offset: 0, height: 256)
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
 pub struct Chunk {
@@ -42,7 +42,7 @@ impl Chunk {
 
     /// Returns the maximum height of the [`Chunk`].
     ///
-    /// This is relative to `0`, not the actual bottom of the world.
+    /// This is relative to `Y = 0`, and does not include the height offset.
     ///
     /// Examples:
     /// - `minecraft:overworld`: 320
@@ -53,7 +53,7 @@ impl Chunk {
 
     /// Returns the height offset of the [`Chunk`].
     ///
-    /// This is the minimum height of the [`Chunk`].
+    /// This is the minimum height of the [`Chunk`], and can be negative.
     ///
     /// Examples:
     /// - `minecraft:overworld`: -64
@@ -62,7 +62,7 @@ impl Chunk {
     #[must_use]
     pub const fn height_offset(&self) -> i32 { self.height_offset }
 
-    /// Returns the height of the [`Chunk`],
+    /// Returns the absolute height of the [`Chunk`]
     /// in blocks from the bottom of the world.
     ///
     /// Examples:
@@ -77,9 +77,23 @@ impl Chunk {
         max_height.wrapping_sub(height_offset as u32)
     }
 
-    /// Returns the number of [`ChunkSection`]s in the [`Chunk`].
+    /// Returns the number of *expected* [`ChunkSections`](ChunkSection) in the
+    /// [`Chunk`] based on the [`maximum height`](Self::max_height) and
+    /// [`height offset`](Self::height_offset).
+    ///
+    /// ### Note
+    /// This does not count the actual number of [`ChunkSection`]s in
+    /// [`Chunk::sections`], for that use [`Chunk::sections`].
     #[must_use]
-    pub const fn sections(&self) -> u32 { self.height() / ChunkSection::HEIGHT }
+    pub const fn expected_sections(&self) -> u32 { self.height() / ChunkSection::HEIGHT }
+
+    /// Returns the number of [`ChunkSections`](ChunkSection) in the [`Chunk`].
+    ///
+    /// # Note
+    /// This acquires a [`read lock`](RwLock::read) on the [`Chunk`],
+    /// and may block other threads.
+    #[must_use]
+    pub fn sections(&self) -> usize { self.sections.read().len() }
 
     /// Returns the index of the [`ChunkSection`] at the given height.
     #[must_use]

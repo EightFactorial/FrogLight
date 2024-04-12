@@ -9,7 +9,6 @@
 pub mod common;
 pub mod packet;
 pub mod protocol;
-pub mod registries;
 pub mod states;
 pub mod traits;
 pub mod versions;

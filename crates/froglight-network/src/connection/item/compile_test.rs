@@ -6,7 +6,7 @@ use froglight_protocol::{
 use super::{Clientbound, Connection};
 
 #[test]
-fn v1_20_1_serverbound() {
+fn v1_20_0_serverbound() {
     Connection::<V1_20_0, Handshaking>::nothing();
     Connection::<V1_20_0, Status>::nothing();
     Connection::<V1_20_0, Login>::nothing();
@@ -14,7 +14,7 @@ fn v1_20_1_serverbound() {
 }
 
 #[test]
-fn v1_20_1_clientbound() {
+fn v1_20_0_clientbound() {
     Connection::<V1_20_0, Handshaking, Clientbound>::nothing();
     Connection::<V1_20_0, Status, Clientbound>::nothing();
     Connection::<V1_20_0, Login, Clientbound>::nothing();

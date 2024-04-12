@@ -12,9 +12,9 @@ pub use froglight_network::{
     common::*,
     connection::{Clientbound, Connection, ConnectionError, Serverbound},
     packet::*,
-    registries::*,
     resolver::{Resolver, ResolverError},
     states::*,
     traits::*,
-    // versions::*,
+    versions::*,
 };
+// pub use froglight_registry::registries::*;

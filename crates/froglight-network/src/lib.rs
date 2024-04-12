@@ -9,7 +9,8 @@ pub mod connection;
 pub mod resolver;
 
 // Re-export most of `froglight-protocol` for convenience.
-pub use froglight_protocol::{common, packet, registries, states, traits, versions};
+pub use froglight_protocol::{common, packet, states, traits, versions};
+pub use froglight_registry as registry;
 
 /// The `Network` Froglight plugin group.
 ///
