@@ -51,6 +51,12 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
             quote! { #protocol_path::common::ResourceKey::new(#variant_str) }
         };
 
+        assert_eq!(
+            variant_attrs.other,
+            variant_str.is_empty(),
+            "Variant key must be set if not marked as `other`"
+        );
+
         // If the variant is the `other` variant, set the flag
         if is_other && variant_attrs.other {
             panic!("Only one variant can be marked as `other`");
