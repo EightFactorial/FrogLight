@@ -4,10 +4,11 @@
 
 pub use froglight_macros::FrogRegistry;
 
-mod custom;
+mod default;
+pub use default::DefaultIdRegistry;
 
 mod simple;
-pub use simple::{DefaultIdRegistry, SimpleIdRegistry};
+pub use simple::SimpleIdRegistry;
 
 mod traits;
-pub use traits::{ConvertKey, ConvertKeyError, InitializeIdRegistry, MissingKeyError};
+pub use traits::InitializeIdRegistry;

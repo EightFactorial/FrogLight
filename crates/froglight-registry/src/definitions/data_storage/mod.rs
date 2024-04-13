@@ -1,0 +1,1 @@
+//! Registry data storage

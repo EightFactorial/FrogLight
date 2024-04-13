@@ -17,9 +17,10 @@ workspace = true
 
 [dependencies]
 bevy_app = { workspace = true }
+bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
-bevy_derive = { workspace = true }
+compact_str = { workspace = true }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-registry",
 ] }

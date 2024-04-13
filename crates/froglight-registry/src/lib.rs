@@ -5,15 +5,14 @@
 
 use bevy_app::{App, Plugin};
 
-mod definitions;
-pub use definitions::*;
+pub mod definitions;
 
 mod events;
 pub use events::RegistryOverrideEvent;
 
 pub mod registries;
 
-pub mod systemsets;
+mod systemsets;
 
 #[cfg(test)]
 mod tests;

@@ -1,7 +1,7 @@
 use froglight_macros::FrogRegistry;
 
 use super::TestVersion;
-use crate::definitions::convert::{ConvertKey, DefaultIdRegistry, InitializeIdRegistry};
+use crate::definitions::{ConvertKey, DefaultIdRegistry, InitializeIdRegistry};
 
 /// A test registry with four values.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogRegistry)]
@@ -57,7 +57,7 @@ fn registry_inorder() {
     }
 
     // Create a simple registry
-    let mut simple = TestEnumRegistry::new_from_default(&default);
+    let mut simple = TestEnumIdRegistry::new_from_default(&default);
 
     // Check that new simple registry is the same as the default
     {

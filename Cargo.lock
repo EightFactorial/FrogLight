@@ -2149,6 +2149,7 @@ dependencies = [
  "bevy_derive",
  "bevy_ecs",
  "bevy_log",
+ "compact_str",
  "froglight-macros",
  "froglight-protocol",
  "hashbrown",

@@ -19,8 +19,8 @@ pub(super) fn build(app: &mut bevy_app::App) {
 
 /// A [`SystemSet`] that runs during the [`PostStartup`] phase.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
-pub struct RegistryPostStartupSet;
+pub(crate) struct RegistryPostStartupSet;
 
 /// A [`SystemSet`] that runs during the [`PostUpdate`] phase.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
-pub struct RegistryPostUpdateSet;
+pub(crate) struct RegistryPostUpdateSet;
