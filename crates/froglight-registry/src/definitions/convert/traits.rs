@@ -10,7 +10,7 @@ use froglight_protocol::{
 ///
 /// This trait must be implemented per [`Version`], as IDs can
 /// change between versions.
-pub trait InitializeRegistry<V: Version>
+pub trait InitializeIdRegistry<V: Version>
 where
     Self: Sized + Send + Sync,
 {
@@ -62,7 +62,8 @@ where
     Other(E),
 }
 
-/// There is no value for the specified [`key`](MissingKeyError::key).
+/// There is no value for the specified
+/// [`key`](super::MissingKeyError).
 #[derive(Debug, thiserror::Error)]
 #[error("There is no value for the specified key: {key}")]
 pub struct MissingKeyError {

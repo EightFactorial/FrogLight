@@ -1,10 +1,7 @@
 use froglight_macros::FrogRegistry;
 
 use super::TestVersion;
-use crate::{
-    definitions::{ConvertKey, InitializeRegistry},
-    DefaultRegistry,
-};
+use crate::definitions::convert::{ConvertKey, DefaultIdRegistry, InitializeIdRegistry};
 
 /// A test registry with four values.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogRegistry)]
@@ -19,7 +16,7 @@ enum TestEnum {
     Fourth,
 }
 
-impl InitializeRegistry<TestVersion> for TestEnum {
+impl InitializeIdRegistry<TestVersion> for TestEnum {
     fn initialize() -> Vec<Self> { vec![Self::First, Self::Second, Self::Third] }
 }
 
@@ -44,7 +41,7 @@ fn to_key() {
 #[test]
 fn registry_inorder() {
     // Create a default registry
-    let default: DefaultRegistry<TestVersion, TestEnum> = DefaultRegistry::default();
+    let default: DefaultIdRegistry<TestVersion, TestEnum> = DefaultIdRegistry::default();
 
     // Check the default values
     {
@@ -60,7 +57,7 @@ fn registry_inorder() {
     }
 
     // Create a simple registry
-    let mut simple = TestEnumRegistry::from_default(&default);
+    let mut simple = TestEnumRegistry::new_from_default(&default);
 
     // Check that new simple registry is the same as the default
     {
@@ -90,7 +87,7 @@ fn registry_inorder() {
 
     // Reset the simple registry
     {
-        simple.clone_default(&default);
+        simple.overwrite_with(&default);
 
         // Make sure the simple registry is the same as the default
         assert_eq!(simple.get_id(&TestEnum::First), Some(0));

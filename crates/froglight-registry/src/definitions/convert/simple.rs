@@ -4,13 +4,13 @@ use bevy_ecs::system::Resource;
 use froglight_protocol::traits::Version;
 use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use crate::{ConvertKey, InitializeRegistry};
+use crate::definitions::convert::{ConvertKey, InitializeIdRegistry};
 
-/// A registry that stores the default values for a specific [`Version`].
+/// A registry that stores the default id values for a specific [`Version`].
 ///
-/// This registry is only modified by bevy [`Plugins`](bevy_app::Plugin).
+/// Can only be modified by bevy [`Plugins`](bevy_app::Plugin).
 #[derive(Debug, Clone, Resource)]
-pub struct DefaultRegistry<V, R>
+pub struct DefaultIdRegistry<V, R>
 where
     V: Version,
     R: ConvertKey,
@@ -19,38 +19,38 @@ where
     _version: PhantomData<V>,
 }
 
-impl<V, R> Default for DefaultRegistry<V, R>
+impl<V, R> Default for DefaultIdRegistry<V, R>
 where
     V: Version,
-    R: ConvertKey + InitializeRegistry<V>,
+    R: ConvertKey + InitializeIdRegistry<V>,
 {
     fn default() -> Self {
         Self { storage: Arc::new(RwLock::new(R::initialize())), _version: PhantomData }
     }
 }
 
-impl<V, R> DefaultRegistry<V, R>
+impl<V, R> DefaultIdRegistry<V, R>
 where
     V: Version,
     R: ConvertKey,
 {
-    /// Creates a new [`DefaultRegistry`] with the default values.
+    /// Creates a new [`DefaultIdRegistry`] with the default values.
     #[must_use]
     pub fn new() -> Self
     where
-        R: InitializeRegistry<V>,
+        R: InitializeIdRegistry<V>,
     {
         Self::default()
     }
 
-    /// Creates a new [`SimpleRegistry`] from this [`DefaultRegistry`].
+    /// Creates a new [`SimpleIdRegistry`] from this [`DefaultIdRegistry`].
     #[must_use]
-    pub fn create_simple(&self) -> SimpleRegistry<R>
+    pub fn create_simple(&self) -> SimpleIdRegistry<R>
     where
         R: Clone,
     {
         let storage = self.storage.read().to_vec();
-        SimpleRegistry { storage: Arc::new(RwLock::new(storage)) }
+        SimpleIdRegistry { storage: Arc::new(RwLock::new(storage)) }
     }
 
     /// Pushes a new value into the registry.
@@ -94,8 +94,8 @@ where
     ///
     /// This is useful for bulk operations.
     ///
-    /// If you need a single value, use [`DefaultRegistry::get_value`] or
-    /// [`DefaultRegistry::get_value_cloned`].
+    /// If you need a single value, use [`DefaultIdRegistry::get_value`] or
+    /// [`DefaultIdRegistry::get_value_cloned`].
     ///
     /// ---
     ///
@@ -107,7 +107,7 @@ where
     ///
     /// This is useful for bulk operations.
     ///
-    /// If you need to push a single value, use [`DefaultRegistry::push`].
+    /// If you need to push a single value, use [`DefaultIdRegistry::push`].
     ///
     /// ---
     ///
@@ -116,35 +116,37 @@ where
     pub fn write(&self) -> RwLockWriteGuard<'_, Vec<R>> { self.storage.write() }
 }
 
-/// A registry that stores the currently active registry values.
+/// A registry that stores the currently active registry id values.
+///
+/// Can be modified by bevy [`Plugins`](bevy_app::Plugin) and connected servers.
 #[derive(Debug, Clone, Resource)]
-pub struct SimpleRegistry<R>
+pub struct SimpleIdRegistry<R>
 where
     R: ConvertKey,
 {
     storage: Arc<RwLock<Vec<R>>>,
 }
 
-impl<R> Default for SimpleRegistry<R>
+impl<R> Default for SimpleIdRegistry<R>
 where
     R: ConvertKey,
 {
     fn default() -> Self { Self { storage: Arc::new(RwLock::new(Vec::new())) } }
 }
 
-impl<R> SimpleRegistry<R>
+impl<R> SimpleIdRegistry<R>
 where
     R: ConvertKey,
 {
-    /// Creates a new empty [`SimpleRegistry`].
+    /// Creates a new empty [`SimpleIdRegistry`].
     ///
-    /// This is the same as [`SimpleRegistry::default`].
+    /// This is the same as [`SimpleIdRegistry::default`].
     #[must_use]
     pub fn new_empty() -> Self { Self::default() }
 
-    /// Creates a new [`SimpleRegistry`] with a [`Version`]'s default values.
+    /// Creates a new [`SimpleIdRegistry`] with a [`Version`]'s default values.
     #[must_use]
-    pub fn from_default<V>(default: &DefaultRegistry<V, R>) -> Self
+    pub fn new_from_default<V>(default: &DefaultIdRegistry<V, R>) -> Self
     where
         V: Version,
         R: Clone,
@@ -153,7 +155,7 @@ where
     }
 
     /// Overwrites the registry values with the default values.
-    pub fn clone_default<V>(&mut self, default: &DefaultRegistry<V, R>)
+    pub fn overwrite_with<V>(&mut self, default: &DefaultIdRegistry<V, R>)
     where
         V: Version,
         R: Clone,

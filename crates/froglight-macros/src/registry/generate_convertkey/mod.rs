@@ -23,7 +23,7 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
     let mut error_type = if let Some(error) = attrs.error {
         error
     } else {
-        Path::from_input(quote! { #crate_path::definitions::MissingKeyError }).unwrap()
+        Path::from_input(quote! { #crate_path::convert::MissingKeyError }).unwrap()
     };
 
     // Collect the tokens for the `from_key` and `to_key` functions
@@ -97,9 +97,9 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
     let registry_name = Ident::new(&format!("{enum_ident}Registry"), Span::call_site());
 
     quote! {
-        type #registry_name = #crate_path::definitions::SimpleRegistry<#enum_ident>;
+        type #registry_name = #crate_path::convert::SimpleIdRegistry<#enum_ident>;
 
-        impl #crate_path::definitions::ConvertKey for #enum_ident {
+        impl #crate_path::convert::ConvertKey for #enum_ident {
             type Error = #error_type;
             fn from_key(key: &#protocol_path::common::ResourceKey) -> Result<Self, Self::Error> {
                 match key.as_ref() {
