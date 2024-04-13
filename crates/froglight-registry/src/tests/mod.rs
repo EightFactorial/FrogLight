@@ -1,7 +1,7 @@
 use froglight_protocol::traits::Version;
 
-mod simple_id_registry;
-mod simple_id_registry_other;
+mod block_registry;
+mod id_registry;
 
 /// A test [`Version`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]

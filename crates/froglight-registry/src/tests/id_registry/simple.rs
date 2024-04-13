@@ -1,7 +1,9 @@
 use froglight_macros::FrogRegistry;
 
-use super::TestVersion;
-use crate::definitions::{ConvertKey, DefaultIdRegistry, InitializeIdRegistry};
+use crate::{
+    definitions::{ConvertKey, DefaultIdRegistry, InitializeIdRegistry},
+    tests::TestVersion,
+};
 
 /// A test registry with four values.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogRegistry)]

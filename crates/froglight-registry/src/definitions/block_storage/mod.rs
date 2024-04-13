@@ -1,108 +1,93 @@
-use std::{any::TypeId, ops::Range};
+use std::sync::Arc;
 
+use bevy_ecs::system::Resource;
 use froglight_protocol::traits::Version;
-use hashbrown::HashMap;
-use rangemap::RangeMap;
+use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 mod traits;
 pub use traits::*;
 
-/// Storage for all blocks of a specific [`Version`].
-#[derive(Debug, Default)]
-pub struct BlockStorage<V: Version> {
-    /// All of the blocks for a specific [`Version`].
-    pub(crate) dyn_storage: Vec<Box<dyn BlockType<V>>>,
+mod resolver;
+pub use resolver::VanillaResolver;
 
-    /// A map of block state ranges to their index in `dyn_storage`.
-    pub(crate) range_map: RangeMap<u32, usize>,
+mod storage;
+pub use storage::BlockStorage;
 
-    /// A map of block type ids to their block state ranges.
-    pub(crate) type_map: HashMap<TypeId, Range<u32>>,
+/// A registry which contains all blocks.
+#[derive(Debug, Clone, Resource)]
+pub struct BlockRegistry<V>
+where
+    V: Version,
+{
+    storage: Arc<RwLock<BlockStorage<V>>>,
 }
 
-/// [`BlockStateResolver`] for vanilla blocks.
-///
-/// To be used with [`BlockStorage::get_block`].
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct VanillaResolver;
-
-impl<V: Version> BlockStorage<V> {
-    /// Create a new empty [`BlockStorage`].
-    #[must_use]
-    pub fn new() -> Self { Self::default() }
-
-    /// Get a block's state id range.
-    #[must_use]
-    pub fn range_of<Block: BlockType<V>>(&self) -> Option<&Range<u32>> {
-        self.type_map.get(&TypeId::of::<Block>())
-    }
-
-    /// Get a block's relative state id from it's type and state id.
+impl<V> BlockRegistry<V>
+where
+    V: Version,
+{
+    /// Create a new [`BlockRegistry`].
     ///
-    /// This will return `None` if the [`BlockType`] is not registered or
-    /// the state id is out of range.
+    /// This will contains all [`vanilla blocks`](VanillaResolver).
     #[must_use]
-    pub fn relative_state_of<Block: BlockType<V>>(&self, state_id: u32) -> Option<u32> {
-        let range = self.range_of::<Block>()?;
-        if range.contains(&state_id) {
-            state_id.checked_sub(range.start)
-        } else {
-            None
-        }
+    pub fn new() -> Self
+    where
+        VanillaResolver: BlockStateResolver<V>,
+    {
+        Self::default()
     }
 
-    /// Get a block's default state as a trait object.
+    /// Create a new empty [`BlockRegistry`].
+    #[must_use]
+    pub fn new_empty() -> Self {
+        Self { storage: Arc::new(RwLock::new(BlockStorage::new_empty())) }
+    }
+
+    /// Register all default blocks for a specific [`BlockStateResolver`].
+    pub fn register_defaults<R: BlockStateResolver<V>>(&mut self) {
+        R::register_defaults(&mut self.write());
+    }
+
+    /// Get a block from a state id.
+    #[must_use]
+    pub fn get_block<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Result
+    where
+        Res::Result: Copy,
+    {
+        Res::resolve(state_id, &self.read())
+    }
+
+    /// Get a block from a state id.
+    #[must_use]
+    pub fn get_block_clone<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Result
+    where
+        Res::Result: Clone,
+    {
+        Res::resolve(state_id, &self.read())
+    }
+
+    /// Get a [`RwLockReadGuard`] to the [`BlockStorage`].
+    ///
+    /// This is useful for reading the block storage.
     ///
     /// ---
     ///
-    /// ### Note
-    /// This returns a reference to the **default block**, who's properties
-    /// may not match the actual block state.
-    ///
-    /// This is useful if you only need default block properties, or if you
-    /// are sure the property is the same for all block states.
-    ///
-    /// If you want to get the full block state, use
-    /// [`BlockStorage::get_block`].
-    #[must_use]
-    pub fn get_default_dyn(&self, state_id: u32) -> Option<&dyn BlockType<V>> {
-        let storage_index = self.range_map.get(&state_id)?;
-        self.dyn_storage.get(*storage_index).map(AsRef::as_ref)
-    }
+    /// [`Note`](RwLock::read): This may cause a deadlock if the lock is not
+    /// released.
+    pub fn read(&self) -> RwLockReadGuard<'_, BlockStorage<V>> { self.storage.read() }
 
-    /// Get a block from it's state id.
-    ///
-    /// See [`BlockStateResolver`] and [`VanillaResolver`] for more information.
+    /// Get a [`RwLockWriteGuard`] to the [`BlockStorage`].
     ///
     /// ---
     ///
-    /// ### Note
-    /// This will resolve the full block, including all properties.
-    ///
-    /// If you only need the default block properties, use
-    /// the much faster [`BlockStorage::get_default_dyn`].
-    #[must_use]
-    pub fn get_block<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Result {
-        Res::resolve(state_id, self)
-    }
+    /// [`Note`](RwLock::write): This may cause a deadlock if the lock is not
+    /// released.
+    pub fn write(&mut self) -> RwLockWriteGuard<'_, BlockStorage<V>> { self.storage.write() }
+}
 
-    /// Register a new block type with the [`BlockStorage`].
-    pub fn register<Block: Default + BlockExt<V>>(&mut self) -> &mut Self {
-        // Create a new default block.
-        let default = Block::default();
-
-        // Get the next available storage index and insert the block.
-        let storage_index = self.dyn_storage.len();
-        self.dyn_storage.push(Box::new(default));
-
-        // Calculate the block state range.
-        let (last_range, _) = self.range_map.last_range_value().unwrap_or((&(0..0), &0));
-        let new_range = last_range.end..(last_range.end + Block::BLOCK_STATES);
-
-        // Insert the block state range and type id.
-        self.range_map.insert(new_range.clone(), storage_index);
-        self.type_map.insert(TypeId::of::<Block>(), new_range);
-
-        self
-    }
+impl<V: Version> Default for BlockRegistry<V>
+where
+    VanillaResolver: BlockStateResolver<V>,
+{
+    fn default() -> Self { Self { storage: Arc::new(RwLock::new(BlockStorage::new())) } }
 }
