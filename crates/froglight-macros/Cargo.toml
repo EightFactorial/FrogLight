@@ -38,5 +38,8 @@ froglight-protocol = []
 # Emit extra logging for `froglight-protocol` macros
 froglight-protocol-debug = ["froglight-protocol"]
 
+# Enables `froglight-registry` macros
+froglight-registry = ["froglight-protocol"]
+
 # Enables `froglight-world` macros
 froglight-world = []

@@ -3,7 +3,7 @@
 #![feature(const_type_name)]
 #![feature(const_type_id)]
 
-use bevy_app::{App, Plugin, PreUpdate};
+use bevy_app::{App, Plugin, PostStartup, PostUpdate};
 use bevy_ecs::{
     event::Event,
     schedule::{common_conditions::on_event, IntoSystemSetConfigs, SystemSet},
@@ -11,6 +11,7 @@ use bevy_ecs::{
 
 mod definitions;
 pub use definitions::*;
+use froglight_protocol::traits::Version;
 
 pub mod registries;
 
@@ -25,13 +26,13 @@ pub struct RegistryPlugin;
 
 impl Plugin for RegistryPlugin {
     fn build(&self, app: &mut App) {
-        // Add the ResetRegistryEvent event.
+        // Add the `ResetRegistryEvent` event.
         app.add_event::<ResetRegistryEvent>();
 
-        // Add the RegistryPreUpdateSet system set.
-        app.configure_sets(
-            PreUpdate,
-            RegistryPreUpdateSet.run_if(on_event::<ResetRegistryEvent>()),
+        // Add the `RegistryPostStartupSet` and `RegistryPostUpdateSet` SystemSets.
+        app.configure_sets(PostStartup, RegistryPostStartupSet).configure_sets(
+            PostUpdate,
+            RegistryPostUpdateSet.run_if(on_event::<ResetRegistryEvent>()),
         );
 
         // Build the registries.
@@ -39,10 +40,32 @@ impl Plugin for RegistryPlugin {
     }
 }
 
-/// A [`SystemSet`] that runs during the [`PreUpdate`] phase.
+/// A [`SystemSet`] that runs during the [`PostStartup`] phase.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
-pub struct RegistryPreUpdateSet;
+pub struct RegistryPostStartupSet;
 
-/// Resets the registry values to their default values.
+/// A [`SystemSet`] that runs during the [`PostUpdate`] phase.
+#[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, SystemSet)]
+pub struct RegistryPostUpdateSet;
+
+/// An [`Event`] that triggers registry values to reset.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Event)]
-pub struct ResetRegistryEvent;
+pub struct ResetRegistryEvent {
+    /// The [`Version`] to reset the registry values to.
+    pub version_id: i32,
+}
+
+impl ResetRegistryEvent {
+    /// Creates a new [`ResetRegistryEvent`] from a [`Version`].
+    #[must_use]
+    pub fn new<V: Version>() -> Self { Self { version_id: V::ID } }
+
+    /// Creates a new [`ResetRegistryEvent`] from a [`Version::ID`].
+    #[must_use]
+    pub fn from_id(version_id: i32) -> Self { Self { version_id } }
+
+    /// Returns `true` if the [`ResetRegistryEvent`] is for the given
+    /// [`Version`].
+    #[must_use]
+    pub fn is_version<V: Version>(&self) -> bool { self.version_id == V::ID }
+}

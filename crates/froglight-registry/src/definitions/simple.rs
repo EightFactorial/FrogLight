@@ -1,189 +1,202 @@
 use std::{marker::PhantomData, sync::Arc};
 
-use bevy_app::{App, PreUpdate};
-use bevy_ecs::{
-    schedule::IntoSystemConfigs,
-    system::{Res, ResMut, Resource},
-    world::{FromWorld, World},
-};
+use bevy_ecs::system::Resource;
 use froglight_protocol::traits::Version;
-use parking_lot::RwLock;
+use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use super::{DefaultRegistry, InitializeRegistry, RegistryType, RuntimeRegistry};
-use crate::RegistryPreUpdateSet;
+use crate::{ConvertKey, InitializeRegistry};
 
-/// A simple registry that converts between registry values and their IDs.
+/// A registry that stores the default values for a specific [`Version`].
 ///
-/// ## Note
-/// There are two types of registries:
-/// - [`DefaultRegistry`]
-/// - [`RuntimeRegistry`]
-///
-/// Most systems should use the default [`RuntimeRegistry`] type, as it allows
-/// for modification by connected servers.
-///
-/// If you are writing a [`Plugin`](bevy_app::Plugin) that needs to modify the
-/// registry values across multiple servers, use the [`DefaultRegistry`] type.
+/// This registry is only modified by bevy [`Plugins`](bevy_app::Plugin).
 #[derive(Debug, Clone, Resource)]
-pub struct SimpleRegistry<V, T, R = RuntimeRegistry>
+pub struct DefaultRegistry<V, R>
 where
     V: Version,
-    T: InitializeRegistry<V>,
-    R: RegistryType,
+    R: ConvertKey,
 {
-    storage: Arc<RwLock<Vec<T>>>,
+    storage: Arc<RwLock<Vec<R>>>,
     _version: PhantomData<V>,
-    _registry: PhantomData<R>,
 }
 
-impl<V, T, R> SimpleRegistry<V, T, R>
+impl<V, R> Default for DefaultRegistry<V, R>
 where
     V: Version,
-    T: InitializeRegistry<V>,
-    R: RegistryType,
+    R: ConvertKey + InitializeRegistry<V>,
 {
-    /// Gets the value at the given ID.
-    ///
-    /// Requires the value to implement [`Copy`].
+    fn default() -> Self {
+        Self { storage: Arc::new(RwLock::new(R::initialize())), _version: PhantomData }
+    }
+}
+
+impl<V, R> DefaultRegistry<V, R>
+where
+    V: Version,
+    R: ConvertKey,
+{
+    /// Creates a new [`DefaultRegistry`] with the default values.
     #[must_use]
-    pub fn get_value(&self, id: u32) -> Option<T>
+    pub fn new() -> Self
     where
-        T: Copy,
+        R: InitializeRegistry<V>,
+    {
+        Self::default()
+    }
+
+    /// Creates a new [`SimpleRegistry`] from this [`DefaultRegistry`].
+    #[must_use]
+    pub fn create_simple(&self) -> SimpleRegistry<R>
+    where
+        R: Clone,
+    {
+        let storage = self.storage.read().to_vec();
+        SimpleRegistry { storage: Arc::new(RwLock::new(storage)) }
+    }
+
+    /// Pushes a new value into the registry.
+    pub fn push(&mut self, value: R) { self.storage.write().push(value) }
+
+    /// Gets the value with the specified ID.
+    ///
+    /// This requires the value to be [`Copy`].
+    #[must_use]
+    pub fn get_value(&self, id: u32) -> Option<R>
+    where
+        R: Copy,
     {
         self.storage.read().get(id as usize).copied()
     }
 
-    /// Gets the value at the given ID.
+    /// Gets the value with the specified ID.
     ///
-    /// Requires the value to implement [`Clone`].
+    /// This requires the value to be [`Clone`].
     #[must_use]
-    pub fn get_value_cloned(&self, id: u32) -> Option<T>
+    pub fn get_value_cloned(&self, id: u32) -> Option<R>
     where
-        T: Clone,
+        R: Clone,
     {
         self.storage.read().get(id as usize).cloned()
     }
 
-    /// Gets the ID of the given value.
+    /// Gets the ID of the specified value.
     ///
-    /// Requires the value to implement [`PartialEq`].
+    /// This requires the value to be [`PartialEq`].
     #[must_use]
     #[allow(clippy::cast_possible_truncation)]
-    pub fn get_id(&self, value: &T) -> Option<u32>
+    pub fn get_id(&self, value: &R) -> Option<u32>
     where
-        T: PartialEq,
+        R: PartialEq,
     {
-        self.storage.read().iter().position(|v| v == value).map(|id| id as u32)
+        self.storage.read().iter().position(|v| v == value).map(|i| i as u32)
     }
 
-    /// Inserts a value into the registry and returns its ID.
-    #[allow(clippy::cast_possible_truncation)]
-    pub fn insert_value(&mut self, value: T) -> u32 {
-        let mut storage = self.storage.write();
-        storage.push(value);
-        (storage.len() - 1) as u32
-    }
+    /// Gets a [`RwLockReadGuard`] to the registry values.
+    ///
+    /// This is useful for bulk operations.
+    ///
+    /// If you need a single value, use [`DefaultRegistry::get_value`] or
+    /// [`DefaultRegistry::get_value_cloned`].
+    ///
+    /// ---
+    ///
+    /// [`Note`](RwLock::read): This may cause a deadlock if the lock is not
+    /// released.
+    pub fn read(&self) -> RwLockReadGuard<'_, Vec<R>> { self.storage.read() }
 
-    /// Locks the registry for [`reading`](parking_lot::RwLock::read).
+    /// Gets a [`RwLockWriteGuard`] to the registry values.
     ///
-    /// ## Note
-    /// This is useful for bulk operations that require reading lots of registry
-    /// values.
+    /// This is useful for bulk operations.
     ///
-    /// If you only need to read a single value, consider using
-    /// [`get_value`](Self::get_value).
-    pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, Vec<T>> { self.storage.read() }
-
-    /// Locks the registry for [`writing`](parking_lot::RwLock::write).
+    /// If you need to push a single value, use [`DefaultRegistry::push`].
     ///
-    /// ## Note
-    /// This is useful for bulk operations that require writing lots of registry
-    /// values. Be careful when using this method, as it can cause deadlocks!
+    /// ---
     ///
-    /// If you only need to write a single value, consider using
-    /// [`insert_value`](Self::insert_value).
-    pub fn write(&mut self) -> parking_lot::RwLockWriteGuard<'_, Vec<T>> { self.storage.write() }
+    /// [`Note`](RwLock::write): This may cause a deadlock if the lock is not
+    /// released.
+    pub fn write(&self) -> RwLockWriteGuard<'_, Vec<R>> { self.storage.write() }
 }
 
-impl<V, T> Default for SimpleRegistry<V, T, DefaultRegistry>
+/// A registry that stores the currently active registry values.
+#[derive(Debug, Clone, Resource)]
+pub struct SimpleRegistry<R>
 where
-    V: Version,
-    T: InitializeRegistry<V>,
+    R: ConvertKey,
 {
-    fn default() -> Self {
-        Self {
-            storage: Arc::new(RwLock::new(T::initialize())),
-            _version: PhantomData,
-            _registry: PhantomData,
-        }
-    }
+    storage: Arc<RwLock<Vec<R>>>,
 }
 
-#[allow(dead_code)]
-impl<V, T> SimpleRegistry<V, T, RuntimeRegistry>
+impl<R> Default for SimpleRegistry<R>
 where
-    V: Version,
-    T: Clone + InitializeRegistry<V>,
+    R: ConvertKey,
 {
-    /// Creates a new [`RuntimeRegistry`] from the given [`DefaultRegistry`].
+    fn default() -> Self { Self { storage: Arc::new(RwLock::new(Vec::new())) } }
+}
+
+impl<R> SimpleRegistry<R>
+where
+    R: ConvertKey,
+{
+    /// Creates a new empty [`SimpleRegistry`].
+    ///
+    /// This is the same as [`SimpleRegistry::default`].
     #[must_use]
-    pub fn from_default(default: &SimpleRegistry<V, T, DefaultRegistry>) -> Self {
-        Self::from(default)
+    pub fn new_empty() -> Self { Self::default() }
+
+    /// Creates a new [`SimpleRegistry`] with a [`Version`]'s default values.
+    #[must_use]
+    pub fn from_default<V>(default: &DefaultRegistry<V, R>) -> Self
+    where
+        V: Version,
+        R: Clone,
+    {
+        default.create_simple()
     }
 
     /// Overwrites the registry values with the default values.
-    pub fn overwrite_default(&mut self, default: &SimpleRegistry<V, T, DefaultRegistry>) {
+    pub fn clone_default<V>(&mut self, default: &DefaultRegistry<V, R>)
+    where
+        V: Version,
+        R: Clone,
+    {
         self.storage.write().clone_from(&default.storage.read());
     }
 
-    /// Builds the registry in the given [`App`] and registers it's
-    /// [`Self::reset_registry`] [`System`](bevy_ecs::system::System).
+    /// Pushes a new value into the registry.
     ///
-    /// This will build both the [`DefaultRegistry`] and [`RuntimeRegistry`]
-    /// types.
-    pub(crate) fn build(app: &mut App)
+    /// This will assign the next available ID to the value.
+    pub fn push_value(&mut self, value: R) { self.storage.write().push(value) }
+
+    /// Gets the value with the specified ID.
+    ///
+    /// This requires the value to be [`Copy`].
+    #[must_use]
+    pub fn get_value(&self, id: u32) -> Option<R>
     where
-        T: 'static,
+        R: Copy,
     {
-        app.init_resource::<Self>()
-            .add_systems(PreUpdate, Self::reset_registry.in_set(RegistryPreUpdateSet));
+        self.storage.read().get(id as usize).copied()
     }
 
-    /// Resets the registry values to their default values.
-    fn reset_registry(
-        mut runtime: ResMut<Self>,
-        default: Res<SimpleRegistry<V, T, DefaultRegistry>>,
-    ) where
-        T: 'static,
+    /// Gets the value with the specified ID.
+    ///
+    /// This requires the value to be [`Clone`].
+    #[must_use]
+    pub fn get_value_cloned(&self, id: u32) -> Option<R>
+    where
+        R: Clone,
     {
-        runtime.overwrite_default(&*default);
+        self.storage.read().get(id as usize).cloned()
     }
-}
 
-impl<V, T> From<&SimpleRegistry<V, T, DefaultRegistry>> for SimpleRegistry<V, T, RuntimeRegistry>
-where
-    V: Version,
-    T: Clone + InitializeRegistry<V>,
-{
-    fn from(default: &SimpleRegistry<V, T, DefaultRegistry>) -> Self {
-        // Clone the data within, do not clone the Arc.
-        let default_data = default.storage.read().clone();
-        Self {
-            storage: Arc::new(RwLock::new(default_data)),
-            _version: PhantomData,
-            _registry: PhantomData,
-        }
-    }
-}
-
-impl<V, T> FromWorld for SimpleRegistry<V, T, RuntimeRegistry>
-where
-    V: Version,
-    T: 'static + Clone + InitializeRegistry<V>,
-{
-    fn from_world(world: &mut World) -> Self {
-        SimpleRegistry::<V, T, RuntimeRegistry>::from_default(
-            &*world.get_resource_or_insert_with(SimpleRegistry::<V, T, DefaultRegistry>::default),
-        )
+    /// Gets the ID of the specified value.
+    ///
+    /// This requires the value to be [`PartialEq`].
+    #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
+    pub fn get_id(&self, value: &R) -> Option<u32>
+    where
+        R: PartialEq,
+    {
+        self.storage.read().iter().position(|v| v == value).map(|i| i as u32)
     }
 }

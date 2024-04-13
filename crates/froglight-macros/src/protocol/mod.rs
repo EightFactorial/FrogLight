@@ -12,7 +12,7 @@ mod generate_tests;
 ///
 /// Used for generating `FrogRead` and `FrogWrite` implementations with the
 /// correct path to the traits.
-fn get_protocol_path() -> syn::Path {
+pub(crate) fn get_protocol_path() -> syn::Path {
     let mut path = ProjectManifest::get().get_path("froglight_protocol");
 
     if let Some(segment) = path.segments.first() {

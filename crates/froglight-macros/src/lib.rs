@@ -5,7 +5,7 @@ pub(crate) mod manifest;
 
 // --- Asset Macros ---
 
-#[cfg(feature = "asset")]
+#[cfg(feature = "froglight-asset")]
 mod asset;
 
 // --- Protocol Macros ---
@@ -34,14 +34,25 @@ protocol_macro!(FrogReadWrite, frog_readwrite, protocol::GenerateType::ReadWrite
 #[cfg(feature = "froglight-protocol")]
 protocol_macro!(FrogTest, frog_test, protocol::GenerateType::Test);
 
-/// A macro for generating a version state implementation.
+/// A macro for generating `State<Version>` implementations.
 #[cfg(feature = "froglight-protocol")]
 #[proc_macro]
 pub fn frog_state(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     protocol::frog_state(input)
 }
 
+// --- Registry Macros ---
+#[cfg(feature = "froglight-registry")]
+mod registry;
+
+/// A macro for generating `ConvertKey` implementations.
+#[cfg(feature = "froglight-registry")]
+#[proc_macro_derive(FrogRegistry, attributes(frog))]
+pub fn frog_registry(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    registry::frog_registry_convertkey(input)
+}
+
 // --- World Macros ---
 
-#[cfg(feature = "world")]
+#[cfg(feature = "froglight-world")]
 mod world;

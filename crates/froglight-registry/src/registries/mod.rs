@@ -10,4 +10,4 @@ mod v1_20_2;
 mod v1_20_3;
 
 #[doc(hidden)]
-pub(super) fn build(_app: &mut bevy_app::App) {}
+pub(super) fn build(app: &mut bevy_app::App) { generated::build(app); }

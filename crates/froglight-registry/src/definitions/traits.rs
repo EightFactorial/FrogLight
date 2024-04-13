@@ -1,40 +1,10 @@
 //! Traits for converting between registry values, protocol ids,
 //! and resource keys.
 
-use compact_str::CompactString;
-use froglight_protocol::{common::ResourceKey, traits::Version};
-
-/// A trait for converting between keys and a registry values.
-pub trait ConvertKey
-where
-    Self: Sized + Send + Sync,
-{
-    /// Convert the key to a registry value.
-    ///
-    /// # Errors
-    /// If the key does not match any known value.
-    fn try_from_key(key: &(impl AsRef<str> + ?Sized)) -> Result<Self, UnknownKeyError>;
-
-    /// Convert the registry value to a key.
-    fn as_key(&self) -> ResourceKey;
-}
-
-/// An error that occurs when an unknown key is encountered.
-#[derive(Debug, Clone)]
-pub struct UnknownKeyError {
-    /// The name of the type.
-    pub type_name: &'static str,
-    /// The key that was used.
-    pub key: CompactString,
-}
-
-impl UnknownKeyError {
-    /// Create a new unknown key error.
-    #[must_use]
-    pub fn new<T: ConvertKey>(key: &str) -> Self {
-        Self { type_name: std::any::type_name::<T>(), key: CompactString::new(key) }
-    }
-}
+use froglight_protocol::{
+    common::{ResourceKey, ResourceKeyError},
+    traits::Version,
+};
 
 /// A trait for initializing a registry with default values.
 ///
@@ -51,26 +21,55 @@ where
     fn initialize() -> Vec<Self>;
 }
 
-/// A registry type that can only be modified by the application.
-///
-/// Upon leaving a server, the registry will overwrite the
-/// [`runtime values`](RuntimeRegistry).
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct DefaultRegistry;
+/// A trait for converting between keys and a registry values.
+pub trait ConvertKey
+where
+    Self: Sized + Send + Sync,
+{
+    /// The type of error that can occur while converting a key
+    /// to a registry value.
+    type Error: std::error::Error;
 
-pub(super) mod sealed {
-    /// A type of registry.
-    pub trait RegistryType {}
+    /// Convert a [`ResourceKey`] to a registry value.
+    #[allow(clippy::missing_errors_doc)]
+    fn from_key(key: &ResourceKey) -> Result<Self, Self::Error>;
+
+    /// Convert a key to a registry value.
+    ///
+    /// # Errors
+    /// If the key is not a valid [`ResourceKey`].
+    fn try_from_key(
+        key: &(impl AsRef<str> + ?Sized),
+    ) -> Result<Self, ConvertKeyError<Self::Error>> {
+        Self::from_key(&ResourceKey::try_new(key.as_ref())?).map_err(ConvertKeyError::Other)
+    }
+
+    /// Convert the registry value to a [`ResourceKey`].
+    fn to_key(&self) -> ResourceKey;
 }
-use sealed::RegistryType;
 
-impl RegistryType for DefaultRegistry {}
+/// An error that occurred while converting between a registry value and a key.
+#[derive(Debug, thiserror::Error)]
+pub enum ConvertKeyError<E>
+where
+    E: std::error::Error,
+{
+    /// A resource key error occurred.
+    #[error(transparent)]
+    ResourceKey(#[from] ResourceKeyError),
+    /// A conversion error occurred.
+    #[error(transparent)]
+    Other(E),
+}
 
-/// A registry type that can be modified by connected servers.
-///
-/// Upon leaving a server, the registry will be reset to the
-/// [`default values`](DefaultRegistry).
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct RuntimeRegistry;
+/// There is no value for the specified [`key`](MissingKeyError::key).
+#[derive(Debug, thiserror::Error)]
+#[error("There is no value for the specified key: {key}")]
+pub struct MissingKeyError {
+    /// The key that is missing.
+    pub key: ResourceKey,
+}
 
-impl RegistryType for RuntimeRegistry {}
+impl From<ResourceKey> for MissingKeyError {
+    fn from(key: ResourceKey) -> Self { Self { key } }
+}

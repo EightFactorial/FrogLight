@@ -1,7 +1,8 @@
 use froglight_protocol::{common::ResourceKey, traits::Version};
 
-use crate::definitions::{
-    ConvertKey, DefaultRegistry, InitializeRegistry, SimpleRegistry, UnknownKeyError,
+use crate::{
+    definitions::{ConvertKey, DefaultRegistry, InitializeRegistry, SimpleRegistry},
+    ConvertKeyError, MissingKeyError,
 };
 
 /// A test registry with four values.
@@ -14,17 +15,18 @@ enum TestRegistry {
 }
 
 impl ConvertKey for TestRegistry {
-    fn try_from_key(key: &(impl AsRef<str> + ?Sized)) -> Result<Self, UnknownKeyError> {
+    type Error = MissingKeyError;
+    fn from_key(key: &ResourceKey) -> Result<Self, Self::Error> {
         match key.as_ref() {
             "froglight:first" => Ok(Self::First),
             "froglight:second" => Ok(Self::Second),
             "froglight:third" => Ok(Self::Third),
             "froglight:fourth" => Ok(Self::Fourth),
-            unk => Err(UnknownKeyError::new::<Self>(unk)),
+            _ => Err(MissingKeyError::from(key.clone())),
         }
     }
 
-    fn as_key(&self) -> ResourceKey {
+    fn to_key(&self) -> ResourceKey {
         match self {
             Self::First => ResourceKey::new("froglight:first"),
             Self::Second => ResourceKey::new("froglight:second"),
@@ -37,28 +39,39 @@ impl ConvertKey for TestRegistry {
 #[test]
 fn from_key() {
     // Test known keys.
-    assert_eq!(TestRegistry::try_from_key("froglight:first").unwrap(), TestRegistry::First);
-    assert_eq!(TestRegistry::try_from_key("froglight:second").unwrap(), TestRegistry::Second);
-    assert_eq!(TestRegistry::try_from_key("froglight:third").unwrap(), TestRegistry::Third);
-    assert_eq!(TestRegistry::try_from_key("froglight:fourth").unwrap(), TestRegistry::Fourth);
+    assert_eq!(
+        TestRegistry::from_key(&ResourceKey::new_inline("froglight:first")).unwrap(),
+        TestRegistry::First
+    );
+    assert_eq!(
+        TestRegistry::from_key(&ResourceKey::new_inline("froglight:second")).unwrap(),
+        TestRegistry::Second
+    );
+    assert_eq!(
+        TestRegistry::from_key(&ResourceKey::new_inline("froglight:third")).unwrap(),
+        TestRegistry::Third
+    );
+    assert_eq!(
+        TestRegistry::from_key(&ResourceKey::new_inline("froglight:fourth")).unwrap(),
+        TestRegistry::Fourth
+    );
 
     // Test an unknown key.
-    {
-        let fifth = TestRegistry::try_from_key("froglight:fifth");
-        let err = fifth.expect_err("Expected an UnknownKeyError");
+    let fifth = TestRegistry::from_key(&ResourceKey::new_inline("froglight:fifth"));
+    assert!(matches!(fifth, Err(MissingKeyError { .. })));
 
-        assert_eq!(err.type_name, "froglight_registry::tests::simple_registry::TestRegistry");
-        assert_eq!(err.key, "froglight:fifth");
-    }
+    // Test an invalid key
+    let invalid = TestRegistry::try_from_key("froglight:invalid:key");
+    assert!(matches!(invalid, Err(ConvertKeyError::ResourceKey(_))));
 }
 
 #[test]
 fn as_key() {
     // Test all variants have the correct keys.
-    assert_eq!(TestRegistry::First.as_key(), ResourceKey::new("froglight:first"));
-    assert_eq!(TestRegistry::Second.as_key(), ResourceKey::new("froglight:second"));
-    assert_eq!(TestRegistry::Third.as_key(), ResourceKey::new("froglight:third"));
-    assert_eq!(TestRegistry::Fourth.as_key(), ResourceKey::new("froglight:fourth"));
+    assert_eq!(TestRegistry::First.to_key(), ResourceKey::new_inline("froglight:first"));
+    assert_eq!(TestRegistry::Second.to_key(), ResourceKey::new_inline("froglight:second"));
+    assert_eq!(TestRegistry::Third.to_key(), ResourceKey::new_inline("froglight:third"));
+    assert_eq!(TestRegistry::Fourth.to_key(), ResourceKey::new_inline("froglight:fourth"));
 }
 
 /// A test [`Version`] that's registry values are in order.
@@ -75,7 +88,7 @@ impl InitializeRegistry<InOrderVersion> for TestRegistry {
 
 #[test]
 fn inorder_registry() {
-    let default = SimpleRegistry::<InOrderVersion, TestRegistry, DefaultRegistry>::default();
+    let default = DefaultRegistry::<InOrderVersion, TestRegistry>::new();
 
     // Test the DefaultRegistry values.
     {
@@ -107,7 +120,7 @@ fn inorder_registry() {
 
     // Add a new value to the RuntimeRegistry.
     {
-        registry.insert_value(TestRegistry::Fourth);
+        registry.push_value(TestRegistry::Fourth);
 
         assert_eq!(default.get_value(3), None);
         assert_eq!(registry.get_value(3), Some(TestRegistry::Fourth));
@@ -118,7 +131,7 @@ fn inorder_registry() {
 
     // Overwrite the RuntimeRegistry with the DefaultRegistry.
     {
-        registry.overwrite_default(&default);
+        registry.clone_default(&default);
 
         assert_eq!(registry.get_value(0), Some(TestRegistry::First));
         assert_eq!(registry.get_value(1), Some(TestRegistry::Second));
@@ -148,7 +161,7 @@ impl InitializeRegistry<ReverseOrderVersion> for TestRegistry {
 
 #[test]
 fn reverseorder_registry() {
-    let default = SimpleRegistry::<ReverseOrderVersion, TestRegistry, DefaultRegistry>::default();
+    let default = DefaultRegistry::<ReverseOrderVersion, TestRegistry>::default();
 
     // Test the DefaultRegistry values.
     {
@@ -180,7 +193,7 @@ fn reverseorder_registry() {
 
     // Add a new value to the RuntimeRegistry.
     {
-        registry.insert_value(TestRegistry::Fourth);
+        registry.push_value(TestRegistry::Fourth);
 
         assert_eq!(default.get_value(3), None);
         assert_eq!(registry.get_value(3), Some(TestRegistry::Fourth));
@@ -191,7 +204,7 @@ fn reverseorder_registry() {
 
     // Overwrite the RuntimeRegistry with the DefaultRegistry.
     {
-        registry.overwrite_default(&default);
+        registry.clone_default(&default);
 
         assert_eq!(registry.get_value(0), Some(TestRegistry::Third));
         assert_eq!(registry.get_value(1), Some(TestRegistry::Second));
