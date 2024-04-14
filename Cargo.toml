@@ -139,8 +139,8 @@ name = "hello_world"
 path = "examples/systems/hello_world/main.rs"
 
 [[example]]
-name = "basic_systems"
-path = "examples/systems/basic_systems/main.rs"
+name = "system_schedules"
+path = "examples/systems/system_schedules/main.rs"
 
 [[example]]
 name = "custom_plugin"

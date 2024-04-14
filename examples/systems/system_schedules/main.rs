@@ -1,4 +1,4 @@
-//! Example: "basic_systems"
+//! Example: "system_schedules"
 
 use bevy::{app::AppExit, prelude::*};
 use froglight::HeadlessPlugins;

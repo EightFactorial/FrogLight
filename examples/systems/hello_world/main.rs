@@ -1,3 +1,5 @@
+//! Example: "hello_world"
+
 use bevy::{app::AppExit, prelude::*};
 use froglight::HeadlessPlugins;
 
