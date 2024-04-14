@@ -135,10 +135,25 @@ default = []
 mimalloc = ["dep:mimalloc"]
 
 [[example]]
-name = "console_hello"
+name = "hello_world"
+path = "examples/systems/hello_world/main.rs"
 
 [[example]]
-name = "default_client"
+name = "basic_systems"
+path = "examples/systems/basic_systems/main.rs"
 
 [[example]]
-name = "main_menu_button"
+name = "custom_plugin"
+path = "examples/plugins/custom_plugin/main.rs"
+
+[[example]]
+name = "disable_logs"
+path = "examples/plugins/disable_logs/main.rs"
+
+[[example]]
+name = "basic_resource"
+path = "examples/resources/basic_resource/main.rs"
+
+[[example]]
+name = "insert_resources"
+path = "examples/resources/insert_resource/main.rs"

@@ -1,6 +1,7 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     diagnostic::DiagnosticsPlugin,
+    log::LogPlugin,
     MinimalPlugins,
 };
 
@@ -17,6 +18,7 @@ pub struct HeadlessPlugins;
 impl PluginGroup for HeadlessPlugins {
     fn build(self) -> PluginGroupBuilder {
         MinimalPlugins::build(MinimalPlugins)
+            .add(LogPlugin::default())
             .add(DiagnosticsPlugin)
             .add(CorePlugin)
             .add(RegistryPlugin)
