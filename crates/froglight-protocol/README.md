@@ -1,1 +1,1 @@
-# FrogLight Protocol
+# `FrogLight` Protocol
