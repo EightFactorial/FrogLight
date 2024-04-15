@@ -12,3 +12,13 @@ pub struct RegistryUpdateEvent {
     /// to reset the registry values to.
     pub version_id: i32,
 }
+
+impl RegistryUpdateEvent {
+    /// Creates a new [`RegistryUpdateEvent`] with the given version id
+    #[must_use]
+    pub fn new(version_id: i32) -> Self { Self { version_id } }
+
+    /// Returns `true` if the version id is equal to `N`.
+    #[must_use]
+    pub fn is_equal<const N: i32>(&self) -> bool { self.version_id == N }
+}

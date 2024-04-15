@@ -2138,6 +2138,7 @@ dependencies = [
  "bevy_log",
  "compact_str",
  "downcast-rs",
+ "froglight-core",
  "froglight-macros",
  "froglight-protocol",
  "hashbrown",

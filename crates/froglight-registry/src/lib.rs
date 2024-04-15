@@ -2,6 +2,8 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![feature(const_type_name)]
 #![feature(const_type_id)]
+#![allow(incomplete_features)]
+#![feature(generic_const_exprs)]
 
 use bevy_app::{App, Plugin};
 
