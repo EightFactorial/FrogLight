@@ -8,11 +8,14 @@ pub use assets::*;
 mod interface;
 pub use interface::*;
 
-mod networking;
-pub use networking::*;
+mod network;
+pub use network::*;
 
 mod physics;
 pub use physics::*;
+
+mod registry;
+pub use registry::*;
 
 mod settings;
 pub use settings::*;
@@ -27,7 +30,10 @@ pub use world::*;
 pub(super) fn build(app: &mut App) {
     // Unordered
     utility::build(app);
-    networking::build(app);
+
+    // Ordered
+    network::build(app);
+    registry::build(app);
 
     // Ordered
     world::build(app);

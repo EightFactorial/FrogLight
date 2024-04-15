@@ -31,4 +31,6 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", featur
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 rangemap = { version = "1.5.1", features = ["nightly", "const_fn"] }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["preserve_order"] }
 thiserror = { workspace = true }

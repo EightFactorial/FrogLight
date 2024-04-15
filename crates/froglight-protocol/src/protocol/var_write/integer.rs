@@ -8,19 +8,21 @@ macro_rules! impl_integer_var_write {
                 buf: &mut (impl std::io::Write + ?Sized),
             ) -> Result<(), WriteError> {
                 let mut value = *self;
-                let mut byte = [0];
 
+                // Just write a zero and return
                 if value == 0 {
-                    buf.write_all(&byte)?;
-                } else {
-                    while value != 0 {
-                        byte[0] = (value & 0b0111_1111) as u8;
-                        value = (value >> 7) & (<$ty>::max_value() >> 6);
-                        if value != 0 {
-                            byte[0] |= 0b1000_0000;
-                        }
-                        buf.write_all(&byte)?;
+                    buf.write_all(&[0])?;
+                    return Ok(());
+                }
+
+                let mut byte = [0];
+                while value != 0 {
+                    byte[0] = (value & 0b0111_1111) as u8;
+                    value = (value >> 7) & (<$ty>::MAX >> 6);
+                    if value != 0 {
+                        byte[0] |= 0b1000_0000;
                     }
+                    buf.write_all(&byte)?;
                 }
 
                 Ok(())

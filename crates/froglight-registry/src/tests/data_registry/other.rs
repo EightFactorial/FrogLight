@@ -1,8 +1,9 @@
 use froglight_macros::FrogRegistry;
 use froglight_protocol::common::ResourceKey;
+use hashbrown::HashMap;
 
 use crate::{
-    definitions::{ConvertKey, DefaultIdRegistry, InitializeIdRegistry},
+    definitions::{ConvertKey, DefaultRegistry, InitializeRegistry},
     tests::TestVersion,
 };
 
@@ -21,8 +22,8 @@ enum TestEnumOther {
     Other(ResourceKey),
 }
 
-impl InitializeIdRegistry<TestVersion> for TestEnumOther {
-    fn initialize() -> Vec<Self> {
+impl InitializeRegistry<TestVersion> for TestEnumOther {
+    fn initialize_ids() -> Vec<Self> {
         vec![
             Self::First,
             Self::Second,
@@ -30,6 +31,8 @@ impl InitializeIdRegistry<TestVersion> for TestEnumOther {
             Self::Other(ResourceKey::new("froglight:fifth")),
         ]
     }
+
+    fn initialize_storage() -> HashMap<Self, serde_json::Value> { HashMap::new() }
 }
 
 #[test]
@@ -59,7 +62,7 @@ fn to_key() {
 #[test]
 fn registry_inorder() {
     // Create a default registry
-    let default: DefaultIdRegistry<TestVersion, TestEnumOther> = DefaultIdRegistry::default();
+    let default: DefaultRegistry<TestVersion, TestEnumOther> = DefaultRegistry::default();
 
     // Check the default values
     {
@@ -79,10 +82,15 @@ fn registry_inorder() {
             default.get_value_cloned(3),
             Some(TestEnumOther::Other(ResourceKey::new("froglight:fifth")))
         );
+
+        assert_eq!(default.get_data(&TestEnumOther::First), None);
+        assert_eq!(default.get_data(&TestEnumOther::Second), None);
+        assert_eq!(default.get_data(&TestEnumOther::Third), None);
+        assert_eq!(default.get_data(&TestEnumOther::Fourth), None);
     }
 
     // Create a simple registry
-    let mut simple = TestEnumOtherIdRegistry::new_from_default(&default);
+    let mut simple = TestEnumOtherRegistry::new_from_default(&default);
 
     // Check that new simple registry is the same as the default
     {
@@ -102,18 +110,26 @@ fn registry_inorder() {
             simple.get_value_cloned(3),
             Some(TestEnumOther::Other(ResourceKey::new("froglight:fifth")))
         );
+
+        assert_eq!(simple.get_data(&TestEnumOther::First), None);
+        assert_eq!(simple.get_data(&TestEnumOther::Second), None);
+        assert_eq!(simple.get_data(&TestEnumOther::Third), None);
+        assert_eq!(simple.get_data(&TestEnumOther::Fourth), None);
     }
 
-    // Push a new value into the simple registry
+    // Push a new value and some data into the simple registry
     {
         simple.push_value(TestEnumOther::Fourth);
+        simple.insert_data(TestEnumOther::Fourth, serde_json::json!({ "test": 4 }));
 
         // Make sure the value exists in the simple registry
         assert_eq!(simple.get_id(&TestEnumOther::Fourth), Some(4));
+        assert_eq!(simple.get_data(&TestEnumOther::Fourth), Some(serde_json::json!({ "test": 4 })));
         assert_eq!(simple.get_value_cloned(4), Some(TestEnumOther::Fourth));
 
         // Make sure the value does not exist in the default registry
         assert_eq!(default.get_id(&TestEnumOther::Fourth), None);
+        assert_eq!(default.get_data(&TestEnumOther::Fourth), None);
         assert_eq!(default.get_value_cloned(4), None);
     }
 
@@ -138,5 +154,10 @@ fn registry_inorder() {
             simple.get_value_cloned(3),
             Some(TestEnumOther::Other(ResourceKey::new("froglight:fifth")))
         );
+
+        assert_eq!(simple.get_data(&TestEnumOther::First), None);
+        assert_eq!(simple.get_data(&TestEnumOther::Second), None);
+        assert_eq!(simple.get_data(&TestEnumOther::Third), None);
+        assert_eq!(simple.get_data(&TestEnumOther::Fourth), None);
     }
 }

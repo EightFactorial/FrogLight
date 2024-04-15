@@ -17,8 +17,4 @@ pub use froglight_network::{
     traits::*,
     versions::*,
 };
-pub use froglight_registry::{
-    definitions::*,
-    // registries::*,
-    RegistryOverrideEvent,
-};
+pub use froglight_registry::definitions::*;

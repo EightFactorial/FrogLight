@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+async-channel = "2.2.1"
 async-compression = { version = "0.4.8", default-features = false, features = [
     "flate2",
     "futures-io",
@@ -31,7 +32,6 @@ bevy_tasks = { workspace = true }
 bevy_time = { workspace = true }
 bevy_transform = { workspace = true }
 compact_str = { workspace = true }
-flume = "0.11.0"
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
