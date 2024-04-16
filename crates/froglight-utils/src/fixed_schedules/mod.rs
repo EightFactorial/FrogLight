@@ -43,7 +43,7 @@ pub(super) fn build(app: &mut App) {
 
     // Add the fixed virtual timer schedules.
     OneTickSchedule::build_virtual(app);
-    TwoTickSchedule::build_virtual_after(app, OneTickSchedule::fixed_timer_schedule);
+    TwoTickSchedule::build_virtual_after(app, OneTickSchedule::fixed_virtual_timer_schedule);
 
     // Add the fixed timer schedules.
     OneSecondSchedule::build(app);
@@ -63,7 +63,7 @@ trait FixedTimer: 'static + std::fmt::Debug + Default + ScheduleLabel {
     fn build(app: &mut App) {
         // Create a new schedule that runs every second.
         let mut schedule = Schedule::new(Self::default());
-        schedule.set_executor_kind(ExecutorKind::MultiThreaded);
+        schedule.set_executor_kind(ExecutorKind::SingleThreaded);
 
         // Add the schedule to the app.
         app.add_schedule(schedule)
@@ -77,7 +77,7 @@ trait FixedTimer: 'static + std::fmt::Debug + Default + ScheduleLabel {
     fn build_after<M>(app: &mut App, system_set: impl IntoSystemSet<M>) {
         // Create a new schedule that runs every second.
         let mut schedule = Schedule::new(Self::default());
-        schedule.set_executor_kind(ExecutorKind::MultiThreaded);
+        schedule.set_executor_kind(ExecutorKind::SingleThreaded);
 
         // Add the schedule to the app.
         app.add_schedule(schedule)
@@ -114,7 +114,7 @@ trait FixedTimer: 'static + std::fmt::Debug + Default + ScheduleLabel {
     fn build_virtual(app: &mut App) {
         // Create a new schedule that runs every second.
         let mut schedule = Schedule::new(Self::default());
-        schedule.set_executor_kind(ExecutorKind::MultiThreaded);
+        schedule.set_executor_kind(ExecutorKind::SingleThreaded);
 
         // Add the schedule to the app.
         app.add_schedule(schedule)
@@ -128,7 +128,7 @@ trait FixedTimer: 'static + std::fmt::Debug + Default + ScheduleLabel {
     fn build_virtual_after<M>(app: &mut App, system_set: impl IntoSystemSet<M>) {
         // Create a new schedule that runs every second.
         let mut schedule = Schedule::new(Self::default());
-        schedule.set_executor_kind(ExecutorKind::MultiThreaded);
+        schedule.set_executor_kind(ExecutorKind::SingleThreaded);
 
         // Add the schedule to the app.
         app.add_schedule(schedule)

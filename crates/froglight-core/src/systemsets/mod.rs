@@ -31,20 +31,13 @@ pub use world::*;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    //  --- Ordered ---
-    network::build(app);
-    registry::build(app);
-
-    // --- Ambiguous ---
-    entities::build(app);
-    utility::build(app);
-
-    // --- Ordered ---
-    world::build(app);
-    physics::build(app);
-
-    // --- Ordered ---
-    settings::build(app);
     assets::build(app);
+    entities::build(app);
     interface::build(app);
+    network::build(app);
+    physics::build(app);
+    registry::build(app);
+    settings::build(app);
+    utility::build(app);
+    world::build(app);
 }

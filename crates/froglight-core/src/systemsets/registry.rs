@@ -1,6 +1,6 @@
 //! [`SystemSets`](SystemSet) for scheduling the registry systems.
 
-use bevy_app::{PostStartup, PreUpdate};
+use bevy_app::{PostStartup, PostUpdate, PreUpdate};
 use bevy_ecs::schedule::{common_conditions::on_event, IntoSystemSetConfigs, SystemSet};
 
 use super::{NetworkPostUpdateSet, NetworkPreUpdateSet};
@@ -17,7 +17,7 @@ pub(super) fn build(app: &mut bevy_app::App) {
     // Add the `RegistryPostUpdateSet` after the `NetworkPostUpdateSet`
     // and only run if a `RegistryUpdateEvent` is received
     app.configure_sets(
-        PreUpdate,
+        PostUpdate,
         RegistryPostUpdateSet.after(NetworkPostUpdateSet).run_if(on_event::<RegistryUpdateEvent>()),
     );
 }
