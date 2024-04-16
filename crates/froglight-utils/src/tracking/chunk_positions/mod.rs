@@ -43,9 +43,6 @@ impl ChunkPositionMap {
         query: Query<(Entity, &ChunkPosition), (With<Chunk>, Without<EntityId>)>,
         mut map: ResMut<Self>,
     ) {
-        #[cfg(debug_assertions)]
-        let preupdate_size = map.len();
-
         // Clear the map
         map.clear();
 
@@ -53,8 +50,5 @@ impl ChunkPositionMap {
         for (entity, position) in &query {
             map.insert(*position, entity);
         }
-
-        #[cfg(debug_assertions)]
-        bevy_log::trace!("ChunkPositionMap size: {} (was: {preupdate_size})", map.len());
     }
 }

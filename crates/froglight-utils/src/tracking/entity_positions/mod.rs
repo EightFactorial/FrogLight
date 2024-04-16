@@ -8,7 +8,7 @@ use bevy_ecs::{
 };
 use froglight_protocol::common::{ChunkPosition, EntityId};
 use froglight_world::Chunk;
-use hashbrown::HashMap;
+use hashbrown::{HashMap, HashSet};
 
 use crate::fixed_schedules::TenthSecondSchedule;
 
@@ -26,11 +26,11 @@ pub(super) fn build(app: &mut App) {
 
 /// A map containing the positions of all [`Entities`](EntityId).
 ///
-/// This is much faster than iterating over all entities to find a specific
-/// entity.
+/// This is much faster than iterating over all entities to find a ones
+/// in a specific chunk.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
 pub struct EntityChunkMap {
-    position_map: HashMap<ChunkPosition, Entity>,
+    position_map: HashMap<ChunkPosition, Vec<Entity>>,
 }
 
 impl EntityChunkMap {
@@ -43,18 +43,32 @@ impl EntityChunkMap {
         query: Query<(Entity, &ChunkPosition), (With<EntityId>, Without<Chunk>)>,
         mut map: ResMut<Self>,
     ) {
-        #[cfg(debug_assertions)]
-        let preupdate_size = map.len();
-
-        // Clear the map
-        map.clear();
+        // Create a set to track which positions have been updated
+        let mut updated_positions = HashSet::new();
 
         // Insert all positions and entities into the map
         for (entity, position) in &query {
-            map.insert(*position, entity);
+            // Get the list of entities at the position
+            let entities = map.position_map.entry(*position).or_default();
+
+            // Clear the position's list if it hasn't been
+            if !updated_positions.contains(position) {
+                updated_positions.insert(*position);
+                entities.clear();
+            }
+
+            // Add the entity to the list
+            entities.push(entity);
+
+            // Track that the position has been updated
+            updated_positions.insert(*position);
         }
 
-        #[cfg(debug_assertions)]
-        bevy_log::trace!("EntityChunkMap size: {} (was: {preupdate_size})", map.len());
+        // Clear all positions that haven't been updated
+        map.position_map.iter_mut().for_each(|(position, entities)| {
+            if !updated_positions.contains(position) {
+                entities.clear();
+            }
+        });
     }
 }
