@@ -11,7 +11,8 @@ use crate::prelude::plugins::*;
 ///
 /// ---
 ///
-/// This includes bevy's [`MinimalPlugins`], so no need to add them yourself!
+/// This includes bevy's [`MinimalPlugins`], [`LogPlugin`], and
+/// [`DiagnosticsPlugin`], so no need to add them yourself!
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct HeadlessPlugins;
 
@@ -21,6 +22,7 @@ impl PluginGroup for HeadlessPlugins {
             .add(LogPlugin::default())
             .add(DiagnosticsPlugin)
             .add(CorePlugin)
+            .add(EntityPlugin)
             .add(RegistryPlugin)
             .add(UtilityPlugin)
             .add(NetworkPlugins)

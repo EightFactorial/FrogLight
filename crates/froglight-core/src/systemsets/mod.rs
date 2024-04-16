@@ -5,6 +5,9 @@ use bevy_app::App;
 mod assets;
 pub use assets::*;
 
+mod entities;
+pub use entities::*;
+
 mod interface;
 pub use interface::*;
 
@@ -28,18 +31,19 @@ pub use world::*;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    // Unordered
-    utility::build(app);
-
-    // Ordered
+    //  --- Ordered ---
     network::build(app);
     registry::build(app);
 
-    // Ordered
+    // --- Ambiguous ---
+    entities::build(app);
+    utility::build(app);
+
+    // --- Ordered ---
     world::build(app);
     physics::build(app);
 
-    // Ordered
+    // --- Ordered ---
     settings::build(app);
     assets::build(app);
     interface::build(app);

@@ -88,7 +88,10 @@ opt-level = 1
 # Slightly optimize most froglight packages
 froglight-app = { opt-level = 1 }
 froglight-core = { opt-level = 1 }
+froglight-entity = { opt-level = 1 }
 froglight-macros = { opt-level = 1 }
+froglight-registry = { opt-level = 1 }
+froglight-utils = { opt-level = 1 }
 # Fully all other packages
 "*" = { opt-level = 3 }
 

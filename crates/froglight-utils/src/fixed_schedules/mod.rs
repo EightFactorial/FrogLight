@@ -10,6 +10,9 @@ use bevy_ecs::{
 };
 use bevy_time::Time;
 
+mod tenth_second;
+pub use tenth_second::{TenthSecondDuration, TenthSecondSchedule};
+
 mod one_second;
 pub use one_second::{OneSecondDuration, OneSecondSchedule};
 
@@ -36,7 +39,8 @@ pub(super) fn build(app: &mut App) {
     app.world.resource_mut::<MainScheduleOrder>().insert_after(RunFixedMainLoop, RunFixedTimers);
 
     // Add the fixed timer schedules.
-    OneSecondSchedule::build(app);
+    TenthSecondSchedule::build(app);
+    OneSecondSchedule::build_after(app, TenthSecondSchedule::fixed_timer_schedule);
     FiveSecondSchedule::build_after(app, OneSecondSchedule::fixed_timer_schedule);
     ThirtySecondSchedule::build_after(app, FiveSecondSchedule::fixed_timer_schedule);
 }
@@ -47,7 +51,7 @@ trait FixedTimer: 'static + std::fmt::Debug + Default + ScheduleLabel {
     type ScheduleTimer: Default + Resource + std::ops::DerefMut<Target = Duration>;
 
     /// The number of seconds between each run.
-    const SECONDS: u64;
+    const SECONDS: f32;
 
     /// Builds the schedule.
     fn build(app: &mut App) {
@@ -87,12 +91,13 @@ trait FixedTimer: 'static + std::fmt::Debug + Default + ScheduleLabel {
                 **timer += world.resource::<Time>().delta();
 
                 // Run the schedule for each `Self::SECOND` seconds that have passed.
-                let schedule_runs = timer.as_secs() / Self::SECONDS;
+                let schedule_runs = (timer.as_secs_f32() / Self::SECONDS).floor();
                 // Subtract the time that will been processed.
-                **timer -= Duration::from_secs(Self::SECONDS * schedule_runs);
+                **timer -= Duration::from_secs_f32(Self::SECONDS * schedule_runs);
 
-                // Run the schedule.
-                for _ in 0..schedule_runs {
+                // Run the schedule the correct number of times.
+                #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+                for _ in 0..schedule_runs as usize {
                     schedule.run(world);
                 }
             });

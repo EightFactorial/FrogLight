@@ -2054,6 +2054,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "froglight-core",
+ "froglight-entity",
  "froglight-network",
  "froglight-protocol",
  "froglight-registry",
@@ -2070,6 +2071,19 @@ dependencies = [
  "bevy_ecs",
  "bevy_log",
  "bevy_reflect",
+]
+
+[[package]]
+name = "froglight-entity"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_log",
+ "bevy_reflect",
+ "froglight-core",
+ "froglight-protocol",
 ]
 
 [[package]]
@@ -2154,11 +2168,13 @@ name = "froglight-utils"
 version = "0.1.0"
 dependencies = [
  "bevy_app",
+ "bevy_derive",
  "bevy_ecs",
  "bevy_log",
  "bevy_time",
- "derive_more",
  "froglight-core",
+ "froglight-entity",
+ "froglight-protocol",
  "froglight-world",
  "futures-lite 2.3.0",
  "hashbrown",

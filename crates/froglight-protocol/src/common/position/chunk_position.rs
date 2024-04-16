@@ -10,6 +10,7 @@ use crate::protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError,
 #[derive(
     Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut, FrogTest,
 )]
+#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct ChunkPosition(I64Vec2);
 

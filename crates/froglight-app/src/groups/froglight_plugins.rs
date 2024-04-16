@@ -53,6 +53,7 @@ impl PluginGroup for FrogLightPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
             .add(CorePlugin)
+            .add(EntityPlugin)
             .add(RegistryPlugin)
             .add(UtilityPlugin)
             .add(NetworkPlugins)

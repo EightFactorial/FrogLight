@@ -4,6 +4,7 @@
 use bevy_app::{App, Plugin};
 
 pub mod fixed_schedules;
+pub mod tracking;
 
 /// The `Utility` Froglight plugin.
 ///
@@ -12,5 +13,8 @@ pub mod fixed_schedules;
 pub struct UtilityPlugin;
 
 impl Plugin for UtilityPlugin {
-    fn build(&self, app: &mut App) { fixed_schedules::build(app); }
+    fn build(&self, app: &mut App) {
+        fixed_schedules::build(app);
+        tracking::build(app);
+    }
 }
