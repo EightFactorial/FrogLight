@@ -31,11 +31,11 @@ futures-lite = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 
-[default]
-features = ["froglight-entity", "froglight-world"]
+[features]
+default = ["froglight-entity", "froglight-world"]
 
 # Enables tracking of which entities are in which chunks
-froglight-entity = ["dep:froglight_entity", "froglight-world"]
+froglight-entity = ["dep:froglight-entity", "froglight-world"]
 
 # Enables tracking of what positions chunks are at
-froglight-world = ["dep:froglight_world", "dep:froglight-protocol"]
+froglight-world = ["dep:froglight-world", "dep:froglight-protocol"]
