@@ -7,7 +7,7 @@ use super::FixedTimer;
 
 /// A [`Schedule`] that runs every thirty seconds.
 ///
-/// Equivalent to 600 ticks.
+/// Equivalent to 600 real-time ticks.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, ScheduleLabel)]
 pub struct ThirtySecondSchedule;
 

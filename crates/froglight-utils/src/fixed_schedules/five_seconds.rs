@@ -7,7 +7,7 @@ use super::FixedTimer;
 
 /// A [`Schedule`] that runs every five seconds.
 ///
-/// Equivalent to 100 ticks.
+/// Equivalent to 100 real-time ticks.
 #[derive(Debug, Default, Clone, Copy, Eq, PartialEq, Hash, ScheduleLabel)]
 pub struct FiveSecondSchedule;
 

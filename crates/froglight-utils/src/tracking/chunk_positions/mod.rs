@@ -10,16 +10,16 @@ use froglight_protocol::common::{ChunkPosition, EntityId};
 use froglight_world::Chunk;
 use hashbrown::HashMap;
 
-use crate::fixed_schedules::TenthSecondSchedule;
+use crate::fixed_schedules::TwoTickSchedule;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     // Initialize the ChunkPositionMap resource
     app.init_resource::<ChunkPositionMap>();
 
-    // Update the ChunkPositionMap every 1/10 second if there are any chunks
+    // If there are any chunks, update the ChunkPositionMap every other tick
     app.add_systems(
-        TenthSecondSchedule,
+        TwoTickSchedule,
         ChunkPositionMap::update_chunkpositionmap.run_if(any_with_component::<Chunk>),
     );
 }
