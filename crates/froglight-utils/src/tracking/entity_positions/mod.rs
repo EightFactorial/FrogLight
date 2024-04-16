@@ -8,7 +8,7 @@ use bevy_ecs::{
 };
 use froglight_protocol::common::{ChunkPosition, EntityId};
 use froglight_world::Chunk;
-use hashbrown::{HashMap, HashSet};
+use hashbrown::{hash_set::Entry, HashMap, HashSet};
 
 use crate::fixed_schedules::TenthSecondSchedule;
 
@@ -30,7 +30,9 @@ pub(super) fn build(app: &mut App) {
 /// in a specific chunk.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
 pub struct EntityChunkMap {
+    #[deref]
     position_map: HashMap<ChunkPosition, Vec<Entity>>,
+    updated_positions: HashSet<ChunkPosition>,
 }
 
 impl EntityChunkMap {
@@ -43,32 +45,32 @@ impl EntityChunkMap {
         query: Query<(Entity, &ChunkPosition), (With<EntityId>, Without<Chunk>)>,
         mut map: ResMut<Self>,
     ) {
-        // Create a set to track which positions have been updated
-        let mut updated_positions = HashSet::new();
+        // Get the position map and updated positions set
+        let Self { position_map, updated_positions } = &mut *map;
 
         // Insert all positions and entities into the map
         for (entity, position) in &query {
             // Get the list of entities at the position
-            let entities = map.position_map.entry(*position).or_default();
+            let entities = position_map.entry(*position).or_default();
 
             // Clear the position's list if it hasn't been
-            if !updated_positions.contains(position) {
-                updated_positions.insert(*position);
+            if let Entry::Vacant(entry) = updated_positions.entry(*position) {
+                entry.insert();
                 entities.clear();
             }
 
             // Add the entity to the list
             entities.push(entity);
-
-            // Track that the position has been updated
-            updated_positions.insert(*position);
         }
 
         // Clear all positions that haven't been updated
-        map.position_map.iter_mut().for_each(|(position, entities)| {
+        position_map.iter_mut().for_each(|(position, entities)| {
             if !updated_positions.contains(position) {
                 entities.clear();
             }
         });
+
+        // Clear the updated positions set
+        updated_positions.clear();
     }
 }
