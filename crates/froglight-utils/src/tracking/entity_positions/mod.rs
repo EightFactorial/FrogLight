@@ -53,24 +53,26 @@ impl EntityChunkMap {
             // Get the list of entities at the position
             let entities = position_map.entry(*position).or_default();
 
-            // Clear the position's list if it hasn't been
+            // Clear the position's entity list if it hasn't been
             if let Entry::Vacant(entry) = updated_positions.entry(*position) {
                 entry.insert();
                 entities.clear();
             }
 
-            // Add the entity to the list
+            // Add the entity to the entity list
             entities.push(entity);
         }
 
         // Clear all positions that haven't been updated
-        position_map.iter_mut().for_each(|(position, entities)| {
-            if !updated_positions.contains(position) {
-                entities.clear();
-            }
-        });
-
-        // Clear the updated positions set
+        position_map.retain(|position, _| updated_positions.remove(position));
         updated_positions.clear();
     }
+
+    /// Returns the total number of [`Chunks`](ChunkPosition).
+    #[must_use]
+    pub fn total_chunks(&self) -> usize { self.position_map.len() }
+
+    /// Returns the total number of [`Entities`](Entity).
+    #[must_use]
+    pub fn total_entities(&self) -> usize { self.position_map.values().map(Vec::len).sum() }
 }
