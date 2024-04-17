@@ -20,7 +20,7 @@ workspace = true
 
 [dependencies]
 attribute-derive = { version = "0.9.1", features = ["syn-full"] }
-proc-macro2 = { version = "1.0.80", features = ["nightly"] }
+proc-macro2 = { version = "1.0.81", features = ["nightly"] }
 quote = { version = "1.0.36", features = ["proc-macro"] }
 syn = { version = "2.0.59", features = ["full", "printing", "proc-macro"] }
 toml_edit = { version = "0.22.9", default-features = false, features = [
