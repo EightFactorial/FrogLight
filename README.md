@@ -91,6 +91,7 @@ fn main() {
 >  * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
 >  * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
 >  * [FrogLight Examples](examples)
+> 
 > For documentation, see:
 >  * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
 >  * [FrogLight Docs](https://github.com/EightFactorial/FrogLight/)
