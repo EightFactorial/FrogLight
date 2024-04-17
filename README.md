@@ -87,11 +87,12 @@ fn main() {
 
 > [!Tip]
 > For more information, see the following links:
->  * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/)
+>  * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
 >  * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
->  * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
 >  * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
 >  * [FrogLight Examples](examples)
+> For documentation, see:
+>  * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
 >  * [FrogLight Docs](https://github.com/EightFactorial/FrogLight/)
 
 ## License
