@@ -1,7 +1,7 @@
 //! Traits for converting between registry values, protocol ids,
 //! and resource keys.
 
-use froglight_protocol::traits::Version;
+use froglight_protocol::{common::ResourceKey, traits::Version};
 use hashbrown::HashMap;
 
 /// A trait for initializing a registry with default values.
@@ -16,10 +16,12 @@ where
     ///
     /// The order of the values is important, as it will be used
     /// to convert between IDs and registry values.
+    #[must_use]
     fn initialize_ids() -> Vec<Self>;
 
     /// Initialize the data storage with the default values.
     ///
     /// This is used to store data for the registry values.
-    fn initialize_storage() -> HashMap<Self, serde_json::Value>;
+    #[must_use]
+    fn initialize_storage() -> HashMap<ResourceKey, serde_json::Value> { HashMap::new() }
 }

@@ -52,10 +52,15 @@ impl Plugin for FrogLightPlugins {
 impl PluginGroup for FrogLightPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
+            .add(AssetPlugin) // TODO: Add before AssetSource?
             .add(CorePlugin)
+            .add(SettingsPlugin)
             .add(EntityPlugin)
             .add(RegistryPlugin)
             .add(UtilityPlugin)
             .add(NetworkPlugins)
+            .add(RenderPlugin)
+            .add(InterfacePlugin)
+            .add(ClientPlugin)
     }
 }

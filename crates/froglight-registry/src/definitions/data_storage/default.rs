@@ -1,7 +1,7 @@
-use std::{hash::Hash, marker::PhantomData, sync::Arc};
+use std::{marker::PhantomData, sync::Arc};
 
 use bevy_ecs::system::Resource;
-use froglight_protocol::traits::Version;
+use froglight_protocol::{common::ResourceKey, traits::Version};
 use hashbrown::HashMap;
 use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
@@ -19,7 +19,7 @@ where
     R: ConvertKey,
 {
     pub(crate) id_values: Arc<RwLock<Vec<R>>>,
-    pub(crate) storage: Arc<RwLock<HashMap<R, serde_json::Value>>>,
+    pub(crate) storage: Arc<RwLock<HashMap<ResourceKey, serde_json::Value>>>,
     _version: PhantomData<V>,
 }
 
@@ -133,11 +133,8 @@ where
     ///
     /// If you need to insert large amounts of data, consider using
     /// [`DefaultRegistry::write_data`] instead.
-    pub fn insert_data(&mut self, value: R, data: serde_json::Value)
-    where
-        R: Eq + Hash,
-    {
-        self.storage.write().insert(value, data);
+    pub fn insert_data(&mut self, key: ResourceKey, data: serde_json::Value) {
+        self.storage.write().insert(key, data);
     }
 
     /// Gets data from the registry.
@@ -149,11 +146,8 @@ where
     /// If you need to read large amounts of data, consider using
     /// [`DefaultRegistry::read_data`] instead.
     #[must_use]
-    pub fn get_data(&self, value: &R) -> Option<serde_json::Value>
-    where
-        R: Eq + Hash,
-    {
-        self.storage.read().get(value).cloned()
+    pub fn get_data(&self, key: &(impl AsRef<str> + ?Sized)) -> Option<serde_json::Value> {
+        self.storage.read().get(key.as_ref()).cloned()
     }
 
     /// Get a [`RwLockReadGuard`] to the registry data store.
@@ -162,7 +156,7 @@ where
     ///
     /// [`Note`](RwLock::read): This may cause a deadlock if the lock is not
     /// released.
-    pub fn read_data(&self) -> RwLockReadGuard<'_, HashMap<R, serde_json::Value>> {
+    pub fn read_data(&self) -> RwLockReadGuard<'_, HashMap<ResourceKey, serde_json::Value>> {
         self.storage.read()
     }
 
@@ -172,7 +166,7 @@ where
     ///
     /// [`Note`](RwLock::write): This may cause a deadlock if the lock is not
     /// released.
-    pub fn write_data(&mut self) -> RwLockWriteGuard<'_, HashMap<R, serde_json::Value>> {
+    pub fn write_data(&mut self) -> RwLockWriteGuard<'_, HashMap<ResourceKey, serde_json::Value>> {
         self.storage.write()
     }
 }

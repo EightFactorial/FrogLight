@@ -5,7 +5,8 @@ use bevy::{
 
 use crate::FrogLightPlugins;
 
-/// A [`PluginGroup`] for all plugins that are used in the main application.
+/// A [`PluginGroup`] for all plugins that are used in the [`FrogLight`](crate)
+/// application.
 ///
 /// ---
 ///

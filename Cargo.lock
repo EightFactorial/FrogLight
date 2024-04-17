@@ -2069,11 +2069,51 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_mod_debugdump",
+ "froglight-assets",
+ "froglight-client",
  "froglight-core",
  "froglight-entity",
+ "froglight-interface",
  "froglight-network",
  "froglight-protocol",
  "froglight-registry",
+ "froglight-render",
+ "froglight-settings",
+ "froglight-utils",
+ "froglight-world",
+]
+
+[[package]]
+name = "froglight-assets"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_asset",
+ "bevy_audio",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_log",
+ "froglight-core",
+ "froglight-protocol",
+ "froglight-registry",
+ "froglight-settings",
+]
+
+[[package]]
+name = "froglight-client"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_log",
+ "bevy_reflect",
+ "froglight-core",
+ "froglight-entity",
+ "froglight-interface",
+ "froglight-network",
+ "froglight-registry",
+ "froglight-render",
  "froglight-utils",
  "froglight-world",
 ]
@@ -2100,6 +2140,28 @@ dependencies = [
  "bevy_reflect",
  "froglight-core",
  "froglight-protocol",
+]
+
+[[package]]
+name = "froglight-interface"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_gizmos",
+ "bevy_input",
+ "bevy_log",
+ "bevy_sprite",
+ "bevy_text",
+ "bevy_ui",
+ "bevy_window",
+ "froglight-assets",
+ "froglight-core",
+ "froglight-entity",
+ "froglight-render",
+ "froglight-settings",
+ "froglight-utils",
 ]
 
 [[package]]
@@ -2177,6 +2239,32 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+]
+
+[[package]]
+name = "froglight-render"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_log",
+ "bevy_render",
+ "froglight-assets",
+ "froglight-core",
+]
+
+[[package]]
+name = "froglight-settings"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_log",
+ "froglight-core",
+ "serde",
+ "toml",
 ]
 
 [[package]]
@@ -3992,6 +4080,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_spanned"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb3622f419d1296904700073ea6cc23ad690adbd66f13ea683df73298736f0c1"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "sharded-slab"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4314,10 +4411,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "toml"
+version = "0.8.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e9dd1545e8208b4a5af1aa9bbd0b4cf7e9ea08fabc5d0a5c67fcaafa17433aa3"
+dependencies = [
+ "indexmap",
+ "serde",
+ "serde_spanned",
+ "toml_datetime",
+ "toml_edit 0.22.9",
+]
+
+[[package]]
 name = "toml_datetime"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3550f4e9685620ac18a50ed434eb3aec30db8ba93b0287467bca5826ea25baf1"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "toml_edit"
@@ -4337,6 +4450,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8e40bb779c5187258fd7aad0eb68cb8706a0a81fa712fbea808ab43c4b8374c4"
 dependencies = [
  "indexmap",
+ "serde",
+ "serde_spanned",
  "toml_datetime",
  "winnow 0.6.6",
 ]

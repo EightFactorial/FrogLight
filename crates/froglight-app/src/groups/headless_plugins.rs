@@ -7,7 +7,8 @@ use bevy::{
 
 use crate::prelude::plugins::*;
 
-/// A [`PluginGroup`] for all plugins that are used in the headless application.
+/// A [`PluginGroup`] for all plugins that can be used in a headless
+/// application.
 ///
 /// ---
 ///
@@ -22,6 +23,7 @@ impl PluginGroup for HeadlessPlugins {
             .add(LogPlugin::default())
             .add(DiagnosticsPlugin)
             .add(CorePlugin)
+            .add(SettingsPlugin)
             .add(EntityPlugin)
             .add(RegistryPlugin)
             .add(UtilityPlugin)

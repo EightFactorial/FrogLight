@@ -1,19 +1,16 @@
 use bevy_app::{App, PostUpdate, PreUpdate, Update};
 use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
 
-use super::{EntityPostUpdateSet, EntityPreUpdateSet, NetworkPostUpdateSet, NetworkPreUpdateSet};
+use super::{EntityPostUpdateSet, EntityPreUpdateSet, WorldPreUpdateSet};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     app.configure_sets(
         PreUpdate,
-        UtilityPreUpdateSet.after(NetworkPreUpdateSet).after(EntityPreUpdateSet),
+        UtilityPreUpdateSet.after(WorldPreUpdateSet).after(EntityPreUpdateSet),
     )
     .configure_sets(Update, UtilityUpdateSet)
-    .configure_sets(
-        PostUpdate,
-        UtilityPostUpdateSet.after(NetworkPostUpdateSet).after(EntityPostUpdateSet),
-    );
+    .configure_sets(PostUpdate, UtilityPostUpdateSet.after(EntityPostUpdateSet));
 }
 
 /// A [`SystemSet`] that runs during the [`PreUpdate`] phase.

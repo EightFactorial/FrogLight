@@ -50,6 +50,9 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(AppPlugins.build());
 
+    let main = app.main_schedule_label.intern();
+    graph_schedules(&mut app, "main", &[main]);
+
     let startup_labels = app.world.resource::<MainScheduleOrder>().startup_labels.clone();
     graph_schedules(&mut app, "startup", &startup_labels);
 
@@ -86,28 +89,34 @@ fn graph_schedules(app: &mut App, folder: &str, schedules: &[InternedScheduleLab
         info!("Generating graph for `{label:?}`");
         let graph = bevy_mod_debugdump::schedule_graph_dot(app, label.intern(), &settings);
 
-        // Get the path to write the graph to
-        let path = path.join(format!("{label:?}.dot"));
-        debug!("Writing `{label:?}` to \"{}\"", truncate_path(&path));
-
         // Write the graph to a file
-        if let Err(err) = std::fs::write(&path, graph) {
-            error!("Failed to write `{label:?}`: {err}");
-        }
+        write_dot_and_convert(graph, label, &path);
+    }
+}
 
-        // Convert the graph to an image
-        let output_path = path.with_extension("svg");
-        debug!("Converting \"{}\" to \"{}\"", truncate_path(&path), truncate_path(&output_path));
+/// Writes the graph to a dot file and convert it to an svg.
+fn write_dot_and_convert(graph: String, label: &InternedScheduleLabel, path: &Path) {
+    // Get the path to write the graph to
+    let path = path.join(format!("{label:?}.dot"));
+    debug!("Writing `{label:?}` to \"{}\"", truncate_path(&path));
 
-        if let Err(err) = std::process::Command::new("dot")
-            .arg("-Tsvg")
-            .arg(&path)
-            .arg("-o")
-            .arg(output_path)
-            .output()
-        {
-            error!("Failed to convert `{label:?}` to an image: {err}");
-        }
+    // Write the graph to a file
+    if let Err(err) = std::fs::write(&path, graph) {
+        error!("Failed to write `{label:?}`: {err}");
+    }
+
+    // Convert the graph to an image
+    let output_path = path.with_extension("svg");
+    debug!("Converting \"{}\" to \"{}\"", truncate_path(&path), truncate_path(&output_path));
+
+    if let Err(err) = std::process::Command::new("dot")
+        .arg("-Tsvg")
+        .arg(&path)
+        .arg("-o")
+        .arg(output_path)
+        .output()
+    {
+        error!("Failed to convert `{label:?}` to an image: {err}");
     }
 }
 

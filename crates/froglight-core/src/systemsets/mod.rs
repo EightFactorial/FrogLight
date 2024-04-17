@@ -5,6 +5,9 @@ use bevy_app::App;
 mod assets;
 pub use assets::*;
 
+mod client;
+pub use client::*;
+
 mod entities;
 pub use entities::*;
 
@@ -32,6 +35,7 @@ pub use world::*;
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     assets::build(app);
+    client::build(app);
     entities::build(app);
     interface::build(app);
     network::build(app);

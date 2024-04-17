@@ -4,11 +4,17 @@
 resolver = "2"
 members = [
     "crates/froglight-app",
+    "crates/froglight-assets",
+    "crates/froglight-client",
     "crates/froglight-core",
+    "crates/froglight-entity",
+    "crates/froglight-interface",
     "crates/froglight-macros",
     "crates/froglight-network",
     "crates/froglight-protocol",
     "crates/froglight-registry",
+    "crates/froglight-render",
+    "crates/froglight-settings",
     "crates/froglight-utils",
     "crates/froglight-world",
 ]
@@ -54,13 +60,19 @@ bevy_audio = "0.13.2"
 bevy_core = "0.13.2"
 bevy_derive = "0.13.2"
 bevy_ecs = "0.13.2"
+bevy_gizmos = "0.13.2"
+bevy_input = "0.13.2"
 bevy_log = "0.13.2"
 bevy_math = "0.13.2"
 bevy_reflect = "0.13.2"
 bevy_render = "0.13.2"
+bevy_sprite = "0.13.2"
 bevy_tasks = "0.13.2"
+bevy_text = "0.13.2"
 bevy_time = "0.13.2"
 bevy_transform = "0.13.2"
+bevy_ui = "0.13.2"
+bevy_window = "0.13.2"
 bitvec = "1.0.1"
 bytemuck = "1.15.0"
 compact_str = "0.7.1"
@@ -87,11 +99,17 @@ opt-level = 1
 [profile.dev.package]
 # Slightly optimize most froglight packages
 froglight-app = { opt-level = 1 }
+froglight-assets = { opt-level = 1 }
+froglight-client = { opt-level = 1 }
 froglight-core = { opt-level = 1 }
 froglight-entity = { opt-level = 1 }
+froglight-interface = { opt-level = 1 }
 froglight-macros = { opt-level = 1 }
+froglight-network = { opt-level = 1 }
 froglight-registry = { opt-level = 1 }
+froglight-settings = { opt-level = 1 }
 froglight-utils = { opt-level = 1 }
+froglight-world = { opt-level = 1 }
 # Fully all other packages
 "*" = { opt-level = 3 }
 
