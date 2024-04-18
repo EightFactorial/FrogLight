@@ -7,15 +7,11 @@ use froglight_protocol::{
 };
 
 use crate::connection::{
-    events::{RecvPacketEvent, SendPacketEvent},
     plugin::systems::{
-        parts::{ConnectionMarker, ConnectionSet},
-        states::{
-            configuration::ConfigurationState, handshaking::HandshakeState, login::LoginState,
-            play::PlayState, status::StatusState,
-        },
+        misc::{ConnectionMarker, ConnectionSet},
+        states::{handshaking::HandshakeState, login::LoginState, status::StatusState},
     },
-    NetworkDirection, Serverbound,
+    ConnectionChannel, NetworkDirection, RecvPacketEvent, SendPacketEvent, Serverbound,
 };
 
 mod v1_20_0;
@@ -28,6 +24,8 @@ where
     Login: State<Self>,
     Play: State<Self>,
 {
+    type Channel;
+
     fn build(app: &mut App) {
         // Add packet events
         app.add_event::<SendPacketEvent<Self>>().add_event::<RecvPacketEvent<Self>>();
@@ -49,17 +47,19 @@ where
 
 impl<V: Version> HandleConnection for V
 where
-    V: HandshakeState + StatusState + LoginState + ConfigurationState + PlayState,
+    V: HandshakeState + StatusState + LoginState,
+    Serverbound: NetworkDirection<V, Handshaking>
+        + NetworkDirection<V, Status>
+        + NetworkDirection<V, Login>
+        + NetworkDirection<V, Configuration>
+        + NetworkDirection<V, Play>,
     Handshaking: State<V>,
-    Serverbound: NetworkDirection<V, Handshaking>,
     Status: State<V>,
-    Serverbound: NetworkDirection<V, Status>,
     Login: State<V>,
-    Serverbound: NetworkDirection<V, Login>,
     Configuration: State<V>,
-    Serverbound: NetworkDirection<V, Configuration>,
     Play: State<V>,
-    Serverbound: NetworkDirection<V, Play>,
 {
+    type Channel = ConnectionChannel<Self>;
+
     fn add_systems(_app: &mut App) {}
 }

@@ -1,6 +1,11 @@
 use bevy_app::{App, Plugin};
 
-pub mod events;
+mod channel;
+pub use channel::{current::ConnectionChannel, legacy::LegacyChannel};
+
+mod events;
+pub use events::*;
+
 mod systems;
 mod traits;
 

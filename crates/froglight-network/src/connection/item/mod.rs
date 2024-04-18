@@ -31,7 +31,6 @@ where
 {
     pub(crate) stream: TcpStream,
     pub(crate) buffer: BufReader<TcpStream>,
-    #[allow(dead_code)]
     pub(crate) bundle: VecDeque<D::Recv>,
     pub(crate) compression: Option<i32>,
     /// Information about the connection.
