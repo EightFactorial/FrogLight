@@ -19,4 +19,4 @@ pub trait State<V: Version>: 'static + Debug + Default + Copy + Eq + Send + Sync
 }
 
 /// A collection of packets that can be sent or received.
-pub trait PacketEnum: Send + Sync {}
+pub trait PacketEnum: Debug + PartialEq + Send + Sync {}

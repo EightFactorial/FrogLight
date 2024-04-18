@@ -3,7 +3,6 @@ use froglight_macros::FrogReadWrite;
 /// A game event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
 #[frog(tests = ["read_example"], bytes = [1])]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum GameEvent {
     /// Invalid bed.
     NoRespawnBlockAvailable,

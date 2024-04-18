@@ -1,5 +1,5 @@
 use std::{
-    fmt::{Debug, Display, Formatter},
+    fmt::Debug,
     hash::Hash,
     ops::{Add, Sub},
 };
@@ -35,8 +35,7 @@ use crate::protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError,
 /// Be careful when using values that are close to the minimum or maximum
 /// value of the inner type. For example, if the inner type is `u8`, then
 /// `NonZero::new_some(255u8)` will overflow and be written as `0`.
-#[derive(Deref, DerefMut)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut)]
 pub struct NonZero<T>(Option<T>);
 
 impl<T> NonZero<T> {
@@ -108,45 +107,6 @@ impl<T> NonZero<T> {
     {
         Self::new_some(T::default())
     }
-}
-
-impl<T> Default for NonZero<T> {
-    fn default() -> Self { Self(None) }
-}
-
-impl<T: Debug> Debug for NonZero<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match &self.0 {
-            Some(val) => write!(f, "NonZero({val:?})"),
-            None => write!(f, "NonZero(None)"),
-        }
-    }
-}
-
-impl<T: Display> Display for NonZero<T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match &self.0 {
-            Some(val) => write!(f, "{val}"),
-            None => write!(f, "None"),
-        }
-    }
-}
-
-#[allow(clippy::expl_impl_clone_on_copy)]
-impl<T: Clone> Clone for NonZero<T> {
-    fn clone(&self) -> Self { Self(self.0.clone()) }
-}
-
-impl<T: Copy> Copy for NonZero<T> {}
-
-impl<T: PartialEq> PartialEq for NonZero<T> {
-    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
-}
-
-impl<T: Eq> Eq for NonZero<T> {}
-
-impl<T: Hash> Hash for NonZero<T> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state) }
 }
 
 impl<T> From<T> for NonZero<T> {
@@ -228,30 +188,30 @@ proptest::proptest! {
         assert_eq!(buf, (val + 1).fg_to_bytes());
     }
 
-    // #[test]
-    // fn proto_read_nonzero_entityid(val in 0u32..=u32::MAX) {
-    //     use crate::common::EntityId;
+    #[test]
+    fn proto_read_nonzero_entityid(val in 0u32..=u32::MAX) {
+        use crate::common::EntityId;
 
-    //     let bytes = val.fg_to_bytes();
-    //     let mut cursor = std::io::Cursor::new(bytes.as_slice());
-    //     let nonzero = NonZero::<EntityId>::fg_read(&mut cursor).unwrap();
+        let bytes = val.fg_var_to_bytes();
+        let mut cursor = std::io::Cursor::new(bytes.as_slice());
+        let nonzero = NonZero::<EntityId>::fg_read(&mut cursor).unwrap();
 
-    //     if val == 0 {
-    //         assert_eq!(nonzero.into_inner(), None);
-    //     } else {
-    //         assert_eq!(nonzero.into_inner(), Some(EntityId(val - 1)));
-    //     }
-    // }
+        if val == 0 {
+            assert_eq!(nonzero.into_inner(), None);
+        } else {
+            assert_eq!(nonzero.into_inner(), Some(EntityId(val - 1)));
+        }
+    }
 
-    // #[test]
-    // fn proto_write_nonzero_entityid(val in 0u32..u32::MAX) {
-    //     use crate::common::EntityId;
+    #[test]
+    fn proto_write_nonzero_entityid(val in 0u32..u32::MAX) {
+        use crate::common::EntityId;
 
-    //     let nonzero = NonZero::new_some(EntityId(val));
-    //     let buf = nonzero.fg_to_bytes();
+        let nonzero = NonZero::new_some(EntityId(val));
+        let buf = nonzero.fg_to_bytes();
 
-    //     assert_eq!(buf, (val + 1).fg_var_to_bytes());
-    // }
+        assert_eq!(buf, (val + 1).fg_var_to_bytes());
+    }
 }
 
 #[cfg(test)]

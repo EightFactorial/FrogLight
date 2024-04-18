@@ -6,7 +6,6 @@ use crate::{
 };
 
 #[derive(Clone, PartialEq, FrogReadWrite)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub struct ChunkDataS2CPacket {
     pub position: ChunkPosition,
     pub chunk_data: ChunkDataPacket,
