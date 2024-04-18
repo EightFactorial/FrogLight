@@ -79,7 +79,7 @@ tools arg0="" arg1="" arg2="" arg3="" arg4="": (fetch-tools)
 
 # Generate froglight-app graphs
 graph:
-  RUST_LOG=info cargo run --package=froglight-app --example=system-graph --features default
+  RUST_LOG=info cargo run --package=froglight-app --example=system-graph
 
 # ---- Fetch Recipes ----
 

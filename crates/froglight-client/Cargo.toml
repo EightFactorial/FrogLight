@@ -17,10 +17,11 @@ workspace = true
 
 [dependencies]
 bevy_app = { workspace = true }
+bevy_asset = { workspace = true }
+bevy_audio = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
-bevy_reflect = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
 froglight-interface = { version = "0.1.0", path = "../froglight-interface" }

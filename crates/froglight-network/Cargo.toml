@@ -24,6 +24,7 @@ async-compression = { version = "0.4.8", default-features = false, features = [
 ] }
 async-std = { version = "1.12.0", features = ["unstable", "std"] }
 bevy_app = { workspace = true }
+bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
 bevy_math = { workspace = true }

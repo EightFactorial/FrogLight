@@ -13,7 +13,7 @@ pub trait NetworkDirection<V: Version, S: State<V>> {
 
 /// The clientbound [`NetworkDirection`].
 ///
-/// Packets are sent from the `server (this)` to the `client`.
+/// Packets are sent from the `server` (this) to the `client`.
 pub struct Clientbound;
 
 impl<V: Version, S: State<V>> NetworkDirection<V, S> for Clientbound
@@ -27,7 +27,7 @@ where
 
 /// The serverbound [`NetworkDirection`].
 ///
-/// Packets are sent from the `client (this)` to the `server`.
+/// Packets are sent from the `client` (this) to the `server`.
 pub struct Serverbound;
 
 impl<V: Version, S: State<V>> NetworkDirection<V, S> for Serverbound
