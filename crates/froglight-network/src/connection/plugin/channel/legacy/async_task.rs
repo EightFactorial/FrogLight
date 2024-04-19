@@ -9,7 +9,8 @@ use froglight_protocol::{
 use super::LegacyChannel;
 use crate::connection::{ConnectionError, NetworkDirection, Serverbound};
 
-pub(crate) struct LegacyPacketChannel<V: Version>
+#[derive(Clone)]
+pub struct LegacyPacketChannel<V: Version>
 where
     Serverbound: NetworkDirection<V, Play>,
     Play: State<V>,

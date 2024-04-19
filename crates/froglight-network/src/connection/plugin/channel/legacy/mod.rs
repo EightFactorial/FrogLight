@@ -1,4 +1,4 @@
-pub(super) mod async_task;
-pub(super) mod component;
+pub(crate) mod async_task;
+pub(crate) mod component;
 
 pub use component::LegacyChannel;

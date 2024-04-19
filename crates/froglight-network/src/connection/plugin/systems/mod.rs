@@ -3,7 +3,7 @@ use froglight_protocol::versions::v1_20_0::V1_20_0;
 mod misc;
 mod states;
 
-mod traits;
+pub(super) mod traits;
 use traits::handler::HandleConnection;
 
 #[doc(hidden)]

@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use froglight_protocol::{
     packet::ServerStatus,
     states::Status,
@@ -15,12 +17,12 @@ where
     Status: State<Self>,
     Serverbound: NetworkDirection<Self, Status>,
 {
-    async fn perform_status_request(
+    fn version_status_request(
         conn: &mut Connection<Self, Status>,
-    ) -> Result<ServerStatus, ConnectionError>;
+    ) -> impl Future<Output = Result<ServerStatus, ConnectionError>> + Send + Sync;
 
-    async fn perform_ping_request(
+    fn version_ping_request(
         conn: &mut Connection<Self, Status>,
         payload: u64,
-    ) -> Result<u64, ConnectionError>;
+    ) -> impl Future<Output = Result<u64, ConnectionError>> + Send + Sync;
 }

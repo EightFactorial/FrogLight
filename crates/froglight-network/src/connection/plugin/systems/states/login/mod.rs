@@ -1,3 +1,5 @@
+use std::future::Future;
+
 use froglight_protocol::{
     common::GameProfile,
     states::Login,
@@ -15,7 +17,7 @@ where
     Login: State<Self>,
     Serverbound: NetworkDirection<Self, Login>,
 {
-    async fn perform_login(
+    fn version_login(
         conn: &mut Connection<Self, Login>,
-    ) -> Result<GameProfile, ConnectionError>;
+    ) -> impl Future<Output = Result<GameProfile, ConnectionError>> + Send + Sync;
 }

@@ -9,7 +9,8 @@ use froglight_protocol::{
 use super::component::{ChannelReceiver, ChannelSender, ConnectionChannel};
 use crate::connection::{ConnectionError, NetworkDirection, Serverbound};
 
-pub(crate) struct PacketChannel<V: Version>
+#[derive(Clone)]
+pub struct PacketChannel<V: Version>
 where
     Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
     Configuration: State<V>,
@@ -68,6 +69,7 @@ where
 }
 
 /// Receives packets from bevy and sends them to the server.
+#[derive(Clone)]
 pub(crate) struct PacketReceiver<V: Version>
 where
     Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
@@ -88,6 +90,7 @@ where
 }
 
 /// Receives packets from the server and sends them to bevy.
+#[derive(Clone)]
 pub(crate) struct PacketSender<V: Version>
 where
     Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,

@@ -1,13 +1,16 @@
 use std::sync::Arc;
 
 use async_channel::{Receiver, Sender, TryRecvError, TrySendError};
+use bevy_ecs::component::Component;
 use froglight_protocol::{
     states::Play,
     traits::{State, Version},
 };
 
 use super::async_task::LegacyPacketChannel;
-use crate::connection::{ConnectionError, NetworkDirection, Serverbound};
+use crate::connection::{
+    plugin::channel::traits::ChannelType, ConnectionError, NetworkDirection, Serverbound,
+};
 
 /// A channel for sending and receiving packets.
 ///
@@ -18,7 +21,7 @@ use crate::connection::{ConnectionError, NetworkDirection, Serverbound};
 ///
 /// This is used for [`Versions`](Version) that do not have a
 /// [`Configuration`](froglight_protocol::states::Configuration) state.
-#[derive(Clone)]
+#[derive(Clone, Component)]
 pub struct LegacyChannel<V: Version>
 where
     Serverbound: NetworkDirection<V, Play>,
@@ -27,6 +30,15 @@ where
     pub(crate) receiver: Receiver<Arc<<Serverbound as NetworkDirection<V, Play>>::Recv>>,
     pub(crate) sender: Sender<Arc<<Serverbound as NetworkDirection<V, Play>>::Send>>,
     pub(crate) errors: Receiver<ConnectionError>,
+}
+
+impl<V: Version> ChannelType for LegacyChannel<V>
+where
+    Serverbound: NetworkDirection<V, Play>,
+    Play: State<V>,
+{
+    type TaskHalf = LegacyPacketChannel<V>;
+    fn new_pair() -> (Self, Self::TaskHalf) { Self::new_channel() }
 }
 
 #[allow(clippy::type_complexity)]

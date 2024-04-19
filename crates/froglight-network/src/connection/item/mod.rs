@@ -130,6 +130,17 @@ where
     fn nothing() {}
 }
 
+impl<V, S, D> Clone for Connection<V, S, D>
+where
+    V: Version,
+    S: State<V>,
+    D: NetworkDirection<V, S>,
+{
+    fn clone(&self) -> Self {
+        Self { info: self.info.clone(), ..Self::from_async_stream(self.stream.clone()).unwrap() }
+    }
+}
+
 impl<V, S, D> TryFrom<std::net::TcpStream> for Connection<V, S, D>
 where
     V: Version,

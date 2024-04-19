@@ -8,7 +8,9 @@ use froglight_protocol::{
 };
 
 use super::async_task::{PacketChannel, PacketReceiver, PacketSender};
-use crate::connection::{ConnectionError, NetworkDirection, Serverbound};
+use crate::connection::{
+    plugin::channel::traits::ChannelType, ConnectionError, NetworkDirection, Serverbound,
+};
 
 /// A channel for sending and receiving packets.
 ///
@@ -24,6 +26,16 @@ where
     pub(crate) receiver: ChannelReceiver<V>,
     pub(crate) sender: ChannelSender<V>,
     pub(crate) errors: Receiver<ConnectionError>,
+}
+
+impl<V: Version> ChannelType for ConnectionChannel<V>
+where
+    Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    type TaskHalf = PacketChannel<V>;
+    fn new_pair() -> (Self, Self::TaskHalf) { Self::new_channel() }
 }
 
 #[allow(clippy::type_complexity)]

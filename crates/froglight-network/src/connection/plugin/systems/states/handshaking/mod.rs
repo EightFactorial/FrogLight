@@ -1,4 +1,7 @@
+use std::future::Future;
+
 use froglight_protocol::{
+    common::ConnectionIntent,
     states::Handshaking,
     traits::{State, Version},
 };
@@ -14,7 +17,8 @@ where
     Handshaking: State<Self>,
     Serverbound: NetworkDirection<Self, Handshaking>,
 {
-    async fn perform_handshake(
+    fn version_handshake(
         conn: &mut Connection<Self, Handshaking>,
-    ) -> Result<(), ConnectionError>;
+        intent: ConnectionIntent,
+    ) -> impl Future<Output = Result<(), ConnectionError>> + Send + Sync;
 }
