@@ -8,7 +8,11 @@ use bevy_app::{App, PostUpdate, PreUpdate};
 use bevy_ecs::{
     entity::Entity,
     event::{EventReader, EventWriter},
-    schedule::{common_conditions::any_with_component, IntoSystemConfigs},
+    query::QueryEntityError,
+    schedule::{
+        common_conditions::{any_with_component, on_event},
+        IntoSystemConfigs,
+    },
     system::{Commands, Query},
 };
 use bevy_log::{error, warn};
@@ -41,15 +45,15 @@ impl ConnectionHandler for V1_20_0 {
         // Listen for SendPacketEvents
         app.add_systems(
             PostUpdate,
-            packet_event_listener
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
+            listen_for_sendpacket_event
+                .run_if(on_event::<SendPacketEvent<Self, Play>>())
                 .in_set(ConnectionPostUpdateSet::<Self>::default()),
         );
 
         // Create RecvPacketEvents
         app.add_systems(
             PreUpdate,
-            packet_event_creator
+            create_recvpacket_event
                 .run_if(any_with_component::<ConnectionMarker<Self>>)
                 .in_set(ConnectionPreUpdateSet::<Self>::default()),
         );
@@ -83,21 +87,42 @@ impl ConnectionHandler for V1_20_0 {
     }
 }
 
-fn packet_event_listener(
+fn listen_for_sendpacket_event(
     query: Query<(Entity, &LegacyChannel<V1_20_0>)>,
     mut events: EventReader<SendPacketEvent<V1_20_0, Play>>,
     mut commands: Commands,
 ) {
-    for (entity, channel) in &query {
-        for event in events.read() {
-            if let Err(err) = channel.send_packet(event.0.clone()) {
-                match err {
-                    TrySendError::Full(_) => {
-                        warn!("Bevy tried to send a packet to a full channel!");
+    for event in events.read() {
+        if let Some(entity) = event.entity {
+            match query.get(entity) {
+                    Ok((_, channel)) => {
+                        if let Err(err) = channel.send_packet(event.packet.clone()) {
+                            match err {
+                                TrySendError::Full(_) => {
+                                    warn!("Bevy tried to send a packet to a full channel!");
+                                }
+                                TrySendError::Closed(_) => {
+                                    error!("Bevy tried to send a packet to a closed channel!");
+                                    commands.entity(entity).remove::<LegacyChannel<V1_20_0>>();
+                                }
+                            }
+                        }
                     }
-                    TrySendError::Closed(_) => {
-                        error!("Bevy tried to send a packet to a closed channel!");
-                        commands.entity(entity).remove::<LegacyChannel<V1_20_0>>();
+                    Err(QueryEntityError::NoSuchEntity(_)) => warn!("Bevy tried to send a packet to a non-existent entity!"),
+                    Err(QueryEntityError::QueryDoesNotMatch(_)) => warn!("Bevy tried to send a packet to an entity with a different ConnectionChannel type!"),
+                    _ => unreachable!("The Query is not mutable"),
+                }
+        } else {
+            for (entity, channel) in &query {
+                if let Err(err) = channel.send_packet(event.packet.clone()) {
+                    match err {
+                        TrySendError::Full(_) => {
+                            warn!("Bevy tried to send a packet to a full channel!");
+                        }
+                        TrySendError::Closed(_) => {
+                            error!("Bevy tried to send a packet to a closed channel!");
+                            commands.entity(entity).remove::<LegacyChannel<V1_20_0>>();
+                        }
                     }
                 }
             }
@@ -105,7 +130,7 @@ fn packet_event_listener(
     }
 }
 
-fn packet_event_creator(
+fn create_recvpacket_event(
     query: Query<(Entity, &LegacyChannel<V1_20_0>)>,
     mut events: EventWriter<RecvPacketEvent<V1_20_0, Play>>,
     mut commands: Commands,
@@ -113,7 +138,7 @@ fn packet_event_creator(
     for (entity, channel) in &query {
         match channel.recv_packet() {
             Ok(packet) => {
-                events.send(RecvPacketEvent(packet));
+                events.send(RecvPacketEvent::new(packet, entity));
             }
             Err(err) => {
                 if matches!(err, TryRecvError::Closed) {

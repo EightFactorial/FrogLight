@@ -56,7 +56,7 @@ where
     Login: State<V>,
     Play: State<V>,
 {
-    pub(crate) fn listen_for_conn_events(
+    pub(crate) fn listen_for_requestconn_event(
         mut events: EventReader<RequestConnectionEvent>,
         resolver: Res<Resolver>,
         mut commands: Commands,

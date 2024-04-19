@@ -60,7 +60,7 @@ where
         // Handle status request events
         app.add_systems(
             PostUpdate,
-            PendingRequestTask::listen_for_status_events::<Self>
+            PendingRequestTask::listen_for_requeststatus_event::<Self>
                 .run_if(on_event::<RequestStatusEvent>())
                 .in_set(ConnectionPostUpdateSet::<Self>::default()),
         );
@@ -74,7 +74,7 @@ where
         );
         app.add_systems(
             PostUpdate,
-            PendingConnectionTask::<Self>::listen_for_conn_events
+            PendingConnectionTask::<Self>::listen_for_requestconn_event
                 .run_if(on_event::<RequestConnectionEvent>())
                 .in_set(ConnectionPostUpdateSet::<Self>::default()),
         );

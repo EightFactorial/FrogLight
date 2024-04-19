@@ -46,7 +46,7 @@ pub(crate) struct PendingRequestTask {
 
 impl PendingRequestTask {
     /// Listens for status events and creates new tasks.
-    pub(crate) fn listen_for_status_events<V: Version>(
+    pub(crate) fn listen_for_requeststatus_event<V: Version>(
         mut events: EventReader<RequestStatusEvent>,
         resolver: Res<Resolver>,
         mut commands: Commands,
