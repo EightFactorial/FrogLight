@@ -1,7 +1,14 @@
 use std::sync::Arc;
 
-use bevy_app::App;
-use bevy_log::error;
+use async_channel::{TryRecvError, TrySendError};
+use bevy_app::{App, PostUpdate, PreUpdate};
+use bevy_ecs::{
+    entity::Entity,
+    event::{EventReader, EventWriter},
+    schedule::{common_conditions::any_with_component, IntoSystemConfigs},
+    system::{Commands, Query},
+};
+use bevy_log::{error, warn};
 use froglight_protocol::{
     common::{ConnectionIntent, GameProfile},
     packet::ServerStatus,
@@ -9,21 +16,25 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use super::HandleConnection;
+use super::ConnectionHandler;
 use crate::connection::{
     plugin::{
         channel::{conn_enum::ConnectionEnum, current::async_task::PacketChannel},
-        systems::states::{
-            configuration::ConfigurationState, handshaking::HandshakeState, login::LoginState,
-            play::PlayState, status::StatusState,
+        systems::{
+            misc::{ConnectionMarker, ConnectionPostUpdateSet, ConnectionPreUpdateSet},
+            states::{
+                configuration::ConfigurationHandler, handshaking::HandshakeHandler,
+                login::LoginHandler, play::PlayHandler, status::StatusHandler,
+            },
         },
     },
-    Connection, ConnectionChannel, ConnectionError, NetworkDirection, Serverbound,
+    Connection, ConnectionChannel, ConnectionError, NetworkDirection, RecvPacketEvent,
+    SendPacketEvent, Serverbound,
 };
 
-impl<V: Version> HandleConnection for V
+impl<V: Version> ConnectionHandler for V
 where
-    V: HandshakeState + StatusState + LoginState + ConfigurationState + PlayState,
+    V: HandshakeHandler + StatusHandler + LoginHandler + ConfigurationHandler + PlayHandler,
     Serverbound: NetworkDirection<V, Handshaking>
         + NetworkDirection<V, Status>
         + NetworkDirection<V, Login>
@@ -37,7 +48,42 @@ where
 {
     type Channel = ConnectionChannel<Self>;
 
-    fn add_systems(_app: &mut App) {}
+    fn build_version(app: &mut App) {
+        // Add Configuration packet events
+        app.add_event::<SendPacketEvent<Self, Configuration>>()
+            .add_event::<RecvPacketEvent<Self, Configuration>>();
+
+        // Add Play packet events
+        app.add_event::<SendPacketEvent<Self, Play>>().add_event::<RecvPacketEvent<Self, Play>>();
+
+        // Listen for SendPacketEvents
+        app.add_systems(
+            PostUpdate,
+            config_packet_event_listener::<Self>
+                .run_if(any_with_component::<ConnectionMarker<Self>>)
+                .in_set(ConnectionPostUpdateSet::<Self>::default()),
+        );
+        app.add_systems(
+            PostUpdate,
+            play_packet_event_listener::<Self>
+                .run_if(any_with_component::<ConnectionMarker<Self>>)
+                .in_set(ConnectionPostUpdateSet::<Self>::default()),
+        );
+
+        // Create RecvPacketEvents
+        app.add_systems(
+            PreUpdate,
+            config_packet_event_creator::<Self>
+                .run_if(any_with_component::<ConnectionMarker<Self>>)
+                .in_set(ConnectionPreUpdateSet::<Self>::default()),
+        );
+        app.add_systems(
+            PreUpdate,
+            play_packet_event_creator::<Self>
+                .run_if(any_with_component::<ConnectionMarker<Self>>)
+                .in_set(ConnectionPreUpdateSet::<Self>::default()),
+        );
+    }
 
     async fn perform_handshake(
         conn: &mut Connection<Self, Handshaking>,
@@ -67,6 +113,110 @@ where
     }
 }
 
+fn config_packet_event_listener<V>(
+    query: Query<(Entity, &ConnectionChannel<V>)>,
+    mut events: EventReader<SendPacketEvent<V, Configuration>>,
+    mut commands: Commands,
+) where
+    V: Version + ConfigurationHandler + PlayHandler,
+    Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    for event in events.read() {
+        for (entity, channel) in query.iter() {
+            if let Err(err) = channel.send_config(event.0.clone()) {
+                match err {
+                    TrySendError::Full(_) => {
+                        warn!("Bevy tried to send a packet to a full channel!");
+                    }
+                    TrySendError::Closed(_) => {
+                        error!("Bevy tried to send a packet to a closed channel!");
+                        commands.entity(entity).remove::<ConnectionChannel<V>>();
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn play_packet_event_listener<V>(
+    query: Query<(Entity, &ConnectionChannel<V>)>,
+    mut events: EventReader<SendPacketEvent<V, Play>>,
+    mut commands: Commands,
+) where
+    V: Version + ConfigurationHandler + PlayHandler,
+    Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    for event in events.read() {
+        for (entity, channel) in query.iter() {
+            if let Err(err) = channel.send_play(event.0.clone()) {
+                match err {
+                    TrySendError::Full(_) => {
+                        warn!("Bevy tried to send a packet to a full channel!");
+                    }
+                    TrySendError::Closed(_) => {
+                        error!("Bevy tried to send a packet to a closed channel!");
+                        commands.entity(entity).remove::<ConnectionChannel<V>>();
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn config_packet_event_creator<V>(
+    query: Query<(Entity, &ConnectionChannel<V>)>,
+    mut events: EventWriter<RecvPacketEvent<V, Configuration>>,
+    mut commands: Commands,
+) where
+    V: Version + ConfigurationHandler + PlayHandler,
+    Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    for (entity, channel) in &query {
+        match channel.recv_config() {
+            Ok(packet) => {
+                events.send(RecvPacketEvent(packet));
+            }
+            Err(err) => {
+                if matches!(err, TryRecvError::Closed) {
+                    error!("Bevy tried to receive a packet from a closed channel!");
+                    commands.entity(entity).remove::<ConnectionChannel<V>>();
+                }
+            }
+        }
+    }
+}
+
+fn play_packet_event_creator<V>(
+    query: Query<(Entity, &ConnectionChannel<V>)>,
+    mut events: EventWriter<RecvPacketEvent<V, Play>>,
+    mut commands: Commands,
+) where
+    V: Version + ConfigurationHandler + PlayHandler,
+    Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    for (entity, channel) in &query {
+        match channel.recv_play() {
+            Ok(packet) => {
+                events.send(RecvPacketEvent(packet));
+            }
+            Err(err) => {
+                if matches!(err, TryRecvError::Closed) {
+                    error!("Bevy tried to receive a packet from a closed channel!");
+                    commands.entity(entity).remove::<ConnectionChannel<V>>();
+                }
+            }
+        }
+    }
+}
+
 /// Listens for packets from the server and sends them to the channel.
 ///
 /// (Bevy)
@@ -76,7 +226,7 @@ async fn listen_from_server<V>(
     channel: PacketChannel<V>,
 ) -> Result<(), ()>
 where
-    V: Version + ConfigurationState + PlayState,
+    V: Version + ConfigurationHandler + PlayHandler,
     Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
     Configuration: State<V>,
     Play: State<V>,
@@ -154,7 +304,7 @@ async fn listen_from_channel<V>(
     mut conn: ConnectionEnum<V>,
 ) -> Result<(), ()>
 where
-    V: Version + ConfigurationState + PlayState,
+    V: Version + ConfigurationHandler + PlayHandler,
     Serverbound: NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
     Configuration: State<V>,
     Play: State<V>,

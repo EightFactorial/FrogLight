@@ -56,7 +56,7 @@ where
     pub async fn connect_to(
         address: &(impl AsRef<str> + ?Sized),
         resolver: &crate::resolver::Resolver,
-    ) -> Result<Option<Self>, ConnectionError> {
+    ) -> Result<Self, ConnectionError> {
         let address = compact_str::CompactString::from(address.as_ref());
         bevy_log::debug!("Resolving address: `{address}`");
 
@@ -64,10 +64,10 @@ where
             bevy_log::debug!("Connecting to `{address}`: {socket}");
             let mut connection = Self::connect(socket).await?;
             connection.info.address = Some(address);
-            Ok(Some(connection))
+            Ok(connection)
         } else {
             bevy_log::debug!("No records found for `{address}`");
-            Ok(None)
+            Err(ConnectionError::NoRecords(address))
         }
     }
 

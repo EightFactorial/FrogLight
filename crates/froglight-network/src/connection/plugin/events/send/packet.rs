@@ -2,16 +2,15 @@ use std::sync::Arc;
 
 use bevy_derive::Deref;
 use bevy_ecs::event::Event;
-use froglight_protocol::{
-    states::Play,
-    traits::{State, Version},
-};
+use froglight_protocol::traits::{State, Version};
 
 use crate::connection::{NetworkDirection, Serverbound};
 
-/// An event that is consumed to send a packet.
+/// An event sends a packet to the server.
 #[derive(Debug, Clone, PartialEq, Deref, Event)]
-pub struct SendPacketEvent<V: Version>(pub Arc<<Serverbound as NetworkDirection<V, Play>>::Send>)
+pub struct SendPacketEvent<V: Version, S: State<V>>(
+    pub Arc<<Serverbound as NetworkDirection<V, S>>::Send>,
+)
 where
-    Play: State<V>,
-    Serverbound: NetworkDirection<V, Play>;
+    S: State<V>,
+    Serverbound: NetworkDirection<V, S>;

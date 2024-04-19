@@ -12,7 +12,7 @@ mod v1_20_0;
 mod v1_20_2;
 mod v1_20_3;
 
-pub(crate) trait LoginState: Version
+pub(crate) trait LoginHandler: Version
 where
     Login: State<Self>,
     Serverbound: NetworkDirection<Self, Login>,

@@ -3,8 +3,15 @@
 
 use std::sync::Arc;
 
-use bevy_app::App;
-use bevy_log::error;
+use async_channel::{TryRecvError, TrySendError};
+use bevy_app::{App, PostUpdate, PreUpdate};
+use bevy_ecs::{
+    entity::Entity,
+    event::{EventReader, EventWriter},
+    schedule::{common_conditions::any_with_component, IntoSystemConfigs},
+    system::{Commands, Query},
+};
+use bevy_log::{error, warn};
 use froglight_protocol::{
     common::{ConnectionIntent, GameProfile},
     packet::ServerStatus,
@@ -12,19 +19,41 @@ use froglight_protocol::{
     versions::v1_20_0::V1_20_0,
 };
 
-use super::HandleConnection;
+use super::ConnectionHandler;
 use crate::connection::{
     plugin::{
         channel::legacy::async_task::LegacyPacketChannel,
-        systems::states::handshaking::HandshakeState,
+        systems::{
+            misc::{ConnectionMarker, ConnectionPostUpdateSet, ConnectionPreUpdateSet},
+            states::{handshaking::HandshakeHandler, status::StatusHandler},
+        },
     },
-    Connection, ConnectionError, LegacyChannel,
+    Connection, ConnectionError, LegacyChannel, RecvPacketEvent, SendPacketEvent,
 };
 
-impl HandleConnection for V1_20_0 {
+impl ConnectionHandler for V1_20_0 {
     type Channel = LegacyChannel<Self>;
 
-    fn add_systems(_app: &mut App) {}
+    fn build_version(app: &mut App) {
+        // Add packet events
+        app.add_event::<SendPacketEvent<Self, Play>>().add_event::<RecvPacketEvent<Self, Play>>();
+
+        // Listen for SendPacketEvents
+        app.add_systems(
+            PostUpdate,
+            packet_event_listener
+                .run_if(any_with_component::<ConnectionMarker<Self>>)
+                .in_set(ConnectionPostUpdateSet::<Self>::default()),
+        );
+
+        // Create RecvPacketEvents
+        app.add_systems(
+            PreUpdate,
+            packet_event_creator
+                .run_if(any_with_component::<ConnectionMarker<Self>>)
+                .in_set(ConnectionPreUpdateSet::<Self>::default()),
+        );
+    }
 
     async fn perform_handshake(
         conn: &mut Connection<Self, Handshaking>,
@@ -34,9 +63,9 @@ impl HandleConnection for V1_20_0 {
     }
 
     async fn perform_status(
-        _conn: &mut Connection<Self, Status>,
+        conn: &mut Connection<Self, Status>,
     ) -> Result<ServerStatus, ConnectionError> {
-        todo!()
+        V1_20_0::version_status_request(conn).await
     }
 
     async fn perform_login(
@@ -51,6 +80,48 @@ impl HandleConnection for V1_20_0 {
             listen_from_server(conn.clone(), channel.clone()),
             listen_from_channel(channel, conn)
         );
+    }
+}
+
+fn packet_event_listener(
+    query: Query<(Entity, &LegacyChannel<V1_20_0>)>,
+    mut events: EventReader<SendPacketEvent<V1_20_0, Play>>,
+    mut commands: Commands,
+) {
+    for (entity, channel) in &query {
+        for event in events.read() {
+            if let Err(err) = channel.send_packet(event.0.clone()) {
+                match err {
+                    TrySendError::Full(_) => {
+                        warn!("Bevy tried to send a packet to a full channel!");
+                    }
+                    TrySendError::Closed(_) => {
+                        error!("Bevy tried to send a packet to a closed channel!");
+                        commands.entity(entity).remove::<LegacyChannel<V1_20_0>>();
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn packet_event_creator(
+    query: Query<(Entity, &LegacyChannel<V1_20_0>)>,
+    mut events: EventWriter<RecvPacketEvent<V1_20_0, Play>>,
+    mut commands: Commands,
+) {
+    for (entity, channel) in &query {
+        match channel.recv_packet() {
+            Ok(packet) => {
+                events.send(RecvPacketEvent(packet));
+            }
+            Err(err) => {
+                if matches!(err, TryRecvError::Closed) {
+                    error!("Bevy tried to receive a packet from a closed channel!");
+                    commands.entity(entity).remove::<LegacyChannel<V1_20_0>>();
+                }
+            }
+        }
     }
 }
 

@@ -7,9 +7,9 @@ mod events;
 pub use events::*;
 
 mod systems;
+pub use systems::misc::{ConnectionBundle, ConnectionMarker};
 
 mod traits;
-pub use systems::traits::handler::ConnectionBundle;
 
 /// The `Connection` Froglight plugin.
 ///

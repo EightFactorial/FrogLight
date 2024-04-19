@@ -2162,6 +2162,7 @@ dependencies = [
  "froglight-assets",
  "froglight-core",
  "froglight-entity",
+ "froglight-network",
  "froglight-render",
  "froglight-settings",
  "froglight-utils",

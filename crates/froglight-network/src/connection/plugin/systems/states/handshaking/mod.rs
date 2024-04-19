@@ -12,7 +12,7 @@ mod v1_20_0;
 mod v1_20_2;
 mod v1_20_3;
 
-pub(crate) trait HandshakeState: Version
+pub(crate) trait HandshakeHandler: Version
 where
     Handshaking: State<Self>,
     Serverbound: NetworkDirection<Self, Handshaking>,

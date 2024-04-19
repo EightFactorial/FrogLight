@@ -31,6 +31,7 @@ bevy_window = { workspace = true }
 froglight-assets = { version = "0.1.0", path = "../froglight-assets" }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
+froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-render = { version = "0.1.0", path = "../froglight-render" }
 froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils" }

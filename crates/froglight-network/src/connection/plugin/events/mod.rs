@@ -1,9 +1,9 @@
 //! Events that are sent and received by the connection plugin.
 
-mod recv;
+pub(super) mod recv;
 pub use recv::*;
 
-mod send;
+pub(super) mod send;
 pub use send::*;
 
 #[doc(hidden)]

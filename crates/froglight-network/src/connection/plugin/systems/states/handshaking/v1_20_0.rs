@@ -7,7 +7,7 @@ use froglight_protocol::{
 
 use crate::connection::{Connection, ConnectionError};
 
-impl super::HandshakeState for V1_20_0 {
+impl super::HandshakeHandler for V1_20_0 {
     async fn version_handshake(
         conn: &mut Connection<Self, Handshaking>,
         intent: ConnectionIntent,

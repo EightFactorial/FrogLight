@@ -8,7 +8,7 @@ use crate::connection::{NetworkDirection, Serverbound};
 mod v1_20_2;
 mod v1_20_3;
 
-pub(crate) trait ConfigurationState: Version
+pub(crate) trait ConfigurationHandler: Version
 where
     Serverbound: NetworkDirection<Self, Configuration>,
     Configuration: State<Self>,

@@ -12,7 +12,7 @@ mod v1_20_0;
 mod v1_20_2;
 mod v1_20_3;
 
-pub(crate) trait StatusState: Version
+pub(crate) trait StatusHandler: Version
 where
     Status: State<Self>,
     Serverbound: NetworkDirection<Self, Status>,

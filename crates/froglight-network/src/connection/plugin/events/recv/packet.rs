@@ -2,16 +2,27 @@ use std::sync::Arc;
 
 use bevy_derive::Deref;
 use bevy_ecs::event::Event;
-use froglight_protocol::{
-    states::Play,
-    traits::{State, Version},
-};
+use froglight_protocol::traits::{State, Version};
 
 use crate::connection::{NetworkDirection, Serverbound};
 
-/// An event that is sent when a packet is received.
+/// An event that is sent when a packet is received from the server.
 #[derive(Debug, Clone, PartialEq, Deref, Event)]
-pub struct RecvPacketEvent<V: Version>(pub Arc<<Serverbound as NetworkDirection<V, Play>>::Recv>)
+pub struct RecvPacketEvent<V: Version, S: State<V>>(
+    pub Arc<<Serverbound as NetworkDirection<V, S>>::Recv>,
+)
 where
-    Play: State<V>,
-    Serverbound: NetworkDirection<V, Play>;
+    S: State<V>,
+    Serverbound: NetworkDirection<V, S>;
+
+impl<V: Version, S: State<V>> RecvPacketEvent<V, S>
+where
+    S: State<V>,
+    Serverbound: NetworkDirection<V, S>,
+{
+    /// Creates a new `RecvPacketEvent`.
+    #[must_use]
+    pub fn new(packet: <Serverbound as NetworkDirection<V, S>>::Recv) -> Self {
+        Self(Arc::new(packet))
+    }
+}

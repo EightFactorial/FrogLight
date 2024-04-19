@@ -1,9 +1,13 @@
 use std::future::Future;
 
-use bevy_app::{App, PreUpdate};
-use bevy_ecs::{bundle::Bundle, prelude::any_with_component, schedule::IntoSystemSetConfigs};
+use bevy_app::{App, PostUpdate, PreUpdate};
+use bevy_ecs::{
+    prelude::any_with_component,
+    schedule::{common_conditions::on_event, IntoSystemConfigs, IntoSystemSetConfigs},
+};
 use bevy_tasks::IoTaskPool;
-use froglight_core::systemsets::NetworkPreUpdateSet;
+use compact_str::CompactString;
+use froglight_core::systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 use froglight_protocol::{
     common::{ConnectionIntent, GameProfile},
     packet::ServerStatus,
@@ -11,19 +15,25 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use crate::connection::{
-    plugin::{
-        channel::{task::ConnectionTask, traits::ChannelType},
-        systems::misc::{ConnectionMarker, ConnectionSet},
+use crate::{
+    connection::{
+        plugin::{
+            channel::{task::ConnectionTask, traits::ChannelType},
+            systems::misc::{ConnectionBundle, ConnectionPostUpdateSet, ConnectionPreUpdateSet},
+        },
+        server_conn::PendingConnectionTask,
+        server_status::PendingRequestTask,
+        Connection, ConnectionError, NetworkDirection, RequestConnectionEvent, RequestStatusEvent,
+        Serverbound,
     },
-    Connection, ConnectionError, NetworkDirection, RecvPacketEvent, SendPacketEvent, Serverbound,
+    resolver::Resolver,
 };
 
 mod generic;
 
 mod v1_20_0;
 
-pub trait HandleConnection: Version
+pub trait ConnectionHandler: Version
 where
     Serverbound: NetworkDirection<Self, Handshaking>
         + NetworkDirection<Self, Status>
@@ -37,28 +47,52 @@ where
     type Channel: ChannelType;
 
     fn build(app: &mut App) {
-        // Add packet events
-        app.add_event::<SendPacketEvent<Self>>().add_event::<RecvPacketEvent<Self>>();
-
-        // Add ConnectionSet<V>
+        // Add ConnectionSets
         app.configure_sets(
             PreUpdate,
-            ConnectionSet::<Self>::default()
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .in_set(NetworkPreUpdateSet),
+            ConnectionPreUpdateSet::<Self>::default().in_set(NetworkPreUpdateSet),
+        );
+        app.configure_sets(
+            PostUpdate,
+            ConnectionPostUpdateSet::<Self>::default().in_set(NetworkPostUpdateSet),
         );
 
-        // Add systems
-        Self::add_systems(app);
+        // Handle status request events
+        app.add_systems(
+            PostUpdate,
+            PendingRequestTask::listen_for_status_events::<Self>
+                .run_if(on_event::<RequestStatusEvent>())
+                .in_set(ConnectionPostUpdateSet::<Self>::default()),
+        );
+
+        // Handle connection request events
+        app.add_systems(
+            PreUpdate,
+            PendingConnectionTask::<Self>::poll_conn_tasks
+                .run_if(any_with_component::<PendingConnectionTask<Self>>)
+                .in_set(ConnectionPreUpdateSet::<Self>::default()),
+        );
+        app.add_systems(
+            PostUpdate,
+            PendingConnectionTask::<Self>::listen_for_conn_events
+                .run_if(on_event::<RequestConnectionEvent>())
+                .in_set(ConnectionPostUpdateSet::<Self>::default()),
+        );
+
+        // Add other events and systems
+        Self::build_version(app);
     }
 
-    fn add_systems(app: &mut App);
+    /// Build the version-specific events and systems.
+    fn build_version(app: &mut App);
 
     /// Connect to the server and retrieve the server status.
     fn connect_status(
-        mut conn: Connection<Self, Handshaking>,
-    ) -> impl Future<Output = Result<ServerStatus, ConnectionError>> + Send + Sync {
+        address: CompactString,
+        resolver: Resolver,
+    ) -> impl Future<Output = Result<ServerStatus, ConnectionError>> + Send {
         async move {
+            let mut conn = Connection::connect_to(&address, &resolver).await?;
             Self::perform_handshake(&mut conn, ConnectionIntent::Status).await?;
 
             let mut conn = conn.status();
@@ -68,18 +102,18 @@ where
 
     /// Connect to the server and log in.
     fn connect_game(
-        mut conn: Connection<Self, Handshaking>,
-    ) -> impl Future<Output = Result<(GameProfile, Self::Channel, ConnectionTask), ConnectionError>>
-           + Send
-           + Sync {
+        address: CompactString,
+        resolver: Resolver,
+    ) -> impl Future<Output = Result<ConnectionBundle<Self>, ConnectionError>> + Send {
         async move {
+            let mut conn = Connection::connect_to(&address, &resolver).await?;
             Self::perform_handshake(&mut conn, ConnectionIntent::Login).await?;
 
             let mut conn = conn.login();
             let profile = Self::perform_login(&mut conn).await?;
 
             let (channel, task) = Self::create_task(conn);
-            Ok((profile, channel, task))
+            Ok(ConnectionBundle::new(profile, channel, task))
         }
     }
 
@@ -116,25 +150,4 @@ where
         conn: Connection<Self, Login>,
         channel: <Self::Channel as ChannelType>::TaskHalf,
     ) -> impl Future<Output = ()> + Send;
-}
-
-/// A bundle containing [`Connection`] components.
-#[derive(Debug, Bundle)]
-pub struct ConnectionBundle<V: Version + HandleConnection>
-where
-    Serverbound: NetworkDirection<V, Handshaking>
-        + NetworkDirection<V, Status>
-        + NetworkDirection<V, Login>
-        + NetworkDirection<V, Play>,
-    Handshaking: State<V>,
-    Status: State<V>,
-    Login: State<V>,
-    Play: State<V>,
-{
-    /// The player's game profile.
-    pub profile: GameProfile,
-    /// The connection channel.
-    pub channel: V::Channel,
-    /// The connection task.
-    pub task: ConnectionTask,
 }

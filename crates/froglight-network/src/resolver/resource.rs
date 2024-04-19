@@ -15,7 +15,7 @@ use tldextract::{TldExtractor, TldOption};
 ///
 /// Used to asynchronously resolve domain names to IP addresses
 /// and lookup SRV records.
-#[derive(Debug, Resource)]
+#[derive(Debug, Clone, Resource)]
 pub struct Resolver {
     resolver: Arc<AsyncStdResolver>,
     extractor: Arc<TldExtractor>,
@@ -71,18 +71,22 @@ impl Resolver {
     /// # Errors
     /// If the address is not a valid domain name.
     /// If an error occurs while resolving the address.
-    pub async fn lookup_mc(&self, mut address: &str) -> Result<Option<SocketAddr>, ResolverError> {
+    pub async fn lookup_mc<'a>(
+        &'a self,
+        mut address: &'a str,
+    ) -> Result<Option<SocketAddr>, ResolverError> {
         #[cfg(debug_assertions)]
         bevy_log::debug!("Looking for a server for `{address}`");
 
         let mut port: u16 = 25565;
         if let Some((split_host, split_port)) = address.split_once(':') {
-            // Update the address
-            address = split_host;
             // Parse the port
             if let Ok(split_port) = split_port.parse::<u16>() {
                 port = split_port;
             }
+
+            // Update the address
+            address = split_host;
         }
 
         // Extract the domain from the address
@@ -109,7 +113,10 @@ impl Resolver {
     ///
     /// # Errors
     /// If an error occurs while resolving the address.
-    pub async fn lookup_srv(&self, address: &str) -> Result<Option<IpAddr>, ResolveError> {
+    pub async fn lookup_srv<'a>(
+        &'a self,
+        address: &'a str,
+    ) -> Result<Option<IpAddr>, ResolveError> {
         let result = self.resolver.srv_lookup(address).await?.ip_iter().next();
 
         #[cfg(debug_assertions)]
@@ -122,7 +129,7 @@ impl Resolver {
     ///
     /// # Errors
     /// If an error occurs while resolving the address.
-    pub async fn lookup_ip(&self, address: &str) -> Result<Option<IpAddr>, ResolveError> {
+    pub async fn lookup_ip<'a>(&'a self, address: &'a str) -> Result<Option<IpAddr>, ResolveError> {
         let result = self.resolver.lookup_ip(address).await?.iter().next();
 
         #[cfg(debug_assertions)]

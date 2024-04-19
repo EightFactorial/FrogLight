@@ -8,7 +8,7 @@ use crate::connection::{NetworkDirection, Serverbound};
 mod v1_20_2;
 mod v1_20_3;
 
-pub(crate) trait PlayState: Version
+pub(crate) trait PlayHandler: Version
 where
     Serverbound: NetworkDirection<Self, Play>,
     Play: State<Self>,
