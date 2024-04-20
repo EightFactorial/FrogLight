@@ -69,6 +69,7 @@ where
         app.add_systems(
             PreUpdate,
             PendingConnectionTask::<Self>::poll_conn_tasks
+                .ambiguous_with_all()
                 .run_if(any_with_component::<PendingConnectionTask<Self>>)
                 .in_set(ConnectionPreUpdateSet::<Self>::default()),
         );

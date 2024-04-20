@@ -30,6 +30,7 @@ where
             bundle: VecDeque::with_capacity(16),
             compression: self.compression,
             info: self.info,
+            account: self.account,
             _version: PhantomData,
             _state: PhantomData,
             _direction: PhantomData,

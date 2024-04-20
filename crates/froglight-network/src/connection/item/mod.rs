@@ -6,6 +6,9 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
+mod account;
+pub use account::AccountInformation;
+
 mod conversions;
 mod packets;
 
@@ -35,6 +38,8 @@ where
     pub(crate) compression: Option<i32>,
     /// Information about the connection.
     pub info: ConnectionInformation,
+    /// Information about the account.
+    pub account: AccountInformation,
     _version: PhantomData<V>,
     _state: PhantomData<S>,
     _direction: PhantomData<D>,
@@ -87,6 +92,15 @@ where
     S: State<V>,
     D: NetworkDirection<V, S>,
 {
+    /// Get the account information for the connection.
+    #[inline]
+    #[must_use]
+    pub fn account(&self) -> &AccountInformation { &self.account }
+
+    /// Set the account information for the connection.
+    #[inline]
+    pub fn set_account(&mut self, account: AccountInformation) { self.account = account; }
+
     /// Get the compression threshold for the connection.
     #[inline]
     #[must_use]
@@ -116,6 +130,7 @@ where
 
         Ok(Self {
             info: ConnectionInformation { address: None, socket: stream.peer_addr()? },
+            account: AccountInformation::default(),
             buffer: BufReader::new(stream.clone()),
             bundle: VecDeque::with_capacity(16),
             compression: None,

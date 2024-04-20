@@ -9,11 +9,16 @@ use bevy_ecs::{
 use bevy_log::{debug, error, warn};
 use bevy_tasks::{block_on, poll_once, IoTaskPool, Task};
 use froglight_core::systemsets::NetworkPreUpdateSet;
-use froglight_protocol::{packet::ServerStatus, traits::Version};
+use froglight_protocol::{
+    packet::ServerStatus,
+    states::{Handshaking, Login, Play, Status},
+    traits::{State, Version},
+};
 
 use crate::{
     connection::{
-        plugin::systems::traits::handler::ConnectionHandler, ConnectionError, RequestStatusEvent,
+        plugin::systems::handler::ConnectionHandler, ConnectionError, NetworkDirection,
+        RequestStatusEvent, Serverbound,
     },
     resolver::Resolver,
 };
@@ -46,16 +51,24 @@ pub(crate) struct PendingRequestTask {
 
 impl PendingRequestTask {
     /// Listens for status events and creates new tasks.
-    pub(crate) fn listen_for_requeststatus_event<V: Version>(
+    pub(crate) fn listen_for_requeststatus_event<V: Version + ConnectionHandler>(
         mut events: EventReader<RequestStatusEvent>,
         resolver: Res<Resolver>,
         mut commands: Commands,
-    ) {
+    ) where
+        Serverbound: NetworkDirection<V, Handshaking>
+            + NetworkDirection<V, Status>
+            + NetworkDirection<V, Login>
+            + NetworkDirection<V, Play>,
+        Handshaking: State<V>,
+        Status: State<V>,
+        Login: State<V>,
+        Play: State<V>,
+    {
         for event in events.read().filter(|e| e.version_id == V::ID) {
             if let Some(mut entity) = commands.get_entity(event.entity) {
                 // Create a new task
-                let future =
-                    ConnectionHandler::connect_status(event.address.clone(), resolver.clone());
+                let future = V::connect_status(event.address.clone(), resolver.clone());
                 let task = IoTaskPool::get().spawn(future);
 
                 entity.insert(PendingRequestTask { task });

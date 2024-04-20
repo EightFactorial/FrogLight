@@ -7,7 +7,7 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use super::traits::handler::ConnectionHandler;
+use super::handler::ConnectionHandler;
 use crate::connection::{plugin::channel::task::ConnectionTask, NetworkDirection, Serverbound};
 
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]

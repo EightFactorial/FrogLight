@@ -14,7 +14,7 @@ use froglight_protocol::{
 
 use crate::{
     connection::{
-        plugin::systems::traits::handler::ConnectionHandler, ConnectionBundle, ConnectionError,
+        plugin::systems::handler::ConnectionHandler, ConnectionBundle, ConnectionError,
         NetworkDirection, RequestConnectionEvent, Serverbound,
     },
     resolver::Resolver,
