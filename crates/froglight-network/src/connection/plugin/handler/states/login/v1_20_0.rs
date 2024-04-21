@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use bevy_log::{debug, error, trace};
 use froglight_protocol::{
-    common::{GameProfile, UnsizedBuffer},
+    common::GameProfile,
     states::Login,
     versions::{
         v1_20_0::{
@@ -85,12 +85,8 @@ impl super::LoginHandler for V1_20_0 {
                         );
 
                         // Respond that the client doesn't understand the query
-                        conn.send(LoginQueryResponseC2SPacket {
-                            id: packet.id,
-                            identifier: packet.identifier,
-                            data: UnsizedBuffer::new(),
-                        })
-                        .await?;
+                        conn.send(LoginQueryResponseC2SPacket { id: packet.id, data: None })
+                            .await?;
                     }
                 }
             }
