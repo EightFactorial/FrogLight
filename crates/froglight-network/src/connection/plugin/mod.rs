@@ -1,15 +1,19 @@
+#![allow(dead_code)]
 use bevy_app::{App, Plugin};
 
-mod channel;
-pub use channel::{current::ConnectionChannel, legacy::LegacyChannel};
+pub mod channels;
+pub use channels::{current::PacketChannel, legacy::LegacyPacketChannel};
 
-mod events;
-pub use events::*;
+pub mod handler;
+pub use handler::ConnectionHandler;
 
-mod systems;
-pub use systems::misc::{ConnectionBundle, ConnectionMarker};
+mod misc;
+pub use misc::{ConnectionMarker, ConnectionTask, StatusTask};
 
-mod traits;
+mod resources;
+pub use resources::{ConfigPlugins, LoginPlugins, PlayPlugins};
+
+mod systemsets;
 
 /// The `Connection` Froglight plugin.
 ///
@@ -19,10 +23,12 @@ pub struct ConnectionPlugin;
 
 impl Plugin for ConnectionPlugin {
     fn build(&self, app: &mut App) {
-        // Add events
-        events::build(app);
+        resources::build(app);
+        // TODO: events
 
-        // Add systems
-        systems::build(app);
+        // Build ConnectionHandler systems
+        // <V1_20_0 as ConnectionHandler>::build(app);
+        // <V1_20_2 as ConnectionHandler>::build(app);
+        // <V1_20_3 as ConnectionHandler>::build(app);
     }
 }

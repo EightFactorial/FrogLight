@@ -17,7 +17,10 @@ macro_rules! impl_integer_var_write {
 
                 let mut byte = [0];
                 while value != 0 {
-                    byte[0] = (value & 0b0111_1111) as u8;
+                    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+                    {
+                        byte[0] = (value & 0b0111_1111) as u8;
+                    }
                     value = (value >> 7) & (<$ty>::MAX >> 6);
                     if value != 0 {
                         byte[0] |= 0b1000_0000;

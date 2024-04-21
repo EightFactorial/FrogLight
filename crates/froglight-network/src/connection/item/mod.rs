@@ -59,10 +59,12 @@ where
     /// If the connection cannot be established.
     #[cfg(feature = "resolver")]
     pub async fn connect_to(
-        address: &(impl AsRef<str> + ?Sized),
+        address: &str,
         resolver: &crate::resolver::Resolver,
     ) -> Result<Self, ConnectionError> {
-        let address = compact_str::CompactString::from(address.as_ref());
+        use compact_str::ToCompactString;
+
+        let address = address.to_compact_string();
         bevy_log::debug!("Resolving address: `{address}`");
 
         if let Some(socket) = resolver.lookup_mc(&address).await? {

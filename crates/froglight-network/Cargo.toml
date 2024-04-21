@@ -36,8 +36,9 @@ compact_str = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
-futures = "0.3.30"
+hashbrown = { workspace = true }
 md-5 = "0.10.6"
+parking_lot = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["v3"] }
 
