@@ -6,7 +6,7 @@ use froglight_protocol::{
 
 use super::{
     parts::{PacketPair, TaskPair},
-    traits::{PacketChannelTrait, TaskChannelTrait},
+    traits::{PacketChannelTrait, PacketTrait, TaskChannelTrait},
 };
 use crate::connection::{NetworkDirection, Serverbound};
 
@@ -56,6 +56,39 @@ where
 {
     type TaskHalf = TaskChannel<V>;
     fn new() -> (Self, Self::TaskHalf) { new_channel() }
+}
+
+impl<V: Version> PacketTrait<V, Login> for PacketChannel<V>
+where
+    Serverbound:
+        NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Login: State<V>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    fn get_pair(&self) -> &PacketPair<V, Login> { &self.login }
+}
+
+impl<V: Version> PacketTrait<V, Configuration> for PacketChannel<V>
+where
+    Serverbound:
+        NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Login: State<V>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    fn get_pair(&self) -> &PacketPair<V, Configuration> { &self.config }
+}
+
+impl<V: Version> PacketTrait<V, Play> for PacketChannel<V>
+where
+    Serverbound:
+        NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
+    Login: State<V>,
+    Configuration: State<V>,
+    Play: State<V>,
+{
+    fn get_pair(&self) -> &PacketPair<V, Play> { &self.play }
 }
 
 /// A channel used for passing packets between bevy and the server.

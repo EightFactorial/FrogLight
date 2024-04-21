@@ -7,7 +7,11 @@ use std::{
 };
 
 use bevy_app::{App, PostUpdate, PreUpdate};
-use bevy_ecs::{component::Component, schedule::IntoSystemSetConfigs};
+use bevy_ecs::{
+    component::Component,
+    schedule::{IntoSystemConfigs, IntoSystemSetConfigs},
+};
+use bevy_log::{debug, error};
 use bevy_tasks::IoTaskPool;
 use froglight_core::systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 use froglight_protocol::{
@@ -17,15 +21,16 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
+use self::impls::listen_connection_request;
 use super::{
     channels::traits::{PacketChannelTrait, TaskChannelTrait},
-    misc::ConnectionBundle,
     systemsets::{ConnectionPostUpdateSet, ConnectionPreUpdateSet},
-    LoginPlugins, StatusTask,
+    ConnectionTask, LoginPlugins, StatusTask,
 };
 use crate::connection::{Connection, ConnectionError, NetworkDirection, Serverbound};
 
 mod impls;
+use impls::listen_status_request;
 
 mod states;
 pub use states::*;
@@ -47,6 +52,7 @@ where
 
     /// Add [`Version`]-specific systems to the app.
     fn build(app: &mut App) {
+        // Configure sets
         app.configure_sets(
             PreUpdate,
             ConnectionPreUpdateSet::<Self>::default().in_set(NetworkPreUpdateSet),
@@ -56,80 +62,22 @@ where
             ConnectionPostUpdateSet::<Self>::default().in_set(NetworkPostUpdateSet),
         );
 
+        // Listen for status and connection requests
+        app.add_systems(
+            PostUpdate,
+            listen_status_request::<Self>.in_set(ConnectionPostUpdateSet::<Self>::default()),
+        );
+        app.add_systems(
+            PostUpdate,
+            listen_connection_request::<Self>.in_set(ConnectionPostUpdateSet::<Self>::default()),
+        );
+
         // Add implementation-specific systems to the app.
         Self::version_build(app);
     }
 
     /// Add implementation-specific systems to the app.
     fn version_build(app: &mut App);
-
-    /// Connect to a server using it's address.
-    #[cfg(feature = "resolver")]
-    #[must_use]
-    fn connect_to(
-        address: &str,
-        resolver: &crate::resolver::Resolver,
-        channels: <Self::PacketChannels as PacketChannelTrait<Self>>::TaskHalf,
-        plugins: &LoginPlugins,
-    ) -> ConnectionBundle<Self> {
-        use compact_str::ToCompactString;
-
-        let address = address.to_compact_string();
-        let resolver = resolver.clone();
-        let plugins = plugins.clone();
-
-        let task = IoTaskPool::get().spawn(async move {
-            match Connection::connect_to(&address, &resolver).await {
-                Ok(conn) => Self::connect_with(conn, channels, plugins).await,
-                Err(err) => err,
-            }
-        });
-
-        ConnectionBundle::<Self>::new(task)
-    }
-
-    /// Connect to a server using it's ip and port.
-    #[must_use]
-    fn connect_to_socket(
-        socket: SocketAddr,
-        channels: <Self::PacketChannels as PacketChannelTrait<Self>>::TaskHalf,
-        plugins: &LoginPlugins,
-    ) -> ConnectionBundle<Self> {
-        let plugins = plugins.clone();
-
-        let task = IoTaskPool::get().spawn(async move {
-            match Connection::connect(socket).await {
-                Ok(conn) => Self::connect_with(conn, channels, plugins).await,
-                Err(err) => err,
-            }
-        });
-
-        ConnectionBundle::<Self>::new(task)
-    }
-
-    /// Connect to a server using a pre-existing connection.
-    #[must_use]
-    fn connect_with(
-        mut conn: Connection<Self, Handshaking>,
-        channels: <Self::PacketChannels as PacketChannelTrait<Self>>::TaskHalf,
-        plugins: LoginPlugins,
-    ) -> impl std::future::Future<Output = ConnectionError> + Send + Sync {
-        async move {
-            // Perform the handshake.
-            if let Err(err) = Self::perform_handshake(&mut conn, ConnectionIntent::Play).await {
-                return err;
-            };
-
-            // Perform the login.
-            let mut conn = conn.login();
-            if let Err(err) = Self::perform_login(&mut conn, channels.login(), &plugins).await {
-                return err;
-            };
-
-            // Handle packets.
-            Self::handle_packets(&mut conn, channels).await
-        }
-    }
 
     /// Get the status of a server using it's address.
     #[cfg(feature = "resolver")]
@@ -171,25 +119,112 @@ where
     {
         async move {
             // Perform the handshake.
-            Self::perform_handshake(&mut conn, ConnectionIntent::Status).await?;
+            if let Err(err) = Self::perform_handshake(&mut conn, ConnectionIntent::Status).await {
+                error!("Failed to perform handshake: {err:?}");
+                return Err(err);
+            }
 
             // Perform the status request.
+            debug!("Performing status request");
             let mut conn = conn.status();
-            let status = Self::perform_status_request(&mut conn).await?;
+            let status = match Self::perform_status_request(&mut conn).await {
+                Ok(status) => status,
+                Err(err) => {
+                    error!("Failed to perform status request: {err:?}");
+                    return Err(err);
+                }
+            };
 
             // Perform the ping request.
+            debug!("Performing ping request");
             #[allow(clippy::cast_possible_truncation)]
             let payload = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
-            let ping = Self::perform_ping_request(&mut conn, payload).await?;
+            let ping = match Self::perform_ping_request(&mut conn, payload).await {
+                Ok(ping) => ping,
+                Err(err) => {
+                    error!("Failed to perform ping request: {err:?}");
+                    return Err(err);
+                }
+            };
 
             Ok((status, ping))
+        }
+    }
+
+    /// Connect to a server using it's address.
+    #[cfg(feature = "resolver")]
+    #[must_use]
+    fn connect_to(
+        address: &str,
+        channels: <Self::PacketChannels as PacketChannelTrait<Self>>::TaskHalf,
+        resolver: &crate::resolver::Resolver,
+        plugins: &LoginPlugins,
+    ) -> ConnectionTask {
+        use compact_str::ToCompactString;
+
+        let address = address.to_compact_string();
+        let resolver = resolver.clone();
+        let plugins = plugins.clone();
+
+        let task = IoTaskPool::get().spawn(async move {
+            match Connection::connect_to(&address, &resolver).await {
+                Ok(conn) => Self::connect_with(conn, channels, plugins).await,
+                Err(err) => err,
+            }
+        });
+
+        ConnectionTask::new::<Self>(task)
+    }
+
+    /// Connect to a server using it's ip and port.
+    #[must_use]
+    fn connect_to_socket(
+        socket: SocketAddr,
+        channels: <Self::PacketChannels as PacketChannelTrait<Self>>::TaskHalf,
+        plugins: &LoginPlugins,
+    ) -> ConnectionTask {
+        let plugins = plugins.clone();
+
+        let task = IoTaskPool::get().spawn(async move {
+            match Connection::connect(socket).await {
+                Ok(conn) => Self::connect_with(conn, channels, plugins).await,
+                Err(err) => err,
+            }
+        });
+
+        ConnectionTask::new::<Self>(task)
+    }
+
+    /// Connect to a server using a pre-existing connection.
+    #[must_use]
+    fn connect_with(
+        mut conn: Connection<Self, Handshaking>,
+        channels: <Self::PacketChannels as PacketChannelTrait<Self>>::TaskHalf,
+        plugins: LoginPlugins,
+    ) -> impl std::future::Future<Output = ConnectionError> + Send + Sync {
+        async move {
+            // Perform the handshake.
+            if let Err(err) = Self::perform_handshake(&mut conn, ConnectionIntent::Login).await {
+                error!("Failed to perform handshake: {err:?}");
+                return err;
+            };
+
+            // Perform the login.
+            let mut conn = conn.login();
+            if let Err(err) = Self::perform_login(&mut conn, channels.login(), &plugins).await {
+                error!("Failed to perform login: {err:?}");
+                return err;
+            };
+
+            // Handle packets.
+            Self::handle_packets(conn, channels).await
         }
     }
 
     /// Handle passing back and forth packets.
     #[must_use]
     fn handle_packets(
-        conn: &mut Connection<Self, Login>,
+        conn: Connection<Self, Login>,
         channels: <Self::PacketChannels as PacketChannelTrait<Self>>::TaskHalf,
     ) -> impl std::future::Future<Output = ConnectionError> + Send + Sync;
 }

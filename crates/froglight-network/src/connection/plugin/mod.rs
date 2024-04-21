@@ -1,8 +1,10 @@
-#![allow(dead_code)]
 use bevy_app::{App, Plugin};
+use froglight_protocol::versions::v1_20_0::V1_20_0;
 
 pub mod channels;
 pub use channels::{current::PacketChannel, legacy::LegacyPacketChannel};
+
+pub mod events;
 
 pub mod handler;
 pub use handler::ConnectionHandler;
@@ -23,11 +25,18 @@ pub struct ConnectionPlugin;
 
 impl Plugin for ConnectionPlugin {
     fn build(&self, app: &mut App) {
+        // Insert resources
         resources::build(app);
-        // TODO: events
+
+        // Register events
+        events::build(app);
+
+        // Build task systems
+        ConnectionTask::build(app);
+        StatusTask::build(app);
 
         // Build ConnectionHandler systems
-        // <V1_20_0 as ConnectionHandler>::build(app);
+        <V1_20_0 as ConnectionHandler>::build(app);
         // <V1_20_2 as ConnectionHandler>::build(app);
         // <V1_20_3 as ConnectionHandler>::build(app);
     }

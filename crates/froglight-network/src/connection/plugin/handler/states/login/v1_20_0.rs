@@ -49,6 +49,10 @@ impl super::LoginHandler for V1_20_0 {
                     return Err(ConnectionError::ConnectionClosed);
                 }
                 LoginClientboundPackets::LoginSuccess(packet) => {
+                    debug!(
+                        "Received Profile: \"{}\": \"{}\"",
+                        packet.profile.name, packet.profile.uuid
+                    );
                     return Ok(packet.profile);
                 }
                 LoginClientboundPackets::LoginQueryRequest(packet) => {

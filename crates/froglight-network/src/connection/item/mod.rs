@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, marker::PhantomData, net::SocketAddr};
+use std::{collections::VecDeque, marker::PhantomData, net::SocketAddr, sync::Arc};
 
 use async_std::{io::BufReader, net::TcpStream};
 use froglight_protocol::{
@@ -18,8 +18,12 @@ pub use directions::{Clientbound, NetworkDirection, Serverbound};
 mod error;
 pub use error::ConnectionError;
 
+mod halves;
+pub use halves::{ReadConnection, WriteConnection};
+
 mod information;
 pub use information::ConnectionInformation;
+use parking_lot::RwLock;
 
 #[cfg(test)]
 mod compile_test;
@@ -32,8 +36,7 @@ where
     S: State<V>,
     D: NetworkDirection<V, S>,
 {
-    pub(crate) stream: TcpStream,
-    pub(crate) buffer: BufReader<TcpStream>,
+    pub(crate) stream: BufReader<TcpStream>,
     pub(crate) bundle: VecDeque<D::Recv>,
     pub(crate) compression: Option<i32>,
     /// Information about the connection.
@@ -112,6 +115,36 @@ where
     #[inline]
     pub fn set_compression(&mut self, threshold: Option<i32>) { self.compression = threshold; }
 
+    /// Split the connection into a read and write half.
+    #[must_use]
+    pub fn into_split(self) -> (ReadConnection<V, S, D>, WriteConnection<V, S, D>) {
+        let compression = Arc::new(RwLock::new(self.compression));
+        let info = Arc::new(RwLock::new(self.info));
+        let account = Arc::new(RwLock::new(self.account));
+
+        let write = WriteConnection {
+            stream: self.stream.get_ref().clone(),
+            compression: compression.clone(),
+            info: info.clone(),
+            account: account.clone(),
+            _version: PhantomData,
+            _state: PhantomData,
+            _direction: PhantomData,
+        };
+        let read = ReadConnection {
+            stream: self.stream,
+            bundle: self.bundle,
+            compression,
+            info,
+            account,
+            _version: PhantomData,
+            _state: PhantomData,
+            _direction: PhantomData,
+        };
+
+        (read, write)
+    }
+
     /// Create a new connection from a [`std::net::TcpStream`].
     ///
     /// # Errors
@@ -133,29 +166,21 @@ where
         Ok(Self {
             info: ConnectionInformation { address: None, socket: stream.peer_addr()? },
             account: AccountInformation::default(),
-            buffer: BufReader::new(stream.clone()),
+            stream: BufReader::with_capacity(65536, stream),
             bundle: VecDeque::with_capacity(16),
             compression: None,
-            stream,
             _version: PhantomData,
             _state: PhantomData,
             _direction: PhantomData,
         })
     }
 
+    /// Returns the inner [`TcpStream`].
+    #[must_use]
+    pub fn into_stream(self) -> BufReader<TcpStream> { self.stream }
+
     #[cfg(test)]
     fn nothing() {}
-}
-
-impl<V, S, D> Clone for Connection<V, S, D>
-where
-    V: Version,
-    S: State<V>,
-    D: NetworkDirection<V, S>,
-{
-    fn clone(&self) -> Self {
-        Self { info: self.info.clone(), ..Self::from_async_stream(self.stream.clone()).unwrap() }
-    }
 }
 
 impl<V, S, D> TryFrom<std::net::TcpStream> for Connection<V, S, D>

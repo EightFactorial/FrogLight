@@ -26,7 +26,6 @@ where
     {
         Connection {
             stream: self.stream,
-            buffer: self.buffer,
             bundle: VecDeque::with_capacity(16),
             compression: self.compression,
             info: self.info,

@@ -3,7 +3,7 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use super::parts::TaskPair;
+use super::{parts::TaskPair, PacketPair};
 use crate::connection::{NetworkDirection, Serverbound};
 
 /// A trait for a packet channel that can be paired with a task channel.
@@ -28,4 +28,13 @@ where
 {
     /// Gets the login [`TaskPair`].
     fn login(&self) -> &TaskPair<V, Login>;
+}
+
+/// A trait for sending and receiving packets from a packet channel.
+pub(crate) trait PacketTrait<V: Version, S: State<V>>: PacketChannelTrait<V>
+where
+    Serverbound: NetworkDirection<V, S> + NetworkDirection<V, Login>,
+    Login: State<V>,
+{
+    fn get_pair(&self) -> &PacketPair<V, S>;
 }

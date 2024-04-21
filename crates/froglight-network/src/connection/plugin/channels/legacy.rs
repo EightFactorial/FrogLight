@@ -6,7 +6,7 @@ use froglight_protocol::{
 
 use super::{
     parts::{PacketPair, TaskPair},
-    traits::{PacketChannelTrait, TaskChannelTrait},
+    traits::{PacketChannelTrait, PacketTrait, TaskChannelTrait},
 };
 use crate::connection::{NetworkDirection, Serverbound};
 
@@ -53,6 +53,24 @@ where
     fn new() -> (Self, Self::TaskHalf) { new_legacy_channel() }
 }
 
+impl<V: Version> PacketTrait<V, Login> for LegacyPacketChannel<V>
+where
+    Serverbound: NetworkDirection<V, Login> + NetworkDirection<V, Play>,
+    Login: State<V>,
+    Play: State<V>,
+{
+    fn get_pair(&self) -> &PacketPair<V, Login> { &self.login }
+}
+
+impl<V: Version> PacketTrait<V, Play> for LegacyPacketChannel<V>
+where
+    Serverbound: NetworkDirection<V, Login> + NetworkDirection<V, Play>,
+    Login: State<V>,
+    Play: State<V>,
+{
+    fn get_pair(&self) -> &PacketPair<V, Play> { &self.play }
+}
+
 /// A [`TaskChannel`](super::TaskChannel) that does not have
 /// a [`Configuration`](froglight_protocol::states::Configuration) state.
 #[derive(Debug, Clone)]
@@ -74,5 +92,5 @@ where
     Login: State<V>,
     Play: State<V>,
 {
-    fn login(&self) -> &TaskPair<V, Login> { todo!() }
+    fn login(&self) -> &TaskPair<V, Login> { &self.login }
 }

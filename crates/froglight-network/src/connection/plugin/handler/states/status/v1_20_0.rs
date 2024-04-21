@@ -21,14 +21,14 @@ impl super::StatusHandler for V1_20_0 {
         // Wait for the response
         match conn.recv().await? {
             StatusClientboundPackets::QueryResponse(packet) => Ok(packet.status),
-            StatusClientboundPackets::QueryPong(pong) => {
-                Err(ConnectionError::UnexpectedPacket(std::any::type_name_of_val(&pong)))
+            StatusClientboundPackets::QueryPong(other) => {
+                Err(ConnectionError::UnexpectedPacket(std::any::type_name_of_val(&other)))
             }
         }
     }
 
     async fn perform_ping_request(
-        conn: &mut Connection<Self, froglight_protocol::states::Status>,
+        conn: &mut Connection<Self, Status>,
         payload: u64,
     ) -> Result<Duration, ConnectionError> {
         // Send the ping request packet
@@ -40,8 +40,8 @@ impl super::StatusHandler for V1_20_0 {
         // Wait for the response
         match conn.recv().await? {
             StatusClientboundPackets::QueryPong(_) => Ok(now.elapsed()),
-            StatusClientboundPackets::QueryResponse(response) => {
-                Err(ConnectionError::UnexpectedPacket(std::any::type_name_of_val(&response)))
+            StatusClientboundPackets::QueryResponse(other) => {
+                Err(ConnectionError::UnexpectedPacket(std::any::type_name_of_val(&other)))
             }
         }
     }
