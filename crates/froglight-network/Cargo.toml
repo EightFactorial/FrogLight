@@ -21,7 +21,7 @@ async-compression = { version = "0.4.8", default-features = false, features = [
     "futures-io",
     "zlib",
 ] }
-async-std = { version = "1.12.0", features = ["unstable", "std"] }
+async-std = { workspace = true, features = ["std", "unstable"] }
 bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }

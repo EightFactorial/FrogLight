@@ -23,7 +23,7 @@ impl PluginGroup for HeadlessPlugins {
             .add(LogPlugin::default())
             .add(DiagnosticsPlugin)
             .add(CorePlugin)
-            .add(SettingsPlugin)
+            .add(SettingsPlugin::default().disable_source())
             .add(EntityPlugin)
             .add(RegistryPlugin)
             .add(UtilityPlugin)

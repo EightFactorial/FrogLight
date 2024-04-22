@@ -1,9 +1,10 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
+    asset::AssetPlugin as BevyAssetPlugin,
     DefaultPlugins as BevyDefaultPlugins,
 };
 
-use crate::FrogLightPlugins;
+use crate::{prelude::plugins::*, FrogLightPlugins};
 
 /// A [`PluginGroup`] for all plugins that are used in the [`FrogLight`](crate)
 /// application.
@@ -17,6 +18,8 @@ pub struct AppPlugins;
 
 impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
-        BevyDefaultPlugins::build(BevyDefaultPlugins).add(FrogLightPlugins)
+        BevyDefaultPlugins::build(BevyDefaultPlugins)
+            .add_before::<BevyAssetPlugin, _>(SettingsPlugin::default())
+            .add(FrogLightPlugins)
     }
 }

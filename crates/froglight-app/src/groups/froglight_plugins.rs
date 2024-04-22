@@ -2,10 +2,13 @@ use bevy::app::{App, Plugin, PluginGroup, PluginGroupBuilder};
 
 use crate::prelude::plugins::*;
 
-/// A [`PluginGroup`] for all [`FrogLight`](crate) plugins that are used in the
-/// main application.
+/// A [`PluginGroup`] for *almost* all [`FrogLight`](crate) plugins that are
+/// used in the main application.
 ///
 /// ### Note
+/// This does not include [`SettingsPlugin`], which must be added
+/// before bevy's [`AssetPlugin`](bevy::asset::AssetPlugin).
+///
 /// If Rust's type inference is not working, you can use
 /// [`FrogLightPlugins::as_plugin`] to get a [`Plugin`] or
 /// [`FrogLightPlugins::as_plugingroup`] to get a [`PluginGroup`].
@@ -52,9 +55,8 @@ impl Plugin for FrogLightPlugins {
 impl PluginGroup for FrogLightPlugins {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
-            .add(AssetPlugin) // TODO: Add before AssetSource?
+            .add(AssetPlugin)
             .add(CorePlugin)
-            .add(SettingsPlugin)
             .add(EntityPlugin)
             .add(RegistryPlugin)
             .add(UtilityPlugin)

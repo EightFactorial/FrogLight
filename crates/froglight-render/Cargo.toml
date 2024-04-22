@@ -17,6 +17,7 @@ workspace = true
 
 [dependencies]
 bevy_app = { workspace = true }
+bevy_asset = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
