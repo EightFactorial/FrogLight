@@ -1,5 +1,5 @@
 use bevy_app::{App, Plugin};
-use froglight_protocol::versions::v1_20_0::V1_20_0;
+use froglight_protocol::versions::{v1_20_0::V1_20_0, v1_20_2::V1_20_2, v1_20_3::V1_20_3};
 
 pub mod channels;
 pub use channels::{current::PacketChannel, legacy::LegacyPacketChannel};
@@ -37,7 +37,7 @@ impl Plugin for ConnectionPlugin {
 
         // Build ConnectionHandler systems
         <V1_20_0 as ConnectionHandler>::build(app);
-        // <V1_20_2 as ConnectionHandler>::build(app);
-        // <V1_20_3 as ConnectionHandler>::build(app);
+        <V1_20_2 as ConnectionHandler>::build(app);
+        <V1_20_3 as ConnectionHandler>::build(app);
     }
 }

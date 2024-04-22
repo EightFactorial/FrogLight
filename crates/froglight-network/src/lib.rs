@@ -5,7 +5,6 @@ use bevy_app::{App, Plugin, PluginGroup, PluginGroupBuilder};
 use connection::ConnectionPlugin;
 
 pub mod connection;
-#[cfg(feature = "resolver")]
 pub mod resolver;
 
 // Re-export most of `froglight-protocol` for convenience.

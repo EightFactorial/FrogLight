@@ -37,6 +37,25 @@ where
     /// Returns the inner [`TcpStream`].
     #[must_use]
     pub fn into_stream(self) -> BufReader<TcpStream> { self.stream }
+
+    /// Set the state of the connection.
+    #[must_use]
+    pub fn set_state<S2>(self) -> ReadConnection<V, S2, D>
+    where
+        S2: State<V>,
+        D: NetworkDirection<V, S2>,
+    {
+        ReadConnection {
+            stream: self.stream,
+            bundle: VecDeque::with_capacity(16),
+            compression: self.compression,
+            info: self.info,
+            account: self.account,
+            _version: PhantomData,
+            _state: PhantomData,
+            _direction: PhantomData,
+        }
+    }
 }
 
 /// The write half of a [`Connection`](super::Connection).
@@ -69,4 +88,22 @@ where
     /// Returns the inner [`TcpStream`].
     #[must_use]
     pub fn into_stream(self) -> TcpStream { self.stream }
+
+    /// Set the state of the connection.
+    #[must_use]
+    pub fn set_state<S2>(self) -> WriteConnection<V, S2, D>
+    where
+        S2: State<V>,
+        D: NetworkDirection<V, S2>,
+    {
+        WriteConnection {
+            stream: self.stream,
+            compression: self.compression,
+            info: self.info,
+            account: self.account,
+            _version: PhantomData,
+            _state: PhantomData,
+            _direction: PhantomData,
+        }
+    }
 }

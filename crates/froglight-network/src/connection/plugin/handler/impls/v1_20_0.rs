@@ -5,14 +5,14 @@ use bevy_ecs::schedule::{
     common_conditions::{any_with_component, on_event},
     IntoSystemConfigs,
 };
-use bevy_log::{debug, error, warn};
+use bevy_log::error;
 use bevy_tasks::futures_lite::future::try_zip;
 use froglight_protocol::{
     states::{Login, Play},
     versions::v1_20_0::V1_20_0,
 };
 
-use super::{fire_legacy_recvpacket, listen_legacy_sendpacket};
+use super::{fire_legacy_recvpacket, handle_connection_error, listen_legacy_sendpacket};
 use crate::connection::{
     channels::LegacyTaskChannel,
     events::{RecvPacket, SendPacket},
@@ -70,11 +70,7 @@ impl ConnectionHandler for V1_20_0 {
         let (read, write) = conn.play().into_split();
 
         // Handle packets in both directions.
-        match try_zip(
-            server_to_bevy(read, channels.clone()),
-            bevy_to_server(write, channels.clone()),
-        )
-        .await
+        match try_zip(server_to_bevy(read, channels.clone()), bevy_to_server(write, channels)).await
         {
             Ok(((), ())) => unreachable!("Both tasks should never complete Ok"),
             Err(err) => err,
@@ -89,8 +85,6 @@ async fn server_to_bevy(
     mut read: ReadConnection<V1_20_0, Play>,
     channels: LegacyTaskChannel<V1_20_0>,
 ) -> Result<(), ConnectionError> {
-    debug!("Listening for packets from Server");
-
     loop {
         match read.recv().await {
             Ok(packet) => {
@@ -99,22 +93,7 @@ async fn server_to_bevy(
                     return Err(ConnectionError::ConnectionClosed);
                 }
             }
-            Err(err) =>
-            {
-                #[allow(clippy::redundant_else)]
-                if let ConnectionError::PacketReadError(_) = err {
-                    error!("Failed to read packet from Server: \"{err:?}\"");
-
-                    #[cfg(debug_assertions)]
-                    {
-                        warn!("Debug Mode: Closing Connection");
-                        return Err(err);
-                    }
-                } else {
-                    error!("Failed to receive packet from Server: \"{err:?}\"");
-                    return Err(err);
-                }
-            }
+            Err(err) => handle_connection_error(err)?,
         }
     }
 }

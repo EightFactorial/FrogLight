@@ -18,7 +18,8 @@ use crate::connection::{
     channels::{traits::PacketTrait, PacketPair},
     events::{ConnectionRequest, RecvPacket, SendPacket, StatusRequest},
     plugin::channels::traits::PacketChannelTrait,
-    LegacyPacketChannel, LoginPlugins, NetworkDirection, PacketChannel, Serverbound,
+    ConnectionError, LegacyPacketChannel, LoginPlugins, NetworkDirection, PacketChannel,
+    Serverbound,
 };
 
 mod generic;
@@ -188,8 +189,7 @@ fn listen_legacy_sendpacket<V: Version, S: State<V>>(
 
 // --- Current Systems ---
 
-#[allow(dead_code)]
-fn fire_sendpacket<V: Version, S: State<V>>(
+fn fire_recvpacket<V: Version, S: State<V>>(
     query: Query<(Entity, &PacketChannel<V>)>,
     mut events: EventWriter<RecvPacket<V, S>>,
     mut commands: Commands,
@@ -220,7 +220,6 @@ fn fire_sendpacket<V: Version, S: State<V>>(
     }
 }
 
-#[allow(dead_code)]
 fn listen_sendpacket<V: Version, S: State<V>>(
     query: Query<(Entity, &PacketChannel<V>)>,
     mut events: EventReader<SendPacket<V, S>>,
@@ -281,5 +280,26 @@ fn send_through_pair<V: Version, S: State<V>>(
                 commands.entity(entity).despawn();
             }
         }
+    }
+}
+
+/// Used when reading packets, continues when unable to read a packet.
+fn handle_connection_error(err: ConnectionError) -> Result<(), ConnectionError> {
+    #[allow(clippy::redundant_else)]
+    if let ConnectionError::PacketReadError(_) = err {
+        error!("Failed to read packet from Server: \"{err:?}\"");
+
+        #[cfg(debug_assertions)]
+        {
+            warn!("Debug Mode: Closing Connection");
+            Err(err)
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            Ok(())
+        }
+    } else {
+        error!("Failed to receive packet from Server: \"{err:?}\"");
+        Err(err)
     }
 }

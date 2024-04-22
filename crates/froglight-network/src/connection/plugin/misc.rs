@@ -6,15 +6,24 @@ use bevy_ecs::{
     entity::Entity,
     event::EventWriter,
     schedule::{common_conditions::any_with_component, IntoSystemConfigs},
-    system::{Commands, Query},
+    system::{Commands, EntityCommands, Query},
 };
 use bevy_log::error;
 use bevy_tasks::{block_on, poll_once, Task};
 use froglight_core::systemsets::NetworkPostUpdateSet;
-use froglight_protocol::{packet::ServerStatus, traits::Version};
+use froglight_protocol::{
+    packet::ServerStatus,
+    states::{Handshaking, Login, Status},
+    traits::{State, Version},
+    versions::{v1_20_0::V1_20_0, v1_20_2::V1_20_2, v1_20_3::V1_20_3},
+};
 
-use super::events::{ConnectionDisconnect, StatusResponse};
-use crate::connection::ConnectionError;
+use super::{
+    events::{ConnectionDisconnect, StatusResponse},
+    handler::{HandshakeHandler, LoginHandler, StatusHandler},
+    ConnectionHandler,
+};
+use crate::connection::{ConnectionError, NetworkDirection, Serverbound};
 
 /// A marker [`Component`](bevy_ecs::prelude::Component) used to identify
 /// [`Entities`](bevy_ecs::prelude::Entity) that have a
@@ -65,10 +74,45 @@ impl ConnectionTask {
             if let Some(err) = block_on(poll_once(&mut task.task)) {
                 events.send(ConnectionDisconnect { entity, reason: err.to_string(), error: err });
 
+                let mut entity_commands = commands.entity(entity);
+
                 // Remove the task from the entity
-                commands.entity(entity).remove::<ConnectionTask>();
+                entity_commands.remove::<ConnectionTask>();
+
+                // Remove the connection marker and packet channels
+                match task.version_id {
+                    V1_20_0::ID => {
+                        Self::remove_components::<V1_20_0>(&mut entity_commands);
+                    }
+                    V1_20_2::ID => {
+                        Self::remove_components::<V1_20_2>(&mut entity_commands);
+                    }
+                    V1_20_3::ID => {
+                        Self::remove_components::<V1_20_3>(&mut entity_commands);
+                    }
+                    _ => {}
+                }
             }
         }
+    }
+
+    /// Remove the [`ConnectionMarker`] and
+    /// [`PacketChannels`](ConnectionHandler::PacketChannels) from the entity.
+    fn remove_components<
+        V: Version + ConnectionHandler + HandshakeHandler + LoginHandler + StatusHandler,
+    >(
+        commands: &mut EntityCommands,
+    ) where
+        Serverbound: NetworkDirection<V, Handshaking>
+            + NetworkDirection<V, Status>
+            + NetworkDirection<V, Login>,
+        Handshaking: State<V>,
+        Status: State<V>,
+        Login: State<V>,
+    {
+        commands
+            .remove::<ConnectionMarker<V>>()
+            .remove::<<V as ConnectionHandler>::PacketChannels>();
     }
 }
 

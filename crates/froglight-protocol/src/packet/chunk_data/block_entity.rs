@@ -22,6 +22,7 @@ impl std::fmt::Debug for BlockEntity {
         f.debug_struct("BlockEntity")
             .field("position", &self.position)
             .field("kind", &self.kind)
+            .field("data", &self.data.len())
             .finish()
     }
 }
@@ -49,7 +50,7 @@ impl FrogWrite for BlockEntity {
         byte |= self.position.z & 0x0F;
         byte.fg_write(buf)?;
 
-        i16::try_from(self.position.y)?.fg_write(buf)?;
+        u16::try_from(self.position.y)?.fg_write(buf)?;
         self.kind.fg_var_write(buf)?;
         self.data.fg_write(buf)?;
         Ok(())
