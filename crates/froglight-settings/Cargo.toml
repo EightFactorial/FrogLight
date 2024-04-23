@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 bevy_app = { workspace = true }
-bevy_asset = { workspace = true }
+bevy_asset = { workspace = true, optional = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
@@ -25,3 +25,9 @@ dirs = "5.0.1"
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 serde = { workspace = true, features = ["derive"] }
 toml = { version = "0.8.12", features = ["parse", "preserve_order"] }
+
+[features]
+default = ["bevy_asset"]
+
+# Registers the "frog://" AssetSource
+bevy_asset = ["dep:bevy_asset"]

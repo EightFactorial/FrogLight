@@ -53,16 +53,21 @@ impl Plugin for FrogLightPlugins {
 }
 
 impl PluginGroup for FrogLightPlugins {
+    #[allow(unused_mut)]
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>()
-            .add(AssetPlugin)
+        let mut builder = PluginGroupBuilder::start::<Self>()
             .add(CorePlugin)
             .add(EntityPlugin)
             .add(RegistryPlugin)
             .add(UtilityPlugin)
-            .add(NetworkPlugins)
-            .add(RenderPlugin)
-            .add(InterfacePlugin)
-            .add(ClientPlugin)
+            .add(NetworkPlugins);
+
+        #[cfg(feature = "bevy_asset")]
+        {
+            builder =
+                builder.add(AssetPlugin).add(RenderPlugin).add(InterfacePlugin).add(ClientPlugin);
+        }
+
+        builder
     }
 }

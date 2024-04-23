@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+async-std = { workspace = true, features = ["std", "unstable"] }
 async_zip = { version = "0.0.17", features = ["deflate"] }
 bevy_app = { workspace = true }
 bevy_asset = { workspace = true }
@@ -31,6 +32,7 @@ froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
+futures-concurrency = "7.6.0"
 futures-lite = { workspace = true }
 hashbrown = { workspace = true }
 image = { workspace = true }

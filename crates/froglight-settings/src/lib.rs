@@ -10,7 +10,8 @@ pub use folder::ConfigFolder;
 
 /// The `Settings` Froglight plugin.
 ///
-/// Adds
+/// Adds a configuration folder to the application,
+/// and optionally registers an asset source for it.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SettingsPlugin {
     /// The path to the configuration folder.
@@ -18,10 +19,12 @@ pub struct SettingsPlugin {
     /// If `None`, the [`default path`](ConfigFolder::from_env) is used.
     pub path: Option<PathBuf>,
 
-    /// Whether to add an asset source for the configuration folder.
+    /// Whether to add an `AssetSource` for the configuration folder.
     ///
     /// If `true`, paths using `frog://` can be used to access
     /// the configuration folder.
+    ///
+    /// Does nothing is the `bevy_asset` feature is disabled.
     pub asset_source: bool,
 }
 

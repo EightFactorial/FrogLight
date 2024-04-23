@@ -19,24 +19,32 @@ workspace = true
 bevy_mod_debugdump = "0.10.0"
 
 [dependencies]
-bevy = { workspace = true }
-froglight-assets = { version = "0.1.0", path = "../froglight-assets" }
-froglight-client = { version = "0.1.0", path = "../froglight-client" }
+bevy = { workspace = true, default-features = false }
+froglight-assets = { version = "0.1.0", path = "../froglight-assets", optional = true }
+froglight-client = { version = "0.1.0", path = "../froglight-client", optional = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
-froglight-interface = { version = "0.1.0", path = "../froglight-interface" }
+froglight-interface = { version = "0.1.0", path = "../froglight-interface", optional = true }
 froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
-froglight-render = { version = "0.1.0", path = "../froglight-render" }
-froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
+froglight-render = { version = "0.1.0", path = "../froglight-render", optional = true }
+froglight-settings = { version = "0.1.0", path = "../froglight-settings", default-features = false }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
 [features]
 default = ["bevy_asset"]
 
-bevy_asset = ["bevy/bevy_asset"]
+# Enables creates which load assets
+bevy_asset = [
+    "bevy/bevy_asset",
+    "dep:froglight-assets",
+    "dep:froglight-client",
+    "dep:froglight-interface",
+    "dep:froglight-render",
+    "froglight-settings/bevy_asset",
+]
 
 [[example]]
 name = "system-graph"

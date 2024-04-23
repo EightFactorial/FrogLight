@@ -2207,6 +2207,7 @@ dependencies = [
 name = "froglight-assets"
 version = "0.1.0"
 dependencies = [
+ "async-std",
  "async_zip",
  "bevy_app",
  "bevy_asset",
@@ -2222,6 +2223,7 @@ dependencies = [
  "froglight-protocol",
  "froglight-registry",
  "froglight-settings",
+ "futures-concurrency",
  "futures-lite 2.3.0",
  "hashbrown",
  "image",
@@ -2457,6 +2459,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eac8f7d7865dcb88bd4373ab671c8cf4508703796caa2b1985a9ca867b3fcb78"
 dependencies = [
  "futures-core",
+]
+
+[[package]]
+name = "futures-concurrency"
+version = "7.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "51ee14e256b9143bfafbf2fddeede6f396650bacf95d06fc1b3f2b503df129a0"
+dependencies = [
+ "bitvec",
+ "futures-core",
+ "futures-lite 1.13.0",
+ "pin-project",
+ "slab",
+ "smallvec",
 ]
 
 [[package]]

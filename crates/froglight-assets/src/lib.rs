@@ -3,6 +3,11 @@
 
 use bevy_app::{App, Plugin};
 
+pub mod assets;
+
+mod asset_manager;
+pub use asset_manager::AssetManager;
+
 /// The `Assets` Froglight plugin.
 ///
 /// Adds asset loading and management to the app.
@@ -10,5 +15,8 @@ use bevy_app::{App, Plugin};
 pub struct AssetPlugin;
 
 impl Plugin for AssetPlugin {
-    fn build(&self, _app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        asset_manager::build(app);
+        assets::build(app);
+    }
 }

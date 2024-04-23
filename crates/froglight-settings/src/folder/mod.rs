@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+#[cfg(feature = "bevy_asset")]
 use bevy_asset::{
     io::{AssetSource as BevyAssetSource, AssetSourceId as BevyAssetSourceId},
     AssetApp,
@@ -18,6 +19,7 @@ pub(super) fn build(plugin: &SettingsPlugin, app: &mut bevy_app::App) {
     };
 
     // Optionally add an AssetSource
+    #[cfg(feature = "bevy_asset")]
     if plugin.asset_source {
         let path_str =
             folder.path.to_str().expect("Unable to convert config folder path to string");

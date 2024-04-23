@@ -1,6 +1,5 @@
 use std::{collections::VecDeque, marker::PhantomData};
 
-use bevy_log::debug;
 use froglight_protocol::{
     states::{Configuration, Handshaking, Login, Play, Status},
     traits::{State, Version},
@@ -50,7 +49,7 @@ where
         D: NetworkDirection<V, Status>,
     {
         #[cfg(debug_assertions)]
-        debug!("Setting `Handshaking` Connection to `Status`");
+        bevy_log::debug!("Setting `Handshaking` Connection to `Status`");
         self.set_state()
     }
 
@@ -63,7 +62,7 @@ where
         D: NetworkDirection<V, Login>,
     {
         #[cfg(debug_assertions)]
-        debug!("Setting `Handshaking` Connection to `Login`");
+        bevy_log::debug!("Setting `Handshaking` Connection to `Login`");
         self.set_state()
     }
 }
@@ -81,7 +80,7 @@ where
         D: NetworkDirection<V, Configuration>,
     {
         #[cfg(debug_assertions)]
-        debug!("Setting `Login` Connection to `Configuration`");
+        bevy_log::debug!("Setting `Login` Connection to `Configuration`");
         self.set_state()
     }
 
@@ -94,7 +93,7 @@ where
         D: NetworkDirection<V, Play>,
     {
         #[cfg(debug_assertions)]
-        debug!("Setting `Login` Connection to `Play`");
+        bevy_log::debug!("Setting `Login` Connection to `Play`");
         self.set_state()
     }
 }
@@ -112,7 +111,7 @@ where
         D: NetworkDirection<V, Play>,
     {
         #[cfg(debug_assertions)]
-        debug!("Setting `Configuration` Connection to `Play`");
+        bevy_log::debug!("Setting `Configuration` Connection to `Play`");
         self.set_state()
     }
 }
@@ -130,7 +129,7 @@ where
         D: NetworkDirection<V, Configuration>,
     {
         #[cfg(debug_assertions)]
-        debug!("Setting `Play` Connection to `Configuration`");
+        bevy_log::debug!("Setting `Play` Connection to `Configuration`");
         self.set_state()
     }
 }
