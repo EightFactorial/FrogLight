@@ -1,5 +1,12 @@
-#[cfg(feature = "bevy_asset")]
-pub(crate) mod app_plugins;
+mod basic;
+pub use basic::BasicPlugins;
 
-pub(crate) mod froglight_plugins;
-pub(crate) mod headless_plugins;
+#[cfg(feature = "bevy_asset")]
+mod graphics;
+#[cfg(feature = "bevy_asset")]
+pub use graphics::GraphicalPlugins;
+
+mod preset;
+#[cfg(feature = "bevy_asset")]
+pub use preset::app::AppPlugins;
+pub use preset::headless::HeadlessPlugins;
