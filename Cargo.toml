@@ -139,7 +139,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 [dependencies]
 bevy = { workspace = true, features = ["default", "wayland"] }
 froglight-app = { version = "0.1.0", path = "crates/froglight-app" }
-mimalloc = { version = "0.1.39", optional = true }
+mimalloc = { version = "0.1.41", optional = true }
 
 [[bin]]
 name = "froglight"
