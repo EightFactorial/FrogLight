@@ -34,5 +34,5 @@ pub(super) async fn read(
 
     // Insert the handle into the pack and manager.
     pack.lock().await.sounds.insert(filekey.clone(), handle.clone_weak());
-    loader.sounds.write().insert(filekey, handle);
+    loader.audio.write().insert(filekey, handle);
 }

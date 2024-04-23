@@ -28,6 +28,7 @@ bevy_reflect = { workspace = true }
 bevy_render = { workspace = true }
 bevy_tasks = { workspace = true }
 compact_str = { workspace = true, features = ["serde"] }
+fastrand = "2.0.2"
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }

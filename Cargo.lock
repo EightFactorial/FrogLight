@@ -2219,6 +2219,7 @@ dependencies = [
  "bevy_render",
  "bevy_tasks",
  "compact_str",
+ "fastrand 2.0.2",
  "froglight-core",
  "froglight-protocol",
  "froglight-registry",

@@ -6,6 +6,9 @@ use bevy_ecs::system::Resource;
 mod inner;
 use inner::AssetManagerInner;
 
+pub(crate) mod blockmap;
+pub(crate) mod soundmap;
+
 #[doc(hidden)]
 pub(super) fn build(app: &mut bevy_app::App) { app.init_resource::<AssetManager>(); }
 

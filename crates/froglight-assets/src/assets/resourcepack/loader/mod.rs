@@ -15,6 +15,7 @@ use super::ResourcePack;
 use crate::AssetManager;
 
 mod audio;
+mod item;
 mod texture;
 
 /// An [`AssetLoader`] for [`ResourcePacks`](ResourcePack).
@@ -58,6 +59,7 @@ impl ResourcePackLoader {
         let context = Mutex::new(context);
 
         // Debug timing.
+        #[cfg(debug_assertions)]
         let start = std::time::Instant::now();
 
         // Create a ZIP file reader
@@ -76,12 +78,14 @@ impl ResourcePackLoader {
             }
         }
 
+        #[cfg(debug_assertions)]
         bevy_log::debug!("Reading `{}` files...", group.len());
 
         // Read all entries concurrently.
         group.co().collect::<Vec<()>>().await;
 
         // Debug timing.
+        #[cfg(debug_assertions)]
         bevy_log::debug!(
             "Loaded `{}` in {} seconds",
             context.lock().await.asset_path(),
@@ -97,7 +101,7 @@ impl ResourcePackLoader {
             // Check for files in the "assets" directory
             if filename.starts_with("assets/") {
                 // Check for supported file extensions
-                matches!(filename.split('.').last(), Some("png" | "ogg"))
+                matches!(filename.split('.').last(), Some("png" | "ogg" | "json"))
             } else {
                 // Check for "pack.mcmeta" and "pack.png"
                 matches!(filename, "pack.mcmeta" | "pack.png")
@@ -128,10 +132,15 @@ impl ResourcePackLoader {
         // SAFETY: The filename was checked in `should_read`.
         let filename = file.entry().filename().as_str().unwrap();
 
-        // Check for "pack.mcmeta" and "pack.png"
+        // Check for specific files.
         match filename {
+            // TODO: Read the pack.mcmeta and pack.png files
             "pack.mcmeta" | "pack.png" => {
-                // TODO: Read the pack.mcmeta and pack.png files
+                return;
+            }
+            // Read the sounds.json file.
+            "assets/minecraft/sounds.json" => {
+                item::read_sounds(self, file).await;
                 return;
             }
             _ => {}
@@ -153,13 +162,11 @@ impl ResourcePackLoader {
             }
             Some("ogg") => {
                 // Read an audio file if it hasn't been read yet.
-                if !self.sounds.read().contains_key(&filekey) {
+                if !self.audio.read().contains_key(&filekey) {
                     audio::read(self, file, filekey, pack, context).await;
                 }
             }
-            _ => {
-                warn!("Unable to load file: \"{filename}\"");
-            }
+            _ => {}
         }
     }
 
