@@ -33,6 +33,11 @@ froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
+[features]
+default = ["bevy_asset"]
+
+bevy_asset = ["bevy/bevy_asset"]
+
 [[example]]
 name = "system-graph"
 path = "examples/system-graph/main.rs"

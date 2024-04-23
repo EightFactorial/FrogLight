@@ -16,6 +16,6 @@ pub use froglight_utils as utils;
 pub use froglight_world as world;
 
 mod groups;
-pub use groups::{
-    app_plugins::AppPlugins, froglight_plugins::FrogLightPlugins, headless_plugins::HeadlessPlugins,
-};
+#[cfg(feature = "bevy_asset")]
+pub use groups::app_plugins::AppPlugins;
+pub use groups::{froglight_plugins::FrogLightPlugins, headless_plugins::HeadlessPlugins};
