@@ -17,13 +17,12 @@ use bevy_mod_debugdump::schedule_graph::settings::{
     Settings as ScheduleSettings, Style as ScheduleStyle,
 };
 use froglight_app::AppPlugins;
-use froglight_utils::fixed_schedules::{
-    FiveSecondSchedule, OneSecondSchedule, OneTickSchedule, RunFixedTimers, ThirtySecondSchedule,
-    TwoTickSchedule,
+use froglight_utils::schedules::{
+    FiveSeconds, OneSecond, OneTick, RunFixedUtilLoop, TenTicks, TwoTicks,
 };
 
 /// Schedules that run once every fixed amount of time.
-static FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| {
+static BEVY_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| {
     [
         RunFixedMainLoop.intern(),
         FixedFirst.intern(),
@@ -35,14 +34,14 @@ static FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| 
 });
 
 /// Schedules that run once every fixed amount of time.
-static TIMED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| {
+static UTIL_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| {
     [
-        RunFixedTimers.intern(),
-        OneTickSchedule.intern(),
-        TwoTickSchedule.intern(),
-        OneSecondSchedule.intern(),
-        FiveSecondSchedule.intern(),
-        ThirtySecondSchedule.intern(),
+        RunFixedUtilLoop.intern(),
+        OneTick.intern(),
+        TwoTicks.intern(),
+        TenTicks.intern(),
+        OneSecond.intern(),
+        FiveSeconds.intern(),
     ]
 });
 
@@ -59,8 +58,8 @@ fn main() {
     let labels = app.world.resource::<MainScheduleOrder>().labels.clone();
     graph_schedules(&mut app, "update", &labels);
 
-    graph_schedules(&mut app, "fixed", &*FIXED_SCHEDULES);
-    graph_schedules(&mut app, "timed", &*TIMED_SCHEDULES);
+    graph_schedules(&mut app, "fixed", &*BEVY_FIXED_SCHEDULES);
+    graph_schedules(&mut app, "fixed", &*UTIL_FIXED_SCHEDULES);
 }
 
 fn graph_schedules(app: &mut App, folder: &str, schedules: &[InternedScheduleLabel]) {
