@@ -6,9 +6,13 @@ use hashbrown::HashMap;
 use parking_lot::RwLock;
 
 use super::{blockmap::BlockMap, soundmap::SoundMap};
+use crate::assets::resourcepack::ResourcePack;
 
 #[derive(Debug, Default)]
 pub struct AssetManagerInner {
+    /// All loaded resource packs.
+    pub resourcepacks: RwLock<Vec<Handle<ResourcePack>>>,
+
     /// All loaded textures.
     pub textures: RwLock<HashMap<ResourceKey, Handle<Image>>>,
     /// All loaded audio files.

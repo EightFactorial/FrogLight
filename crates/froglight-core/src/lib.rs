@@ -25,14 +25,10 @@ impl Plugin for CorePlugin {
         systemsets::build(app);
     }
 
-    #[allow(unused_variables)]
-    fn finish(&self, app: &mut App) {
-        // Add a system to log if the program was built in debug mode.
+    fn finish(&self, _app: &mut App) {
         #[cfg(debug_assertions)]
         {
-            app.add_systems(bevy_app::Startup, || {
-                bevy_log::warn!("FrogLight was built in debug mode!");
-            });
+            bevy_log::warn!("FrogLight was built in debug mode!");
         }
     }
 }

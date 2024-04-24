@@ -36,6 +36,6 @@ impl GraphicalPlugins {
     /// Adds all the [`Plugins`](bevy::prelude::Plugin) that are part of the
     /// [`GraphicalPlugins`] [`PluginGroup`].
     pub(crate) fn add(builder: PluginGroupBuilder) -> PluginGroupBuilder {
-        builder.add(AssetPlugin).add(RenderPlugin).add(InterfacePlugin).add(ClientPlugin)
+        builder.add(AssetPlugin::default()).add(RenderPlugin).add(InterfacePlugin).add(ClientPlugin)
     }
 }

@@ -20,6 +20,9 @@ pub use physics::*;
 mod registry;
 pub use registry::*;
 
+mod render;
+pub use render::*;
+
 mod settings;
 pub use settings::*;
 
@@ -34,6 +37,7 @@ pub(super) fn build(app: &mut App) {
     network::build(app);
     physics::build(app);
     registry::build(app);
+    render::build(app);
     settings::build(app);
     utility::build(app);
 }

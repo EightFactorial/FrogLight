@@ -8,6 +8,9 @@ use bevy_app::{App, Plugin};
 mod folder;
 pub use folder::ConfigFolder;
 
+mod traits;
+pub use traits::ConfigFile;
+
 /// The `Settings` Froglight plugin.
 ///
 /// Adds a configuration folder to the application,
