@@ -1,13 +1,11 @@
 use bevy_app::{App, PostUpdate, PreStartup, Startup};
-use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
-
-use super::ClientPostUpdateSet;
+use bevy_ecs::schedule::SystemSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     app.configure_sets(PreStartup, SettingsPreStartupSet)
         .configure_sets(Startup, SettingsStartupSet)
-        .configure_sets(PostUpdate, SettingsPostUpdateSet.after(ClientPostUpdateSet));
+        .configure_sets(PostUpdate, SettingsPostUpdateSet);
 }
 
 /// A [`SystemSet`] that runs during the [`PreStartup`] phase.

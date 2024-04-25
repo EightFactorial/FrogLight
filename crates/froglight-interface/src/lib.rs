@@ -3,6 +3,11 @@
 
 use bevy_app::{App, Plugin};
 
+pub mod loading_screen;
+
+mod uiscale;
+pub use uiscale::*;
+
 /// The `Interface` Froglight plugin.
 ///
 /// Adds interfaces and user interaction to the app.
@@ -10,5 +15,8 @@ use bevy_app::{App, Plugin};
 pub struct InterfacePlugin;
 
 impl Plugin for InterfacePlugin {
-    fn build(&self, _app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        uiscale::build(app);
+        loading_screen::build(app);
+    }
 }

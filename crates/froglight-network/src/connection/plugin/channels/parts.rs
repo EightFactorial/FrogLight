@@ -38,7 +38,7 @@ where
 
 /// A pair of task channels.
 ///
-/// This is used to send and receive a specifc type of packet between the
+/// This is used to send and receive a specific type of packet between the
 /// connection task and the server.
 #[derive(Debug, Clone)]
 pub struct TaskPair<V: Version, S: State<V>>

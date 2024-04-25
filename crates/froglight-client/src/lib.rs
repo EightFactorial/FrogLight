@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-use bevy_app::{App, Plugin};
+use bevy::prelude::*;
 
 /// The `Client` Froglight plugin.
 ///

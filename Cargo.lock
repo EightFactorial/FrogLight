@@ -2174,12 +2174,7 @@ dependencies = [
 name = "froglight-client"
 version = "0.1.0"
 dependencies = [
- "bevy_app",
- "bevy_asset",
- "bevy_audio",
- "bevy_derive",
- "bevy_ecs",
- "bevy_log",
+ "bevy",
  "froglight-core",
  "froglight-entity",
  "froglight-interface",
@@ -2224,8 +2219,10 @@ dependencies = [
  "bevy_derive",
  "bevy_ecs",
  "bevy_gizmos",
+ "bevy_hierarchy",
  "bevy_input",
  "bevy_log",
+ "bevy_render",
  "bevy_sprite",
  "bevy_text",
  "bevy_ui",
