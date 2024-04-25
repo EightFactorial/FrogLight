@@ -19,7 +19,6 @@ workspace = true
 bevy = { workspace = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
-froglight-interface = { version = "0.1.0", path = "../froglight-interface" }
 froglight-network = { version = "0.1.0", path = "../froglight-network", features = [
     "resolver",
 ] }

@@ -8,7 +8,6 @@ members = [
     "crates/froglight-client",
     "crates/froglight-core",
     "crates/froglight-entity",
-    "crates/froglight-interface",
     "crates/froglight-macros",
     "crates/froglight-network",
     "crates/froglight-protocol",
@@ -104,7 +103,6 @@ froglight-assets = { opt-level = 1 }
 froglight-client = { opt-level = 1 }
 froglight-core = { opt-level = 1 }
 froglight-entity = { opt-level = 1 }
-froglight-interface = { opt-level = 1 }
 froglight-macros = { opt-level = 1 }
 froglight-network = { opt-level = 1 }
 froglight-registry = { opt-level = 1 }

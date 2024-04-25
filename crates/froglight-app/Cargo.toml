@@ -24,7 +24,6 @@ froglight-assets = { version = "0.1.0", path = "../froglight-assets", optional =
 froglight-client = { version = "0.1.0", path = "../froglight-client", optional = true }
 froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
-froglight-interface = { version = "0.1.0", path = "../froglight-interface", optional = true }
 froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
@@ -41,7 +40,6 @@ bevy_asset = [
     "bevy/bevy_asset",
     "dep:froglight-assets",
     "dep:froglight-client",
-    "dep:froglight-interface",
     "dep:froglight-render",
     "froglight-settings/bevy_asset",
 ]

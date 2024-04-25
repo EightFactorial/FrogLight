@@ -5,9 +5,6 @@ use bevy_app::App;
 mod client;
 pub use client::*;
 
-mod interface;
-pub use interface::*;
-
 mod network;
 pub use network::*;
 
@@ -29,7 +26,6 @@ pub use utility::*;
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     client::build(app);
-    interface::build(app);
     network::build(app);
     physics::build(app);
     registry::build(app);

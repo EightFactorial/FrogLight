@@ -6,8 +6,6 @@ pub use froglight_assets::AssetPlugin;
 pub use froglight_client::ClientPlugin;
 pub use froglight_core::CorePlugin;
 pub use froglight_entity::EntityPlugin;
-#[cfg(feature = "bevy_asset")]
-pub use froglight_interface::InterfacePlugin;
 pub use froglight_network::{
     connection::ConnectionPlugin, resolver::ResolverPlugin, NetworkPlugins,
 };

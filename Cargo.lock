@@ -2137,7 +2137,6 @@ dependencies = [
  "froglight-client",
  "froglight-core",
  "froglight-entity",
- "froglight-interface",
  "froglight-network",
  "froglight-protocol",
  "froglight-registry",
@@ -2177,7 +2176,6 @@ dependencies = [
  "bevy",
  "froglight-core",
  "froglight-entity",
- "froglight-interface",
  "froglight-network",
  "froglight-registry",
  "froglight-render",
@@ -2207,33 +2205,6 @@ dependencies = [
  "bevy_reflect",
  "froglight-core",
  "froglight-protocol",
-]
-
-[[package]]
-name = "froglight-interface"
-version = "0.1.0"
-dependencies = [
- "bevy_app",
- "bevy_asset",
- "bevy_audio",
- "bevy_derive",
- "bevy_ecs",
- "bevy_gizmos",
- "bevy_hierarchy",
- "bevy_input",
- "bevy_log",
- "bevy_render",
- "bevy_sprite",
- "bevy_text",
- "bevy_ui",
- "bevy_window",
- "froglight-assets",
- "froglight-core",
- "froglight-entity",
- "froglight-network",
- "froglight-render",
- "froglight-settings",
- "froglight-utils",
 ]
 
 [[package]]
