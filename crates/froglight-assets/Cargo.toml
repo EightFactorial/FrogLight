@@ -16,27 +16,19 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-async-std = { workspace = true, features = ["std", "unstable"] }
 async_zip = { version = "0.0.17", features = ["deflate"] }
 bevy_app = { workspace = true }
 bevy_asset = { workspace = true }
-bevy_audio = { workspace = true }
+bevy_audio = { workspace = true, features = ["vorbis"] }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
 bevy_reflect = { workspace = true }
-bevy_render = { workspace = true }
-bevy_tasks = { workspace = true }
+bevy_render = { workspace = true, features = ["png"] }
 compact_str = { workspace = true, features = ["serde"] }
-fastrand = "2.0.2"
-froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
-froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
-froglight-settings = { version = "0.1.0", path = "../froglight-settings" }
-futures-concurrency = "7.6.0"
 futures-lite = { workspace = true }
 hashbrown = { workspace = true }
-image = { workspace = true }
 parking_lot = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

@@ -1,13 +1,13 @@
 use bevy_app::{App, PostUpdate, PreUpdate, Startup, Update};
 use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
 
-use super::{AssetStartupSet, ClientPostUpdateSet, ClientPreUpdateSet};
+use super::{ClientPostUpdateSet, ClientPreUpdateSet};
 
 /// All `Interface` [`SystemSets`](SystemSet) run after `Asset`
 /// [`SystemSets`](SystemSet).
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.configure_sets(Startup, InterfaceStartupSet.after(AssetStartupSet))
+    app.configure_sets(Startup, InterfaceStartupSet)
         .configure_sets(PreUpdate, InterfacePreUpdateSet.after(ClientPreUpdateSet))
         .configure_sets(Update, InterfaceUpdateSet)
         .configure_sets(PostUpdate, InterfacePostUpdateSet.after(ClientPostUpdateSet));

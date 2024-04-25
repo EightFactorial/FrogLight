@@ -1,38 +1,33 @@
-//! The [`ResourcePack`] asset and loader.
-
 use bevy_app::App;
 use bevy_asset::{Asset, AssetApp, Handle};
 use bevy_audio::AudioSource;
 use bevy_reflect::TypePath;
-
-mod loader;
 use bevy_render::texture::Image;
 use froglight_protocol::common::ResourceKey;
 use hashbrown::HashMap;
-pub use loader::{ResourcePackError, ResourcePackLoader};
+
+mod info;
+pub use info::*;
+
+mod loader;
+pub use loader::*;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    // Initialize the ResourcePack asset and loader.
-    app.init_asset::<ResourcePack>().init_asset_loader::<ResourcePackLoader>();
+    app.init_asset::<ResourcePack>().init_asset_loader::<ResourcePackZipLoader>();
 }
 
-/// A collection of assets and resource definitions.
+/// A bundle of assets.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Asset, TypePath)]
 pub struct ResourcePack {
-    /// Handles to all loaded textures.
-    ///
-    /// ### Note
-    /// All handles are [`Weak`](Handle::Weak),
-    /// [`Strong`](Handle::Strong) handles are stored in the
-    /// [`AssetManager`](crate::asset_manager::AssetManager).
-    pub textures: HashMap<ResourceKey, Handle<Image>>,
+    /// [`ResourcePack`] information
+    pub info: ResourcePackInfo,
 
-    /// Handles to all loaded sounds.
-    ///
-    /// ### Note
-    /// All handles are [`Weak`](Handle::Weak),
-    /// [`Strong`](Handle::Strong) handles are stored in the
-    /// [`AssetManager`](crate::asset_manager::AssetManager).
-    pub sounds: HashMap<ResourceKey, Handle<AudioSource>>,
+    /// Textures
+    pub textures: HashMap<ResourceKey, Handle<Image>>,
+    /// Audio
+    pub audio: HashMap<ResourceKey, Handle<AudioSource>>,
+
+    /// Json files
+    pub json: HashMap<ResourceKey, serde_json::Value>,
 }

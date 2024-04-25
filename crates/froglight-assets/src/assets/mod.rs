@@ -1,8 +1,7 @@
-//! Asset types and loaders.
+//! Different kinds of assets
 
-use bevy_app::App;
-
-pub mod resourcepack;
+mod resourcepack;
+pub use resourcepack::*;
 
 #[doc(hidden)]
-pub(super) fn build(app: &mut App) { resourcepack::build(app); }
+pub(super) fn build(app: &mut bevy_app::App) { resourcepack::build(app); }

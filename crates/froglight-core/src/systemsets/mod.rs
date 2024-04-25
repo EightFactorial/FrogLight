@@ -2,9 +2,6 @@
 
 use bevy_app::App;
 
-mod assets;
-pub use assets::*;
-
 mod client;
 pub use client::*;
 
@@ -31,7 +28,6 @@ pub use utility::*;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    assets::build(app);
     client::build(app);
     interface::build(app);
     network::build(app);
