@@ -1,11 +1,9 @@
 use bevy_app::{App, PostUpdate, PreUpdate, Update};
-use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
-
-use super::NetworkPreUpdateSet;
+use bevy_ecs::schedule::SystemSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.configure_sets(PreUpdate, ClientPreUpdateSet.after(NetworkPreUpdateSet))
+    app.configure_sets(PreUpdate, ClientPreUpdateSet)
         .configure_sets(Update, ClientUpdateSet)
         .configure_sets(PostUpdate, ClientPostUpdateSet);
 }

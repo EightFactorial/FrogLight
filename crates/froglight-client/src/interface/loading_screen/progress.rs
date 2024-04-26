@@ -1,6 +1,4 @@
-use bevy_app::App;
-use bevy_derive::{Deref, DerefMut};
-use bevy_ecs::{component::Component, entity::Entity, world::World};
+use bevy::prelude::*;
 
 #[doc(hidden)]
 pub(super) fn build(_app: &mut App) {}

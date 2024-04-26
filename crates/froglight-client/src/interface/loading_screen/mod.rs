@@ -1,16 +1,6 @@
 //! A basic [`LoadingScreen`]
 
-use bevy_app::{App, Update};
-use bevy_ecs::{
-    component::Component,
-    entity::Entity,
-    schedule::{common_conditions::any_with_component, IntoSystemSetConfigs, SystemSet},
-    world::World,
-};
-use bevy_hierarchy::BuildWorldChildren;
-use bevy_log::error;
-use bevy_render::{color::Color, view::Visibility};
-use bevy_ui::{node_bundles::NodeBundle, Display, FocusPolicy, PositionType, Style, Val, ZIndex};
+use bevy::{prelude::*, ui::FocusPolicy};
 
 mod enable;
 pub use enable::*;

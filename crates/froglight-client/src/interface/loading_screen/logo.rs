@@ -1,6 +1,4 @@
-use bevy_app::App;
-use bevy_asset::embedded_asset;
-use bevy_ecs::{component::Component, entity::Entity, world::World};
+use bevy::{asset::embedded_asset, prelude::*};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

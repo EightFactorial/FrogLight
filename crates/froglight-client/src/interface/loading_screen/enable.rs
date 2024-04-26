@@ -1,16 +1,5 @@
-use bevy_app::{App, PreUpdate};
-use bevy_derive::{Deref, DerefMut};
-use bevy_ecs::{
-    query::With,
-    schedule::{
-        common_conditions::{any_with_component, not, resource_added, resource_exists_and_changed},
-        IntoSystemConfigs,
-    },
-    system::{Query, Res, Resource},
-};
-use bevy_log::debug;
-use bevy_render::view::Visibility;
-use froglight_core::systemsets::InterfacePreUpdateSet;
+use bevy::{prelude::*, render::view::VisibilitySystems};
+use froglight_core::systemsets::ClientPostUpdateSet;
 
 use super::LoadingScreen;
 
@@ -21,12 +10,13 @@ pub(super) fn build(app: &mut App) {
 
     // Add the LoadingScreenVisibility visibility system
     app.add_systems(
-        PreUpdate,
+        PostUpdate,
         LoadingScreenVisibility::set_loadingsceen_visibility
             .run_if(any_with_component::<LoadingScreen>)
             .run_if(resource_exists_and_changed::<LoadingScreenVisibility>)
             .run_if(not(resource_added::<LoadingScreenVisibility>))
-            .in_set(InterfacePreUpdateSet),
+            .before(VisibilitySystems::VisibilityPropagate)
+            .in_set(ClientPostUpdateSet),
     );
 }
 

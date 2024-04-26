@@ -3,7 +3,8 @@
 
 use bevy::prelude::*;
 
-// pub mod interface;
+pub mod interface;
+pub mod systemsets;
 
 /// The `Client` Froglight plugin.
 ///
@@ -12,5 +13,8 @@ use bevy::prelude::*;
 pub struct ClientPlugin;
 
 impl Plugin for ClientPlugin {
-    fn build(&self, _app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        interface::build(app);
+        systemsets::build(app);
+    }
 }

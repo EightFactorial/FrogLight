@@ -1,29 +1,13 @@
 use std::num::NonZeroU8;
 
-use bevy_app::{App, PreUpdate};
-use bevy_derive::{Deref, DerefMut};
-use bevy_ecs::{
-    event::{Event, EventReader, EventWriter},
-    query::With,
-    schedule::{common_conditions::on_event, Condition, IntoSystemConfigs},
-    system::{Query, Res, ResMut, Resource},
+use bevy::{
+    prelude::*,
+    ui::UiSystem,
+    window::{PrimaryWindow, WindowResized},
 };
-use bevy_log::{debug, warn};
-use bevy_ui::UiScale;
-use bevy_window::{PrimaryWindow, WindowResized};
-use froglight_core::systemsets::InterfacePreUpdateSet;
+use froglight_core::systemsets::ClientPreUpdateSet;
 
-/// The virtual window width.
-///
-/// All Ui should be designed for this width,
-/// the scale will be adjusted to fit the actual window size.
-pub const WINDOW_VIRTUAL_WIDTH: u32 = 380;
-
-/// The virtual window height.
-///
-/// All Ui should be designed for this height,
-/// the scale will be adjusted to fit the actual window size.
-pub const WINDOW_VIRTUAL_HEIGHT: u32 = 240;
+use super::{WINDOW_VIRTUAL_HEIGHT, WINDOW_VIRTUAL_WIDTH};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -39,7 +23,8 @@ pub(super) fn build(app: &mut App) {
         UiScaleLimit::update_uiscale
             .run_if(on_event::<WindowResized>().or_else(on_event::<UiScaleUpdate>()))
             .run_if(UiScaleMode::enabled)
-            .in_set(InterfacePreUpdateSet),
+            .before(UiSystem::Focus)
+            .in_set(ClientPreUpdateSet),
     );
 }
 
