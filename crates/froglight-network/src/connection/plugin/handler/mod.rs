@@ -6,14 +6,11 @@ use std::{
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
-use bevy_app::{App, PostUpdate, PreUpdate};
-use bevy_ecs::{
-    component::Component,
-    schedule::{IntoSystemConfigs, IntoSystemSetConfigs},
-};
+use bevy_app::{App, PostUpdate};
+use bevy_ecs::{component::Component, schedule::IntoSystemConfigs};
 use bevy_log::{debug, error};
 use bevy_tasks::IoTaskPool;
-use froglight_core::systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet};
+use froglight_core::systemsets::NetworkPostUpdateSet;
 use froglight_protocol::{
     common::ConnectionIntent,
     packet::ServerStatus,
@@ -21,16 +18,14 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use self::impls::listen_connection_request;
 use super::{
     channels::traits::{PacketChannelTrait, TaskChannelTrait},
-    systemsets::{ConnectionPostUpdateSet, ConnectionPreUpdateSet},
     ConnectionTask, LoginPlugins, StatusTask,
 };
 use crate::connection::{Connection, ConnectionError, NetworkDirection, Serverbound};
 
 mod impls;
-use impls::listen_status_request;
+use impls::listen_requests;
 
 mod states;
 pub use states::*;
@@ -52,25 +47,8 @@ where
 
     /// Add [`Version`]-specific systems to the app.
     fn build(app: &mut App) {
-        // Configure sets
-        app.configure_sets(
-            PreUpdate,
-            ConnectionPreUpdateSet::<Self>::default().in_set(NetworkPreUpdateSet),
-        );
-        app.configure_sets(
-            PostUpdate,
-            ConnectionPostUpdateSet::<Self>::default().in_set(NetworkPostUpdateSet),
-        );
-
         // Listen for status and connection requests
-        app.add_systems(
-            PostUpdate,
-            listen_status_request::<Self>.in_set(ConnectionPostUpdateSet::<Self>::default()),
-        );
-        app.add_systems(
-            PostUpdate,
-            listen_connection_request::<Self>.in_set(ConnectionPostUpdateSet::<Self>::default()),
-        );
+        app.add_systems(PostUpdate, listen_requests::<Self>.in_set(NetworkPostUpdateSet));
 
         // Add implementation-specific systems to the app.
         Self::version_build(app);

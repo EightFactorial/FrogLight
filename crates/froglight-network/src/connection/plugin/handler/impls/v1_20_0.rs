@@ -3,10 +3,11 @@ use std::sync::Arc;
 use bevy_app::{App, PostUpdate, PreUpdate};
 use bevy_ecs::schedule::{
     common_conditions::{any_with_component, on_event},
-    IntoSystemConfigs,
+    Condition, IntoSystemConfigs,
 };
 use bevy_log::error;
 use bevy_tasks::futures_lite::future::try_zip;
+use froglight_core::systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 use froglight_protocol::{
     states::{Login, Play},
     versions::v1_20_0::V1_20_0,
@@ -16,7 +17,6 @@ use super::{fire_legacy_recvpacket, handle_connection_error, listen_legacy_sendp
 use crate::connection::{
     channels::LegacyTaskChannel,
     events::{RecvPacket, SendPacket},
-    plugin::systemsets::{ConnectionPostUpdateSet, ConnectionPreUpdateSet},
     Connection, ConnectionError, ConnectionHandler, ConnectionMarker, LegacyPacketChannel,
     ReadConnection, WriteConnection,
 };
@@ -34,31 +34,21 @@ impl ConnectionHandler for V1_20_0 {
         // Add systems to send packet events
         app.add_systems(
             PreUpdate,
-            fire_legacy_recvpacket::<Self, Play>
+            fire_legacy_recvpacket::<Self>
                 .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .in_set(ConnectionPreUpdateSet::<Self>::default()),
-        );
-        app.add_systems(
-            PreUpdate,
-            fire_legacy_recvpacket::<Self, Login>
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .in_set(ConnectionPreUpdateSet::<Self>::default()),
+                .in_set(NetworkPreUpdateSet),
         );
 
         // Add systems to listen for packet events
         app.add_systems(
             PostUpdate,
-            listen_legacy_sendpacket::<Self, Play>
+            listen_legacy_sendpacket::<Self>
                 .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .run_if(on_event::<SendPacket<Self, Play>>())
-                .in_set(ConnectionPostUpdateSet::<Self>::default()),
-        );
-        app.add_systems(
-            PostUpdate,
-            listen_legacy_sendpacket::<Self, Login>
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .run_if(on_event::<SendPacket<Self, Login>>())
-                .in_set(ConnectionPostUpdateSet::<Self>::default()),
+                .run_if(
+                    on_event::<SendPacket<Self, Play>>()
+                        .or_else(on_event::<SendPacket<Self, Login>>()),
+                )
+                .in_set(NetworkPostUpdateSet),
         );
     }
 

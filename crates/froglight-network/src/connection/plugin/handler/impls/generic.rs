@@ -3,10 +3,11 @@ use std::sync::Arc;
 use bevy_app::{App, PostUpdate, PreUpdate};
 use bevy_ecs::schedule::{
     common_conditions::{any_with_component, on_event},
-    IntoSystemConfigs,
+    Condition, IntoSystemConfigs,
 };
 use bevy_log::error;
 use bevy_tasks::futures_lite::future::try_zip;
+use froglight_core::systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 use froglight_protocol::{
     states::{Configuration, Handshaking, Login, Play, Status},
     traits::{State, Version},
@@ -17,7 +18,6 @@ use crate::connection::{
     channels::TaskChannel,
     events::{RecvPacket, SendPacket},
     handler::{ConfigurationHandler, HandshakeHandler, LoginHandler, PlayHandler, StatusHandler},
-    plugin::systemsets::{ConnectionPostUpdateSet, ConnectionPreUpdateSet},
     Connection, ConnectionError, ConnectionHandler, ConnectionMarker, NetworkDirection,
     PacketChannel, ReadConnection, Serverbound, WriteConnection,
 };
@@ -55,44 +55,23 @@ where
         // Add systems to send packet events
         app.add_systems(
             PreUpdate,
-            fire_recvpacket::<Self, Play>
+            fire_recvpacket::<Self>
                 .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .in_set(ConnectionPreUpdateSet::<Self>::default()),
-        );
-        app.add_systems(
-            PreUpdate,
-            fire_recvpacket::<Self, Configuration>
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .in_set(ConnectionPreUpdateSet::<Self>::default()),
-        );
-        app.add_systems(
-            PreUpdate,
-            fire_recvpacket::<Self, Login>
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .in_set(ConnectionPreUpdateSet::<Self>::default()),
+                .in_set(NetworkPreUpdateSet),
         );
 
         // Add systems to listen for packet events
         app.add_systems(
             PostUpdate,
-            listen_sendpacket::<Self, Play>
+            listen_sendpacket::<Self>
                 .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .run_if(on_event::<SendPacket<Self, Play>>())
-                .in_set(ConnectionPostUpdateSet::<Self>::default()),
-        );
-        app.add_systems(
-            PostUpdate,
-            listen_sendpacket::<Self, Configuration>
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .run_if(on_event::<SendPacket<Self, Configuration>>())
-                .in_set(ConnectionPostUpdateSet::<Self>::default()),
-        );
-        app.add_systems(
-            PostUpdate,
-            listen_sendpacket::<Self, Login>
-                .run_if(any_with_component::<ConnectionMarker<Self>>)
-                .run_if(on_event::<SendPacket<Self, Login>>())
-                .in_set(ConnectionPostUpdateSet::<Self>::default()),
+                .run_if(
+                    on_event::<SendPacket<Self, Play>>().or_else(
+                        on_event::<SendPacket<Self, Configuration>>()
+                            .or_else(on_event::<SendPacket<Self, Login>>()),
+                    ),
+                )
+                .in_set(NetworkPostUpdateSet),
         );
     }
 

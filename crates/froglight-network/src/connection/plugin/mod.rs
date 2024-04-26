@@ -15,8 +15,6 @@ pub use misc::{ConnectionMarker, ConnectionTask, StatusTask};
 mod resources;
 pub use resources::{ConfigPlugins, LoginPlugins, PlayPlugins};
 
-mod systemsets;
-
 /// The `Connection` Froglight plugin.
 ///
 /// Adds networking capabilities.
