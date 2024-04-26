@@ -17,7 +17,7 @@ workspace = true
 
 [dependencies]
 async-channel = "2.2.1"
-async-compression = { version = "0.4.8", default-features = false, features = [
+async-compression = { version = "0.4.9", default-features = false, features = [
     "futures-io",
     "zlib",
 ] }
