@@ -2,8 +2,5 @@
 
 use bevy_app::App;
 
-mod interface;
-pub use interface::*;
-
 #[doc(hidden)]
-pub(super) fn build(app: &mut App) { interface::build(app); }
+pub(super) fn build(_app: &mut App) {}

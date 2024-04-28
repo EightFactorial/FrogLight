@@ -1,3 +1,5 @@
+//! Systems that change [`UiScale`] based on the [`Window`] resolution.
+
 use std::num::NonZeroU8;
 
 use bevy::{
@@ -14,44 +16,44 @@ pub(super) fn build(app: &mut App) {
     // Add the UIScale update event
     app.add_event::<UiScaleUpdate>();
 
-    // Add the UiScale Mode and Limit resources
-    app.init_resource::<UiScaleMode>().init_resource::<UiScaleLimit>();
+    // Add the UiScale Enable and Limit resources
+    app.init_resource::<UiScaleEnable>().init_resource::<UiScaleLimit>();
 
     // Add the UiScale update system
     app.add_systems(
         PreUpdate,
         UiScaleLimit::update_uiscale
             .run_if(on_event::<WindowResized>().or_else(on_event::<UiScaleUpdate>()))
-            .run_if(UiScaleMode::enabled)
+            .run_if(UiScaleEnable::enabled)
             .before(UiSystem::Focus)
             .in_set(ClientPreUpdateSet),
     );
 }
 
-/// The UI scale mode.
+/// The [`UiScale`] automatic scaling toggle.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
-pub struct UiScaleMode(pub bool);
+pub struct UiScaleEnable(pub bool);
 
-impl Default for UiScaleMode {
-    fn default() -> Self { UiScaleMode(true) }
+impl Default for UiScaleEnable {
+    fn default() -> Self { UiScaleEnable(true) }
 }
 
-impl UiScaleMode {
-    /// Creates a new UI scale mode.
+impl UiScaleEnable {
+    /// Creates a new [`UiScaleEnable`].
     #[must_use]
-    pub const fn new(enabled: bool) -> Self { UiScaleMode(enabled) }
+    pub const fn new(enabled: bool) -> Self { UiScaleEnable(enabled) }
 
-    /// Returns `true` if the UI scale is enabled.
+    /// Returns `true` if the [`UiScaleEnable`] is enabled.
     #[must_use]
     pub const fn is_enabled(&self) -> bool { self.0 }
 
-    /// A [`Condition`](bevy_ecs::schedule::Condition) that checks if the
-    /// [`UiScaleMode`] is enabled.
+    /// A [`Condition`](bevy::ecs::schedule::Condition) that checks if the
+    /// [`UiScaleEnable`] is enabled.
     #[must_use]
     pub fn enabled(mode: Res<Self>) -> bool { mode.is_enabled() }
 }
 
-/// The UI scale limit.
+/// The [`UiScale`] limit.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
 pub struct UiScaleLimit(pub Option<NonZeroU8>);
 
@@ -70,8 +72,8 @@ impl UiScaleLimit {
         }
     }
 
-    /// A [`System`](bevy_ecs::system::System) that updates the UI scale when
-    /// the [`PrimaryWindow`](bevy_window::PrimaryWindow) is resized.
+    /// A [`System`](bevy::ecs::system::System) that updates the UI scale when
+    /// the [`PrimaryWindow`](bevy::window::PrimaryWindow) is resized.
     fn update_uiscale(
         query: Query<(), With<PrimaryWindow>>,
         limit: Res<Self>,
@@ -89,7 +91,7 @@ impl UiScaleLimit {
         }
     }
 
-    /// Updates the UI scale.
+    /// Updates the [`UiScale`].
     ///
     /// Returns `Some(scale)` if the [`UiScale`] was set.
     fn set(uiscale: &mut UiScale, limit: Option<u8>, width: u32, height: u32) -> Option<u8> {
@@ -100,7 +102,7 @@ impl UiScaleLimit {
             scale = scale.min(limit);
         }
 
-        // Update the UI scale if it changed.
+        // Update the `UiScale` if it changed.
         let fscale = f32::from(scale);
         if (uiscale.0 - fscale).abs() < f32::EPSILON {
             None

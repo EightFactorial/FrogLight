@@ -20,5 +20,5 @@ impl RegistryUpdateEvent {
 
     /// Returns `true` if the version id is equal to `N`.
     #[must_use]
-    pub fn is_equal<const N: i32>(&self) -> bool { self.version_id == N }
+    pub fn is_equal<const ID: i32>(&self) -> bool { self.version_id == ID }
 }

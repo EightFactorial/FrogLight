@@ -1,6 +1,7 @@
 //! A basic [`LoadingScreen`]
 
 use bevy::{prelude::*, ui::FocusPolicy};
+use froglight_core::systemsets::ClientUpdateSet;
 
 mod enable;
 pub use enable::*;
@@ -14,7 +15,10 @@ pub use progress::*;
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     // Add the LoadingScreenSet SystemSet
-    app.configure_sets(Update, LoadingScreenSet.run_if(any_with_component::<LoadingScreen>));
+    app.configure_sets(
+        Update,
+        LoadingScreenSet.run_if(any_with_component::<LoadingScreen>).in_set(ClientUpdateSet),
+    );
 
     enable::build(app);
     logo::build(app);

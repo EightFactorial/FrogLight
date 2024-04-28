@@ -2,8 +2,7 @@
 
 pub mod loading_screen;
 
-mod uiscale;
-pub use uiscale::*;
+pub mod uiscale;
 
 /// The virtual window width.
 ///
