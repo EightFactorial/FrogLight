@@ -3,6 +3,7 @@
 
 use bevy_app::{App, Plugin};
 
+pub mod events;
 pub mod systemsets;
 
 /// The `Events` Froglight plugin.
@@ -12,5 +13,8 @@ pub mod systemsets;
 pub struct EventPlugin;
 
 impl Plugin for EventPlugin {
-    fn build(&self, app: &mut App) { systemsets::build(app); }
+    fn build(&self, app: &mut App) {
+        systemsets::build(app);
+        events::build(app);
+    }
 }
