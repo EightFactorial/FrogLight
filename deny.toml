@@ -97,6 +97,8 @@ name = "event-listener"
 [[bans.skip]]
 name = "libredox"
 [[bans.skip]]
+name = "libloading"
+[[bans.skip]]
 name = "nix"
 [[bans.skip]]
 name = "ndk"

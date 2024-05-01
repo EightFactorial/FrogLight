@@ -5,9 +5,10 @@ resolver = "2"
 members = [
     "crates/froglight-app",
     "crates/froglight-assets",
-    "crates/froglight-client",
-    "crates/froglight-core",
+    "crates/froglight-client", 
+    "crates/froglight-components",
     "crates/froglight-entity",
+    "crates/froglight-events",
     "crates/froglight-macros",
     "crates/froglight-network",
     "crates/froglight-protocol",
@@ -101,7 +102,6 @@ opt-level = 1
 froglight-app = { opt-level = 1 }
 froglight-assets = { opt-level = 1 }
 froglight-client = { opt-level = 1 }
-froglight-core = { opt-level = 1 }
 froglight-entity = { opt-level = 1 }
 froglight-macros = { opt-level = 1 }
 froglight-network = { opt-level = 1 }

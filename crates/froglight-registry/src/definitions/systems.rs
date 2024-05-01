@@ -6,10 +6,10 @@ use bevy_ecs::{
     schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet},
     system::{Res, ResMut},
 };
-use froglight_core::{events::RegistryUpdateEvent, systemsets::RegistryPostUpdateSet};
 use froglight_protocol::traits::Version;
 
 use super::{ConvertKey, DefaultRegistry, InitializeRegistry, SimpleRegistry};
+use crate::{systemsets::RegistryPostUpdateSet, RegistryUpdateEvent};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub(crate) struct RegistrySystems<V: Version>(PhantomData<V>);

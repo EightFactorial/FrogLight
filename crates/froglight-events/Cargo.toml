@@ -1,5 +1,5 @@
 [package]
-name = "froglight-core"
+name = "froglight-events"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -20,4 +20,4 @@ bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
-bevy_reflect = { workspace = true }
+froglight-network = { version = "0.1.0", path = "../froglight-network" }

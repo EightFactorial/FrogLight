@@ -9,10 +9,12 @@ use bevy_ecs::{
     system::{Commands, Res, Resource},
 };
 use bevy_log::{debug, error};
-use froglight_core::systemsets::{SettingsPostUpdateSet, SettingsPreStartupSet};
 use serde::{de::DeserializeOwned, Serialize};
 
-use crate::ConfigFolder;
+use crate::{
+    systemsets::{SettingsPostUpdateSet, SettingsPreStartupSet},
+    ConfigFolder,
+};
 
 /// A trait implementing basic loading and saving for configuration files.
 pub trait ConfigFile: Default + Resource + Serialize + DeserializeOwned {

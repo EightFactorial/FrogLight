@@ -10,7 +10,6 @@ use bevy_ecs::{
 };
 use bevy_log::error;
 use bevy_tasks::{block_on, poll_once, Task};
-use froglight_core::systemsets::NetworkPostUpdateSet;
 use froglight_protocol::{
     packet::ServerStatus,
     states::{Handshaking, Login, Status},
@@ -21,6 +20,7 @@ use froglight_protocol::{
 use super::{
     events::{ConnectionDisconnect, StatusResponse},
     handler::{HandshakeHandler, LoginHandler, StatusHandler},
+    systemsets::NetworkPostUpdateSet,
     ConnectionHandler,
 };
 use crate::connection::{ConnectionError, NetworkDirection, Serverbound};

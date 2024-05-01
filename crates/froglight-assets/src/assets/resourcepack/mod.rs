@@ -3,7 +3,7 @@ use bevy_asset::{Asset, AssetApp, Handle};
 use bevy_audio::AudioSource;
 use bevy_reflect::TypePath;
 use bevy_render::texture::Image;
-use froglight_protocol::common::ResourceKey;
+use froglight_components::resourcekey::ResourceKey;
 use hashbrown::HashMap;
 
 mod info;

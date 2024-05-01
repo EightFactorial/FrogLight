@@ -7,7 +7,6 @@ use bevy_ecs::schedule::{
 };
 use bevy_log::error;
 use bevy_tasks::futures_lite::future::try_zip;
-use froglight_core::systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 use froglight_protocol::{
     states::{Configuration, Handshaking, Login, Play, Status},
     traits::{State, Version},
@@ -18,6 +17,7 @@ use crate::connection::{
     channels::TaskChannel,
     events::{RecvPacket, SendPacket},
     handler::{ConfigurationHandler, HandshakeHandler, LoginHandler, PlayHandler, StatusHandler},
+    systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet},
     Connection, ConnectionError, ConnectionHandler, ConnectionMarker, NetworkDirection,
     PacketChannel, ReadConnection, Serverbound, WriteConnection,
 };

@@ -1,7 +1,7 @@
 use bevy::{prelude::*, render::view::VisibilitySystems};
-use froglight_core::systemsets::ClientPostUpdateSet;
 
 use super::LoadingScreen;
+use crate::systemsets::ClientPostUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

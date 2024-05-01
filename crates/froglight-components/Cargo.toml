@@ -1,5 +1,5 @@
 [package]
-name = "froglight-world"
+name = "froglight-components"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -17,16 +17,19 @@ workspace = true
 
 [dependencies]
 bevy_ecs = { workspace = true, optional = true }
-bevy_log = { workspace = true, optional = true }
-bitvec = { workspace = true }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
-froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
-parking_lot = { workspace = true }
-simdnbt = { workspace = true }
+compact_str = { workspace = true, features = ["serde", "smallvec"] }
+derive_more = { workspace = true }
+hashbrown = { workspace = true }
+serde = { workspace = true, features = ["derive"], optional = true }
 thiserror = { workspace = true }
+uuid = { workspace = true }
+
 
 [features]
 default = ["bevy"]
 
-# Derives `Component` for `Chunk` and enables some logs.
-bevy = ["dep:bevy_ecs", "dep:bevy_log"]
+# Derives `Component` for some types.
+bevy = ["dep:bevy_ecs"]
+
+# Derives `Serialize` and `Deserialize` for some types.
+serde = ["dep:serde", "compact_str/serde", "uuid/serde"]

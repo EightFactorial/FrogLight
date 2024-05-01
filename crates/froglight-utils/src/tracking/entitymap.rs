@@ -6,10 +6,11 @@ use bevy_ecs::{
     schedule::{common_conditions::any_with_component, IntoSystemConfigs},
     system::{Query, ResMut, Resource},
 };
-use froglight_core::systemsets::UtilityPreUpdateSet;
 use froglight_protocol::common::{ChunkPosition, EntityId};
 use froglight_world::Chunk;
 use hashbrown::{hash_set::Entry, HashMap, HashSet};
+
+use crate::systemsets::UtilityPreUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

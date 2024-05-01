@@ -22,8 +22,8 @@ bevy_mod_debugdump = "0.10.0"
 bevy = { workspace = true, default-features = false }
 froglight-assets = { version = "0.1.0", path = "../froglight-assets", optional = true }
 froglight-client = { version = "0.1.0", path = "../froglight-client", optional = true }
-froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
+froglight-events = { version = "0.1.0", path = "../froglight-events" }
 froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }

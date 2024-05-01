@@ -8,11 +8,6 @@
 pub mod plugins;
 
 pub use froglight_client::interface::uiscale::*;
-pub use froglight_core::{
-    components::*,
-    events::*,
-    // resources::*
-};
 pub use froglight_network::{
     common::*,
     connection::{Clientbound, Connection, ConnectionError, Serverbound},

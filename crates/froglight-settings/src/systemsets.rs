@@ -1,3 +1,5 @@
+//! [`SystemSets`](SystemSet) for loading and saving settings.
+
 use bevy_app::{App, PostUpdate, PreStartup, Startup};
 use bevy_ecs::schedule::SystemSet;
 

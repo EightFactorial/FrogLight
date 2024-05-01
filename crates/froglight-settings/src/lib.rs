@@ -8,6 +8,8 @@ use bevy_app::{App, Plugin};
 mod folder;
 pub use folder::ConfigFolder;
 
+pub mod systemsets;
+
 mod traits;
 pub use traits::ConfigFile;
 
@@ -48,5 +50,8 @@ impl SettingsPlugin {
 }
 
 impl Plugin for SettingsPlugin {
-    fn build(&self, app: &mut App) { folder::build(self, app); }
+    fn build(&self, app: &mut App) {
+        systemsets::build(app);
+        folder::build(self, app);
+    }
 }

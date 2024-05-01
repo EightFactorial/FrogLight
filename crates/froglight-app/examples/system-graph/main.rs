@@ -9,7 +9,7 @@ use std::{
 };
 
 use bevy::{
-    app::{MainScheduleOrder, RunFixedMainLoop},
+    app::MainScheduleOrder,
     ecs::schedule::{InternedScheduleLabel, ScheduleLabel},
     prelude::*,
 };
@@ -17,14 +17,11 @@ use bevy_mod_debugdump::schedule_graph::settings::{
     Settings as ScheduleSettings, Style as ScheduleStyle,
 };
 use froglight_app::AppPlugins;
-use froglight_utils::schedules::{
-    FiveSeconds, OneSecond, OneTick, RunFixedUtilLoop, TenTicks, TwoTicks,
-};
+use froglight_utils::schedules::{FiveSeconds, OneSecond, OneTick, TenTicks, TwoTicks};
 
 /// Schedules that run once every fixed amount of time.
-static BEVY_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| {
+static BEVY_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 5]> = LazyLock::new(|| {
     [
-        RunFixedMainLoop.intern(),
         FixedFirst.intern(),
         FixedPreUpdate.intern(),
         FixedUpdate.intern(),
@@ -34,9 +31,8 @@ static BEVY_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::ne
 });
 
 /// Schedules that run once every fixed amount of time.
-static UTIL_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| {
+static UTIL_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 5]> = LazyLock::new(|| {
     [
-        RunFixedUtilLoop.intern(),
         OneTick.intern(),
         TwoTicks.intern(),
         TenTicks.intern(),
@@ -112,10 +108,10 @@ fn write_dot_and_convert(graph: String, label: &InternedScheduleLabel, path: &Pa
         .arg("-Tsvg")
         .arg(&path)
         .arg("-o")
-        .arg(output_path)
+        .arg(&output_path)
         .output()
     {
-        error!("Failed to convert `{label:?}` to an image: {err}");
+        error!("Failed to convert \"{}\" to \"{}\": {err}", path.display(), output_path.display());
     }
 }
 

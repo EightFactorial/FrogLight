@@ -1,7 +1,8 @@
 //! A basic [`LoadingScreen`]
 
 use bevy::{prelude::*, ui::FocusPolicy};
-use froglight_core::systemsets::ClientUpdateSet;
+
+use crate::systemsets::ClientUpdateSet;
 
 mod enable;
 pub use enable::*;

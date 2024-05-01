@@ -8,7 +8,6 @@ pub mod prelude;
 pub use froglight_assets as assets;
 #[cfg(feature = "bevy_asset")]
 pub use froglight_client as client;
-pub use froglight_core as core;
 pub use froglight_network as network;
 pub use froglight_protocol::protocol;
 pub use froglight_registry as registry;

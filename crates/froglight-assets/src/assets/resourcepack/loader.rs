@@ -7,7 +7,7 @@ use bevy_asset::{
     LoadContext,
 };
 use bevy_log::{error, warn};
-use froglight_protocol::common::ResourceKey;
+use froglight_components::resourcekey::ResourceKey;
 use futures_lite::io::BufReader;
 use thiserror::Error;
 

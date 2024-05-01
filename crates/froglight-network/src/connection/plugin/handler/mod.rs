@@ -10,7 +10,6 @@ use bevy_app::{App, PostUpdate};
 use bevy_ecs::{component::Component, schedule::IntoSystemConfigs};
 use bevy_log::{debug, error};
 use bevy_tasks::IoTaskPool;
-use froglight_core::systemsets::NetworkPostUpdateSet;
 use froglight_protocol::{
     common::ConnectionIntent,
     packet::ServerStatus,
@@ -20,6 +19,7 @@ use froglight_protocol::{
 
 use super::{
     channels::traits::{PacketChannelTrait, TaskChannelTrait},
+    systemsets::NetworkPostUpdateSet,
     ConnectionTask, LoginPlugins, StatusTask,
 };
 use crate::connection::{Connection, ConnectionError, NetworkDirection, Serverbound};

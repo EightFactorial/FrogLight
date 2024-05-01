@@ -26,7 +26,9 @@ bevy_log = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_render = { workspace = true, features = ["png"] }
 compact_str = { workspace = true, features = ["serde"] }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
+froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
+    "serde",
+] }
 futures-lite = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }

@@ -7,7 +7,6 @@ use bevy_ecs::schedule::{
 };
 use bevy_log::error;
 use bevy_tasks::futures_lite::future::try_zip;
-use froglight_core::systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 use froglight_protocol::{
     states::{Login, Play},
     versions::v1_20_0::V1_20_0,
@@ -17,6 +16,7 @@ use super::{fire_legacy_recvpacket, handle_connection_error, listen_legacy_sendp
 use crate::connection::{
     channels::LegacyTaskChannel,
     events::{RecvPacket, SendPacket},
+    systemsets::{NetworkPostUpdateSet, NetworkPreUpdateSet},
     Connection, ConnectionError, ConnectionHandler, ConnectionMarker, LegacyPacketChannel,
     ReadConnection, WriteConnection,
 };

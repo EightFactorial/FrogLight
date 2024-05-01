@@ -6,7 +6,6 @@ use crate::prelude::plugins::*;
 /// application.
 ///
 /// This includes:
-/// - [`CorePlugin`]
 /// - [`EntityPlugin`]
 /// - [`RegistryPlugin`]
 /// - [`UtilityPlugin`]
@@ -22,11 +21,6 @@ impl BasicPlugins {
     /// Adds all the [`Plugins`](bevy::prelude::Plugin) that are part of the
     /// [`BasicPlugins`] [`PluginGroup`].
     pub(crate) fn add(builder: PluginGroupBuilder) -> PluginGroupBuilder {
-        builder
-            .add(CorePlugin)
-            .add(EntityPlugin)
-            .add(RegistryPlugin)
-            .add(UtilityPlugin)
-            .add(NetworkPlugins)
+        builder.add(RegistryPlugin).add(UtilityPlugin).add(NetworkPlugins).add(EventPlugin)
     }
 }

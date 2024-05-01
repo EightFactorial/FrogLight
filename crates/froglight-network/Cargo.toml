@@ -32,7 +32,6 @@ bevy_tasks = { workspace = true, features = ["multi-threaded"] }
 bevy_time = { workspace = true }
 bevy_transform = { workspace = true }
 compact_str = { workspace = true }
-froglight-core = { version = "0.1.0", path = "../froglight-core" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 hashbrown = { workspace = true }
@@ -49,4 +48,4 @@ tldextract = { version = "0.6.0", optional = true }
 default = ["resolver"]
 
 # Enables the ResolverPlugin
-resolver = ["async-std-resolver", "tldextract"]
+resolver = ["dep:async-std-resolver", "dep:tldextract"]

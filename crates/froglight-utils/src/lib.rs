@@ -4,6 +4,7 @@
 use bevy_app::{App, Plugin};
 
 pub mod schedules;
+pub mod systemsets;
 pub mod tracking;
 
 /// The `Utility` Froglight plugin.
@@ -14,6 +15,7 @@ pub struct UtilityPlugin;
 
 impl Plugin for UtilityPlugin {
     fn build(&self, app: &mut App) {
+        systemsets::build(app);
         schedules::build(app);
         tracking::build(app);
     }

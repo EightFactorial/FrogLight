@@ -1,6 +1,5 @@
+use froglight_components::entity::EntityId;
 use froglight_macros::FrogReadWrite;
-
-use crate::common::EntityId;
 
 /// An entity to look at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]

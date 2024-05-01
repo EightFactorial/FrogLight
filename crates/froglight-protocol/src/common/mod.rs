@@ -1,7 +1,7 @@
 //! Common data structures used by the protocol.
 
-mod newtype;
-pub use newtype::*;
+mod entity;
+pub use froglight_components::entity::{EntityId, EntityUuid};
 
 mod other;
 pub use other::*;
@@ -12,5 +12,5 @@ pub use position::*;
 mod special;
 pub use special::*;
 
-mod resource_key;
-pub use resource_key::{ResourceKey, ResourceKeyError};
+mod resourcekey;
+pub use froglight_components::resourcekey::{ResourceKey, ResourceKeyError};

@@ -7,9 +7,9 @@ use bevy::{
     ui::UiSystem,
     window::{PrimaryWindow, WindowResized},
 };
-use froglight_core::systemsets::ClientPreUpdateSet;
 
 use super::{WINDOW_VIRTUAL_HEIGHT, WINDOW_VIRTUAL_WIDTH};
+use crate::systemsets::ClientPreUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
