@@ -78,9 +78,11 @@ impl Default for AutomaticServerPing {
 
 impl AutomaticServerPing {
     /// Returns `true` if [`AutomaticServerPing`] is enabled.
+    #[must_use]
     pub fn enabled(&self) -> bool { self.0 }
 
     /// A [`Condition`](bevy_ecs::schedule::Condition) that returns `true` if
     /// [`AutomaticServerPing`] is enabled.
+    #[must_use]
     pub fn is_enabled(res: Res<Self>) -> bool { res.enabled() }
 }
