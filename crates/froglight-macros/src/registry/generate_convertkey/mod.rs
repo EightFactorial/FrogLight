@@ -23,16 +23,17 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
     let mut error_type = if let Some(error) = attrs.error {
         error
     } else {
-        Path::from_input(quote! { #crate_path::definitions::errors::MissingKeyError }).unwrap()
+        Path::from_input(quote! { #crate_path::definitions::errors::InvalidKeyError }).unwrap()
     };
 
-    // Collect the tokens for the `from_key` and `to_key` functions
+    // Collect the tokens for the `from_key`, `to_key_str`, and `to_key` functions
     let mut from_key_tokens = TokenStream::new();
+    let mut to_key_str_tokens = TokenStream::new();
     let mut to_key_tokens = TokenStream::new();
 
     // Define the flag for the `other` variant
     let mut is_other = false;
-    let mut other_variant: Ident = Ident::new("Bingus", Span::call_site());
+    let mut other_variant: Option<Ident> = None;
 
     // Parse the variants
     for variant in &data.variants {
@@ -61,17 +62,27 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
         if is_other && variant_attrs.other {
             panic!("Only one variant can be marked as `other`");
         } else if !is_other && variant_attrs.other {
-            other_variant = variant.ident.clone();
+            other_variant = Some(variant.ident.clone());
             is_other = true;
 
             // Add tokens for the to_key function
             to_key_tokens.extend(quote! {
                 #enum_ident::#variant_ident(key) => key.clone().into(),
             });
+
+            // Add tokens for the to_key_str function
+            to_key_str_tokens.extend(quote! {
+                #enum_ident::#variant_ident(key) => key.as_ref(),
+            });
         } else {
             // Add tokens for the to_key function
             to_key_tokens.extend(quote! {
                 #enum_ident::#variant_ident => #variant_key,
+            });
+
+            // Add tokens for the to_key_str function
+            to_key_str_tokens.extend(quote! {
+                #enum_ident::#variant_ident => #variant_str,
             });
 
             // Add tokens for the from_key function
@@ -83,13 +94,15 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
 
     // If the registry has an `other` variant, set the error type to `Infallible`
     if is_other {
-        error_type = Path::from_input(quote! { ::std::convert::Infallible }).unwrap();
+        error_type = Path::from_input(quote! { #protocol_path::common::ResourceKeyError }).unwrap();
+        let other_variant = other_variant.unwrap();
+
         from_key_tokens.extend(quote! {
-            _ => Ok(#enum_ident::#other_variant(key.clone().into())),
+            other => Ok(#enum_ident::#other_variant(other.try_into()?)),
         });
     } else {
         from_key_tokens.extend(quote! {
-            _ => Err(#error_type::from(key.clone())),
+            other => Err(other.into()),
         });
     }
 
@@ -98,12 +111,16 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
 
     quote! {
         type #registry_name = #crate_path::definitions::SimpleRegistry<#enum_ident>;
-
         impl #crate_path::definitions::ConvertKey for #enum_ident {
             type Error = #error_type;
-            fn from_key(key: &#protocol_path::common::ResourceKey) -> Result<Self, Self::Error> {
+            fn from_key(key: &(impl ::core::convert::AsRef<str> + ?::core::marker::Sized)) -> Result<Self, Self::Error> {
                 match key.as_ref() {
                     #from_key_tokens
+                }
+            }
+            fn to_key_str(&self) -> &str {
+                match self {
+                    #to_key_str_tokens
                 }
             }
             fn to_key(&self) -> #protocol_path::common::ResourceKey {

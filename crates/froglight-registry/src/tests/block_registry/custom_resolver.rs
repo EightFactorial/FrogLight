@@ -1,8 +1,5 @@
 use std::any::TypeId;
 
-use compact_str::CompactString;
-use froglight_protocol::common::ResourceKey;
-
 use super::block_definitions::*;
 use crate::{
     definitions::{
@@ -16,8 +13,8 @@ use crate::{
 struct SomeOtherBlock;
 
 impl BlockType<TestVersion> for SomeOtherBlock {
-    fn to_key(&self) -> ResourceKey { ResourceKey::new_inline("froglight:some_other") }
-    fn to_lang(&self) -> CompactString { CompactString::from("block.froglight.some_other") }
+    fn to_key(&self) -> &'static str { "froglight:some_other" }
+    fn to_lang(&self) -> &'static str { "block.froglight.some_other" }
 }
 
 impl BlockExt<TestVersion> for SomeOtherBlock {

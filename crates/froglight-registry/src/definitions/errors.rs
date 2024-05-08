@@ -1,30 +1,18 @@
 //! Errors that occur while using registries.
 
-use froglight_protocol::common::{ResourceKey, ResourceKeyError};
-
-/// An error that occurred while converting between a registry value and a key.
+/// There is no value for the specified key.
 #[derive(Debug, thiserror::Error)]
-pub enum ConvertKeyError<E>
-where
-    E: std::error::Error,
-{
-    /// A resource key error occurred.
-    #[error(transparent)]
-    ResourceKey(#[from] ResourceKeyError),
-    /// A conversion error occurred.
-    #[error(transparent)]
-    Other(E),
+#[error("There is no value for the specified key: \"{}\"", self.0)]
+pub struct InvalidKeyError(pub String);
+
+impl From<String> for InvalidKeyError {
+    fn from(key: String) -> Self { Self(key) }
 }
 
-/// There is no value for the specified
-/// [`key`](super::MissingKeyError).
-#[derive(Debug, thiserror::Error)]
-#[error("There is no value for the specified key: {key}")]
-pub struct MissingKeyError {
-    /// The key that is missing.
-    pub key: ResourceKey,
+impl From<&str> for InvalidKeyError {
+    fn from(key: &str) -> Self { Self(key.to_string()) }
 }
 
-impl From<ResourceKey> for MissingKeyError {
-    fn from(key: ResourceKey) -> Self { Self { key } }
+impl From<InvalidKeyError> for String {
+    fn from(err: InvalidKeyError) -> Self { err.0 }
 }

@@ -24,12 +24,12 @@ impl InitializeRegistry<TestVersion> for TestEnum {
 
 #[test]
 fn from_key() {
-    assert_eq!(TestEnum::try_from_key("froglight:first").unwrap(), TestEnum::First);
-    assert_eq!(TestEnum::try_from_key("froglight:second").unwrap(), TestEnum::Second);
-    assert_eq!(TestEnum::try_from_key("froglight:third").unwrap(), TestEnum::Third);
-    assert_eq!(TestEnum::try_from_key("froglight:fourth").unwrap(), TestEnum::Fourth);
+    assert_eq!(TestEnum::from_key("froglight:first").unwrap(), TestEnum::First);
+    assert_eq!(TestEnum::from_key("froglight:second").unwrap(), TestEnum::Second);
+    assert_eq!(TestEnum::from_key("froglight:third").unwrap(), TestEnum::Third);
+    assert_eq!(TestEnum::from_key("froglight:fourth").unwrap(), TestEnum::Fourth);
 
-    assert!(TestEnum::try_from_key("froglight:fifth").is_err());
+    assert!(TestEnum::from_key("froglight:fifth").is_err());
 }
 
 #[test]

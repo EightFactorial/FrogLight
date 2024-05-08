@@ -1,6 +1,4 @@
 use bevy_derive::{Deref, DerefMut};
-use compact_str::CompactString;
-use froglight_protocol::common::ResourceKey;
 
 use crate::{
     definitions::{BlockAttribute, BlockExt, BlockType},
@@ -19,8 +17,8 @@ pub enum TestBlocks {
 pub struct AirBlock;
 
 impl BlockType<TestVersion> for AirBlock {
-    fn to_key(&self) -> ResourceKey { ResourceKey::new_inline("minecraft:air") }
-    fn to_lang(&self) -> CompactString { CompactString::from("block.minecraft.air") }
+    fn to_key(&self) -> &'static str { "minecraft:air" }
+    fn to_lang(&self) -> &'static str { "block.minecraft.air" }
 
     fn is_air(&self) -> bool { true }
     fn is_opaque(&self) -> bool { false }
@@ -34,8 +32,8 @@ impl BlockExt<TestVersion> for AirBlock {
 pub struct StoneBlock;
 
 impl BlockType<TestVersion> for StoneBlock {
-    fn to_key(&self) -> ResourceKey { ResourceKey::new_inline("minecraft:stone") }
-    fn to_lang(&self) -> CompactString { CompactString::from("block.minecraft.stone") }
+    fn to_key(&self) -> &'static str { "minecraft:stone" }
+    fn to_lang(&self) -> &'static str { "block.minecraft.stone" }
 }
 impl BlockExt<TestVersion> for StoneBlock {
     fn default_state() -> Self { StoneBlock }
@@ -47,11 +45,11 @@ pub struct GrassBlock {
 }
 
 impl BlockType<TestVersion> for GrassBlock {
-    fn to_key(&self) -> ResourceKey { ResourceKey::new_inline("minecraft:grass") }
-    fn to_lang(&self) -> CompactString { CompactString::from("block.minecraft.grass") }
+    fn to_key(&self) -> &'static str { "minecraft:grass" }
+    fn to_lang(&self) -> &'static str { "block.minecraft.grass" }
 }
 impl BlockExt<TestVersion> for GrassBlock {
-    const BLOCK_STATES: u32 = GrassyAttribute::STATES;
+    const BLOCK_STATES: u32 = GrassyAttribute::ATTRIB_STATES;
     fn default_state() -> Self { GrassBlock { grassy: GrassyAttribute(false) } }
     fn from_relative_id(id: u32) -> Option<Self> {
         match id {
@@ -67,5 +65,5 @@ impl BlockExt<TestVersion> for GrassBlock {
 pub struct GrassyAttribute(pub bool);
 
 impl BlockAttribute<TestVersion> for GrassyAttribute {
-    const STATES: u32 = 2u32;
+    const ATTRIB_STATES: u32 = 2u32;
 }

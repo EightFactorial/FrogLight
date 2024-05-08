@@ -1,8 +1,7 @@
 use std::{any::Any, fmt::Debug};
 
-use compact_str::CompactString;
 use downcast_rs::Downcast;
-use froglight_protocol::{common::ResourceKey, traits::Version};
+use froglight_protocol::traits::Version;
 
 use super::BlockStorage;
 
@@ -14,10 +13,10 @@ where
 {
     /// The block's [`ResourceKey`].
     #[must_use]
-    fn to_key(&self) -> ResourceKey;
+    fn to_key(&self) -> &'static str;
     /// The block's language key.
     #[must_use]
-    fn to_lang(&self) -> CompactString;
+    fn to_lang(&self) -> &'static str;
 
     /// Returns `true` if the block is air.
     #[must_use]
@@ -38,7 +37,8 @@ where
 {
     /// The total number of block states.
     ///
-    /// This is equal to all of the attribute's states multiplied together.
+    /// This is equal to all of the block attributes'
+    /// states *multiplied* together.
     const BLOCK_STATES: u32 = 1u32;
 
     /// Create a new block from it's default state.
@@ -64,8 +64,8 @@ pub trait BlockAttribute<V>
 where
     V: Version,
 {
-    /// A count of the attribute's states.
-    const STATES: u32;
+    /// The total number of attribute states.
+    const ATTRIB_STATES: u32;
 }
 
 /// A block state resolver for a specific [`Version`].
