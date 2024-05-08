@@ -2,12 +2,11 @@ use bevy_app::{App, PreUpdate};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{
     entity::Entity,
-    query::{With, Without},
+    query::With,
     schedule::{common_conditions::any_with_component, IntoSystemConfigs},
     system::{Query, ResMut, Resource},
 };
 use froglight_protocol::common::{ChunkPosition, EntityId};
-use froglight_world::Chunk;
 use hashbrown::{hash_set::Entry, HashMap, HashSet};
 
 use crate::systemsets::UtilityPreUpdateSet;
@@ -39,7 +38,7 @@ pub struct EntityChunkMap {
 impl EntityChunkMap {
     #[allow(clippy::type_complexity)]
     fn update_entitychunks(
-        query: Query<(Entity, &ChunkPosition), (With<EntityId>, Without<Chunk>)>,
+        query: Query<(Entity, &ChunkPosition), With<EntityId>>,
         mut map: ResMut<Self>,
     ) {
         let Self { map, updates } = &mut *map;

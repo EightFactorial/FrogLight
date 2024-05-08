@@ -1,9 +1,9 @@
 //! [`Schedules`] that run at specific intervals.
 
 use bevy_app::{App, MainScheduleOrder, RunFixedMainLoop};
+use bevy_ecs::schedule::{ExecutorKind, Schedule, ScheduleLabel};
 
 mod seconds;
-use bevy_ecs::schedule::{ExecutorKind, Schedule, ScheduleLabel};
 pub use seconds::*;
 
 mod ticks;

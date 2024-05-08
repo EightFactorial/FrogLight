@@ -21,8 +21,12 @@ bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
 bevy_time = { workspace = true }
-froglight-entity = { version = "0.1.0", path = "../froglight-entity", optional = true }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", optional = true }
+froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
+    "bevy",
+], optional = true }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+    "bevy",
+], optional = true }
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
     "bevy",
 ], optional = true }
@@ -31,10 +35,10 @@ hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 
 [features]
-default = ["froglight-entity", "froglight-world"]
+default = ["froglight-components", "froglight-world"]
 
-# Enables tracking of which entities are in which chunks
-froglight-entity = ["dep:froglight-entity", "froglight-world"]
+# Enables tracking of entity ids and uuids
+froglight-components = ["dep:froglight-components"]
 
 # Enables tracking of what positions chunks are at
 froglight-world = ["dep:froglight-world", "dep:froglight-protocol"]

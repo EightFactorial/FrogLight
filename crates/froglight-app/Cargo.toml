@@ -29,7 +29,10 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-render = { version = "0.1.0", path = "../froglight-render", optional = true }
 froglight-settings = { version = "0.1.0", path = "../froglight-settings", default-features = false }
-froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
+froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
+    "froglight-components",
+    "froglight-world",
+] }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
 [features]

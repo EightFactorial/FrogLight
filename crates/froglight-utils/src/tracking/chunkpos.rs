@@ -2,11 +2,11 @@ use bevy_app::{App, PreUpdate};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{
     entity::Entity,
-    query::{With, Without},
+    query::With,
     schedule::{common_conditions::any_with_component, IntoSystemConfigs},
     system::{Query, ResMut, Resource},
 };
-use froglight_protocol::common::{ChunkPosition, EntityId};
+use froglight_protocol::common::ChunkPosition;
 use froglight_world::Chunk;
 use hashbrown::HashMap;
 
@@ -35,7 +35,7 @@ pub struct ChunkPositionMap(HashMap<ChunkPosition, Entity>);
 impl ChunkPositionMap {
     #[allow(clippy::type_complexity)]
     fn update_chunkpositions(
-        query: Query<(Entity, &ChunkPosition), (With<Chunk>, Without<EntityId>)>,
+        query: Query<(Entity, &ChunkPosition), With<Chunk>>,
         mut map: ResMut<Self>,
     ) {
         // Clear the map
