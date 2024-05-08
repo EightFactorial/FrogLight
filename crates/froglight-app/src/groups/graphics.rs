@@ -19,6 +19,7 @@ use crate::prelude::plugins::*;
 /// use bevy::{asset::AssetPlugin, prelude::*, DefaultPlugins};
 /// use froglight_app::prelude::plugins::SettingsPlugin;
 ///
+/// // Create a new `App`
 /// let mut app = App::new();
 ///
 /// // Add the `SettingsPlugin` before the `AssetPlugin`

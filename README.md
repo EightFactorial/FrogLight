@@ -20,10 +20,9 @@ This project does not include any assets, all assets must be loaded from resourc
 
 ## Version Support
 
-FrogLight is multiprotocol and supports release versions 1.20.0+, including:
-- 1.20.0 and 1.20.1 (763)
-- ~1.20.2~ (764)
-- ~1.20.3 and 1.20.4~ (765)
+FrogLight supports multiple different versions, including:
+- 1.20.0 - 1.20.1 (**TEMP**)
+- 1.21.0+ (**TARGET**)
 
 > [!Note]
 > Support for more versions will be added after core features and functionality.
@@ -64,10 +63,10 @@ After building, FrogLight can be found at `./target/release/froglight[.exe]`
 
 ## Plugins
 
-Using the [Bevy Engine](https://github.com/bevyengine/bevy/), plugins are very easy to create.
+Plugins are very easy to create using the [Bevy Engine](https://github.com/bevyengine/bevy/).
 
 ```rust
-use bevy::{asset::embedded_asset, prelude::*};
+use bevy::prelude::*;
 use froglight::plugins::{AppPlugins, LoadingPlugin};
 
 fn main() {
