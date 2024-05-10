@@ -1,10 +1,14 @@
 use bevy::prelude::*;
 
 #[doc(hidden)]
-pub(super) fn build(_app: &mut App) {}
+pub(super) fn build(app: &mut App) {
+    app.register_type::<LoadingScreenProgressBar>().register_type::<LoadingScreenProgress>();
+}
 
 /// A marker [`Component`] for the [`LoadingScreen`](super::LoadingScreen)
 /// progress bar.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+#[reflect(Component)]
 pub struct LoadingScreenProgressBar;
 
 impl LoadingScreenProgressBar {
@@ -14,7 +18,8 @@ impl LoadingScreenProgressBar {
 
 /// A [`Component`] that represents the progress of a
 /// [`LoadingScreen`](super::LoadingScreen).
-#[derive(Debug, Default, Clone, Copy, PartialEq, Deref, DerefMut, Component)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Deref, DerefMut, Component, Reflect)]
+#[reflect(Component)]
 pub struct LoadingScreenProgress(pub f32);
 
 impl LoadingScreenProgress {

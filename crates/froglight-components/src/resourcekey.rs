@@ -2,6 +2,7 @@
 
 use std::{borrow::Borrow, fmt::Display};
 
+use bevy_reflect::Reflect;
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
 use hashbrown::Equivalent;
@@ -13,7 +14,7 @@ use thiserror::Error;
 /// All keys are made of a namespace and a path, separated by a colon.
 ///
 /// Internally just a wrapper around a [`CompactString`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut, Reflect)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 pub struct ResourceKey(CompactString);

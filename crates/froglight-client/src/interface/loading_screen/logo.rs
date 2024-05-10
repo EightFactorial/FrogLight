@@ -2,11 +2,14 @@ use bevy::{asset::embedded_asset, prelude::*};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    app.register_type::<LoadingScreenLogo>();
+
     embedded_asset!(app, "assets/froglight_logo.png");
 }
 
 /// A marker [`Component`] for the [`LoadingScreen`](super::LoadingScreen) logo.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+#[reflect(Component)]
 pub struct LoadingScreenLogo;
 
 impl LoadingScreenLogo {

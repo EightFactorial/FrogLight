@@ -6,7 +6,7 @@ use crate::systemsets::ClientPostUpdateSet;
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     // Add the LoadingScreenVisibility resource
-    app.init_resource::<LoadingScreenVisibility>();
+    app.init_resource::<LoadingScreenVisibility>().register_type::<LoadingScreenVisibility>();
 
     // Add the LoadingScreenVisibility visibility system
     app.add_systems(
@@ -21,7 +21,8 @@ pub(super) fn build(app: &mut App) {
 }
 
 /// A [`Resource`] that enables or disables the [`LoadingScreen`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource, Reflect)]
+#[reflect(Resource)]
 pub struct LoadingScreenVisibility(pub bool);
 
 impl Default for LoadingScreenVisibility {

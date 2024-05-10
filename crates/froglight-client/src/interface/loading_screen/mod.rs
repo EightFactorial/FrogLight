@@ -2,8 +2,6 @@
 
 use bevy::{prelude::*, ui::FocusPolicy};
 
-use crate::systemsets::ClientUpdateSet;
-
 mod enable;
 pub use enable::*;
 
@@ -13,25 +11,22 @@ pub use logo::*;
 mod progress;
 pub use progress::*;
 
+mod systemset;
+pub use systemset::LoadingScreenSet;
+
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    // Add the LoadingScreenSet SystemSet
-    app.configure_sets(
-        Update,
-        LoadingScreenSet.run_if(any_with_component::<LoadingScreen>).in_set(ClientUpdateSet),
-    );
+    app.register_type::<LoadingScreen>();
 
+    systemset::build(app);
     enable::build(app);
     logo::build(app);
     progress::build(app);
 }
 
-/// A [`SystemSet`] for [`LoadingScreen`] [`Systems`](bevy_ecs::system::System).
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
-pub struct LoadingScreenSet;
-
 /// A marker [`Component`] for a loading screen.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+#[reflect(Component)]
 pub struct LoadingScreen;
 
 impl LoadingScreen {
@@ -61,8 +56,8 @@ impl LoadingScreen {
                 display: Display::Flex,
                 position_type: PositionType::Relative,
 
-                left: Val::Px(0.0),
-                top: Val::Px(0.0),
+                left: Val::Percent(0.0),
+                top: Val::Percent(0.0),
 
                 height: Val::Percent(100.0),
                 width: Val::Percent(100.0),

@@ -17,6 +17,7 @@ workspace = true
 
 [dependencies]
 bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
 compact_str = { workspace = true }
 derive_more = { workspace = true }
 hashbrown = { workspace = true }
@@ -28,7 +29,7 @@ uuid = { workspace = true }
 default = ["bevy"]
 
 # Derives `Component` for some types.
-bevy = ["dep:bevy_ecs"]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect"]
 
 # Derives `Serialize` and `Deserialize` for some types.
 serde = ["dep:serde", "compact_str/serde", "uuid/serde"]

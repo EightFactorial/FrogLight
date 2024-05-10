@@ -16,6 +16,7 @@ pub mod status;
 ///
 /// Used by Minecraft 1.20.2
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct V1_20_2;
 
 impl Version for V1_20_2 {

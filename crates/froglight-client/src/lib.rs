@@ -3,6 +3,7 @@
 
 use bevy::prelude::*;
 
+pub mod cameras;
 pub mod interface;
 pub mod systemsets;
 
@@ -17,4 +18,6 @@ impl Plugin for ClientPlugin {
         interface::build(app);
         systemsets::build(app);
     }
+
+    fn finish(&self, app: &mut App) { cameras::finish(app); }
 }

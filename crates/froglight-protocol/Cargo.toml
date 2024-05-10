@@ -23,6 +23,7 @@ proptest = { workspace = true }
 
 [dependencies]
 bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
 bitvec = { workspace = true }
 bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
 compact_str = { workspace = true, features = ["serde", "smallvec"] }
@@ -51,4 +52,4 @@ uuid = { workspace = true, features = ["serde"] }
 default = ["bevy"]
 
 # Derives `Component` for some types.
-bevy = ["dep:bevy_ecs", "froglight-components/bevy"]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-components/bevy"]

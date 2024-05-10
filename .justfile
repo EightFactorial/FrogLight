@@ -33,7 +33,7 @@ run-release: (run-profile "release")
 # Run build with specified profile
 [private]
 run-profile profile="dev" args="":
-  cargo run --profile {{profile}} --features mimalloc {{args}}
+  cargo run --profile {{profile}} --features mimalloc,inspector {{args}}
 
 # ---- Test Recipes ----
 

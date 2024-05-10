@@ -5,7 +5,7 @@ resolver = "2"
 members = [
     "crates/froglight-app",
     "crates/froglight-assets",
-    "crates/froglight-client", 
+    "crates/froglight-client",
     "crates/froglight-components",
     "crates/froglight-entity",
     "crates/froglight-events",
@@ -136,6 +136,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 bevy = { workspace = true, features = ["default", "wayland"] }
+bevy-inspector-egui = { version = "0.24.0", optional = true }
 froglight-app = { version = "0.1.0", path = "crates/froglight-app" }
 mimalloc = { version = "0.1.41", optional = true }
 
@@ -148,11 +149,15 @@ name = "froglight"
 path = "src/lib/froglight/lib.rs"
 
 [features]
-default = []
+default = ["mimalloc"]
 
 # Use mimalloc as the global allocator
 # Only applies to the froglight binary
 mimalloc = ["dep:mimalloc"]
+
+# Add an inspector for debugging
+# Only applies to the froglight binary
+inspector = ["dep:bevy-inspector-egui"]
 
 [[example]]
 name = "hello_world"
