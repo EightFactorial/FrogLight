@@ -3,11 +3,14 @@
 use bevy_app::{App, MainScheduleOrder, RunFixedMainLoop};
 use bevy_ecs::schedule::{ExecutorKind, Schedule, ScheduleLabel};
 
+mod current_tick;
+pub use current_tick::*;
+
 mod seconds;
-pub use seconds::*;
+pub use seconds::{FiveSeconds, OneSecond};
 
 mod ticks;
-pub use ticks::*;
+pub use ticks::{OneTick, TenTicks, TwoTicks};
 
 mod timer;
 
@@ -16,6 +19,7 @@ use traits::ScheduleTrait;
 
 pub(super) fn build(app: &mut App) {
     // Create and add the main schedule to the app
+    // TODO: Benchmark `SingleThreaded` vs `MultiThreaded`
     {
         let mut schedule = Schedule::new(RunFixedUtilLoop);
         schedule.set_executor_kind(ExecutorKind::SingleThreaded);
@@ -37,6 +41,9 @@ pub(super) fn build(app: &mut App) {
         OneSecond::build(app);
         FiveSeconds::build(app);
     }
+
+    // Add systems to get the current tick
+    current_tick::build(app);
 }
 
 /// Runs all fixed timer schedules in a loop according until all relevant

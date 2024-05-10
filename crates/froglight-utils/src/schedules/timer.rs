@@ -1,12 +1,15 @@
 use std::{marker::PhantomData, time::Duration};
 
 use bevy_derive::{Deref, DerefMut};
-use bevy_ecs::system::Resource;
+use bevy_ecs::{reflect::ReflectResource, system::Resource};
+use bevy_reflect::{std_traits::ReflectDefault, Reflect};
 
-#[derive(Debug, Default, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+#[derive(Debug, Default, PartialEq, Eq, Hash, Deref, DerefMut, Resource, Reflect)]
+#[reflect(Default, Resource)]
 pub(super) struct ScheduleTimer<T: Default> {
     #[deref]
     duration: Duration,
+    #[reflect(ignore)]
     _marker: PhantomData<T>,
 }
 

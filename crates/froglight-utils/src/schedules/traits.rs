@@ -5,12 +5,14 @@ use bevy_ecs::{
     schedule::{ExecutorKind, Schedule, ScheduleLabel},
     world::{Mut, World},
 };
+use bevy_reflect::TypePath;
 use bevy_time::Time;
 
 use super::{timer::ScheduleTimer, RunFixedUtilLoop};
 
-pub(super) trait ScheduleTrait<TimeType: 'static + Default + Send + Sync = ()>:
-    Default + ScheduleLabel
+pub(super) trait ScheduleTrait<TimeType: 'static + Default + Send + Sync = ()>
+where
+    Self: Default + ScheduleLabel + TypePath,
 {
     const MILLISECONDS: u64;
 
@@ -20,7 +22,9 @@ pub(super) trait ScheduleTrait<TimeType: 'static + Default + Send + Sync = ()>:
         schedule.set_executor_kind(ExecutorKind::SingleThreaded);
 
         // Add the schedule to the app
-        app.add_schedule(schedule).init_resource::<ScheduleTimer<Self>>();
+        app.add_schedule(schedule)
+            .init_resource::<ScheduleTimer<Self>>()
+            .register_type::<ScheduleTimer<Self>>();
 
         // Add a schedule runner and timer
         app.add_systems(RunFixedUtilLoop, run_schedule::<Self, TimeType>);
