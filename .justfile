@@ -15,7 +15,7 @@ build-release: (build-profile "release")
 # Compile build with specified profile
 [private]
 build-profile profile="dev" args="":
-  cargo build --profile {{profile}} --features mimalloc {{args}}
+  cargo build --profile {{profile}} --features mimalloc,inspector,binary {{args}}
 
 # Clean build artifacts
 clean: (fetch-tools) (tools "clean")
@@ -33,7 +33,7 @@ run-release: (run-profile "release")
 # Run build with specified profile
 [private]
 run-profile profile="dev" args="":
-  cargo run --profile {{profile}} --features mimalloc,inspector {{args}}
+  cargo run --profile {{profile}} --features mimalloc,inspector,binary {{args}}
 
 # ---- Test Recipes ----
 
