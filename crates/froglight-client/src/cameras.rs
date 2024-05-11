@@ -27,6 +27,7 @@ pub struct FrogLightCamera2dBundle {
     name: Name,
     camera: Camera2dBundle,
     marker: FrogLightCamera,
+    default: IsDefaultUiCamera,
 }
 
 impl FrogLightCamera2dBundle {
@@ -54,6 +55,7 @@ impl Default for FrogLightCamera2dBundle {
                 ..Default::default()
             },
             marker: FrogLightCamera,
+            default: IsDefaultUiCamera,
         }
     }
 }

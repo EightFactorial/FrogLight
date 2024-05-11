@@ -23,14 +23,12 @@ pub struct HeadlessPlugins;
 impl PluginGroup for HeadlessPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = BevyMinimalPlugins.build();
-
-        // Add some QoL plugins
         builder = builder.add(LogPlugin::default()).add(DiagnosticsPlugin);
 
         // Add the SettingsPlugin with the AssetSource disabled
         builder = builder.add(SettingsPlugin::default().disable_source());
 
-        // Add all BasicPlugins
+        // Add BasicPlugins
         builder = BasicPlugins::add(builder);
 
         builder

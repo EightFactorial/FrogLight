@@ -22,7 +22,7 @@ pub(super) fn build(app: &mut App) {
 
 /// A [`Resource`] that enables or disables the [`LoadingScreen`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource, Reflect)]
-#[reflect(Resource)]
+#[reflect(Default, Resource)]
 pub struct LoadingScreenVisibility(pub bool);
 
 impl Default for LoadingScreenVisibility {
@@ -63,7 +63,7 @@ impl LoadingScreenVisibility {
         state: Res<Self>,
     ) {
         let new_vis = state.get_visibility();
-        debug!("Setting {} `LoadingScreen` visibility to `{new_vis:?}`", query.iter().count());
+        debug!("Setting `LoadingScreen` visibility to `{new_vis:?}`");
 
         for mut vis in &mut query {
             *vis = new_vis;

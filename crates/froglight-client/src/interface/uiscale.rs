@@ -13,6 +13,11 @@ use crate::systemsets::ClientPreUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    // Register UiScale resources
+    app.register_type_data::<UiScale, ReflectResource>()
+        .register_type::<UiScaleEnable>()
+        .register_type::<UiScaleLimit>();
+
     // Add the UIScale update event
     app.add_event::<UiScaleUpdate>();
 
@@ -31,7 +36,8 @@ pub(super) fn build(app: &mut App) {
 }
 
 /// The [`UiScale`] automatic scaling toggle.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource, Reflect)]
+#[reflect(Default, Resource)]
 pub struct UiScaleEnable(pub bool);
 
 impl Default for UiScaleEnable {
@@ -54,7 +60,8 @@ impl UiScaleEnable {
 }
 
 /// The [`UiScale`] limit.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource, Reflect)]
+#[reflect(Default, Resource)]
 pub struct UiScaleLimit(pub Option<NonZeroU8>);
 
 impl UiScaleLimit {

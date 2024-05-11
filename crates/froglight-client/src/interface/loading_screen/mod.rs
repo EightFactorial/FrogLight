@@ -18,6 +18,12 @@ pub use systemset::LoadingScreenSet;
 pub(super) fn build(app: &mut App) {
     app.register_type::<LoadingScreen>();
 
+    // Spawn a new LoadingScreen on startup if one doesn't exist
+    app.add_systems(
+        PostStartup,
+        LoadingScreen::spawn.run_if(not(any_with_component::<LoadingScreen>)),
+    );
+
     systemset::build(app);
     enable::build(app);
     logo::build(app);
@@ -26,7 +32,7 @@ pub(super) fn build(app: &mut App) {
 
 /// A marker [`Component`] for a loading screen.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
-#[reflect(Component)]
+#[reflect(Component, Default)]
 pub struct LoadingScreen;
 
 impl LoadingScreen {
@@ -38,23 +44,30 @@ impl LoadingScreen {
     /// A [`System`](bevy_ecs::system::System) that spawns a
     /// [`LoadingScreen`].
     pub fn spawn(world: &mut World) {
+        let visibility = world.resource::<LoadingScreenVisibility>().get_visibility();
         let entity = world.spawn_empty().id();
-        Self::spawn_at(entity, Visibility::Inherited, world);
+        Self::spawn_at(entity, visibility, world);
         world.entity_mut(entity).insert(Self::Z_INDEX);
     }
 
     /// Creates a new [`LoadingScreen`] at the given [`Entity`].
     pub fn spawn_at(entity: Entity, visibility: Visibility, world: &mut World) {
+        debug!("Entity {entity:?} - Spawning a new `LoadingScreen`");
         let Some(mut entity_commands) = world.get_entity_mut(entity) else {
-            error!("Failed to spawn `LoadingScreen`, entity not found!");
+            error!("Failed to spawn `LoadingScreen`, Entity not found!");
             return;
         };
 
         // Create a new NodeBundle
         let node = NodeBundle {
             style: Style {
-                display: Display::Flex,
                 position_type: PositionType::Relative,
+
+                display: Display::Flex,
+                flex_direction: FlexDirection::Column,
+
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
 
                 left: Val::Percent(0.0),
                 top: Val::Percent(0.0),
@@ -71,21 +84,12 @@ impl LoadingScreen {
         };
 
         // Insert the marker and NodeBundle
-        entity_commands.insert((LoadingScreen, node));
+        entity_commands.insert((LoadingScreen, Name::new("LoadingScreen"), node));
 
-        // Spawn the logo and progress bar
-        let children = entity_commands.world_scope(|world| {
-            let logo_child = world.spawn_empty().id();
-            LoadingScreenLogo::spawn(logo_child, world);
-
-            let progress_child = world.spawn_empty().id();
-            LoadingScreenProgressBar::spawn(progress_child, world);
-
-            // Return the children we want to add to the parent
-            [logo_child, progress_child]
+        // Spawn a logo and progress bar and add them as children
+        let children: [Entity; 2] = entity_commands.world_scope(|world| {
+            [LoadingScreenLogo::spawn(world), LoadingScreenProgressBar::spawn(world)]
         });
-
-        // Add the children to the entity
         entity_commands.push_children(&children);
     }
 }

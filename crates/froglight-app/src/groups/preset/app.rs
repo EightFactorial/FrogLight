@@ -23,17 +23,13 @@ pub struct AppPlugins;
 impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = BevyDefaultPlugins.build();
-
-        // Add the DiagnosticPlugin
         builder = builder.add(DiagnosticsPlugin);
 
         // Add the SettingsPlugin before the BevyAssetPlugin
         builder = builder.add_before::<BevyAssetPlugin, _>(SettingsPlugin::default());
 
-        // Add all BasicPlugins
+        // Add BasicPlugins and GraphicalPlugins
         builder = BasicPlugins::add(builder);
-
-        // Add all GraphicalPlugins
         builder = GraphicalPlugins::add(builder);
 
         builder

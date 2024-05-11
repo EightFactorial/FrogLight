@@ -6,7 +6,7 @@ use bevy_asset::{
     io::Reader, Asset, AssetLoader, AsyncReadExt, BoxedFuture, ErasedLoadedAsset, Handle,
     LoadContext,
 };
-use bevy_log::{error, warn};
+use bevy_log::error;
 use froglight_components::resourcekey::ResourceKey;
 use futures_lite::io::BufReader;
 use thiserror::Error;
@@ -94,7 +94,7 @@ impl ResourcePackZipLoader {
             }
         } else {
             #[cfg(debug_assertions)]
-            warn!("Error reading `ZipEntry` filename");
+            bevy_log::warn!("Error reading `ZipEntry` filename");
             false
         }
     }
@@ -197,6 +197,7 @@ impl ResourcePackZipLoader {
                 error!("Asset \"{path}\" was not of type `{}`", A::type_path());
                 None
             }
+            #[allow(unused_variables)]
             Err(err) => {
                 #[cfg(debug_assertions)]
                 error!("{err}");
