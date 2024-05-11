@@ -31,7 +31,7 @@ fn main() {
     }
 
     // Add the `WindowTitlePlugin` if the target OS is not Android or iOS.
-    #[cfg(all(not(target_os = "android"), not(target_os = "ios")))]
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
         app.add_plugins(window_title::WindowTitlePlugin);
     }
@@ -42,7 +42,7 @@ fn main() {
         info!("World Inspector enabled, press F3 + I");
         app.add_plugins(bevy_inspector_egui::quick::WorldInspectorPlugin::new().run_if(
             |input: Res<ButtonInput<KeyCode>>, mut state: Local<bool>| {
-                if input.pressed(KeyCode::F3) && input.just_pressed(KeyCode::KeyI) {
+                if input.just_pressed(KeyCode::KeyI) && input.pressed(KeyCode::F3) {
                     *state = !*state;
                 }
                 *state

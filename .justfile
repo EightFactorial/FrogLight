@@ -58,7 +58,7 @@ doc-test:
 # ---- Tool Recipes ----
 
 # Run cargo deny
-deny:
+deny: (tools "deny")
   cargo deny check
 
 # Run cargo update
