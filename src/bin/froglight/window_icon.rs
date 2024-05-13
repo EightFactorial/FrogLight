@@ -50,14 +50,14 @@ impl WindowIconPlugin {
             if let Ok(handle) = window.window_handle() {
                 if matches!(
                     handle.as_raw(),
-                    // Linux using X11
-                    RawWindowHandle::Xcb(_) | RawWindowHandle::Xlib(_)
-                    // Windows
-                    | RawWindowHandle::Win32(_) | RawWindowHandle::WinRt(_)
+                    RawWindowHandle::Xcb(_)
+                        | RawWindowHandle::Xlib(_)
+                        | RawWindowHandle::Win32(_)
+                        | RawWindowHandle::WinRt(_)
                 ) {
                     debug!("Setting window icon");
                 } else {
-                    debug!("Setting window icon not supported on this platform");
+                    info!("Setting window icon not supported on this platform");
                 }
             }
 

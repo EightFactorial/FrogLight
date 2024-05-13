@@ -2,7 +2,8 @@
 
 use std::{borrow::Borrow, fmt::Display};
 
-use bevy_reflect::Reflect;
+#[cfg(feature = "bevy")]
+use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
 use hashbrown::Equivalent;
@@ -14,10 +15,12 @@ use thiserror::Error;
 /// All keys are made of a namespace and a path, separated by a colon.
 ///
 /// Internally just a wrapper around a [`CompactString`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut, Reflect)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
-pub struct ResourceKey(CompactString);
+pub struct ResourceKey(#[cfg_attr(feature = "bevy", reflect(ignore))] CompactString);
 
 /// An error that occurred while creating a [`ResourceKey`]
 #[derive(Debug, Error)]
@@ -278,4 +281,31 @@ impl PartialEq<String> for ResourceKey {
 
 impl PartialEq<CompactString> for ResourceKey {
     fn eq(&self, other: &CompactString) -> bool { self.as_str() == other.as_str() }
+}
+
+#[cfg(feature = "inspector")]
+impl bevy_inspector_egui::inspector_egui_impls::InspectorPrimitive for ResourceKey {
+    fn ui(
+        &mut self,
+        ui: &mut bevy_inspector_egui::egui::Ui,
+        _: &dyn std::any::Any,
+        _: bevy_inspector_egui::egui::Id,
+        _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
+    ) -> bool {
+        ui.add_sized(
+            ui.available_size(),
+            bevy_inspector_egui::egui::TextEdit::singleline(&mut self.to_string()),
+        )
+        .changed()
+    }
+
+    fn ui_readonly(
+        &self,
+        ui: &mut bevy_inspector_egui::egui::Ui,
+        _: &dyn std::any::Any,
+        _: bevy_inspector_egui::egui::Id,
+        _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
+    ) {
+        ui.add_sized(ui.available_size(), bevy_inspector_egui::egui::Label::new(self.as_str()));
+    }
 }

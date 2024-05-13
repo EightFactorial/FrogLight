@@ -1,11 +1,23 @@
+use bevy_app::App;
 use bevy_asset::Handle;
+use bevy_reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize};
 use bevy_render::texture::Image;
-use compact_str::CompactString;
 use hashbrown::HashMap;
 use serde::Deserialize;
 
+#[doc(hidden)]
+pub(super) fn build(app: &mut App) {
+    app.register_type::<ResourcePackInfo>()
+        .register_type::<ResourcePackMeta>()
+        .register_type::<ResourcePackFormat>()
+        .register_type::<ResourcePackDescription>()
+        .register_type::<SupportedFormats>()
+        .register_type::<ResourcePackLanguage>();
+}
+
 /// Information about a [`ResourcePack`](super::ResourcePack).
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
+#[reflect(Default)]
 pub struct ResourcePackInfo {
     /// The [`ResourcePack`](super::ResourcePack) icon
     ///
@@ -18,7 +30,8 @@ pub struct ResourcePackInfo {
 /// [`ResourcePack`](super::ResourcePack) metadata
 ///
 /// This is the `pack.mcmeta` file.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deserialize, Reflect)]
+#[reflect(Default, Deserialize)]
 pub struct ResourcePackMeta {
     /// The [`ResourcePack`](super::ResourcePack) format
     #[serde(default)]
@@ -28,11 +41,12 @@ pub struct ResourcePackMeta {
     /// The key is the language code, which has a corresponding
     /// file in the `assets/{namespace}/lang` directory.
     #[serde(default)]
-    pub language: HashMap<CompactString, ResourcePackLanguage>,
+    pub language: HashMap<String, ResourcePackLanguage>,
 }
 
 /// [`ResourcePack`](super::ResourcePack) format.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deserialize, Reflect)]
+#[reflect(Default, Deserialize)]
 pub struct ResourcePackFormat {
     /// The [`ResourcePack`](super::ResourcePack) format version
     #[serde(default)]
@@ -42,11 +56,21 @@ pub struct ResourcePackFormat {
     pub supported_formats: SupportedFormats,
     /// The [`ResourcePack`](super::ResourcePack) description
     #[serde(default)]
+    pub description: ResourcePackDescription,
+}
+
+/// [`ResourcePack`](super::ResourcePack) description.
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deserialize, Reflect)]
+#[reflect(Default, Deserialize)]
+pub struct ResourcePackDescription {
+    /// The [`ResourcePack`](super::ResourcePack) description
+    #[reflect(ignore)]
     pub description: serde_json::Value,
 }
 
 /// Supported [`ResourcePack`](super::ResourcePack) formats.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Reflect)]
+#[reflect(Deserialize)]
 #[serde(untagged)]
 pub enum SupportedFormats {
     /// A list of format versions
@@ -78,12 +102,13 @@ impl SupportedFormats {
 }
 
 /// A language in a [`ResourcePack`](super::ResourcePack).
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deserialize, Reflect)]
+#[reflect(Default, Deserialize)]
 pub struct ResourcePackLanguage {
     /// The language name
-    pub name: CompactString,
+    pub name: String,
     /// The language region
-    pub region: CompactString,
+    pub region: String,
     /// The language bidirectional flag
     ///
     /// False: left-to-right

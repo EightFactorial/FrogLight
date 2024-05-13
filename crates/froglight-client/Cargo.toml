@@ -25,6 +25,9 @@ froglight-network = { version = "0.1.0", path = "../froglight-network", features
 ] }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-render = { version = "0.1.0", path = "../froglight-render" }
+froglight-settings = { version = "0.1.0", path = "../froglight-settings", features = [
+    "bevy_asset",
+] }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
     "froglight-components",
     "froglight-world",
@@ -32,3 +35,4 @@ froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
     "bevy",
 ] }
+serde = { workspace = true, features = ["derive"] }

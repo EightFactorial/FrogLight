@@ -1,13 +1,17 @@
 #[cfg(feature = "bevy")]
 use bevy_ecs::reflect::ReflectComponent;
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::ReflectDefault;
 use derive_more::{Deref, DerefMut, From, Into};
 
 /// An entity's identifier.
 ///
 /// One is assigned to an entity when it is sent to the client.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, From, Into, Deref, DerefMut)]
+#[derive(
+    Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, From, Into, Deref, DerefMut,
+)]
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Component))]
+#[cfg_attr(feature = "bevy", reflect(Component, Default))]
 pub struct EntityId(pub u32);
 
 impl std::fmt::Display for EntityId {

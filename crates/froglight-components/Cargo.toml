@@ -17,6 +17,7 @@ workspace = true
 
 [dependencies]
 bevy_ecs = { workspace = true, optional = true }
+bevy-inspector-egui = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 compact_str = { workspace = true }
 derive_more = { workspace = true }
@@ -29,7 +30,10 @@ uuid = { workspace = true }
 default = ["bevy"]
 
 # Derives `Component` for some types.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect"]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "serde"]
+
+# Implements InspectorPrimitive for ResourceKey.
+inspector = ["dep:bevy-inspector-egui", "bevy"]
 
 # Derives `Serialize` and `Deserialize` for some types.
 serde = ["dep:serde", "compact_str/serde", "uuid/serde"]

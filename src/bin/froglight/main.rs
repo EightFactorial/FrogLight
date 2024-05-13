@@ -48,6 +48,9 @@ fn main() {
                 *state
             },
         ));
+
+        // Register the `ResourceKey` type data for the inspector.
+        app.register_type::<froglight::network::common::ResourceKey>().register_type_data::<froglight::network::common::ResourceKey, bevy_inspector_egui::inspector_egui_impls::InspectorEguiImpl>();
     }
 
     app.run();

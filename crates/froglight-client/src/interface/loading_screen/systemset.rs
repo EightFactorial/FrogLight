@@ -4,15 +4,11 @@ use bevy::{
 };
 
 use super::LoadingScreen;
-use crate::systemsets::ClientUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     // Add the LoadingScreenSet SystemSet
-    app.configure_sets(
-        Update,
-        LoadingScreenSet.run_if(any_with_component::<LoadingScreen>).in_set(ClientUpdateSet),
-    );
+    app.configure_sets(Update, LoadingScreenSet.run_if(any_with_component::<LoadingScreen>));
 }
 
 /// A [`SystemSet`] for [`LoadingScreen`] systems.

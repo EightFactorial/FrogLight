@@ -49,7 +49,7 @@ impl WindowTitlePlugin {
         window_title = window_title.replace("{random}", random);
 
         // Set the window title for all windows.
-        debug!("Setting window title: \"{window_title}\"");
+        info!("Setting window title: \"{window_title}\"");
         for window in windows.windows.values() {
             window.set_title(window_title.as_str());
         }

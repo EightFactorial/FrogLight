@@ -1,8 +1,10 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![feature(trivial_bounds)]
 
 use bevy::prelude::*;
 
+pub mod assets;
 pub mod cameras;
 pub mod interface;
 pub mod systemsets;
@@ -15,8 +17,10 @@ pub struct ClientPlugin;
 
 impl Plugin for ClientPlugin {
     fn build(&self, app: &mut App) {
-        interface::build(app);
         systemsets::build(app);
+
+        assets::build(app);
+        interface::build(app);
     }
 
     fn finish(&self, app: &mut App) { cameras::finish(app); }

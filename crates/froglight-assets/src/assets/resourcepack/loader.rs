@@ -9,9 +9,12 @@ use bevy_asset::{
 use bevy_log::error;
 use froglight_components::resourcekey::ResourceKey;
 use futures_lite::io::BufReader;
+use hashbrown::HashMap;
+use serde::de::DeserializeOwned;
 use thiserror::Error;
 
 use super::ResourcePack;
+use crate::assets::TextSource;
 
 /// An [`AssetLoader`] for [`ResourcePack`]s.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -86,20 +89,29 @@ impl ResourcePackZipLoader {
         if let Ok(filename) = entry.filename().as_str() {
             // Check for files in the "assets" directory
             if filename.starts_with("assets/") {
-                // Check for supported file extensions
-                matches!(filename.split('.').last(), Some("png" | "ogg" | "json"))
+                // Check for supported file extensions in subdirectories
+                let ext = filename.split('.').last().unwrap_or_default();
+                match filename.split('/').nth(2).unwrap_or_default() {
+                    "blockstates" | "font" | "lang" | "models" | "particles" => {
+                        matches!(ext, "json")
+                    }
+                    "sounds" => matches!(ext, "ogg"),
+                    "texts" => matches!(ext, "json" | "txt"),
+                    "textures" => matches!(ext, "png"),
+                    "sounds.json" => true,
+                    _ => false,
+                }
             } else {
                 // Check for "pack.mcmeta" and "pack.png"
                 matches!(filename, "pack.mcmeta" | "pack.png")
             }
         } else {
-            #[cfg(debug_assertions)]
-            bevy_log::warn!("Error reading `ZipEntry` filename");
             false
         }
     }
 
     /// Reads an entry from the ZIP file.
+    #[allow(clippy::too_many_lines)]
     async fn read_entry(
         reader: &mut ZipEntryReader<'_, BufReader<&mut Reader<'_>>, WithEntry<'_>>,
         context: &mut LoadContext<'_>,
@@ -110,6 +122,7 @@ impl ResourcePackZipLoader {
 
         // Check for special files
         match filename.as_str() {
+            // Deserialize the "pack.mcmeta" file
             "pack.mcmeta" => {
                 let mut buffer = Vec::new();
                 reader.read_to_end(&mut buffer).await?;
@@ -123,6 +136,7 @@ impl ResourcePackZipLoader {
 
                 return Ok(());
             }
+            // Load the "pack.png" image
             "pack.png" => {
                 if let Some(icon) = Self::load_asset(reader, context, "pack_icon", "pack.png").await
                 {
@@ -140,31 +154,83 @@ impl ResourcePackZipLoader {
             return Ok(());
         };
 
-        // Load the asset based on the file extension.
-        match filename.split('.').last() {
-            Some("png") => {
-                if let Some(texture) =
-                    Self::load_asset(reader, context, &resource_key, &filename).await
-                {
-                    resource_pack.textures.insert(resource_key, texture);
-                }
+        // Load the asset.
+        match filename.split('/').nth(2).unwrap_or_default() {
+            "blockstates" => {
+                Self::deserialize_and_insert_asset(
+                    reader,
+                    &mut resource_pack.blockstates,
+                    resource_key,
+                )
+                .await;
             }
-            Some("ogg") => {
-                if let Some(audio) =
-                    Self::load_asset(reader, context, &resource_key, &filename).await
-                {
-                    resource_pack.audio.insert(resource_key, audio);
-                }
+            "font" => {
+                Self::deserialize_and_insert_asset(reader, &mut resource_pack.font, resource_key)
+                    .await;
             }
-            Some("json") => {
-                let mut buffer = Vec::new();
-                reader.read_to_end(&mut buffer).await?;
+            "lang" => {
+                Self::deserialize_and_insert_asset(reader, &mut resource_pack.lang, resource_key)
+                    .await;
+            }
+            "models" => {
+                Self::deserialize_and_insert_asset(reader, &mut resource_pack.models, resource_key)
+                    .await;
+            }
+            "particles" => {
+                Self::deserialize_and_insert_asset(
+                    reader,
+                    &mut resource_pack.particles,
+                    resource_key,
+                )
+                .await;
+            }
+            "sounds" => {
+                Self::load_and_insert_asset(
+                    reader,
+                    context,
+                    &mut resource_pack.sounds,
+                    resource_key,
+                    &filename,
+                )
+                .await;
+            }
+            "texts" => {
+                // Read the text file.
+                let mut contents = String::new();
+                if let Err(err) = reader.read_to_string(&mut contents).await {
+                    error!("Error reading text file: {err}");
+                    return Ok(());
+                }
 
-                match serde_json::from_slice(&buffer) {
-                    Ok(json) => {
-                        resource_pack.json.insert(resource_key, json);
+                // If the file is a JSON file, parse it as JSON.
+                // Otherwise, store it as raw text.
+                match filename.split('.').last().unwrap_or_default() {
+                    "json" => match serde_json::from_str(&contents) {
+                        Ok(json) => {
+                            resource_pack.texts.insert(resource_key, TextSource::Json(json));
+                        }
+                        Err(err) => {
+                            error!("Error parsing JSON file \"{filename}\": {err}");
+                        }
+                    },
+                    _ => {
+                        resource_pack.texts.insert(resource_key, TextSource::RawText(contents));
                     }
-                    Err(err) => error!("Error parsing JSON \"{resource_key}\": {err}"),
+                }
+            }
+            "textures" => {
+                Self::load_and_insert_asset(
+                    reader,
+                    context,
+                    &mut resource_pack.textures,
+                    resource_key,
+                    &filename,
+                )
+                .await;
+            }
+            "sounds.json" => {
+                if let Some(definitions) = Self::deserialize_asset(reader, &resource_key).await {
+                    resource_pack.sound_defs.insert(resource_key, definitions);
                 }
             }
             _ => {}
@@ -180,6 +246,49 @@ impl ResourcePackZipLoader {
         ResourceKey::try_new(stripped[..stripped.len() - 1].replacen('/', ":", 1)).ok()
     }
 
+    async fn deserialize_and_insert_asset<T: DeserializeOwned>(
+        reader: &mut Reader<'_>,
+        map: &mut HashMap<ResourceKey, T>,
+        key: ResourceKey,
+    ) {
+        if let Some(asset) = Self::deserialize_asset(reader, &key).await {
+            map.insert(key, asset);
+        }
+    }
+
+    /// Deserializes an asset and inserts it into a map.
+    async fn deserialize_asset<T: DeserializeOwned>(
+        reader: &mut Reader<'_>,
+        path: &str,
+    ) -> Option<T> {
+        let mut buffer = Vec::new();
+        reader.read_to_end(&mut buffer).await.unwrap();
+        match serde_json::from_slice(&buffer) {
+            Ok(asset) => Some(asset),
+            #[allow(unused_variables)]
+            Err(err) => {
+                #[cfg(debug_assertions)]
+                error!("Error deserializing asset: \"{path}\", {err}");
+                #[cfg(not(debug_assertions))]
+                error!("Error deserializing asset: \"{path}\"");
+                None
+            }
+        }
+    }
+
+    /// Loads an asset and inserts it into a map.
+    async fn load_and_insert_asset<A: Asset>(
+        reader: &mut Reader<'_>,
+        context: &mut LoadContext<'_>,
+        map: &mut HashMap<ResourceKey, Handle<A>>,
+        key: ResourceKey,
+        path: &str,
+    ) {
+        if let Some(asset) = Self::load_asset(reader, context, &key, path).await {
+            map.insert(key, asset);
+        }
+    }
+
     /// Loads an asset from a ZIP entry.
     async fn load_asset<A: Asset>(
         reader: &mut Reader<'_>,
@@ -187,25 +296,29 @@ impl ResourcePackZipLoader {
         key: &str,
         path: &str,
     ) -> Option<Handle<A>> {
-        match context
-            .load_direct_with_reader(reader, path.to_string())
-            .await
-            .map(ErasedLoadedAsset::take::<A>)
-        {
-            Ok(Some(asset)) => Some(context.add_labeled_asset(key.to_string(), asset)),
-            Ok(None) => {
-                error!("Asset \"{path}\" was not of type `{}`", A::type_path());
-                None
-            }
-            #[allow(unused_variables)]
+        let loaded_asset = match context.load_direct_with_reader(reader, path.to_string()).await {
+            Ok(asset) => asset,
             Err(err) => {
                 #[cfg(debug_assertions)]
                 error!("{err}");
                 #[cfg(not(debug_assertions))]
                 error!("Error loading asset: \"{path}\"");
 
-                None
+                return None;
             }
+        };
+
+        #[cfg(debug_assertions)]
+        let type_name = loaded_asset.asset_type_name();
+
+        if let Some(asset) = ErasedLoadedAsset::take::<A>(loaded_asset) {
+            Some(context.add_labeled_asset(key.to_string(), asset))
+        } else {
+            #[cfg(debug_assertions)]
+            error!("Asset \"{path}\" is `{type_name}`, not `{}`", A::type_path());
+            #[cfg(not(debug_assertions))]
+            error!("Asset \"{path}\" was not of type `{}`", A::type_path());
+            None
         }
     }
 }
