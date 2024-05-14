@@ -8,7 +8,6 @@ members = [
     "crates/froglight-client",
     "crates/froglight-components",
     "crates/froglight-entity",
-    "crates/froglight-events",
     "crates/froglight-macros",
     "crates/froglight-network",
     "crates/froglight-protocol",
@@ -67,6 +66,7 @@ bevy_input = "0.13.2"
 bevy-inspector-egui = "0.24.0"
 bevy_log = "0.13.2"
 bevy_math = "0.13.2"
+bevy_pbr = "0.13.2"
 bevy_reflect = "0.13.2"
 bevy_render = "0.13.2"
 bevy_sprite = "0.13.2"
@@ -99,19 +99,24 @@ uuid = "1.8.0"
 opt-level = 1
 
 [profile.dev.package]
-# Slightly optimize most froglight packages
+# Only slightly optimize most froglight packages
 froglight-app = { opt-level = 1 }
 froglight-assets = { opt-level = 1 }
 froglight-client = { opt-level = 1 }
+froglight-components = { opt-level = 1 }
 froglight-entity = { opt-level = 1 }
 froglight-macros = { opt-level = 1 }
 froglight-network = { opt-level = 1 }
 froglight-registry = { opt-level = 1 }
 froglight-settings = { opt-level = 1 }
 froglight-utils = { opt-level = 1 }
-froglight-world = { opt-level = 1 }
-# Fully all other packages
-"*" = { opt-level = 3 }
+# Fully optimize important froglight packages and bevy
+bevy = { opt-level = 3 }
+froglight-protocol = { opt-level = 3 }
+froglight-render = { opt-level = 3 }
+froglight-world = { opt-level = 3 }
+# Somewhat optimize all other packages
+"*" = { opt-level = 2 }
 
 # Fully optimize release builds
 [profile.release]
@@ -175,6 +180,8 @@ inspector = ["dep:bevy-inspector-egui"]
 # Adds dependencies for client plugins
 # Only applies to the froglight binary
 binary = ["dep:fastrand", "dep:image", "dep:winit"]
+
+# --- Examples ---
 
 [[example]]
 name = "hello_world"

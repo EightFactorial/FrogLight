@@ -19,7 +19,6 @@ workspace = true
 bevy = { workspace = true, default-features = true, features = ["wayland"] }
 froglight-assets = { version = "0.1.0", path = "../froglight-assets" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
-froglight-events = { version = "0.1.0", path = "../froglight-events" }
 froglight-network = { version = "0.1.0", path = "../froglight-network", features = [
     "resolver",
 ] }

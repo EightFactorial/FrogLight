@@ -13,6 +13,7 @@ pub(super) fn build(app: &mut App) {
     // Add the ResourcePackSettings ConfigFile implementation
     ResourcePackSettings::build(app);
 
+    // Load all resource packs on startup
     app.add_systems(
         Update,
         ResourcePackSettings::load_resourcepacks_on_startup

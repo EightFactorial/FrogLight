@@ -2,19 +2,14 @@
 
 use bevy::{
     app::{App, PostUpdate, PreUpdate, Update},
-    ecs::schedule::{IntoSystemSetConfigs, SystemSet},
+    ecs::schedule::SystemSet,
 };
-use froglight_events::systemsets::EventPreUpdateSet;
-use froglight_utils::systemsets::UtilityPreUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.configure_sets(
-        PreUpdate,
-        ClientPreUpdateSet.after(EventPreUpdateSet).before(UtilityPreUpdateSet),
-    )
-    .configure_sets(Update, ClientUpdateSet)
-    .configure_sets(PostUpdate, ClientPostUpdateSet);
+    app.configure_sets(PreUpdate, ClientPreUpdateSet)
+        .configure_sets(Update, ClientUpdateSet)
+        .configure_sets(PostUpdate, ClientPostUpdateSet);
 }
 
 /// A [`SystemSet`] that runs during the [`PreUpdate`] phase.

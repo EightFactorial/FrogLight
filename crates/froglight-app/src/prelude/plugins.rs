@@ -4,7 +4,6 @@
 pub use froglight_assets::AssetPlugin;
 #[cfg(feature = "bevy_asset")]
 pub use froglight_client::ClientPlugin;
-pub use froglight_events::EventPlugin;
 pub use froglight_network::{
     connection::ConnectionPlugin, resolver::ResolverPlugin, NetworkPlugins,
 };

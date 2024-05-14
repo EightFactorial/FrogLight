@@ -21,6 +21,6 @@ impl BasicPlugins {
     /// Adds all the [`Plugins`](bevy::prelude::Plugin) that are part of the
     /// [`BasicPlugins`] [`PluginGroup`].
     pub(crate) fn add(builder: PluginGroupBuilder) -> PluginGroupBuilder {
-        builder.add(RegistryPlugin).add(UtilityPlugin).add(NetworkPlugins).add(EventPlugin)
+        builder.add(RegistryPlugin).add(UtilityPlugin).add(NetworkPlugins)
     }
 }

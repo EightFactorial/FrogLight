@@ -7,6 +7,7 @@ use bevy::prelude::*;
 pub mod assets;
 pub mod cameras;
 pub mod interface;
+pub mod networking;
 pub mod systemsets;
 
 /// The `Client` Froglight plugin.
@@ -21,6 +22,7 @@ impl Plugin for ClientPlugin {
 
         assets::build(app);
         interface::build(app);
+        networking::build(app);
     }
 
     fn finish(&self, app: &mut App) { cameras::finish(app); }
