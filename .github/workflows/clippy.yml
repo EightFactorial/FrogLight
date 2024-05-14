@@ -39,7 +39,7 @@ jobs:
           components: clippy
       # Install clippy-sarif and sarif-fmt
       - name: Install Sarif
-        uses: taiki-e/install-action@00a67321d66e038602baf558d366a594a7019ea2 # v2
+        uses: taiki-e/install-action@c2927f0c5b5adc6a76bc4a7847bc6e0503754bed # v2
         with:
           tool: clippy-sarif,sarif-fmt
       # Checkout the repository
@@ -58,7 +58,7 @@ jobs:
         continue-on-error: true
       # Upload the results
       - name: Upload Results
-        uses: github/codeql-action/upload-sarif@d39d31e687223d841ef683f52467bd88e9b21c14 # v3
+        uses: github/codeql-action/upload-sarif@b7cec7526559c32f1616476ff32d17ba4c59b2d6 # v3
         with:
           sarif_file: clippy-results.sarif
           wait-for-processing: true
