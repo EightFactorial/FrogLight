@@ -39,7 +39,7 @@ jobs:
           components: clippy
       # Install clippy-sarif and sarif-fmt
       - name: Install Sarif
-        uses: taiki-e/install-action@00a67321d66e038602baf558d366a594a7019ea2 # v2
+        uses: taiki-e/install-action@c2927f0c5b5adc6a76bc4a7847bc6e0503754bed # v2
         with:
           tool: clippy-sarif,sarif-fmt
       # Checkout the repository
