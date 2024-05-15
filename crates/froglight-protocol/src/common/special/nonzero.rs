@@ -36,6 +36,7 @@ use crate::protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError,
 /// value of the inner type. For example, if the inner type is `u8`, then
 /// `NonZero::new_some(255u8)` will overflow and be written as `0`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct NonZero<T>(Option<T>);
 
 impl<T> NonZero<T> {

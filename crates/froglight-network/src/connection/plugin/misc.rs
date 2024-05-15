@@ -19,7 +19,6 @@ use froglight_protocol::{
 
 use super::{
     events::{ConnectionDisconnect, StatusResponse},
-    handler::{HandshakeHandler, LoginHandler, StatusHandler},
     systemsets::NetworkPostUpdateSet,
     ConnectionHandler,
 };
@@ -74,12 +73,8 @@ impl ConnectionTask {
             if let Some(err) = block_on(poll_once(&mut task.task)) {
                 events.send(ConnectionDisconnect { entity, reason: err.to_string(), error: err });
 
+                // Remove the connection task, marker, and channels
                 let mut entity_commands = commands.entity(entity);
-
-                // Remove the task from the entity
-                entity_commands.remove::<ConnectionTask>();
-
-                // Remove the connection marker and packet channels
                 match task.version_id {
                     V1_20_0::ID => {
                         Self::remove_components::<V1_20_0>(&mut entity_commands);
@@ -96,13 +91,10 @@ impl ConnectionTask {
         }
     }
 
-    /// Remove the [`ConnectionMarker`] and
+    /// Remove the [`ConnectionMarker`], [`ConnectionTask`], and
     /// [`PacketChannels`](ConnectionHandler::PacketChannels) from the entity.
-    fn remove_components<
-        V: Version + ConnectionHandler + HandshakeHandler + LoginHandler + StatusHandler,
-    >(
-        commands: &mut EntityCommands,
-    ) where
+    pub(crate) fn remove_components<V: Version + ConnectionHandler>(commands: &mut EntityCommands)
+    where
         Serverbound: NetworkDirection<V, Handshaking>
             + NetworkDirection<V, Status>
             + NetworkDirection<V, Login>,
@@ -111,6 +103,7 @@ impl ConnectionTask {
         Login: State<V>,
     {
         commands
+            .remove::<ConnectionTask>()
             .remove::<ConnectionMarker<V>>()
             .remove::<<V as ConnectionHandler>::PacketChannels>();
     }

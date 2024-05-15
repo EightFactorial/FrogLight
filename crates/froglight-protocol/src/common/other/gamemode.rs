@@ -1,9 +1,14 @@
+#[cfg(feature = "bevy")]
+use bevy_ecs::reflect::ReflectComponent;
+#[cfg(feature = "bevy")]
+use bevy_reflect::std_traits::ReflectDefault;
 use froglight_macros::FrogReadWrite;
 
 /// The game mode of a player.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Default, Component))]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
-#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
 pub enum GameMode {
     /// Survival mode.
     #[default]

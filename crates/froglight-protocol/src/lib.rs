@@ -2,6 +2,7 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![feature(array_try_from_fn)]
 #![feature(const_type_name)]
+#![feature(trivial_bounds)]
 #![allow(incomplete_features)]
 #![feature(generic_const_exprs)]
 #![allow(clippy::struct_excessive_bools)]

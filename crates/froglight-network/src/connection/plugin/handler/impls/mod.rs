@@ -104,7 +104,6 @@ fn fire_legacy_recvpacket<V: Version>(
     query: Query<(Entity, &LegacyPacketChannel<V>)>,
     mut login_events: EventWriter<RecvPacket<V, Login>>,
     mut play_events: EventWriter<RecvPacket<V, Play>>,
-    mut commands: Commands,
 ) where
     Serverbound: NetworkDirection<V, Login> + NetworkDirection<V, Play>,
     LegacyPacketChannel<V>: PacketTrait<V, Login> + PacketTrait<V, Play>,
@@ -113,18 +112,17 @@ fn fire_legacy_recvpacket<V: Version>(
 {
     for (entity, channel) in &query {
         // Send Login Packets
-        receive_legacyrecvpacket(entity, channel, &mut login_events, &mut commands);
+        receive_legacyrecvpacket(entity, channel, &mut login_events);
         // Send Play Packets
-        receive_legacyrecvpacket(entity, channel, &mut play_events, &mut commands);
+        receive_legacyrecvpacket(entity, channel, &mut play_events);
     }
 }
 
 // Listens for SendPacket events and sends the packets through the channel.
 fn listen_legacy_sendpacket<V: Version>(
-    query: Query<(Entity, &LegacyPacketChannel<V>)>,
+    query: Query<&LegacyPacketChannel<V>>,
     mut login_events: EventReader<SendPacket<V, Login>>,
     mut play_events: EventReader<SendPacket<V, Play>>,
-    mut commands: Commands,
 ) where
     Serverbound: NetworkDirection<V, Login> + NetworkDirection<V, Play>,
     LegacyPacketChannel<V>: PacketTrait<V, Login> + PacketTrait<V, Play>,
@@ -132,9 +130,9 @@ fn listen_legacy_sendpacket<V: Version>(
     Play: State<V>,
 {
     // Listen Login Packets
-    send_legacysendpacket(&query, &mut login_events, &mut commands);
+    send_legacysendpacket(&query, &mut login_events);
     // Listen Play Packets
-    send_legacysendpacket(&query, &mut play_events, &mut commands);
+    send_legacysendpacket(&query, &mut play_events);
 }
 
 // --- Current Systems ---
@@ -144,7 +142,6 @@ fn fire_recvpacket<V: Version>(
     mut login_events: EventWriter<RecvPacket<V, Login>>,
     mut config_events: EventWriter<RecvPacket<V, Configuration>>,
     mut play_events: EventWriter<RecvPacket<V, Play>>,
-    mut commands: Commands,
 ) where
     Serverbound:
         NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
@@ -155,21 +152,20 @@ fn fire_recvpacket<V: Version>(
 {
     for (entity, channel) in &query {
         // Send Login Packets
-        receive_recvpacket(entity, channel, &mut login_events, &mut commands);
+        receive_recvpacket(entity, channel, &mut login_events);
         // Send Configuration Packets
-        receive_recvpacket(entity, channel, &mut config_events, &mut commands);
+        receive_recvpacket(entity, channel, &mut config_events);
         // Send Play Packets
-        receive_recvpacket(entity, channel, &mut play_events, &mut commands);
+        receive_recvpacket(entity, channel, &mut play_events);
     }
 }
 
 /// Listens for [`SendPacket`] events and sends the packets through the channel.
 fn listen_sendpacket<V: Version>(
-    query: Query<(Entity, &PacketChannel<V>)>,
+    query: Query<&PacketChannel<V>>,
     mut login_events: EventReader<SendPacket<V, Login>>,
     mut config_events: EventReader<SendPacket<V, Configuration>>,
     mut play_events: EventReader<SendPacket<V, Play>>,
-    mut commands: Commands,
 ) where
     Serverbound:
         NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
@@ -179,11 +175,11 @@ fn listen_sendpacket<V: Version>(
     Play: State<V>,
 {
     // Send Login Packets
-    send_sendpacket(&query, &mut login_events, &mut commands);
+    send_sendpacket(&query, &mut login_events);
     // Send Configuration Packets
-    send_sendpacket(&query, &mut config_events, &mut commands);
+    send_sendpacket(&query, &mut config_events);
     // Send Play Packets
-    send_sendpacket(&query, &mut play_events, &mut commands);
+    send_sendpacket(&query, &mut play_events);
 }
 
 // --- Legacy Helpers ---
@@ -192,7 +188,6 @@ fn receive_legacyrecvpacket<V: Version, S: State<V>>(
     entity: Entity,
     channel: &LegacyPacketChannel<V>,
     events: &mut EventWriter<RecvPacket<V, S>>,
-    commands: &mut Commands,
 ) where
     Serverbound: NetworkDirection<V, S> + NetworkDirection<V, Login> + NetworkDirection<V, Play>,
     LegacyPacketChannel<V>: PacketTrait<V, S> + PacketTrait<V, Login> + PacketTrait<V, Play>,
@@ -207,17 +202,15 @@ fn receive_legacyrecvpacket<V: Version, S: State<V>>(
             }
             Err(TryRecvError::Empty) => break,
             Err(TryRecvError::Closed) => {
-                warn!("LegacyPacketChannel was closed, despawning!");
-                commands.entity(entity).despawn();
+                warn!("LegacyPacketChannel was closed, can't receive packets!");
             }
         }
     }
 }
 
 fn send_legacysendpacket<V: Version, S: State<V>>(
-    query: &Query<(Entity, &LegacyPacketChannel<V>)>,
+    query: &Query<&LegacyPacketChannel<V>>,
     events: &mut EventReader<SendPacket<V, S>>,
-    commands: &mut Commands,
 ) where
     Serverbound: NetworkDirection<V, S> + NetworkDirection<V, Login> + NetworkDirection<V, Play>,
     LegacyPacketChannel<V>: PacketTrait<V, S> + PacketTrait<V, Login> + PacketTrait<V, Play>,
@@ -228,9 +221,9 @@ fn send_legacysendpacket<V: Version, S: State<V>>(
         if let Some(entity) = event.connection {
             // Send to specific connection
             match query.get(entity) {
-                Ok((entity, channel)) => {
+                Ok(channel) => {
                     let pair = <LegacyPacketChannel<V> as PacketTrait<V, S>>::get_pair(channel);
-                    send_through_pair(event.packet.clone(), pair, entity, commands);
+                    send_through_pair(event.packet.clone(), pair);
                 }
                 Err(QueryEntityError::NoSuchEntity(_)) => {
                     warn!("Requested Entity does not exist!");
@@ -242,9 +235,9 @@ fn send_legacysendpacket<V: Version, S: State<V>>(
             }
         } else {
             // Send to all connections
-            for (entity, channel) in query.iter() {
+            for channel in query {
                 let pair = <LegacyPacketChannel<V> as PacketTrait<V, S>>::get_pair(channel);
-                send_through_pair(event.packet.clone(), pair, entity, commands);
+                send_through_pair(event.packet.clone(), pair);
             }
         }
     }
@@ -257,7 +250,6 @@ fn receive_recvpacket<V: Version, S: State<V>>(
     entity: Entity,
     channel: &PacketChannel<V>,
     events: &mut EventWriter<RecvPacket<V, S>>,
-    commands: &mut Commands,
 ) where
     Serverbound: NetworkDirection<V, S>
         + NetworkDirection<V, Login>
@@ -279,8 +271,7 @@ fn receive_recvpacket<V: Version, S: State<V>>(
             }
             Err(TryRecvError::Empty) => break,
             Err(TryRecvError::Closed) => {
-                warn!("PacketChannel was closed, despawning!");
-                commands.entity(entity).despawn();
+                warn!("PacketChannel was closed, can't receive packets!");
             }
         }
     }
@@ -288,9 +279,8 @@ fn receive_recvpacket<V: Version, S: State<V>>(
 
 // Sends packets through a channel
 fn send_sendpacket<V: Version, S: State<V>>(
-    query: &Query<(Entity, &PacketChannel<V>)>,
+    query: &Query<&PacketChannel<V>>,
     events: &mut EventReader<SendPacket<V, S>>,
-    commands: &mut Commands,
 ) where
     Serverbound: NetworkDirection<V, S>
         + NetworkDirection<V, Login>
@@ -305,9 +295,9 @@ fn send_sendpacket<V: Version, S: State<V>>(
         if let Some(entity) = event.connection {
             // Send to specific connection
             match query.get(entity) {
-                Ok((entity, channel)) => {
+                Ok(channel) => {
                     let pair = <PacketChannel<V> as PacketTrait<V, S>>::get_pair(channel);
-                    send_through_pair(event.packet.clone(), pair, entity, commands);
+                    send_through_pair(event.packet.clone(), pair);
                 }
                 Err(QueryEntityError::NoSuchEntity(_)) => {
                     warn!("Requested Entity does not exist!");
@@ -319,9 +309,9 @@ fn send_sendpacket<V: Version, S: State<V>>(
             }
         } else {
             // Send to all connections
-            for (entity, channel) in query {
+            for channel in query {
                 let pair = <PacketChannel<V> as PacketTrait<V, S>>::get_pair(channel);
-                send_through_pair(event.packet.clone(), pair, entity, commands);
+                send_through_pair(event.packet.clone(), pair);
             }
         }
     }
@@ -333,8 +323,6 @@ fn send_sendpacket<V: Version, S: State<V>>(
 fn send_through_pair<V: Version, S: State<V>>(
     packet: Arc<<Serverbound as NetworkDirection<V, S>>::Send>,
     pair: &PacketPair<V, S>,
-    entity: Entity,
-    commands: &mut Commands,
 ) where
     Serverbound: NetworkDirection<V, S>,
 {
@@ -344,8 +332,7 @@ fn send_through_pair<V: Version, S: State<V>>(
                 warn!("PacketChannel is full, dropping packet!");
             }
             TrySendError::Closed(_) => {
-                error!("PacketChannel was closed, despawning!");
-                commands.entity(entity).despawn();
+                error!("PacketChannel was closed, dropping packet!");
             }
         }
     }

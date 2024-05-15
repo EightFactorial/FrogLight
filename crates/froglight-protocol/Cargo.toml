@@ -53,3 +53,6 @@ default = ["bevy"]
 
 # Derives `Component` for some types.
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-components/bevy"]
+
+# TODO: Remove this once V1.20.2/.3 packets are no longer in use
+reflect = ["bevy"]

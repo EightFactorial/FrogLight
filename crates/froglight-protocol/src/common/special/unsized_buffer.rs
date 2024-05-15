@@ -14,6 +14,7 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 ///
 /// For this reason, it *must* be the last field in the packet.
 #[derive(Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct UnsizedBuffer(SmallVec<[u8; Self::BUFFER_SIZE]>);
 
 impl UnsizedBuffer {
@@ -22,7 +23,7 @@ impl UnsizedBuffer {
 
     /// Creates a new [`UnsizedBuffer`]
     #[must_use]
-    pub fn new() -> Self { Self(SmallVec::new()) }
+    pub const fn new() -> Self { Self(SmallVec::new_const()) }
 
     /// Creates a new [`UnsizedBuffer`] with the specified capacity.
     #[must_use]
@@ -41,7 +42,6 @@ impl UnsizedBuffer {
     pub fn from_array<const N: usize>(arr: [u8; N]) -> Self {
         let mut smallvec = SmallVec::with_capacity(N);
         smallvec.extend(arr);
-
         Self(smallvec)
     }
 

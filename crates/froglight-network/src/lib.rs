@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![feature(trivial_bounds)]
 
 use bevy_app::{App, Plugin, PluginGroup, PluginGroupBuilder};
 use connection::ConnectionPlugin;
@@ -9,7 +10,6 @@ pub mod resolver;
 
 // Re-export most of `froglight-protocol` for convenience.
 pub use froglight_protocol::{common, packet, states, traits, versions};
-pub use froglight_registry as registry;
 
 /// The `Network` Froglight plugin group.
 ///

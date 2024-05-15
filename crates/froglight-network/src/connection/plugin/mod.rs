@@ -15,6 +15,9 @@ pub use misc::{ConnectionMarker, ConnectionTask, StatusTask};
 mod resources;
 pub use resources::{ConfigPlugins, LoginPlugins, PlayPlugins};
 
+#[doc(hidden)]
+mod reflect;
+
 pub mod systemsets;
 
 /// The `Connection` Froglight plugin.
@@ -26,9 +29,10 @@ pub struct ConnectionPlugin;
 impl Plugin for ConnectionPlugin {
     fn build(&self, app: &mut App) {
         systemsets::build(app);
-        events::build(app);
 
-        // Insert resources
+        // Add events and resources
+        events::build(app);
+        reflect::build(app);
         resources::build(app);
 
         // Build task systems

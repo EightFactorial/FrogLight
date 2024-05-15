@@ -15,7 +15,6 @@ pub use froglight_network::{
     resolver::{Resolver, ResolverError},
     states::{Configuration, Handshaking, Login, Play, Status},
     traits::{State, Version},
-    versions::{v1_20_0, v1_20_2, v1_20_3},
 };
 pub use froglight_registry::definitions::{BlockExt, BlockRegistry, BlockType};
 pub use froglight_utils::{

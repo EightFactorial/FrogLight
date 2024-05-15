@@ -32,8 +32,9 @@ bevy_tasks = { workspace = true, features = ["multi-threaded"] }
 bevy_time = { workspace = true }
 bevy_transform = { workspace = true }
 compact_str = { workspace = true }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
-froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+    "bevy",
+] }
 hashbrown = { workspace = true }
 md-5 = "0.10.6"
 parking_lot = { workspace = true }

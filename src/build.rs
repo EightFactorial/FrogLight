@@ -2,6 +2,9 @@ use std::env;
 
 fn main() {
     // Check if building the FrogLight binary
+    //
+    // TODO: Check if this *only* works when building the FrogLight binary,
+    // and not when importing the library.
     if let Ok(package_name) = env::var("CARGO_PKG_NAME") {
         if package_name == "froglight" {
             froglight_scripts();

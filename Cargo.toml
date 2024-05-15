@@ -110,11 +110,12 @@ froglight-network = { opt-level = 1 }
 froglight-registry = { opt-level = 1 }
 froglight-settings = { opt-level = 1 }
 froglight-utils = { opt-level = 1 }
-# Fully optimize important froglight packages and bevy
+# Fully optimize important packages and bevy
 bevy = { opt-level = 3 }
 froglight-protocol = { opt-level = 3 }
 froglight-render = { opt-level = 3 }
 froglight-world = { opt-level = 3 }
+mimalloc = { opt-level = 3 }
 # Somewhat optimize all other packages
 "*" = { opt-level = 2 }
 
@@ -146,7 +147,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 embed-resource = "2.4.2"
 
 [dependencies]
-bevy = { workspace = true, features = ["default", "x11", "wayland"] }
+bevy = { workspace = true, features = ["default"] }
 bevy-inspector-egui = { workspace = true, optional = true }
 fastrand = { version = "2.1.0", optional = true }
 froglight-app = { version = "0.1.0", path = "crates/froglight-app" }
@@ -156,6 +157,10 @@ froglight-components = { version = "0.1.0", path = "crates/froglight-components"
 image = { version = "0.24.9", optional = true, default-features = false }
 mimalloc = { version = "0.1.41", optional = true }
 winit = { version = "0.29.15", optional = true, default-features = false }
+
+# Enable the "x11" and "wayland" features for linux
+[target.x86_64-unknown-linux-gnu.dependencies]
+bevy = { workspace = true, features = ["x11", "wayland"] }
 
 [[bin]]
 name = "froglight"
