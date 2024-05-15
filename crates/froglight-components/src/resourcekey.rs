@@ -189,6 +189,7 @@ impl ResourceKey {
     /// # Panics
     /// - If the key is empty
     /// - If the key contains does not contain exactly one colon
+    /// - If the key is too long to be inlined
     #[must_use]
     pub const fn new_inline(key: &str) -> Self {
         assert!(!key.is_empty(), "ResourceKey must not be empty");

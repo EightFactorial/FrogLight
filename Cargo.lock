@@ -2369,6 +2369,8 @@ dependencies = [
  "froglight-settings",
  "froglight-utils",
  "froglight-world",
+ "hashbrown",
+ "parking_lot",
  "serde",
 ]
 

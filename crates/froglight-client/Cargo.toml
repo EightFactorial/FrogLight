@@ -34,4 +34,6 @@ froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
     "bevy",
 ] }
+hashbrown = { workspace = true }
+parking_lot = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
