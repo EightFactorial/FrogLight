@@ -1,5 +1,5 @@
 use serde_json::Value;
-use simdnbt::owned::Nbt;
+use simdnbt::owned::{self, Nbt};
 use uuid::Uuid;
 
 use super::{FrogRead, ReadError};
@@ -15,7 +15,7 @@ impl FrogRead for Nbt {
     where
         Self: Sized,
     {
-        Nbt::read(buf).map_err(ReadError::from)
+        owned::read(buf).map_err(ReadError::from)
     }
 }
 

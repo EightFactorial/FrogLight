@@ -69,6 +69,7 @@ impl LanguageManager {
     ///
     /// # Examples
     /// ```rust
+    /// use froglight_assets::assets::LanguageFile;
     /// use froglight_client::assets::LanguageManager;
     /// use froglight_network::common::ResourceKey;
     /// use hashbrown::HashMap;
@@ -79,7 +80,7 @@ impl LanguageManager {
     /// lang.insert("test_single".to_string(), "Hello, %s!".to_string());
     /// lang.insert("test_multi_ordered".to_string(), "Hello, %s and %s!".to_string());
     /// lang.insert("test_multi_reversed".to_string(), "Hello, %2$s and %1$s!".to_string());
-    /// manager.languages.insert(ResourceKey::new_inline("minecraft:lang/en_us"), lang);
+    /// manager.languages.insert(ResourceKey::new_inline("minecraft:lang/en_us"), LanguageFile(lang));
     ///
     /// let test_single =
     ///     manager.get_string("minecraft:lang/en_us", "test_single", &["world"]).unwrap();
@@ -117,6 +118,7 @@ impl LanguageManager {
     ///
     /// # Examples
     /// ```rust
+    /// use froglight_assets::assets::LanguageFile;
     /// use froglight_client::assets::LanguageManager;
     /// use froglight_network::common::ResourceKey;
     /// use hashbrown::HashMap;
@@ -127,7 +129,7 @@ impl LanguageManager {
     /// lang.insert("test_single".to_string(), "Hello, %s!".to_string());
     /// lang.insert("test_multi_ordered".to_string(), "Hello, %s and %s!".to_string());
     /// lang.insert("test_multi_reversed".to_string(), "Hello, %2$s and %1$s!".to_string());
-    /// manager.languages.insert(ResourceKey::new_inline("minecraft:lang/en_us"), lang);
+    /// manager.languages.insert(ResourceKey::new_inline("minecraft:lang/en_us"), LanguageFile(lang));
     ///
     /// let test_single = manager.current_string("test_single", &["world"]).unwrap();
     /// assert_eq!(test_single, "Hello, world!");
@@ -194,11 +196,11 @@ impl LanguageManager {
     /// use froglight_network::common::ResourceKey;
     ///
     /// let dirt_key = ResourceKey::new_inline("minecraft:dirt");
-    /// let dirt_lang = LanguageManager::resourcekey_to_langkey("block", dirt_key);
+    /// let dirt_lang = LanguageManager::resourcekey_to_langkey("block", &dirt_key);
     /// assert_eq!(dirt_lang, "block.minecraft.dirt");
     ///
     /// let dye_key = ResourceKey::new_inline("minecraft:yellow_dye");
-    /// let dye_lang = LanguageManager::resourcekey_to_langkey("item", dye_key);
+    /// let dye_lang = LanguageManager::resourcekey_to_langkey("item", &dye_key);
     /// assert_eq!(dye_lang, "item.minecraft.yellow_dye");
     /// ```
     #[must_use]
