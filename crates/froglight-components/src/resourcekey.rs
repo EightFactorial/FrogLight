@@ -131,8 +131,10 @@ impl ResourceKey {
     /// ```
     #[inline]
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
-    pub fn split(&self) -> (&str, &str) { self.split_once(':').unwrap() }
+    pub fn split(&self) -> (&str, &str) {
+        self.split_once(':')
+            .unwrap_or_else(|| unreachable!("ResourceKeys always have a namespace and path"))
+    }
 
     /// Returns the namespace of the key
     ///

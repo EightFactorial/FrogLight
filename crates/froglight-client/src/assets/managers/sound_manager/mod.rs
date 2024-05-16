@@ -1,20 +1,15 @@
 use bevy::prelude::*;
-use froglight_network::common::ResourceKey;
+use froglight_assets::assets::SoundDefinitions;
+
+mod event;
+pub use event::SoundEvent;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.init_resource::<SoundManager>().add_event::<SoundEvent>();
+    app.init_resource::<SoundManager>().register_type::<SoundManager>().add_event::<SoundEvent>();
 }
 
-/// Manages the sounds in the game.
-#[derive(Debug, Default, Clone, Resource)]
-pub struct SoundManager {
-    // TODO: Collect sound definitions from all resource packs.
-}
-
-/// A sound event.
-///
-/// Plays the sound with the given [`ResourceKey`],
-/// if it exists in the [`SoundManager`].
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Event, Deref, DerefMut)]
-pub struct SoundEvent(pub ResourceKey);
+/// A [`Resource`] for managing sound effects.
+#[derive(Debug, Default, Clone, Resource, Deref, DerefMut, Reflect)]
+#[reflect(Default, Resource)]
+pub struct SoundManager(pub SoundDefinitions);

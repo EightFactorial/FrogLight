@@ -35,7 +35,7 @@ pub struct ResourcePack {
     /// Blockstates
     pub blockstates: HashMap<ResourceKey, BlockStateDefinition>,
     /// Fonts
-    pub font: HashMap<ResourceKey, FontDefinition>,
+    pub fonts: HashMap<ResourceKey, FontDefinition>,
     /// Languages
     #[reflect(ignore)]
     pub lang: HashMap<ResourceKey, LanguageFile>,

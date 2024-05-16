@@ -3,7 +3,7 @@ use froglight_assets::assets::ResourcePack;
 use froglight_settings::ConfigFile;
 use serde::{Deserialize, Serialize};
 
-use super::{AssetLoading, AssetManager, LanguageManager, SoundManager};
+use super::AssetLoading;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -14,7 +14,7 @@ pub(super) fn build(app: &mut App) {
     ResourcePackSettings::build(app);
 
     // Load all resource packs on startup
-    // Only attemps to load once.
+    // Only attempts to load once.
     app.add_systems(
         Update,
         ResourcePackSettings::load_resourcepacks_on_startup
@@ -23,20 +23,19 @@ pub(super) fn build(app: &mut App) {
             .in_set(AssetLoading::Waiting),
     );
 
-    // Wait for all resource packs to load
-    // Inserts all assets into their respective managers
+    // Waits for all `ResourcePack`s to load or fail
     app.add_systems(
         Update,
-        ResourcePackSettings::collect_resourcepack_assets
+        ResourcePackSettings::wait_for_resourcepacks
             .run_if(resource_exists::<ResourcePackSettings>)
-            .run_if(resource_exists::<AssetManager>)
-            .run_if(resource_exists::<LanguageManager>)
-            .run_if(resource_exists::<SoundManager>)
             .in_set(AssetLoading::Loading),
     );
 }
 
 /// Settings for loading resource packs.
+///
+/// # Note
+/// Every frame this is accessed mutably it will save the settings to disk.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Resource, Serialize, Deserialize, Reflect)]
 #[reflect(Default, Serialize, Deserialize, Resource)]
 pub struct ResourcePackSettings {
@@ -63,9 +62,9 @@ impl ResourcePackSettings {
         debug!("Entering AssetLoading::Loading");
 
         // Load all resource packs
-        info!("Loading \"{}\" ResourcePacks", settings.resourcepacks.len());
+        info!("Loading {} ResourcePack(s)", settings.resourcepacks.len());
         for item in &mut settings.resourcepacks {
-            debug!("Loading ResourcePack: \"{}\"", item.path);
+            debug!("Loading: \"{}\"", item.path);
             item.handle = Some(assets.load(item.path.to_string()));
         }
     }
@@ -74,22 +73,16 @@ impl ResourcePackSettings {
     ///
     /// Enters the [`AssetLoading::Processing`] [`State`] when all
     /// [`ResourcePack`]s have either loaded or failed to load.
-    pub fn collect_resourcepack_assets(
-        asset_server: Res<AssetServer>,
-        mut resourcepacks: ResMut<Assets<ResourcePack>>,
-
-        mut asset_manager: ResMut<AssetManager>,
-        mut lang_manager: ResMut<LanguageManager>,
-        mut _sound_manager: ResMut<SoundManager>,
-
-        mut settings: ResMut<ResourcePackSettings>,
+    pub fn wait_for_resourcepacks(
+        assets: Res<AssetServer>,
+        settings: Res<ResourcePackSettings>,
         mut state: ResMut<NextState<AssetLoading>>,
     ) {
         // Check if all `ResourcePack`s either loaded or failed to load
         if settings.resourcepacks.iter().all(|pack| {
             if let Some(handle) = &pack.handle {
                 matches!(
-                    asset_server.get_recursive_dependency_load_state(handle),
+                    assets.get_recursive_dependency_load_state(handle),
                     Some(
                         RecursiveDependencyLoadState::Loaded | RecursiveDependencyLoadState::Failed
                     )
@@ -98,39 +91,6 @@ impl ResourcePackSettings {
                 true
             }
         }) {
-            // Clear all assets
-            asset_manager.clear();
-            lang_manager.clear();
-            // sound_manager.clear();
-
-            // Take all the handles from `ResourcePackSettings`
-            // and replace them with weak handles.
-            {
-                let mut strong_handles = Vec::with_capacity(settings.resourcepacks.len());
-                for pack in &mut settings.resourcepacks {
-                    if let Some(settings_handle) = &mut pack.handle {
-                        strong_handles
-                            .push(std::mem::replace(settings_handle, settings_handle.clone_weak()));
-                    }
-                }
-                asset_manager.resourcepacks = strong_handles;
-            }
-
-            // Insert all assets into their respective manager.
-            // This will drop all assets that went unused.
-            {
-                let handles: Vec<Handle<ResourcePack>> = asset_manager.resourcepacks.clone();
-                for handle in handles {
-                    if let Some(resourcepack) = resourcepacks.get_mut(handle) {
-                        asset_manager.insert(resourcepack);
-                        // Takes care of managing language strings
-                        lang_manager.insert(resourcepack);
-                        // Takes care of managing sounds definitions
-                        // sound_manager.insert(resourcepack);
-                    }
-                }
-            }
-
             // Enter the processing state, as all assets have loaded
             debug!("Entering AssetLoading::Processing");
             state.set(AssetLoading::Processing);

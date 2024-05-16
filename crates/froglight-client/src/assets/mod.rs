@@ -11,13 +11,10 @@ pub use resourcepacks::ResourcePackSettings;
 mod systemsets;
 pub use systemsets::{AssetLoading, AssetUpdateSet};
 
-mod textureatlases;
-
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     systemsets::build(app);
 
     managers::build(app);
     resourcepacks::build(app);
-    textureatlases::build(app);
 }

@@ -165,7 +165,7 @@ impl ResourcePackZipLoader {
                 .await;
             }
             "font" => {
-                Self::deserialize_and_insert_asset(reader, &mut resource_pack.font, resource_key)
+                Self::deserialize_and_insert_asset(reader, &mut resource_pack.fonts, resource_key)
                     .await;
             }
             "lang" => {
