@@ -26,7 +26,7 @@ pub(super) fn build(app: &mut App) {
 }
 
 /// A bundle of assets.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Asset, Reflect)]
+#[derive(Debug, Default, Clone, PartialEq, Asset, Reflect)]
 #[reflect(Default, Asset)]
 pub struct ResourcePack {
     /// [`ResourcePack`] information
@@ -37,21 +37,17 @@ pub struct ResourcePack {
     /// Fonts
     pub fonts: HashMap<ResourceKey, FontDefinition>,
     /// Languages
-    #[reflect(ignore)]
     pub lang: HashMap<ResourceKey, LanguageFile>,
     /// Models
     pub models: HashMap<ResourceKey, ModelDefinition>,
     /// Particles
     pub particles: HashMap<ResourceKey, ParticleDefinition>,
     /// Sounds
-    #[reflect(ignore)]
     pub sounds: HashMap<ResourceKey, Handle<AudioSource>>,
     /// Sound Definitions
     pub sound_defs: HashMap<ResourceKey, SoundDefinitions>,
     /// Texts
-    #[reflect(ignore)]
     pub texts: HashMap<ResourceKey, TextSource>,
     /// Textures
-    #[reflect(ignore)]
     pub textures: HashMap<ResourceKey, Handle<Image>>,
 }

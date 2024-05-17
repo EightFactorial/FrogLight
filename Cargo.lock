@@ -2346,6 +2346,7 @@ dependencies = [
  "bevy_render",
  "bevy_text",
  "compact_str",
+ "fastrand 2.1.0",
  "froglight-components",
  "futures-lite 2.3.0",
  "hashbrown",

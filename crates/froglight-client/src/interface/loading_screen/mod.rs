@@ -21,7 +21,7 @@ pub(super) fn build(app: &mut App) {
     // Spawn a new LoadingScreen on startup if one doesn't exist
     app.add_systems(
         PostStartup,
-        LoadingScreen::spawn.run_if(not(any_with_component::<LoadingScreen>)),
+        LoadingScreen::spawn_loading_screen.run_if(not(any_with_component::<LoadingScreen>)),
     );
 
     systemset::build(app);
@@ -41,8 +41,12 @@ impl LoadingScreen {
     /// Ensures the [`LoadingScreen`] is always on top.
     pub const Z_INDEX: ZIndex = ZIndex::Global(i32::MAX / 1024);
 
-    /// A [`System`](bevy_ecs::system::System) that spawns a
+    /// A [`System`](bevy::prelude::System) that spawns a
     /// [`LoadingScreen`].
+    #[inline]
+    fn spawn_loading_screen(world: &mut World) { Self::spawn(world); }
+
+    /// Spawns a new [`LoadingScreen`] in the [`World`].
     pub fn spawn(world: &mut World) {
         let visibility = world.resource::<LoadingScreenVisibility>().get_visibility();
         let entity = world.spawn_empty().id();

@@ -64,8 +64,12 @@ impl ResourcePackSettings {
         // Load all resource packs
         info!("Loading {} ResourcePack(s)", settings.resourcepacks.len());
         for item in &mut settings.resourcepacks {
-            debug!("Loading: \"{}\"", item.path);
-            item.handle = Some(assets.load(item.path.to_string()));
+            if let Some(path) = &item.path {
+                debug!("Loading: \"{}\"", path);
+                item.handle = Some(assets.load(path.to_string()));
+            } else if item.handle.is_none() {
+                error!("`ResourcePackItem` has no path or handle?");
+            }
         }
     }
 
@@ -103,7 +107,9 @@ impl ResourcePackSettings {
 #[reflect(Serialize, Deserialize)]
 pub struct ResourcePackItem {
     /// The path to the resource pack.
-    pub path: String,
+    ///
+    /// Only [`ResourcePack`]s with a path will be saved/loaded from disk.
+    pub path: Option<String>,
     #[serde(skip)]
     #[reflect(ignore)]
     pub handle: Option<Handle<ResourcePack>>,
@@ -111,4 +117,16 @@ pub struct ResourcePackItem {
 
 impl ConfigFile for ResourcePackSettings {
     const PATH: &'static str = "resourcepacks.toml";
+
+    fn deserialize_map(mut self) -> Self {
+        // Remove any `ResourcePackItem`s without a path
+        self.resourcepacks.retain(|item| item.path.is_some());
+        self
+    }
+
+    fn serialize_map(mut self) -> Self {
+        // Remove any `ResourcePackItem`s without a path
+        self.resourcepacks.retain(|item| item.path.is_some());
+        self
+    }
 }

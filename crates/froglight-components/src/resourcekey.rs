@@ -7,7 +7,6 @@ use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
 use hashbrown::Equivalent;
-use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 /// A string used to identify a resource.
@@ -18,7 +17,7 @@ use thiserror::Error;
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 pub struct ResourceKey(#[cfg_attr(feature = "bevy", reflect(ignore))] CompactString);
 
@@ -51,6 +50,9 @@ impl ResourceKey {
     /// If there is no colon in the key, the
     /// [`DEFAULT_NAMESPACE`](Self::DEFAULT_NAMESPACE) will be used.
     ///
+    /// If you want to properly handle errors, use [`ResourceKey::try_new`]
+    /// instead.
+    ///
     /// # Examples
     /// ```rust
     /// use froglight_components::resourcekey::ResourceKey;
@@ -64,30 +66,9 @@ impl ResourceKey {
     ///
     /// # Panics
     /// - If the key is empty
-    ///
-    /// # Debug Panics
     /// - If the key contains a leading or trailing colon
     /// - If the key contains more than one colon
-    pub fn new(key: impl Into<CompactString>) -> Self {
-        let key = key.into();
-
-        // Keys must not be empty and must contain a colon
-        assert!(!key.is_empty(), "ResourceKey must not be empty");
-
-        // No leading or trailing colons
-        debug_assert!(!key.starts_with(':'), "ResourceKey must not start with a colon");
-        debug_assert!(!key.ends_with(':'), "ResourceKey must not end with a colon");
-
-        if key.contains(':') {
-            // If there is a colon, ensure there is only one
-            debug_assert_eq!(key.matches(':').count(), 1);
-
-            Self(key)
-        } else {
-            // If no colon, use the default namespace
-            Self(Self::DEFAULT_NAMESPACE.clone() + ":" + &key)
-        }
-    }
+    pub fn new(key: impl Into<CompactString>) -> Self { Self::try_new(key).unwrap() }
 
     /// Attempt to create a new [`ResourceKey`]
     ///
@@ -98,21 +79,24 @@ impl ResourceKey {
     pub fn try_new(key: impl Into<CompactString>) -> Result<Self, ResourceKeyError> {
         let key = key.into();
 
+        // Keys must not be empty
         if key.is_empty() {
             return Err(ResourceKeyError::Empty);
         }
 
+        // No leading or trailing colons
         if key.starts_with(':') {
             return Err(ResourceKeyError::LeadingColon(key));
-        }
-
-        if key.ends_with(':') {
+        } else if key.ends_with(':') {
             return Err(ResourceKeyError::TrailingColon(key));
         }
 
         match key.matches(':').count() {
+            // If there is no colon, use the default namespace
             0 => Ok(Self(Self::DEFAULT_NAMESPACE.clone() + ":" + &key)),
+            // If there is exactly one colon, return the key
             1 => Ok(Self(key)),
+            // If there is more than one colon, return an error
             n => Err(ResourceKeyError::MultipleColons(key, n)),
         }
     }
@@ -284,6 +268,14 @@ impl PartialEq<String> for ResourceKey {
 
 impl PartialEq<CompactString> for ResourceKey {
     fn eq(&self, other: &CompactString) -> bool { self.as_str() == other.as_str() }
+}
+
+#[cfg(feature = "serde")]
+impl<'de> serde::Deserialize<'de> for ResourceKey {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        ResourceKey::try_new(CompactString::deserialize(deserializer)?)
+            .map_err(serde::de::Error::custom)
+    }
 }
 
 #[cfg(feature = "inspector")]

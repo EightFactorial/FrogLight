@@ -1,11 +1,31 @@
 use bevy::prelude::*;
-use froglight_assets::assets::LanguageFile;
+use froglight_assets::assets::{LanguageFile, ResourcePack};
 use froglight_network::common::ResourceKey;
-use hashbrown::HashMap;
+use hashbrown::{hash_map::Entry, HashMap};
+
+use super::{AssetManager, SoundManager};
+use crate::assets::{AssetLoading, ResourcePackSettings};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.init_resource::<LanguageManager>().register_type::<LanguageManager>();
+    app.init_resource::<LanguageManager>()
+        .register_type::<LanguageManager>()
+        .init_resource::<LanguageManagerState>()
+        .register_type::<LanguageManagerState>();
+
+    app.add_systems(
+        OnEnter(AssetLoading::Loading),
+        LanguageManager::reset_language_manager.run_if(resource_exists::<LanguageManager>),
+    );
+    app.add_systems(
+        Update,
+        LanguageManager::populate_language_manager
+            .run_if(not(LanguageManager::is_finished))
+            .run_if(resource_exists::<LanguageManager>)
+            .ambiguous_with(AssetManager::populate_asset_manager)
+            .ambiguous_with(SoundManager::populate_sound_manager)
+            .in_set(AssetLoading::Processing),
+    );
 }
 
 /// A [`Resource`] for managing the current language and language strings.
@@ -13,6 +33,8 @@ pub(super) fn build(app: &mut App) {
 #[reflect(Default, Resource)]
 pub struct LanguageManager {
     /// The current language.
+    ///
+    /// Defaults to [`FALLBACK_LANG`](Self::FALLBACK_LANG).
     pub current: ResourceKey,
 
     /// All loaded languages.
@@ -20,13 +42,23 @@ pub struct LanguageManager {
     pub languages: HashMap<ResourceKey, LanguageFile>,
 }
 
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Resource, Reflect)]
+#[reflect(Default, Resource)]
+#[allow(unreachable_pub)]
+pub struct LanguageManagerState {
+    finished: bool,
+    current: usize,
+}
+
 impl Default for LanguageManager {
-    fn default() -> Self {
-        Self { current: ResourceKey::new_inline("minecraft:lang/en_us"), languages: HashMap::new() }
-    }
+    fn default() -> Self { Self { current: Self::FALLBACK_LANG, languages: HashMap::new() } }
 }
 
 impl LanguageManager {
+    /// The language key to fall back to if the current language
+    /// does not have a string.
+    pub const FALLBACK_LANG: ResourceKey = ResourceKey::new_inline("minecraft:lang/en_us");
+
     /// Get a language by key.
     #[must_use]
     #[inline]
@@ -102,6 +134,25 @@ impl LanguageManager {
         Some(Self::parse_string_arguments(string.to_string(), args))
     }
 
+    /// Get a string from a language, with arguments.
+    ///
+    /// If the string is not found in the language, it will fall back to the
+    /// [`FALLBACK_LANG`](Self::FALLBACK_LANG).
+    ///
+    /// If the string is still not found, it will return the key.
+    #[must_use]
+    pub fn get_string_fallback(&self, lang: &str, key: &str, args: &[&str]) -> String {
+        if let Some(string) = self.get_raw_string(lang, key) {
+            Self::parse_string_arguments(string.to_string(), args)
+        } else if let Some(string) = self.get_raw_string(&Self::FALLBACK_LANG, key) {
+            Self::parse_string_arguments(string.to_string(), args)
+        } else {
+            #[cfg(debug_assertions)]
+            warn!("Unable to find string for key: \"{}\":\"{key}\"", lang);
+            key.to_string()
+        }
+    }
+
     /// Get a string from the current language.
     ///
     /// Does not replace arguments in the string.
@@ -146,28 +197,6 @@ impl LanguageManager {
     pub fn current_string(&self, key: &str, args: &[&str]) -> Option<String> {
         let string = self.current_raw_string(key)?;
         Some(Self::parse_string_arguments(string.to_string(), args))
-    }
-
-    /// The language key to fall back to if the current language does not have a
-    /// string.
-    pub const FALLBACK_LANG: ResourceKey = ResourceKey::new_inline("minecraft:lang/en_us");
-
-    /// Get a string from a language, with arguments.
-    ///
-    /// If the string is not found in the language, it will fall back to the
-    /// [`FALLBACK_LANG`](Self::FALLBACK_LANG).
-    ///
-    /// If the string is still not found, it will return the key.
-    #[must_use]
-    pub fn get_string_fallback(&self, lang: &str, key: &str, args: &[&str]) -> String {
-        if let Some(string) = self.get_raw_string(lang, key) {
-            Self::parse_string_arguments(string.to_string(), args)
-        } else if let Some(string) = self.get_raw_string(&Self::FALLBACK_LANG, key) {
-            Self::parse_string_arguments(string.to_string(), args)
-        } else {
-            warn!("Unable to find string for key: \"{}\":\"{key}\"", lang);
-            key.to_string()
-        }
     }
 
     /// Get a string from the current language, with arguments.
@@ -226,5 +255,73 @@ impl LanguageManager {
             }
         }
         string
+    }
+
+    /// Returns `true` if the [`LanguageManager`] has finished loading all
+    /// assets.
+    #[must_use]
+    pub fn is_finished(state: Res<LanguageManagerState>) -> bool { state.finished }
+
+    /// Resets the [`LanguageManager`] to its initial state.
+    fn reset_language_manager(
+        mut manager: ResMut<LanguageManager>,
+        mut state: ResMut<LanguageManagerState>,
+    ) {
+        manager.languages.clear();
+        state.finished = false;
+        state.current = 0;
+    }
+
+    /// Populates the [`LanguageManager`] with languages from currently loaded
+    /// [`ResourcePack`]s.
+    ///
+    /// Does not rely on any other asset managers.
+    pub(crate) fn populate_language_manager(
+        settings: Res<ResourcePackSettings>,
+        mut manager: ResMut<LanguageManager>,
+        mut state: ResMut<LanguageManagerState>,
+        mut assets: ResMut<Assets<ResourcePack>>,
+    ) {
+        // Get the current `ResourcePack` from the list
+        if let Some(pack_item) = settings.resourcepacks.get(state.current) {
+            // If the `ResourcePack` has a handle
+            if let Some(pack_handle) = pack_item.handle.as_ref() {
+                // Access the `ResourcePack` data
+                if let Some(resourcepack) = assets.get_mut(pack_handle) {
+                    // Take the languages from the `ResourcePack`.
+                    for (resourcekey, lang) in std::mem::take(&mut resourcepack.lang) {
+                        match manager.languages.entry(resourcekey) {
+                            Entry::Vacant(entry) => {
+                                // Insert the language into the LanguageManager
+                                entry.insert(lang);
+                            }
+                            Entry::Occupied(mut entry) => {
+                                // Merge the language with the existing language,
+                                // without overwriting existing keys.
+                                let existing = entry.get_mut();
+                                for (key, value) in lang.0 {
+                                    existing.0.entry(key).or_insert(value);
+                                }
+                            }
+                        }
+                    }
+                } else if let Some(path) = &pack_item.path {
+                    error!("Failed to access ResourcePack: \"{path}\"");
+                } else {
+                    error!("Failed to access ResourcePack: #{}", state.current);
+                }
+            }
+        }
+
+        // Increment the current `ResourcePack` index
+        state.current += 1;
+
+        // Set the finished flag if all `ResourcePack`s have been loaded
+        if state.current >= settings.resourcepacks.len() {
+            #[cfg(debug_assertions)]
+            debug!("Loaded \"{}\" languages", manager.languages.len());
+
+            state.finished = true;
+        }
     }
 }

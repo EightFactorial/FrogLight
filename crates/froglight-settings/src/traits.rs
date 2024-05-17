@@ -17,7 +17,7 @@ use crate::{
 };
 
 /// A trait implementing basic loading and saving for configuration files.
-pub trait ConfigFile: Default + Resource + Serialize + DeserializeOwned {
+pub trait ConfigFile: Default + Clone + Resource + Serialize + DeserializeOwned {
     /// The path to the configuration file, relative to the [`ConfigFolder`]
     const PATH: &'static str;
 
@@ -49,7 +49,7 @@ pub trait ConfigFile: Default + Resource + Serialize + DeserializeOwned {
 
         // Parse the file
         match toml::from_str(&contents) {
-            Ok(config) => config,
+            Ok(config) => Self::deserialize_map(config),
             #[allow(unused_variables)]
             Err(err) => {
                 #[cfg(debug_assertions)]
@@ -61,11 +61,17 @@ pub trait ConfigFile: Default + Resource + Serialize + DeserializeOwned {
         }
     }
 
+    /// Perform operations after deserializing the file.
+    ///
+    /// By default, this does nothing.
+    #[must_use]
+    fn deserialize_map(self) -> Self { self }
+
     /// Serializes the configuration file.
-    fn serialize(&self, path: &Path) {
+    fn serialize(self, path: &Path) {
         let path = path.join(Self::PATH);
 
-        let Ok(contents) = toml::to_string_pretty(self) else {
+        let Ok(contents) = toml::to_string_pretty(&Self::serialize_map(self)) else {
             error!("Failed to serialize configuration file at \"{}\"", path.display());
             return;
         };
@@ -78,6 +84,12 @@ pub trait ConfigFile: Default + Resource + Serialize + DeserializeOwned {
             error!("Failed to write configuration file at \"{}\"", path.display());
         }
     }
+
+    /// Perform operations before serializing the file.
+    ///
+    /// By default, this does nothing.
+    #[must_use]
+    fn serialize_map(self) -> Self { self }
 }
 
 /// Loads the configuration file.
@@ -87,7 +99,7 @@ fn load_file<T: ConfigFile>(folder: Res<ConfigFolder>, mut commands: Commands) {
 }
 
 /// Saves the configuration file.
-fn save_file<T: ConfigFile>(folder: Res<ConfigFolder>, config: Res<T>) {
+fn save_file<T: ConfigFile + Clone>(folder: Res<ConfigFolder>, config: Res<T>) {
     debug!("Saving `{}` to \"{}\"", std::any::type_name::<T>(), T::PATH);
-    <T as ConfigFile>::serialize(&*config, &folder.path);
+    <T as ConfigFile>::serialize(config.clone(), &folder.path);
 }

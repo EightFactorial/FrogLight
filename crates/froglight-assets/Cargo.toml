@@ -27,6 +27,7 @@ bevy_reflect = { workspace = true }
 bevy_render = { workspace = true, features = ["png"] }
 bevy_text = { workspace = true }
 compact_str = { workspace = true, features = ["serde"] }
+fastrand = { workspace = true }
 froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
     "serde",
 ] }

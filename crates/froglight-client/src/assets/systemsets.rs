@@ -17,15 +17,24 @@ pub(super) fn build(app: &mut App) {
     );
     app.configure_sets(
         Update,
-        AssetLoading::Loading.run_if(in_state(AssetLoading::Loading)).in_set(AssetUpdateSet),
+        AssetLoading::Loading
+            .run_if(in_state(AssetLoading::Loading))
+            .in_set(AssetUpdateSet)
+            .after(AssetLoading::Waiting),
     );
     app.configure_sets(
         Update,
-        AssetLoading::Processing.run_if(in_state(AssetLoading::Processing)).in_set(AssetUpdateSet),
+        AssetLoading::Processing
+            .run_if(in_state(AssetLoading::Processing))
+            .in_set(AssetUpdateSet)
+            .after(AssetLoading::Loading),
     );
     app.configure_sets(
         Update,
-        AssetLoading::Finished.run_if(in_state(AssetLoading::Finished)).in_set(AssetUpdateSet),
+        AssetLoading::Finished
+            .run_if(in_state(AssetLoading::Finished))
+            .in_set(AssetUpdateSet)
+            .after(AssetLoading::Processing),
     );
 }
 
