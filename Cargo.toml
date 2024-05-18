@@ -52,6 +52,7 @@ pedantic = "warn"
 unnecessary_cast = "warn"
 
 [workspace.dependencies]
+ab_glyph = "0.2.26"
 async-std = "1.12.0"
 bevy = { version = "0.13.2", default-features = false }
 bevy_app = "0.13.2"

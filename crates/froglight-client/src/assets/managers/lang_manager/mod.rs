@@ -3,7 +3,7 @@ use froglight_assets::assets::{LanguageFile, ResourcePack};
 use froglight_network::common::ResourceKey;
 use hashbrown::{hash_map::Entry, HashMap};
 
-use super::{AssetManager, SoundManager};
+use super::{AssetManager, ParticleManager, SoundManager};
 use crate::assets::{AssetLoading, ResourcePackSettings};
 
 #[doc(hidden)]
@@ -23,6 +23,7 @@ pub(super) fn build(app: &mut App) {
             .run_if(not(LanguageManager::is_finished))
             .run_if(resource_exists::<LanguageManager>)
             .ambiguous_with(AssetManager::populate_asset_manager)
+            .ambiguous_with(ParticleManager::populate_particle_manager)
             .ambiguous_with(SoundManager::populate_sound_manager)
             .in_set(AssetLoading::Processing),
     );

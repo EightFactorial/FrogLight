@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+ab_glyph = { workspace = true }
 bevy = { workspace = true, default-features = true, features = ["wayland"] }
 froglight-assets = { version = "0.1.0", path = "../froglight-assets" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
@@ -37,3 +38,4 @@ froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+simdnbt = { workspace = true }

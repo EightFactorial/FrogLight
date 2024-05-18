@@ -5,7 +5,7 @@ mod event;
 pub use event::SoundEvent;
 use hashbrown::hash_map::Entry;
 
-use super::{AssetManager, LanguageManager};
+use super::{AssetManager, LanguageManager, ParticleManager};
 use crate::assets::{AssetLoading, ResourcePackSettings};
 
 #[doc(hidden)]
@@ -27,6 +27,7 @@ pub(super) fn build(app: &mut App) {
             .run_if(resource_exists::<SoundManager>)
             .ambiguous_with(AssetManager::populate_asset_manager)
             .ambiguous_with(LanguageManager::populate_language_manager)
+            .ambiguous_with(ParticleManager::populate_particle_manager)
             .in_set(AssetLoading::Processing),
     );
 }

@@ -2360,6 +2360,7 @@ dependencies = [
 name = "froglight-client"
 version = "0.1.0"
 dependencies = [
+ "ab_glyph",
  "bevy",
  "froglight-assets",
  "froglight-entity",
@@ -2372,6 +2373,7 @@ dependencies = [
  "hashbrown",
  "parking_lot",
  "serde",
+ "simdnbt",
 ]
 
 [[package]]
