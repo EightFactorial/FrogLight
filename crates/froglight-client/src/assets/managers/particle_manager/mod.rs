@@ -234,7 +234,7 @@ impl ParticleManager {
         // Set the finished flag if all `ResourcePack`s have been loaded
         if state.current >= settings.resourcepacks.len() {
             #[cfg(debug_assertions)]
-            debug!("Loaded \"{}\" particle defintions", manager.particles.len());
+            debug!("Loaded \"{}\" particle definitions", manager.particles.len());
 
             state.finished = true;
         }

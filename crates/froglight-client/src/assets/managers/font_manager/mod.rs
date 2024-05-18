@@ -92,7 +92,7 @@ impl FontManager {
         // Set the finished flag if all `ResourcePack`s have been loaded
         if state.current >= settings.resourcepacks.len() {
             #[cfg(debug_assertions)]
-            debug!("Loaded \"{}\" font defintions", manager.fonts.len());
+            debug!("Loaded \"{}\" font definitions", manager.fonts.len());
 
             state.finished = true;
         }
