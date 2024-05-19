@@ -241,9 +241,20 @@ impl ResourcePackZipLoader {
 
     /// Converts a file path to a [`ResourceKey`].
     fn filename_to_resourcekey(filename: &str) -> Option<ResourceKey> {
+        // Strip the file extension and the "assets/" prefix.
         let ext = filename.split('.').last()?;
         let stripped = filename.strip_prefix("assets/").unwrap().strip_suffix(ext).unwrap();
-        ResourceKey::try_new(stripped[..stripped.len() - 1].replacen('/', ":", 1)).ok()
+        let stripped = stripped[..stripped.len() - 1].replacen('/', ":", 1);
+
+        // If the key's path has a directory, remove the first one.
+        //
+        // For example, "minecraft:block/stone" becomes "minecraft:stone".
+        if let Some((prefixed_domain, path)) = stripped.split_once('/') {
+            let domain = prefixed_domain.split_once(':').unwrap().0;
+            ResourceKey::try_new(format!("{domain}:{path}")).ok()
+        } else {
+            ResourceKey::try_new(stripped).ok()
+        }
     }
 
     async fn deserialize_and_insert_asset<T: DeserializeOwned>(
