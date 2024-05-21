@@ -24,6 +24,12 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(AppPlugins);
 
+    // Print the MiMalloc version if the `mimalloc` feature is enabled.
+    #[cfg(feature = "mimalloc")]
+    {
+        info!("Using MiMalloc v{}", GLOBAL.version());
+    }
+
     // Add the `WindowIconPlugin` if the target OS is Windows or Linux.
     #[cfg(any(target_os = "windows", target_os = "linux"))]
     {
@@ -42,6 +48,7 @@ fn main() {
         info!("World Inspector enabled, press F3 + I");
         app.add_plugins(bevy_inspector_egui::quick::WorldInspectorPlugin::new().run_if(
             |input: Res<ButtonInput<KeyCode>>, mut state: Local<bool>| {
+                // Toggle the enable state with F3 + I.
                 if input.just_pressed(KeyCode::KeyI) && input.pressed(KeyCode::F3) {
                     *state = !*state;
                 }
@@ -49,8 +56,10 @@ fn main() {
             },
         ));
 
-        // Register the `ResourceKey` type data for the inspector.
-        app.register_type::<froglight::network::common::ResourceKey>().register_type_data::<froglight::network::common::ResourceKey, bevy_inspector_egui::inspector_egui_impls::InspectorEguiImpl>();
+        // Register the `ResourceKey` type.
+        app.register_type::<froglight::network::common::ResourceKey>();
+        // Register the `ResourceKey` type data.
+        app.register_type_data::<froglight::network::common::ResourceKey, bevy_inspector_egui::inspector_egui_impls::InspectorEguiImpl>();
     }
 
     app.run();

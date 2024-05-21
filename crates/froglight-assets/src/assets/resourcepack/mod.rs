@@ -13,8 +13,8 @@ mod loader;
 pub use loader::*;
 
 use super::{
-    blockstate::BlockStateDefinition, language::LanguageFile, model::ModelDefinition,
-    particle::ParticleDefinition, sound::SoundDefinitions, textsource::TextSource, FontDefinition,
+    blockstate::BlockStateDefinition, language::LanguageFile, particle::ParticleDefinition,
+    sound::SoundDefinitions, textsource::TextSource, FontDefinition, ModelDefinition,
 };
 
 #[doc(hidden)]

@@ -157,7 +157,7 @@ froglight-components = { version = "0.1.0", path = "crates/froglight-components"
     "inspector",
 ] }
 image = { version = "0.24.9", optional = true, default-features = false }
-mimalloc = { version = "0.1.41", optional = true }
+mimalloc = { version = "0.1.41", optional = true, features = ["extended"] }
 winit = { version = "0.29.15", optional = true, default-features = false }
 
 # Enable the "x11" and "wayland" features for linux

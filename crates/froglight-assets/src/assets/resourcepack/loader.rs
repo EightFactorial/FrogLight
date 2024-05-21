@@ -14,7 +14,7 @@ use serde::de::DeserializeOwned;
 use thiserror::Error;
 
 use super::ResourcePack;
-use crate::assets::TextSource;
+use crate::assets::{ModelDefinition, TextSource};
 
 /// An [`AssetLoader`] for [`ResourcePack`]s.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -172,10 +172,22 @@ impl ResourcePackZipLoader {
                 Self::deserialize_and_insert_asset(reader, &mut resource_pack.lang, resource_key)
                     .await;
             }
-            "models" => {
-                Self::deserialize_and_insert_asset(reader, &mut resource_pack.models, resource_key)
+            "models" => match filename.split('/').nth(3).unwrap_or_default() {
+                "block" => {
+                    if let Some(asset) = Self::deserialize_asset(reader, &resource_key).await {
+                        resource_pack.models.insert(resource_key, ModelDefinition::Block(asset));
+                    }
+                }
+                "item" => {
+                    Self::deserialize_and_insert_asset(
+                        reader,
+                        &mut resource_pack.models,
+                        resource_key,
+                    )
                     .await;
-            }
+                }
+                _ => {}
+            },
             "particles" => {
                 Self::deserialize_and_insert_asset(
                     reader,
