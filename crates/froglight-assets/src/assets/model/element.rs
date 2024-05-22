@@ -33,7 +33,7 @@ pub struct ModelElement {
     /// Whether to shade the cube
     #[serde(
         default = "ModelElement::shade_default",
-        skip_serializing_if = "ModelElement::shade_is_default"
+        skip_serializing_if = "ModelElement::is_default_shade"
     )]
     pub shade: bool,
 
@@ -43,9 +43,11 @@ pub struct ModelElement {
 }
 
 impl ModelElement {
-    const fn shade_default() -> bool { true }
+    /// The default shade value
+    #[must_use]
+    pub const fn shade_default() -> bool { true }
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    const fn shade_is_default(b: &bool) -> bool { *b == Self::shade_default() }
+    const fn is_default_shade(b: &bool) -> bool { *b == Self::shade_default() }
 }
 
 /// A model element rotation
@@ -65,13 +67,13 @@ pub struct ElementRotation {
     pub angle: f32,
 
     /// Whether to scale the faces across the whole block
-    #[serde(default, skip_serializing_if = "ElementRotation::is_rescale_default")]
+    #[serde(default, skip_serializing_if = "ElementRotation::is_default_rescale")]
     pub rescale: bool,
 }
 
 impl ElementRotation {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    const fn is_rescale_default(rescale: &bool) -> bool { !*rescale }
+    const fn is_default_rescale(rescale: &bool) -> bool { !*rescale }
 }
 
 /// An axis in a model

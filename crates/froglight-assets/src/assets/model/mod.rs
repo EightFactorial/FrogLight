@@ -1,7 +1,8 @@
+//! Block and item model definitions
+
 use bevy_app::App;
 use bevy_derive::{Deref, DerefMut};
 use bevy_reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
-use froglight_components::resourcekey::ResourceKey;
 use hashbrown::HashMap;
 use serde::{Deserialize, Serialize};
 
@@ -55,4 +56,4 @@ pub enum ModelDefinition {
     Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize, Deref, DerefMut, Reflect,
 )]
 #[reflect(Default, Serialize, Deserialize)]
-pub struct ModelTextures(pub HashMap<String, ResourceKey>);
+pub struct ModelTextures(pub HashMap<String, String>);

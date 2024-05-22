@@ -321,9 +321,10 @@ impl ResourcePackZipLoader {
     ) -> Option<Handle<A>> {
         let loaded_asset = match context.load_direct_with_reader(reader, path.to_string()).await {
             Ok(asset) => asset,
+            #[allow(unused_variables)]
             Err(err) => {
                 #[cfg(debug_assertions)]
-                error!("{err}");
+                error!("Error loading asset: \"{path}\", {err}");
                 #[cfg(not(debug_assertions))]
                 error!("Error loading asset: \"{path}\"");
 
@@ -331,6 +332,7 @@ impl ResourcePackZipLoader {
             }
         };
 
+        // Must be retrieved before the asset is taken.
         #[cfg(debug_assertions)]
         let type_name = loaded_asset.asset_type_name();
 

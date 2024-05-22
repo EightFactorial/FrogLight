@@ -29,7 +29,7 @@ pub struct ElementFace {
     /// Rotate the texture by this many degrees
     ///
     /// Must be a multiple of 90
-    #[serde(default, skip_serializing_if = "ElementFace::is_rotation_default")]
+    #[serde(default, skip_serializing_if = "ElementFace::is_default_rotation")]
     pub rotation: i32,
 
     /// If the face should be tinted using a color index
@@ -37,18 +37,20 @@ pub struct ElementFace {
     /// These are hardcoded only for certain blocks
     #[serde(
         default = "ElementFace::tint_index_default",
-        skip_serializing_if = "ElementFace::tint_index_is_default"
+        skip_serializing_if = "ElementFace::is_default_tint_index"
     )]
     pub tint_index: i32,
 }
 
 impl ElementFace {
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    const fn is_rotation_default(rotation: &i32) -> bool { *rotation == 0 }
+    const fn is_default_rotation(rotation: &i32) -> bool { *rotation == 0 }
 
-    const fn tint_index_default() -> i32 { -1 }
+    /// The default tint index
+    #[must_use]
+    pub const fn tint_index_default() -> i32 { -1 }
     #[allow(clippy::trivially_copy_pass_by_ref)]
-    const fn tint_index_is_default(tint_index: &i32) -> bool {
+    const fn is_default_tint_index(tint_index: &i32) -> bool {
         *tint_index == Self::tint_index_default()
     }
 }

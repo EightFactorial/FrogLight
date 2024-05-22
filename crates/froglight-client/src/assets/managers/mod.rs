@@ -15,7 +15,7 @@ pub use font_manager::FontManager;
 mod lang_manager;
 pub use lang_manager::LanguageManager;
 
-mod model_manager;
+pub mod model_manager;
 pub use model_manager::ModelManager;
 
 mod particle_manager;

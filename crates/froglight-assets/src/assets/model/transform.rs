@@ -43,6 +43,23 @@ pub enum DisplayPosition {
     Fixed,
 }
 
+impl DisplayPosition {
+    /// Returns all display positions as a slice
+    #[must_use]
+    pub const fn as_slice() -> &'static [Self] {
+        &[
+            Self::ThirdPersonRightHand,
+            Self::ThirdPersonLeftHand,
+            Self::FirstPersonRightHand,
+            Self::FirstPersonLeftHand,
+            Self::Gui,
+            Self::Head,
+            Self::Ground,
+            Self::Fixed,
+        ]
+    }
+}
+
 /// A model display transform
 ///
 /// Translations are applied before rotations
@@ -51,7 +68,7 @@ pub enum DisplayPosition {
 pub struct ModelDisplayTransform {
     /// Rotation
     #[serde(
-        default = "ModelDisplayTransform::default_rotation",
+        default = "ModelDisplayTransform::rotation_default",
         skip_serializing_if = "ModelDisplayTransform::is_default_rotation"
     )]
     pub rotation: [f32; 3],
@@ -59,7 +76,7 @@ pub struct ModelDisplayTransform {
     ///
     /// Clamped between `-80` and `80`
     #[serde(
-        default = "ModelDisplayTransform::default_translation",
+        default = "ModelDisplayTransform::translation_default",
         skip_serializing_if = "ModelDisplayTransform::is_default_translation"
     )]
     pub translation: [f32; 3],
@@ -67,7 +84,7 @@ pub struct ModelDisplayTransform {
     ///
     /// Maximum value of `4`
     #[serde(
-        default = "ModelDisplayTransform::default_scale",
+        default = "ModelDisplayTransform::scale_default",
         skip_serializing_if = "ModelDisplayTransform::is_default_scale"
     )]
     pub scale: [f32; 3],
@@ -75,22 +92,32 @@ pub struct ModelDisplayTransform {
 
 impl Default for ModelDisplayTransform {
     fn default() -> Self {
-        Self { rotation: [0.0, 0.0, 0.0], translation: [0.0, 0.0, 0.0], scale: [1.0, 1.0, 1.0] }
+        Self {
+            rotation: Self::rotation_default(),
+            translation: Self::translation_default(),
+            scale: Self::scale_default(),
+        }
     }
 }
 
 impl ModelDisplayTransform {
-    const fn default_rotation() -> [f32; 3] { [0.0, 0.0, 0.0] }
+    /// The default rotation
+    #[must_use]
+    pub const fn rotation_default() -> [f32; 3] { [0.0, 0.0, 0.0] }
     fn is_default_rotation([x, y, z]: &[f32; 3]) -> bool {
         (x - 0.0 < f32::EPSILON) && (y - 0.0 < f32::EPSILON) && (z - 0.0 < f32::EPSILON)
     }
 
-    const fn default_translation() -> [f32; 3] { [0.0, 0.0, 0.0] }
+    /// The default translation
+    #[must_use]
+    pub const fn translation_default() -> [f32; 3] { [0.0, 0.0, 0.0] }
     fn is_default_translation([x, y, z]: &[f32; 3]) -> bool {
         (x - 0.0 < f32::EPSILON) && (y - 0.0 < f32::EPSILON) && (z - 0.0 < f32::EPSILON)
     }
 
-    const fn default_scale() -> [f32; 3] { [1.0, 1.0, 1.0] }
+    /// The default scale
+    #[must_use]
+    pub const fn scale_default() -> [f32; 3] { [1.0, 1.0, 1.0] }
     fn is_default_scale([x, y, z]: &[f32; 3]) -> bool {
         (x - 1.0 < f32::EPSILON) && (y - 1.0 < f32::EPSILON) && (z - 1.0 < f32::EPSILON)
     }

@@ -9,8 +9,8 @@ pub use font::*;
 mod language;
 pub use language::*;
 
-mod model;
-pub use model::*;
+pub mod model;
+pub use model::{BlockModelDefinition, ItemModelDefinition, ModelDefinition};
 
 mod particle;
 pub use particle::*;

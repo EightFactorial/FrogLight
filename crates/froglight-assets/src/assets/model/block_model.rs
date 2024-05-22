@@ -13,7 +13,7 @@ pub struct BlockModelDefinition {
     pub parent: Option<ResourceKey>,
 
     /// Whether to enable ambient occlusion, or use the parent's values
-    #[serde(rename = "ambientocclusion", default, skip_serializing_if = "Option::is_none")]
+    #[serde(default, rename = "ambientocclusion", skip_serializing_if = "Option::is_none")]
     pub ambient_occlusion: Option<bool>,
 
     /// The display settings for the model, or use the parent's values
@@ -27,4 +27,10 @@ pub struct BlockModelDefinition {
     /// The elements of the model, or use the parent's values
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub elements: Option<Vec<ModelElement>>,
+}
+
+impl BlockModelDefinition {
+    /// The default value for ambient occlusion
+    #[must_use]
+    pub const fn ambient_occlusion_default() -> bool { true }
 }

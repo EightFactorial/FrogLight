@@ -202,6 +202,43 @@ impl ResourceKey {
             _ => panic!("ResourceKey must contain at most one `:`"),
         }
     }
+
+    /// Checks if the key is a valid [`ResourceKey`]
+    ///
+    /// A valid [`ResourceKey`] must:
+    /// - Not be empty
+    /// - Not start or end with a colon
+    /// - Contain exactly one colon
+    ///
+    /// # Examples
+    /// ```rust
+    /// use froglight_components::resourcekey::ResourceKey;
+    ///
+    /// assert!(!ResourceKey::is_valid("minecraft:"));
+    /// assert!(!ResourceKey::is_valid(":stone"));
+    /// assert!(!ResourceKey::is_valid(""));
+    ///
+    /// assert!(ResourceKey::is_valid("minecraft:stone"));
+    /// assert!(ResourceKey::is_valid("froglight:dirt"));
+    /// assert!(ResourceKey::is_valid("any:thing"));
+    ///
+    /// assert!(!ResourceKey::is_valid("minecraft:stone:"));
+    /// assert!(!ResourceKey::is_valid(":minecraft:stone"));
+    /// assert!(!ResourceKey::is_valid("minecraft::stone"));
+    /// assert!(!ResourceKey::is_valid("stone"));
+    /// ```
+    #[must_use]
+    pub fn is_valid(key: &str) -> bool {
+        if key.is_empty() {
+            return false;
+        }
+
+        if key.starts_with(':') || key.ends_with(':') {
+            return false;
+        }
+
+        key.matches(':').count() == 1
+    }
 }
 
 impl AsRef<str> for ResourceKey {
