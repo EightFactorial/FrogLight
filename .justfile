@@ -10,12 +10,12 @@ alias build := build-profile
 # Compile development build
 alias build-dev := build-profile
 # Compile release build
-build-release: (build-profile "release")
+build-release: (build-profile "release" "")
 
 # Compile build with specified profile
 [private]
-build-profile profile="dev" args="":
-  cargo build --profile {{profile}} --features mimalloc,inspector {{args}}
+build-profile profile="dev" args="--features=mimalloc,inspector":
+  cargo build --profile {{profile}}  {{args}}
 
 # Clean build artifacts
 clean: (fetch-tools) (tools "clean")
@@ -28,12 +28,12 @@ alias run := run-profile
 # Run development build
 alias run-dev := run-profile
 # Run release build
-run-release: (run-profile "release")
+run-release: (run-profile "release" "")
 
 # Run build with specified profile
 [private]
-run-profile profile="dev" args="":
-  cargo run --profile {{profile}} --features mimalloc,inspector {{args}}
+run-profile profile="dev" args="--features=mimalloc,inspector":
+  cargo run --profile {{profile}} {{args}}
 
 # ---- Test Recipes ----
 

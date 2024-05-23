@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![allow(clippy::needless_doctest_main)]
 
 use bevy::app::App;
 use froglight::AppPlugins;
