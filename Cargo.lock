@@ -2308,15 +2308,7 @@ dependencies = [
 name = "froglight"
 version = "0.1.0"
 dependencies = [
- "bevy",
- "bevy-inspector-egui",
- "embed-resource",
- "fastrand 2.1.0",
  "froglight-app",
- "froglight-components",
- "image 0.24.9",
- "mimalloc",
- "winit",
 ]
 
 [[package]]
@@ -2360,6 +2352,21 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+]
+
+[[package]]
+name = "froglight-bin"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy-inspector-egui",
+ "embed-resource",
+ "fastrand 2.1.0",
+ "froglight",
+ "froglight-components",
+ "image 0.24.9",
+ "mimalloc",
+ "winit",
 ]
 
 [[package]]

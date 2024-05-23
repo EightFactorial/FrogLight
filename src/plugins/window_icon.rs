@@ -10,17 +10,22 @@ use winit::{
 /// # Note
 /// This only works on Windows and Linux using X11.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub(super) struct WindowIconPlugin;
+pub struct WindowIconPlugin;
 
 impl Plugin for WindowIconPlugin {
-    fn build(&self, app: &mut App) { app.add_systems(PreStartup, Self::set_window_icon); }
+    fn build(&self, app: &mut App) {
+        // Run the `set_window_icon` system during the pre-startup schedule.
+        app.add_systems(PreStartup, Self::set_window_icon);
+    }
 }
 
 impl WindowIconPlugin {
+    /// The debug window icon.
     #[cfg(debug_assertions)]
-    const WINDOW_ICON: &'static [u8; 3620] = include_bytes!("../../assets/pearlescent.png");
+    const WINDOW_ICON: &'static [u8; 3620] = include_bytes!("../assets/pearlescent.png");
+    /// The release window icon.
     #[cfg(not(debug_assertions))]
-    const WINDOW_ICON: &'static [u8; 3540] = include_bytes!("../../assets/verdant.png");
+    const WINDOW_ICON: &'static [u8; 3540] = include_bytes!("../assets/verdant.png");
 
     /// A bevy system that sets all window icons.
     fn set_window_icon(windows: NonSend<WinitWindows>) {
@@ -57,7 +62,7 @@ impl WindowIconPlugin {
                 ) {
                     debug!("Setting window icon");
                 } else {
-                    info!("Setting window icon not supported on this platform");
+                    warn!("Setting window icon not supported on this platform");
                 }
             }
 
