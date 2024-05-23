@@ -86,7 +86,7 @@ derive_more = "0.99.17"
 fastrand = "2.1.0"
 futures-lite = "2.3.0"
 hashbrown = "0.14.5"
-image = { version = "0.24.9", default-features = false }
+image = { version = "0.25.0", default-features = false }
 parking_lot = "0.12.2"
 proptest = "1.4.0"
 serde = "1.0.200"
