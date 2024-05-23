@@ -9,5 +9,6 @@ use plugins::ExtraPlugins;
 
 /// The main function.
 ///
-/// Create a new [`App`], add the [`AppPlugins`], and run it.
+/// Create a new [`App`], add the [`AppPlugins`] and [`ExtraPlugins`],
+/// and run it.
 fn main() { App::new().add_plugins((AppPlugins, ExtraPlugins)).run() }

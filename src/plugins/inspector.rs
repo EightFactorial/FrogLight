@@ -2,6 +2,12 @@ use bevy::{app::Plugin, prelude::*};
 use bevy_inspector_egui::{inspector_egui_impls::InspectorEguiImpl, quick::WorldInspectorPlugin};
 use froglight_components::resourcekey::ResourceKey;
 
+/// A plugin for enabling the [`WorldInspectorPlugin`].
+///
+/// Additionally adds a keybind to show/hide the inspector.
+///
+/// This is very useful for debugging and inspecting entities,
+/// but should not be enabled for release builds.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct InspectorPlugin;
 

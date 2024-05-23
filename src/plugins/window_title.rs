@@ -5,7 +5,7 @@ use bevy::{prelude::*, winit::WinitWindows};
 /// # Note
 /// Does not work for Android or iOS.
 ///
-/// No, I don't plan on adding support for mobile platforms.
+/// No, there is no plan to support for mobile platforms.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct WindowTitlePlugin;
 

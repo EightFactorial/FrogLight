@@ -12,7 +12,23 @@ pub mod window_icon;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 pub mod window_title;
 
-/// A [`PluginGroup`] with extra plugins.
+/// A [`PluginGroup`] containing a few extra plugins.
+///
+/// All of these plugins are optional, though enabled by default when
+/// the requirements are met.
+///
+/// Contains:
+/// - [`InspectorPlugin`](inspector::InspectorPlugin) if the `inspector` feature
+///   is enabled.
+///
+/// - [`MiMallocPlugin`](mimalloc::MiMallocPlugin) if the `mimalloc` feature is
+///   enabled.
+///
+/// - [`WindowIconPlugin`](window_icon::WindowIconPlugin) if the target is
+///   `Windows` or `Linux`.
+///
+/// - [`WindowTitlePlugin`](window_title::WindowTitlePlugin) if the target is
+///   not `Android` or `iOS`.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ExtraPlugins;
 

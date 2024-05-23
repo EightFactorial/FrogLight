@@ -1,15 +1,16 @@
 use bevy::app::{App, Plugin};
 use mimalloc::MiMalloc;
 
-/// The global allocator.
+/// The mimalloc global allocator.
 ///
-/// This is completely optional, but might improve performance.
+/// This is optional, but likely improves performance.
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;
 
-/// The MiMalloc plugin.
+/// A plugin for logging the version of [`MiMalloc`].
 ///
-/// Logs the version of [`MiMalloc`] to the console.
+/// This plugin does not enable [`MiMalloc`], it is
+/// automatically enabled with the `mimalloc` feature.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MiMallocPlugin;
 
