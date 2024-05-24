@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![feature(trivial_bounds)]
+#![feature(array_try_from_fn)]
 
 use bevy::prelude::*;
 
@@ -11,8 +12,6 @@ pub mod networking;
 pub mod systemsets;
 
 /// The `Client` Froglight plugin.
-///
-/// Adds
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ClientPlugin;
 

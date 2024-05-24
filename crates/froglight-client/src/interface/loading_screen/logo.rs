@@ -4,7 +4,7 @@ use bevy::{asset::embedded_asset, prelude::*};
 pub(super) fn build(app: &mut App) {
     app.register_type::<LoadingScreenLogo>();
 
-    embedded_asset!(app, "assets/froglight_logo.png");
+    embedded_asset!(app, "assets/logo.png");
 }
 
 /// A marker [`Component`] for the [`LoadingScreen`](super::LoadingScreen) logo.
@@ -15,8 +15,11 @@ pub struct LoadingScreenLogo;
 impl LoadingScreenLogo {
     /// Spawns a [`LoadingScreenLogo`], returning the [`Entity`].
     pub fn spawn(world: &mut World) -> Entity {
+        // Spawn a new loading screen logo
         let entity = world.spawn_empty().id();
         Self::spawn_at(entity, world);
+
+        // Return the `Entity`
         entity
     }
 
@@ -29,16 +32,17 @@ impl LoadingScreenLogo {
         };
 
         // Load the embedded logo image
-        // let _image_handle: Handle<Image> = entity_commands.world_scope(|world| {
+        // let image_handle: Handle<Image> = entity_commands.world_scope(|world| {
         //     world.resource::<AssetServer>().load(
-        //         "embedded://froglight_client/interface/loading_screen/assets/
-        // froglight_logo.png",     )
-        // });
+        //         "embedded://froglight_client/interface/loading_screen/assets/logo.
+        // png"     )
+        //});
 
         // Create a new NodeBundle
         let node = ImageBundle {
             style: Style {
                 position_type: PositionType::Relative,
+                margin: UiRect::vertical(Val::Px(2.0)),
                 height: Val::Px(100.0),
                 width: Val::Px(100.0),
                 ..Default::default()

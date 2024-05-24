@@ -43,14 +43,21 @@ impl LoadingScreen {
 
     /// A [`System`](bevy::prelude::System) that spawns a
     /// [`LoadingScreen`].
+    ///
+    /// This is a helper function to give the system a more descriptive name.
     #[inline]
     fn spawn_loading_screen(world: &mut World) { Self::spawn(world); }
 
     /// Spawns a new [`LoadingScreen`] in the [`World`].
     pub fn spawn(world: &mut World) {
+        // Get the visibility of the loading screen
         let visibility = world.resource::<LoadingScreenVisibility>().get_visibility();
+
+        // Spawn a new loading screen
         let entity = world.spawn_empty().id();
         Self::spawn_at(entity, visibility, world);
+
+        // Set a global `ZIndex` to ensure the loading screen is always on top
         world.entity_mut(entity).insert(Self::Z_INDEX);
     }
 
@@ -63,6 +70,9 @@ impl LoadingScreen {
         };
 
         // Create a new NodeBundle
+        //
+        // Fills the screen, blocks input below it,
+        // and centers its children in a column.
         let node = NodeBundle {
             style: Style {
                 position_type: PositionType::Relative,
@@ -87,7 +97,7 @@ impl LoadingScreen {
             ..Default::default()
         };
 
-        // Insert the marker and NodeBundle
+        // Insert the marker and `NodeBundle`
         entity_commands.insert((LoadingScreen, Name::new("LoadingScreen"), node));
 
         // Spawn a logo and progress bar and add them as children

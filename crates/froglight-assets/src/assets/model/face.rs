@@ -74,3 +74,48 @@ pub enum ModelFace {
     /// The east face
     East,
 }
+
+impl ModelFace {
+    /// Returns the index of the face
+    #[must_use]
+    pub const fn as_index(&self) -> usize {
+        match self {
+            Self::Down => 0,
+            Self::Up => 1,
+            Self::North => 2,
+            Self::South => 3,
+            Self::West => 4,
+            Self::East => 5,
+        }
+    }
+
+    /// Returns the face from the index
+    ///
+    /// # Panics
+    /// Panics if the index is greater than `5`
+    #[must_use]
+    pub const fn from_index(index: usize) -> Self {
+        match index {
+            0 => Self::Down,
+            1 => Self::Up,
+            2 => Self::North,
+            3 => Self::South,
+            4 => Self::West,
+            5 => Self::East,
+            _ => panic!("Invalid ModelFace index"),
+        }
+    }
+
+    /// Returns the opposite face
+    #[must_use]
+    pub const fn opposite(&self) -> Self {
+        match self {
+            Self::Down => Self::Up,
+            Self::Up => Self::Down,
+            Self::North => Self::South,
+            Self::South => Self::North,
+            Self::West => Self::East,
+            Self::East => Self::West,
+        }
+    }
+}

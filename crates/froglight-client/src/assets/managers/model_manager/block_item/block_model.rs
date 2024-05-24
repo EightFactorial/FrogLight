@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use froglight_assets::assets::{
-    model::{DisplayPosition, ModelDisplayTransform},
-    BlockModelDefinition, ModelDefinition,
+    model::ModelDisplayTransform, BlockModelDefinition, ModelDefinition,
 };
 use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
@@ -15,7 +14,10 @@ pub struct BlockModel {
     pub ambient_occlusion: bool,
 
     /// Model transforms
-    pub model_transforms: HashMap<DisplayPosition, ModelDisplayTransform>,
+    ///
+    /// Indexed via
+    /// [`DisplayPosition`](froglight_assets::assets::model::DisplayPosition).
+    pub model_transforms: [ModelDisplayTransform; 7],
 
     /// Model elements
     pub elements: Vec<ModelElement>,

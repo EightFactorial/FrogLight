@@ -4,17 +4,29 @@ pub mod loading_screen;
 
 pub mod uiscale;
 
-/// The virtual window width.
+/// The window scale width.
 ///
-/// All Ui should be designed for this width,
-/// the scale will be adjusted to fit the actual window size.
-pub const WINDOW_VIRTUAL_WIDTH: u32 = 380;
+/// Used to calculate the [`UiScale`](bevy::ui::UiScale).
+pub const SCALE_WIDTH: u32 = 380;
 
-/// The virtual window height.
+/// The window scale width as a `f32`.
 ///
-/// All Ui should be designed for this height,
-/// the scale will be adjusted to fit the actual window size.
-pub const WINDOW_VIRTUAL_HEIGHT: u32 = 240;
+/// When used as the width of a ui element, it
+/// will never clip off the screen.
+#[allow(clippy::cast_precision_loss)]
+pub const SCALE_WIDTH_F32: f32 = SCALE_WIDTH as f32;
+
+/// The window scale height.
+///
+/// Used to calculate the [`UiScale`](bevy::ui::UiScale).
+pub const SCALE_HEIGHT: u32 = 240;
+
+/// The window scale height as a `f32`.
+///
+/// When used as the height of a ui element, it
+/// will never clip off the screen.
+#[allow(clippy::cast_precision_loss)]
+pub const SCALE_HEIGHT_F32: f32 = SCALE_HEIGHT as f32;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut bevy::app::App) {

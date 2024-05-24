@@ -1,9 +1,11 @@
 use bevy::reflect::Reflect;
 use froglight_assets::assets::model::{
-    ElementRotation, ModelElement as ModelDefinitionElement, ModelFace,
+    ElementRotation, ModelElement as DefinitionModelElement, ModelFace, ElementFace as DefinitionElementFace,
 };
 use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
+
+use crate::assets::AssetManager;
 
 /// A model element
 #[derive(Debug, Clone, PartialEq, Reflect)]
@@ -25,49 +27,82 @@ pub struct ModelElement {
     pub shade: bool,
 
     /// The faces of the cube
-    pub faces: HashMap<ModelFace, ElementFace>,
+    /// 
+    /// Indexed via [`ModelFace`].
+    pub faces: [ElementFace; 6],
 }
 
 impl ModelElement {
-    /// Resolves a [`ModelDefinitionElement`] into a [`ModelElement`].
-    #[allow(unused_variables, unreachable_code, clippy::diverging_sub_expression)]
+    /// Resolves a [`DefinitionModelElement`] into a [`ModelElement`].    
     #[must_use]
     pub fn resolve_from(
         key: &ResourceKey,
-        def: &ModelDefinitionElement,
+        def: &DefinitionModelElement,
         textures: &HashMap<String, String>,
     ) -> Option<Self> {
-        let mut faces = HashMap::new();
+        let faces = std::array::try_from_fn(|index| {
+            // Get the face definition, return `None` if it does not exist
+            let face = ModelFace::from_index(index);
+            let face_def = def.faces.get(&face)?;
 
-        for (face, face_def) in &def.faces {
-            faces.insert(
-                *face,
-                ElementFace {
-                    uv: face_def.uv.unwrap_or_else(|| {
-                        // Create default UVs, based on the from, to, and face
-                        //
-                        // TODO: These are probably wrong, fix later
-                        match face {
-                            ModelFace::Down | ModelFace::Up => {
-                                [def.from[0], def.from[2], def.to[0], def.to[2]]
-                            }
-                            ModelFace::North | ModelFace::South => {
-                                [def.from[0], def.from[1], def.to[0], def.to[1]]
-                            }
-                            ModelFace::West | ModelFace::East => {
-                                [def.from[2], def.from[1], def.to[2], def.to[1]]
-                            }
-                        }
-                    }),
-                    texture: todo!("Resolve texture from textures map"),
-                    cullface: face_def.cullface.unwrap_or(*face),
-                    rotation: face_def.rotation,
-                    tint_index: face_def.tint_index,
-                },
-            );
-        }
+            Some(ElementFace {
+                // Use the UVs if they are defined, otherwise use the default UVs
+                uv: face_def.uv.unwrap_or_else(|| {
+                    Self::default_uvs(face, &def.from, &def.to)
+                }),
+                // Use the texture key to get the texture, or return the fallback texture
+                texture: Self::resolve_texture(key, face_def, textures).unwrap_or(AssetManager::FALLBACK_TEXTURE),
+                cullface: face_def.cullface.unwrap_or(face),
+                rotation: face_def.rotation,
+                tint_index: face_def.tint_index,
+            })
+        })?;
 
         Some(Self { from: def.from, to: def.to, rotation: def.rotation, shade: def.shade, faces })
+    }
+
+    /// Returns the default UVs for a face, given the `from` and `to` coordinates
+    /// 
+    /// The UVs are returned in the order `[x1, y1, x2, y2]`
+    // TODO: Check if the UVs are correct
+    #[must_use]
+    fn default_uvs(face: ModelFace, from: &[f32; 3], to: &[f32; 3]) -> [f32; 4] {
+        match face {
+            ModelFace::Down | ModelFace::Up => [from[0], from[2], to[0], to[2]],
+            ModelFace::North | ModelFace::South => [from[0], from[1], to[0], to[1]],
+            ModelFace::West | ModelFace::East => [from[2], from[1], to[2], to[1]],
+        }
+    }
+
+    /// Attempt to resolve a texture key into a [`ResourceKey`].
+    /// 
+    /// Fails if the texture key is not found in the `textures` map.
+    #[must_use]
+    fn resolve_texture(
+        key: &ResourceKey,
+        face_def: &DefinitionElementFace,
+        textures: &HashMap<String, String>,
+    ) -> Option<ResourceKey> {
+        let mut texture = face_def.texture.as_str();
+
+        // Resolve the texture key until an actual texture is found
+        while texture.starts_with('#') {
+            if let Some(new_texture) = textures.get(&texture[1..]) {
+                texture = new_texture;
+            } else {
+                #[cfg(debug_assertions)]
+                {
+                    bevy::log::error!("Failed to resolve texture \"{}\" for \"{key}\"", face_def.texture.as_str());
+                    bevy::log::debug!("Available textures for \"{key}\": {textures:?}");
+                }
+                #[cfg(not(debug_assertions))]
+                bevy::log::error!("Failed to find texture for \"{key}\"");
+                return None;
+            }
+        }
+
+        // Try to create a `ResourceKey` from the texture
+        ResourceKey::try_new(texture).ok()
     }
 }
 
@@ -75,6 +110,8 @@ impl ModelElement {
 #[derive(Debug, Clone, PartialEq, Reflect)]
 pub struct ElementFace {
     /// The area of the texture to use
+    /// 
+    /// The UVs are in the order `[x1, y1, x2, y2]`
     pub uv: [f32; 4],
 
     /// The texture to use

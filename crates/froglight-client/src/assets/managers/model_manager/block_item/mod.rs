@@ -14,6 +14,7 @@ pub use element::*;
 
 /// A Model for a block or item
 #[derive(Debug, Clone, PartialEq, Reflect)]
+#[allow(clippy::large_enum_variant)]
 pub enum BlockItemModel {
     /// A block model
     Block(BlockModel),
@@ -31,10 +32,10 @@ impl BlockItemModel {
     ) -> Option<Self> {
         match def {
             ModelDefinition::Block(block) => {
-                Some(Self::Block(BlockModel::resolve_definition(key, block, definitions)?))
+                BlockModel::resolve_definition(key, block, definitions).map(Self::Block)
             }
             ModelDefinition::Item(item) => {
-                Some(Self::Item(ItemModel::resolve_definition(key, item, definitions)))
+                ItemModel::resolve_definition(key, item, definitions).map(Self::Item)
             }
         }
     }

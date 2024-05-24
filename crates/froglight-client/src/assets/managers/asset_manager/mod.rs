@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{asset::embedded_asset, prelude::*};
 use froglight_assets::assets::ResourcePack;
 use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
@@ -8,6 +8,9 @@ use crate::assets::{AssetLoading, ResourcePackSettings};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    // Embed the fallback texture asset
+    embedded_asset!(app, "assets/fallback.png");
+
     app.init_resource::<AssetManager>()
         .register_type::<AssetManager>()
         .init_resource::<AssetManagerState>()
@@ -31,13 +34,32 @@ pub(super) fn build(app: &mut App) {
 
 /// A [`Resource`] for managing [`sound`](AudioSource) and [`texture`](Image)
 /// assets.
-#[derive(Debug, Default, Clone, Resource, Reflect)]
-#[reflect(Default, Resource)]
+#[derive(Debug, Clone, Resource, Reflect)]
+#[reflect(Resource)]
 pub struct AssetManager {
     /// Sounds
     pub sounds: HashMap<ResourceKey, Handle<AudioSource>>,
     /// Textures
     pub textures: HashMap<ResourceKey, Handle<Image>>,
+}
+
+impl FromWorld for AssetManager {
+    fn from_world(world: &mut World) -> Self {
+        let mut textures = HashMap::with_capacity(1);
+
+        // Load and insert the fallback texture
+        {
+            let handle = if let Some(asset_server) = world.get_resource::<AssetServer>() {
+                asset_server
+                    .load("embedded://froglight_client/assets/assetmanager/assets/fallback.png")
+            } else {
+                Handle::default()
+            };
+            textures.insert(Self::FALLBACK_TEXTURE.clone(), handle);
+        }
+
+        Self { sounds: HashMap::default(), textures }
+    }
 }
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Resource, Reflect)]
@@ -49,6 +71,9 @@ pub struct AssetManagerState {
 }
 
 impl AssetManager {
+    /// The [`ResourceKey`] for the fallback texture.
+    pub const FALLBACK_TEXTURE: ResourceKey = ResourceKey::new_inline("froglight:fallback");
+
     /// Returns `true` if the [`AssetManager`] has finished loading all assets.
     #[must_use]
     pub fn is_finished(state: Res<AssetManagerState>) -> bool { state.finished }
@@ -58,8 +83,9 @@ impl AssetManager {
         mut manager: ResMut<AssetManager>,
         mut state: ResMut<AssetManagerState>,
     ) {
+        manager.textures.retain(|key, _| key == &Self::FALLBACK_TEXTURE);
+
         manager.sounds.clear();
-        manager.textures.clear();
         state.finished = false;
         state.current = 0;
     }
@@ -111,5 +137,15 @@ impl AssetManager {
 
             state.finished = true;
         }
+    }
+
+    /// Returns the texture handle for the given [`ResourceKey`], or the
+    /// [`AssetManager::FALLBACK_TEXTURE`].
+    #[allow(clippy::missing_panics_doc)]
+    #[must_use]
+    pub fn get_texture_or_fallback(&self, key: &ResourceKey) -> &Handle<Image> {
+        self.textures.get(key).unwrap_or_else(|| {
+            self.textures.get(&Self::FALLBACK_TEXTURE).expect("Fallback texture not found")
+        })
     }
 }

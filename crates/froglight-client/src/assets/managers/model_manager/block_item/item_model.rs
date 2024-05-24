@@ -14,7 +14,7 @@ impl ItemModel {
         _key: &ResourceKey,
         _def: &ItemModelDefinition,
         _definitions: &HashMap<ResourceKey, ModelDefinition>,
-    ) -> Self {
-        Self {}
+    ) -> Option<Self> {
+        todo!()
     }
 }

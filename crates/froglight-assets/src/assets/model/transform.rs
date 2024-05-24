@@ -44,7 +44,7 @@ pub enum DisplayPosition {
 }
 
 impl DisplayPosition {
-    /// Returns all display positions as a slice
+    /// Returns all [`DisplayPosition`]s as a slice
     #[must_use]
     pub const fn as_slice() -> &'static [Self] {
         &[
@@ -57,6 +57,40 @@ impl DisplayPosition {
             Self::Ground,
             Self::Fixed,
         ]
+    }
+
+    /// Returns the index of the [`DisplayPosition`]
+    #[must_use]
+    pub const fn as_index(&self) -> usize {
+        match self {
+            Self::ThirdPersonRightHand => 0,
+            Self::ThirdPersonLeftHand => 1,
+            Self::FirstPersonRightHand => 2,
+            Self::FirstPersonLeftHand => 3,
+            Self::Gui => 4,
+            Self::Head => 5,
+            Self::Ground => 6,
+            Self::Fixed => 7,
+        }
+    }
+
+    /// Returns the [`DisplayPosition`] from the index
+    ///
+    /// # Panics
+    /// Panics if the index is greater than `7`
+    #[must_use]
+    pub const fn from_index(index: usize) -> Self {
+        match index {
+            0 => Self::ThirdPersonRightHand,
+            1 => Self::ThirdPersonLeftHand,
+            2 => Self::FirstPersonRightHand,
+            3 => Self::FirstPersonLeftHand,
+            4 => Self::Gui,
+            5 => Self::Head,
+            6 => Self::Ground,
+            7 => Self::Fixed,
+            _ => panic!("Invalid DisplayPosition index"),
+        }
     }
 }
 

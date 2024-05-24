@@ -8,7 +8,7 @@ use bevy::{
     window::{PrimaryWindow, WindowResized},
 };
 
-use super::{WINDOW_VIRTUAL_HEIGHT, WINDOW_VIRTUAL_WIDTH};
+use super::{SCALE_HEIGHT, SCALE_WIDTH};
 use crate::systemsets::ClientPreUpdateSet;
 
 #[doc(hidden)]
@@ -122,12 +122,12 @@ impl UiScaleLimit {
 
     /// Calculates a new scale based on the window size.
     fn calculate(width: u32, height: u32) -> u8 {
-        let w_scale = width / WINDOW_VIRTUAL_WIDTH;
-        let h_scale = height / WINDOW_VIRTUAL_HEIGHT;
+        let w_scale = width / SCALE_WIDTH;
+        let h_scale = height / SCALE_HEIGHT;
 
         let output = w_scale.min(h_scale).max(1);
         u8::try_from(output).unwrap_or_else(|_| {
-            warn!("UiScale calculation overflowed!");
+            error!("UiScale calculation overflowed!");
             1u8
         })
     }
