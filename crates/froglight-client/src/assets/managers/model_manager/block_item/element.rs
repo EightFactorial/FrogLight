@@ -1,6 +1,7 @@
 use bevy::reflect::Reflect;
 use froglight_assets::assets::model::{
-    ElementRotation, ModelElement as DefinitionModelElement, ModelFace, ElementFace as DefinitionElementFace,
+    ElementFace as DefinitionElementFace, ElementRotation, ModelElement as DefinitionModelElement,
+    ModelFace,
 };
 use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
@@ -27,13 +28,13 @@ pub struct ModelElement {
     pub shade: bool,
 
     /// The faces of the cube
-    /// 
+    ///
     /// Indexed via [`ModelFace`].
     pub faces: [ElementFace; 6],
 }
 
 impl ModelElement {
-    /// Resolves a [`DefinitionModelElement`] into a [`ModelElement`].    
+    /// Resolves a [`DefinitionModelElement`] into a [`ModelElement`].
     #[must_use]
     pub fn resolve_from(
         key: &ResourceKey,
@@ -47,11 +48,10 @@ impl ModelElement {
 
             Some(ElementFace {
                 // Use the UVs if they are defined, otherwise use the default UVs
-                uv: face_def.uv.unwrap_or_else(|| {
-                    Self::default_uvs(face, &def.from, &def.to)
-                }),
+                uv: face_def.uv.unwrap_or_else(|| Self::default_uvs(face, &def.from, &def.to)),
                 // Use the texture key to get the texture, or return the fallback texture
-                texture: Self::resolve_texture(key, face_def, textures).unwrap_or(AssetManager::FALLBACK_TEXTURE),
+                texture: Self::resolve_texture(key, face_def, textures)
+                    .unwrap_or(AssetManager::FALLBACK_TEXTURE),
                 cullface: face_def.cullface.unwrap_or(face),
                 rotation: face_def.rotation,
                 tint_index: face_def.tint_index,
@@ -61,8 +61,9 @@ impl ModelElement {
         Some(Self { from: def.from, to: def.to, rotation: def.rotation, shade: def.shade, faces })
     }
 
-    /// Returns the default UVs for a face, given the `from` and `to` coordinates
-    /// 
+    /// Returns the default UVs for a face, given the `from` and `to`
+    /// coordinates
+    ///
     /// The UVs are returned in the order `[x1, y1, x2, y2]`
     // TODO: Check if the UVs are correct
     #[must_use]
@@ -75,7 +76,7 @@ impl ModelElement {
     }
 
     /// Attempt to resolve a texture key into a [`ResourceKey`].
-    /// 
+    ///
     /// Fails if the texture key is not found in the `textures` map.
     #[must_use]
     fn resolve_texture(
@@ -92,7 +93,10 @@ impl ModelElement {
             } else {
                 #[cfg(debug_assertions)]
                 {
-                    bevy::log::error!("Failed to resolve texture \"{}\" for \"{key}\"", face_def.texture.as_str());
+                    bevy::log::error!(
+                        "Failed to resolve texture \"{}\" for \"{key}\"",
+                        face_def.texture.as_str()
+                    );
                     bevy::log::debug!("Available textures for \"{key}\": {textures:?}");
                 }
                 #[cfg(not(debug_assertions))]
@@ -110,7 +114,7 @@ impl ModelElement {
 #[derive(Debug, Clone, PartialEq, Reflect)]
 pub struct ElementFace {
     /// The area of the texture to use
-    /// 
+    ///
     /// The UVs are in the order `[x1, y1, x2, y2]`
     pub uv: [f32; 4],
 

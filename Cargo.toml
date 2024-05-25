@@ -79,7 +79,7 @@ bevy_transform = "0.13.2"
 bevy_ui = "0.13.2"
 bevy_window = "0.13.2"
 bitvec = "1.0.1"
-bytemuck = "1.15.0"
+bytemuck = "1.16.0"
 compact_str = "0.7.1"
 criterion = "0.5.1"
 derive_more = "0.99.17"
@@ -87,7 +87,7 @@ fastrand = "2.1.0"
 futures-lite = "2.3.0"
 hashbrown = "0.14.5"
 image = { version = "0.24.9", default-features = false }
-parking_lot = "0.12.2"
+parking_lot = "0.12.3"
 proptest = "1.4.0"
 serde = "1.0.200"
 serde_json = "1.0.116"
@@ -105,8 +105,10 @@ opt-level = 1
 
 [profile.dev.package]
 # Only slightly optimize most froglight packages
+froglight = { opt-level = 1 }
 froglight-app = { opt-level = 1 }
 froglight-assets = { opt-level = 1 }
+froglight-bin = { opt-level = 1 }
 froglight-client = { opt-level = 1 }
 froglight-components = { opt-level = 1 }
 froglight-entity = { opt-level = 1 }
@@ -115,11 +117,13 @@ froglight-network = { opt-level = 1 }
 froglight-registry = { opt-level = 1 }
 froglight-settings = { opt-level = 1 }
 froglight-utils = { opt-level = 1 }
-# Fully optimize important packages and bevy
+# Fully optimize important packages
 bevy = { opt-level = 3 }
+bytemuck = { opt-level = 3 }
 froglight-protocol = { opt-level = 3 }
 froglight-render = { opt-level = 3 }
 froglight-world = { opt-level = 3 }
+glam = { opt-level = 3 }
 mimalloc = { opt-level = 3 }
 # Somewhat optimize all other packages
 "*" = { opt-level = 2 }

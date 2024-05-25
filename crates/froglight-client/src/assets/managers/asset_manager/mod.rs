@@ -50,8 +50,9 @@ impl FromWorld for AssetManager {
         // Load and insert the fallback texture
         {
             let handle = if let Some(asset_server) = world.get_resource::<AssetServer>() {
-                asset_server
-                    .load("embedded://froglight_client/assets/assetmanager/assets/fallback.png")
+                asset_server.load(
+                    "embedded://froglight_client/assets/managers/asset_manager/assets/fallback.png",
+                )
             } else {
                 Handle::default()
             };
