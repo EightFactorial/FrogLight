@@ -6,6 +6,8 @@ use froglight_assets::assets::{
 use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
 
+use crate::assets::AssetManager;
+
 /// An Item Model
 #[derive(Debug, Reflect)]
 pub struct ItemModel {
@@ -35,6 +37,7 @@ impl ItemModel {
         _key: &ResourceKey,
         _def: &ItemModelDefinition,
         _definitions: &HashMap<ResourceKey, ModelDefinition>,
+        _asset_manager: &AssetManager,
         _mesh_assets: &mut Assets<Mesh>,
     ) -> Self {
         todo!()

@@ -88,3 +88,22 @@ pub enum ModelAxis {
     /// The Z axis
     Z,
 }
+
+impl ModelAxis {
+    /// The identity of the X axis
+    pub const X_IDENTITY: [f32; 3] = [1.0, 0.0, 0.0];
+    /// The identity of the Y axis
+    pub const Y_IDENTITY: [f32; 3] = [0.0, 1.0, 0.0];
+    /// The identity of the Z axis
+    pub const Z_IDENTITY: [f32; 3] = [0.0, 0.0, 1.0];
+
+    /// Get the identity of the axis
+    #[must_use]
+    pub const fn as_identity(&self) -> [f32; 3] {
+        match self {
+            Self::X => Self::X_IDENTITY,
+            Self::Y => Self::Y_IDENTITY,
+            Self::Z => Self::Z_IDENTITY,
+        }
+    }
+}

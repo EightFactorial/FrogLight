@@ -39,6 +39,7 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(LanguageManager::populate_language_manager)
             .ambiguous_with(ParticleManager::populate_particle_manager)
             .ambiguous_with(SoundManager::populate_sound_manager)
+            .after(AssetManager::populate_asset_manager)
             .in_set(AssetLoading::Processing),
     );
 }

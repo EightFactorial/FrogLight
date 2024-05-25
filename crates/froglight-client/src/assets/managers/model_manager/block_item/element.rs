@@ -30,7 +30,7 @@ pub struct ResolvedModelElement {
     /// The faces of the cube
     ///
     /// Indexed via [`ModelFace`].
-    pub faces: [ResolvedElementFace; 6],
+    pub faces: [Option<ResolvedElementFace>; 6],
 }
 
 impl ResolvedModelElement {
@@ -41,24 +41,24 @@ impl ResolvedModelElement {
         element: &DefinitionModelElement,
         textures: &HashMap<&String, &String>,
     ) -> Option<Self> {
-        let faces = std::array::try_from_fn(|index| {
+        let faces = std::array::from_fn(|index| {
             // Get the face definition, return `None` if it does not exist
             let face = ModelFace::from_index(index);
-            let face_def = element.faces.get(&face)?;
-
-            Some(ResolvedElementFace {
-                // Use the UVs if they are defined, otherwise use the default UVs
-                uv: face_def
-                    .uv
-                    .unwrap_or_else(|| Self::default_uvs(face, &element.from, &element.to)),
-                // Use the texture key to get the texture, or return the fallback texture
-                texture: Self::resolve_texture(key, face_def, textures)
-                    .unwrap_or(AssetManager::FALLBACK_TEXTURE),
-                cullface: face_def.cullface.unwrap_or(face),
-                rotation: face_def.rotation,
-                tint_index: face_def.tint_index,
+            element.faces.get(&face).map(|face_def| {
+                ResolvedElementFace {
+                    // Use the UVs if they are defined, otherwise use the default UVs
+                    uv: face_def
+                        .uv
+                        .unwrap_or_else(|| Self::default_uvs(face, &element.from, &element.to)),
+                    // Use the texture key to get the texture, or return the fallback texture
+                    texture: Self::resolve_texture(key, face_def, textures)
+                        .unwrap_or(AssetManager::FALLBACK_TEXTURE),
+                    cullface: face_def.cullface.unwrap_or(face),
+                    rotation: face_def.rotation,
+                    tint_index: face_def.tint_index,
+                }
             })
-        })?;
+        });
 
         Some(Self {
             from: element.from,

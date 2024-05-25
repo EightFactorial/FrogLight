@@ -1,3 +1,4 @@
+use asset_manager::AssetManager;
 use bevy::prelude::*;
 use froglight_assets::assets::ModelDefinition;
 use froglight_network::common::ResourceKey;
@@ -11,6 +12,8 @@ pub use item_model::*;
 
 mod element;
 pub use element::*;
+
+use crate::assets::managers::asset_manager;
 
 /// A Model for a block or item
 #[derive(Debug, Reflect)]
@@ -29,15 +32,24 @@ impl BlockItemModel {
         key: &ResourceKey,
         def: &ModelDefinition,
         definitions: &HashMap<ResourceKey, ModelDefinition>,
+        asset_manager: &AssetManager,
         mesh_assets: &mut Assets<Mesh>,
     ) -> Self {
         match def {
-            ModelDefinition::Block(block) => {
-                Self::Block(BlockModel::resolve_definition(key, block, definitions, mesh_assets))
-            }
-            ModelDefinition::Item(item) => {
-                Self::Item(ItemModel::resolve_definition(key, item, definitions, mesh_assets))
-            }
+            ModelDefinition::Block(block) => Self::Block(BlockModel::resolve_definition(
+                key,
+                block,
+                definitions,
+                asset_manager,
+                mesh_assets,
+            )),
+            ModelDefinition::Item(item) => Self::Item(ItemModel::resolve_definition(
+                key,
+                item,
+                definitions,
+                asset_manager,
+                mesh_assets,
+            )),
         }
     }
 }

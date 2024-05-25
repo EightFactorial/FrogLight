@@ -146,6 +146,8 @@ impl AssetManager {
     #[must_use]
     pub fn get_texture_or_fallback(&self, key: &ResourceKey) -> &Handle<Image> {
         self.textures.get(key).unwrap_or_else(|| {
+            #[cfg(debug_assertions)]
+            warn!("Unable to find texture for: \"{key}\"");
             self.textures.get(&Self::FALLBACK_TEXTURE).expect("Fallback texture not found")
         })
     }
