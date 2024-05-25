@@ -2386,6 +2386,7 @@ dependencies = [
  "hashbrown",
  "parking_lot",
  "serde",
+ "serde_json",
  "simdnbt",
 ]
 

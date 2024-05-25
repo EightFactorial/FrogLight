@@ -10,7 +10,7 @@ use crate::assets::AssetManager;
 
 /// A model element
 #[derive(Debug, Clone, PartialEq, Reflect)]
-pub struct ModelElement {
+pub struct ResolvedModelElement {
     /// The starting point of the cube
     ///
     /// Must be between `-16` and `32`
@@ -30,25 +30,27 @@ pub struct ModelElement {
     /// The faces of the cube
     ///
     /// Indexed via [`ModelFace`].
-    pub faces: [ElementFace; 6],
+    pub faces: [ResolvedElementFace; 6],
 }
 
-impl ModelElement {
-    /// Resolves a [`DefinitionModelElement`] into a [`ModelElement`].
+impl ResolvedModelElement {
+    /// Resolves a [`DefinitionModelElement`] into a [`ResolvedModelElement`].
     #[must_use]
     pub fn resolve_from(
         key: &ResourceKey,
-        def: &DefinitionModelElement,
-        textures: &HashMap<String, String>,
+        element: &DefinitionModelElement,
+        textures: &HashMap<&String, &String>,
     ) -> Option<Self> {
         let faces = std::array::try_from_fn(|index| {
             // Get the face definition, return `None` if it does not exist
             let face = ModelFace::from_index(index);
-            let face_def = def.faces.get(&face)?;
+            let face_def = element.faces.get(&face)?;
 
-            Some(ElementFace {
+            Some(ResolvedElementFace {
                 // Use the UVs if they are defined, otherwise use the default UVs
-                uv: face_def.uv.unwrap_or_else(|| Self::default_uvs(face, &def.from, &def.to)),
+                uv: face_def
+                    .uv
+                    .unwrap_or_else(|| Self::default_uvs(face, &element.from, &element.to)),
                 // Use the texture key to get the texture, or return the fallback texture
                 texture: Self::resolve_texture(key, face_def, textures)
                     .unwrap_or(AssetManager::FALLBACK_TEXTURE),
@@ -58,7 +60,13 @@ impl ModelElement {
             })
         })?;
 
-        Some(Self { from: def.from, to: def.to, rotation: def.rotation, shade: def.shade, faces })
+        Some(Self {
+            from: element.from,
+            to: element.to,
+            rotation: element.rotation,
+            shade: element.shade,
+            faces,
+        })
     }
 
     /// Returns the default UVs for a face, given the `from` and `to`
@@ -82,13 +90,13 @@ impl ModelElement {
     fn resolve_texture(
         key: &ResourceKey,
         face_def: &DefinitionElementFace,
-        textures: &HashMap<String, String>,
+        textures: &HashMap<&String, &String>,
     ) -> Option<ResourceKey> {
         let mut texture = face_def.texture.as_str();
 
         // Resolve the texture key until an actual texture is found
         while texture.starts_with('#') {
-            if let Some(new_texture) = textures.get(&texture[1..]) {
+            if let Some(&new_texture) = textures.get(&texture[1..].to_string()) {
                 texture = new_texture;
             } else {
                 #[cfg(debug_assertions)]
@@ -112,7 +120,7 @@ impl ModelElement {
 
 /// A block model element face
 #[derive(Debug, Clone, PartialEq, Reflect)]
-pub struct ElementFace {
+pub struct ResolvedElementFace {
     /// The area of the texture to use
     ///
     /// The UVs are in the order `[x1, y1, x2, y2]`

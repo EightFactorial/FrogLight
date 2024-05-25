@@ -44,20 +44,17 @@ pub enum DisplayPosition {
 }
 
 impl DisplayPosition {
-    /// Returns all [`DisplayPosition`]s as a slice
-    #[must_use]
-    pub const fn as_slice() -> &'static [Self] {
-        &[
-            Self::ThirdPersonRightHand,
-            Self::ThirdPersonLeftHand,
-            Self::FirstPersonRightHand,
-            Self::FirstPersonLeftHand,
-            Self::Gui,
-            Self::Head,
-            Self::Ground,
-            Self::Fixed,
-        ]
-    }
+    /// All [`DisplayPosition`]s in order
+    pub const ALL: [DisplayPosition; 8] = [
+        DisplayPosition::ThirdPersonRightHand,
+        DisplayPosition::ThirdPersonLeftHand,
+        DisplayPosition::FirstPersonRightHand,
+        DisplayPosition::FirstPersonLeftHand,
+        DisplayPosition::Gui,
+        DisplayPosition::Head,
+        DisplayPosition::Ground,
+        DisplayPosition::Fixed,
+    ];
 
     /// Returns the index of the [`DisplayPosition`]
     #[must_use]

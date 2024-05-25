@@ -44,21 +44,23 @@ pub(super) fn build(app: &mut App) {
 }
 
 /// A [`Resource`] for managing model assets.
-#[derive(Debug, Default, Clone, Resource, Reflect)]
+///
+/// Can safely be cloned and shared bewteen threads.
+#[derive(Debug, Default, Clone, Resource, Deref, Reflect)]
 #[reflect(Default, Resource)]
-pub struct ModelManager {
+pub struct ModelManager(#[reflect(ignore)] Arc<RwLock<ModelManagerInner>>);
+
+/// The inner data of the [`ModelManager`].
+#[derive(Debug, Default)]
+pub struct ModelManagerInner {
     /// Block and Item Definitions
     block_item_defs: HashMap<ResourceKey, BlockItemDefinition>,
     /// Block and Item Models
-    #[reflect(ignore)]
-    pub block_item: BlockItemModels,
+    pub block_item: HashMap<ResourceKey, BlockItemModel>,
 
     /// Entity Models
     pub entities: HashMap<ResourceKey, EntityModel>,
 }
-
-/// Block and Item models stored in a [`HashMap`].
-pub type BlockItemModels = Arc<RwLock<HashMap<ResourceKey, BlockItemModel>>>;
 
 /// A [`Resource`] for managing the state of the [`ModelManager`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Resource, Reflect)]
@@ -76,13 +78,13 @@ impl ModelManager {
     pub fn is_finished(state: Res<ModelManagerState>) -> bool { state.finished }
 
     /// Resets the [`ModelManager`] to its initial state.
-    fn reset_model_manager(
-        mut manager: ResMut<ModelManager>,
-        mut state: ResMut<ModelManagerState>,
-    ) {
-        manager.block_item_defs.clear();
-        manager.block_item.write().clear();
-        manager.entities.clear();
+    fn reset_model_manager(manager: ResMut<ModelManager>, mut state: ResMut<ModelManagerState>) {
+        {
+            let mut inner = manager.write();
+            inner.block_item_defs.clear();
+            inner.block_item.clear();
+            inner.entities.clear();
+        }
         state.finished = false;
         state.current = 0;
     }
@@ -95,8 +97,8 @@ impl ModelManager {
     /// Does not rely on any other asset managers.
     pub fn populate_model_manager(
         settings: Res<ResourcePackSettings>,
+        manager: ResMut<ModelManager>,
         mut assets: ResMut<Assets<ResourcePack>>,
-        mut manager: ResMut<ModelManager>,
         mut state: ResMut<ModelManagerState>,
     ) {
         // Get the current `ResourcePack` from the list
@@ -107,6 +109,7 @@ impl ModelManager {
                 if let Some(resourcepack) = assets.get_mut(pack_handle) {
                     // Take the models from the `ResourcePack`,
                     // if they don't already exist.
+                    let mut manager = manager.write();
                     for (resourcekey, sound_handle) in std::mem::take(&mut resourcepack.models) {
                         manager.block_item_defs.entry(resourcekey).or_insert(sound_handle);
                     }
@@ -124,7 +127,10 @@ impl ModelManager {
         // Set the finished flag if all `ResourcePack`s have been loaded
         if state.current >= settings.resourcepacks.len() {
             #[cfg(debug_assertions)]
-            debug!("Loaded \"{}\" block and item model definitions", manager.block_item_defs.len());
+            debug!(
+                "Loaded \"{}\" block and item model definitions",
+                manager.read().block_item_defs.len()
+            );
             state.finished = true;
         }
     }

@@ -76,6 +76,10 @@ pub enum ModelFace {
 }
 
 impl ModelFace {
+    /// All [`ModelFace`]s in order
+    pub const ALL: [Self; 6] =
+        [Self::Down, Self::Up, Self::North, Self::South, Self::West, Self::East];
+
     /// Returns the index of the face
     #[must_use]
     pub const fn as_index(&self) -> usize {

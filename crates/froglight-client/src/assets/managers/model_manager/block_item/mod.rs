@@ -1,19 +1,19 @@
-use bevy::reflect::Reflect;
+use bevy::prelude::*;
 use froglight_assets::assets::ModelDefinition;
 use froglight_network::common::ResourceKey;
+use hashbrown::HashMap;
 
 mod block_model;
 pub use block_model::*;
 
 mod item_model;
-use hashbrown::HashMap;
 pub use item_model::*;
 
 mod element;
 pub use element::*;
 
 /// A Model for a block or item
-#[derive(Debug, Clone, PartialEq, Reflect)]
+#[derive(Debug, Reflect)]
 #[allow(clippy::large_enum_variant)]
 pub enum BlockItemModel {
     /// A block model
@@ -29,13 +29,14 @@ impl BlockItemModel {
         key: &ResourceKey,
         def: &ModelDefinition,
         definitions: &HashMap<ResourceKey, ModelDefinition>,
-    ) -> Option<Self> {
+        mesh_assets: &mut Assets<Mesh>,
+    ) -> Self {
         match def {
             ModelDefinition::Block(block) => {
-                BlockModel::resolve_definition(key, block, definitions).map(Self::Block)
+                Self::Block(BlockModel::resolve_definition(key, block, definitions, mesh_assets))
             }
             ModelDefinition::Item(item) => {
-                ItemModel::resolve_definition(key, item, definitions).map(Self::Item)
+                Self::Item(ItemModel::resolve_definition(key, item, definitions, mesh_assets))
             }
         }
     }
