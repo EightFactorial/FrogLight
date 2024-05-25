@@ -1,12 +1,16 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     asset::AssetPlugin as BevyAssetPlugin,
+    core::TaskPoolPlugin,
     diagnostic::DiagnosticsPlugin,
     DefaultPlugins as BevyDefaultPlugins,
 };
 use froglight_settings::SettingsPlugin;
 
-use crate::groups::{basic::BasicPlugins, graphics::GraphicalPlugins};
+use crate::{
+    groups::{basic::BasicPlugins, graphics::GraphicalPlugins},
+    TASKPOOL_SETTINGS,
+};
 
 /// A [`PluginGroup`] for all plugins that are used in the [`FrogLight`](crate)
 /// application.
@@ -27,6 +31,9 @@ impl PluginGroup for AppPlugins {
 
         // Add the SettingsPlugin before the BevyAssetPlugin
         builder = builder.add_before::<BevyAssetPlugin, _>(SettingsPlugin::default());
+
+        // Configure the TaskPoolPlugin
+        builder = builder.set(TaskPoolPlugin { task_pool_options: TASKPOOL_SETTINGS });
 
         // Add BasicPlugins and GraphicalPlugins
         builder = BasicPlugins::add(builder);
