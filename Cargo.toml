@@ -153,6 +153,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [build-dependencies]
 embed-resource = "2.4.2"
+rustc_version = "0.4.0"
 
 [dependencies]
 bevy = { workspace = true, features = ["default"] }

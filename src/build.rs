@@ -10,12 +10,46 @@ fn main() {
 /// Scripts for building FrogLight
 fn froglight_scripts() {
     // Get the target platform
-    let target = env::var("TARGET").expect("The \"TARGET\" environment variable is not set!");
-    println!("cargo:warning=Building FrogLight for: \"{target}\"");
+    let target_platform =
+        env::var("TARGET").expect("The \"TARGET\" environment variable is not set!");
+    println!("cargo:warning=Building FrogLight for: \"{target_platform}\"");
 
-    if target.contains("windows") {
+    if target_platform.contains("windows") {
         // Embed the executable icon
         windows_exec_icon();
+    }
+
+    // Get the target cpu
+    let target_cpu = if let Ok(flags) = env::var("CARGO_ENCODED_RUSTFLAGS") {
+        // Split the flags by the flag separator
+        let mut flags = flags.split('\u{1f}');
+
+        // Find the 'target-cpu' flag
+        if let Some(flag) = flags.find(|flag| flag.starts_with("-Ctarget-cpu=")) {
+            flag.split('=').nth(1).unwrap_or("generic").to_string()
+        } else {
+            String::from("generic")
+        }
+    } else {
+        String::from("generic")
+    };
+    println!("cargo::rustc-env=FROGLIGHT_TARGET_CPU={target_cpu}");
+
+    // Get the rust compiler version
+    match rustc_version::version_meta() {
+        Ok(version) => {
+            let channel = format!("{:?}", version.channel).to_ascii_lowercase();
+            println!("cargo::rustc-env=FROGLIGHT_RUSTC_CHANNEL={channel}");
+
+            let version = format!(
+                "{}.{}.{}",
+                version.semver.major, version.semver.minor, version.semver.patch
+            );
+            println!("cargo::rustc-env=FROGLIGHT_RUSTC_VERSION={version}");
+        }
+        Err(err) => {
+            println!("cargo:warning=Failed to get rustc metadata: {err}");
+        }
     }
 }
 

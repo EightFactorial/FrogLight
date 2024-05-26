@@ -2365,6 +2365,7 @@ dependencies = [
  "froglight-components",
  "image 0.24.9",
  "mimalloc",
+ "rustc_version",
  "winit",
 ]
 
