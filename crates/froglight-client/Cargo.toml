@@ -40,3 +40,11 @@ parking_lot = { workspace = true, features = ["arc_lock"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 simdnbt = { workspace = true }
+
+[target.'cfg(any(target_os = "linux", target_os = "windows", target_os = "android"))'.dependencies]
+sysinfo = { version = "0.30.12", default-features = false }
+
+[target.'cfg(all(target_os="macos"))'.dependencies]
+sysinfo = { version = "0.30.12", default-features = false, features = [
+    "apple-app-store",
+] }

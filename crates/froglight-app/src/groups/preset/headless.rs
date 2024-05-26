@@ -1,7 +1,9 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     core::TaskPoolPlugin,
-    diagnostic::DiagnosticsPlugin,
+    diagnostic::{
+        DiagnosticsPlugin, EntityCountDiagnosticsPlugin, SystemInformationDiagnosticsPlugin,
+    },
     log::LogPlugin,
     MinimalPlugins as BevyMinimalPlugins,
 };
@@ -16,6 +18,8 @@ use crate::{groups::basic::BasicPlugins, TASKPOOL_SETTINGS};
 /// - [`MinimalPlugins`](BevyMinimalPlugins)
 /// - [`LogPlugin`]
 /// - [`DiagnosticsPlugin`]
+/// - [`EntityCountDiagnosticsPlugin`]
+/// - [`SystemInformationDiagnosticsPlugin`]
 /// - [`SettingsPlugin`]
 /// - [`BasicPlugins`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -24,7 +28,11 @@ pub struct HeadlessPlugins;
 impl PluginGroup for HeadlessPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = BevyMinimalPlugins.build();
-        builder = builder.add(LogPlugin::default()).add(DiagnosticsPlugin);
+        builder = builder
+            .add(LogPlugin::default())
+            .add(DiagnosticsPlugin)
+            .add(EntityCountDiagnosticsPlugin)
+            .add(SystemInformationDiagnosticsPlugin);
 
         // Add the SettingsPlugin with the AssetSource disabled
         builder = builder.add(SettingsPlugin::default().disable_source());

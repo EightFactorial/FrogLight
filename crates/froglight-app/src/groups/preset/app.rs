@@ -2,7 +2,9 @@ use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     asset::AssetPlugin as BevyAssetPlugin,
     core::TaskPoolPlugin,
-    diagnostic::DiagnosticsPlugin,
+    diagnostic::{
+        DiagnosticsPlugin, EntityCountDiagnosticsPlugin, SystemInformationDiagnosticsPlugin,
+    },
     DefaultPlugins as BevyDefaultPlugins,
 };
 use froglight_settings::SettingsPlugin;
@@ -18,6 +20,8 @@ use crate::{
 /// Contains:
 /// - [`DefaultPlugins`](BevyDefaultPlugins)
 /// - [`DiagnosticsPlugin`]
+/// - [`EntityCountDiagnosticsPlugin`]
+/// - [`SystemInformationDiagnosticsPlugin`]
 /// - [`SettingsPlugin`]
 /// - [`BasicPlugins`]
 /// - [`GraphicalPlugins`]
@@ -27,7 +31,10 @@ pub struct AppPlugins;
 impl PluginGroup for AppPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = BevyDefaultPlugins.build();
-        builder = builder.add(DiagnosticsPlugin);
+        builder = builder
+            .add(DiagnosticsPlugin)
+            .add(EntityCountDiagnosticsPlugin)
+            .add(SystemInformationDiagnosticsPlugin);
 
         // Add the SettingsPlugin before the BevyAssetPlugin
         builder = builder.add_before::<BevyAssetPlugin, _>(SettingsPlugin::default());

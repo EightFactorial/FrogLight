@@ -7,6 +7,7 @@ use bevy::prelude::*;
 
 pub mod assets;
 pub mod cameras;
+pub mod diagnostics;
 pub mod interface;
 pub mod networking;
 pub mod systemsets;
@@ -20,6 +21,7 @@ impl Plugin for ClientPlugin {
         systemsets::build(app);
 
         assets::build(app);
+        diagnostics::build(app);
         interface::build(app);
         networking::build(app);
     }
