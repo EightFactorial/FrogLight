@@ -3,7 +3,8 @@ use bevy::{
     asset::AssetPlugin as BevyAssetPlugin,
     core::TaskPoolPlugin,
     diagnostic::{
-        DiagnosticsPlugin, EntityCountDiagnosticsPlugin, SystemInformationDiagnosticsPlugin,
+        DiagnosticsPlugin, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin,
+        SystemInformationDiagnosticsPlugin,
     },
     DefaultPlugins as BevyDefaultPlugins,
 };
@@ -22,6 +23,7 @@ use crate::{
 /// - [`DiagnosticsPlugin`]
 /// - [`EntityCountDiagnosticsPlugin`]
 /// - [`SystemInformationDiagnosticsPlugin`]
+/// - [`FrameTimeDiagnosticsPlugin`]
 /// - [`SettingsPlugin`]
 /// - [`BasicPlugins`]
 /// - [`GraphicalPlugins`]
@@ -34,7 +36,8 @@ impl PluginGroup for AppPlugins {
         builder = builder
             .add(DiagnosticsPlugin)
             .add(EntityCountDiagnosticsPlugin)
-            .add(SystemInformationDiagnosticsPlugin);
+            .add(SystemInformationDiagnosticsPlugin)
+            .add(FrameTimeDiagnosticsPlugin);
 
         // Add the SettingsPlugin before the BevyAssetPlugin
         builder = builder.add_before::<BevyAssetPlugin, _>(SettingsPlugin::default());
