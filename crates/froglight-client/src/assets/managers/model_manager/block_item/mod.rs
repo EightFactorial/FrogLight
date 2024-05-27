@@ -52,4 +52,13 @@ impl BlockItemModel {
             )),
         }
     }
+
+    /// Returns the model for the block or item.
+    #[must_use]
+    pub fn get_model(&self) -> &Handle<Mesh> {
+        match self {
+            Self::Block(block) => &block.block_model,
+            Self::Item(item) => &item.item_model,
+        }
+    }
 }

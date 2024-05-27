@@ -1,15 +1,34 @@
+use bevy_app::App;
 use bevy_reflect::{std_traits::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
+use compact_str::{CompactString, ToCompactString};
+use hashbrown::HashMap;
 use serde::{Deserialize, Serialize};
+
+use super::SingleOrMultiModel;
+
+#[doc(hidden)]
+pub(super) fn build(app: &mut App) {
+    app.register_type::<BlockAttributes>().register_type::<BlockStateVariants>();
+}
+
+/// A list of block state variants
+#[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, Reflect)]
+#[reflect(Default, Serialize, Deserialize)]
+pub struct BlockStateVariants {
+    /// A list of block state variants
+    pub variants: HashMap<BlockAttributes, SingleOrMultiModel>,
+}
 
 /// A list of attributes that define a block variant
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Reflect)]
 #[reflect(Default, Serialize, Deserialize)]
-pub struct VariantAttributes {
+pub struct BlockAttributes {
     /// A list of attributes that define the variant
-    pub attributes: Vec<(String, String)>,
+    #[reflect(ignore)]
+    pub attributes: Vec<(CompactString, CompactString)>,
 }
 
-impl Serialize for VariantAttributes {
+impl Serialize for BlockAttributes {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -27,14 +46,14 @@ impl Serialize for VariantAttributes {
     }
 }
 
-impl<'de> Deserialize<'de> for VariantAttributes {
+impl<'de> Deserialize<'de> for BlockAttributes {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        let string = String::deserialize(deserializer)?;
+        let string = CompactString::deserialize(deserializer)?;
         if string.is_empty() {
-            return Ok(VariantAttributes::default());
+            return Ok(BlockAttributes::default());
         }
 
         let mut attributes = Vec::new();
@@ -42,8 +61,8 @@ impl<'de> Deserialize<'de> for VariantAttributes {
             let mut split = pair.split('=');
             let key = split.next().unwrap();
             let value = split.next().unwrap();
-            attributes.push((key.to_string(), value.to_string()));
+            attributes.push((key.to_compact_string(), value.to_compact_string()));
         }
-        Ok(VariantAttributes { attributes })
+        Ok(BlockAttributes { attributes })
     }
 }

@@ -122,7 +122,19 @@ fn recurse_elements<'a>(
                 if let ModelDefinition::Block(parent_def) = parent_def {
                     // Add the parent textures to the textures list
                     if let Some(parent_textures) = &parent_def.textures {
-                        textures.extend(&parent_textures.0);
+                        for (tex_key, mut tex) in &parent_textures.0 {
+                            // Resolve the texture key until an actual texture is found
+                            //
+                            // TODO: Figure out a fix without panicking
+                            while tex.starts_with('#') {
+                                tex = textures
+                                    .get(&tex[1..].to_string())
+                                    .copied()
+                                    .expect("Parent texture referenced unknown child texture");
+                            }
+
+                            textures.insert(tex_key, tex);
+                        }
                     }
 
                     // Recurse into the parent for elements

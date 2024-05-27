@@ -289,7 +289,6 @@ impl BlockModel {
         }
 
         // Combine all block faces into the block model
-
         let mut indices: Vec<u32> = Vec::new();
         let mut position: Vec<[f32; 3]> = Vec::new();
         let mut normals: Vec<[f32; 3]> = Vec::new();

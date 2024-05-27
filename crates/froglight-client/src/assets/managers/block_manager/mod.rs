@@ -55,8 +55,7 @@ pub struct BlockManager(#[reflect(ignore)] Arc<RwLock<BlockManagerInner>>);
 
 #[derive(Debug, Default, Reflect)]
 pub struct BlockManagerInner {
-    blockstate_defs: HashMap<ResourceKey, BlockStateDefinition>,
-    pub blockstates: HashMap<ResourceKey, ()>,
+    pub blockstates: HashMap<ResourceKey, BlockStateDefinition>,
 }
 
 /// The state of the [`BlockManager`].
@@ -142,7 +141,7 @@ impl BlockManager {
                     // if they don't already exist.
                     let mut manager = manager.write();
                     for (resourcekey, state_def) in std::mem::take(&mut resourcepack.blockstates) {
-                        manager.blockstate_defs.entry(resourcekey).or_insert(state_def);
+                        manager.blockstates.entry(resourcekey).or_insert(state_def);
                     }
                 } else if let Some(path) = &pack_item.path {
                     error!("Failed to access ResourcePack: \"{path}\"");
@@ -158,7 +157,7 @@ impl BlockManager {
         // Set the finished flag if all `ResourcePack`s have been loaded
         if state.pack_current >= settings.resourcepacks.len() {
             #[cfg(debug_assertions)]
-            debug!("Loaded \"{}\" blockstate definitions", manager.read().blockstate_defs.len());
+            debug!("Loaded \"{}\" blockstate definitions", manager.read().blockstates.len());
             state.pack_finished = true;
 
             #[cfg(debug_assertions)]
@@ -182,33 +181,62 @@ impl BlockManager {
         manager: Res<BlockManager>,
         mut state: ResMut<BlockManagerState>,
 
-        _asset_manager: Res<AssetManager>,
+        asset_manager: Res<AssetManager>,
         model_manager: ResMut<ModelManager>,
 
-        _mesh_assets: ResMut<Assets<Mesh>>,
+        mut mesh_assets: ResMut<Assets<Mesh>>,
     ) {
-        let mut manager = manager.0.write();
+        let manager = manager.0.read();
 
         // Load `BLOCKSTATES_PER_FRAME` blockstates per frame
         {
-            let mut _model_manager = model_manager.write();
-            for (_state_key, _def) in manager
-                .blockstate_defs
-                .iter()
+            let mut model_manager = model_manager.write();
+
+            for def in manager
+                .blockstates
+                .values()
                 .skip(state.block_current)
                 .take(Self::BLOCKSTATES_PER_FRAME)
             {
-                // #[cfg(debug_assertions)]
-                // if model_manager
-                //     .get_or_load_model(model_key, &asset_manager, &mut
-                // mesh_assets)     .is_none()
-                // {
-                //     error!("Failed to load block model: \"{model_key}\"");
-                // }
+                match def {
+                    BlockStateDefinition::Variants(variants) => {
+                        for model in variants.variants.values().flat_map(|m| m.iter_models()) {
+                            #[cfg(debug_assertions)]
+                            if model_manager
+                                .get_or_load_model(&model.model, &asset_manager, &mut mesh_assets)
+                                .is_none()
+                            {
+                                error!("Failed to load block model: \"{}\"", &model.model);
+                            }
 
-                // #[cfg(not(debug_assertions))]
-                // model_manager.get_or_load_model(model_key, &asset_manager,
-                // &mut mesh_assets);
+                            #[cfg(not(debug_assertions))]
+                            model_manager.get_or_load_model(
+                                &model.model,
+                                &asset_manager,
+                                &mut mesh_assets,
+                            );
+                        }
+                    }
+                    BlockStateDefinition::Multipart(multiparts) => {
+                        for model in multiparts.multipart.iter().flat_map(|m| m.apply.iter_models())
+                        {
+                            #[cfg(debug_assertions)]
+                            if model_manager
+                                .get_or_load_model(&model.model, &asset_manager, &mut mesh_assets)
+                                .is_none()
+                            {
+                                error!("Failed to load block model: \"{}\"", &model.model);
+                            }
+
+                            #[cfg(not(debug_assertions))]
+                            model_manager.get_or_load_model(
+                                &model.model,
+                                &asset_manager,
+                                &mut mesh_assets,
+                            );
+                        }
+                    }
+                }
             }
         }
 
@@ -216,20 +244,18 @@ impl BlockManager {
         state.block_current += Self::BLOCKSTATES_PER_FRAME;
 
         // Set the finished flag if all blockstates have been loaded
-        if state.block_current >= manager.blockstate_defs.len() {
+        if state.block_current >= manager.blockstates.len() {
             state.block_finished = true;
+
+            let mut model_manager = model_manager.write();
 
             #[cfg(debug_assertions)]
             {
-                debug!("Processed \"{}\" blockstates", manager.blockstate_defs.len());
+                debug!("Loaded \"{}\" block models", model_manager.block_item.len());
                 debug!("Processed blockstates in {:?}", state.instant.elapsed());
             }
 
-            // Clear the blockstate and model definitions
-            manager.blockstate_defs.clear();
-            manager.blockstate_defs.shrink_to_fit();
-
-            let mut model_manager = model_manager.write();
+            // Clear the block model definitions, as they are no longer needed.
             model_manager.block_item_defs.clear();
             model_manager.block_item_defs.shrink_to_fit();
         }
