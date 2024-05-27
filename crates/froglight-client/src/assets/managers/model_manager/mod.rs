@@ -39,14 +39,13 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(LanguageManager::populate_language_manager)
             .ambiguous_with(ParticleManager::populate_particle_manager)
             .ambiguous_with(SoundManager::populate_sound_manager)
-            .after(AssetManager::populate_asset_manager)
             .in_set(AssetLoading::Processing),
     );
 }
 
 /// A [`Resource`] for managing model assets.
 ///
-/// Can safely be cloned and shared bewteen threads.
+/// Can safely be cloned and shared between threads.
 #[derive(Debug, Default, Clone, Resource, Deref, Reflect)]
 #[reflect(Default, Resource)]
 pub struct ModelManager(#[reflect(ignore)] Arc<RwLock<ModelManagerInner>>);
@@ -55,12 +54,52 @@ pub struct ModelManager(#[reflect(ignore)] Arc<RwLock<ModelManagerInner>>);
 #[derive(Debug, Default)]
 pub struct ModelManagerInner {
     /// Block and Item Definitions
-    block_item_defs: HashMap<ResourceKey, BlockItemDefinition>,
+    pub(crate) block_item_defs: HashMap<ResourceKey, BlockItemDefinition>,
     /// Block and Item Models
     pub block_item: HashMap<ResourceKey, BlockItemModel>,
 
     /// Entity Models
     pub entities: HashMap<ResourceKey, EntityModel>,
+}
+
+impl ModelManagerInner {
+    /// Loads a [`BlockItemModel`] into the [`ModelManager`].
+    pub(crate) fn load_model(
+        &mut self,
+        key: &ResourceKey,
+        asset_manager: &AssetManager,
+        mesh_assets: &mut Assets<Mesh>,
+    ) -> Option<&BlockItemModel> {
+        self.block_item_defs.get(key).map(|def| {
+            // Resolve the model definition into a model
+            let model = BlockItemModel::resolve_definition(
+                key,
+                def,
+                &self.block_item_defs,
+                asset_manager,
+                mesh_assets,
+            );
+
+            // Insert the model into the map and return a reference
+            self.block_item.insert(key.clone(), model);
+            self.block_item.get(key).unwrap()
+        })
+    }
+
+    /// Returns the [`BlockItemModel`] for the given key, loading it if it
+    /// doesn't already exist.
+    pub fn get_or_load_model(
+        &mut self,
+        key: &ResourceKey,
+        asset_manager: &AssetManager,
+        mesh_assets: &mut Assets<Mesh>,
+    ) -> Option<&BlockItemModel> {
+        if self.block_item.contains_key(key) {
+            self.block_item.get(key)
+        } else {
+            self.load_model(key, asset_manager, mesh_assets)
+        }
+    }
 }
 
 /// A [`Resource`] for managing the state of the [`ModelManager`].
@@ -96,7 +135,7 @@ impl ModelManager {
     /// This does not create any models, it only collects the definitions.
     ///
     /// Does not rely on any other asset managers.
-    pub fn populate_model_manager(
+    pub(crate) fn populate_model_manager(
         settings: Res<ResourcePackSettings>,
         manager: ResMut<ModelManager>,
         mut assets: ResMut<Assets<ResourcePack>>,
@@ -128,10 +167,15 @@ impl ModelManager {
         // Set the finished flag if all `ResourcePack`s have been loaded
         if state.current >= settings.resourcepacks.len() {
             #[cfg(debug_assertions)]
-            debug!(
-                "Loaded \"{}\" block and item model definitions",
-                manager.read().block_item_defs.len()
-            );
+            {
+                let manager = manager.read();
+                debug!(
+                    "Loaded \"{}\" block and item model definitions",
+                    manager.block_item_defs.len()
+                );
+                debug!("Loaded \"{}\" entity model definitions", manager.entities.len());
+            }
+
             state.finished = true;
         }
     }

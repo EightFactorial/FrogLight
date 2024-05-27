@@ -12,7 +12,8 @@ use froglight_assets::assets::{
 use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
 
-use crate::assets::{model_manager::ResolvedModelElement, AssetManager};
+use super::resolve;
+use crate::assets::AssetManager;
 
 /// An Item Model
 #[derive(Debug, Reflect)]
@@ -58,17 +59,17 @@ impl BlockModel {
         mesh_assets: &mut Assets<Mesh>,
     ) -> Self {
         // Get the ambient occlusion
-        let ambient_occlusion = Self::recursive_occlusion(key, def, definitions)
+        let ambient_occlusion = resolve::recursive_occlusion(key, def, definitions)
             .unwrap_or_else(BlockModelDefinition::ambient_occlusion_default);
 
         // Get the model transforms
-        let model_transforms = Self::recursive_transforms(key, def, definitions);
+        let model_transforms = resolve::recursive_transforms(key, def, definitions);
 
         let mut block_faces: [Option<BlockFaceMesh>; 6] = [None, None, None, None, None, None];
         let mut textures: Vec<ResourceKey> = Vec::new();
 
         // Get the elements for the model
-        for element in Self::recursive_elements(key, def, definitions) {
+        for element in resolve::recursive_elements(key, def, definitions) {
             for element_face in element.faces.into_iter().flatten() {
                 // Get the face index
                 let face_index = element_face.cullface.as_index();
@@ -314,8 +315,6 @@ impl BlockModel {
         block_model.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
         // block_model.insert_attribute(Mesh::ATTRIBUTE_UV_1, textures);
 
-        debug!("Block model: {block_model:#?}");
-
         Self {
             ambient_occlusion,
             model_transforms,
@@ -334,155 +333,6 @@ impl BlockModel {
                 })
                 .cloned()
                 .collect(),
-        }
-    }
-
-    /// Recursively get the ambient occlusion for the model.
-    ///
-    /// Checks the current model definition, then the parent model definition.
-    #[must_use]
-    #[allow(unused_variables)]
-    fn recursive_occlusion(
-        key: &ResourceKey,
-        def: &BlockModelDefinition,
-        definitions: &HashMap<ResourceKey, ModelDefinition>,
-    ) -> Option<bool> {
-        // If the ambient occlusion is defined, return it
-        if def.ambient_occlusion.is_some() {
-            return def.ambient_occlusion;
-        }
-
-        // If the parent is defined, check the parent for the ambient occlusion
-        if let Some(parent) = &def.parent {
-            if let Some(parent_def) = definitions.get(parent) {
-                // The parent model must be a block model
-                if let ModelDefinition::Block(parent_def) = parent_def {
-                    // Recurse into the parent for the ambient occlusion
-                    return Self::recursive_occlusion(parent, parent_def, definitions);
-                }
-
-                #[cfg(debug_assertions)]
-                error!("Parent is not a block model: \"{key}\" -> \"{parent}\"");
-            } else {
-                #[cfg(debug_assertions)]
-                warn!("No parent for block model: \"{key}\" -> \"{parent}\"");
-            }
-        }
-
-        None
-    }
-
-    /// Get all of the model transforms for the model.
-    #[must_use]
-    fn recursive_transforms(
-        key: &ResourceKey,
-        def: &BlockModelDefinition,
-        definitions: &HashMap<ResourceKey, ModelDefinition>,
-    ) -> [ModelDisplayTransform; 7] {
-        std::array::from_fn(|position_index| {
-            Self::recurse_transform(
-                DisplayPosition::from_index(position_index),
-                key,
-                def,
-                definitions,
-            )
-            .unwrap_or_default()
-        })
-    }
-
-    /// Recursively get the model transform for the given display position.
-    ///
-    /// Checks the current model definition, then the parent model definition.
-    #[must_use]
-    #[allow(unused_variables)]
-    fn recurse_transform(
-        display: DisplayPosition,
-        key: &ResourceKey,
-        def: &BlockModelDefinition,
-        definitions: &HashMap<ResourceKey, ModelDefinition>,
-    ) -> Option<ModelDisplayTransform> {
-        def.display.as_ref().and_then(|map| map.get(&display)).copied().or_else(|| {
-            // If the parent is defined, check the parent for the model transform
-            if let Some(parent) = &def.parent {
-                if let Some(parent_def) = definitions.get(parent) {
-                    if let ModelDefinition::Block(parent_def) = parent_def {
-                        // Recurse into the parent for the model transform
-                        return Self::recurse_transform(display, parent, parent_def, definitions);
-                    }
-
-                    #[cfg(debug_assertions)]
-                    error!("Parent is not a block model: \"{key}\" -> \"{parent}\"");
-                } else {
-                    #[cfg(debug_assertions)]
-                    warn!("No parent for block model: \"{key}\" -> \"{parent}\"");
-                }
-            }
-
-            None
-        })
-    }
-
-    /// Get the elements for the model.
-    fn recursive_elements(
-        key: &ResourceKey,
-        def: &BlockModelDefinition,
-        definitions: &HashMap<ResourceKey, ModelDefinition>,
-    ) -> Vec<ResolvedModelElement> {
-        let mut textures = HashMap::new();
-        if let Some(def_textures) = &def.textures {
-            textures.extend(&def_textures.0);
-        }
-        Self::recurse_elements(key, def, &mut textures, definitions)
-    }
-
-    /// Recursively get the elements for the model.
-    ///
-    /// Checks the current model definition, then the parent model definition.
-    fn recurse_elements<'a>(
-        key: &ResourceKey,
-        def: &BlockModelDefinition,
-        textures: &mut HashMap<&'a String, &'a String>,
-        definitions: &'a HashMap<ResourceKey, ModelDefinition>,
-    ) -> Vec<ResolvedModelElement> {
-        if let Some(elements) = &def.elements {
-            // Return the elements from this model
-            elements
-                .iter()
-                .enumerate()
-                .filter_map(|(index, element)| {
-                    let resolved = ResolvedModelElement::resolve_from(key, element, textures);
-
-                    #[cfg(debug_assertions)]
-                    if resolved.is_none() {
-                        warn!("Failed to resolve element for block model: \"{key}\" -> {index}");
-                    }
-
-                    resolved
-                })
-                .collect()
-        } else {
-            // If the parent is defined, check the parent for elements
-            if let Some(parent) = &def.parent {
-                if let Some(parent_def) = definitions.get(parent) {
-                    if let ModelDefinition::Block(parent_def) = parent_def {
-                        // Add the parent textures to the textures list
-                        if let Some(parent_textures) = &parent_def.textures {
-                            textures.extend(&parent_textures.0);
-                        }
-
-                        // Recurse into the parent for elements
-                        return Self::recurse_elements(key, parent_def, textures, definitions);
-                    }
-
-                    #[cfg(debug_assertions)]
-                    error!("Parent is not a block model: \"{key}\" -> \"{parent}\"");
-                } else {
-                    #[cfg(debug_assertions)]
-                    warn!("No parent for block model: \"{key}\" -> \"{parent}\"");
-                }
-            }
-
-            Vec::new()
         }
     }
 
@@ -510,6 +360,8 @@ pub struct BlockFaceMesh {
     pub normals: Vec<[f32; 3]>,
     /// The mesh UVs
     pub uvs: Vec<[f32; 2]>,
-    /// The mesh textures
+    /// The mesh texture indices
+    ///
+    /// This is an index into the [`BlockModel::textures`] array.
     pub textures: Vec<u32>,
 }

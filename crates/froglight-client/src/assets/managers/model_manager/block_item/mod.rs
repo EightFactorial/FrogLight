@@ -4,11 +4,11 @@ use froglight_assets::assets::ModelDefinition;
 use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
 
-mod block_model;
-pub use block_model::*;
+mod block;
+pub use block::*;
 
-mod item_model;
-pub use item_model::*;
+mod item;
+pub use item::*;
 
 mod element;
 pub use element::*;

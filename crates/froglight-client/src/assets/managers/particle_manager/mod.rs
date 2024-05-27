@@ -62,6 +62,61 @@ pub struct ParticleManagerState {
 }
 
 impl ParticleManager {
+    /// Returns `true` if the [`ParticleManager`] has finished loading all
+    /// particles.
+    #[must_use]
+    pub fn is_finished(state: Res<ParticleManagerState>) -> bool { state.finished }
+
+    /// Resets the [`ParticleManager`] to its initial state.
+    fn reset_particle_manager(
+        mut manager: ResMut<ParticleManager>,
+        mut state: ResMut<ParticleManagerState>,
+    ) {
+        manager.particles.clear();
+        state.finished = false;
+        state.current = 0;
+    }
+
+    /// Populates the [`ParticleManager`] with particles.
+    ///
+    /// Does not rely on any other asset managers.
+    pub(crate) fn populate_particle_manager(
+        settings: Res<ResourcePackSettings>,
+        mut manager: ResMut<ParticleManager>,
+        mut state: ResMut<ParticleManagerState>,
+        mut assets: ResMut<Assets<ResourcePack>>,
+    ) {
+        // Get the current `ResourcePack` from the list
+        if let Some(pack_item) = settings.resourcepacks.get(state.current) {
+            // If the `ResourcePack` has a handle
+            if let Some(pack_handle) = pack_item.handle.as_ref() {
+                // Access the `ResourcePack` data
+                if let Some(resourcepack) = assets.get_mut(pack_handle) {
+                    // Take the particles from the `ResourcePack`,
+                    // if they don't already exist.
+                    for (resourcekey, particle) in std::mem::take(&mut resourcepack.particles) {
+                        manager.particles.entry(resourcekey).or_insert(particle);
+                    }
+                } else if let Some(path) = &pack_item.path {
+                    error!("Failed to access ResourcePack: \"{path}\"");
+                } else {
+                    error!("Failed to access ResourcePack: #{}", state.current);
+                }
+            }
+        }
+
+        // Increment the current `ResourcePack` index
+        state.current += 1;
+
+        // Set the finished flag if all `ResourcePack`s have been loaded
+        if state.current >= settings.resourcepacks.len() {
+            #[cfg(debug_assertions)]
+            debug!("Loaded \"{}\" particle definitions", manager.particles.len());
+
+            state.finished = true;
+        }
+    }
+
     /// Handle vanilla particle events.
     ///
     /// TODO: Implement particles.
@@ -182,61 +237,6 @@ impl ParticleManager {
                 "minecraft:trial_spawner_detection" => {}
                 _ => {}
             }
-        }
-    }
-
-    /// Returns `true` if the [`ParticleManager`] has finished loading all
-    /// particles.
-    #[must_use]
-    pub fn is_finished(state: Res<ParticleManagerState>) -> bool { state.finished }
-
-    /// Resets the [`ParticleManager`] to its initial state.
-    fn reset_particle_manager(
-        mut manager: ResMut<ParticleManager>,
-        mut state: ResMut<ParticleManagerState>,
-    ) {
-        manager.particles.clear();
-        state.finished = false;
-        state.current = 0;
-    }
-
-    /// Populates the [`ParticleManager`] with particles.
-    ///
-    /// Does not rely on any other asset managers.
-    pub(crate) fn populate_particle_manager(
-        settings: Res<ResourcePackSettings>,
-        mut manager: ResMut<ParticleManager>,
-        mut state: ResMut<ParticleManagerState>,
-        mut assets: ResMut<Assets<ResourcePack>>,
-    ) {
-        // Get the current `ResourcePack` from the list
-        if let Some(pack_item) = settings.resourcepacks.get(state.current) {
-            // If the `ResourcePack` has a handle
-            if let Some(pack_handle) = pack_item.handle.as_ref() {
-                // Access the `ResourcePack` data
-                if let Some(resourcepack) = assets.get_mut(pack_handle) {
-                    // Take the particles from the `ResourcePack`,
-                    // if they don't already exist.
-                    for (resourcekey, particle) in std::mem::take(&mut resourcepack.particles) {
-                        manager.particles.entry(resourcekey).or_insert(particle);
-                    }
-                } else if let Some(path) = &pack_item.path {
-                    error!("Failed to access ResourcePack: \"{path}\"");
-                } else {
-                    error!("Failed to access ResourcePack: #{}", state.current);
-                }
-            }
-        }
-
-        // Increment the current `ResourcePack` index
-        state.current += 1;
-
-        // Set the finished flag if all `ResourcePack`s have been loaded
-        if state.current >= settings.resourcepacks.len() {
-            #[cfg(debug_assertions)]
-            debug!("Loaded \"{}\" particle definitions", manager.particles.len());
-
-            state.finished = true;
         }
     }
 }

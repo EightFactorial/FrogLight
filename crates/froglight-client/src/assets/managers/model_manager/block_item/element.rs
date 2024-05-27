@@ -40,7 +40,7 @@ impl ResolvedModelElement {
         key: &ResourceKey,
         element: &DefinitionModelElement,
         textures: &HashMap<&String, &String>,
-    ) -> Option<Self> {
+    ) -> Self {
         let faces = std::array::from_fn(|index| {
             // Get the face definition, return `None` if it does not exist
             let face = ModelFace::from_index(index);
@@ -60,13 +60,13 @@ impl ResolvedModelElement {
             })
         });
 
-        Some(Self {
+        Self {
             from: element.from,
             to: element.to,
             rotation: element.rotation,
             shade: element.shade,
             faces,
-        })
+        }
     }
 
     /// Returns the default UVs for a face, given the `from` and `to`
