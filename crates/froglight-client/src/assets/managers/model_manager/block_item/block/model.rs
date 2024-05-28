@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
     render::{
-        mesh::{Indices, PrimitiveTopology},
+        mesh::{Indices, PrimitiveTopology, VertexAttributeValues},
         render_asset::RenderAssetUsages,
     },
 };
@@ -13,7 +13,10 @@ use froglight_network::common::ResourceKey;
 use hashbrown::HashMap;
 
 use super::resolve;
-use crate::assets::AssetManager;
+use crate::assets::{
+    model_manager::{ResolvedElementFace, ResolvedModelElement},
+    AssetManager,
+};
 
 /// An Item Model
 #[derive(Debug, Reflect)]
@@ -70,249 +73,21 @@ impl BlockModel {
 
         // Get the elements for the model
         for element in resolve::recursive_elements(key, def, definitions) {
-            for element_face in element.faces.into_iter().flatten() {
-                // Get the face index
+            for element_face in element.faces.iter().flatten() {
+                // Get the block face
                 let face_index = element_face.cullface.as_index();
-
-                // Get the block face or create a new one
                 let block_face = block_faces[face_index].get_or_insert(BlockFaceMesh::default());
 
-                // Add the face indices
-                {
-                    // Create the face indices
-                    #[allow(clippy::cast_possible_truncation)]
-                    let mut face_indices = {
-                        let start = block_face.position.len() as u32;
-                        [start, start + 1, start + 2, start + 2, start + 3, start]
-                    };
-                    // Rotate the indices if the face texture is rotated
-                    match element_face.rotation {
-                        0 => {}
-                        90 => {
-                            face_indices.rotate_right(1);
-                        }
-                        180 => {
-                            face_indices.rotate_right(2);
-                        }
-                        270 => {
-                            face_indices.rotate_right(3);
-                        }
-                        _ => {
-                            #[cfg(debug_assertions)]
-                            error!("Invalid rotation for block model: \"{key}\"");
-                        }
-                    }
-                    block_face.indices.extend(face_indices);
-                }
-
-                // Add the face positions
-                {
-                    match element_face.cullface {
-                        ModelFace::Down => {
-                            block_face.position.extend(&[
-                                [
-                                    element.from[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [
-                                    element.from[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                            ]);
-                        }
-                        ModelFace::Up => {
-                            block_face.position.extend(&[
-                                [
-                                    element.from[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [element.to[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
-                                [
-                                    element.from[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                            ]);
-                        }
-                        ModelFace::North => {
-                            block_face.position.extend(&[
-                                [
-                                    element.from[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [
-                                    element.from[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                            ]);
-                        }
-                        ModelFace::South => {
-                            block_face.position.extend(&[
-                                [
-                                    element.from[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                                [
-                                    element.from[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                                [element.to[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                            ]);
-                        }
-                        ModelFace::West => {
-                            block_face.position.extend(&[
-                                [
-                                    element.from[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                                [
-                                    element.from[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                                [
-                                    element.from[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [
-                                    element.from[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                            ]);
-                        }
-                        ModelFace::East => {
-                            block_face.position.extend(&[
-                                [
-                                    element.to[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.to[2] / 16.0,
-                                ],
-                                [element.to[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.to[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                                [
-                                    element.to[0] / 16.0,
-                                    element.from[1] / 16.0,
-                                    element.from[2] / 16.0,
-                                ],
-                            ]);
-                        }
-                    }
-                }
-
-                // Create the face normal from the `from` and `to` coordinates
-                //
-                // TODO: Check if this is correct
-                {
-                    // Get the cross product of the `from` and `to` coordinates
-                    let mut cross = Vec3::from_array(element.from)
-                        .cross(Vec3::from_array(element.to))
-                        .normalize_or_zero();
-
-                    // Rotate the cross product if the element has a rotation
-                    //
-                    // TODO: Respect `rotation.origin` and `rotation.rescale`
-                    if let Some(rotation) = element.rotation {
-                        let quat = Quat::from_axis_angle(
-                            rotation.axis.as_identity().into(),
-                            rotation.angle,
-                        );
-                        cross = quat.mul_vec3(cross);
-                    }
-                    block_face.normals.extend(&[cross.into(); 4]);
-                }
-
-                // Add the face uvs
-                block_face.uvs.extend(&[
-                    [element_face.uv[0], element_face.uv[1]],
-                    [element_face.uv[2], element_face.uv[1]],
-                    [element_face.uv[2], element_face.uv[3]],
-                    [element_face.uv[0], element_face.uv[3]],
-                ]);
-
-                // Add the face texture
-                #[allow(clippy::cast_possible_truncation)]
-                {
-                    let texture_index = textures
-                        .iter()
-                        .position(|texture| texture == &element_face.texture)
-                        .unwrap_or_else(|| {
-                            textures.push(element_face.texture);
-                            textures.len() - 1
-                        });
-                    block_face.textures.extend([texture_index as u32; 4]);
-                }
+                // Add the element face data to the block face
+                block_face.add_element_data(element_face, &element, &mut textures);
             }
         }
 
-        // Combine all block faces into the block model
-        let mut indices: Vec<u32> = Vec::new();
-        let mut position: Vec<[f32; 3]> = Vec::new();
-        let mut normals: Vec<[f32; 3]> = Vec::new();
-        let mut uvs: Vec<[f32; 2]> = Vec::new();
-        // let mut textures: Vec<u32> = Vec::new();
-
-        #[allow(clippy::cast_possible_truncation)]
-        for face in block_faces.iter().flatten() {
-            let start = position.len() as u32;
-            indices.extend(face.indices.iter().map(|index| index + start));
-            position.extend(face.position.iter());
-            normals.extend(face.normals.iter());
-            uvs.extend(face.uvs.iter());
-            // textures.extend(face.textures.iter());
-        }
-
-        // Create the block model from the block face data
+        // Combine all block faces into a block model
         let mut block_model = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::all());
-
-        block_model.insert_indices(Indices::U32(indices));
-        block_model.insert_attribute(Mesh::ATTRIBUTE_POSITION, position);
-        block_model.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
-        block_model.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
-        // block_model.insert_attribute(Mesh::ATTRIBUTE_UV_1, textures);
+        for face in block_faces.iter().flatten() {
+            face.add_to_mesh(&mut block_model);
+        }
 
         Self {
             ambient_occlusion,
@@ -363,4 +138,181 @@ pub struct BlockFaceMesh {
     ///
     /// This is an index into the [`BlockModel::textures`] array.
     pub textures: Vec<u32>,
+}
+
+impl BlockFaceMesh {
+    /// Adds an [`ResolvedElementFace`] to the [`BlockFaceMesh`].
+    pub fn add_element_data(
+        &mut self,
+        element_face: &ResolvedElementFace,
+        element: &ResolvedModelElement,
+        textures: &mut Vec<ResourceKey>,
+    ) {
+        // Add the face indices
+        {
+            // Create the face indices
+            #[allow(clippy::cast_possible_truncation)]
+            let mut face_indices = {
+                let start = self.position.len() as u32;
+                [start, start + 2, start + 1, start, start + 3, start + 2]
+            };
+
+            // Rotate the indices if the face texture is rotated
+            #[allow(clippy::cast_sign_loss)]
+            face_indices.rotate_right(element_face.rotation.min(270) as usize / 90);
+
+            self.indices.extend(face_indices);
+        }
+
+        // Add the face positions
+        //
+        // Rotate quads to point out of the block
+        {
+            match element_face.cullface {
+                ModelFace::Down => {
+                    self.position.extend(&[
+                        [element.from[0] / 16.0, element.from[1] / 16.0, element.to[2] / 16.0],
+                        [element.to[0] / 16.0, element.from[1] / 16.0, element.to[2] / 16.0],
+                        [element.to[0] / 16.0, element.from[1] / 16.0, element.from[2] / 16.0],
+                        [element.from[0] / 16.0, element.from[1] / 16.0, element.from[2] / 16.0],
+                    ]);
+                }
+                ModelFace::Up => {
+                    self.position.extend(&[
+                        [element.from[0] / 16.0, element.to[1] / 16.0, element.from[2] / 16.0],
+                        [element.to[0] / 16.0, element.to[1] / 16.0, element.from[2] / 16.0],
+                        [element.to[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
+                        [element.from[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
+                    ]);
+                }
+                ModelFace::North => {
+                    self.position.extend(&[
+                        [element.to[0] / 16.0, element.to[1] / 16.0, element.from[2] / 16.0],
+                        [element.from[0] / 16.0, element.to[1] / 16.0, element.from[2] / 16.0],
+                        [element.from[0] / 16.0, element.from[1] / 16.0, element.from[2] / 16.0],
+                        [element.to[0] / 16.0, element.from[1] / 16.0, element.from[2] / 16.0],
+                    ]);
+                }
+                ModelFace::South => {
+                    self.position.extend(&[
+                        [element.from[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
+                        [element.to[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
+                        [element.to[0] / 16.0, element.from[1] / 16.0, element.to[2] / 16.0],
+                        [element.from[0] / 16.0, element.from[1] / 16.0, element.to[2] / 16.0],
+                    ]);
+                }
+                ModelFace::West => {
+                    self.position.extend(&[
+                        [element.from[0] / 16.0, element.to[1] / 16.0, element.from[2] / 16.0],
+                        [element.from[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
+                        [element.from[0] / 16.0, element.from[1] / 16.0, element.to[2] / 16.0],
+                        [element.from[0] / 16.0, element.from[1] / 16.0, element.from[2] / 16.0],
+                    ]);
+                }
+                ModelFace::East => {
+                    self.position.extend(&[
+                        [element.to[0] / 16.0, element.to[1] / 16.0, element.to[2] / 16.0],
+                        [element.to[0] / 16.0, element.to[1] / 16.0, element.from[2] / 16.0],
+                        [element.to[0] / 16.0, element.from[1] / 16.0, element.from[2] / 16.0],
+                        [element.to[0] / 16.0, element.from[1] / 16.0, element.to[2] / 16.0],
+                    ]);
+                }
+            }
+        }
+
+        // Create the face normal from the `from` and `to` coordinates
+        //
+        // TODO: Check if this is correct
+        {
+            // Get the cross product of the `from` and `to` coordinates
+            let mut cross = Vec3::from_array(element.from)
+                .cross(Vec3::from_array(element.to))
+                .normalize_or_zero();
+
+            // Rotate the cross product if the element has a rotation
+            //
+            // TODO: Respect `rotation.origin` and `rotation.rescale`
+            if let Some(rotation) = element.rotation {
+                let quat =
+                    Quat::from_axis_angle(rotation.axis.as_identity().into(), rotation.angle);
+                cross = quat.mul_vec3(cross);
+            }
+            self.normals.extend(&[cross.into(); 4]);
+        }
+
+        // Add the face uvs
+        self.uvs.extend(&[
+            [element_face.uv[0] / 16.0, element_face.uv[1] / 16.0],
+            [element_face.uv[2] / 16.0, element_face.uv[1] / 16.0],
+            [element_face.uv[2] / 16.0, element_face.uv[3] / 16.0],
+            [element_face.uv[0] / 16.0, element_face.uv[3] / 16.0],
+        ]);
+
+        // Add the face texture
+        #[allow(clippy::cast_possible_truncation)]
+        {
+            let texture_index = textures
+                .iter()
+                .position(|texture| texture == &element_face.texture)
+                .unwrap_or_else(|| {
+                    textures.push(element_face.texture.clone());
+                    textures.len() - 1
+                });
+            self.textures.extend([texture_index as u32; 4]);
+        }
+    }
+
+    /// Adds the [`BlockFaceMesh`] to a [`Mesh`].
+    pub fn add_to_mesh(&self, mesh: &mut Mesh) {
+        // Get the index offset
+        let offset = mesh
+            .attribute(Mesh::ATTRIBUTE_POSITION)
+            .and_then(|p| u32::try_from(p.len()).ok())
+            .unwrap_or_default();
+
+        // Insert or extend the attributes
+        if let Some(Indices::U32(indices)) = mesh.indices_mut() {
+            indices.extend(self.indices.iter().map(|index| *index + offset));
+        } else {
+            mesh.insert_indices(Indices::U32(self.indices.clone()));
+        }
+
+        if let Some(VertexAttributeValues::Float32x3(position)) =
+            mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION)
+        {
+            position.extend(&self.position);
+        } else {
+            mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, self.position.clone());
+        }
+
+        if let Some(VertexAttributeValues::Float32x3(normals)) =
+            mesh.attribute_mut(Mesh::ATTRIBUTE_NORMAL)
+        {
+            normals.extend(&self.normals);
+        } else {
+            mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, self.normals.clone());
+        }
+
+        if let Some(VertexAttributeValues::Float32x2(uvs)) =
+            mesh.attribute_mut(Mesh::ATTRIBUTE_UV_0)
+        {
+            uvs.extend(&self.uvs);
+        } else {
+            mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, self.uvs.clone());
+        }
+
+        // if let Some(textures) = mesh.attribute_mut(Mesh::ATTRIBUTE_UV_1) {
+        //     textures.extend(self.textures.iter().cloned());
+        // } else {
+        //     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_1,
+        // self.textures.clone()); }
+    }
+}
+
+impl From<BlockFaceMesh> for Mesh {
+    fn from(value: BlockFaceMesh) -> Self {
+        let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::all());
+        value.add_to_mesh(&mut mesh);
+        mesh
+    }
 }
