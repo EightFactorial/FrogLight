@@ -310,7 +310,10 @@ impl BlockFaceMesh {
 }
 
 impl From<BlockFaceMesh> for Mesh {
-    fn from(value: BlockFaceMesh) -> Self {
+    fn from(value: BlockFaceMesh) -> Self { Mesh::from(&value) }
+}
+impl From<&BlockFaceMesh> for Mesh {
+    fn from(value: &BlockFaceMesh) -> Self {
         let mut mesh = Mesh::new(PrimitiveTopology::TriangleList, RenderAssetUsages::all());
         value.add_to_mesh(&mut mesh);
         mesh

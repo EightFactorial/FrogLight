@@ -13,13 +13,16 @@ use bevy::{
     ecs::schedule::{InternedScheduleLabel, ScheduleLabel},
     prelude::*,
 };
-use bevy_mod_debugdump::schedule_graph::settings::{
-    Settings as ScheduleSettings, Style as ScheduleStyle,
+use bevy_mod_debugdump::{
+    render_graph::settings::{Settings as RenderSettings, Style as RenderStyle},
+    schedule_graph::settings::{Settings as ScheduleSettings, Style as ScheduleStyle},
 };
 use froglight_app::AppPlugins;
 use froglight_utils::schedules::{FiveSeconds, OneSecond, OneTick, TenTicks, TwoTicks};
 
-/// Schedules that run once every fixed amount of time.
+/// Bevy's fixed [`bevy::app::main_schedule`].
+///
+/// Run every fixed period of time.
 static BEVY_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 5]> = LazyLock::new(|| {
     [
         FixedFirst.intern(),
@@ -30,7 +33,9 @@ static BEVY_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 5]> = LazyLock::ne
     ]
 });
 
-/// Schedules that run once every fixed amount of time.
+/// Schedules defined in the [`froglight-utils`] crate.
+///
+/// Run every fixed period of time.
 static UTIL_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 5]> = LazyLock::new(|| {
     [
         OneTick.intern(),
@@ -45,6 +50,7 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(AppPlugins.build());
 
+    // Generate schedule graphs
     let main = app.main_schedule_label.intern();
     graph_schedules(&mut app, "main", &[main]);
 
@@ -56,22 +62,32 @@ fn main() {
 
     graph_schedules(&mut app, "fixed", &*BEVY_FIXED_SCHEDULES);
     graph_schedules(&mut app, "fixed", &*UTIL_FIXED_SCHEDULES);
+
+    // Generate the render graph
+    let render_settings = RenderSettings { style: RenderStyle::dark_github() };
+    let render = bevy_mod_debugdump::render_graph_dot(&app, &render_settings);
+    write_dot_and_convert(render, "Render", &graph_path("render"));
 }
 
-fn graph_schedules(app: &mut App, folder: &str, schedules: &[InternedScheduleLabel]) {
-    let settings = ScheduleSettings { style: ScheduleStyle::dark_github(), ..Default::default() };
-
+/// Get the path to write the graphs to.
+fn graph_path(folder: &str) -> PathBuf {
     // Get the path to write the graphs to
     let mut path = PathBuf::from(file!());
-    {
-        path.pop();
-        path.push("graphs");
-        path.push(folder);
 
-        if !path.exists() {
-            std::fs::create_dir_all(&path).expect("Failed to create directory");
-        }
+    path.pop();
+    path.push("graphs");
+    path.push(folder);
+
+    if !path.exists() {
+        std::fs::create_dir_all(&path).expect("Failed to create directory");
     }
+
+    path
+}
+
+/// Generate graphs for the given schedules.
+fn graph_schedules(app: &mut App, folder: &str, schedules: &[InternedScheduleLabel]) {
+    let settings = ScheduleSettings { style: ScheduleStyle::dark_github(), ..Default::default() };
 
     for label in schedules {
         // Skip schedules that don't exist
@@ -85,19 +101,19 @@ fn graph_schedules(app: &mut App, folder: &str, schedules: &[InternedScheduleLab
         let graph = bevy_mod_debugdump::schedule_graph_dot(app, label.intern(), &settings);
 
         // Write the graph to a file
-        write_dot_and_convert(graph, label, &path);
+        write_dot_and_convert(graph, &format!("{label:?}"), &graph_path(folder));
     }
 }
 
-/// Writes the graph to a dot file and convert it to an svg.
-fn write_dot_and_convert(graph: String, label: &InternedScheduleLabel, path: &Path) {
+/// Write the graph to a dot file and convert it to an svg.
+fn write_dot_and_convert(graph: String, label: &str, path: &Path) {
     // Get the path to write the graph to
-    let path = path.join(format!("{label:?}.dot"));
-    debug!("Writing `{label:?}` to \"{}\"", truncate_path(&path));
+    let path = path.join(format!("{label}.dot"));
+    debug!("Writing `{label}` to \"{}\"", truncate_path(&path));
 
     // Write the graph to a file
     if let Err(err) = std::fs::write(&path, graph) {
-        error!("Failed to write `{label:?}`: {err}");
+        error!("Failed to write `{label}`: {err}");
     }
 
     // Convert the graph to an image
@@ -115,7 +131,7 @@ fn write_dot_and_convert(graph: String, label: &InternedScheduleLabel, path: &Pa
     }
 }
 
-/// Truncates the path to just the file name.
+/// Truncate the path to just the file name.
 fn truncate_path(path: &Path) -> &str {
     path.file_name()
         .and_then(|name| name.to_str())
