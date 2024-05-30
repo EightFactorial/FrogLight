@@ -2,7 +2,7 @@ use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     core::TaskPoolPlugin,
     diagnostic::{
-        DiagnosticsPlugin, EntityCountDiagnosticsPlugin, SystemInformationDiagnosticsPlugin,
+        DiagnosticsPlugin, EntityCountDiagnosticsPlugin,
     },
     log::LogPlugin,
     MinimalPlugins as BevyMinimalPlugins,
@@ -19,7 +19,6 @@ use crate::{groups::basic::BasicPlugins, TASKPOOL_SETTINGS};
 /// - [`LogPlugin`]
 /// - [`DiagnosticsPlugin`]
 /// - [`EntityCountDiagnosticsPlugin`]
-/// - [`SystemInformationDiagnosticsPlugin`]
 /// - [`SettingsPlugin`]
 /// - [`BasicPlugins`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -31,8 +30,7 @@ impl PluginGroup for HeadlessPlugins {
         builder = builder
             .add(LogPlugin::default())
             .add(DiagnosticsPlugin)
-            .add(EntityCountDiagnosticsPlugin)
-            .add(SystemInformationDiagnosticsPlugin);
+            .add(EntityCountDiagnosticsPlugin);
 
         // Add the SettingsPlugin with the AssetSource disabled
         builder = builder.add(SettingsPlugin::default().disable_source());
