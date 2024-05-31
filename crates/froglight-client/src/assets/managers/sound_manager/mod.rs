@@ -74,7 +74,8 @@ impl SoundManager {
     }
 
     /// Returns `true` if the [`SoundManager`] has finished loading all assets.
-    fn is_finished(state: Res<SoundManagerState>) -> bool { state.finished }
+    #[must_use]
+    pub fn is_finished(state: Res<SoundManagerState>) -> bool { state.finished }
 
     /// Resets the [`SoundManager`] to its initial state.
     fn reset_sound_manager(

@@ -24,6 +24,8 @@ pub use particle_manager::{ParticleEvent, ParticleManager};
 mod sound_manager;
 pub use sound_manager::{SoundEvent, SoundManager};
 
+mod finish;
+
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     asset_manager::build(app);
@@ -34,4 +36,6 @@ pub(super) fn build(app: &mut App) {
     model_manager::build(app);
     particle_manager::build(app);
     sound_manager::build(app);
+
+    finish::build(app);
 }

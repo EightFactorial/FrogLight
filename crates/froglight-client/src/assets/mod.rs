@@ -1,6 +1,6 @@
 //! Asset systems and resources.
 
-use bevy::app::App;
+use bevy::prelude::*;
 
 mod managers;
 pub use managers::*;

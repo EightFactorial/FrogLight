@@ -61,7 +61,7 @@ impl FontManager {
     /// Populates the [`FontManager`] with fonts.
     ///
     /// Relies on the [`AssetServer`] to load font textures.
-    fn populate_font_manager(
+    pub(crate) fn populate_font_manager(
         settings: Res<ResourcePackSettings>,
         mut manager: ResMut<FontManager>,
         mut state: ResMut<FontManagerState>,

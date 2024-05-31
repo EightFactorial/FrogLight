@@ -63,11 +63,11 @@ pub struct BlockManagerInner {
 #[reflect(Default, Resource)]
 #[allow(unreachable_pub)]
 pub struct BlockManagerState {
-    pub block_finished: bool,
-    pub block_current: usize,
+    block_finished: bool,
+    block_current: usize,
 
-    pub pack_finished: bool,
-    pub pack_current: usize,
+    pack_finished: bool,
+    pack_current: usize,
 
     #[cfg(debug_assertions)]
     instant: std::time::Instant,

@@ -1,7 +1,7 @@
 use bevy::{prelude::*, render::view::VisibilitySystems};
 
 use super::LoadingScreen;
-use crate::systemsets::ClientPostUpdateSet;
+use crate::{assets::AssetLoading, systemsets::ClientPostUpdateSet};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -17,6 +17,11 @@ pub(super) fn build(app: &mut App) {
             .run_if(not(resource_added::<LoadingScreenVisibility>))
             .before(VisibilitySystems::VisibilityPropagate)
             .in_set(ClientPostUpdateSet),
+    );
+
+    app.add_systems(
+        OnEnter(AssetLoading::Finished),
+        LoadingScreenVisibility::hide_when_finished.run_if(LoadingScreenVisibility::enabled),
     );
 }
 
@@ -34,7 +39,13 @@ impl LoadingScreenVisibility {
     #[must_use]
     pub const fn new(enabled: bool) -> Self { LoadingScreenVisibility(enabled) }
 
-    /// Toggles the [`LoadingScreenVisibility`].
+    /// Set [`LoadingScreenVisibility`] to `true`.
+    pub fn show(&mut self) { self.0 = true }
+
+    /// Set [`LoadingScreenVisibility`] to `false`.
+    pub fn hide(&mut self) { self.0 = false }
+
+    /// Toggle the [`LoadingScreenVisibility`].
     pub fn toggle(&mut self) { self.0 = !self.0 }
 
     /// Returns `true` if the [`LoadingScreenVisibility`] is enabled.
@@ -51,12 +62,12 @@ impl LoadingScreenVisibility {
         }
     }
 
-    /// A [`Condition`](bevy_ecs::schedule::Condition) that checks if the
+    /// A [`Condition`](bevy::ecs::schedule::Condition) that checks if the
     /// [`LoadingScreenVisibility`] is enabled.
     #[must_use]
     pub fn enabled(enable: Res<Self>) -> bool { enable.is_enabled() }
 
-    /// A [`System`](bevy_ecs::system::System) that sets the [`LoadingScreen`]
+    /// A [`System`](bevy::ecs::system::System) that sets the [`LoadingScreen`]
     /// [`Visibility`].
     fn set_loadingsceen_visibility(
         mut query: Query<&mut Visibility, With<LoadingScreen>>,
@@ -69,4 +80,8 @@ impl LoadingScreenVisibility {
             *vis = new_vis;
         }
     }
+
+    /// A [`System`](bevy::ecs::system::System) that hides the loading screen
+    /// when assets finish loading.
+    fn hide_when_finished(mut vis: ResMut<Self>) { vis.hide(); }
 }
