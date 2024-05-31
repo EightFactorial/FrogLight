@@ -1,9 +1,7 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     core::TaskPoolPlugin,
-    diagnostic::{
-        DiagnosticsPlugin, EntityCountDiagnosticsPlugin,
-    },
+    diagnostic::{DiagnosticsPlugin, EntityCountDiagnosticsPlugin},
     log::LogPlugin,
     MinimalPlugins as BevyMinimalPlugins,
 };

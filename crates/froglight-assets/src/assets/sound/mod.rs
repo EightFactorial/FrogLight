@@ -20,6 +20,24 @@ pub(super) fn build(app: &mut App) {
 
 pub struct SoundDefinitions(pub HashMap<String, SoundDefinition>);
 
+impl SoundDefinitions {
+    /// Get a random sound key, if any.
+    ///
+    /// The probability of a sound key being selected
+    /// is based on the `weight` field.
+    #[must_use]
+    pub fn get_sound(&self, key: &str) -> Option<(&ResourceKey, Option<&SoundSettings>)> {
+        self.0.get(key).and_then(SoundDefinition::get_sound_object).and_then(|sound| match sound {
+            SoundObject::Path(path) => Some((path, None)),
+            SoundObject::PathSettings(path, settings) => Some((path, Some(settings))),
+            SoundObject::Settings(settings) => match settings.kind {
+                SoundType::Sound => Some((&settings.name, Some(settings))),
+                SoundType::Event => self.get_sound(&settings.name),
+            },
+        })
+    }
+}
+
 /// A sound definition.
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, Reflect)]
 #[reflect(Default, Serialize, Deserialize)]
@@ -53,7 +71,7 @@ impl SoundDefinition {
     /// The probability of a sound object being selected
     /// is based on the `weight` field.
     #[must_use]
-    pub fn get_sound(&self) -> Option<&SoundObject> {
+    pub fn get_sound_object(&self) -> Option<&SoundObject> {
         if self.sounds.is_empty() {
             return None;
         }

@@ -2,9 +2,7 @@ use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     asset::AssetPlugin as BevyAssetPlugin,
     core::TaskPoolPlugin,
-    diagnostic::{
-        DiagnosticsPlugin, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin,
-    },
+    diagnostic::{DiagnosticsPlugin, EntityCountDiagnosticsPlugin, FrameTimeDiagnosticsPlugin},
     DefaultPlugins as BevyDefaultPlugins,
 };
 use froglight_settings::SettingsPlugin;

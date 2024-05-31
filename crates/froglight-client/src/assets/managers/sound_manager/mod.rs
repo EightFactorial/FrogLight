@@ -1,12 +1,12 @@
-use bevy::prelude::*;
-use froglight_assets::assets::{ResourcePack, SoundDefinition, SoundDefinitions, SoundObject};
-
-mod event;
-pub use event::SoundEvent;
+use bevy::{audio::Volume, prelude::*};
+use froglight_assets::assets::{ResourcePack, SoundDefinitions};
 use hashbrown::hash_map::Entry;
 
 use super::{AssetManager, LanguageManager, ParticleManager};
-use crate::assets::{AssetLoading, ResourcePackSettings};
+use crate::{
+    assets::{AssetLoading, ResourcePackSettings},
+    systemsets::ClientPostUpdateSet,
+};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -30,10 +30,17 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(ParticleManager::populate_particle_manager)
             .in_set(AssetLoading::Processing),
     );
+
+    app.add_systems(
+        PostUpdate,
+        SoundEvent::handle_sound_events
+            .run_if(on_event::<SoundEvent>())
+            .in_set(ClientPostUpdateSet),
+    );
 }
 
 /// A [`Resource`] for managing sound effects.
-#[derive(Debug, Default, Clone, Resource, Reflect)]
+#[derive(Debug, Default, Clone, Resource, Deref, DerefMut, Reflect)]
 #[reflect(Default, Resource)]
 pub struct SoundManager(pub SoundDefinitions);
 
@@ -46,33 +53,6 @@ pub struct SoundManagerState {
 }
 
 impl SoundManager {
-    /// Get the number of sound definitions.
-    #[must_use]
-    pub fn len(&self) -> usize { self.0.len() }
-
-    /// Returns `true` if the [`SoundManager`] is empty.
-    #[must_use]
-    pub fn is_empty(&self) -> bool { self.0.is_empty() }
-
-    /// Get a sound definition by key.
-    #[must_use]
-    pub fn get_definition(&self, key: &str) -> Option<&SoundDefinition> { self.0.get(key) }
-
-    /// Get a mutable sound definition by key.
-    #[must_use]
-    pub fn get_definition_mut(&mut self, key: &str) -> Option<&mut SoundDefinition> {
-        self.0.get_mut(key)
-    }
-
-    /// Get a random sound object by key.
-    ///
-    /// The sound is randomly selected from the list
-    /// of sounds in the [`SoundDefinition`], if it exists.
-    #[must_use]
-    pub fn get_sound(&self, key: &str) -> Option<&SoundObject> {
-        self.get_definition(key).and_then(SoundDefinition::get_sound)
-    }
-
     /// Returns `true` if the [`SoundManager`] has finished loading all assets.
     #[must_use]
     pub fn is_finished(state: Res<SoundManagerState>) -> bool { state.finished }
@@ -138,6 +118,70 @@ impl SoundManager {
             debug!("Loaded \"{}\" sound definitions", manager.len());
 
             state.finished = true;
+        }
+    }
+}
+
+/// A sound event.
+///
+/// Plays the given sound, if it exists in the [`SoundManager`].
+#[derive(Debug, Clone, PartialEq, Event)]
+pub struct SoundEvent {
+    /// The name of the sound to play.
+    pub sound: String,
+
+    /// The position of the sound.
+    ///
+    /// If `None`, the sound will be played at the listener's position.
+    pub position: Option<Vec3>,
+}
+
+impl SoundEvent {
+    /// Creates a new [`SoundEvent`] with the given key.
+    #[must_use]
+    pub fn new(name: &str) -> Self { Self { sound: name.to_string(), position: None } }
+
+    /// Creates a new [`SoundEvent`] with the given key and position.
+    #[must_use]
+    pub fn with_position(mut self, position: Vec3) -> Self {
+        self.position = Some(position);
+        self
+    }
+
+    /// Play sounds when [`SoundEvent`]s are received.
+    pub(crate) fn handle_sound_events(
+        assets: Res<AssetManager>,
+        sounds: Res<SoundManager>,
+
+        mut events: EventReader<Self>,
+        mut commands: Commands,
+    ) {
+        for event in events.read() {
+            #[cfg(debug_assertions)]
+            debug!("SoundEvent: \"{}\"", event.sound);
+
+            if let Some((key, settings)) = sounds.get_sound(&event.sound) {
+                if let Some(sound) = assets.sounds.get(key) {
+                    #[cfg(debug_assertions)]
+                    debug!("Playing: \"{key}\"");
+
+                    let mut audio =
+                        AudioBundle { source: sound.clone(), settings: PlaybackSettings::DESPAWN };
+
+                    // Apply sound settings, if available
+                    if let Some(settings) = settings {
+                        audio.settings.volume = Volume::new(settings.volume);
+                        // audio.settings.pitch = settings.pitch;
+                    }
+
+                    // Play the sound
+                    commands.spawn(audio);
+                } else {
+                    error!("Failed to find sound asset: \"{key}\"");
+                }
+            } else {
+                warn!("Unexpected Sound: \"{}\"", event.sound);
+            }
         }
     }
 }
