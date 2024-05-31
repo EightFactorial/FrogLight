@@ -144,7 +144,7 @@ impl AssetManager {
     /// [`AssetManager::FALLBACK_TEXTURE`].
     #[allow(clippy::missing_panics_doc)]
     #[must_use]
-    pub fn get_texture_or_fallback(&self, key: &ResourceKey) -> &Handle<Image> {
+    pub fn get_texture_or_fallback(&self, key: &str) -> &Handle<Image> {
         self.textures.get(key).unwrap_or_else(|| {
             #[cfg(debug_assertions)]
             warn!("Unable to find texture for: \"{key}\"");

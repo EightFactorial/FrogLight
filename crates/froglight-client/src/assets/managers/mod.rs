@@ -3,9 +3,6 @@ use bevy::app::App;
 mod asset_manager;
 pub use asset_manager::AssetManager;
 
-mod atlas_manager;
-pub use atlas_manager::AtlasManager;
-
 mod block_manager;
 pub use block_manager::BlockManager;
 
@@ -29,7 +26,6 @@ mod finish;
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
     asset_manager::build(app);
-    atlas_manager::build(app);
     block_manager::build(app);
     font_manager::build(app);
     lang_manager::build(app);

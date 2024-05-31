@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 
 use super::{
-    AssetManager, AtlasManager, BlockManager, FontManager, LanguageManager, ParticleManager,
-    SoundManager,
+    AssetManager, BlockManager, FontManager, LanguageManager, ParticleManager, SoundManager,
 };
 use crate::assets::{AssetLoading, ModelManager};
 
@@ -13,8 +12,6 @@ pub(super) fn build(app: &mut App) {
         finish_processing
             .run_if(AssetManager::is_finished)
             .after(AssetManager::populate_asset_manager)
-            .run_if(AtlasManager::is_finished)
-            .after(AtlasManager::populate_atlas_manager)
             .run_if(BlockManager::is_finished)
             .after(BlockManager::process_blockstates)
             .run_if(FontManager::is_finished)
