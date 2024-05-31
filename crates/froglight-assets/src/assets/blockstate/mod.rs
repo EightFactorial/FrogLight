@@ -16,7 +16,7 @@ pub(super) fn build(app: &mut App) {
     app.register_type::<BlockStateDefinition>();
 
     model::build(app);
-    // multipart::build(app);
+    multipart::build(app);
     variant::build(app);
 }
 
