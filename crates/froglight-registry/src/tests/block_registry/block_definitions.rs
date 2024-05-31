@@ -1,4 +1,5 @@
 use bevy_derive::{Deref, DerefMut};
+use bevy_reflect::Reflect;
 
 use crate::{
     definitions::{BlockAttribute, BlockExt, BlockType},
@@ -6,14 +7,14 @@ use crate::{
 };
 
 /// Blocks for testing the block registry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub enum TestBlocks {
     Air(AirBlock),
     Stone(StoneBlock),
     Grass(GrassBlock),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct AirBlock;
 
 impl BlockType<TestVersion> for AirBlock {
@@ -28,7 +29,7 @@ impl BlockExt<TestVersion> for AirBlock {
     fn default_state() -> Self { AirBlock }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct StoneBlock;
 
 impl BlockType<TestVersion> for StoneBlock {
@@ -39,7 +40,7 @@ impl BlockExt<TestVersion> for StoneBlock {
     fn default_state() -> Self { StoneBlock }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 pub struct GrassBlock {
     pub grassy: GrassyAttribute,
 }
@@ -61,7 +62,7 @@ impl BlockExt<TestVersion> for GrassBlock {
     fn to_relative_id(&self) -> u32 { u32::from(self.grassy.0) }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Reflect)]
 pub struct GrassyAttribute(pub bool);
 
 impl BlockAttribute<TestVersion> for GrassyAttribute {

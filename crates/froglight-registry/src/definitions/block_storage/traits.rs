@@ -1,6 +1,6 @@
-use std::{any::Any, fmt::Debug};
+use std::fmt::Debug;
 
-use downcast_rs::Downcast;
+use bevy_reflect::Reflect;
 use froglight_protocol::traits::Version;
 
 use super::BlockStorage;
@@ -8,7 +8,7 @@ use super::BlockStorage;
 /// A block for a specific [`Version`].
 pub trait BlockType<V>
 where
-    Self: 'static + Any + Downcast + Debug + Send + Sync,
+    Self: 'static + Debug + Reflect,
     V: Version,
 {
     /// The block's [`ResourceKey`].

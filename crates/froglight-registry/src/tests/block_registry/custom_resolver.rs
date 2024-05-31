@@ -1,5 +1,7 @@
 use std::any::TypeId;
 
+use bevy_reflect::Reflect;
+
 use super::block_definitions::*;
 use crate::{
     definitions::{
@@ -9,7 +11,7 @@ use crate::{
 };
 
 /// A custom block that is not registered by the default resolver.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 struct SomeOtherBlock;
 
 impl BlockType<TestVersion> for SomeOtherBlock {

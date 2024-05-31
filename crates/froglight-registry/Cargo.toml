@@ -20,8 +20,8 @@ bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
+bevy_reflect = { workspace = true }
 compact_str = { workspace = true }
-downcast-rs = "1.2.1"
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-registry",
 ] }
