@@ -20,7 +20,7 @@ bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bitvec = { workspace = true }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
-froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
+froglight-registry = { version = "0.1.0", path = "../froglight-registry", optional = true }
 parking_lot = { workspace = true }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }
@@ -30,3 +30,6 @@ default = ["bevy"]
 
 # Derives `Component` for `Chunk` and enables some logs.
 bevy = ["dep:bevy_ecs", "dep:bevy_log"]
+
+# Adds methods to get Blocks from a Chunk.
+froglight-registry = ["dep:froglight-registry"]

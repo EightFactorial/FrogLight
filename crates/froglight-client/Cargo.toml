@@ -34,6 +34,7 @@ froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
 ] }
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
     "bevy",
+    "froglight-registry",
 ] }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true, features = ["arc_lock"] }

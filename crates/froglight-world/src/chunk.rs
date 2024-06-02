@@ -115,33 +115,90 @@ impl Chunk {
     /// Returns an iterator over the blocks of the [`Chunk`].
     #[must_use]
     pub fn block_iter(&self) -> ChunkBlockIter<'_> { ChunkBlockIter::new(self) }
+}
 
-    /// Returns the `Block ID` at the given position.
+impl Chunk {
+    /// Returns the `block id` at the given position.
     ///
     /// # Note
     /// This acquires a [`read lock`](RwLock::read) on the [`Chunk`],
     /// and may block other threads.
     #[must_use]
-    pub fn get_block(&self, position: ChunkBlockPosition) -> Option<u32> {
+    pub fn get_block_id(&self, position: ChunkBlockPosition) -> Option<u32> {
         self.sections
             .read()
             .get(Self::section_index(position))
             .map(|s| s.get_block(position.into()))
     }
 
-    /// Sets the `Block ID` at the given position.
+    /// Returns the `Block` at the given position.
     ///
-    /// Returns the previous `Block ID` at the position.
+    /// # Note
+    /// This calls
+    /// [`BlockStorage::get_block`](froglight_registry::definitions::BlockStorage)
+    /// and can be very expensive compared to [`Chunk::get_block_id`].
+    ///
+    /// This acquires a [`read lock`](RwLock::read) on the [`Chunk`],
+    /// and may block other threads.
+    #[must_use]
+    #[cfg(feature = "froglight-registry")]
+    pub fn get_block<
+        V: froglight_protocol::traits::Version,
+        Res: froglight_registry::definitions::BlockStateResolver<V>,
+    >(
+        &self,
+        position: ChunkBlockPosition,
+        storage: &froglight_registry::definitions::BlockStorage<V>,
+    ) -> Option<Res::Result> {
+        self.get_block_id(position).map(|id| storage.get_block::<Res>(id))
+    }
+
+    /// Sets the `block id` at the given position.
+    ///
+    /// Returns the previous `block id` at the position.
     ///
     /// # Note
     /// This acquires a [`write lock`](RwLock::write) on the [`Chunk`],
     /// and will block other threads.
     #[allow(clippy::must_use_candidate)]
-    pub fn set_block(&self, position: ChunkBlockPosition, block_id: u32) -> Option<u32> {
+    pub fn set_block_id(&self, position: ChunkBlockPosition, block_id: u32) -> Option<u32> {
         self.sections
             .write()
             .get_mut(Self::section_index(position))
             .map(|s| s.set_block(position.into(), block_id))
+    }
+
+    /// Sets the `Block` at the given position.
+    ///
+    /// Returns the previous `Block` at the position.
+    ///
+    /// # Note
+    /// This calls
+    /// [`BlockStorage::get_block`](froglight_registry::definitions::BlockStorage)
+    /// and can be very expensive compared to [`Chunk::set_block_id`].
+    ///
+    /// This acquires a [`write lock`](RwLock::write) on the [`Chunk`],
+    /// and will block other threads.
+    #[allow(clippy::must_use_candidate)]
+    #[cfg(feature = "froglight-registry")]
+    pub fn set_block<
+        V: froglight_protocol::traits::Version,
+        Res: froglight_registry::definitions::BlockStateResolver<V>,
+    >(
+        &self,
+        position: ChunkBlockPosition,
+        block: &impl froglight_registry::definitions::BlockExt<V>,
+        storage: &froglight_registry::definitions::BlockStorage<V>,
+    ) -> Option<Res::Result> {
+        // Get the block id from the storage.
+        let Some(block_id) = storage.get_block_id(block) else {
+            #[cfg(feature = "bevy")]
+            bevy_log::warn!("Block not found in storage: \"{}\"", block.to_key());
+            return None;
+        };
+
+        // Set the block id and convert the old block id into a block.
+        self.set_block_id(position, block_id).map(|old_id| storage.get_block::<Res>(old_id))
     }
 
     /// Sets the `Biome ID` at the given position.
@@ -150,7 +207,7 @@ impl Chunk {
     /// This acquires a [`read lock`](RwLock::read) on the [`Chunk`],
     /// and may block other threads.
     #[must_use]
-    pub fn get_biome(&self, position: ChunkBlockPosition) -> Option<u32> {
+    pub fn get_biome_id(&self, position: ChunkBlockPosition) -> Option<u32> {
         self.sections
             .read()
             .get(Self::section_index(position))
@@ -165,7 +222,7 @@ impl Chunk {
     /// This acquires a [`write lock`](RwLock::write) on the [`Chunk`],
     /// and will block other threads.
     #[allow(clippy::must_use_candidate)]
-    pub fn set_biome(&self, position: ChunkBlockPosition, biome_id: u32) -> Option<u32> {
+    pub fn set_biome_id(&self, position: ChunkBlockPosition, biome_id: u32) -> Option<u32> {
         self.sections
             .write()
             .get_mut(Self::section_index(position))

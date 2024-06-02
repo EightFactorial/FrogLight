@@ -38,8 +38,14 @@ impl<V: Version> BlockStorage<V> {
 
     /// Get a block's state id range.
     #[must_use]
-    pub fn range_of<Block: BlockType<V>>(&self) -> Option<&Range<u32>> {
+    pub fn range_of_type<Block: BlockType<V>>(&self) -> Option<&Range<u32>> {
         self.type_map.get(&TypeId::of::<Block>())
+    }
+
+    /// Get a block's state id range.
+    #[must_use]
+    pub fn range_of(&self, block: &dyn BlockType<V>) -> Option<&Range<u32>> {
+        self.type_map.get(&block.type_id())
     }
 
     /// Get a block's relative state id from it's type and state id.
@@ -47,8 +53,22 @@ impl<V: Version> BlockStorage<V> {
     /// This will return `None` if the [`BlockType`] is not registered or
     /// the state id is out of range.
     #[must_use]
-    pub fn relative_state_of<Block: BlockType<V>>(&self, state_id: u32) -> Option<u32> {
-        let range = self.range_of::<Block>()?;
+    pub fn relative_state_of_type<Block: BlockType<V>>(&self, state_id: u32) -> Option<u32> {
+        let range = self.range_of_type::<Block>()?;
+        if range.contains(&state_id) {
+            state_id.checked_sub(range.start)
+        } else {
+            None
+        }
+    }
+
+    /// Get a block's relative state id from it's type and state id.
+    ///
+    /// This will return `None` if the [`BlockType`] is not registered or
+    /// the state id is out of range.
+    #[must_use]
+    pub fn relative_state_of(&self, block: &dyn BlockType<V>, state_id: u32) -> Option<u32> {
+        let range = self.range_of(block)?;
         if range.contains(&state_id) {
             state_id.checked_sub(range.start)
         } else {
@@ -89,6 +109,16 @@ impl<V: Version> BlockStorage<V> {
     #[must_use]
     pub fn get_block<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Result {
         Res::resolve(state_id, self)
+    }
+
+    /// Get a block's id, if it's registered with the [`BlockStorage`].
+    ///
+    /// This will return `None` if the block is not registered.
+    #[must_use]
+    pub fn get_block_id(&self, block: &impl BlockExt<V>) -> Option<u32> {
+        let range = self.range_of(block)?;
+        let relative_id = block.to_relative_id();
+        range.start.checked_add(relative_id)
     }
 
     /// Register a new block type with the [`BlockStorage`].

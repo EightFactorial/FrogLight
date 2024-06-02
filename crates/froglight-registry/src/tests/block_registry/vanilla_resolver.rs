@@ -15,7 +15,7 @@ impl BlockStateResolver<TestVersion> for VanillaResolver {
             id if id == TypeId::of::<AirBlock>() => Some(TestBlocks::Air(AirBlock)),
             id if id == TypeId::of::<StoneBlock>() => Some(TestBlocks::Stone(StoneBlock)),
             id if id == TypeId::of::<GrassBlock>() => {
-                let relative_id = storage.relative_state_of::<GrassBlock>(state_id)?;
+                let relative_id = storage.relative_state_of(default_dyn, state_id)?;
                 Some(TestBlocks::Grass(GrassBlock::from_relative_id(relative_id)?))
             }
             _ => None,

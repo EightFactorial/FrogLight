@@ -40,13 +40,12 @@ impl<'c> ChunkBlockIter<'c> {
 
 impl Iterator for ChunkBlockIter<'_> {
     type Item = u32;
-
     fn next(&mut self) -> Option<Self::Item> {
         if self.finished {
             return None;
         }
 
-        let block = self.chunk.get_block(self.index);
+        let block = self.chunk.get_block_id(self.index);
 
         let next_index = self.index.next();
         if next_index.y() >= self.chunk.height() {
