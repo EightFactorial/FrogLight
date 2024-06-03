@@ -1,5 +1,5 @@
 [package]
-name = "froglight-entity"
+name = "froglight-physics"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -16,9 +16,13 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_math = { workspace = true }
+bevy_time = { workspace = true }
+bevy_transform = { workspace = true }
 froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
     "bevy",
 ] }
+froglight-entity = { version = "0.1.0", path = "../froglight-entity" }

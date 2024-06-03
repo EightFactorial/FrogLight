@@ -3,11 +3,6 @@
 
 pub(crate) mod manifest;
 
-// --- Asset Macros ---
-
-#[cfg(feature = "froglight-asset")]
-mod asset;
-
 // --- Protocol Macros ---
 
 #[cfg(feature = "froglight-protocol")]
@@ -42,6 +37,7 @@ pub fn frog_state(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 }
 
 // --- Registry Macros ---
+
 #[cfg(feature = "froglight-registry")]
 mod registry;
 
@@ -51,8 +47,3 @@ mod registry;
 pub fn frog_registry(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     registry::frog_registry_convertkey(input)
 }
-
-// --- World Macros ---
-
-#[cfg(feature = "froglight-world")]
-mod world;

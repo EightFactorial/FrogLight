@@ -3,18 +3,14 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/froglight",
-    "crates/froglight-app",
-    "crates/froglight-assets",
-    "crates/froglight-client",
     "crates/froglight-components",
     "crates/froglight-entity",
+    "crates/froglight-internal",
     "crates/froglight-macros",
     "crates/froglight-network",
+    "crates/froglight-physics",
     "crates/froglight-protocol",
     "crates/froglight-registry",
-    "crates/froglight-render",
-    "crates/froglight-settings",
     "crates/froglight-utils",
     "crates/froglight-world",
 ]
@@ -53,40 +49,28 @@ pedantic = { level = "warn", priority = -1 }
 unnecessary_cast = "warn"
 
 [workspace.dependencies]
-ab_glyph = "0.2.26"
 async-std = "1.12.0"
 bevy = { version = "0.13.2", default-features = false }
 bevy_app = "0.13.2"
-bevy_asset = "0.13.2"
-bevy_audio = "0.13.2"
 bevy_core = "0.13.2"
 bevy_derive = "0.13.2"
 bevy_ecs = "0.13.2"
-bevy_gizmos = "0.13.2"
 bevy_hierarchy = "0.13.2"
 bevy_input = "0.13.2"
 bevy-inspector-egui = "0.24.0"
 bevy_log = "0.13.2"
 bevy_math = "0.13.2"
-bevy_pbr = "0.13.2"
 bevy_reflect = "0.13.2"
-bevy_render = "0.13.2"
-bevy_sprite = "0.13.2"
 bevy_tasks = "0.13.2"
-bevy_text = "0.13.2"
 bevy_time = "0.13.2"
 bevy_transform = "0.13.2"
-bevy_ui = "0.13.2"
-bevy_window = "0.13.2"
 bitvec = "1.0.1"
 bytemuck = "1.16.0"
 compact_str = "0.7.1"
 criterion = "0.5.1"
 derive_more = "0.99.17"
-fastrand = "2.1.0"
 futures-lite = "2.3.0"
 hashbrown = "0.14.5"
-image = { version = "0.24.9", default-features = false }
 parking_lot = "0.12.3"
 proptest = "1.4.0"
 serde = "1.0.200"
@@ -95,50 +79,11 @@ simdnbt = "0.5.0"
 smallvec = "1.13.2"
 thiserror = "1.0.59"
 uuid = "1.8.0"
-winit = { version = "0.29.15", default-features = false }
-
-# --- Build Settings ---
-
-# Slightly optimize dev builds
-[profile.dev]
-opt-level = 1
-
-[profile.dev.package]
-# Only slightly optimize most froglight packages
-froglight = { opt-level = 1 }
-froglight-app = { opt-level = 1 }
-froglight-assets = { opt-level = 1 }
-froglight-bin = { opt-level = 1 }
-froglight-client = { opt-level = 1 }
-froglight-components = { opt-level = 1 }
-froglight-entity = { opt-level = 1 }
-froglight-macros = { opt-level = 1 }
-froglight-network = { opt-level = 1 }
-froglight-registry = { opt-level = 1 }
-froglight-settings = { opt-level = 1 }
-froglight-utils = { opt-level = 1 }
-# Fully optimize important packages
-bevy = { opt-level = 3 }
-bytemuck = { opt-level = 3 }
-froglight-protocol = { opt-level = 3 }
-froglight-render = { opt-level = 3 }
-froglight-world = { opt-level = 3 }
-glam = { opt-level = 3 }
-mimalloc = { opt-level = 3 }
-# Somewhat optimize all other packages
-"*" = { opt-level = 2 }
-
-# Fully optimize release builds
-[profile.release]
-opt-level = 3
-strip = true
-lto = true
 
 # --- FrogLight Package ---
 
 [package]
-name = "froglight-bin"
-build = "src/build.rs"
+name = "froglight"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -151,59 +96,8 @@ readme = { workspace = true }
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
-[build-dependencies]
-embed-resource = "2.4.2"
-rustc_version = "0.4.0"
+[lints]
+workspace = true
 
 [dependencies]
-bevy = { workspace = true, features = ["default"] }
-bevy-inspector-egui = { workspace = true, optional = true }
-fastrand = { workspace = true }
-froglight = { version = "0.1.0", path = "crates/froglight" }
-froglight-components = { version = "0.1.0", path = "crates/froglight-components", optional = true }
-image = { workspace = true }
-mimalloc = { version = "0.1.41", optional = true, features = ["extended"] }
-winit = { workspace = true }
-
-# Enable the "x11" and "wayland" features for linux
-[target.x86_64-unknown-linux-gnu.dependencies]
-bevy = { workspace = true, features = ["x11", "wayland"] }
-
-[features]
-default = ["mimalloc"]
-
-# Use mimalloc as the global allocator
-mimalloc = ["dep:mimalloc"]
-
-# Add an inspector for debugging
-inspector = [
-    "dep:bevy-inspector-egui",
-    "dep:froglight-components",
-    "froglight-components/inspector",
-]
-
-# --- Examples ---
-
-[[example]]
-name = "hello_world"
-path = "examples/systems/hello_world/main.rs"
-
-[[example]]
-name = "system_schedules"
-path = "examples/systems/system_schedules/main.rs"
-
-[[example]]
-name = "custom_plugin"
-path = "examples/plugins/custom_plugin/main.rs"
-
-[[example]]
-name = "disable_logs"
-path = "examples/plugins/disable_logs/main.rs"
-
-[[example]]
-name = "basic_resource"
-path = "examples/resources/basic_resource/main.rs"
-
-[[example]]
-name = "insert_resources"
-path = "examples/resources/insert_resource/main.rs"
+froglight-internal = { version = "0.1.0", path = "crates/froglight-internal" }

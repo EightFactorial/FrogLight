@@ -19,7 +19,6 @@ workspace = true
 bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
-bevy_log = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_time = { workspace = true }
 froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
@@ -31,9 +30,7 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", featur
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
     "bevy",
 ], optional = true }
-futures-lite = { workspace = true }
 hashbrown = { workspace = true }
-parking_lot = { workspace = true }
 
 [features]
 default = ["froglight-components", "froglight-world"]

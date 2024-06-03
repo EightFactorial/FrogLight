@@ -14,6 +14,6 @@
 # VS Code project files
 /.vscode
 
-# FrogLight-App system-graph files
-/crates/froglight-app/examples/system-graph/**/*.dot
-/crates/froglight-app/examples/system-graph/**/*.svg
+# froglight-internal system-graph files
+/crates/froglight-internal/examples/system-graph/**/*.dot
+/crates/froglight-internal/examples/system-graph/**/*.svg

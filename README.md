@@ -1,5 +1,5 @@
 <h1 align="center">FrogLight</h1>
-<p align="center">A Minecraft client written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
+<p align="center">A Minecraft client/server library written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
 
 <p align="center">
   <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>  
@@ -11,89 +11,44 @@
 
 FrogLight is currently in a **very early alpha state**. Not everything is functional yet!
 
-This project does not include any assets, all assets must be loaded from resource packs!
-
-> [!Warning]
-> Modded clients will get you **banned** from servers with anticheat!
+> [!Caution]
+> Some servers do not allow modified clients!
 > 
-> You have been warned!
+> **I am not responsible if your account gets banned!**
 
 ## Version Support
 
 FrogLight supports multiple different versions, including:
 - 1.20.0 - 1.20.1 (**TEMP**)
-- 1.21.0+ (**TARGET**)
 
 > [!Note]
-> Support for more versions will be added after core features and functionality.
-> 
-> Everything is built with support for multiple versions in mind!
+> Support for other versions will be added after most development is done.
 
-## Configuration Files
+## Usage
 
-All configuration files and resource packs are stored in the following directories:
+FrogLight can added as a dependency in your `cargo.toml` file:
 
-| OS      | Config Folder                             |
-| ------- | ----------------------------------------- |
-| Windows | `%APPDATA%/FrogLight`                     |
-| Linux   | `$XDG_CONFIG_HOME/FrogLight`              |
-| MacOS   | `~/Library/Application Support/FrogLight` |
-
-## Building
-
-Like most Rust projects, you can build the project using `cargo`
-
-```sh
-# Clone and enter the repository
-git clone --depth 1 https://github.com/EightFactorial/FrogLight
-cd FrogLight
-
-# Build the client, or
-cargo build --release --bin froglight
-# Build and run the client
-cargo run --release
+```toml
+[dependencies]
+bevy = "0.13.0"
+froglight = { git = "https://github.com/EightFactorial/FrogLight.git" }
+# etc...
 ```
-
-This will take a while the first time and requires a couple of gigabytes of space!
-
-After building, FrogLight can be found at `./target/release/froglight[.exe]`
 
 > [!Important]
-> Make sure you are building in `--release` mode!
+> If you are getting poor performance, try building your project in `--release` mode!
 
-## Plugins
+## Helpful Resources
 
-Plugins are very easy to create using the [Bevy Engine](https://github.com/bevyengine/bevy/).
+For more information, see the following links:
+  * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
+  * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
+  * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
+  * [FrogLight Examples](examples)
 
-```rust
-use bevy::prelude::*;
-use froglight::plugins::{AppPlugins, LoadingPlugin};
-
-fn main() {
-    // Create a new bevy App
-    let mut app = App::new();
-
-    // Add the FrogLight app plugins
-    app.add_plugins(AppPlugins);
-
-    // Add your own custom plugins here!
-    // app.add_plugins(MyCustomPlugin);
-
-    // Run the client!
-    app.run();
-}
-```
-
-> [!Tip]
-> For more information, see the following links:
->  * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
->  * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
->  * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
->  * [FrogLight Examples](examples)
-> 
-> For documentation, see:
->  * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
->  * [FrogLight Docs](https://github.com/EightFactorial/FrogLight/)
+For documentation, see:
+  * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
+  * [FrogLight Docs](https://github.com/EightFactorial/FrogLight/)
 
 ## License
 

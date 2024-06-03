@@ -1,7 +1,7 @@
 #!/usr/bin/env just --justfile
 
 # Alias for `run`
-default: (run-profile "dev")
+default: (build-profile "dev")
 
 # ---- Build Recipes ----
 
@@ -14,26 +14,12 @@ build-release: (build-profile "release" "")
 
 # Compile build with specified profile
 [private]
-build-profile profile="dev" args="--features=mimalloc,inspector":
+build-profile profile="dev" args="":
   cargo build --profile {{profile}}  {{args}}
 
 # Clean build artifacts
 clean: (fetch-tools) (tools "clean")
   cargo clean
-
-# ---- Run Recipes ----
-
-# Run development build
-alias run := run-profile
-# Run development build
-alias run-dev := run-profile
-# Run release build
-run-release: (run-profile "release" "")
-
-# Run build with specified profile
-[private]
-run-profile profile="dev" args="--features=mimalloc,inspector":
-  cargo run --profile {{profile}} {{args}}
 
 # ---- Test Recipes ----
 
@@ -77,9 +63,9 @@ fmt:
 tools arg0="" arg1="" arg2="" arg3="" arg4="" arg5="" arg6="" arg7="": (fetch-tools)
   @just --justfile tools/.justfile {{arg0}} {{arg1}} {{arg2}} {{arg3}} {{arg4}} {{arg5}} {{arg6}} {{arg7}}
 
-# Generate froglight-app graphs
+# Generate froglight-internal graphs
 graph:
-  RUST_LOG=info cargo run --package=froglight-app --example=system-graph
+  RUST_LOG=info cargo run --package=froglight-internal --example=system-graph
 
 # ---- Fetch Recipes ----
 

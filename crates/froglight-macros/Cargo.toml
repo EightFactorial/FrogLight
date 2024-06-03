@@ -30,9 +30,6 @@ toml_edit = { version = "0.22.12", default-features = false, features = [
 [features]
 default = []
 
-# Enables `froglight-asset` macros
-froglight-asset = []
-
 # Enables `froglight-protocol` macros
 froglight-protocol = []
 # Emit extra logging for `froglight-protocol` macros
@@ -40,6 +37,3 @@ froglight-protocol-debug = ["froglight-protocol"]
 
 # Enables `froglight-registry` macros
 froglight-registry = ["froglight-protocol"]
-
-# Enables `froglight-world` macros
-froglight-world = []
