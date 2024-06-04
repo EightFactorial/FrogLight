@@ -19,16 +19,26 @@ workspace = true
 bevy_mod_debugdump = "0.10.0"
 
 [dependencies]
-bevy = { workspace = true, default-features = false, optional = true }
+bevy = { workspace = true, default-features = false, optional = true, features = [
+    "multi-threaded",
+] }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
-froglight-network = { version = "0.1.0", path = "../froglight-network" }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
+froglight-network = { version = "0.1.0", path = "../froglight-network", features = [
+    "bevy",
+    "resolver",
+] }
+froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+    "bevy",
+] }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
     "froglight-components",
+    "froglight-network",
     "froglight-world",
 ] }
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
+    "bevy",
     "froglight-registry",
 ] }
 

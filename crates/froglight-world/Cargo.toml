@@ -26,7 +26,7 @@ simdnbt = { workspace = true }
 thiserror = { workspace = true }
 
 [features]
-default = ["bevy"]
+default = ["bevy", "froglight-registry"]
 
 # Derives `Component` for `Chunk` and enables some logs.
 bevy = ["dep:bevy_ecs", "dep:bevy_log"]

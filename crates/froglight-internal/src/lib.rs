@@ -10,7 +10,5 @@ pub use froglight_registry as registry;
 pub use froglight_utils as utils;
 pub use froglight_world as world;
 
-#[cfg(feature = "presets")]
 mod groups;
-#[cfg(feature = "presets")]
 pub use groups::*;

@@ -21,22 +21,28 @@ bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_time = { workspace = true }
-froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
+froglight-components = { version = "0.1.0", path = "../froglight-components", optional = true, features = [
     "bevy",
-], optional = true }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+] }
+froglight-network = { version = "0.1.0", path = "../froglight-network", optional = true, features = [
     "bevy",
-], optional = true }
-froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
+] }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", optional = true, features = [
     "bevy",
-], optional = true }
+] }
+froglight-world = { version = "0.1.0", path = "../froglight-world", optional = true, features = [
+    "bevy",
+] }
 hashbrown = { workspace = true }
 
 [features]
-default = ["froglight-components", "froglight-world"]
+default = ["froglight-components", "froglight-network", "froglight-world"]
 
 # Enables tracking of entity ids and uuids
 froglight-components = ["dep:froglight-components"]
+
+# Schedules PreUpdate systems to run after network systems'
+froglight-network = ["dep:froglight-network", "dep:froglight-protocol"]
 
 # Enables tracking of what positions chunks are at
 froglight-world = ["dep:froglight-world", "dep:froglight-protocol"]
