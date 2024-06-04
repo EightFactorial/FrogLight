@@ -1,5 +1,5 @@
 <h1 align="center">FrogLight</h1>
-<p align="center">A Minecraft client/server library written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
+<p align="center">A collection of Minecraft libraries written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
 
 <p align="center">
   <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>  
