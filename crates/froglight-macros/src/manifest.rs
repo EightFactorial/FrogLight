@@ -48,8 +48,8 @@ impl ProjectManifest {
 
     /// The package name of the `froglight` crate.
     const FROGLIGHT: &'static str = "froglight";
-    /// The package name of the `froglight_app` crate.
-    const FROGLIGHT_APP: &'static str = "froglight_app";
+    /// The package name of the `froglight_internal` crate.
+    const FROGLIGHT_APP: &'static str = "froglight_internal";
 
     /// The prefix for all `froglight` crates.
     const PREFIX: &'static str = "froglight_";

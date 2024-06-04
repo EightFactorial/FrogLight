@@ -16,12 +16,12 @@ pub(crate) fn get_protocol_path() -> syn::Path {
     let mut path = ProjectManifest::get().get_path("froglight_protocol");
 
     if let Some(segment) = path.segments.first() {
-        // If the path is `froglight` or `froglight_app`,
+        // If the path is `froglight` or `froglight_internal`,
         // remove an extra `protocol` segment.
         //
         // This is done because only the `froglight_protocol::protocol`
         // module is re-exported
-        if segment.ident == "froglight" || segment.ident == "froglight_app" {
+        if segment.ident == "froglight" || segment.ident == "froglight_internal" {
             let segments = path.segments.into_iter().enumerate().filter(|(i, _)| i != &1);
             path.segments = segments.map(|(_, s)| s).collect();
         }
