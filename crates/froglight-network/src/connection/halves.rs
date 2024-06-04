@@ -1,8 +1,7 @@
 use std::{collections::VecDeque, marker::PhantomData, sync::Arc};
 
-use async_std::{io::BufReader, net::TcpStream};
+use async_std::{io::BufReader, net::TcpStream, sync::RwLock};
 use froglight_protocol::traits::{State, Version};
-use parking_lot::RwLock;
 
 use super::{AccountInformation, ConnectionInformation, NetworkDirection, Serverbound};
 
@@ -47,10 +46,10 @@ where
     {
         ReadConnection {
             stream: self.stream,
-            bundle: VecDeque::with_capacity(16),
             compression: self.compression,
             info: self.info,
             account: self.account,
+            bundle: VecDeque::new(),
             _version: PhantomData,
             _state: PhantomData,
             _direction: PhantomData,

@@ -10,6 +10,7 @@ pub struct ConnectionInformation {
     /// If the server ever asks for the address the client is connected to, this
     /// is the address that will be sent.
     pub address: Option<CompactString>,
+
     /// The socket address of the remote host.
     ///
     /// This is the address that the connection is established with.
@@ -17,6 +18,19 @@ pub struct ConnectionInformation {
 }
 
 impl ConnectionInformation {
+    /// Create a new [`ConnectionInformation`] with the given socket address.
+    ///
+    /// Does not set the address.
+    #[must_use]
+    pub fn new(socket: SocketAddr) -> Self { Self { address: None, socket } }
+
+    /// Set the address of the connection.
+    #[must_use]
+    pub fn with_address(mut self, address: impl Into<CompactString>) -> Self {
+        self.address = Some(address.into());
+        self
+    }
+
     /// Gets the address of the connection.
     ///
     /// If the address is not set, the socket address is returned.
@@ -27,9 +41,13 @@ impl ConnectionInformation {
 
     /// Gets the port of the connection.
     ///
-    /// If the port cannot be parsed, `25565` is returned.
+    /// If there is no port or it cannot be parsed,
+    /// the port of the socket address is returned.
     #[must_use]
     pub fn get_port(&self) -> u16 {
-        self.get_address().split_once(':').and_then(|(_, port)| port.parse().ok()).unwrap_or(25565)
+        self.get_address()
+            .split_once(':')
+            .and_then(|(_addr, port)| port.parse::<u16>().ok())
+            .unwrap_or_else(|| self.socket.port())
     }
 }

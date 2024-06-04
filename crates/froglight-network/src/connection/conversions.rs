@@ -25,10 +25,10 @@ where
     {
         Connection {
             stream: self.stream,
-            bundle: VecDeque::with_capacity(16),
             compression: self.compression,
             info: self.info,
             account: self.account,
+            bundle: VecDeque::new(),
             _version: PhantomData,
             _state: PhantomData,
             _direction: PhantomData,

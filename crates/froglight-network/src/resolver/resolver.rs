@@ -51,6 +51,16 @@ impl Resolver {
         )
     }
 
+    /// Returns a reference to the underlying [`AsyncStdResolver`].
+    #[must_use]
+    #[inline]
+    pub fn resolver(&self) -> &AsyncStdResolver { &self.resolver }
+
+    /// Returns a reference to the underlying [`TldExtractor`].
+    #[must_use]
+    #[inline]
+    pub fn extractor(&self) -> &TldExtractor { &self.extractor }
+
     /// Looks up the given address for an IP to connect to.
     ///
     /// If the address contains a port, it will be used as the port to connect

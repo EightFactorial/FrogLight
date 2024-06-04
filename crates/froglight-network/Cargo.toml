@@ -16,34 +16,47 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-async-channel = "2.2.1"
-async-compression = { version = "0.4.9", default-features = false, features = [
+async-channel = "2.3.1"
+async-compression = { version = "0.4.11", default-features = false, features = [
     "futures-io",
     "zlib",
 ] }
 async-std = { workspace = true, features = ["std", "unstable"] }
-bevy_app = { workspace = true }
-bevy_derive = { workspace = true }
-bevy_ecs = { workspace = true }
-bevy_log = { workspace = true }
-bevy_reflect = { workspace = true }
-bevy_tasks = { workspace = true, features = ["multi-threaded"] }
 compact_str = { workspace = true }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
-    "bevy",
-] }
-hashbrown = { workspace = true }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
+futures-lite = { workspace = true }
 md-5 = "0.10.6"
 parking_lot = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["v3"] }
+
+# Optional dependencies used by Bevy
+bevy_app = { workspace = true, optional = true }
+bevy_derive = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true }
+bevy_log = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+bevy_tasks = { workspace = true, optional = true, features = [
+    "multi-threaded",
+] }
 
 # Optional dependencies used by the ResolverPlugin
 async-std-resolver = { version = "0.24.1", optional = true }
 tldextract = { version = "0.6.0", optional = true }
 
 [features]
-default = ["resolver"]
+default = ["bevy", "resolver"]
+
+# Enables Bevy integration
+bevy = [
+    "dep:bevy_app",
+    "dep:bevy_derive",
+    "dep:bevy_ecs",
+    "dep:bevy_log",
+    "dep:bevy_reflect",
+    "dep:bevy_tasks",
+    "froglight-protocol/bevy",
+]
 
 # Enables the ResolverPlugin
-resolver = ["dep:async-std-resolver", "dep:tldextract"]
+resolver = ["bevy", "dep:async-std-resolver", "dep:tldextract"]

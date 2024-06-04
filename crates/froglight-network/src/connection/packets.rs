@@ -6,11 +6,11 @@ use async_std::{
     net::TcpStream,
 };
 use bevy_log::error;
-use bevy_tasks::futures_lite::AsyncBufReadExt;
 use froglight_protocol::{
     protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, WriteError},
     traits::{State, Version},
 };
+use futures_lite::AsyncBufReadExt;
 
 use super::{Connection, ConnectionError, NetworkDirection, ReadConnection, WriteConnection};
 
@@ -50,7 +50,7 @@ where
     /// # Panics
     /// If the packet length overflows.
     pub async fn recv(&mut self) -> Result<D::Recv, ConnectionError> {
-        recv::<V, S, D>(&mut self.stream, &mut self.bundle, &self.compression).await
+        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, &self.compression).await
     }
 }
 
@@ -68,8 +68,8 @@ where
     /// # Panics
     /// If the packet length overflows.
     pub async fn recv(&mut self) -> Result<D::Recv, ConnectionError> {
-        let compression = *self.compression.read();
-        recv::<V, S, D>(&mut self.stream, &mut self.bundle, &compression).await
+        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, &*self.compression.read().await)
+            .await
     }
 }
 
@@ -98,8 +98,7 @@ where
     /// # Panics
     /// If the packet length overflows.
     pub async fn send_packet(&mut self, packet: &D::Send) -> Result<(), ConnectionError> {
-        let compression = *self.compression.read();
-        send_packet::<V, S, D>(&mut self.stream, &compression, packet).await
+        send_packet::<V, S, D>(&mut self.stream, &*self.compression.read().await, packet).await
     }
 }
 
@@ -141,7 +140,7 @@ where
     // TODO: Encryption
 
     // Write the buffer to the stream
-    Ok(stream.write_all(&buffer).await?)
+    stream.write_all(&buffer).await.map_err(ConnectionError::from)
 }
 
 /// Receive a packet from the other side of the connection.
@@ -151,7 +150,7 @@ where
 ///
 /// # Panics
 /// If the packet length overflows.
-async fn recv<V, S, D>(
+async fn recv_packet<V, S, D>(
     buffer: &mut BufReader<TcpStream>,
     bundle: &mut VecDeque<D::Recv>,
     compression: &Option<i32>,

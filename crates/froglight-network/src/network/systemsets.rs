@@ -1,5 +1,3 @@
-//! [`SystemSets`](SystemSet) for running networking systems.
-
 use bevy_app::{App, PostUpdate, PreUpdate};
 use bevy_ecs::schedule::SystemSet;
 
