@@ -1,13 +1,11 @@
 # --- Version Configuration --- #
+#
+# Versions grouped together must have the same protocol version!
+#
+# [[version]]
+# base = "1.20.0" # Name of the supported version
+# jar = "1.20.1" # Jar used to generate code
 
-[[versions]]
-base_version = "1.20.0"
-jar_version = "1.20.1"
-
-[[versions]]
-base_version = "1.20.2"
-jar_version = "1.20.2"
-
-[[versions]]
-base_version = "1.20.3"
-jar_version = "1.20.4"
+[[version]]
+base = "1.21.0"
+jar = "1.21.0"
