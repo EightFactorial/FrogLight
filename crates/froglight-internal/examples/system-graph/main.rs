@@ -1,8 +1,6 @@
 //! Prints graphs of bevy apps and subapps.
 //!
 //! Useful for visualizing schedule and system ordering
-#![feature(lazy_cell)]
-
 use std::{
     path::{Path, PathBuf},
     sync::LazyLock,
