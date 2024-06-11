@@ -12,6 +12,7 @@ allow = [
     "0BSD",
     "BSD-2-Clause",
     "BSL-1.0",
+    "Unicode-3.0",
 ]
 
 [[licenses.exceptions]]
@@ -43,6 +44,8 @@ version = "=2.8.0"
 name = "bitflags"
 version = "=1.3.2"
 [[bans.skip]]
+name = "event-listener"
+[[bans.skip]]
 name = "fastrand"
 version = "=1.9.0"
 [[bans.skip]]
@@ -58,10 +61,16 @@ version = "=0.4.0"
 name = "polling"
 version = "=2.8.0"
 [[bans.skip]]
+name = "raw-window-handle"
+[[bans.skip]]
+name = "redox_syscall"
+[[bans.skip]]
 name = "regex-automata"
 version = "=0.1.10"
 [[bans.skip]]
 name = "regex-syntax"
+[[bans.skip]]
+name = "rustix"
 [[bans.skip]]
 name = "socket2"
 version = "=0.4.10"
@@ -75,25 +84,9 @@ version = "=0.21.1"
 name = "tracing-log"
 version = "=0.1.4"
 
-# Other
-[[bans.skip]]
-name = "event-listener"
-[[bans.skip]]
-name = "raw-window-handle"
-[[bans.skip]]
-name = "rustix"
-[[bans.skip]]
-name = "redox_syscall"
-[[bans.skip]]
-name = "winnow"
-[[bans.skip]]
-name = "winreg"
-
-# Linux
 [[bans.skip]]
 name = "linux-raw-sys"
 
-# Windows
 [[bans.skip]]
 name = "windows"
 [[bans.skip]]
@@ -116,3 +109,7 @@ name = "windows_x86_64_gnu"
 name = "windows_x86_64_gnullvm"
 [[bans.skip]]
 name = "windows_x86_64_msvc"
+[[bans.skip]]
+name = "winnow"
+[[bans.skip]]
+name = "winreg"
