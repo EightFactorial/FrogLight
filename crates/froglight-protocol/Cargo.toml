@@ -32,7 +32,7 @@ froglight-components = { version = "0.1.0", path = "../froglight-components", fe
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-protocol",
 ] }
-glam = { version = "0.25.0", features = ["bytemuck"] }
+glam = { version = "0.28.0", features = ["bytemuck"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 simdnbt = { workspace = true }
