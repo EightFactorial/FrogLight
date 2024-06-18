@@ -33,10 +33,17 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", option
 froglight-world = { version = "0.1.0", path = "../froglight-world", optional = true, features = [
     "bevy",
 ] }
-hashbrown = { workspace = true }
+
+# Optional dependencies
+hashbrown = { workspace = true, optional = true }
 
 [features]
-default = ["froglight-components", "froglight-network", "froglight-world"]
+default = [
+    "froglight-components",
+    "froglight-network",
+    "froglight-world",
+    "hashbrown",
+]
 
 # Enables tracking of entity ids and uuids
 froglight-components = ["dep:froglight-components"]
@@ -46,3 +53,10 @@ froglight-network = ["dep:froglight-network", "dep:froglight-protocol"]
 
 # Enables tracking of what positions chunks are at
 froglight-world = ["dep:froglight-world", "dep:froglight-protocol"]
+
+# Use `hashbrown` for better performance
+hashbrown = [
+    "dep:hashbrown",
+    "froglight-components/hashbrown",
+    "froglight-protocol/hashbrown",
+]

@@ -6,7 +6,6 @@ use std::{borrow::Borrow, fmt::Display};
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use compact_str::CompactString;
 use derive_more::{Deref, DerefMut};
-use hashbrown::Equivalent;
 use thiserror::Error;
 
 /// A string used to identify a resource.
@@ -257,10 +256,6 @@ impl Borrow<CompactString> for ResourceKey {
     fn borrow(&self) -> &CompactString { &self.0 }
 }
 
-impl Equivalent<str> for ResourceKey {
-    fn equivalent(&self, key: &str) -> bool { self.as_str() == key }
-}
-
 impl Display for ResourceKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }
 }
@@ -294,7 +289,6 @@ impl TryFrom<CompactString> for ResourceKey {
 impl PartialEq<str> for ResourceKey {
     fn eq(&self, other: &str) -> bool { self.as_str() == other }
 }
-
 impl PartialEq<&str> for ResourceKey {
     fn eq(&self, other: &&str) -> bool { self.as_str() == *other }
 }
@@ -305,6 +299,21 @@ impl PartialEq<String> for ResourceKey {
 
 impl PartialEq<CompactString> for ResourceKey {
     fn eq(&self, other: &CompactString) -> bool { self.as_str() == other.as_str() }
+}
+
+#[cfg(feature = "hashbrown")]
+impl hashbrown::Equivalent<str> for ResourceKey {
+    fn equivalent(&self, key: &str) -> bool { self.as_str() == key }
+}
+
+#[cfg(feature = "hashbrown")]
+impl hashbrown::Equivalent<String> for ResourceKey {
+    fn equivalent(&self, key: &String) -> bool { self.as_str() == key.as_str() }
+}
+
+#[cfg(feature = "hashbrown")]
+impl hashbrown::Equivalent<CompactString> for ResourceKey {
+    fn equivalent(&self, key: &CompactString) -> bool { self.as_str() == key.as_str() }
 }
 
 #[cfg(feature = "serde")]

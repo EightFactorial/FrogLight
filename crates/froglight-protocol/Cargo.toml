@@ -22,11 +22,9 @@ froglight-macros = { version = "0.1.0", path = "../froglight-macros", features =
 proptest = { workspace = true }
 
 [dependencies]
-bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
 bitvec = { workspace = true }
 bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
-compact_str = { workspace = true, features = ["serde", "smallvec"] }
+compact_str = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true }
 froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
     "serde",
@@ -35,24 +33,35 @@ froglight-macros = { version = "0.1.0", path = "../froglight-macros", features =
     "froglight-protocol",
 ] }
 glam = { version = "0.25.0", features = ["bytemuck"] }
-hashbrown = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 simdnbt = { workspace = true }
-smallvec = { workspace = true, features = [
+thiserror = { workspace = true }
+uuid = { workspace = true, features = ["serde"] }
+
+# Bevy crates
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+
+# Optional dependencies
+hashbrown = { workspace = true, optional = true }
+smallvec = { workspace = true, optional = true, features = [
     "const_generics",
     "const_new",
     "serde",
     "write",
 ] }
-thiserror = { workspace = true }
-uuid = { workspace = true, features = ["serde"] }
 
 [features]
-default = ["bevy"]
+default = ["bevy", "hashbrown", "smallvec"]
 
-# Derives `Component` for some types.
+# Derives `Component` and `Reflect` for some types
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-components/bevy"]
+
+# Use `hashbrown` for better performance
+hashbrown = ["dep:hashbrown", "froglight-components/hashbrown"]
+# Use `smallvec` for better performance
+smallvec = ["dep:smallvec", "compact_str/smallvec"]
 
 # TODO: Remove this once V1.20.2/.3 packets are no longer in use
 reflect = ["bevy"]
