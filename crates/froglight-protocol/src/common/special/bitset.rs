@@ -30,7 +30,7 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct BitSet<const N: usize>(BitArray<[u8; N.div_ceil(8)], Msb0>)
 where
-    [u8; N.div_ceil(8)]:,
+    [(); N.div_ceil(8)]:,
     Assert<{ N > 0 }>: IsNotZero;
 
 impl<const N: usize> BitSet<N>

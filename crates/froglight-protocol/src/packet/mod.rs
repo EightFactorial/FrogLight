@@ -10,13 +10,16 @@ mod chat_suggestion;
 pub use chat_suggestion::ChatSuggestionAction;
 
 mod chunk_data;
-pub use chunk_data::{BiomeDataPacket, BlockEntity, ChunkDataPacket, SectionDataPacket};
+pub use chunk_data::{BiomeDataPacket, BlockEntity, ChunkDataBuffer, SectionDataPacket};
 
 mod command_block;
 pub use command_block::CommandBlockMode;
 
 mod client;
 pub use client::*;
+
+mod debug_sample;
+pub use debug_sample::DebugSampleType;
 
 mod dynamic_registries;
 pub use dynamic_registries::{RegistryData, RegistryList};
@@ -50,6 +53,9 @@ pub use resource_pack::ResourcePackAction;
 
 mod server_status;
 pub use server_status::{ServerPlayers, ServerSamplePlayer, ServerStatus, ServerVersion};
+
+mod spawn_information;
+pub use spawn_information::SpawnInformation;
 
 mod trade_offer;
 pub use trade_offer::{LegacyTradeOffer, TradeOffer};
