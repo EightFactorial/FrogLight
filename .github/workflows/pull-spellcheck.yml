@@ -43,7 +43,7 @@ jobs:
           files: ${{ steps.changed-files.outputs.all_changed_files }}
           write_changes: true
       # Suggest Changes
-      - uses: reviewdog/action-suggester@42b08604516990e201b3c21902cc13c6a0ee5fe8 # v1
+      - uses: reviewdog/action-suggester@a1d57ff096639094e0ba35ef3039e79316364796 # v1
         if: steps.changed-files.outputs.any_changed == 'true'
         with:
           tool_name: typos
