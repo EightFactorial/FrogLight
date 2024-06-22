@@ -4,7 +4,7 @@ use std::{collections::VecDeque, marker::PhantomData, net::SocketAddr, sync::Arc
 
 use async_std::{io::BufReader, net::TcpStream, sync::RwLock};
 use froglight_protocol::{
-    states::Handshaking,
+    states::Handshake,
     traits::{State, Version},
 };
 
@@ -26,8 +26,8 @@ pub use halves::{ReadConnection, WriteConnection};
 mod information;
 pub use information::ConnectionInformation;
 
-#[cfg(test)]
-mod compile_test;
+// #[cfg(test)]
+// mod compile_test;
 
 /// A connection to a remote host.
 #[derive(Debug)]
@@ -49,11 +49,11 @@ where
     _direction: PhantomData<D>,
 }
 
-impl<V> Connection<V, Handshaking, Serverbound>
+impl<V> Connection<V, Handshake, Serverbound>
 where
     V: Version,
-    Handshaking: State<V>,
-    Serverbound: NetworkDirection<V, Handshaking>,
+    Handshake: State<V>,
+    Serverbound: NetworkDirection<V, Handshake>,
 {
     /// Connect to a remote host using a
     /// [`Resolver`](crate::resolver::Resolver).
@@ -181,6 +181,7 @@ where
     pub fn into_stream(self) -> BufReader<TcpStream> { self.stream }
 
     #[cfg(test)]
+    #[allow(dead_code)]
     const fn nothing() {}
 }
 

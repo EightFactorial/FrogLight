@@ -12,7 +12,7 @@ pub use froglight_network::{
     connection::{Clientbound, Connection, ConnectionError, Serverbound},
     packet::*,
     resolver::{Resolver, ResolverError},
-    states::{Configuration, Handshaking, Login, Play, Status},
+    states::{Configuration, Handshake, Login, Play, Status},
     traits::{State, Version},
 };
 pub use froglight_registry::definitions::{BlockExt, BlockRegistry, BlockType};

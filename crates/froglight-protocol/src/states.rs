@@ -5,7 +5,7 @@
 /// This is the initial state of a connection,
 /// where the client sends a handshake packet to the server.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Handshaking;
+pub struct Handshake;
 
 /// The Status state
 ///

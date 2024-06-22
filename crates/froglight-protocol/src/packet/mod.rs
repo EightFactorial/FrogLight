@@ -18,6 +18,9 @@ pub use command_block::CommandBlockMode;
 mod client;
 pub use client::*;
 
+mod dynamic_registries;
+pub use dynamic_registries::{RegistryData, RegistryList};
+
 mod entity_animation;
 pub use entity_animation::EntityAnimation;
 
@@ -29,6 +32,9 @@ pub use game_event::GameEvent;
 
 mod item_slot;
 pub use item_slot::{ItemSlot, ItemSlotAction, LegacyItemSlot};
+
+mod known_resourcepacks;
+pub use known_resourcepacks::KnownResourcePacks;
 
 mod look_anchor;
 pub use look_anchor::{LookAnchor, LookEntity};

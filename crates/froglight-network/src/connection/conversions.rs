@@ -1,7 +1,7 @@
 use std::{collections::VecDeque, marker::PhantomData};
 
 use froglight_protocol::{
-    states::{Configuration, Handshaking, Login, Play, Status},
+    states::{Configuration, Handshake, Login, Play, Status},
     traits::{State, Version},
 };
 
@@ -36,9 +36,9 @@ where
     }
 }
 
-impl<V: Version, D: NetworkDirection<V, Handshaking>> Connection<V, Handshaking, D>
+impl<V: Version, D: NetworkDirection<V, Handshake>> Connection<V, Handshake, D>
 where
-    Handshaking: State<V>,
+    Handshake: State<V>,
 {
     /// Set the [`Connection`]'s state to [`Status`].
     #[must_use]
