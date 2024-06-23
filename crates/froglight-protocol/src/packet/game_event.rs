@@ -2,6 +2,7 @@ use froglight_macros::FrogReadWrite;
 
 /// A game event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(tests = ["read_example"], bytes = [1])]
 pub enum GameEvent {
     /// Invalid bed.

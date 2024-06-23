@@ -5,6 +5,7 @@ use crate::common::{GameMode, GlobalPosition};
 
 /// Information about the player's spawn.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct SpawnInformation {
     /// The dimension ID
     #[frog(var)]

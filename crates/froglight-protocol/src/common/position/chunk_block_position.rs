@@ -9,6 +9,7 @@ use super::BlockPosition;
 /// The y-coordinate is `0` at the bottom of the world,
 /// regardless of the minimum possible value.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ChunkBlockPosition {
     /// The x-coordinate of the position.
     ///

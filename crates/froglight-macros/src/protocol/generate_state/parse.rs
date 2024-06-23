@@ -146,8 +146,11 @@ pub(super) struct Packet {
 impl Packet {
     /// Get the name of the enum variant.
     fn variant_name(packet: &Ident) -> Ident {
-        let name = packet.to_string().replace("S2CPacket", "").replace("C2SPacket", "");
-        Ident::new(&name, packet.span())
+        let name = packet.to_string();
+        let trimmed =
+            name.trim_end_matches("Packet").trim_end_matches("C2S").trim_end_matches("S2C");
+
+        Ident::new(trimmed, packet.span())
     }
 }
 

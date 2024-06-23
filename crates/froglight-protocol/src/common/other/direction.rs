@@ -5,6 +5,7 @@ use glam::IVec3;
 
 /// A direction in 3D space.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0])]
 pub enum Direction {
     #[default]

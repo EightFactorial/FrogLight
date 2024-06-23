@@ -8,6 +8,7 @@ use crate::{
 
 /// A hit on a block
 #[derive(Debug, Clone, Copy, PartialEq, FrogTest)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(tests = ["read_example"], bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct BlockHit {
     /// The position of the block that was hit

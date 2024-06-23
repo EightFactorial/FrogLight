@@ -7,6 +7,7 @@ use uuid::Uuid;
 
 /// A status response from a server
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(json)]
 pub struct ServerStatus {
     // TODO: FormattedText
@@ -30,6 +31,7 @@ pub struct ServerStatus {
 
 /// The server's version information
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerVersion {
     // TODO: FormattedText
     /// The version's name
@@ -40,6 +42,7 @@ pub struct ServerVersion {
 
 /// The server's player information
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerPlayers {
     /// The maximum number of players
     pub max: i32,
@@ -52,6 +55,7 @@ pub struct ServerPlayers {
 
 /// Player information
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerSamplePlayer {
     /// The player's UUID
     pub uuid: Uuid,

@@ -1,9 +1,13 @@
+#[cfg(feature = "bevy")]
+use bevy_ecs::reflect::ReflectComponent;
+
 use super::ChunkPosition;
 use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 
 /// The position of a chunk section.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
+#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Component))]
 pub struct SectionPosition {
     /// The chunk position.
     pub chunk: ChunkPosition,

@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::ReflectDefault;
 use derive_more::{Deref, DerefMut, From, Into};
 use froglight_macros::FrogTest;
 use glam::{DVec3, I64Vec3, IVec3, Vec3};
@@ -28,6 +30,8 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 #[derive(
     Debug, Default, Clone, Copy, PartialEq, Eq, Hash, From, Into, Deref, DerefMut, FrogTest,
 )]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Default))]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
 pub struct BlockPosition(I64Vec3);
 

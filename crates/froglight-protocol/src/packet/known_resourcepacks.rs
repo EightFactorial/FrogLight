@@ -4,6 +4,7 @@ use froglight_macros::FrogReadWrite;
 ///
 /// Used to inform the client/server of the resource packs that are available.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct KnownResourcePacks {
     /// The list of resource packs.
     pub resourcepacks: Vec<ResourcePackInfo>,
@@ -11,6 +12,7 @@ pub struct KnownResourcePacks {
 
 /// Information about a resource pack.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ResourcePackInfo {
     /// The namespace of the resource pack.
     pub namespace: String,

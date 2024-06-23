@@ -27,7 +27,6 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 /// assert_eq!(bitset.get_bit(2), Some(false));
 /// ```
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct BitSet<const N: usize>(BitArray<[u8; N.div_ceil(8)], Msb0>)
 where
     [(); N.div_ceil(8)]:,

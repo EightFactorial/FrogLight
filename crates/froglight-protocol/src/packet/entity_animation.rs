@@ -2,6 +2,7 @@ use froglight_macros::FrogReadWrite;
 
 /// An entity animation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(tests = ["read_example"], bytes = [4])]
 pub enum EntityAnimation {
     /// The entity's swings its main hand.
