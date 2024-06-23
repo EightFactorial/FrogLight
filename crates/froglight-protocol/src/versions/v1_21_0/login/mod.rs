@@ -3,12 +3,14 @@
 #![allow(missing_docs)]
 
 pub use super::play::{
-    CookieRequestPacket, CookieResponsePacket, CustomPayloadC2SPacket as LoginQueryResponsePacket,
-    CustomPayloadS2CPacket as LoginQueryRequestPacket, DisconnectPacket as LoginDisconnectPacket,
+    CookieRequestPacket, CookieResponsePacket, DisconnectPacket as LoginDisconnectPacket,
 };
 
 mod login_compression;
 pub use login_compression::*;
+
+mod login_query_request;
+pub use login_query_request::*;
 
 mod enter_configuration;
 pub use enter_configuration::*;
@@ -24,6 +26,9 @@ pub use login_hello_s2c::*;
 
 mod login_key;
 pub use login_key::*;
+
+mod login_query_response;
+pub use login_query_response::*;
 
 froglight_macros::frog_state! {
     Login,

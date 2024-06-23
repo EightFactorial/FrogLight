@@ -49,7 +49,7 @@ mod recipe_book;
 pub use recipe_book::RecipeBookCategory;
 
 mod resource_pack;
-pub use resource_pack::ResourcePackAction;
+pub use resource_pack::ResourcePackStatus;
 
 mod server_status;
 pub use server_status::{ServerPlayers, ServerSamplePlayer, ServerStatus, ServerVersion};

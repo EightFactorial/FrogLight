@@ -1,4 +1,3 @@
-use compact_str::CompactString;
 use froglight_macros::FrogReadWrite;
 
 use crate::common::UnsizedBuffer;

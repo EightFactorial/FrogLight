@@ -36,7 +36,7 @@ impl FrogRead for Value {
         Self: Sized,
     {
         let content: String = String::fg_read(buf)?;
-        Ok(serde_json::from_str(&content)?)
+        Ok(serde_json::from_str(&content).unwrap_or(Value::Null))
     }
 }
 

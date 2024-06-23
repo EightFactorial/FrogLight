@@ -11,15 +11,4 @@ pub struct MapUpdatePacket {
     pub locked: bool,
     // TODO: Implement MapData
     pub map_data: UnsizedBuffer,
-    // #[frog(var)]
-    // pub field_3: u32,
-    // pub field_4: u8,
-    // pub field_5: u8,
-    // pub field_6: u8,
-    // pub field_7: Option<Text>,
-    // pub field_8: u8,
-    // pub field_9: u8,
-    // pub field_10: u8,
-    // pub field_11: u8,
-    // pub field_12: Vec<u8>,
 }

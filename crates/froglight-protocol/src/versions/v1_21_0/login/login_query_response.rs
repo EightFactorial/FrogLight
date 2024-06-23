@@ -1,13 +1,13 @@
+use froglight_components::resourcekey::ResourceKey;
 use froglight_macros::FrogReadWrite;
 
 use crate::common::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-pub struct InventoryPacket {
-    pub container_id: u8,
+pub struct LoginQueryResponsePacket {
     #[frog(var)]
-    pub state_id: u32,
-    // TODO: Implement Inventory
-    pub data: UnsizedBuffer,
+    pub id: u32,
+    pub identifier: ResourceKey,
+    pub payload: Option<UnsizedBuffer>,
 }

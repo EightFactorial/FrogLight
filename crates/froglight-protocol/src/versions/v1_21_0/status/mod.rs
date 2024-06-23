@@ -2,14 +2,10 @@
 //! [`V1_21_0`](super::V1_21_0)
 #![allow(missing_docs)]
 
-mod ping_result;
-pub use ping_result::*;
+pub use super::play::{PingResultPacket, QueryPingPacket};
 
 mod query_response;
 pub use query_response::*;
-
-mod query_ping;
-pub use query_ping::*;
 
 mod query_request;
 pub use query_request::*;
