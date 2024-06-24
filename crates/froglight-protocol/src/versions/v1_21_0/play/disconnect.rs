@@ -6,6 +6,6 @@ use serde_json::Value;
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct DisconnectPacket {
     // TODO: Text
-    #[reflect(ignore)]
+    #[cfg_attr(feature = "bevy", reflect(ignore))]
     pub reason: Value,
 }

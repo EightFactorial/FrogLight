@@ -1,5 +1,3 @@
-use smallvec::SmallVec;
-
 use crate::protocol::{FrogRead, FrogVarRead, ReadError};
 
 impl<T: FrogRead, const N: usize> FrogRead for [T; N] {
@@ -35,13 +33,14 @@ impl<T: FrogRead> FrogRead for Vec<T> {
     }
 }
 
-impl<T: FrogRead, const N: usize> FrogRead for SmallVec<[T; N]> {
+#[cfg(feature = "smallvec")]
+impl<T: FrogRead, const N: usize> FrogRead for smallvec::SmallVec<[T; N]> {
     fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
     where
         Self: Sized,
     {
         let len: usize = u32::fg_var_read(buf)? as usize;
-        let mut vec = SmallVec::with_capacity(len);
+        let mut vec = smallvec::SmallVec::with_capacity(len);
 
         for i in 0..len {
             match T::fg_read(buf) {
@@ -162,6 +161,7 @@ proptest::proptest! {
     }
 
     #[test]
+    #[cfg(feature = "smallvec")]
     fn proto_read_smallvec_u8(data in proptest::collection::vec(proptest::bits::u8::ANY, 0..512)) {
         use crate::protocol::var_write::FrogVarWrite;
 
@@ -173,13 +173,14 @@ proptest::proptest! {
 
         // Read the data back
         let mut cursor = std::io::Cursor::new(vec.as_slice());
-        let result: Result<SmallVec<[u8; 32]>, _> = SmallVec::fg_read(&mut cursor);
+        let result: Result<smallvec::SmallVec<[u8; 32]>, _> = smallvec::SmallVec::fg_read(&mut cursor);
 
         assert_eq!(result.unwrap().to_vec(), data);
         assert_eq!(cursor.position(), vec.len() as u64);
     }
 
     #[test]
+    #[cfg(feature = "smallvec")]
     fn proto_read_smallvec_string(data in proptest::collection::vec(".*", 0..64)) {
         use crate::protocol::var_write::FrogVarWrite;
 
@@ -196,7 +197,7 @@ proptest::proptest! {
 
         // Read the data back
         let mut cursor = std::io::Cursor::new(vec.as_slice());
-        let result: Result<SmallVec<[String; 32]>, _> = SmallVec::fg_read(&mut cursor);
+        let result: Result<smallvec::SmallVec<[String; 32]>, _> = smallvec::SmallVec::fg_read(&mut cursor);
 
         assert_eq!(result.unwrap().to_vec(), data);
         assert_eq!(cursor.position(), vec.len() as u64);

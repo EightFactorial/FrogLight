@@ -16,28 +16,31 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy_ecs = { workspace = true, optional = true }
-bevy-inspector-egui = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
 compact_str = { workspace = true }
 derive_more = { workspace = true }
-serde = { workspace = true, optional = true, features = ["derive"] }
 thiserror = { workspace = true }
 uuid = { workspace = true }
 
+# Optional bevy dependencies
+bevy_ecs = { workspace = true, optional = true }
+bevy-inspector-egui = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+
 # Optional dependencies
 hashbrown = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
+
 
 [features]
 default = ["bevy"]
 
-# Derives `Component` for some types
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "serde"]
+# Derives `Component`, `Resource`, and `Reflect` for some types
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "hashbrown", "serde"]
 
-# Implements `Equivlanet` for ResourceKeys
+# Implement `Equivalent` for ResourceKey
 hashbrown = ["dep:hashbrown"]
 
-# Implements InspectorPrimitive for ResourceKey
+# Implement `InspectorPrimitive` for ResourceKey
 inspector = ["dep:bevy-inspector-egui", "bevy"]
 
 # Derives `Serialize` and `Deserialize` for some types

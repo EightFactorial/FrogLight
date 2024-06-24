@@ -27,6 +27,7 @@ impl<K: Eq + Hash + FrogRead, V: FrogRead, S: Default + BuildHasher> FrogRead
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<K: Eq + Hash + FrogRead, V: FrogRead, S: Default + BuildHasher> FrogRead
     for hashbrown::HashMap<K, V, S>
 {
@@ -77,6 +78,7 @@ impl<T: Eq + Hash + FrogRead, S: Default + BuildHasher> FrogRead
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<T: Eq + Hash + FrogRead, S: Default + BuildHasher> FrogRead for hashbrown::HashSet<T, S> {
     fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, crate::protocol::ReadError>
     where

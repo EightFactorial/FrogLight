@@ -1,9 +1,13 @@
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::HashMap;
+
 #[cfg(feature = "bevy")]
 use bevy_ecs::reflect::ReflectComponent;
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
 use compact_str::CompactString;
 use froglight_macros::FrogReadWrite;
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 use uuid::Uuid;
 

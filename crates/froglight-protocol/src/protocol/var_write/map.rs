@@ -19,6 +19,7 @@ impl<K: FrogWrite + Hash + Eq, V: FrogVarWrite, S: BuildHasher> FrogVarWrite
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<K: FrogWrite + Hash + Eq, V: FrogVarWrite, S: BuildHasher> FrogVarWrite
     for hashbrown::HashMap<K, V, S>
 {
@@ -50,6 +51,7 @@ impl<T: FrogVarWrite, S: BuildHasher> FrogVarWrite for std::collections::HashSet
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<T: FrogVarWrite, S: BuildHasher> FrogVarWrite for hashbrown::HashSet<T, S> {
     #[inline]
     fn fg_var_write(

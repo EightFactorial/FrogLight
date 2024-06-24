@@ -23,7 +23,11 @@ proptest = { workspace = true }
 
 [dependencies]
 bitvec = { workspace = true }
-bytemuck = { workspace = true, features = ["nightly_stdsimd"] }
+bytemuck = { workspace = true, features = [
+    "min_const_generics",
+    "must_cast",
+    "nightly_stdsimd",
+] }
 compact_str = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true }
 froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
@@ -32,14 +36,14 @@ froglight-components = { version = "0.1.0", path = "../froglight-components", fe
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-protocol",
 ] }
-glam = { version = "0.25.0", features = ["bytemuck"] }
+glam = { workspace = true, features = ["bytemuck"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["serde"] }
 
-# Bevy crates
+# Optional bevy dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 
@@ -52,16 +56,25 @@ smallvec = { workspace = true, optional = true, features = [
     "write",
 ] }
 
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+bytemuck = { workspace = true, features = ["wasm_simd"] }
+
+[target.'cfg(target_arch = "aarch64")'.dependencies]
+bytemuck = { workspace = true, features = ["aarch64_simd"] }
+
 [features]
 default = ["bevy", "hashbrown", "smallvec"]
 
-# Derives `Component` and `Reflect` for some types
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-components/bevy"]
+# Derives `Component`, `Resource`, and `Reflect` for some types
+bevy = [
+    "dep:bevy_ecs",
+    "dep:bevy_reflect",
+    "hashbrown",
+    "froglight-components/bevy",
+]
 
 # Use `hashbrown` for better performance
 hashbrown = ["dep:hashbrown", "froglight-components/hashbrown"]
+
 # Use `smallvec` for better performance
 smallvec = ["dep:smallvec", "compact_str/smallvec"]
-
-# TODO: Remove this once V1.20.2/.3 packets are no longer in use
-reflect = ["bevy"]

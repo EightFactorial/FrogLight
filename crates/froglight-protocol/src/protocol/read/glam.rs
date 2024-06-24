@@ -20,7 +20,7 @@ macro_rules! impl_read_glam {
                 {
                     let mut values: $parts = bytemuck::pod_read_unaligned(slice);
                     values.iter_mut().for_each(|v| *v = v.to_be());
-                    Ok(bytemuck::cast(values))
+                    Ok(bytemuck::must_cast(values))
                 } else {
                     Err(ReadError::EndOfBuffer(
                         std::mem::size_of::<$ty>(),

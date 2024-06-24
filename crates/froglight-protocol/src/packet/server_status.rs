@@ -1,7 +1,11 @@
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::HashMap;
+
 use compact_str::CompactString;
 use froglight_macros::FrogReadWrite;
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
-use serde::{Deserialize, Serialize};
+use serde::{ser::SerializeSeq, Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
@@ -10,7 +14,7 @@ use uuid::Uuid;
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(json)]
 pub struct ServerStatus {
-    // TODO: FormattedText
+    // TODO: Text
     /// The server's description
     pub description: Value,
     /// The server's icon
@@ -33,7 +37,7 @@ pub struct ServerStatus {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerVersion {
-    // TODO: FormattedText
+    // TODO: Text
     /// The version's name
     pub name: Value,
     /// The version's protocol id
@@ -49,7 +53,7 @@ pub struct ServerPlayers {
     /// The number of online players
     pub online: i32,
     /// A sample of online players
-    #[serde(default)]
+    #[serde(default, with = "ServerSamplePlayer")]
     pub sample: Vec<ServerSamplePlayer>,
 }
 
@@ -63,6 +67,31 @@ pub struct ServerSamplePlayer {
     /// The player's username
     #[serde(default, skip_serializing_if = "CompactString::is_empty")]
     pub username: CompactString,
+}
+
+impl ServerSamplePlayer {
+    /// Serialize a list of players, filtering out players with
+    /// empty usernames and nil UUIDs
+    fn serialize<S>(list: &[Self], serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        let mut seq = serializer.serialize_seq(None)?;
+        for player in list.iter().filter(|p| !(p.uuid.is_nil() && p.username.is_empty())) {
+            seq.serialize_element(player)?;
+        }
+        seq.end()
+    }
+
+    /// Deserialize a list of players, filtering out players with
+    /// empty usernames and nil UUIDs
+    fn deserialize<'de, D>(deserializer: D) -> Result<Vec<ServerSamplePlayer>, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let list = Vec::<ServerSamplePlayer>::deserialize(deserializer)?;
+        Ok(list.into_iter().filter(|p| !(p.uuid.is_nil() && p.username.is_empty())).collect())
+    }
 }
 
 // TODO: FormattedText

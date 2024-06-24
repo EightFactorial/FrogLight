@@ -27,6 +27,7 @@ impl<K: Eq + Hash + FrogRead, V: FrogVarRead, S: Default + BuildHasher> FrogVarR
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<K: Eq + Hash + FrogRead, V: FrogVarRead, S: Default + BuildHasher> FrogVarRead
     for hashbrown::HashMap<K, V, S>
 {
@@ -77,6 +78,7 @@ impl<T: Eq + Hash + FrogVarRead, S: Default + BuildHasher> FrogVarRead
     }
 }
 
+#[cfg(feature = "hashbrown")]
 impl<T: Eq + Hash + FrogVarRead, S: Default + BuildHasher> FrogVarRead
     for hashbrown::HashSet<T, S>
 {

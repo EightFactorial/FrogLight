@@ -25,26 +25,21 @@ pub(super) fn build(app: &mut App) {
 
     app.add_systems(
         PostUpdate,
-        ConnectionTask::poll_connection_tasks
-            .run_if(any_with_component::<ConnectionTask>)
+        PolledTask::poll_status_tasks
+            .ambiguous_with(PolledTask::poll_connection_tasks)
+            .run_if(any_with_component::<StatusTask>)
+            .run_if(any_with_component::<PolledTask>)
             .in_set(NetworkPostUpdateSet),
     );
     app.add_systems(
         PostUpdate,
-        StatusTask::poll_status_tasks
-            .run_if(any_with_component::<StatusTask>)
+        PolledTask::poll_connection_tasks
+            .ambiguous_with(PolledTask::poll_status_tasks)
+            .run_if(any_with_component::<ConnectionTask>)
+            .run_if(any_with_component::<PolledTask>)
             .in_set(NetworkPostUpdateSet),
     );
 }
-
-/// A marker [`Component`] for [`Tasks`](Task) that will automatically be
-/// polled.
-///
-/// Add this to a [`ConnectionTask`] or [`StatusTask`] to have it polled,
-/// the result sent as an [`Event`](bevy_ecs::event::Event), and then despawned.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
-#[reflect(Default, Component)]
-pub struct PolledTask;
 
 /// A [`Task`] for a connection.
 #[derive(Debug, Component)]
@@ -87,42 +82,6 @@ impl ConnectionTask {
     /// Polling the task again will cause a panic.
     pub fn poll_once(&mut self) -> Option<ConnectionTaskResult> {
         bevy_tasks::block_on(bevy_tasks::poll_once(&mut self.task))
-    }
-
-    /// A bevy [`System`](bevy_ecs::system::System) that
-    /// polls all [`ConnectionTask`]s in parallel.
-    pub(super) fn poll_connection_tasks(
-        mut query: Query<(Entity, &mut Self), With<PolledTask>>,
-        commands: ParallelCommands,
-
-        mut events: EventWriter<NetworkErrorEvent>,
-        buffer: Local<Mutex<Vec<NetworkErrorEvent>>>,
-    ) {
-        query.par_iter_mut().for_each(|(entity, mut task)| match task.poll_once() {
-            // The task errored, log and remove it.
-            Some(Err(error)) => {
-                buffer.lock().push(NetworkErrorEvent { entity, error });
-                commands.command_scope(|mut commands| {
-                    commands.entity(entity).despawn_recursive();
-                });
-            }
-            // The task is done, remove it.
-            Some(Ok(())) => {
-                #[cfg(debug_assertions)]
-                bevy_log::debug!("Connection Closed: {entity:?}");
-                commands.command_scope(|mut commands| {
-                    commands.entity(entity).despawn_recursive();
-                });
-            }
-            // Do nothing, the task is still running.
-            None => {}
-        });
-
-        // Send all errors.
-        let mut error_buffer = buffer.lock();
-        if !error_buffer.is_empty() {
-            events.send_batch(std::mem::take(&mut *error_buffer));
-        }
     }
 }
 
@@ -168,11 +127,58 @@ impl StatusTask {
     pub fn poll_once(&mut self) -> Option<StatusTaskResult> {
         bevy_tasks::block_on(bevy_tasks::poll_once(&mut self.task))
     }
+}
+
+/// A marker [`Component`] for [`Tasks`](Task) that will automatically be
+/// polled.
+///
+/// Add this to a [`ConnectionTask`] or [`StatusTask`] to have it polled,
+/// the result sent as an [`Event`](bevy_ecs::event::Event), and then despawned.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+#[reflect(Default, Component)]
+pub struct PolledTask;
+
+impl PolledTask {
+    /// A bevy [`System`](bevy_ecs::system::System) that
+    /// polls all [`ConnectionTask`]s in parallel.
+    pub(super) fn poll_connection_tasks(
+        mut query: Query<(Entity, &mut ConnectionTask), With<PolledTask>>,
+        commands: ParallelCommands,
+
+        mut events: EventWriter<NetworkErrorEvent>,
+        buffer: Local<Mutex<Vec<NetworkErrorEvent>>>,
+    ) {
+        query.par_iter_mut().for_each(|(entity, mut task)| match task.poll_once() {
+            // Do nothing, the task is still running.
+            None => {}
+            // The task is done, despawn it.
+            Some(Ok(())) => {
+                #[cfg(debug_assertions)]
+                bevy_log::debug!("Connection Closed: {entity:?}");
+                commands.command_scope(|mut commands| {
+                    commands.entity(entity).despawn_recursive();
+                });
+            }
+            // The task errored, push the error and despawn it.
+            Some(Err(error)) => {
+                buffer.lock().push(NetworkErrorEvent { entity, error });
+                commands.command_scope(|mut commands| {
+                    commands.entity(entity).despawn_recursive();
+                });
+            }
+        });
+
+        // Send all errors.
+        let mut error_buffer = buffer.lock();
+        if !error_buffer.is_empty() {
+            events.send_batch(std::mem::take(&mut *error_buffer));
+        }
+    }
 
     /// A bevy [`System`](bevy_ecs::system::System) that
     /// polls all [`StatusTask`]s in parallel.
     pub(super) fn poll_status_tasks(
-        mut query: Query<(Entity, &mut Self), With<PolledTask>>,
+        mut query: Query<(Entity, &mut StatusTask), With<PolledTask>>,
         commands: ParallelCommands,
 
         mut errors: EventWriter<NetworkErrorEvent>,
@@ -181,22 +187,22 @@ impl StatusTask {
         response_buffer: Local<Mutex<Vec<ServerStatusResponse>>>,
     ) {
         query.par_iter_mut().for_each(|(entity, mut task)| match task.poll_once() {
-            // The task errored, log and remove it.
-            Some(Err(error)) => {
-                error_buffer.lock().push(NetworkErrorEvent { entity, error });
-                commands.command_scope(|mut commands| {
-                    commands.entity(entity).despawn_recursive();
-                });
-            }
-            // The task is done, remove it.
+            // Do nothing, the task is still running.
+            None => {}
+            // The task is done, despawn it.
             Some(Ok((status, ping))) => {
                 response_buffer.lock().push(ServerStatusResponse { entity, status, ping });
                 commands.command_scope(|mut commands| {
                     commands.entity(entity).despawn_recursive();
                 });
             }
-            // Do nothing, the task is still running.
-            None => {}
+            // The task errored, push the error and despawn it.
+            Some(Err(error)) => {
+                error_buffer.lock().push(NetworkErrorEvent { entity, error });
+                commands.command_scope(|mut commands| {
+                    commands.entity(entity).despawn_recursive();
+                });
+            }
         });
 
         // Send all errors.

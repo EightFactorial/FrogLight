@@ -30,7 +30,7 @@ parking_lot = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true, features = ["v3"] }
 
-# Optional dependencies used by Bevy
+# Optional bevy dependencies
 bevy_app = { workspace = true, optional = true }
 bevy_derive = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
@@ -41,7 +41,7 @@ bevy_tasks = { workspace = true, optional = true, features = [
     "multi-threaded",
 ] }
 
-# Optional dependencies used by the ResolverPlugin
+# Optional dependencies
 async-std-resolver = { version = "0.24.1", optional = true }
 
 [features]

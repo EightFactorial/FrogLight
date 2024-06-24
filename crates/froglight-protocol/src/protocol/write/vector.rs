@@ -1,5 +1,3 @@
-use smallvec::SmallVec;
-
 use crate::protocol::{FrogVarWrite, FrogWrite, WriteError};
 
 impl<T: FrogWrite, const N: usize> FrogWrite for [T; N] {
@@ -23,7 +21,8 @@ impl<T: FrogWrite> FrogWrite for Vec<T> {
     }
 }
 
-impl<T: FrogWrite, const N: usize> FrogWrite for SmallVec<[T; N]> {
+#[cfg(feature = "smallvec")]
+impl<T: FrogWrite, const N: usize> FrogWrite for smallvec::SmallVec<[T; N]> {
     #[inline]
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         u32::try_from(self.len()).expect("Vector length too long").fg_var_write(buf)?;
@@ -75,6 +74,7 @@ proptest::proptest! {
     }
 
     #[test]
+    #[cfg(feature = "smallvec")]
     fn proto_write_smallvec_u8(data in proptest::collection::vec(proptest::num::u8::ANY, 0..1024)) {
         use crate::protocol::FrogVarWrite;
 
@@ -82,7 +82,7 @@ proptest::proptest! {
         u32::try_from(data.len()).unwrap().fg_var_write(&mut bytes).unwrap();
         bytes.extend(&data);
 
-        assert_eq!(SmallVec::<[u8; 8]>::from_vec(data).fg_to_bytes(), bytes);
+        assert_eq!(smallvec::SmallVec::<[u8; 8]>::from_vec(data).fg_to_bytes(), bytes);
     }
 
     #[test]

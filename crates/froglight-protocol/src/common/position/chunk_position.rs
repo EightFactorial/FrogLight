@@ -17,7 +17,7 @@ use crate::protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError,
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Default, Component))]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [0, 0, 0, 0, 0, 0, 0, 0])]
-pub struct ChunkPosition(#[reflect(ignore)] I64Vec2);
+pub struct ChunkPosition(#[cfg_attr(feature = "bevy", reflect(ignore))] I64Vec2);
 
 impl ChunkPosition {
     /// All zeros.
