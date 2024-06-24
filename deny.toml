@@ -54,9 +54,6 @@ version = "=1.13.0"
 name = "hermit-abi"
 [[bans.skip]]
 name = "idna"
-version = "=0.2.3"
-[[bans.skip]]
-name = "idna"
 version = "=0.4.0"
 [[bans.skip]]
 name = "polling"

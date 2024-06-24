@@ -58,8 +58,10 @@ pub struct ServerPlayers {
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerSamplePlayer {
     /// The player's UUID
+    #[serde(default, skip_serializing_if = "Uuid::is_nil")]
     pub uuid: Uuid,
     /// The player's username
+    #[serde(default, skip_serializing_if = "CompactString::is_empty")]
     pub username: CompactString,
 }
 

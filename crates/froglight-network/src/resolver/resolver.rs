@@ -1,15 +1,10 @@
-use std::{
-    net::{IpAddr, SocketAddr},
-    sync::Arc,
-};
+use std::{net::SocketAddr, sync::Arc};
 
 use async_std_resolver::{
     config::{ResolverConfig, ResolverOpts},
     AsyncStdResolver, ResolveError,
 };
 use bevy_ecs::system::Resource;
-use thiserror::Error;
-use tldextract::{TldExtractor, TldOption};
 
 /// A DNS resolver.
 ///
@@ -18,48 +13,26 @@ use tldextract::{TldExtractor, TldOption};
 #[derive(Debug, Clone, Resource)]
 pub struct Resolver {
     resolver: Arc<AsyncStdResolver>,
-    extractor: Arc<TldExtractor>,
-}
-
-/// A resolver error.
-#[derive(Debug, Error)]
-pub enum ResolverError {
-    /// An error occurred while resolving an address.
-    #[error(transparent)]
-    ResolveError(#[from] ResolveError),
-    /// An error occurred while extracting the TLD from an address.
-    #[error(transparent)]
-    TldError(#[from] tldextract::TldExtractError),
 }
 
 impl Resolver {
     /// Creates a new resolver from the given [`AsyncStdResolver`] and
     /// [`TldExtractor`].
     #[must_use]
-    pub fn new(resolver: AsyncStdResolver, extractor: TldExtractor) -> Self {
-        Self { resolver: Arc::new(resolver), extractor: Arc::new(extractor) }
-    }
+    pub fn new(resolver: AsyncStdResolver) -> Self { Self { resolver: Arc::new(resolver) } }
 
     /// Builds a new resolver from the given [`ResolverConfig`] and
     /// [`ResolverOpts`].
     #[allow(clippy::default_trait_access)]
     #[must_use]
     pub fn build(config: ResolverConfig, opts: ResolverOpts) -> Self {
-        Self::new(
-            AsyncStdResolver::new(config, opts, Default::default()),
-            TldOption::default().naive_mode(true).build(),
-        )
+        Self::new(AsyncStdResolver::new(config, opts, Default::default()))
     }
 
     /// Returns a reference to the underlying [`AsyncStdResolver`].
     #[must_use]
     #[inline]
     pub fn resolver(&self) -> &AsyncStdResolver { &self.resolver }
-
-    /// Returns a reference to the underlying [`TldExtractor`].
-    #[must_use]
-    #[inline]
-    pub fn extractor(&self) -> &TldExtractor { &self.extractor }
 
     /// Looks up the given address for an IP to connect to.
     ///
@@ -84,10 +57,7 @@ impl Resolver {
     pub async fn lookup_mc<'a>(
         &'a self,
         mut address: &'a str,
-    ) -> Result<Option<SocketAddr>, ResolverError> {
-        #[cfg(debug_assertions)]
-        bevy_log::debug!("Looking for a server for `{address}`");
-
+    ) -> Result<Option<SocketAddr>, ResolveError> {
         let mut port: u16 = 25565;
         if let Some((split_host, split_port)) = address.split_once(':') {
             // Parse the port
@@ -99,24 +69,8 @@ impl Resolver {
             address = split_host;
         }
 
-        // Extract the domain from the address
-        let extracted = self.extractor.extract_naive(address)?;
-        if let (None, Some(domain), Some(suffix)) =
-            (&extracted.subdomain, &extracted.domain, &extracted.suffix)
-        {
-            // Lookup a SRV record for the given address
-            let srv_address = format!("_minecraft._tcp.{domain}.{suffix}");
-            if let Some(ip) = self.lookup_srv(&srv_address).await? {
-                return Ok(Some(SocketAddr::new(ip, port)));
-            }
-        }
-
-        // Lookup an A/AAAA record for the given address
-        if let Some(ip) = self.lookup_ip(address).await? {
-            Ok(Some(SocketAddr::new(ip, port)))
-        } else {
-            Ok(None)
-        }
+        // Lookup a SRV record for the given address
+        self.lookup_srv(address, port).await
     }
 
     /// Looks up an SRV record for the given address.
@@ -126,25 +80,32 @@ impl Resolver {
     pub async fn lookup_srv<'a>(
         &'a self,
         address: &'a str,
-    ) -> Result<Option<IpAddr>, ResolveError> {
-        let result = self.resolver.srv_lookup(address).await?.ip_iter().next();
+        port: u16,
+    ) -> Result<Option<SocketAddr>, ResolveError> {
+        let srv_address = format!("_minecraft._tcp.{address}");
+        let Ok(result) = self.resolver.srv_lookup(srv_address).await else {
+            // No SRV record found, fallback to A/AAAA
+            return self.lookup_ip(address, port).await;
+        };
 
-        #[cfg(debug_assertions)]
-        bevy_log::debug!("Found SRV for `{}`: `{:?}`", address, result);
-
-        Ok(result)
+        match (result.iter().next(), result.ip_iter().next()) {
+            (Some(srv), Some(ip)) => Ok(Some(SocketAddr::new(ip, srv.port()))),
+            (None, Some(ip)) => Ok(Some(SocketAddr::new(ip, port))),
+            (Some(srv), None) => self.lookup_ip(&srv.target().to_string(), srv.port()).await,
+            (None, None) => self.lookup_ip(address, port).await,
+        }
     }
 
     /// Looks up an A/AAAA record for the given address.
     ///
     /// # Errors
     /// If an error occurs while resolving the address.
-    pub async fn lookup_ip<'a>(&'a self, address: &'a str) -> Result<Option<IpAddr>, ResolveError> {
-        let result = self.resolver.lookup_ip(address).await?.iter().next();
-
-        #[cfg(debug_assertions)]
-        bevy_log::debug!("Resolved `{}` to `{:?}`", address, result);
-
-        Ok(result)
+    pub async fn lookup_ip<'a>(
+        &'a self,
+        address: &'a str,
+        port: u16,
+    ) -> Result<Option<SocketAddr>, ResolveError> {
+        let ip_address = self.resolver.lookup_ip(address).await?.iter().next();
+        Ok(ip_address.map(|ip| SocketAddr::new(ip, port)))
     }
 }

@@ -12,7 +12,7 @@ pub enum ConnectionError {
     /// A resolver error occurred.
     #[error(transparent)]
     #[cfg(feature = "resolver")]
-    Resolver(#[from] crate::resolver::ResolverError),
+    Resolver(#[from] crate::resolver::AsyncStdResolveError),
     /// Connection was closed.
     #[error("Connection was closed")]
     ConnectionClosed,

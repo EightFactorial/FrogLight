@@ -51,3 +51,7 @@ presets = ["dep:bevy"]
 [[example]]
 name = "system-graph"
 path = "examples/system-graph/main.rs"
+
+[[example]]
+name = "status-request"
+path = "examples/status-request/main.rs"

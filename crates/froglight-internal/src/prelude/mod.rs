@@ -11,7 +11,7 @@ pub use froglight_network::{
     common::*,
     connection::{Clientbound, Connection, ConnectionError, Serverbound},
     packet::*,
-    resolver::{Resolver, ResolverError},
+    resolver::Resolver,
     states::{Configuration, Handshake, Login, Play, Status},
     traits::{State, Version},
 };

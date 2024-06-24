@@ -4,13 +4,15 @@ use bevy_app::{App, PostUpdate};
 use bevy_ecs::{
     component::Component,
     entity::Entity,
+    event::EventWriter,
     schedule::{common_conditions::any_with_component, IntoSystemConfigs},
-    system::{ParallelCommands, Query},
+    system::{Local, ParallelCommands, Query},
 };
 use bevy_tasks::Task;
 use froglight_protocol::{packet::ServerStatus, traits::Version};
+use parking_lot::Mutex;
 
-use super::NetworkPostUpdateSet;
+use super::{NetworkErrorEvent, NetworkPostUpdateSet, ServerStatusResponse};
 use crate::connection::ConnectionError;
 
 #[doc(hidden)]
@@ -74,13 +76,17 @@ impl ConnectionTask {
 
     /// A bevy [`System`](bevy_ecs::system::System) that
     /// polls all [`ConnectionTask`]s in parallel.
-    fn poll_connection_tasks(mut query: Query<(Entity, &mut Self)>, commands: ParallelCommands) {
+    pub(super) fn poll_connection_tasks(
+        mut query: Query<(Entity, &mut Self)>,
+        commands: ParallelCommands,
+
+        mut events: EventWriter<NetworkErrorEvent>,
+        buffer: Local<Mutex<Vec<NetworkErrorEvent>>>,
+    ) {
         query.par_iter_mut().for_each(|(entity, mut task)| match task.poll_once() {
             // The task errored, log and remove it.
-            Some(Err(err)) => {
-                #[cfg(debug_assertions)]
-                bevy_log::error!("Connection Error: {entity:?}: {err}");
-
+            Some(Err(error)) => {
+                buffer.lock().push(NetworkErrorEvent { entity, error });
                 commands.command_scope(|mut commands| {
                     commands.entity(entity).remove::<Self>();
                 });
@@ -89,7 +95,6 @@ impl ConnectionTask {
             Some(Ok(())) => {
                 #[cfg(debug_assertions)]
                 bevy_log::debug!("Connection Closed: {entity:?}");
-
                 commands.command_scope(|mut commands| {
                     commands.entity(entity).remove::<Self>();
                 });
@@ -97,6 +102,12 @@ impl ConnectionTask {
             // Do nothing, the task is still running.
             None => {}
         });
+
+        // Send all errors.
+        let mut error_buffer = buffer.lock();
+        if !error_buffer.is_empty() {
+            events.send_batch(std::mem::take(&mut *error_buffer));
+        }
     }
 }
 
@@ -145,22 +156,26 @@ impl StatusTask {
 
     /// A bevy [`System`](bevy_ecs::system::System) that
     /// polls all [`StatusTask`]s in parallel.
-    fn poll_status_tasks(mut query: Query<(Entity, &mut Self)>, commands: ParallelCommands) {
+    pub(super) fn poll_status_tasks(
+        mut query: Query<(Entity, &mut Self)>,
+        commands: ParallelCommands,
+
+        mut errors: EventWriter<NetworkErrorEvent>,
+        error_buffer: Local<Mutex<Vec<NetworkErrorEvent>>>,
+        mut responses: EventWriter<ServerStatusResponse>,
+        response_buffer: Local<Mutex<Vec<ServerStatusResponse>>>,
+    ) {
         query.par_iter_mut().for_each(|(entity, mut task)| match task.poll_once() {
             // The task errored, log and remove it.
-            Some(Err(err)) => {
-                #[cfg(debug_assertions)]
-                bevy_log::error!("Status Error: {entity:?}: {err}");
-
+            Some(Err(error)) => {
+                error_buffer.lock().push(NetworkErrorEvent { entity, error });
                 commands.command_scope(|mut commands| {
                     commands.entity(entity).remove::<Self>();
                 });
             }
             // The task is done, remove it.
-            Some(Ok((_status, _ping))) => {
-                #[cfg(debug_assertions)]
-                bevy_log::debug!("Status Received: {entity:?}");
-
+            Some(Ok((status, ping))) => {
+                response_buffer.lock().push(ServerStatusResponse { entity, status, ping });
                 commands.command_scope(|mut commands| {
                     commands.entity(entity).remove::<Self>();
                 });
@@ -168,5 +183,17 @@ impl StatusTask {
             // Do nothing, the task is still running.
             None => {}
         });
+
+        // Send all errors.
+        let mut error_buffer = error_buffer.lock();
+        if !error_buffer.is_empty() {
+            errors.send_batch(std::mem::take(&mut *error_buffer));
+        }
+
+        // Send all responses.
+        let mut response_buffer = response_buffer.lock();
+        if !response_buffer.is_empty() {
+            responses.send_batch(std::mem::take(&mut *response_buffer));
+        }
     }
 }

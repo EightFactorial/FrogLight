@@ -7,7 +7,7 @@ use froglight_protocol::{
 
 /// A trait defining the direction in which packets are sent and received.
 pub trait NetworkDirection<V: Version, S: State<V>>:
-    'static + Debug + Default + Copy + Eq + Send + Sync
+    'static + Debug + Default + Clone + Copy + Eq + Send + Sync
 {
     /// The packet type that is sent.
     type Send: PacketEnum + FrogWrite;

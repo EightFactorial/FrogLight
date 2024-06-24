@@ -14,11 +14,11 @@ froglight_macros::frog_state! {
     Status,
     V1_21_0,
     Clientbound {
-        0u32 => PingResultPacket,
-        1u32 => QueryResponsePacket,
+        0u32 => QueryResponsePacket,
+        1u32 => PingResultPacket,
     },
     Serverbound {
-        0u32 => QueryPingPacket,
-        1u32 => QueryRequestPacket,
+        0u32 => QueryRequestPacket,
+        1u32 => QueryPingPacket,
     },
 }
