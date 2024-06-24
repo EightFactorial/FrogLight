@@ -5,9 +5,13 @@ use bevy_ecs::{
     component::Component,
     entity::Entity,
     event::EventWriter,
+    query::With,
+    reflect::ReflectComponent,
     schedule::{common_conditions::any_with_component, IntoSystemConfigs},
     system::{Local, ParallelCommands, Query},
 };
+use bevy_hierarchy::DespawnRecursiveExt;
+use bevy_reflect::{std_traits::ReflectDefault, Reflect};
 use bevy_tasks::Task;
 use froglight_protocol::{packet::ServerStatus, traits::Version};
 use parking_lot::Mutex;
@@ -17,6 +21,8 @@ use crate::connection::ConnectionError;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    app.register_type::<PolledTask>();
+
     app.add_systems(
         PostUpdate,
         ConnectionTask::poll_connection_tasks
@@ -30,6 +36,15 @@ pub(super) fn build(app: &mut App) {
             .in_set(NetworkPostUpdateSet),
     );
 }
+
+/// A marker [`Component`] for [`Tasks`](Task) that will automatically be
+/// polled.
+///
+/// Add this to a [`ConnectionTask`] or [`StatusTask`] to have it polled,
+/// the result sent as an [`Event`](bevy_ecs::event::Event), and then despawned.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
+#[reflect(Default, Component)]
+pub struct PolledTask;
 
 /// A [`Task`] for a connection.
 #[derive(Debug, Component)]
@@ -77,7 +92,7 @@ impl ConnectionTask {
     /// A bevy [`System`](bevy_ecs::system::System) that
     /// polls all [`ConnectionTask`]s in parallel.
     pub(super) fn poll_connection_tasks(
-        mut query: Query<(Entity, &mut Self)>,
+        mut query: Query<(Entity, &mut Self), With<PolledTask>>,
         commands: ParallelCommands,
 
         mut events: EventWriter<NetworkErrorEvent>,
@@ -88,7 +103,7 @@ impl ConnectionTask {
             Some(Err(error)) => {
                 buffer.lock().push(NetworkErrorEvent { entity, error });
                 commands.command_scope(|mut commands| {
-                    commands.entity(entity).remove::<Self>();
+                    commands.entity(entity).despawn_recursive();
                 });
             }
             // The task is done, remove it.
@@ -96,7 +111,7 @@ impl ConnectionTask {
                 #[cfg(debug_assertions)]
                 bevy_log::debug!("Connection Closed: {entity:?}");
                 commands.command_scope(|mut commands| {
-                    commands.entity(entity).remove::<Self>();
+                    commands.entity(entity).despawn_recursive();
                 });
             }
             // Do nothing, the task is still running.
@@ -157,7 +172,7 @@ impl StatusTask {
     /// A bevy [`System`](bevy_ecs::system::System) that
     /// polls all [`StatusTask`]s in parallel.
     pub(super) fn poll_status_tasks(
-        mut query: Query<(Entity, &mut Self)>,
+        mut query: Query<(Entity, &mut Self), With<PolledTask>>,
         commands: ParallelCommands,
 
         mut errors: EventWriter<NetworkErrorEvent>,
@@ -170,14 +185,14 @@ impl StatusTask {
             Some(Err(error)) => {
                 error_buffer.lock().push(NetworkErrorEvent { entity, error });
                 commands.command_scope(|mut commands| {
-                    commands.entity(entity).remove::<Self>();
+                    commands.entity(entity).despawn_recursive();
                 });
             }
             // The task is done, remove it.
             Some(Ok((status, ping))) => {
                 response_buffer.lock().push(ServerStatusResponse { entity, status, ping });
                 commands.command_scope(|mut commands| {
-                    commands.entity(entity).remove::<Self>();
+                    commands.entity(entity).despawn_recursive();
                 });
             }
             // Do nothing, the task is still running.

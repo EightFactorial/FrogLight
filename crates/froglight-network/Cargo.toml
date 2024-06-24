@@ -34,6 +34,7 @@ uuid = { workspace = true, features = ["v3"] }
 bevy_app = { workspace = true, optional = true }
 bevy_derive = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
+bevy_hierarchy = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true, features = [
@@ -51,6 +52,7 @@ bevy = [
     "dep:bevy_app",
     "dep:bevy_derive",
     "dep:bevy_ecs",
+    "dep:bevy_hierarchy",
     "dep:bevy_log",
     "dep:bevy_reflect",
     "dep:bevy_tasks",

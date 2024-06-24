@@ -15,18 +15,18 @@ use super::Resolver;
 /// use froglight_network::resolver::ResolverPlugin;
 ///
 /// // By default the resolver prefers IPv4 over IPv6.
-/// let _cloudflare_prefer_ipv4 = ResolverPlugin::default();
-/// let _google_prefer_ipv4 = ResolverPlugin::default().google();
-/// let _quad9_prefer_ipv4 = ResolverPlugin::default().quad9();
+/// let cloudflare_prefer_ipv4 = ResolverPlugin::default();
+/// let google_prefer_ipv4 = ResolverPlugin::default().google();
+/// let quad9_prefer_ipv4 = ResolverPlugin::default().quad9();
 ///
 /// // Use the `prefer_ipv6` method to prefer IPv6.
-/// let _cloudflare_prefer_ipv6 = ResolverPlugin::default().prefer_ipv6();
+/// let cloudflare_prefer_ipv6 = ResolverPlugin::default().prefer_ipv6();
 ///
 /// // Use the `ipv4_only` method to only use IPv4.
-/// let _google_ipv4_only = ResolverPlugin::default().google().ipv4_only();
+/// let google_ipv4_only = ResolverPlugin::default().google().ipv4_only();
 ///
 /// // Use the `ipv6_only` method to only use IPv6.
-/// let _quad9_ipv6_only = ResolverPlugin::default().quad9().ipv6_only();
+/// let quad9_ipv6_only = ResolverPlugin::default().quad9().ipv6_only();
 /// ```
 #[derive(Debug)]
 pub struct ResolverPlugin {

@@ -16,7 +16,7 @@ mod systemset;
 pub use systemset::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 
 mod task;
-pub use task::{ConnectionTask, ConnectionTaskResult, StatusTask, StatusTaskResult};
+pub use task::{ConnectionTask, ConnectionTaskResult, PolledTask, StatusTask, StatusTaskResult};
 
 /// The `Network` Froglight plugin.
 ///

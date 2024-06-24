@@ -21,10 +21,9 @@ mod play;
 mod status;
 
 /// A trait for creating connections to servers.
-#[allow(private_bounds)]
 pub trait ConnectionTrait
 where
-    Self: Version + HandshakeState + StatusState,
+    Self: Version,
     Handshake: State<Self>,
     Status: State<Self>,
     Login: State<Self>,
@@ -42,22 +41,10 @@ where
     /// address.
     #[must_use]
     #[cfg(feature = "resolver")]
-    fn connect_to(
+    fn connect(
         address: &str,
         resolver: &crate::resolver::Resolver,
-    ) -> (ConnectionTask, ConnectionChannel<Self>) {
-        let (channel, task_channel) = ConnectionChannel::<Self>::new();
-
-        let address = address.to_compact_string();
-        let resolver = resolver.clone();
-
-        let task = IoTaskPool::get().spawn(async move {
-            let conn = Connection::<Self, Handshake>::connect_to(&address, &resolver).await?;
-            perform_server_connection(conn, task_channel).await
-        });
-
-        (ConnectionTask::new::<Self>(task), channel)
-    }
+    ) -> (ConnectionTask, ConnectionChannel<Self>);
 
     /// Request the status of a server.
     ///
@@ -65,50 +52,18 @@ where
     /// address.
     #[must_use]
     #[cfg(feature = "resolver")]
-    fn request_status_of(address: &str, resolver: &crate::resolver::Resolver) -> StatusTask {
-        let address = address.to_compact_string();
-        let resolver = resolver.clone();
-
-        let task = IoTaskPool::get().spawn(async move {
-            let conn = Connection::<Self, Handshake>::connect_to(&address, &resolver).await?;
-            perform_status_request(conn).await
-        });
-
-        StatusTask::new::<Self>(task)
-    }
+    fn status(address: &str, resolver: &crate::resolver::Resolver) -> StatusTask;
 
     /// Connect and login to a server.
     #[must_use]
-    fn connect(
-        address: SocketAddr,
-        url: Option<&str>,
-    ) -> (ConnectionTask, ConnectionChannel<Self>) {
-        let (channel, task_channel) = ConnectionChannel::<Self>::new();
-
-        let url = url.map(|url| url.to_compact_string());
-
-        let task = IoTaskPool::get().spawn(async move {
-            let mut conn = Connection::<Self, Handshake>::connect(address).await?;
-            conn.info.address = url;
-            perform_server_connection(conn, task_channel).await
-        });
-
-        (ConnectionTask::new::<Self>(task), channel)
-    }
+    fn connect_to(
+        socket: SocketAddr,
+        address: Option<&str>,
+    ) -> (ConnectionTask, ConnectionChannel<Self>);
 
     /// Request the status of a server.
     #[must_use]
-    fn request_status(address: SocketAddr, url: Option<&str>) -> StatusTask {
-        let url = url.map(|url| url.to_compact_string());
-
-        let task = IoTaskPool::get().spawn(async move {
-            let mut conn = Connection::<Self, Handshake>::connect(address).await?;
-            conn.info.address = url;
-            perform_status_request(conn).await
-        });
-
-        StatusTask::new::<Self>(task)
-    }
+    fn status_of(socket: SocketAddr, address: Option<&str>) -> StatusTask;
 }
 
 impl<V> ConnectionTrait for V
@@ -125,6 +80,65 @@ where
         + NetworkDirection<V, Configuration>
         + NetworkDirection<V, Play>,
 {
+    #[cfg(feature = "resolver")]
+    fn connect(
+        address: &str,
+        resolver: &crate::resolver::Resolver,
+    ) -> (ConnectionTask, ConnectionChannel<Self>) {
+        let (channel, task_channel) = ConnectionChannel::<Self>::new();
+
+        let address = address.to_compact_string();
+        let resolver = resolver.clone();
+
+        let task = IoTaskPool::get().spawn(async move {
+            let conn = Connection::<Self, Handshake>::connect_to(&address, &resolver).await?;
+            perform_server_connection(conn, task_channel).await
+        });
+
+        (ConnectionTask::new::<Self>(task), channel)
+    }
+
+    #[cfg(feature = "resolver")]
+    fn status(address: &str, resolver: &crate::resolver::Resolver) -> StatusTask {
+        let address = address.to_compact_string();
+        let resolver = resolver.clone();
+
+        let task = IoTaskPool::get().spawn(async move {
+            let conn = Connection::<Self, Handshake>::connect_to(&address, &resolver).await?;
+            perform_status_request(conn).await
+        });
+
+        StatusTask::new::<Self>(task)
+    }
+
+    fn connect_to(
+        socket: SocketAddr,
+        address: Option<&str>,
+    ) -> (ConnectionTask, ConnectionChannel<Self>) {
+        let (channel, task_channel) = ConnectionChannel::<Self>::new();
+
+        let address = address.map(|addr| addr.to_compact_string());
+
+        let task = IoTaskPool::get().spawn(async move {
+            let mut conn = Connection::<Self, Handshake>::connect(socket).await?;
+            conn.info.address = address;
+            perform_server_connection(conn, task_channel).await
+        });
+
+        (ConnectionTask::new::<Self>(task), channel)
+    }
+
+    fn status_of(socket: SocketAddr, address: Option<&str>) -> StatusTask {
+        let address = address.map(|addr| addr.to_compact_string());
+
+        let task = IoTaskPool::get().spawn(async move {
+            let mut conn = Connection::<Self, Handshake>::connect(socket).await?;
+            conn.info.address = address;
+            perform_status_request(conn).await
+        });
+
+        StatusTask::new::<Self>(task)
+    }
 }
 
 async fn perform_status_request<V>(

@@ -6,9 +6,7 @@
 mod generated;
 // pub use generated::*;
 
-mod v1_20_0;
-mod v1_20_2;
-mod v1_20_3;
+mod v1_21_0;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut bevy_app::App) { generated::build(app); }

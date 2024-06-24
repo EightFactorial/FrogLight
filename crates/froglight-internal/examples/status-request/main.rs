@@ -3,7 +3,7 @@
 use bevy::{app::AppExit, prelude::*};
 use froglight_internal::{prelude::*, HeadlessPlugins};
 use froglight_network::{
-    network::{ConnectionTrait, NetworkErrorEvent, ServerStatusResponse},
+    network::{ConnectionTrait, NetworkErrorEvent, PolledTask, ServerStatusResponse},
     versions::v1_21_0::V1_21_0,
 };
 
@@ -24,10 +24,12 @@ fn main() {
     app.run();
 }
 
-/// Send a status request to "localhost"
+const SERVER_ADDRESS: &str = "localhost";
+
+/// Send a status request to [`SERVER_ADDRESS`].
 fn send_status_request(mut commands: Commands, resolver: Res<Resolver>) {
-    let task = V1_21_0::request_status_of("localhost", &resolver);
-    commands.spawn(task);
+    let task = V1_21_0::status(SERVER_ADDRESS, &resolver);
+    commands.spawn((task, PolledTask));
 }
 
 /// Print the status response and exit.
