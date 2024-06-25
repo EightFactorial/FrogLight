@@ -3,9 +3,8 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use crate::{
-    connection::{Connection, ConnectionError, NetworkDirection, Serverbound},
-    network::channel::ConnectionTaskChannel,
+use crate::connection::{
+    Connection, ConnectionError, NetworkDirection, Serverbound, WriteConnection,
 };
 
 mod v1_21_0;
@@ -22,9 +21,15 @@ where
 {
     fn perform_login(
         conn: Connection<Self, Login, Serverbound>,
-        task_channel: &ConnectionTaskChannel<Self, Serverbound>,
-    ) -> impl std::future::Future<
-        Output = Result<Connection<Self, Login, Serverbound>, ConnectionError>,
-    > + Send
-           + Sync;
+    ) -> impl std::future::Future<Output = Result<Connection<Self, Login>, ConnectionError>> + Send + Sync;
+
+    /// Returns `true` if the login was successful,
+    /// or `false` if the login is still in progress.
+    fn end_login(
+        packet: &<Serverbound as NetworkDirection<Self, Login>>::Recv,
+        conn: &WriteConnection<Self, Login, Serverbound>,
+    ) -> impl std::future::Future<Output = Result<bool, ConnectionError>> + Send + Sync;
+
+    /// Returns `true` when the end of the login has been acknowledged.
+    fn login_acknowledged(packet: &<Serverbound as NetworkDirection<Self, Login>>::Send) -> bool;
 }

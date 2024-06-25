@@ -1,4 +1,3 @@
-use compact_str::CompactString;
 use froglight_protocol::protocol::{ReadError, WriteError};
 use thiserror::Error;
 
@@ -8,7 +7,7 @@ pub enum ConnectionError {
     /// No DNS records
     #[error("No DNS records found for `{0}`")]
     #[cfg(feature = "resolver")]
-    NoRecords(CompactString),
+    NoRecords(String),
     /// A resolver error occurred.
     #[error(transparent)]
     #[cfg(feature = "resolver")]
@@ -16,6 +15,9 @@ pub enum ConnectionError {
     /// Connection was closed.
     #[error("Connection was closed")]
     ConnectionClosed,
+    /// Server sent an error.
+    #[error("Server sent an error: `{0}`")]
+    ServerError(String),
     /// An IO error occurred.
     #[error(transparent)]
     Io(#[from] std::io::Error),

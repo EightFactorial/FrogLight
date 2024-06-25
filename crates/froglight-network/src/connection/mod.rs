@@ -66,18 +66,22 @@ where
         address: &str,
         resolver: &crate::resolver::Resolver,
     ) -> Result<Self, ConnectionError> {
-        use compact_str::ToCompactString;
-
-        let address = address.to_compact_string();
+        #[cfg(debug_assertions)]
         bevy_log::debug!("Resolving address: `{address}`");
 
+        let address = address.to_string();
+
         if let Some(socket) = resolver.lookup_mc(&address).await? {
+            #[cfg(debug_assertions)]
             bevy_log::debug!("Connecting to `{address}`: {socket}");
+
             let mut connection = Self::connect(socket).await?;
-            connection.info.address = Some(address);
+            connection.info.address = Some(address.into());
             Ok(connection)
         } else {
+            #[cfg(debug_assertions)]
             bevy_log::debug!("No records found for `{address}`");
+
             Err(ConnectionError::NoRecords(address))
         }
     }

@@ -1,10 +1,10 @@
 use froglight_macros::FrogReadWrite;
-use serde_json::Value;
+
+use crate::common::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerMetadataPacket {
-    // TODO: Text
-    pub description: Value,
-    pub favicon: Option<Vec<u8>>,
+    // TODO: Implement ServerMetadata
+    pub metadata: UnsizedBuffer,
 }

@@ -43,6 +43,7 @@ bevy_tasks = { workspace = true, optional = true, features = [
 
 # Optional dependencies
 async-std-resolver = { version = "0.24.1", optional = true }
+serde_json = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "resolver"]
@@ -56,6 +57,7 @@ bevy = [
     "dep:bevy_log",
     "dep:bevy_reflect",
     "dep:bevy_tasks",
+    "dep:serde_json",
     "froglight-protocol/bevy",
 ]
 

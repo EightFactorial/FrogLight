@@ -3,10 +3,7 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 
-use crate::{
-    connection::{Connection, ConnectionError, NetworkDirection, Serverbound},
-    network::channel::ConnectionTaskChannel,
-};
+use crate::connection::{ConnectionError, NetworkDirection, Serverbound, WriteConnection};
 
 mod v1_21_0;
 
@@ -20,11 +17,15 @@ where
         + NetworkDirection<Self, Configuration>
         + NetworkDirection<Self, Play>,
 {
-    fn perform_configuration(
-        conn: Connection<Self, Configuration, Serverbound>,
-        task_channel: &ConnectionTaskChannel<Self, Serverbound>,
-    ) -> impl std::future::Future<
-        Output = Result<Connection<Self, Configuration, Serverbound>, ConnectionError>,
-    > + Send
-           + Sync;
+    /// Returns `true` if the configuration was successful,
+    /// or `false` if the configuration is still in progress.
+    fn end_configuration<'a, 'b>(
+        packet: &'a <Serverbound as NetworkDirection<Self, Configuration>>::Recv,
+        conn: &'b WriteConnection<Self, Configuration, Serverbound>,
+    ) -> impl std::future::Future<Output = Result<bool, ConnectionError>> + Send + Sync;
+
+    /// Returns `true` when the end of the configuration has been acknowledged.
+    fn config_acknowledged(
+        packet: &<Serverbound as NetworkDirection<Self, Configuration>>::Send,
+    ) -> bool;
 }

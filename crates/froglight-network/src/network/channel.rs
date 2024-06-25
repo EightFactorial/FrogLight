@@ -87,6 +87,22 @@ pub(super) struct PacketTaskChannel<V: Version, S: State<V>, D: NetworkDirection
     pub(super) recv: Receiver<Arc<D::Send>>,
 }
 
+impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketTaskChannel<V, S, D> {
+    /// Send a packet through the channel.
+    ///
+    /// # Errors
+    /// This will return an error if the channel is full or closed.
+    pub(super) fn send(&self, packet: impl Into<D::Recv>) -> async_channel::Send<'_, Arc<D::Recv>> {
+        self.send.send(Arc::new(packet.into()))
+    }
+
+    /// Receive a packet from the channel.
+    ///
+    /// # Errors
+    /// This will return an error if the channel is empty or closed.
+    pub(super) fn recv(&self) -> async_channel::Recv<'_, Arc<D::Send>> { self.recv.recv() }
+}
+
 impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketChannel<V, S, D> {
     /// Create a new set of channels.
     ///
