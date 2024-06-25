@@ -4,16 +4,16 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum ReadError {
     /// An error occurred while reading data.
-    #[error(transparent)]
+    #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
     /// An error occurred while deserializing JSON.
-    #[error(transparent)]
+    #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
     /// An error occurred while reading a string.
-    #[error(transparent)]
+    #[error("UTF-8 error: {0}")]
     Utf8Error(#[from] std::str::Utf8Error),
     /// An error occurred while reading nbt data.
-    #[error(transparent)]
+    #[error("NBT error: {0}")]
     NbtError(#[from] simdnbt::Error),
     /// The buffer ended before the expected data was read.
     #[error("Reached end of buffer, expected {0} bytes, got {1}")]

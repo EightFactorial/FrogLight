@@ -8,6 +8,7 @@ pub use handshake::*;
 froglight_macros::frog_state! {
     Handshake,
     V1_21_0,
+    Clientbound {},
     Serverbound {
         0u32 => HandshakePacket,
     },

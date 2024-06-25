@@ -49,7 +49,7 @@ where
         D: NetworkDirection<V, Status>,
     {
         #[cfg(debug_assertions)]
-        bevy_log::debug!("Setting `Handshaking` Connection to `Status`");
+        bevy_log::debug!("Setting `Handshake` Connection to `Status`");
         self.set_state()
     }
 
@@ -62,7 +62,7 @@ where
         D: NetworkDirection<V, Login>,
     {
         #[cfg(debug_assertions)]
-        bevy_log::debug!("Setting `Handshaking` Connection to `Login`");
+        bevy_log::debug!("Setting `Handshake` Connection to `Login`");
         self.set_state()
     }
 }

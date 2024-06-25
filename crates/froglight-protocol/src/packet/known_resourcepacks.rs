@@ -1,23 +1,14 @@
+use compact_str::CompactString;
 use froglight_macros::FrogReadWrite;
 
-/// A list of known resource packs.
-///
-/// Used to inform the client/server of the resource packs that are available.
+/// Information about a known resource pack.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-pub struct KnownResourcePacks {
-    /// The list of resource packs.
-    pub resourcepacks: Vec<ResourcePackInfo>,
-}
-
-/// Information about a resource pack.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-pub struct ResourcePackInfo {
+pub struct KnownResourcePack {
     /// The namespace of the resource pack.
-    pub namespace: String,
+    pub namespace: CompactString,
     /// The ID of the resource pack.
-    pub id: String,
+    pub id: CompactString,
     /// The version of the resource pack.
-    pub version: String,
+    pub version: CompactString,
 }

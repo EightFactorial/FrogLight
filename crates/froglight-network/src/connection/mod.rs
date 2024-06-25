@@ -26,8 +26,8 @@ pub use halves::{ReadConnection, WriteConnection};
 mod information;
 pub use information::ConnectionInformation;
 
-// #[cfg(test)]
-// mod compile_test;
+#[cfg(test)]
+mod compile_test;
 
 /// A connection to a remote host.
 #[derive(Debug)]
@@ -41,9 +41,9 @@ where
     pub(crate) bundle: VecDeque<D::Recv>,
     pub(crate) compression: Option<i32>,
     /// Information about the connection.
-    pub info: ConnectionInformation,
+    info: ConnectionInformation,
     /// Information about the account.
-    pub account: AccountInformation,
+    account: AccountInformation,
     _version: PhantomData<V>,
     _state: PhantomData<S>,
     _direction: PhantomData<D>,
@@ -98,23 +98,35 @@ where
     S: State<V>,
     D: NetworkDirection<V, S>,
 {
-    /// Get the account information for the connection.
+    /// Get a reference to the [`AccountInformation`].
     #[inline]
     #[must_use]
     pub fn account(&self) -> &AccountInformation { &self.account }
 
-    /// Set the account information for the connection.
+    /// Get a mutable reference to the [`AccountInformation`].
     #[inline]
-    pub fn set_account(&mut self, account: AccountInformation) { self.account = account; }
+    #[must_use]
+    pub fn account_mut(&mut self) -> &mut AccountInformation { &mut self.account }
 
-    /// Get the compression threshold for the connection.
+    /// Get a reference to the compression level.
     #[inline]
     #[must_use]
     pub fn compression(&self) -> Option<i32> { self.compression }
 
-    /// Set the compression threshold for the connection.
+    /// Get a mutable reference to the compression level.
     #[inline]
-    pub fn set_compression(&mut self, threshold: Option<i32>) { self.compression = threshold; }
+    #[must_use]
+    pub fn compression_mut(&mut self) -> &mut Option<i32> { &mut self.compression }
+
+    /// Get a reference to the [`ConnectionInformation`].
+    #[inline]
+    #[must_use]
+    pub fn info(&self) -> &ConnectionInformation { &self.info }
+
+    /// Get a mutable reference to the [`ConnectionInformation`].
+    #[inline]
+    #[must_use]
+    pub fn info_mut(&mut self) -> &mut ConnectionInformation { &mut self.info }
 
     /// Split the connection into a read and write half.
     #[must_use]
@@ -154,6 +166,8 @@ where
         Self::from_async_stream(TcpStream::from(stream))
     }
 
+    pub(super) const BUFREADER_CAPACITY: usize = 65536;
+
     /// Create a new connection from an async [`TcpStream`].
     ///
     /// # Errors
@@ -167,7 +181,7 @@ where
         Ok(Self {
             info: ConnectionInformation { address: None, socket: stream.peer_addr()? },
             account: AccountInformation::default(),
-            stream: BufReader::with_capacity(65536, stream),
+            stream: BufReader::with_capacity(Self::BUFREADER_CAPACITY, stream),
             bundle: VecDeque::new(),
             compression: None,
             _version: PhantomData,

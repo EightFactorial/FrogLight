@@ -22,7 +22,7 @@ mod debug_sample;
 pub use debug_sample::DebugSampleType;
 
 mod dynamic_registries;
-pub use dynamic_registries::{RegistryData, RegistryList};
+pub use dynamic_registries::RegistryData;
 
 mod entity_animation;
 pub use entity_animation::EntityAnimation;
@@ -37,7 +37,7 @@ mod item_slot;
 pub use item_slot::{ItemSlot, ItemSlotAction, LegacyItemSlot};
 
 mod known_resourcepacks;
-pub use known_resourcepacks::KnownResourcePacks;
+pub use known_resourcepacks::KnownResourcePack;
 
 mod look_anchor;
 pub use look_anchor::{LookAnchor, LookEntity};

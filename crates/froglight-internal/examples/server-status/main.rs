@@ -1,4 +1,4 @@
-//! Send a status request to "localhost" and prints the response.
+//! Send a status request to [`SERVER_ADDRESS`] and prints the response.
 
 use bevy::{app::AppExit, prelude::*};
 use froglight_internal::{prelude::*, HeadlessPlugins};
@@ -28,8 +28,10 @@ const SERVER_ADDRESS: &str = "localhost";
 
 /// Send a status request to [`SERVER_ADDRESS`].
 fn send_status_request(mut commands: Commands, resolver: Res<Resolver>) {
+    info!("Connecting to \"{SERVER_ADDRESS}\"...");
     let task = V1_21_0::status(SERVER_ADDRESS, &resolver);
     commands.spawn((task, PolledTask));
+    info!("Waiting for status response...");
 }
 
 /// Print the status response and exit.
@@ -38,12 +40,9 @@ fn print_status_response(
     mut exit: EventWriter<AppExit>,
 ) {
     if let Some(event) = events.read().next() {
-        println!("Entity {:?}", event.entity);
-        println!("Ping: {:?}", event.ping);
-        println!("Status: {:#?}", event.status);
-
-        println!();
-        println!("Exiting...");
+        info!("Ping: {:?}", event.ping);
+        info!("Status:\n{}", serde_json::to_string_pretty(&event.status).unwrap());
+        info!("Exiting...");
         exit.send(AppExit);
     }
 }
@@ -52,8 +51,9 @@ fn print_status_response(
 ///
 /// The error will already be logged, so we just need to exit.
 fn exit_on_error(mut events: EventReader<NetworkErrorEvent>, mut exit: EventWriter<AppExit>) {
-    if events.read().next().is_some() {
-        error!("Exiting due to error...");
+    if let Some(error) = events.read().next() {
+        error!("Error: {}", error.error);
+        error!("Exiting...");
         exit.send(AppExit);
     }
 }

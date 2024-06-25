@@ -9,9 +9,6 @@ pub use super::play::{
 mod login_compression;
 pub use login_compression::*;
 
-mod login_query_request;
-pub use login_query_request::*;
-
 mod enter_configuration;
 pub use enter_configuration::*;
 
@@ -26,6 +23,9 @@ pub use login_hello_s2c::*;
 
 mod login_key;
 pub use login_key::*;
+
+mod login_query_request;
+pub use login_query_request::*;
 
 mod login_query_response;
 pub use login_query_response::*;

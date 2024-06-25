@@ -12,7 +12,7 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 /// the packet.
 ///
 /// For this reason, it *must* be the last field in the packet.
-#[derive(Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct UnsizedBuffer(
     #[cfg(feature = "smallvec")] smallvec::SmallVec<[u8; Self::BUFFER_SIZE]>,
@@ -154,11 +154,5 @@ impl FrogRead for UnsizedBuffer {
         buf.read_to_end(&mut buffer)?;
 
         Ok(UnsizedBuffer::from_vec(buffer))
-    }
-}
-
-impl std::fmt::Debug for UnsizedBuffer {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "UnsizedBuffer({})", self.0.len())
     }
 }

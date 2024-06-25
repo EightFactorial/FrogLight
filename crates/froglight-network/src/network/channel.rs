@@ -1,6 +1,6 @@
-#![allow(dead_code)]
+use std::sync::Arc;
 
-use async_channel::{Receiver, Sender};
+use async_channel::{Receiver, Sender, TryRecvError, TrySendError};
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 use bevy_reflect::Reflect;
 use froglight_protocol::{
@@ -29,6 +29,7 @@ where
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(super) struct ConnectionTaskChannel<V: Version, D>
 where
     Login: State<V>,
@@ -72,18 +73,18 @@ where
 #[derive(Debug)]
 pub struct PacketChannel<V: Version, S: State<V>, D: NetworkDirection<V, S>> {
     /// A [`Sender`] for sending packets of type [`D::Send`].
-    pub send: Sender<D::Send>,
+    pub send: Sender<Arc<D::Send>>,
     /// A [`Receiver`] for receiving packets of type [`D::Recv`].
-    pub recv: Receiver<D::Recv>,
+    pub recv: Receiver<Arc<D::Recv>>,
 }
 
 /// A pair of channels for sending and receiving packets.
 #[derive(Debug)]
 pub(super) struct PacketTaskChannel<V: Version, S: State<V>, D: NetworkDirection<V, S>> {
     /// A [`Sender`] for sending packets of type [`D::Recv`].
-    pub(super) send: Sender<D::Recv>,
+    pub(super) send: Sender<Arc<D::Recv>>,
     /// A [`Receiver`] for receiving packets of type [`D::Send`].
-    pub(super) recv: Receiver<D::Send>,
+    pub(super) recv: Receiver<Arc<D::Send>>,
 }
 
 impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketChannel<V, S, D> {
@@ -103,4 +104,18 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketChannel<V, S, D> 
             PacketTaskChannel { send: task_send, recv: ecs_recv },
         )
     }
+
+    /// Send a packet through the channel.
+    ///
+    /// # Errors
+    /// This will return an error if the channel is full or closed.
+    pub fn send(&self, packet: impl Into<D::Send>) -> Result<(), TrySendError<Arc<D::Send>>> {
+        self.send.try_send(Arc::new(packet.into()))
+    }
+
+    /// Receive a packet from the channel.
+    ///
+    /// # Errors
+    /// This will return an error if the channel is empty or closed.
+    pub fn recv(&self) -> Result<Arc<D::Recv>, TryRecvError> { self.recv.try_recv() }
 }

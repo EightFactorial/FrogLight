@@ -15,8 +15,8 @@ impl HandshakeState for V1_21_0 {
     ) -> Result<Connection<Self, Handshake>, ConnectionError> {
         conn.send(HandshakePacket {
             protocol: Self::ID,
-            address: conn.info.get_address(),
-            port: conn.info.get_port(),
+            address: conn.info().get_address(),
+            port: conn.info().get_port(),
             intent,
         })
         .await

@@ -2,6 +2,7 @@ use std::{net::SocketAddr, time::Duration};
 
 use bevy_tasks::IoTaskPool;
 use compact_str::ToCompactString;
+use configuration::ConfigurationState;
 use froglight_protocol::{
     common::ConnectionIntent,
     packet::ServerStatus,
@@ -9,6 +10,8 @@ use froglight_protocol::{
     traits::{State, Version},
 };
 use handshake::HandshakeState;
+use login::LoginState;
+use play::PlayState;
 use status::StatusState;
 
 use super::{channel::ConnectionTaskChannel, ConnectionChannel, ConnectionTask, StatusTask};
@@ -38,7 +41,7 @@ where
     /// Connect and login to a server.
     ///
     /// Requires a [`Resolver`](crate::resolver::Resolver) to resolve the
-    /// address.
+    /// provided address.
     #[must_use]
     #[cfg(feature = "resolver")]
     fn connect(
@@ -49,12 +52,15 @@ where
     /// Request the status of a server.
     ///
     /// Requires a [`Resolver`](crate::resolver::Resolver) to resolve the
-    /// address.
+    /// provided address.
     #[must_use]
     #[cfg(feature = "resolver")]
     fn status(address: &str, resolver: &crate::resolver::Resolver) -> StatusTask;
 
     /// Connect and login to a server.
+    ///
+    /// If no address is provided, the connection will use the provided socket
+    /// as the address.
     #[must_use]
     fn connect_to(
         socket: SocketAddr,
@@ -62,13 +68,16 @@ where
     ) -> (ConnectionTask, ConnectionChannel<Self>);
 
     /// Request the status of a server.
+    ///
+    /// If no address is provided, the connection will use the provided socket
+    /// as the address.
     #[must_use]
     fn status_of(socket: SocketAddr, address: Option<&str>) -> StatusTask;
 }
 
 impl<V> ConnectionTrait for V
 where
-    V: Version + HandshakeState + StatusState,
+    V: Version + HandshakeState + StatusState + LoginState + ConfigurationState + PlayState,
     Handshake: State<V>,
     Status: State<V>,
     Login: State<V>,
@@ -121,7 +130,7 @@ where
 
         let task = IoTaskPool::get().spawn(async move {
             let mut conn = Connection::<Self, Handshake>::connect(socket).await?;
-            conn.info.address = address;
+            conn.info_mut().address = address;
             perform_server_connection(conn, task_channel).await
         });
 
@@ -133,7 +142,7 @@ where
 
         let task = IoTaskPool::get().spawn(async move {
             let mut conn = Connection::<Self, Handshake>::connect(socket).await?;
-            conn.info.address = address;
+            conn.info_mut().address = address;
             perform_status_request(conn).await
         });
 
@@ -141,6 +150,7 @@ where
     }
 }
 
+/// Use a [`Connection`] to perform a status request.
 async fn perform_status_request<V>(
     mut conn: Connection<V, Handshake>,
 ) -> Result<(ServerStatus, Duration), ConnectionError>
@@ -154,12 +164,15 @@ where
     V::perform_status_request(conn.status()).await
 }
 
+/// Use a [`Connection`] to connect to a server.
+///
+/// Relay packets between the channel and the connection.
 async fn perform_server_connection<V>(
-    conn: Connection<V, Handshake>,
-    _task_channel: ConnectionTaskChannel<V, Serverbound>,
+    mut conn: Connection<V, Handshake>,
+    task_channel: ConnectionTaskChannel<V, Serverbound>,
 ) -> Result<(), ConnectionError>
 where
-    V: Version + HandshakeState,
+    V: Version + HandshakeState + LoginState + ConfigurationState + PlayState,
     Handshake: State<V>,
     Login: State<V>,
     Configuration: State<V>,
@@ -169,6 +182,8 @@ where
         + NetworkDirection<V, Configuration>
         + NetworkDirection<V, Play>,
 {
-    let _conn = V::perform_handshake(conn, ConnectionIntent::Login).await?;
-    todo!();
+    conn = V::perform_handshake(conn, ConnectionIntent::Login).await?;
+    let conn = V::perform_login(conn.login(), &task_channel).await?;
+    let conn = V::perform_configuration(conn.configuration(), &task_channel).await?;
+    V::perform_play(conn.play(), &task_channel).await
 }

@@ -1,4 +1,7 @@
-use std::{collections::VecDeque, io::Cursor};
+use std::{
+    collections::VecDeque,
+    io::{Cursor, Read},
+};
 
 use async_compression::futures::{bufread::ZlibDecoder, write::ZlibEncoder};
 use async_std::{
@@ -124,13 +127,18 @@ where
 
     if let Some(threshold) = compression {
         if i32::try_from(buffer.len()).expect("Packet length overflow") >= *threshold {
-            // Compress the buffer, prefixing it with `0` to indicate that it is compressed
-            let mut compressor = ZlibEncoder::new(vec![0u8]);
+            // Compress the buffer, prefixing it with the uncompressed length
+            let mut compressor = ZlibEncoder::new(buffer.len().fg_var_to_bytes());
             compressor.write_all(&buffer).await?;
+
             buffer = compressor.into_inner();
         } else {
-            // Prefix the buffer with its uncompressed length
-            prefix_length(&mut buffer)?;
+            // Prefix the buffer with `0` to indicate that it is not compressed
+            let mut prefixed_buffer = Vec::with_capacity(buffer.len() + 1);
+            0u32.fg_var_write(&mut prefixed_buffer)?;
+            prefixed_buffer.append(&mut buffer);
+
+            buffer = prefixed_buffer;
         }
     }
 
@@ -182,6 +190,13 @@ where
     let packet_length = usize::fg_var_read(&mut cursor)?;
     let packet_length_bytes = usize::try_from(cursor.position()).expect("Packet length overflow");
 
+    // Read the packet from the buffer
+    let mut packet_buffer = vec![0u8; packet_length];
+    cursor.read_exact(&mut packet_buffer)?;
+    buffer.consume(packet_length_bytes + packet_length);
+
+    let mut cursor = Cursor::new(packet_buffer.as_slice());
+
     // If the packet is compressed, decompress it
     if compression.is_some_and(|c| c >= 0) && 0 != u32::fg_var_read(&mut cursor)? {
         let current_position = usize::try_from(cursor.position()).expect("Packet length overflow");
@@ -208,9 +223,6 @@ where
             }
         }
 
-        // Consume the packet bytes from the original buffer
-        buffer.consume(packet_length_bytes + packet_length);
-
         // Return the packet
         packet.map_err(ConnectionError::from)
     } else {
@@ -223,9 +235,6 @@ where
                 error!("Error reading bundled packets: {err}");
             }
         }
-
-        // Consume the packet bytes from the buffer
-        buffer.consume(packet_length_bytes + packet_length);
 
         // Return the packet
         packet.map_err(ConnectionError::from)

@@ -17,6 +17,7 @@ workspace = true
 
 [dev-dependencies]
 bevy_mod_debugdump = "0.10.0"
+serde_json = { workspace = true }
 
 [dependencies]
 bevy = { workspace = true, default-features = false, optional = true, features = [
@@ -53,5 +54,9 @@ name = "system-graph"
 path = "examples/system-graph/main.rs"
 
 [[example]]
-name = "status-request"
-path = "examples/status-request/main.rs"
+name = "server-login"
+path = "examples/server-login/main.rs"
+
+[[example]]
+name = "server-status"
+path = "examples/server-status/main.rs"
