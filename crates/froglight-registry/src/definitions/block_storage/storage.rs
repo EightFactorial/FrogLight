@@ -1,6 +1,9 @@
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::HashMap;
 use std::{any::TypeId, ops::Range};
 
 use froglight_protocol::traits::Version;
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 use rangemap::RangeMap;
 

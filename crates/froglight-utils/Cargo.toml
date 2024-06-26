@@ -57,6 +57,6 @@ froglight-world = ["dep:froglight-world", "dep:froglight-protocol"]
 # Use `hashbrown` for better performance
 hashbrown = [
     "dep:hashbrown",
-    "froglight-components/hashbrown",
-    "froglight-protocol/hashbrown",
+    "froglight-components?/hashbrown",
+    "froglight-protocol?/hashbrown",
 ]

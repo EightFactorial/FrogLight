@@ -20,29 +20,22 @@ use traits::ScheduleTrait;
 pub(super) fn build(app: &mut App) {
     // Create and add the main schedule to the app
     // TODO: Benchmark `SingleThreaded` vs `MultiThreaded`
-    {
-        let mut schedule = Schedule::new(RunFixedUtilLoop);
-        schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-        app.add_schedule(schedule);
-    }
+    let mut schedule = Schedule::new(RunFixedUtilLoop);
+    schedule.set_executor_kind(ExecutorKind::SingleThreaded);
+    app.add_schedule(schedule);
 
     // Insert the main schedule into the schedule order
-    {
-        let mut order = app.world.resource_mut::<MainScheduleOrder>();
-        order.insert_after(RunFixedMainLoop, RunFixedUtilLoop);
-    }
+    let mut order = app.world.resource_mut::<MainScheduleOrder>();
+    order.insert_after(RunFixedMainLoop, RunFixedUtilLoop);
 
     // Add all of the other schedules
-    {
-        OneTick::build(app);
-        TwoTicks::build(app);
-        TenTicks::build(app);
+    OneTick::build(app);
+    TwoTicks::build(app);
+    TenTicks::build(app);
+    OneSecond::build(app);
+    FiveSeconds::build(app);
 
-        OneSecond::build(app);
-        FiveSeconds::build(app);
-    }
-
-    // Add systems to get the current tick
+    // Add CurrentTick
     current_tick::build(app);
 }
 

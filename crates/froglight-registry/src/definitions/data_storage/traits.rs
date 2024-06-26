@@ -1,7 +1,11 @@
 //! Traits for converting between registry values, protocol ids,
 //! and resource keys.
 
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::HashMap;
+
 use froglight_protocol::{common::ResourceKey, traits::Version};
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 
 /// A trait for initializing a registry with default values.

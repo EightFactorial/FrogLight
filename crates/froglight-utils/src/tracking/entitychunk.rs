@@ -1,3 +1,6 @@
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::{HashMap, HashSet};
+
 use bevy_app::{App, PreUpdate};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{
@@ -7,9 +10,10 @@ use bevy_ecs::{
     system::{Query, ResMut, Resource},
 };
 use froglight_protocol::common::{ChunkPosition, EntityId};
-use hashbrown::{hash_set::Entry, HashMap, HashSet};
+#[cfg(feature = "hashbrown")]
+use hashbrown::{HashMap, HashSet};
 
-use crate::systemsets::UtilityPreUpdateSet;
+use crate::systemset::UtilityPreUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -49,8 +53,7 @@ impl EntityChunkMap {
             let entity_list = map.entry(*position).or_default();
 
             // If the chunk has not been reset this frame, clear the list
-            if let Entry::Vacant(entry) = updates.entry(*position) {
-                entry.insert();
+            if updates.insert(*position) {
                 entity_list.clear();
             }
 

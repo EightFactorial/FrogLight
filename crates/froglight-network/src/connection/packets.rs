@@ -8,7 +8,6 @@ use async_std::{
     io::{BufReader, ReadExt, WriteExt},
     net::TcpStream,
 };
-use bevy_log::error;
 use froglight_protocol::{
     protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, WriteError},
     traits::{State, Version},
@@ -216,10 +215,12 @@ where
 
         // Read any bundled packets from the decompressed buffer
         if packet.is_ok() && cursor.position() == 0u64 {
+            #[allow(unused_variables)]
             if let Err(err) =
                 read_bundled::<V, S, D>(decompressed_packet_length, &mut cursor, bundle)
             {
-                error!("Error reading bundled packets: {err}");
+                #[cfg(feature = "bevy")]
+                bevy_log::error!("Error reading bundled packets: {err}");
             }
         }
 
@@ -231,8 +232,10 @@ where
 
         // Read any bundled packets from the buffer
         if packet.is_ok() && cursor.position() == 0u64 {
+            #[allow(unused_variables)]
             if let Err(err) = read_bundled::<V, S, D>(packet_length, &mut cursor, bundle) {
-                error!("Error reading bundled packets: {err}");
+                #[cfg(feature = "bevy")]
+                bevy_log::error!("Error reading bundled packets: {err}");
             }
         }
 

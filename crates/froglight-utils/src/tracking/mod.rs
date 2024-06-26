@@ -21,6 +21,7 @@ mod entityuuid;
 pub use entityuuid::EntityUuidMap;
 
 #[doc(hidden)]
+#[allow(unused_variables)]
 pub(super) fn build(app: &mut bevy_app::App) {
     #[cfg(feature = "froglight-world")]
     {

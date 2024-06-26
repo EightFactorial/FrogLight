@@ -1,3 +1,6 @@
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::HashMap;
+
 use bevy_app::{App, PreUpdate};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{
@@ -8,9 +11,10 @@ use bevy_ecs::{
 };
 use froglight_protocol::common::ChunkPosition;
 use froglight_world::Chunk;
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 
-use crate::systemsets::UtilityPreUpdateSet;
+use crate::systemset::UtilityPreUpdateSet;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {

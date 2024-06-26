@@ -32,4 +32,4 @@ default = ["bevy", "froglight-registry"]
 bevy = ["dep:bevy_ecs", "dep:bevy_log"]
 
 # Adds methods to get Blocks from a Chunk.
-froglight-registry = ["dep:froglight-registry"]
+froglight-registry = ["bevy", "dep:froglight-registry"]

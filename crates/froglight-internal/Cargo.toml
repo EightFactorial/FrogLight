@@ -31,12 +31,16 @@ froglight-network = { version = "0.1.0", path = "../froglight-network", features
 froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
     "bevy",
+    "hashbrown",
 ] }
-froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
+froglight-registry = { version = "0.1.0", path = "../froglight-registry", features = [
+    "hashbrown",
+] }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
     "froglight-components",
     "froglight-network",
     "froglight-world",
+    "hashbrown",
 ] }
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
     "bevy",

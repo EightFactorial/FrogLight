@@ -48,7 +48,7 @@ where
         Status: State<V>,
         D: NetworkDirection<V, Status>,
     {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "bevy"))]
         bevy_log::debug!("Setting `Handshake` Connection to `Status`");
         self.set_state()
     }
@@ -61,7 +61,7 @@ where
         Login: State<V>,
         D: NetworkDirection<V, Login>,
     {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "bevy"))]
         bevy_log::debug!("Setting `Handshake` Connection to `Login`");
         self.set_state()
     }
@@ -79,7 +79,7 @@ where
         Configuration: State<V>,
         D: NetworkDirection<V, Configuration>,
     {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "bevy"))]
         bevy_log::debug!("Setting `Login` Connection to `Configuration`");
         self.set_state()
     }
@@ -92,7 +92,7 @@ where
         Play: State<V>,
         D: NetworkDirection<V, Play>,
     {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "bevy"))]
         bevy_log::debug!("Setting `Login` Connection to `Play`");
         self.set_state()
     }
@@ -110,7 +110,7 @@ where
         Play: State<V>,
         D: NetworkDirection<V, Play>,
     {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "bevy"))]
         bevy_log::debug!("Setting `Configuration` Connection to `Play`");
         self.set_state()
     }
@@ -128,7 +128,7 @@ where
         Configuration: State<V>,
         D: NetworkDirection<V, Configuration>,
     {
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "bevy"))]
         bevy_log::debug!("Setting `Play` Connection to `Configuration`");
         self.set_state()
     }

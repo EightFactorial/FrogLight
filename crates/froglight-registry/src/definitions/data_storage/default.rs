@@ -1,7 +1,10 @@
+#[cfg(not(feature = "hashbrown"))]
+use std::collections::HashMap;
 use std::{marker::PhantomData, sync::Arc};
 
 use bevy_ecs::system::Resource;
 use froglight_protocol::{common::ResourceKey, traits::Version};
+#[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 

@@ -24,7 +24,7 @@ async-compression = { version = "0.4.11", default-features = false, features = [
     "futures-io",
     "zlib",
 ] }
-async-std = { workspace = true, features = ["std", "unstable"] }
+async-std = { workspace = true, features = ["default", "std", "unstable"] }
 compact_str = { workspace = true }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 futures-lite = { workspace = true }
