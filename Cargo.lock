@@ -1965,6 +1965,7 @@ dependencies = [
  "async-compression",
  "async-std",
  "async-std-resolver",
+ "bevy",
  "bevy_app",
  "bevy_derive",
  "bevy_ecs",

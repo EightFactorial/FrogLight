@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+bevy = { workspace = true }
+
 [dependencies]
 async-channel = "2.3.1"
 async-compression = { version = "0.4.11", default-features = false, features = [
@@ -63,3 +66,11 @@ bevy = [
 
 # Enables the ResolverPlugin
 resolver = ["bevy", "dep:async-std-resolver"]
+
+[[example]]
+name = "server-login"
+path = "examples/server-login/main.rs"
+
+[[example]]
+name = "server-status"
+path = "examples/server-status/main.rs"

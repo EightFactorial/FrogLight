@@ -1,6 +1,6 @@
 use std::{
     net::SocketAddr,
-    sync::atomic::{AtomicU8, Ordering},
+    sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
 
@@ -194,7 +194,7 @@ where
 
 /// Use a [`Connection`] to connect to a server.
 ///
-/// Relay packets between the channel and the connection.
+/// Relay packets between the channel and the server.
 async fn perform_server_connection<V>(
     conn: Connection<V, Handshake>,
     task_channel: ConnectionTaskChannel<V, Serverbound>,
@@ -210,84 +210,65 @@ where
         + NetworkDirection<V, Configuration>
         + NetworkDirection<V, Play>,
 {
+    // Perform the handshake and login
     let conn = V::perform_handshake(conn, ConnectionIntent::Login).await?;
     let conn = V::perform_login(conn.login()).await?;
 
+    // Split the connection into a read and write connection
     let (read_conn, write_conn) = conn.into_split();
     let mut conn = ConnEnum::Login(read_conn, write_conn);
 
     // Main loop
     loop {
-        let atomic_state = AtomicU8::new(0u8);
+        let atomic_state = AtomicBool::new(false);
         match conn {
             // Login state
             ConnEnum::Login(mut read_conn, mut write_conn) => {
-                let (read_res, write_res) = futures_lite::future::zip(
+                futures_lite::future::try_zip(
                     server_to_bevy(
                         &mut read_conn,
                         write_conn.clone(),
                         &task_channel.login,
                         &atomic_state,
                     ),
-                    bevy_to_server(
-                        &mut write_conn,
-                        &task_channel.login,
-                        V::login_acknowledged,
-                        &atomic_state,
-                    ),
+                    bevy_to_server(&mut write_conn, &task_channel.login, &atomic_state),
                 )
-                .await;
+                .await?;
 
-                read_res?;
-                write_res?;
-
+                // Enter the configuration state
                 conn = ConnEnum::Configuration(read_conn.set_state(), write_conn.set_state());
             }
 
             // Configuration state
             ConnEnum::Configuration(mut read_conn, mut write_conn) => {
-                let (read_res, write_res) = futures_lite::future::zip(
+                futures_lite::future::try_zip(
                     server_to_bevy(
                         &mut read_conn,
                         write_conn.clone(),
                         &task_channel.config,
                         &atomic_state,
                     ),
-                    bevy_to_server(
-                        &mut write_conn,
-                        &task_channel.config,
-                        V::config_acknowledged,
-                        &atomic_state,
-                    ),
+                    bevy_to_server(&mut write_conn, &task_channel.config, &atomic_state),
                 )
-                .await;
+                .await?;
 
-                read_res?;
-                write_res?;
-
+                // Enter the play state
                 conn = ConnEnum::Play(read_conn.set_state(), write_conn.set_state());
             }
             // Play state
             ConnEnum::Play(mut read_conn, mut write_conn) => {
-                let (read_res, write_res) = futures_lite::future::zip(
+                futures_lite::future::try_zip(
                     server_to_bevy(
                         &mut read_conn,
                         write_conn.clone(),
                         &task_channel.play,
                         &atomic_state,
                     ),
-                    bevy_to_server(
-                        &mut write_conn,
-                        &task_channel.play,
-                        V::play_acknowledged,
-                        &atomic_state,
-                    ),
+                    bevy_to_server(&mut write_conn, &task_channel.play, &atomic_state),
                 )
-                .await;
+                .await?;
 
-                read_res?;
-                write_res?;
-
+                // Enter the configuration state
                 conn = ConnEnum::Configuration(read_conn.set_state(), write_conn.set_state());
             }
         }
@@ -299,7 +280,7 @@ async fn server_to_bevy<V, S>(
     read_conn: &mut ReadConnection<V, S, Serverbound>,
     write_conn: WriteConnection<V, S, Serverbound>,
     task_channel: &PacketTaskChannel<V, S, Serverbound>,
-    atomic_state: &AtomicU8,
+    atomic_state: &AtomicBool,
 ) -> Result<(), ConnectionError>
 where
     V: Version + LoginState + ConfigurationState + PlayState,
@@ -312,51 +293,36 @@ where
         + NetworkDirection<V, Configuration>
         + NetworkDirection<V, Play>,
 {
-    let error;
     loop {
         // Read packets from the server
-        let packet = match read_conn.recv().await {
-            Ok(packet) => packet,
-            Err(err) => {
-                error = err;
-                break;
-            }
-        };
+        let packet = read_conn.recv().await?;
 
-        // Send the packet to Bevy and check if the state has changed
-        let end_state = S::packet_fn(&packet, &write_conn).await?;
+        // Check if the state has changed and send the packet to Bevy
+        let state_change = S::packet_state_fn(&packet, &write_conn).await?;
         if task_channel.send(packet).await.is_err() {
             error!("Failed to send packet to Bevy!");
-            error = ConnectionError::ConnectionClosed;
-            break;
+            return Err(ConnectionError::ConnectionClosed);
         }
 
-        // If the state has changed, return
-        if end_state {
+        // If the state has changed, notify the other task and return
+        if state_change {
             #[cfg(debug_assertions)]
             bevy_log::debug!("Waiting for the state change to be acknowledged...");
-
-            // Notify the writer that the state has changed
-            atomic_state.store(1u8, Ordering::Relaxed);
+            atomic_state.store(true, Ordering::Relaxed);
             return Ok(());
         }
     }
-
-    // Notify the writer and return the error
-    atomic_state.store(2u8, Ordering::Relaxed);
-    Err(error)
 }
 
-/// Relay packets from Bevy to the connected server.
+/// Relay packets from Bevy to the Server.
 async fn bevy_to_server<V, S>(
     write_conn: &mut WriteConnection<V, S, Serverbound>,
     task_channel: &PacketTaskChannel<V, S, Serverbound>,
-    acknowledge_fn: fn(&<Serverbound as NetworkDirection<V, S>>::Send) -> bool,
-    atomic_state: &AtomicU8,
+    atomic_state: &AtomicBool,
 ) -> Result<(), ConnectionError>
 where
     V: Version + LoginState + ConfigurationState + PlayState,
-    S: State<V>,
+    S: State<V> + PacketFn<V>,
     Login: State<V>,
     Configuration: State<V>,
     Play: State<V>,
@@ -366,26 +332,18 @@ where
         + NetworkDirection<V, Play>,
 {
     loop {
-        // Forward packets from Bevy to the server
+        // Forward packets from Bevy to the Server
         let packet = task_channel.recv().await.map_err(|_| {
             error!("Failed to receive packet from Bevy!");
             ConnectionError::ConnectionClosed
         })?;
         write_conn.send_packet(&packet).await?;
 
-        match atomic_state.load(Ordering::Relaxed) {
-            // If the state has changed, check if the change has been acknowledged
-            1 => {
-                if acknowledge_fn(&packet) {
-                    #[cfg(debug_assertions)]
-                    bevy_log::debug!("State change acknowledged!");
-
-                    return Ok(());
-                }
-            }
-            // If the connection has been closed, return
-            2 => return Ok(()),
-            _ => {}
+        // If looking for an acknowledgement and one was received, return
+        if atomic_state.load(Ordering::Relaxed) && S::packet_ack_fn(&packet) {
+            #[cfg(debug_assertions)]
+            bevy_log::debug!("State change acknowledged!");
+            return Ok(());
         }
     }
 }

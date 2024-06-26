@@ -19,17 +19,18 @@ where
         + NetworkDirection<Self, Configuration>
         + NetworkDirection<Self, Play>,
 {
+    /// Send the initial login packet to the server.
     fn perform_login(
         conn: Connection<Self, Login, Serverbound>,
     ) -> impl std::future::Future<Output = Result<Connection<Self, Login>, ConnectionError>> + Send + Sync;
 
-    /// Returns `true` if the login was successful,
+    /// Returns `true` if the login finished successfully,
     /// or `false` if the login is still in progress.
-    fn end_login(
+    fn login_state_handle(
         packet: &<Serverbound as NetworkDirection<Self, Login>>::Recv,
         conn: &WriteConnection<Self, Login, Serverbound>,
     ) -> impl std::future::Future<Output = Result<bool, ConnectionError>> + Send + Sync;
 
     /// Returns `true` when the end of the login has been acknowledged.
-    fn login_acknowledged(packet: &<Serverbound as NetworkDirection<Self, Login>>::Send) -> bool;
+    fn login_ack_handle(packet: &<Serverbound as NetworkDirection<Self, Login>>::Send) -> bool;
 }

@@ -24,7 +24,7 @@ impl LoginState for V1_21_0 {
         Ok(conn)
     }
 
-    async fn end_login(
+    async fn login_state_handle(
         packet: &<Serverbound as NetworkDirection<Self, Login>>::Recv,
         conn: &WriteConnection<Self, Login, Serverbound>,
     ) -> Result<bool, ConnectionError> {
@@ -42,7 +42,7 @@ impl LoginState for V1_21_0 {
         }
     }
 
-    fn login_acknowledged(packet: &<Serverbound as NetworkDirection<Self, Login>>::Send) -> bool {
+    fn login_ack_handle(packet: &<Serverbound as NetworkDirection<Self, Login>>::Send) -> bool {
         matches!(packet, LoginServerboundPackets::EnterConfiguration(..))
     }
 }

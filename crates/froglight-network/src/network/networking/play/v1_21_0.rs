@@ -10,7 +10,7 @@ use super::PlayState;
 use crate::connection::{ConnectionError, Serverbound, WriteConnection};
 
 impl PlayState for V1_21_0 {
-    async fn end_play(
+    async fn play_state_handle(
         packet: &PlayClientboundPackets,
         _: &WriteConnection<Self, Play, Serverbound>,
     ) -> Result<bool, ConnectionError> {
@@ -23,7 +23,7 @@ impl PlayState for V1_21_0 {
         }
     }
 
-    fn play_acknowledged(packet: &PlayServerboundPackets) -> bool {
+    fn play_ack_handle(packet: &PlayServerboundPackets) -> bool {
         matches!(packet, PlayServerboundPackets::AcknowledgeReconfiguration(..))
     }
 }

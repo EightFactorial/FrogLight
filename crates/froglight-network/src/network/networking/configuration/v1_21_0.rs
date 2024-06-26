@@ -10,7 +10,7 @@ use super::ConfigurationState;
 use crate::connection::{ConnectionError, Serverbound, WriteConnection};
 
 impl ConfigurationState for V1_21_0 {
-    async fn end_configuration<'a, 'b>(
+    async fn config_state_handle<'a, 'b>(
         packet: &'a ConfigurationClientboundPackets,
         _: &'b WriteConnection<Self, Configuration, Serverbound>,
     ) -> Result<bool, ConnectionError> {
@@ -23,7 +23,7 @@ impl ConfigurationState for V1_21_0 {
         }
     }
 
-    fn config_acknowledged(packet: &ConfigurationServerboundPackets) -> bool {
+    fn config_ack_handle(packet: &ConfigurationServerboundPackets) -> bool {
         matches!(packet, ConfigurationServerboundPackets::Ready(..))
     }
 }

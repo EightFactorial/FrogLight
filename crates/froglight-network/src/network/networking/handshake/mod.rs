@@ -14,6 +14,7 @@ where
     Handshake: State<Self>,
     Serverbound: NetworkDirection<Self, Handshake>,
 {
+    /// Send the initial handshake packet to the server.
     fn perform_handshake(
         conn: Connection<Self, Handshake, Serverbound>,
         intent: ConnectionIntent,

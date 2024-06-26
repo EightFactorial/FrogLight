@@ -92,8 +92,8 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketTaskChannel<V, S,
     ///
     /// # Errors
     /// This will return an error if the channel is full or closed.
-    pub(super) fn send(&self, packet: impl Into<D::Recv>) -> async_channel::Send<'_, Arc<D::Recv>> {
-        self.send.send(Arc::new(packet.into()))
+    pub(super) fn send(&self, packet: D::Recv) -> async_channel::Send<'_, Arc<D::Recv>> {
+        self.send.send(Arc::new(packet))
     }
 
     /// Receive a packet from the channel.

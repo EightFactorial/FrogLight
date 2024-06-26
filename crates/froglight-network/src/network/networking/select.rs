@@ -7,7 +7,8 @@ use super::{configuration::ConfigurationState, login::LoginState, play::PlayStat
 use crate::connection::{ConnectionError, NetworkDirection, Serverbound, WriteConnection};
 
 type FnOutput = Result<bool, ConnectionError>;
-type PacketType<V, S> = <Serverbound as NetworkDirection<V, S>>::Recv;
+type SendPacket<V, S> = <Serverbound as NetworkDirection<V, S>>::Send;
+type RecvPacket<V, S> = <Serverbound as NetworkDirection<V, S>>::Recv;
 type WriteConn<V, S> = WriteConnection<V, S, Serverbound>;
 
 /// A trait for selecting the correct packet function
@@ -17,10 +18,14 @@ where
     V: Version,
     Serverbound: NetworkDirection<V, Self>,
 {
-    fn packet_fn(
-        packet: &PacketType<V, Self>,
+    /// Returns the correct packet function based on the current state.
+    fn packet_state_fn(
+        packet: &RecvPacket<V, Self>,
         conn: &WriteConn<V, Self>,
     ) -> impl std::future::Future<Output = FnOutput> + Send + Sync;
+
+    /// Returns the correct acknowledgement function based on the current state.
+    fn packet_ack_fn(packet: &SendPacket<V, Self>) -> bool;
 }
 
 impl<V> PacketFn<V> for Login
@@ -33,12 +38,15 @@ where
         NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
 {
     #[inline]
-    fn packet_fn(
-        packet: &PacketType<V, Self>,
+    fn packet_state_fn(
+        packet: &RecvPacket<V, Self>,
         conn: &WriteConn<V, Self>,
     ) -> impl std::future::Future<Output = FnOutput> + Send + Sync {
-        V::end_login(packet, conn)
+        V::login_state_handle(packet, conn)
     }
+
+    #[inline]
+    fn packet_ack_fn(packet: &SendPacket<V, Self>) -> bool { V::login_ack_handle(packet) }
 }
 
 impl<V> PacketFn<V> for Configuration
@@ -51,12 +59,15 @@ where
         NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
 {
     #[inline]
-    fn packet_fn(
-        packet: &PacketType<V, Self>,
+    fn packet_state_fn(
+        packet: &RecvPacket<V, Self>,
         conn: &WriteConn<V, Self>,
     ) -> impl std::future::Future<Output = FnOutput> + Send + Sync {
-        V::end_configuration(packet, conn)
+        V::config_state_handle(packet, conn)
     }
+
+    #[inline]
+    fn packet_ack_fn(packet: &SendPacket<V, Self>) -> bool { V::config_ack_handle(packet) }
 }
 
 impl<V> PacketFn<V> for Play
@@ -69,10 +80,13 @@ where
         NetworkDirection<V, Login> + NetworkDirection<V, Configuration> + NetworkDirection<V, Play>,
 {
     #[inline]
-    fn packet_fn(
-        packet: &PacketType<V, Self>,
+    fn packet_state_fn(
+        packet: &RecvPacket<V, Self>,
         conn: &WriteConn<V, Self>,
     ) -> impl std::future::Future<Output = FnOutput> + Send + Sync {
-        V::end_play(packet, conn)
+        V::play_state_handle(packet, conn)
     }
+
+    #[inline]
+    fn packet_ack_fn(packet: &SendPacket<V, Self>) -> bool { V::play_ack_handle(packet) }
 }

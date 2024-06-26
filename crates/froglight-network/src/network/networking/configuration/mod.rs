@@ -17,15 +17,15 @@ where
         + NetworkDirection<Self, Configuration>
         + NetworkDirection<Self, Play>,
 {
-    /// Returns `true` if the configuration was successful,
+    /// Returns `true` if the configuration finished successfully,
     /// or `false` if the configuration is still in progress.
-    fn end_configuration<'a, 'b>(
-        packet: &'a <Serverbound as NetworkDirection<Self, Configuration>>::Recv,
-        conn: &'b WriteConnection<Self, Configuration, Serverbound>,
+    fn config_state_handle(
+        packet: &<Serverbound as NetworkDirection<Self, Configuration>>::Recv,
+        conn: &WriteConnection<Self, Configuration, Serverbound>,
     ) -> impl std::future::Future<Output = Result<bool, ConnectionError>> + Send + Sync;
 
     /// Returns `true` when the end of the configuration has been acknowledged.
-    fn config_acknowledged(
+    fn config_ack_handle(
         packet: &<Serverbound as NetworkDirection<Self, Configuration>>::Send,
     ) -> bool;
 }

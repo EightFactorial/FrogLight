@@ -1,15 +1,17 @@
 //! Send a status request to [`SERVER_ADDRESS`] and prints the response.
 
 use bevy::{app::AppExit, prelude::*};
-use froglight_internal::{prelude::*, HeadlessPlugins};
+use bevy_log::LogPlugin;
 use froglight_network::{
     network::{ConnectionTrait, NetworkErrorEvent, PolledTask, ServerStatusResponse},
+    resolver::Resolver,
     versions::v1_21_0::V1_21_0,
+    NetworkPlugins,
 };
 
 fn main() {
     let mut app = App::new();
-    app.add_plugins(HeadlessPlugins);
+    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins.as_plugingroup()));
 
     app.add_systems(
         Update,

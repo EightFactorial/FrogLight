@@ -1,9 +1,11 @@
 //! Send a status request to "localhost" and prints the response.
 
 use bevy::{app::AppExit, prelude::*};
-use froglight_internal::{prelude::*, HeadlessPlugins};
+use bevy_log::LogPlugin;
 use froglight_network::{
-    network::{ConnectionTrait, NetworkErrorEvent, PolledTask},
+    common::UnsizedBuffer,
+    network::{ConnectionChannel, ConnectionTask, ConnectionTrait, NetworkErrorEvent, PolledTask},
+    resolver::Resolver,
     versions::v1_21_0::{
         configuration::{
             ConfigurationClientboundPackets, ReadyC2SPacket, SelectKnownPacksC2SPacket,
@@ -15,12 +17,13 @@ use froglight_network::{
         },
         V1_21_0,
     },
+    NetworkPlugins,
 };
 use froglight_protocol::protocol::FrogWrite;
 
 fn main() {
     let mut app = App::new();
-    app.add_plugins(HeadlessPlugins);
+    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins.as_plugingroup()));
 
     app.add_systems(
         Update,
@@ -222,6 +225,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     info!("    Position: {:?}", chunk_packet.position);
 
                     // Respond that we accepted the chunk
+                    // Not actually true or how it works, but the server accepts it :)
                     channel.play.send(AcknowledgeChunksPacket { chunks_per_tick: 1.0 }).unwrap();
                 }
                 PlayClientboundPackets::LightUpdate(_) => {

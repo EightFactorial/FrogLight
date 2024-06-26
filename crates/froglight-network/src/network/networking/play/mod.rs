@@ -19,11 +19,11 @@ where
 {
     /// Returns `true` if the client should exit the play state,
     /// or `false` if the client is still playing.
-    fn end_play(
+    fn play_state_handle(
         packet: &<Serverbound as NetworkDirection<Self, Play>>::Recv,
         conn: &WriteConnection<Self, Play, Serverbound>,
     ) -> impl std::future::Future<Output = Result<bool, ConnectionError>> + Send + Sync;
 
     /// Returns `true` when the end of the play state has been acknowledged.
-    fn play_acknowledged(packet: &<Serverbound as NetworkDirection<Self, Play>>::Send) -> bool;
+    fn play_ack_handle(packet: &<Serverbound as NetworkDirection<Self, Play>>::Send) -> bool;
 }
