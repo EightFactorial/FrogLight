@@ -1,15 +1,12 @@
 use froglight_macros::FrogReadWrite;
-use serde_json::Value;
+use simdnbt::owned::NbtTag;
 
-#[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
+#[derive(Debug, Clone, PartialEq, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ProfilelessChatMessagePacket {
-    // TODO: Text
-    pub message: Value,
+    pub message: NbtTag,
     #[frog(var)]
     pub chat_type: u32,
-    // TODO: Text
-    pub sender: Value,
-    // TODO: Text
-    pub target: Option<Value>,
+    pub sender: NbtTag,
+    pub target: Option<NbtTag>,
 }

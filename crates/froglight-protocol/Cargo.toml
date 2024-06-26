@@ -46,6 +46,7 @@ uuid = { workspace = true, features = ["serde"] }
 # Optional bevy dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+bevy_log = { workspace = true, optional = true }
 
 # Optional dependencies
 hashbrown = { workspace = true, optional = true }
@@ -69,6 +70,7 @@ default = ["bevy", "hashbrown", "smallvec"]
 bevy = [
     "dep:bevy_ecs",
     "dep:bevy_reflect",
+    "dep:bevy_log",
     "hashbrown",
     "froglight-components/bevy",
 ]

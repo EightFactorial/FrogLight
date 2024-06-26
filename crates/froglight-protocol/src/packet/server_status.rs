@@ -14,7 +14,6 @@ use uuid::Uuid;
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(json)]
 pub struct ServerStatus {
-    // TODO: Text
     /// The server's description
     pub description: Value,
     /// The server's icon
@@ -37,7 +36,6 @@ pub struct ServerStatus {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerVersion {
-    // TODO: Text
     /// The version's name
     pub name: Value,
     /// The version's protocol id
@@ -93,35 +91,3 @@ impl ServerSamplePlayer {
         Ok(list.into_iter().filter(|p| !(p.uuid.is_nil() && p.username.is_empty())).collect())
     }
 }
-
-// TODO: FormattedText
-// #[test]
-// fn serverstatus_read_write_verify() {
-//     use crate::{
-//         io::{FrogRead, FrogWrite},
-//         traits::Version,
-//         versions::v1_20_0::V1_20_0,
-//     };
-
-//     let mut buf = Vec::new();
-//     let status = ServerStatus {
-//         description: "Hello world!".into(),
-//         favicon: None,
-//         players: ServerPlayers { max: 100, online: 50, sample: vec![] },
-//         version: ServerVersion { name: "1.20.1".into(), protocol:
-// V1_20_0::PROTOCOL_VERSION },         enforces_secure_chat: None,
-//     };
-
-//     // Write the status to the buffer
-//     status.fg_write(&mut buf).unwrap();
-//     // Read a string from the buffer
-//     let mut cursor = std::io::Cursor::new(buf.as_slice());
-//     let string = String::fg_read(&mut cursor).unwrap();
-
-//     // Verify that the string matches the status as json
-//     assert_eq!(
-//         string,
-//         r#"{"description":{"text":"Hello
-// world!"},"players":{"max":100,"online":50,"sample":[]},"version":{"name":{"
-// text":"1.20.1"},"protocol":763}}"#     );
-// }

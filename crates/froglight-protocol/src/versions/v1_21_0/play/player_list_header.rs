@@ -1,11 +1,9 @@
 use froglight_macros::FrogReadWrite;
-use serde_json::Value;
+use simdnbt::owned::NbtTag;
 
-#[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
+#[derive(Debug, Clone, PartialEq, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct PlayerListHeaderPacket {
-    // TODO: Text
-    pub header: Value,
-    // TODO: Text
-    pub footer: Value,
+    pub header: NbtTag,
+    pub footer: NbtTag,
 }

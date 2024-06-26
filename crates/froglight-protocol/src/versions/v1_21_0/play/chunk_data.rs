@@ -9,6 +9,7 @@ use crate::{
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ChunkDataPacket {
     pub position: ChunkPosition,
+    // TODO: Fix Nbt Error?
     pub chunk_data: UnsizedBuffer,
     // pub light_data: UnsizedBuffer,
 }

@@ -30,7 +30,11 @@ impl LoginState for V1_21_0 {
     ) -> Result<bool, ConnectionError> {
         match packet {
             LoginClientboundPackets::LoginDisconnect(packet) => {
-                Err(ConnectionError::ServerError(serde_json::to_string(&packet.reason).unwrap()))
+                Err(ConnectionError::ServerError(if let Some(reason) = packet.reason.string() {
+                    reason.to_string()
+                } else {
+                    format!("{:?}", packet.reason)
+                }))
             }
             LoginClientboundPackets::LoginSuccess(..) => Ok(true),
             #[allow(clippy::cast_possible_wrap)]

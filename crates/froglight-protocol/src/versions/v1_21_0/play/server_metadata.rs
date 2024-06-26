@@ -1,10 +1,9 @@
 use froglight_macros::FrogReadWrite;
+use simdnbt::owned::NbtTag;
 
-use crate::common::UnsizedBuffer;
-
-#[derive(Debug, Clone, PartialEq, Eq, FrogReadWrite)]
+#[derive(Debug, Clone, PartialEq, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ServerMetadataPacket {
-    // TODO: Implement ServerMetadata
-    pub metadata: UnsizedBuffer,
+    pub metadata: NbtTag,
+    pub favicon: Option<Vec<u8>>,
 }

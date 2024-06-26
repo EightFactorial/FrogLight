@@ -1,5 +1,5 @@
 use serde_json::Value;
-use simdnbt::owned::Nbt;
+use simdnbt::owned::{Nbt, NbtCompound, NbtTag};
 use uuid::Uuid;
 
 use super::{FrogWrite, WriteError};
@@ -10,6 +10,26 @@ impl FrogWrite for () {
 }
 
 impl FrogWrite for Nbt {
+    #[inline]
+    fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+        let mut vec = Vec::new();
+        self.write(&mut vec);
+
+        Ok(buf.write_all(&vec)?)
+    }
+}
+
+impl FrogWrite for NbtCompound {
+    #[inline]
+    fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+        let mut vec = Vec::new();
+        self.write(&mut vec);
+
+        Ok(buf.write_all(&vec)?)
+    }
+}
+
+impl FrogWrite for NbtTag {
     #[inline]
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         let mut vec = Vec::new();

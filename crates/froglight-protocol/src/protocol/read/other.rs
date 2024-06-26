@@ -1,5 +1,5 @@
 use serde_json::Value;
-use simdnbt::owned::{self, Nbt};
+use simdnbt::owned::{self, Nbt, NbtCompound, NbtTag};
 use uuid::Uuid;
 
 use super::{FrogRead, ReadError};
@@ -16,6 +16,26 @@ impl FrogRead for Nbt {
         Self: Sized,
     {
         owned::read(buf).map_err(ReadError::from)
+    }
+}
+
+impl FrogRead for NbtCompound {
+    #[inline]
+    fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
+    where
+        Self: Sized,
+    {
+        owned::read_compound(buf).map_err(ReadError::from)
+    }
+}
+
+impl FrogRead for NbtTag {
+    #[inline]
+    fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError>
+    where
+        Self: Sized,
+    {
+        owned::read_tag(buf).map_err(ReadError::from)
     }
 }
 

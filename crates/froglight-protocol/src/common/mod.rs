@@ -9,8 +9,8 @@ pub use other::*;
 mod position;
 pub use position::*;
 
-mod special;
-pub use special::*;
-
 mod resourcekey;
 pub use froglight_components::resourcekey::{ResourceKey, ResourceKeyError};
+
+mod special;
+pub use special::*;

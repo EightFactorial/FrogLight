@@ -28,7 +28,7 @@ pub enum ReadError {
     #[error("Invalid enum variant: {0} -> {1}")]
     InvalidEnum(i32, &'static str),
     /// An error occurred while reading a packet.
-    #[error("Error reading {1} ({0}): {2}")]
+    #[error("{1} ({0}): {2}")]
     PacketError(u32, &'static str, Box<ReadError>),
 }
 

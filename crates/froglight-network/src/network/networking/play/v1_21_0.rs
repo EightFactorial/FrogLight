@@ -16,7 +16,11 @@ impl PlayState for V1_21_0 {
     ) -> Result<bool, ConnectionError> {
         match packet {
             PlayClientboundPackets::Disconnect(packet) => {
-                Err(ConnectionError::ServerError(serde_json::to_string(&packet.reason).unwrap()))
+                Err(ConnectionError::ServerError(if let Some(reason) = packet.reason.string() {
+                    reason.to_string()
+                } else {
+                    format!("{:?}", packet.reason)
+                }))
             }
             PlayClientboundPackets::EnterReconfiguration(..) => Ok(true),
             _ => Ok(false),

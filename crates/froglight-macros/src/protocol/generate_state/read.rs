@@ -29,8 +29,36 @@ pub(super) fn impl_enum_read(ident: &Ident, packets: &StatePackets, output: &mut
         let name = packet.name.to_string();
         let variant = &packet.variant;
 
+        #[cfg(not(feature = "froglight-protocol-debug"))]
         variant_tokens.extend(quote! {
-            #id => Ok(#ident::#variant(#crate_path::protocol::FrogRead::fg_read(buf).map_err(|e| #crate_path::protocol::ReadError::PacketError(#id, #name, Box::new(e)))?)),
+            #id => {
+                match #crate_path::protocol::FrogRead::fg_read(buf) {
+                    Ok(packet) => Ok(#ident::#variant(packet)),
+                    Err(e) => Err(#crate_path::protocol::ReadError::PacketError(#id, #name, Box::new(e))),
+                }
+            },
+        });
+
+        #[cfg(feature = "froglight-protocol-debug")]
+        variant_tokens.extend(quote! {
+            #id => {
+                #[cfg(all(debug_assertions, feature = "bevy"))]
+                {
+                    let mut buf_ref = *buf.get_ref();
+                    let buf_len = buf_ref.len();
+
+                    if buf_len > 64 {
+                        buf_ref = &buf_ref[..64];
+                    }
+
+                    bevy_log::trace!("Reading {}: {buf_len} bytes, {buf_ref:?}", #name);
+                }
+
+                match #crate_path::protocol::FrogRead::fg_read(buf) {
+                    Ok(packet) => Ok(#ident::#variant(packet)),
+                    Err(e) => Err(#crate_path::protocol::ReadError::PacketError(#id, #name, Box::new(e))),
+                }
+            },
         });
     }
 

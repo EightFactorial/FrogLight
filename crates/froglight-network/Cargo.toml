@@ -17,6 +17,9 @@ workspace = true
 
 [dev-dependencies]
 bevy = { workspace = true }
+froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
+    "froglight-protocol-debug",
+] }
 
 [dependencies]
 async-channel = "2.3.1"
