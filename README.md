@@ -18,8 +18,8 @@ FrogLight is currently in a **very early alpha state**. Not everything is functi
 
 ## Version Support
 
-FrogLight supports multiple different versions, including:
-- 1.20.0 - 1.20.1 (**TEMP**)
+FrogLight supports multiple versions, including:
+- 1.21.0
 
 > [!Note]
 > Support for other versions will be added after most development is done.
