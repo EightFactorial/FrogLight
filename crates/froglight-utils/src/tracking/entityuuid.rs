@@ -5,7 +5,10 @@ use bevy_app::{App, PreUpdate};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{
     entity::Entity,
-    schedule::{common_conditions::any_with_component, IntoSystemConfigs},
+    schedule::{
+        common_conditions::{any_with_component, resource_exists},
+        IntoSystemConfigs,
+    },
     system::{Query, ResMut, Resource},
 };
 use froglight_components::entity::EntityUuid;
@@ -19,11 +22,12 @@ pub(super) fn build(app: &mut App) {
     // Initialize the EntityUuidMap resource
     app.init_resource::<EntityUuidMap>();
 
-    // Update the EntityUuidMap every frame
+    // Update the EntityUuidMap every `frame`
     app.add_systems(
         PreUpdate,
-        EntityUuidMap::update_entityuuids
+        EntityUuidMap::update_entityuuid_map
             .run_if(any_with_component::<EntityUuid>)
+            .run_if(resource_exists::<EntityUuidMap>)
             .in_set(UtilityPreUpdateSet),
     );
 }
@@ -35,13 +39,56 @@ pub(super) fn build(app: &mut App) {
 pub struct EntityUuidMap(HashMap<EntityUuid, Entity>);
 
 impl EntityUuidMap {
-    fn update_entityuuids(mut map: ResMut<Self>, query: Query<(Entity, &EntityUuid)>) {
+    fn update_entityuuid_map(mut map: ResMut<Self>, query: Query<(Entity, &EntityUuid)>) {
         // Clear the map
         map.clear();
 
         // Insert all uuids and entities into the map
         for (entity, uuid) in &query {
+            #[cfg(debug_assertions)]
+            debug_assert!(
+                map.insert(*uuid, entity).is_none(),
+                "Two entities cannot have the same EntityUuid!"
+            );
+
+            #[cfg(not(debug_assertions))]
             map.insert(*uuid, entity);
         }
     }
+}
+
+#[test]
+fn entityuuid_map() {
+    use bevy_app::{prelude::*, AppExit};
+    use bevy_ecs::prelude::*;
+
+    let mut app = App::new();
+    app.add_plugins((
+        bevy_app::ScheduleRunnerPlugin::default(),
+        bevy_time::TimePlugin,
+        crate::UtilityPlugin,
+    ));
+
+    app.add_systems(
+        Update,
+        |query: Query<(Entity, &EntityUuid)>,
+         entity_map: Res<EntityUuidMap>,
+         mut events: EventWriter<AppExit>,
+         mut commands: Commands| {
+            // Check that the EntityUuidMap contains all entities
+            for (entity, entity_uuid) in &query {
+                assert_eq!(entity_map.get(entity_uuid), Some(&entity));
+            }
+
+            // Spawn new entities until there are 512, then exit
+            let count = query.iter().count() as u128;
+            if count >= 512 {
+                events.send(AppExit);
+            } else {
+                commands.spawn(EntityUuid::from(count));
+            }
+        },
+    );
+
+    app.run();
 }

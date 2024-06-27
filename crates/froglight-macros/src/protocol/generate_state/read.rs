@@ -51,7 +51,7 @@ pub(super) fn impl_enum_read(ident: &Ident, packets: &StatePackets, output: &mut
                         buf_ref = &buf_ref[..64];
                     }
 
-                    bevy_log::trace!("Reading {}: {buf_len} bytes, {buf_ref:?}", #name);
+                    bevy_log::trace!(concat!("Reading ", #name, ": {} bytes, {:?}"), buf_len, buf_ref);
                 }
 
                 match #crate_path::protocol::FrogRead::fg_read(buf) {

@@ -19,7 +19,6 @@ use traits::ScheduleTrait;
 
 pub(super) fn build(app: &mut App) {
     // Create and add the main schedule to the app
-    // TODO: Benchmark `SingleThreaded` vs `MultiThreaded`
     let mut schedule = Schedule::new(RunFixedUtilLoop);
     schedule.set_executor_kind(ExecutorKind::SingleThreaded);
     app.add_schedule(schedule);
@@ -28,10 +27,12 @@ pub(super) fn build(app: &mut App) {
     let mut order = app.world.resource_mut::<MainScheduleOrder>();
     order.insert_after(RunFixedMainLoop, RunFixedUtilLoop);
 
-    // Add all of the other schedules
+    // Add virtual time schedules
     OneTick::build(app);
     TwoTicks::build(app);
     TenTicks::build(app);
+
+    // Add real time schedules
     OneSecond::build(app);
     FiveSeconds::build(app);
 

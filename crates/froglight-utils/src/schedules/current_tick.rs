@@ -16,13 +16,15 @@ pub(super) fn build(app: &mut App) {
 
 /// A [`Resource`] that keeps track of the current tick.
 ///
-/// A tick is equal to `50ms`, or `1/20` of a second,
-/// and this will always be a value between `0` and `19`.
+/// A tick is equal to `50ms`, or `1 / 20` of a
+/// second, when using [`Real`](bevy_time::Real) time.
+///
+/// This will always be a value between `0` and `19`.
 ///
 /// ---
 ///
 /// This doesn't keep track of ticks from the server,
-/// but rather the current real-time tick.
+/// but rather the current [`Virtual`](bevy_time::Virtual) tick.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Resource, Reflect)]
 #[reflect(Default, Resource)]
 pub struct CurrentTick(pub u8);

@@ -70,10 +70,12 @@ impl Chunk {
     /// - `minecraft:the_nether`: 256 (256 - 0)
     /// - `minecraft:the_end`: 256 (256 - 0)
     #[must_use]
-    pub const fn height(&self) -> u32 { Self::internal_height(self.max_height, self.height_offset) }
+    pub const fn height(&self) -> u32 {
+        Self::calc_internal_height(self.max_height, self.height_offset)
+    }
 
     #[allow(clippy::cast_sign_loss)]
-    const fn internal_height(max_height: u32, height_offset: i32) -> u32 {
+    const fn calc_internal_height(max_height: u32, height_offset: i32) -> u32 {
         max_height.wrapping_sub(height_offset as u32)
     }
 
@@ -104,7 +106,9 @@ impl Chunk {
     /// Creates a new empty [`Chunk`] with the given height.
     #[must_use]
     pub fn new_empty(max_height: u32, height_offset: i32) -> Self {
-        let section_count = Self::internal_height(max_height, height_offset) / ChunkSection::HEIGHT;
+        let section_count =
+            Self::calc_internal_height(max_height, height_offset) / ChunkSection::HEIGHT;
+
         Self {
             max_height,
             height_offset,
@@ -242,7 +246,8 @@ impl Chunk {
         height_offset: i32,
         buf: &mut std::io::Cursor<&[u8]>,
     ) -> Result<Self, ReadError> {
-        let section_count = Self::internal_height(max_height, height_offset) / ChunkSection::HEIGHT;
+        let section_count =
+            Self::calc_internal_height(max_height, height_offset) / ChunkSection::HEIGHT;
 
         let mut sections = Vec::with_capacity(section_count as usize);
         for _ in 0..section_count {

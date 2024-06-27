@@ -6,11 +6,15 @@ use bevy_ecs::{
     world::{Mut, World},
 };
 use bevy_reflect::TypePath;
-use bevy_time::Time;
+use bevy_time::{Real, Time};
 
 use super::{timer::ScheduleTimer, RunFixedUtilLoop};
 
-pub(super) trait ScheduleTrait<TimeType: 'static + Default + Send + Sync = ()>
+/// A trait for schedules that run at specific intervals.
+///
+/// By default uses [`Real`] time, but can be used with
+/// [`Virtual`](bevy_time::Virtual) time.
+pub(super) trait ScheduleTrait<TimeType: 'static + Default + Send + Sync = Real>
 where
     Self: Default + ScheduleLabel + TypePath,
 {

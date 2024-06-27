@@ -14,12 +14,21 @@ use derive_more::{Deref, DerefMut, From, Into};
 #[cfg_attr(feature = "bevy", reflect(Component, Default))]
 pub struct EntityId(pub u32);
 
+impl EntityId {
+    /// Creates a new `EntityId` with the given value.
+    #[must_use]
+    pub const fn new(value: u32) -> Self { EntityId(value) }
+}
+
 impl std::fmt::Display for EntityId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }
 }
 
 impl From<u8> for EntityId {
     fn from(value: u8) -> Self { EntityId(value.into()) }
+}
+impl From<u16> for EntityId {
+    fn from(value: u16) -> Self { EntityId(value.into()) }
 }
 
 impl std::ops::Add<EntityId> for EntityId {
