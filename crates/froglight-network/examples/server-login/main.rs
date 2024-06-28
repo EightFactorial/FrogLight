@@ -1,10 +1,15 @@
-//! Send a status request to "localhost" and prints the response.
+//! Connect to a server and log the packets received.
+//!
+//! The connection will eventually be closed by the server
+//! due to not responding to keep-alive packets.
 
 use bevy::{app::AppExit, prelude::*};
 use bevy_log::LogPlugin;
 use froglight_network::{
     common::UnsizedBuffer,
-    network::{ConnectionChannel, ConnectionTask, ConnectionTrait, NetworkErrorEvent, PolledTask},
+    network::{
+        ConnectionChannel, ConnectionTrait, NetworkErrorEvent, NetworkPreUpdateSet, PolledTask,
+    },
     resolver::Resolver,
     versions::v1_21_0::{
         configuration::{
@@ -25,11 +30,22 @@ fn main() {
     let mut app = App::new();
     app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins.as_plugingroup()));
 
+    // I recommend polling for packets during the `PreUpdate` stage.
+    // This way you can handle packets and move/spawn entities,
+    // update inventories, etc. before the main game logic.
+    app.add_systems(
+        PreUpdate,
+        print_packets
+            .run_if(any_with_component::<ConnectionChannel<V1_21_0>>)
+            .in_set(NetworkPreUpdateSet),
+    );
+
     app.add_systems(
         Update,
         (
+            // Create a connection to the server once
             create_connection.run_if(run_once()),
-            print_packets.run_if(any_with_component::<ConnectionTask>),
+            // Exit if a network error occurs
             exit_on_error.run_if(on_event::<NetworkErrorEvent>()),
         )
             .chain(),
@@ -38,13 +54,37 @@ fn main() {
     app.run();
 }
 
+/// The server address to connect to.
 const SERVER_ADDRESS: &str = "localhost";
 
+/// Create a connection to the server.
+///
+/// **Do not** drop the task or the channel before it is done.
+/// If either are dropped the connection will immediately close.
+///
+/// If you don't want to manage entity lifetimes and polling tasks,
+/// you can use the [`PolledTask`] [`Component`], which will
+/// despawn the entity automatically when the task is done.
 fn create_connection(mut commands: Commands, resolver: Res<Resolver>) {
     let (task, channel) = V1_21_0::connect(SERVER_ADDRESS, &resolver);
     commands.spawn((task, channel, PolledTask));
 }
 
+/// Log and exit if a network error occurs.
+fn exit_on_error(mut events: EventReader<NetworkErrorEvent>, mut exit: EventWriter<AppExit>) {
+    if let Some(error) = events.read().next() {
+        error!("Error: {}", error.error);
+        error!("Exiting...");
+        exit.send(AppExit);
+    }
+}
+
+/// Query for any [`ConnectionChannel`]s and print any packets received.
+///
+/// I do recommend keeping this as one large system,
+/// but it should be split up into multiple functions for readability.
+///
+/// Disabled the lint since it's just an example.
 #[allow(clippy::too_many_lines)]
 fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut commands: Commands) {
     for (entity, channel) in channels.iter() {
@@ -100,7 +140,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
         }
 
         // Handle `Configuration` packets
-        while let Ok(packet) = channel.config.recv.try_recv() {
+        while let Ok(packet) = channel.config.recv() {
             match packet.as_ref() {
                 ConfigurationClientboundPackets::SelectKnownPacks(resourcepack_packet) => {
                     info!("Config: ResourcePacks");
@@ -180,7 +220,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
             }
         }
 
-        while let Ok(packet) = channel.play.recv.try_recv() {
+        while let Ok(packet) = channel.play.recv() {
             match packet.as_ref() {
                 PlayClientboundPackets::CookieRequest(cookie_packet) => {
                     info!("Play: Cookie \"{}\"", cookie_packet.cookie);
@@ -251,16 +291,5 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                 }
             }
         }
-    }
-}
-
-/// Exit when a network error occurs.
-///
-/// The error will already be logged, so we just need to exit.
-fn exit_on_error(mut events: EventReader<NetworkErrorEvent>, mut exit: EventWriter<AppExit>) {
-    if let Some(error) = events.read().next() {
-        error!("Error: {}", error.error);
-        error!("Exiting...");
-        exit.send(AppExit);
     }
 }

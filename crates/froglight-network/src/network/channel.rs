@@ -90,6 +90,8 @@ pub(super) struct PacketTaskChannel<V: Version, S: State<V>, D: NetworkDirection
 impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketTaskChannel<V, S, D> {
     /// Send a packet through the channel.
     ///
+    /// A shortcut for [`Sender::send`].
+    ///
     /// # Errors
     /// This will return an error if the channel is full or closed.
     pub(super) fn send(&self, packet: D::Recv) -> async_channel::Send<'_, Arc<D::Recv>> {
@@ -97,6 +99,8 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketTaskChannel<V, S,
     }
 
     /// Receive a packet from the channel.
+    ///
+    /// A shortcut for [`Receiver::recv`].
     ///
     /// # Errors
     /// This will return an error if the channel is empty or closed.
@@ -123,6 +127,8 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketChannel<V, S, D> 
 
     /// Send a packet through the channel.
     ///
+    /// A shortcut for [`Sender::try_send`].
+    ///
     /// # Errors
     /// This will return an error if the channel is full or closed.
     pub fn send(&self, packet: impl Into<D::Send>) -> Result<(), TrySendError<Arc<D::Send>>> {
@@ -130,6 +136,8 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketChannel<V, S, D> 
     }
 
     /// Receive a packet from the channel.
+    ///
+    /// A shortcut for [`Receiver::try_recv`].
     ///
     /// # Errors
     /// This will return an error if the channel is empty or closed.

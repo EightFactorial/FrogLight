@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
+compact_str = { workspace = true, features = ["proptest"] }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-protocol-debug",
 ] }

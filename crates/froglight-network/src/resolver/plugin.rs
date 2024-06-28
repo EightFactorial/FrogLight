@@ -37,7 +37,7 @@ pub struct ResolverPlugin {
 impl Default for ResolverPlugin {
     /// Create a new [`ResolverPlugin`] with the default config.
     ///
-    /// Uses Cloudflare's DNS service and prefers IPv4 over IPv6.
+    /// Uses Cloudflare's DNS service and prefers `IPv4` over `IPv6`.
     fn default() -> Self { Self::new(ResolverConfig::cloudflare()).prefer_ipv4() }
 }
 

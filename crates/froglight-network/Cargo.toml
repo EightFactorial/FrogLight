@@ -39,7 +39,7 @@ uuid = { workspace = true, features = ["v3"] }
 # Optional bevy dependencies
 bevy_app = { workspace = true, optional = true }
 bevy_derive = { workspace = true, optional = true }
-bevy_ecs = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true, features = ["multi-threaded"] }
 bevy_hierarchy = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }

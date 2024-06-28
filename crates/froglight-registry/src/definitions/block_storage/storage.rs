@@ -24,9 +24,9 @@ pub struct BlockStorage<V: Version> {
 
 /// Implementations for creating a new [`BlockStorage`] and registering blocks.
 impl<V: Version> BlockStorage<V> {
-    /// Create a new empty [`BlockStorage`].
-    #[must_use]
-    pub fn new_empty() -> Self { Self::default() }
+    /// The default capacity for a [`BlockStorage`] when using
+    /// [`BlockStorage::new`].
+    pub const DEFAULT_CAPACITY: usize = 1024 + 128;
 
     /// Create a new [`BlockStorage`] with all
     /// [`vanilla blocks`](VanillaResolver) registered.
@@ -35,9 +35,37 @@ impl<V: Version> BlockStorage<V> {
     where
         VanillaResolver: BlockStateResolver<V>,
     {
-        let mut storage = Self::new_empty();
+        let mut storage = Self::with_capacity(Self::DEFAULT_CAPACITY);
         storage.register_resolver::<VanillaResolver>();
         storage
+    }
+
+    /// Create a new [`BlockStorage`] with a specific capacity.
+    #[must_use]
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            dyn_storage: Vec::with_capacity(capacity),
+            type_map: HashMap::with_capacity(capacity),
+            ..Self::new_empty()
+        }
+    }
+
+    /// Create a new empty [`BlockStorage`].
+    #[must_use]
+    #[cfg(feature = "hashbrown")]
+    pub const fn new_empty() -> Self {
+        Self {
+            dyn_storage: Vec::new(),
+            range_map: RangeMap::new(),
+            type_map: HashMap::with_hasher(hashbrown::hash_map::DefaultHashBuilder::new()),
+        }
+    }
+
+    /// Create a new empty [`BlockStorage`].
+    #[must_use]
+    #[cfg(not(feature = "hashbrown"))]
+    pub fn new_empty() -> Self {
+        Self { dyn_storage: Vec::new(), range_map: RangeMap::new(), type_map: HashMap::new() }
     }
 
     /// Register all blocks for a specific [`BlockStateResolver`].
@@ -78,18 +106,15 @@ impl<V: Version> BlockStorage<V> {
     ///  # Example
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::definitions::BlockStorage;
+    /// use froglight_registry::{blocks::GrassBlock, definitions::BlockStorage};
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
-    /// // Pretend we don't know the block type.
-    /// let stone_range = storage.blockstate_range(1).unwrap();
-    /// let grass_range = storage.blockstate_range(8).unwrap();
-    ///
-    /// // Stone has 1 block state, `1`.
-    /// assert_eq!(stone_range, &(1..2));
+    /// // Here we know the block type, but you can use any `dyn BlockType`.
+    /// let grass_range = storage.blockstate_range(&GrassBlock::default()).unwrap();
     /// // Grass has 2 block states, `8` and `9`.
     /// assert_eq!(grass_range, &(8..10));
+    /// ```
     #[must_use]
     pub fn blockstate_range(&self, block: &dyn BlockType<V>) -> Option<&Range<u32>> {
         self.type_map.get(&block.type_id())
@@ -124,7 +149,7 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// # Note
     /// This ***is not*** the same as the `block state id`!
-    /// 
+    ///
     /// You likely want to use [`BlockStorage::blockstate_id_of`] instead.
     ///
     /// # Example
@@ -185,22 +210,22 @@ impl<V: Version> BlockStorage<V> {
     /// Get the `block state id` of a block.
     ///
     /// This is the reverse of [`BlockStorage::resolve_blockstate`].
-    ///  
+    ///
     /// # Example
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///    attributes::SnowyAttribute,
-    ///    blocks::GrassBlock,
-    ///    definitions::{BlockExt, BlockStorage},
+    ///     attributes::SnowyAttribute,
+    ///     blocks::GrassBlock,
+    ///     definitions::{BlockExt, BlockStorage},
     /// };
-    /// 
+    ///
     /// let storage = BlockStorage::<V1_21_0>::new();
-    /// 
+    ///
     /// // The first variant of grass has `SnowyAttribute(true)`.
     /// let grass_snowy = storage.blockstate_id_of(&GrassBlock { snowy: SnowyAttribute(true) });
     /// assert_eq!(grass_snowy, Some(8));
-    /// 
+    ///
     /// // The second variant of grass has `SnowyAttribute(false)`.
     /// let grass_normal = storage.blockstate_id_of(&GrassBlock { snowy: SnowyAttribute(false) });
     /// assert_eq!(grass_normal, Some(9));
@@ -248,7 +273,7 @@ impl<V: Version> BlockStorage<V> {
     }
 
     /// Resolve a [`Res::Resolved`] from a `block state id`.
-    /// 
+    ///
     /// This is the reverse of [`BlockStorage::blockstate_id_of`].
     ///
     /// # Example

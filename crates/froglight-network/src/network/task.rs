@@ -133,7 +133,8 @@ impl StatusTask {
 /// polled.
 ///
 /// Add this to a [`ConnectionTask`] or [`StatusTask`] to have it polled,
-/// the result sent as an [`Event`](bevy_ecs::event::Event), and then despawned.
+/// the result sent as an [`Event`](bevy_ecs::event::Event), and then despawned
+/// when done.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
 #[reflect(Default, Component)]
 pub struct PolledTask;

@@ -8,10 +8,10 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 ///
 /// Unlike a [`Vec<u8>`], when encoded it is not prefixed with a length.
 ///
-/// When used as a field in a packet, the buffer takes up the entire length of
-/// the packet.
+/// When used as a field in a packet, the buffer takes up the entire remaining
+/// length of the packet.
 ///
-/// For this reason, it *must* be the last field in the packet.
+/// For this reason, it **must** be the last field in the packet.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct UnsizedBuffer(
