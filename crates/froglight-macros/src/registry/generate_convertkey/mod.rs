@@ -3,10 +3,10 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{Data, DeriveInput, Ident, Path};
 
-use super::RegistryAttributes;
-use crate::registry::VariantAttributes;
+use super::ConvertKeyAttributes;
+use crate::registry::ConvertKeyVariantAttributes;
 
-pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes) -> TokenStream {
+pub(super) fn generate_convertkey(input: DeriveInput, attrs: ConvertKeyAttributes) -> TokenStream {
     // Get the path to `froglight-registry`
     let crate_path = crate::registry::get_registry_path();
 
@@ -40,7 +40,8 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: RegistryAttributes)
         let variant_ident = &variant.ident;
 
         // Parse the attributes of the variant
-        let variant_attrs = VariantAttributes::from_attributes(variant.attrs.iter()).unwrap();
+        let variant_attrs =
+            ConvertKeyVariantAttributes::from_attributes(variant.attrs.iter()).unwrap();
 
         // Parse the key attribute
         let variant_str = variant_attrs.key.as_str();

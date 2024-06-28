@@ -47,3 +47,17 @@ mod registry;
 pub fn frog_registry(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     registry::frog_registry_convertkey(input)
 }
+
+/// A macro for generating block attributes.
+#[cfg(feature = "froglight-registry")]
+#[proc_macro]
+pub fn frog_create_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    registry::frog_create_attributes(input)
+}
+
+/// A macro for generating block structs.
+#[cfg(feature = "froglight-registry")]
+#[proc_macro]
+pub fn frog_create_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    registry::frog_create_blocks(input)
+}

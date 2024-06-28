@@ -62,9 +62,11 @@ where
     /// # Example
     /// ```rust
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::{Air, GrassBlock, Stone},
     ///     definitions::BlockExt,
+    ///     registries::{
+    ///         attributes::SnowyAttribute,
+    ///         blocks::{Air, GrassBlock, Stone},
+    ///     },
     /// };
     ///
     /// // Air has no attributes, so it has `1` block state.
@@ -92,9 +94,8 @@ where
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::GrassBlock,
     ///     definitions::{BlockExt, BlockStorage},
+    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
@@ -131,9 +132,8 @@ where
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::GrassBlock,
     ///     definitions::{BlockExt, BlockStorage},
+    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
@@ -160,9 +160,8 @@ where
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::GrassBlock,
     ///     definitions::{BlockExt, BlockStorage},
+    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
@@ -186,9 +185,8 @@ where
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::GrassBlock,
     ///     definitions::{BlockExt, BlockStorage},
+    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
@@ -244,7 +242,7 @@ where
     ///
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{attributes::SnowyAttribute, definitions::BlockAttribute};
+    /// use froglight_registry::{definitions::BlockAttribute, registries::attributes::SnowyAttribute};
     ///
     /// // SnowyAttribute has two states, `true` and `false`.
     /// assert_eq!(<SnowyAttribute as BlockAttribute<V1_21_0>>::ATTRIBUTE_STATES, 2);

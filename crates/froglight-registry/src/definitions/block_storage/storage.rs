@@ -106,7 +106,7 @@ impl<V: Version> BlockStorage<V> {
     ///  # Example
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{blocks::GrassBlock, definitions::BlockStorage};
+    /// use froglight_registry::{definitions::BlockStorage, registries::blocks::GrassBlock};
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
@@ -156,9 +156,11 @@ impl<V: Version> BlockStorage<V> {
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::{Air, GrassBlock, Stone},
     ///     definitions::BlockStorage,
+    ///     registries::{
+    ///         attributes::SnowyAttribute,
+    ///         blocks::{Air, GrassBlock, Stone},
+    ///     },
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
@@ -215,9 +217,8 @@ impl<V: Version> BlockStorage<V> {
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::GrassBlock,
     ///     definitions::{BlockExt, BlockStorage},
+    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
@@ -280,9 +281,8 @@ impl<V: Version> BlockStorage<V> {
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
-    ///     attributes::SnowyAttribute,
-    ///     blocks::GrassBlock,
     ///     definitions::{BlockStateResolver, BlockStorage, VanillaResolver},
+    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
