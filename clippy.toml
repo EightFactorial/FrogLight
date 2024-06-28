@@ -1,1 +1,8 @@
-doc-valid-idents = ["FrogLight"]
+doc-valid-idents = [
+    "FrogLight",
+    "HandshakeState",
+    "StatusState",
+    "LoginState",
+    "ConfigurationState",
+    "PlayState",
+]
