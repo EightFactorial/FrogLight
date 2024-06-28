@@ -7,22 +7,21 @@ use crate::{
 };
 
 impl BlockStateResolver<TestVersion> for VanillaResolver {
-    type Result = Option<TestBlocks>;
+    type Resolved = Option<TestBlocks>;
 
-    fn resolve(state_id: u32, storage: &BlockStorage<TestVersion>) -> Self::Result {
-        let default_dyn = storage.get_default_dyn(state_id)?;
+    fn resolve_state(state_id: u32, storage: &BlockStorage<TestVersion>) -> Self::Resolved {
+        let default_dyn = storage.default_blockstate(state_id)?;
         match default_dyn.type_id() {
             id if id == TypeId::of::<AirBlock>() => Some(TestBlocks::Air(AirBlock)),
             id if id == TypeId::of::<StoneBlock>() => Some(TestBlocks::Stone(StoneBlock)),
             id if id == TypeId::of::<GrassBlock>() => {
-                let relative_id = storage.relative_state_of(default_dyn, state_id)?;
-                Some(TestBlocks::Grass(GrassBlock::from_relative_id(relative_id)?))
+                GrassBlock::from_blockstate_id(state_id, storage).map(TestBlocks::Grass)
             }
             _ => None,
         }
     }
 
-    fn register_defaults(storage: &mut BlockStorage<TestVersion>) {
+    fn register_blocks(storage: &mut BlockStorage<TestVersion>) {
         storage.register::<AirBlock>().register::<StoneBlock>().register::<GrassBlock>();
     }
 }
@@ -34,37 +33,37 @@ fn default_dyn() {
 
     // Check that the default air block is correct
     {
-        let dyn_air = read.get_default_dyn(0).unwrap();
+        let dyn_air = read.default_blockstate(0).unwrap();
         let dyn_air = dyn_air.as_any().downcast_ref::<AirBlock>().unwrap();
 
-        assert_eq!(dyn_air, &AirBlock::default_state());
+        assert_eq!(dyn_air, &AirBlock::default_block());
     }
 
     // Check that the default stone block is correct
     {
-        let dyn_stone = read.get_default_dyn(1).unwrap();
+        let dyn_stone = read.default_blockstate(1).unwrap();
         let dyn_stone = dyn_stone.as_any().downcast_ref::<StoneBlock>().unwrap();
 
-        assert_eq!(dyn_stone, &StoneBlock::default_state());
+        assert_eq!(dyn_stone, &StoneBlock::default_block());
     }
 
     // Check that the default grass block is correct
     {
-        let dyn_grass_bare = read.get_default_dyn(2).unwrap();
+        let dyn_grass_bare = read.default_blockstate(2).unwrap();
         let dyn_grass_bare = dyn_grass_bare.as_any().downcast_ref::<GrassBlock>().unwrap();
 
         // This is as expected, because the first state
         // is the default state for the grass block.
         assert_eq!(dyn_grass_bare, &GrassBlock { grassy: GrassyAttribute(false) });
 
-        let dyn_grass_grassy = read.get_default_dyn(3).unwrap();
+        let dyn_grass_grassy = read.default_blockstate(3).unwrap();
         let dyn_grass_grassy = dyn_grass_grassy.as_any().downcast_ref::<GrassBlock>().unwrap();
 
         // This is not correct, because the second state
         // is *not* the same as the default state.
         //
         // If you need to know the attributes for sure,
-        // use `get_block` instead of `get_default_dyn`.
+        // use `get_block` instead of `default_blockstate`.
         assert_eq!(dyn_grass_grassy, &GrassBlock { grassy: GrassyAttribute(false) });
     }
 }

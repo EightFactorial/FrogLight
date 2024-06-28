@@ -14,6 +14,7 @@ pub struct ChunkSection {
     pub biomes: BiomeContainer,
 }
 
+// TODO: Increment/decrement `ChunkSection::block_count` when setting blocks.
 impl ChunkSection {
     /// The width of a [`ChunkSection`].
     ///
@@ -37,29 +38,31 @@ impl ChunkSection {
     #[must_use]
     pub fn block_iter(&self) -> SectionBlockIter<'_> { SectionBlockIter::new(self) }
 
-    /// Returns the `Block ID` at the given position.
+    /// Returns the `block state id` at the given position.
     #[inline]
     #[must_use]
-    pub fn get_block(&self, position: SectionBlockPosition) -> u32 {
+    pub fn get_blockstate(&self, position: SectionBlockPosition) -> u32 {
         self.blocks.get_data(&position)
     }
 
-    /// Sets the `Block ID` at the given position.
+    /// Sets the `block state id` at the given position.
     ///
-    /// Returns the previous `Block ID` at the position.
+    /// Returns the previous `block state id` at the position.
     #[inline]
-    pub fn set_block(&mut self, position: SectionBlockPosition, block_id: u32) -> u32 {
-        self.blocks.set_data(&position, block_id)
+    pub fn set_blockstate(&mut self, position: SectionBlockPosition, blockstate_id: u32) -> u32 {
+        self.blocks.set_data(&position, blockstate_id)
     }
 
-    /// Returns the `Biome ID` at the given position.
+    /// Returns the `biome id` at the given position.
     #[inline]
     #[must_use]
     pub fn get_biome(&self, position: SectionBlockPosition) -> u32 {
         self.biomes.get_data(&position)
     }
 
-    /// Sets the `Biome ID` at the given position.
+    /// Sets the `biome id` at the given position.
+    ///
+    /// Returns the previous `biome id` at the position.
     #[inline]
     pub fn set_biome(&mut self, position: SectionBlockPosition, biome_id: u32) -> u32 {
         self.biomes.set_data(&position, biome_id)

@@ -21,7 +21,7 @@ impl BlockType<TestVersion> for SomeOtherBlock {
 
 impl BlockExt<TestVersion> for SomeOtherBlock {
     const BLOCK_STATES: u32 = 1u32;
-    fn default_state() -> Self { SomeOtherBlock }
+    fn default_block() -> Self { SomeOtherBlock }
 }
 
 /// A custom block resolver that only resolves `SomeOtherBlock`.
@@ -31,10 +31,10 @@ impl BlockExt<TestVersion> for SomeOtherBlock {
 struct SomeOtherResolver;
 
 impl BlockStateResolver<TestVersion> for SomeOtherResolver {
-    type Result = Option<SomeOtherBlock>;
+    type Resolved = Option<SomeOtherBlock>;
 
-    fn resolve(state_id: u32, storage: &BlockStorage<TestVersion>) -> Self::Result {
-        let default_dyn = storage.get_default_dyn(state_id)?;
+    fn resolve_state(state_id: u32, storage: &BlockStorage<TestVersion>) -> Self::Resolved {
+        let default_dyn = storage.default_blockstate(state_id)?;
         if default_dyn.type_id() == TypeId::of::<SomeOtherBlock>() {
             Some(SomeOtherBlock)
         } else {
@@ -42,7 +42,7 @@ impl BlockStateResolver<TestVersion> for SomeOtherResolver {
         }
     }
 
-    fn register_defaults(storage: &mut BlockStorage<TestVersion>) {
+    fn register_blocks(storage: &mut BlockStorage<TestVersion>) {
         storage.register::<SomeOtherBlock>();
     }
 }

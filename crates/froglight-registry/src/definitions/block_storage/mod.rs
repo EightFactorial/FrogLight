@@ -45,25 +45,25 @@ where
 
     /// Register all default blocks for a specific [`BlockStateResolver`].
     pub fn register_defaults<R: BlockStateResolver<V>>(&mut self) {
-        R::register_defaults(&mut self.write());
+        R::register_blocks(&mut self.write());
     }
 
     /// Get a block from a state id.
     #[must_use]
-    pub fn get_block<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Result
+    pub fn get_block<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Resolved
     where
-        Res::Result: Copy,
+        Res::Resolved: Copy,
     {
-        Res::resolve(state_id, &self.read())
+        Res::resolve_state(state_id, &self.read())
     }
 
     /// Get a block from a state id.
     #[must_use]
-    pub fn get_block_clone<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Result
+    pub fn get_block_clone<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Resolved
     where
-        Res::Result: Clone,
+        Res::Resolved: Clone,
     {
-        Res::resolve(state_id, &self.read())
+        Res::resolve_state(state_id, &self.read())
     }
 
     /// Get a [`RwLockReadGuard`] to the [`BlockStorage`].

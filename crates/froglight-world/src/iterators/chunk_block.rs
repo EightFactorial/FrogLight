@@ -45,7 +45,7 @@ impl Iterator for ChunkBlockIter<'_> {
             return None;
         }
 
-        let block = self.chunk.get_block_id(self.index);
+        let block = self.chunk.get_blockstate_id(self.index);
 
         let next_index = self.index.next();
         if next_index.y() >= self.chunk.height() {

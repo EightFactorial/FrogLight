@@ -22,7 +22,12 @@ pub struct BlockStorage<V: Version> {
     pub(crate) type_map: HashMap<TypeId, Range<u32>>,
 }
 
+/// Implementations for creating a new [`BlockStorage`] and registering blocks.
 impl<V: Version> BlockStorage<V> {
+    /// Create a new empty [`BlockStorage`].
+    #[must_use]
+    pub fn new_empty() -> Self { Self::default() }
+
     /// Create a new [`BlockStorage`] with all
     /// [`vanilla blocks`](VanillaResolver) registered.
     #[must_use]
@@ -31,103 +36,23 @@ impl<V: Version> BlockStorage<V> {
         VanillaResolver: BlockStateResolver<V>,
     {
         let mut storage = Self::new_empty();
-        Self::register_defaults::<VanillaResolver>(&mut storage);
+        storage.register_resolver::<VanillaResolver>();
         storage
     }
 
-    /// Create a new empty [`BlockStorage`].
-    #[must_use]
-    pub fn new_empty() -> Self { Self::default() }
-
-    /// Get a block's state id range.
-    #[must_use]
-    pub fn range_of_type<Block: BlockType<V>>(&self) -> Option<&Range<u32>> {
-        self.type_map.get(&TypeId::of::<Block>())
-    }
-
-    /// Get a block's state id range.
-    #[must_use]
-    pub fn range_of(&self, block: &dyn BlockType<V>) -> Option<&Range<u32>> {
-        self.type_map.get(&block.type_id())
-    }
-
-    /// Get a block's relative state id from it's type and state id.
-    ///
-    /// This will return `None` if the [`BlockType`] is not registered or
-    /// the state id is out of range.
-    #[must_use]
-    pub fn relative_state_of_type<Block: BlockType<V>>(&self, state_id: u32) -> Option<u32> {
-        let range = self.range_of_type::<Block>()?;
-        if range.contains(&state_id) {
-            state_id.checked_sub(range.start)
-        } else {
-            None
-        }
-    }
-
-    /// Get a block's relative state id from it's type and state id.
-    ///
-    /// This will return `None` if the [`BlockType`] is not registered or
-    /// the state id is out of range.
-    #[must_use]
-    pub fn relative_state_of(&self, block: &dyn BlockType<V>, state_id: u32) -> Option<u32> {
-        let range = self.range_of(block)?;
-        if range.contains(&state_id) {
-            state_id.checked_sub(range.start)
-        } else {
-            None
-        }
-    }
-
-    /// Get a block's default state as a trait object.
-    ///
-    /// ---
-    ///
-    /// ### Note
-    /// This returns a reference to the **default block**, who's properties
-    /// may not match the actual block state.
-    ///
-    /// This is useful if you only need default block properties, or if you
-    /// are sure the property is the same for all block states.
-    ///
-    /// If you want to get the full block state, use
-    /// [`BlockStorage::get_block`].
-    #[must_use]
-    pub fn get_default_dyn(&self, state_id: u32) -> Option<&dyn BlockType<V>> {
-        let storage_index = self.range_map.get(&state_id)?;
-        self.dyn_storage.get(*storage_index).map(AsRef::as_ref)
-    }
-
-    /// Get a block from it's state id.
-    ///
-    /// See [`BlockStateResolver`] and [`VanillaResolver`] for more information.
-    ///
-    /// ---
-    ///
-    /// ### Note
-    /// This will resolve the full block, including all properties.
-    ///
-    /// If you only need the default block properties, use
-    /// the much faster [`BlockStorage::get_default_dyn`].
-    #[must_use]
-    pub fn get_block<Res: BlockStateResolver<V>>(&self, state_id: u32) -> Res::Result {
-        Res::resolve(state_id, self)
-    }
-
-    /// Get a block's id, if it's registered with the [`BlockStorage`].
-    ///
-    /// This will return `None` if the block is not registered.
-    #[must_use]
-    pub fn get_block_id(&self, block: &impl BlockExt<V>) -> Option<u32> {
-        let range = self.range_of(block)?;
-        let relative_id = block.to_relative_id();
-        range.start.checked_add(relative_id)
+    /// Register all blocks for a specific [`BlockStateResolver`].
+    pub fn register_resolver<Res: BlockStateResolver<V>>(&mut self) -> &mut Self {
+        Res::register_blocks(self);
+        self
     }
 
     /// Register a new block type with the [`BlockStorage`].
+    ///
+    /// This is usually called by a [`BlockStateResolver`]
+    /// when using [`BlockStorage::register_resolver`].
     pub fn register<Block: BlockExt<V>>(&mut self) -> &mut Self {
         // Create a new default block.
-        let default = Block::default_state();
+        let default = Block::default_block();
 
         // Get the next available storage index and insert the block.
         let storage_index = self.dyn_storage.len();
@@ -143,10 +68,213 @@ impl<V: Version> BlockStorage<V> {
 
         self
     }
+}
 
-    /// Register all default blocks for a specific [`BlockStateResolver`].
-    pub fn register_defaults<Res: BlockStateResolver<V>>(&mut self) -> &mut Self {
-        Res::register_defaults(self);
-        self
+/// Implementations for converting between blocks and block state ids.
+impl<V: Version> BlockStorage<V> {
+    /// Get the (exclusive) range of `block states` for a block, when you don't
+    /// know the block type.
+    ///
+    ///  # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
+    /// use froglight_registry::definitions::BlockStorage;
+    ///
+    /// let storage = BlockStorage::<V1_21_0>::new();
+    ///
+    /// // Pretend we don't know the block type.
+    /// let stone_range = storage.blockstate_range(1).unwrap();
+    /// let grass_range = storage.blockstate_range(8).unwrap();
+    ///
+    /// // Stone has 1 block state, `1`.
+    /// assert_eq!(stone_range, &(1..2));
+    /// // Grass has 2 block states, `8` and `9`.
+    /// assert_eq!(grass_range, &(8..10));
+    #[must_use]
+    pub fn blockstate_range(&self, block: &dyn BlockType<V>) -> Option<&Range<u32>> {
+        self.type_map.get(&block.type_id())
+    }
+
+    /// Get the range of `block states` for a `block state id`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
+    /// use froglight_registry::definitions::BlockStorage;
+    ///
+    /// let storage = BlockStorage::<V1_21_0>::new();
+    ///
+    /// // Stone has 1 block state, `1`.
+    /// let stone_range = storage.blockstate_range_of(1).unwrap();
+    /// assert_eq!(stone_range, &(1..2));
+    ///
+    /// // Grass has 2 block states, `8` and `9`.
+    /// let grass_range = storage.blockstate_range_of(8).unwrap();
+    /// assert_eq!(grass_range, storage.blockstate_range_of(9).unwrap());
+    /// assert_eq!(grass_range, &(8..10));
+    /// ```
+    #[must_use]
+    pub fn blockstate_range_of(&self, blockstate_id: u32) -> Option<&Range<u32>> {
+        self.range_map.get_key_value(&blockstate_id).map(|(range, _)| range)
+    }
+
+    /// Get the `block id` of a dyn block.
+    ///
+    /// This equivalent to the order in which the blocks were registered.
+    ///
+    /// # Note
+    /// This ***is not*** the same as the `block state id`!
+    /// 
+    /// You likely want to use [`BlockStorage::blockstate_id_of`] instead.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
+    /// use froglight_registry::{
+    ///     attributes::SnowyAttribute,
+    ///     blocks::{Air, GrassBlock, Stone},
+    ///     definitions::BlockStorage,
+    /// };
+    ///
+    /// let storage = BlockStorage::<V1_21_0>::new();
+    ///
+    /// // Air was registered first, so it has an id of `0`.
+    /// let air_id = storage.block_id(&Air).unwrap();
+    /// assert_eq!(air_id, 0);
+    ///
+    /// // Stone was registered second, so it has an id of `1`.
+    /// let stone_id = storage.block_id(&Stone).unwrap();
+    /// assert_eq!(stone_id, 1);
+    ///
+    /// // Grass was registered ninth, so it has an id of `8`.
+    /// let grass_id = storage.block_id(&GrassBlock { snowy: SnowyAttribute(true) }).unwrap();
+    /// assert_eq!(grass_id, storage.block_id(&GrassBlock { snowy: SnowyAttribute(false) }).unwrap());
+    /// assert_eq!(grass_id, 8);
+    /// ```
+    #[must_use]
+    pub fn block_id(&self, block: &dyn BlockType<V>) -> Option<usize> {
+        self.blockstate_range(block).and_then(|range| self.range_map.get(&range.start)).copied()
+    }
+
+    /// Get the `block id` of a block from it's `block state id`.
+    ///
+    /// This equivalent to the order in which the blocks were registered.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
+    /// use froglight_registry::definitions::BlockStorage;
+    ///
+    /// let storage = BlockStorage::<V1_21_0>::new();
+    ///
+    /// // Air was registered first, so it has a `block id` of `0`.
+    /// assert_eq!(storage.block_id_of(0), Some(0));
+    ///
+    /// // Stone was registered second, so it has a `block id` of `1`.
+    /// assert_eq!(storage.block_id_of(1), Some(1));
+    ///
+    /// // Grass was registered ninth, so it has a `block id` of `8`.
+    /// assert_eq!(storage.block_id_of(8), Some(8));
+    /// assert_eq!(storage.block_id_of(9), Some(8));
+    /// ```
+    #[must_use]
+    pub fn block_id_of(&self, blockstate_id: u32) -> Option<usize> {
+        self.range_map.get(&blockstate_id).copied()
+    }
+
+    /// Get the `block state id` of a block.
+    ///
+    /// This is the reverse of [`BlockStorage::resolve_blockstate`].
+    ///  
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
+    /// use froglight_registry::{
+    ///    attributes::SnowyAttribute,
+    ///    blocks::GrassBlock,
+    ///    definitions::{BlockExt, BlockStorage},
+    /// };
+    /// 
+    /// let storage = BlockStorage::<V1_21_0>::new();
+    /// 
+    /// // The first variant of grass has `SnowyAttribute(true)`.
+    /// let grass_snowy = storage.blockstate_id_of(&GrassBlock { snowy: SnowyAttribute(true) });
+    /// assert_eq!(grass_snowy, Some(8));
+    /// 
+    /// // The second variant of grass has `SnowyAttribute(false)`.
+    /// let grass_normal = storage.blockstate_id_of(&GrassBlock { snowy: SnowyAttribute(false) });
+    /// assert_eq!(grass_normal, Some(9));
+    /// ```
+    #[must_use]
+    pub fn blockstate_id_of(&self, block: &impl BlockExt<V>) -> Option<u32> {
+        block.to_blockstate_id(self)
+    }
+
+    /// Returns the default block for a `block state id`.
+    ///
+    /// # Note
+    /// This is only useful if you don't know the block type,
+    /// and the properties of the block are not needed
+    /// or will not change between different block states.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
+    /// use froglight_registry::definitions::BlockStorage;
+    ///
+    /// let storage = BlockStorage::<V1_21_0>::new();
+    ///
+    /// // Pretend we don't know the block type.
+    /// let grass_snowy = storage.default_blockstate(8).unwrap();
+    /// let grass_normal = storage.default_blockstate(9).unwrap();
+    ///
+    /// // The block key is the same for both block states.
+    /// assert_eq!(grass_snowy.to_key(), "minecraft:grass_block");
+    /// assert_eq!(grass_normal.to_key(), "minecraft:grass_block");
+    ///
+    /// // Both block states are not `air`.
+    /// assert!(!grass_snowy.is_air());
+    /// assert!(!grass_normal.is_air());
+    ///
+    /// // However, specific properties that should be different are the same.
+    /// // This is because we are using the *default* (not `snowy`) block state.
+    /// // assert_eq!(**grass_snowy.is_snowy(), Some(false));
+    /// // assert_eq!(**grass_normal.is_snowy(), Some(false));
+    /// ```
+    #[must_use]
+    pub fn default_blockstate(&self, blockstate_id: u32) -> Option<&dyn BlockType<V>> {
+        self.block_id_of(blockstate_id)
+            .and_then(|block_id| self.dyn_storage.get(block_id).map(std::convert::AsRef::as_ref))
+    }
+
+    /// Resolve a [`Res::Resolved`] from a `block state id`.
+    /// 
+    /// This is the reverse of [`BlockStorage::blockstate_id_of`].
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
+    /// use froglight_registry::{
+    ///     attributes::SnowyAttribute,
+    ///     blocks::GrassBlock,
+    ///     definitions::{BlockStateResolver, BlockStorage, VanillaResolver},
+    /// };
+    ///
+    /// let storage = BlockStorage::<V1_21_0>::new();
+    ///
+    /// // The first variant of grass has `SnowyAttribute(true)`.
+    /// let grass_snowy = storage.resolve_blockstate::<VanillaResolver>(8).unwrap();
+    /// assert_eq!(grass_snowy, GrassBlock { snowy: SnowyAttribute(true) }.into());
+    ///
+    /// // The second variant of grass has `SnowyAttribute(false)`.
+    /// let grass_normal = storage.resolve_blockstate::<VanillaResolver>(9).unwrap();
+    /// assert_eq!(grass_normal, GrassBlock { snowy: SnowyAttribute(false) }.into());
+    /// ```
+    #[must_use]
+    pub fn resolve_blockstate<Res: BlockStateResolver<V>>(
+        &self,
+        blockstate_id: u32,
+    ) -> Res::Resolved {
+        Res::resolve_state(blockstate_id, self)
     }
 }

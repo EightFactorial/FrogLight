@@ -26,7 +26,7 @@ impl BlockType<TestVersion> for AirBlock {
     fn is_collidable(&self) -> bool { false }
 }
 impl BlockExt<TestVersion> for AirBlock {
-    fn default_state() -> Self { AirBlock }
+    fn default_block() -> Self { AirBlock }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
@@ -37,7 +37,7 @@ impl BlockType<TestVersion> for StoneBlock {
     fn to_lang(&self) -> &'static str { "block.minecraft.stone" }
 }
 impl BlockExt<TestVersion> for StoneBlock {
-    fn default_state() -> Self { StoneBlock }
+    fn default_block() -> Self { StoneBlock }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
@@ -50,8 +50,8 @@ impl BlockType<TestVersion> for GrassBlock {
     fn to_lang(&self) -> &'static str { "block.minecraft.grass" }
 }
 impl BlockExt<TestVersion> for GrassBlock {
-    const BLOCK_STATES: u32 = GrassyAttribute::ATTRIB_STATES;
-    fn default_state() -> Self { GrassBlock { grassy: GrassyAttribute(false) } }
+    const BLOCK_STATES: u32 = GrassyAttribute::ATTRIBUTE_STATES;
+    fn default_block() -> Self { GrassBlock { grassy: GrassyAttribute(false) } }
     fn from_relative_id(id: u32) -> Option<Self> {
         match id {
             0 => Some(GrassBlock { grassy: GrassyAttribute(false) }),
@@ -66,5 +66,5 @@ impl BlockExt<TestVersion> for GrassBlock {
 pub struct GrassyAttribute(pub bool);
 
 impl BlockAttribute<TestVersion> for GrassyAttribute {
-    const ATTRIB_STATES: u32 = 2u32;
+    const ATTRIBUTE_STATES: u32 = 2u32;
 }

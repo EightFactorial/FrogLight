@@ -46,7 +46,7 @@ impl Iterator for SectionBlockIter<'_> {
             return None;
         }
 
-        let block = self.section.get_block(self.index);
+        let block = self.section.get_blockstate(self.index);
 
         if let Some(next) = self.index.next() {
             self.index = next;
