@@ -26,7 +26,7 @@ All preparation will be done automatically, and the tool will attempt to generat
 > [!Warning]
 > This code will not be pretty, and packets will need to be manually cleaned up and double checked.
 > 
-> **Do not** generate code and complain it doesn't work!
+> **Do not generate code and complain it doesn't work!**
 
 > [!Note]
 > This tool uses packet `CODEC`s, which are fairly recent additions.
