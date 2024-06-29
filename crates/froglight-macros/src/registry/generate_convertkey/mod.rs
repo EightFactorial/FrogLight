@@ -3,8 +3,7 @@ use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{Data, DeriveInput, Ident, Path};
 
-use super::ConvertKeyAttributes;
-use crate::registry::ConvertKeyVariantAttributes;
+use super::{ConvertKeyAttributes, ConvertKeyVariantAttributes};
 
 pub(super) fn generate_convertkey(input: DeriveInput, attrs: ConvertKeyAttributes) -> TokenStream {
     // Get the path to `froglight-registry`
@@ -108,7 +107,10 @@ pub(super) fn generate_convertkey(input: DeriveInput, attrs: ConvertKeyAttribute
     }
 
     // Create a registry name
-    let registry_name = Ident::new(&format!("{enum_ident}Registry"), Span::call_site());
+    let registry_name = Ident::new(
+        &format!("{}Registry", enum_ident.to_string().trim_end_matches("Key")),
+        Span::call_site(),
+    );
 
     quote! {
         type #registry_name = #crate_path::definitions::SimpleRegistry<#enum_ident>;
