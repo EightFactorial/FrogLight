@@ -1,3 +1,4 @@
+use convert_case::{Case, Casing};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
@@ -61,6 +62,7 @@ use syn::{
 ///     }
 /// }
 /// ```
+#[allow(clippy::too_many_lines)]
 pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStream {
     let BlockImplMacro { version, attributes, blocks } =
         syn::parse(tokens).expect("Failed to parse block list");
@@ -79,11 +81,41 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
         tokenstream.extend(quote! {
             impl BlockStateResolver<#version> for VanillaResolver {
                 type Resolved = Option<Blocks>;
-                fn resolve_state(blockstate_id: u32, storage: &BlockStorage<#version>) -> Self::Resolved { todo!() }
+                fn resolve_state(blockstate_id: u32, storage: &BlockStorage<#version>) -> Self::Resolved {
+                    let block_dyn = storage.default_blockstate(blockstate_id)?;
+                    let (_, suffix) = block_dyn.to_key().split_once("minecraft:")?;
+
+                    let block_range = storage.blockstate_range(block_dyn)?;
+                    let relative_id = blockstate_id - block_range.start;
+
+                    FUNCTION_MAP.get(suffix).and_then(|f| f(relative_id))
+                 }
                 fn register_blocks(storage: &mut BlockStorage<#version>) {
                     #register_tokens
                 }
             }
+        });
+    }
+
+    // Create a phf map for the `resolve_state` fn
+    {
+        let mut map_fns = TokenStream::new();
+        for block in &blocks {
+            // TODO: Might need to add the actual block name to the macro
+            let name = &block.name;
+            let str_name = block.name.to_string().to_case(Case::Snake);
+
+            map_fns.extend(quote! {
+                #str_name => |id| {
+                    #name::from_relative_id(id).map(Into::into)
+                },
+            });
+        }
+
+        tokenstream.extend(quote! {
+            static FUNCTION_MAP: phf::Map<&'static str, fn(u32) -> Option<Blocks>> = phf::phf_map! {
+                #map_fns
+            };
         });
     }
 

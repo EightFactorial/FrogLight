@@ -293,7 +293,7 @@ impl<V: Version> BlockStorage<V> {
     /// This is the reverse of [`BlockStorage::blockstate_id_of`].
     ///
     /// # Example
-    /// ```rust,no_run
+    /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
     ///     definitions::{BlockStateResolver, BlockStorage, VanillaResolver},

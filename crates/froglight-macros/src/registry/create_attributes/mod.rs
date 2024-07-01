@@ -105,7 +105,7 @@ impl From<AttributeDeclaration> for Item {
             AttributeFields::Struct(fields) => Item::Struct(ItemStruct {
                 attrs: if fields.unnamed.len() == 1 {
                     vec![
-                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, bevy_derive::Deref, bevy_derive::DerefMut, bevy_reflect::Reflect)] },
+                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into, bevy_derive::Deref, bevy_derive::DerefMut, bevy_reflect::Reflect)] },
                     ]
                 } else {
                     vec![
