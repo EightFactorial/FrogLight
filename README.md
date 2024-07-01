@@ -36,7 +36,7 @@ froglight = { git = "https://github.com/EightFactorial/FrogLight.git" }
 ```
 
 > [!Important]
-> If you are getting poor performance, try building your project in `--release` mode!
+> If you are getting poor performance, make sure you are using `--release` mode!
 
 ## Helpful Resources
 
