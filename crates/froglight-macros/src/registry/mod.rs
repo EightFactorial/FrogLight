@@ -1,4 +1,3 @@
-use attribute_derive::FromAttr;
 use proc_macro::TokenStream;
 use syn::Path;
 
@@ -6,6 +5,7 @@ use crate::manifest::ProjectManifest;
 
 mod create_attributes;
 mod create_blocks;
+mod create_registry;
 mod generate_convertkey;
 
 /// Get the path to the `froglight_registry` crate.
@@ -14,31 +14,7 @@ pub(crate) fn get_registry_path() -> Path { ProjectManifest::get().get_path("fro
 /// Generate a `ConvertKey` implementation for a registry.
 pub(super) fn frog_registry_convertkey(tokens: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(tokens as syn::DeriveInput);
-    let attrs =
-        ConvertKeyAttributes::from_attributes(&input.attrs).expect("Failed to parse attributes");
-
-    generate_convertkey::generate_convertkey(input, attrs).into()
-}
-
-/// Attributes for the registry.
-#[derive(Debug, Clone, FromAttr)]
-#[attribute(ident = frog)]
-struct ConvertKeyAttributes {
-    #[attribute(optional)]
-    error: Option<Path>,
-}
-
-/// Attributes for registry variants.
-#[derive(Debug, Clone, FromAttr)]
-#[attribute(ident = frog)]
-struct ConvertKeyVariantAttributes {
-    /// The key for the registry variant.
-    #[attribute(optional, conflicts = [other])]
-    key: String,
-
-    /// If no other variants match, use this variant.
-    #[attribute(conflicts = [key])]
-    other: bool,
+    generate_convertkey::generate_convertkey(input).into()
 }
 
 /// Generate the block attributes.
@@ -54,4 +30,9 @@ pub(super) fn frog_create_blocks(tokens: TokenStream) -> TokenStream {
 /// Generate the block trait impls.
 pub(super) fn frog_create_block_impls(tokens: TokenStream) -> TokenStream {
     create_blocks::generate_block_impls(tokens).into()
+}
+
+/// Generate the registry trait impls.
+pub(super) fn frog_create_registry_impls(tokens: TokenStream) -> TokenStream {
+    create_registry::generate_registry_impls(tokens).into()
 }

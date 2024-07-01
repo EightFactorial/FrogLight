@@ -68,3 +68,10 @@ pub fn frog_create_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenSt
 pub fn frog_create_block_impls(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     registry::frog_create_block_impls(input)
 }
+
+/// A macro for generating registry trait impls.
+#[cfg(feature = "froglight-registry")]
+#[proc_macro]
+pub fn frog_create_registry_impls(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    registry::frog_create_registry_impls(input)
+}
