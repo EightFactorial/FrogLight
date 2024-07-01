@@ -57,5 +57,8 @@ pub use server_status::{ServerPlayers, ServerSamplePlayer, ServerStatus, ServerV
 mod spawn_information;
 pub use spawn_information::SpawnInformation;
 
+mod tag_data;
+pub use tag_data::ServerTagData;
+
 mod trade_offer;
 pub use trade_offer::{LegacyTradeOffer, TradeOffer};

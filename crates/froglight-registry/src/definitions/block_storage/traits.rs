@@ -5,12 +5,8 @@ use froglight_protocol::traits::Version;
 
 use super::BlockStorage;
 
-/// A block for a specific [`Version`].
-pub trait BlockType<V>
-where
-    Self: 'static + Debug + Reflect + Send + Sync,
-    V: Version,
-{
+/// A block
+pub trait BlockType: 'static + Debug + Reflect + Send + Sync {
     /// The block's [`ResourceKey`](froglight_protocol::common::ResourceKey).
     ///
     /// This is used to identify the block in the resource pack.
@@ -39,20 +35,10 @@ where
     /// Returns `true` if the block is air.
     #[must_use]
     fn is_air(&self) -> bool { false }
-    /// Returns `true` if the block is opaque.
-    #[must_use]
-    fn is_opaque(&self) -> bool { true }
-    /// Returns `true` if the block is collidable.
-    #[must_use]
-    fn is_collidable(&self) -> bool { true }
 }
 
 /// An extension trait for [`BlockType`].
-pub trait BlockExt<V>
-where
-    Self: Sized + BlockType<V>,
-    V: Version,
-{
+pub trait BlockExt<V: Version>: Sized + BlockType {
     /// The total number of states for this block.
     ///
     /// This is `1` by default, and is equal
@@ -83,7 +69,7 @@ where
 
     /// The block's default state.
     #[must_use]
-    fn default_block() -> Self;
+    fn default_state() -> Self;
 
     /// Get a block from it's *relative* `block state id`.
     ///
@@ -118,7 +104,7 @@ where
     #[must_use]
     fn from_relative_id(relative_id: u32) -> Option<Self> {
         if relative_id == 0 {
-            Some(Self::default_block())
+            Some(Self::default_state())
         } else {
             None
         }
@@ -206,48 +192,6 @@ where
         let blockstate_range = storage.blockstate_range(self)?;
         Some(blockstate_range.start + self.to_relative_id())
     }
-}
-
-/// A block attribute for a specific [`Version`].
-///
-/// # Example
-/// ```rust
-/// use bevy_derive::{Deref, DerefMut};
-/// use bevy_reflect::Reflect;
-/// use froglight_protocol::versions::v1_21_0::V1_21_0;
-/// use froglight_registry::definitions::BlockAttribute;
-///
-/// /// A custom boolean attribute.
-/// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, Reflect)]
-/// struct MyAttribute(bool);
-///
-/// impl BlockAttribute<V1_21_0> for MyAttribute {
-///     const ATTRIBUTE_STATES: u32 = 2;
-/// }
-/// ```
-pub trait BlockAttribute<V>
-where
-    Self: 'static + Debug + Reflect + Send + Sync,
-    V: Version,
-{
-    /// The total number of attribute states.
-    ///
-    /// For boolean attributes, this is `2`,
-    /// `true` and `false`.
-    ///
-    /// For enum attributes, this is the number
-    /// of variants the enum has.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{definitions::BlockAttribute, registries::attributes::SnowyAttribute};
-    ///
-    /// // SnowyAttribute has two states, `true` and `false`.
-    /// assert_eq!(<SnowyAttribute as BlockAttribute<V1_21_0>>::ATTRIBUTE_STATES, 2);
-    /// ```
-    const ATTRIBUTE_STATES: u32;
 }
 
 /// A block state resolver for a specific [`Version`].

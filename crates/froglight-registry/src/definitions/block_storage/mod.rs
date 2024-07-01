@@ -15,17 +15,11 @@ pub use storage::BlockStorage;
 
 /// A registry which contains all blocks.
 #[derive(Debug, Clone, Resource)]
-pub struct BlockRegistry<V>
-where
-    V: Version,
-{
+pub struct BlockRegistry<V: Version> {
     storage: Arc<RwLock<BlockStorage<V>>>,
 }
 
-impl<V> BlockRegistry<V>
-where
-    V: Version,
-{
+impl<V: Version> BlockRegistry<V> {
     /// Create a new [`BlockRegistry`].
     ///
     /// This will contains all [`vanilla blocks`](VanillaResolver).
@@ -40,7 +34,7 @@ where
     /// Create a new empty [`BlockRegistry`].
     #[must_use]
     pub fn new_empty() -> Self {
-        Self { storage: Arc::new(RwLock::new(BlockStorage::new_empty())) }
+        Self { storage: Arc::new(RwLock::new(BlockStorage::<V>::new_empty())) }
     }
 
     /// Register all default blocks for a specific [`BlockStateResolver`].

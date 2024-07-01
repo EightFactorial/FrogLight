@@ -3,37 +3,39 @@ use std::marker::PhantomData;
 use bevy_app::{App, PostUpdate};
 use bevy_ecs::{
     event::EventReader,
-    schedule::{IntoSystemConfigs, IntoSystemSetConfigs, SystemSet},
-    system::{Res, ResMut},
+    schedule::{
+        common_conditions::on_event, Condition, IntoSystemConfigs, IntoSystemSetConfigs, SystemSet,
+    },
+    system::{Commands, Res},
 };
 use froglight_protocol::traits::Version;
 
-use super::{ConvertKey, DefaultRegistry, InitializeRegistry, SimpleRegistry};
+use super::{ConvertKey, DefaultRegistry, InitializeRegistry};
 use crate::{systemsets::RegistryPostUpdateSet, RegistryUpdateEvent};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub(crate) struct RegistrySystems<V: Version>(PhantomData<V>);
 
-#[allow(dead_code)]
+#[allow(clippy::cast_sign_loss, dead_code)]
 impl<V: Version> RegistrySystems<V> {
     /// Registers the [`SystemSet`] in the given [`App`].
     ///
     /// This should be called once for each [`Version`].
-    #[allow(clippy::cast_sign_loss)]
-    pub(crate) fn register_systemset(app: &mut App)
+    pub(crate) fn register(app: &mut App)
     where
         [(); { V::ID } as usize]:,
     {
         app.configure_sets(
             PostUpdate,
-            Self::default().run_if(Self::systemset_conditions).in_set(RegistryPostUpdateSet),
+            Self::default()
+                .run_if(on_event::<RegistryUpdateEvent>().and_then(Self::condition))
+                .in_set(RegistryPostUpdateSet),
         );
     }
 
     /// Returns `true` if the [`RegistryUpdateEvent`] has the
     /// same [`Version::ID`] as [`V`].
-    #[allow(clippy::cast_sign_loss)]
-    fn systemset_conditions(mut events: EventReader<RegistryUpdateEvent>) -> bool
+    fn condition(mut events: EventReader<RegistryUpdateEvent>) -> bool
     where
         [(); { V::ID } as usize]:,
     {
@@ -41,23 +43,22 @@ impl<V: Version> RegistrySystems<V> {
     }
 
     /// Initializes a [`DefaultRegistry`] and adds a
-    /// listener to update the [`SimpleRegistry`].
+    /// listener system to update the [`SimpleRegistry`](super::SimpleRegistry).
     ///
     /// This should be called once for each registry in each [`Version`].
-    pub(crate) fn create_systems<R>(app: &mut App)
+    pub(crate) fn init<R>(app: &mut App)
     where
         R: 'static + Clone + ConvertKey + InitializeRegistry<V>,
     {
         app.init_resource::<DefaultRegistry<V, R>>()
-            .add_systems(PostUpdate, Self::update_registry::<R>.in_set(Self::default()));
+            .add_systems(PostUpdate, Self::refresh_registry::<R>.in_set(Self::default()));
     }
 
-    /// Overwrites the [`SimpleRegistry`] with the
-    /// content inside the [`DefaultRegistry`].
-    fn update_registry<R>(def: Res<DefaultRegistry<V, R>>, mut reg: ResMut<SimpleRegistry<R>>)
+    /// Overwrite the [`SimpleRegistry`] with the [`DefaultRegistry`].
+    fn refresh_registry<R>(def: Res<DefaultRegistry<V, R>>, mut commands: Commands)
     where
         R: 'static + Clone + ConvertKey + InitializeRegistry<V>,
     {
-        reg.overwrite_with(&def);
+        commands.insert_resource(def.create_simple());
     }
 }

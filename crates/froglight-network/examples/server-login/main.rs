@@ -204,12 +204,6 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         })
                         .unwrap();
                 }
-                ConfigurationClientboundPackets::DynamicRegistries(_) => {
-                    info!("Config: DynamicRegistries(DynamicRegistriesPacket {{..}})");
-                }
-                ConfigurationClientboundPackets::SynchronizeTags(_) => {
-                    info!("Config: SynchronizeTags(SynchronizeTagsPacket {{..}})");
-                }
                 ConfigurationClientboundPackets::Ready(_) => {
                     // Send an acknowledgement packet
                     channel.config.send(ReadyC2SPacket).unwrap();

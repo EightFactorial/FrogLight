@@ -13,13 +13,13 @@ use super::{BlockExt, BlockStateResolver, BlockType, VanillaResolver};
 #[derive(Debug, Default)]
 pub struct BlockStorage<V: Version> {
     /// All of the blocks for a specific [`Version`].
-    pub(crate) dyn_storage: Vec<Box<dyn BlockType<V>>>,
-
+    pub(crate) dyn_storage: Vec<Box<dyn BlockType>>,
     /// A map of block state ranges to their index in `dyn_storage`.
     pub(crate) range_map: RangeMap<u32, usize>,
-
     /// A map of block type ids to their block state ranges.
     pub(crate) type_map: HashMap<TypeId, Range<u32>>,
+
+    _v: std::marker::PhantomData<V>,
 }
 
 /// Implementations for creating a new [`BlockStorage`] and registering blocks.
@@ -58,6 +58,7 @@ impl<V: Version> BlockStorage<V> {
             dyn_storage: Vec::new(),
             range_map: RangeMap::new(),
             type_map: HashMap::with_hasher(hashbrown::hash_map::DefaultHashBuilder::new()),
+            _v: std::marker::PhantomData,
         }
     }
 
@@ -65,7 +66,12 @@ impl<V: Version> BlockStorage<V> {
     #[must_use]
     #[cfg(not(feature = "hashbrown"))]
     pub fn new_empty() -> Self {
-        Self { dyn_storage: Vec::new(), range_map: RangeMap::new(), type_map: HashMap::new() }
+        Self {
+            dyn_storage: Vec::new(),
+            range_map: RangeMap::new(),
+            type_map: HashMap::new(),
+            _v: std::marker::PhantomData,
+        }
     }
 
     /// Register all blocks for a specific [`BlockStateResolver`].
@@ -80,7 +86,7 @@ impl<V: Version> BlockStorage<V> {
     /// when using [`BlockStorage::register_resolver`].
     pub fn register<Block: BlockExt<V>>(&mut self) -> &mut Self {
         // Create a new default block.
-        let default = Block::default_block();
+        let default = Block::default_state();
 
         // Get the next available storage index and insert the block.
         let storage_index = self.dyn_storage.len();
@@ -116,7 +122,7 @@ impl<V: Version> BlockStorage<V> {
     /// assert_eq!(grass_range, &(8..10));
     /// ```
     #[must_use]
-    pub fn blockstate_range(&self, block: &dyn BlockType<V>) -> Option<&Range<u32>> {
+    pub fn blockstate_range(&self, block: &dyn BlockType) -> Option<&Range<u32>> {
         self.type_map.get(&block.type_id())
     }
 
@@ -179,7 +185,7 @@ impl<V: Version> BlockStorage<V> {
     /// assert_eq!(grass_id, 8);
     /// ```
     #[must_use]
-    pub fn block_id(&self, block: &dyn BlockType<V>) -> Option<usize> {
+    pub fn block_id(&self, block: &dyn BlockType) -> Option<usize> {
         self.blockstate_range(block).and_then(|range| self.range_map.get(&range.start)).copied()
     }
 
@@ -268,7 +274,7 @@ impl<V: Version> BlockStorage<V> {
     /// // assert_eq!(**grass_normal.is_snowy(), Some(false));
     /// ```
     #[must_use]
-    pub fn default_blockstate(&self, blockstate_id: u32) -> Option<&dyn BlockType<V>> {
+    pub fn default_blockstate(&self, blockstate_id: u32) -> Option<&dyn BlockType> {
         self.block_id_of(blockstate_id)
             .and_then(|block_id| self.dyn_storage.get(block_id).map(std::convert::AsRef::as_ref))
     }

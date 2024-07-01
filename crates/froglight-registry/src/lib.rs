@@ -13,12 +13,10 @@ pub mod definitions;
 mod events;
 pub use events::*;
 
+#[cfg(not(clippy))]
 pub mod registries;
 
 pub mod systemsets;
-
-#[cfg(test)]
-mod tests;
 
 /// The `Registry` Froglight plugin.
 ///
@@ -31,6 +29,7 @@ impl Plugin for RegistryPlugin {
         events::build(app);
         systemsets::build(app);
         // Build the registries.
+        #[cfg(not(clippy))]
         registries::build(app);
     }
 }

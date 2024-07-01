@@ -5,6 +5,7 @@ mod integer;
 mod map;
 mod option;
 mod tuple;
+mod vector;
 
 /// A trait for reading a variable-length type from a buffer
 ///

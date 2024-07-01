@@ -26,7 +26,11 @@ impl FrogRead for DynamicRegistriesPacket {
         for _ in 0..length {
             match FrogRead::fg_read(buf) {
                 Ok(data) => registry_data.push(data),
-                Err(_) => break,
+                Err(err) => {
+                    #[cfg(feature = "bevy")]
+                    bevy_log::error!("Failed to read RegistryData: {err}");
+                    break;
+                }
             }
         }
 
