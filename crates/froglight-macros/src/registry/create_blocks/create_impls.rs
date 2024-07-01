@@ -78,7 +78,7 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
 
         tokenstream.extend(quote! {
             impl BlockStateResolver<#version> for VanillaResolver {
-                type Resolved = Blocks;
+                type Resolved = Option<Blocks>;
                 fn resolve_state(blockstate_id: u32, storage: &BlockStorage<#version>) -> Self::Resolved { todo!() }
                 fn register_blocks(storage: &mut BlockStorage<#version>) {
                     #register_tokens

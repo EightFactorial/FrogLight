@@ -112,12 +112,16 @@ impl<V: Version> BlockStorage<V> {
     ///  # Example
     /// ```rust
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{definitions::BlockStorage, registries::blocks::GrassBlock};
+    /// use froglight_registry::{
+    ///     definitions::{BlockExt, BlockStorage},
+    ///     registries::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
+    /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
     /// // Here we know the block type, but you can use any `dyn BlockType`.
-    /// let grass_range = storage.blockstate_range(&GrassBlock::default()).unwrap();
+    /// let grass_range =
+    ///     storage.blockstate_range(&GrassBlock { snowy: SnowyBooleanAttribute(true) }).unwrap();
     /// // Grass has 2 block states, `8` and `9`.
     /// assert_eq!(grass_range, &(8..10));
     /// ```
@@ -164,7 +168,7 @@ impl<V: Version> BlockStorage<V> {
     /// use froglight_registry::{
     ///     definitions::BlockStorage,
     ///     registries::{
-    ///         attributes::SnowyAttribute,
+    ///         attributes::SnowyBooleanAttribute,
     ///         blocks::{Air, GrassBlock, Stone},
     ///     },
     /// };
@@ -180,8 +184,12 @@ impl<V: Version> BlockStorage<V> {
     /// assert_eq!(stone_id, 1);
     ///
     /// // Grass was registered ninth, so it has an id of `8`.
-    /// let grass_id = storage.block_id(&GrassBlock { snowy: SnowyAttribute(true) }).unwrap();
-    /// assert_eq!(grass_id, storage.block_id(&GrassBlock { snowy: SnowyAttribute(false) }).unwrap());
+    /// let grass_id = storage.block_id(&GrassBlock { snowy: SnowyBooleanAttribute(true) }).unwrap();
+    /// // Both variants of grass have the same `block id`.
+    /// assert_eq!(
+    ///     grass_id,
+    ///     storage.block_id(&GrassBlock { snowy: SnowyBooleanAttribute(false) }).unwrap()
+    /// );
     /// assert_eq!(grass_id, 8);
     /// ```
     #[must_use]
@@ -224,17 +232,18 @@ impl<V: Version> BlockStorage<V> {
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
     ///     definitions::{BlockExt, BlockStorage},
-    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
+    ///     registries::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
-    /// // The first variant of grass has `SnowyAttribute(true)`.
-    /// let grass_snowy = storage.blockstate_id_of(&GrassBlock { snowy: SnowyAttribute(true) });
+    /// // The first variant of grass has `SnowyBooleanAttribute(true)`.
+    /// let grass_snowy = storage.blockstate_id_of(&GrassBlock { snowy: SnowyBooleanAttribute(true) });
     /// assert_eq!(grass_snowy, Some(8));
     ///
-    /// // The second variant of grass has `SnowyAttribute(false)`.
-    /// let grass_normal = storage.blockstate_id_of(&GrassBlock { snowy: SnowyAttribute(false) });
+    /// // The second variant of grass has `SnowyBooleanAttribute(false)`.
+    /// let grass_normal =
+    ///     storage.blockstate_id_of(&GrassBlock { snowy: SnowyBooleanAttribute(false) });
     /// assert_eq!(grass_normal, Some(9));
     /// ```
     #[must_use]
@@ -284,22 +293,22 @@ impl<V: Version> BlockStorage<V> {
     /// This is the reverse of [`BlockStorage::blockstate_id_of`].
     ///
     /// # Example
-    /// ```rust
+    /// ```rust,no_run
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     /// use froglight_registry::{
     ///     definitions::{BlockStateResolver, BlockStorage, VanillaResolver},
-    ///     registries::{attributes::SnowyAttribute, blocks::GrassBlock},
+    ///     registries::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
     /// };
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
-    /// // The first variant of grass has `SnowyAttribute(true)`.
+    /// // The first variant of grass has `SnowyBooleanAttribute(true)`.
     /// let grass_snowy = storage.resolve_blockstate::<VanillaResolver>(8).unwrap();
-    /// assert_eq!(grass_snowy, GrassBlock { snowy: SnowyAttribute(true) }.into());
+    /// assert_eq!(grass_snowy, GrassBlock { snowy: SnowyBooleanAttribute(true) }.into());
     ///
-    /// // The second variant of grass has `SnowyAttribute(false)`.
+    /// // The second variant of grass has `SnowyBooleanAttribute(false)`.
     /// let grass_normal = storage.resolve_blockstate::<VanillaResolver>(9).unwrap();
-    /// assert_eq!(grass_normal, GrassBlock { snowy: SnowyAttribute(false) }.into());
+    /// assert_eq!(grass_normal, GrassBlock { snowy: SnowyBooleanAttribute(false) }.into());
     /// ```
     #[must_use]
     pub fn resolve_blockstate<Res: BlockStateResolver<V>>(

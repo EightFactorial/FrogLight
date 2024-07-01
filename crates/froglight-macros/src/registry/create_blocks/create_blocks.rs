@@ -41,7 +41,7 @@ pub(crate) fn generate_blocks(tokens: proc_macro::TokenStream) -> TokenStream {
         }
 
         tokenstream.extend(quote! {
-            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)]
+            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, bevy_reflect::Reflect)]
             pub enum Blocks {
                 #variants
             }
