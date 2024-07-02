@@ -47,11 +47,11 @@ pub(super) fn impl_enum_read(ident: &Ident, packets: &StatePackets, output: &mut
                     let mut buf_ref = *buf.get_ref();
                     let buf_len = buf_ref.len();
 
-                    if buf_len > 64 {
-                        buf_ref = &buf_ref[..64];
+                    if buf_len > 16 {
+                        buf_ref = &buf_ref[..16];
                     }
 
-                    bevy_log::trace!(concat!("Reading ", #name, ": {} bytes, {:?}"), buf_len, buf_ref);
+                    bevy_log::trace!(concat!("Reading Packet \"", #name, "\": {} bytes, {:?}"), buf_len, buf_ref);
                 }
 
                 match #crate_path::protocol::FrogRead::fg_read(buf) {

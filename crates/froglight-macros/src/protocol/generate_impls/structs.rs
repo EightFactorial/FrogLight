@@ -14,6 +14,27 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
     };
 
     let mut read_tokens = TokenStream::new();
+
+    #[cfg(feature = "froglight-protocol-debug")]
+    {
+        let name = struct_ident.to_string();
+        read_tokens.extend(quote! {
+            #[cfg(all(debug_assertions, feature = "bevy"))]
+            {
+                let buf_pos = buf.position() as usize;
+
+                let mut buf_ref = &buf.get_ref()[buf_pos..];
+                let buf_len = buf_ref.len();
+
+                if buf_len > 64 {
+                    buf_ref = &buf_ref[..64];
+                }
+
+                bevy_log::trace!(concat!("Reading Struct \"", #name, "\": {} bytes, {:?}"), buf_len, buf_ref);
+            }
+        });
+    }
+
     match &data.fields {
         Fields::Named(fields) => {
             // Collect tokens for reading each field

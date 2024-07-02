@@ -1,16 +1,14 @@
 use froglight_macros::FrogReadWrite;
 
-use crate::{
-    common::{ChunkPosition, UnsizedBuffer},
-    // packet::ChunkDataBuffer,
-};
+use crate::common::ChunkPosition;
 
 #[derive(Clone, PartialEq, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ChunkDataPacket {
     pub position: ChunkPosition,
     // TODO: Fix Nbt Error?
-    pub chunk_data: UnsizedBuffer,
+    // pub chunk_data: crate::packet::ChunkDataBuffer,
+    pub chunk_data: crate::common::UnsizedBuffer,
     // pub light_data: UnsizedBuffer,
 }
 

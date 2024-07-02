@@ -42,3 +42,7 @@ default = ["hashbrown"]
 
 # Use `hashbrown` for better performance
 hashbrown = ["dep:hashbrown", "froglight-protocol/hashbrown"]
+
+[[example]]
+name = "server-tags"
+path = "examples/server-tags/main.rs"

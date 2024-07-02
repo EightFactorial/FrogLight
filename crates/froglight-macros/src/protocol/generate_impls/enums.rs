@@ -5,6 +5,7 @@ use syn::{spanned::Spanned, Data, DeriveInput, Fields};
 use super::{is_variable, set_discriminant};
 
 /// Generate a `FrogRead` implementation.
+#[allow(clippy::too_many_lines)]
 pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
     let crate_path = crate::protocol::get_protocol_path();
 
@@ -90,20 +91,56 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
         discriminant += 1;
     }
 
-    quote! {
-        impl #crate_path::protocol::FrogRead for #enum_ident {
-            fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, #crate_path::protocol::ReadError>
-            where
-                Self: Sized,
-            {
-                match #crate_path::protocol::FrogVarRead::fg_var_read(buf)? {
-                    #read_tokens
-                    unk => Err(#crate_path::protocol::ReadError::InvalidEnum(unk, std::any::type_name::<Self>())),
+    #[cfg(feature = "froglight-protocol-debug")]
+    {
+        let name = enum_ident.to_string();
+        quote! {
+            impl #crate_path::protocol::FrogRead for #enum_ident {
+                fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, #crate_path::protocol::ReadError>
+                where
+                    Self: Sized,
+                {
+                    #[cfg(all(debug_assertions, feature = "bevy"))]
+                    {
+                        let buf_pos = buf.position() as usize;
+        
+                        let mut buf_ref = &buf.get_ref()[buf_pos..];
+                        let buf_len = buf_ref.len();
+        
+                        if buf_len > 64 {
+                            buf_ref = &buf_ref[..64];
+                        }
+        
+                        bevy_log::trace!(concat!("Reading Enum \"", #name, "\": {} bytes, {:?}"), buf_len, buf_ref);
+                    }
+
+                    match #crate_path::protocol::FrogVarRead::fg_var_read(buf)? {
+                        #read_tokens
+                        unk => Err(#crate_path::protocol::ReadError::InvalidEnum(unk, std::any::type_name::<Self>())),
+                    }
                 }
             }
         }
+        .into()
     }
-    .into()
+
+    #[cfg(not(feature = "froglight-protocol-debug"))]
+    {
+        quote! {
+            impl #crate_path::protocol::FrogRead for #enum_ident {
+                fn fg_read(buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, #crate_path::protocol::ReadError>
+                where
+                    Self: Sized,
+                {
+                    match #crate_path::protocol::FrogVarRead::fg_var_read(buf)? {
+                        #read_tokens
+                        unk => Err(#crate_path::protocol::ReadError::InvalidEnum(unk, std::any::type_name::<Self>())),
+                    }
+                }
+            }
+        }
+        .into()
+    }
 }
 
 pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {

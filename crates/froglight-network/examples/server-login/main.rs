@@ -208,6 +208,15 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     // Send an acknowledgement packet
                     channel.config.send(ReadyC2SPacket).unwrap();
                 }
+                ConfigurationClientboundPackets::SynchronizeTags(tags_packet) => {
+                    info!("Config: SynchronizeTags");
+                    for (key, data) in &tags_packet.tags {
+                        info!("    \"{key}\":");
+                        for (tag, data) in &data.data {
+                            info!("        \"{tag}\": {data:?}");
+                        }
+                    }
+                }
                 _ => {
                     info!("Config: {packet:?}");
                 }
@@ -261,6 +270,15 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     // Respond that we accepted the chunk
                     // Not actually true or how it works, but the server accepts it :)
                     channel.play.send(AcknowledgeChunksPacket { chunks_per_tick: 1.0 }).unwrap();
+                }
+                PlayClientboundPackets::SynchronizeTags(tags_packet) => {
+                    info!("Play: SynchronizeTags");
+                    for (key, data) in &tags_packet.tags {
+                        info!("    \"{key}\":");
+                        for (tag, data) in &data.data {
+                            info!("        \"{tag}\": {data:?}");
+                        }
+                    }
                 }
                 PlayClientboundPackets::LightUpdate(_) => {
                     info!("Play: LightUpdate(LightUpdatePacket {{..}})");
