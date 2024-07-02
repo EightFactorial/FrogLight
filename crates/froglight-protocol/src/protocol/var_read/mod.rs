@@ -4,6 +4,7 @@ mod glam;
 mod integer;
 mod map;
 mod option;
+mod other;
 mod tuple;
 mod vector;
 

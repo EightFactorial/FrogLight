@@ -1,15 +1,14 @@
 use froglight_macros::FrogReadWrite;
 use glam::DVec3;
 
-use crate::common::{BlockPosition, UnsizedBuffer};
+use crate::common::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq, FrogReadWrite)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct ExplosionPacket {
     pub position: DVec3,
     pub radius: f32,
-    pub blocks: Vec<BlockPosition>,
+    pub blocks: Vec<[i8; 3]>,
     pub player_velocity: DVec3,
-    // TODO: Implement ExplosionData
     pub explosion_data: UnsizedBuffer,
 }

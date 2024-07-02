@@ -266,6 +266,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                 PlayClientboundPackets::ChunkData(chunk_packet) => {
                     info!("Play: ChunkData");
                     info!("    Position: {:?}", chunk_packet.position);
+                    info!("    Entities: {:?}", chunk_packet.chunk_data.entities);
 
                     // Respond that we accepted the chunk
                     // Not actually true or how it works, but the server accepts it :)

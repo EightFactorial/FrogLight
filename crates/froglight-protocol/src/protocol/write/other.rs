@@ -14,8 +14,7 @@ impl FrogWrite for Nbt {
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         let mut vec = Vec::new();
         self.write(&mut vec);
-
-        Ok(buf.write_all(&vec)?)
+        buf.write_all(&vec).map_err(WriteError::Io)
     }
 }
 
@@ -24,8 +23,7 @@ impl FrogWrite for NbtCompound {
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         let mut vec = Vec::new();
         self.write(&mut vec);
-
-        Ok(buf.write_all(&vec)?)
+        buf.write_all(&vec).map_err(WriteError::Io)
     }
 }
 
@@ -34,8 +32,7 @@ impl FrogWrite for NbtTag {
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         let mut vec = Vec::new();
         self.write(&mut vec);
-
-        Ok(buf.write_all(&vec)?)
+        buf.write_all(&vec).map_err(WriteError::Io)
     }
 }
 

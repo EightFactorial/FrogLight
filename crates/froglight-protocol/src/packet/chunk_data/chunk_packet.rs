@@ -7,6 +7,7 @@ use super::BlockEntity;
 #[derive(Clone, PartialEq, FrogReadWrite)]
 pub struct ChunkDataBuffer {
     /// The heightmap data for the chunk.
+    #[frog(var)]
     pub heightmaps: Nbt,
     /// The chunk blocks and biomes.
     pub data: Vec<u8>,

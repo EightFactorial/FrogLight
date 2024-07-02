@@ -6,25 +6,14 @@ use crate::{
 };
 
 /// A block entity in a chunk.
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct BlockEntity {
     /// The position of the block entity.
     pub position: ChunkBlockPosition,
     /// The kind of block entity.
     pub kind: u32,
-    /// The data of the block entity.
+    /// The block entity data.
     pub data: Nbt,
-}
-
-#[allow(clippy::missing_fields_in_debug)]
-impl std::fmt::Debug for BlockEntity {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("BlockEntity")
-            .field("position", &self.position)
-            .field("kind", &self.kind)
-            .field("data", &self.data.len())
-            .finish()
-    }
 }
 
 impl FrogRead for BlockEntity {
@@ -38,7 +27,7 @@ impl FrogRead for BlockEntity {
         Ok(Self {
             position: ChunkBlockPosition { x: (byte >> 4) & 0x0F, y, z: byte & 0x0F },
             kind: u32::fg_var_read(buf)?,
-            data: Nbt::fg_read(buf)?,
+            data: Nbt::fg_var_read(buf)?,
         })
     }
 }
@@ -52,7 +41,6 @@ impl FrogWrite for BlockEntity {
 
         u16::try_from(self.position.y)?.fg_write(buf)?;
         self.kind.fg_var_write(buf)?;
-        self.data.fg_write(buf)?;
-        Ok(())
+        self.data.fg_var_write(buf)
     }
 }
