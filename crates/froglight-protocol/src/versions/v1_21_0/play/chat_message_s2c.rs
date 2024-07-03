@@ -1,3 +1,4 @@
+use compact_str::CompactString;
 use froglight_components::entity::EntityUuid;
 use froglight_macros::FrogReadWrite;
 
@@ -8,7 +9,11 @@ use crate::common::UnsizedBuffer;
 pub struct ChatMessageS2CPacket {
     pub sender: EntityUuid,
     #[frog(var)]
-    pub index: u32,
+    pub message_index: u32,
+    pub signature: Option<[u8; 256]>,
+    pub message: CompactString,
+    pub timestamp: u64,
+    pub salt: u64,
     // TODO: Implement ChatMessageData
-    pub message_data: UnsizedBuffer,
+    pub data: UnsizedBuffer,
 }
