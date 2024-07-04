@@ -58,7 +58,7 @@ impl EntityIdMap {
 }
 
 #[test]
-fn entityid_map() {
+fn entityid_map() -> bevy_app::AppExit {
     use bevy_app::{prelude::*, AppExit};
     use bevy_ecs::prelude::*;
 
@@ -85,12 +85,12 @@ fn entityid_map() {
 
             // Spawn new entities until there are 512, then exit
             if count >= 512 {
-                events.send(AppExit);
+                events.send(AppExit::Success);
             } else {
                 commands.spawn(EntityId::new(count));
             }
         },
     );
 
-    app.run();
+    app.run()
 }

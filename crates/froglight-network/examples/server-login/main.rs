@@ -3,6 +3,8 @@
 //! The connection will eventually be closed by the server
 //! due to not responding to keep-alive packets.
 
+use std::num::NonZeroU8;
+
 use bevy::{app::AppExit, prelude::*};
 use bevy_log::LogPlugin;
 use froglight_network::{
@@ -26,7 +28,7 @@ use froglight_network::{
 };
 use froglight_protocol::protocol::FrogWrite;
 
-fn main() {
+fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins.as_plugingroup()));
 
@@ -51,7 +53,7 @@ fn main() {
             .chain(),
     );
 
-    app.run();
+    app.run()
 }
 
 /// The server address to connect to.
@@ -75,7 +77,7 @@ fn exit_on_error(mut events: EventReader<NetworkErrorEvent>, mut exit: EventWrit
     if let Some(error) = events.read().next() {
         error!("Error: {}", error.error);
         error!("Exiting...");
-        exit.send(AppExit);
+        exit.send(AppExit::Error(NonZeroU8::new(1).unwrap()));
     }
 }
 

@@ -16,12 +16,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy_mod_debugdump = "0.10.0"
+# bevy_mod_debugdump = "0.10.0"
 serde_json = { workspace = true }
 
 [dependencies]
 bevy = { workspace = true, default-features = false, optional = true, features = [
-    "multi-threaded",
+    "multi_threaded",
 ] }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
 froglight-network = { version = "0.1.0", path = "../froglight-network", features = [
@@ -53,6 +53,6 @@ default = ["presets"]
 # Enables preset plugin groups
 presets = ["dep:bevy"]
 
-[[example]]
-name = "system-graph"
-path = "examples/system-graph/main.rs"
+# [[example]]
+# name = "system-graph"
+# path = "examples/system-graph/main.rs"

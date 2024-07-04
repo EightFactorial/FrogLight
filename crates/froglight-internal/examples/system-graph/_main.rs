@@ -49,13 +49,13 @@ fn main() {
     app.add_plugins(HeadlessPlugins.build());
 
     // Generate schedule graphs
-    let main = app.main_schedule_label.intern();
+    let main = app.main().update_schedule.unwrap().intern();
     graph_schedules(&mut app, "main", &[main]);
 
-    let startup_labels = app.world.resource::<MainScheduleOrder>().startup_labels.clone();
+    let startup_labels = app.world().resource::<MainScheduleOrder>().startup_labels.clone();
     graph_schedules(&mut app, "startup", &startup_labels);
 
-    let labels = app.world.resource::<MainScheduleOrder>().labels.clone();
+    let labels = app.world().resource::<MainScheduleOrder>().labels.clone();
     graph_schedules(&mut app, "update", &labels);
 
     graph_schedules(&mut app, "fixed", &*BEVY_FIXED_SCHEDULES);
@@ -84,7 +84,7 @@ fn graph_schedules(app: &mut App, folder: &str, schedules: &[InternedScheduleLab
 
     for label in schedules {
         // Skip schedules that don't exist
-        if !app.world.resource::<Schedules>().contains(label.intern()) {
+        if !app.world().resource::<Schedules>().contains(label.intern()) {
             warn!("Unable to find Schedule `{label:?}`!");
             continue;
         }

@@ -1,4 +1,5 @@
 //! A string used to identify a resource.
+#![allow(unexpected_cfgs)]
 
 use std::{borrow::Borrow, fmt::Display};
 

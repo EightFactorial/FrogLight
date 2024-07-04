@@ -71,7 +71,7 @@ impl EntityChunkMap {
 }
 
 #[test]
-fn entitychunk_map() {
+fn entitychunk_map() -> bevy_app::AppExit {
     use bevy_app::{prelude::*, AppExit};
     use bevy_ecs::prelude::*;
 
@@ -105,12 +105,12 @@ fn entitychunk_map() {
 
             // Spawn new entities until there are 512, then exit
             if count >= 512 {
-                events.send(AppExit);
+                events.send(AppExit::Success);
             } else {
                 commands.spawn((id, pos));
             }
         },
     );
 
-    app.run();
+    app.run()
 }

@@ -63,7 +63,7 @@ impl ChunkPositionMap {
 }
 
 #[test]
-fn chunkpos_map() {
+fn chunkpos_map() -> bevy_app::AppExit {
     use bevy_app::{prelude::*, AppExit};
     use bevy_ecs::prelude::*;
 
@@ -90,12 +90,12 @@ fn chunkpos_map() {
 
             // Spawn new entities until there are 512, then exit
             if count >= 512 {
-                events.send(AppExit);
+                events.send(AppExit::Success);
             } else {
                 commands.spawn((ChunkPosition::splat(count), Chunk::new_empty(0, 0)));
             }
         },
     );
 
-    app.run();
+    app.run()
 }

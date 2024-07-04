@@ -24,7 +24,7 @@ pub(super) fn build(app: &mut App) {
     app.add_schedule(schedule);
 
     // Insert the main schedule into the schedule order
-    let mut order = app.world.resource_mut::<MainScheduleOrder>();
+    let mut order = app.world_mut().resource_mut::<MainScheduleOrder>();
     order.insert_after(RunFixedMainLoop, RunFixedUtilLoop);
 
     // Add virtual time schedules

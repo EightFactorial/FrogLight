@@ -58,7 +58,7 @@ impl EntityUuidMap {
 }
 
 #[test]
-fn entityuuid_map() {
+fn entityuuid_map() -> bevy_app::AppExit {
     use bevy_app::{prelude::*, AppExit};
     use bevy_ecs::prelude::*;
 
@@ -83,12 +83,12 @@ fn entityuuid_map() {
             // Spawn new entities until there are 512, then exit
             let count = query.iter().count() as u128;
             if count >= 512 {
-                events.send(AppExit);
+                events.send(AppExit::Success);
             } else {
                 commands.spawn(EntityUuid::from(count));
             }
         },
     );
 
-    app.run();
+    app.run()
 }

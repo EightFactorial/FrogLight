@@ -50,27 +50,27 @@ unnecessary_cast = "warn"
 
 [workspace.dependencies]
 async-std = { version = "1.12.0", default-features = false }
-bevy = { version = "0.13.2", default-features = false }
-bevy_app = "0.13.2"
-bevy_core = "0.13.2"
-bevy_derive = "0.13.2"
-bevy_ecs = "0.13.2"
-bevy_hierarchy = "0.13.2"
-bevy_input = "0.13.2"
+bevy = { version = "0.14.0", default-features = false }
+bevy_app = "0.14.0"
+bevy_core = "0.14.0"
+bevy_derive = "0.14.0"
+bevy_ecs = "0.14.0"
+bevy_hierarchy = "0.14.0"
+bevy_input = "0.14.0"
 bevy-inspector-egui = "0.24.0"
-bevy_log = "0.13.2"
-bevy_math = "0.13.2"
-bevy_reflect = "0.13.2"
-bevy_tasks = "0.13.2"
-bevy_time = "0.13.2"
-bevy_transform = "0.13.2"
+bevy_log = "0.14.0"
+bevy_math = "0.14.0"
+bevy_reflect = "0.14.0"
+bevy_tasks = "0.14.0"
+bevy_time = "0.14.0"
+bevy_transform = "0.14.0"
 bitvec = "1.0.1"
 bytemuck = { version = "1.16.1", features = ["nightly_stdsimd"] }
 compact_str = "0.7.1"
 criterion = "0.5.1"
 derive_more = "0.99.18"
 futures-lite = "2.3.0"
-glam = { version = "0.25.0", features = ["core-simd"] }
+glam = { version = "0.27.0", features = ["core-simd"] }
 hashbrown = { version = "0.14.5", features = ["default", "nightly"] }
 parking_lot = { version = "0.12.3", features = [
     "hardware-lock-elision",

@@ -103,14 +103,14 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
                     #[cfg(all(debug_assertions, feature = "bevy"))]
                     {
                         let buf_pos = buf.position() as usize;
-        
+
                         let mut buf_ref = &buf.get_ref()[buf_pos..];
                         let buf_len = buf_ref.len();
-        
+
                         if buf_len > 64 {
                             buf_ref = &buf_ref[..64];
                         }
-        
+
                         bevy_log::trace!(concat!("Reading Enum \"", #name, "\": {} bytes, {:?}"), buf_len, buf_ref);
                     }
 

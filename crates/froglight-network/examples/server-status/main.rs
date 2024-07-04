@@ -1,5 +1,7 @@
 //! Send a status request to [`SERVER_ADDRESS`] and prints the response.
 
+use std::num::NonZeroU8;
+
 use bevy::{app::AppExit, prelude::*};
 use bevy_log::LogPlugin;
 use froglight_network::{
@@ -9,7 +11,7 @@ use froglight_network::{
     NetworkPlugins,
 };
 
-fn main() {
+fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins.as_plugingroup()));
 
@@ -26,7 +28,7 @@ fn main() {
             .chain(),
     );
 
-    app.run();
+    app.run()
 }
 
 const SERVER_ADDRESS: &str = "localhost";
@@ -55,7 +57,7 @@ fn print_status_response(
         info!("Ping: {:?}", event.ping);
         info!("Status:\n{}", serde_json::to_string_pretty(&event.status).unwrap());
         info!("Exiting...");
-        exit.send(AppExit);
+        exit.send(AppExit::Success);
     }
 }
 
@@ -64,6 +66,6 @@ fn exit_on_error(mut events: EventReader<NetworkErrorEvent>, mut exit: EventWrit
     if let Some(error) = events.read().next() {
         error!("Error: {}", error.error);
         error!("Exiting...");
-        exit.send(AppExit);
+        exit.send(AppExit::Error(NonZeroU8::new(1).unwrap()));
     }
 }
