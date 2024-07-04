@@ -15,7 +15,7 @@ use froglight_components::entity::EntityId;
 #[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 
-use crate::systemset::UtilityPreUpdateSet;
+use crate::systemset::{UtilityPreUpdateDeferredSet, UtilityPreUpdateSet};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -28,6 +28,7 @@ pub(super) fn build(app: &mut App) {
         EntityIdMap::update_entityid_map
             .run_if(any_with_component::<EntityId>)
             .run_if(resource_exists::<EntityIdMap>)
+            .after(UtilityPreUpdateDeferredSet)
             .in_set(UtilityPreUpdateSet),
     );
 }

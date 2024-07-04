@@ -16,7 +16,7 @@ use froglight_protocol::common::{ChunkPosition, EntityId};
 #[cfg(feature = "hashbrown")]
 use hashbrown::{HashMap, HashSet};
 
-use crate::systemset::UtilityPreUpdateSet;
+use crate::systemset::{UtilityPreUpdateDeferredSet, UtilityPreUpdateSet};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -29,6 +29,7 @@ pub(super) fn build(app: &mut App) {
         EntityChunkMap::update_entitychunk_map
             .run_if(any_with_component::<EntityId>)
             .run_if(resource_exists::<EntityChunkMap>)
+            .after(UtilityPreUpdateDeferredSet)
             .in_set(UtilityPreUpdateSet),
     );
 }
