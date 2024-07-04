@@ -174,17 +174,13 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     // Create a response packet that says we don't understand the payload
                     let mut response = CustomPayloadC2SPacket {
                         identifier: payload_packet.identifier.clone(),
-                        payload: None,
+                        payload: UnsizedBuffer::new(),
                     };
 
                     // If the payload is a brand request, respond with "froglight"
                     if payload_packet.identifier.as_str() == "minecraft:brand" {
                         info!("    Response: \"froglight\"");
-
-                        // Set the payload to "froglight"
-                        let mut payload = UnsizedBuffer::new();
-                        "froglight".fg_write(&mut payload).unwrap();
-                        response.payload = Some(payload);
+                        "froglight".fg_write(&mut response.payload).unwrap();
                     } else {
                         info!("    Response: None");
                     }
@@ -248,7 +244,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         .play
                         .send(CustomPayloadC2SPacket {
                             identifier: payload_packet.identifier.clone(),
-                            payload: None,
+                            payload: UnsizedBuffer::new(),
                         })
                         .unwrap();
                 }

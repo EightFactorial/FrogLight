@@ -70,8 +70,8 @@ where
     /// # Panics
     /// If the packet length overflows.
     pub async fn recv(&mut self) -> Result<D::Recv, ConnectionError> {
-        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, &*self.compression.read().await)
-            .await
+        let compression = *self.compression.read().await;
+        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, &compression).await
     }
 }
 
@@ -100,7 +100,8 @@ where
     /// # Panics
     /// If the packet length overflows.
     pub async fn send_packet(&mut self, packet: &D::Send) -> Result<(), ConnectionError> {
-        send_packet::<V, S, D>(&mut self.stream, &*self.compression.read().await, packet).await
+        let compression = *self.compression.read().await;
+        send_packet::<V, S, D>(&mut self.stream, &compression, packet).await
     }
 }
 

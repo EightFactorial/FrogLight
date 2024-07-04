@@ -8,20 +8,15 @@ use bevy_app::{App, Plugin};
 
 pub mod definitions;
 
-mod events;
-pub use events::*;
-
 pub mod registries;
 
 /// The `Registry` Froglight plugin.
 ///
-/// Adds registry values, conversions, and management.
+/// Registers types for [`Reflection`](bevy_reflect) and initializes
+/// [`BlockRegistry`](definitions::BlockRegistry)s
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct RegistryPlugin;
 
 impl Plugin for RegistryPlugin {
-    fn build(&self, app: &mut App) {
-        events::build(app);
-        registries::build(app);
-    }
+    fn build(&self, app: &mut App) { registries::build(app); }
 }

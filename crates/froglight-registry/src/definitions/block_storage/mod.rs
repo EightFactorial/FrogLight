@@ -13,7 +13,9 @@ pub use resolver::VanillaResolver;
 mod storage;
 pub use storage::BlockStorage;
 
-/// A registry which contains all blocks.
+/// A registry which contains all blocks for a specific [`Version`].
+///
+/// Allows converting between blockstate ids and blocks.
 #[derive(Debug, Clone, Resource)]
 pub struct BlockRegistry<V: Version> {
     storage: Arc<RwLock<BlockStorage<V>>>,

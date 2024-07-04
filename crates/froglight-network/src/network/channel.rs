@@ -132,7 +132,17 @@ impl<V: Version, S: State<V>, D: NetworkDirection<V, S>> PacketChannel<V, S, D> 
     /// # Errors
     /// This will return an error if the channel is full or closed.
     pub fn send(&self, packet: impl Into<D::Send>) -> Result<(), TrySendError<Arc<D::Send>>> {
-        self.send.try_send(Arc::new(packet.into()))
+        self.send_packet(Arc::new(packet.into()))
+    }
+
+    /// Send a packet through the channel.
+    ///
+    /// A shortcut for [`Sender::try_send`].
+    ///
+    /// # Errors
+    /// This will return an error if the channel is full or closed.
+    pub fn send_packet(&self, packet: Arc<D::Send>) -> Result<(), TrySendError<Arc<D::Send>>> {
+        self.send.try_send(packet)
     }
 
     /// Receive a packet from the channel.

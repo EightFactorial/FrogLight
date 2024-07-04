@@ -7,5 +7,5 @@ use crate::common::UnsizedBuffer;
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct CustomPayloadC2SPacket {
     pub identifier: ResourceKey,
-    pub payload: Option<UnsizedBuffer>,
+    pub payload: UnsizedBuffer,
 }
