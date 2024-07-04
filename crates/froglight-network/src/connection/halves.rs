@@ -38,6 +38,7 @@ where
     pub fn into_stream(self) -> BufReader<TcpStream> { self.stream }
 
     /// Returns the compression level of the connection.
+    #[must_use]
     pub fn get_compression(&self) -> &RwLock<Option<i32>> { &self.compression }
 
     /// Set the state of the connection.
@@ -92,6 +93,7 @@ where
     pub fn into_stream(self) -> TcpStream { self.stream }
 
     /// Returns the compression level of the connection.
+    #[must_use]
     pub fn get_compression(&self) -> &RwLock<Option<i32>> { &self.compression }
 
     /// Set the state of the connection.
