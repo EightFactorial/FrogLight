@@ -30,7 +30,7 @@ FrogLight can added as a dependency in your `cargo.toml` file:
 
 ```toml
 [dependencies]
-bevy = "0.13.0"
+bevy = "0.14.0"
 froglight = { git = "https://github.com/EightFactorial/FrogLight.git" }
 # etc...
 ```
