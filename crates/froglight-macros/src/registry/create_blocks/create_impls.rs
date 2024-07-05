@@ -82,13 +82,16 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
             impl BlockStateResolver<#version> for VanillaResolver {
                 type Resolved = Option<Blocks>;
                 fn resolve_state(blockstate_id: u32, storage: &BlockStorage<#version>) -> Self::Resolved {
-                    let block_dyn = storage.default_blockstate(blockstate_id)?;
-                    let (_, suffix) = block_dyn.to_key().split_once("minecraft:")?;
-
-                    let block_range = storage.blockstate_range(block_dyn)?;
+                    let (block_range, block_id) = storage.range_map.get_key_value(&blockstate_id)?;
                     let relative_id = blockstate_id - block_range.start;
 
-                    FUNCTION_MAP.get(suffix).and_then(|f| f(relative_id))
+                    let key = storage.dyn_storage[*block_id].to_key();
+                    if key.starts_with("minecraft:") {
+                        FUNCTION_MAP.get(&key[10..]).and_then(|func| func(relative_id))
+                    } else {
+                        None
+                    }
+
                  }
                 fn register_blocks(storage: &mut BlockStorage<#version>) {
                     #register_tokens
@@ -97,7 +100,7 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
         });
     }
 
-    // Create a phf map for the `resolve_state` fn
+    // Create a phf `FUNCTION_MAP` for the `resolve_state` fn
     {
         let mut map_fns = TokenStream::new();
         for block in &blocks {
