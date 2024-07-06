@@ -28,6 +28,7 @@ jobs:
       # Run Spellcheck and verify fixes
       - name: Spellcheck (Verify)
         id: spellcheck-verify
+        if: steps.spellcheck-fix.outcome != 'success'
         uses: crate-ci/typos@master
       # Create PR with fixes
       - name: Pull Request
