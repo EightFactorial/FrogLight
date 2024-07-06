@@ -33,4 +33,4 @@ jobs:
       # Create PR with fixes
       - name: Pull Request
         if: steps.spellcheck-fix.outcome != 'success' && steps.spellcheck-verify.outcome == 'success'
-        uses: peter-evans/create-pull-request@v6.1.0
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
