@@ -85,13 +85,8 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
                     let (block_range, block_id) = storage.range_map.get_key_value(&blockstate_id)?;
                     let relative_id = blockstate_id - block_range.start;
 
-                    let key = storage.dyn_storage[*block_id].to_key();
-                    if key.starts_with("minecraft:") {
-                        FUNCTION_MAP.get(&key[10..]).and_then(|func| func(relative_id))
-                    } else {
-                        None
-                    }
-
+                    let key = storage.dyn_storage.get(*block_id)?.to_key();
+                    key.strip_prefix("minecraft:").and_then(|suffix| FUNCTION_MAP.get(suffix)).and_then(|func| func(relative_id))
                  }
                 fn register_blocks(storage: &mut BlockStorage<#version>) {
                     #register_tokens
