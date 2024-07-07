@@ -1,4 +1,4 @@
-//! [`Schedules`] that run at specific intervals.
+//! [`Schedules`](bevy_ecs::schedule::Schedule) that run at specific intervals.
 
 use bevy_app::{App, MainScheduleOrder, RunFixedMainLoop};
 use bevy_ecs::schedule::{ExecutorKind, Schedule, ScheduleLabel};

@@ -72,9 +72,9 @@ where
 /// A pair of channels for sending and receiving packets.
 #[derive(Debug)]
 pub struct PacketChannel<V: Version, S: State<V>, D: NetworkDirection<V, S>> {
-    /// A [`Sender`] for sending packets of type [`D::Send`].
+    /// A [`Sender`] for sending packets of type `D::Send`.
     pub send: Sender<Arc<D::Send>>,
-    /// A [`Receiver`] for receiving packets of type [`D::Recv`].
+    /// A [`Receiver`] for receiving packets of type `D::Recv`.
     pub recv: Receiver<Arc<D::Recv>>,
 }
 

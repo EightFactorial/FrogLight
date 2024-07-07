@@ -6,7 +6,7 @@ use crate::prelude::plugins::*;
 /// application.
 ///
 /// This includes:
-/// - [`EntityPlugin`]
+/// - `EntityPlugin`
 /// - [`RegistryPlugin`]
 /// - [`UtilityPlugin`]
 /// - [`NetworkPlugins`]

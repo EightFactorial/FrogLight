@@ -288,7 +288,7 @@ impl<V: Version> BlockStorage<V> {
             .and_then(|block_id| self.dyn_storage.get(block_id).map(std::convert::AsRef::as_ref))
     }
 
-    /// Resolve a [`Res::Resolved`] from a `block state id`.
+    /// Resolve a `Res::Resolved` from a `block state id`.
     ///
     /// This is the reverse of [`BlockStorage::blockstate_id_of`].
     ///

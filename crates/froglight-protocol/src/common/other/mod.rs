@@ -8,7 +8,7 @@ mod gamemode;
 pub use gamemode::GameMode;
 
 mod gameprofile;
-pub use gameprofile::GameProfile;
+pub use gameprofile::{GameProfile, ProfileProperty};
 
 mod intent;
 pub use intent::ConnectionIntent;

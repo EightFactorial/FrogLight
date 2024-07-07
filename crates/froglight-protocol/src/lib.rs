@@ -1,4 +1,14 @@
-#![doc = include_str!("../README.md")]
+//! # Froglight Protocol
+//! A barebones implementation of reading and writing types and packets in the
+//! Minecraft format.
+//!
+//! This crate contains no networking logic, only logic for
+//! reading and writing bytes and data structures!
+//!
+//! Most likely you are looking for the [Froglight
+//! Network](../froglight-network/) crate, which implements a  basic
+//! [`Connection`](../froglight-network/src/connection/mod.rs) using this
+//! protocol.
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![feature(array_try_from_fn)]
 #![feature(const_type_name)]

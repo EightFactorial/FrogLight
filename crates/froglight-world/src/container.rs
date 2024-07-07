@@ -301,8 +301,7 @@ impl<T: ContainerType> Container<T> {
     }
 }
 
-/// Bitslice and calculation methods for accessing
-/// data in a [`ChunkDataContainer`].
+/// Bitslice and calculation methods for accessing data in a [`Container`].
 impl<T: ContainerType> Container<T> {
     const U64BITS: usize = u64::BITS as usize;
 

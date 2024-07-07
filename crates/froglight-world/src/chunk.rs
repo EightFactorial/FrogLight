@@ -221,7 +221,7 @@ impl Chunk {
     ///
     /// # Note
     /// This calls
-    /// [`BlockStorage::resolve_blockstate`]
+    /// [`BlockStorage::resolve_blockstate`](froglight_registry::definitions::BlockStorage::resolve_blockstate)
     /// and can be very expensive compared to [`Chunk::get_blockstate_id`].
     ///
     /// This acquires a [`read lock`](RwLock::read) on the [`Chunk`],
@@ -245,7 +245,7 @@ impl Chunk {
     ///
     /// # Note
     /// This calls
-    /// [`BlockStorage::resolve_blockstate`]
+    /// [`BlockStorage::resolve_blockstate`](froglight_registry::definitions::BlockStorage::resolve_blockstate)
     /// and can be very expensive compared to [`Chunk::set_blockstate_id`].
     ///
     /// This acquires a [`write lock`](RwLock::write) on the [`Chunk`],

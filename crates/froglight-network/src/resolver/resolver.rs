@@ -16,8 +16,7 @@ pub struct Resolver {
 }
 
 impl Resolver {
-    /// Creates a new resolver from the given [`AsyncStdResolver`] and
-    /// [`TldExtractor`].
+    /// Creates a new resolver from the given [`AsyncStdResolver`]
     #[must_use]
     pub fn new(resolver: AsyncStdResolver) -> Self { Self { resolver: Arc::new(resolver) } }
 
