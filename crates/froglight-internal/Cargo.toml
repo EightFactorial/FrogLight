@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-# bevy_mod_debugdump = "0.10.0"
+bevy_mod_debugdump = "0.11.0"
 serde_json = { workspace = true }
 
 [dependencies]
@@ -53,6 +53,6 @@ default = ["presets"]
 # Enables preset plugin groups
 presets = ["dep:bevy"]
 
-# [[example]]
-# name = "system-graph"
-# path = "examples/system-graph/main.rs"
+[[example]]
+name = "system-graph"
+path = "examples/system-graph/main.rs"

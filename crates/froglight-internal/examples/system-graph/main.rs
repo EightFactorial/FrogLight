@@ -49,8 +49,7 @@ fn main() {
     app.add_plugins(HeadlessPlugins.build());
 
     // Generate schedule graphs
-    let main = app.main().update_schedule.unwrap().intern();
-    graph_schedules(&mut app, "main", &[main]);
+    graph_schedules(&mut app, "main", &[Main.intern()]);
 
     let startup_labels = app.world().resource::<MainScheduleOrder>().startup_labels.clone();
     graph_schedules(&mut app, "startup", &startup_labels);
