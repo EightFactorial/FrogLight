@@ -1,4 +1,4 @@
-use std::{any::TypeId, fmt::Debug};
+use std::fmt::Debug;
 
 use bevy_reflect::Reflect;
 use froglight_protocol::traits::Version;
@@ -125,51 +125,6 @@ pub trait BlockExt<V: Version>: Sized + BlockType {
         }
     }
 
-    /// Get a block from it's `block state id`.
-    ///
-    /// Returns `None` if the `block state id` is invalid.
-    ///
-    /// Requires the block to have been registered in the [`BlockStorage`].
-    ///
-    /// # Example
-    /// ```rust
-    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{
-    ///     definitions::{BlockExt, BlockStorage},
-    ///     registries::{
-    ///         attributes::{SnowyBooleanAttribute, WaterloggedBooleanAttribute},
-    ///         blocks::{GrassBlock, HeavyCore},
-    ///     },
-    /// };
-    ///
-    /// let storage = BlockStorage::<V1_21_0>::new();
-    ///
-    /// // GrassBlock has two block state ids, `8` and `9`.
-    /// let grass_snowy = <GrassBlock as BlockExt<V1_21_0>>::from_blockstate_id(8, &storage).unwrap();
-    /// assert_eq!(grass_snowy, GrassBlock { snowy: SnowyBooleanAttribute(true) });
-    ///
-    /// let grass_normal = <GrassBlock as BlockExt<V1_21_0>>::from_blockstate_id(9, &storage).unwrap();
-    /// assert_eq!(grass_normal, GrassBlock { snowy: SnowyBooleanAttribute(false) });
-    ///
-    /// // HeavyCore has two block state ids, `26682` and `26683`.
-    /// let heavy_core_wet =
-    ///     <HeavyCore as BlockExt<V1_21_0>>::from_blockstate_id(26682, &storage).unwrap();
-    /// assert_eq!(heavy_core_wet, HeavyCore { waterlogged: WaterloggedBooleanAttribute(true) });
-    ///
-    /// let heavy_core_dry =
-    ///     <HeavyCore as BlockExt<V1_21_0>>::from_blockstate_id(26683, &storage).unwrap();
-    /// assert_eq!(heavy_core_dry, HeavyCore { waterlogged: WaterloggedBooleanAttribute(false) });
-    /// ```
-    #[must_use]
-    fn from_blockstate_id(blockstate_id: u32, storage: &BlockStorage<V>) -> Option<Self> {
-        let blockstate_range = storage.type_map.get(&TypeId::of::<Self>())?;
-        if blockstate_range.contains(&blockstate_id) {
-            Self::from_relative_id(blockstate_id - blockstate_range.start)
-        } else {
-            None
-        }
-    }
-
     /// Get the block's *relative* `block state id`.
     ///
     /// This is equivalent to subtracting the first valid `block state id`
@@ -195,36 +150,6 @@ pub trait BlockExt<V: Version>: Sized + BlockType {
     /// ```
     #[must_use]
     fn to_relative_id(&self) -> u32 { 0 }
-
-    /// Get the block's `block state id`.
-    ///
-    /// Requires the block to have been registered in the [`BlockStorage`].
-    ///
-    /// # Example
-    /// ```rust
-    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{
-    ///     definitions::{BlockExt, BlockStorage},
-    ///     registries::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
-    /// };
-    ///
-    /// let storage = BlockStorage::<V1_21_0>::new();
-    ///
-    /// // The first variant of grass has `SnowyBooleanAttribute(true)`.
-    /// let grass_snowy =
-    ///     GrassBlock { snowy: SnowyBooleanAttribute(true) }.to_blockstate_id(&storage).unwrap();
-    /// assert_eq!(grass_snowy, 8);
-    ///
-    /// // The second variant of grass has `SnowyBooleanAttribute(false)`.
-    /// let grass_normal =
-    ///     GrassBlock { snowy: SnowyBooleanAttribute(false) }.to_blockstate_id(&storage).unwrap();
-    /// assert_eq!(grass_normal, 9);
-    /// ```
-    #[must_use]
-    fn to_blockstate_id(&self, storage: &BlockStorage<V>) -> Option<u32> {
-        let blockstate_range = storage.blockstate_range(self)?;
-        Some(blockstate_range.start + self.to_relative_id())
-    }
 }
 
 /// A block state resolver for a specific [`Version`].

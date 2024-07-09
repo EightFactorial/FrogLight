@@ -248,7 +248,8 @@ impl<V: Version> BlockStorage<V> {
     /// ```
     #[must_use]
     pub fn blockstate_id_of(&self, block: &impl BlockExt<V>) -> Option<u32> {
-        block.to_blockstate_id(self)
+        let blockstate_range = self.type_map.get(&block.type_id())?;
+        Some(blockstate_range.start + block.to_relative_id())
     }
 
     /// Returns the default block for a `block state id`.
