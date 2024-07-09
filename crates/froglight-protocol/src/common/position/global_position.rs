@@ -17,7 +17,7 @@ pub struct GlobalPosition {
 impl Default for GlobalPosition {
     fn default() -> Self {
         Self {
-            world: ResourceKey::new_inline("minecraft:overworld"),
+            world: ResourceKey::const_new("minecraft:overworld"),
             position: BlockPosition::default(),
         }
     }

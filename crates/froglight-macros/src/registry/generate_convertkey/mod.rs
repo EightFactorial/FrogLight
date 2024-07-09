@@ -27,20 +27,11 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
 
         // Parse the attributes of the variant
         let variant_attrs = VariantAttributes::from_attributes(variant.attrs.iter()).unwrap();
-
-        // Parse the key attribute
         let variant_str = variant_attrs.key.as_str();
-        let variant_key = if variant_str.len() <= 24 {
-            // If the key is less than or equal to 24 characters, use an inline key.
-            quote! { #protocol_path::common::ResourceKey::new_inline(#variant_str) }
-        } else {
-            // If the key is greater than 24 characters, use a standard key.
-            quote! { #protocol_path::common::ResourceKey::new(#variant_str) }
-        };
 
         // Add tokens for the to_key function
         to_key_tokens.extend(quote! {
-            #enum_ident::#variant_ident => #variant_key,
+            #enum_ident::#variant_ident => #protocol_path::common::ResourceKey::const_new(#variant_str),
         });
 
         // Add tokens for the to_key_str function

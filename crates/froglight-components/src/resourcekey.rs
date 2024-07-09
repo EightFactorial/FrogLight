@@ -13,7 +13,7 @@ use thiserror::Error;
 ///
 /// All keys are made of a namespace and a path, separated by a colon.
 ///
-/// Internally just a wrapper around a [`CompactString`]
+/// Internally just a wrapper around a [`CompactString`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Deref, DerefMut)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Serialize, Deserialize))]
@@ -43,7 +43,7 @@ impl ResourceKey {
     ///
     /// When creating a [`ResourceKey`] without
     /// a namespace, this will be used.
-    pub const DEFAULT_NAMESPACE: CompactString = CompactString::new_inline("minecraft");
+    pub const DEFAULT_NAMESPACE: CompactString = CompactString::const_new("minecraft");
 
     /// Creates a new [`ResourceKey`]
     ///
@@ -58,9 +58,11 @@ impl ResourceKey {
     /// use froglight_components::resourcekey::ResourceKey;
     ///
     /// let key = ResourceKey::new("minecraft:stone");
+    /// assert_eq!(key, ResourceKey::const_new("minecraft:stone"));
     /// assert_eq!(key, "minecraft:stone");
     ///
     /// let key = ResourceKey::new("stone");
+    /// assert_eq!(key, ResourceKey::const_new("minecraft:stone"));
     /// assert_eq!(key, "minecraft:stone");
     /// ```
     ///
@@ -68,7 +70,9 @@ impl ResourceKey {
     /// - If the key is empty
     /// - If the key contains a leading or trailing colon
     /// - If the key contains more than one colon
-    pub fn new(key: impl Into<CompactString>) -> Self { Self::try_new(key).unwrap() }
+    pub fn new(key: impl Into<CompactString>) -> Self {
+        Self::try_new(key).expect("Failed to create ResourceKey")
+    }
 
     /// Attempt to create a new [`ResourceKey`]
     ///
@@ -107,7 +111,7 @@ impl ResourceKey {
     /// ```rust
     /// use froglight_components::resourcekey::ResourceKey;
     ///
-    /// let key = ResourceKey::new("minecraft:stone");
+    /// let key = ResourceKey::const_new("minecraft:stone");
     /// assert_eq!(key.split(), ("minecraft", "stone"));
     ///
     /// let key = ResourceKey::new("air");
@@ -126,10 +130,10 @@ impl ResourceKey {
     /// ```rust
     /// use froglight_components::resourcekey::ResourceKey;
     ///
-    /// let key = ResourceKey::new("minecraft:dirt");
+    /// let key = ResourceKey::const_new("minecraft:dirt");
     /// assert_eq!(key.namespace(), "minecraft");
     ///
-    /// let key = ResourceKey::new("froglight:error");
+    /// let key = ResourceKey::const_new("froglight:error");
     /// assert_eq!(key.namespace(), "froglight");
     /// ```
     #[inline]
@@ -142,42 +146,38 @@ impl ResourceKey {
     /// ```rust
     /// use froglight_components::resourcekey::ResourceKey;
     ///
-    /// let key = ResourceKey::new("minecraft:grass");
+    /// let key = ResourceKey::const_new("minecraft:grass");
     /// assert_eq!(key.path(), "grass");
     ///
-    /// let key = ResourceKey::new("froglight:error");
+    /// let key = ResourceKey::const_new("froglight:error");
     /// assert_eq!(key.path(), "error");
     /// ```
     #[inline]
     #[must_use]
     pub fn path(&self) -> &str { self.split().1 }
 
-    /// Creates a new inline [`ResourceKey`] at compile time.
+    /// Creates a new [`ResourceKey`] at compile time.
     ///
     /// Must contain exactly one colon (`:`).
     ///
-    /// Note: Trying to create a long string that can't be inlined, will fail to
-    /// build.
-    ///
-    /// See [`CompactString::new_inline`](CompactString) for more information.
+    /// See [`CompactString::const_new`] for more information.
     ///
     /// # Examples
     /// ```rust
     /// use froglight_components::resourcekey::ResourceKey;
     ///
-    /// const AIR: ResourceKey = ResourceKey::new_inline("minecraft:air");
+    /// const AIR: ResourceKey = ResourceKey::const_new("minecraft:air");
     /// assert_eq!(AIR, "minecraft:air");
     ///
-    /// const ERROR: ResourceKey = ResourceKey::new_inline("froglight:error");
+    /// const ERROR: ResourceKey = ResourceKey::const_new("froglight:error");
     /// assert_eq!(ERROR, "froglight:error");
     /// ```
     ///
     /// # Panics
     /// - If the key is empty
     /// - If the key contains does not contain exactly one colon
-    /// - If the key is too long to be inlined
     #[must_use]
-    pub const fn new_inline(key: &str) -> Self {
+    pub const fn const_new(key: &'static str) -> Self {
         assert!(!key.is_empty(), "ResourceKey must not be empty");
 
         // Count the number of colons
@@ -198,7 +198,7 @@ impl ResourceKey {
 
         match colon_count {
             0 => panic!("ResourceKey must contain at least one `:`"),
-            1 => Self(CompactString::new_inline(key)),
+            1 => Self(CompactString::const_new(key)),
             _ => panic!("ResourceKey must contain at most one `:`"),
         }
     }
