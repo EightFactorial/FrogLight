@@ -1,7 +1,7 @@
 use attribute_derive::FromAttr;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput};
+use syn::{Data, DeriveInput, Ident};
 
 pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
     // Get the path to `froglight-registry`
@@ -16,10 +16,11 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
         panic!("Registries must be enums");
     };
 
-    // Collect the tokens for the `from_key`, `to_key_str`, and `to_key` functions
+    // Collect the tokens for the `from_key` and `to_key` functions
     let mut from_key_tokens = TokenStream::new();
-    let mut to_key_str_tokens = TokenStream::new();
     let mut to_key_tokens = TokenStream::new();
+
+    let mut key_tokens = TokenStream::new();
 
     // Parse the variants
     for variant in &data.variants {
@@ -29,23 +30,37 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
         let variant_attrs = VariantAttributes::from_attributes(variant.attrs.iter()).unwrap();
         let variant_str = variant_attrs.key.as_str();
 
-        // Add tokens for the to_key function
-        to_key_tokens.extend(quote! {
-            #enum_ident::#variant_ident => #protocol_path::common::ResourceKey::const_new(#variant_str),
-        });
+        // Add tokens for the str constant
+        let str_ident = Ident::new(
+            &format!("{}_STR", variant_ident.to_string().to_uppercase()),
+            variant_ident.span(),
+        );
+        // Add tokens for the key constant
+        let const_ident = Ident::new(
+            &format!("{}_KEY", variant_ident.to_string().to_uppercase()),
+            variant_ident.span(),
+        );
 
-        // Add tokens for the to_key_str function
-        to_key_str_tokens.extend(quote! {
-            #enum_ident::#variant_ident => #variant_str,
+        key_tokens.extend(quote! {
+            pub const #str_ident: &'static str = #variant_str;
+            pub const #const_ident: &'static #protocol_path::common::ResourceKey = &#protocol_path::common::ResourceKey::const_new(Self::#str_ident);
         });
 
         // Add tokens for the from_key function
         from_key_tokens.extend(quote! {
-            #variant_str => Some(#enum_ident::#variant_ident),
+            Self::#str_ident => Some(#enum_ident::#variant_ident),
+        });
+
+        // Add tokens for the to_key function
+        to_key_tokens.extend(quote! {
+            #enum_ident::#variant_ident => Self::#const_ident,
         });
     }
 
     quote! {
+        impl #enum_ident {
+            #key_tokens
+        }
         impl #crate_path::definitions::ConvertKey for #enum_ident {
             fn from_key(key: &str) -> Option<Self> {
                 match key {
@@ -53,12 +68,7 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
                     _ => None,
                 }
             }
-            fn to_key_str(&self) -> &'static str {
-                match self {
-                    #to_key_str_tokens
-                }
-            }
-            fn to_key(&self) -> #protocol_path::common::ResourceKey {
+            fn to_key(&self) -> &'static #protocol_path::common::ResourceKey {
                 match self {
                     #to_key_tokens
                 }

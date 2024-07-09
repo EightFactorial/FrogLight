@@ -10,11 +10,8 @@ where
     /// Returns `None` if the key does not match any known value.
     fn from_key(key: &str) -> Option<Self>;
 
-    /// Get the key as a [`str`].
-    fn to_key_str(&self) -> &'static str;
-
     /// Convert the registry value to a [`ResourceKey`].
-    fn to_key(&self) -> ResourceKey { ResourceKey::new(self.to_key_str()) }
+    fn to_key(&self) -> &'static ResourceKey;
 }
 
 /// A trait for converting between IDs and a registry values.
