@@ -126,6 +126,7 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
                 BlockData::Default => {
                     tokenstream.extend(quote! {
                         impl BlockExt<#version> for #name {
+                            #[inline]
                             fn default_state() -> Self { #name }
                         }
                     });
@@ -186,6 +187,10 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
                     tokenstream.extend(quote! {
                         impl BlockExt<#version> for #name {
                             const BLOCK_STATES: u32 = #permutations_len;
+                            #[inline]
+                            fn default_state() -> Self {
+                                #default_state_tokens
+                            }
                             fn from_relative_id(id: u32) -> Option<Self> {
                                 match id {
                                     #from_relative_id_tokens
@@ -196,9 +201,6 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
                                 match self {
                                     #to_relative_id_tokens
                                 }
-                            }
-                            fn default_state() -> Self {
-                                #default_state_tokens
                             }
                         }
                     });

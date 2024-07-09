@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use bevy_reflect::Reflect;
-use froglight_protocol::traits::Version;
+use froglight_protocol::{common::ResourceKey, traits::Version};
 
 use super::BlockStorage;
 
@@ -18,7 +18,7 @@ pub trait BlockType: 'static + Debug + Reflect + Send + Sync {
     /// let stone = "minecraft:stone";
     /// ```
     #[must_use]
-    fn to_key(&self) -> &'static str;
+    fn to_key(&self) -> &'static ResourceKey;
     /// The block's language key.
     ///
     /// This is used to identify the block in the language files.

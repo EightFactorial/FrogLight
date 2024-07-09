@@ -111,27 +111,39 @@ impl Parse for BlockDeclaration {
 
 impl BlockDeclaration {
     fn to_tokens(BlockDeclaration { ident, key, fields }: Self, namespace: &str) -> TokenStream {
-        let block_impl: Item = {
+        let protocol_path = crate::protocol::get_protocol_path();
+
+        let (block_impl, type_impl): (Item, Item) = {
             let name_key = format!("{namespace}:{key}");
             let lang_key = format!("block.{namespace}.{key}");
 
             let mut method_fns = TokenStream::new();
             method_fns.extend(quote! {
-                fn to_key(&self) -> &'static str { #name_key }
+                #[inline]
+                fn to_key(&self) -> &'static #protocol_path::common::ResourceKey { Self::BLOCK_KEY }
+                #[inline]
                 fn to_lang(&self) -> &'static str { #lang_key }
             });
 
             if ident.to_string().ends_with("Air") {
                 method_fns.extend(quote! {
+                    #[inline]
                     fn is_air(&self) -> bool { true }
                 });
             }
 
-            syn::parse_quote! {
-                impl crate::definitions::BlockType for #ident {
-                    #method_fns
-                }
-            }
+            (
+                syn::parse_quote! {
+                    impl #ident {
+                        pub const BLOCK_KEY: &'static #protocol_path::common::ResourceKey = &#protocol_path::common::ResourceKey::const_new(#name_key);
+                    }
+                },
+                syn::parse_quote! {
+                    impl crate::definitions::BlockType for #ident {
+                        #method_fns
+                    }
+                },
+            )
         };
 
         let block_struct = match fields {
@@ -162,6 +174,7 @@ impl BlockDeclaration {
         quote! {
             #block_struct
             #block_impl
+            #type_impl
         }
     }
 }
