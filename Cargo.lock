@@ -501,9 +501,9 @@ dependencies = [
 
 [[package]]
 name = "bevy-inspector-egui"
-version = "0.25.0"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "094e2d697a9dcbbd62fc6ff133d1d95990f66b6c4d25cdfb528f4b102c6a3ed1"
+checksum = "f8d77dbe53c8840aa74b66ea19dac6675d0a1752c989610cbded909d03967bec"
 dependencies = [
  "bevy-inspector-egui-derive",
  "bevy_app",
