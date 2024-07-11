@@ -7,6 +7,9 @@
 
 pub mod plugins;
 
+pub use froglight_block::{
+    BlockExt, BlockRegistry, BlockStateResolver, BlockType, VanillaResolver,
+};
 pub use froglight_network::{
     common::*,
     connection::{Clientbound, Connection, ConnectionError, Serverbound},
@@ -16,10 +19,7 @@ pub use froglight_network::{
     states::{Configuration, Handshake, Login, Play, Status},
     traits::{State, Version},
 };
-pub use froglight_registry::{
-    definitions::{BlockExt, BlockRegistry, BlockType, ConvertId, ConvertKey},
-    registries::*,
-};
+pub use froglight_registry::*;
 pub use froglight_utils::{
     schedules::{FiveSeconds, OneSecond, OneTick, TenTicks, TwoTicks},
     tracking::{ChunkPositionMap, EntityChunkMap, EntityIdMap, EntityUuidMap},

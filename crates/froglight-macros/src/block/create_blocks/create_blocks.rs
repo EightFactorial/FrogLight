@@ -41,7 +41,8 @@ pub(crate) fn generate_blocks(tokens: proc_macro::TokenStream) -> TokenStream {
         }
 
         tokenstream.extend(quote! {
-            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, bevy_reflect::Reflect)]
+            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From)]
+            #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
             pub enum Blocks {
                 #variants
             }
@@ -139,7 +140,7 @@ impl BlockDeclaration {
                     }
                 },
                 syn::parse_quote! {
-                    impl crate::definitions::BlockType for #ident {
+                    impl crate::BlockType for #ident {
                         #method_fns
                     }
                 },
@@ -149,7 +150,8 @@ impl BlockDeclaration {
         let block_struct = match fields {
             Some(fields) => Item::Struct(ItemStruct {
                 attrs: vec![
-                    syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
+                    syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)] },
+                    syn::parse_quote! { #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))] },
                 ],
                 vis: Visibility::Public(Token![pub](Span::call_site())),
                 struct_token: Token![struct](Span::call_site()),
@@ -160,7 +162,8 @@ impl BlockDeclaration {
             }),
             None => Item::Struct(ItemStruct {
                 attrs: vec![
-                    syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
+                    syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)] },
+                    syn::parse_quote! { #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))] },
                 ],
                 vis: Visibility::Public(Token![pub](Span::call_site())),
                 struct_token: Token![struct](Span::call_site()),

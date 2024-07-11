@@ -1,0 +1,61 @@
+[package]
+name = "froglight-block"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+derive_more = { workspace = true }
+froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
+    "froglight-block",
+] }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
+    "bevy",
+] }
+
+# Optional dependencies
+hashbrown = { workspace = true, optional = true }
+parking_lot = { workspace = true, optional = true }
+phf = { version = "0.11.2", optional = true, features = ["macros", "std"] }
+rangemap = { version = "1.5.1", optional = true, features = [
+    "nightly",
+    "const_fn",
+] }
+
+# Optional bevy dependencies
+bevy_app = { workspace = true, optional = true }
+bevy_derive = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+
+[features]
+default = ["bevy", "hashbrown"]
+
+# Adds `BlockRegistry` for converting between block IDs and block types.
+bevy = [
+    "dep:bevy_app",
+    "dep:bevy_derive",
+    "dep:bevy_ecs",
+    "dep:parking_lot",
+    "dep:phf",
+    "dep:rangemap",
+    "hashbrown",
+    "reflect",
+]
+
+# Use `hashbrown` for better performance
+hashbrown = ["dep:hashbrown"]
+
+# Derives `Reflect` for block and block attributes.
+reflect = ["dep:bevy_reflect"]

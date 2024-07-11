@@ -4,14 +4,7 @@ use bevy_ecs::system::Resource;
 use froglight_protocol::traits::Version;
 use parking_lot::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-mod traits;
-pub use traits::*;
-
-mod resolver;
-pub use resolver::VanillaResolver;
-
-mod storage;
-pub use storage::BlockStorage;
+use crate::{BlockStateResolver, BlockStorage, VanillaResolver};
 
 /// A registry which contains all blocks for a specific [`Version`].
 ///

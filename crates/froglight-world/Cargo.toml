@@ -18,7 +18,9 @@ workspace = true
 [dependencies]
 bitvec = { workspace = true }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
-froglight-registry = { version = "0.1.0", path = "../froglight-registry", optional = true }
+froglight-block = { version = "0.1.0", path = "../froglight-block", optional = true, features = [
+    "bevy",
+] }
 parking_lot = { workspace = true }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }
@@ -29,10 +31,10 @@ bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 
 [features]
-default = ["bevy", "froglight-registry"]
+default = ["bevy", "froglight-block"]
 
 # Derives `Component` and `Reflect` for some types.
 bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect"]
 
 # Adds methods to get Blocks from a Chunk.
-froglight-registry = ["bevy", "dep:froglight-registry"]
+froglight-block = ["bevy", "dep:froglight-block"]

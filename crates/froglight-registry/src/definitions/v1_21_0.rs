@@ -6,7 +6,7 @@ use froglight_macros::frog_create_registry_impls;
 use froglight_protocol::versions::v1_21_0::V1_21_0;
 
 #[allow(clippy::wildcard_imports)]
-use crate::{definitions::ConvertId, registries::registries::*};
+use crate::definitions::*;
 
 frog_create_registry_impls! {
     V1_21_0,

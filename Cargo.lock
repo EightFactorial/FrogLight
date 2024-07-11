@@ -1868,6 +1868,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "froglight-block"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_reflect",
+ "derive_more",
+ "froglight-macros",
+ "froglight-protocol",
+ "hashbrown",
+ "parking_lot",
+ "phf",
+ "rangemap",
+]
+
+[[package]]
 name = "froglight-components"
 version = "0.1.0"
 dependencies = [
@@ -1899,6 +1916,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_mod_debugdump",
+ "froglight-block",
  "froglight-entity",
  "froglight-network",
  "froglight-physics",
@@ -1994,15 +2012,9 @@ dependencies = [
  "bevy_derive",
  "bevy_ecs",
  "bevy_reflect",
- "derive_more",
  "froglight-macros",
  "froglight-protocol",
  "hashbrown",
- "parking_lot",
- "phf",
- "rangemap",
- "serde",
- "serde_json",
  "thiserror",
 ]
 
@@ -2031,8 +2043,8 @@ dependencies = [
  "bevy_log",
  "bevy_reflect",
  "bitvec",
+ "froglight-block",
  "froglight-protocol",
- "froglight-registry",
  "parking_lot",
  "simdnbt",
  "thiserror",

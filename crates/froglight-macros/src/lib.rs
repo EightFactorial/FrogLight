@@ -3,6 +3,32 @@
 
 pub(crate) mod manifest;
 
+// --- Block Macros ---
+
+#[cfg(feature = "froglight-block")]
+mod block;
+
+/// A macro for generating block attributes.
+#[cfg(feature = "froglight-block")]
+#[proc_macro]
+pub fn frog_create_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::frog_create_attributes(input)
+}
+
+/// A macro for generating block structs.
+#[cfg(feature = "froglight-block")]
+#[proc_macro]
+pub fn frog_create_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::frog_create_blocks(input)
+}
+
+/// A macro for generating block trait impls.
+#[cfg(feature = "froglight-block")]
+#[proc_macro]
+pub fn frog_create_block_impls(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::frog_create_block_impls(input)
+}
+
 // --- Protocol Macros ---
 
 #[cfg(feature = "froglight-protocol")]
@@ -46,27 +72,6 @@ mod registry;
 #[proc_macro_derive(FrogRegistry, attributes(frog))]
 pub fn frog_registry(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     registry::frog_registry_convertkey(input)
-}
-
-/// A macro for generating block attributes.
-#[cfg(feature = "froglight-registry")]
-#[proc_macro]
-pub fn frog_create_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    registry::frog_create_attributes(input)
-}
-
-/// A macro for generating block structs.
-#[cfg(feature = "froglight-registry")]
-#[proc_macro]
-pub fn frog_create_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    registry::frog_create_blocks(input)
-}
-
-/// A macro for generating block trait impls.
-#[cfg(feature = "froglight-registry")]
-#[proc_macro]
-pub fn frog_create_block_impls(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    registry::frog_create_block_impls(input)
 }
 
 /// A macro for generating registry trait impls.

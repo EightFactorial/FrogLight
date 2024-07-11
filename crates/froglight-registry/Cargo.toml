@@ -15,33 +15,21 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+hashbrown = { workspace = true }
+
 [dependencies]
 bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_reflect = { workspace = true }
-derive_more = { workspace = true }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-registry",
 ] }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
     "bevy",
 ] }
-parking_lot = { workspace = true }
-phf = { version = "0.11.2", features = ["macros", "std"] }
-rangemap = { version = "1.5.1", features = ["nightly", "const_fn"] }
-serde = { workspace = true }
-serde_json = { workspace = true, features = ["preserve_order"] }
 thiserror = { workspace = true }
-
-# Optional dependencies
-hashbrown = { workspace = true, optional = true }
-
-[features]
-default = ["hashbrown"]
-
-# Use `hashbrown` for better performance
-hashbrown = ["dep:hashbrown", "froglight-protocol/hashbrown"]
 
 [[example]]
 name = "server-tags"

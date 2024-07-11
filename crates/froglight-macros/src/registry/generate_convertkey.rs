@@ -61,7 +61,7 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
         impl #enum_ident {
             #key_tokens
         }
-        impl #crate_path::definitions::ConvertKey for #enum_ident {
+        impl #crate_path::ConvertKey for #enum_ident {
             fn from_key(key: &str) -> Option<Self> {
                 match key {
                     #from_key_tokens

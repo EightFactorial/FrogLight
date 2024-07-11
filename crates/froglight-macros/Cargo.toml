@@ -31,6 +31,9 @@ toml_edit = { version = "0.22.14", default-features = false, features = [
 [features]
 default = []
 
+# Enables `froglight-block` macros
+froglight-block = []
+
 # Enables `froglight-protocol` macros
 froglight-protocol = []
 # Emit extra logging for `froglight-protocol` macros

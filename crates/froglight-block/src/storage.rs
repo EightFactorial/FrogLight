@@ -111,11 +111,11 @@ impl<V: Version> BlockStorage<V> {
     ///
     ///  # Example
     /// ```rust
-    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{
-    ///     definitions::{BlockExt, BlockStorage},
-    ///     registries::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
+    /// use froglight_block::{
+    ///     definitions::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
+    ///     BlockExt, BlockStorage,
     /// };
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
@@ -134,8 +134,8 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// # Example
     /// ```rust
+    /// use froglight_block::BlockStorage;
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::definitions::BlockStorage;
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
@@ -164,14 +164,14 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{
-    ///     definitions::BlockStorage,
-    ///     registries::{
+    /// use froglight_block::{
+    ///     definitions::{
     ///         attributes::SnowyBooleanAttribute,
     ///         blocks::{Air, GrassBlock, Stone},
     ///     },
+    ///     BlockStorage,
     /// };
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
@@ -203,8 +203,8 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// # Example
     /// ```rust
+    /// use froglight_block::BlockStorage;
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::definitions::BlockStorage;
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
@@ -229,11 +229,11 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{
-    ///     definitions::{BlockExt, BlockStorage},
-    ///     registries::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
+    /// use froglight_block::{
+    ///     definitions::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
+    ///     BlockExt, BlockStorage,
     /// };
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
@@ -261,8 +261,8 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// # Example
     /// ```rust
+    /// use froglight_block::BlockStorage;
     /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::definitions::BlockStorage;
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///
@@ -295,11 +295,11 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
-    /// use froglight_registry::{
-    ///     definitions::{BlockStateResolver, BlockStorage, VanillaResolver},
-    ///     registries::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
+    /// use froglight_block::{
+    ///     definitions::{attributes::SnowyBooleanAttribute, blocks::GrassBlock},
+    ///     BlockStateResolver, BlockStorage, VanillaResolver,
     /// };
+    /// use froglight_protocol::versions::v1_21_0::V1_21_0;
     ///
     /// let storage = BlockStorage::<V1_21_0>::new();
     ///

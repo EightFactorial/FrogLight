@@ -6,10 +6,7 @@ use froglight_macros::frog_create_block_impls;
 use froglight_protocol::versions::v1_21_0::V1_21_0;
 
 #[allow(clippy::wildcard_imports)]
-use crate::{
-    definitions::{BlockExt, BlockStateResolver, BlockStorage, VanillaResolver},
-    registries::{attributes::*, blocks::*},
-};
+use super::{attributes::*, blocks::*};
 
 frog_create_block_impls! {
     V1_21_0,

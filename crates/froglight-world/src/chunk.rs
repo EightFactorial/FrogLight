@@ -215,7 +215,7 @@ impl Chunk {
 
 /// Additional methods for [`Chunk`] when the
 /// `froglight-registry` feature is enabled.
-#[cfg(feature = "froglight-registry")]
+#[cfg(feature = "froglight-block")]
 impl Chunk {
     /// Returns the `Block` at the given position.
     ///
@@ -229,14 +229,14 @@ impl Chunk {
     #[must_use]
     pub fn get_block<
         V: froglight_protocol::traits::Version,
-        Res: froglight_registry::definitions::BlockStateResolver<V>,
+        Res: froglight_block::BlockStateResolver<V>,
     >(
         &self,
         position: ChunkBlockPosition,
-        storage: &froglight_registry::definitions::BlockStorage<V>,
+        storage: &froglight_block::BlockStorage<V>,
     ) -> Option<Res::Resolved> {
         self.get_blockstate_id(position)
-            .map(|blockstate_id| storage.resolve_blockstate::<Res>(blockstate_id))
+            .map(|current_id| storage.resolve_blockstate::<Res>(current_id))
     }
 
     /// Sets the `Block` at the given position.
@@ -253,22 +253,22 @@ impl Chunk {
     #[allow(clippy::must_use_candidate)]
     pub fn set_block<
         V: froglight_protocol::traits::Version,
-        Res: froglight_registry::definitions::BlockStateResolver<V>,
+        Res: froglight_block::BlockStateResolver<V>,
     >(
         &self,
         position: ChunkBlockPosition,
-        block: &impl froglight_registry::definitions::BlockExt<V>,
-        storage: &froglight_registry::definitions::BlockStorage<V>,
+        block: &impl froglight_block::BlockExt<V>,
+        storage: &froglight_block::BlockStorage<V>,
     ) -> Option<Res::Resolved> {
         // Get the blockstate id from the storage.
-        let Some(blockstate_id) = storage.blockstate_id_of(block) else {
+        let Some(new_id) = storage.blockstate_id_of(block) else {
             #[cfg(feature = "bevy")]
             bevy_log::warn!("Block not found in storage: \"{}\"", block.to_key());
             return None;
         };
 
         // Set the blockstate id and convert the old blockstate id into a block.
-        self.set_blockstate_id(position, blockstate_id)
+        self.set_blockstate_id(position, new_id)
             .map(|old_id| storage.resolve_blockstate::<Res>(old_id))
     }
 }

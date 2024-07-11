@@ -5,7 +5,7 @@ use syn::{
     Ident, Token,
 };
 
-pub(crate) fn generate_registry_impls(tokens: proc_macro::TokenStream) -> TokenStream {
+pub(crate) fn generate_convertid(tokens: proc_macro::TokenStream) -> TokenStream {
     let RegistryImpls { version, registries } =
         syn::parse(tokens).expect("Failed to parse registry impls");
     let mut tokenstream = TokenStream::new();
@@ -26,7 +26,7 @@ pub(crate) fn generate_registry_impls(tokens: proc_macro::TokenStream) -> TokenS
         }
 
         tokenstream.extend(quote! {
-            impl ConvertId<#version> for #ident {
+            impl crate::ConvertId<#version> for #ident {
                 fn from_id(id: u32) -> Option<Self> {
                     match id {
                         #from_tokens

@@ -3,4 +3,4 @@
 entitys = "entitys"
 
 [files]
-extend-exclude = ["*.svg", "crates/froglight-registry/src/registries/*/**"]
+extend-exclude = ["*.svg", "crates/froglight-registry/src/definitions/**/*.rs"]

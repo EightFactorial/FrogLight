@@ -2,7 +2,7 @@
 //! between ids and keys.
 
 use froglight_protocol::{common::ResourceKey, packet::ServerTagData};
-use froglight_registry::{definitions::ConvertId, registries::registries::ItemKey};
+use froglight_registry::{definitions::ItemKey, ConvertId};
 use hashbrown::HashMap;
 
 fn main() {

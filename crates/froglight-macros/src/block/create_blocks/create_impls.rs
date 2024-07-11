@@ -79,16 +79,16 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
         }
 
         tokenstream.extend(quote! {
-            impl BlockStateResolver<#version> for VanillaResolver {
+            impl crate::BlockStateResolver<#version> for crate::VanillaResolver {
                 type Resolved = Option<Blocks>;
-                fn resolve_state(blockstate_id: u32, storage: &BlockStorage<#version>) -> Self::Resolved {
+                fn resolve_state(blockstate_id: u32, storage: &crate::BlockStorage<#version>) -> Self::Resolved {
                     let (block_range, block_id) = storage.range_map.get_key_value(&blockstate_id)?;
                     let relative_id = blockstate_id - block_range.start;
 
                     let key = storage.dyn_storage.get(*block_id)?.to_key();
                     key.strip_prefix("minecraft:").and_then(|suffix| FUNCTION_MAP.get(suffix)).and_then(|func| func(relative_id))
                  }
-                fn register_blocks(storage: &mut BlockStorage<#version>) {
+                fn register_blocks(storage: &mut crate::BlockStorage<#version>) {
                     #register_tokens
                 }
             }
@@ -99,13 +99,12 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
     {
         let mut map_fns = TokenStream::new();
         for block in &blocks {
-            // TODO: Might need to add the actual block name to the macro
             let name = &block.name;
             let str_name = block.name.to_string().to_case(Case::Snake);
 
             map_fns.extend(quote! {
                 #str_name => |id| {
-                    #name::from_relative_id(id).map(Into::into)
+                    <#name as crate::BlockExt<#version>>::from_relative_id(id).map(Into::into)
                 },
             });
         }
@@ -125,7 +124,7 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
             match block.data {
                 BlockData::Default => {
                     tokenstream.extend(quote! {
-                        impl BlockExt<#version> for #name {
+                        impl crate::BlockExt<#version> for #name {
                             #[inline]
                             fn default_state() -> Self { #name }
                         }
@@ -185,7 +184,7 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
                         u32::try_from(permutations.len()).expect("Too many permutations for u32");
 
                     tokenstream.extend(quote! {
-                        impl BlockExt<#version> for #name {
+                        impl crate::BlockExt<#version> for #name {
                             const BLOCK_STATES: u32 = #permutations_len;
                             #[inline]
                             fn default_state() -> Self {

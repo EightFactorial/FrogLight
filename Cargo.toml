@@ -3,6 +3,7 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/froglight-block",
     "crates/froglight-components",
     "crates/froglight-entity",
     "crates/froglight-internal",
@@ -83,6 +84,18 @@ simdnbt = "0.6.0"
 smallvec = "1.13.2"
 thiserror = "1.0.61"
 uuid = "1.8.0"
+
+[profile.dev.package]
+froglight-macros = { opt-level = 3 }
+syn = { opt-level = 3 }
+quote = { opt-level = 3 }
+proc-macro2 = { opt-level = 3 }
+
+[profile.release.package]
+froglight-macros = { opt-level = 3 }
+syn = { opt-level = 3 }
+quote = { opt-level = 3 }
+proc-macro2 = { opt-level = 3 }
 
 # --- FrogLight Package ---
 

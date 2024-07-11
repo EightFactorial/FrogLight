@@ -254,13 +254,13 @@ fn global_container() {
 }
 
 #[test]
-#[cfg(feature = "froglight-registry")]
+#[cfg(feature = "froglight-block")]
 fn chunk_blocks() {
-    use froglight_protocol::{common::ChunkBlockPosition, versions::v1_21_0::V1_21_0};
-    use froglight_registry::{
-        definitions::{BlockStorage, VanillaResolver},
-        registries::blocks::{Air, Blocks, GrassBlock, Stone},
+    use froglight_block::{
+        definitions::blocks::{Air, Blocks, GrassBlock, Stone},
+        BlockStorage, VanillaResolver,
     };
+    use froglight_protocol::{common::ChunkBlockPosition, versions::v1_21_0::V1_21_0};
 
     use crate::Chunk;
 

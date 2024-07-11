@@ -23,6 +23,10 @@ serde_json = { workspace = true }
 bevy = { workspace = true, default-features = false, optional = true, features = [
     "multi_threaded",
 ] }
+froglight-block = { version = "0.1.0", path = "../froglight-block", features = [
+    "bevy",
+    "hashbrown",
+] }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
 froglight-network = { version = "0.1.0", path = "../froglight-network", features = [
     "bevy",
@@ -33,9 +37,7 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", featur
     "bevy",
     "hashbrown",
 ] }
-froglight-registry = { version = "0.1.0", path = "../froglight-registry", features = [
-    "hashbrown",
-] }
+froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
     "froglight-components",
     "froglight-network",
@@ -44,7 +46,7 @@ froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
 ] }
 froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
     "bevy",
-    "froglight-registry",
+    "froglight-block",
 ] }
 
 [features]
