@@ -157,15 +157,19 @@ pub trait BlockExt<V: Version>: Sized + BlockType {
 /// # Example
 /// ```rust
 /// use bevy_reflect::Reflect;
-/// use froglight_protocol::versions::v1_21_0::V1_21_0;
+/// use froglight_protocol::{common::ResourceKey, versions::v1_21_0::V1_21_0};
 /// use froglight_registry::definitions::{BlockExt, BlockStateResolver, BlockStorage, BlockType};
 ///
 /// /// A custom block type.
 /// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 /// struct MyBlock;
 ///
+/// impl MyBlock {
+///     pub const BLOCK_KEY: &'static ResourceKey = &ResourceKey::const_new("froglight:my_block");
+/// }
+///
 /// impl BlockType for MyBlock {
-///     fn to_key(&self) -> &'static str { "froglight:my_block" }
+///     fn to_key(&self) -> &'static ResourceKey { Self::BLOCK_KEY }
 ///     fn to_lang(&self) -> &'static str { "block.froglight.my_block" }
 /// }
 ///
