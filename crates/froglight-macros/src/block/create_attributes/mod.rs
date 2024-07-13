@@ -110,7 +110,7 @@ impl From<AttributeDeclaration> for Item {
             AttributeFields::Struct(fields) => Item::Struct(ItemStruct {
                 attrs: if fields.unnamed.len() == 1 {
                     vec![
-                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into, derive_more::Deref)] },
+                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into, derive_more::Deref, derive_more::DerefMut)] },
                         reflect,
                     ]
                 } else {

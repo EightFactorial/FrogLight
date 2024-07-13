@@ -35,17 +35,16 @@ rangemap = { version = "1.5.1", optional = true, features = [
 
 # Optional bevy dependencies
 bevy_app = { workspace = true, optional = true }
-bevy_derive = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "hashbrown"]
 
-# Adds `BlockRegistry` for converting between block IDs and block types.
+# Adds `BlockRegistry`s for converting between block IDs and block types.
+# Adds a bevy plugin that initializes block registries.
 bevy = [
     "dep:bevy_app",
-    "dep:bevy_derive",
     "dep:bevy_ecs",
     "dep:parking_lot",
     "dep:phf",
@@ -57,5 +56,5 @@ bevy = [
 # Use `hashbrown` for better performance
 hashbrown = ["dep:hashbrown"]
 
-# Derives `Reflect` for block and block attributes.
+# Derives `Reflect` for blocks and block attributes.
 reflect = ["dep:bevy_reflect"]

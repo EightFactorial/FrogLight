@@ -163,7 +163,7 @@ impl BlockDeclaration {
             }),
             None => Item::Struct(ItemStruct {
                 attrs: vec![
-                    syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)] },
+                    syn::parse_quote! { #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)] },
                     syn::parse_quote! { #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))] },
                 ],
                 vis: Visibility::Public(Token![pub](Span::call_site())),
