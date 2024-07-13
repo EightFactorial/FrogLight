@@ -23,6 +23,7 @@ pub(crate) fn generate_blocks(tokens: proc_macro::TokenStream) -> TokenStream {
         // Create the function
         tokenstream.extend(quote! {
             #[doc(hidden)]
+            #[cfg(feature = "bevy")]
             pub(super) fn build(app: &mut bevy_app::App) {
                 #register_fns
                 app.register_type::<Blocks>();

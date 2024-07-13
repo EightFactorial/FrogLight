@@ -4,7 +4,8 @@ use syn::{
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
     token::Brace,
-    Fields, FieldsUnnamed, Generics, Ident, Item, ItemEnum, ItemStruct, Token, Variant, Visibility,
+    Attribute, Fields, FieldsUnnamed, Generics, Ident, Item, ItemEnum, ItemStruct, Token, Variant,
+    Visibility,
 };
 
 pub(super) fn generate_attributes(tokens: proc_macro::TokenStream) -> TokenStream {
@@ -26,6 +27,7 @@ pub(super) fn generate_attributes(tokens: proc_macro::TokenStream) -> TokenStrea
     // Add the `build` function
     tokenstream.extend(quote! {
         #[doc(hidden)]
+        #[cfg(feature = "bevy")]
         pub(super) fn build(app: &mut bevy_app::App) {
             #register_fns
         }
@@ -101,15 +103,20 @@ impl Parse for AttributeDeclaration {
 
 impl From<AttributeDeclaration> for Item {
     fn from(value: AttributeDeclaration) -> Self {
+        let reflect: Attribute =
+            syn::parse_quote! { #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))] };
+
         match value.fields {
             AttributeFields::Struct(fields) => Item::Struct(ItemStruct {
                 attrs: if fields.unnamed.len() == 1 {
                     vec![
-                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into, bevy_derive::Deref, bevy_derive::DerefMut, bevy_reflect::Reflect)] },
+                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into, derive_more::Deref)] },
+                        reflect,
                     ]
                 } else {
                     vec![
-                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
+                        syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)] },
+                        reflect,
                     ]
                 },
                 vis: Visibility::Public(Token![pub](Span::call_site())),
@@ -121,7 +128,8 @@ impl From<AttributeDeclaration> for Item {
             }),
             AttributeFields::Enum(variants) => Item::Enum(ItemEnum {
                 attrs: vec![
-                    syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, bevy_reflect::Reflect)] },
+                    syn::parse_quote! { #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)] },
+                    reflect,
                 ],
                 vis: Visibility::Public(Token![pub](Span::call_site())),
                 enum_token: Token![enum](Span::call_site()),

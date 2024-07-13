@@ -19,15 +19,13 @@ pub struct HeadlessPlugins;
 
 impl PluginGroup for HeadlessPlugins {
     fn build(self) -> PluginGroupBuilder {
-        let mut builder = BevyMinimalPlugins.build();
-        builder = builder.add(LogPlugin::default());
+        let mut builder = PluginGroupBuilder::start::<Self>();
+        builder = builder.add_group(BevyMinimalPlugins).add(LogPlugin::default());
 
         // Configure the TaskPoolPlugin
         builder = builder.set(TaskPoolPlugin { task_pool_options: TASKPOOL_SETTINGS });
 
         // Add BasicPlugins
-        builder = BasicPlugins::add(builder);
-
-        builder
+        builder.add_group(BasicPlugins)
     }
 }
