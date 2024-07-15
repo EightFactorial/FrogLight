@@ -146,26 +146,34 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
             match packet.as_ref() {
                 ConfigurationClientboundPackets::SelectKnownPacks(resourcepack_packet) => {
                     info!("Config: ResourcePacks");
-                    for pack in &resourcepack_packet.resourcepacks {
-                        info!("    \"{}:{}\" v{}", pack.namespace, pack.id, pack.version);
+
+                    // Log the received packs
+                    info!("    Received:");
+                    for p in &resourcepack_packet.resourcepacks {
+                        info!("        {p:?}");
+                    }
+
+                    // Filter out packs that aren't in the default namespace
+                    let resourcepacks: Vec<_> =
+                        resourcepack_packet
+                            .iter()
+                            .filter_map(|p| {
+                                if p.namespace == "minecraft" {
+                                    Some(p.clone())
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect();
+
+                    // Log the response
+                    info!("    Responded:");
+                    for p in &resourcepacks {
+                        info!("        {p:?}");
                     }
 
                     // Respond that we only know about packs in the default namespace
-                    channel
-                        .config
-                        .send(SelectKnownPacksC2SPacket {
-                            resourcepacks: resourcepack_packet
-                                .iter()
-                                .filter_map(|p| {
-                                    if p.namespace == "minecraft" {
-                                        Some(p.clone())
-                                    } else {
-                                        None
-                                    }
-                                })
-                                .collect(),
-                        })
-                        .unwrap();
+                    channel.config.send(SelectKnownPacksC2SPacket { resourcepacks }).unwrap();
                 }
                 ConfigurationClientboundPackets::CustomPayload(payload_packet) => {
                     info!(
@@ -212,6 +220,17 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("    \"{key}\":");
                         for (tag, data) in &data.data {
                             info!("        \"{tag}\": {data:?}");
+                        }
+                    }
+                }
+                ConfigurationClientboundPackets::DynamicRegistries(registries_packet) => {
+                    info!("Config: DynamicRegistries");
+                    info!("    Identifier: \"{}\"", registries_packet.identifier);
+                    for data in &registries_packet.registry_data {
+                        if let Some(nbt) = &data.data {
+                            info!("        \"{}\": {nbt:?},", data.identifier);
+                        } else {
+                            info!("        \"{}\",", data.identifier);
                         }
                     }
                 }

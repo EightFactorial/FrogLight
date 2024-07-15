@@ -1,6 +1,6 @@
 use froglight_components::resourcekey::ResourceKey;
 use froglight_macros::FrogReadWrite;
-use simdnbt::owned::Nbt;
+use simdnbt::owned::NbtCompound;
 
 /// Data about a registry.
 #[derive(Debug, Clone, PartialEq, FrogReadWrite)]
@@ -9,5 +9,5 @@ pub struct RegistryData {
     /// The name of the registry.
     pub identifier: ResourceKey,
     /// Optional data about the registry.
-    pub data: Option<Nbt>,
+    pub data: Option<NbtCompound>,
 }

@@ -25,7 +25,7 @@ impl FrogRead for NbtCompound {
     where
         Self: Sized,
     {
-        owned::read_compound(buf).map_err(ReadError::from)
+        NbtTag::fg_read(buf)?.into_compound().ok_or(ReadError::NbtCompoundError)
     }
 }
 

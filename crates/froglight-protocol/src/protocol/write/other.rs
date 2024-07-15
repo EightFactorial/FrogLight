@@ -21,8 +21,13 @@ impl FrogWrite for Nbt {
 impl FrogWrite for NbtCompound {
     #[inline]
     fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+        // Write the Compound Tag ID
+        buf.write_all(&[10u8])?;
+
+        // Write the Compound
         let mut vec = Vec::new();
         self.write(&mut vec);
+
         buf.write_all(&vec).map_err(WriteError::Io)
     }
 }

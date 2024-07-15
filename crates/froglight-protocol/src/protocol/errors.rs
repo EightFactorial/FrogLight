@@ -15,6 +15,9 @@ pub enum ReadError {
     /// An error occurred while reading nbt data.
     #[error("NBT error: {0}")]
     NbtError(#[from] simdnbt::Error),
+    /// Expected a Compound Nbt tag.
+    #[error("Expected a Compound tag")]
+    NbtCompoundError,
     /// The buffer ended before the expected data was read.
     #[error("Reached end of buffer, expected {0} bytes, got {1}")]
     EndOfBuffer(usize, usize),
