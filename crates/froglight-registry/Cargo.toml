@@ -19,10 +19,6 @@ workspace = true
 hashbrown = { workspace = true }
 
 [dependencies]
-bevy_app = { workspace = true }
-bevy_derive = { workspace = true }
-bevy_ecs = { workspace = true }
-bevy_reflect = { workspace = true }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-registry",
 ] }
@@ -30,6 +26,22 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", featur
     "bevy",
 ] }
 thiserror = { workspace = true }
+
+# Optional bevy dependencies
+bevy_app = { workspace = true, optional = true }
+bevy_derive = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+
+[features]
+default = []
+
+# Adds a bevy plugin that registers registry types for reflection.
+bevy = ["dep:bevy_app", "dep:bevy_derive", "dep:bevy_ecs", "reflect"]
+
+# Derives `Reflect` for registry types.
+# WARNING: This massively increases compile times!
+reflect = ["dep:bevy_reflect"]
 
 [[example]]
 name = "server-tags"
