@@ -8,12 +8,11 @@ use crate::BlockStorage;
 ///
 /// # Example
 /// ```rust
-/// use bevy_reflect::Reflect;
 /// use froglight_block::{BlockExt, BlockStateResolver, BlockStorage, BlockType};
 /// use froglight_protocol::{common::ResourceKey, versions::v1_21_0::V1_21_0};
 ///
 /// /// A custom block type.
-/// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
+/// #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// struct MyBlock;
 ///
 /// impl MyBlock {

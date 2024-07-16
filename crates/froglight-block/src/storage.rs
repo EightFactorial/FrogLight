@@ -1,23 +1,30 @@
-#[cfg(not(feature = "hashbrown"))]
+#[cfg(all(not(feature = "hashbrown"), not(feature = "bevy")))]
 use std::collections::HashMap;
 use std::{any::TypeId, ops::Range};
 
+#[cfg(feature = "bevy")]
+use bevy_utils::TypeIdMap;
 use froglight_protocol::traits::Version;
-#[cfg(feature = "hashbrown")]
+#[cfg(all(feature = "hashbrown", not(feature = "bevy")))]
 use hashbrown::HashMap;
 use rangemap::RangeMap;
 
 use super::{BlockExt, BlockStateResolver, BlockType, VanillaResolver};
 
 /// Storage for all blocks of a specific [`Version`].
-#[derive(Debug, Default)]
+#[derive(Default)]
 pub struct BlockStorage<V: Version> {
     /// All of the blocks for a specific [`Version`].
     pub(crate) dyn_storage: Vec<Box<dyn BlockType>>,
     /// A map of block state ranges to their index in `dyn_storage`.
     pub(crate) range_map: RangeMap<u32, usize>,
+
     /// A map of block type ids to their block state ranges.
+    #[cfg(not(feature = "bevy"))]
     pub(crate) type_map: HashMap<TypeId, Range<u32>>,
+    /// A map of block type ids to their block state ranges.
+    #[cfg(feature = "bevy")]
+    pub(crate) type_map: TypeIdMap<Range<u32>>,
 
     _v: std::marker::PhantomData<V>,
 }
@@ -42,6 +49,7 @@ impl<V: Version> BlockStorage<V> {
 
     /// Create a new [`BlockStorage`] with a specific capacity.
     #[must_use]
+    #[cfg(not(feature = "bevy"))]
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             dyn_storage: Vec::with_capacity(capacity),
@@ -50,9 +58,32 @@ impl<V: Version> BlockStorage<V> {
         }
     }
 
+    /// Create a new [`BlockStorage`] with a specific capacity.
+    #[must_use]
+    #[cfg(feature = "bevy")]
+    pub fn with_capacity(capacity: usize) -> Self {
+        Self {
+            dyn_storage: Vec::with_capacity(capacity),
+            type_map: TypeIdMap::with_capacity_and_hasher(capacity, bevy_utils::NoOpHash),
+            ..Self::new_empty()
+        }
+    }
+
     /// Create a new empty [`BlockStorage`].
     #[must_use]
-    #[cfg(feature = "hashbrown")]
+    #[cfg(all(not(feature = "hashbrown"), not(feature = "bevy")))]
+    pub fn new_empty() -> Self {
+        Self {
+            dyn_storage: Vec::new(),
+            range_map: RangeMap::new(),
+            type_map: HashMap::new(),
+            _v: std::marker::PhantomData,
+        }
+    }
+
+    /// Create a new empty [`BlockStorage`].
+    #[must_use]
+    #[cfg(all(feature = "hashbrown", not(feature = "bevy")))]
     pub const fn new_empty() -> Self {
         Self {
             dyn_storage: Vec::new(),
@@ -64,12 +95,12 @@ impl<V: Version> BlockStorage<V> {
 
     /// Create a new empty [`BlockStorage`].
     #[must_use]
-    #[cfg(not(feature = "hashbrown"))]
-    pub fn new_empty() -> Self {
+    #[cfg(feature = "bevy")]
+    pub const fn new_empty() -> Self {
         Self {
             dyn_storage: Vec::new(),
             range_map: RangeMap::new(),
-            type_map: HashMap::new(),
+            type_map: TypeIdMap::with_hasher(bevy_utils::NoOpHash),
             _v: std::marker::PhantomData,
         }
     }
@@ -127,7 +158,7 @@ impl<V: Version> BlockStorage<V> {
     /// ```
     #[must_use]
     pub fn blockstate_range(&self, block: &dyn BlockType) -> Option<&Range<u32>> {
-        self.type_map.get(&block.type_id())
+        self.type_map.get(&block.as_any().type_id())
     }
 
     /// Get the range of `block states` for a `block state id`.

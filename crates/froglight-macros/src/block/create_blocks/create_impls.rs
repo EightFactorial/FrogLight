@@ -88,6 +88,7 @@ pub(crate) fn generate_block_impls(tokens: proc_macro::TokenStream) -> TokenStre
                     let key = storage.dyn_storage.get(*block_id)?.to_key();
                     key.strip_prefix("minecraft:").and_then(|suffix| FUNCTION_MAP.get(suffix)).and_then(|func| func(relative_id))
                  }
+                #[inline(never)]
                 fn register_blocks(storage: &mut crate::BlockStorage<#version>) {
                     #register_tokens
                 }

@@ -9,7 +9,7 @@ use crate::{BlockStateResolver, BlockStorage, VanillaResolver};
 /// A registry which contains all blocks for a specific [`Version`].
 ///
 /// Allows converting between blockstate ids and blocks.
-#[derive(Debug, Clone, Resource)]
+#[derive(Clone, Resource)]
 pub struct BlockRegistry<V: Version> {
     storage: Arc<RwLock<BlockStorage<V>>>,
 }

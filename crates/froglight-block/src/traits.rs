@@ -1,10 +1,8 @@
-use std::fmt::Debug;
-
-use bevy_reflect::Reflect;
+use downcast_rs::Downcast;
 use froglight_protocol::{common::ResourceKey, traits::Version};
 
 /// A block
-pub trait BlockType: 'static + Debug + Reflect + Send + Sync {
+pub trait BlockType: 'static + Downcast + Send + Sync {
     /// The block's [`ResourceKey`](froglight_protocol::common::ResourceKey).
     ///
     /// This is used to identify the block in the resource pack.

@@ -17,6 +17,7 @@ workspace = true
 
 [dependencies]
 derive_more = { workspace = true }
+downcast-rs = "1.2.1"
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-block",
 ] }
@@ -37,6 +38,7 @@ rangemap = { version = "1.5.1", optional = true, features = [
 bevy_app = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+bevy_utils = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "hashbrown"]
@@ -46,15 +48,16 @@ default = ["bevy", "hashbrown"]
 bevy = [
     "dep:bevy_app",
     "dep:bevy_ecs",
+    "dep:bevy_utils",
     "dep:parking_lot",
     "dep:phf",
     "dep:rangemap",
     "hashbrown",
-    "reflect",
 ]
 
 # Use `hashbrown` for better performance
 hashbrown = ["dep:hashbrown"]
 
 # Derives `Reflect` for blocks and block attributes.
+# WARNING: This massively increases compile times!
 reflect = ["dep:bevy_reflect"]

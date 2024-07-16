@@ -65,6 +65,7 @@ bevy_reflect = "0.14.0"
 bevy_tasks = "0.14.0"
 bevy_time = "0.14.0"
 bevy_transform = "0.14.0"
+bevy_utils = "0.14.0"
 bitvec = "1.0.1"
 bytemuck = { version = "1.16.1", features = ["nightly_stdsimd"] }
 compact_str = "0.8.0"
