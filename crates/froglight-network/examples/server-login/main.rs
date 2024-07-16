@@ -173,6 +173,8 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     }
 
                     // Respond that we only know about packs in the default namespace
+                    //
+                    // If you respond with no packs, the server will send all registry data
                     channel.config.send(SelectKnownPacksC2SPacket { resourcepacks }).unwrap();
                 }
                 ConfigurationClientboundPackets::CustomPayload(payload_packet) => {
