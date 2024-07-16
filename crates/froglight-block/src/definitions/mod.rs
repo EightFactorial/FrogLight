@@ -11,8 +11,7 @@ mod v1_21_0;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut bevy_app::App) {
-    attributes::build(app);
-    blocks::build(app);
+    app.register_type::<blocks::Blocks>();
 
     app.init_resource::<crate::BlockRegistry<froglight_protocol::versions::v1_21_0::V1_21_0>>();
 }

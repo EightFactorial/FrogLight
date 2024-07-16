@@ -1,5 +1,5 @@
 use proc_macro2::{Span, TokenStream};
-use quote::{quote, ToTokens};
+use quote::ToTokens;
 use syn::{
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
@@ -12,29 +12,8 @@ pub(super) fn generate_attributes(tokens: proc_macro::TokenStream) -> TokenStrea
     let list: BlockAttributeList =
         syn::parse(tokens).expect("Failed to parse block attribute list");
 
-    // Create the token stream
-    let mut tokenstream = TokenStream::new();
-
-    // Register the attributes
-    let mut register_fns = TokenStream::new();
-    for attr in &list.attributes {
-        let ident = &attr.ident;
-        register_fns.extend(quote! {
-            app.register_type::<#ident>();
-        });
-    }
-
-    // Add the `build` function
-    tokenstream.extend(quote! {
-        #[doc(hidden)]
-        #[cfg(feature = "bevy")]
-        pub(super) fn build(app: &mut bevy_app::App) {
-            #register_fns
-        }
-    });
-
     // Convert the attributes into structs
-    list.attributes.into_iter().fold(tokenstream, |mut f, attr| {
+    list.attributes.into_iter().fold(TokenStream::new(), |mut f, attr| {
         f.extend(Item::from(attr).into_token_stream());
         f
     })

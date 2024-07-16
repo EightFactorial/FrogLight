@@ -9,28 +9,6 @@ pub(crate) fn generate_blocks(tokens: proc_macro::TokenStream) -> TokenStream {
     let list: BlockList = syn::parse(tokens).expect("Failed to parse block list");
     let mut tokenstream = TokenStream::new();
 
-    // Add the `build` function
-    {
-        // Register the blocks
-        let mut register_fns = TokenStream::new();
-        for block in &list.blocks {
-            let ident = &block.ident;
-            register_fns.extend(quote! {
-                app.register_type::<#ident>();
-            });
-        }
-
-        // Create the function
-        tokenstream.extend(quote! {
-            #[doc(hidden)]
-            #[cfg(feature = "bevy")]
-            pub(super) fn build(app: &mut bevy_app::App) {
-                #register_fns
-                app.register_type::<Blocks>();
-            }
-        });
-    }
-
     // Create the Blocks enum
     {
         let mut variants = TokenStream::new();
