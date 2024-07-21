@@ -80,11 +80,11 @@ parking_lot = { version = "0.12.3", features = [
 ] }
 proptest = "1.5.0"
 serde = "1.0.203"
-serde_json = "1.0.117"
+serde_json = "1.0.120"
 simdnbt = "0.6.0"
 smallvec = "1.13.2"
-thiserror = "1.0.61"
-uuid = "1.8.0"
+thiserror = "1.0.63"
+uuid = "1.10.0"
 
 [profile.dev.package]
 froglight-macros = { opt-level = 3 }
