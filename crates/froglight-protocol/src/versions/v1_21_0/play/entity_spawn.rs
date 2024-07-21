@@ -1,4 +1,4 @@
-use froglight_components::entity::{EntityId, EntityUuid};
+use froglight_common::{EntityId, EntityUuid};
 use froglight_macros::FrogReadWrite;
 use glam::{DVec3, I16Vec3};
 

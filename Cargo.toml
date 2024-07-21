@@ -3,15 +3,19 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/froglight-asset",
     "crates/froglight-block",
-    "crates/froglight-components",
+    "crates/froglight-common",
     "crates/froglight-entity",
+    "crates/froglight-interface",
     "crates/froglight-internal",
     "crates/froglight-macros",
+    "crates/froglight-model",
     "crates/froglight-network",
     "crates/froglight-physics",
     "crates/froglight-protocol",
     "crates/froglight-registry",
+    "crates/froglight-render",
     "crates/froglight-utils",
     "crates/froglight-world",
 ]
@@ -117,5 +121,21 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[[bin]]
+name = "froglight"
+path = "src/client/main.rs"
+required-features = ["client"]
+
+[lib]
+name = "froglight"
+path = "src/library/lib.rs"
+
 [dependencies]
+bevy = { workspace = true, optional = true }
 froglight-internal = { version = "0.1.0", path = "crates/froglight-internal" }
+
+[features]
+default = []
+
+# Enables extra crates used by clients
+client = ["dep:bevy", "froglight-internal/client"]

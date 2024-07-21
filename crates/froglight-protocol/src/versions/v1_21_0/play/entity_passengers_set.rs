@@ -1,4 +1,4 @@
-use froglight_components::entity::EntityId;
+use froglight_common::EntityId;
 use froglight_macros::FrogReadWrite;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogReadWrite)]

@@ -1,6 +1,6 @@
 use std::io::Cursor;
 
-use froglight_components::entity::{EntityId, EntityUuid};
+use froglight_common::{EntityId, EntityUuid};
 use uuid::Uuid;
 
 use crate::protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, WriteError};

@@ -1,4 +1,4 @@
-use froglight_components::resourcekey::ResourceKey;
+use froglight_common::ResourceKey;
 use froglight_macros::FrogReadWrite;
 
 /// The action to perform on the advancement tab.

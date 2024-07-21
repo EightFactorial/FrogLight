@@ -1,12 +1,8 @@
 //! Traits used for versioning and serialization of data.
 
-use std::{fmt::Debug, hash::Hash};
+use std::fmt::Debug;
 
-/// A Protocol version
-pub trait Version: 'static + Debug + Default + Copy + Eq + Hash + Send + Sync {
-    /// The protocol id
-    const ID: i32;
-}
+pub use froglight_common::Version;
 
 /// A Protocol state
 ///

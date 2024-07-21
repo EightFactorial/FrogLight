@@ -2,7 +2,7 @@ use bevy::app::{PluginGroup, PluginGroupBuilder};
 
 use crate::prelude::plugins::*;
 
-/// A [`PluginGroup`] for all basic `FrogLight` plugins.
+/// A [`PluginGroup`] containing all basic `FrogLight` plugins.
 ///
 /// This includes:
 /// - [`BlockPlugin`]

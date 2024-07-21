@@ -191,7 +191,7 @@ proptest::proptest! {
 
     #[test]
     fn proto_read_nonzero_entityid(val in 0u32..=u32::MAX) {
-        use froglight_components::entity::EntityId;
+        use froglight_common::EntityId;
 
         let bytes = val.fg_var_to_bytes();
         let mut cursor = std::io::Cursor::new(bytes.as_slice());
@@ -206,7 +206,7 @@ proptest::proptest! {
 
     #[test]
     fn proto_write_nonzero_entityid(val in 0u32..u32::MAX) {
-        use froglight_components::entity::EntityId;
+        use froglight_common::EntityId;
 
         let nonzero = NonZero::new_some(EntityId(val));
         let buf = nonzero.fg_to_bytes();

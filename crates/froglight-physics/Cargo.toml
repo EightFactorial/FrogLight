@@ -22,7 +22,7 @@ bevy_ecs = { workspace = true }
 bevy_math = { workspace = true }
 bevy_time = { workspace = true }
 bevy_transform = { workspace = true }
-froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
+froglight-common = { version = "0.1.0", path = "../froglight-common", features = [
     "bevy",
 ] }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }

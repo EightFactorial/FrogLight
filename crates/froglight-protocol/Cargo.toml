@@ -31,7 +31,7 @@ bytemuck = { workspace = true, features = [
 ] }
 compact_str = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true }
-froglight-components = { version = "0.1.0", path = "../froglight-components", features = [
+froglight-common = { version = "0.1.0", path = "../froglight-common", features = [
     "serde",
 ] }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
@@ -73,11 +73,11 @@ bevy = [
     "dep:bevy_reflect",
     "dep:bevy_log",
     "hashbrown",
-    "froglight-components/bevy",
+    "froglight-common/bevy",
 ]
 
 # Use `hashbrown` for better performance
-hashbrown = ["dep:hashbrown", "froglight-components/hashbrown"]
+hashbrown = ["dep:hashbrown", "froglight-common/hashbrown"]
 
 # Use `smallvec` for better performance
 smallvec = ["dep:smallvec", "compact_str/smallvec"]

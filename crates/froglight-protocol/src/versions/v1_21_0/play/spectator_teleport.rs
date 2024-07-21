@@ -1,5 +1,5 @@
 use derive_more::{Deref, DerefMut, From, Into};
-use froglight_components::entity::EntityUuid;
+use froglight_common::EntityUuid;
 use froglight_macros::FrogReadWrite;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogReadWrite)]

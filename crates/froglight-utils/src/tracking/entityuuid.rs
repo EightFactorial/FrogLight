@@ -11,7 +11,7 @@ use bevy_ecs::{
     },
     system::{Query, ResMut, Resource},
 };
-use froglight_components::entity::EntityUuid;
+use froglight_common::EntityUuid;
 #[cfg(feature = "hashbrown")]
 use hashbrown::HashMap;
 

@@ -1,7 +1,7 @@
 use std::io::Cursor;
 
 use compact_str::CompactString;
-use froglight_components::resourcekey::ResourceKey;
+use froglight_common::ResourceKey;
 
 use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 

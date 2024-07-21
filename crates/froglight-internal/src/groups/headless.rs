@@ -9,7 +9,9 @@ use crate::{groups::basic::BasicPlugins, TASKPOOL_SETTINGS};
 
 /// A [`PluginGroup`] for creating a basic headless application.
 ///
-/// Contains the following bevy plugins:
+/// Contains all the plugins required to run a headless application.
+///
+/// [`MinimalPlugins`](BevyMinimalPlugins):
 /// - [`TaskPoolPlugin`](bevy::core::TaskPoolPlugin)
 /// - [`TypeRegistrationPlugin`](bevy::core::TypeRegistrationPlugin)
 /// - [`FrameCountPlugin`](bevy::core::FrameCountPlugin)
@@ -19,7 +21,8 @@ use crate::{groups::basic::BasicPlugins, TASKPOOL_SETTINGS};
 ///
 /// And the following `FrogLight` plugins:
 /// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
-/// - [`NetworkPlugins`](crate::prelude::plugins::NetworkPlugins)
+/// - [`NetworkPlugin`](crate::prelude::plugins::NetworkPlugin)
+/// - [`ResolverPlugin`](crate::prelude::plugins::ResolverPlugin)
 /// - [`UtilityPlugin`](crate::prelude::plugins::UtilityPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct HeadlessPlugins;

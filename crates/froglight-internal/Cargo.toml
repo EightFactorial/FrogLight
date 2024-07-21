@@ -20,34 +20,21 @@ bevy_mod_debugdump = "0.11.0"
 serde_json = { workspace = true }
 
 [dependencies]
-bevy = { workspace = true, default-features = false, optional = true, features = [
-    "multi_threaded",
-] }
-froglight-block = { version = "0.1.0", path = "../froglight-block", features = [
-    "bevy",
-    "hashbrown",
-] }
+bevy = { workspace = true, optional = true, features = ["multi_threaded"] }
+froglight-block = { version = "0.1.0", path = "../froglight-block" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
-froglight-network = { version = "0.1.0", path = "../froglight-network", features = [
-    "bevy",
-    "resolver",
-] }
+froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
-    "bevy",
-    "hashbrown",
-] }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
-froglight-utils = { version = "0.1.0", path = "../froglight-utils", features = [
-    "froglight-components",
-    "froglight-network",
-    "froglight-world",
-    "hashbrown",
-] }
-froglight-world = { version = "0.1.0", path = "../froglight-world", features = [
-    "bevy",
-    "froglight-block",
-] }
+froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
+froglight-world = { version = "0.1.0", path = "../froglight-world" }
+
+# Client dependencies
+froglight-asset = { version = "0.1.0", path = "../froglight-asset", optional = true }
+froglight-interface = { version = "0.1.0", path = "../froglight-interface", optional = true }
+froglight-model = { version = "0.1.0", path = "../froglight-model", optional = true }
+froglight-render = { version = "0.1.0", path = "../froglight-render", optional = true }
 
 [features]
 default = ["presets"]
@@ -55,6 +42,18 @@ default = ["presets"]
 # Enables preset plugin groups
 presets = ["dep:bevy"]
 
+# Enables extra crates used by clients
+client = [
+    "bevy/default",
+    "presets",
+    "dep:froglight-asset",
+    "dep:froglight-interface",
+    "dep:froglight-model",
+    "dep:froglight-render",
+]
+
+# Generate graphs used for visualizing systems
 [[example]]
 name = "system-graph"
 path = "examples/system-graph/main.rs"
+required-features = ["client"]

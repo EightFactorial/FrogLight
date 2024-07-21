@@ -24,7 +24,7 @@ bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_time = { workspace = true }
-froglight-components = { version = "0.1.0", path = "../froglight-components", optional = true, features = [
+froglight-common = { version = "0.1.0", path = "../froglight-common", optional = true, features = [
     "bevy",
 ] }
 froglight-network = { version = "0.1.0", path = "../froglight-network", optional = true, features = [
@@ -42,14 +42,14 @@ hashbrown = { workspace = true, optional = true }
 
 [features]
 default = [
-    "froglight-components",
+    "froglight-common",
     "froglight-network",
     "froglight-world",
     "hashbrown",
 ]
 
 # Enables tracking of entity ids and uuids
-froglight-components = ["dep:froglight-components"]
+froglight-common = ["dep:froglight-common"]
 
 # Schedules PreUpdate systems to run after network systems'
 froglight-network = ["dep:froglight-network", "dep:froglight-protocol"]
@@ -60,6 +60,6 @@ froglight-world = ["dep:froglight-world", "dep:froglight-protocol"]
 # Use `hashbrown` for better performance
 hashbrown = [
     "dep:hashbrown",
-    "froglight-components?/hashbrown",
+    "froglight-common?/hashbrown",
     "froglight-protocol?/hashbrown",
 ]
