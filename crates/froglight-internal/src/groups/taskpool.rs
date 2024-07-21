@@ -7,9 +7,6 @@ use bevy::core::{TaskPoolOptions, TaskPoolThreadAssignmentPolicy};
 /// - 40% for `async compute`, at least 1, no limit
 /// - 40% for `compute`, at least 1, no limit
 ///
-/// At lower core counts, `async compute` and `compute` are balanced.
-/// As core counts increase, `compute` is favored over `async compute`.
-///
 /// | CPU Cores/Threads | # IO | # Async Compute | # Compute |
 /// |-------------------|------|-----------------|-----------|
 /// | 1-3               | 1    | 1               | 1         |
@@ -32,27 +29,42 @@ use bevy::core::{TaskPoolOptions, TaskPoolThreadAssignmentPolicy};
 /// | 64                | 4    | 26              | 34        |
 /// | 128               | 4    | 51              | 73        |
 pub const TASKPOOL_SETTINGS: TaskPoolOptions = TaskPoolOptions {
-    // By default, use however many cores are available on the system
+    // Use as many threads as possible
     min_total_threads: 1,
     max_total_threads: usize::MAX,
 
-    // Use 20% of cores for IO, at least 1, no more than 4
-    io: TaskPoolThreadAssignmentPolicy { min_threads: 1, max_threads: 4, percent: 0.2 },
-
-    // Use 40% of cores for async compute, at least 1, no limit
-    async_compute: TaskPoolThreadAssignmentPolicy {
-        min_threads: 1,
-        max_threads: usize::MAX,
-        percent: 0.4,
+    // Assign threads based on Min/Max/Percent
+    io: TaskPoolThreadAssignmentPolicy {
+        min_threads: IO_MIN,
+        max_threads: IO_MAX,
+        percent: IO_PERCENT,
     },
-
-    // Use all (40%) remaining cores for compute, at least 1, no limit
+    async_compute: TaskPoolThreadAssignmentPolicy {
+        min_threads: ASYNC_COMPUTE_MIN,
+        max_threads: ASYNC_COMPUTE_MAX,
+        percent: ASYNC_COMPUTE_PERCENT,
+    },
     compute: TaskPoolThreadAssignmentPolicy {
-        min_threads: 1,
-        max_threads: usize::MAX,
-        percent: 1.0,
+        min_threads: COMPUTE_MIN,
+        max_threads: COMPUTE_MAX,
+        percent: COMPUTE_PERCENT,
     },
 };
+
+// Use 20% of cores for IO, at least 1, no more than 4
+const IO_MIN: usize = 1;
+const IO_MAX: usize = 4;
+const IO_PERCENT: f32 = 0.2;
+
+// Use 40% of cores for async compute, at least 1, no limit
+const ASYNC_COMPUTE_MIN: usize = 1;
+const ASYNC_COMPUTE_MAX: usize = usize::MAX;
+const ASYNC_COMPUTE_PERCENT: f32 = 0.4;
+
+// Use all (40%) remaining cores for compute, at least 1, no limit
+const COMPUTE_MIN: usize = 1;
+const COMPUTE_MAX: usize = usize::MAX;
+const COMPUTE_PERCENT: f32 = 1.0;
 
 #[cfg(test)]
 mod tests {

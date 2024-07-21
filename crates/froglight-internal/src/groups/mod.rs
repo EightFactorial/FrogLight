@@ -2,9 +2,9 @@ mod basic;
 pub use basic::BasicPlugins;
 
 #[cfg(feature = "presets")]
-mod preset;
+mod headless;
 #[cfg(feature = "presets")]
-pub use preset::headless::HeadlessPlugins;
+pub use headless::HeadlessPlugins;
 
 mod taskpool;
 pub use taskpool::TASKPOOL_SETTINGS;

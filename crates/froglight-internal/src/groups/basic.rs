@@ -2,8 +2,7 @@ use bevy::app::{PluginGroup, PluginGroupBuilder};
 
 use crate::prelude::plugins::*;
 
-/// A [`PluginGroup`] for all plugins that are part of the basic `FrogLight`
-/// application.
+/// A [`PluginGroup`] for all basic `FrogLight` plugins.
 ///
 /// This includes:
 /// - [`BlockPlugin`]
@@ -14,6 +13,9 @@ pub struct BasicPlugins;
 
 impl PluginGroup for BasicPlugins {
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>().add(BlockPlugin).add(NetworkPlugins).add(UtilityPlugin)
+        let mut builder = PluginGroupBuilder::start::<Self>();
+        builder = builder.add_group(NetworkPlugins);
+
+        builder.add(BlockPlugin).add(UtilityPlugin)
     }
 }

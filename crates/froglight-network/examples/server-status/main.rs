@@ -13,7 +13,7 @@ use froglight_network::{
 
 fn main() -> AppExit {
     let mut app = App::new();
-    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins.as_plugingroup()));
+    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins));
 
     app.add_systems(
         Update,

@@ -30,7 +30,7 @@ use froglight_protocol::protocol::FrogWrite;
 
 fn main() -> AppExit {
     let mut app = App::new();
-    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins.as_plugingroup()));
+    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins));
 
     // I recommend polling for packets during the `PreUpdate` stage.
     // This way you can handle packets and move/spawn entities,
