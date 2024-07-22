@@ -7,7 +7,7 @@ use super::{BasicPlugins, ClientPlugins};
 
 /// A [`PluginGroup`] for creating a custom client.
 ///
-/// Contains all the plugins required to run a client.
+/// Contains all the plugins required to run a client application.
 ///
 /// This includes:
 /// [`BevyDefaultPlugins`]:
@@ -48,6 +48,11 @@ use super::{BasicPlugins, ClientPlugins};
 /// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
 ///
 /// [`ClientPlugins`]:
+/// - [`AssetDefinitionPlugin`](crate::prelude::plugins::AssetDefinitionPlugin)
+/// - [`AssetLoaderPlugin`](crate::prelude::plugins::AssetLoaderPlugin)
+/// - [`AssetProcessorPlugin`](crate::prelude::plugins::AssetProcessorPlugin)
+/// - [`AssetStoragePlugin`](crate::prelude::plugins::AssetStoragePlugin)
+/// - [`LoadingScreenPlugin`](crate::prelude::plugins::LoadingScreenPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ApplicationPlugins;
 

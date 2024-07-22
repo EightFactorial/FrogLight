@@ -17,3 +17,7 @@ workspace = true
 
 [dependencies]
 bevy = { workspace = true }
+froglight-asset = { version = "0.1.0", path = "../froglight-asset" }
+froglight-common = { version = "0.1.0", path = "../froglight-common" }
+froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
+froglight-render = { version = "0.1.0", path = "../froglight-render" }
