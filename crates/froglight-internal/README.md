@@ -1,1 +1,1 @@
-# `FrogLight` Internal
+# Froglight Internal

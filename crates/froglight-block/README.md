@@ -1,2 +1,2 @@
-# `FrogLight` Block
+# Froglight Block
 

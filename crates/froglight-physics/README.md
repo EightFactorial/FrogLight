@@ -1,2 +1,2 @@
-# `FrogLight` Physics
+# Froglight Physics
 

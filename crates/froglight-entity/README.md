@@ -1,2 +1,2 @@
-# `FrogLight` Entity
+# Froglight Entity
 

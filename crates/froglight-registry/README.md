@@ -1,1 +1,1 @@
-# `FrogLight` Registries
+# Froglight Registry
