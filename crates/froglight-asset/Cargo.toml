@@ -16,4 +16,18 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy = { workspace = true }
+async_zip = { version = "0.0.17", features = ["deflate"] }
+bevy_app = { workspace = true }
+bevy_asset = { workspace = true }
+bevy_audio = { workspace = true, features = ["vorbis"] }
+bevy_derive = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_log = { workspace = true }
+bevy_reflect = { workspace = true }
+bevy_render = { workspace = true }
+bevy_state = { workspace = true }
+bevy_utils = { workspace = true }
+froglight-common = { version = "0.1.0", path = "../froglight-common" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
