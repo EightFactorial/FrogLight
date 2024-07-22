@@ -16,7 +16,7 @@ use bevy_mod_debugdump::schedule_graph::settings::{
     Settings as ScheduleSettings, Style as ScheduleStyle,
 };
 use froglight_internal::ApplicationPlugins;
-use froglight_utils::schedules::{FiveSeconds, OneSecond, OneTick, TenTicks, TwoTicks};
+use froglight_utils::schedules::{FiveSeconds, HalfSecond, OneSecond, OneTick, TenTicks, TwoTicks};
 
 /// Bevy's fixed [`bevy::app::main_schedule`].
 ///
@@ -34,11 +34,12 @@ static BEVY_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 5]> = LazyLock::ne
 /// Schedules defined in the [`froglight-utils`] crate.
 ///
 /// Run every fixed period of time.
-static UTIL_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 5]> = LazyLock::new(|| {
+static UTIL_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 6]> = LazyLock::new(|| {
     [
         OneTick.intern(),
         TwoTicks.intern(),
         TenTicks.intern(),
+        HalfSecond.intern(),
         OneSecond.intern(),
         FiveSeconds.intern(),
     ]

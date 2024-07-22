@@ -1,0 +1,35 @@
+[package]
+name = "froglight-diagnostic"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy_app = { workspace = true }
+bevy_derive = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_diagnostic = { workspace = true }
+froglight-common = { version = "0.1.0", path = "../froglight-common", features = [
+    "bevy",
+] }
+froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
+
+# Optional dependencies
+froglight-world = { version = "0.1.0", path = "../froglight-world", optional = true }
+
+[features]
+default = ["froglight-world"]
+
+# Enables diagnostics about chunks
+froglight-world = ["dep:froglight-world"]

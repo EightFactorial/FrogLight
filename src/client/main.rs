@@ -3,6 +3,10 @@
 
 use bevy::app::{App, AppExit};
 use froglight::ApplicationPlugins;
+use mimalloc::MiMalloc;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
 
 #[cfg(feature = "inspector")]
 mod inspector;

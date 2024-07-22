@@ -6,6 +6,7 @@ members = [
     "crates/froglight-asset",
     "crates/froglight-block",
     "crates/froglight-common",
+    "crates/froglight-diagnostic",
     "crates/froglight-entity",
     "crates/froglight-interface",
     "crates/froglight-internal",
@@ -61,6 +62,7 @@ bevy_asset = "0.14.0"
 bevy_audio = "0.14.0"
 bevy_core = "0.14.0"
 bevy_derive = "0.14.0"
+bevy_diagnostic = "0.14.0"
 bevy_ecs = "0.14.0"
 bevy_hierarchy = "0.14.0"
 bevy_input = "0.14.0"
@@ -140,12 +142,13 @@ froglight-internal = { version = "0.1.0", path = "crates/froglight-internal" }
 # Optional dependencies
 bevy = { workspace = true, optional = true }
 bevy-inspector-egui = { version = "0.25.1", optional = true }
+mimalloc = { version = "0.1.43", optional = true }
 
 [features]
 default = []
 
 # Enables extra crates used by clients
-client = ["dep:bevy", "froglight-internal/client"]
+client = ["dep:bevy", "dep:mimalloc", "froglight-internal/client"]
 
 # Enables the egui inspector
 inspector = ["dep:bevy-inspector-egui", "froglight-internal/inspector"]
