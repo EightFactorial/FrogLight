@@ -22,6 +22,7 @@ serde_json = { workspace = true }
 [dependencies]
 bevy = { workspace = true, optional = true, features = ["multi_threaded"] }
 froglight-block = { version = "0.1.0", path = "../froglight-block" }
+froglight-common = { version = "0.1.0", path = "../froglight-common" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
 froglight-network = { version = "0.1.0", path = "../froglight-network" }
 froglight-physics = { version = "0.1.0", path = "../froglight-physics" }
@@ -45,12 +46,16 @@ presets = ["dep:bevy"]
 # Enables extra crates used by clients
 client = [
     "bevy/default",
+    "bevy/wayland",
     "presets",
     "dep:froglight-asset",
     "dep:froglight-interface",
     "dep:froglight-model",
     "dep:froglight-render",
 ]
+
+# Enables egui inspector trait implementations
+inspector = ["froglight-common/inspector"]
 
 # Generate graphs used for visualizing systems
 [[example]]
