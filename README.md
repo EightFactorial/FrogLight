@@ -24,7 +24,32 @@ FrogLight supports multiple versions, including:
 > [!Note]
 > Support for other versions will be added after most development is done.
 
-## Usage
+## Client Usage
+
+FrogLight can be built and run using the following commands:
+
+```sh
+git clone --depth=1 https://github.com/EightFactorial/FrogLight.git
+cd FrogLight
+
+# Build only
+cargo build --release --bin froglight
+
+# Build and run
+cargo run --release --bin froglight
+```
+
+> [!Important]
+> Make sure you are using `--release` mode!
+
+The resulting binary will be located in `target/release/froglight[.exe]`.
+
+> [!Note]
+> If you don't care about compatibility, see [`fast_config.toml`](.cargo/fast_config.toml) for additional optimizations.
+>
+> If you are planning on sharing builds, do not enable these as it may cause issues on other machines.
+
+## Library Usage
 
 FrogLight can added as a dependency in your `cargo.toml` file:
 
@@ -35,8 +60,7 @@ froglight = { git = "https://github.com/EightFactorial/FrogLight.git" }
 # etc...
 ```
 
-> [!Important]
-> If you are getting poor performance, make sure you are using `--release` mode!
+Many crates optionally depend on each other and bevy, so you can pick and choose which ones you want to use!
 
 ## Helpful Resources
 

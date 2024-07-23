@@ -96,18 +96,6 @@ smallvec = "1.13.2"
 thiserror = "1.0.63"
 uuid = "1.10.0"
 
-[profile.dev.package]
-froglight-macros = { opt-level = 3 }
-syn = { opt-level = 3 }
-quote = { opt-level = 3 }
-proc-macro2 = { opt-level = 3 }
-
-[profile.release.package]
-froglight-macros = { opt-level = 3 }
-syn = { opt-level = 3 }
-quote = { opt-level = 3 }
-proc-macro2 = { opt-level = 3 }
-
 # --- FrogLight Package ---
 
 [package]
@@ -136,11 +124,35 @@ required-features = ["client"]
 name = "froglight"
 path = "src/library/lib.rs"
 
+# Development builds with optimizations disabled
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package]
+bevy = { opt-level = 3 }
+froglight-macros = { opt-level = 3 }
+syn = { opt-level = 3 }
+quote = { opt-level = 3 }
+proc-macro2 = { opt-level = 3 }
+
+# Release builds with optimizations enabled
+[profile.release]
+lto = "thin"
+opt-level = 3
+panic = "abort"
+strip = true
+
+# Extra optimizations with longer build times
+[profile.final]
+codegen-units = 1
+incremental = false
+inherits = "release"
+
 [dependencies]
 froglight-internal = { version = "0.1.0", path = "crates/froglight-internal" }
 
 # Optional dependencies
-bevy = { workspace = true, optional = true }
+bevy = { workspace = true, optional = true, features = ["default"] }
 bevy-inspector-egui = { version = "0.25.1", optional = true }
 mimalloc = { version = "0.1.43", optional = true }
 

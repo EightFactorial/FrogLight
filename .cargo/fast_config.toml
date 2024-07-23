@@ -1,13 +1,11 @@
-# To use these settings, keep it in the ".cargo" folder and rename it to "config.toml"
+# To use these settings, copy and rename this file to "config.toml"
 
-# These settings are for optimized maximum performance, not compatibility.
+# These settings are for optimized maximum performance, ***not compatibility***.
 #
-# Builds with these settings may not work on machines other than the one they were built on.
+# Builds with these settings may not work on other machines!
 
 # If you don't have the Mold linker installed, remove both the 
 # "linker = ..." argument and the "-Clink-arg=-fuse-ld=..." flag
-#
-# If using rust stable, remove the "-Zshare-generics=y" flag
 
 [target.x86_64-unknown-linux-gnu]
 linker = "clang"
