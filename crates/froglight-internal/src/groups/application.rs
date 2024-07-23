@@ -1,7 +1,9 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
+    asset::AssetPlugin as BevyAssetPlugin,
     DefaultPlugins as BevyDefaultPlugins,
 };
+use froglight_asset::AssetSourcePlugin;
 
 use super::{BasicPlugins, ClientPlugins};
 
@@ -48,6 +50,7 @@ use super::{BasicPlugins, ClientPlugins};
 /// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
 ///
 /// [`ClientPlugins`]:
+/// - [`AssetSourcePlugin`](crate::prelude::plugins::AssetSourcePlugin)
 /// - [`AssetDefinitionPlugin`](crate::prelude::plugins::AssetDefinitionPlugin)
 /// - [`AssetLoaderPlugin`](crate::prelude::plugins::AssetLoaderPlugin)
 /// - [`AssetProcessorPlugin`](crate::prelude::plugins::AssetProcessorPlugin)
@@ -58,7 +61,9 @@ pub struct ApplicationPlugins;
 
 impl PluginGroup for ApplicationPlugins {
     fn build(self) -> PluginGroupBuilder {
-        let builder = PluginGroupBuilder::start::<Self>();
-        builder.add_group(BevyDefaultPlugins).add_group(BasicPlugins).add_group(ClientPlugins)
+        let mut builder = PluginGroupBuilder::start::<Self>();
+        builder =
+            builder.add_group(BevyDefaultPlugins).add_group(BasicPlugins).add_group(ClientPlugins);
+        builder.add_before::<BevyAssetPlugin, _>(AssetSourcePlugin::default())
     }
 }
