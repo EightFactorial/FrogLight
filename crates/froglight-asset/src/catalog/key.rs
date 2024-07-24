@@ -38,6 +38,11 @@ impl<A: Asset> AssetKey<A> {
     #[must_use]
     pub const fn new(key: ResourceKey) -> Self { Self { key, _a: PhantomData } }
 
+    /// Returns the [`ResourceKey`] of the asset.
+    #[must_use]
+    #[inline]
+    pub fn key(&self) -> &ResourceKey { self.as_ref() }
+
     /// Looks up the [`AssetId`] and inserts a [`Handle`] to it's [`Asset`].
     fn on_add(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
         // Get the AssetKey and AssetStorage
@@ -73,4 +78,8 @@ impl<A: Asset> From<ResourceKey> for AssetKey<A> {
 }
 impl<A: Asset> From<AssetKey<A>> for ResourceKey {
     fn from(key: AssetKey<A>) -> Self { key.key }
+}
+
+impl<A: Asset> AsRef<ResourceKey> for AssetKey<A> {
+    fn as_ref(&self) -> &ResourceKey { &self.key }
 }

@@ -8,7 +8,7 @@ use bevy_ecs::{
     schedule::IntoSystemConfigs,
     system::{Commands, Query, Res, ResMut},
 };
-use bevy_log::warn;
+use bevy_log::error;
 
 use super::{systemset::AssetKeyRefreshSet, AssetCatalog, AssetKey};
 
@@ -29,19 +29,18 @@ fn refresh_asset_keys<A: Asset>(
     mut assets: ResMut<Assets<A>>,
     mut commands: Commands,
 ) {
-    let Some(asset_map) = catalog.storage.get(&TypeId::of::<A>()) else { return };
+    let Some(untyped_map) = catalog.storage.get(&TypeId::of::<A>()) else { return };
     for (entity, key) in &query {
-        let key = &**key;
-        if let Some(untyped_id) = asset_map.get(key) {
+        if let Some(untyped_id) = untyped_map.get(key.as_ref()) {
             if let Some(asset_handle) =
                 assets.get_strong_handle(untyped_id.typed_debug_checked::<A>())
             {
                 commands.entity(entity).insert(asset_handle);
             } else {
-                warn!("AssetKey \"{key}\" refers to an asset that does not exist!");
+                error!("AssetKey \"{}\" refers to an asset that does not exist!", key.as_ref());
             }
         } else {
-            warn!("AssetKey \"{key}\" does not refer to any known asset");
+            error!("AssetKey \"{}\" does not refer to any known asset!", key.as_ref());
         }
     }
 }
