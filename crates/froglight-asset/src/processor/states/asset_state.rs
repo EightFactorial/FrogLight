@@ -8,12 +8,9 @@ use bevy_state::{
 use super::{AssetLoadState, AssetLoadSystemSet};
 
 #[doc(hidden)]
-pub(super) fn build(app: &mut App) {
+pub(crate) fn build(app: &mut App) {
     // Create the `AssetStateSystemSet` and initialize the `AssetState` state.
-    app.configure_sets(
-        Update,
-        AssetStateSystemSet.ambiguous_with(AssetLoadSystemSet).after(AssetLoadSystemSet),
-    );
+    app.configure_sets(Update, AssetStateSystemSet.ambiguous_with(AssetLoadSystemSet));
     app.init_state::<AssetState>().enable_state_scoped_entities::<AssetState>();
 
     // Configure `AssetState::Unloaded`

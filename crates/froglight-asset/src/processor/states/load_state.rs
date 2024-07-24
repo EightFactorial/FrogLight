@@ -1,11 +1,11 @@
 use bevy_app::{App, Update};
 use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
-use bevy_state::{app::AppExtStates, state::States};
+use bevy_state::{app::AppExtStates, prelude::in_state, state::States};
 
 use super::AssetStateSystemSet;
 
 #[doc(hidden)]
-pub(super) fn build(app: &mut App) {
+pub(crate) fn build(app: &mut App) {
     // Create the `AssetStateSystemSet` and initialize the `AssetState` state.
     app.configure_sets(Update, AssetLoadSystemSet.ambiguous_with(AssetStateSystemSet));
     app.init_state::<AssetLoadState>();
@@ -18,6 +18,7 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(AssetLoadState::Processing)
             .ambiguous_with(AssetLoadState::Spawning)
             .ambiguous_with(AssetLoadState::Finished)
+            .run_if(in_state(AssetLoadState::Waiting))
             .in_set(AssetLoadSystemSet),
     );
 
@@ -30,6 +31,7 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(AssetLoadState::Spawning)
             .ambiguous_with(AssetLoadState::Finished)
             .after(AssetLoadState::Waiting)
+            .run_if(in_state(AssetLoadState::Loading))
             .in_set(AssetLoadSystemSet),
     );
 
@@ -42,6 +44,7 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(AssetLoadState::Spawning)
             .ambiguous_with(AssetLoadState::Finished)
             .after(AssetLoadState::Loading)
+            .run_if(in_state(AssetLoadState::Processing))
             .in_set(AssetLoadSystemSet),
     );
 
@@ -54,6 +57,7 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(AssetLoadState::Processing)
             .ambiguous_with(AssetLoadState::Finished)
             .after(AssetLoadState::Processing)
+            .run_if(in_state(AssetLoadState::Spawning))
             .in_set(AssetLoadSystemSet),
     );
 
@@ -66,6 +70,7 @@ pub(super) fn build(app: &mut App) {
             .ambiguous_with(AssetLoadState::Processing)
             .ambiguous_with(AssetLoadState::Spawning)
             .after(AssetLoadState::Spawning)
+            .run_if(in_state(AssetLoadState::Finished))
             .in_set(AssetLoadSystemSet),
     );
 }

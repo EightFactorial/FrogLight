@@ -1,10 +1,15 @@
 use bevy_app::{App, Plugin};
 
-mod asset_state;
-pub use asset_state::{AssetState, AssetStateSystemSet};
+mod loading;
 
-mod load_state;
-pub use load_state::{AssetLoadState, AssetLoadSystemSet};
+mod sources;
+pub use sources::ResourcePackList;
+
+mod states;
+pub use states::{AssetLoadState, AssetLoadSystemSet, AssetState, AssetStateSystemSet};
+
+mod trigger;
+pub use trigger::{ResourceLoadTrigger, ResourceResetTrigger};
 
 /// A [`Plugin`] that adds asset processing systems.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -12,7 +17,11 @@ pub struct AssetProcessorPlugin;
 
 impl Plugin for AssetProcessorPlugin {
     fn build(&self, app: &mut App) {
-        asset_state::build(app);
-        load_state::build(app);
+        states::build_asset_state(app);
+        states::build_load_state(app);
+
+        loading::build(app);
+        sources::build(app);
+        trigger::build(app);
     }
 }
