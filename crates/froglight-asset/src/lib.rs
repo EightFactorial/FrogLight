@@ -11,7 +11,9 @@ pub mod loaders;
 pub use loaders::AssetLoaderPlugin;
 
 mod processor;
-pub use processor::{AssetLoadState, AssetProcessorPlugin, AssetState};
+pub use processor::{
+    AssetLoadState, AssetLoadSystemSet, AssetProcessorPlugin, AssetState, AssetStateSystemSet,
+};
 
 mod source;
 pub use source::AssetSourcePlugin;

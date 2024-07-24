@@ -100,10 +100,7 @@ impl ResourcePackZipLoader {
 
         match kind {
             EntryType::PackMeta | EntryType::PackPng => {
-                let trimmed = filename.trim_start_matches("assets/");
-                let namespace = trimmed.split_once('/')?.0;
-                let key = ResourceKey::new(format!("{namespace}:pack"));
-                Some((key, kind))
+                Some((ResourceKey::const_new("minecraft:pack"), kind))
             }
             EntryType::SoundMap => {
                 let trimmed = filename.trim_start_matches("assets/");
@@ -113,9 +110,11 @@ impl ResourcePackZipLoader {
             }
             _ => {
                 let mut split = filename.split('/');
-                split.nth(2)?;
+                split.next()?;
 
                 let namespace = split.next()?;
+                split.next()?;
+
                 let mut path = split.remainder()?;
                 path = path.split_once('.')?.0;
 
@@ -144,6 +143,14 @@ impl ResourcePackZipLoader {
                 let asset = Self::load_asset(&filename, reader, context).await?;
                 resourcepack.sounds.insert(key, asset);
             }
+            EntryType::Language => {
+                let asset = Self::load_asset(&filename, reader, context).await?;
+                resourcepack.languages.insert(key, asset);
+            }
+            EntryType::ResourcePack => {
+                let asset = Self::load_asset(&filename, reader, context).await?;
+                resourcepack.children.insert(key, asset);
+            }
             EntryType::SoundMap => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
                 resourcepack.soundmaps.insert(key.namespace().to_string(), asset);
@@ -161,6 +168,7 @@ impl ResourcePackZipLoader {
     }
 
     /// Loads an asset from a zip entry.
+    // TODO: Fix needing to use a buffer here.
     async fn load_asset<A: Asset>(
         path: &str,
         reader: &mut ZipEntryReader<'_, BufReader<&mut Reader<'_>>, WithEntry<'_>>,

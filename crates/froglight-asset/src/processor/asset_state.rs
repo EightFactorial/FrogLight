@@ -1,18 +1,40 @@
-use bevy_app::App;
-use bevy_ecs::schedule::SystemSet;
+use bevy_app::{App, Update};
+use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
 use bevy_state::{
     app::AppExtStates,
     state::{States, SubStates},
 };
 
-use super::AssetLoadState;
+use super::{AssetLoadState, AssetLoadSystemSet};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    // Create the `AssetStateSystemSet` and initialize the `AssetState` state.
+    app.configure_sets(
+        Update,
+        AssetStateSystemSet.ambiguous_with(AssetLoadSystemSet).after(AssetLoadSystemSet),
+    );
     app.init_state::<AssetState>().enable_state_scoped_entities::<AssetState>();
 
-    // TODO: Configure SystemSets
+    // Configure `AssetState::Unloaded`
+    app.configure_sets(
+        Update,
+        AssetState::Unloaded.ambiguous_with(AssetState::Loaded).in_set(AssetStateSystemSet),
+    );
+
+    // Configure `AssetState::Loaded`
+    app.configure_sets(
+        Update,
+        AssetState::Loaded
+            .ambiguous_with(AssetState::Unloaded)
+            .after(AssetState::Unloaded)
+            .in_set(AssetStateSystemSet),
+    );
 }
+
+/// A [`SystemSet`] that contains all [`AssetState`] systems.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub struct AssetStateSystemSet;
 
 /// The state of all assets.
 ///

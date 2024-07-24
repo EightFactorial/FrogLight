@@ -8,6 +8,8 @@ pub use zip::{ResourcePackZipError, ResourcePackZipLoader};
 enum EntryType {
     Texture,
     Sound,
+    Language,
+    ResourcePack,
     SoundMap,
     PackMeta,
     PackPng,
@@ -28,17 +30,41 @@ impl EntryType {
         if path.ends_with(".mcmeta") {
             return None;
         }
+        // Skip icons.
+        if path.starts_with("assets/icons") {
+            return None;
+        }
 
-        // Read the directory after the namespace.
-        match path.split('/').nth(2)? {
-            "textures" => Some(Self::Texture),
-            "sounds" => Some(Self::Sound),
-            "sounds.json" => Some(Self::SoundMap),
+        // Get the folder and file extension
+        let folder = path.split('/').nth(2)?;
+        let extension = path.split('.').last()?;
+
+        // Match the folder and expected extension.
+        match (folder, extension) {
+            ("textures", "png") => Some(Self::Texture),
+            ("sounds", "ogg") => Some(Self::Sound),
+            ("lang", "json") => Some(Self::Language),
+            ("resourcepacks", "zip") => Some(Self::ResourcePack),
+            ("sounds.json", "json") => Some(Self::SoundMap),
+
+            // Suppress warnings for known unsupported assets.
             #[cfg(debug_assertions)]
-            unk => {
-                bevy_log::warn!("Unknown entry type: {unk}");
+            (
+                "atlases" | "blockstates" | "font" | "models" | "particles" | "shaders" | "texts",
+                _,
+            ) => None,
+
+            // Suppress warnings for known but unused assets.
+            #[cfg(debug_assertions)]
+            ("gpu_warnlist.json" | "regional_compliancies.json", _) => None,
+
+            // Warn about unknown assets in debug mode.
+            #[cfg(debug_assertions)]
+            _ => {
+                bevy_log::warn!("Unknown asset: \"{path}\"");
                 None
             }
+            // Ignore unknown assets in release mode.
             #[cfg(not(debug_assertions))]
             _ => None,
         }
