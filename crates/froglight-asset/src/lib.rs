@@ -7,6 +7,9 @@ use bevy_app::{PluginGroup, PluginGroupBuilder};
 pub mod assets;
 pub use assets::{AssetDefinitionPlugin, ResourcePack, ResourcePackMeta};
 
+mod catalog;
+pub use catalog::{AssetCatalog, AssetCatalogPlugin, AssetKey};
+
 pub mod loaders;
 pub use loaders::AssetLoaderPlugin;
 
@@ -15,9 +18,6 @@ pub use processor::*;
 
 mod source;
 pub use source::AssetSourcePlugin;
-
-mod storage;
-pub use storage::{AssetKey, AssetStorage, AssetStoragePlugin};
 
 /// A [`PluginGroup`] that contains all of the asset plugins.
 ///
@@ -37,6 +37,6 @@ impl PluginGroup for AssetPlugins {
             .add(AssetDefinitionPlugin)
             .add(AssetLoaderPlugin)
             .add(AssetProcessorPlugin)
-            .add(AssetStoragePlugin)
+            .add(AssetCatalogPlugin)
     }
 }

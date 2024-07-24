@@ -12,9 +12,9 @@ use bevy_log::{error, warn};
 use bevy_reflect::Reflect;
 use froglight_common::ResourceKey;
 
-use crate::AssetStorage;
+use crate::AssetCatalog;
 
-/// A key to an [`Asset`] in the [`AssetStorage`].
+/// A key to an [`Asset`] in the [`AssetCatalog`].
 ///
 /// Automatically inserts a [`Handle`] to the asset when added to an entity.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Reflect)]
@@ -42,7 +42,7 @@ impl<A: Asset> AssetKey<A> {
     fn on_add(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
         // Get the AssetKey and AssetStorage
         let asset_key = world.get::<AssetKey<A>>(entity).unwrap();
-        let storage = world.resource::<AssetStorage>();
+        let storage = world.resource::<AssetCatalog>();
 
         // Get the AssetId from the AssetStorage
         if let Some(asset_id) = storage.get::<A>(asset_key) {

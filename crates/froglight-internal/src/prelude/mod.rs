@@ -8,7 +8,7 @@
 pub mod plugins;
 
 #[cfg(feature = "client")]
-pub use froglight_asset::{AssetKey, AssetLoadState, AssetState, AssetStorage};
+pub use froglight_asset::{AssetCatalog, AssetKey, AssetLoadState, AssetState};
 pub use froglight_block::{
     definitions::{attributes, blocks},
     BlockExt, BlockRegistry, BlockStateResolver, BlockType, VanillaResolver,

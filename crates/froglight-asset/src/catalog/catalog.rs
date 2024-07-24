@@ -1,5 +1,6 @@
 use std::any::TypeId;
 
+use bevy_app::App;
 use bevy_asset::{Asset, AssetId, UntypedAssetId};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{reflect::ReflectResource, system::Resource};
@@ -7,20 +8,25 @@ use bevy_reflect::{std_traits::ReflectDefault, Reflect};
 use bevy_utils::{HashMap, TypeIdMap};
 use froglight_common::ResourceKey;
 
-/// Storage for assets.
+#[doc(hidden)]
+pub(super) fn build(app: &mut App) {
+    app.register_type::<AssetCatalog>().init_resource::<AssetCatalog>();
+}
+
+/// A catalog of assets.
 ///
-/// Allows associating asset keys with asset IDs.
+/// Allows associating asset keys with asset ids.
 #[derive(Debug, Default, Resource, Reflect)]
 #[reflect(Default, Resource)]
-pub struct AssetStorage {
-    storage: TypeIdMap<AssetMap>,
+pub struct AssetCatalog {
+    pub(super) storage: TypeIdMap<UntypedAssetMap>,
 }
 
 /// A map of [`ResourceKey`]s to [`UntypedAssetId`]s.
 #[derive(Debug, Default, Clone, Deref, DerefMut, Reflect)]
-struct AssetMap(#[reflect(ignore)] HashMap<ResourceKey, UntypedAssetId>);
+pub(super) struct UntypedAssetMap(#[reflect(ignore)] HashMap<ResourceKey, UntypedAssetId>);
 
-impl AssetStorage {
+impl AssetCatalog {
     /// Creates a new [`AssetStorage`].
     ///
     /// Equivalent to [`AssetStorage::default()`].
