@@ -2357,6 +2357,7 @@ dependencies = [
  "bevy_reflect",
  "bevy_render",
  "bevy_state",
+ "bevy_time",
  "bevy_utils",
  "dirs",
  "froglight-common",

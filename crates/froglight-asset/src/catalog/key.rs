@@ -10,9 +10,10 @@ use bevy_ecs::{
 };
 use bevy_log::{error, warn};
 use bevy_reflect::Reflect;
+use bevy_state::state::State;
 use froglight_common::ResourceKey;
 
-use crate::AssetCatalog;
+use crate::{AssetCatalog, AssetState};
 
 /// A key to an [`Asset`] in the [`AssetCatalog`].
 ///
@@ -43,14 +44,15 @@ impl<A: Asset> AssetKey<A> {
     #[inline]
     pub fn key(&self) -> &ResourceKey { self.as_ref() }
 
-    /// Looks up the [`AssetId`] and inserts a [`Handle`] to it's [`Asset`].
+    /// Looks up the [`AssetId`](bevy_asset::AssetId) in the [`AssetCatalog`]
+    /// and inserts the [`Asset`]'s [`Handle`].
     fn on_add(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
-        // Get the AssetKey and AssetStorage
+        // Get the AssetKey and AssetCatalog
         let asset_key = world.get::<AssetKey<A>>(entity).unwrap();
-        let storage = world.resource::<AssetCatalog>();
+        let catalog = world.resource::<AssetCatalog>();
 
-        // Get the AssetId from the AssetStorage
-        if let Some(asset_id) = storage.get::<A>(asset_key) {
+        // Get the AssetId from the AssetCatalog
+        if let Some(asset_id) = catalog.get::<A>(asset_key) {
             let mut assets = world.resource_mut::<Assets<A>>();
 
             // Create a Handle to the asset and insert it into the entity
@@ -60,7 +62,10 @@ impl<A: Asset> AssetKey<A> {
                 let asset_key = world.get::<AssetKey<A>>(entity).unwrap();
                 error!("AssetKey \"{}\" refers to an asset that does not exist!", asset_key.key);
             }
-        } else {
+        } else if Some(&AssetState::Loaded)
+            == world.get_resource::<State<AssetState>>().map(|s| &**s)
+        {
+            // If in the `AssetState::Loaded` state, warn about missing assets
             warn!("AssetKey \"{}\" does not refer to any known asset", asset_key.key);
         }
     }

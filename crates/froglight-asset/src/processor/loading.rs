@@ -89,7 +89,7 @@ mod error {
     /// Enter the [`AssetLoadState::Waiting`] state.
     pub(super) fn enter_waiting_state(mut state: ResMut<NextState<AssetLoadState>>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("AssetLoadState: Errors, re-entering `AssetLoadState::Waiting`");
+        bevy_log::error!("AssetLoadState: Error, re-entering `AssetLoadState::Waiting`");
         state.set(AssetLoadState::Waiting);
     }
 }

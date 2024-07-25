@@ -14,10 +14,6 @@ pub(crate) fn build(app: &mut App) {
     app.configure_sets(
         Update,
         AssetLoadState::Waiting
-            .ambiguous_with(AssetLoadState::Loading)
-            .ambiguous_with(AssetLoadState::Processing)
-            .ambiguous_with(AssetLoadState::Spawning)
-            .ambiguous_with(AssetLoadState::Finished)
             .run_if(in_state(AssetLoadState::Waiting))
             .in_set(AssetLoadSystemSet),
     );
@@ -26,10 +22,6 @@ pub(crate) fn build(app: &mut App) {
     app.configure_sets(
         Update,
         AssetLoadState::Loading
-            .ambiguous_with(AssetLoadState::Waiting)
-            .ambiguous_with(AssetLoadState::Processing)
-            .ambiguous_with(AssetLoadState::Spawning)
-            .ambiguous_with(AssetLoadState::Finished)
             .after(AssetLoadState::Waiting)
             .run_if(in_state(AssetLoadState::Loading))
             .in_set(AssetLoadSystemSet),
@@ -39,10 +31,6 @@ pub(crate) fn build(app: &mut App) {
     app.configure_sets(
         Update,
         AssetLoadState::Processing
-            .ambiguous_with(AssetLoadState::Waiting)
-            .ambiguous_with(AssetLoadState::Loading)
-            .ambiguous_with(AssetLoadState::Spawning)
-            .ambiguous_with(AssetLoadState::Finished)
             .after(AssetLoadState::Loading)
             .run_if(in_state(AssetLoadState::Processing))
             .in_set(AssetLoadSystemSet),
@@ -52,10 +40,6 @@ pub(crate) fn build(app: &mut App) {
     app.configure_sets(
         Update,
         AssetLoadState::Spawning
-            .ambiguous_with(AssetLoadState::Waiting)
-            .ambiguous_with(AssetLoadState::Loading)
-            .ambiguous_with(AssetLoadState::Processing)
-            .ambiguous_with(AssetLoadState::Finished)
             .after(AssetLoadState::Processing)
             .run_if(in_state(AssetLoadState::Spawning))
             .in_set(AssetLoadSystemSet),
@@ -65,10 +49,6 @@ pub(crate) fn build(app: &mut App) {
     app.configure_sets(
         Update,
         AssetLoadState::Finished
-            .ambiguous_with(AssetLoadState::Waiting)
-            .ambiguous_with(AssetLoadState::Loading)
-            .ambiguous_with(AssetLoadState::Processing)
-            .ambiguous_with(AssetLoadState::Spawning)
             .after(AssetLoadState::Spawning)
             .run_if(in_state(AssetLoadState::Finished))
             .in_set(AssetLoadSystemSet),

@@ -1,12 +1,14 @@
 use bevy_app::{App, Plugin};
 
 mod loading;
+mod process;
+mod spawning;
 
 mod sources;
 pub use sources::ResourcePackList;
 
-mod states;
-pub use states::{AssetLoadState, AssetLoadSystemSet, AssetState, AssetStateSystemSet};
+mod state;
+pub use state::{AssetLoadState, AssetLoadSystemSet, AssetState, AssetStateSystemSet};
 
 mod trigger;
 pub use trigger::{ResourceLoadTrigger, ResourceResetTrigger};
@@ -17,11 +19,14 @@ pub struct AssetProcessorPlugin;
 
 impl Plugin for AssetProcessorPlugin {
     fn build(&self, app: &mut App) {
-        states::build_asset_state(app);
-        states::build_load_state(app);
+        state::build_asset_state(app);
+        state::build_load_state(app);
 
-        loading::build(app);
         sources::build(app);
         trigger::build(app);
+
+        loading::build(app);
+        process::build(app);
+        spawning::build(app);
     }
 }

@@ -1,4 +1,5 @@
 use bevy_app::{App, Plugin};
+use bevy_audio::AudioSource;
 use bevy_render::{mesh::Mesh, texture::Image};
 
 #[allow(clippy::module_inception)]
@@ -24,5 +25,6 @@ impl Plugin for AssetCatalogPlugin {
         // Register the types of AssetKeys
         register::add_systems::<Image>(app);
         register::add_systems::<Mesh>(app);
+        register::add_systems::<AudioSource>(app);
     }
 }

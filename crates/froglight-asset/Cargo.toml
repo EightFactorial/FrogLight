@@ -26,6 +26,7 @@ bevy_log = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_render = { workspace = true }
 bevy_state = { workspace = true }
+bevy_time = { workspace = true }
 bevy_utils = { workspace = true }
 dirs = "5.0.1"
 froglight-common = { version = "0.1.0", path = "../froglight-common" }

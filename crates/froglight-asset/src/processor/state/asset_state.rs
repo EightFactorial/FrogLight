@@ -1,9 +1,6 @@
 use bevy_app::{App, Update};
 use bevy_ecs::schedule::{IntoSystemSetConfigs, SystemSet};
-use bevy_state::{
-    app::AppExtStates,
-    state::{States, SubStates},
-};
+use bevy_state::{app::AppExtStates, prelude::in_state, state::ComputedStates};
 
 use super::{AssetLoadState, AssetLoadSystemSet};
 
@@ -11,20 +8,20 @@ use super::{AssetLoadState, AssetLoadSystemSet};
 pub(crate) fn build(app: &mut App) {
     // Create the `AssetStateSystemSet` and initialize the `AssetState` state.
     app.configure_sets(Update, AssetStateSystemSet.ambiguous_with(AssetLoadSystemSet));
-    app.init_state::<AssetState>().enable_state_scoped_entities::<AssetState>();
+    app.add_computed_state::<AssetState>().enable_state_scoped_entities::<AssetState>();
 
     // Configure `AssetState::Unloaded`
     app.configure_sets(
         Update,
-        AssetState::Unloaded.ambiguous_with(AssetState::Loaded).in_set(AssetStateSystemSet),
+        AssetState::Unloaded.run_if(in_state(AssetState::Unloaded)).in_set(AssetStateSystemSet),
     );
 
     // Configure `AssetState::Loaded`
     app.configure_sets(
         Update,
         AssetState::Loaded
-            .ambiguous_with(AssetState::Unloaded)
             .after(AssetState::Unloaded)
+            .run_if(in_state(AssetState::Loaded))
             .in_set(AssetStateSystemSet),
     );
 }
@@ -41,7 +38,7 @@ pub struct AssetStateSystemSet;
 /// ```rust,ignore
 /// app.add_systems(OnEnter(AssetState::Loaded), ...);
 /// ```
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, SystemSet, States)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, SystemSet)]
 pub enum AssetState {
     /// Assets are not loaded.
     #[default]
@@ -50,9 +47,9 @@ pub enum AssetState {
     Loaded,
 }
 
-impl SubStates for AssetState {
+impl ComputedStates for AssetState {
     type SourceStates = AssetLoadState;
-    fn should_exist(sources: Self::SourceStates) -> Option<Self> {
+    fn compute(sources: Self::SourceStates) -> Option<Self> {
         match sources {
             AssetLoadState::Spawning | AssetLoadState::Finished => Some(Self::Loaded),
             _ => Some(Self::Unloaded),

@@ -3,12 +3,14 @@ use bevy_ecs::{
     prelude::resource_changed,
     schedule::{IntoSystemSetConfigs, SystemSet},
 };
+use bevy_state::state::OnEnter;
 
 use super::AssetCatalog;
 use crate::AssetState;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    app.configure_sets(OnEnter(AssetState::Loaded), AssetKeyRefreshSet);
     app.configure_sets(
         Update,
         AssetKeyRefreshSet.run_if(resource_changed::<AssetCatalog>).in_set(AssetState::Loaded),
