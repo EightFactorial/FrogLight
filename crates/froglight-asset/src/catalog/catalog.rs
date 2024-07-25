@@ -1,7 +1,7 @@
 use std::{any::TypeId, hash::BuildHasherDefault};
 
 use bevy_app::App;
-use bevy_asset::{Asset, AssetId, UntypedAssetId};
+use bevy_asset::{Asset, AssetId, Assets, Handle, UntypedAssetId};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{reflect::ReflectResource, system::Resource};
 use bevy_reflect::{std_traits::ReflectDefault, Reflect};
@@ -51,6 +51,12 @@ impl AssetCatalog {
     pub fn get<A: Asset>(&self, key: &str) -> Option<AssetId<A>> {
         let map = self.inner.get(&TypeId::of::<A>())?;
         map.get(key).copied().map(UntypedAssetId::typed_debug_checked)
+    }
+
+    /// Creates a new [`Handle`] to the asset with the given key.
+    #[must_use]
+    pub fn create_handle<A: Asset>(&self, key: &str, assets: &mut Assets<A>) -> Option<Handle<A>> {
+        self.get::<A>(key).and_then(|id| assets.get_strong_handle(id))
     }
 
     /// Gets an [`Entry`] into the catalog for the given key.

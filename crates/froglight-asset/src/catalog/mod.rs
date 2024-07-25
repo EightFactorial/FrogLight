@@ -9,6 +9,8 @@ pub use catalog::AssetCatalog;
 mod key;
 pub use key::AssetKey;
 
+use crate::assets::processed::SoundEvent;
+
 mod register;
 
 mod systemset;
@@ -26,5 +28,7 @@ impl Plugin for AssetCatalogPlugin {
         register::add_systems::<Image>(app);
         register::add_systems::<Mesh>(app);
         register::add_systems::<AudioSource>(app);
+
+        register::add_systems::<SoundEvent>(app);
     }
 }

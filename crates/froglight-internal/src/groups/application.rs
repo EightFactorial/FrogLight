@@ -54,8 +54,9 @@ use super::{BasicPlugins, ClientPlugins};
 /// - [`AssetDefinitionPlugin`](crate::prelude::plugins::AssetDefinitionPlugin)
 /// - [`AssetLoaderPlugin`](crate::prelude::plugins::AssetLoaderPlugin)
 /// - [`AssetProcessorPlugin`](crate::prelude::plugins::AssetProcessorPlugin)
-/// - [`AssetStoragePlugin`](crate::prelude::plugins::AssetStoragePlugin)
+/// - [`AssetCatalogPlugin`](crate::prelude::plugins::AssetCatalogPlugin)
 /// - [`LoadingScreenPlugin`](crate::prelude::plugins::LoadingScreenPlugin)
+/// - [`EntropyPlugin`](bevy_rand::plugin::EntropyPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ApplicationPlugins;
 

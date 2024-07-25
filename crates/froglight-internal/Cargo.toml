@@ -32,10 +32,13 @@ froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
 # Client dependencies
+bevy_rand = { workspace = true, optional = true }
+bevy_prng = { workspace = true, optional = true, features = ["wyrand"] }
 froglight-asset = { version = "0.1.0", path = "../froglight-asset", optional = true }
 froglight-interface = { version = "0.1.0", path = "../froglight-interface", optional = true }
 froglight-model = { version = "0.1.0", path = "../froglight-model", optional = true }
 froglight-render = { version = "0.1.0", path = "../froglight-render", optional = true }
+
 
 [features]
 default = ["presets"]
@@ -48,6 +51,8 @@ client = [
     "bevy/default",
     "bevy/wayland",
     "presets",
+    "dep:bevy_rand",
+    "dep:bevy_prng",
     "dep:froglight-asset",
     "dep:froglight-interface",
     "dep:froglight-model",

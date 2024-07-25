@@ -5,16 +5,16 @@
 use bevy_app::App;
 use bevy_asset::{AssetApp, Handle, ReflectHandle};
 
-mod language_map;
+pub(crate) mod language_map;
 pub use language_map::LanguageMap;
 
-mod namespace_soundmap;
-pub use namespace_soundmap::NamespaceSoundMap;
+pub(crate) mod sound_definition;
+pub use sound_definition::SoundDefinitionMap;
 
-mod resourcepack;
+pub(crate) mod resourcepack;
 pub use resourcepack::ResourcePack;
 
-mod resourcepack_meta;
+pub(crate) mod resourcepack_meta;
 pub use resourcepack_meta::ResourcePackMeta;
 
 #[doc(hidden)]
@@ -25,11 +25,11 @@ pub(super) fn build(app: &mut App) {
         .register_type_data::<Handle<LanguageMap>, ReflectHandle>()
         .init_asset::<LanguageMap>();
 
-    // Register `NamespaceSoundMap`
-    app.register_type::<NamespaceSoundMap>()
-        .register_type::<Handle<NamespaceSoundMap>>()
-        .register_type_data::<Handle<NamespaceSoundMap>, ReflectHandle>()
-        .init_asset::<NamespaceSoundMap>();
+    // Register `SoundDefinitionMap`
+    app.register_type::<SoundDefinitionMap>()
+        .register_type::<Handle<SoundDefinitionMap>>()
+        .register_type_data::<Handle<SoundDefinitionMap>, ReflectHandle>()
+        .init_asset::<SoundDefinitionMap>();
 
     // Register `ResourcePackMeta`
     app.register_type::<ResourcePackMeta>()

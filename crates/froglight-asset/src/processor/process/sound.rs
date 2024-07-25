@@ -14,9 +14,9 @@ use crate::{AssetCatalog, AssetLoadState, ResourcePack, ResourcePackList};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.register_type::<SoundState>().init_resource::<SoundState>();
+    app.init_resource::<SoundState>();
 
-    // Reset the `SoundState` when entering the `AssetLoadState::Processing` state
+    // Reset the `SoundState` when entering `AssetLoadState::Processing`
     app.add_systems(OnEnter(AssetLoadState::Processing), SoundState::reset);
 
     // Catalog sounds from the `ResourcePackList`
@@ -44,15 +44,8 @@ impl SoundState {
     /// Returns `true` if the [`SoundState`] has finished.
     pub(super) const fn finished(&self) -> bool { self.finished }
 
-    /// Resets the [`SoundState`].
-    fn reset(mut res: ResMut<Self>) {
-        res.resource_index = 0;
-        res.sound_index = 0;
-        res.finished = false;
-    }
-
     /// Returns `true` if the [`SoundState`] has finished.
-    fn is_finished(res: Res<Self>) -> bool { res.finished() }
+    pub(super) fn is_finished(res: Res<Self>) -> bool { res.finished() }
 
     /// Catalogs sounds from the [`ResourcePackList`].
     pub(super) fn catalog_sounds(
@@ -91,5 +84,12 @@ impl SoundState {
             }
             _ => {}
         }
+    }
+
+    /// Resets the [`SoundState`].
+    fn reset(mut res: ResMut<Self>) {
+        res.resource_index = 0;
+        res.sound_index = 0;
+        res.finished = false;
     }
 }

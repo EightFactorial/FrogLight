@@ -3,34 +3,43 @@ use bevy_ecs::{
     schedule::IntoSystemConfigs,
     system::{Res, ResMut},
 };
-
-mod sounds;
 use bevy_state::state::NextState;
-use sounds::SoundState;
 
-mod textures;
-use textures::TextureState;
+mod sound;
+use sound::SoundState;
+
+mod sound_event;
+use sound_event::SoundEventState;
+
+mod texture;
+use texture::TextureState;
 
 use super::AssetLoadState;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    sounds::build(app);
-    textures::build(app);
+    sound::build(app);
+    texture::build(app);
+    sound_event::build(app);
 
     app.add_systems(
         Update,
         finish_processing
             .after(SoundState::catalog_sounds)
             .after(TextureState::catalog_textures)
+            .after(SoundEventState::finish_sound_events)
             .run_if(is_finished)
             .in_set(AssetLoadState::Processing),
     );
 }
 
 /// Returns `true` if all assets have been processed.
-fn is_finished(sounds: Res<SoundState>, textures: Res<TextureState>) -> bool {
-    sounds.finished() && textures.finished()
+fn is_finished(
+    sounds: Res<SoundState>,
+    textures: Res<TextureState>,
+    sound_events: Res<SoundEventState>,
+) -> bool {
+    sounds.finished() && textures.finished() && sound_events.finished()
 }
 
 fn finish_processing(mut state: ResMut<NextState<AssetLoadState>>) {

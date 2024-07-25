@@ -69,6 +69,8 @@ bevy_input = "0.14.0"
 bevy-inspector-egui = { version = "0.25.1", default-features = false }
 bevy_log = "0.14.0"
 bevy_math = "0.14.0"
+bevy_prng = { version = "0.7.1", features = ["wyrand"] }
+bevy_rand = "0.7.1"
 bevy_reflect = "0.14.0"
 bevy_render = "0.14.0"
 bevy_state = "0.14.0"
@@ -89,6 +91,8 @@ parking_lot = { version = "0.12.3", features = [
     "nightly",
 ] }
 proptest = "1.5.0"
+rand = "0.8.5"
+rand_core = "0.6.4"
 serde = "1.0.203"
 serde_json = "1.0.120"
 simdnbt = "0.6.0"

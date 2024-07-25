@@ -9,7 +9,7 @@ use bevy_app::{App, Plugin};
 pub mod processed;
 
 pub mod unprocessed;
-pub use unprocessed::{NamespaceSoundMap, ResourcePack, ResourcePackMeta};
+pub use unprocessed::{ResourcePack, ResourcePackMeta, SoundDefinitionMap};
 
 /// A [`Plugin`] that registers all of the asset types.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]

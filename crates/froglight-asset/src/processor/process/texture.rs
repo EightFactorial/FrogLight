@@ -14,9 +14,9 @@ use crate::{AssetCatalog, AssetLoadState, ResourcePack, ResourcePackList};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    app.register_type::<TextureState>().init_resource::<TextureState>();
+    app.init_resource::<TextureState>();
 
-    // Reset the `TextureState` when entering the `AssetLoadState::Processing` state
+    // Reset the `TextureState` when entering `AssetLoadState::Processing`
     app.add_systems(OnEnter(AssetLoadState::Processing), TextureState::reset);
 
     // Catalog textures from the `ResourcePackList`
@@ -43,13 +43,6 @@ impl TextureState {
 
     /// Returns `true` if the [`TextureState`] has finished.
     pub(super) const fn finished(&self) -> bool { self.finished }
-
-    /// Resets the [`TextureState`].
-    fn reset(mut res: ResMut<Self>) {
-        res.resource_index = 0;
-        res.texture_index = 0;
-        res.finished = false;
-    }
 
     /// Returns `true` if the [`TextureState`] has finished.
     pub(super) fn is_finished(res: Res<Self>) -> bool { res.finished() }
@@ -91,5 +84,12 @@ impl TextureState {
             }
             _ => {}
         }
+    }
+
+    /// Resets the [`TextureState`].
+    fn reset(mut res: ResMut<Self>) {
+        res.resource_index = 0;
+        res.texture_index = 0;
+        res.finished = false;
     }
 }

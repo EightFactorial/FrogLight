@@ -153,7 +153,7 @@ impl ResourcePackZipLoader {
             }
             EntryType::SoundMap => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.soundmaps.insert(key.namespace().to_string(), asset);
+                resourcepack.sound_definitions.insert(key.namespace().to_string(), asset);
             }
             EntryType::PackMeta => {
                 let mut meta_content = String::new();

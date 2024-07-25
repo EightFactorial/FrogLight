@@ -12,7 +12,7 @@ pub use pack::{
 mod serde;
 pub use serde::SerdeJsonLoader;
 
-use crate::assets::unprocessed::{LanguageMap, NamespaceSoundMap};
+use crate::assets::unprocessed::{LanguageMap, SoundDefinitionMap};
 
 /// A [`Plugin`] that registers all of the asset loaders.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -24,7 +24,7 @@ impl Plugin for AssetLoaderPlugin {
             .init_asset_loader::<ResourcePackZipLoader>();
 
         // TODO: Init loaders for each type loaded by `SerdeJsonLoader`.
-        app.init_asset_loader::<SerdeJsonLoader<NamespaceSoundMap>>();
+        app.init_asset_loader::<SerdeJsonLoader<SoundDefinitionMap>>();
         app.init_asset_loader::<SerdeJsonLoader<LanguageMap>>();
     }
 }
