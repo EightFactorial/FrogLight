@@ -1,8 +1,13 @@
 use bevy_app::App;
-use bevy_ecs::{event::Event, observer::Trigger, system::ResMut};
+use bevy_ecs::{
+    event::Event,
+    observer::Trigger,
+    system::{Res, ResMut},
+};
+use bevy_log::warn;
 use bevy_state::state::NextState;
 
-use super::AssetLoadState;
+use super::{AssetLoadState, ResourcePackList};
 
 #[doc(hidden)]
 pub(crate) fn build(app: &mut App) {
@@ -40,9 +45,17 @@ pub struct ResourceLoadTrigger;
 
 impl ResourceLoadTrigger {
     /// Enter the [`AssetLoadState::Loading`] state.
-    fn trigger_observer(_: Trigger<Self>, mut state: ResMut<NextState<AssetLoadState>>) {
-        #[cfg(debug_assertions)]
-        bevy_log::info!("ResourceLoadTrigger: Entering `AssetLoadState::Loading`");
-        state.set(AssetLoadState::Loading);
+    fn trigger_observer(
+        _: Trigger<Self>,
+        list: Res<ResourcePackList>,
+        mut state: ResMut<NextState<AssetLoadState>>,
+    ) {
+        if list.is_empty() {
+            warn!("ResourceLoadTrigger: No ResourcePacks to load, ignoring trigger");
+        } else {
+            #[cfg(debug_assertions)]
+            bevy_log::info!("ResourceLoadTrigger: Entering `AssetLoadState::Loading`");
+            state.set(AssetLoadState::Loading);
+        }
     }
 }
