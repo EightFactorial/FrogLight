@@ -7,7 +7,7 @@ use bevy_reflect::prelude::{ReflectDeserialize, ReflectSerialize};
 use glam::IVec3;
 
 /// A direction in 3D space.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Default))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -23,7 +23,7 @@ pub enum Direction {
     Down,
     /// Facing -Z, 180 degrees
     North,
-    /// Facing +X, 0 degrees
+    /// Facing +Z, 0 degrees
     South,
     /// Facing +X, -90 degrees
     East,

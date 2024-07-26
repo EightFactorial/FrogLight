@@ -1,7 +1,7 @@
 use std::any::TypeId;
 
 use bevy_app::{App, Update};
-use bevy_asset::Assets;
+use bevy_asset::{AssetId, Assets};
 use bevy_ecs::{
     prelude::not,
     reflect::ReflectResource,
@@ -13,11 +13,13 @@ use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::{
     mesh::{Indices, Mesh, PrimitiveTopology, VertexAttributeValues},
     render_asset::RenderAssetUsages,
+    texture::Image,
 };
 use bevy_state::state::OnEnter;
 use bevy_transform::components::Transform;
 use bevy_utils::HashMap;
 use froglight_common::Direction;
+use glam::FloatExt;
 
 use super::resource_atlas::ResourceAtlasState;
 use crate::{
@@ -26,7 +28,10 @@ use crate::{
             block_model::{BlockDataStorage, BlockModelData, BlockModelStorage},
             BlockModel, ModelTransformIndex,
         },
-        unprocessed::{block_definition::DefinitionElement, BlockModelDefinition},
+        unprocessed::{
+            block_definition::{DefinitionElement, ResourceOrVariable},
+            BlockModelDefinition,
+        },
     },
     AssetCatalog, AssetLoadState, ResourcePack, ResourcePackList,
 };
@@ -140,6 +145,7 @@ impl BlockModelState {
         false
     }
 
+    #[allow(clippy::too_many_lines)]
     fn generate_block_models(
         definitions: &Assets<BlockModelDefinition>,
         models: &mut Assets<BlockModel>,
@@ -189,22 +195,41 @@ impl BlockModelState {
                 for element in elements {
                     for (direction, element_face) in &element.faces {
                         let positions = element.positions_from(*direction);
-                        let uvs = if let Some([x1, y1, x2, y2]) = element_face.uv {
-                            match direction {
-                                Direction::Up | Direction::Down => {
-                                    [[x1, y2], [x2, y2], [x2, y1], [x1, y1]]
-                                }
-                                Direction::North | Direction::South => {
-                                    [[x1, y1], [x2, y1], [x2, y2], [x1, y2]]
-                                }
-                                Direction::West | Direction::East => {
-                                    [[x1, y1], [x1, y2], [x2, y2], [x2, y1]]
-                                }
+                        let mut uvs = element_face
+                            .uvs_from()
+                            .unwrap_or(element.uvs_from(*direction, element_face.rotation));
+
+                        if let Some(texture_index) = match &element_face.texture {
+                            ResourceOrVariable::Resource(key) => catalog.get::<Image>(key),
+                            ResourceOrVariable::Variable(var) => Self::recurse_for_resource(
+                                catalog,
+                                var.to_owned(),
+                                definition,
+                                definitions,
+                                &mut HashMap::default(),
+                            ),
+                        }
+                        .and_then(|id| storage.block_atlas.get_texture_index(id))
+                        {
+                            let texture_size = storage.block_atlas.size.as_vec2();
+                            let texture_rect =
+                                storage.block_atlas.textures[texture_index].as_rect();
+
+                            for uv in &mut uvs {
+                                uv[0] = uv[0].remap(
+                                    0.0,
+                                    1.0,
+                                    texture_rect.min.x / texture_size.x,
+                                    texture_rect.max.x / texture_size.x,
+                                );
+                                uv[1] = uv[1].remap(
+                                    1.0,
+                                    0.0,
+                                    texture_rect.min.y / texture_size.y,
+                                    texture_rect.max.y / texture_size.y,
+                                );
                             }
-                            .map(|[x, y]| [x / 16f32, y / 16f32])
-                        } else {
-                            element.uvs_from(*direction)
-                        };
+                        }
 
                         // Add the element to the face
                         Self::insert_mesh_data(
@@ -220,7 +245,7 @@ impl BlockModelState {
             }
 
             #[cfg(debug_assertions)]
-            bevy_log::debug!("BlockModel: Generated \"{key}\"");
+            bevy_log::trace!("BlockModel: Generated \"{key}\"");
 
             // Insert the `BlockModel` Mesh into the asset storage
             let mesh = meshes.add(model);
@@ -291,6 +316,15 @@ impl BlockModelState {
         mesh
     }
 
+    // Indices::U32(vec![
+    //     0, 1, 2, 2, 3, 0, // front
+    //     4, 5, 6, 6, 7, 4, // back
+    //     8, 9, 10, 10, 11, 8, // right
+    //     12, 13, 14, 14, 15, 12, // left
+    //     16, 17, 18, 18, 19, 16, // top
+    //     20, 21, 22, 22, 23, 20, // bottom
+    // ]);
+
     /// Inserts the mesh data into the [`Mesh`].
     fn insert_mesh_data(
         positions: [[f32; 3]; 4],
@@ -299,15 +333,9 @@ impl BlockModelState {
         direction: Direction,
     ) {
         if let Some(Indices::U32(indices)) = mesh.indices_mut() {
-            let last_index = u32::try_from(indices.len()).unwrap_or_default();
-            indices.extend_from_slice(&[
-                last_index,
-                last_index + 1,
-                last_index + 2,
-                last_index,
-                last_index + 2,
-                last_index + 3,
-            ]);
+            let index =
+                indices.get(indices.len().saturating_sub(2)).map(|v| v + 1).unwrap_or_default();
+            indices.extend_from_slice(&[index, index + 1, index + 2, index + 2, index + 3, index]);
         }
 
         if let Some(VertexAttributeValues::Float32x3(mesh_positions)) =
@@ -321,7 +349,7 @@ impl BlockModelState {
             mesh.attribute_mut(Mesh::ATTRIBUTE_NORMAL)
         {
             let normal = direction.to_axis().to_array().map(|v| v as f32);
-            mesh_normals.extend([normal, normal, normal, normal]);
+            mesh_normals.extend([normal; 4]);
         }
 
         if let Some(VertexAttributeValues::Float32x2(mesh_uvs)) =
@@ -364,6 +392,52 @@ impl BlockModelState {
                 }
             }
         }
+        None
+    }
+
+    fn recurse_for_resource<'a>(
+        catalog: &'a AssetCatalog,
+        mut resource: String,
+        definition: &'a BlockModelDefinition,
+        definitions: &'a Assets<BlockModelDefinition>,
+        variables: &mut HashMap<String, ResourceOrVariable>,
+    ) -> Option<AssetId<Image>> {
+        variables.extend(definition.textures.clone());
+
+        if let Some(mut variable) = variables.get(&resource) {
+            while let ResourceOrVariable::Variable(var) = variable {
+                if let Some(value) = variables.get(var) {
+                    if variable == value {
+                        break;
+                    }
+                    variable = value;
+                } else {
+                    resource = var.to_string();
+                    break;
+                }
+            }
+            if let ResourceOrVariable::Resource(key) = variable {
+                if let Some(asset_id) = catalog.get::<Image>(key) {
+                    return Some(asset_id);
+                }
+                resource = key.to_string();
+            }
+        }
+
+        if let Some(parent_key) = &definition.parent {
+            if let Some(parent_id) = catalog.get::<BlockModelDefinition>(parent_key) {
+                if let Some(parent_def) = definitions.get(parent_id) {
+                    return Self::recurse_for_resource(
+                        catalog,
+                        resource,
+                        parent_def,
+                        definitions,
+                        variables,
+                    );
+                }
+            }
+        }
+
         None
     }
 

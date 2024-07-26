@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use bevy_asset::{Asset, ReflectAsset};
 use bevy_reflect::{prelude::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
 use bevy_transform::components::Transform;
@@ -84,8 +86,8 @@ pub struct DefinitionElement {
     pub rotation: Option<ElementRotation>,
     #[serde(default, skip_serializing_if = "DefinitionElement::is_shaded")]
     pub shade: bool,
-    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
-    pub faces: HashMap<Direction, ElementFace>,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub faces: BTreeMap<Direction, ElementFace>,
 }
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -93,31 +95,106 @@ impl DefinitionElement {
     pub const DEFAULT_SHADE: bool = true;
     fn is_shaded(shade: &bool) -> bool { !shade }
 
+    // Indices::U32(vec![
+    //     0, 1, 2, 2, 3, 0, // front
+    //     4, 5, 6, 6, 7, 4, // back
+    //     8, 9, 10, 10, 11, 8, // right
+    //     12, 13, 14, 14, 15, 12, // left
+    //     16, 17, 18, 18, 19, 16, // top
+    //     20, 21, 22, 22, 23, 20, // bottom
+    // ]);
+
     /// Returns the positions of the element face.
+    ///
+    /// Each array is an [x, y, z] coordinate in local space.
+    /// The camera coordinate space is right-handed x-right, y-up, z-back.
+    /// This means "forward" is -Z.
+    #[must_use]
     pub fn positions_from(&self, direction: Direction) -> [[f32; 3]; 4] {
-        let [x1, y1, z1] = self.from;
-        let [x2, y2, z2] = self.to;
-        match direction {
-            Direction::Up => [[x1, y2, z1], [x2, y2, z1], [x2, y2, z2], [x1, y2, z2]],
-            Direction::Down => [[x1, y1, z2], [x2, y1, z2], [x2, y1, z1], [x1, y1, z1]],
-            Direction::North => [[x1, y1, z1], [x2, y1, z1], [x2, y2, z1], [x1, y2, z1]],
-            Direction::South => [[x2, y1, z2], [x1, y1, z2], [x1, y2, z2], [x2, y2, z2]],
-            Direction::West => [[x1, y1, z2], [x1, y1, z1], [x1, y2, z1], [x1, y2, z2]],
-            Direction::East => [[x2, y1, z1], [x2, y1, z2], [x2, y2, z2], [x2, y2, z1]],
+        let [min_x, min_y, min_z] = self.from;
+        let [max_x, max_y, max_z] = self.to;
+
+        let mut positions = match direction {
+            Direction::North => [
+                [min_x, min_y, max_z],
+                [max_x, min_y, max_z],
+                [max_x, max_y, max_z],
+                [min_x, max_y, max_z],
+            ],
+            Direction::South => [
+                [max_x, min_y, min_z],
+                [min_x, min_y, min_z],
+                [min_x, max_y, min_z],
+                [max_x, max_y, min_z],
+            ],
+            Direction::West => [
+                [max_x, min_y, max_z],
+                [max_x, min_y, min_z],
+                [max_x, max_y, min_z],
+                [max_x, max_y, max_z],
+            ],
+            Direction::East => [
+                [min_x, min_y, min_z],
+                [min_x, min_y, max_z],
+                [min_x, max_y, max_z],
+                [min_x, max_y, min_z],
+            ],
+            Direction::Up => [
+                [max_x, max_y, min_z],
+                [min_x, max_y, min_z],
+                [min_x, max_y, max_z],
+                [max_x, max_y, max_z],
+            ],
+            Direction::Down => [
+                [max_x, min_y, max_z],
+                [min_x, min_y, max_z],
+                [min_x, min_y, min_z],
+                [max_x, min_y, min_z],
+            ],
         }
-        .map(|[x, y, z]| [x / 16f32, y / 16f32, z / 16f32])
+        .map(|[x, y, z]| [x / 16f32, y / 16f32, z / 16f32]);
+
+        if let Some(rotation) = self.rotation.as_ref() {
+            let axis = match rotation.axis {
+                'x' => Vec3::X,
+                'y' => Vec3::Y,
+                'z' => Vec3::Z,
+                _ => unreachable!(),
+            };
+            let angle = rotation.angle.to_radians();
+            let quat = Quat::from_axis_angle(axis, angle);
+            let origin = Vec3::from(rotation.origin).normalize();
+
+            for position in &mut positions {
+                let pos = Vec3::from(*position);
+                let pos = pos - origin;
+                let pos = quat.mul_vec3(pos);
+                let pos = pos + origin;
+                *position = pos.into();
+            }
+        }
+
+        positions
     }
 
     /// Returns the UVs of the element face.
-    pub fn uvs_from(&self, direction: Direction) -> [[f32; 2]; 4] {
-        let [x1, y1, z1] = self.from;
-        let [x2, y2, z2] = self.to;
-        match direction {
-            Direction::Up | Direction::Down => [[x1, z1], [x2, z1], [x2, z2], [x1, z2]],
-            Direction::North | Direction::South => [[x2, y1], [x1, y1], [x1, y2], [x2, y2]],
-            Direction::West | Direction::East => [[z2, y1], [z1, y1], [z1, y2], [z2, y2]],
+    #[must_use]
+    pub fn uvs_from(&self, direction: Direction, rotation: u32) -> [[f32; 2]; 4] {
+        let [min_x, min_y, min_z] = self.from;
+        let [max_x, max_y, max_z] = self.to;
+
+        let mut uvs = match direction {
+            Direction::North => [[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]],
+            Direction::South => [[min_x, max_y], [max_x, max_y], [max_x, min_y], [min_x, min_y]],
+            Direction::West => [[max_z, min_y], [max_z, max_y], [min_z, max_y], [min_z, min_y]],
+            Direction::East => [[min_z, min_y], [min_z, max_y], [max_z, max_y], [max_z, min_y]],
+            Direction::Up => [[max_x, max_z], [min_x, max_z], [min_x, min_z], [max_x, min_z]],
+            Direction::Down => [[max_x, min_z], [min_x, min_z], [min_x, max_z], [max_x, max_z]],
         }
-        .map(|[x, y]| [x / 16f32, y / 16f32])
+        .map(|[u, v]| [u / 16f32, v / 16f32]);
+        uvs.rotate_right((rotation / 90) as usize % 4);
+
+        uvs
     }
 }
 
@@ -176,6 +253,18 @@ pub struct ElementFace {
 impl ElementFace {
     fn default_rotation(rotation: &u32) -> bool { *rotation == 0 }
     fn default_tintindex(tintindex: &i32) -> bool { *tintindex == -1 }
+
+    pub fn uvs_from(&self) -> Option<[[f32; 2]; 4]> {
+        self.uv.map(|mut uv| {
+            uv.rotate_right((self.rotation / 90) as usize % 4);
+            [
+                [uv[0] / 16f32, uv[1] / 16f32],
+                [uv[2] / 16f32, uv[1] / 16f32],
+                [uv[2] / 16f32, uv[3] / 16f32],
+                [uv[0] / 16f32, uv[3] / 16f32],
+            ]
+        })
+    }
 }
 
 // --- ResourceOrVariable ---
