@@ -334,11 +334,7 @@ impl bevy_inspector_egui::inspector_egui_impls::InspectorPrimitive for ResourceK
         _: bevy_inspector_egui::egui::Id,
         _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
     ) -> bool {
-        ui.add_sized(
-            ui.available_size(),
-            bevy_inspector_egui::egui::TextEdit::singleline(&mut self.to_string()),
-        )
-        .changed()
+        ui.text_edit_singleline(self).changed()
     }
 
     fn ui_readonly(
@@ -348,6 +344,22 @@ impl bevy_inspector_egui::inspector_egui_impls::InspectorPrimitive for ResourceK
         _: bevy_inspector_egui::egui::Id,
         _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
     ) {
-        ui.add_sized(ui.available_size(), bevy_inspector_egui::egui::Label::new(self.as_str()));
+        ui.label(self.as_str());
+    }
+}
+
+#[cfg(feature = "inspector")]
+impl bevy_inspector_egui::egui::TextBuffer for ResourceKey {
+    fn is_mutable(&self) -> bool { true }
+
+    fn as_str(&self) -> &str { self }
+
+    fn insert_text(&mut self, text: &str, char_index: usize) -> usize {
+        self.0.insert_str(char_index, text);
+        char_index + text.len()
+    }
+
+    fn delete_char_range(&mut self, char_range: std::ops::Range<usize>) {
+        self.0.replace_range(char_range, "");
     }
 }
