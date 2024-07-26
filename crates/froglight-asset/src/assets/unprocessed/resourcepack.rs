@@ -2,10 +2,13 @@ use bevy_asset::{Asset, Handle, ReflectAsset};
 use bevy_audio::AudioSource;
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::texture::Image;
-use bevy_utils::HashMap;
+use bevy_utils::hashbrown::HashMap;
 use froglight_common::ResourceKey;
 
-use super::{LanguageMap, ResourceAtlasDefinition, ResourcePackMeta, SoundDefinitionMap};
+use super::{
+    BlockModelDefinition, LanguageMap, ResourceAtlasDefinition, ResourcePackMeta,
+    SoundDefinitionMap,
+};
 
 /// A resource pack.
 ///
@@ -24,6 +27,9 @@ pub struct ResourcePack {
     pub sounds: HashMap<ResourceKey, Handle<AudioSource>>,
     /// The [`ResourcePack`]'s languages.
     pub languages: HashMap<ResourceKey, Handle<LanguageMap>>,
+
+    /// The [`ResourcePack`]'s block models.
+    pub block_models: HashMap<ResourceKey, Handle<BlockModelDefinition>>,
 
     /// The [`ResourcePack`]'s atlas definitions.
     pub atlas_definitions: HashMap<ResourceKey, Handle<ResourceAtlasDefinition>>,

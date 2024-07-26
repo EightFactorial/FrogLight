@@ -8,6 +8,7 @@ pub use zip::{ResourcePackZipError, ResourcePackZipLoader};
 enum EntryType {
     Texture,
     Sound,
+    BlockModel,
     Language,
     TextureAtlas,
     ResourcePack,
@@ -44,6 +45,15 @@ impl EntryType {
         match (folder, extension) {
             ("textures", "png") => Some(Self::Texture),
             ("sounds", "ogg") => Some(Self::Sound),
+            ("models", "json") => {
+                if path.contains("models/block") {
+                    Some(Self::BlockModel)
+                // } else if path.contains("models/item") {
+                //     Some(Self::ItemModel)
+                } else {
+                    None
+                }
+            }
             ("lang", "json") => Some(Self::Language),
             ("atlases", "json") => Some(Self::TextureAtlas),
             ("resourcepacks", "zip") => Some(Self::ResourcePack),

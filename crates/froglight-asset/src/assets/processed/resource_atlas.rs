@@ -26,6 +26,18 @@ pub(super) fn build(app: &mut App) {
         .init_asset::<ResourceAtlas>();
 }
 
+/// An atlas of resource textures.
+#[derive(Debug, Default, Clone, PartialEq, Reflect, Asset)]
+#[reflect(Default, Asset)]
+pub struct ResourceAtlas {
+    /// A [`Handle`] to the atlas's [`Image`].
+    pub atlas_image: Handle<Image>,
+    /// A [`Handle`] to the atlas's [`TextureAtlasLayout`].
+    pub atlas_layout: Handle<TextureAtlasLayout>,
+}
+
+// --- Handle Storage ---
+
 /// A [`Vec`] used to store [`Handle::Strong`] references to [`ResourceAtlas`]s.
 ///
 /// Without this, [`ResourceAtlas`]s would unload when they are no longer in
@@ -38,14 +50,4 @@ pub(crate) struct ResourceAtlasStorage {
 impl ResourceAtlasStorage {
     /// Clear the [`ResourceAtlasStorage`].
     fn clear(mut res: ResMut<Self>) { res.clear() }
-}
-
-/// An atlas of resource textures.
-#[derive(Debug, Default, Clone, PartialEq, Reflect, Asset)]
-#[reflect(Default, Asset)]
-pub struct ResourceAtlas {
-    /// A [`Handle`] to the atlas's [`Image`].
-    pub atlas_image: Handle<Image>,
-    /// A [`Handle`] to the atlas's [`TextureAtlasLayout`].
-    pub atlas_layout: Handle<TextureAtlasLayout>,
 }

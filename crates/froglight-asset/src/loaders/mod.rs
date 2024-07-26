@@ -12,7 +12,9 @@ pub use pack::{
 mod serde;
 pub use serde::SerdeJsonLoader;
 
-use crate::assets::unprocessed::{LanguageMap, ResourceAtlasDefinition, SoundDefinitionMap};
+use crate::assets::unprocessed::{
+    BlockModelDefinition, LanguageMap, ResourceAtlasDefinition, SoundDefinitionMap,
+};
 
 /// A [`Plugin`] that registers all of the asset loaders.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,6 +27,7 @@ impl Plugin for AssetLoaderPlugin {
 
         // Initialize loaders for types that use `SerdeJsonLoader`.
         app.init_asset_loader::<SerdeJsonLoader<ResourceAtlasDefinition>>();
+        app.init_asset_loader::<SerdeJsonLoader<BlockModelDefinition>>();
         app.init_asset_loader::<SerdeJsonLoader<LanguageMap>>();
         app.init_asset_loader::<SerdeJsonLoader<SoundDefinitionMap>>();
     }

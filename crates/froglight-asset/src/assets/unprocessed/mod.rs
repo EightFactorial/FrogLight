@@ -8,6 +8,9 @@ use bevy_asset::{AssetApp, Handle, ReflectHandle};
 pub(crate) mod atlas_definition;
 pub use atlas_definition::ResourceAtlasDefinition;
 
+pub(crate) mod block_definition;
+pub use block_definition::BlockModelDefinition;
+
 pub(crate) mod language_map;
 pub use language_map::LanguageMap;
 
@@ -27,6 +30,12 @@ pub(super) fn build(app: &mut App) {
         .register_type::<Handle<ResourceAtlasDefinition>>()
         .register_type_data::<Handle<ResourceAtlasDefinition>, ReflectHandle>()
         .init_asset::<ResourceAtlasDefinition>();
+
+    // Register `BlockDefinition`
+    app.register_type::<BlockModelDefinition>()
+        .register_type::<Handle<BlockModelDefinition>>()
+        .register_type_data::<Handle<BlockModelDefinition>, ReflectHandle>()
+        .init_asset::<BlockModelDefinition>();
 
     // Register `LanguageMap`
     app.register_type::<LanguageMap>()

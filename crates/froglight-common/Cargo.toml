@@ -18,6 +18,7 @@ workspace = true
 [dependencies]
 compact_str = { workspace = true }
 derive_more = { workspace = true }
+glam = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true }
 

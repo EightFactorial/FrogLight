@@ -2,6 +2,9 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![feature(trivial_bounds)]
 
+mod direction;
+pub use direction::Direction;
+
 mod entity;
 pub use entity::{EntityId, EntityUuid};
 

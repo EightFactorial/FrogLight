@@ -26,6 +26,10 @@ pub struct AssetCatalog {
 #[derive(Debug, Default, Clone, Deref, DerefMut, Reflect)]
 pub(crate) struct UntypedAssetMap(#[reflect(ignore)] HashMap<ResourceKey, UntypedAssetId>);
 
+impl From<HashMap<ResourceKey, UntypedAssetId>> for UntypedAssetMap {
+    fn from(map: HashMap<ResourceKey, UntypedAssetId>) -> Self { Self(map) }
+}
+
 impl AssetCatalog {
     /// Creates a new [`AssetCatalog`].
     ///

@@ -3,7 +3,7 @@
 use bevy_app::App;
 
 pub(crate) mod block_model;
-pub use block_model::{BlockModel, ModelTransformIndex};
+pub use block_model::{BlockDataStorage, BlockModel, ModelTransformIndex};
 
 pub(crate) mod resource_atlas;
 pub use resource_atlas::ResourceAtlas;

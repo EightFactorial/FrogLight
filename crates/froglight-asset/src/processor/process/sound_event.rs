@@ -87,7 +87,7 @@ impl SoundEventState {
             &mut state,
             &mut catalog,
         ) {
-            Self::fix_sound_event_refs(&catalog, &mut state, &mut event_assets, &mut sound_assets);
+            Self::fix_sound_event_refs(&catalog, &mut event_assets, &mut sound_assets);
             state.finished = true;
         }
     }
@@ -230,8 +230,6 @@ impl SoundEventState {
     /// Fix the [`SoundRef`] handles in the [`SoundEvent`]s.
     fn fix_sound_event_refs(
         catalog: &AssetCatalog,
-
-        state: &mut Self,
         event_assets: &mut Assets<SoundEvent>,
         sound_assets: &mut Assets<AudioSource>,
     ) {
@@ -265,16 +263,15 @@ impl SoundEventState {
                 }
             }
 
-            // Update the SoundEvent in the asset storage
+            // Update the `SoundEvent` in the asset storage
             event_assets.insert(id, event);
         }
 
         #[cfg(debug_assertions)]
         bevy_log::debug!("AssetCatalog: Finished Fixing SoundEvent Handles");
-        state.finished = true;
     }
 
-    /// Resets the [`SoundState`].
+    /// Resets the [`SoundEventState`].
     fn reset(mut res: ResMut<Self>) {
         res.resource_index = 0;
         res.map_index = 0;

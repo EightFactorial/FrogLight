@@ -29,19 +29,6 @@ pub(super) fn build(app: &mut App) {
         .init_asset::<SoundEvent>();
 }
 
-/// A [`Vec`] used to store [`Handle::Strong`] references to [`SoundEvent`]s.
-///
-/// Without this, [`SoundEvent`]s would unload when they are no longer in use.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource, Deref, DerefMut)]
-#[reflect(Default, Resource)]
-pub(crate) struct SoundEventStorage {
-    inner: Vec<Handle<SoundEvent>>,
-}
-impl SoundEventStorage {
-    /// Clear the [`SoundEventStorage`].
-    fn clear(mut res: ResMut<Self>) { res.clear() }
-}
-
 /// A sound event.
 #[derive(Debug, Default, Clone, PartialEq, Reflect, Asset)]
 #[reflect(Default, Asset)]
@@ -148,4 +135,19 @@ impl From<&SoundDefinition> for SoundSettings {
             },
         }
     }
+}
+
+// --- Handle Storage ---
+
+/// A [`Vec`] used to store [`Handle::Strong`] references to [`SoundEvent`]s.
+///
+/// Without this, [`SoundEvent`]s would unload when they are no longer in use.
+#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource, Deref, DerefMut)]
+#[reflect(Default, Resource)]
+pub(crate) struct SoundEventStorage {
+    inner: Vec<Handle<SoundEvent>>,
+}
+impl SoundEventStorage {
+    /// Clear the [`SoundEventStorage`].
+    fn clear(mut res: ResMut<Self>) { res.clear() }
 }

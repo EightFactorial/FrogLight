@@ -6,7 +6,7 @@ use bevy_ecs::{
     prelude::not,
     reflect::ReflectResource,
     schedule::IntoSystemConfigs,
-    system::{Res, ResMut, Resource},
+    system::{Commands, Res, ResMut, Resource},
 };
 use bevy_log::{error, warn};
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
@@ -17,7 +17,7 @@ use bevy_state::state::OnEnter;
 use super::texture::TextureState;
 use crate::{
     assets::{
-        processed::{resource_atlas::ResourceAtlasStorage, ResourceAtlas},
+        processed::{resource_atlas::ResourceAtlasStorage, BlockDataStorage, ResourceAtlas},
         unprocessed::{atlas_definition::AtlasDefinitionEntry, ResourceAtlasDefinition},
     },
     AssetCatalog, AssetLoadState, ResourcePack, ResourcePackList,
@@ -68,6 +68,7 @@ impl ResourceAtlasState {
         mut catalog: ResMut<AssetCatalog>,
         mut storage: ResMut<ResourceAtlasStorage>,
 
+        mut commands: Commands,
         mut atlas_assets: ResMut<Assets<ResourceAtlas>>,
         mut image_assets: ResMut<Assets<Image>>,
         mut layout_assets: ResMut<Assets<TextureAtlasLayout>>,
@@ -172,6 +173,15 @@ impl ResourceAtlasState {
                         "AssetCatalog: {} ResourceAtlases",
                         catalog.len_of::<ResourceAtlas>()
                     );
+                }
+
+                // Create the `BlockDataStorage`
+                if let Some(storage) =
+                    BlockDataStorage::from_catalog(&catalog, &atlas_assets, &layout_assets)
+                {
+                    commands.insert_resource(storage);
+                } else {
+                    error!("ResourceAtlas: Failed to create BlockDataStorage");
                 }
 
                 state.finished = true;

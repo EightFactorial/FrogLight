@@ -143,6 +143,10 @@ impl ResourcePackZipLoader {
                 let asset = Self::load_asset(&filename, reader, context).await?;
                 resourcepack.sounds.insert(key, asset);
             }
+            EntryType::BlockModel => {
+                let asset = Self::load_asset(&filename, reader, context).await?;
+                resourcepack.block_models.insert(key, asset);
+            }
             EntryType::Language => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
                 resourcepack.languages.insert(key, asset);

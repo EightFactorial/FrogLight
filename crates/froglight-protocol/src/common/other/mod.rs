@@ -2,7 +2,7 @@ mod difficulty;
 pub use difficulty::Difficulty;
 
 mod direction;
-pub use direction::Direction;
+pub use froglight_common::Direction;
 
 mod gamemode;
 pub use gamemode::GameMode;
