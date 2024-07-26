@@ -10,7 +10,7 @@ use bevy_ecs::{
 };
 use bevy_log::{error, warn};
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
-use bevy_render::texture::Image;
+use bevy_render::texture::{Image, ImageSampler};
 use bevy_sprite::{TextureAtlasBuilder, TextureAtlasLayout};
 use bevy_state::state::OnEnter;
 
@@ -139,8 +139,10 @@ impl ResourceAtlasState {
                 // Build the `ResourceAtlas`
                 match builder.build() {
                     Err(err) => error!("ResourceAtlas: Failed to build, {err}"),
-                    Ok((atlas_layout, atlas_image)) => {
+                    Ok((atlas_layout, mut atlas_image)) => {
+                        atlas_image.sampler = ImageSampler::nearest();
                         let atlas_image = image_assets.add(atlas_image);
+
                         let atlas_layout = layout_assets.add(atlas_layout);
                         let atlas = atlas_assets.add(ResourceAtlas { atlas_image, atlas_layout });
 

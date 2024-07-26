@@ -1,7 +1,6 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     asset::AssetPlugin as BevyAssetPlugin,
-    prelude::ImagePlugin,
     DefaultPlugins as BevyDefaultPlugins,
 };
 use froglight_asset::AssetSourcePlugin;
@@ -64,9 +63,9 @@ pub struct ApplicationPlugins;
 impl PluginGroup for ApplicationPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = PluginGroupBuilder::start::<Self>();
-        builder = builder.add_group(BevyDefaultPlugins).set(ImagePlugin::default_linear());
-
+        builder = builder.add_group(BevyDefaultPlugins);
         builder = builder.add_group(BasicPlugins).add_group(ClientPlugins);
+
         builder.add_before::<BevyAssetPlugin, _>(AssetSourcePlugin::default())
     }
 }

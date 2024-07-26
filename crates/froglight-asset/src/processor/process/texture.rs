@@ -7,7 +7,7 @@ use bevy_ecs::{
     system::{Res, ResMut, Resource},
 };
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
-use bevy_render::texture::Image;
+use bevy_render::texture::{Image, ImageSampler};
 use bevy_state::state::OnEnter;
 
 use crate::{AssetCatalog, AssetLoadState, ResourcePack, ResourcePackList};
@@ -53,6 +53,7 @@ impl TextureState {
         assets: Res<Assets<ResourcePack>>,
 
         mut state: ResMut<Self>,
+        mut images: ResMut<Assets<Image>>,
         mut catalog: ResMut<AssetCatalog>,
     ) {
         let handle = list.get(state.resource_index).expect("ResourceIndex out of bounds");
@@ -61,6 +62,11 @@ impl TextureState {
         for (key, handle) in
             resource.textures.iter().skip(state.texture_index).take(Self::TEXTURES_PER_FRAME)
         {
+            // Set the image sampler to nearest
+            let image = images.get_mut(handle).expect("Image not found");
+            image.sampler = ImageSampler::nearest();
+
+            // Add the texture to the catalog
             catalog.entry::<Image>(key.clone()).or_insert(handle.id().untyped());
             state.texture_index += 1;
         }
