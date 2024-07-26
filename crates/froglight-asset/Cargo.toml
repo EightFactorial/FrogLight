@@ -23,17 +23,16 @@ bevy_audio = { workspace = true, features = ["vorbis"] }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
-bevy_prng = { workspace = true }
 bevy_reflect = { workspace = true }
-bevy_rand = { workspace = true }
 bevy_render = { workspace = true }
+bevy_sprite = { workspace = true }
 bevy_state = { workspace = true }
 bevy_time = { workspace = true }
+bevy_transform = { workspace = true }
 bevy_utils = { workspace = true }
 dirs = "5.0.1"
 froglight-common = { version = "0.1.0", path = "../froglight-common" }
 futures-lite = { workspace = true }
-rand = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

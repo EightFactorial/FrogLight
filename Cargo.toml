@@ -73,6 +73,7 @@ bevy_prng = { version = "0.7.1", features = ["wyrand"] }
 bevy_rand = "0.7.1"
 bevy_reflect = "0.14.0"
 bevy_render = "0.14.0"
+bevy_sprite = "0.14.0"
 bevy_state = "0.14.0"
 bevy_tasks = "0.14.0"
 bevy_time = "0.14.0"

@@ -5,6 +5,9 @@ use bevy_ecs::{
 };
 use bevy_state::state::NextState;
 
+mod resource_atlas;
+use resource_atlas::ResourceAtlasState;
+
 mod sound;
 use sound::SoundState;
 
@@ -18,16 +21,19 @@ use super::AssetLoadState;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    sound::build(app);
     texture::build(app);
+    resource_atlas::build(app);
+
+    sound::build(app);
     sound_event::build(app);
 
     app.add_systems(
         Update,
         finish_processing
             .after(SoundState::catalog_sounds)
+            .after(SoundEventState::create_sound_events)
             .after(TextureState::catalog_textures)
-            .after(SoundEventState::finish_sound_events)
+            .after(ResourceAtlasState::create_resource_atlases)
             .run_if(is_finished)
             .in_set(AssetLoadState::Processing),
     );
@@ -35,11 +41,12 @@ pub(super) fn build(app: &mut App) {
 
 /// Returns `true` if all assets have been processed.
 fn is_finished(
-    sounds: Res<SoundState>,
     textures: Res<TextureState>,
+    resource_atlas: Res<ResourceAtlasState>,
+    sounds: Res<SoundState>,
     sound_events: Res<SoundEventState>,
 ) -> bool {
-    sounds.finished() && textures.finished() && sound_events.finished()
+    sounds.finished() && textures.finished() && sound_events.finished() && resource_atlas.finished()
 }
 
 fn finish_processing(mut state: ResMut<NextState<AssetLoadState>>) {

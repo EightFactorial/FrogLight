@@ -36,21 +36,11 @@ pub(super) fn build(app: &mut App) {
     // Generate `SoundEvent`s from the `ResourcePackList`
     app.add_systems(
         Update,
-        SoundEventState::generate_sound_events
+        SoundEventState::create_sound_events
             .ambiguous_with_all()
-            .run_if(not(SoundEventState::is_generated))
+            .run_if(not(SoundEventState::is_finished))
             .run_if(SoundState::is_finished)
             .after(SoundState::catalog_sounds)
-            .in_set(AssetLoadState::Processing),
-    );
-    // Fix `SoundEvent` handles
-    app.add_systems(
-        Update,
-        SoundEventState::finish_sound_events
-            .ambiguous_with_all()
-            .run_if(SoundEventState::is_generated)
-            .run_if(not(SoundEventState::is_finished))
-            .after(SoundEventState::generate_sound_events)
             .in_set(AssetLoadState::Processing),
     );
 }
@@ -61,8 +51,6 @@ pub(super) struct SoundEventState {
     resource_index: usize,
     map_index: usize,
     sound_index: usize,
-
-    generated: bool,
     finished: bool,
 }
 
@@ -71,26 +59,53 @@ impl SoundEventState {
     const SOUNDEVENTS_PER_FRAME: usize = 8;
 
     /// Returns `true` if the [`SoundEventState`] has finished.
-    pub(super) const fn finished(&self) -> bool { self.generated && self.finished }
+    pub(super) const fn finished(&self) -> bool { self.finished }
 
     /// Returns `true` if the [`SoundEventState`] has finished.
     fn is_finished(res: Res<Self>) -> bool { res.finished() }
 
-    /// Returns `true` if the [`SoundEventState`] has generated [`SoundEvent`]s.
-    fn is_generated(res: Res<Self>) -> bool { res.generated }
-
-    /// Catalogs [`SoundEvent`]s from the [`ResourcePackList`].
-    fn generate_sound_events(
+    /// Create [`SoundEvent`]s from the [`SoundDefinitionMap`]s.
+    #[allow(clippy::too_many_arguments)]
+    pub(super) fn create_sound_events(
         list: Res<ResourcePackList>,
         pack_assets: Res<Assets<ResourcePack>>,
         def_assets: Res<Assets<SoundDefinitionMap>>,
 
         mut event_assets: ResMut<Assets<SoundEvent>>,
         mut event_storage: ResMut<SoundEventStorage>,
+        mut sound_assets: ResMut<Assets<AudioSource>>,
 
         mut state: ResMut<Self>,
         mut catalog: ResMut<AssetCatalog>,
     ) {
+        if Self::generate_sound_events(
+            &list,
+            &pack_assets,
+            &def_assets,
+            &mut event_assets,
+            &mut event_storage,
+            &mut state,
+            &mut catalog,
+        ) {
+            Self::fix_sound_event_refs(&catalog, &mut state, &mut event_assets, &mut sound_assets);
+            state.finished = true;
+        }
+    }
+
+    /// Generate [`SoundEvent`]s from the [`SoundDefinitionMap`]s.
+    ///
+    /// Returns `true` if all [`SoundEvent`]s have been generated.
+    fn generate_sound_events(
+        list: &ResourcePackList,
+        pack_assets: &Assets<ResourcePack>,
+        def_assets: &Assets<SoundDefinitionMap>,
+
+        event_assets: &mut Assets<SoundEvent>,
+        event_storage: &mut SoundEventStorage,
+
+        state: &mut Self,
+        catalog: &mut AssetCatalog,
+    ) -> bool {
         let handle = list.get(state.resource_index).expect("ResourceIndex out of bounds");
         let resource = pack_assets.get(handle).expect("ResourcePack not found");
 
@@ -193,7 +208,8 @@ impl SoundEventState {
                     );
                 }
 
-                state.generated = true;
+                // We're done creating SoundEvents, fix the SoundRef handles
+                return true;
             }
             (false, true, true) => {
                 state.resource_index += 1;
@@ -206,16 +222,18 @@ impl SoundEventState {
             }
             _ => {}
         }
+
+        // We're not done creating SoundEvents
+        false
     }
 
-    /// Fix `SoundEvent` handles
-    // TODO: Limit to a certain number of `SoundEvent`s per frame?
-    pub(super) fn finish_sound_events(
-        catalog: Res<AssetCatalog>,
+    /// Fix the [`SoundRef`] handles in the [`SoundEvent`]s.
+    fn fix_sound_event_refs(
+        catalog: &AssetCatalog,
 
-        mut state: ResMut<Self>,
-        mut event_assets: ResMut<Assets<SoundEvent>>,
-        mut sound_assets: ResMut<Assets<AudioSource>>,
+        state: &mut Self,
+        event_assets: &mut Assets<SoundEvent>,
+        sound_assets: &mut Assets<AudioSource>,
     ) {
         // Clone all of the SoundEvents so we can modify them
         let events = event_assets.iter().map(|(i, e)| (i, e.clone())).collect::<Vec<_>>();
@@ -228,7 +246,7 @@ impl SoundEventState {
                 match &mut entry.sound_ref {
                     SoundRef::Event(handle) => {
                         if let Some(new_handle) =
-                            catalog.create_handle(&entry.sound_ref_name, &mut event_assets)
+                            catalog.create_handle(&entry.sound_ref_name, event_assets)
                         {
                             *handle = new_handle;
                         } else {
@@ -237,7 +255,7 @@ impl SoundEventState {
                     }
                     SoundRef::Audio(handle) => {
                         if let Some(new_handle) =
-                            catalog.create_handle(&entry.sound_ref_name, &mut sound_assets)
+                            catalog.create_handle(&entry.sound_ref_name, sound_assets)
                         {
                             *handle = new_handle;
                         } else {
@@ -261,7 +279,6 @@ impl SoundEventState {
         res.resource_index = 0;
         res.map_index = 0;
         res.sound_index = 0;
-        res.generated = false;
         res.finished = false;
     }
 }

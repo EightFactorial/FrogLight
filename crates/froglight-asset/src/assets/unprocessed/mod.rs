@@ -5,6 +5,9 @@
 use bevy_app::App;
 use bevy_asset::{AssetApp, Handle, ReflectHandle};
 
+pub(crate) mod atlas_definition;
+pub use atlas_definition::ResourceAtlasDefinition;
+
 pub(crate) mod language_map;
 pub use language_map::LanguageMap;
 
@@ -19,6 +22,12 @@ pub use resourcepack_meta::ResourcePackMeta;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
+    // Register `ResourceAtlasDefinition`
+    app.register_type::<ResourceAtlasDefinition>()
+        .register_type::<Handle<ResourceAtlasDefinition>>()
+        .register_type_data::<Handle<ResourceAtlasDefinition>, ReflectHandle>()
+        .init_asset::<ResourceAtlasDefinition>();
+
     // Register `LanguageMap`
     app.register_type::<LanguageMap>()
         .register_type::<Handle<LanguageMap>>()

@@ -9,11 +9,10 @@ pub use catalog::AssetCatalog;
 mod key;
 pub use key::AssetKey;
 
-use crate::assets::processed::SoundEvent;
-
 mod register;
-
 mod systemset;
+
+use crate::assets::processed::{BlockModel, ResourceAtlas, SoundEvent};
 
 /// A [`Plugin`] that adds the [`AssetCatalog`] resource.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -29,6 +28,8 @@ impl Plugin for AssetCatalogPlugin {
         register::add_systems::<Mesh>(app);
         register::add_systems::<AudioSource>(app);
 
+        register::add_systems::<BlockModel>(app);
+        register::add_systems::<ResourceAtlas>(app);
         register::add_systems::<SoundEvent>(app);
     }
 }

@@ -9,6 +9,7 @@ enum EntryType {
     Texture,
     Sound,
     Language,
+    TextureAtlas,
     ResourcePack,
     SoundMap,
     PackMeta,
@@ -44,15 +45,13 @@ impl EntryType {
             ("textures", "png") => Some(Self::Texture),
             ("sounds", "ogg") => Some(Self::Sound),
             ("lang", "json") => Some(Self::Language),
+            ("atlases", "json") => Some(Self::TextureAtlas),
             ("resourcepacks", "zip") => Some(Self::ResourcePack),
             ("sounds.json", "json") => Some(Self::SoundMap),
 
             // Suppress warnings for known unsupported assets.
             #[cfg(debug_assertions)]
-            (
-                "atlases" | "blockstates" | "font" | "models" | "particles" | "shaders" | "texts",
-                _,
-            ) => None,
+            ("blockstates" | "font" | "models" | "particles" | "shaders" | "texts", _) => None,
 
             // Suppress warnings for known but unused assets.
             #[cfg(debug_assertions)]

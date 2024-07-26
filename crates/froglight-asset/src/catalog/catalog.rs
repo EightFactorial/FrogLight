@@ -19,12 +19,12 @@ pub(super) fn build(app: &mut App) {
 #[derive(Debug, Default, Resource, Reflect)]
 #[reflect(Default, Resource)]
 pub struct AssetCatalog {
-    pub(super) inner: TypeIdMap<UntypedAssetMap>,
+    pub(crate) inner: TypeIdMap<UntypedAssetMap>,
 }
 
 /// A map of [`ResourceKey`]s to [`UntypedAssetId`]s.
 #[derive(Debug, Default, Clone, Deref, DerefMut, Reflect)]
-pub(super) struct UntypedAssetMap(#[reflect(ignore)] HashMap<ResourceKey, UntypedAssetId>);
+pub(crate) struct UntypedAssetMap(#[reflect(ignore)] HashMap<ResourceKey, UntypedAssetId>);
 
 impl AssetCatalog {
     /// Creates a new [`AssetCatalog`].

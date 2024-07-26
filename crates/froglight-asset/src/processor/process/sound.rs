@@ -66,8 +66,8 @@ impl SoundState {
         }
 
         match (
-            state.resource_index >= list.len() - 1,
-            state.sound_index >= resource.sounds.len() - 1,
+            state.resource_index >= list.len().checked_sub(1).unwrap_or_default(),
+            state.sound_index >= resource.sounds.len().checked_sub(1).unwrap_or_default(),
         ) {
             (true, true) => {
                 #[cfg(debug_assertions)]

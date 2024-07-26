@@ -6,12 +6,9 @@ use bevy_ecs::{
     reflect::ReflectResource,
     system::{ResMut, Resource},
 };
-use bevy_prng::WyRand;
-use bevy_rand::prelude::GlobalEntropy;
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_state::state::OnExit;
 use froglight_common::ResourceKey;
-use rand::Rng;
 
 use crate::{
     assets::unprocessed::sound_definition::{SoundDefinition, SoundKind},
@@ -40,7 +37,6 @@ pub(super) fn build(app: &mut App) {
 pub(crate) struct SoundEventStorage {
     inner: Vec<Handle<SoundEvent>>,
 }
-
 impl SoundEventStorage {
     /// Clear the [`SoundEventStorage`].
     fn clear(mut res: ResMut<Self>) { res.clear() }
@@ -64,21 +60,6 @@ pub struct SoundEvent {
     ///
     /// When triggered, one of these sounds is selected at random.
     pub sound_pool: Vec<SoundEntry>,
-}
-
-impl SoundEvent {
-    /// Select a random sound from the [`SoundEvent`]'s sound pool.
-    #[must_use]
-    pub fn get_random_sound(&self, rng: &mut GlobalEntropy<WyRand>) -> Option<&SoundEntry> {
-        let mut weight = rng.gen_range(0..self.total_weight);
-        for sound in &self.sound_pool {
-            weight -= sound.weight;
-            if weight < 0 {
-                return Some(sound);
-            }
-        }
-        None
-    }
 }
 
 /// A sound entry.

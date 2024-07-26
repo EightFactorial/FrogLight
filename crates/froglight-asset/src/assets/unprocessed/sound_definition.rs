@@ -36,6 +36,8 @@ pub struct SoundEventDefinition {
 }
 
 /// A sound definition.
+///
+/// May be just the name of an audio file or another sound, can have settings.
 #[derive(Debug, Clone, PartialEq, Reflect, Serialize, Deserialize)]
 #[reflect(Serialize, Deserialize)]
 #[serde(untagged)]

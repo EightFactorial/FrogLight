@@ -6,8 +6,9 @@ use bevy::{
     ecs::system::{Local, Res},
     input::{keyboard::KeyCode, ButtonInput},
     log::info,
-    prelude::{AppTypeRegistry, Image, Mesh},
+    prelude::{AppTypeRegistry, Image, Mesh, ReflectResource},
     reflect::Reflect,
+    ui::UiScale,
 };
 use bevy_inspector_egui::{
     egui::{text::LayoutJob, FontId, Id, TextFormat, Ui},
@@ -15,12 +16,16 @@ use bevy_inspector_egui::{
     quick::WorldInspectorPlugin,
     reflect_inspector::InspectorUi,
 };
+use froglight::prelude::ResourceKey;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub(super) struct InspectorPlugin;
 
 impl Plugin for InspectorPlugin {
     fn build(&self, app: &mut App) {
+        app.register_type::<ResourceKey>().register_type_data::<ResourceKey, InspectorEguiImpl>();
+        app.register_type::<UiScale>().register_type_data::<UiScale, ReflectResource>();
+
         Self::add_of_with_many::<Handle<Image>>(app);
         Self::add_of_with_many::<Handle<Mesh>>(app);
 

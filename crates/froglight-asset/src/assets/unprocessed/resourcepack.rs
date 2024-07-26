@@ -5,7 +5,7 @@ use bevy_render::texture::Image;
 use bevy_utils::HashMap;
 use froglight_common::ResourceKey;
 
-use super::{LanguageMap, ResourcePackMeta, SoundDefinitionMap};
+use super::{LanguageMap, ResourceAtlasDefinition, ResourcePackMeta, SoundDefinitionMap};
 
 /// A resource pack.
 ///
@@ -25,6 +25,8 @@ pub struct ResourcePack {
     /// The [`ResourcePack`]'s languages.
     pub languages: HashMap<ResourceKey, Handle<LanguageMap>>,
 
+    /// The [`ResourcePack`]'s atlas definitions.
+    pub atlas_definitions: HashMap<ResourceKey, Handle<ResourceAtlasDefinition>>,
     /// The [`ResourcePack`]'s sound definitions.
     pub sound_definitions: HashMap<String, Handle<SoundDefinitionMap>>,
 }

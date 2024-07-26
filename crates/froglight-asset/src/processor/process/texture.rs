@@ -66,8 +66,8 @@ impl TextureState {
         }
 
         match (
-            state.resource_index >= list.len() - 1,
-            state.texture_index >= resource.textures.len() - 1,
+            state.resource_index >= list.len().checked_sub(1).unwrap_or_default(),
+            state.texture_index >= resource.textures.len().checked_sub(1).unwrap_or_default(),
         ) {
             (true, true) => {
                 #[cfg(debug_assertions)]

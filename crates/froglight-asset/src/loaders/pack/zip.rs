@@ -147,6 +147,10 @@ impl ResourcePackZipLoader {
                 let asset = Self::load_asset(&filename, reader, context).await?;
                 resourcepack.languages.insert(key, asset);
             }
+            EntryType::TextureAtlas => {
+                let asset = Self::load_asset(&filename, reader, context).await?;
+                resourcepack.atlas_definitions.insert(key, asset);
+            }
             EntryType::ResourcePack => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
                 resourcepack.children.insert(key, asset);
