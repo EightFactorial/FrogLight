@@ -2378,6 +2378,7 @@ dependencies = [
 name = "froglight-asset"
 version = "0.1.0"
 dependencies = [
+ "async-lock 3.4.0",
  "async_zip",
  "bevy_app",
  "bevy_asset",
@@ -2390,6 +2391,7 @@ dependencies = [
  "bevy_render",
  "bevy_sprite",
  "bevy_state",
+ "bevy_tasks",
  "bevy_time",
  "bevy_transform",
  "bevy_utils",

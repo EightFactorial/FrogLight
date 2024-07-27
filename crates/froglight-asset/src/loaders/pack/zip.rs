@@ -1,11 +1,13 @@
 use async_zip::{
-    base::read::{seek::ZipFileReader, WithEntry, ZipEntryReader},
+    base::read::{mem::ZipFileReader, WithEntry, ZipEntryReader},
     ZipEntry,
 };
 use bevy_asset::{io::Reader, Asset, AssetLoader, AsyncReadExt, Handle, LoadContext};
 use bevy_log::error;
+use bevy_tasks::IoTaskPool;
 use froglight_common::ResourceKey;
-use futures_lite::io::{BufReader, Cursor};
+use futures_lite::io::Cursor;
+use parking_lot::{Mutex, RwLock};
 
 use super::EntryType;
 use crate::{assets::unprocessed::ResourcePack, ResourcePackMeta};
@@ -53,34 +55,53 @@ impl ResourcePackZipLoader {
         reader: &mut Reader<'_>,
         context: &mut LoadContext<'_>,
     ) -> Result<ResourcePack, ResourcePackZipError> {
-        let buffer = BufReader::new(reader);
-        let mut zip = ZipFileReader::new(buffer).await?;
+        let mut buffer = Vec::new();
+        reader.read_to_end(&mut buffer).await?;
+        let zip = ZipFileReader::new(buffer).await?;
 
         let mut resourcepack = ResourcePack::default();
         let mut meta = ResourcePackMeta::default();
 
-        // Iterate over each entry in the zip file.
-        for index in 0..zip.file().entries().len() {
-            // If the entry should be read, read it.
-            let mut reader = zip.reader_with_entry(index).await?;
-            if let Some((key, kind)) = Self::should_read(reader.entry()) {
-                // Print an error if the entry could not be read, but continue.
-                if let Err(err) = Self::add_to_resourcepack(
-                    key,
-                    kind,
-                    &mut reader,
-                    context,
-                    &mut meta,
-                    &mut resourcepack,
-                )
-                .await
-                {
-                    error!(
-                        "Error reading entry \"{}\": {err}",
-                        reader.entry().filename().as_str().unwrap_or_default()
-                    );
-                }
-            }
+        {
+            let context = async_lock::Mutex::new(&mut *context);
+            let resourcepack = RwLock::new(&mut resourcepack);
+            let meta = Mutex::new(&mut meta);
+
+            let context_ref = &context;
+            let resourcepack_ref = &resourcepack;
+            let meta_ref = &meta;
+
+            IoTaskPool::get().scope(|pool| {
+                pool.spawn(async {
+                    // Iterate over each entry in the zip file.
+                    for index in 0..zip.file().entries().len() {
+                        let Ok(mut reader) = zip.reader_with_entry(index).await else {
+                            continue;
+                        };
+
+                        if let Some((key, kind)) = Self::should_read(reader.entry()) {
+                            pool.spawn(async move {
+                                // Print an error if the entry could not be read, but continue.
+                                if let Err(err) = Self::add_to_resourcepack(
+                                    key,
+                                    kind,
+                                    &mut reader,
+                                    context_ref,
+                                    meta_ref,
+                                    resourcepack_ref,
+                                )
+                                .await
+                                {
+                                    error!(
+                                        "Error reading entry \"{}\": {err}",
+                                        reader.entry().filename().as_str().unwrap_or_default()
+                                    );
+                                }
+                            });
+                        }
+                    }
+                });
+            });
         }
 
         // Add the `ResourcePackMeta` to the `ResourcePack`.
@@ -96,19 +117,17 @@ impl ResourcePackZipLoader {
         }
 
         let filename = entry.filename().as_str().ok()?;
-        let kind = EntryType::from_path(filename)?;
-
-        match kind {
-            EntryType::PackMeta | EntryType::PackPng => {
-                Some((ResourceKey::const_new("minecraft:pack"), kind))
+        match EntryType::from_path(filename)? {
+            pack if matches!(pack, EntryType::PackMeta | EntryType::PackPng) => {
+                Some((ResourceKey::const_new("minecraft:pack"), pack))
             }
             EntryType::SoundMap => {
                 let trimmed = filename.trim_start_matches("assets/");
                 let namespace = trimmed.split_once('/')?.0;
                 let key = ResourceKey::new(format!("{namespace}:sounds"));
-                Some((key, kind))
+                Some((key, EntryType::SoundMap))
             }
-            _ => {
+            other => {
                 let mut split = filename.split('/');
                 split.next()?;
 
@@ -119,7 +138,7 @@ impl ResourcePackZipLoader {
                 path = path.split_once('.')?.0;
 
                 let key = ResourceKey::try_new(format!("{namespace}:{path}")).ok()?;
-                Some((key, kind))
+                Some((key, other))
             }
         }
     }
@@ -128,48 +147,48 @@ impl ResourcePackZipLoader {
     async fn add_to_resourcepack(
         key: ResourceKey,
         kind: EntryType,
-        reader: &mut ZipEntryReader<'_, BufReader<&mut Reader<'_>>, WithEntry<'_>>,
-        context: &mut LoadContext<'_>,
-        meta: &mut ResourcePackMeta,
-        resourcepack: &mut ResourcePack,
+        reader: &mut ZipEntryReader<'_, Cursor<&[u8]>, WithEntry<'_>>,
+        context: &async_lock::Mutex<&mut LoadContext<'_>>,
+        meta: &Mutex<&mut ResourcePackMeta>,
+        resourcepack: &RwLock<&mut ResourcePack>,
     ) -> Result<(), ResourcePackZipError> {
         let filename = reader.entry().filename().clone().into_string().unwrap_or_default();
         match kind {
             EntryType::Texture => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.textures.insert(key, asset);
+                resourcepack.write().textures.insert(key, asset);
             }
             EntryType::Sound => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.sounds.insert(key, asset);
+                resourcepack.write().sounds.insert(key, asset);
             }
             EntryType::BlockModel => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.block_models.insert(key, asset);
+                resourcepack.write().block_models.insert(key, asset);
             }
             EntryType::Language => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.languages.insert(key, asset);
+                resourcepack.write().languages.insert(key, asset);
             }
             EntryType::TextureAtlas => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.atlas_definitions.insert(key, asset);
+                resourcepack.write().atlas_definitions.insert(key, asset);
             }
             EntryType::ResourcePack => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.children.insert(key, asset);
+                resourcepack.write().children.insert(key, asset);
             }
             EntryType::SoundMap => {
                 let asset = Self::load_asset(&filename, reader, context).await?;
-                resourcepack.sound_definitions.insert(key.namespace().to_string(), asset);
+                resourcepack.write().sound_definitions.insert(key.namespace().to_string(), asset);
             }
             EntryType::PackMeta => {
                 let mut meta_content = String::new();
                 reader.read_to_string(&mut meta_content).await?;
-                meta.mcmeta = serde_json::from_str(&meta_content)?;
+                meta.lock().mcmeta = serde_json::from_str(&meta_content)?;
             }
             EntryType::PackPng => {
-                meta.icon = Some(Self::load_asset(&filename, reader, context).await?);
+                meta.lock().icon = Some(Self::load_asset(&filename, reader, context).await?);
             }
         }
         Ok(())
@@ -179,8 +198,8 @@ impl ResourcePackZipLoader {
     // TODO: Fix needing to use a buffer here.
     async fn load_asset<A: Asset>(
         path: &str,
-        reader: &mut ZipEntryReader<'_, BufReader<&mut Reader<'_>>, WithEntry<'_>>,
-        context: &mut LoadContext<'_>,
+        reader: &mut ZipEntryReader<'_, Cursor<&[u8]>, WithEntry<'_>>,
+        context: &async_lock::Mutex<&mut LoadContext<'_>>,
     ) -> Result<Handle<A>, ResourcePackZipError> {
         let mut buffer = Vec::with_capacity(
             usize::try_from(reader.entry().uncompressed_size()).unwrap_or_default(),
@@ -188,6 +207,7 @@ impl ResourcePackZipLoader {
         reader.read_to_end(&mut buffer).await?;
         let mut cursor = Cursor::new(buffer);
 
+        let mut context = context.lock().await;
         let nested_loader = context.loader().with_asset_type::<A>();
         let direct_loader = nested_loader.direct().with_reader(&mut cursor);
         let loaded_asset = direct_loader.load(path.to_string()).await?;
