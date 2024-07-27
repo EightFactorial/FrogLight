@@ -4,7 +4,7 @@ use async_zip::{
 };
 use bevy_asset::{io::Reader, Asset, AssetLoader, AsyncReadExt, Handle, LoadContext};
 use bevy_log::error;
-use bevy_tasks::IoTaskPool;
+use bevy_tasks::AsyncComputeTaskPool;
 use froglight_common::ResourceKey;
 use futures_lite::io::Cursor;
 use parking_lot::{Mutex, RwLock};
@@ -62,6 +62,9 @@ impl ResourcePackZipLoader {
         let mut resourcepack = ResourcePack::default();
         let mut meta = ResourcePackMeta::default();
 
+        #[cfg(debug_assertions)]
+        let instant = std::time::Instant::now();
+
         {
             let context = async_lock::Mutex::new(&mut *context);
             let resourcepack = RwLock::new(&mut resourcepack);
@@ -71,7 +74,12 @@ impl ResourcePackZipLoader {
             let resourcepack_ref = &resourcepack;
             let meta_ref = &meta;
 
-            IoTaskPool::get().scope(|pool| {
+            // Spawn a task on the `AsyncComputeTaskPool` for each entry that should be
+            // read.
+            //
+            // Normally this would use the `IoTaskPool`, but since this is decompressing
+            // zip file entries this is a better fit for the `AsyncComputeTaskPool`.
+            AsyncComputeTaskPool::get().scope(|pool| {
                 pool.spawn(async {
                     // Iterate over each entry in the zip file.
                     for index in 0..zip.file().entries().len() {
@@ -79,6 +87,7 @@ impl ResourcePackZipLoader {
                             continue;
                         };
 
+                        // If the entry should be read, spawn a task and add it to the ResourcePack
                         if let Some((key, kind)) = Self::should_read(reader.entry()) {
                             pool.spawn(async move {
                                 // Print an error if the entry could not be read, but continue.
@@ -104,6 +113,13 @@ impl ResourcePackZipLoader {
             });
         }
 
+        #[cfg(debug_assertions)]
+        bevy_log::debug!(
+            "ResourcePack: \"{}\" {}ms",
+            context.path().display(),
+            instant.elapsed().as_millis()
+        );
+
         // Add the `ResourcePackMeta` to the `ResourcePack`.
         let meta = context.add_labeled_asset(String::from("pack.mcmeta"), meta);
         resourcepack.meta = meta;
@@ -111,6 +127,7 @@ impl ResourcePackZipLoader {
         Ok(resourcepack)
     }
 
+    #[inline]
     fn should_read(entry: &ZipEntry) -> Option<(ResourceKey, EntryType)> {
         if entry.dir().ok()? {
             return None;
@@ -143,7 +160,6 @@ impl ResourcePackZipLoader {
         }
     }
 
-    #[allow(clippy::unused_async)]
     async fn add_to_resourcepack(
         key: ResourceKey,
         kind: EntryType,
@@ -195,7 +211,7 @@ impl ResourcePackZipLoader {
     }
 
     /// Loads an asset from a zip entry.
-    // TODO: Fix needing to use a buffer here.
+    #[inline]
     async fn load_asset<A: Asset>(
         path: &str,
         reader: &mut ZipEntryReader<'_, Cursor<&[u8]>, WithEntry<'_>>,

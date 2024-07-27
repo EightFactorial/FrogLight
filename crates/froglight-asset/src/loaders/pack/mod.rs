@@ -20,6 +20,7 @@ enum EntryType {
 impl EntryType {
     /// Gets the type of an entry from its path.
     #[must_use]
+    #[inline]
     fn from_path(path: &str) -> Option<Self> {
         // Check for `pack.mcmeta` and `pack.png`.
         match path {
