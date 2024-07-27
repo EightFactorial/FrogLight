@@ -1,11 +1,12 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     asset::AssetPlugin as BevyAssetPlugin,
+    core::TaskPoolPlugin,
     DefaultPlugins as BevyDefaultPlugins,
 };
 use froglight_asset::AssetSourcePlugin;
 
-use super::{BasicPlugins, ClientPlugins};
+use super::{BasicPlugins, ClientPlugins, TASKPOOL_SETTINGS};
 
 /// A [`PluginGroup`] for creating a custom client.
 ///
@@ -66,6 +67,10 @@ impl PluginGroup for ApplicationPlugins {
         builder = builder.add_group(BevyDefaultPlugins);
         builder = builder.add_group(BasicPlugins).add_group(ClientPlugins);
 
+        // Configure the `TaskPoolPlugin`
+        builder = builder.set(TaskPoolPlugin { task_pool_options: TASKPOOL_SETTINGS });
+
+        // Add `AssetSourcePlugin` before `BevyAssetPlugin`
         builder.add_before::<BevyAssetPlugin, _>(AssetSourcePlugin::default())
     }
 }
