@@ -256,7 +256,7 @@ impl ElementFace {
 
     pub fn uvs_from(&self) -> Option<[[f32; 2]; 4]> {
         self.uv.map(|mut uv| {
-            uv.rotate_right((self.rotation / 90) as usize % 4);
+            uv.rotate_right(((self.rotation / 90) as usize + 2) % 4);
             [
                 [uv[0] / 16f32, uv[1] / 16f32],
                 [uv[2] / 16f32, uv[1] / 16f32],

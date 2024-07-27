@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use bevy_app::App;
 use bevy_asset::{Asset, AssetApp, AssetId, Assets, Handle, ReflectAsset, ReflectHandle};
-use bevy_derive::Deref;
+use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{
     reflect::ReflectResource,
     system::{Commands, ResMut, Resource},
@@ -198,16 +198,12 @@ impl BlockModelData {
 /// A [`Vec`] used to store [`Handle::Strong`] references to [`BlockModel`]s.
 ///
 /// Without this, [`BlockModel`]s would unload when they are no longer in use.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource, Deref, DerefMut)]
 #[reflect(Default, Resource)]
 pub(crate) struct BlockModelStorage {
-    pub(crate) models: Vec<Handle<BlockModel>>,
-    pub(crate) meshes: Vec<Handle<Mesh>>,
+    models: Vec<Handle<BlockModel>>,
 }
 impl BlockModelStorage {
     /// Clear the [`BlockModelStorage`].
-    fn clear(mut res: ResMut<Self>) {
-        res.models.clear();
-        res.meshes.clear();
-    }
+    fn clear(mut res: ResMut<Self>) { res.clear(); }
 }

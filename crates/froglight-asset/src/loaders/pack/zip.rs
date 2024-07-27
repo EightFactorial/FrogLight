@@ -182,13 +182,15 @@ impl ResourcePackZipLoader {
         reader: &mut ZipEntryReader<'_, BufReader<&mut Reader<'_>>, WithEntry<'_>>,
         context: &mut LoadContext<'_>,
     ) -> Result<Handle<A>, ResourcePackZipError> {
-        let mut buffer = Vec::new();
+        let mut buffer = Vec::with_capacity(
+            usize::try_from(reader.entry().uncompressed_size()).unwrap_or_default(),
+        );
         reader.read_to_end(&mut buffer).await?;
         let mut cursor = Cursor::new(buffer);
 
-        let loader = context.loader().with_asset_type::<A>();
-        let loader = loader.direct().with_reader(&mut cursor);
-        let asset = loader.load(path.to_string()).await?;
-        Ok(context.add_loaded_labeled_asset(path.to_string(), asset))
+        let nested_loader = context.loader().with_asset_type::<A>();
+        let direct_loader = nested_loader.direct().with_reader(&mut cursor);
+        let loaded_asset = direct_loader.load(path.to_string()).await?;
+        Ok(context.add_loaded_labeled_asset(path.to_string(), loaded_asset))
     }
 }

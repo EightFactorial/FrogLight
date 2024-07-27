@@ -8,7 +8,7 @@ use bevy_ecs::{
     schedule::IntoSystemConfigs,
     system::{Res, ResMut, Resource},
 };
-use bevy_log::error;
+use bevy_log::{error, warn};
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::{
     mesh::{Indices, Mesh, PrimitiveTopology, VertexAttributeValues},
@@ -223,12 +223,19 @@ impl BlockModelState {
                                     texture_rect.max.x / texture_size.x,
                                 );
                                 uv[1] = uv[1].remap(
-                                    1.0,
                                     0.0,
+                                    1.0,
                                     texture_rect.min.y / texture_size.y,
                                     texture_rect.max.y / texture_size.y,
                                 );
                             }
+                        } else {
+                            #[cfg(debug_assertions)]
+                            warn!(
+                                "BlockModel: \"{key}\" has no texture for {direction}: \"{:?}\"",
+                                element_face.texture
+                            );
+                            continue;
                         }
 
                         // Add the element to the face
@@ -242,6 +249,10 @@ impl BlockModelState {
                         Self::insert_mesh_data(positions, uvs, &mut model, *direction);
                     }
                 }
+            } else {
+                #[cfg(debug_assertions)]
+                warn!("BlockModel: \"{key}\" has no elements");
+                continue;
             }
 
             #[cfg(debug_assertions)]
@@ -253,19 +264,24 @@ impl BlockModelState {
             catalog_mesh_queue.push((key.clone(), mesh.id()));
 
             // Insert the `BlockModel` into the asset storage
-            let model = models.add(BlockModel { mesh: mesh.clone(), transforms });
+            let model = models.add(BlockModel { mesh, transforms });
             // Add the `BlockModel` to the `AssetCatalog` queue
             catalog_block_queue.push((key.clone(), model.id()));
 
             // Insert the `BlockModelData` into the `BlockDataStorage`
             storage.model_data.insert(
                 key.clone(),
-                BlockModelData { ambient_occlusion: true, asset_id: model.id(), faces },
+                BlockModelData {
+                    ambient_occlusion: definition
+                        .ambient_occlusion
+                        .unwrap_or(BlockModelDefinition::DEFAULT_AMBIENT_OCCLUSION),
+                    asset_id: model.id(),
+                    faces,
+                },
             );
 
-            // Insert the `BlockModel` and `Mesh` handles into the `BlockModelStorage`
-            handles.models.push(model);
-            handles.meshes.push(mesh);
+            // Insert the `BlockModel` handle into the `BlockModelStorage`
+            handles.push(model);
         }
 
         // Add the queued `BlockModel`s to the `AssetCatalog`
