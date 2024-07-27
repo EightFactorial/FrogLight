@@ -8,7 +8,7 @@ use bevy_ecs::{
     schedule::IntoSystemConfigs,
     system::{Res, ResMut, Resource},
 };
-use bevy_log::{error, warn};
+use bevy_log::error;
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::{
     mesh::{Indices, Mesh, PrimitiveTopology, VertexAttributeValues},
@@ -231,7 +231,7 @@ impl BlockModelState {
                             }
                         } else {
                             #[cfg(debug_assertions)]
-                            warn!(
+                            bevy_log::warn!(
                                 "BlockModel: \"{key}\" has no texture for {direction}: \"{:?}\"",
                                 element_face.texture
                             );
@@ -251,7 +251,7 @@ impl BlockModelState {
                 }
             } else {
                 #[cfg(debug_assertions)]
-                warn!("BlockModel: \"{key}\" has no elements");
+                bevy_log::warn!("BlockModel: \"{key}\" has no elements");
                 continue;
             }
 
@@ -305,6 +305,9 @@ impl BlockModelState {
                 untyped_meshes.insert(key, id.untyped());
             }
         }
+
+        // Remove all `BlockModelDefinition`s from the `AssetCatalog`
+        catalog.inner.remove(&TypeId::of::<BlockModelDefinition>());
 
         #[cfg(debug_assertions)]
         bevy_log::info!("AssetCatalog: Finished Generating BlockModels");
