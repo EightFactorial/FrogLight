@@ -5,12 +5,13 @@ use bevy_asset::{Asset, Assets};
 use bevy_ecs::{
     entity::Entity,
     prelude::any_with_component,
-    query::Changed,
+    query::{Changed, QueryFilter, QueryParIter},
     schedule::IntoSystemConfigs,
-    system::{Commands, Query, Res, ResMut},
+    system::{Local, ParallelCommands, Query, Res, ResMut},
 };
 use bevy_log::error;
 use bevy_state::state::OnEnter;
+use parking_lot::RwLock;
 
 use super::{catalog::UntypedAssetMap, systemset::AssetKeyRefreshSet, AssetCatalog, AssetKey};
 use crate::AssetState;
@@ -50,40 +51,74 @@ fn any_keys_changed<A: Asset>(query: Query<(), Changed<AssetKey<A>>>) -> bool { 
 fn refresh_changed_asset_keys<A: Asset>(
     query: Query<(Entity, &AssetKey<A>), Changed<AssetKey<A>>>,
     catalog: Res<AssetCatalog>,
+    commands: ParallelCommands,
+
     mut assets: ResMut<Assets<A>>,
-    mut commands: Commands,
+    local: Local<RwLock<Option<Assets<A>>>>,
 ) {
-    let Some(untyped_map) = catalog.inner.get(&TypeId::of::<A>()) else {
+    // Initialize `local`
+    if local.read().is_none() {
+        *local.write() = Some(Assets::default());
+    }
+
+    // Swap `assets` into `local`
+    std::mem::swap(local.write().as_mut().unwrap(), &mut assets);
+
+    // Refresh the keys
+    if let Some(untyped_map) = catalog.inner.get(&TypeId::of::<A>()) {
+        refresh_keys(query.par_iter(), untyped_map, &local, commands);
+    } else {
         error!("No \"{}\" Assets exist in the AssetCatalog!", A::short_type_path());
-        return;
     };
-    refresh_keys(query.iter(), untyped_map, &mut assets, &mut commands);
+
+    // Swap `local` back into `assets`
+    std::mem::swap(local.write().as_mut().unwrap(), &mut *assets);
 }
 
 /// Update the handles for all entities with an [`AssetKey`].
 fn refresh_asset_keys<A: Asset>(
     query: Query<(Entity, &AssetKey<A>)>,
     catalog: Res<AssetCatalog>,
+    commands: ParallelCommands,
+
     mut assets: ResMut<Assets<A>>,
-    mut commands: Commands,
+    local: Local<RwLock<Option<Assets<A>>>>,
 ) {
-    let Some(untyped_map) = catalog.inner.get(&TypeId::of::<A>()) else {
+    // Initialize `local`
+    if local.read().is_none() {
+        *local.write() = Some(Assets::default());
+    }
+
+    // Swap `assets` into `local`
+    std::mem::swap(local.write().as_mut().unwrap(), &mut assets);
+
+    // Refresh the keys
+    if let Some(untyped_map) = catalog.inner.get(&TypeId::of::<A>()) {
+        refresh_keys(query.par_iter(), untyped_map, &local, commands);
+    } else {
         error!("No \"{}\" Assets exist in the AssetCatalog!", A::short_type_path());
-        return;
     };
-    refresh_keys(query.iter(), untyped_map, &mut assets, &mut commands);
+
+    // Swap `local` back into `assets`
+    std::mem::swap(local.write().as_mut().unwrap(), &mut *assets);
 }
 
-fn refresh_keys<'a, A: Asset>(
-    iterator: impl Iterator<Item = (Entity, &'a AssetKey<A>)>,
+/// Create [`Handle`](bevy_asset::Handle)s for all entities with an
+/// [`AssetKey`].
+///
+/// Runs in parallel using a [`QueryParIter`].
+fn refresh_keys<'a, A: Asset, F: QueryFilter>(
+    iterator: QueryParIter<'a, 'a, (Entity, &AssetKey<A>), F>,
     untyped_map: &UntypedAssetMap,
-    assets: &mut Assets<A>,
-    commands: &mut Commands,
+    assets: &RwLock<Option<Assets<A>>>,
+    commands: ParallelCommands,
 ) {
-    for (entity, key) in iterator {
+    iterator.for_each(|(entity, key)| {
         if let Some(untyped_id) = untyped_map.get(key.as_ref()) {
-            if let Some(asset_handle) =
-                assets.get_strong_handle(untyped_id.typed_debug_checked::<A>())
+            if let Some(asset_handle) = assets
+                .write()
+                .as_mut()
+                .and_then(|a| a.get_strong_handle(untyped_id.typed_debug_checked::<A>()))
             {
                 #[cfg(debug_assertions)]
                 bevy_log::trace!(
@@ -93,7 +128,9 @@ fn refresh_keys<'a, A: Asset>(
                     asset_handle.id()
                 );
 
-                commands.entity(entity).insert(asset_handle);
+                commands.command_scope(|mut commands| {
+                    commands.entity(entity).insert(asset_handle);
+                });
             } else {
                 error!(
                     "AssetKey::<{}>: \"{}\" refers to an asset that does not exist!",
@@ -108,5 +145,5 @@ fn refresh_keys<'a, A: Asset>(
                 key.as_ref()
             );
         }
-    }
+    });
 }

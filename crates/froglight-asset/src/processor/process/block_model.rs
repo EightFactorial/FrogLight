@@ -260,7 +260,7 @@ impl BlockModelState {
 
             // Insert the `BlockModel` Mesh into the asset storage
             let mesh = meshes.add(model);
-            // Inser the `BlockModel` into the `AssetCatalog` queue
+            // Insert the `BlockModel` into the `AssetCatalog` queue
             catalog_mesh_queue.push((key.clone(), mesh.id()));
 
             // Insert the `BlockModel` into the asset storage
