@@ -91,15 +91,16 @@ impl Default for OverlayCameraBundle {
     }
 }
 
-/// A [`Component`] that adds the [`OverlayCamera`] render layer to an entity.
+/// A [`Component`] that adds the [`OverlayCamera::RENDER_LAYER`] to an entity.
 ///
-/// This component is not required, it's just for convenience.
+/// If the entity has no existing [`RenderLayers`],
+/// it will only be rendered by the [`OverlayCamera`].
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
 #[reflect(Default, Component)]
 pub struct OverlayCameraLayer;
 
 impl Component for OverlayCameraLayer {
-    const STORAGE_TYPE: StorageType = StorageType::Table;
+    const STORAGE_TYPE: StorageType = StorageType::SparseSet;
     fn register_component_hooks(hooks: &mut ComponentHooks) {
         hooks.on_insert(OverlayCameraLayer::on_insert).on_remove(OverlayCameraLayer::on_remove);
     }
@@ -126,8 +127,7 @@ impl OverlayCameraLayer {
             // If `RenderLayers` contains `OverlayCamera::RENDER_LAYER`, remove the layer.
             if layers.intersects(&OverlayCamera::RENDER_LAYERS) {
                 let without = layers.clone().without(OverlayCamera::RENDER_LAYER);
-
-                if without.iter().count() == 0 {
+                if without.iter().next().is_none() {
                     // If `RenderLayers` is empty, remove it.
                     world.commands().entity(entity).remove::<RenderLayers>();
                 } else {

@@ -87,15 +87,16 @@ impl Default for ModelCameraBundle {
     }
 }
 
-/// A [`Component`] that adds the [`ModelCamera`] render layer to an entity.
+/// A [`Component`] that adds the [`ModelCamera::RENDER_LAYER`] to an entity.
 ///
-/// This component is not required, it's just for convenience.
+/// If the entity has no existing [`RenderLayers`],
+/// it will only be rendered by the [`ModelCamera`].
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect)]
 #[reflect(Default, Component)]
 pub struct ModelCameraLayer;
 
 impl Component for ModelCameraLayer {
-    const STORAGE_TYPE: StorageType = StorageType::Table;
+    const STORAGE_TYPE: StorageType = StorageType::SparseSet;
     fn register_component_hooks(hooks: &mut ComponentHooks) {
         hooks.on_insert(ModelCameraLayer::on_insert).on_remove(ModelCameraLayer::on_remove);
     }
@@ -122,8 +123,7 @@ impl ModelCameraLayer {
             // If `RenderLayers` contains `ModelCamera::RENDER_LAYER`, remove the layer.
             if layers.intersects(&ModelCamera::RENDER_LAYERS) {
                 let without = layers.clone().without(ModelCamera::RENDER_LAYER);
-
-                if without.iter().count() == 0 {
+                if without.iter().next().is_none() {
                     // If `RenderLayers` is empty, remove it.
                     world.commands().entity(entity).remove::<RenderLayers>();
                 } else {
