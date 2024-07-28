@@ -3,18 +3,22 @@
 
 use bevy::app::{PluginGroup, PluginGroupBuilder};
 
+pub mod camera;
+use camera::CameraPlugin;
+
 pub mod loading_screen;
 use loading_screen::LoadingScreenPlugin;
 
 /// A [`PluginGroup`] that contains all of the interface plugins.
 ///
 /// Includes:
+/// - [`CameraPlugin`]
 /// - [`LoadingScreenPlugin`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct InterfacePlugins;
 
 impl PluginGroup for InterfacePlugins {
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>().add(LoadingScreenPlugin)
+        PluginGroupBuilder::start::<Self>().add(CameraPlugin).add(LoadingScreenPlugin)
     }
 }

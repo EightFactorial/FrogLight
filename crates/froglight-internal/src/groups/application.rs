@@ -56,6 +56,7 @@ use super::{BasicPlugins, ClientPlugins, TASKPOOL_SETTINGS};
 /// - [`AssetLoaderPlugin`](crate::prelude::plugins::AssetLoaderPlugin)
 /// - [`AssetProcessorPlugin`](crate::prelude::plugins::AssetProcessorPlugin)
 /// - [`AssetCatalogPlugin`](crate::prelude::plugins::AssetCatalogPlugin)
+/// - [`CameraPlugin`](crate::prelude::plugins::CameraPlugin)
 /// - [`LoadingScreenPlugin`](crate::prelude::plugins::LoadingScreenPlugin)
 /// - [`EntropyPlugin`](bevy_rand::plugin::EntropyPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
