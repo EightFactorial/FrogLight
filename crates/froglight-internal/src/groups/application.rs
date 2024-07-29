@@ -58,6 +58,7 @@ use super::{BasicPlugins, ClientPlugins, TASKPOOL_SETTINGS};
 /// - [`AssetCatalogPlugin`](crate::prelude::plugins::AssetCatalogPlugin)
 /// - [`CameraPlugin`](crate::prelude::plugins::CameraPlugin)
 /// - [`LoadingScreenPlugin`](crate::prelude::plugins::LoadingScreenPlugin)
+/// - [`RenderPlugin`](crate::prelude::plugins::RenderPlugin)
 /// - [`EntropyPlugin`](bevy_rand::plugin::EntropyPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ApplicationPlugins;

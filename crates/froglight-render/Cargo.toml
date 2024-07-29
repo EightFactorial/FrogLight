@@ -16,4 +16,5 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy = { workspace = true }
+bevy = { workspace = true, features = ["default"] }
+froglight-asset = { version = "0.1.0", path = "../froglight-asset" }

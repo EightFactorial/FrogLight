@@ -11,4 +11,6 @@ pub use froglight_interface::{
     camera::CameraPlugin, loading_screen::LoadingScreenPlugin, InterfacePlugins,
 };
 pub use froglight_network::{network::NetworkPlugin, resolver::ResolverPlugin, NetworkPlugins};
+#[cfg(feature = "client")]
+pub use froglight_render::RenderPlugin;
 pub use froglight_utils::UtilityPlugin;
