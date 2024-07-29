@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{collections::BTreeMap, sync::Arc};
 
 use bevy_app::App;
 use bevy_asset::{Asset, AssetApp, AssetId, Assets, Handle, ReflectAsset, ReflectHandle};
@@ -8,7 +8,9 @@ use bevy_ecs::{
     system::{Commands, ResMut, Resource},
 };
 use bevy_reflect::{prelude::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
-use bevy_render::mesh::Mesh;
+use bevy_render::mesh::{
+    Indices, Mesh, MeshVertexAttribute, MeshVertexAttributeId, VertexAttributeValues,
+};
 use bevy_sprite::TextureAtlasLayout;
 use bevy_state::state::OnExit;
 use bevy_transform::components::Transform;
@@ -112,6 +114,172 @@ impl From<usize> for ModelTransformIndex {
     }
 }
 
+// --- Block Data ---
+
+/// Get the block model data for a given [`BlockModel`].
+#[derive(Debug)]
+pub struct BlockModelData {
+    /// The [`AssetId`] of the [`BlockModel`].
+    pub asset_id: AssetId<BlockModel>,
+
+    /// Whether ambient occlusion is enabled.
+    pub ambient_occlusion: bool,
+
+    /// The faces of the [`BlockModel`].
+    ///
+    /// Indexed by [`Direction`].
+    pub faces: [ModelFaceData; 6],
+}
+
+impl BlockModelData {
+    /// Get the face of the block model in a given [`Direction`].
+    #[must_use]
+    pub fn get_face(&self, direction: Direction) -> &ModelFaceData {
+        &self.faces[usize::from(direction)]
+    }
+
+    /// Get the face of the block model in a given [`Direction`] mutably.
+    #[must_use]
+    pub fn get_face_mut(&mut self, direction: Direction) -> &mut ModelFaceData {
+        &mut self.faces[usize::from(direction)]
+    }
+}
+
+/// The data for a face of a [`BlockModel`].
+#[derive(Debug)]
+pub struct ModelFaceData {
+    /// The attributes of the face.
+    pub attributes: BTreeMap<MeshVertexAttributeId, (MeshVertexAttribute, VertexAttributeValues)>,
+    /// The indices of the face.
+    pub indices: Indices,
+}
+
+impl Default for ModelFaceData {
+    fn default() -> Self {
+        Self { attributes: BTreeMap::default(), indices: Indices::U32(Vec::new()) }
+    }
+}
+
+impl ModelFaceData {
+    /// Append [`MeshVertexAttribute`] data to the [`ModelFaceData`].
+    pub fn append_to_face(
+        &mut self,
+        attribute: MeshVertexAttribute,
+        values: VertexAttributeValues,
+    ) {
+        if let Some((_, face_attr)) = self.attributes.get_mut(&attribute.id) {
+            Self::append_face_to_values(face_attr, values);
+        } else {
+            self.attributes.insert(attribute.id, (attribute, values));
+        }
+    }
+
+    /// Append the [`ModelFaceData`] to a [`Mesh`].
+    ///
+    /// If the mesh does not have an attribute, it will be added.
+    ///
+    /// If the mesh does not have indices, they will be added.
+    pub fn append_to_mesh(&self, mesh: &mut Mesh) {
+        // Append the attributes
+        for (attr_id, (attr, values)) in &self.attributes {
+            if let Some(mesh_attr) = mesh.attribute_mut(*attr_id) {
+                Self::append_face_to_values(mesh_attr, values.clone());
+            } else {
+                mesh.insert_attribute(attr.clone(), values.clone());
+            }
+        }
+
+        // Append the indices
+        match (mesh.indices_mut(), self.indices.clone()) {
+            (Some(Indices::U32(mesh_ind)), Indices::U32(indices)) => {
+                mesh_ind.extend(indices);
+            }
+            (Some(Indices::U16(mesh_ind)), Indices::U16(indices)) => {
+                mesh_ind.extend(indices);
+            }
+            (None, indices) => {
+                mesh.insert_indices(indices);
+            }
+            _ => {}
+        }
+    }
+
+    /// Append the attribute data to the [`VertexAttributeValues`].
+    fn append_face_to_values(mesh_attr: &mut VertexAttributeValues, values: VertexAttributeValues) {
+        match (mesh_attr, values) {
+            (VertexAttributeValues::Float32(a), VertexAttributeValues::Float32(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint32(a), VertexAttributeValues::Sint32(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint32(a), VertexAttributeValues::Uint32(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Float32x2(a), VertexAttributeValues::Float32x2(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint32x2(a), VertexAttributeValues::Sint32x2(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint32x2(a), VertexAttributeValues::Uint32x2(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Float32x3(a), VertexAttributeValues::Float32x3(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint32x3(a), VertexAttributeValues::Sint32x3(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint32x3(a), VertexAttributeValues::Uint32x3(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Float32x4(a), VertexAttributeValues::Float32x4(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint32x4(a), VertexAttributeValues::Sint32x4(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint32x4(a), VertexAttributeValues::Uint32x4(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint16x2(a), VertexAttributeValues::Sint16x2(b))
+            | (VertexAttributeValues::Snorm16x2(a), VertexAttributeValues::Snorm16x2(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint16x2(a), VertexAttributeValues::Uint16x2(b))
+            | (VertexAttributeValues::Unorm16x2(a), VertexAttributeValues::Unorm16x2(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint16x4(a), VertexAttributeValues::Sint16x4(b))
+            | (VertexAttributeValues::Snorm16x4(a), VertexAttributeValues::Snorm16x4(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint16x4(a), VertexAttributeValues::Uint16x4(b))
+            | (VertexAttributeValues::Unorm16x4(a), VertexAttributeValues::Unorm16x4(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint8x2(a), VertexAttributeValues::Sint8x2(b))
+            | (VertexAttributeValues::Snorm8x2(a), VertexAttributeValues::Snorm8x2(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint8x2(a), VertexAttributeValues::Uint8x2(b))
+            | (VertexAttributeValues::Unorm8x2(a), VertexAttributeValues::Unorm8x2(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Sint8x4(a), VertexAttributeValues::Sint8x4(b))
+            | (VertexAttributeValues::Snorm8x4(a), VertexAttributeValues::Snorm8x4(b)) => {
+                a.extend(b);
+            }
+            (VertexAttributeValues::Uint8x4(a), VertexAttributeValues::Uint8x4(b))
+            | (VertexAttributeValues::Unorm8x4(a), VertexAttributeValues::Unorm8x4(b)) => {
+                a.extend(b);
+            }
+            _ => panic!("Attribute Value Mismatch"),
+        }
+    }
+}
+
 // --- Block Data Storage ---
 
 /// Storage for block data.
@@ -166,33 +334,6 @@ pub struct BlockDataStorageInner {
     pub block_atlas: TextureAtlasLayout,
 }
 
-/// Get the block model data for a given [`BlockModel`].
-#[derive(Debug)]
-pub struct BlockModelData {
-    /// The [`AssetId`] of the [`BlockModel`].
-    pub asset_id: AssetId<BlockModel>,
-
-    /// The faces of the [`BlockModel`].
-    ///
-    /// Indexed by [`Direction`].
-    pub faces: [Mesh; 6],
-
-    /// Whether ambient occlusion is enabled.
-    pub ambient_occlusion: bool,
-}
-
-impl BlockModelData {
-    /// Get the face of the block model in a given [`Direction`].
-    #[must_use]
-    pub fn get_face(&self, direction: Direction) -> &Mesh { &self.faces[usize::from(direction)] }
-
-    /// Get the face of the block model in a given [`Direction`] mutably.
-    #[must_use]
-    pub fn get_face_mut(&mut self, direction: Direction) -> &mut Mesh {
-        &mut self.faces[usize::from(direction)]
-    }
-}
-
 // --- Handle Storage ---
 
 /// A [`Vec`] used to store [`Handle::Strong`] references to [`BlockModel`]s.
@@ -201,7 +342,7 @@ impl BlockModelData {
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Resource, Deref, DerefMut)]
 #[reflect(Default, Resource)]
 pub(crate) struct BlockModelStorage {
-    models: Vec<Handle<BlockModel>>,
+    inner: Vec<Handle<BlockModel>>,
 }
 impl BlockModelStorage {
     /// Clear the [`BlockModelStorage`].
