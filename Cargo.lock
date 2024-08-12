@@ -1055,9 +1055,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_mod_debugdump"
-version = "0.11.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9651b4fb528d1c4800a8da0a5819ebeffb32933654d13e0aa5b6a738146b7f15"
+checksum = "30f0eab3099d7d474b25a95a6a2a945e6089d75e099af5a571fe896f7c1a455b"
 dependencies = [
  "bevy_app",
  "bevy_color",
