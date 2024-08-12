@@ -19,7 +19,7 @@ FrogLight is currently in a **very early alpha state**. Not everything is functi
 ## Version Support
 
 FrogLight supports multiple versions, including:
-- 1.21.0
+- 1.21.0 - 1.21.1
 
 > [!Note]
 > Support for other versions will be added after most development is done.
