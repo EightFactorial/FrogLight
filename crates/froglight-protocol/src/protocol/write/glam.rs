@@ -10,13 +10,12 @@ macro_rules! impl_write_glam {
     ($ty:ty, $parts:ty) => {
         impl FrogWrite for $ty {
             fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+                // Convert the inner values to big-endian
                 let mut values: $parts = bytemuck::must_cast(*self);
                 values.iter_mut().for_each(|v| *v = v.to_be());
 
-                buf.write_all(&bytemuck::must_cast::<$parts, [u8; std::mem::size_of::<$parts>()]>(
-                    values,
-                ))
-                .map_err(WriteError::Io)
+                // Write the bytes to the buffer
+                buf.write_all(bytemuck::must_cast_slice::<_, u8>(&values)).map_err(WriteError::Io)
             }
         }
     };

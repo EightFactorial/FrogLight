@@ -6,7 +6,7 @@ macro_rules! impl_float_write {
             impl FrogWrite for $ty {
                 #[inline]
                 fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
-                    Ok(buf.write_all(&self.to_be_bytes())?)
+                    buf.write_all(&self.to_be_bytes()).map_err(WriteError::Io)
                 }
             }
         )*

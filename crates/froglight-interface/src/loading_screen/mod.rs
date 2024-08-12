@@ -6,7 +6,6 @@ pub mod elements;
 
 mod child;
 
-
 mod screen;
 pub use screen::LoadingScreen;
 
