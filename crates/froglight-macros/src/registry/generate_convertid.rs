@@ -21,7 +21,7 @@ pub(crate) fn generate_convertid(tokens: proc_macro::TokenStream) -> TokenStream
                 #index => Some(Self::#entry),
             });
             to_tokens.extend(quote! {
-                Self::#entry => #index,
+                Self::#entry => Some(#index),
             });
         }
 
@@ -33,9 +33,10 @@ pub(crate) fn generate_convertid(tokens: proc_macro::TokenStream) -> TokenStream
                         _ => None,
                     }
                 }
-                fn to_id(&self) -> u32 {
+                fn to_id(&self) -> Option<u32> {
                     match self {
                         #to_tokens
+                        _ => None,
                     }
                 }
             }
