@@ -14,8 +14,10 @@ pub struct SerdeJsonLoader<A: Asset + DeserializeOwned> {
 /// An error that can occur when loading an asset with [`SerdeJsonLoader`].
 #[derive(Debug, thiserror::Error)]
 pub enum SerdeJsonLoaderError {
+    /// An I/O error occurred while reading the asset.
     #[error(transparent)]
     Io(#[from] std::io::Error),
+    /// A deserialization error occurred while parsing the asset.
     #[error(transparent)]
     Serde(#[from] serde_json::Error),
 }

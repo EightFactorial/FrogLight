@@ -1,48 +1,81 @@
+//! [`ResourcePackMeta`], and other related types.
 #![allow(clippy::used_underscore_binding)]
 
-use bevy_asset::{Asset, Handle, ReflectAsset};
-use bevy_derive::{Deref, DerefMut};
+use bevy_app::App;
+use bevy_asset::{Asset, AssetApp, Handle, ReflectAsset, ReflectHandle};
 use bevy_reflect::{prelude::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
 use bevy_render::texture::Image;
 use bevy_utils::HashMap;
 use serde::{Deserialize, Serialize};
 
+#[allow(unused_imports)]
+use crate::assets::ResourcePack;
+
+#[doc(hidden)]
+pub(super) fn build(app: &mut App) {
+    app.init_asset::<ResourcePackMeta>();
+
+    app.register_type::<ResourcePackMeta>()
+        .register_type::<Handle<ResourcePackMeta>>()
+        .register_type_data::<Handle<ResourcePackMeta>, ReflectHandle>();
+}
+
 /// Metadata about a [`ResourcePack`].
 ///
-/// Read from the `pack.mcmeta` and `pack.png` files.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Asset)]
+/// Created from a [`PackMcMeta`] and an optional icon.
+#[derive(Debug, Default, Clone, PartialEq, Eq, Asset, Reflect)]
 #[reflect(Default, Asset)]
 pub struct ResourcePackMeta {
     /// The [`ResourcePack`]'s icon.
     pub icon: Option<Handle<Image>>,
 
-    /// Metadata about the [`ResourcePack`].
+    /// The [`ResourcePack`]'s metadata.
     pub mcmeta: PackMcMeta,
 }
 
+impl From<PackMcMeta> for ResourcePackMeta {
+    fn from(mcmeta: PackMcMeta) -> Self { ResourcePackMeta { icon: None, mcmeta } }
+}
+
 /// Metadata about a [`ResourcePack`].
+///
+/// Read from the `pack.mcmeta` file.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Serialize, Deserialize)]
 #[reflect(Default, Serialize, Deserialize)]
 pub struct PackMcMeta {
+    /// The pack's information.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pack: Option<PackInformation>,
+
+    /// The pack's filters.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[reflect(ignore)]
     pub filter: Option<PackFilters>,
+
+    /// The pack's overlays.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[reflect(ignore)]
     pub overlays: Option<PackOverlays>,
+
+    /// The pack's supported languages.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub language: Option<PackLanguages>,
+    pub language: Option<HashMap<String, PackLanguage>>,
 }
 
 /// Information about a [`ResourcePack`].
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Serialize, Deserialize)]
 #[reflect(Default, Serialize, Deserialize)]
 pub struct PackInformation {
+    /// The pack's description.
     #[reflect(ignore)]
-    pub description: serde_json::Value,
-    pub pack_format: i32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub description: Option<serde_json::Value>,
+
+    /// The pack's format id number.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pack_format: Option<i32>,
+
+    /// The pack's supported formats.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub supported_formats: Option<SupportedFormats>,
 }
@@ -52,9 +85,17 @@ pub struct PackInformation {
 #[reflect(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum SupportedFormats {
+    /// A single format.
     Single(i32),
+    /// A range of supported formats.
     Range(i32, i32),
-    RangeCompound { min_inclusive: i32, max_inclusive: i32 },
+    /// A range of supported formats with specified bounds.
+    RangeCompound {
+        /// The minimum supported format version.
+        min_inclusive: i32,
+        /// The maximum supported format version.
+        max_inclusive: i32,
+    },
 }
 
 /// A list of filters for a [`ResourcePack`].
@@ -69,21 +110,14 @@ pub struct PackFilters {}
 #[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PackOverlays {}
 
-/// A list of languages supported by a [`ResourcePack`].
-#[derive(
-    Debug, Default, Clone, PartialEq, Eq, Reflect, Serialize, Deserialize, Deref, DerefMut,
-)]
-#[reflect(Default, Serialize, Deserialize)]
-pub struct PackLanguages {
-    #[serde(flatten)]
-    languages: HashMap<String, PackLanguage>,
-}
-
 /// A language supported by a [`ResourcePack`].
 #[derive(Debug, Default, Clone, PartialEq, Eq, Reflect, Serialize, Deserialize)]
 #[reflect(Default, Serialize, Deserialize)]
 pub struct PackLanguage {
+    /// The language's name.
     pub name: String,
+    /// The language's region.
     pub region: String,
+    /// Whether the language is bidirectional.
     pub bidirectional: bool,
 }

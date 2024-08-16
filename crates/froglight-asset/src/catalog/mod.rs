@@ -1,35 +1,29 @@
+//! A catalog of loaded assets.
+
 use bevy_app::{App, Plugin};
-use bevy_audio::AudioSource;
-use bevy_render::{mesh::Mesh, texture::Image};
+
+mod register;
 
 #[allow(clippy::module_inception)]
 mod catalog;
+mod catalog_iter;
+mod catalog_ref;
+
 pub use catalog::AssetCatalog;
+pub use catalog_iter::{CatalogIter, CatalogIterMut};
+pub use catalog_ref::{TypedCatalogMut, TypedCatalogRef};
 
 mod key;
 pub use key::AssetKey;
 
-mod register;
-mod systemset;
-
-use crate::assets::processed::{BlockModel, ResourceAtlas, SoundEvent};
-
-/// A [`Plugin`] that adds the [`AssetCatalog`] resource.
+/// A [`Plugin`] that adds the [`AssetCatalog`].
+///
+/// Allows for easy access to assets by name.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AssetCatalogPlugin;
+pub struct CatalogPlugin;
 
-impl Plugin for AssetCatalogPlugin {
+impl Plugin for CatalogPlugin {
     fn build(&self, app: &mut App) {
-        systemset::build(app);
-        catalog::build(app);
-
-        // Register the types of AssetKeys
-        register::add_systems::<Image>(app);
-        register::add_systems::<Mesh>(app);
-        register::add_systems::<AudioSource>(app);
-
-        register::add_systems::<BlockModel>(app);
-        register::add_systems::<ResourceAtlas>(app);
-        register::add_systems::<SoundEvent>(app);
+        app.register_type::<AssetCatalog>().init_resource::<AssetCatalog>();
     }
 }

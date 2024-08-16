@@ -1,23 +1,24 @@
-//! Assets loaded and processed by the game.
-//!
-//! [`unprocessed`] contains assets that are loaded from disk.
-//!
-//! [`processed`] contains assets that are processed and ready to be used.
+//! Module for asset types.
 
 use bevy_app::{App, Plugin};
 
 pub mod processed;
 
-pub mod unprocessed;
-pub use unprocessed::{ResourcePack, ResourcePackMeta, SoundDefinitionMap};
+pub mod raw;
+pub use raw::{ResourcePack, ResourcePackMeta};
 
-/// A [`Plugin`] that registers all of the asset types.
+mod serde;
+pub use serde::{SerdeJsonLoader, SerdeJsonLoaderError};
+
+/// A [`Plugin`] that adds asset types.
+///
+/// This plugin does not add asset processing systems.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AssetDefinitionPlugin;
+pub struct AssetPlugin;
 
-impl Plugin for AssetDefinitionPlugin {
+impl Plugin for AssetPlugin {
     fn build(&self, app: &mut App) {
         processed::build(app);
-        unprocessed::build(app);
+        raw::build(app);
     }
 }

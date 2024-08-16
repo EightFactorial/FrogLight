@@ -2,13 +2,18 @@
 
 #[cfg(feature = "client")]
 pub use froglight_asset::{
-    AssetCatalogPlugin, AssetDefinitionPlugin, AssetLoaderPlugin, AssetPlugins,
-    AssetProcessorPlugin, AssetSourcePlugin,
+    AssetPlugin,
+    AssetPlugins,
+    AssetSourcePlugin,
+    CatalogPlugin,
+    // AssetProcessorPlugin
 };
 pub use froglight_block::BlockPlugin;
 #[cfg(feature = "client")]
 pub use froglight_interface::{
-    camera::CameraPlugin, loading_screen::LoadingScreenPlugin, InterfacePlugins,
+    camera::CameraPlugin,
+    InterfacePlugins,
+    // loading_screen::LoadingScreenPlugin,
 };
 pub use froglight_network::{network::NetworkPlugin, resolver::ResolverPlugin, NetworkPlugins};
 #[cfg(feature = "client")]

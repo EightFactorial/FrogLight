@@ -1,99 +1,80 @@
-use std::{any::TypeId, hash::BuildHasherDefault};
+use std::any::TypeId;
 
-use bevy_app::App;
-use bevy_asset::{Asset, AssetId, Assets, Handle, UntypedAssetId};
+use bevy_asset::{Asset, Handle, UntypedHandle};
 use bevy_derive::{Deref, DerefMut};
 use bevy_ecs::{reflect::ReflectResource, system::Resource};
-use bevy_reflect::{std_traits::ReflectDefault, Reflect};
-use bevy_utils::{AHasher, Entry, HashMap, TypeIdMap};
+use bevy_reflect::Reflect;
+use bevy_utils::{HashMap, TypeIdMap};
 use froglight_common::ResourceKey;
 
-#[doc(hidden)]
-pub(super) fn build(app: &mut App) {
-    app.register_type::<AssetCatalog>().init_resource::<AssetCatalog>();
-}
+use super::{TypedCatalogMut, TypedCatalogRef};
 
-/// A catalog of assets.
-///
-/// Allows associating asset keys with asset ids.
-#[derive(Debug, Default, Resource, Reflect)]
-#[reflect(Default, Resource)]
-pub struct AssetCatalog {
-    pub(crate) inner: TypeIdMap<UntypedAssetMap>,
-}
-
-/// A map of [`ResourceKey`]s to [`UntypedAssetId`]s.
-#[derive(Debug, Default, Clone, Deref, DerefMut, Reflect)]
-pub(crate) struct UntypedAssetMap(#[reflect(ignore)] HashMap<ResourceKey, UntypedAssetId>);
-
-impl From<HashMap<ResourceKey, UntypedAssetId>> for UntypedAssetMap {
-    fn from(map: HashMap<ResourceKey, UntypedAssetId>) -> Self { Self(map) }
-}
+/// A collection of [`Asset`]s that can be accessed by name.
+#[derive(Debug, Default, Clone, PartialEq, Eq, Resource, Reflect)]
+#[reflect(Resource)]
+pub struct AssetCatalog(TypeIdMap<UntypedAssetMap>);
 
 impl AssetCatalog {
-    /// Creates a new [`AssetCatalog`].
+    /// Get a [`Handle`] to an [`Asset`] from the [`AssetCatalog`],
+    /// if it exists.
+    #[must_use]
+    pub fn get<A: Asset>(&self, asset: &str) -> Option<Handle<A>> {
+        let untyped = self.0.get(&TypeId::of::<A>())?;
+        untyped.get(asset).map(|h| h.clone().typed_debug_checked())
+    }
+
+    /// Insert an [`Asset`] into the [`AssetCatalog`].
+    pub fn insert<A: Asset>(&mut self, asset: ResourceKey, handle: Handle<A>) {
+        let untyped = self.0.entry(TypeId::of::<A>()).or_default();
+        untyped.insert(asset, handle.untyped());
+    }
+
+    /// Returns `true` if the [`AssetCatalog`] contains the asset.
+    #[must_use]
+    pub fn contains<A: Asset>(&self, asset: &str) -> bool {
+        self.0.get(&TypeId::of::<A>()).map_or(false, |m| m.contains_key(asset))
+    }
+
+    /// Returns the number of asset types in the [`AssetCatalog`].
+    #[must_use]
+    pub fn len(&self) -> usize { self.0.len() }
+
+    /// Returns `true` if the [`AssetCatalog`] is empty.
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.0.is_empty() }
+
+    /// Returns the number of assets of type `A` in the [`AssetCatalog`].
+    #[must_use]
+    pub fn asset_len<A: Asset>(&self) -> usize {
+        self.0.get(&TypeId::of::<A>()).map_or(0, |m| m.len())
+    }
+
+    /// Returns `true` if the [`AssetCatalog`] contains no assets of type `A`.
+    #[must_use]
+    pub fn asset_empty<A: Asset>(&self) -> bool {
+        self.0.get(&TypeId::of::<A>()).map_or(true, |m| m.is_empty())
+    }
+
+    /// Returns the total number of assets in the [`AssetCatalog`].
+    #[must_use]
+    pub fn asset_total(&self) -> usize { self.0.values().map(|m| m.len()).sum() }
+
+    /// Get a reference to the [`AssetCatalog`] for an [`Asset`].
     ///
-    /// Equivalent to [`AssetCatalog::default()`].
+    /// This is useful when reading many assets of the same type.
     #[must_use]
-    pub fn new() -> Self { Self::default() }
+    pub fn typed_ref<A: Asset>(&self) -> Option<TypedCatalogRef<A>> {
+        self.0.get(&TypeId::of::<A>()).map(TypedCatalogRef::new)
+    }
 
-    /// Inserts an asset into the catalog.
+    /// Get a mutable reference to the [`AssetCatalog`] for an [`Asset`].
     ///
-    /// Returns the old asset id if one existed.
-    pub fn insert<A: Asset>(
-        &mut self,
-        key: ResourceKey,
-        id: impl Into<AssetId<A>>,
-    ) -> Option<AssetId<A>> {
-        let map = self.inner.entry(TypeId::of::<A>()).or_default();
-        let old = map.insert(key, Into::<AssetId<A>>::into(id).untyped());
-        old.map(UntypedAssetId::typed_debug_checked)
-    }
-
-    /// Gets an asset from the catalog by it's key.
+    /// This is useful when modifying many assets of the same type.
     #[must_use]
-    pub fn get<A: Asset>(&self, key: &str) -> Option<AssetId<A>> {
-        let map = self.inner.get(&TypeId::of::<A>())?;
-        map.get(key).copied().map(UntypedAssetId::typed_debug_checked)
-    }
-
-    /// Creates a new [`Handle`] to the asset with the given key.
-    #[must_use]
-    pub fn create_handle<A: Asset>(&self, key: &str, assets: &mut Assets<A>) -> Option<Handle<A>> {
-        self.get::<A>(key).and_then(|id| assets.get_strong_handle(id))
-    }
-
-    /// Gets an [`Entry`] into the catalog for the given key.
-    ///
-    /// # Note
-    /// Be very careful and make sure the [`UntypedAssetId`]
-    /// is the correct type!
-    #[must_use]
-    pub fn entry<A: Asset>(
-        &mut self,
-        key: ResourceKey,
-    ) -> Entry<ResourceKey, UntypedAssetId, BuildHasherDefault<AHasher>> {
-        self.inner.entry(TypeId::of::<A>()).or_default().entry(key)
-    }
-
-    /// Removes an asset from the catalog by it's key.
-    pub fn remove<A: Asset>(&mut self, key: &str) -> Option<AssetId<A>> {
-        let map = self.inner.get_mut(&TypeId::of::<A>())?;
-        map.remove(key).map(UntypedAssetId::typed_debug_checked)
-    }
-
-    /// Returns the number of assets of type `A` in the catalog.
-    #[must_use]
-    pub fn len_of<A: Asset>(&self) -> usize {
-        self.inner.get(&TypeId::of::<A>()).map_or(0, |map| map.len())
-    }
-
-    /// Clears the catalog, removing all assets.
-    ///
-    /// Keeps the allocated memory for future use.
-    pub fn clear(&mut self) {
-        for map in self.inner.values_mut() {
-            map.clear();
-        }
+    pub fn typed_mut<A: Asset>(&mut self) -> Option<TypedCatalogMut<A>> {
+        self.0.get_mut(&TypeId::of::<A>()).map(TypedCatalogMut::new)
     }
 }
+
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Reflect)]
+pub(super) struct UntypedAssetMap(#[reflect(ignore)] HashMap<ResourceKey, UntypedHandle>);
