@@ -29,6 +29,7 @@ pub struct SoundDefinitionMap(HashMap<String, SoundDefinition>);
 
 /// A definition inside a [`SoundDefinitionMap`].
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, Reflect)]
+#[reflect(Default, Serialize, Deserialize)]
 pub struct SoundDefinition {
     /// Whether the sound should replace existing sounds.
     #[serde(default, skip_serializing_if = "Option::is_none")]

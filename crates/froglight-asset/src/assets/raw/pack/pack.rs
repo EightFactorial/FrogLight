@@ -6,7 +6,10 @@ use bevy_render::texture::Image;
 use bevy_utils::HashMap;
 use froglight_common::ResourceKey;
 
-use crate::assets::{raw::SingleLanguageMap, ResourcePackMeta};
+use crate::assets::{
+    raw::{SingleLanguageMap, SoundDefinitionMap},
+    ResourcePackMeta,
+};
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
@@ -28,6 +31,8 @@ pub struct ResourcePack {
 
     /// The [`ResourcePack`]'s sounds.
     pub sounds: HashMap<ResourceKey, Handle<AudioSource>>,
+    /// The [`ResourcePack`]'s sound maps.
+    pub sound_maps: HashMap<ResourceKey, Handle<SoundDefinitionMap>>,
 
     /// The [`ResourcePack`]'s languages.
     pub languages: HashMap<ResourceKey, Handle<SingleLanguageMap>>,

@@ -25,7 +25,7 @@ where
     fn from_id(id: u32) -> Option<Self>;
 
     /// Convert the registry value to an ID.
-    /// 
+    ///
     /// Returns `None` if the value does not match any known id.
     fn to_id(&self) -> Option<u32>;
 }
