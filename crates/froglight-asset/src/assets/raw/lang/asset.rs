@@ -1,5 +1,3 @@
-//! [`SingleLanguageMap`] and related types.
-
 use bevy_app::App;
 use bevy_asset::{Asset, AssetApp, Handle, ReflectAsset, ReflectHandle};
 use bevy_derive::{Deref, DerefMut};

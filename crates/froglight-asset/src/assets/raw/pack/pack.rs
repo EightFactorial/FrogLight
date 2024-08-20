@@ -1,7 +1,7 @@
 use bevy_app::App;
 use bevy_asset::{Asset, AssetApp, Handle, ReflectAsset, ReflectHandle};
 use bevy_audio::AudioSource;
-use bevy_reflect::Reflect;
+use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::texture::Image;
 use bevy_utils::HashMap;
 use froglight_common::ResourceKey;
@@ -21,7 +21,7 @@ pub(super) fn build(app: &mut App) {
 
 /// A resource pack.
 #[derive(Debug, Default, Clone, Asset, Reflect)]
-#[reflect(Asset)]
+#[reflect(Default, Asset)]
 pub struct ResourcePack {
     /// The [`ResourcePack`]'s metadata.
     pub meta: Handle<ResourcePackMeta>,
