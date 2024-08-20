@@ -1,7 +1,6 @@
 use async_zip::base::read::seek::ZipFileReader;
-use bevy_asset::{io::Reader, AssetLoader, LoadContext};
+use bevy_asset::{io::Reader, AssetLoader, LoadContext, LoadedAsset};
 use bevy_log::error;
-use bevy_render::texture::Image;
 use futures_lite::io::BufReader;
 
 use crate::assets::{
@@ -39,59 +38,54 @@ impl ResourcePackMetaZipLoader {
         context: &mut LoadContext<'_>,
     ) -> Result<ResourcePackMeta, ResourcePackLoaderError> {
         let mut zip = ZipFileReader::new(BufReader::new(reader)).await?;
-        Self::read_pack_metadata_zip(&mut zip, context).await
-    }
 
-    pub(crate) async fn read_pack_metadata_zip(
-        zip: &mut ZipFileReader<BufReader<&mut Reader<'_>>>,
-        context: &mut LoadContext<'_>,
-    ) -> Result<ResourcePackMeta, ResourcePackLoaderError> {
-        // Load the `pack.png` icon if it exists.
-        let mut icon_handle = None;
-        if let Some(icon_index) = zip.file().entries().iter().position(|entry| {
-            entry.filename().as_str().map_or(false, |filename| filename == "pack.png")
-        }) {
-            let mut icon_reader = zip.reader_with_entry(icon_index).await?;
-            let loaded_icon =
-                ResourcePackZipLoader::load_zipped_asset(&mut icon_reader, context).await?;
-            icon_handle = Some(
-                context.add_loaded_labeled_asset::<Image>(String::from("pack.png"), loaded_icon),
-            );
+        // Find the index of the `pack.mcmeta` and `pack.png` files.
+        let mut icon_index: Option<usize> = None;
+        let mut mcmeta_index: Option<usize> = None;
+
+        for (index, entry) in zip.file().entries().iter().enumerate() {
+            match entry.filename().as_str() {
+                Ok("pack.mcmeta") => {
+                    mcmeta_index = Some(index);
+                    if icon_index.is_some() {
+                        break;
+                    }
+                }
+                Ok("pack.png") => {
+                    icon_index = Some(index);
+                    if mcmeta_index.is_some() {
+                        break;
+                    }
+                }
+                _ => {}
+            }
         }
 
-        #[cfg(debug_assertions)]
-        bevy_log::debug!(
-            "ResourcePackMeta: \"{}\" Icon -> \"{icon_handle:?}\"",
-            context.asset_path()
-        );
-
-        // Get the index of the `pack.mcmeta` file.
-        let Some(mcmeta_index) = zip.file().entries().iter().position(|entry| {
-            entry.filename().as_str().map_or(false, |filename| filename == "pack.mcmeta")
-        }) else {
-            error!("ResourcePackMeta: No metadata found for \"{}\"", context.asset_path());
-            return Err(ResourcePackLoaderError::NoMetadata);
-        };
-
-        // Load the `pack.mcmeta` file.
+        // Load the `pack.mcmeta` metadata file.
+        let mcmeta_index = mcmeta_index.ok_or(ResourcePackLoaderError::NoMetadata)?;
         let mut mcmeta_reader = zip.reader_with_entry(mcmeta_index).await?;
-        ResourcePackZipLoader::load_zipped_asset::<ResourcePackMeta>(&mut mcmeta_reader, context)
-            .await
-            .map(|loaded| {
-                let mut mcmeta = loaded.take();
 
-                // If the icon was not already set, set it.
-                if matches!((&mcmeta.icon, &icon_handle), (None, Some(_))) {
-                    #[cfg(debug_assertions)]
-                    bevy_log::debug!(
-                        "ResourcePackMeta: \"{}\" Zip Icon -> \"{icon_handle:?}\"",
-                        context.asset_path()
-                    );
+        let mut mcmeta: ResourcePackMeta =
+            ResourcePackZipLoader::load_zipped_asset_no_lock(&mut mcmeta_reader, context)
+                .await
+                .map(LoadedAsset::take)?;
 
-                    mcmeta.icon = icon_handle;
+        // Load the `pack.png` icon file, if it exists.
+        if let Some(icon_index) = icon_index {
+            if let Ok(mut icon_reader) = zip.reader_with_entry(icon_index).await {
+                match ResourcePackZipLoader::load_zipped_asset_no_lock(&mut icon_reader, context)
+                    .await
+                {
+                    Ok(loaded_icon) => {
+                        mcmeta.icon = Some(
+                            context.add_loaded_labeled_asset(String::from("pack.png"), loaded_icon),
+                        );
+                    }
+                    Err(err) => error!("ResourcePackMeta: Failed to load icon, {err}"),
                 }
+            }
+        }
 
-                mcmeta
-            })
+        Ok(mcmeta)
     }
 }
