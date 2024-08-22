@@ -4,9 +4,11 @@ use async_zip::{
     },
     StoredZipEntry,
 };
-use bevy_asset::{io::Reader, AssetLoader, LoadContext};
-use bevy_log::error;
-use futures_lite::{io::BufReader, AsyncBufRead, AsyncSeek};
+use bevy_asset::{io::Reader, Asset, AssetLoader, LoadContext, LoadedAsset};
+use futures_lite::{
+    io::{BufReader, Cursor},
+    AsyncBufRead, AsyncSeek,
+};
 
 use crate::assets::{
     raw::pack::loader::{ResourcePackLoaderError, ResourcePackZipLoader},
@@ -31,94 +33,65 @@ impl AssetLoader for ResourcePackMetaZipLoader {
         (): &'a (),
         context: &'a mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
-        let mut zip = SeekZipFileReader::new(BufReader::new(reader)).await?;
-        Self::async_seek_zipfile_metadata(&mut zip, context).await
+        Self::load_zipfile_metadata(
+            &mut SeekZipFileReader::new(BufReader::new(reader)).await?,
+            context,
+        )
+        .await
     }
 
     fn extensions(&self) -> &[&str] { &["zip"] }
 }
 
-// TODO: Collapse `async_seek_zipfile_metadata` and `async_mem_zipfile_metadata`
-// into one function.
 impl ResourcePackMetaZipLoader {
-    /// Read a [`ResourcePackMeta`] from a ZIP file using a
-    /// [`SeekZipFileReader`].
-    pub(crate) async fn async_seek_zipfile_metadata<R: AsyncBufRead + AsyncSeek + Unpin>(
-        zip: &mut SeekZipFileReader<R>,
+    /// Read a [`ResourcePackMeta`] from a ZIP file.
+    ///
+    /// Requires a reference to a [`SeekZipFileReader`] or [`MemZipFileReader`].
+    #[allow(private_bounds)]
+    pub(crate) async fn load_zipfile_metadata<'a, R: 'a + AsyncBufRead + AsyncSeek + Unpin>(
+        zip_reader: impl Into<ZipEntryReader<'a, R>>,
         context: &mut LoadContext<'_>,
     ) -> Result<ResourcePackMeta, ResourcePackLoaderError> {
-        let (mcmeta_index, icon_index) = Self::get_metadata_indexes(zip.file().entries());
+        let mut zip_reader = zip_reader.into();
+        let (mcmeta_index, icon_index) = zip_reader.metadata_indexes();
+        let mcmeta_index = mcmeta_index.ok_or(ResourcePackLoaderError::NoMetadata)?;
 
         // Load the `pack.mcmeta` metadata file.
-        let mcmeta_index = mcmeta_index.ok_or(ResourcePackLoaderError::NoMetadata)?;
-        let mut mcmeta_reader = zip.reader_with_entry(mcmeta_index).await?;
-
-        let mcmeta =
-            ResourcePackZipLoader::async_load_zipped_asset(&mut mcmeta_reader, context).await?;
+        let mcmeta = zip_reader.load_asset(mcmeta_index, context).await?;
         let mut mcmeta: ResourcePackMeta = mcmeta.take();
 
         // Load the `pack.png` icon file, if it exists.
         if let Some(icon_index) = icon_index {
-            if let Ok(mut icon_reader) = zip.reader_with_entry(icon_index).await {
-                match ResourcePackZipLoader::async_load_zipped_asset(&mut icon_reader, context)
-                    .await
-                {
-                    Ok(loaded_icon) => {
-                        mcmeta.icon = Some(
-                            context.add_loaded_labeled_asset(String::from("pack.png"), loaded_icon),
-                        );
-                    }
-                    Err(err) => error!("ResourcePackMeta: Failed to load icon, {err}"),
-                }
+            if let Ok(loaded_icon) = zip_reader.load_asset(icon_index, context).await {
+                mcmeta.icon =
+                    Some(context.add_loaded_labeled_asset(String::from("pack.png"), loaded_icon));
             }
         }
 
         Ok(mcmeta)
     }
+}
 
-    /// Read a [`ResourcePackMeta`] from a ZIP file using a
-    /// [`MemZipFileReader`].
-    pub(crate) async fn async_mem_zipfile_metadata(
-        zip: &mut MemZipFileReader,
-        context: &mut LoadContext<'_>,
-    ) -> Result<ResourcePackMeta, ResourcePackLoaderError> {
-        let (mcmeta_index, icon_index) = Self::get_metadata_indexes(zip.file().entries());
+enum ZipEntryReader<'a, R: AsyncBufRead + AsyncSeek + Unpin> {
+    Seek(&'a mut SeekZipFileReader<R>),
+    Mem(&'a MemZipFileReader),
+}
 
-        // Load the `pack.mcmeta` metadata file.
-        let mcmeta_index = mcmeta_index.ok_or(ResourcePackLoaderError::NoMetadata)?;
-        let mut mcmeta_reader = zip.reader_with_entry(mcmeta_index).await?;
-
-        let mcmeta =
-            ResourcePackZipLoader::async_load_zipped_asset(&mut mcmeta_reader, context).await?;
-        let mut mcmeta: ResourcePackMeta = mcmeta.take();
-
-        // Load the `pack.png` icon file, if it exists.
-        if let Some(icon_index) = icon_index {
-            if let Ok(mut icon_reader) = zip.reader_with_entry(icon_index).await {
-                match ResourcePackZipLoader::async_load_zipped_asset(&mut icon_reader, context)
-                    .await
-                {
-                    Ok(loaded_icon) => {
-                        mcmeta.icon = Some(
-                            context.add_loaded_labeled_asset(String::from("pack.png"), loaded_icon),
-                        );
-                    }
-                    Err(err) => error!("ResourcePackMeta: Failed to load icon, {err}"),
-                }
-            }
+impl<R: AsyncBufRead + AsyncSeek + Unpin> ZipEntryReader<'_, R> {
+    fn entries(&self) -> &[StoredZipEntry] {
+        match self {
+            Self::Seek(reader) => reader.file().entries(),
+            Self::Mem(reader) => reader.file().entries(),
         }
-
-        Ok(mcmeta)
     }
 
-    const PACK_PNG: &str = "pack.png";
-    const PACK_MCMETA: &str = "pack.mcmeta";
+    const PACK_PNG: &'static str = "pack.png";
+    const PACK_MCMETA: &'static str = "pack.mcmeta";
 
-    /// Find the index of the `pack.mcmeta` and `pack.png` files.
-    fn get_metadata_indexes(entries: &[StoredZipEntry]) -> (Option<usize>, Option<usize>) {
+    fn metadata_indexes(&self) -> (Option<usize>, Option<usize>) {
         let mut icon_index: Option<usize> = None;
         let mut mcmeta_index: Option<usize> = None;
-        for (index, entry) in entries.iter().enumerate() {
+        for (index, entry) in self.entries().iter().enumerate() {
             match entry.filename().as_str() {
                 Ok(Self::PACK_MCMETA) => {
                     mcmeta_index = Some(index);
@@ -137,4 +110,34 @@ impl ResourcePackMetaZipLoader {
         }
         (mcmeta_index, icon_index)
     }
+
+    async fn load_asset<A: Asset>(
+        &mut self,
+        index: usize,
+        context: &mut LoadContext<'_>,
+    ) -> Result<LoadedAsset<A>, ResourcePackLoaderError> {
+        match self {
+            Self::Seek(reader) => {
+                let mut entry_reader = reader.reader_with_entry(index).await?;
+                ResourcePackZipLoader::async_load_zipped_asset(&mut entry_reader, context).await
+            }
+            Self::Mem(reader) => {
+                let mut entry_reader = reader.reader_with_entry(index).await?;
+                ResourcePackZipLoader::async_load_zipped_asset(&mut entry_reader, context).await
+            }
+        }
+    }
+}
+
+impl<'a, R: AsyncBufRead + AsyncSeek + Unpin> From<&'a mut SeekZipFileReader<R>>
+    for ZipEntryReader<'a, R>
+{
+    fn from(reader: &'a mut SeekZipFileReader<R>) -> Self { Self::Seek(reader) }
+}
+
+impl<'a> From<&'a MemZipFileReader> for ZipEntryReader<'a, Cursor<&[u8]>> {
+    fn from(reader: &'a MemZipFileReader) -> Self { Self::Mem(reader) }
+}
+impl<'a> From<&'a mut MemZipFileReader> for ZipEntryReader<'a, Cursor<&[u8]>> {
+    fn from(reader: &'a mut MemZipFileReader) -> Self { Self::Mem(reader) }
 }

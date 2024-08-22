@@ -38,10 +38,10 @@ impl ResourcePackZipLoader {
     ) -> Result<ResourcePack, ResourcePackLoaderError> {
         let mut zip_buffer = Vec::new();
         reader.read_to_end(&mut zip_buffer).await?;
-        let mut zip = ZipFileReader::new(zip_buffer).await?;
+        let zip = ZipFileReader::new(zip_buffer).await?;
 
-        // Load the `pack.mcmeta` metadata file.
-        let meta = ResourcePackMetaZipLoader::async_mem_zipfile_metadata(&mut zip, context).await?;
+        // Load the `pack.mcmeta` and `pack.png` files.
+        let meta = ResourcePackMetaZipLoader::load_zipfile_metadata(&zip, context).await?;
         let meta = context.add_labeled_asset(String::from("pack.mcmeta"), meta);
 
         // Create a new `ResourcePack` with the metadata.
