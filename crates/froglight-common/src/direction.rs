@@ -104,12 +104,12 @@ impl From<usize> for Direction {
     #[inline]
     fn from(value: usize) -> Self {
         match value {
-            0 => Direction::North,
-            1 => Direction::South,
-            2 => Direction::East,
-            3 => Direction::West,
-            4 => Direction::Up,
-            5 => Direction::Down,
+            0 => Direction::Up,
+            1 => Direction::Down,
+            2 => Direction::North,
+            3 => Direction::South,
+            4 => Direction::East,
+            5 => Direction::West,
             _ => panic!("Invalid Direction value: {value}"),
         }
     }
@@ -118,12 +118,12 @@ impl From<Direction> for usize {
     #[inline]
     fn from(value: Direction) -> Self {
         match value {
-            Direction::North => 0,
-            Direction::South => 1,
-            Direction::East => 2,
-            Direction::West => 3,
-            Direction::Up => 4,
-            Direction::Down => 5,
+            Direction::Up => 0,
+            Direction::Down => 1,
+            Direction::North => 2,
+            Direction::South => 3,
+            Direction::East => 4,
+            Direction::West => 5,
         }
     }
 }

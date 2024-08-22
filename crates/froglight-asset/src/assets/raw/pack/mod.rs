@@ -1,20 +1,19 @@
-//! [`ResourcePack`], [`ResourcePackMeta`], and other related types.
+//! [`ResourcePack`] and other related types.
 //!
-//! Also contains the [`ResourcePackZipLoader`], [`ResourcePackFolderLoader`],
-//! and [`ResourcePackMetaLoader`] asset loaders.
+//! Also contains the [`ResourcePackLoader`] and [`ResourcePackZipLoader`]
+//! asset loaders.
 
 use bevy_app::App;
 
 pub mod loader;
-// pub use loader::{ResourcePackFolderLoader, ResourcePackMetaLoader,
-// ResourcePackZipLoader};
+pub use loader::{ResourcePackLoader, ResourcePackZipLoader};
 
 #[allow(clippy::module_inception)]
-mod pack;
-pub use pack::ResourcePack;
+mod asset;
+pub use asset::ResourcePack;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    pack::build(app);
+    asset::build(app);
     loader::build(app);
 }

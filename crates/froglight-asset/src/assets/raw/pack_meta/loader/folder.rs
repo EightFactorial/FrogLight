@@ -1,11 +1,13 @@
 use bevy_asset::{io::Reader, AssetLoader, AsyncReadExt, LoadContext};
 
 use crate::assets::{
-    raw::{pack::loader::ResourcePackLoaderError, pack_meta::meta::PackMcMeta},
+    raw::{pack::loader::ResourcePackLoaderError, pack_meta::asset::PackMcMeta},
     ResourcePackMeta,
 };
 
-/// An [`AssetLoader`] for loading [`ResourcePackMeta`]s.
+/// An [`AssetLoader`] for loading [`ResourcePackMeta`]s from folders.
+///
+/// Must be pointed to a `pack.mcmeta` file.
 ///
 /// This is useful when you only need the metadata of a
 /// [`ResourcePack`](crate::assets::ResourcePack).

@@ -67,9 +67,9 @@ impl ResourcePackZipLoader {
                         if let Err(err) = Self::process_zip_entry(
                             entry_type,
                             asset_key,
-                            resourcepack,
                             entry_reader,
                             context,
+                            resourcepack,
                         )
                         .await
                         {
@@ -86,9 +86,9 @@ impl ResourcePackZipLoader {
     async fn process_zip_entry<R: AsyncBufRead + Unpin>(
         entry_type: EntryType,
         asset_key: ResourceKey,
-        resourcepack: &Mutex<ResourcePack>,
         entry_reader: ZipEntryReader<'_, R, WithEntry<'_>>,
         context: &RwLock<&mut LoadContext<'_>>,
+        resourcepack: &Mutex<ResourcePack>,
     ) -> Result<(), ResourcePackLoaderError> {
         match entry_type {
             // EntryType::BlockModel => {

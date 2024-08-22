@@ -15,7 +15,7 @@ use crate::assets::{
     ResourcePackMeta,
 };
 
-/// An [`AssetLoader`] for loading [`ResourcePackMeta`]s.
+/// An [`AssetLoader`] for loading [`ResourcePackMeta`]s from ZIP files.
 ///
 /// This is useful when you only need the metadata of a
 /// [`ResourcePack`](crate::assets::ResourcePack).

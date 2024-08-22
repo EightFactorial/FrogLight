@@ -51,11 +51,10 @@ use super::{BasicPlugins, ClientPlugins, TASKPOOL_SETTINGS};
 /// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
 ///
 /// [`ClientPlugins`]:
-/// - [`AssetSourcePlugin`](crate::prelude::plugins::AssetSourcePlugin)
-/// - [`AssetDefinitionPlugin`](crate::prelude::plugins::AssetDefinitionPlugin)
-/// - [`AssetLoaderPlugin`](crate::prelude::plugins::AssetLoaderPlugin)
+/// - [`AssetPlugin`](crate::prelude::plugins::AssetPlugin)
 /// - [`AssetProcessorPlugin`](crate::prelude::plugins::AssetProcessorPlugin)
-/// - [`AssetCatalogPlugin`](crate::prelude::plugins::AssetCatalogPlugin)
+/// - [`AssetSourcePlugin`](crate::prelude::plugins::AssetSourcePlugin)
+/// - [`CatalogPlugin`](crate::prelude::plugins::CatalogPlugin)
 /// - [`CameraPlugin`](crate::prelude::plugins::CameraPlugin)
 /// - [`LoadingScreenPlugin`](crate::prelude::plugins::LoadingScreenPlugin)
 /// - [`RenderPlugin`](crate::prelude::plugins::RenderPlugin)

@@ -2,11 +2,7 @@
 
 #[cfg(feature = "client")]
 pub use froglight_asset::{
-    AssetPlugin,
-    AssetPlugins,
-    AssetSourcePlugin,
-    CatalogPlugin,
-    // AssetProcessorPlugin
+    AssetPlugin, AssetPlugins, AssetProcessorPlugin, AssetSourcePlugin, CatalogPlugin,
 };
 pub use froglight_block::BlockPlugin;
 #[cfg(feature = "client")]
