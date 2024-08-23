@@ -21,7 +21,7 @@ pub(super) fn build(app: &mut App) {
 
     app.add_systems(
         Update,
-        ResourcePackList::resource_warning
+        ResourcePackList::modified_resource_warning
             .run_if(resource_changed::<ResourcePackList>.and_then(ResourcePackList::should_warn))
             .in_set(AssetProcessSet),
     );
@@ -43,14 +43,14 @@ impl ResourcePackList {
     /// processed
     fn should_warn(current: Res<State<AssetProcess>>, next: Res<NextState<AssetProcess>>) -> bool {
         !matches!(
-            (current.as_ref().get(), next.as_ref()),
+            (current.get(), next.as_ref()),
             (AssetProcess::Waiting | AssetProcess::Loading, _)
                 | (_, NextState::Pending(AssetProcess::Waiting | AssetProcess::Loading))
         )
     }
 
     /// Issue a warning that the [`ResourcePackList`] has been modified
-    fn resource_warning() {
+    fn modified_resource_warning() {
         warn!("ResourcePackList: Modified after assets are processed, this may cause issues!");
     }
 }

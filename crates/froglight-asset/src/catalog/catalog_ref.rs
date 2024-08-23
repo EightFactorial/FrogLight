@@ -1,6 +1,13 @@
-use std::marker::PhantomData;
+use std::{
+    hash::{BuildHasherDefault, Hash},
+    marker::PhantomData,
+};
 
 use bevy_asset::{Asset, Handle, UntypedHandle};
+use bevy_utils::{
+    hashbrown::{hash_map::EntryRef, Equivalent},
+    AHasher, Entry,
+};
 use froglight_common::ResourceKey;
 
 use super::{
@@ -89,6 +96,25 @@ impl<'a, A: Asset> TypedCatalogMut<'a, A> {
     ///
     /// Returns the [`UntypedHandle`] if it existed.
     pub fn remove_untyped(&mut self, asset: &str) -> Option<UntypedHandle> { self.0.remove(asset) }
+
+    /// Returns an [`Entry`] for the asset in the [`TypedCatalogMut`] for
+    /// in-place manipulation.
+    ///
+    /// See [`bevy_utils::hashbrown::hash_map::Entry`] for more information.
+    pub fn entry(&mut self, asset: ResourceKey) -> Entry<'_, ResourceKey, UntypedHandle> {
+        self.0.entry(asset)
+    }
+
+    /// Returns an [`EntryRef`] for the asset in the [`TypedCatalogMut`] for
+    /// in-place manipulation.
+    ///
+    /// See [`bevy_utils::hashbrown::hash_map::EntryRef`] for more information.
+    pub fn entry_ref<'b, Q: Equivalent<ResourceKey> + Hash + ?Sized>(
+        &mut self,
+        asset: &'b Q,
+    ) -> EntryRef<'_, 'b, ResourceKey, Q, UntypedHandle, BuildHasherDefault<AHasher>> {
+        self.0.entry_ref(asset)
+    }
 
     /// Returns `true` if the [`TypedCatalogMut`] contains the asset.
     #[must_use]

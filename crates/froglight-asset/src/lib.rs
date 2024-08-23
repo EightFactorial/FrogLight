@@ -15,7 +15,10 @@ mod source;
 pub use source::AssetSourcePlugin;
 
 pub mod processor;
-pub use processor::{AssetProcess, AssetProcessorPlugin, AssetState, ResourcePackList};
+pub use processor::{
+    AssetProcess, AssetProcessorPlugin, AssetState, ResourceLoadTrigger, ResourcePackList,
+    ResourceResetTrigger,
+};
 
 /// A [`PluginGroup`] that contains all of the asset plugins.
 ///

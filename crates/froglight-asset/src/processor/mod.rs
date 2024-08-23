@@ -5,7 +5,7 @@ use bevy_app::{App, Plugin};
 mod sources;
 pub use sources::ResourcePackList;
 
-mod state;
+pub mod state;
 
 mod systemset;
 pub use systemset::{AssetProcess, AssetProcessSet, AssetState, AssetStateSet};

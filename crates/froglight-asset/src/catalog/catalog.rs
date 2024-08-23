@@ -39,25 +39,25 @@ impl AssetCatalog {
     #[must_use]
     pub fn len(&self) -> usize { self.0.len() }
 
+    /// Returns the number of assets of type `A` in the [`AssetCatalog`].
+    #[must_use]
+    pub fn len_of<A: Asset>(&self) -> usize {
+        self.0.get(&TypeId::of::<A>()).map_or(0, |m| m.len())
+    }
+
     /// Returns `true` if the [`AssetCatalog`] is empty.
     #[must_use]
     pub fn is_empty(&self) -> bool { self.0.is_empty() }
 
-    /// Returns the number of assets of type `A` in the [`AssetCatalog`].
-    #[must_use]
-    pub fn asset_len<A: Asset>(&self) -> usize {
-        self.0.get(&TypeId::of::<A>()).map_or(0, |m| m.len())
-    }
-
     /// Returns `true` if the [`AssetCatalog`] contains no assets of type `A`.
     #[must_use]
-    pub fn asset_empty<A: Asset>(&self) -> bool {
+    pub fn is_asset_empty<A: Asset>(&self) -> bool {
         self.0.get(&TypeId::of::<A>()).map_or(true, |m| m.is_empty())
     }
 
     /// Returns the total number of assets in the [`AssetCatalog`].
     #[must_use]
-    pub fn asset_total(&self) -> usize { self.0.values().map(|m| m.len()).sum() }
+    pub fn len_total(&self) -> usize { self.0.values().map(|m| m.len()).sum() }
 
     /// Get a reference to the [`AssetCatalog`] for an [`Asset`].
     ///
@@ -70,9 +70,13 @@ impl AssetCatalog {
     /// Get a mutable reference to the [`AssetCatalog`] for an [`Asset`].
     ///
     /// This is useful when modifying many assets of the same type.
+    ///
+    /// # Note
+    /// This will create an empty entry for the [`Asset`] type if it does not
+    /// exist.
     #[must_use]
-    pub fn typed_mut<A: Asset>(&mut self) -> Option<TypedCatalogMut<A>> {
-        self.0.get_mut(&TypeId::of::<A>()).map(TypedCatalogMut::new)
+    pub fn typed_mut<A: Asset>(&mut self) -> TypedCatalogMut<A> {
+        TypedCatalogMut::new(self.0.entry(TypeId::of::<A>()).or_default())
     }
 }
 

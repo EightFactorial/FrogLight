@@ -22,9 +22,9 @@ workspace = true
 attribute-derive = { version = "0.10.0", features = ["syn-full"] }
 convert_case = "0.6.0"
 proc-macro2 = { version = "1.0.86", features = ["nightly"] }
-quote = { version = "1.0.36", features = ["proc-macro"] }
-syn = { version = "2.0.72", features = ["full", "printing", "proc-macro"] }
-toml_edit = { version = "0.22.14", default-features = false, features = [
+quote = { version = "1.0.37", features = ["proc-macro"] }
+syn = { version = "2.0.75", features = ["full", "printing", "proc-macro"] }
+toml_edit = { version = "0.22.20", default-features = false, features = [
     "parse",
 ] }
 
