@@ -5,6 +5,10 @@ pub mod prelude;
 
 // Re-export all sub-crates.
 #[cfg(feature = "client")]
+pub use bevy_prng;
+#[cfg(feature = "client")]
+pub use bevy_rand;
+#[cfg(feature = "client")]
 pub use froglight_asset as asset;
 #[cfg(feature = "client")]
 pub use froglight_interface as interface;

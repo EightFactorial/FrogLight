@@ -8,8 +8,15 @@
 pub mod plugins;
 
 #[cfg(feature = "client")]
+pub use bevy_prng::WyRand;
+#[cfg(feature = "client")]
+pub use bevy_rand::resource::GlobalEntropy;
+#[cfg(feature = "client")]
 pub use froglight_asset::{
-    assets::{ResourcePack, ResourcePackMeta},
+    assets::{ResourcePack, ResourcePackMeta, SoundMap},
+    processor::{
+        AssetProcess, AssetState, ResourceLoadTrigger, ResourcePackList, ResourceResetTrigger,
+    },
     AssetCatalog, AssetKey,
 };
 pub use froglight_block::{

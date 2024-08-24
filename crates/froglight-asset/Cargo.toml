@@ -25,6 +25,8 @@ bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
 bevy_math = { workspace = true }
+bevy_prng = { workspace = true }
+bevy_rand = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_render = { workspace = true }
 bevy_sprite = { workspace = true }
@@ -38,6 +40,7 @@ froglight-common = { version = "0.1.0", path = "../froglight-common" }
 futures-lite = { workspace = true }
 glam = { workspace = true }
 parking_lot = { workspace = true }
+rand = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

@@ -2,5 +2,8 @@
 
 use bevy_app::App;
 
+pub mod sound;
+pub use sound::{SoundMap, SoundSet};
+
 #[doc(hidden)]
-pub(super) fn build(_app: &mut App) {}
+pub(super) fn build(app: &mut App) { sound::build(app); }

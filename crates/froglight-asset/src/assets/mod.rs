@@ -3,6 +3,7 @@
 use bevy_app::{App, Plugin};
 
 pub mod processed;
+pub use processed::{SoundMap, SoundSet};
 
 pub mod raw;
 pub use raw::{ResourcePack, ResourcePackMeta};

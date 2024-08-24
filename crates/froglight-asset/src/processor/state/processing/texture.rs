@@ -26,6 +26,7 @@ pub(crate) fn build(app: &mut App) {
         Update,
         TextureProcessor::catalog_textures
             .run_if(not(TextureProcessor::is_finished))
+            .ambiguous_with_all()
             .in_set(AssetProcess::Processing),
     );
 }
@@ -133,5 +134,9 @@ impl TextureProcessor {
     }
 
     /// Resets the state of the [`TextureProcessor`].
-    fn reset_state(mut res: ResMut<Self>) { *res = Self::default(); }
+    fn reset_state(mut res: ResMut<Self>) {
+        #[cfg(debug_assertions)]
+        bevy_log::info!("TextureProcessor: Resetting state");
+        *res = Self::default();
+    }
 }
