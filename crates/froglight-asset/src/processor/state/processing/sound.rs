@@ -7,7 +7,7 @@ use bevy_ecs::{
     schedule::IntoSystemConfigs,
     system::{Res, ResMut, Resource},
 };
-use bevy_log::error;
+use bevy_log::{debug, error};
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_state::state::OnEnter;
 
@@ -19,7 +19,9 @@ pub(crate) fn build(app: &mut App) {
     app.init_resource::<SoundProcessor>();
 
     // Reset the `SoundProcessor` state
-    app.add_systems(OnEnter(AssetProcess::Processing), SoundProcessor::reset_state);
+    app.add_systems(OnEnter(AssetProcess::Processing), SoundProcessor::reset_sound_state);
+    // Clear the `AssetCatalog` sounds
+    app.add_systems(OnEnter(AssetProcess::Processing), SoundProcessor::clear_catalog_sounds);
 
     // Catalog sounds
     app.add_systems(
@@ -62,13 +64,8 @@ impl SoundProcessor {
         // Check if the processor is finished.
         if state.resource_index >= resources.len() {
             #[cfg(debug_assertions)]
-            {
-                bevy_log::info!("SoundProcessor: Finished");
-                bevy_log::debug!(
-                    "SoundProcessor: Cataloged {} Sounds",
-                    catalog.len_of::<AudioSource>()
-                );
-            }
+            bevy_log::info!("SoundProcessor: Finished");
+            debug!("SoundProcessor: Cataloged {} Sounds", catalog.len_of::<AudioSource>());
             // Set the processor to finished.
             *state = Self { finished: true, ..Self::default() };
         }
@@ -117,9 +114,16 @@ impl SoundProcessor {
     }
 
     /// Resets the state of the [`SoundProcessor`].
-    fn reset_state(mut res: ResMut<Self>) {
+    fn reset_sound_state(mut res: ResMut<Self>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("SoundProcessor: Resetting state");
+        bevy_log::trace!("SoundProcessor: Resetting state");
         *res = Self::default();
+    }
+
+    /// Clears all sounds from the [`AssetCatalog`].
+    fn clear_catalog_sounds(mut catalog: ResMut<AssetCatalog>) {
+        #[cfg(debug_assertions)]
+        bevy_log::info!("SoundProcessor: Clearing AssetCatalog Sounds");
+        catalog.clear_of::<AudioSource>();
     }
 }

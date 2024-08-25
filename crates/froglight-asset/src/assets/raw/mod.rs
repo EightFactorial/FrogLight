@@ -5,8 +5,14 @@
 
 use bevy_app::App;
 
+pub mod blockstate;
+pub use blockstate::BlockStateDefinition;
+
 pub mod lang;
 pub use lang::SingleLanguageMap;
+
+pub mod model;
+pub use model::BlockModelDefinition;
 
 pub mod pack;
 pub use pack::ResourcePack;
@@ -19,9 +25,10 @@ pub use sound::SoundDefinitionMap;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut App) {
-    pack::build(app);
-    pack_meta::build(app);
-
+    blockstate::build(app);
     lang::build(app);
+    model::build(app);
+    pack_meta::build(app);
+    pack::build(app);
     sound::build(app);
 }

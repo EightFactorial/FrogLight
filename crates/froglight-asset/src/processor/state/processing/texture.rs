@@ -6,7 +6,7 @@ use bevy_ecs::{
     schedule::IntoSystemConfigs,
     system::{Res, ResMut, Resource},
 };
-use bevy_log::error;
+use bevy_log::{debug, error};
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::texture::{Image, ImageSampler};
 use bevy_state::state::OnEnter;
@@ -19,7 +19,9 @@ pub(crate) fn build(app: &mut App) {
     app.init_resource::<TextureProcessor>();
 
     // Reset the `TextureProcessor` state
-    app.add_systems(OnEnter(AssetProcess::Processing), TextureProcessor::reset_state);
+    app.add_systems(OnEnter(AssetProcess::Processing), TextureProcessor::reset_texture_state);
+    // Clear the `AssetCatalog` textures
+    app.add_systems(OnEnter(AssetProcess::Processing), TextureProcessor::clear_catalog_textures);
 
     // Catalog textures
     app.add_systems(
@@ -69,13 +71,8 @@ impl TextureProcessor {
         // Check if the processor is finished.
         if state.resource_index >= resources.len() {
             #[cfg(debug_assertions)]
-            {
-                bevy_log::info!("TextureProcessor: Finished");
-                bevy_log::debug!(
-                    "TextureProcessor: Cataloged {} Textures",
-                    catalog.len_of::<Image>()
-                );
-            }
+            bevy_log::info!("TextureProcessor: Finished");
+            debug!("TextureProcessor: Cataloged {} Textures", catalog.len_of::<Image>());
             // Set the processor to finished.
             *state = Self { finished: true, ..Self::default() };
         }
@@ -134,9 +131,16 @@ impl TextureProcessor {
     }
 
     /// Resets the state of the [`TextureProcessor`].
-    fn reset_state(mut res: ResMut<Self>) {
+    fn reset_texture_state(mut res: ResMut<Self>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("TextureProcessor: Resetting state");
+        bevy_log::trace!("TextureProcessor: Resetting state");
         *res = Self::default();
+    }
+
+    /// Clears all textures from the [`AssetCatalog`].
+    fn clear_catalog_textures(mut catalog: ResMut<AssetCatalog>) {
+        #[cfg(debug_assertions)]
+        bevy_log::info!("TextureProcessor: Clearing AssetCatalog Textures");
+        catalog.clear_of::<Image>();
     }
 }

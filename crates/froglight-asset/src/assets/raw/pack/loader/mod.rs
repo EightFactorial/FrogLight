@@ -41,8 +41,11 @@ pub enum ResourcePackLoaderError {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 enum EntryType {
     BlockModel,
+    BlockState,
+    ItemModel,
     Language,
     ResourcePack,
     Sound,
@@ -77,13 +80,9 @@ impl EntryType {
         match (folder, extension) {
             ("textures", "png") => Some(Self::Texture),
             ("sounds", "ogg") => Some(Self::Sound),
-            ("models", "json") => {
-                if path.contains("models/block") {
-                    Some(Self::BlockModel)
-                } else {
-                    None
-                }
-            }
+            ("blockstates", "json") => Some(Self::BlockState),
+            ("models", "json") if path.contains("models/block") => Some(Self::BlockModel),
+            ("models", "json") if path.contains("models/item") => Some(Self::ItemModel),
             ("lang", "json") => Some(Self::Language),
             ("atlases", "json") => Some(Self::TextureAtlas),
             ("resourcepacks", "zip") => Some(Self::ResourcePack),
@@ -91,7 +90,7 @@ impl EntryType {
 
             // Suppress warnings for known unsupported assets.
             #[cfg(debug_assertions)]
-            ("blockstates" | "font" | "models" | "particles" | "shaders" | "texts", _) => None,
+            ("font" | "particles" | "shaders" | "texts", _) => None,
 
             // Suppress warnings for known but unused assets.
             #[cfg(debug_assertions)]

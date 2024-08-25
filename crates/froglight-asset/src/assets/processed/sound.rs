@@ -41,15 +41,20 @@ impl SoundMap {
         self.get_audio_recursive(key, 0, entropy)
     }
 
-    const DEPTH_LIMIT: usize = 16;
+    /// The maximum depth to recurse when retrieving audio.
+    const DEPTH_LIMIT: usize = 8;
+
+    /// Retrieves an audio handle and settings for a sound key, recursively.
+    ///
+    /// Only recurses up to [`SoundMap::DEPTH_LIMIT`] to prevent infinite loops.
+    #[must_use]
     fn get_audio_recursive<R: SeedableEntropySource>(
         &self,
         key: &str,
         depth: usize,
         entropy: &mut GlobalEntropy<R>,
     ) -> Option<(&Handle<AudioSource>, SoundSettings)> {
-        let audio_set = self.0.get(key)?;
-        let entry = audio_set.random_entry(entropy)?;
+        let entry = self.0.get(key).and_then(|set| set.random_entry(entropy))?;
         match &entry.reference {
             // Return the handle and settings
             SoundEntryRef::Handle(handle) => Some((handle, entry.settings)),
@@ -101,6 +106,8 @@ impl SoundSet {
     }
 
     /// Creates a [`SoundSet`] from a [`SoundDefinition`].
+    ///
+    /// Skips any [`DefinitionEntry`]s that fail to convert to [`SoundEntry`]s.
     #[must_use]
     pub fn from_definition(def: &SoundDefinition, catalog: &AssetCatalog) -> Self {
         // Convert `DefinitionEntry`s to `SoundEntry`s.

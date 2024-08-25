@@ -7,7 +7,7 @@ use bevy_utils::HashMap;
 use froglight_common::ResourceKey;
 
 use crate::assets::{
-    raw::{SingleLanguageMap, SoundDefinitionMap},
+    raw::{BlockModelDefinition, BlockStateDefinition, SingleLanguageMap, SoundDefinitionMap},
     ResourcePackMeta,
 };
 
@@ -28,6 +28,11 @@ pub struct ResourcePack {
 
     /// The [`ResourcePack`]'s textures.
     pub textures: HashMap<ResourceKey, Handle<Image>>,
+
+    /// The [`ResourcePack`]'s block models.
+    pub block_models: HashMap<ResourceKey, Handle<BlockModelDefinition>>,
+    /// The [`ResourcePack`]'s block states.
+    pub block_states: HashMap<ResourceKey, Handle<BlockStateDefinition>>,
 
     /// The [`ResourcePack`]'s sounds.
     pub sounds: HashMap<ResourceKey, Handle<AudioSource>>,

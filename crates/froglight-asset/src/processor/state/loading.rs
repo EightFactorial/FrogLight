@@ -27,6 +27,7 @@ pub(crate) fn build(app: &mut App) {
 mod success {
     use bevy_asset::{AssetServer, RecursiveDependencyLoadState};
     use bevy_ecs::system::{Res, ResMut};
+    use bevy_log::debug;
     use bevy_state::state::NextState;
 
     use super::{AssetProcess, ResourcePackList};
@@ -41,8 +42,7 @@ mod success {
 
     /// Enter the [`AssetProcess::Processing`] state.
     pub(super) fn enter_processing_state(mut state: ResMut<NextState<AssetProcess>>) {
-        #[cfg(debug_assertions)]
-        bevy_log::info!("AssetProcess: Entering `AssetProcess::Processing`");
+        debug!("AssetProcess: Starting processing...");
         state.set(AssetProcess::Processing);
     }
 }
@@ -88,8 +88,7 @@ mod error {
 
     /// Enter the [`AssetProcess::Waiting`] state.
     pub(super) fn enter_waiting_state(mut state: ResMut<NextState<AssetProcess>>) {
-        #[cfg(debug_assertions)]
-        bevy_log::error!("AssetProcess: Error, re-entering `AssetProcess::Waiting`");
+        error!("AssetProcess: Error, re-entering waiting...");
         state.set(AssetProcess::Waiting);
     }
 }

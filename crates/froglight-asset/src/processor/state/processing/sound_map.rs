@@ -6,6 +6,7 @@ use bevy_ecs::{
     schedule::IntoSystemConfigs,
     system::{Res, ResMut, Resource},
 };
+use bevy_log::debug;
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_state::state::OnEnter;
 use bevy_utils::Entry;
@@ -26,7 +27,7 @@ pub(crate) fn build(app: &mut App) {
     app.init_resource::<SoundMapProcessor>();
 
     // Reset the `SoundMapProcessor` state
-    app.add_systems(OnEnter(AssetProcess::Processing), SoundMapProcessor::reset_state);
+    app.add_systems(OnEnter(AssetProcess::Processing), SoundMapProcessor::reset_soundmap_state);
     // Clear the `SoundMap`
     app.add_systems(OnEnter(AssetProcess::Processing), SoundMapProcessor::clear_soundmap);
 
@@ -105,18 +106,16 @@ impl SoundMapProcessor {
         // Check if we've finished processing all ResourcePacks
         if state.resource_index >= resources.len() {
             #[cfg(debug_assertions)]
-            {
-                bevy_log::info!("SoundMapProcessor: Finished");
-                bevy_log::debug!("SoundMapProcessor: Created {} SoundSets", soundmap.len());
-            }
+            bevy_log::info!("SoundMapProcessor: Finished");
+            debug!("SoundMapProcessor: Created {} SoundSets", soundmap.len());
             *state = Self { finished: true, ..Self::default() };
         }
     }
 
     /// Resets the state of the [`SoundMapProcessor`].
-    fn reset_state(mut res: ResMut<Self>) {
+    fn reset_soundmap_state(mut res: ResMut<Self>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("SoundMapProcessor: Resetting state");
+        bevy_log::trace!("SoundMapProcessor: Resetting state");
         *res = Self::default();
     }
 

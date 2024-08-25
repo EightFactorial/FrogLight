@@ -6,9 +6,13 @@ use serde::de::DeserializeOwned;
 /// An [`AssetLoader`] that uses [`serde_json`] to load assets.
 ///
 /// This loader is used for loading assets that are stored in JSON format.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SerdeJsonLoader<A: Asset + DeserializeOwned> {
     _a: PhantomData<A>,
+}
+
+impl<A: Asset + DeserializeOwned> Default for SerdeJsonLoader<A> {
+    fn default() -> Self { Self { _a: PhantomData } }
 }
 
 /// An error that can occur when loading an asset with [`SerdeJsonLoader`].

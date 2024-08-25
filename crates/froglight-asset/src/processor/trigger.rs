@@ -4,6 +4,7 @@ use bevy_ecs::{
     observer::Trigger,
     system::{Res, ResMut},
 };
+use bevy_log::{debug, warn};
 use bevy_state::state::NextState;
 
 use super::{AssetProcess, ResourcePackList};
@@ -32,11 +33,9 @@ impl ResourceLoadTrigger {
         mut state: ResMut<NextState<AssetProcess>>,
     ) {
         if res.is_empty() {
-            #[cfg(debug_assertions)]
-            bevy_log::info!("ResourceLoadTrigger: `ResourcePackList` is empty, ignoring trigger");
+            warn!("ResourceTrigger: No ResourcePacks, ignoring trigger");
         } else {
-            #[cfg(debug_assertions)]
-            bevy_log::info!("ResourceLoadTrigger: Entering `AssetLoadState::Loading`");
+            debug!("ResourceTrigger: Waiting for ResourcePacks to load...");
             state.set(AssetProcess::Loading);
         }
     }
@@ -52,8 +51,7 @@ pub struct ResourceResetTrigger;
 
 impl ResourceResetTrigger {
     fn event_trigger(_: Trigger<Self>, mut state: ResMut<NextState<AssetProcess>>) {
-        #[cfg(debug_assertions)]
-        bevy_log::info!("ResourceResetTrigger: Entering `AssetLoadState::Waiting`");
+        debug!("ResourceTrigger: Resetting ResourcePacks...");
         state.set(AssetProcess::Waiting);
     }
 }

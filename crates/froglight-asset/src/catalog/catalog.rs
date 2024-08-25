@@ -39,6 +39,10 @@ impl AssetCatalog {
     #[must_use]
     pub fn len(&self) -> usize { self.0.len() }
 
+    /// Returns the total number of assets in the [`AssetCatalog`].
+    #[must_use]
+    pub fn len_total(&self) -> usize { self.0.values().map(|m| m.len()).sum() }
+
     /// Returns the number of assets of type `A` in the [`AssetCatalog`].
     #[must_use]
     pub fn len_of<A: Asset>(&self) -> usize {
@@ -51,13 +55,24 @@ impl AssetCatalog {
 
     /// Returns `true` if the [`AssetCatalog`] contains no assets of type `A`.
     #[must_use]
-    pub fn is_asset_empty<A: Asset>(&self) -> bool {
+    pub fn is_empty_of<A: Asset>(&self) -> bool {
         self.0.get(&TypeId::of::<A>()).map_or(true, |m| m.is_empty())
     }
 
-    /// Returns the total number of assets in the [`AssetCatalog`].
-    #[must_use]
-    pub fn len_total(&self) -> usize { self.0.values().map(|m| m.len()).sum() }
+    /// Clear the [`AssetCatalog`].
+    ///
+    /// This will remove all assets from the [`AssetCatalog`].
+    pub fn clear(&mut self) { self.0.clear() }
+
+    /// Clear the [`AssetCatalog`] of a specific [`Asset`] type.
+    ///
+    /// This will remove all assets of the specified type from the
+    /// [`AssetCatalog`].
+    pub fn clear_of<A: Asset>(&mut self) {
+        if let Some(m) = self.0.get_mut(&TypeId::of::<A>()) {
+            m.clear();
+        }
+    }
 
     /// Get a reference to the [`AssetCatalog`] for an [`Asset`].
     ///
@@ -77,6 +92,23 @@ impl AssetCatalog {
     #[must_use]
     pub fn typed_mut<A: Asset>(&mut self) -> TypedCatalogMut<A> {
         TypedCatalogMut::new(self.0.entry(TypeId::of::<A>()).or_default())
+    }
+
+    /// Get a reference to the [`AssetCatalog`] for an [`Asset`] type.
+    ///
+    /// This is useful when needing to read and write assets of different types
+    /// at the same time.
+    ///
+    /// # Note
+    /// This will create an empty entry for the [`Asset`] type if it does not
+    /// exist.
+    pub fn typed_mut_scope<A: Asset>(
+        &mut self,
+        fun: impl FnOnce(&mut AssetCatalog, TypedCatalogMut<A>),
+    ) {
+        let mut taken = std::mem::take(self.0.entry(TypeId::of::<A>()).or_default());
+        fun(self, TypedCatalogMut::new(&mut taken));
+        self.0.insert(TypeId::of::<A>(), taken);
     }
 }
 

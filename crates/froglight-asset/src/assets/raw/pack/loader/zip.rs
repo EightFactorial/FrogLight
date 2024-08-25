@@ -91,11 +91,16 @@ impl ResourcePackZipLoader {
         resourcepack: &Mutex<ResourcePack>,
     ) -> Result<(), ResourcePackLoaderError> {
         match entry_type {
-            // EntryType::BlockModel => {
-            //     let asset_handle =
-            //         Self::get_zipped_asset(&asset_key, &mut entry_reader,
-            // context).await?;     resourcepack.block_models.
-            // insert(asset_key, asset_handle); }
+            EntryType::BlockModel => {
+                let asset_handle =
+                    Self::async_add_zipped_asset(&asset_key, entry_reader, context).await?;
+                resourcepack.lock().await.block_models.insert(asset_key, asset_handle);
+            }
+            EntryType::BlockState => {
+                let asset_handle =
+                    Self::async_add_zipped_asset(&asset_key, entry_reader, context).await?;
+                resourcepack.lock().await.block_states.insert(asset_key, asset_handle);
+            }
             EntryType::Language => {
                 let asset_handle =
                     Self::async_add_zipped_asset(&asset_key, entry_reader, context).await?;
