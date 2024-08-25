@@ -82,7 +82,10 @@ impl DefinitionTransform {
 }
 
 impl From<DefinitionTransform> for bevy_transform::components::Transform {
-    fn from(value: DefinitionTransform) -> Self {
+    fn from(value: DefinitionTransform) -> Self { Self::from(&value) }
+}
+impl From<&DefinitionTransform> for bevy_transform::components::Transform {
+    fn from(value: &DefinitionTransform) -> Self {
         bevy_transform::components::Transform {
             translation: value.translation().into(),
             scale: value.scale().into(),
@@ -98,6 +101,7 @@ impl From<DefinitionTransform> for bevy_transform::components::Transform {
 
 /// A reference to a resource or another variable.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Reflect)]
+#[reflect(Serialize, Deserialize)]
 pub enum ResourceOrVariable {
     /// A key to a resource.
     Resource(String),

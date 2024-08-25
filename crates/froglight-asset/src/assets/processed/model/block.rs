@@ -87,6 +87,25 @@ pub enum ModelTransformIndex {
     Fixed,
 }
 
+impl ModelTransformIndex {
+    /// All possible values of [`ModelTransformIndex`].
+    pub const ALL: &'static [ModelTransformIndex; 8] = &[
+        ModelTransformIndex::ThirdPersonRighthand,
+        ModelTransformIndex::ThirdPersonLefthand,
+        ModelTransformIndex::FirstPersonRighthand,
+        ModelTransformIndex::FirstPersonLefthand,
+        ModelTransformIndex::Gui,
+        ModelTransformIndex::Head,
+        ModelTransformIndex::Ground,
+        ModelTransformIndex::Fixed,
+    ];
+
+    /// Returns an iterator over all possible values of [`ModelTransformIndex`].
+    pub fn iter() -> impl Iterator<Item = ModelTransformIndex> {
+        ModelTransformIndex::ALL.iter().copied()
+    }
+}
+
 impl From<ModelTransformIndex> for usize {
     fn from(index: ModelTransformIndex) -> usize {
         match index {

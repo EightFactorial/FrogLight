@@ -23,6 +23,13 @@ impl AssetCatalog {
         untyped.get(asset).map(|h| h.clone().typed_debug_checked())
     }
 
+    /// Get an [`UntypedHandle`] to an [`Asset`] from the [`AssetCatalog`],
+    /// if it exists.
+    #[must_use]
+    pub fn get_untyped<A: Asset>(&self, asset: &str) -> Option<&UntypedHandle> {
+        self.0.get(&TypeId::of::<A>()).and_then(|m| m.get(asset))
+    }
+
     /// Insert an [`Asset`] into the [`AssetCatalog`].
     pub fn insert<A: Asset>(&mut self, asset: ResourceKey, handle: Handle<A>) {
         let untyped = self.0.entry(TypeId::of::<A>()).or_default();
