@@ -134,7 +134,7 @@ impl BlockStateProcessor {
     /// Clears all textures from the [`AssetCatalog`].
     fn clear_catalog_blockstates(mut catalog: ResMut<AssetCatalog>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("BlockStateProcessor: Clearing AssetCatalog BlockStates");
+        bevy_log::trace!("BlockStateProcessor: Clearing AssetCatalog BlockStates");
         catalog.clear_of::<BlockStateDefinition>();
         // catalog.clear_of::<BlockState>();
     }

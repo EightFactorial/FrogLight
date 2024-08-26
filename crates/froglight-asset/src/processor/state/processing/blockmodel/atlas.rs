@@ -55,37 +55,63 @@ impl BlockModelProcessor {
         let mut builder = TextureAtlasBuilder::default();
         builder.initial_size((512, 512).into()).max_size((4096, 4096).into());
 
+        #[cfg(debug_assertions)]
+        let mut definition_count = 0;
         let mut inserted_textures = HashSet::new();
 
         // Iterate over all `BlockModelDefinition`s
-        for def in catalog
-            .typed_ref::<BlockModelDefinition>()
-            .unwrap()
-            .iter_untyped()
-            .filter_map(|(_, h)| definitions.get(h.id().typed_debug_checked()))
-        {
-            // If the `BlockModelDefinition` has textures
-            if let Some(textures) = &def.textures {
-                // Get all texture references
-                for texture in textures.values().filter_map(|v| {
-                    if let ResourceOrVariable::Resource(key) = v {
-                        ResourceKey::try_new(key).ok()
-                    } else {
-                        None
-                    }
-                }) {
-                    if let Some(image_handle) = catalog.get::<Image>(&texture) {
-                        if inserted_textures.insert(image_handle.id()) {
-                            if let Some(image) = images.get(&image_handle) {
-                                builder.add_texture(Some(image_handle.id()), image);
-                            }
+        for def in catalog.typed_ref::<BlockModelDefinition>().unwrap().iter_untyped().filter_map(
+            |(k, h)| {
+                definitions.get(h.id().typed_debug_checked()).or_else(|| {
+                    error!("BlockModelProcessor: Failed to get BlockModelDefinition from AssetServer, \"{k}\"");
+                    None
+                })
+            },
+        ) {
+            // Get the resources (textures) from the current definition and all parents
+            for resource in
+                Self::get_resources(def, &catalog, &definitions).into_iter().filter_map(|r| {
+                    ResourceKey::try_new(r)
+                        .inspect_err(|err| {
+                            error!(
+                                "BlockModelProcessor: Failed to create ResourceKey from \"{r}\", {err}"
+                            );
+                        })
+                        .ok()
+                })
+            {
+                // Get the texture handle from the catalog
+                if let Some(image_handle) = catalog.get_untyped::<Image>(&resource) {
+                    // If the texture has not been inserted before
+                    if inserted_textures.insert(image_handle.id()) {
+                        // Add the texture to the `TextureAtlasBuilder`
+                        let image_id = image_handle.id().typed_debug_checked();
+                        if let Some(image) = images.get(image_id) {
+                            builder.add_texture(Some(image_id), image);
+                        } else {
+                            error!(
+                                "BlockModelProcessor: Failed to get Image from AssetServer, \"{resource}\""
+                            );
                         }
-                    } else {
-                        error!("BlockModelProcessor: Catalog missing texture \"{texture}\"");
                     }
+                } else {
+                    error!(
+                        "BlockModelProcessor: Failed to get Image from AssetCatalog, \"{resource}\""
+                    );
                 }
             }
+
+            #[cfg(debug_assertions)]
+            {
+                definition_count += 1;
+            }
         }
+
+        #[cfg(debug_assertions)]
+        debug!(
+            "BlockModelProcessor: Creating BlockAtlas from {definition_count} model definitions and {} textures",
+            inserted_textures.len()
+        );
 
         // Build the `BlockAtlas`
         match builder.build() {
@@ -103,5 +129,35 @@ impl BlockModelProcessor {
 
         debug!("BlockModelProcessor: Created BlockAtlas");
         state.atlas_finished = true;
+    }
+
+    fn get_resources<'a>(
+        def: &'a BlockModelDefinition,
+        catalog: &AssetCatalog,
+        definitions: &'a Assets<BlockModelDefinition>,
+    ) -> Vec<&'a str> {
+        // If a parent exists, collect resources from the parent
+        let mut resources = if let Some(parent) = def
+            .parent
+            .as_ref()
+            .and_then(|p| ResourceKey::try_new(p).ok())
+            .and_then(|k| catalog.get_untyped::<BlockModelDefinition>(&k))
+            .and_then(|h| definitions.get(h.id().typed_debug_checked()))
+        {
+            Self::get_resources(parent, catalog, definitions)
+        } else {
+            Vec::new()
+        };
+
+        // Get the resources from the current definition
+        if let Some(textures) = &def.textures {
+            for value in textures.values() {
+                if let ResourceOrVariable::Resource(key) = value {
+                    resources.push(key);
+                }
+            }
+        }
+
+        resources
     }
 }

@@ -122,7 +122,7 @@ impl SoundMapProcessor {
     /// Clears the [`SoundMap`].
     fn clear_soundmap(mut soundmap: ResMut<SoundMap>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("SoundMapProcessor: Clearing SoundMap");
+        bevy_log::trace!("SoundMapProcessor: Clearing SoundMap");
         soundmap.clear();
     }
 }

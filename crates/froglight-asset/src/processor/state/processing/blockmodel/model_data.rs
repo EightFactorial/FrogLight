@@ -1,4 +1,5 @@
 use bevy_asset::{Assets, UntypedHandle};
+use bevy_log::error;
 use bevy_render::{
     mesh::{Indices, Mesh, PrimitiveTopology, VertexAttributeValues},
     render_asset::RenderAssetUsages,
@@ -97,10 +98,7 @@ impl BlockModelProcessor {
                 variables,
             )
         } else {
-            #[cfg(debug_assertions)]
-            bevy_log::warn!(
-                    "BlockModelProcessor: Failed to resolve variable \"{variable}\" in BlockModel \"{definition_key}\"",
-                );
+            error!("BlockModelProcessor: Failed to resolve variable \"{variable}\" in BlockModel \"{definition_key}\"");
             None
         }
     }

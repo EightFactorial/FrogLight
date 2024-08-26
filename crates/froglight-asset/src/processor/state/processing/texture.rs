@@ -1,12 +1,12 @@
 use bevy_app::{App, Update};
-use bevy_asset::Assets;
+use bevy_asset::{AssetServer, Assets, LoadState};
 use bevy_ecs::{
     prelude::not,
     reflect::ReflectResource,
     schedule::IntoSystemConfigs,
     system::{Res, ResMut, Resource},
 };
-use bevy_log::{debug, error};
+use bevy_log::{debug, error, warn};
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::texture::{Image, ImageSampler};
 use bevy_state::state::OnEnter;
@@ -53,8 +53,11 @@ impl TextureProcessor {
     ///
     /// [`ResourcePack`]s are processed in the same order as they are in the
     /// [`ResourcePackList`].
+    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::too_many_arguments)]
     pub fn catalog_textures(
         resources: Res<ResourcePackList>,
+        asset_server: Res<AssetServer>,
         mut assets: ResMut<Assets<ResourcePack>>,
         mut images: ResMut<Assets<Image>>,
         mut catalog: ResMut<AssetCatalog>,
@@ -70,9 +73,17 @@ impl TextureProcessor {
 
         // Check if the processor is finished.
         if state.resource_index >= resources.len() {
+            // Check if all textures have loaded
+            for (key, handle) in catalog.typed_ref::<Image>().unwrap().iter_untyped() {
+                if asset_server.get_load_state(handle.id()) != Some(LoadState::Loaded) {
+                    warn!("TextureProcessor: Texture has not loaded, \"{key}\"");
+                }
+            }
+
             #[cfg(debug_assertions)]
             bevy_log::info!("TextureProcessor: Finished");
             debug!("TextureProcessor: Cataloged {} Textures", catalog.len_of::<Image>());
+
             // Set the processor to finished.
             *state = Self { finished: true, ..Self::default() };
         }
@@ -140,7 +151,7 @@ impl TextureProcessor {
     /// Clears all textures from the [`AssetCatalog`].
     fn clear_catalog_textures(mut catalog: ResMut<AssetCatalog>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("TextureProcessor: Clearing AssetCatalog Textures");
+        bevy_log::trace!("TextureProcessor: Clearing AssetCatalog Textures");
         catalog.clear_of::<Image>();
     }
 }

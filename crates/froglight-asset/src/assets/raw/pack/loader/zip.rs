@@ -32,10 +32,14 @@ impl AssetLoader for ResourcePackZipLoader {
 
 #[allow(clippy::unused_async)]
 impl ResourcePackZipLoader {
+    #[inline]
     async fn load_resourcepack_from_zip(
         reader: &mut Reader<'_>,
         context: &mut LoadContext<'_>,
     ) -> Result<ResourcePack, ResourcePackLoaderError> {
+        #[cfg(debug_assertions)]
+        bevy_log::info!("ResourcePack: Starting \"{}\"", context.path().display());
+
         let mut zip_buffer = Vec::new();
         reader.read_to_end(&mut zip_buffer).await?;
         let zip = ZipFileReader::new(zip_buffer).await?;
@@ -79,6 +83,9 @@ impl ResourcePackZipLoader {
                 });
             }
         });
+
+        #[cfg(debug_assertions)]
+        bevy_log::info!("ResourcePack: Finished \"{}\"", context.read().await.path().display());
 
         Ok(resourcepack.into_inner())
     }

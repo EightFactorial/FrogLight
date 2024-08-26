@@ -62,7 +62,7 @@ impl BlockModelProcessor {
     /// Clears the [`AssetCatalog`] of all [`BlockModel`]s.
     fn clear_catalog_models(mut catalog: ResMut<AssetCatalog>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("BlockModelProcessor: Clearing AssetCatalog BlockModels");
+        bevy_log::trace!("BlockModelProcessor: Clearing AssetCatalog BlockModels");
         catalog.clear_of::<BlockModelDefinition>();
         catalog.clear_of::<BlockModel>();
     }

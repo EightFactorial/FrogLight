@@ -1,5 +1,7 @@
 use bevy_app::App;
-use bevy_asset::{Asset, AssetApp, Handle, ReflectAsset, ReflectHandle};
+use bevy_asset::{
+    Asset, AssetApp, Handle, ReflectAsset, ReflectHandle, UntypedAssetId, VisitAssetDependencies,
+};
 use bevy_audio::AudioSource;
 use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::texture::Image;
@@ -20,7 +22,7 @@ pub(super) fn build(app: &mut App) {
 }
 
 /// A resource pack.
-#[derive(Debug, Default, Clone, Asset, Reflect)]
+#[derive(Debug, Default, Clone, Reflect)]
 #[reflect(Default, Asset)]
 pub struct ResourcePack {
     /// The [`ResourcePack`]'s metadata.
@@ -44,6 +46,20 @@ pub struct ResourcePack {
 
     /// Other [`ResourcePack`]s embedded in this [`ResourcePack`].
     pub children: HashMap<ResourceKey, Handle<ResourcePack>>,
+}
+
+impl Asset for ResourcePack {}
+impl VisitAssetDependencies for ResourcePack {
+    fn visit_dependencies(&self, visit: &mut impl FnMut(UntypedAssetId)) {
+        self.meta.visit_dependencies(visit);
+        self.textures.values().for_each(|handle| visit(handle.into()));
+        self.block_models.values().for_each(|handle| visit(handle.into()));
+        self.block_states.values().for_each(|handle| visit(handle.into()));
+        self.sounds.values().for_each(|handle| visit(handle.into()));
+        self.sound_maps.values().for_each(|handle| visit(handle.into()));
+        self.languages.values().for_each(|handle| visit(handle.into()));
+        self.children.values().for_each(|handle| visit(handle.into()));
+    }
 }
 
 impl ResourcePack {

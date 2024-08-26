@@ -27,6 +27,7 @@ impl AssetLoader for ResourcePackLoader {
 }
 
 impl ResourcePackLoader {
+    #[inline]
     async fn load_from_folder(
         reader: &mut Reader<'_>,
         context: &mut LoadContext<'_>,

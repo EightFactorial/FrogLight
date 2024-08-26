@@ -123,7 +123,7 @@ impl SoundProcessor {
     /// Clears all sounds from the [`AssetCatalog`].
     fn clear_catalog_sounds(mut catalog: ResMut<AssetCatalog>) {
         #[cfg(debug_assertions)]
-        bevy_log::info!("SoundProcessor: Clearing AssetCatalog Sounds");
+        bevy_log::trace!("SoundProcessor: Clearing AssetCatalog Sounds");
         catalog.clear_of::<AudioSource>();
     }
 }
