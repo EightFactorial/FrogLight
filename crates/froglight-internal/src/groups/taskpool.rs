@@ -5,7 +5,7 @@ use bevy::core::{TaskPoolOptions, TaskPoolThreadAssignmentPolicy};
 /// Assigns CPU cores as follows:
 /// - 20% for `IO`, at least 1, no more than 4
 /// - 40% for `async compute`, at least 1, no limit
-/// - 40% for `compute`, at least 1, no limit
+/// - Remaining (~40%) for `compute`, at least 1, no limit
 ///
 /// | CPU Cores/Threads | # IO | # Async Compute | # Compute |
 /// |-------------------|------|-----------------|-----------|
@@ -61,7 +61,7 @@ const ASYNC_COMPUTE_MIN: usize = 1;
 const ASYNC_COMPUTE_MAX: usize = usize::MAX;
 const ASYNC_COMPUTE_PERCENT: f32 = 0.4;
 
-// Use all (40%) remaining cores for compute, at least 1, no limit
+// Use all (~40%) remaining cores for compute, at least 1, no limit
 const COMPUTE_MIN: usize = 1;
 const COMPUTE_MAX: usize = usize::MAX;
 const COMPUTE_PERCENT: f32 = 1.0;
@@ -71,39 +71,41 @@ mod tests {
     use bevy::core::{TaskPoolOptions, TaskPoolThreadAssignmentPolicy};
 
     /// The expected distribution of threads based on the number of cores.
-    const EXPECTED_DISTRIBUTION: [(usize, usize, usize); 16] = [
-        (1, 1, 1),
-        (1, 1, 1),
-        (1, 1, 1),
-        (1, 2, 1),
-        (1, 2, 2),
-        (1, 2, 3),
-        (1, 3, 3),
-        (2, 3, 3),
-        (2, 4, 3),
-        (2, 4, 4),
-        (2, 4, 5),
-        (2, 5, 5),
-        (3, 5, 5),
-        (3, 6, 5),
-        (3, 6, 6),
-        (3, 6, 7),
+    const EXPECTED_DISTRIBUTION: &[(usize, usize, usize, usize)] = &[
+        (1, 1, 1, 1),
+        (2, 1, 1, 1),
+        (3, 1, 1, 1),
+        (4, 1, 2, 1),
+        (5, 1, 2, 2),
+        (6, 1, 2, 3),
+        (7, 1, 3, 3),
+        (8, 2, 3, 3),
+        (9, 2, 4, 3),
+        (10, 2, 4, 4),
+        (11, 2, 4, 5),
+        (12, 2, 5, 5),
+        (13, 3, 5, 5),
+        (14, 3, 6, 5),
+        (15, 3, 6, 6),
+        (16, 3, 6, 7),
+        (24, 4, 10, 10),
+        (32, 4, 13, 15),
+        (48, 4, 19, 25),
+        (64, 4, 26, 34),
+        (128, 4, 51, 73),
     ];
 
     /// Test the distribution of threads based on the number of cores.
     #[test]
     fn taskpool_threads() {
-        // Test core counts 1 through 16
-        for (index, distribution) in EXPECTED_DISTRIBUTION.iter().enumerate() {
-            assert_eq!(*distribution, calculate_threads(index + 1, &super::TASKPOOL_SETTINGS));
+        for (cores, io, async_comp, comp) in EXPECTED_DISTRIBUTION {
+            let expected = calculate_threads(*cores, &super::TASKPOOL_SETTINGS);
+            assert_eq!(
+                (*io, *async_comp, *comp),
+                expected,
+                "Cores: {cores}, Expected: ({io}, {async_comp}, {comp}), Actual: {expected:?}",
+            );
         }
-
-        // Test 24, 32, 48, 64, and 128 cores, just for fun
-        assert_eq!((4, 10, 10), calculate_threads(24, &super::TASKPOOL_SETTINGS));
-        assert_eq!((4, 13, 15), calculate_threads(32, &super::TASKPOOL_SETTINGS));
-        assert_eq!((4, 19, 25), calculate_threads(48, &super::TASKPOOL_SETTINGS));
-        assert_eq!((4, 26, 34), calculate_threads(64, &super::TASKPOOL_SETTINGS));
-        assert_eq!((4, 51, 73), calculate_threads(128, &super::TASKPOOL_SETTINGS));
     }
 
     /// Calculate the number of threads to use based on the taskpool options and
