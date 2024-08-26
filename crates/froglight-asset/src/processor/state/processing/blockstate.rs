@@ -37,7 +37,7 @@ pub(crate) fn build(app: &mut App) {
     );
 }
 
-/// A processor that catalogs textures in the [`AssetCatalog`].
+/// A processor that catalogs [`BlockStateDefinition`]s in the [`AssetCatalog`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Resource, Reflect)]
 #[reflect(Default, Resource)]
 pub struct BlockStateProcessor {
