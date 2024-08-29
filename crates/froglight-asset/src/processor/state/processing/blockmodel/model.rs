@@ -6,19 +6,14 @@ use bevy_ecs::{
     system::{Res, ResMut},
 };
 use bevy_log::debug;
-use bevy_math::prelude::Cuboid;
-use bevy_render::mesh::{Mesh, VertexAttributeValues};
+use bevy_render::mesh::Mesh;
 use bevy_transform::components::Transform;
 use froglight_common::{Direction, ResourceKey};
-use glam::{FloatExt, Vec3};
 
 use super::BlockModelProcessor;
 use crate::{
     assets::{
-        processed::{
-            model::{BlockModel, BlockModelCache, ModelTransformIndex},
-            BlockAtlas,
-        },
+        processed::{model::ModelTransformIndex, BlockAtlas, BlockModel, BlockModelCache},
         raw::{blockstate::StateModelDefinitions, BlockModelDefinition, BlockStateDefinition},
     },
     processor::state::BlockStateProcessor,
@@ -158,39 +153,23 @@ impl BlockModelProcessor {
 }
 
 impl BlockModelProcessor {
-    // Suppose Y-up right hand, and camera look from +Z to -Z
-    const CUBOID_FACES: [Direction; 6] = [
-        // Front
-        Direction::South,
-        // Back
-        Direction::North,
-        // Right
-        Direction::East,
-        // Left
-        Direction::West,
-        // Top
-        Direction::Up,
-        // Bottom
-        Direction::Down,
-    ];
-
     fn create_model(
-        definition: &BlockModelDefinition,
-        definition_key: &ResourceKey,
-        definitions: &Assets<BlockModelDefinition>,
+        def: &BlockModelDefinition,
+        def_key: &ResourceKey,
+        defs: &Assets<BlockModelDefinition>,
         cache: &BlockModelCache,
         atlas: &BlockAtlas,
         catalog: &AssetCatalog,
         meshes: &mut Assets<Mesh>,
     ) -> BlockModel {
         // Get the ambient occlusion value
-        let _ambient_occlusion = Self::get_ambient_occlusion(definition, catalog, definitions);
+        let _ambient_occlusion = Self::get_ambient_occlusion(def, catalog, defs);
 
         // Get the display transforms for each display type
         let mut transforms = [Transform::default(); 8];
         for display_type in ModelTransformIndex::iter() {
             if let Some(display_transform) =
-                Self::get_display_type(display_type, definition, catalog, definitions)
+                Self::get_display_type(display_type, def, catalog, defs)
             {
                 transforms[usize::from(display_type)] = display_transform.into();
             }
@@ -198,7 +177,7 @@ impl BlockModelProcessor {
 
         // Initialize the cache array
         let mut cache = cache.write();
-        let cache = cache.entry(definition_key.clone()).or_insert([
+        let cache = cache.entry(def_key.clone()).or_insert([
             Self::default_mesh(),
             Self::default_mesh(),
             Self::default_mesh(),
@@ -209,82 +188,30 @@ impl BlockModelProcessor {
 
         // Iterate over the elements and create meshes
         let mut block_mesh = Self::default_mesh();
-        if let Some(elements) = Self::get_elements(definition, catalog, definitions) {
+        if let Some(elements) = Self::get_elements(def, catalog, defs) {
             for element in elements {
-                let (from, to): (Vec3, Vec3) = (element.from.into(), element.to.into());
-
-                let mut element_mesh = Mesh::from(Cuboid::from_corners(from, to));
-                element_mesh.translate_by(from.midpoint(to) - Vec3::splat(8.0));
-                element_mesh.scale_by(Vec3::splat(1.0 / 16.0));
-
-                // TODO: Rotate the element mesh based on the element rotation
-
-                // Append per-face data to the directional meshes
-                for direction in Self::CUBOID_FACES {
-                    let Some(element_face) = element.faces.get(&direction) else {
-                        continue;
-                    };
-
-                    let direction_mesh = &mut cache[usize::from(direction)];
-                    let attribute_group = usize::from(direction);
-
-                    // TODO: Set the element mesh UVs based on the element texture
-                    // TODO: Apply the element face rotation to the UVs
-                    if let Some(texture_handle) = Self::get_element_texture(
-                        element_face,
-                        definition,
-                        definition_key,
-                        catalog,
-                        definitions,
-                    ) {
-                        if let Some(atlas_index) = atlas
-                            .layout()
-                            .get_texture_index(texture_handle.id().typed_debug_checked())
-                        {
-                            let atlas_rect = atlas.layout().textures[atlas_index].as_rect();
-                            let atlas_size = atlas.layout().size.as_vec2();
-
-                            let element_uvs =
-                                element_mesh.attribute_mut(Mesh::ATTRIBUTE_UV_0).unwrap();
-                            let VertexAttributeValues::Float32x2(element_uvs) = element_uvs else {
-                                unreachable!();
-                            };
-
-                            let _face_uvs = element_face.uv(element);
-
-                            let uv_range = (attribute_group * 4)..(attribute_group * 4 + 4);
-                            for [u, v] in &mut element_uvs[uv_range] {
-                                *u = u.remap(
-                                    0.0,
-                                    1.0,
-                                    atlas_rect.min.x / atlas_size.x,
-                                    atlas_rect.max.x / atlas_size.x,
-                                );
-                                *v = v.remap(
-                                    0.0,
-                                    1.0,
-                                    atlas_rect.min.y / atlas_size.y,
-                                    atlas_rect.max.y / atlas_size.y,
-                                );
-                            }
-                        } else {
-                            #[cfg(debug_assertions)]
-                            bevy_log::error!("BlockModelProcessor: BlockAtlas missing {direction:?} texture for \"{definition_key}\"");
-                        }
-                    } else {
-                        #[cfg(debug_assertions)]
-                        bevy_log::error!("BlockModelProcessor: AssetCatalog missing {direction:?} texture for \"{definition_key}\"");
-                    }
+                // Append per-face data to the face meshes
+                for (direction, face) in
+                    Direction::iter().filter_map(|d| element.faces.get(&d).map(|f| (d, f)))
+                {
+                    let face_mesh = &mut cache[usize::from(direction)];
+                    *face_mesh = Self::create_face_mesh(face, element, direction);
 
                     // Append the element positions to the direction mesh
-                    Self::append_element_positions(attribute_group, direction_mesh, &element_mesh);
-                    // Append the element normals to the direction mesh
-                    Self::append_element_normals(attribute_group, direction_mesh, &element_mesh);
-                    // Append the element uvs to the direction mesh
-                    Self::append_element_uvs(attribute_group, direction_mesh, &element_mesh);
-                }
+                    Self::append_element_positions(face, element, face_mesh);
 
-                block_mesh.merge(&element_mesh);
+                    // Get the texture for the element face
+                    let texture = Self::get_element_texture(face, def, def_key, catalog, defs);
+
+                    // Append the element normals to the direction mesh
+                    Self::append_element_normals(face, element, texture, catalog, face_mesh);
+
+                    // Append the element uvs to the direction mesh
+                    Self::append_element_uvs(face, element, texture, atlas, catalog, face_mesh);
+
+                    // Append the direction mesh to the block mesh
+                    block_mesh.merge(face_mesh);
+                }
             }
         }
 

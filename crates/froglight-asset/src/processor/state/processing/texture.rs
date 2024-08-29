@@ -11,7 +11,9 @@ use bevy_reflect::{prelude::ReflectDefault, Reflect};
 use bevy_render::texture::{Image, ImageSampler};
 use bevy_state::state::OnEnter;
 
-use crate::{AssetCatalog, AssetProcess, ResourcePack, ResourcePackList};
+use crate::{
+    assets::processed::FallbackTexture, AssetCatalog, AssetProcess, ResourcePack, ResourcePackList,
+};
 
 #[doc(hidden)]
 pub(crate) fn build(app: &mut App) {
@@ -58,6 +60,7 @@ impl TextureProcessor {
     pub fn catalog_textures(
         resources: Res<ResourcePackList>,
         asset_server: Res<AssetServer>,
+        fallback: Res<FallbackTexture>,
         mut assets: ResMut<Assets<ResourcePack>>,
         mut images: ResMut<Assets<Image>>,
         mut catalog: ResMut<AssetCatalog>,
@@ -73,6 +76,9 @@ impl TextureProcessor {
 
         // Check if the processor is finished.
         if state.resource_index >= resources.len() {
+            // Add the `FallbackTexture` to the catalog.
+            catalog.insert(FallbackTexture::ASSET_KEY, fallback.as_handle().clone());
+
             // Check if all textures have loaded
             for (key, handle) in catalog.typed_ref::<Image>().unwrap().iter_untyped() {
                 if asset_server.get_load_state(handle.id()) != Some(LoadState::Loaded) {

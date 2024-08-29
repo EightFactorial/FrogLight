@@ -1,17 +1,20 @@
 use bevy_asset::{Assets, UntypedHandle};
 use bevy_log::error;
+use bevy_math::{prelude::Rectangle, Dir3};
 use bevy_render::{
     mesh::{Indices, Mesh, PrimitiveTopology, VertexAttributeValues},
     render_asset::RenderAssetUsages,
     texture::Image,
 };
+use bevy_transform::components::Transform;
 use bevy_utils::HashMap;
-use froglight_common::ResourceKey;
+use froglight_common::{Direction, ResourceKey};
+use glam::{FloatExt, Vec2, Vec3, Vec3Swizzles};
 
 use super::BlockModelProcessor;
 use crate::{
     assets::{
-        processed::model::ModelTransformIndex,
+        processed::{model::ModelTransformIndex, BlockAtlas, FallbackTexture},
         raw::{
             model::{DefinitionElement, DefinitionTransform, ElementFace, ResourceOrVariable},
             BlockModelDefinition,
@@ -193,82 +196,125 @@ impl BlockModelProcessor {
         mesh
     }
 
-    /// Appends the [`Mesh::ATTRIBUTE_POSITION`] values
-    /// from an `element mesh` to a `direction mesh`.
+    /// Creates a [`Mesh`] for an [`ElementFace`].
+    #[must_use]
+    pub(super) fn create_face_mesh(
+        _face: &ElementFace,
+        element: &DefinitionElement,
+        direction: Direction,
+    ) -> Mesh {
+        // Correctly position the face element
+        let mut translation = Vec3::from(element.from).midpoint(Vec3::from(element.to));
+        // Center the model around the origin
+        translation -= Vec3::splat(8.0);
+
+        // Scale the model to the correct size
+        let scale = Vec3::splat(1.0 / 16.0);
+
+        // TODO: Transform the model to face the correct direction
+        let transform = Transform::IDENTITY.looking_to(direction.to_axis().as_vec3(), Dir3::Y);
+
+        Mesh::from(Self::get_rectangle(element, direction))
+            .transformed_by(transform)
+            .translated_by(translation)
+            .scaled_by(scale)
+    }
+
+    /// Creates a [`Rectangle`] for an [`ElementFace`] based on the direction.
+    #[must_use]
+    fn get_rectangle(element: &DefinitionElement, direction: Direction) -> Rectangle {
+        let (from, to): (Vec2, Vec2) = match direction {
+            Direction::Up => (Vec3::from(element.from).xz(), Vec3::from(element.to).xz()),
+            Direction::Down => (Vec3::from(element.to).xz(), Vec3::from(element.from).xz()),
+            Direction::North => (Vec3::from(element.from).yz(), Vec3::from(element.to).yz()),
+            Direction::South => (Vec3::from(element.to).yz(), Vec3::from(element.from).yz()),
+            Direction::East => (Vec3::from(element.to).xy(), Vec3::from(element.from).xy()),
+            Direction::West => (Vec3::from(element.from).xy(), Vec3::from(element.to).xy()),
+        };
+        Rectangle::from_corners(from, to)
+    }
+
+    /// Appends the positions of an [`ElementFace`] to a [`Mesh`].
     pub(super) fn append_element_positions(
-        attribute_group: usize,
-        direction_mesh: &mut Mesh,
-        element_mesh: &Mesh,
+        _face: &ElementFace,
+        _element: &DefinitionElement,
+        _face_mesh: &mut Mesh,
     ) {
-        let position_range = (attribute_group * 4)..(attribute_group * 4 + 4);
-        match (
-            element_mesh.attribute(Mesh::ATTRIBUTE_POSITION),
-            direction_mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION),
-        ) {
-            (
-                Some(VertexAttributeValues::Float32x3(elem_positions)),
-                Some(VertexAttributeValues::Float32x3(dir_positions)),
-            ) => {
-                dir_positions.extend_from_slice(&elem_positions[position_range]);
-            }
-            (Some(VertexAttributeValues::Float32x3(elem_positions)), None) => {
-                direction_mesh.insert_attribute(
-                    Mesh::ATTRIBUTE_POSITION,
-                    elem_positions[position_range].to_vec(),
-                );
-            }
-            _ => unreachable!("Element will always have Float32x3 positions"),
-        }
     }
 
-    /// Appends the [`Mesh::ATTRIBUTE_NORMAL`] values
-    /// from an `element mesh` to a `direction mesh`.
+    /// Appends the normals of an [`ElementFace`] to a [`Mesh`].
     pub(super) fn append_element_normals(
-        attribute_group: usize,
-        direction_mesh: &mut Mesh,
-        element_mesh: &Mesh,
+        _face: &ElementFace,
+        _element: &DefinitionElement,
+        _texture: Option<&UntypedHandle>,
+        _catalog: &AssetCatalog,
+        _face_mesh: &mut Mesh,
     ) {
-        let normal_range = (attribute_group * 4)..(attribute_group * 4 + 4);
-        match (
-            element_mesh.attribute(Mesh::ATTRIBUTE_NORMAL),
-            direction_mesh.attribute_mut(Mesh::ATTRIBUTE_NORMAL),
-        ) {
-            (
-                Some(VertexAttributeValues::Float32x3(elem_normals)),
-                Some(VertexAttributeValues::Float32x3(dir_normals)),
-            ) => {
-                dir_normals.extend_from_slice(&elem_normals[normal_range]);
-            }
-            (Some(VertexAttributeValues::Float32x3(elem_normals)), None) => {
-                direction_mesh
-                    .insert_attribute(Mesh::ATTRIBUTE_NORMAL, elem_normals[normal_range].to_vec());
-            }
-            _ => unreachable!("Element will always have Float32x3 normals"),
-        }
     }
 
-    /// Appends the [`Mesh::ATTRIBUTE_UV_0`] values
-    /// from an `element mesh` to a `direction mesh`.
+    /// Appends the UVs of an [`ElementFace`] to a [`Mesh`].
     pub(super) fn append_element_uvs(
-        attribute_group: usize,
-        direction_mesh: &mut Mesh,
-        element_mesh: &Mesh,
+        face: &ElementFace,
+        element: &DefinitionElement,
+        texture: Option<&UntypedHandle>,
+        atlas: &BlockAtlas,
+        catalog: &AssetCatalog,
+        face_mesh: &mut Mesh,
     ) {
-        let uv_range = (attribute_group * 4)..(attribute_group * 4 + 4);
-        match (
-            element_mesh.attribute(Mesh::ATTRIBUTE_UV_0),
-            direction_mesh.attribute_mut(Mesh::ATTRIBUTE_UV_0),
-        ) {
-            (
-                Some(VertexAttributeValues::Float32x2(elem_uvs)),
-                Some(VertexAttributeValues::Float32x2(dir_uvs)),
-            ) => {
-                dir_uvs.extend_from_slice(&elem_uvs[uv_range]);
-            }
-            (Some(VertexAttributeValues::Float32x2(elem_uvs)), None) => {
-                direction_mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, elem_uvs[uv_range].to_vec());
-            }
-            _ => unreachable!("Element will always have Float32x2 uvs"),
+        // Get the texture index in the atlas, or the fallback texture if missing
+        let atlas_index = texture
+            .and_then(|h| atlas.layout().get_texture_index(h.id().typed_debug_checked()))
+            .unwrap_or_else(|| {
+                // Log an error if the texture is missing
+                if let Some(texture) = texture {
+                    if let Some(path) = texture.path() {
+                        error!("BlockModelProcessor: BlockAtlas missing texture, \"{path}\"");
+                    } else {
+                        error!(
+                            "BlockModelProcessor: BlockAtlas missing texture, {:?}",
+                            texture.id()
+                        );
+                    }
+                }
+
+                // Get the index of the fallback texture
+                let fallback = catalog
+                    .get_untyped::<Image>(&FallbackTexture::ASSET_KEY)
+                    .expect("AssetCatalog missing FallbackTexture");
+                atlas
+                    .layout()
+                    .get_texture_index(fallback.id().typed_debug_checked())
+                    .expect("BlockAtlas missing FallbackTexture")
+            });
+
+        // Order: x1, x2, y1, y2
+        let mut face_uvs = face.uv(element);
+        // Apply the face's rotation to the UVs
+        face_uvs.rotate_right(face.rotation() as usize / 90 % 4);
+
+        let atlas_rect = atlas.layout().textures[atlas_index].as_rect();
+        let atlas_size = atlas.layout().size.as_vec2();
+
+        // Remap the UVs to the texture atlas
+        let mut uvs = Vec::with_capacity(4);
+        for index in 0..4 {
+            // Push UVs in this order,
+            let (u, v) = match index {
+                // X1, Y1
+                0 => (face_uvs[0], face_uvs[2]),
+                // X1, Y2
+                1 => (face_uvs[0], face_uvs[3]),
+                // X2, Y2
+                2 => (face_uvs[1], face_uvs[3]),
+                // X2, Y1
+                3 => (face_uvs[1], face_uvs[2]),
+                _ => unreachable!(),
+            };
+            uvs.push([
+                u.remap(0.0, 1.0, atlas_rect.min.x / atlas_size.x, atlas_rect.max.x / atlas_size.x),
+                v.remap(0.0, 1.0, atlas_rect.min.y / atlas_size.y, atlas_rect.max.y / atlas_size.y),
+            ]);
         }
+        face_mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
     }
 }

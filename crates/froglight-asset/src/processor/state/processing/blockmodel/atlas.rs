@@ -14,7 +14,7 @@ use froglight_common::ResourceKey;
 use super::BlockModelProcessor;
 use crate::{
     assets::{
-        processed::BlockAtlas,
+        processed::{BlockAtlas, FallbackTexture},
         raw::{model::ResourceOrVariable, BlockModelDefinition},
     },
     processor::state::TextureProcessor,
@@ -47,6 +47,7 @@ impl BlockModelProcessor {
     pub(super) fn create_block_atlas(
         definitions: Res<Assets<BlockModelDefinition>>,
         catalog: Res<AssetCatalog>,
+        fallback: Res<FallbackTexture>,
         mut images: ResMut<Assets<Image>>,
         mut atlases: ResMut<Assets<TextureAtlasLayout>>,
         mut state: ResMut<Self>,
@@ -58,6 +59,15 @@ impl BlockModelProcessor {
         #[cfg(debug_assertions)]
         let mut definition_count = 0;
         let mut inserted_textures = HashSet::new();
+
+        // Insert the `FallbackTexture`
+        {
+            let fallback_handle = fallback.as_handle();
+            let fallback_image =
+                images.get(fallback_handle).expect("AssetServer failed to load FallbackTexture");
+            builder.add_texture(Some(fallback_handle.id()), fallback_image);
+            inserted_textures.insert(fallback_handle.id().untyped());
+        }
 
         // Iterate over all `BlockModelDefinition`s
         for def in catalog.typed_ref::<BlockModelDefinition>().unwrap().iter_untyped().filter_map(

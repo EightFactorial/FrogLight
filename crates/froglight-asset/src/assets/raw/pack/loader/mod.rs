@@ -78,24 +78,22 @@ impl EntryType {
 
         // Match folders with expected file extensions
         match (folder, extension) {
-            ("textures", "png") => Some(Self::Texture),
-            ("sounds", "ogg") => Some(Self::Sound),
+            ("atlases", "json") => Some(Self::TextureAtlas),
             ("blockstates", "json") => Some(Self::BlockState),
+            ("lang", "json") => Some(Self::Language),
             ("models", "json") if path.contains("models/block") => Some(Self::BlockModel),
             ("models", "json") if path.contains("models/item") => Some(Self::ItemModel),
-            ("lang", "json") => Some(Self::Language),
-            ("atlases", "json") => Some(Self::TextureAtlas),
             ("resourcepacks", "zip") => Some(Self::ResourcePack),
             ("sounds.json", "json") => Some(Self::SoundMap),
+            ("sounds", "ogg") => Some(Self::Sound),
+            ("textures", "png") => Some(Self::Texture),
 
-            // Suppress warnings for known unsupported assets.
-            #[cfg(debug_assertions)]
-            ("font" | "particles" | "shaders" | "texts", _) => None,
-
-            // Suppress warnings for known but unused assets.
+            // Suppress warnings for unused files.
             #[cfg(debug_assertions)]
             ("gpu_warnlist.json" | "regional_compliancies.json", _) => None,
-
+            // Suppress warnings for unsupported assets.
+            #[cfg(debug_assertions)]
+            ("font" | "particles" | "shaders" | "texts", _) => None,
             // Warn about unknown assets in debug mode.
             #[cfg(debug_assertions)]
             _ => {

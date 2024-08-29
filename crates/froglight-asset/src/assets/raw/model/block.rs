@@ -212,13 +212,9 @@ impl ElementFace {
     pub const DEFAULT_TINT_INDEX: i32 = -1;
 
     /// The uv coordinates of the face.
-    ///
-    /// Uses the [`DefinitionElement`]'s `from` and `to`
-    /// values if not specified.
-    // TODO: Does this care about the direction of the current face?
     #[must_use]
-    pub fn uv(&self, element: &DefinitionElement) -> [f32; 4] {
-        self.uv.unwrap_or_else(|| [element.from[0], element.from[1], element.to[0], element.to[1]])
+    pub fn uv(&self, _element: &DefinitionElement) -> [f32; 4] {
+        self.uv.unwrap_or([0f32, 1f32, 0f32, 1f32])
     }
 
     /// The cullface of the current face.

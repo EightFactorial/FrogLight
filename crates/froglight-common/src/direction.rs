@@ -32,6 +32,16 @@ pub enum Direction {
 }
 
 impl Direction {
+    /// An array of all possible [`Direction`]s.
+    pub const ALL: [Direction; 6] = [
+        Direction::Up,
+        Direction::Down,
+        Direction::North,
+        Direction::South,
+        Direction::East,
+        Direction::West,
+    ];
+
     /// A [`IVec3`] pointing in the [`Direction::Up`] direction.
     pub const UP: IVec3 = IVec3::new(0, 1, 0);
     /// A [`IVec3`] pointing in the [`Direction::Down`] direction.
@@ -68,6 +78,11 @@ impl Direction {
     #[must_use]
     #[inline]
     pub fn try_from_axis(axis: IVec3) -> Option<Direction> { Self::try_from(axis).ok() }
+
+    /// Returns an iterator over all possible [`Direction`]s.
+    #[must_use]
+    #[inline]
+    pub fn iter() -> std::array::IntoIter<Self, 6> { Self::ALL.into_iter() }
 }
 
 impl TryFrom<IVec3> for Direction {
