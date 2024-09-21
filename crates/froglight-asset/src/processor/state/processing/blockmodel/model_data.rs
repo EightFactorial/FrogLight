@@ -259,6 +259,7 @@ impl BlockModelProcessor {
         texture: Option<&UntypedHandle>,
         atlas: &BlockAtlas,
         catalog: &AssetCatalog,
+        direction: Direction,
         face_mesh: &mut Mesh,
     ) {
         // Get the texture index in the atlas, or the fallback texture if missing
@@ -288,7 +289,7 @@ impl BlockModelProcessor {
             });
 
         // Order: x1, x2, y1, y2
-        let mut face_uvs = face.uv(element);
+        let mut face_uvs = face.uv(element, direction);
         // Apply the face's rotation to the UVs
         face_uvs.rotate_right(face.rotation() as usize / 90 % 4);
 
@@ -311,8 +312,18 @@ impl BlockModelProcessor {
                 _ => unreachable!(),
             };
             uvs.push([
-                u.remap(0.0, 1.0, atlas_rect.min.x / atlas_size.x, atlas_rect.max.x / atlas_size.x),
-                v.remap(0.0, 1.0, atlas_rect.min.y / atlas_size.y, atlas_rect.max.y / atlas_size.y),
+                u.remap(
+                    0.0,
+                    16.0,
+                    atlas_rect.min.x / atlas_size.x,
+                    atlas_rect.max.x / atlas_size.x,
+                ),
+                v.remap(
+                    0.0,
+                    16.0,
+                    atlas_rect.min.y / atlas_size.y,
+                    atlas_rect.max.y / atlas_size.y,
+                ),
             ]);
         }
         face_mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);

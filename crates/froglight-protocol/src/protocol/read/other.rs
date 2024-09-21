@@ -35,7 +35,7 @@ impl FrogRead for NbtTag {
     where
         Self: Sized,
     {
-        owned::read_tag(buf).map_err(ReadError::from)
+        owned::read_tag(buf).map_err(|e| ReadError::NbtError(e.into()))
     }
 }
 

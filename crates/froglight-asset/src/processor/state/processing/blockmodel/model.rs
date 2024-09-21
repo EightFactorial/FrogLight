@@ -207,7 +207,9 @@ impl BlockModelProcessor {
                     Self::append_element_normals(face, element, texture, catalog, face_mesh);
 
                     // Append the element uvs to the direction mesh
-                    Self::append_element_uvs(face, element, texture, atlas, catalog, face_mesh);
+                    Self::append_element_uvs(
+                        face, element, texture, atlas, catalog, direction, face_mesh,
+                    );
 
                     // Append the direction mesh to the block mesh
                     block_mesh.merge(face_mesh);

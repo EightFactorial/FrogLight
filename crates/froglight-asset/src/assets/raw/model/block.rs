@@ -5,7 +5,7 @@ use bevy_asset::{Asset, AssetApp, Handle, ReflectAsset, ReflectHandle};
 use bevy_reflect::{prelude::ReflectDefault, Reflect, ReflectDeserialize, ReflectSerialize};
 use bevy_utils::HashMap;
 use froglight_common::Direction;
-use glam::{EulerRot, Quat};
+use glam::{EulerRot, Quat, Vec3};
 use serde::{Deserialize, Serialize};
 
 use crate::assets::{processed::model::ModelTransformIndex, SerdeJsonLoader};
@@ -212,9 +212,20 @@ impl ElementFace {
     pub const DEFAULT_TINT_INDEX: i32 = -1;
 
     /// The uv coordinates of the face.
+    ///
+    /// Uses the element's position if not specified.
+    ///
+    /// Order is `[x1, x2, y1, y2]`.
     #[must_use]
-    pub fn uv(&self, _element: &DefinitionElement) -> [f32; 4] {
-        self.uv.unwrap_or([0f32, 1f32, 0f32, 1f32])
+    pub fn uv(&self, element: &DefinitionElement, direction: Direction) -> [f32; 4] {
+        self.uv.unwrap_or_else(|| {
+            let (from, to) = (Vec3::from(element.from), Vec3::from(element.to));
+            match direction {
+                Direction::Up | Direction::Down => [from.x, to.x, from.z, to.z],
+                Direction::North | Direction::South => [from.x, to.x, from.y, to.y],
+                Direction::East | Direction::West => [from.z, to.z, from.y, to.y],
+            }
+        })
     }
 
     /// The cullface of the current face.
