@@ -55,79 +55,79 @@ impl BlockModelProcessor {
         mut state: ResMut<Self>,
     ) {
         catalog.typed_mut_scope::<BlockModel>(|catalog, mut catalog_models| {
-            for (_state_key, state_handle) in catalog
-                .typed_ref::<BlockStateDefinition>()
-                .unwrap()
-                .iter_untyped()
-                .skip(state.state_index)
-                .take(Self::CREATED_MODELS_PER_FRAME)
-            {
-                state.state_index += 1;
-                if let Some(state) = states.get(state_handle.id().typed_debug_checked()) {
-                    match state {
-                        BlockStateDefinition::Variants { variants } => {
-                            for def in variants.values().flat_map(StateModelDefinitions::as_slice) {
-                                let Some(definition_key) =
-                                    ResourceKey::try_new(def.model.clone()).ok()
-                                else {
-                                    continue;
-                                };
-                                let Some(definition_handle) =
-                                    catalog.get_untyped::<BlockModelDefinition>(&definition_key)
-                                else {
-                                    continue;
-                                };
-                                let Some(definition) =
-                                    definitions.get(definition_handle.id().typed_debug_checked())
-                                else {
-                                    continue;
-                                };
+            if let Some(defs) = catalog.typed_ref::<BlockStateDefinition>() {
+                for (_state_key, state_handle) in
+                    defs.iter_untyped().skip(state.state_index).take(Self::CREATED_MODELS_PER_FRAME)
+                {
+                    state.state_index += 1;
+                    if let Some(state) = states.get(state_handle.id().typed_debug_checked()) {
+                        match state {
+                            BlockStateDefinition::Variants { variants } => {
+                                for def in
+                                    variants.values().flat_map(StateModelDefinitions::as_slice)
+                                {
+                                    let Some(definition_key) =
+                                        ResourceKey::try_new(def.model.clone()).ok()
+                                    else {
+                                        continue;
+                                    };
+                                    let Some(definition_handle) = catalog
+                                        .get_untyped::<BlockModelDefinition>(&definition_key)
+                                    else {
+                                        continue;
+                                    };
+                                    let Some(definition) = definitions
+                                        .get(definition_handle.id().typed_debug_checked())
+                                    else {
+                                        continue;
+                                    };
 
-                                if !catalog_models.contains(&definition_key) {
-                                    let model = Self::create_model(
-                                        definition,
-                                        &definition_key,
-                                        &definitions,
-                                        &cache,
-                                        &atlas,
-                                        catalog,
-                                        &mut meshes,
-                                    );
-                                    let model_handle = models.add(model);
-                                    catalog_models.insert(definition_key, model_handle);
+                                    if !catalog_models.contains(&definition_key) {
+                                        let model = Self::create_model(
+                                            definition,
+                                            &definition_key,
+                                            &definitions,
+                                            &cache,
+                                            &atlas,
+                                            catalog,
+                                            &mut meshes,
+                                        );
+                                        let model_handle = models.add(model);
+                                        catalog_models.insert(definition_key, model_handle);
+                                    }
                                 }
                             }
-                        }
-                        BlockStateDefinition::MultiPart { multipart } => {
-                            for def in multipart.iter().flat_map(|p| p.apply.as_slice()) {
-                                let Some(definition_key) =
-                                    ResourceKey::try_new(def.model.clone()).ok()
-                                else {
-                                    continue;
-                                };
-                                let Some(definition_handle) =
-                                    catalog.get_untyped::<BlockModelDefinition>(&definition_key)
-                                else {
-                                    continue;
-                                };
-                                let Some(definition) =
-                                    definitions.get(definition_handle.id().typed_debug_checked())
-                                else {
-                                    continue;
-                                };
+                            BlockStateDefinition::MultiPart { multipart } => {
+                                for def in multipart.iter().flat_map(|p| p.apply.as_slice()) {
+                                    let Some(definition_key) =
+                                        ResourceKey::try_new(def.model.clone()).ok()
+                                    else {
+                                        continue;
+                                    };
+                                    let Some(definition_handle) = catalog
+                                        .get_untyped::<BlockModelDefinition>(&definition_key)
+                                    else {
+                                        continue;
+                                    };
+                                    let Some(definition) = definitions
+                                        .get(definition_handle.id().typed_debug_checked())
+                                    else {
+                                        continue;
+                                    };
 
-                                if !catalog_models.contains(&definition_key) {
-                                    let model = Self::create_model(
-                                        definition,
-                                        &definition_key,
-                                        &definitions,
-                                        &cache,
-                                        &atlas,
-                                        catalog,
-                                        &mut meshes,
-                                    );
-                                    let model_handle = models.add(model);
-                                    catalog_models.insert(definition_key, model_handle);
+                                    if !catalog_models.contains(&definition_key) {
+                                        let model = Self::create_model(
+                                            definition,
+                                            &definition_key,
+                                            &definitions,
+                                            &cache,
+                                            &atlas,
+                                            catalog,
+                                            &mut meshes,
+                                        );
+                                        let model_handle = models.add(model);
+                                        catalog_models.insert(definition_key, model_handle);
+                                    }
                                 }
                             }
                         }

@@ -263,7 +263,7 @@ impl BlockModelProcessor {
         face_mesh: &mut Mesh,
     ) {
         // Get the texture index in the atlas, or the fallback texture if missing
-        let atlas_index = texture
+        let atlas_index: usize = texture
             .and_then(|h| atlas.layout().get_texture_index(h.id().typed_debug_checked()))
             .unwrap_or_else(|| {
                 // Log an error if the texture is missing
@@ -279,22 +279,19 @@ impl BlockModelProcessor {
                 }
 
                 // Get the index of the fallback texture
-                let fallback = catalog
+                catalog
                     .get_untyped::<Image>(&FallbackTexture::ASSET_KEY)
-                    .expect("AssetCatalog missing FallbackTexture");
-                atlas
-                    .layout()
-                    .get_texture_index(fallback.id().typed_debug_checked())
+                    .and_then(|h| atlas.layout().get_texture_index(h.id().typed_debug_checked()))
                     .expect("BlockAtlas missing FallbackTexture")
             });
+
+        let atlas_rect = atlas.layout().textures[atlas_index].as_rect();
+        let atlas_size = atlas.layout().size.as_vec2();
 
         // Order: x1, x2, y1, y2
         let mut face_uvs = face.uv(element, direction);
         // Apply the face's rotation to the UVs
         face_uvs.rotate_right(face.rotation() as usize / 90 % 4);
-
-        let atlas_rect = atlas.layout().textures[atlas_index].as_rect();
-        let atlas_size = atlas.layout().size.as_vec2();
 
         // Remap the UVs to the texture atlas
         let mut uvs = Vec::with_capacity(4);

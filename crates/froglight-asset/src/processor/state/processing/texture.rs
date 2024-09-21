@@ -81,8 +81,14 @@ impl TextureProcessor {
 
             // Check if all textures have loaded
             for (key, handle) in catalog.typed_ref::<Image>().unwrap().iter_untyped() {
-                if asset_server.get_load_state(handle.id()) != Some(LoadState::Loaded) {
-                    warn!("TextureProcessor: Texture has not loaded, \"{key}\"");
+                match asset_server.get_load_state(handle.id()) {
+                    Some(LoadState::Loaded) => {}
+                    Some(state) => {
+                        warn!("TextureProcessor: Texture has not loaded, {state:?} \"{key}\"");
+                    }
+                    None => {
+                        warn!("TextureProcessor: Texture has not loaded, \"{key}\"");
+                    }
                 }
             }
 

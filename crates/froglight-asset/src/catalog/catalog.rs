@@ -65,7 +65,6 @@ impl AssetCatalog {
     pub fn is_empty_of<A: Asset>(&self) -> bool {
         self.0.get(&TypeId::of::<A>()).map_or(true, |m| m.is_empty())
     }
-
     /// Clear the [`AssetCatalog`].
     ///
     /// This will remove all assets from the [`AssetCatalog`].
@@ -81,6 +80,12 @@ impl AssetCatalog {
         }
     }
 
+    /// Iterate over all [`UntypedHandle`]s in the [`AssetCatalog`].
+    pub fn iter(&self) -> impl Iterator<Item = (&ResourceKey, &UntypedHandle, &TypeId)> {
+        self.0
+            .iter()
+            .flat_map(|(type_id, m)| m.iter().map(move |(key, handle)| (key, handle, type_id)))
+    }
     /// Get a reference to the [`AssetCatalog`] for an [`Asset`].
     ///
     /// This is useful when reading many assets of the same type.

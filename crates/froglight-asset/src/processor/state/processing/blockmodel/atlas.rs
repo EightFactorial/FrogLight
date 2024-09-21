@@ -70,52 +70,55 @@ impl BlockModelProcessor {
         }
 
         // Iterate over all `BlockModelDefinition`s
-        for def in catalog.typed_ref::<BlockModelDefinition>().unwrap().iter_untyped().filter_map(
-            |(k, h)| {
-                definitions.get(h.id().typed_debug_checked()).or_else(|| {
-                    error!("BlockModelProcessor: Failed to get BlockModelDefinition from AssetServer, \"{k}\"");
-                    None
-                })
-            },
-        ) {
-            // Get the resources (textures) from the current definition and all parents
-            for resource in
-                Self::get_resources(def, &catalog, &definitions).into_iter().filter_map(|r| {
-                    ResourceKey::try_new(r)
-                        .inspect_err(|err| {
-                            error!(
-                                "BlockModelProcessor: Failed to create ResourceKey from \"{r}\", {err}"
-                            );
-                        })
-                        .ok()
-                })
-            {
-                // Get the texture handle from the catalog
-                if let Some(image_handle) = catalog.get_untyped::<Image>(&resource) {
-                    // If the texture has not been inserted before
-                    if inserted_textures.insert(image_handle.id()) {
-                        // Add the texture to the `TextureAtlasBuilder`
-                        let image_id = image_handle.id().typed_debug_checked();
-                        if let Some(image) = images.get(image_id) {
-                            builder.add_texture(Some(image_id), image);
-                        } else {
-                            error!(
-                                "BlockModelProcessor: Failed to get Image from AssetServer, \"{resource}\""
-                            );
+        if let Some(defs) = catalog.typed_ref::<BlockModelDefinition>() {
+            for def in defs.iter_untyped().filter_map(
+                |(k, h)| {
+                    definitions.get(h.id().typed_debug_checked()).or_else(|| {
+                        error!("BlockModelProcessor: Failed to get BlockModelDefinition from AssetServer, \"{k}\"");
+                        None
+                    })
+                },
+            ) {
+                // Get the resources (textures) from the current definition and all parents
+                for resource in
+                    Self::get_resources(def, &catalog, &definitions).into_iter().filter_map(|r| {
+                        ResourceKey::try_new(r)
+                            .inspect_err(|err| {
+                                error!(
+                                    "BlockModelProcessor: Failed to create ResourceKey from \"{r}\", {err}"
+                                );
+                            })
+                            .ok()
+                    })
+                {
+                    // Get the texture handle from the catalog
+                    if let Some(image_handle) = catalog.get_untyped::<Image>(&resource) {
+                        // If the texture has not been inserted before
+                        if inserted_textures.insert(image_handle.id()) {
+                            // Add the texture to the `TextureAtlasBuilder`
+                            let image_id = image_handle.id().typed_debug_checked();
+                            if let Some(image) = images.get(image_id) {
+                                builder.add_texture(Some(image_id), image);
+                            } else {
+                                error!(
+                                    "BlockModelProcessor: Failed to get Image from AssetServer, \"{resource}\""
+                                );
+                            }
                         }
+                    } else {
+                        error!(
+                            "BlockModelProcessor: Failed to get Image from AssetCatalog, \"{resource}\""
+                        );
                     }
-                } else {
-                    error!(
-                        "BlockModelProcessor: Failed to get Image from AssetCatalog, \"{resource}\""
-                    );
+                }
+    
+                #[cfg(debug_assertions)]
+                {
+                    definition_count += 1;
                 }
             }
-
-            #[cfg(debug_assertions)]
-            {
-                definition_count += 1;
-            }
         }
+
 
         #[cfg(debug_assertions)]
         debug!(

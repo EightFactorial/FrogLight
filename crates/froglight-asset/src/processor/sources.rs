@@ -32,7 +32,7 @@ pub(super) fn build(app: &mut App) {
 /// [`ResourcePack`]s are loaded in the order they are listed.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, Deref, DerefMut, Resource, Reflect)]
 #[reflect(Default, Resource)]
-pub struct ResourcePackList(pub Vec<Handle<ResourcePack>>);
+pub struct ResourcePackList(Vec<Handle<ResourcePack>>);
 
 impl ResourcePackList {
     /// Create a new empty [`ResourcePackList`].
