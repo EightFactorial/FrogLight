@@ -37,9 +37,9 @@ impl<A: Asset + DeserializeOwned> AssetLoader for SerdeJsonLoader<A> {
         (): &'a Self::Settings,
         _: &'a mut LoadContext<'_>,
     ) -> Result<Self::Asset, Self::Error> {
-        let mut reader_content = String::new();
-        reader.read_to_string(&mut reader_content).await?;
-        serde_json::from_str(&reader_content).map_err(SerdeJsonLoaderError::Serde)
+        let mut buf = Vec::new();
+        reader.read_to_end(&mut buf).await?;
+        serde_json::from_slice(&buf).map_err(SerdeJsonLoaderError::Serde)
     }
 
     fn extensions(&self) -> &[&str] { &["json"] }

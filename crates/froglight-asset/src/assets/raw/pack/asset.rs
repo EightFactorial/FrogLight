@@ -52,14 +52,19 @@ impl Asset for ResourcePack {}
 impl VisitAssetDependencies for ResourcePack {
     fn visit_dependencies(&self, visit: &mut impl FnMut(UntypedAssetId)) {
         self.meta.visit_dependencies(visit);
-        self.textures.values().for_each(|handle| visit(handle.into()));
-        self.block_models.values().for_each(|handle| visit(handle.into()));
-        self.block_states.values().for_each(|handle| visit(handle.into()));
-        self.sounds.values().for_each(|handle| visit(handle.into()));
-        self.sound_maps.values().for_each(|handle| visit(handle.into()));
-        self.languages.values().for_each(|handle| visit(handle.into()));
-        self.children.values().for_each(|handle| visit(handle.into()));
+        self.textures.values().for_each(visit_handle(visit));
+        self.block_models.values().for_each(visit_handle(visit));
+        self.block_states.values().for_each(visit_handle(visit));
+        self.sounds.values().for_each(visit_handle(visit));
+        self.sound_maps.values().for_each(visit_handle(visit));
+        self.languages.values().for_each(visit_handle(visit));
+        self.children.values().for_each(visit_handle(visit));
     }
+}
+
+#[inline]
+fn visit_handle<A: Asset>(visit: &mut impl FnMut(UntypedAssetId)) -> impl '_ + FnMut(&Handle<A>) {
+    |handle| handle.visit_dependencies(visit)
 }
 
 impl ResourcePack {
