@@ -25,7 +25,7 @@ pub(crate) fn build(app: &mut App) {
 }
 
 mod success {
-    use bevy_asset::{AssetServer, RecursiveDependencyLoadState};
+    use bevy_asset::AssetServer;
     use bevy_ecs::system::{Res, ResMut};
     use bevy_log::debug;
     use bevy_state::state::NextState;
@@ -34,10 +34,7 @@ mod success {
 
     /// Check if all [`ResourcePack`](crate::ResourcePack)s are loaded.
     pub(super) fn all_assets_loaded(list: Res<ResourcePackList>, assets: Res<AssetServer>) -> bool {
-        list.iter().all(|h| {
-            assets.get_recursive_dependency_load_state(h.id())
-                == Some(RecursiveDependencyLoadState::Loaded)
-        })
+        list.iter().all(|h| assets.is_loaded_with_dependencies(h.id()))
     }
 
     /// Enter the [`AssetProcess::Processing`] state.

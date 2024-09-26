@@ -203,33 +203,41 @@ impl BlockModelProcessor {
         element: &DefinitionElement,
         direction: Direction,
     ) -> Mesh {
-        // Correctly position the face element
-        let mut translation = Vec3::from(element.from).midpoint(Vec3::from(element.to));
-        // Center the model around the origin
-        translation -= Vec3::splat(8.0);
-
-        // Scale the model to the correct size
-        let scale = Vec3::splat(1.0 / 16.0);
-
-        // TODO: Transform the model to face the correct direction
-        let transform = Transform::IDENTITY.looking_to(direction.to_axis().as_vec3(), Dir3::Y);
-
         Mesh::from(Self::get_rectangle(element, direction))
-            .transformed_by(transform)
-            .translated_by(translation)
-            .scaled_by(scale)
+            .transformed_by(
+                Transform::from_translation(
+                    // Center the face on the element
+                    Vec3::from(element.from).midpoint(Vec3::from(element.to)) - Vec3::splat(8.0),
+                )
+                // TODO: Rotate the face based on the direction
+                .looking_to(
+                    match direction {
+                        Direction::North | Direction::South => direction.to_axis().zxy().as_vec3(),
+                        Direction::East | Direction::West => direction.to_axis().yxz().as_vec3(),
+                        Direction::Up | Direction::Down => direction.opposite().to_axis().as_vec3(),
+                    },
+                    match direction {
+                        Direction::North | Direction::South => Dir3::X,
+                        Direction::East | Direction::West => Dir3::Y,
+                        Direction::Up | Direction::Down => Dir3::Z,
+                    },
+                ),
+            )
+            // Scale the face to the correct size
+            .scaled_by(Vec3::splat(1.0 / 16.0))
     }
 
     /// Creates a [`Rectangle`] for an [`ElementFace`] based on the direction.
     #[must_use]
     fn get_rectangle(element: &DefinitionElement, direction: Direction) -> Rectangle {
+        let (from, to) = (Vec3::from(element.from), Vec3::from(element.to));
         let (from, to): (Vec2, Vec2) = match direction {
-            Direction::Up => (Vec3::from(element.from).xz(), Vec3::from(element.to).xz()),
-            Direction::Down => (Vec3::from(element.to).xz(), Vec3::from(element.from).xz()),
-            Direction::North => (Vec3::from(element.from).yz(), Vec3::from(element.to).yz()),
-            Direction::South => (Vec3::from(element.to).yz(), Vec3::from(element.from).yz()),
-            Direction::East => (Vec3::from(element.to).xy(), Vec3::from(element.from).xy()),
-            Direction::West => (Vec3::from(element.from).xy(), Vec3::from(element.to).xy()),
+            Direction::Up => (from.xz(), to.xz()),
+            Direction::Down => (to.xz(), from.xz()),
+            Direction::North => (from.yz(), to.yz()),
+            Direction::South => (to.yz(), from.yz()),
+            Direction::East => (to.xy(), from.xy()),
+            Direction::West => (from.xy(), to.xy()),
         };
         Rectangle::from_corners(from, to)
     }
