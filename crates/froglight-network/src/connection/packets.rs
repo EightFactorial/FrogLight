@@ -41,7 +41,7 @@ where
     /// # Panics
     /// If the packet length overflows.
     pub async fn send_packet(&mut self, packet: &D::Send) -> Result<(), ConnectionError> {
-        send_packet::<V, S, D>(self.stream.get_mut(), &self.compression, packet).await
+        send_packet::<V, S, D>(self.stream.get_mut(), self.compression.as_ref(), packet).await
     }
 
     /// Receive a packet from the other side of the connection.
@@ -52,7 +52,7 @@ where
     /// # Panics
     /// If the packet length overflows.
     pub async fn recv(&mut self) -> Result<D::Recv, ConnectionError> {
-        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, &self.compression).await
+        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, self.compression.as_ref()).await
     }
 }
 
@@ -71,7 +71,7 @@ where
     /// If the packet length overflows.
     pub async fn recv(&mut self) -> Result<D::Recv, ConnectionError> {
         let compression = *self.compression.read().await;
-        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, &compression).await
+        recv_packet::<V, S, D>(&mut self.stream, &mut self.bundle, compression.as_ref()).await
     }
 }
 
@@ -101,7 +101,7 @@ where
     /// If the packet length overflows.
     pub async fn send_packet(&mut self, packet: &D::Send) -> Result<(), ConnectionError> {
         let compression = *self.compression.read().await;
-        send_packet::<V, S, D>(&mut self.stream, &compression, packet).await
+        send_packet::<V, S, D>(&mut self.stream, compression.as_ref(), packet).await
     }
 }
 
@@ -114,7 +114,7 @@ where
 /// If the packet length overflows.
 async fn send_packet<V, S, D>(
     stream: &mut TcpStream,
-    compression: &Option<i32>,
+    compression: Option<&i32>,
     packet: &D::Send,
 ) -> Result<(), ConnectionError>
 where
@@ -161,7 +161,7 @@ where
 async fn recv_packet<V, S, D>(
     buffer: &mut BufReader<TcpStream>,
     bundle: &mut VecDeque<D::Recv>,
-    compression: &Option<i32>,
+    compression: Option<&i32>,
 ) -> Result<D::Recv, ConnectionError>
 where
     V: Version,
@@ -198,7 +198,7 @@ where
     let mut cursor = Cursor::new(packet_buffer.as_slice());
 
     // If the packet is compressed, decompress it
-    if compression.is_some_and(|c| c >= 0) && 0 != u32::fg_var_read(&mut cursor)? {
+    if compression.is_some_and(|&c| c >= 0) && 0 != u32::fg_var_read(&mut cursor)? {
         let current_position = usize::try_from(cursor.position()).expect("Packet length overflow");
         let slice = &cursor.get_ref()[current_position..];
 

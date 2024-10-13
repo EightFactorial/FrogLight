@@ -21,7 +21,7 @@ pub(super) fn generate_read(input: &DeriveInput) -> proc_macro::TokenStream {
         let variant_ident = &variant.ident;
 
         // Update the discriminant if the variant has one.
-        set_discriminant(&variant.discriminant, &mut discriminant);
+        set_discriminant(variant.discriminant.as_ref(), &mut discriminant);
 
         // Collect the tokens for the variant
         let variant_tokens = match &variant.fields {
@@ -159,7 +159,7 @@ pub(super) fn generate_write(input: &DeriveInput) -> proc_macro::TokenStream {
         let variant_ident = &variant.ident;
 
         // Update the discriminant if the variant has one.
-        set_discriminant(&variant.discriminant, &mut discriminant);
+        set_discriminant(variant.discriminant.as_ref(), &mut discriminant);
 
         match &variant.fields {
             Fields::Named(fields) => {
