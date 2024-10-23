@@ -9,3 +9,7 @@
 [[version]]
 base = "1.21.0"
 jar = "1.21.1"
+
+[[version]]
+base = "1.21.2"
+jar = "1.21.2"
