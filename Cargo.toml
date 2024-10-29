@@ -66,7 +66,7 @@ bevy_diagnostic = "0.14.2"
 bevy_ecs = "0.14.2"
 bevy_hierarchy = "0.14.2"
 bevy_input = "0.14.2"
-bevy-inspector-egui = { version = "0.26.0", default-features = false }
+bevy-inspector-egui = { version = "0.27.0", default-features = false }
 bevy_log = "0.14.2"
 bevy_math = "0.14.2"
 bevy_prng = { version = "0.7.1", features = ["wyrand"] }
@@ -158,7 +158,7 @@ froglight-internal = { version = "0.1.0", path = "crates/froglight-internal" }
 
 # Optional dependencies
 bevy = { workspace = true, optional = true, features = ["default"] }
-bevy-inspector-egui = { version = "0.26.0", optional = true }
+bevy-inspector-egui = { version = "0.27.0", optional = true }
 mimalloc = { version = "0.1.43", optional = true }
 
 [features]
