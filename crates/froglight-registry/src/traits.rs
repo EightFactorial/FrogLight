@@ -11,7 +11,7 @@ where
     fn from_key(key: &str) -> Option<Self>;
 
     /// Convert the registry value to a [`ResourceKey`].
-    fn to_key(&self) -> &'static ResourceKey;
+    fn to_key(&self) -> ResourceKey;
 }
 
 /// A trait for converting between IDs and a registry values.

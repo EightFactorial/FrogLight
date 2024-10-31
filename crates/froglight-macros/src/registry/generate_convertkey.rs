@@ -30,11 +30,6 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
         let variant_attrs = VariantAttributes::from_attributes(variant.attrs.iter()).unwrap();
         let variant_str = variant_attrs.key.as_str();
 
-        // Add tokens for the str constant
-        let str_ident = Ident::new(
-            &format!("{}_STR", variant_ident.to_string().to_uppercase()),
-            variant_ident.span(),
-        );
         // Add tokens for the key constant
         let const_ident = Ident::new(
             &format!("{}_KEY", variant_ident.to_string().to_uppercase()),
@@ -42,18 +37,17 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
         );
 
         key_tokens.extend(quote! {
-            pub const #str_ident: &'static str = #variant_str;
-            pub const #const_ident: &'static #protocol_path::common::ResourceKey = &#protocol_path::common::ResourceKey::const_new(Self::#str_ident);
+            pub const #const_ident: #protocol_path::common::ResourceKey = #protocol_path::common::ResourceKey::const_new(#variant_str);
         });
 
         // Add tokens for the from_key function
         from_key_tokens.extend(quote! {
-            Self::#str_ident => Some(#enum_ident::#variant_ident),
+            #variant_str => Some(Self::#variant_ident),
         });
 
         // Add tokens for the to_key function
         to_key_tokens.extend(quote! {
-            #enum_ident::#variant_ident => Self::#const_ident,
+            Self::#variant_ident => Self::#const_ident,
         });
     }
 
@@ -68,7 +62,7 @@ pub(super) fn generate_convertkey(input: DeriveInput) -> TokenStream {
                     _ => None,
                 }
             }
-            fn to_key(&self) -> &'static #protocol_path::common::ResourceKey {
+            fn to_key(&self) -> #protocol_path::common::ResourceKey {
                 match self {
                     #to_key_tokens
                 }

@@ -9,8 +9,8 @@ impl From<String> for InvalidKeyError {
     fn from(key: String) -> Self { Self(key) }
 }
 
-impl From<&str> for InvalidKeyError {
-    fn from(key: &str) -> Self { Self(key.to_string()) }
+impl<T: AsRef<str>> From<&T> for InvalidKeyError {
+    fn from(key: &T) -> Self { Self(key.as_ref().to_string()) }
 }
 
 impl From<InvalidKeyError> for String {
