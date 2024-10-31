@@ -17,7 +17,6 @@ workspace = true
 
 [dev-dependencies]
 bevy_mod_debugdump = "0.11.0"
-serde_json = { workspace = true }
 
 [dependencies]
 bevy = { workspace = true, optional = true, default-features = false }
@@ -30,6 +29,11 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
+
+bytemuck = { workspace = true, optional = true }
+glam = { workspace = true, optional = true }
+hashbrown = { workspace = true, optional = true }
+parking_lot = { workspace = true, optional = true }
 
 # Enable x11 on linux, prevents compilation errors
 [target.'cfg(target_os = "linux")'.dependencies]
@@ -45,6 +49,21 @@ presets = ["dep:bevy"]
 
 # Enables egui inspector trait implementations
 inspector = ["froglight-common/inspector"]
+
+# Enable optimizations using the nightly compiler
+nightly = [
+    "dep:bytemuck",
+    "bytemuck/nightly_docs",
+    "bytemuck/nightly_portable_simd",
+    "bytemuck/nightly_stdsimd",
+    "dep:glam",
+    "glam/core-simd",
+    "dep:hashbrown",
+    "hashbrown/nightly",
+    "dep:parking_lot",
+    "parking_lot/hardware-lock-elision",
+    "parking_lot/nightly",
+]
 
 # Generate graphs used for visualizing systems
 [[example]]

@@ -1850,6 +1850,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_mod_debugdump",
+ "bytemuck",
  "froglight-block",
  "froglight-common",
  "froglight-entity",
@@ -1859,7 +1860,9 @@ dependencies = [
  "froglight-registry",
  "froglight-utils",
  "froglight-world",
- "serde_json",
+ "glam",
+ "hashbrown 0.14.5",
+ "parking_lot",
 ]
 
 [[package]]

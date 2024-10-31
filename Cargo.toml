@@ -69,21 +69,13 @@ bevy_time = "0.14"
 bevy_transform = "0.14"
 bevy_utils = "0.14"
 bitvec = "1.0.1"
-bytemuck = { version = "1.19.0", features = [
-    "latest_stable_rust",
-    "nightly_docs",
-    "nightly_portable_simd",
-    "nightly_stdsimd",
-] }
+bytemuck = { version = "1.19.0", features = ["latest_stable_rust"] }
 compact_str = "0.8.0"
 derive_more = { version = "1.0.0", features = ["full"] }
 futures-lite = "2.4.0"
-glam = { version = "0.27.0", features = ["core-simd"] }
-hashbrown = { version = "0.14.5", features = ["default", "nightly"] }
-parking_lot = { version = "0.12.3", features = [
-    "hardware-lock-elision",
-    "nightly",
-] }
+glam = "0.27.0"
+hashbrown = "0.14.5"
+parking_lot = "0.12.3"
 proptest = "1.5.0"
 serde = "1.0"
 serde_json = "1.0"
@@ -113,3 +105,9 @@ workspace = true
 
 [dependencies]
 froglight-internal = { version = "0.1.0", path = "crates/froglight-internal" }
+
+[features]
+default = ["nightly"]
+
+# Enable optimizations using the nightly compiler
+nightly = ["froglight-internal/nightly"]

@@ -24,11 +24,7 @@ proptest = { workspace = true }
 
 [dependencies]
 bitvec = { workspace = true }
-bytemuck = { workspace = true, features = [
-    "min_const_generics",
-    "must_cast",
-    "nightly_stdsimd",
-] }
+bytemuck = { workspace = true }
 compact_str = { workspace = true, features = ["serde"] }
 derive_more = { workspace = true }
 froglight-common = { version = "0.1.0", path = "../froglight-common", features = [
