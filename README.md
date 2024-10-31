@@ -1,5 +1,5 @@
 <h1 align="center">FrogLight</h1>
-<p align="center">A collection of Minecraft libraries written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
+<p align="center">A collection of Minecraft libraries written in Rust</p>
 
 <p align="center">
   <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>  
@@ -46,7 +46,7 @@ For more information, see the following links:
   * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
   * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
   * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
-  * ~~[FrogLight Examples](examples)~~
+  * [FrogLight Examples](examples)
 
 For documentation, see:
   * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
