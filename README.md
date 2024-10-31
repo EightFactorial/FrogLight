@@ -1,5 +1,5 @@
 <h1 align="center">FrogLight</h1>
-<p align="center">A collection of Minecraft libraries and a client written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
+<p align="center">A collection of Minecraft libraries written in Rust using <a href="https://bevyengine.org/">Bevy</a></p>
 
 <p align="center">
   <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>  
@@ -9,47 +9,21 @@
 
 ## About
 
-FrogLight is currently in a **very early alpha state**. Not everything is functional yet!
+FrogLight is a set of libraries for creating Minecraft clients. Each crate is designed to be used independently, but plugins are provided for the [Bevy](https://github.com/bevyengine/bevy/) engine.
+
+It is currently in a **very early alpha state**. Most things do not work yet!
 
 > [!Caution]
 > Some servers do not allow modified clients!
 > 
-> **I am not responsible if your account gets banned!**
+> **I am not responsible for banned accounts!**
 
 ## Version Support
 
-FrogLight supports multiple versions, including:
-- 1.21.0 - 1.21.1
+FrogLight has support for:
+- v1.21.0 - v1.21.1
 
-> [!Note]
-> Support for other versions will be added after most development is done.
-
-## Client Usage
-
-FrogLight can be built and run using the following commands:
-
-```sh
-git clone --depth=1 https://github.com/EightFactorial/FrogLight.git
-cd FrogLight
-
-# Build only
-cargo build --release --bin froglight
-
-# Build and run
-cargo run --release --bin froglight
-```
-
-> [!Important]
-> Make sure you are using `--release` mode!
-
-The resulting binary will be located in `target/release/froglight[.exe]`.
-
-> [!Note]
-> If you don't care about compatibility, see [`fast_config.toml`](.cargo/fast_config.toml) for additional optimizations.
->
-> If you are planning on sharing builds, do not enable these as it may cause issues on other machines.
-
-## Library Usage
+## Usage
 
 FrogLight can added as a dependency in your `cargo.toml` file:
 
@@ -60,7 +34,11 @@ froglight = { git = "https://github.com/EightFactorial/FrogLight.git" }
 # etc...
 ```
 
-Many crates optionally depend on each other and bevy, so you can pick and choose which ones you want to use!
+See the [examples](examples) directory for how to use the library.
+
+## Client
+
+See [FrogLight Client](https://github.com/EightFactorial/FrogLight/) for more information.
 
 ## Helpful Resources
 
@@ -68,11 +46,11 @@ For more information, see the following links:
   * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
   * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
   * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
-  * [FrogLight Examples](examples)
+  * ~~[FrogLight Examples](examples)~~
 
 For documentation, see:
   * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
-  * [FrogLight Docs](https://github.com/EightFactorial/FrogLight/)
+  * ~~[FrogLight Docs](https://github.com/EightFactorial/FrogLight/)~~
 
 ## License
 

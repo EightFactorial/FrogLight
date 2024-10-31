@@ -15,7 +15,7 @@ build-release: (build-profile "release" "")
 # Compile build with specified profile
 [private]
 build-profile profile="dev" args="":
-  cargo build --bin froglight --profile {{profile}} --features=client {{args}}
+  cargo build --bin froglight --profile {{profile}} {{args}}
 
 # Run development build
 alias run := run-profile
@@ -27,7 +27,7 @@ run-release: (run-profile "release" "")
 # Run build with specified profile
 [private]
 run-profile profile="dev" args="":
-  cargo run --bin froglight --profile {{profile}} --features=client {{args}}
+  cargo run --bin froglight --profile {{profile}} {{args}}
 
 # Clean build artifacts
 clean: (fetch-tools) (tools "clean")
@@ -77,7 +77,7 @@ tools arg0="" arg1="" arg2="" arg3="" arg4="" arg5="" arg6="" arg7="": (fetch-to
 
 # Generate froglight-internal graphs
 graph:
-  RUST_LOG=info cargo run --package=froglight-internal --example=system-graph --features=client
+  RUST_LOG=info cargo run --package=froglight-internal --example=system-graph
 
 # ---- Fetch Recipes ----
 

@@ -1,16 +1,17 @@
 use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
-    asset::AssetPlugin as BevyAssetPlugin,
     core::TaskPoolPlugin,
     DefaultPlugins as BevyDefaultPlugins,
 };
-use froglight_asset::AssetSourcePlugin;
 
-use super::{BasicPlugins, ClientPlugins, TASKPOOL_SETTINGS};
+use super::{BasicPlugins, TASKPOOL_SETTINGS};
 
 /// A [`PluginGroup`] for creating a custom client.
 ///
 /// Contains all the plugins required to run a client application.
+///
+/// # Note
+/// Plugins are only added if the appropriate bevy features are enabled.
 ///
 /// This includes:
 /// [`BevyDefaultPlugins`]:
@@ -49,16 +50,6 @@ use super::{BasicPlugins, ClientPlugins, TASKPOOL_SETTINGS};
 /// - [`ResolverPlugin`](crate::prelude::plugins::ResolverPlugin)
 /// - [`UtilityPlugin`](crate::prelude::plugins::UtilityPlugin)
 /// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
-///
-/// [`ClientPlugins`]:
-/// - [`AssetPlugin`](crate::prelude::plugins::AssetPlugin)
-/// - [`AssetProcessorPlugin`](crate::prelude::plugins::AssetProcessorPlugin)
-/// - [`AssetSourcePlugin`](crate::prelude::plugins::AssetSourcePlugin)
-/// - [`CatalogPlugin`](crate::prelude::plugins::CatalogPlugin)
-/// - [`CameraPlugin`](crate::prelude::plugins::CameraPlugin)
-/// - [`LoadingScreenPlugin`](crate::prelude::plugins::LoadingScreenPlugin)
-/// - [`RenderPlugin`](crate::prelude::plugins::RenderPlugin)
-/// - [`EntropyPlugin`](bevy_rand::plugin::EntropyPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ApplicationPlugins;
 
@@ -66,12 +57,9 @@ impl PluginGroup for ApplicationPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = PluginGroupBuilder::start::<Self>();
         builder = builder.add_group(BevyDefaultPlugins);
-        builder = builder.add_group(BasicPlugins).add_group(ClientPlugins);
+        builder = builder.add_group(BasicPlugins);
 
         // Configure the `TaskPoolPlugin`
-        builder = builder.set(TaskPoolPlugin { task_pool_options: TASKPOOL_SETTINGS });
-
-        // Add `AssetSourcePlugin` before `BevyAssetPlugin`
-        builder.add_before::<BevyAssetPlugin, _>(AssetSourcePlugin::default())
+        builder.set(TaskPoolPlugin { task_pool_options: TASKPOOL_SETTINGS })
     }
 }

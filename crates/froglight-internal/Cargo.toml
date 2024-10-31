@@ -20,7 +20,7 @@ bevy_mod_debugdump = "0.11.0"
 serde_json = { workspace = true }
 
 [dependencies]
-bevy = { workspace = true, optional = true, features = ["multi_threaded"] }
+bevy = { workspace = true, optional = true, default-features = false }
 froglight-block = { version = "0.1.0", path = "../froglight-block" }
 froglight-common = { version = "0.1.0", path = "../froglight-common" }
 froglight-entity = { version = "0.1.0", path = "../froglight-entity" }
@@ -31,33 +31,17 @@ froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
-# Client dependencies
-bevy_rand = { workspace = true, optional = true }
-bevy_prng = { workspace = true, optional = true, features = ["wyrand"] }
-froglight-asset = { version = "0.1.0", path = "../froglight-asset", optional = true }
-froglight-interface = { version = "0.1.0", path = "../froglight-interface", optional = true }
-froglight-model = { version = "0.1.0", path = "../froglight-model", optional = true }
-froglight-render = { version = "0.1.0", path = "../froglight-render", optional = true }
-
+# Enable x11 on linux, prevents compilation errors
+[target.'cfg(target_os = "linux")'.dependencies]
+bevy = { workspace = true, optional = true, default-features = false, features = [
+    "x11",
+] }
 
 [features]
 default = ["presets"]
 
 # Enables preset plugin groups
 presets = ["dep:bevy"]
-
-# Enables extra crates used by clients
-client = [
-    "bevy/default",
-    "bevy/wayland",
-    "presets",
-    "dep:bevy_rand",
-    "dep:bevy_prng",
-    "dep:froglight-asset",
-    "dep:froglight-interface",
-    "dep:froglight-model",
-    "dep:froglight-render",
-]
 
 # Enables egui inspector trait implementations
 inspector = ["froglight-common/inspector"]
@@ -66,4 +50,3 @@ inspector = ["froglight-common/inspector"]
 [[example]]
 name = "system-graph"
 path = "examples/system-graph/main.rs"
-required-features = ["client"]
