@@ -5,32 +5,28 @@
 
 use std::num::NonZeroU8;
 
-use bevy::{app::AppExit, prelude::*};
-use bevy_log::LogPlugin;
-use froglight_network::{
-    common::UnsizedBuffer,
+use bevy::prelude::*;
+use froglight::{
     network::{
-        ConnectionChannel, ConnectionTrait, NetworkErrorEvent, NetworkPreUpdateSet, PolledTask,
-    },
-    resolver::Resolver,
-    versions::v1_21_0::{
-        configuration::{
-            ConfigurationClientboundPackets, ReadyC2SPacket, SelectKnownPacksC2SPacket,
+        network::{NetworkErrorEvent, NetworkPreUpdateSet},
+        versions::v1_21_0::{
+            configuration::{
+                ConfigurationClientboundPackets, CookieResponsePacket, CustomPayloadC2SPacket,
+                ReadyC2SPacket, SelectKnownPacksC2SPacket,
+            },
+            login::{EnterConfigurationPacket, LoginClientboundPackets, LoginQueryResponsePacket},
+            play::{AcknowledgeChunksPacket, PlayClientboundPackets, TeleportConfirmPacket},
+            V1_21_0,
         },
-        login::{EnterConfigurationPacket, LoginClientboundPackets, LoginQueryResponsePacket},
-        play::{
-            AcknowledgeChunksPacket, CookieResponsePacket, CustomPayloadC2SPacket,
-            PlayClientboundPackets, TeleportConfirmPacket,
-        },
-        V1_21_0,
     },
-    NetworkPlugins,
+    prelude::*,
+    protocol::FrogWrite,
+    HeadlessPlugins,
 };
-use froglight_protocol::protocol::FrogWrite;
 
 fn main() -> AppExit {
     let mut app = App::new();
-    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins));
+    app.add_plugins(HeadlessPlugins);
 
     // I recommend polling for packets during the `PreUpdate` stage.
     // This way you can handle packets and move/spawn entities,

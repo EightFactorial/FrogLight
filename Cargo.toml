@@ -103,6 +103,11 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+bevy = { workspace = true }
+hashbrown = { workspace = true }
+serde_json = { workspace = true }
+
 [dependencies]
 froglight-internal = { version = "0.1.0", path = "crates/froglight-internal" }
 

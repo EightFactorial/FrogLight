@@ -1783,7 +1783,10 @@ dependencies = [
 name = "froglight"
 version = "0.1.0"
 dependencies = [
+ "bevy",
  "froglight-internal",
+ "hashbrown 0.14.5",
+ "serde_json",
 ]
 
 [[package]]
@@ -1885,7 +1888,6 @@ dependencies = [
  "async-compression",
  "async-std",
  "async-std-resolver",
- "bevy",
  "bevy_app",
  "bevy_derive",
  "bevy_ecs",
@@ -1952,7 +1954,6 @@ dependencies = [
  "bevy_reflect",
  "froglight-macros",
  "froglight-protocol",
- "hashbrown 0.14.5",
  "thiserror",
 ]
 

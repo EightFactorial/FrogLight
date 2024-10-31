@@ -16,7 +16,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy = { workspace = true }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-protocol-debug",
 ] }
@@ -69,11 +68,3 @@ bevy = [
 
 # Enables the ResolverPlugin
 resolver = ["bevy", "dep:async-std-resolver"]
-
-[[example]]
-name = "server-login"
-path = "examples/server-login/main.rs"
-
-[[example]]
-name = "server-status"
-path = "examples/server-status/main.rs"

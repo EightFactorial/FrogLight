@@ -2,18 +2,19 @@
 
 use std::num::NonZeroU8;
 
-use bevy::{app::AppExit, prelude::*};
-use bevy_log::LogPlugin;
-use froglight_network::{
-    network::{ConnectionTrait, NetworkErrorEvent, PolledTask, ServerStatusResponse},
-    resolver::Resolver,
-    versions::v1_21_0::V1_21_0,
-    NetworkPlugins,
+use bevy::prelude::*;
+use froglight::{
+    network::{
+        network::{NetworkErrorEvent, ServerStatusResponse},
+        versions::v1_21_0::V1_21_0,
+    },
+    prelude::*,
+    HeadlessPlugins,
 };
 
 fn main() -> AppExit {
     let mut app = App::new();
-    app.add_plugins((MinimalPlugins, LogPlugin::default(), NetworkPlugins));
+    app.add_plugins(HeadlessPlugins);
 
     app.add_systems(
         Update,

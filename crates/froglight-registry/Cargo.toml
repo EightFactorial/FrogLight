@@ -15,9 +15,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
-[dev-dependencies]
-hashbrown = { workspace = true }
-
 [dependencies]
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-registry",
@@ -42,7 +39,3 @@ bevy = ["dep:bevy_app", "dep:bevy_derive", "dep:bevy_ecs", "reflect"]
 # Derives `Reflect` for registry types.
 # WARNING: This massively increases compile times!
 reflect = ["dep:bevy_reflect"]
-
-[[example]]
-name = "server-tags"
-path = "examples/server-tags/main.rs"

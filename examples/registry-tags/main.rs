@@ -1,8 +1,10 @@
 //! This example demonstrates how to use the [`ConvertId`] trait to convert
 //! between ids and keys.
 
-use froglight_protocol::{common::ResourceKey, packet::ServerTagData};
-use froglight_registry::{definitions::ItemKey, ConvertId};
+use froglight::{
+    network::versions::v1_21_0::V1_21_0,
+    prelude::{registries::ItemKey, ConvertId, ResourceKey, ServerTagData},
+};
 use hashbrown::HashMap;
 
 fn main() {
@@ -30,25 +32,28 @@ fn main() {
             data
         },
     };
-    println!("{tag_data:#?}\n\n");
 
-    println!("dampens_vibrations:");
+    println!("\"dampens_vibrations\":");
     let tag_values = tag_data.get("minecraft:dampens_vibrations").unwrap();
-    let keys: Vec<ItemKey> = tag_values.iter().map(|id| ItemKey::from_id(*id).unwrap()).collect();
+    let keys: Vec<ItemKey> =
+        tag_values.iter().map(|id| ConvertId::<V1_21_0>::from_id(*id).unwrap()).collect();
     println!("   {keys:?}\n");
 
-    println!("rails:");
+    println!("\"rails\":");
     let tag_values = tag_data.get("minecraft:rails").unwrap();
-    let keys: Vec<ItemKey> = tag_values.iter().map(|id| ItemKey::from_id(*id).unwrap()).collect();
+    let keys: Vec<ItemKey> =
+        tag_values.iter().map(|id| ConvertId::<V1_21_0>::from_id(*id).unwrap()).collect();
     println!("   {keys:?}\n");
 
-    println!("enchantable/fire_aspect:");
+    println!("\"enchantable/fire_aspect\":");
     let tag_values = tag_data.get("minecraft:enchantable/fire_aspect").unwrap();
-    let keys: Vec<ItemKey> = tag_values.iter().map(|id| ItemKey::from_id(*id).unwrap()).collect();
+    let keys: Vec<ItemKey> =
+        tag_values.iter().map(|id| ConvertId::<V1_21_0>::from_id(*id).unwrap()).collect();
     println!("   {keys:?}\n");
 
-    println!("foot_armor:");
+    println!("\"foot_armor\":");
     let tag_values = tag_data.get("minecraft:foot_armor").unwrap();
-    let keys: Vec<ItemKey> = tag_values.iter().map(|id| ItemKey::from_id(*id).unwrap()).collect();
+    let keys: Vec<ItemKey> =
+        tag_values.iter().map(|id| ConvertId::<V1_21_0>::from_id(*id).unwrap()).collect();
     println!("   {keys:?}\n");
 }
