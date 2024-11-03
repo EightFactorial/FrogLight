@@ -3,13 +3,13 @@
 # Versions grouped together must have the same protocol version!
 #
 # [[version]]
-# base = "1.20.0" # Name of the supported version
-# jar = "1.20.1" # Jar used to generate code
+# base = "1.20.0" # The version whose name is used
+# target = "1.20.1" # The version used to generate code
 
 [[version]]
 base = "1.21.0"
-jar = "1.21.1"
+target = "1.21.1"
 
 [[version]]
 base = "1.21.2"
-jar = "1.21.3"
+target = "1.21.3"
