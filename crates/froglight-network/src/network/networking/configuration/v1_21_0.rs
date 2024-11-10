@@ -10,9 +10,9 @@ use super::ConfigurationState;
 use crate::connection::{ConnectionError, Serverbound, WriteConnection};
 
 impl ConfigurationState for V1_21_0 {
-    async fn config_state_handle<'a, 'b>(
-        packet: &'a ConfigurationClientboundPackets,
-        _: &'b WriteConnection<Self, Configuration, Serverbound>,
+    async fn config_state_handle(
+        packet: &ConfigurationClientboundPackets,
+        _: &WriteConnection<Self, Configuration, Serverbound>,
     ) -> Result<bool, ConnectionError> {
         match packet {
             ConfigurationClientboundPackets::Disconnect(packet) => {
