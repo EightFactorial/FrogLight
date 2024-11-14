@@ -24,6 +24,8 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     permissions:
+      actions: read
+      contents: read
       # Required to upload the results
       security-events: write
     steps:
