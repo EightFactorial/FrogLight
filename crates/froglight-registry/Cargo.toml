@@ -16,12 +16,14 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+compact_str = { workspace = true }
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-registry",
 ] }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
     "bevy",
 ] }
+phf = { workspace = true, features = ["macros", "std"] }
 thiserror = { workspace = true }
 
 # Optional bevy dependencies

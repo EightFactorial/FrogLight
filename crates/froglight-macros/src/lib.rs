@@ -11,22 +11,15 @@ mod block;
 /// A macro for generating block attributes.
 #[cfg(feature = "froglight-block")]
 #[proc_macro]
-pub fn frog_create_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    block::frog_create_attributes(input)
+pub fn impl_generated_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::impl_generated_attributes(input)
 }
 
 /// A macro for generating block structs.
 #[cfg(feature = "froglight-block")]
 #[proc_macro]
-pub fn frog_create_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    block::frog_create_blocks(input)
-}
-
-/// A macro for generating block trait impls.
-#[cfg(feature = "froglight-block")]
-#[proc_macro]
-pub fn frog_create_block_impls(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    block::frog_create_block_impls(input)
+pub fn impl_generated_blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::impl_generated_blocks(input)
 }
 
 // --- Protocol Macros ---

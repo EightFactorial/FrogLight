@@ -1,31 +1,20 @@
-use froglight_protocol::{common::ResourceKey, traits::Version};
+use compact_str::CompactString;
+use froglight_protocol::traits::Version;
 
-/// A trait for converting between keys and a registry values.
-pub trait ConvertKey
-where
-    Self: Sized + Send + Sync,
-{
-    /// Convert a [`ResourceKey`] to a registry value.
-    ///
-    /// Returns `None` if the key does not match any known value.
-    fn from_key(key: &str) -> Option<Self>;
+/// A trait for converting between a registry key and its ID.
+pub trait RegistryId<V: Version>: Sized {
+    /// Get the ID of the registry value.
+    fn as_id(&self) -> Option<u32>;
 
-    /// Convert the registry value to a [`ResourceKey`].
-    fn to_key(&self) -> ResourceKey;
+    /// Get the registry value from the ID.
+    fn from_id(id: u32) -> Option<Self>;
 }
 
-/// A trait for converting between IDs and a registry values.
-pub trait ConvertId<V: Version>
-where
-    Self: Sized + Send + Sync,
-{
-    /// Convert an ID to a registry value.
-    ///
-    /// Returns `None` if the ID does not match any known value.
-    fn from_id(id: u32) -> Option<Self>;
+/// A trait for converting between a registry key and its value.
+pub trait RegistryKey<V: Version>: Sized {
+    /// Get the key of the registry value.
+    fn as_key(&self) -> Option<CompactString>;
 
-    /// Convert the registry value to an ID.
-    ///
-    /// Returns `None` if the value does not match any known id.
-    fn to_id(&self) -> Option<u32>;
+    /// Get the registry value from the key.
+    fn from_key(key: &str) -> Option<Self>;
 }

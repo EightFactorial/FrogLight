@@ -37,4 +37,4 @@ default = ["bevy", "froglight-block"]
 bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect"]
 
 # Adds methods to get Blocks from a Chunk.
-froglight-block = ["bevy", "dep:froglight-block"]
+# froglight-block = ["bevy", "dep:froglight-block"]

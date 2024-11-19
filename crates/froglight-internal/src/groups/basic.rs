@@ -15,6 +15,6 @@ impl PluginGroup for BasicPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = PluginGroupBuilder::start::<Self>();
         builder = builder.add_group(NetworkPlugins);
-        builder.add(BlockPlugin).add(UtilityPlugin)
+        builder.add(UtilityPlugin) // .add(BlockPlugin)
     }
 }

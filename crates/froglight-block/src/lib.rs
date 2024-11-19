@@ -1,28 +1,21 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![feature(build_hasher_default_const_new)]
+#![feature(const_type_name)]
+#![feature(const_type_id)]
 
-pub mod definitions;
-
-#[cfg(feature = "bevy")]
-mod registry;
-#[cfg(feature = "bevy")]
-pub use registry::BlockRegistry;
-
-#[cfg(feature = "bevy")]
-mod plugin;
-#[cfg(feature = "bevy")]
-pub use plugin::BlockPlugin;
-
-#[cfg(feature = "bevy")]
-mod resolver;
-#[cfg(feature = "bevy")]
-pub use resolver::{BlockStateResolver, VanillaResolver};
-
-#[cfg(feature = "bevy")]
-mod storage;
-#[cfg(feature = "bevy")]
-pub use storage::BlockStorage;
+mod generated;
+pub use generated::{attribute, block};
 
 mod traits;
-pub use traits::{BlockExt, BlockType};
+pub use traits::{BlockAttribute, BlockState, BlockStateExt};
+
+mod storage;
+pub use storage::BlockStorage;
+#[cfg(feature = "bevy")]
+pub use storage::{
+    BlockBuilder, BlockPlugin, BlockStorageArc, ReflectBlockBuilder, VanillaBuilder,
+};
+
+#[cfg(test)]
+mod test;

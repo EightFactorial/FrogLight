@@ -15,20 +15,22 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+bevy = { workspace = true }
+
 [dependencies]
+bevy_utils = { workspace = true }
 derive_more = { workspace = true }
 downcast-rs = "1.2.1"
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-block",
 ] }
-froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", features = [
-    "bevy",
-] }
+froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
 
 # Optional dependencies
 hashbrown = { workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
-phf = { version = "0.11.2", optional = true, features = ["macros", "std"] }
+phf = { workspace = true }
 rangemap = { version = "1.5.1", optional = true, features = [
     "nightly",
     "const_fn",
@@ -38,7 +40,6 @@ rangemap = { version = "1.5.1", optional = true, features = [
 bevy_app = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
-bevy_utils = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "hashbrown"]
@@ -48,11 +49,10 @@ default = ["bevy", "hashbrown"]
 bevy = [
     "dep:bevy_app",
     "dep:bevy_ecs",
-    "dep:bevy_utils",
     "dep:parking_lot",
-    "dep:phf",
     "dep:rangemap",
     "hashbrown",
+    "froglight-protocol/bevy",
 ]
 
 # Use `hashbrown` for better performance

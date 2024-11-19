@@ -1,17 +1,11 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![feature(build_hasher_default_const_new)]
 #![feature(const_type_name)]
 #![feature(const_type_id)]
 
-mod error;
-pub use error::InvalidKeyError;
-
-pub mod definitions;
-
-#[cfg(feature = "bevy")]
-mod plugin;
-#[cfg(feature = "bevy")]
-pub use plugin::RegistryPlugin;
+mod generated;
+pub use generated::registry;
 
 mod traits;
-pub use traits::{ConvertId, ConvertKey};
+pub use traits::{RegistryId, RegistryKey};

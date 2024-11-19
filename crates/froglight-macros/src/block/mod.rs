@@ -1,19 +1,15 @@
 use proc_macro::TokenStream;
 
-mod create_attributes;
-mod create_blocks;
+mod attribute;
+#[allow(clippy::module_inception)]
+mod block;
 
 /// Generate the block attributes.
-pub(super) fn frog_create_attributes(tokens: TokenStream) -> TokenStream {
-    create_attributes::generate_attributes(tokens).into()
+pub(super) fn impl_generated_attributes(tokens: TokenStream) -> TokenStream {
+    attribute::impl_generated_attributes(tokens.into()).into()
 }
 
 /// Generate the block structs.
-pub(super) fn frog_create_blocks(tokens: TokenStream) -> TokenStream {
-    create_blocks::generate_blocks(tokens).into()
-}
-
-/// Generate the block trait impls.
-pub(super) fn frog_create_block_impls(tokens: TokenStream) -> TokenStream {
-    create_blocks::generate_block_impls(tokens).into()
+pub(super) fn impl_generated_blocks(tokens: TokenStream) -> TokenStream {
+    block::impl_generated_blocks(tokens.into()).into()
 }

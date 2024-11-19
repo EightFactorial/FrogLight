@@ -213,62 +213,62 @@ impl Chunk {
     }
 }
 
-/// Additional methods for [`Chunk`] when the
-/// `froglight-registry` feature is enabled.
-#[cfg(feature = "froglight-block")]
-impl Chunk {
-    /// Returns the `Block` at the given position.
-    ///
-    /// # Note
-    /// This calls
-    /// [`BlockStorage::resolve_blockstate`](froglight_registry::definitions::BlockStorage::resolve_blockstate)
-    /// and can be very expensive compared to [`Chunk::get_blockstate_id`].
-    ///
-    /// This acquires a [`read lock`](RwLock::read) on the [`Chunk`],
-    /// and may block other threads.
-    #[must_use]
-    pub fn get_block<
-        V: froglight_protocol::traits::Version,
-        Res: froglight_block::BlockStateResolver<V>,
-    >(
-        &self,
-        position: ChunkBlockPosition,
-        storage: &froglight_block::BlockStorage<V>,
-    ) -> Option<Res::Resolved> {
-        self.get_blockstate_id(position)
-            .map(|current_id| storage.resolve_blockstate::<Res>(current_id))
-    }
+// /// Additional methods for [`Chunk`] when the
+// /// `froglight-registry` feature is enabled.
+// #[cfg(feature = "froglight-block")]
+// impl Chunk {
+//     /// Returns the `Block` at the given position.
+//     ///
+//     /// # Note
+//     /// This calls
+//     /// [`BlockStorage::resolve_blockstate`](froglight_registry::definitions::BlockStorage::resolve_blockstate)
+//     /// and can be very expensive compared to [`Chunk::get_blockstate_id`].
+//     ///
+//     /// This acquires a [`read lock`](RwLock::read) on the [`Chunk`],
+//     /// and may block other threads.
+//     #[must_use]
+//     pub fn get_block<
+//         V: froglight_protocol::traits::Version,
+//         Res: froglight_block::BlockStateResolver<V>,
+//     >(
+//         &self,
+//         position: ChunkBlockPosition,
+//         storage: &froglight_block::BlockStorage<V>,
+//     ) -> Option<Res::Resolved> {
+//         self.get_blockstate_id(position)
+//             .map(|current_id| storage.resolve_blockstate::<Res>(current_id))
+//     }
 
-    /// Sets the `Block` at the given position.
-    ///
-    /// Returns the previous `Block` at the position.
-    ///
-    /// # Note
-    /// This calls
-    /// [`BlockStorage::resolve_blockstate`](froglight_registry::definitions::BlockStorage::resolve_blockstate)
-    /// and can be very expensive compared to [`Chunk::set_blockstate_id`].
-    ///
-    /// This acquires a [`write lock`](RwLock::write) on the [`Chunk`],
-    /// and will block other threads.
-    #[allow(clippy::must_use_candidate)]
-    pub fn set_block<
-        V: froglight_protocol::traits::Version,
-        Res: froglight_block::BlockStateResolver<V>,
-    >(
-        &self,
-        position: ChunkBlockPosition,
-        block: &impl froglight_block::BlockExt<V>,
-        storage: &froglight_block::BlockStorage<V>,
-    ) -> Option<Res::Resolved> {
-        // Get the blockstate id from the storage.
-        let Some(new_id) = storage.blockstate_id_of(block) else {
-            #[cfg(feature = "bevy")]
-            bevy_log::warn!("Block not found in storage: \"{}\"", block.to_key());
-            return None;
-        };
+//     /// Sets the `Block` at the given position.
+//     ///
+//     /// Returns the previous `Block` at the position.
+//     ///
+//     /// # Note
+//     /// This calls
+//     /// [`BlockStorage::resolve_blockstate`](froglight_registry::definitions::BlockStorage::resolve_blockstate)
+//     /// and can be very expensive compared to [`Chunk::set_blockstate_id`].
+//     ///
+//     /// This acquires a [`write lock`](RwLock::write) on the [`Chunk`],
+//     /// and will block other threads.
+//     #[allow(clippy::must_use_candidate)]
+//     pub fn set_block<
+//         V: froglight_protocol::traits::Version,
+//         Res: froglight_block::BlockStateResolver<V>,
+//     >(
+//         &self,
+//         position: ChunkBlockPosition,
+//         block: &impl froglight_block::BlockExt<V>,
+//         storage: &froglight_block::BlockStorage<V>,
+//     ) -> Option<Res::Resolved> {
+//         // Get the blockstate id from the storage.
+//         let Some(new_id) = storage.blockstate_id_of(block) else {
+//             #[cfg(feature = "bevy")]
+//             bevy_log::warn!("Block not found in storage: \"{}\"",
+// block.to_key());             return None;
+//         };
 
-        // Set the blockstate id and convert the old blockstate id into a block.
-        self.set_blockstate_id(position, new_id)
-            .map(|old_id| storage.resolve_blockstate::<Res>(old_id))
-    }
-}
+//         // Set the blockstate id and convert the old blockstate id into a
+// block.         self.set_blockstate_id(position, new_id)
+//             .map(|old_id| storage.resolve_blockstate::<Res>(old_id))
+//     }
+// }
