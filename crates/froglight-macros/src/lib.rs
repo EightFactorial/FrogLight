@@ -60,16 +60,16 @@ pub fn frog_state(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 #[cfg(feature = "froglight-registry")]
 mod registry;
 
-/// A macro for generating `ConvertKey` implementations.
+/// A macro for generating `const` registry keys.
 #[cfg(feature = "froglight-registry")]
 #[proc_macro_derive(FrogRegistry, attributes(frog))]
 pub fn frog_registry(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    registry::frog_registry_convertkey(input)
+    registry::impl_registry_consts(input)
 }
 
 /// A macro for generating registry trait impls.
 #[cfg(feature = "froglight-registry")]
 #[proc_macro]
-pub fn frog_create_registry_impls(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    registry::frog_create_registry_impls(input)
+pub fn impl_generated_registries(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    registry::impl_generated_registries(input)
 }

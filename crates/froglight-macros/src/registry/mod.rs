@@ -1,21 +1,20 @@
 use proc_macro::TokenStream;
-use syn::Path;
 
-use crate::manifest::ProjectManifest;
+mod impl_generated;
+mod registry_consts;
 
-mod generate_convertid;
-mod generate_convertkey;
-
-/// Get the path to the `froglight_registry` crate.
-pub(crate) fn get_registry_path() -> Path { ProjectManifest::get().get_path("froglight_registry") }
+// Get the path to the `froglight_registry` crate.
+// pub(crate) fn get_registry_path() -> Path {
+// ProjectManifest::get().get_path("froglight_registry") }
 
 /// Generate a `ConvertKey` implementation for a registry.
-pub(super) fn frog_registry_convertkey(tokens: TokenStream) -> TokenStream {
-    let input = syn::parse_macro_input!(tokens as syn::DeriveInput);
-    generate_convertkey::generate_convertkey(input).into()
+pub(super) fn impl_registry_consts(tokens: TokenStream) -> TokenStream {
+    registry_consts::impl_registry_consts(syn::parse_macro_input!(tokens as syn::DeriveInput))
+        .into()
 }
 
-/// Generate a `ConvertId` implementation for a registry.
-pub(super) fn frog_create_registry_impls(tokens: TokenStream) -> TokenStream {
-    generate_convertid::generate_convertid(tokens).into()
+/// Generate a `RegistryId` and `ConvertId` implementation for
+/// all registries used in a specific version.
+pub(super) fn impl_generated_registries(tokens: TokenStream) -> TokenStream {
+    impl_generated::impl_generated_registries(tokens).into()
 }

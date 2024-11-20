@@ -19,6 +19,7 @@ workspace = true
 bevy = { workspace = true }
 
 [dependencies]
+bevy_reflect = { workspace = true }
 bevy_utils = { workspace = true }
 derive_more = { workspace = true }
 downcast-rs = "1.2.1"
@@ -39,7 +40,6 @@ rangemap = { version = "1.5.1", optional = true, features = [
 # Optional bevy dependencies
 bevy_app = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "hashbrown"]
@@ -60,4 +60,4 @@ hashbrown = ["dep:hashbrown"]
 
 # Derives `Reflect` for blocks and block attributes.
 # WARNING: This massively increases compile times!
-reflect = ["dep:bevy_reflect"]
+reflect = []
