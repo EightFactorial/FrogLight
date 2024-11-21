@@ -12,6 +12,8 @@ use froglight::{
     HeadlessPlugins,
 };
 
+const SERVER_ADDRESS: &str = "localhost";
+
 fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins(HeadlessPlugins);
@@ -31,8 +33,6 @@ fn main() -> AppExit {
 
     app.run()
 }
-
-const SERVER_ADDRESS: &str = "localhost";
 
 /// Send a status request to [`SERVER_ADDRESS`].
 ///

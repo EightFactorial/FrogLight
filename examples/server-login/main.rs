@@ -24,6 +24,9 @@ use froglight::{
     HeadlessPlugins,
 };
 
+/// The server address to connect to.
+const SERVER_ADDRESS: &str = "localhost";
+
 fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins(HeadlessPlugins);
@@ -51,9 +54,6 @@ fn main() -> AppExit {
 
     app.run()
 }
-
-/// The server address to connect to.
-const SERVER_ADDRESS: &str = "localhost";
 
 /// Create a connection to the server.
 ///
