@@ -400,6 +400,22 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     PlayClientboundPackets::AdvancementUpdate(_) => {
                         info!("Play: AdvancementUpdate(AdvancementUpdatePacket {{..}})");
                     }
+                    PlayClientboundPackets::EntityMoveRelative(packet) => {
+                        debug!("Play: {packet:?}");
+                    }
+                    PlayClientboundPackets::EntityRotateAndMoveRelative(packet) => {
+                        debug!("Play: {packet:?}");
+                    }
+                    PlayClientboundPackets::EntityPosition(packet) => {
+                        debug!("Play: {packet:?}");
+                    }
+                    PlayClientboundPackets::EntitySetHeadYaw(packet) => {
+                        debug!("Play: {packet:?}");
+                    }
+                    PlayClientboundPackets::EntityVelocityUpdate(packet) => {
+                        debug!("Play: {packet:?}");
+                    }
+                    PlayClientboundPackets::BundleDelimiter(..) => {}
                     other => {
                         info!("Play: {other:?}");
                     }
