@@ -7,7 +7,7 @@ use froglight_protocol::{
 
 use crate::{
     connection::{Connection, ConnectionError, NetworkDirection, Serverbound},
-    network::channel::AsyncConnectionChannel,
+    network::channel::{AsyncConnectionChannel, ConnectionHolder},
 };
 
 mod v1_21_0;
@@ -33,21 +33,19 @@ where
            + Sync;
 
     fn perform_login(
-        conn: Connection<Self, Login, Serverbound>,
+        conn: ConnectionHolder<Self, Serverbound>,
         channel: &AsyncConnectionChannel<Self, Serverbound>,
-    ) -> impl Future<Output = Result<Connection<Self, Login, Serverbound>, ConnectionError>> + Send + Sync;
+    ) -> impl Future<Output = Result<ConnectionHolder<Self, Serverbound>, ConnectionError>> + Send + Sync;
 
     fn perform_configuration(
-        conn: Connection<Self, Configuration, Serverbound>,
+        conn: ConnectionHolder<Self, Serverbound>,
         channel: &AsyncConnectionChannel<Self, Serverbound>,
-    ) -> impl Future<Output = Result<Connection<Self, Configuration, Serverbound>, ConnectionError>>
-           + Send
-           + Sync;
+    ) -> impl Future<Output = Result<ConnectionHolder<Self, Serverbound>, ConnectionError>> + Send + Sync;
 
     fn perform_play(
-        conn: Connection<Self, Play, Serverbound>,
+        conn: ConnectionHolder<Self, Serverbound>,
         channel: &AsyncConnectionChannel<Self, Serverbound>,
-    ) -> impl Future<Output = Result<Option<Connection<Self, Play, Serverbound>>, ConnectionError>>
+    ) -> impl Future<Output = Result<Option<ConnectionHolder<Self, Serverbound>>, ConnectionError>>
            + Send
            + Sync;
 }
@@ -73,15 +71,20 @@ where
 
     // Perform the handshake.
     let hand = V::perform_handshake(conn).await?;
+    // Split the connection into read and write halves.
+    let (read, write) = hand.into_split();
+    let hand = ConnectionHolder::Handshake(read, write);
+
     // Perform the login.
-    let login = V::perform_login(hand.login(), channel).await?;
+    let login = V::perform_login(hand.into_login(), channel).await?;
+
     // Perform the configuration.
-    let mut config = V::perform_configuration(login.configuration(), channel).await?;
+    let mut config = V::perform_configuration(login.into_config(), channel).await?;
 
     // Connect to the server and play.
     // If it returns an open connection, perform configuration and play again.
-    while let Some(play) = V::perform_play(config.play(), channel).await? {
-        config = V::perform_configuration(play.configuration(), channel).await?;
+    while let Some(play) = V::perform_play(config.into_play(), channel).await? {
+        config = V::perform_configuration(play.into_config(), channel).await?;
     }
 
     Ok(())

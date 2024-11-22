@@ -8,6 +8,7 @@ use froglight_protocol::{
 use crate::connection::NetworkDirection;
 
 /// A packet sent through a connection channel.
+#[derive(Debug)]
 pub enum ChannelSendPacket<V: Version, D>
 where
     D: NetworkDirection<V, Handshake>
@@ -69,6 +70,7 @@ where
 }
 
 /// A packet received from a connection channel.
+#[derive(Debug)]
 pub enum ChannelRecvPacket<V: Version, D>
 where
     D: NetworkDirection<V, Handshake>

@@ -3,7 +3,7 @@
 //! The connection will eventually be closed by the server
 //! due to not responding to keep-alive packets.
 
-use std::{num::NonZeroU8, sync::Arc};
+use std::{io::Cursor, num::NonZeroU8, sync::Arc};
 
 use bevy::prelude::*;
 use froglight::{
@@ -15,11 +15,17 @@ use froglight::{
                 ReadyC2SPacket, SelectKnownPacksC2SPacket,
             },
             login::{EnterConfigurationPacket, LoginClientboundPackets, LoginQueryResponsePacket},
-            play::{AcknowledgeChunksPacket, PlayClientboundPackets, TeleportConfirmPacket},
+            play::{
+                AcknowledgeChunksPacket, PlayClientboundPackets, ResourcePackStatusPacket,
+                TeleportConfirmPacket,
+            },
             V1_21_0,
         },
     },
-    prelude::*,
+    prelude::{
+        registry::{BlockRegistry, ItemRegistry},
+        *,
+    },
     protocol::FrogWrite,
     HeadlessPlugins,
 };
@@ -47,7 +53,9 @@ fn main() -> AppExit {
             // Create a connection to the server once
             create_connection.run_if(run_once()),
             // Exit if a network error occurs
-            exit_on_error.run_if(on_event::<ConnectionErrorEvent>()),
+            exit_on_error.run_if(
+                any_component_removed::<PolledTask>().or_else(on_event::<ConnectionErrorEvent>()),
+            ),
         )
             .chain(),
     );
@@ -73,9 +81,10 @@ fn create_connection(mut commands: Commands, resolver: Res<Resolver>) {
 fn exit_on_error(mut events: EventReader<ConnectionErrorEvent>, mut exit: EventWriter<AppExit>) {
     if let Some(error) = events.read().next() {
         error!("Error: {}", error.error);
-        error!("Exiting...");
-        exit.send(AppExit::Error(NonZeroU8::new(1).unwrap()));
     }
+
+    error!("Exiting...");
+    exit.send(AppExit::Error(NonZeroU8::new(1).unwrap()));
 }
 
 /// Query for any [`ConnectionChannel`]s and print any packets received.
@@ -131,6 +140,12 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                             cookie: cookie_packet.cookie,
                             payload: None,
                         });
+                    }
+                    LoginClientboundPackets::LoginDisconnect(disconnect_packet) => {
+                        info!("Login: Disconnect \"{:?}\"", disconnect_packet.reason);
+
+                        // Disconnect from the server
+                        commands.entity(entity).despawn_recursive();
                     }
                     other => {
                         info!("Login: {other:?}");
@@ -203,9 +218,42 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     ConfigurationClientboundPackets::SynchronizeTags(tags_packet) => {
                         info!("Config: SynchronizeTags");
                         for (key, data) in &tags_packet.tags {
-                            info!("    \"{key}\":");
-                            for (tag, data) in &data.data {
-                                info!("        \"{tag}\": {data:?}");
+                            match key.as_str() {
+                                // Use `ItemRegistry` to convert the ids to actual items
+                                "minecraft:item" | "minecraft:banner_pattern" => {
+                                    info!("    \"{key}\":");
+                                    for (tag, data) in &data.data {
+                                        info!(
+                                            "        \"{tag}\": {:?}",
+                                            data.iter()
+                                                .map(|id| {
+                                                    RegistryId::<V1_21_0>::from_id(*id).unwrap()
+                                                })
+                                                .collect::<Vec<ItemRegistry>>()
+                                        );
+                                    }
+                                }
+                                // Use `BlockRegistry` to convert the ids to actual blocks
+                                "minecraft:block" | "minecraft:point_of_interest_type" => {
+                                    info!("    \"{key}\":");
+                                    for (tag, data) in &data.data {
+                                        info!(
+                                            "        \"{tag}\": {:?}",
+                                            data.iter()
+                                                .map(|id| {
+                                                    RegistryId::<V1_21_0>::from_id(*id).unwrap()
+                                                })
+                                                .collect::<Vec<BlockRegistry>>()
+                                        );
+                                    }
+                                }
+                                // Log the data as is
+                                key => {
+                                    info!("    \"{key}\":");
+                                    for (tag, data) in &data.data {
+                                        info!("        \"{tag}\": {data:?}");
+                                    }
+                                }
                             }
                         }
                     }
@@ -219,6 +267,23 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                                 info!("        \"{}\",", data.identifier);
                             }
                         }
+                    }
+                    ConfigurationClientboundPackets::ResourcePackSend(resourcepack_packet) => {
+                        info!("Config: ResourcePackSend");
+                        info!("    UUID: \"{}\"", resourcepack_packet.uuid);
+                        info!("    URL: {}", resourcepack_packet.url);
+                        info!("    Hash: {}", resourcepack_packet.hash);
+                        info!("    Required: {}", resourcepack_packet.required);
+
+                        // Respond that we downloaded and successfully loaded the pack
+                        channel.send_configuration(ResourcePackStatusPacket {
+                            resourcepack: resourcepack_packet.uuid,
+                            status: ResourcePackStatus::Accepted,
+                        });
+                        channel.send_configuration(ResourcePackStatusPacket {
+                            resourcepack: resourcepack_packet.uuid,
+                            status: ResourcePackStatus::SuccessfullyLoaded,
+                        });
                     }
                     other => {
                         info!("Config: {other:?}");
@@ -264,6 +329,13 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("    Position: {:?}", chunk_packet.position);
                         info!("    Entities: {:?}", chunk_packet.chunk_data.entities);
 
+                        let mut cursor = Cursor::new(chunk_packet.chunk_data.data.as_slice());
+                        if let Err(err) = Chunk::read_from(320, -64, &mut cursor) {
+                            error!("    Error: {err}");
+                        } else {
+                            info!("    Valid!");
+                        }
+
                         // Respond that we accepted the chunk
                         // Not actually true or how it works, but the server accepts it :)
                         channel.send_play(AcknowledgeChunksPacket { chunks_per_tick: 1.0 });
@@ -271,9 +343,42 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                     PlayClientboundPackets::SynchronizeTags(tags_packet) => {
                         info!("Play: SynchronizeTags");
                         for (key, data) in &tags_packet.tags {
-                            info!("    \"{key}\":");
-                            for (tag, data) in &data.data {
-                                info!("        \"{tag}\": {data:?}");
+                            match key.as_str() {
+                                // Use `ItemRegistry` to convert the ids to actual items
+                                "minecraft:item" | "minecraft:banner_pattern" => {
+                                    info!("    \"{key}\":");
+                                    for (tag, data) in &data.data {
+                                        info!(
+                                            "        \"{tag}\": {:?}",
+                                            data.iter()
+                                                .map(|id| {
+                                                    RegistryId::<V1_21_0>::from_id(*id).unwrap()
+                                                })
+                                                .collect::<Vec<ItemRegistry>>()
+                                        );
+                                    }
+                                }
+                                // Use `BlockRegistry` to convert the ids to actual blocks
+                                "minecraft:block" | "minecraft:point_of_interest_type" => {
+                                    info!("    \"{key}\":");
+                                    for (tag, data) in &data.data {
+                                        info!(
+                                            "        \"{tag}\": {:?}",
+                                            data.iter()
+                                                .map(|id| {
+                                                    RegistryId::<V1_21_0>::from_id(*id).unwrap()
+                                                })
+                                                .collect::<Vec<BlockRegistry>>()
+                                        );
+                                    }
+                                }
+                                // Log the data as is
+                                key => {
+                                    info!("    \"{key}\":");
+                                    for (tag, data) in &data.data {
+                                        info!("        \"{tag}\": {data:?}");
+                                    }
+                                }
                             }
                         }
                     }

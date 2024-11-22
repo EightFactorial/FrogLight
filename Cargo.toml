@@ -72,7 +72,8 @@ bitvec = "1.0.1"
 bytemuck = { version = "1.19.0", features = ["latest_stable_rust"] }
 compact_str = "0.8.0"
 derive_more = { version = "1.0.0", features = ["full"] }
-futures-lite = "2.4.0"
+futures-lite = "2.5.0"
+futures-util = "0.3.31"
 glam = "0.27.0"
 hashbrown = "0.14.5"
 parking_lot = "0.12.3"

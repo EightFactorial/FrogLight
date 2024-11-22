@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_channel::{
     Receiver, Recv as RecvFut, Send as SendFut, Sender, TryRecvError, TrySendError,
 };
@@ -143,6 +145,51 @@ where
     Configuration: State<V>,
     Play: State<V>,
 {
+    /// Send a [`Handshake`] packet.
+    #[inline]
+    pub fn send_handshake(
+        &self,
+        packet: <D as NetworkDirection<V, Handshake>>::Recv,
+    ) -> SendFut<'_, ChannelRecvPacket<V, D>> {
+        self.send(ChannelRecvPacket::Handshake(Arc::new(packet)))
+    }
+
+    /// Send a [`Status`] packet.
+    #[inline]
+    pub fn send_status(
+        &self,
+        packet: <D as NetworkDirection<V, Status>>::Recv,
+    ) -> SendFut<'_, ChannelRecvPacket<V, D>> {
+        self.send(ChannelRecvPacket::Status(Arc::new(packet)))
+    }
+
+    /// Send a [`Login`] packet.
+    #[inline]
+    pub fn send_login(
+        &self,
+        packet: <D as NetworkDirection<V, Login>>::Recv,
+    ) -> SendFut<'_, ChannelRecvPacket<V, D>> {
+        self.send(ChannelRecvPacket::Login(Arc::new(packet)))
+    }
+
+    /// Send a [`Configuration`] packet.
+    #[inline]
+    pub fn send_configuration(
+        &self,
+        packet: <D as NetworkDirection<V, Configuration>>::Recv,
+    ) -> SendFut<'_, ChannelRecvPacket<V, D>> {
+        self.send(ChannelRecvPacket::Config(Arc::new(packet)))
+    }
+
+    /// Send a [`Play`] packet.
+    #[inline]
+    pub fn send_play(
+        &self,
+        packet: <D as NetworkDirection<V, Play>>::Recv,
+    ) -> SendFut<'_, ChannelRecvPacket<V, D>> {
+        self.send(ChannelRecvPacket::Play(Arc::new(packet)))
+    }
+
     /// Send a packet to bevy through the channel.
     #[inline]
     pub fn send(&self, packet: ChannelRecvPacket<V, D>) -> SendFut<'_, ChannelRecvPacket<V, D>> {
