@@ -5,7 +5,7 @@ use std::num::NonZeroU8;
 use bevy::prelude::*;
 use froglight::{
     network::{
-        network::{NetworkErrorEvent, ServerStatusResponse},
+        network::{ConnectTrait, ConnectionErrorEvent, PolledTask, StatusResponseEvent},
         versions::v1_21_0::V1_21_0,
     },
     prelude::*,
@@ -24,9 +24,9 @@ fn main() -> AppExit {
             // Send a status request to the server.
             send_status_request.run_if(run_once()),
             // Print the status response and exit.
-            print_status_response.run_if(on_event::<ServerStatusResponse>()),
+            print_status_response.run_if(on_event::<StatusResponseEvent>()),
             // Exit if a network error occurs.
-            exit_on_error.run_if(on_event::<NetworkErrorEvent>()),
+            exit_on_error.run_if(on_event::<ConnectionErrorEvent>()),
         )
             .chain(),
     );
@@ -51,19 +51,25 @@ fn send_status_request(mut commands: Commands, resolver: Res<Resolver>) {
 
 /// Print the status response and exit.
 fn print_status_response(
-    mut events: EventReader<ServerStatusResponse>,
+    mut events: EventReader<StatusResponseEvent>,
     mut exit: EventWriter<AppExit>,
 ) {
     if let Some(event) = events.read().next() {
-        info!("Ping: {:?}", event.ping);
+        if event.ping.as_millis() <= 5 {
+            info!("Ping: {}μs", event.ping.as_micros());
+        } else {
+            info!("Ping: {}ms", event.ping.as_millis());
+        }
+
         info!("Status:\n{}", serde_json::to_string_pretty(&event.status).unwrap());
+
         info!("Exiting...");
         exit.send(AppExit::Success);
     }
 }
 
 /// Log and exit if a network error occurs.
-fn exit_on_error(mut events: EventReader<NetworkErrorEvent>, mut exit: EventWriter<AppExit>) {
+fn exit_on_error(mut events: EventReader<ConnectionErrorEvent>, mut exit: EventWriter<AppExit>) {
     if let Some(error) = events.read().next() {
         error!("Error: {}", error.error);
         error!("Exiting...");

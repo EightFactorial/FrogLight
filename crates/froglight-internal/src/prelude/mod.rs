@@ -15,7 +15,10 @@ pub use froglight_block::{
 pub use froglight_network::{
     common::*,
     connection::{Clientbound, Connection, ConnectionError, Serverbound},
-    network::{ConnectionChannel, ConnectionTask, ConnectionTrait, PolledTask, StatusTask},
+    network::{
+        BevyConnectionChannel as ConnectionChannel, ChannelRecvPacket, ConnectTrait,
+        ConnectionErrorEvent, ConnectionTask, PolledTask, StatusTask,
+    },
     packet::*,
     resolver::Resolver,
     states::{Configuration, Handshake, Login, Play, Status},

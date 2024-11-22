@@ -3,20 +3,20 @@
 use bevy_app::{App, Plugin};
 use froglight_protocol::common::{ChunkPosition, Difficulty, GameMode};
 
-mod channel;
-pub use channel::{ConnectionChannel, PacketChannel};
+pub mod channel;
+pub use channel::{BevyConnectionChannel, ChannelRecvPacket, ChannelSendPacket};
 
-mod event;
-pub use event::{NetworkErrorEvent, ServerStatusResponse};
-
-mod networking;
-pub use networking::ConnectionTrait;
+mod connect;
+pub use connect::ConnectTrait;
 
 mod systemset;
 pub use systemset::{NetworkPostUpdateSet, NetworkPreUpdateSet};
 
 mod task;
-pub use task::{ConnectionTask, ConnectionTaskResult, PolledTask, StatusTask, StatusTaskResult};
+pub use task::{
+    ConnectionClosedEvent, ConnectionErrorEvent, ConnectionTask, PolledTask, StatusResponseEvent,
+    StatusTask,
+};
 
 /// The `Network` Froglight plugin.
 ///
@@ -26,12 +26,11 @@ pub struct NetworkPlugin;
 
 impl Plugin for NetworkPlugin {
     fn build(&self, app: &mut App) {
+        app.register_type::<Difficulty>()
+            .register_type::<GameMode>()
+            .register_type::<ChunkPosition>();
+
         systemset::build(app);
-
-        event::build(app);
         task::build(app);
-
-        app.init_resource::<Difficulty>().register_type::<Difficulty>();
-        app.register_type::<ChunkPosition>().register_type::<GameMode>();
     }
 }

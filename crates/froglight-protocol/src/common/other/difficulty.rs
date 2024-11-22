@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::reflect::ReflectResource;
+use bevy_ecs::reflect::ReflectComponent;
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
 use froglight_macros::FrogReadWrite;
@@ -9,8 +9,8 @@ use froglight_macros::FrogReadWrite;
 /// The difficulty of the game.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogReadWrite)]
 #[frog(tests = ["read_verify", "write_verify"], bytes = [2])]
-#[cfg_attr(feature = "bevy", derive(bevy_ecs::system::Resource, bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Default, Resource))]
+#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Default, Component))]
 pub enum Difficulty {
     /// Peaceful difficulty.
     Peaceful,
