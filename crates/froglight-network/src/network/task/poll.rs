@@ -1,5 +1,6 @@
 use bevy_app::{App, PostUpdate};
 use bevy_ecs::prelude::*;
+use bevy_hierarchy::DespawnRecursiveExt;
 use bevy_reflect::{std_traits::ReflectDefault, Reflect};
 use parking_lot::Mutex;
 
@@ -48,27 +49,26 @@ impl PolledTask {
     ) {
         query.par_iter_mut().for_each(|(entity, connection, status)| {
             // Poll all `ConnectionTask`s
-            if let Some(event) = connection.and_then(|mut c| c.poll(entity)) {
-                conn_buffer.lock().push(event);
-                // Remove the `ConnectionTask` component
+            if let Some(result) = connection.and_then(|mut c| c.poll(entity)) {
+                match result {
+                    Ok(event) => conn_buffer.lock().push(event),
+                    Err(error) => error_buffer.lock().push(error),
+                }
+                // Despawn the entity
                 commands.command_scope(|mut commands| {
-                    commands.entity(entity).remove::<ConnectionTask>();
+                    commands.entity(entity).despawn_recursive();
                 });
             }
 
             // Poll all `StatusTask`s
             if let Some(result) = status.and_then(|mut s| s.poll(entity)) {
                 match result {
-                    Ok(event) => {
-                        status_buffer.lock().push(event);
-                    }
-                    Err(error) => {
-                        error_buffer.lock().push(error);
-                    }
+                    Ok(event) => status_buffer.lock().push(event),
+                    Err(error) => error_buffer.lock().push(error),
                 }
-                // Remove the `StatusTask` component
+                // Despawn the entity
                 commands.command_scope(|mut commands| {
-                    commands.entity(entity).remove::<StatusTask>();
+                    commands.entity(entity).despawn_recursive();
                 });
             }
         });

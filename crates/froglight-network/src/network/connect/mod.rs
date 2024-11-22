@@ -94,14 +94,8 @@ where
 
         let task = IoTaskPool::get().spawn(async move {
             match Connection::<Self, Handshake>::connect_to(&task_address, &resolver).await {
-                Ok(conn) => {
-                    if let Err(err) = perform_server_connection(conn, &task).await {
-                        let _ = task.send_error(err).await;
-                    }
-                }
-                Err(err) => {
-                    let _ = task.send_error(err).await;
-                }
+                Ok(conn) => perform_server_connection(conn, &task).await,
+                Err(err) => Err(err),
             }
         });
 
@@ -121,13 +115,9 @@ where
             match Connection::<Self, Handshake, Serverbound>::connect(socket).await {
                 Ok(mut conn) => {
                     conn.info_mut().address = task_address;
-                    if let Err(err) = perform_server_connection(conn, &task).await {
-                        let _ = task.send_error(err).await;
-                    }
+                    perform_server_connection(conn, &task).await
                 }
-                Err(err) => {
-                    let _ = task.send_error(err).await;
-                }
+                Err(err) => Err(err),
             }
         });
 

@@ -8,7 +8,7 @@ use froglight_protocol::{
 };
 
 use super::{ChannelRecvPacket, ChannelSendPacket};
-use crate::connection::{ConnectionError, NetworkDirection, Serverbound};
+use crate::connection::{NetworkDirection, Serverbound};
 
 /// Create a new channel for sending and receiving packets
 /// between bevy and a connection.
@@ -50,7 +50,7 @@ where
     Play: State<V>,
 {
     sender: Sender<ChannelSendPacket<V, D>>,
-    receiver: Receiver<Result<ChannelRecvPacket<V, D>, ConnectionError>>,
+    receiver: Receiver<ChannelRecvPacket<V, D>>,
 }
 
 impl<V: Version, D> BevyConnectionChannel<V, D>
@@ -107,9 +107,7 @@ where
     /// Receive a packet to the connection through the channel.
     #[inline]
     #[expect(clippy::missing_errors_doc)]
-    pub fn try_recv(
-        &self,
-    ) -> Result<Result<ChannelRecvPacket<V, D>, ConnectionError>, TryRecvError> {
+    pub fn try_recv(&self) -> Result<ChannelRecvPacket<V, D>, TryRecvError> {
         self.receiver.try_recv()
     }
 }
@@ -128,7 +126,7 @@ where
     Configuration: State<V>,
     Play: State<V>,
 {
-    sender: Sender<Result<ChannelRecvPacket<V, D>, ConnectionError>>,
+    sender: Sender<ChannelRecvPacket<V, D>>,
     receiver: Receiver<ChannelSendPacket<V, D>>,
 }
 
@@ -147,20 +145,8 @@ where
 {
     /// Send a packet to bevy through the channel.
     #[inline]
-    pub fn send(
-        &self,
-        packet: ChannelRecvPacket<V, D>,
-    ) -> SendFut<'_, Result<ChannelRecvPacket<V, D>, ConnectionError>> {
-        self.sender.send(Ok(packet))
-    }
-
-    /// Send an error to bevy through the channel.
-    #[inline]
-    pub fn send_error(
-        &self,
-        error: ConnectionError,
-    ) -> SendFut<'_, Result<ChannelRecvPacket<V, D>, ConnectionError>> {
-        self.sender.send(Err(error))
+    pub fn send(&self, packet: ChannelRecvPacket<V, D>) -> SendFut<'_, ChannelRecvPacket<V, D>> {
+        self.sender.send(packet)
     }
 
     /// Receive a packet from bevy through the channel.

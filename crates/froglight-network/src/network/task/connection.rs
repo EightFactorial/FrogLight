@@ -1,7 +1,10 @@
 use bevy_ecs::{component::Component, entity::Entity, event::Event};
-use bevy_tasks::Task;
+use bevy_tasks::{block_on, poll_once, Task};
 use compact_str::CompactString;
 use froglight_protocol::traits::Version;
+
+use super::ConnectionErrorEvent;
+use crate::connection::ConnectionError;
 
 #[doc(hidden)]
 pub(super) fn build(app: &mut bevy_app::App) { app.add_event::<ConnectionClosedEvent>(); }
@@ -14,13 +17,16 @@ pub struct ConnectionTask {
     /// The version id of the server.
     pub version: i32,
 
-    task: Task<()>,
+    task: Task<Result<(), ConnectionError>>,
 }
 
 impl ConnectionTask {
     /// Create a new [`ConnectionTask`] from a [`Task`].
     #[must_use]
-    pub fn new<V: Version>(address: impl Into<CompactString>, task: Task<()>) -> Self {
+    pub fn new<V: Version>(
+        address: impl Into<CompactString>,
+        task: Task<Result<(), ConnectionError>>,
+    ) -> Self {
         Self { address: address.into(), version: V::ID, task }
     }
 
@@ -28,9 +34,17 @@ impl ConnectionTask {
     ///
     /// Returns a `ConnectionClosedEvent` if the connection was closed,
     /// otherwise returns `None`.
-    pub fn poll(&mut self, entity: Entity) -> Option<ConnectionClosedEvent> {
-        if self.task.is_finished() {
-            Some(ConnectionClosedEvent { entity, address: self.address.clone() })
+    pub fn poll(
+        &mut self,
+        entity: Entity,
+    ) -> Option<Result<ConnectionClosedEvent, ConnectionErrorEvent>> {
+        if let Some(result) = block_on(poll_once(&mut self.task)) {
+            match result {
+                Ok(()) => Some(Ok(ConnectionClosedEvent { entity, address: self.address.clone() })),
+                Err(error) => {
+                    Some(Err(ConnectionErrorEvent { entity, address: self.address.clone(), error }))
+                }
+            }
         } else {
             None
         }

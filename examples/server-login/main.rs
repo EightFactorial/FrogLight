@@ -64,6 +64,7 @@ fn main() -> AppExit {
 /// you can use the [`PolledTask`] [`Component`], which will
 /// despawn the entity automatically when the task is done.
 fn create_connection(mut commands: Commands, resolver: Res<Resolver>) {
+    info!("Connecting to \"{SERVER_ADDRESS}\"...");
     let (task, channel) = V1_21_0::connect(SERVER_ADDRESS, &resolver);
     commands.spawn((task, channel, PolledTask));
 }
@@ -88,13 +89,13 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
     for (entity, channel) in channels.iter() {
         while let Ok(received) = channel.try_recv() {
             match received {
-                Ok(ChannelRecvPacket::Handshake(packet)) => {
+                ChannelRecvPacket::Handshake(packet) => {
                     error!("Handshake: {packet:?}");
                 }
-                Ok(ChannelRecvPacket::Status(packet)) => {
+                ChannelRecvPacket::Status(packet) => {
                     error!("Status: {packet:?}");
                 }
-                Ok(ChannelRecvPacket::Login(packet)) => match Arc::unwrap_or_clone(packet) {
+                ChannelRecvPacket::Login(packet) => match Arc::unwrap_or_clone(packet) {
                     LoginClientboundPackets::LoginSuccess(profile_packet) => {
                         // Log the profile information
                         info!("Login: Profile");
@@ -135,7 +136,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("Login: {other:?}");
                     }
                 },
-                Ok(ChannelRecvPacket::Config(packet)) => match Arc::unwrap_or_clone(packet) {
+                ChannelRecvPacket::Config(packet) => match Arc::unwrap_or_clone(packet) {
                     ConfigurationClientboundPackets::SelectKnownPacks(resourcepack_packet) => {
                         info!("Config: ResourcePacks");
 
@@ -223,7 +224,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("Config: {other:?}");
                     }
                 },
-                Ok(ChannelRecvPacket::Play(packet)) => match Arc::unwrap_or_clone(packet) {
+                ChannelRecvPacket::Play(packet) => match Arc::unwrap_or_clone(packet) {
                     PlayClientboundPackets::CookieRequest(cookie_packet) => {
                         info!("Play: Cookie \"{}\"", cookie_packet.cookie);
 
@@ -298,10 +299,6 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("Play: {other:?}");
                     }
                 },
-                Err(err) => {
-                    error!("Error: {err}");
-                    commands.entity(entity).despawn_recursive();
-                }
             }
         }
     }
