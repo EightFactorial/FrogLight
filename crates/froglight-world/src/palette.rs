@@ -1,4 +1,4 @@
-use froglight_protocol::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
+use froglight_protocol::protocol::{FrogVarRead, FrogVarWrite, ReadError, WriteError};
 
 /// A palette type for a container.
 ///
@@ -21,18 +21,18 @@ impl ContainerPalette {
     /// Reads a palette type from the buffer.
     pub(crate) fn read_type(&self, buf: &mut std::io::Cursor<&[u8]>) -> Result<Self, ReadError> {
         match self {
-            Self::Single(_) => Ok(Self::Single(u32::fg_read(buf)?)),
-            Self::Vector(_) => Ok(Self::Vector(Vec::fg_read(buf)?)),
+            Self::Single(_) => Ok(Self::Single(u32::fg_var_read(buf)?)),
+            Self::Vector(_) => Ok(Self::Vector(Vec::fg_var_read(buf)?)),
             Self::Global => Ok(Self::Global),
         }
     }
 }
 
-impl FrogWrite for ContainerPalette {
-    fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+impl FrogVarWrite for ContainerPalette {
+    fn fg_var_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
         match self {
-            Self::Single(id) => id.fg_write(buf),
-            Self::Vector(ids) => ids.fg_write(buf),
+            Self::Single(id) => id.fg_var_write(buf),
+            Self::Vector(ids) => ids.fg_var_write(buf),
             Self::Global => Ok(()),
         }
     }

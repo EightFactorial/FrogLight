@@ -63,7 +63,6 @@ impl<T: ContainerType> Container<T> {
     /// Sets the value at the given coordinates.
     ///
     /// Returns the previous value.
-    #[allow(clippy::missing_panics_doc)]
     pub fn set_data(&mut self, pos: &SectionBlockPosition, value: u32) -> u32 {
         match &self.palette {
             ContainerPalette::Single(_) => self.set_single(*pos, value),
@@ -107,7 +106,6 @@ impl<T: ContainerType> Container<T> {
     }
 
     /// Set a value inside a [`Palette::Vector`].
-    #[allow(clippy::manual_unwrap_or_default)]
     fn set_vector(&mut self, pos: SectionBlockPosition, value: u32) -> u32 {
         let ContainerPalette::Vector(vec) = &self.palette else {
             unreachable!("ContainerPalette must be ContainerPalette::Vector");
@@ -138,9 +136,10 @@ impl<T: ContainerType> Container<T> {
 
             // Get the number of bits needed to store palette indexes.
             let required_size = Self::vector_bits_required(vec.len());
+            let required_bits = u8::try_from(required_size).unwrap();
 
             // Check if the palette needs to be expanded.
-            match T::palette_type(required_size) {
+            match T::palette_type(required_bits) {
                 ContainerPalette::Vector(_) => {
                     // Expand the bitvec to fit the new value.
                     if required_size > self.bits {
@@ -370,7 +369,7 @@ impl<T: ContainerType> Container<T> {
     /// Panics if the given length is 0.
     #[must_use]
     #[inline]
-    #[allow(clippy::cast_possible_truncation)]
+    #[expect(clippy::cast_possible_truncation)]
     pub(crate) const fn vector_bits_required(len: usize) -> usize {
         (len as u32).ilog2() as usize + 1
     }
@@ -387,7 +386,7 @@ pub(super) mod sealed {
     pub trait ContainerType {
         /// Returns the palette type for a given number of bits.
         #[must_use]
-        fn palette_type(bits: usize) -> crate::palette::ContainerPalette;
+        fn palette_type(bits: u8) -> crate::palette::ContainerPalette;
     }
 }
 
@@ -399,7 +398,7 @@ pub struct BlockStorage;
 pub type BlockContainer = Container<BlockStorage>;
 
 impl ContainerType for BlockStorage {
-    fn palette_type(bits: usize) -> ContainerPalette {
+    fn palette_type(bits: u8) -> ContainerPalette {
         match bits {
             0 => ContainerPalette::Single(0u32),
             1..=8 => ContainerPalette::Vector(Vec::new()),
@@ -416,7 +415,7 @@ pub struct BiomeStorage;
 pub type BiomeContainer = Container<BiomeStorage>;
 
 impl ContainerType for BiomeStorage {
-    fn palette_type(bits: usize) -> ContainerPalette {
+    fn palette_type(bits: u8) -> ContainerPalette {
         match bits {
             0 => ContainerPalette::Single(0u32),
             1..=3 => ContainerPalette::Vector(Vec::new()),
@@ -441,7 +440,7 @@ impl<T: ContainerType> FrogRead for Container<T> {
         Self: Sized,
     {
         // Read the bit count
-        let bits = usize::from(u8::fg_read(buf)?);
+        let bits = u8::fg_read(buf)?;
 
         // Read the palette
         let mut palette = T::palette_type(bits);
@@ -451,7 +450,7 @@ impl<T: ContainerType> FrogRead for Container<T> {
         let data = Vec::<u64>::fg_read(buf)?;
         let data = BitVec::from_vec(data);
 
-        Ok(Self { bits, palette, data, _phantom: PhantomData })
+        Ok(Self { bits: usize::from(bits), palette, data, _phantom: PhantomData })
     }
 }
 
@@ -461,7 +460,7 @@ impl<T: ContainerType> FrogWrite for Container<T> {
         FrogWrite::fg_write(&u8::try_from(self.bits).expect("Bitsize overflow"), buf)?;
 
         // Write the palette
-        self.palette.fg_write(buf)?;
+        self.palette.fg_var_write(buf)?;
 
         // Write the data
         //
