@@ -4,7 +4,7 @@ use bevy_utils::{NoOpHash, TypeIdMap};
 use froglight_protocol::traits::Version;
 use rangemap::RangeMap;
 
-use crate::{BlockState, BlockStateExt};
+use crate::{BlockResolver, BlockState, BlockStateExt, VanillaResolver};
 
 #[cfg(feature = "bevy")]
 mod plugin;
@@ -37,6 +37,7 @@ pub struct BlockStorage<V: Version> {
 
 impl<V: Version> BlockStorage<V> {
     /// Create a new [`BlockStorage`].
+    #[inline]
     #[must_use]
     pub const fn new_empty() -> Self {
         Self { type_map: TypeIdMap::with_hasher(NoOpHash), type_range: RangeMap::new() }
@@ -58,6 +59,41 @@ impl<V: Version> BlockStorage<V> {
         } else {
             None
         }
+    }
+
+    /// Get the block with the given ID.
+    ///
+    /// Requires knowing the block type ahead of time.
+    #[must_use]
+    pub fn get_known_block<B: BlockStateExt<V>>(&self, block_id: u32) -> Option<B> {
+        let (range, _) = self.type_range.get_key_value(&block_id)?;
+        B::from_relative(usize::try_from(block_id - range.start).ok()?)
+    }
+
+    /// Get the block with the given ID using a [`BlockResolver`].
+    ///
+    /// # Note
+    /// This is a wrapper around [`BlockResolver::resolve`].
+    #[inline]
+    #[must_use]
+    pub fn get_block<R: BlockResolver<V>>(&self, block_id: u32) -> R::Output {
+        R::resolve(block_id, self)
+    }
+}
+
+impl<V: Version> BlockStorage<V>
+where
+    VanillaResolver: BlockResolver<V>,
+{
+    /// Get the vanilla block with the given ID.
+    ///
+    /// # Note
+    /// This is a wrapper around [`BlockResolver::resolve`]
+    /// using [`VanillaResolver`] as the resolver.
+    #[inline]
+    #[must_use]
+    pub fn get_vanilla(&self, block_id: u32) -> <VanillaResolver as BlockResolver<V>>::Output {
+        VanillaResolver::resolve(block_id, self)
     }
 }
 

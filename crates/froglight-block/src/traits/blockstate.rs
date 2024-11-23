@@ -64,11 +64,3 @@ pub trait BlockStateExt<V: Version>: BlockState<V> + Sized {
         Self::Attributes::from_index(self.to_relative()).unwrap()
     }
 }
-
-/// A block attribute that can be in one of multiple states.
-pub trait BlockAttribute: 'static + Into<usize> + Clone + Copy + PartialEq + Eq + Sized {
-    /// The number of states this attribute can be in.
-    const STATE_COUNT: usize = Self::STATES.len();
-    /// All possible states this attribute can be in.
-    const STATES: &'static [Self];
-}

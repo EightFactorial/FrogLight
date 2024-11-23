@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+bevy = { workspace = true }
+
 [dependencies]
 bitvec = { workspace = true }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
@@ -37,4 +40,4 @@ default = ["bevy", "froglight-block"]
 bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect"]
 
 # Adds methods to get Blocks from a Chunk.
-# froglight-block = ["bevy", "dep:froglight-block"]
+froglight-block = ["bevy", "dep:froglight-block"]

@@ -1,5 +1,9 @@
-mod blockstate;
-pub use blockstate::{BlockAttribute, BlockState, BlockStateExt};
+mod attribute;
+pub use attribute::BlockAttribute;
+pub(crate) use attribute::ResolvableAttributes;
 
-mod resolver;
-pub(crate) use resolver::ResolvableAttributes;
+mod blockstate;
+pub use blockstate::{BlockState, BlockStateExt};
+
+mod resolve;
+pub use resolve::{BlockResolver, VanillaResolver};

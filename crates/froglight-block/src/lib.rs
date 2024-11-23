@@ -8,7 +8,7 @@ mod generated;
 pub use generated::{attribute, block};
 
 mod traits;
-pub use traits::{BlockAttribute, BlockState, BlockStateExt};
+pub use traits::{BlockAttribute, BlockResolver, BlockState, BlockStateExt, VanillaResolver};
 
 mod storage;
 pub use storage::BlockStorage;

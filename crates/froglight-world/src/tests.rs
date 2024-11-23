@@ -253,56 +253,61 @@ fn global_container() {
     }
 }
 
-// #[test]
-// #[cfg(feature = "froglight-block")]
-// fn chunk_blocks() {
-//     use froglight_block::{
-//         definitions::blocks::{Air, Blocks, GrassBlock, Stone},
-//         BlockStorage, VanillaResolver,
-//     };
-//     use froglight_protocol::{common::ChunkBlockPosition,
-// versions::v1_21_0::V1_21_0};
+#[test]
+#[cfg(feature = "froglight-block")]
+fn chunk_blocks() {
+    use bevy::{app::App, MinimalPlugins};
+    use froglight_block::{
+        attribute::SnowyBooleanAttribute,
+        block::{Air, Blocks, GrassBlock, Stone},
+        BlockPlugin, BlockStateExt, BlockStorageArc, VanillaResolver,
+    };
+    use froglight_protocol::{common::ChunkBlockPosition, versions::v1_21_0::V1_21_0};
 
-//     use crate::Chunk;
+    use crate::Chunk;
 
-//     let chunk = Chunk::new_empty(16, 0);
-//     let storage = BlockStorage::<V1_21_0>::new();
+    let mut app = App::new();
+    app.add_plugins(MinimalPlugins);
+    app.add_plugins(BlockPlugin);
 
-//     // All blocks in the chunk should be air.
-//     for blockstate_id in chunk.block_iter() {
-//         assert_eq!(
-//             storage.resolve_blockstate::<VanillaResolver>(blockstate_id),
-//             Some(Blocks::Air(Air))
-//         );
-//     }
+    // Retrieve the block storage.
+    let storage = app.world().resource::<BlockStorageArc<V1_21_0>>();
+    let storage = storage.read();
 
-//     // Set the first half of the blocks to stone.
-//     let halfway = chunk.volume() / 2;
-//     for index in 0..halfway {
-//         let pos = ChunkBlockPosition::from_index(index as usize);
-//         chunk.set_block::<V1_21_0, VanillaResolver>(pos, &Stone, &storage);
-//     }
+    let chunk = Chunk::new_empty(16, 0);
 
-//     // Set the next row to non-snowy grass.
-//     for index in halfway..halfway + 16 {
-//         let pos = ChunkBlockPosition::from_index(index as usize);
-//         chunk.set_block::<V1_21_0, VanillaResolver>(
-//             pos,
-//             &GrassBlock { snowy: false.into() },
-//             &storage,
-//         );
-//     }
+    // All blocks in the chunk should be air.
+    for blockstate_id in chunk.block_iter() {
+        assert_eq!(storage.get_vanilla(blockstate_id), Some(Blocks::Air(Air)));
+    }
 
-//     // Check that all blocks are set correctly.
-//     for (index, blockstate_id) in chunk.block_iter().enumerate() {
-//         let expected = if index < halfway as usize {
-//             Blocks::Stone(Stone)
-//         } else if index < halfway as usize + 16 {
-//             Blocks::GrassBlock(GrassBlock { snowy: false.into() })
-//         } else {
-//             Blocks::Air(Air)
-//         };
+    // Set the first half of the blocks to stone.
+    let halfway = chunk.volume() / 2;
+    for index in 0..halfway {
+        let pos = ChunkBlockPosition::from_index(index as usize);
+        chunk.set_block::<V1_21_0, VanillaResolver>(pos, &Stone, &storage);
+    }
 
-//         assert_eq!(storage.
-// resolve_blockstate::<VanillaResolver>(blockstate_id), Some(expected));     }
-// }
+    // Set the next row to non-snowy grass.
+    for index in halfway..halfway + 16 {
+        let pos = ChunkBlockPosition::from_index(index as usize);
+        chunk.set_block::<V1_21_0, VanillaResolver>(
+            pos,
+            &GrassBlock::from_attributes(SnowyBooleanAttribute(false)),
+            &storage,
+        );
+    }
+
+    // Check that all blocks are set correctly.
+    for (index, blockstate_id) in chunk.block_iter().enumerate() {
+        let expected = if index < halfway as usize {
+            Blocks::Stone(Stone)
+        } else if index < halfway as usize + 16 {
+            Blocks::GrassBlock(GrassBlock::from_attributes(SnowyBooleanAttribute(false)))
+        } else {
+            Blocks::Air(Air)
+        };
+
+        assert_eq!(storage.get_vanilla(blockstate_id), Some(expected));
+    }
+}

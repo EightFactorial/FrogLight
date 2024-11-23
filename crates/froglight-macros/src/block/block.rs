@@ -36,7 +36,7 @@ fn build_enum(items: &[ItemStruct]) -> TokenStream {
         });
     }
     quote! {
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From)]
         #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
         pub enum Blocks {
             #output

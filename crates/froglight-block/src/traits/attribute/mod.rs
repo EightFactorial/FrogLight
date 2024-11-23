@@ -11,14 +11,20 @@
 //!  - `(false, A)`
 //!  - `(false, B)`
 //!  - `(false, C)`
-#![allow(dead_code, non_snake_case, unused_assignments)]
+#![allow(non_snake_case, unused_assignments)]
 
 use std::any::TypeId;
 
-use super::BlockAttribute;
-
 #[cfg(test)]
 mod test;
+
+/// A block attribute that can be in one of multiple states.
+pub trait BlockAttribute: 'static + Into<usize> + Clone + Copy + PartialEq + Eq + Sized {
+    /// The number of states this attribute can be in.
+    const STATE_COUNT: usize = Self::STATES.len();
+    /// All possible states this attribute can be in.
+    const STATES: &'static [Self];
+}
 
 /// A set of attributes that can be resolved into an index and vice versa.
 pub(crate) trait ResolvableAttributes: Sized {

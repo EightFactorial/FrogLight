@@ -125,7 +125,7 @@ impl BlockAttribute for LargerEnumAttribute {
 }
 
 #[test]
-fn resolver() {
+fn attribute() {
     // Test individual attributes
     {
         assert_eq!(BooleanAttribute::from_index(0), Some(BooleanAttribute(true)));
