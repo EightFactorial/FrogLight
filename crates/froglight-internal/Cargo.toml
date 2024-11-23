@@ -30,6 +30,7 @@ froglight-registry = { version = "0.1.0", path = "../froglight-registry" }
 froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
 froglight-world = { version = "0.1.0", path = "../froglight-world" }
 
+# Optional dependencies
 bytemuck = { workspace = true, optional = true, features = [
     "nightly_docs",
     "nightly_portable_simd",
@@ -49,7 +50,7 @@ bevy = { workspace = true, optional = true, default-features = false, features =
 ] }
 
 [features]
-default = ["presets"]
+default = ["presets", "nightly"]
 
 # Enables preset plugin groups
 presets = ["dep:bevy"]

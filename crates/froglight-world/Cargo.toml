@@ -21,17 +21,17 @@ bevy = { workspace = true }
 [dependencies]
 bitvec = { workspace = true }
 froglight-protocol = { version = "0.1.0", path = "../froglight-protocol" }
-froglight-block = { version = "0.1.0", path = "../froglight-block", optional = true, features = [
-    "bevy",
-] }
 parking_lot = { workspace = true }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }
 
-# Optional bevy dependencies.
+# Optional dependencies.
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+froglight-block = { version = "0.1.0", path = "../froglight-block", optional = true, features = [
+    "bevy",
+] }
 
 [features]
 default = ["bevy", "froglight-block"]

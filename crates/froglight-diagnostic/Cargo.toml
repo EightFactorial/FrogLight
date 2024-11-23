@@ -26,10 +26,14 @@ froglight-common = { version = "0.1.0", path = "../froglight-common", features =
 froglight-utils = { version = "0.1.0", path = "../froglight-utils" }
 
 # Optional dependencies
+froglight-physics = { version = "0.1.0", path = "../froglight-physics", optional = true }
 froglight-world = { version = "0.1.0", path = "../froglight-world", optional = true }
 
 [features]
-default = ["froglight-world"]
+default = ["froglight-physics", "froglight-world"]
 
-# Enables diagnostics about chunks
+# Enables diagnostics for physics
+froglight-physics = ["dep:froglight-physics"]
+
+# Enables diagnostics for chunks
 froglight-world = ["dep:froglight-world"]
