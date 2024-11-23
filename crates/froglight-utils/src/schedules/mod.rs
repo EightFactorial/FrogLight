@@ -7,7 +7,7 @@ mod current_tick;
 pub use current_tick::*;
 
 mod seconds;
-pub use seconds::{FiveSeconds, HalfSecond, OneSecond};
+pub use seconds::{FiveSeconds, HalfSecond, OneSecond, QuarterSecond, TwoSeconds};
 
 mod ticks;
 pub use ticks::{OneTick, TenTicks, TwoTicks};
@@ -33,8 +33,10 @@ pub(super) fn build(app: &mut App) {
     TenTicks::build(app);
 
     // Add real time schedules
+    QuarterSecond::build(app);
     HalfSecond::build(app);
     OneSecond::build(app);
+    TwoSeconds::build(app);
     FiveSeconds::build(app);
 
     // Add CurrentTick

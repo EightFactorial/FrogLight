@@ -5,7 +5,7 @@ use crate::schedules::traits::ScheduleTrait;
 
 /// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs once every second.
 ///
-/// This schedule uses [`Real`](bevy_time::Real) time.
+/// This schedule uses [`Real`](bevy_time::Real) [`Time`](bevy_time::Time).
 ///
 /// # Example
 /// ```rust,no_run

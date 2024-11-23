@@ -24,6 +24,8 @@ bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_time = { workspace = true }
+
+# Optional dependencies
 froglight-common = { version = "0.1.0", path = "../froglight-common", optional = true, features = [
     "bevy",
 ] }
@@ -36,8 +38,6 @@ froglight-protocol = { version = "0.1.0", path = "../froglight-protocol", option
 froglight-world = { version = "0.1.0", path = "../froglight-world", optional = true, features = [
     "bevy",
 ] }
-
-# Optional dependencies
 hashbrown = { workspace = true, optional = true }
 
 [features]

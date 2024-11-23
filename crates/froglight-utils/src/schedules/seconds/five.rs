@@ -3,10 +3,9 @@ use bevy_reflect::TypePath;
 
 use crate::schedules::traits::ScheduleTrait;
 
-/// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs once every five
-/// seconds.
+/// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs every five seconds.
 ///
-/// This schedule uses [`Real`](bevy_time::Real) time.
+/// This schedule uses [`Real`](bevy_time::Real) [`Time`](bevy_time::Time).
 ///
 /// # Example
 /// ```rust,no_run
@@ -16,7 +15,7 @@ use crate::schedules::traits::ScheduleTrait;
 /// let mut app = App::new();
 /// app.add_plugins(UtilityPlugin);
 ///
-/// // Add a system that runs once every five seconds
+/// // Add a system that runs every five seconds
 /// app.add_systems(FiveSeconds, || {
 ///     bevy_log::info!("Five seconds have passed!");
 /// });
@@ -25,6 +24,6 @@ use crate::schedules::traits::ScheduleTrait;
 pub struct FiveSeconds;
 
 impl ScheduleTrait for FiveSeconds {
-    /// Equivalent to once every `5` seconds.
+    /// Equivalent to every `5` seconds.
     const MILLISECONDS: u64 = 1000 * 5;
 }
