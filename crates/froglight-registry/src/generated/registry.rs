@@ -84,6 +84,32 @@ pub enum ArmorMaterialRegistry {
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
 pub enum AttributeRegistry {
+    #[frog(key = "minecraft:armor")]
+    Armor,
+    #[frog(key = "minecraft:armor_toughness")]
+    ArmorToughness,
+    #[frog(key = "minecraft:attack_damage")]
+    AttackDamage,
+    #[frog(key = "minecraft:attack_knockback")]
+    AttackKnockback,
+    #[frog(key = "minecraft:attack_speed")]
+    AttackSpeed,
+    #[frog(key = "minecraft:block_break_speed")]
+    BlockBreakSpeed,
+    #[frog(key = "minecraft:block_interaction_range")]
+    BlockInteractionRange,
+    #[frog(key = "minecraft:burning_time")]
+    BurningTime,
+    #[frog(key = "minecraft:entity_interaction_range")]
+    EntityInteractionRange,
+    #[frog(key = "minecraft:explosion_knockback_resistance")]
+    ExplosionKnockbackResistance,
+    #[frog(key = "minecraft:fall_damage_multiplier")]
+    FallDamageMultiplier,
+    #[frog(key = "minecraft:flying_speed")]
+    FlyingSpeed,
+    #[frog(key = "minecraft:follow_range")]
+    FollowRange,
     #[frog(key = "minecraft:generic.armor")]
     GenericArmor,
     #[frog(key = "minecraft:generic.armor_toughness")]
@@ -130,6 +156,26 @@ pub enum AttributeRegistry {
     GenericStepHeight,
     #[frog(key = "minecraft:generic.water_movement_efficiency")]
     GenericWaterMovementEfficiency,
+    #[frog(key = "minecraft:gravity")]
+    Gravity,
+    #[frog(key = "minecraft:jump_strength")]
+    JumpStrength,
+    #[frog(key = "minecraft:knockback_resistance")]
+    KnockbackResistance,
+    #[frog(key = "minecraft:luck")]
+    Luck,
+    #[frog(key = "minecraft:max_absorption")]
+    MaxAbsorption,
+    #[frog(key = "minecraft:max_health")]
+    MaxHealth,
+    #[frog(key = "minecraft:mining_efficiency")]
+    MiningEfficiency,
+    #[frog(key = "minecraft:movement_efficiency")]
+    MovementEfficiency,
+    #[frog(key = "minecraft:movement_speed")]
+    MovementSpeed,
+    #[frog(key = "minecraft:oxygen_bonus")]
+    OxygenBonus,
     #[frog(key = "minecraft:player.block_break_speed")]
     PlayerBlockBreakSpeed,
     #[frog(key = "minecraft:player.block_interaction_range")]
@@ -144,6 +190,24 @@ pub enum AttributeRegistry {
     PlayerSubmergedMiningSpeed,
     #[frog(key = "minecraft:player.sweeping_damage_ratio")]
     PlayerSweepingDamageRatio,
+    #[frog(key = "minecraft:safe_fall_distance")]
+    SafeFallDistance,
+    #[frog(key = "minecraft:scale")]
+    Scale,
+    #[frog(key = "minecraft:sneaking_speed")]
+    SneakingSpeed,
+    #[frog(key = "minecraft:spawn_reinforcements")]
+    SpawnReinforcements,
+    #[frog(key = "minecraft:step_height")]
+    StepHeight,
+    #[frog(key = "minecraft:submerged_mining_speed")]
+    SubmergedMiningSpeed,
+    #[frog(key = "minecraft:sweeping_damage_ratio")]
+    SweepingDamageRatio,
+    #[frog(key = "minecraft:tempt_range")]
+    TemptRange,
+    #[frog(key = "minecraft:water_movement_efficiency")]
+    WaterMovementEfficiency,
     #[frog(key = "minecraft:zombie.spawn_reinforcements")]
     ZombieSpawnReinforcements,
 
@@ -607,6 +671,8 @@ pub enum BlockRegistry {
     Crafter,
     #[frog(key = "minecraft:crafting_table")]
     CraftingTable,
+    #[frog(key = "minecraft:creaking_heart")]
+    CreakingHeart,
     #[frog(key = "minecraft:creeper_head")]
     CreeperHead,
     #[frog(key = "minecraft:creeper_wall_head")]
@@ -1447,6 +1513,46 @@ pub enum BlockRegistry {
     PackedIce,
     #[frog(key = "minecraft:packed_mud")]
     PackedMud,
+    #[frog(key = "minecraft:pale_hanging_moss")]
+    PaleHangingMoss,
+    #[frog(key = "minecraft:pale_moss_block")]
+    PaleMossBlock,
+    #[frog(key = "minecraft:pale_moss_carpet")]
+    PaleMossCarpet,
+    #[frog(key = "minecraft:pale_oak_button")]
+    PaleOakButton,
+    #[frog(key = "minecraft:pale_oak_door")]
+    PaleOakDoor,
+    #[frog(key = "minecraft:pale_oak_fence")]
+    PaleOakFence,
+    #[frog(key = "minecraft:pale_oak_fence_gate")]
+    PaleOakFenceGate,
+    #[frog(key = "minecraft:pale_oak_hanging_sign")]
+    PaleOakHangingSign,
+    #[frog(key = "minecraft:pale_oak_leaves")]
+    PaleOakLeaves,
+    #[frog(key = "minecraft:pale_oak_log")]
+    PaleOakLog,
+    #[frog(key = "minecraft:pale_oak_planks")]
+    PaleOakPlanks,
+    #[frog(key = "minecraft:pale_oak_pressure_plate")]
+    PaleOakPressurePlate,
+    #[frog(key = "minecraft:pale_oak_sapling")]
+    PaleOakSapling,
+    #[frog(key = "minecraft:pale_oak_sign")]
+    PaleOakSign,
+    #[frog(key = "minecraft:pale_oak_slab")]
+    PaleOakSlab,
+    #[frog(key = "minecraft:pale_oak_stairs")]
+    PaleOakStairs,
+    #[frog(key = "minecraft:pale_oak_trapdoor")]
+    PaleOakTrapdoor,
+    #[frog(key = "minecraft:pale_oak_wall_hanging_sign")]
+    PaleOakWallHangingSign,
+    #[frog(key = "minecraft:pale_oak_wall_sign")]
+    PaleOakWallSign,
+    #[frog(key = "minecraft:pale_oak_wood")]
+    PaleOakWood,
     #[frog(key = "minecraft:pearlescent_froglight")]
     PearlescentFroglight,
     #[frog(key = "minecraft:peony")]
@@ -1613,6 +1719,8 @@ pub enum BlockRegistry {
     PottedOrangeTulip,
     #[frog(key = "minecraft:potted_oxeye_daisy")]
     PottedOxeyeDaisy,
+    #[frog(key = "minecraft:potted_pale_oak_sapling")]
+    PottedPaleOakSapling,
     #[frog(key = "minecraft:potted_pink_tulip")]
     PottedPinkTulip,
     #[frog(key = "minecraft:potted_poppy")]
@@ -1975,6 +2083,10 @@ pub enum BlockRegistry {
     StrippedOakLog,
     #[frog(key = "minecraft:stripped_oak_wood")]
     StrippedOakWood,
+    #[frog(key = "minecraft:stripped_pale_oak_log")]
+    StrippedPaleOakLog,
+    #[frog(key = "minecraft:stripped_pale_oak_wood")]
+    StrippedPaleOakWood,
     #[frog(key = "minecraft:stripped_spruce_log")]
     StrippedSpruceLog,
     #[frog(key = "minecraft:stripped_spruce_wood")]
@@ -2309,6 +2421,8 @@ pub enum BlockEntityTypeRegistry {
     Conduit,
     #[frog(key = "minecraft:crafter")]
     Crafter,
+    #[frog(key = "minecraft:creaking_heart")]
+    CreakingHeart,
     #[frog(key = "minecraft:daylight_detector")]
     DaylightDetector,
     #[frog(key = "minecraft:decorated_pot")]
@@ -2443,6 +2557,8 @@ pub enum BlockTypeRegistry {
     BlastFurnace,
     #[frog(key = "minecraft:block")]
     Block,
+    #[frog(key = "minecraft:bonemealable_feature_placer")]
+    BonemealableFeaturePlacer,
     #[frog(key = "minecraft:brewing_stand")]
     BrewingStand,
     #[frog(key = "minecraft:brushable")]
@@ -2521,6 +2637,8 @@ pub enum BlockTypeRegistry {
     Crafter,
     #[frog(key = "minecraft:crafting_table")]
     CraftingTable,
+    #[frog(key = "minecraft:creaking_heart")]
+    CreakingHeart,
     #[frog(key = "minecraft:crop")]
     Crop,
     #[frog(key = "minecraft:crying_obsidian")]
@@ -2591,6 +2709,8 @@ pub enum BlockTypeRegistry {
     Grindstone,
     #[frog(key = "minecraft:half_transparent")]
     HalfTransparent,
+    #[frog(key = "minecraft:hanging_moss")]
+    HangingMoss,
     #[frog(key = "minecraft:hanging_roots")]
     HangingRoots,
     #[frog(key = "minecraft:hay")]
@@ -2653,6 +2773,8 @@ pub enum BlockTypeRegistry {
     MangroveRoots,
     #[frog(key = "minecraft:moss")]
     Moss,
+    #[frog(key = "minecraft:mossy_carpet")]
+    MossyCarpet,
     #[frog(key = "minecraft:moving_piston")]
     MovingPiston,
     #[frog(key = "minecraft:mud")]
@@ -3049,6 +3171,20 @@ pub enum CommandArgumentTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+pub enum ConsumeEffectTypeRegistry {
+    #[frog(key = "minecraft:apply_effects")]
+    ApplyEffects,
+    #[frog(key = "minecraft:clear_all_effects")]
+    ClearAllEffects,
+    #[frog(key = "minecraft:play_sound")]
+    PlaySound,
+    #[frog(key = "minecraft:remove_effects")]
+    RemoveEffects,
+    #[frog(key = "minecraft:teleport_randomly")]
+    TeleportRandomly,
+
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
 pub enum CreativeModeTabRegistry {
     #[frog(key = "minecraft:building_blocks")]
     BuildingBlocks,
@@ -3258,6 +3394,8 @@ pub enum DataComponentTypeRegistry {
     CanPlaceOn,
     #[frog(key = "minecraft:charged_projectiles")]
     ChargedProjectiles,
+    #[frog(key = "minecraft:consumable")]
+    Consumable,
     #[frog(key = "minecraft:container")]
     Container,
     #[frog(key = "minecraft:container_loot")]
@@ -3272,16 +3410,24 @@ pub enum DataComponentTypeRegistry {
     CustomName,
     #[frog(key = "minecraft:damage")]
     Damage,
+    #[frog(key = "minecraft:damage_resistant")]
+    DamageResistant,
+    #[frog(key = "minecraft:death_protection")]
+    DeathProtection,
     #[frog(key = "minecraft:debug_stick_state")]
     DebugStickState,
     #[frog(key = "minecraft:dyed_color")]
     DyedColor,
+    #[frog(key = "minecraft:enchantable")]
+    Enchantable,
     #[frog(key = "minecraft:enchantment_glint_override")]
     EnchantmentGlintOverride,
     #[frog(key = "minecraft:enchantments")]
     Enchantments,
     #[frog(key = "minecraft:entity_data")]
     EntityData,
+    #[frog(key = "minecraft:equippable")]
+    Equippable,
     #[frog(key = "minecraft:fire_resistant")]
     FireResistant,
     #[frog(key = "minecraft:firework_explosion")]
@@ -3290,6 +3436,8 @@ pub enum DataComponentTypeRegistry {
     Fireworks,
     #[frog(key = "minecraft:food")]
     Food,
+    #[frog(key = "minecraft:glider")]
+    Glider,
     #[frog(key = "minecraft:hide_additional_tooltip")]
     HideAdditionalTooltip,
     #[frog(key = "minecraft:hide_tooltip")]
@@ -3298,6 +3446,8 @@ pub enum DataComponentTypeRegistry {
     Instrument,
     #[frog(key = "minecraft:intangible_projectile")]
     IntangibleProjectile,
+    #[frog(key = "minecraft:item_model")]
+    ItemModel,
     #[frog(key = "minecraft:item_name")]
     ItemName,
     #[frog(key = "minecraft:jukebox_playable")]
@@ -3336,16 +3486,24 @@ pub enum DataComponentTypeRegistry {
     Recipes,
     #[frog(key = "minecraft:repair_cost")]
     RepairCost,
+    #[frog(key = "minecraft:repairable")]
+    Repairable,
     #[frog(key = "minecraft:stored_enchantments")]
     StoredEnchantments,
     #[frog(key = "minecraft:suspicious_stew_effects")]
     SuspiciousStewEffects,
     #[frog(key = "minecraft:tool")]
     Tool,
+    #[frog(key = "minecraft:tooltip_style")]
+    TooltipStyle,
     #[frog(key = "minecraft:trim")]
     Trim,
     #[frog(key = "minecraft:unbreakable")]
     Unbreakable,
+    #[frog(key = "minecraft:use_cooldown")]
+    UseCooldown,
+    #[frog(key = "minecraft:use_remainder")]
+    UseRemainder,
     #[frog(key = "minecraft:writable_book_content")]
     WritableBookContent,
     #[frog(key = "minecraft:written_book_content")]
@@ -3474,6 +3632,8 @@ pub enum EnchantmentEntityEffectTypeRegistry {
     AllOf,
     #[frog(key = "minecraft:apply_mob_effect")]
     ApplyMobEffect,
+    #[frog(key = "minecraft:change_item_damage")]
+    ChangeItemDamage,
     #[frog(key = "minecraft:damage_entity")]
     DamageEntity,
     #[frog(key = "minecraft:damage_item")]
@@ -3520,6 +3680,8 @@ pub enum EnchantmentLocationBasedEffectTypeRegistry {
     ApplyMobEffect,
     #[frog(key = "minecraft:attribute")]
     Attribute,
+    #[frog(key = "minecraft:change_item_damage")]
+    ChangeItemDamage,
     #[frog(key = "minecraft:damage_entity")]
     DamageEntity,
     #[frog(key = "minecraft:damage_item")]
@@ -3600,6 +3762,10 @@ pub enum EntitySubPredicateTypeRegistry {
     Rabbit,
     #[frog(key = "minecraft:raider")]
     Raider,
+    #[frog(key = "minecraft:salmon")]
+    Salmon,
+    #[frog(key = "minecraft:sheep")]
+    Sheep,
     #[frog(key = "minecraft:slime")]
     Slime,
     #[frog(key = "minecraft:tropical_fish")]
@@ -3612,6 +3778,10 @@ pub enum EntitySubPredicateTypeRegistry {
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
 pub enum EntityTypeRegistry {
+    #[frog(key = "minecraft:acacia_boat")]
+    AcaciaBoat,
+    #[frog(key = "minecraft:acacia_chest_boat")]
+    AcaciaChestBoat,
     #[frog(key = "minecraft:allay")]
     Allay,
     #[frog(key = "minecraft:area_effect_cloud")]
@@ -3624,10 +3794,18 @@ pub enum EntityTypeRegistry {
     Arrow,
     #[frog(key = "minecraft:axolotl")]
     Axolotl,
+    #[frog(key = "minecraft:bamboo_chest_raft")]
+    BambooChestRaft,
+    #[frog(key = "minecraft:bamboo_raft")]
+    BambooRaft,
     #[frog(key = "minecraft:bat")]
     Bat,
     #[frog(key = "minecraft:bee")]
     Bee,
+    #[frog(key = "minecraft:birch_boat")]
+    BirchBoat,
+    #[frog(key = "minecraft:birch_chest_boat")]
+    BirchChestBoat,
     #[frog(key = "minecraft:blaze")]
     Blaze,
     #[frog(key = "minecraft:block_display")]
@@ -3646,6 +3824,10 @@ pub enum EntityTypeRegistry {
     Cat,
     #[frog(key = "minecraft:cave_spider")]
     CaveSpider,
+    #[frog(key = "minecraft:cherry_boat")]
+    CherryBoat,
+    #[frog(key = "minecraft:cherry_chest_boat")]
+    CherryChestBoat,
     #[frog(key = "minecraft:chest_boat")]
     ChestBoat,
     #[frog(key = "minecraft:chest_minecart")]
@@ -3658,8 +3840,16 @@ pub enum EntityTypeRegistry {
     CommandBlockMinecart,
     #[frog(key = "minecraft:cow")]
     Cow,
+    #[frog(key = "minecraft:creaking")]
+    Creaking,
+    #[frog(key = "minecraft:creaking_transient")]
+    CreakingTransient,
     #[frog(key = "minecraft:creeper")]
     Creeper,
+    #[frog(key = "minecraft:dark_oak_boat")]
+    DarkOakBoat,
+    #[frog(key = "minecraft:dark_oak_chest_boat")]
+    DarkOakChestBoat,
     #[frog(key = "minecraft:dolphin")]
     Dolphin,
     #[frog(key = "minecraft:donkey")]
@@ -3738,6 +3928,10 @@ pub enum EntityTypeRegistry {
     ItemDisplay,
     #[frog(key = "minecraft:item_frame")]
     ItemFrame,
+    #[frog(key = "minecraft:jungle_boat")]
+    JungleBoat,
+    #[frog(key = "minecraft:jungle_chest_boat")]
+    JungleChestBoat,
     #[frog(key = "minecraft:leash_knot")]
     LeashKnot,
     #[frog(key = "minecraft:lightning_bolt")]
@@ -3748,6 +3942,10 @@ pub enum EntityTypeRegistry {
     LlamaSpit,
     #[frog(key = "minecraft:magma_cube")]
     MagmaCube,
+    #[frog(key = "minecraft:mangrove_boat")]
+    MangroveBoat,
+    #[frog(key = "minecraft:mangrove_chest_boat")]
+    MangroveChestBoat,
     #[frog(key = "minecraft:marker")]
     Marker,
     #[frog(key = "minecraft:minecart")]
@@ -3756,12 +3954,20 @@ pub enum EntityTypeRegistry {
     Mooshroom,
     #[frog(key = "minecraft:mule")]
     Mule,
+    #[frog(key = "minecraft:oak_boat")]
+    OakBoat,
+    #[frog(key = "minecraft:oak_chest_boat")]
+    OakChestBoat,
     #[frog(key = "minecraft:ocelot")]
     Ocelot,
     #[frog(key = "minecraft:ominous_item_spawner")]
     OminousItemSpawner,
     #[frog(key = "minecraft:painting")]
     Painting,
+    #[frog(key = "minecraft:pale_oak_boat")]
+    PaleOakBoat,
+    #[frog(key = "minecraft:pale_oak_chest_boat")]
+    PaleOakChestBoat,
     #[frog(key = "minecraft:panda")]
     Panda,
     #[frog(key = "minecraft:parrot")]
@@ -3819,6 +4025,10 @@ pub enum EntityTypeRegistry {
     SpectralArrow,
     #[frog(key = "minecraft:spider")]
     Spider,
+    #[frog(key = "minecraft:spruce_boat")]
+    SpruceBoat,
+    #[frog(key = "minecraft:spruce_chest_boat")]
+    SpruceChestBoat,
     #[frog(key = "minecraft:squid")]
     Squid,
     #[frog(key = "minecraft:stray")]
@@ -4284,6 +4494,8 @@ pub enum ItemRegistry {
     BlackBanner,
     #[frog(key = "minecraft:black_bed")]
     BlackBed,
+    #[frog(key = "minecraft:black_bundle")]
+    BlackBundle,
     #[frog(key = "minecraft:black_candle")]
     BlackCandle,
     #[frog(key = "minecraft:black_carpet")]
@@ -4328,6 +4540,8 @@ pub enum ItemRegistry {
     BlueBanner,
     #[frog(key = "minecraft:blue_bed")]
     BlueBed,
+    #[frog(key = "minecraft:blue_bundle")]
+    BlueBundle,
     #[frog(key = "minecraft:blue_candle")]
     BlueCandle,
     #[frog(key = "minecraft:blue_carpet")]
@@ -4368,6 +4582,8 @@ pub enum ItemRegistry {
     Book,
     #[frog(key = "minecraft:bookshelf")]
     Bookshelf,
+    #[frog(key = "minecraft:bordure_indented_banner_pattern")]
+    BordureIndentedBannerPattern,
     #[frog(key = "minecraft:bow")]
     Bow,
     #[frog(key = "minecraft:bowl")]
@@ -4402,6 +4618,8 @@ pub enum ItemRegistry {
     BrownBanner,
     #[frog(key = "minecraft:brown_bed")]
     BrownBed,
+    #[frog(key = "minecraft:brown_bundle")]
+    BrownBundle,
     #[frog(key = "minecraft:brown_candle")]
     BrownCandle,
     #[frog(key = "minecraft:brown_carpet")]
@@ -4660,6 +4878,10 @@ pub enum ItemRegistry {
     Crafter,
     #[frog(key = "minecraft:crafting_table")]
     CraftingTable,
+    #[frog(key = "minecraft:creaking_heart")]
+    CreakingHeart,
+    #[frog(key = "minecraft:creaking_spawn_egg")]
+    CreakingSpawnEgg,
     #[frog(key = "minecraft:creeper_banner_pattern")]
     CreeperBannerPattern,
     #[frog(key = "minecraft:creeper_head")]
@@ -4720,6 +4942,8 @@ pub enum ItemRegistry {
     CyanBanner,
     #[frog(key = "minecraft:cyan_bed")]
     CyanBed,
+    #[frog(key = "minecraft:cyan_bundle")]
+    CyanBundle,
     #[frog(key = "minecraft:cyan_candle")]
     CyanCandle,
     #[frog(key = "minecraft:cyan_carpet")]
@@ -5008,6 +5232,8 @@ pub enum ItemRegistry {
     FermentedSpiderEye,
     #[frog(key = "minecraft:fern")]
     Fern,
+    #[frog(key = "minecraft:field_masoned_banner_pattern")]
+    FieldMasonedBannerPattern,
     #[frog(key = "minecraft:filled_map")]
     FilledMap,
     #[frog(key = "minecraft:fire_charge")]
@@ -5138,6 +5364,8 @@ pub enum ItemRegistry {
     GrayBanner,
     #[frog(key = "minecraft:gray_bed")]
     GrayBed,
+    #[frog(key = "minecraft:gray_bundle")]
+    GrayBundle,
     #[frog(key = "minecraft:gray_candle")]
     GrayCandle,
     #[frog(key = "minecraft:gray_carpet")]
@@ -5164,6 +5392,8 @@ pub enum ItemRegistry {
     GreenBanner,
     #[frog(key = "minecraft:green_bed")]
     GreenBed,
+    #[frog(key = "minecraft:green_bundle")]
+    GreenBundle,
     #[frog(key = "minecraft:green_candle")]
     GreenCandle,
     #[frog(key = "minecraft:green_carpet")]
@@ -5378,6 +5608,8 @@ pub enum ItemRegistry {
     LightBlueBanner,
     #[frog(key = "minecraft:light_blue_bed")]
     LightBlueBed,
+    #[frog(key = "minecraft:light_blue_bundle")]
+    LightBlueBundle,
     #[frog(key = "minecraft:light_blue_candle")]
     LightBlueCandle,
     #[frog(key = "minecraft:light_blue_carpet")]
@@ -5404,6 +5636,8 @@ pub enum ItemRegistry {
     LightGrayBanner,
     #[frog(key = "minecraft:light_gray_bed")]
     LightGrayBed,
+    #[frog(key = "minecraft:light_gray_bundle")]
+    LightGrayBundle,
     #[frog(key = "minecraft:light_gray_candle")]
     LightGrayCandle,
     #[frog(key = "minecraft:light_gray_carpet")]
@@ -5440,6 +5674,8 @@ pub enum ItemRegistry {
     LimeBanner,
     #[frog(key = "minecraft:lime_bed")]
     LimeBed,
+    #[frog(key = "minecraft:lime_bundle")]
+    LimeBundle,
     #[frog(key = "minecraft:lime_candle")]
     LimeCandle,
     #[frog(key = "minecraft:lime_carpet")]
@@ -5476,6 +5712,8 @@ pub enum ItemRegistry {
     MagentaBanner,
     #[frog(key = "minecraft:magenta_bed")]
     MagentaBed,
+    #[frog(key = "minecraft:magenta_bundle")]
+    MagentaBundle,
     #[frog(key = "minecraft:magenta_candle")]
     MagentaCandle,
     #[frog(key = "minecraft:magenta_carpet")]
@@ -5750,6 +5988,8 @@ pub enum ItemRegistry {
     OrangeBanner,
     #[frog(key = "minecraft:orange_bed")]
     OrangeBed,
+    #[frog(key = "minecraft:orange_bundle")]
+    OrangeBundle,
     #[frog(key = "minecraft:orange_candle")]
     OrangeCandle,
     #[frog(key = "minecraft:orange_carpet")]
@@ -5800,6 +6040,46 @@ pub enum ItemRegistry {
     PackedMud,
     #[frog(key = "minecraft:painting")]
     Painting,
+    #[frog(key = "minecraft:pale_hanging_moss")]
+    PaleHangingMoss,
+    #[frog(key = "minecraft:pale_moss_block")]
+    PaleMossBlock,
+    #[frog(key = "minecraft:pale_moss_carpet")]
+    PaleMossCarpet,
+    #[frog(key = "minecraft:pale_oak_boat")]
+    PaleOakBoat,
+    #[frog(key = "minecraft:pale_oak_button")]
+    PaleOakButton,
+    #[frog(key = "minecraft:pale_oak_chest_boat")]
+    PaleOakChestBoat,
+    #[frog(key = "minecraft:pale_oak_door")]
+    PaleOakDoor,
+    #[frog(key = "minecraft:pale_oak_fence")]
+    PaleOakFence,
+    #[frog(key = "minecraft:pale_oak_fence_gate")]
+    PaleOakFenceGate,
+    #[frog(key = "minecraft:pale_oak_hanging_sign")]
+    PaleOakHangingSign,
+    #[frog(key = "minecraft:pale_oak_leaves")]
+    PaleOakLeaves,
+    #[frog(key = "minecraft:pale_oak_log")]
+    PaleOakLog,
+    #[frog(key = "minecraft:pale_oak_planks")]
+    PaleOakPlanks,
+    #[frog(key = "minecraft:pale_oak_pressure_plate")]
+    PaleOakPressurePlate,
+    #[frog(key = "minecraft:pale_oak_sapling")]
+    PaleOakSapling,
+    #[frog(key = "minecraft:pale_oak_sign")]
+    PaleOakSign,
+    #[frog(key = "minecraft:pale_oak_slab")]
+    PaleOakSlab,
+    #[frog(key = "minecraft:pale_oak_stairs")]
+    PaleOakStairs,
+    #[frog(key = "minecraft:pale_oak_trapdoor")]
+    PaleOakTrapdoor,
+    #[frog(key = "minecraft:pale_oak_wood")]
+    PaleOakWood,
     #[frog(key = "minecraft:panda_spawn_egg")]
     PandaSpawnEgg,
     #[frog(key = "minecraft:paper")]
@@ -5832,6 +6112,8 @@ pub enum ItemRegistry {
     PinkBanner,
     #[frog(key = "minecraft:pink_bed")]
     PinkBed,
+    #[frog(key = "minecraft:pink_bundle")]
+    PinkBundle,
     #[frog(key = "minecraft:pink_candle")]
     PinkCandle,
     #[frog(key = "minecraft:pink_carpet")]
@@ -5982,6 +6264,8 @@ pub enum ItemRegistry {
     PurpleBanner,
     #[frog(key = "minecraft:purple_bed")]
     PurpleBed,
+    #[frog(key = "minecraft:purple_bundle")]
+    PurpleBundle,
     #[frog(key = "minecraft:purple_candle")]
     PurpleCandle,
     #[frog(key = "minecraft:purple_carpet")]
@@ -6058,6 +6342,8 @@ pub enum ItemRegistry {
     RedBanner,
     #[frog(key = "minecraft:red_bed")]
     RedBed,
+    #[frog(key = "minecraft:red_bundle")]
+    RedBundle,
     #[frog(key = "minecraft:red_candle")]
     RedCandle,
     #[frog(key = "minecraft:red_carpet")]
@@ -6398,6 +6684,10 @@ pub enum ItemRegistry {
     StrippedOakLog,
     #[frog(key = "minecraft:stripped_oak_wood")]
     StrippedOakWood,
+    #[frog(key = "minecraft:stripped_pale_oak_log")]
+    StrippedPaleOakLog,
+    #[frog(key = "minecraft:stripped_pale_oak_wood")]
+    StrippedPaleOakWood,
     #[frog(key = "minecraft:stripped_spruce_log")]
     StrippedSpruceLog,
     #[frog(key = "minecraft:stripped_spruce_wood")]
@@ -6664,6 +6954,8 @@ pub enum ItemRegistry {
     WhiteBanner,
     #[frog(key = "minecraft:white_bed")]
     WhiteBed,
+    #[frog(key = "minecraft:white_bundle")]
+    WhiteBundle,
     #[frog(key = "minecraft:white_candle")]
     WhiteCandle,
     #[frog(key = "minecraft:white_carpet")]
@@ -6724,6 +7016,8 @@ pub enum ItemRegistry {
     YellowBanner,
     #[frog(key = "minecraft:yellow_bed")]
     YellowBed,
+    #[frog(key = "minecraft:yellow_bundle")]
+    YellowBundle,
     #[frog(key = "minecraft:yellow_candle")]
     YellowCandle,
     #[frog(key = "minecraft:yellow_carpet")]
@@ -7415,6 +7709,8 @@ pub enum ParticleTypeRegistry {
     Ash,
     #[frog(key = "minecraft:block")]
     Block,
+    #[frog(key = "minecraft:block_crumble")]
+    BlockCrumble,
     #[frog(key = "minecraft:block_marker")]
     BlockMarker,
     #[frog(key = "minecraft:bubble")]
@@ -7603,6 +7899,8 @@ pub enum ParticleTypeRegistry {
     SweepAttack,
     #[frog(key = "minecraft:totem_of_undying")]
     TotemOfUndying,
+    #[frog(key = "minecraft:trail")]
+    Trail,
     #[frog(key = "minecraft:trial_omen")]
     TrialOmen,
     #[frog(key = "minecraft:trial_spawner_detection")]
@@ -7788,6 +8086,50 @@ pub enum PotionRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+pub enum RecipeBookCategoryRegistry {
+    #[frog(key = "minecraft:blast_furnace_blocks")]
+    BlastFurnaceBlocks,
+    #[frog(key = "minecraft:blast_furnace_misc")]
+    BlastFurnaceMisc,
+    #[frog(key = "minecraft:campfire")]
+    Campfire,
+    #[frog(key = "minecraft:crafting_building_blocks")]
+    CraftingBuildingBlocks,
+    #[frog(key = "minecraft:crafting_equipment")]
+    CraftingEquipment,
+    #[frog(key = "minecraft:crafting_misc")]
+    CraftingMisc,
+    #[frog(key = "minecraft:crafting_redstone")]
+    CraftingRedstone,
+    #[frog(key = "minecraft:furnace_blocks")]
+    FurnaceBlocks,
+    #[frog(key = "minecraft:furnace_food")]
+    FurnaceFood,
+    #[frog(key = "minecraft:furnace_misc")]
+    FurnaceMisc,
+    #[frog(key = "minecraft:smithing")]
+    Smithing,
+    #[frog(key = "minecraft:smoker_food")]
+    SmokerFood,
+    #[frog(key = "minecraft:stonecutter")]
+    Stonecutter,
+
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+pub enum RecipeDisplayRegistry {
+    #[frog(key = "minecraft:crafting_shaped")]
+    CraftingShaped,
+    #[frog(key = "minecraft:crafting_shapeless")]
+    CraftingShapeless,
+    #[frog(key = "minecraft:furnace")]
+    Furnace,
+    #[frog(key = "minecraft:smithing")]
+    Smithing,
+    #[frog(key = "minecraft:stonecutter")]
+    Stonecutter,
+
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
 pub enum RecipeSerializerRegistry {
     #[frog(key = "minecraft:blasting")]
     Blasting,
@@ -7825,6 +8167,8 @@ pub enum RecipeSerializerRegistry {
     CraftingSpecialSuspiciousstew,
     #[frog(key = "minecraft:crafting_special_tippedarrow")]
     CraftingSpecialTippedarrow,
+    #[frog(key = "minecraft:crafting_transmute")]
+    CraftingTransmute,
     #[frog(key = "minecraft:smelting")]
     Smelting,
     #[frog(key = "minecraft:smithing_transform")]
@@ -7950,6 +8294,26 @@ pub enum SensorTypeRegistry {
     VillagerHostiles,
     #[frog(key = "minecraft:warden_entity_sensor")]
     WardenEntitySensor,
+
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+pub enum SlotDisplayRegistry {
+    #[frog(key = "minecraft:any_fuel")]
+    AnyFuel,
+    #[frog(key = "minecraft:composite")]
+    Composite,
+    #[frog(key = "minecraft:empty")]
+    Empty,
+    #[frog(key = "minecraft:item")]
+    Item,
+    #[frog(key = "minecraft:item_stack")]
+    ItemStack,
+    #[frog(key = "minecraft:smithing_trim")]
+    SmithingTrim,
+    #[frog(key = "minecraft:tag")]
+    Tag,
+    #[frog(key = "minecraft:with_remainder")]
+    WithRemainder,
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
@@ -8422,6 +8786,22 @@ pub enum SoundEventRegistry {
     BlockCrafterCraft,
     #[frog(key = "minecraft:block.crafter.fail")]
     BlockCrafterFail,
+    #[frog(key = "minecraft:block.creaking_heart.break")]
+    BlockCreakingHeartBreak,
+    #[frog(key = "minecraft:block.creaking_heart.fall")]
+    BlockCreakingHeartFall,
+    #[frog(key = "minecraft:block.creaking_heart.hit")]
+    BlockCreakingHeartHit,
+    #[frog(key = "minecraft:block.creaking_heart.hurt")]
+    BlockCreakingHeartHurt,
+    #[frog(key = "minecraft:block.creaking_heart.idle")]
+    BlockCreakingHeartIdle,
+    #[frog(key = "minecraft:block.creaking_heart.place")]
+    BlockCreakingHeartPlace,
+    #[frog(key = "minecraft:block.creaking_heart.spawn")]
+    BlockCreakingHeartSpawn,
+    #[frog(key = "minecraft:block.creaking_heart.step")]
+    BlockCreakingHeartStep,
     #[frog(key = "minecraft:block.crop.break")]
     BlockCropBreak,
     #[frog(key = "minecraft:block.decorated_pot.break")]
@@ -8934,6 +9314,8 @@ pub enum SoundEventRegistry {
     BlockPackedMudPlace,
     #[frog(key = "minecraft:block.packed_mud.step")]
     BlockPackedMudStep,
+    #[frog(key = "minecraft:block.pale_hanging_moss.idle")]
+    BlockPaleHangingMossIdle,
     #[frog(key = "minecraft:block.pink_petals.break")]
     BlockPinkPetalsBreak,
     #[frog(key = "minecraft:block.pink_petals.fall")]
@@ -9198,6 +9580,16 @@ pub enum SoundEventRegistry {
     BlockSoulSoilPlace,
     #[frog(key = "minecraft:block.soul_soil.step")]
     BlockSoulSoilStep,
+    #[frog(key = "minecraft:block.spawner.break")]
+    BlockSpawnerBreak,
+    #[frog(key = "minecraft:block.spawner.fall")]
+    BlockSpawnerFall,
+    #[frog(key = "minecraft:block.spawner.hit")]
+    BlockSpawnerHit,
+    #[frog(key = "minecraft:block.spawner.place")]
+    BlockSpawnerPlace,
+    #[frog(key = "minecraft:block.spawner.step")]
+    BlockSpawnerStep,
     #[frog(key = "minecraft:block.sponge.absorb")]
     BlockSpongeAbsorb,
     #[frog(key = "minecraft:block.sponge.break")]
@@ -9662,6 +10054,26 @@ pub enum SoundEventRegistry {
     EntityCowMilk,
     #[frog(key = "minecraft:entity.cow.step")]
     EntityCowStep,
+    #[frog(key = "minecraft:entity.creaking.activate")]
+    EntityCreakingActivate,
+    #[frog(key = "minecraft:entity.creaking.ambient")]
+    EntityCreakingAmbient,
+    #[frog(key = "minecraft:entity.creaking.attack")]
+    EntityCreakingAttack,
+    #[frog(key = "minecraft:entity.creaking.deactivate")]
+    EntityCreakingDeactivate,
+    #[frog(key = "minecraft:entity.creaking.death")]
+    EntityCreakingDeath,
+    #[frog(key = "minecraft:entity.creaking.freeze")]
+    EntityCreakingFreeze,
+    #[frog(key = "minecraft:entity.creaking.spawn")]
+    EntityCreakingSpawn,
+    #[frog(key = "minecraft:entity.creaking.step")]
+    EntityCreakingStep,
+    #[frog(key = "minecraft:entity.creaking.sway")]
+    EntityCreakingSway,
+    #[frog(key = "minecraft:entity.creaking.unfreeze")]
+    EntityCreakingUnfreeze,
     #[frog(key = "minecraft:entity.creeper.death")]
     EntityCreeperDeath,
     #[frog(key = "minecraft:entity.creeper.hurt")]
@@ -10192,6 +10604,8 @@ pub enum SoundEventRegistry {
     EntityParrotImitateBogged,
     #[frog(key = "minecraft:entity.parrot.imitate.breeze")]
     EntityParrotImitateBreeze,
+    #[frog(key = "minecraft:entity.parrot.imitate.creaking")]
+    EntityParrotImitateCreaking,
     #[frog(key = "minecraft:entity.parrot.imitate.creeper")]
     EntityParrotImitateCreeper,
     #[frog(key = "minecraft:entity.parrot.imitate.drowned")]
@@ -10946,6 +11360,8 @@ pub enum SoundEventRegistry {
     ItemBundleDropContents,
     #[frog(key = "minecraft:item.bundle.insert")]
     ItemBundleInsert,
+    #[frog(key = "minecraft:item.bundle.insert_fail")]
+    ItemBundleInsertFail,
     #[frog(key = "minecraft:item.bundle.remove_one")]
     ItemBundleRemoveOne,
     #[frog(key = "minecraft:item.chorus_fruit.teleport")]
@@ -11158,6 +11574,8 @@ pub enum SoundEventRegistry {
     UiButtonClick,
     #[frog(key = "minecraft:ui.cartography_table.take_result")]
     UiCartographyTableTakeResult,
+    #[frog(key = "minecraft:ui.hud.bubble_pop")]
+    UiHudBubblePop,
     #[frog(key = "minecraft:ui.loom.select_pattern")]
     UiLoomSelectPattern,
     #[frog(key = "minecraft:ui.loom.take_result")]
@@ -11258,6 +11676,8 @@ pub enum TriggerTypeRegistry {
     ItemUsedOnBlock,
     #[frog(key = "minecraft:kill_mob_near_sculk_catalyst")]
     KillMobNearSculkCatalyst,
+    #[frog(key = "minecraft:killed_by_arrow")]
+    KilledByArrow,
     #[frog(key = "minecraft:killed_by_crossbow")]
     KilledByCrossbow,
     #[frog(key = "minecraft:levitation")]
@@ -11950,8 +12370,12 @@ pub enum WorldgenTreeDecoratorTypeRegistry {
     Beehive,
     #[frog(key = "minecraft:cocoa")]
     Cocoa,
+    #[frog(key = "minecraft:creaking_heart")]
+    CreakingHeart,
     #[frog(key = "minecraft:leave_vine")]
     LeaveVine,
+    #[frog(key = "minecraft:pale_moss")]
+    PaleMoss,
     #[frog(key = "minecraft:trunk_vine")]
     TrunkVine,
 

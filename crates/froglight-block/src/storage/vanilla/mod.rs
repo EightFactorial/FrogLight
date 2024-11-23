@@ -1,10 +1,11 @@
 use bevy_app::App;
 use bevy_reflect::Reflect;
-use froglight_protocol::versions::v1_21_0::V1_21_0;
+use froglight_protocol::versions::{v1_21_0::V1_21_0, v1_21_2::V1_21_2};
 
-use super::{ReflectBlockBuilder, BlockStorageArc};
+use super::{BlockStorageArc, ReflectBlockBuilder};
 
 mod v1_21_0;
+mod v1_21_2;
 
 /// A builder for vanilla block storage.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
@@ -15,5 +16,7 @@ impl VanillaBuilder {
         app.register_type::<Self>();
         app.register_type_data::<Self, ReflectBlockBuilder<V1_21_0>>();
         app.init_resource::<BlockStorageArc<V1_21_0>>();
+        app.register_type_data::<Self, ReflectBlockBuilder<V1_21_2>>();
+        app.init_resource::<BlockStorageArc<V1_21_2>>();
     }
 }

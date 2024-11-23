@@ -293,7 +293,7 @@ fn chunk_blocks() {
         let pos = ChunkBlockPosition::from_index(index as usize);
         chunk.set_block::<V1_21_0, VanillaResolver>(
             pos,
-            &GrassBlock::from_attributes(SnowyBooleanAttribute(false)),
+            &<GrassBlock as BlockStateExt<V1_21_0>>::from_attributes(SnowyBooleanAttribute(false)),
             &storage,
         );
     }
@@ -303,7 +303,9 @@ fn chunk_blocks() {
         let expected = if index < halfway as usize {
             Blocks::Stone(Stone)
         } else if index < halfway as usize + 16 {
-            Blocks::GrassBlock(GrassBlock::from_attributes(SnowyBooleanAttribute(false)))
+            Blocks::GrassBlock(BlockStateExt::<V1_21_0>::from_attributes(SnowyBooleanAttribute(
+                false,
+            )))
         } else {
             Blocks::Air(Air)
         };

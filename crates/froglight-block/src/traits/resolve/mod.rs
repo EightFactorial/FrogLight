@@ -3,6 +3,7 @@ use froglight_protocol::traits::Version;
 use crate::BlockStorage;
 
 mod v1_21_0;
+mod v1_21_2;
 
 /// A resolver for vanilla blocks.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]

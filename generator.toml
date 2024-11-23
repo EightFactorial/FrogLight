@@ -10,6 +10,6 @@
 base = "1.21.0"
 target = "1.21.1"
 
-# [[version]]
-# base = "1.21.2"
-# target = "1.21.3"
+[[version]]
+base = "1.21.2"
+target = "1.21.3"

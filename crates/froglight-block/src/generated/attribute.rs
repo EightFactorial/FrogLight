@@ -136,6 +136,11 @@ froglight_macros::impl_generated_attributes! {
     pub struct ConditionalBooleanAttribute(pub bool);
     pub struct CrackedBooleanAttribute(pub bool);
     pub struct CraftingBooleanAttribute(pub bool);
+    pub enum CreakingEnumAttribute {
+        Disabled,
+        Dormant,
+        Active,
+    }
     pub enum DelayIntRangeAttribute {
         _1,
         _2,
@@ -524,6 +529,7 @@ froglight_macros::impl_generated_attributes! {
         Partial,
         Full,
     }
+    pub struct TipBooleanAttribute(pub bool);
     pub enum TrialSpawnerStateEnumAttribute {
         Inactive,
         WaitingForPlayers,
