@@ -1,5 +1,7 @@
 //! Common data structures used by the protocol.
 
+pub use uuid::Uuid;
+
 mod entity;
 pub use froglight_common::{EntityId, EntityUuid};
 

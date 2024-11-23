@@ -8,7 +8,7 @@ use froglight_protocol::{
 };
 
 use super::{BevyConnectionChannel, ConnectionTask, StatusTask};
-use crate::connection::{Connection, NetworkDirection, Serverbound};
+use crate::connection::{AccountInformation, Connection, NetworkDirection, Serverbound};
 
 mod play;
 use play::{perform_server_connection, PerformServerConnection};
@@ -39,6 +39,7 @@ where
     #[cfg(feature = "resolver")]
     fn connect(
         address: &str,
+        account: AccountInformation,
         resolver: &crate::resolver::Resolver,
     ) -> (BevyConnectionChannel<Self, Serverbound>, ConnectionTask);
 
@@ -50,6 +51,7 @@ where
     fn connect_to(
         socket: SocketAddr,
         address: Option<&str>,
+        account: AccountInformation,
     ) -> (BevyConnectionChannel<Self, Serverbound>, ConnectionTask);
 
     /// Request the status of a server.
@@ -85,6 +87,7 @@ where
     #[cfg(feature = "resolver")]
     fn connect(
         address: &str,
+        account: AccountInformation,
         resolver: &crate::resolver::Resolver,
     ) -> (BevyConnectionChannel<Self, Serverbound>, ConnectionTask) {
         let task_address = address.to_compact_string();
@@ -94,7 +97,10 @@ where
 
         let task = IoTaskPool::get().spawn(async move {
             match Connection::<Self, Handshake>::connect_to(&task_address, &resolver).await {
-                Ok(conn) => perform_server_connection(conn, &task).await,
+                Ok(mut conn) => {
+                    *conn.account_mut() = account;
+                    perform_server_connection(conn, &task).await
+                }
                 Err(err) => Err(err),
             }
         });
@@ -105,6 +111,7 @@ where
     fn connect_to(
         socket: SocketAddr,
         address: Option<&str>,
+        account: AccountInformation,
     ) -> (BevyConnectionChannel<Self, Serverbound>, ConnectionTask) {
         let task_address = address.map(|addr| addr.to_compact_string());
         let address = task_address.clone().unwrap_or(socket.to_compact_string());
@@ -114,6 +121,7 @@ where
         let task = IoTaskPool::get().spawn(async move {
             match Connection::<Self, Handshake, Serverbound>::connect(socket).await {
                 Ok(mut conn) => {
+                    *conn.account_mut() = account;
                     conn.info_mut().address = task_address;
                     perform_server_connection(conn, &task).await
                 }

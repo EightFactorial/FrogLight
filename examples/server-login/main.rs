@@ -7,17 +7,20 @@ use std::{io::Cursor, num::NonZeroU8, sync::Arc};
 
 use bevy::prelude::*;
 use froglight::{
-    network::versions::v1_21_0::{
-        configuration::{
-            ConfigurationClientboundPackets, CookieResponsePacket, CustomPayloadC2SPacket,
-            ReadyC2SPacket, SelectKnownPacksC2SPacket,
+    network::{
+        connection::AccountInformation,
+        versions::v1_21_0::{
+            configuration::{
+                ConfigurationClientboundPackets, CookieResponsePacket, CustomPayloadC2SPacket,
+                ReadyC2SPacket, SelectKnownPacksC2SPacket,
+            },
+            login::{EnterConfigurationPacket, LoginClientboundPackets, LoginQueryResponsePacket},
+            play::{
+                AcknowledgeChunksPacket, PlayClientboundPackets, ResourcePackStatusPacket,
+                TeleportConfirmPacket,
+            },
+            V1_21_0,
         },
-        login::{EnterConfigurationPacket, LoginClientboundPackets, LoginQueryResponsePacket},
-        play::{
-            AcknowledgeChunksPacket, PlayClientboundPackets, ResourcePackStatusPacket,
-            TeleportConfirmPacket,
-        },
-        V1_21_0,
     },
     prelude::{
         registry::{BlockRegistry, ItemRegistry},
@@ -29,6 +32,9 @@ use froglight::{
 
 /// The server address to connect to.
 const SERVER_ADDRESS: &str = "localhost";
+
+/// The account information to use when connecting to the server.
+const ACCOUNT: AccountInformation = AccountInformation::const_new("froglight", Uuid::nil());
 
 fn main() -> AppExit {
     let mut app = App::new();
@@ -64,8 +70,8 @@ fn main() -> AppExit {
 /// despawn the entity automatically when the task is done.
 fn create_connection(mut commands: Commands, resolver: Res<Resolver>) {
     info!("Connecting to \"{SERVER_ADDRESS}\"...");
-    let (task, channel) = V1_21_0::connect(SERVER_ADDRESS, &resolver);
-    commands.spawn((task, channel, PolledTask));
+    let (channel, task) = V1_21_0::connect(SERVER_ADDRESS, ACCOUNT, &resolver);
+    commands.spawn((channel, task, PolledTask));
 }
 
 /// Log and exit if a network error occurs.

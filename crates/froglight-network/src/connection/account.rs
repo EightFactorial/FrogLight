@@ -2,7 +2,7 @@ use compact_str::CompactString;
 use md5::{Digest, Md5};
 use uuid::{Builder, Uuid};
 
-/// Information about the account being used.
+/// Information about the account being used to connect to a server.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AccountInformation {
     /// The account's username.
@@ -27,13 +27,21 @@ impl AccountInformation {
         Self { username: username.into(), uuid }
     }
 
+    /// Creates a new account with the given username and UUID.
+    #[must_use]
+    pub const fn const_new(username: &'static str, uuid: Uuid) -> Self {
+        Self { username: CompactString::const_new(username), uuid }
+    }
+
     /// Set the auth token for the account.
     #[must_use]
     pub fn with_token(self, _token: impl Into<CompactString>) -> Self {
-        // self.auth_token = Some(CompactString::new(token.as_ref()));
+        // self.auth_token = Some(token.into());
         self
     }
+}
 
+impl AccountInformation {
     /// Creates a new account with an offline UUID.
     ///
     /// # Example
@@ -69,7 +77,7 @@ impl AccountInformation {
 
 /// TODO: Add more examples
 #[test]
-fn test_uuids() {
+fn offline_uuid() {
     assert_eq!(
         AccountInformation::offline_uuid("froglight").to_string(),
         "8ee7f9a9-5c09-3373-8aeb-8aba0d9adeaa"

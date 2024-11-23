@@ -44,8 +44,7 @@ fn main() -> AppExit {
 /// despawn the entity automatically when the task is done.
 fn send_status_request(mut commands: Commands, resolver: Res<Resolver>) {
     info!("Connecting to \"{SERVER_ADDRESS}\"...");
-    let task = V1_21_0::status(SERVER_ADDRESS, &resolver);
-    commands.spawn((task, PolledTask));
+    commands.spawn((V1_21_0::status(SERVER_ADDRESS, &resolver), PolledTask));
     info!("Waiting for status response...");
 }
 
