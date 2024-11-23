@@ -42,12 +42,12 @@ pub trait BlockStateExt<V: Version>: BlockState<V> + Sized {
 
     /// Create a block state from a relative index.
     #[must_use]
-    fn from_relative(relative: usize) -> Option<Self>;
+    fn from_relative(relative: u16) -> Option<Self>;
 
     /// Convert a tuple of attributes into a block state.
     #[must_use]
     fn from_attributes(attributes: Self::Attributes) -> Self {
-        if let Some(block) = Self::from_relative(attributes.to_index()) {
+        if let Some(block) = Self::from_relative(u16::try_from(attributes.to_index()).unwrap()) {
             block
         } else {
             unreachable!("The current largest number of states is roughly 1300")
@@ -56,11 +56,11 @@ pub trait BlockStateExt<V: Version>: BlockState<V> + Sized {
 
     /// Convert a block state into a relative index.
     #[must_use]
-    fn to_relative(&self) -> usize;
+    fn to_relative(&self) -> u16;
 
     /// Convert a block state into a tuple of attributes.
     #[must_use]
     fn to_attributes(&self) -> Self::Attributes {
-        Self::Attributes::from_index(self.to_relative()).unwrap()
+        Self::Attributes::from_index(usize::from(self.to_relative())).unwrap()
     }
 }

@@ -50,12 +50,12 @@ impl<V: Version> BlockStorage<V> {
     }
 
     /// Get the block ID of a given block.
-    #[expect(clippy::cast_possible_truncation)]
+    #[must_use]
     pub fn get_block_id<B: BlockStateExt<V>>(&self, block: &B) -> Option<u32> {
         if let Some((type_range, _)) =
             self.type_range.iter().find(|(_, type_id)| **type_id == TypeId::of::<B>())
         {
-            Some(type_range.start + block.to_relative() as u32)
+            Some(type_range.start + u32::from(block.to_relative()))
         } else {
             None
         }
@@ -67,7 +67,7 @@ impl<V: Version> BlockStorage<V> {
     #[must_use]
     pub fn get_known_block<B: BlockStateExt<V>>(&self, block_id: u32) -> Option<B> {
         let (range, _) = self.type_range.get_key_value(&block_id)?;
-        B::from_relative(usize::try_from(block_id - range.start).ok()?)
+        B::from_relative(u16::try_from(block_id - range.start).ok()?)
     }
 
     /// Get the block with the given ID using a [`BlockResolver`].

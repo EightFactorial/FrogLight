@@ -26,9 +26,9 @@ impl BlockState<V1_21_2> for Air {
 impl BlockStateExt<V1_21_2> for Air {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -45,9 +45,9 @@ impl BlockState<V1_21_2> for Stone {
 impl BlockStateExt<V1_21_2> for Stone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -64,9 +64,9 @@ impl BlockState<V1_21_2> for Granite {
 impl BlockStateExt<V1_21_2> for Granite {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -83,9 +83,9 @@ impl BlockState<V1_21_2> for PolishedGranite {
 impl BlockStateExt<V1_21_2> for PolishedGranite {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -102,9 +102,9 @@ impl BlockState<V1_21_2> for Diorite {
 impl BlockStateExt<V1_21_2> for Diorite {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -121,9 +121,9 @@ impl BlockState<V1_21_2> for PolishedDiorite {
 impl BlockStateExt<V1_21_2> for PolishedDiorite {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -140,9 +140,9 @@ impl BlockState<V1_21_2> for Andesite {
 impl BlockStateExt<V1_21_2> for Andesite {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -159,9 +159,9 @@ impl BlockState<V1_21_2> for PolishedAndesite {
 impl BlockStateExt<V1_21_2> for PolishedAndesite {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -178,9 +178,9 @@ impl BlockState<V1_21_2> for GrassBlock {
 impl BlockStateExt<V1_21_2> for GrassBlock {
     type Attributes = SnowyBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -197,9 +197,9 @@ impl BlockState<V1_21_2> for Dirt {
 impl BlockStateExt<V1_21_2> for Dirt {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -216,9 +216,9 @@ impl BlockState<V1_21_2> for CoarseDirt {
 impl BlockStateExt<V1_21_2> for CoarseDirt {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -235,9 +235,9 @@ impl BlockState<V1_21_2> for Podzol {
 impl BlockStateExt<V1_21_2> for Podzol {
     type Attributes = SnowyBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -254,9 +254,9 @@ impl BlockState<V1_21_2> for Cobblestone {
 impl BlockStateExt<V1_21_2> for Cobblestone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -273,9 +273,9 @@ impl BlockState<V1_21_2> for OakPlanks {
 impl BlockStateExt<V1_21_2> for OakPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -292,9 +292,9 @@ impl BlockState<V1_21_2> for SprucePlanks {
 impl BlockStateExt<V1_21_2> for SprucePlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -311,9 +311,9 @@ impl BlockState<V1_21_2> for BirchPlanks {
 impl BlockStateExt<V1_21_2> for BirchPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -330,9 +330,9 @@ impl BlockState<V1_21_2> for JunglePlanks {
 impl BlockStateExt<V1_21_2> for JunglePlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -349,9 +349,9 @@ impl BlockState<V1_21_2> for AcaciaPlanks {
 impl BlockStateExt<V1_21_2> for AcaciaPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -368,9 +368,9 @@ impl BlockState<V1_21_2> for CherryPlanks {
 impl BlockStateExt<V1_21_2> for CherryPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -387,9 +387,9 @@ impl BlockState<V1_21_2> for DarkOakPlanks {
 impl BlockStateExt<V1_21_2> for DarkOakPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -406,9 +406,9 @@ impl BlockState<V1_21_2> for PaleOakWood {
 impl BlockStateExt<V1_21_2> for PaleOakWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -425,9 +425,9 @@ impl BlockState<V1_21_2> for PaleOakPlanks {
 impl BlockStateExt<V1_21_2> for PaleOakPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -444,9 +444,9 @@ impl BlockState<V1_21_2> for MangrovePlanks {
 impl BlockStateExt<V1_21_2> for MangrovePlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -463,9 +463,9 @@ impl BlockState<V1_21_2> for BambooPlanks {
 impl BlockStateExt<V1_21_2> for BambooPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -482,9 +482,9 @@ impl BlockState<V1_21_2> for BambooMosaic {
 impl BlockStateExt<V1_21_2> for BambooMosaic {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -501,9 +501,9 @@ impl BlockState<V1_21_2> for OakSapling {
 impl BlockStateExt<V1_21_2> for OakSapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -520,9 +520,9 @@ impl BlockState<V1_21_2> for SpruceSapling {
 impl BlockStateExt<V1_21_2> for SpruceSapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -539,9 +539,9 @@ impl BlockState<V1_21_2> for BirchSapling {
 impl BlockStateExt<V1_21_2> for BirchSapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -558,9 +558,9 @@ impl BlockState<V1_21_2> for JungleSapling {
 impl BlockStateExt<V1_21_2> for JungleSapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -577,9 +577,9 @@ impl BlockState<V1_21_2> for AcaciaSapling {
 impl BlockStateExt<V1_21_2> for AcaciaSapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -596,9 +596,9 @@ impl BlockState<V1_21_2> for CherrySapling {
 impl BlockStateExt<V1_21_2> for CherrySapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -615,9 +615,9 @@ impl BlockState<V1_21_2> for DarkOakSapling {
 impl BlockStateExt<V1_21_2> for DarkOakSapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -634,9 +634,9 @@ impl BlockState<V1_21_2> for PaleOakSapling {
 impl BlockStateExt<V1_21_2> for PaleOakSapling {
     type Attributes = StageIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -653,9 +653,9 @@ impl BlockState<V1_21_2> for MangrovePropagule {
 impl BlockStateExt<V1_21_2> for MangrovePropagule {
     type Attributes = (AgeIntRangeAttribute_0_4, HangingBooleanAttribute, StageIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(5u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -672,9 +672,9 @@ impl BlockState<V1_21_2> for Bedrock {
 impl BlockStateExt<V1_21_2> for Bedrock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -691,9 +691,9 @@ impl BlockState<V1_21_2> for Water {
 impl BlockStateExt<V1_21_2> for Water {
     type Attributes = LevelIntRangeAttribute_0_15;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -710,9 +710,9 @@ impl BlockState<V1_21_2> for Lava {
 impl BlockStateExt<V1_21_2> for Lava {
     type Attributes = LevelIntRangeAttribute_0_15;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -729,9 +729,9 @@ impl BlockState<V1_21_2> for Sand {
 impl BlockStateExt<V1_21_2> for Sand {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -748,9 +748,9 @@ impl BlockState<V1_21_2> for SuspiciousSand {
 impl BlockStateExt<V1_21_2> for SuspiciousSand {
     type Attributes = DustedIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -767,9 +767,9 @@ impl BlockState<V1_21_2> for RedSand {
 impl BlockStateExt<V1_21_2> for RedSand {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -786,9 +786,9 @@ impl BlockState<V1_21_2> for Gravel {
 impl BlockStateExt<V1_21_2> for Gravel {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -805,9 +805,9 @@ impl BlockState<V1_21_2> for SuspiciousGravel {
 impl BlockStateExt<V1_21_2> for SuspiciousGravel {
     type Attributes = DustedIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -824,9 +824,9 @@ impl BlockState<V1_21_2> for GoldOre {
 impl BlockStateExt<V1_21_2> for GoldOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -843,9 +843,9 @@ impl BlockState<V1_21_2> for DeepslateGoldOre {
 impl BlockStateExt<V1_21_2> for DeepslateGoldOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -862,9 +862,9 @@ impl BlockState<V1_21_2> for IronOre {
 impl BlockStateExt<V1_21_2> for IronOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -881,9 +881,9 @@ impl BlockState<V1_21_2> for DeepslateIronOre {
 impl BlockStateExt<V1_21_2> for DeepslateIronOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -900,9 +900,9 @@ impl BlockState<V1_21_2> for CoalOre {
 impl BlockStateExt<V1_21_2> for CoalOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -919,9 +919,9 @@ impl BlockState<V1_21_2> for DeepslateCoalOre {
 impl BlockStateExt<V1_21_2> for DeepslateCoalOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -938,9 +938,9 @@ impl BlockState<V1_21_2> for NetherGoldOre {
 impl BlockStateExt<V1_21_2> for NetherGoldOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -957,9 +957,9 @@ impl BlockState<V1_21_2> for OakLog {
 impl BlockStateExt<V1_21_2> for OakLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -976,9 +976,9 @@ impl BlockState<V1_21_2> for SpruceLog {
 impl BlockStateExt<V1_21_2> for SpruceLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -995,9 +995,9 @@ impl BlockState<V1_21_2> for BirchLog {
 impl BlockStateExt<V1_21_2> for BirchLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1014,9 +1014,9 @@ impl BlockState<V1_21_2> for JungleLog {
 impl BlockStateExt<V1_21_2> for JungleLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1033,9 +1033,9 @@ impl BlockState<V1_21_2> for AcaciaLog {
 impl BlockStateExt<V1_21_2> for AcaciaLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1052,9 +1052,9 @@ impl BlockState<V1_21_2> for CherryLog {
 impl BlockStateExt<V1_21_2> for CherryLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1071,9 +1071,9 @@ impl BlockState<V1_21_2> for DarkOakLog {
 impl BlockStateExt<V1_21_2> for DarkOakLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1090,9 +1090,9 @@ impl BlockState<V1_21_2> for PaleOakLog {
 impl BlockStateExt<V1_21_2> for PaleOakLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1109,9 +1109,9 @@ impl BlockState<V1_21_2> for MangroveLog {
 impl BlockStateExt<V1_21_2> for MangroveLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1128,9 +1128,9 @@ impl BlockState<V1_21_2> for MangroveRoots {
 impl BlockStateExt<V1_21_2> for MangroveRoots {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1147,9 +1147,9 @@ impl BlockState<V1_21_2> for MuddyMangroveRoots {
 impl BlockStateExt<V1_21_2> for MuddyMangroveRoots {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1166,9 +1166,9 @@ impl BlockState<V1_21_2> for BambooBlock {
 impl BlockStateExt<V1_21_2> for BambooBlock {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1185,9 +1185,9 @@ impl BlockState<V1_21_2> for StrippedSpruceLog {
 impl BlockStateExt<V1_21_2> for StrippedSpruceLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1204,9 +1204,9 @@ impl BlockState<V1_21_2> for StrippedBirchLog {
 impl BlockStateExt<V1_21_2> for StrippedBirchLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1223,9 +1223,9 @@ impl BlockState<V1_21_2> for StrippedJungleLog {
 impl BlockStateExt<V1_21_2> for StrippedJungleLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1242,9 +1242,9 @@ impl BlockState<V1_21_2> for StrippedAcaciaLog {
 impl BlockStateExt<V1_21_2> for StrippedAcaciaLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1261,9 +1261,9 @@ impl BlockState<V1_21_2> for StrippedCherryLog {
 impl BlockStateExt<V1_21_2> for StrippedCherryLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1280,9 +1280,9 @@ impl BlockState<V1_21_2> for StrippedDarkOakLog {
 impl BlockStateExt<V1_21_2> for StrippedDarkOakLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1299,9 +1299,9 @@ impl BlockState<V1_21_2> for StrippedPaleOakLog {
 impl BlockStateExt<V1_21_2> for StrippedPaleOakLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1318,9 +1318,9 @@ impl BlockState<V1_21_2> for StrippedOakLog {
 impl BlockStateExt<V1_21_2> for StrippedOakLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1337,9 +1337,9 @@ impl BlockState<V1_21_2> for StrippedMangroveLog {
 impl BlockStateExt<V1_21_2> for StrippedMangroveLog {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1356,9 +1356,9 @@ impl BlockState<V1_21_2> for StrippedBambooBlock {
 impl BlockStateExt<V1_21_2> for StrippedBambooBlock {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1375,9 +1375,9 @@ impl BlockState<V1_21_2> for OakWood {
 impl BlockStateExt<V1_21_2> for OakWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1394,9 +1394,9 @@ impl BlockState<V1_21_2> for SpruceWood {
 impl BlockStateExt<V1_21_2> for SpruceWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1413,9 +1413,9 @@ impl BlockState<V1_21_2> for BirchWood {
 impl BlockStateExt<V1_21_2> for BirchWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1432,9 +1432,9 @@ impl BlockState<V1_21_2> for JungleWood {
 impl BlockStateExt<V1_21_2> for JungleWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1451,9 +1451,9 @@ impl BlockState<V1_21_2> for AcaciaWood {
 impl BlockStateExt<V1_21_2> for AcaciaWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1470,9 +1470,9 @@ impl BlockState<V1_21_2> for CherryWood {
 impl BlockStateExt<V1_21_2> for CherryWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1489,9 +1489,9 @@ impl BlockState<V1_21_2> for DarkOakWood {
 impl BlockStateExt<V1_21_2> for DarkOakWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1508,9 +1508,9 @@ impl BlockState<V1_21_2> for MangroveWood {
 impl BlockStateExt<V1_21_2> for MangroveWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1527,9 +1527,9 @@ impl BlockState<V1_21_2> for StrippedOakWood {
 impl BlockStateExt<V1_21_2> for StrippedOakWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1546,9 +1546,9 @@ impl BlockState<V1_21_2> for StrippedSpruceWood {
 impl BlockStateExt<V1_21_2> for StrippedSpruceWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1565,9 +1565,9 @@ impl BlockState<V1_21_2> for StrippedBirchWood {
 impl BlockStateExt<V1_21_2> for StrippedBirchWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1584,9 +1584,9 @@ impl BlockState<V1_21_2> for StrippedJungleWood {
 impl BlockStateExt<V1_21_2> for StrippedJungleWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1603,9 +1603,9 @@ impl BlockState<V1_21_2> for StrippedAcaciaWood {
 impl BlockStateExt<V1_21_2> for StrippedAcaciaWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1622,9 +1622,9 @@ impl BlockState<V1_21_2> for StrippedCherryWood {
 impl BlockStateExt<V1_21_2> for StrippedCherryWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1641,9 +1641,9 @@ impl BlockState<V1_21_2> for StrippedDarkOakWood {
 impl BlockStateExt<V1_21_2> for StrippedDarkOakWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1660,9 +1660,9 @@ impl BlockState<V1_21_2> for StrippedPaleOakWood {
 impl BlockStateExt<V1_21_2> for StrippedPaleOakWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1679,9 +1679,9 @@ impl BlockState<V1_21_2> for StrippedMangroveWood {
 impl BlockStateExt<V1_21_2> for StrippedMangroveWood {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1698,9 +1698,9 @@ impl BlockState<V1_21_2> for OakLeaves {
 impl BlockStateExt<V1_21_2> for OakLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1717,9 +1717,9 @@ impl BlockState<V1_21_2> for SpruceLeaves {
 impl BlockStateExt<V1_21_2> for SpruceLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1736,9 +1736,9 @@ impl BlockState<V1_21_2> for BirchLeaves {
 impl BlockStateExt<V1_21_2> for BirchLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1755,9 +1755,9 @@ impl BlockState<V1_21_2> for JungleLeaves {
 impl BlockStateExt<V1_21_2> for JungleLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1774,9 +1774,9 @@ impl BlockState<V1_21_2> for AcaciaLeaves {
 impl BlockStateExt<V1_21_2> for AcaciaLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1793,9 +1793,9 @@ impl BlockState<V1_21_2> for CherryLeaves {
 impl BlockStateExt<V1_21_2> for CherryLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1812,9 +1812,9 @@ impl BlockState<V1_21_2> for DarkOakLeaves {
 impl BlockStateExt<V1_21_2> for DarkOakLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1831,9 +1831,9 @@ impl BlockState<V1_21_2> for PaleOakLeaves {
 impl BlockStateExt<V1_21_2> for PaleOakLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1850,9 +1850,9 @@ impl BlockState<V1_21_2> for MangroveLeaves {
 impl BlockStateExt<V1_21_2> for MangroveLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1869,9 +1869,9 @@ impl BlockState<V1_21_2> for AzaleaLeaves {
 impl BlockStateExt<V1_21_2> for AzaleaLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1888,9 +1888,9 @@ impl BlockState<V1_21_2> for FloweringAzaleaLeaves {
 impl BlockStateExt<V1_21_2> for FloweringAzaleaLeaves {
     type Attributes = (DistanceIntRangeAttribute_1_7, PersistentBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(27u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -1907,9 +1907,9 @@ impl BlockState<V1_21_2> for Sponge {
 impl BlockStateExt<V1_21_2> for Sponge {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -1926,9 +1926,9 @@ impl BlockState<V1_21_2> for WetSponge {
 impl BlockStateExt<V1_21_2> for WetSponge {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -1945,9 +1945,9 @@ impl BlockState<V1_21_2> for Glass {
 impl BlockStateExt<V1_21_2> for Glass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -1964,9 +1964,9 @@ impl BlockState<V1_21_2> for LapisOre {
 impl BlockStateExt<V1_21_2> for LapisOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -1983,9 +1983,9 @@ impl BlockState<V1_21_2> for DeepslateLapisOre {
 impl BlockStateExt<V1_21_2> for DeepslateLapisOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2002,9 +2002,9 @@ impl BlockState<V1_21_2> for LapisBlock {
 impl BlockStateExt<V1_21_2> for LapisBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2021,9 +2021,9 @@ impl BlockState<V1_21_2> for Dispenser {
 impl BlockStateExt<V1_21_2> for Dispenser {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, TriggeredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2040,9 +2040,9 @@ impl BlockState<V1_21_2> for Sandstone {
 impl BlockStateExt<V1_21_2> for Sandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2059,9 +2059,9 @@ impl BlockState<V1_21_2> for ChiseledSandstone {
 impl BlockStateExt<V1_21_2> for ChiseledSandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2078,9 +2078,9 @@ impl BlockState<V1_21_2> for CutSandstone {
 impl BlockStateExt<V1_21_2> for CutSandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2097,9 +2097,9 @@ impl BlockState<V1_21_2> for NoteBlock {
 impl BlockStateExt<V1_21_2> for NoteBlock {
     type Attributes = (InstrumentEnumAttribute, NoteIntRangeAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2116,9 +2116,9 @@ impl BlockState<V1_21_2> for WhiteBed {
 impl BlockStateExt<V1_21_2> for WhiteBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2135,9 +2135,9 @@ impl BlockState<V1_21_2> for OrangeBed {
 impl BlockStateExt<V1_21_2> for OrangeBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2154,9 +2154,9 @@ impl BlockState<V1_21_2> for MagentaBed {
 impl BlockStateExt<V1_21_2> for MagentaBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2173,9 +2173,9 @@ impl BlockState<V1_21_2> for LightBlueBed {
 impl BlockStateExt<V1_21_2> for LightBlueBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2192,9 +2192,9 @@ impl BlockState<V1_21_2> for YellowBed {
 impl BlockStateExt<V1_21_2> for YellowBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2211,9 +2211,9 @@ impl BlockState<V1_21_2> for LimeBed {
 impl BlockStateExt<V1_21_2> for LimeBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2230,9 +2230,9 @@ impl BlockState<V1_21_2> for PinkBed {
 impl BlockStateExt<V1_21_2> for PinkBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2249,9 +2249,9 @@ impl BlockState<V1_21_2> for GrayBed {
 impl BlockStateExt<V1_21_2> for GrayBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2268,9 +2268,9 @@ impl BlockState<V1_21_2> for LightGrayBed {
 impl BlockStateExt<V1_21_2> for LightGrayBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2287,9 +2287,9 @@ impl BlockState<V1_21_2> for CyanBed {
 impl BlockStateExt<V1_21_2> for CyanBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2306,9 +2306,9 @@ impl BlockState<V1_21_2> for PurpleBed {
 impl BlockStateExt<V1_21_2> for PurpleBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2325,9 +2325,9 @@ impl BlockState<V1_21_2> for BlueBed {
 impl BlockStateExt<V1_21_2> for BlueBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2344,9 +2344,9 @@ impl BlockState<V1_21_2> for BrownBed {
 impl BlockStateExt<V1_21_2> for BrownBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2363,9 +2363,9 @@ impl BlockState<V1_21_2> for GreenBed {
 impl BlockStateExt<V1_21_2> for GreenBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2382,9 +2382,9 @@ impl BlockState<V1_21_2> for RedBed {
 impl BlockStateExt<V1_21_2> for RedBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2401,9 +2401,9 @@ impl BlockState<V1_21_2> for BlackBed {
 impl BlockStateExt<V1_21_2> for BlackBed {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OccupiedBooleanAttribute, PartEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2420,9 +2420,9 @@ impl BlockState<V1_21_2> for PoweredRail {
 impl BlockStateExt<V1_21_2> for PoweredRail {
     type Attributes = (PoweredBooleanAttribute, ShapeEnumAttribute_NorthSouth_EastWest_AscendingEast_AscendingWest_AscendingNorth_AscendingSouth, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(13u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2439,9 +2439,9 @@ impl BlockState<V1_21_2> for DetectorRail {
 impl BlockStateExt<V1_21_2> for DetectorRail {
     type Attributes = (PoweredBooleanAttribute, ShapeEnumAttribute_NorthSouth_EastWest_AscendingEast_AscendingWest_AscendingNorth_AscendingSouth, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(13u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2458,9 +2458,9 @@ impl BlockState<V1_21_2> for StickyPiston {
 impl BlockStateExt<V1_21_2> for StickyPiston {
     type Attributes = (ExtendedBooleanAttribute, FacingEnumAttribute_North_East_South_West_Up_Down);
     const DEFAULT: Self = Self(6u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2477,9 +2477,9 @@ impl BlockState<V1_21_2> for Cobweb {
 impl BlockStateExt<V1_21_2> for Cobweb {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2496,9 +2496,9 @@ impl BlockState<V1_21_2> for ShortGrass {
 impl BlockStateExt<V1_21_2> for ShortGrass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2515,9 +2515,9 @@ impl BlockState<V1_21_2> for Fern {
 impl BlockStateExt<V1_21_2> for Fern {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2534,9 +2534,9 @@ impl BlockState<V1_21_2> for DeadBush {
 impl BlockStateExt<V1_21_2> for DeadBush {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2553,9 +2553,9 @@ impl BlockState<V1_21_2> for Seagrass {
 impl BlockStateExt<V1_21_2> for Seagrass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2572,9 +2572,9 @@ impl BlockState<V1_21_2> for TallSeagrass {
 impl BlockStateExt<V1_21_2> for TallSeagrass {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2591,9 +2591,9 @@ impl BlockState<V1_21_2> for Piston {
 impl BlockStateExt<V1_21_2> for Piston {
     type Attributes = (ExtendedBooleanAttribute, FacingEnumAttribute_North_East_South_West_Up_Down);
     const DEFAULT: Self = Self(6u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2610,9 +2610,9 @@ impl BlockState<V1_21_2> for PistonHead {
 impl BlockStateExt<V1_21_2> for PistonHead {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, ShortBooleanAttribute, TypeEnumAttribute_Normal_Sticky);
     const DEFAULT: Self = Self(2u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2629,9 +2629,9 @@ impl BlockState<V1_21_2> for WhiteWool {
 impl BlockStateExt<V1_21_2> for WhiteWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2648,9 +2648,9 @@ impl BlockState<V1_21_2> for OrangeWool {
 impl BlockStateExt<V1_21_2> for OrangeWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2667,9 +2667,9 @@ impl BlockState<V1_21_2> for MagentaWool {
 impl BlockStateExt<V1_21_2> for MagentaWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2686,9 +2686,9 @@ impl BlockState<V1_21_2> for LightBlueWool {
 impl BlockStateExt<V1_21_2> for LightBlueWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2705,9 +2705,9 @@ impl BlockState<V1_21_2> for YellowWool {
 impl BlockStateExt<V1_21_2> for YellowWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2724,9 +2724,9 @@ impl BlockState<V1_21_2> for LimeWool {
 impl BlockStateExt<V1_21_2> for LimeWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2743,9 +2743,9 @@ impl BlockState<V1_21_2> for PinkWool {
 impl BlockStateExt<V1_21_2> for PinkWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2762,9 +2762,9 @@ impl BlockState<V1_21_2> for GrayWool {
 impl BlockStateExt<V1_21_2> for GrayWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2781,9 +2781,9 @@ impl BlockState<V1_21_2> for LightGrayWool {
 impl BlockStateExt<V1_21_2> for LightGrayWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2800,9 +2800,9 @@ impl BlockState<V1_21_2> for CyanWool {
 impl BlockStateExt<V1_21_2> for CyanWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2819,9 +2819,9 @@ impl BlockState<V1_21_2> for PurpleWool {
 impl BlockStateExt<V1_21_2> for PurpleWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2838,9 +2838,9 @@ impl BlockState<V1_21_2> for BlueWool {
 impl BlockStateExt<V1_21_2> for BlueWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2857,9 +2857,9 @@ impl BlockState<V1_21_2> for BrownWool {
 impl BlockStateExt<V1_21_2> for BrownWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2876,9 +2876,9 @@ impl BlockState<V1_21_2> for GreenWool {
 impl BlockStateExt<V1_21_2> for GreenWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2895,9 +2895,9 @@ impl BlockState<V1_21_2> for RedWool {
 impl BlockStateExt<V1_21_2> for RedWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2914,9 +2914,9 @@ impl BlockState<V1_21_2> for BlackWool {
 impl BlockStateExt<V1_21_2> for BlackWool {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2933,9 +2933,9 @@ impl BlockState<V1_21_2> for MovingPiston {
 impl BlockStateExt<V1_21_2> for MovingPiston {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, TypeEnumAttribute_Normal_Sticky);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -2952,9 +2952,9 @@ impl BlockState<V1_21_2> for Dandelion {
 impl BlockStateExt<V1_21_2> for Dandelion {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2971,9 +2971,9 @@ impl BlockState<V1_21_2> for Torchflower {
 impl BlockStateExt<V1_21_2> for Torchflower {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -2990,9 +2990,9 @@ impl BlockState<V1_21_2> for Poppy {
 impl BlockStateExt<V1_21_2> for Poppy {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3009,9 +3009,9 @@ impl BlockState<V1_21_2> for BlueOrchid {
 impl BlockStateExt<V1_21_2> for BlueOrchid {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3028,9 +3028,9 @@ impl BlockState<V1_21_2> for Allium {
 impl BlockStateExt<V1_21_2> for Allium {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3047,9 +3047,9 @@ impl BlockState<V1_21_2> for AzureBluet {
 impl BlockStateExt<V1_21_2> for AzureBluet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3066,9 +3066,9 @@ impl BlockState<V1_21_2> for RedTulip {
 impl BlockStateExt<V1_21_2> for RedTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3085,9 +3085,9 @@ impl BlockState<V1_21_2> for OrangeTulip {
 impl BlockStateExt<V1_21_2> for OrangeTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3104,9 +3104,9 @@ impl BlockState<V1_21_2> for WhiteTulip {
 impl BlockStateExt<V1_21_2> for WhiteTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3123,9 +3123,9 @@ impl BlockState<V1_21_2> for PinkTulip {
 impl BlockStateExt<V1_21_2> for PinkTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3142,9 +3142,9 @@ impl BlockState<V1_21_2> for OxeyeDaisy {
 impl BlockStateExt<V1_21_2> for OxeyeDaisy {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3161,9 +3161,9 @@ impl BlockState<V1_21_2> for Cornflower {
 impl BlockStateExt<V1_21_2> for Cornflower {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3180,9 +3180,9 @@ impl BlockState<V1_21_2> for WitherRose {
 impl BlockStateExt<V1_21_2> for WitherRose {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3199,9 +3199,9 @@ impl BlockState<V1_21_2> for LilyOfTheValley {
 impl BlockStateExt<V1_21_2> for LilyOfTheValley {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3218,9 +3218,9 @@ impl BlockState<V1_21_2> for BrownMushroom {
 impl BlockStateExt<V1_21_2> for BrownMushroom {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3237,9 +3237,9 @@ impl BlockState<V1_21_2> for RedMushroom {
 impl BlockStateExt<V1_21_2> for RedMushroom {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3256,9 +3256,9 @@ impl BlockState<V1_21_2> for GoldBlock {
 impl BlockStateExt<V1_21_2> for GoldBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3275,9 +3275,9 @@ impl BlockState<V1_21_2> for IronBlock {
 impl BlockStateExt<V1_21_2> for IronBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3294,9 +3294,9 @@ impl BlockState<V1_21_2> for Bricks {
 impl BlockStateExt<V1_21_2> for Bricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3313,9 +3313,9 @@ impl BlockState<V1_21_2> for Tnt {
 impl BlockStateExt<V1_21_2> for Tnt {
     type Attributes = UnstableBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3332,9 +3332,9 @@ impl BlockState<V1_21_2> for Bookshelf {
 impl BlockStateExt<V1_21_2> for Bookshelf {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3351,9 +3351,9 @@ impl BlockState<V1_21_2> for ChiseledBookshelf {
 impl BlockStateExt<V1_21_2> for ChiseledBookshelf {
     type Attributes = (FacingEnumAttribute_North_South_West_East, Slot0OccupiedBooleanAttribute, Slot1OccupiedBooleanAttribute, Slot2OccupiedBooleanAttribute, Slot3OccupiedBooleanAttribute, Slot4OccupiedBooleanAttribute, Slot5OccupiedBooleanAttribute);
     const DEFAULT: Self = Self(63u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3370,9 +3370,9 @@ impl BlockState<V1_21_2> for MossyCobblestone {
 impl BlockStateExt<V1_21_2> for MossyCobblestone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3389,9 +3389,9 @@ impl BlockState<V1_21_2> for Obsidian {
 impl BlockStateExt<V1_21_2> for Obsidian {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3408,9 +3408,9 @@ impl BlockState<V1_21_2> for Torch {
 impl BlockStateExt<V1_21_2> for Torch {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3427,9 +3427,9 @@ impl BlockState<V1_21_2> for WallTorch {
 impl BlockStateExt<V1_21_2> for WallTorch {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3446,9 +3446,9 @@ impl BlockState<V1_21_2> for Fire {
 impl BlockStateExt<V1_21_2> for Fire {
     type Attributes = (AgeIntRangeAttribute_0_15, EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3465,9 +3465,9 @@ impl BlockState<V1_21_2> for SoulFire {
 impl BlockStateExt<V1_21_2> for SoulFire {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3484,9 +3484,9 @@ impl BlockState<V1_21_2> for Spawner {
 impl BlockStateExt<V1_21_2> for Spawner {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3503,9 +3503,9 @@ impl BlockState<V1_21_2> for CreakingHeart {
 impl BlockStateExt<V1_21_2> for CreakingHeart {
     type Attributes = (AxisEnumAttribute_X_Y_Z, CreakingEnumAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3522,9 +3522,9 @@ impl BlockState<V1_21_2> for OakStairs {
 impl BlockStateExt<V1_21_2> for OakStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3541,9 +3541,9 @@ impl BlockState<V1_21_2> for Chest {
 impl BlockStateExt<V1_21_2> for Chest {
     type Attributes = (FacingEnumAttribute_North_South_West_East, TypeEnumAttribute_Single_Left_Right, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3560,9 +3560,9 @@ impl BlockState<V1_21_2> for RedstoneWire {
 impl BlockStateExt<V1_21_2> for RedstoneWire {
     type Attributes = (EastEnumAttribute_Up_Side_None, NorthEnumAttribute_Up_Side_None, PowerIntRangeAttribute, SouthEnumAttribute_Up_Side_None, WestEnumAttribute_Up_Side_None);
     const DEFAULT: Self = Self(1160u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3579,9 +3579,9 @@ impl BlockState<V1_21_2> for DiamondOre {
 impl BlockStateExt<V1_21_2> for DiamondOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3598,9 +3598,9 @@ impl BlockState<V1_21_2> for DeepslateDiamondOre {
 impl BlockStateExt<V1_21_2> for DeepslateDiamondOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3617,9 +3617,9 @@ impl BlockState<V1_21_2> for DiamondBlock {
 impl BlockStateExt<V1_21_2> for DiamondBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3636,9 +3636,9 @@ impl BlockState<V1_21_2> for CraftingTable {
 impl BlockStateExt<V1_21_2> for CraftingTable {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -3655,9 +3655,9 @@ impl BlockState<V1_21_2> for Wheat {
 impl BlockStateExt<V1_21_2> for Wheat {
     type Attributes = AgeIntRangeAttribute_0_7;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3674,9 +3674,9 @@ impl BlockState<V1_21_2> for Farmland {
 impl BlockStateExt<V1_21_2> for Farmland {
     type Attributes = MoistureIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3693,9 +3693,9 @@ impl BlockState<V1_21_2> for Furnace {
 impl BlockStateExt<V1_21_2> for Furnace {
     type Attributes = (FacingEnumAttribute_North_South_West_East, LitBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3712,9 +3712,9 @@ impl BlockState<V1_21_2> for OakSign {
 impl BlockStateExt<V1_21_2> for OakSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3731,9 +3731,9 @@ impl BlockState<V1_21_2> for SpruceSign {
 impl BlockStateExt<V1_21_2> for SpruceSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3750,9 +3750,9 @@ impl BlockState<V1_21_2> for BirchSign {
 impl BlockStateExt<V1_21_2> for BirchSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3769,9 +3769,9 @@ impl BlockState<V1_21_2> for AcaciaSign {
 impl BlockStateExt<V1_21_2> for AcaciaSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3788,9 +3788,9 @@ impl BlockState<V1_21_2> for CherrySign {
 impl BlockStateExt<V1_21_2> for CherrySign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3807,9 +3807,9 @@ impl BlockState<V1_21_2> for JungleSign {
 impl BlockStateExt<V1_21_2> for JungleSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3826,9 +3826,9 @@ impl BlockState<V1_21_2> for DarkOakSign {
 impl BlockStateExt<V1_21_2> for DarkOakSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3845,9 +3845,9 @@ impl BlockState<V1_21_2> for PaleOakSign {
 impl BlockStateExt<V1_21_2> for PaleOakSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3864,9 +3864,9 @@ impl BlockState<V1_21_2> for MangroveSign {
 impl BlockStateExt<V1_21_2> for MangroveSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3883,9 +3883,9 @@ impl BlockState<V1_21_2> for BambooSign {
 impl BlockStateExt<V1_21_2> for BambooSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3902,9 +3902,9 @@ impl BlockState<V1_21_2> for OakDoor {
 impl BlockStateExt<V1_21_2> for OakDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3921,9 +3921,9 @@ impl BlockState<V1_21_2> for Ladder {
 impl BlockStateExt<V1_21_2> for Ladder {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3940,9 +3940,9 @@ impl BlockState<V1_21_2> for Rail {
 impl BlockStateExt<V1_21_2> for Rail {
     type Attributes = (ShapeEnumAttribute_NorthSouth_EastWest_AscendingEast_AscendingWest_AscendingNorth_AscendingSouth_SouthEast_SouthWest_NorthWest_NorthEast, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3959,9 +3959,9 @@ impl BlockState<V1_21_2> for CobblestoneStairs {
 impl BlockStateExt<V1_21_2> for CobblestoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3978,9 +3978,9 @@ impl BlockState<V1_21_2> for OakWallSign {
 impl BlockStateExt<V1_21_2> for OakWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -3997,9 +3997,9 @@ impl BlockState<V1_21_2> for SpruceWallSign {
 impl BlockStateExt<V1_21_2> for SpruceWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4016,9 +4016,9 @@ impl BlockState<V1_21_2> for BirchWallSign {
 impl BlockStateExt<V1_21_2> for BirchWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4035,9 +4035,9 @@ impl BlockState<V1_21_2> for AcaciaWallSign {
 impl BlockStateExt<V1_21_2> for AcaciaWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4054,9 +4054,9 @@ impl BlockState<V1_21_2> for CherryWallSign {
 impl BlockStateExt<V1_21_2> for CherryWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4073,9 +4073,9 @@ impl BlockState<V1_21_2> for JungleWallSign {
 impl BlockStateExt<V1_21_2> for JungleWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4092,9 +4092,9 @@ impl BlockState<V1_21_2> for DarkOakWallSign {
 impl BlockStateExt<V1_21_2> for DarkOakWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4111,9 +4111,9 @@ impl BlockState<V1_21_2> for PaleOakWallSign {
 impl BlockStateExt<V1_21_2> for PaleOakWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4130,9 +4130,9 @@ impl BlockState<V1_21_2> for MangroveWallSign {
 impl BlockStateExt<V1_21_2> for MangroveWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4149,9 +4149,9 @@ impl BlockState<V1_21_2> for BambooWallSign {
 impl BlockStateExt<V1_21_2> for BambooWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4168,9 +4168,9 @@ impl BlockState<V1_21_2> for OakHangingSign {
 impl BlockStateExt<V1_21_2> for OakHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4187,9 +4187,9 @@ impl BlockState<V1_21_2> for SpruceHangingSign {
 impl BlockStateExt<V1_21_2> for SpruceHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4206,9 +4206,9 @@ impl BlockState<V1_21_2> for BirchHangingSign {
 impl BlockStateExt<V1_21_2> for BirchHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4225,9 +4225,9 @@ impl BlockState<V1_21_2> for AcaciaHangingSign {
 impl BlockStateExt<V1_21_2> for AcaciaHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4244,9 +4244,9 @@ impl BlockState<V1_21_2> for CherryHangingSign {
 impl BlockStateExt<V1_21_2> for CherryHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4263,9 +4263,9 @@ impl BlockState<V1_21_2> for JungleHangingSign {
 impl BlockStateExt<V1_21_2> for JungleHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4282,9 +4282,9 @@ impl BlockState<V1_21_2> for DarkOakHangingSign {
 impl BlockStateExt<V1_21_2> for DarkOakHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4301,9 +4301,9 @@ impl BlockState<V1_21_2> for PaleOakHangingSign {
 impl BlockStateExt<V1_21_2> for PaleOakHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4320,9 +4320,9 @@ impl BlockState<V1_21_2> for CrimsonHangingSign {
 impl BlockStateExt<V1_21_2> for CrimsonHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4339,9 +4339,9 @@ impl BlockState<V1_21_2> for WarpedHangingSign {
 impl BlockStateExt<V1_21_2> for WarpedHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4358,9 +4358,9 @@ impl BlockState<V1_21_2> for MangroveHangingSign {
 impl BlockStateExt<V1_21_2> for MangroveHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4377,9 +4377,9 @@ impl BlockState<V1_21_2> for BambooHangingSign {
 impl BlockStateExt<V1_21_2> for BambooHangingSign {
     type Attributes = (AttachedBooleanAttribute, RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(33u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4396,9 +4396,9 @@ impl BlockState<V1_21_2> for OakWallHangingSign {
 impl BlockStateExt<V1_21_2> for OakWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4415,9 +4415,9 @@ impl BlockState<V1_21_2> for SpruceWallHangingSign {
 impl BlockStateExt<V1_21_2> for SpruceWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4434,9 +4434,9 @@ impl BlockState<V1_21_2> for BirchWallHangingSign {
 impl BlockStateExt<V1_21_2> for BirchWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4453,9 +4453,9 @@ impl BlockState<V1_21_2> for AcaciaWallHangingSign {
 impl BlockStateExt<V1_21_2> for AcaciaWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4472,9 +4472,9 @@ impl BlockState<V1_21_2> for CherryWallHangingSign {
 impl BlockStateExt<V1_21_2> for CherryWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4491,9 +4491,9 @@ impl BlockState<V1_21_2> for JungleWallHangingSign {
 impl BlockStateExt<V1_21_2> for JungleWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4510,9 +4510,9 @@ impl BlockState<V1_21_2> for DarkOakWallHangingSign {
 impl BlockStateExt<V1_21_2> for DarkOakWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4529,9 +4529,9 @@ impl BlockState<V1_21_2> for PaleOakWallHangingSign {
 impl BlockStateExt<V1_21_2> for PaleOakWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4548,9 +4548,9 @@ impl BlockState<V1_21_2> for MangroveWallHangingSign {
 impl BlockStateExt<V1_21_2> for MangroveWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4567,9 +4567,9 @@ impl BlockState<V1_21_2> for CrimsonWallHangingSign {
 impl BlockStateExt<V1_21_2> for CrimsonWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4586,9 +4586,9 @@ impl BlockState<V1_21_2> for WarpedWallHangingSign {
 impl BlockStateExt<V1_21_2> for WarpedWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4605,9 +4605,9 @@ impl BlockState<V1_21_2> for BambooWallHangingSign {
 impl BlockStateExt<V1_21_2> for BambooWallHangingSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4624,9 +4624,9 @@ impl BlockState<V1_21_2> for Lever {
 impl BlockStateExt<V1_21_2> for Lever {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4643,9 +4643,9 @@ impl BlockState<V1_21_2> for StonePressurePlate {
 impl BlockStateExt<V1_21_2> for StonePressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4662,9 +4662,9 @@ impl BlockState<V1_21_2> for IronDoor {
 impl BlockStateExt<V1_21_2> for IronDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4681,9 +4681,9 @@ impl BlockState<V1_21_2> for OakPressurePlate {
 impl BlockStateExt<V1_21_2> for OakPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4700,9 +4700,9 @@ impl BlockState<V1_21_2> for SprucePressurePlate {
 impl BlockStateExt<V1_21_2> for SprucePressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4719,9 +4719,9 @@ impl BlockState<V1_21_2> for BirchPressurePlate {
 impl BlockStateExt<V1_21_2> for BirchPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4738,9 +4738,9 @@ impl BlockState<V1_21_2> for JunglePressurePlate {
 impl BlockStateExt<V1_21_2> for JunglePressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4757,9 +4757,9 @@ impl BlockState<V1_21_2> for AcaciaPressurePlate {
 impl BlockStateExt<V1_21_2> for AcaciaPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4776,9 +4776,9 @@ impl BlockState<V1_21_2> for CherryPressurePlate {
 impl BlockStateExt<V1_21_2> for CherryPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4795,9 +4795,9 @@ impl BlockState<V1_21_2> for DarkOakPressurePlate {
 impl BlockStateExt<V1_21_2> for DarkOakPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4814,9 +4814,9 @@ impl BlockState<V1_21_2> for PaleOakPressurePlate {
 impl BlockStateExt<V1_21_2> for PaleOakPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4833,9 +4833,9 @@ impl BlockState<V1_21_2> for MangrovePressurePlate {
 impl BlockStateExt<V1_21_2> for MangrovePressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4852,9 +4852,9 @@ impl BlockState<V1_21_2> for BambooPressurePlate {
 impl BlockStateExt<V1_21_2> for BambooPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4871,9 +4871,9 @@ impl BlockState<V1_21_2> for RedstoneOre {
 impl BlockStateExt<V1_21_2> for RedstoneOre {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4890,9 +4890,9 @@ impl BlockState<V1_21_2> for DeepslateRedstoneOre {
 impl BlockStateExt<V1_21_2> for DeepslateRedstoneOre {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4909,9 +4909,9 @@ impl BlockState<V1_21_2> for RedstoneTorch {
 impl BlockStateExt<V1_21_2> for RedstoneTorch {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4928,9 +4928,9 @@ impl BlockState<V1_21_2> for RedstoneWallTorch {
 impl BlockStateExt<V1_21_2> for RedstoneWallTorch {
     type Attributes = (FacingEnumAttribute_North_South_West_East, LitBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4947,9 +4947,9 @@ impl BlockState<V1_21_2> for StoneButton {
 impl BlockStateExt<V1_21_2> for StoneButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4966,9 +4966,9 @@ impl BlockState<V1_21_2> for Snow {
 impl BlockStateExt<V1_21_2> for Snow {
     type Attributes = LayersIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -4985,9 +4985,9 @@ impl BlockState<V1_21_2> for Ice {
 impl BlockStateExt<V1_21_2> for Ice {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5004,9 +5004,9 @@ impl BlockState<V1_21_2> for SnowBlock {
 impl BlockStateExt<V1_21_2> for SnowBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5023,9 +5023,9 @@ impl BlockState<V1_21_2> for Cactus {
 impl BlockStateExt<V1_21_2> for Cactus {
     type Attributes = AgeIntRangeAttribute_0_15;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5042,9 +5042,9 @@ impl BlockState<V1_21_2> for Clay {
 impl BlockStateExt<V1_21_2> for Clay {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5061,9 +5061,9 @@ impl BlockState<V1_21_2> for SugarCane {
 impl BlockStateExt<V1_21_2> for SugarCane {
     type Attributes = AgeIntRangeAttribute_0_15;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5080,9 +5080,9 @@ impl BlockState<V1_21_2> for Jukebox {
 impl BlockStateExt<V1_21_2> for Jukebox {
     type Attributes = HasRecordBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5099,9 +5099,9 @@ impl BlockState<V1_21_2> for OakFence {
 impl BlockStateExt<V1_21_2> for OakFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5118,9 +5118,9 @@ impl BlockState<V1_21_2> for Netherrack {
 impl BlockStateExt<V1_21_2> for Netherrack {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5137,9 +5137,9 @@ impl BlockState<V1_21_2> for SoulSand {
 impl BlockStateExt<V1_21_2> for SoulSand {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5156,9 +5156,9 @@ impl BlockState<V1_21_2> for SoulSoil {
 impl BlockStateExt<V1_21_2> for SoulSoil {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5175,9 +5175,9 @@ impl BlockState<V1_21_2> for Basalt {
 impl BlockStateExt<V1_21_2> for Basalt {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5194,9 +5194,9 @@ impl BlockState<V1_21_2> for PolishedBasalt {
 impl BlockStateExt<V1_21_2> for PolishedBasalt {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5213,9 +5213,9 @@ impl BlockState<V1_21_2> for SoulTorch {
 impl BlockStateExt<V1_21_2> for SoulTorch {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5232,9 +5232,9 @@ impl BlockState<V1_21_2> for SoulWallTorch {
 impl BlockStateExt<V1_21_2> for SoulWallTorch {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5251,9 +5251,9 @@ impl BlockState<V1_21_2> for Glowstone {
 impl BlockStateExt<V1_21_2> for Glowstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5270,9 +5270,9 @@ impl BlockState<V1_21_2> for NetherPortal {
 impl BlockStateExt<V1_21_2> for NetherPortal {
     type Attributes = AxisEnumAttribute_X_Z;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5289,9 +5289,9 @@ impl BlockState<V1_21_2> for CarvedPumpkin {
 impl BlockStateExt<V1_21_2> for CarvedPumpkin {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5308,9 +5308,9 @@ impl BlockState<V1_21_2> for JackOLantern {
 impl BlockStateExt<V1_21_2> for JackOLantern {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5327,9 +5327,9 @@ impl BlockState<V1_21_2> for Cake {
 impl BlockStateExt<V1_21_2> for Cake {
     type Attributes = BitesIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5346,9 +5346,9 @@ impl BlockState<V1_21_2> for Repeater {
 impl BlockStateExt<V1_21_2> for Repeater {
     type Attributes = (DelayIntRangeAttribute, FacingEnumAttribute_North_South_West_East, LockedBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5365,9 +5365,9 @@ impl BlockState<V1_21_2> for WhiteStainedGlass {
 impl BlockStateExt<V1_21_2> for WhiteStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5384,9 +5384,9 @@ impl BlockState<V1_21_2> for OrangeStainedGlass {
 impl BlockStateExt<V1_21_2> for OrangeStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5403,9 +5403,9 @@ impl BlockState<V1_21_2> for MagentaStainedGlass {
 impl BlockStateExt<V1_21_2> for MagentaStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5422,9 +5422,9 @@ impl BlockState<V1_21_2> for LightBlueStainedGlass {
 impl BlockStateExt<V1_21_2> for LightBlueStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5441,9 +5441,9 @@ impl BlockState<V1_21_2> for YellowStainedGlass {
 impl BlockStateExt<V1_21_2> for YellowStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5460,9 +5460,9 @@ impl BlockState<V1_21_2> for LimeStainedGlass {
 impl BlockStateExt<V1_21_2> for LimeStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5479,9 +5479,9 @@ impl BlockState<V1_21_2> for PinkStainedGlass {
 impl BlockStateExt<V1_21_2> for PinkStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5498,9 +5498,9 @@ impl BlockState<V1_21_2> for GrayStainedGlass {
 impl BlockStateExt<V1_21_2> for GrayStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5517,9 +5517,9 @@ impl BlockState<V1_21_2> for LightGrayStainedGlass {
 impl BlockStateExt<V1_21_2> for LightGrayStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5536,9 +5536,9 @@ impl BlockState<V1_21_2> for CyanStainedGlass {
 impl BlockStateExt<V1_21_2> for CyanStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5555,9 +5555,9 @@ impl BlockState<V1_21_2> for PurpleStainedGlass {
 impl BlockStateExt<V1_21_2> for PurpleStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5574,9 +5574,9 @@ impl BlockState<V1_21_2> for BlueStainedGlass {
 impl BlockStateExt<V1_21_2> for BlueStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5593,9 +5593,9 @@ impl BlockState<V1_21_2> for BrownStainedGlass {
 impl BlockStateExt<V1_21_2> for BrownStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5612,9 +5612,9 @@ impl BlockState<V1_21_2> for GreenStainedGlass {
 impl BlockStateExt<V1_21_2> for GreenStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5631,9 +5631,9 @@ impl BlockState<V1_21_2> for RedStainedGlass {
 impl BlockStateExt<V1_21_2> for RedStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5650,9 +5650,9 @@ impl BlockState<V1_21_2> for BlackStainedGlass {
 impl BlockStateExt<V1_21_2> for BlackStainedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5669,9 +5669,9 @@ impl BlockState<V1_21_2> for OakTrapdoor {
 impl BlockStateExt<V1_21_2> for OakTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5688,9 +5688,9 @@ impl BlockState<V1_21_2> for SpruceTrapdoor {
 impl BlockStateExt<V1_21_2> for SpruceTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5707,9 +5707,9 @@ impl BlockState<V1_21_2> for BirchTrapdoor {
 impl BlockStateExt<V1_21_2> for BirchTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5726,9 +5726,9 @@ impl BlockState<V1_21_2> for JungleTrapdoor {
 impl BlockStateExt<V1_21_2> for JungleTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5745,9 +5745,9 @@ impl BlockState<V1_21_2> for AcaciaTrapdoor {
 impl BlockStateExt<V1_21_2> for AcaciaTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5764,9 +5764,9 @@ impl BlockState<V1_21_2> for CherryTrapdoor {
 impl BlockStateExt<V1_21_2> for CherryTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5783,9 +5783,9 @@ impl BlockState<V1_21_2> for DarkOakTrapdoor {
 impl BlockStateExt<V1_21_2> for DarkOakTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5802,9 +5802,9 @@ impl BlockState<V1_21_2> for PaleOakTrapdoor {
 impl BlockStateExt<V1_21_2> for PaleOakTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5821,9 +5821,9 @@ impl BlockState<V1_21_2> for MangroveTrapdoor {
 impl BlockStateExt<V1_21_2> for MangroveTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5840,9 +5840,9 @@ impl BlockState<V1_21_2> for BambooTrapdoor {
 impl BlockStateExt<V1_21_2> for BambooTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -5859,9 +5859,9 @@ impl BlockState<V1_21_2> for StoneBricks {
 impl BlockStateExt<V1_21_2> for StoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5878,9 +5878,9 @@ impl BlockState<V1_21_2> for MossyStoneBricks {
 impl BlockStateExt<V1_21_2> for MossyStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5897,9 +5897,9 @@ impl BlockState<V1_21_2> for CrackedStoneBricks {
 impl BlockStateExt<V1_21_2> for CrackedStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5916,9 +5916,9 @@ impl BlockState<V1_21_2> for ChiseledStoneBricks {
 impl BlockStateExt<V1_21_2> for ChiseledStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5935,9 +5935,9 @@ impl BlockState<V1_21_2> for PackedMud {
 impl BlockStateExt<V1_21_2> for PackedMud {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5954,9 +5954,9 @@ impl BlockState<V1_21_2> for MudBricks {
 impl BlockStateExt<V1_21_2> for MudBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5973,9 +5973,9 @@ impl BlockState<V1_21_2> for InfestedStone {
 impl BlockStateExt<V1_21_2> for InfestedStone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -5992,9 +5992,9 @@ impl BlockState<V1_21_2> for InfestedCobblestone {
 impl BlockStateExt<V1_21_2> for InfestedCobblestone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6011,9 +6011,9 @@ impl BlockState<V1_21_2> for InfestedStoneBricks {
 impl BlockStateExt<V1_21_2> for InfestedStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6030,9 +6030,9 @@ impl BlockState<V1_21_2> for InfestedMossyStoneBricks {
 impl BlockStateExt<V1_21_2> for InfestedMossyStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6049,9 +6049,9 @@ impl BlockState<V1_21_2> for InfestedCrackedStoneBricks {
 impl BlockStateExt<V1_21_2> for InfestedCrackedStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6068,9 +6068,9 @@ impl BlockState<V1_21_2> for InfestedChiseledStoneBricks {
 impl BlockStateExt<V1_21_2> for InfestedChiseledStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6087,9 +6087,9 @@ impl BlockState<V1_21_2> for BrownMushroomBlock {
 impl BlockStateExt<V1_21_2> for BrownMushroomBlock {
     type Attributes = (DownBooleanAttribute, EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6106,9 +6106,9 @@ impl BlockState<V1_21_2> for RedMushroomBlock {
 impl BlockStateExt<V1_21_2> for RedMushroomBlock {
     type Attributes = (DownBooleanAttribute, EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6125,9 +6125,9 @@ impl BlockState<V1_21_2> for MushroomStem {
 impl BlockStateExt<V1_21_2> for MushroomStem {
     type Attributes = (DownBooleanAttribute, EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6144,9 +6144,9 @@ impl BlockState<V1_21_2> for IronBars {
 impl BlockStateExt<V1_21_2> for IronBars {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6163,9 +6163,9 @@ impl BlockState<V1_21_2> for Chain {
 impl BlockStateExt<V1_21_2> for Chain {
     type Attributes = (AxisEnumAttribute_X_Y_Z, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6182,9 +6182,9 @@ impl BlockState<V1_21_2> for GlassPane {
 impl BlockStateExt<V1_21_2> for GlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6201,9 +6201,9 @@ impl BlockState<V1_21_2> for Pumpkin {
 impl BlockStateExt<V1_21_2> for Pumpkin {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6220,9 +6220,9 @@ impl BlockState<V1_21_2> for Melon {
 impl BlockStateExt<V1_21_2> for Melon {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6239,9 +6239,9 @@ impl BlockState<V1_21_2> for AttachedPumpkinStem {
 impl BlockStateExt<V1_21_2> for AttachedPumpkinStem {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6258,9 +6258,9 @@ impl BlockState<V1_21_2> for AttachedMelonStem {
 impl BlockStateExt<V1_21_2> for AttachedMelonStem {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6277,9 +6277,9 @@ impl BlockState<V1_21_2> for PumpkinStem {
 impl BlockStateExt<V1_21_2> for PumpkinStem {
     type Attributes = AgeIntRangeAttribute_0_7;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6296,9 +6296,9 @@ impl BlockState<V1_21_2> for MelonStem {
 impl BlockStateExt<V1_21_2> for MelonStem {
     type Attributes = AgeIntRangeAttribute_0_7;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6315,9 +6315,9 @@ impl BlockState<V1_21_2> for Vine {
 impl BlockStateExt<V1_21_2> for Vine {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6334,9 +6334,9 @@ impl BlockState<V1_21_2> for GlowLichen {
 impl BlockStateExt<V1_21_2> for GlowLichen {
     type Attributes = (DownBooleanAttribute, EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(127u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6353,9 +6353,9 @@ impl BlockState<V1_21_2> for OakFenceGate {
 impl BlockStateExt<V1_21_2> for OakFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6372,9 +6372,9 @@ impl BlockState<V1_21_2> for BrickStairs {
 impl BlockStateExt<V1_21_2> for BrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6391,9 +6391,9 @@ impl BlockState<V1_21_2> for StoneBrickStairs {
 impl BlockStateExt<V1_21_2> for StoneBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6410,9 +6410,9 @@ impl BlockState<V1_21_2> for MudBrickStairs {
 impl BlockStateExt<V1_21_2> for MudBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6429,9 +6429,9 @@ impl BlockState<V1_21_2> for Mycelium {
 impl BlockStateExt<V1_21_2> for Mycelium {
     type Attributes = SnowyBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6448,9 +6448,9 @@ impl BlockState<V1_21_2> for LilyPad {
 impl BlockStateExt<V1_21_2> for LilyPad {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6467,9 +6467,9 @@ impl BlockState<V1_21_2> for NetherBricks {
 impl BlockStateExt<V1_21_2> for NetherBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6486,9 +6486,9 @@ impl BlockState<V1_21_2> for NetherBrickFence {
 impl BlockStateExt<V1_21_2> for NetherBrickFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6505,9 +6505,9 @@ impl BlockState<V1_21_2> for NetherBrickStairs {
 impl BlockStateExt<V1_21_2> for NetherBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6524,9 +6524,9 @@ impl BlockState<V1_21_2> for NetherWart {
 impl BlockStateExt<V1_21_2> for NetherWart {
     type Attributes = AgeIntRangeAttribute_0_3;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6543,9 +6543,9 @@ impl BlockState<V1_21_2> for EnchantingTable {
 impl BlockStateExt<V1_21_2> for EnchantingTable {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6562,9 +6562,9 @@ impl BlockState<V1_21_2> for BrewingStand {
 impl BlockStateExt<V1_21_2> for BrewingStand {
     type Attributes = (HasBottle0BooleanAttribute, HasBottle1BooleanAttribute, HasBottle2BooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6581,9 +6581,9 @@ impl BlockState<V1_21_2> for Cauldron {
 impl BlockStateExt<V1_21_2> for Cauldron {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6600,9 +6600,9 @@ impl BlockState<V1_21_2> for WaterCauldron {
 impl BlockStateExt<V1_21_2> for WaterCauldron {
     type Attributes = LevelIntRangeAttribute_1_3;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6619,9 +6619,9 @@ impl BlockState<V1_21_2> for LavaCauldron {
 impl BlockStateExt<V1_21_2> for LavaCauldron {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6638,9 +6638,9 @@ impl BlockState<V1_21_2> for PowderSnowCauldron {
 impl BlockStateExt<V1_21_2> for PowderSnowCauldron {
     type Attributes = LevelIntRangeAttribute_1_3;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6657,9 +6657,9 @@ impl BlockState<V1_21_2> for EndPortal {
 impl BlockStateExt<V1_21_2> for EndPortal {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6676,9 +6676,9 @@ impl BlockState<V1_21_2> for EndPortalFrame {
 impl BlockStateExt<V1_21_2> for EndPortalFrame {
     type Attributes = (EyeBooleanAttribute, FacingEnumAttribute_North_South_West_East);
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6695,9 +6695,9 @@ impl BlockState<V1_21_2> for EndStone {
 impl BlockStateExt<V1_21_2> for EndStone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6714,9 +6714,9 @@ impl BlockState<V1_21_2> for DragonEgg {
 impl BlockStateExt<V1_21_2> for DragonEgg {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6733,9 +6733,9 @@ impl BlockState<V1_21_2> for RedstoneLamp {
 impl BlockStateExt<V1_21_2> for RedstoneLamp {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6752,9 +6752,9 @@ impl BlockState<V1_21_2> for Cocoa {
 impl BlockStateExt<V1_21_2> for Cocoa {
     type Attributes = (AgeIntRangeAttribute_0_2, FacingEnumAttribute_North_South_West_East);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6771,9 +6771,9 @@ impl BlockState<V1_21_2> for SandstoneStairs {
 impl BlockStateExt<V1_21_2> for SandstoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6790,9 +6790,9 @@ impl BlockState<V1_21_2> for EmeraldOre {
 impl BlockStateExt<V1_21_2> for EmeraldOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6809,9 +6809,9 @@ impl BlockState<V1_21_2> for DeepslateEmeraldOre {
 impl BlockStateExt<V1_21_2> for DeepslateEmeraldOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6828,9 +6828,9 @@ impl BlockState<V1_21_2> for EnderChest {
 impl BlockStateExt<V1_21_2> for EnderChest {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6847,9 +6847,9 @@ impl BlockState<V1_21_2> for TripwireHook {
 impl BlockStateExt<V1_21_2> for TripwireHook {
     type Attributes = (AttachedBooleanAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6866,9 +6866,9 @@ impl BlockState<V1_21_2> for Tripwire {
 impl BlockStateExt<V1_21_2> for Tripwire {
     type Attributes = (AttachedBooleanAttribute, DisarmedBooleanAttribute, EastBooleanAttribute, NorthBooleanAttribute, PoweredBooleanAttribute, SouthBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(127u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6885,9 +6885,9 @@ impl BlockState<V1_21_2> for EmeraldBlock {
 impl BlockStateExt<V1_21_2> for EmeraldBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6904,9 +6904,9 @@ impl BlockState<V1_21_2> for SpruceStairs {
 impl BlockStateExt<V1_21_2> for SpruceStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6923,9 +6923,9 @@ impl BlockState<V1_21_2> for BirchStairs {
 impl BlockStateExt<V1_21_2> for BirchStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6942,9 +6942,9 @@ impl BlockState<V1_21_2> for JungleStairs {
 impl BlockStateExt<V1_21_2> for JungleStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6961,9 +6961,9 @@ impl BlockState<V1_21_2> for CommandBlock {
 impl BlockStateExt<V1_21_2> for CommandBlock {
     type Attributes = (ConditionalBooleanAttribute, FacingEnumAttribute_North_East_South_West_Up_Down);
     const DEFAULT: Self = Self(6u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -6980,9 +6980,9 @@ impl BlockState<V1_21_2> for Beacon {
 impl BlockStateExt<V1_21_2> for Beacon {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -6999,9 +6999,9 @@ impl BlockState<V1_21_2> for CobblestoneWall {
 impl BlockStateExt<V1_21_2> for CobblestoneWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7018,9 +7018,9 @@ impl BlockState<V1_21_2> for MossyCobblestoneWall {
 impl BlockStateExt<V1_21_2> for MossyCobblestoneWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7037,9 +7037,9 @@ impl BlockState<V1_21_2> for FlowerPot {
 impl BlockStateExt<V1_21_2> for FlowerPot {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7056,9 +7056,9 @@ impl BlockState<V1_21_2> for PottedTorchflower {
 impl BlockStateExt<V1_21_2> for PottedTorchflower {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7075,9 +7075,9 @@ impl BlockState<V1_21_2> for PottedOakSapling {
 impl BlockStateExt<V1_21_2> for PottedOakSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7094,9 +7094,9 @@ impl BlockState<V1_21_2> for PottedSpruceSapling {
 impl BlockStateExt<V1_21_2> for PottedSpruceSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7113,9 +7113,9 @@ impl BlockState<V1_21_2> for PottedBirchSapling {
 impl BlockStateExt<V1_21_2> for PottedBirchSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7132,9 +7132,9 @@ impl BlockState<V1_21_2> for PottedJungleSapling {
 impl BlockStateExt<V1_21_2> for PottedJungleSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7151,9 +7151,9 @@ impl BlockState<V1_21_2> for PottedAcaciaSapling {
 impl BlockStateExt<V1_21_2> for PottedAcaciaSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7170,9 +7170,9 @@ impl BlockState<V1_21_2> for PottedCherrySapling {
 impl BlockStateExt<V1_21_2> for PottedCherrySapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7189,9 +7189,9 @@ impl BlockState<V1_21_2> for PottedDarkOakSapling {
 impl BlockStateExt<V1_21_2> for PottedDarkOakSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7208,9 +7208,9 @@ impl BlockState<V1_21_2> for PottedPaleOakSapling {
 impl BlockStateExt<V1_21_2> for PottedPaleOakSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7227,9 +7227,9 @@ impl BlockState<V1_21_2> for PottedMangrovePropagule {
 impl BlockStateExt<V1_21_2> for PottedMangrovePropagule {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7246,9 +7246,9 @@ impl BlockState<V1_21_2> for PottedFern {
 impl BlockStateExt<V1_21_2> for PottedFern {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7265,9 +7265,9 @@ impl BlockState<V1_21_2> for PottedDandelion {
 impl BlockStateExt<V1_21_2> for PottedDandelion {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7284,9 +7284,9 @@ impl BlockState<V1_21_2> for PottedPoppy {
 impl BlockStateExt<V1_21_2> for PottedPoppy {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7303,9 +7303,9 @@ impl BlockState<V1_21_2> for PottedBlueOrchid {
 impl BlockStateExt<V1_21_2> for PottedBlueOrchid {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7322,9 +7322,9 @@ impl BlockState<V1_21_2> for PottedAllium {
 impl BlockStateExt<V1_21_2> for PottedAllium {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7341,9 +7341,9 @@ impl BlockState<V1_21_2> for PottedAzureBluet {
 impl BlockStateExt<V1_21_2> for PottedAzureBluet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7360,9 +7360,9 @@ impl BlockState<V1_21_2> for PottedRedTulip {
 impl BlockStateExt<V1_21_2> for PottedRedTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7379,9 +7379,9 @@ impl BlockState<V1_21_2> for PottedOrangeTulip {
 impl BlockStateExt<V1_21_2> for PottedOrangeTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7398,9 +7398,9 @@ impl BlockState<V1_21_2> for PottedWhiteTulip {
 impl BlockStateExt<V1_21_2> for PottedWhiteTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7417,9 +7417,9 @@ impl BlockState<V1_21_2> for PottedPinkTulip {
 impl BlockStateExt<V1_21_2> for PottedPinkTulip {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7436,9 +7436,9 @@ impl BlockState<V1_21_2> for PottedOxeyeDaisy {
 impl BlockStateExt<V1_21_2> for PottedOxeyeDaisy {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7455,9 +7455,9 @@ impl BlockState<V1_21_2> for PottedCornflower {
 impl BlockStateExt<V1_21_2> for PottedCornflower {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7474,9 +7474,9 @@ impl BlockState<V1_21_2> for PottedLilyOfTheValley {
 impl BlockStateExt<V1_21_2> for PottedLilyOfTheValley {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7493,9 +7493,9 @@ impl BlockState<V1_21_2> for PottedWitherRose {
 impl BlockStateExt<V1_21_2> for PottedWitherRose {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7512,9 +7512,9 @@ impl BlockState<V1_21_2> for PottedRedMushroom {
 impl BlockStateExt<V1_21_2> for PottedRedMushroom {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7531,9 +7531,9 @@ impl BlockState<V1_21_2> for PottedBrownMushroom {
 impl BlockStateExt<V1_21_2> for PottedBrownMushroom {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7550,9 +7550,9 @@ impl BlockState<V1_21_2> for PottedDeadBush {
 impl BlockStateExt<V1_21_2> for PottedDeadBush {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7569,9 +7569,9 @@ impl BlockState<V1_21_2> for PottedCactus {
 impl BlockStateExt<V1_21_2> for PottedCactus {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -7588,9 +7588,9 @@ impl BlockState<V1_21_2> for Carrots {
 impl BlockStateExt<V1_21_2> for Carrots {
     type Attributes = AgeIntRangeAttribute_0_7;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7607,9 +7607,9 @@ impl BlockState<V1_21_2> for Potatoes {
 impl BlockStateExt<V1_21_2> for Potatoes {
     type Attributes = AgeIntRangeAttribute_0_7;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7626,9 +7626,9 @@ impl BlockState<V1_21_2> for OakButton {
 impl BlockStateExt<V1_21_2> for OakButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7645,9 +7645,9 @@ impl BlockState<V1_21_2> for SpruceButton {
 impl BlockStateExt<V1_21_2> for SpruceButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7664,9 +7664,9 @@ impl BlockState<V1_21_2> for BirchButton {
 impl BlockStateExt<V1_21_2> for BirchButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7683,9 +7683,9 @@ impl BlockState<V1_21_2> for JungleButton {
 impl BlockStateExt<V1_21_2> for JungleButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7702,9 +7702,9 @@ impl BlockState<V1_21_2> for AcaciaButton {
 impl BlockStateExt<V1_21_2> for AcaciaButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7721,9 +7721,9 @@ impl BlockState<V1_21_2> for CherryButton {
 impl BlockStateExt<V1_21_2> for CherryButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7740,9 +7740,9 @@ impl BlockState<V1_21_2> for DarkOakButton {
 impl BlockStateExt<V1_21_2> for DarkOakButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7759,9 +7759,9 @@ impl BlockState<V1_21_2> for PaleOakButton {
 impl BlockStateExt<V1_21_2> for PaleOakButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7778,9 +7778,9 @@ impl BlockState<V1_21_2> for MangroveButton {
 impl BlockStateExt<V1_21_2> for MangroveButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7797,9 +7797,9 @@ impl BlockState<V1_21_2> for BambooButton {
 impl BlockStateExt<V1_21_2> for BambooButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7816,9 +7816,9 @@ impl BlockState<V1_21_2> for SkeletonSkull {
 impl BlockStateExt<V1_21_2> for SkeletonSkull {
     type Attributes = (PoweredBooleanAttribute, RotationIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7835,9 +7835,9 @@ impl BlockState<V1_21_2> for SkeletonWallSkull {
 impl BlockStateExt<V1_21_2> for SkeletonWallSkull {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7854,9 +7854,9 @@ impl BlockState<V1_21_2> for WitherSkeletonSkull {
 impl BlockStateExt<V1_21_2> for WitherSkeletonSkull {
     type Attributes = (PoweredBooleanAttribute, RotationIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7873,9 +7873,9 @@ impl BlockState<V1_21_2> for WitherSkeletonWallSkull {
 impl BlockStateExt<V1_21_2> for WitherSkeletonWallSkull {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7892,9 +7892,9 @@ impl BlockState<V1_21_2> for ZombieHead {
 impl BlockStateExt<V1_21_2> for ZombieHead {
     type Attributes = (PoweredBooleanAttribute, RotationIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7911,9 +7911,9 @@ impl BlockState<V1_21_2> for ZombieWallHead {
 impl BlockStateExt<V1_21_2> for ZombieWallHead {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7930,9 +7930,9 @@ impl BlockState<V1_21_2> for PlayerHead {
 impl BlockStateExt<V1_21_2> for PlayerHead {
     type Attributes = (PoweredBooleanAttribute, RotationIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7949,9 +7949,9 @@ impl BlockState<V1_21_2> for PlayerWallHead {
 impl BlockStateExt<V1_21_2> for PlayerWallHead {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7968,9 +7968,9 @@ impl BlockState<V1_21_2> for CreeperHead {
 impl BlockStateExt<V1_21_2> for CreeperHead {
     type Attributes = (PoweredBooleanAttribute, RotationIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -7987,9 +7987,9 @@ impl BlockState<V1_21_2> for CreeperWallHead {
 impl BlockStateExt<V1_21_2> for CreeperWallHead {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8006,9 +8006,9 @@ impl BlockState<V1_21_2> for DragonHead {
 impl BlockStateExt<V1_21_2> for DragonHead {
     type Attributes = (PoweredBooleanAttribute, RotationIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8025,9 +8025,9 @@ impl BlockState<V1_21_2> for DragonWallHead {
 impl BlockStateExt<V1_21_2> for DragonWallHead {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8044,9 +8044,9 @@ impl BlockState<V1_21_2> for PiglinHead {
 impl BlockStateExt<V1_21_2> for PiglinHead {
     type Attributes = (PoweredBooleanAttribute, RotationIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8063,9 +8063,9 @@ impl BlockState<V1_21_2> for PiglinWallHead {
 impl BlockStateExt<V1_21_2> for PiglinWallHead {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8082,9 +8082,9 @@ impl BlockState<V1_21_2> for Anvil {
 impl BlockStateExt<V1_21_2> for Anvil {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8101,9 +8101,9 @@ impl BlockState<V1_21_2> for ChippedAnvil {
 impl BlockStateExt<V1_21_2> for ChippedAnvil {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8120,9 +8120,9 @@ impl BlockState<V1_21_2> for DamagedAnvil {
 impl BlockStateExt<V1_21_2> for DamagedAnvil {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8139,9 +8139,9 @@ impl BlockState<V1_21_2> for TrappedChest {
 impl BlockStateExt<V1_21_2> for TrappedChest {
     type Attributes = (FacingEnumAttribute_North_South_West_East, TypeEnumAttribute_Single_Left_Right, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8158,9 +8158,9 @@ impl BlockState<V1_21_2> for LightWeightedPressurePlate {
 impl BlockStateExt<V1_21_2> for LightWeightedPressurePlate {
     type Attributes = PowerIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8177,9 +8177,9 @@ impl BlockState<V1_21_2> for HeavyWeightedPressurePlate {
 impl BlockStateExt<V1_21_2> for HeavyWeightedPressurePlate {
     type Attributes = PowerIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8196,9 +8196,9 @@ impl BlockState<V1_21_2> for Comparator {
 impl BlockStateExt<V1_21_2> for Comparator {
     type Attributes = (FacingEnumAttribute_North_South_West_East, ModeEnumAttribute_Compare_Subtract, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8215,9 +8215,9 @@ impl BlockState<V1_21_2> for DaylightDetector {
 impl BlockStateExt<V1_21_2> for DaylightDetector {
     type Attributes = (InvertedBooleanAttribute, PowerIntRangeAttribute);
     const DEFAULT: Self = Self(16u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8234,9 +8234,9 @@ impl BlockState<V1_21_2> for RedstoneBlock {
 impl BlockStateExt<V1_21_2> for RedstoneBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8253,9 +8253,9 @@ impl BlockState<V1_21_2> for NetherQuartzOre {
 impl BlockStateExt<V1_21_2> for NetherQuartzOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8272,9 +8272,9 @@ impl BlockState<V1_21_2> for Hopper {
 impl BlockStateExt<V1_21_2> for Hopper {
     type Attributes = (EnabledBooleanAttribute, FacingEnumAttribute_Down_North_South_West_East);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8291,9 +8291,9 @@ impl BlockState<V1_21_2> for QuartzBlock {
 impl BlockStateExt<V1_21_2> for QuartzBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8310,9 +8310,9 @@ impl BlockState<V1_21_2> for ChiseledQuartzBlock {
 impl BlockStateExt<V1_21_2> for ChiseledQuartzBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8329,9 +8329,9 @@ impl BlockState<V1_21_2> for QuartzPillar {
 impl BlockStateExt<V1_21_2> for QuartzPillar {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8348,9 +8348,9 @@ impl BlockState<V1_21_2> for QuartzStairs {
 impl BlockStateExt<V1_21_2> for QuartzStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8367,9 +8367,9 @@ impl BlockState<V1_21_2> for ActivatorRail {
 impl BlockStateExt<V1_21_2> for ActivatorRail {
     type Attributes = (PoweredBooleanAttribute, ShapeEnumAttribute_NorthSouth_EastWest_AscendingEast_AscendingWest_AscendingNorth_AscendingSouth, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(13u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8386,9 +8386,9 @@ impl BlockState<V1_21_2> for Dropper {
 impl BlockStateExt<V1_21_2> for Dropper {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, TriggeredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8405,9 +8405,9 @@ impl BlockState<V1_21_2> for WhiteTerracotta {
 impl BlockStateExt<V1_21_2> for WhiteTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8424,9 +8424,9 @@ impl BlockState<V1_21_2> for OrangeTerracotta {
 impl BlockStateExt<V1_21_2> for OrangeTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8443,9 +8443,9 @@ impl BlockState<V1_21_2> for MagentaTerracotta {
 impl BlockStateExt<V1_21_2> for MagentaTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8462,9 +8462,9 @@ impl BlockState<V1_21_2> for LightBlueTerracotta {
 impl BlockStateExt<V1_21_2> for LightBlueTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8481,9 +8481,9 @@ impl BlockState<V1_21_2> for YellowTerracotta {
 impl BlockStateExt<V1_21_2> for YellowTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8500,9 +8500,9 @@ impl BlockState<V1_21_2> for LimeTerracotta {
 impl BlockStateExt<V1_21_2> for LimeTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8519,9 +8519,9 @@ impl BlockState<V1_21_2> for PinkTerracotta {
 impl BlockStateExt<V1_21_2> for PinkTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8538,9 +8538,9 @@ impl BlockState<V1_21_2> for GrayTerracotta {
 impl BlockStateExt<V1_21_2> for GrayTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8557,9 +8557,9 @@ impl BlockState<V1_21_2> for LightGrayTerracotta {
 impl BlockStateExt<V1_21_2> for LightGrayTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8576,9 +8576,9 @@ impl BlockState<V1_21_2> for CyanTerracotta {
 impl BlockStateExt<V1_21_2> for CyanTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8595,9 +8595,9 @@ impl BlockState<V1_21_2> for PurpleTerracotta {
 impl BlockStateExt<V1_21_2> for PurpleTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8614,9 +8614,9 @@ impl BlockState<V1_21_2> for BlueTerracotta {
 impl BlockStateExt<V1_21_2> for BlueTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8633,9 +8633,9 @@ impl BlockState<V1_21_2> for BrownTerracotta {
 impl BlockStateExt<V1_21_2> for BrownTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8652,9 +8652,9 @@ impl BlockState<V1_21_2> for GreenTerracotta {
 impl BlockStateExt<V1_21_2> for GreenTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8671,9 +8671,9 @@ impl BlockState<V1_21_2> for RedTerracotta {
 impl BlockStateExt<V1_21_2> for RedTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8690,9 +8690,9 @@ impl BlockState<V1_21_2> for BlackTerracotta {
 impl BlockStateExt<V1_21_2> for BlackTerracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -8709,9 +8709,9 @@ impl BlockState<V1_21_2> for WhiteStainedGlassPane {
 impl BlockStateExt<V1_21_2> for WhiteStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8728,9 +8728,9 @@ impl BlockState<V1_21_2> for OrangeStainedGlassPane {
 impl BlockStateExt<V1_21_2> for OrangeStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8747,9 +8747,9 @@ impl BlockState<V1_21_2> for MagentaStainedGlassPane {
 impl BlockStateExt<V1_21_2> for MagentaStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8766,9 +8766,9 @@ impl BlockState<V1_21_2> for LightBlueStainedGlassPane {
 impl BlockStateExt<V1_21_2> for LightBlueStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8785,9 +8785,9 @@ impl BlockState<V1_21_2> for YellowStainedGlassPane {
 impl BlockStateExt<V1_21_2> for YellowStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8804,9 +8804,9 @@ impl BlockState<V1_21_2> for LimeStainedGlassPane {
 impl BlockStateExt<V1_21_2> for LimeStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8823,9 +8823,9 @@ impl BlockState<V1_21_2> for PinkStainedGlassPane {
 impl BlockStateExt<V1_21_2> for PinkStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8842,9 +8842,9 @@ impl BlockState<V1_21_2> for GrayStainedGlassPane {
 impl BlockStateExt<V1_21_2> for GrayStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8861,9 +8861,9 @@ impl BlockState<V1_21_2> for LightGrayStainedGlassPane {
 impl BlockStateExt<V1_21_2> for LightGrayStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8880,9 +8880,9 @@ impl BlockState<V1_21_2> for CyanStainedGlassPane {
 impl BlockStateExt<V1_21_2> for CyanStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8899,9 +8899,9 @@ impl BlockState<V1_21_2> for PurpleStainedGlassPane {
 impl BlockStateExt<V1_21_2> for PurpleStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8918,9 +8918,9 @@ impl BlockState<V1_21_2> for BlueStainedGlassPane {
 impl BlockStateExt<V1_21_2> for BlueStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8937,9 +8937,9 @@ impl BlockState<V1_21_2> for BrownStainedGlassPane {
 impl BlockStateExt<V1_21_2> for BrownStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8956,9 +8956,9 @@ impl BlockState<V1_21_2> for GreenStainedGlassPane {
 impl BlockStateExt<V1_21_2> for GreenStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8975,9 +8975,9 @@ impl BlockState<V1_21_2> for RedStainedGlassPane {
 impl BlockStateExt<V1_21_2> for RedStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -8994,9 +8994,9 @@ impl BlockState<V1_21_2> for BlackStainedGlassPane {
 impl BlockStateExt<V1_21_2> for BlackStainedGlassPane {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9013,9 +9013,9 @@ impl BlockState<V1_21_2> for AcaciaStairs {
 impl BlockStateExt<V1_21_2> for AcaciaStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9032,9 +9032,9 @@ impl BlockState<V1_21_2> for CherryStairs {
 impl BlockStateExt<V1_21_2> for CherryStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9051,9 +9051,9 @@ impl BlockState<V1_21_2> for DarkOakStairs {
 impl BlockStateExt<V1_21_2> for DarkOakStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9070,9 +9070,9 @@ impl BlockState<V1_21_2> for PaleOakStairs {
 impl BlockStateExt<V1_21_2> for PaleOakStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9089,9 +9089,9 @@ impl BlockState<V1_21_2> for MangroveStairs {
 impl BlockStateExt<V1_21_2> for MangroveStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9108,9 +9108,9 @@ impl BlockState<V1_21_2> for BambooStairs {
 impl BlockStateExt<V1_21_2> for BambooStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9127,9 +9127,9 @@ impl BlockState<V1_21_2> for BambooMosaicStairs {
 impl BlockStateExt<V1_21_2> for BambooMosaicStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9146,9 +9146,9 @@ impl BlockState<V1_21_2> for SlimeBlock {
 impl BlockStateExt<V1_21_2> for SlimeBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9165,9 +9165,9 @@ impl BlockState<V1_21_2> for Barrier {
 impl BlockStateExt<V1_21_2> for Barrier {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9184,9 +9184,9 @@ impl BlockState<V1_21_2> for Light {
 impl BlockStateExt<V1_21_2> for Light {
     type Attributes = (LevelIntRangeAttribute_0_15, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9203,9 +9203,9 @@ impl BlockState<V1_21_2> for IronTrapdoor {
 impl BlockStateExt<V1_21_2> for IronTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9222,9 +9222,9 @@ impl BlockState<V1_21_2> for Prismarine {
 impl BlockStateExt<V1_21_2> for Prismarine {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9241,9 +9241,9 @@ impl BlockState<V1_21_2> for PrismarineBricks {
 impl BlockStateExt<V1_21_2> for PrismarineBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9260,9 +9260,9 @@ impl BlockState<V1_21_2> for DarkPrismarine {
 impl BlockStateExt<V1_21_2> for DarkPrismarine {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9279,9 +9279,9 @@ impl BlockState<V1_21_2> for PrismarineStairs {
 impl BlockStateExt<V1_21_2> for PrismarineStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9298,9 +9298,9 @@ impl BlockState<V1_21_2> for PrismarineBrickStairs {
 impl BlockStateExt<V1_21_2> for PrismarineBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9317,9 +9317,9 @@ impl BlockState<V1_21_2> for DarkPrismarineStairs {
 impl BlockStateExt<V1_21_2> for DarkPrismarineStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9336,9 +9336,9 @@ impl BlockState<V1_21_2> for PrismarineSlab {
 impl BlockStateExt<V1_21_2> for PrismarineSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9355,9 +9355,9 @@ impl BlockState<V1_21_2> for PrismarineBrickSlab {
 impl BlockStateExt<V1_21_2> for PrismarineBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9374,9 +9374,9 @@ impl BlockState<V1_21_2> for DarkPrismarineSlab {
 impl BlockStateExt<V1_21_2> for DarkPrismarineSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9393,9 +9393,9 @@ impl BlockState<V1_21_2> for SeaLantern {
 impl BlockStateExt<V1_21_2> for SeaLantern {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9412,9 +9412,9 @@ impl BlockState<V1_21_2> for HayBlock {
 impl BlockStateExt<V1_21_2> for HayBlock {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9431,9 +9431,9 @@ impl BlockState<V1_21_2> for WhiteCarpet {
 impl BlockStateExt<V1_21_2> for WhiteCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9450,9 +9450,9 @@ impl BlockState<V1_21_2> for OrangeCarpet {
 impl BlockStateExt<V1_21_2> for OrangeCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9469,9 +9469,9 @@ impl BlockState<V1_21_2> for MagentaCarpet {
 impl BlockStateExt<V1_21_2> for MagentaCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9488,9 +9488,9 @@ impl BlockState<V1_21_2> for LightBlueCarpet {
 impl BlockStateExt<V1_21_2> for LightBlueCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9507,9 +9507,9 @@ impl BlockState<V1_21_2> for YellowCarpet {
 impl BlockStateExt<V1_21_2> for YellowCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9526,9 +9526,9 @@ impl BlockState<V1_21_2> for LimeCarpet {
 impl BlockStateExt<V1_21_2> for LimeCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9545,9 +9545,9 @@ impl BlockState<V1_21_2> for PinkCarpet {
 impl BlockStateExt<V1_21_2> for PinkCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9564,9 +9564,9 @@ impl BlockState<V1_21_2> for GrayCarpet {
 impl BlockStateExt<V1_21_2> for GrayCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9583,9 +9583,9 @@ impl BlockState<V1_21_2> for LightGrayCarpet {
 impl BlockStateExt<V1_21_2> for LightGrayCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9602,9 +9602,9 @@ impl BlockState<V1_21_2> for CyanCarpet {
 impl BlockStateExt<V1_21_2> for CyanCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9621,9 +9621,9 @@ impl BlockState<V1_21_2> for PurpleCarpet {
 impl BlockStateExt<V1_21_2> for PurpleCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9640,9 +9640,9 @@ impl BlockState<V1_21_2> for BlueCarpet {
 impl BlockStateExt<V1_21_2> for BlueCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9659,9 +9659,9 @@ impl BlockState<V1_21_2> for BrownCarpet {
 impl BlockStateExt<V1_21_2> for BrownCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9678,9 +9678,9 @@ impl BlockState<V1_21_2> for GreenCarpet {
 impl BlockStateExt<V1_21_2> for GreenCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9697,9 +9697,9 @@ impl BlockState<V1_21_2> for RedCarpet {
 impl BlockStateExt<V1_21_2> for RedCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9716,9 +9716,9 @@ impl BlockState<V1_21_2> for BlackCarpet {
 impl BlockStateExt<V1_21_2> for BlackCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9735,9 +9735,9 @@ impl BlockState<V1_21_2> for Terracotta {
 impl BlockStateExt<V1_21_2> for Terracotta {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9754,9 +9754,9 @@ impl BlockState<V1_21_2> for CoalBlock {
 impl BlockStateExt<V1_21_2> for CoalBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9773,9 +9773,9 @@ impl BlockState<V1_21_2> for PackedIce {
 impl BlockStateExt<V1_21_2> for PackedIce {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -9792,9 +9792,9 @@ impl BlockState<V1_21_2> for Sunflower {
 impl BlockStateExt<V1_21_2> for Sunflower {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9811,9 +9811,9 @@ impl BlockState<V1_21_2> for Lilac {
 impl BlockStateExt<V1_21_2> for Lilac {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9830,9 +9830,9 @@ impl BlockState<V1_21_2> for RoseBush {
 impl BlockStateExt<V1_21_2> for RoseBush {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9849,9 +9849,9 @@ impl BlockState<V1_21_2> for Peony {
 impl BlockStateExt<V1_21_2> for Peony {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9868,9 +9868,9 @@ impl BlockState<V1_21_2> for TallGrass {
 impl BlockStateExt<V1_21_2> for TallGrass {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9887,9 +9887,9 @@ impl BlockState<V1_21_2> for LargeFern {
 impl BlockStateExt<V1_21_2> for LargeFern {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9906,9 +9906,9 @@ impl BlockState<V1_21_2> for WhiteBanner {
 impl BlockStateExt<V1_21_2> for WhiteBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9925,9 +9925,9 @@ impl BlockState<V1_21_2> for OrangeBanner {
 impl BlockStateExt<V1_21_2> for OrangeBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9944,9 +9944,9 @@ impl BlockState<V1_21_2> for MagentaBanner {
 impl BlockStateExt<V1_21_2> for MagentaBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9963,9 +9963,9 @@ impl BlockState<V1_21_2> for LightBlueBanner {
 impl BlockStateExt<V1_21_2> for LightBlueBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -9982,9 +9982,9 @@ impl BlockState<V1_21_2> for YellowBanner {
 impl BlockStateExt<V1_21_2> for YellowBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10001,9 +10001,9 @@ impl BlockState<V1_21_2> for LimeBanner {
 impl BlockStateExt<V1_21_2> for LimeBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10020,9 +10020,9 @@ impl BlockState<V1_21_2> for PinkBanner {
 impl BlockStateExt<V1_21_2> for PinkBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10039,9 +10039,9 @@ impl BlockState<V1_21_2> for GrayBanner {
 impl BlockStateExt<V1_21_2> for GrayBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10058,9 +10058,9 @@ impl BlockState<V1_21_2> for LightGrayBanner {
 impl BlockStateExt<V1_21_2> for LightGrayBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10077,9 +10077,9 @@ impl BlockState<V1_21_2> for CyanBanner {
 impl BlockStateExt<V1_21_2> for CyanBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10096,9 +10096,9 @@ impl BlockState<V1_21_2> for PurpleBanner {
 impl BlockStateExt<V1_21_2> for PurpleBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10115,9 +10115,9 @@ impl BlockState<V1_21_2> for BlueBanner {
 impl BlockStateExt<V1_21_2> for BlueBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10134,9 +10134,9 @@ impl BlockState<V1_21_2> for BrownBanner {
 impl BlockStateExt<V1_21_2> for BrownBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10153,9 +10153,9 @@ impl BlockState<V1_21_2> for GreenBanner {
 impl BlockStateExt<V1_21_2> for GreenBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10172,9 +10172,9 @@ impl BlockState<V1_21_2> for RedBanner {
 impl BlockStateExt<V1_21_2> for RedBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10191,9 +10191,9 @@ impl BlockState<V1_21_2> for BlackBanner {
 impl BlockStateExt<V1_21_2> for BlackBanner {
     type Attributes = RotationIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10210,9 +10210,9 @@ impl BlockState<V1_21_2> for WhiteWallBanner {
 impl BlockStateExt<V1_21_2> for WhiteWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10229,9 +10229,9 @@ impl BlockState<V1_21_2> for OrangeWallBanner {
 impl BlockStateExt<V1_21_2> for OrangeWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10248,9 +10248,9 @@ impl BlockState<V1_21_2> for MagentaWallBanner {
 impl BlockStateExt<V1_21_2> for MagentaWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10267,9 +10267,9 @@ impl BlockState<V1_21_2> for LightBlueWallBanner {
 impl BlockStateExt<V1_21_2> for LightBlueWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10286,9 +10286,9 @@ impl BlockState<V1_21_2> for YellowWallBanner {
 impl BlockStateExt<V1_21_2> for YellowWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10305,9 +10305,9 @@ impl BlockState<V1_21_2> for LimeWallBanner {
 impl BlockStateExt<V1_21_2> for LimeWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10324,9 +10324,9 @@ impl BlockState<V1_21_2> for PinkWallBanner {
 impl BlockStateExt<V1_21_2> for PinkWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10343,9 +10343,9 @@ impl BlockState<V1_21_2> for GrayWallBanner {
 impl BlockStateExt<V1_21_2> for GrayWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10362,9 +10362,9 @@ impl BlockState<V1_21_2> for LightGrayWallBanner {
 impl BlockStateExt<V1_21_2> for LightGrayWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10381,9 +10381,9 @@ impl BlockState<V1_21_2> for CyanWallBanner {
 impl BlockStateExt<V1_21_2> for CyanWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10400,9 +10400,9 @@ impl BlockState<V1_21_2> for PurpleWallBanner {
 impl BlockStateExt<V1_21_2> for PurpleWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10419,9 +10419,9 @@ impl BlockState<V1_21_2> for BlueWallBanner {
 impl BlockStateExt<V1_21_2> for BlueWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10438,9 +10438,9 @@ impl BlockState<V1_21_2> for BrownWallBanner {
 impl BlockStateExt<V1_21_2> for BrownWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10457,9 +10457,9 @@ impl BlockState<V1_21_2> for GreenWallBanner {
 impl BlockStateExt<V1_21_2> for GreenWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10476,9 +10476,9 @@ impl BlockState<V1_21_2> for RedWallBanner {
 impl BlockStateExt<V1_21_2> for RedWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10495,9 +10495,9 @@ impl BlockState<V1_21_2> for BlackWallBanner {
 impl BlockStateExt<V1_21_2> for BlackWallBanner {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10514,9 +10514,9 @@ impl BlockState<V1_21_2> for RedSandstone {
 impl BlockStateExt<V1_21_2> for RedSandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -10533,9 +10533,9 @@ impl BlockState<V1_21_2> for ChiseledRedSandstone {
 impl BlockStateExt<V1_21_2> for ChiseledRedSandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -10552,9 +10552,9 @@ impl BlockState<V1_21_2> for CutRedSandstone {
 impl BlockStateExt<V1_21_2> for CutRedSandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -10571,9 +10571,9 @@ impl BlockState<V1_21_2> for RedSandstoneStairs {
 impl BlockStateExt<V1_21_2> for RedSandstoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10590,9 +10590,9 @@ impl BlockState<V1_21_2> for OakSlab {
 impl BlockStateExt<V1_21_2> for OakSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10609,9 +10609,9 @@ impl BlockState<V1_21_2> for SpruceSlab {
 impl BlockStateExt<V1_21_2> for SpruceSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10628,9 +10628,9 @@ impl BlockState<V1_21_2> for BirchSlab {
 impl BlockStateExt<V1_21_2> for BirchSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10647,9 +10647,9 @@ impl BlockState<V1_21_2> for JungleSlab {
 impl BlockStateExt<V1_21_2> for JungleSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10666,9 +10666,9 @@ impl BlockState<V1_21_2> for AcaciaSlab {
 impl BlockStateExt<V1_21_2> for AcaciaSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10685,9 +10685,9 @@ impl BlockState<V1_21_2> for CherrySlab {
 impl BlockStateExt<V1_21_2> for CherrySlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10704,9 +10704,9 @@ impl BlockState<V1_21_2> for DarkOakSlab {
 impl BlockStateExt<V1_21_2> for DarkOakSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10723,9 +10723,9 @@ impl BlockState<V1_21_2> for PaleOakSlab {
 impl BlockStateExt<V1_21_2> for PaleOakSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10742,9 +10742,9 @@ impl BlockState<V1_21_2> for MangroveSlab {
 impl BlockStateExt<V1_21_2> for MangroveSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10761,9 +10761,9 @@ impl BlockState<V1_21_2> for BambooSlab {
 impl BlockStateExt<V1_21_2> for BambooSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10780,9 +10780,9 @@ impl BlockState<V1_21_2> for BambooMosaicSlab {
 impl BlockStateExt<V1_21_2> for BambooMosaicSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10799,9 +10799,9 @@ impl BlockState<V1_21_2> for StoneSlab {
 impl BlockStateExt<V1_21_2> for StoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10818,9 +10818,9 @@ impl BlockState<V1_21_2> for SmoothStoneSlab {
 impl BlockStateExt<V1_21_2> for SmoothStoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10837,9 +10837,9 @@ impl BlockState<V1_21_2> for SandstoneSlab {
 impl BlockStateExt<V1_21_2> for SandstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10856,9 +10856,9 @@ impl BlockState<V1_21_2> for CutSandstoneSlab {
 impl BlockStateExt<V1_21_2> for CutSandstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10875,9 +10875,9 @@ impl BlockState<V1_21_2> for PetrifiedOakSlab {
 impl BlockStateExt<V1_21_2> for PetrifiedOakSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10894,9 +10894,9 @@ impl BlockState<V1_21_2> for CobblestoneSlab {
 impl BlockStateExt<V1_21_2> for CobblestoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10913,9 +10913,9 @@ impl BlockState<V1_21_2> for BrickSlab {
 impl BlockStateExt<V1_21_2> for BrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10932,9 +10932,9 @@ impl BlockState<V1_21_2> for StoneBrickSlab {
 impl BlockStateExt<V1_21_2> for StoneBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10951,9 +10951,9 @@ impl BlockState<V1_21_2> for MudBrickSlab {
 impl BlockStateExt<V1_21_2> for MudBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10970,9 +10970,9 @@ impl BlockState<V1_21_2> for NetherBrickSlab {
 impl BlockStateExt<V1_21_2> for NetherBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -10989,9 +10989,9 @@ impl BlockState<V1_21_2> for QuartzSlab {
 impl BlockStateExt<V1_21_2> for QuartzSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11008,9 +11008,9 @@ impl BlockState<V1_21_2> for RedSandstoneSlab {
 impl BlockStateExt<V1_21_2> for RedSandstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11027,9 +11027,9 @@ impl BlockState<V1_21_2> for CutRedSandstoneSlab {
 impl BlockStateExt<V1_21_2> for CutRedSandstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11046,9 +11046,9 @@ impl BlockState<V1_21_2> for PurpurSlab {
 impl BlockStateExt<V1_21_2> for PurpurSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11065,9 +11065,9 @@ impl BlockState<V1_21_2> for SmoothStone {
 impl BlockStateExt<V1_21_2> for SmoothStone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11084,9 +11084,9 @@ impl BlockState<V1_21_2> for SmoothSandstone {
 impl BlockStateExt<V1_21_2> for SmoothSandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11103,9 +11103,9 @@ impl BlockState<V1_21_2> for SmoothQuartz {
 impl BlockStateExt<V1_21_2> for SmoothQuartz {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11122,9 +11122,9 @@ impl BlockState<V1_21_2> for SmoothRedSandstone {
 impl BlockStateExt<V1_21_2> for SmoothRedSandstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11141,9 +11141,9 @@ impl BlockState<V1_21_2> for SpruceFenceGate {
 impl BlockStateExt<V1_21_2> for SpruceFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11160,9 +11160,9 @@ impl BlockState<V1_21_2> for BirchFenceGate {
 impl BlockStateExt<V1_21_2> for BirchFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11179,9 +11179,9 @@ impl BlockState<V1_21_2> for JungleFenceGate {
 impl BlockStateExt<V1_21_2> for JungleFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11198,9 +11198,9 @@ impl BlockState<V1_21_2> for AcaciaFenceGate {
 impl BlockStateExt<V1_21_2> for AcaciaFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11217,9 +11217,9 @@ impl BlockState<V1_21_2> for CherryFenceGate {
 impl BlockStateExt<V1_21_2> for CherryFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11236,9 +11236,9 @@ impl BlockState<V1_21_2> for DarkOakFenceGate {
 impl BlockStateExt<V1_21_2> for DarkOakFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11255,9 +11255,9 @@ impl BlockState<V1_21_2> for PaleOakFenceGate {
 impl BlockStateExt<V1_21_2> for PaleOakFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11274,9 +11274,9 @@ impl BlockState<V1_21_2> for MangroveFenceGate {
 impl BlockStateExt<V1_21_2> for MangroveFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11293,9 +11293,9 @@ impl BlockState<V1_21_2> for BambooFenceGate {
 impl BlockStateExt<V1_21_2> for BambooFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11312,9 +11312,9 @@ impl BlockState<V1_21_2> for SpruceFence {
 impl BlockStateExt<V1_21_2> for SpruceFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11331,9 +11331,9 @@ impl BlockState<V1_21_2> for BirchFence {
 impl BlockStateExt<V1_21_2> for BirchFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11350,9 +11350,9 @@ impl BlockState<V1_21_2> for JungleFence {
 impl BlockStateExt<V1_21_2> for JungleFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11369,9 +11369,9 @@ impl BlockState<V1_21_2> for AcaciaFence {
 impl BlockStateExt<V1_21_2> for AcaciaFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11388,9 +11388,9 @@ impl BlockState<V1_21_2> for CherryFence {
 impl BlockStateExt<V1_21_2> for CherryFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11407,9 +11407,9 @@ impl BlockState<V1_21_2> for DarkOakFence {
 impl BlockStateExt<V1_21_2> for DarkOakFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11426,9 +11426,9 @@ impl BlockState<V1_21_2> for PaleOakFence {
 impl BlockStateExt<V1_21_2> for PaleOakFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11445,9 +11445,9 @@ impl BlockState<V1_21_2> for MangroveFence {
 impl BlockStateExt<V1_21_2> for MangroveFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11464,9 +11464,9 @@ impl BlockState<V1_21_2> for BambooFence {
 impl BlockStateExt<V1_21_2> for BambooFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11483,9 +11483,9 @@ impl BlockState<V1_21_2> for SpruceDoor {
 impl BlockStateExt<V1_21_2> for SpruceDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11502,9 +11502,9 @@ impl BlockState<V1_21_2> for BirchDoor {
 impl BlockStateExt<V1_21_2> for BirchDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11521,9 +11521,9 @@ impl BlockState<V1_21_2> for JungleDoor {
 impl BlockStateExt<V1_21_2> for JungleDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11540,9 +11540,9 @@ impl BlockState<V1_21_2> for AcaciaDoor {
 impl BlockStateExt<V1_21_2> for AcaciaDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11559,9 +11559,9 @@ impl BlockState<V1_21_2> for CherryDoor {
 impl BlockStateExt<V1_21_2> for CherryDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11578,9 +11578,9 @@ impl BlockState<V1_21_2> for DarkOakDoor {
 impl BlockStateExt<V1_21_2> for DarkOakDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11597,9 +11597,9 @@ impl BlockState<V1_21_2> for PaleOakDoor {
 impl BlockStateExt<V1_21_2> for PaleOakDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11616,9 +11616,9 @@ impl BlockState<V1_21_2> for MangroveDoor {
 impl BlockStateExt<V1_21_2> for MangroveDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11635,9 +11635,9 @@ impl BlockState<V1_21_2> for BambooDoor {
 impl BlockStateExt<V1_21_2> for BambooDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11654,9 +11654,9 @@ impl BlockState<V1_21_2> for EndRod {
 impl BlockStateExt<V1_21_2> for EndRod {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11673,9 +11673,9 @@ impl BlockState<V1_21_2> for ChorusPlant {
 impl BlockStateExt<V1_21_2> for ChorusPlant {
     type Attributes = (DownBooleanAttribute, EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(63u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11692,9 +11692,9 @@ impl BlockState<V1_21_2> for ChorusFlower {
 impl BlockStateExt<V1_21_2> for ChorusFlower {
     type Attributes = AgeIntRangeAttribute_0_5;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11711,9 +11711,9 @@ impl BlockState<V1_21_2> for PurpurBlock {
 impl BlockStateExt<V1_21_2> for PurpurBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11730,9 +11730,9 @@ impl BlockState<V1_21_2> for PurpurPillar {
 impl BlockStateExt<V1_21_2> for PurpurPillar {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11749,9 +11749,9 @@ impl BlockState<V1_21_2> for PurpurStairs {
 impl BlockStateExt<V1_21_2> for PurpurStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11768,9 +11768,9 @@ impl BlockState<V1_21_2> for EndStoneBricks {
 impl BlockStateExt<V1_21_2> for EndStoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11787,9 +11787,9 @@ impl BlockState<V1_21_2> for TorchflowerCrop {
 impl BlockStateExt<V1_21_2> for TorchflowerCrop {
     type Attributes = AgeIntRangeAttribute_0_1;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11806,9 +11806,9 @@ impl BlockState<V1_21_2> for PitcherCrop {
 impl BlockStateExt<V1_21_2> for PitcherCrop {
     type Attributes = (AgeIntRangeAttribute_0_4, HalfEnumAttribute_Upper_Lower);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11825,9 +11825,9 @@ impl BlockState<V1_21_2> for PitcherPlant {
 impl BlockStateExt<V1_21_2> for PitcherPlant {
     type Attributes = HalfEnumAttribute_Upper_Lower;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11844,9 +11844,9 @@ impl BlockState<V1_21_2> for Beetroots {
 impl BlockStateExt<V1_21_2> for Beetroots {
     type Attributes = AgeIntRangeAttribute_0_3;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11863,9 +11863,9 @@ impl BlockState<V1_21_2> for DirtPath {
 impl BlockStateExt<V1_21_2> for DirtPath {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11882,9 +11882,9 @@ impl BlockState<V1_21_2> for EndGateway {
 impl BlockStateExt<V1_21_2> for EndGateway {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11901,9 +11901,9 @@ impl BlockState<V1_21_2> for RepeatingCommandBlock {
 impl BlockStateExt<V1_21_2> for RepeatingCommandBlock {
     type Attributes = (ConditionalBooleanAttribute, FacingEnumAttribute_North_East_South_West_Up_Down);
     const DEFAULT: Self = Self(6u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11920,9 +11920,9 @@ impl BlockState<V1_21_2> for ChainCommandBlock {
 impl BlockStateExt<V1_21_2> for ChainCommandBlock {
     type Attributes = (ConditionalBooleanAttribute, FacingEnumAttribute_North_East_South_West_Up_Down);
     const DEFAULT: Self = Self(6u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11939,9 +11939,9 @@ impl BlockState<V1_21_2> for FrostedIce {
 impl BlockStateExt<V1_21_2> for FrostedIce {
     type Attributes = AgeIntRangeAttribute_0_3;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -11958,9 +11958,9 @@ impl BlockState<V1_21_2> for MagmaBlock {
 impl BlockStateExt<V1_21_2> for MagmaBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11977,9 +11977,9 @@ impl BlockState<V1_21_2> for NetherWartBlock {
 impl BlockStateExt<V1_21_2> for NetherWartBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -11996,9 +11996,9 @@ impl BlockState<V1_21_2> for RedNetherBricks {
 impl BlockStateExt<V1_21_2> for RedNetherBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12015,9 +12015,9 @@ impl BlockState<V1_21_2> for BoneBlock {
 impl BlockStateExt<V1_21_2> for BoneBlock {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12034,9 +12034,9 @@ impl BlockState<V1_21_2> for StructureVoid {
 impl BlockStateExt<V1_21_2> for StructureVoid {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12053,9 +12053,9 @@ impl BlockState<V1_21_2> for Observer {
 impl BlockStateExt<V1_21_2> for Observer {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(5u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12072,9 +12072,9 @@ impl BlockState<V1_21_2> for ShulkerBox {
 impl BlockStateExt<V1_21_2> for ShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12091,9 +12091,9 @@ impl BlockState<V1_21_2> for WhiteShulkerBox {
 impl BlockStateExt<V1_21_2> for WhiteShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12110,9 +12110,9 @@ impl BlockState<V1_21_2> for OrangeShulkerBox {
 impl BlockStateExt<V1_21_2> for OrangeShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12129,9 +12129,9 @@ impl BlockState<V1_21_2> for MagentaShulkerBox {
 impl BlockStateExt<V1_21_2> for MagentaShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12148,9 +12148,9 @@ impl BlockState<V1_21_2> for LightBlueShulkerBox {
 impl BlockStateExt<V1_21_2> for LightBlueShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12167,9 +12167,9 @@ impl BlockState<V1_21_2> for YellowShulkerBox {
 impl BlockStateExt<V1_21_2> for YellowShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12186,9 +12186,9 @@ impl BlockState<V1_21_2> for LimeShulkerBox {
 impl BlockStateExt<V1_21_2> for LimeShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12205,9 +12205,9 @@ impl BlockState<V1_21_2> for PinkShulkerBox {
 impl BlockStateExt<V1_21_2> for PinkShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12224,9 +12224,9 @@ impl BlockState<V1_21_2> for GrayShulkerBox {
 impl BlockStateExt<V1_21_2> for GrayShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12243,9 +12243,9 @@ impl BlockState<V1_21_2> for LightGrayShulkerBox {
 impl BlockStateExt<V1_21_2> for LightGrayShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12262,9 +12262,9 @@ impl BlockState<V1_21_2> for CyanShulkerBox {
 impl BlockStateExt<V1_21_2> for CyanShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12281,9 +12281,9 @@ impl BlockState<V1_21_2> for PurpleShulkerBox {
 impl BlockStateExt<V1_21_2> for PurpleShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12300,9 +12300,9 @@ impl BlockState<V1_21_2> for BlueShulkerBox {
 impl BlockStateExt<V1_21_2> for BlueShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12319,9 +12319,9 @@ impl BlockState<V1_21_2> for BrownShulkerBox {
 impl BlockStateExt<V1_21_2> for BrownShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12338,9 +12338,9 @@ impl BlockState<V1_21_2> for GreenShulkerBox {
 impl BlockStateExt<V1_21_2> for GreenShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12357,9 +12357,9 @@ impl BlockState<V1_21_2> for RedShulkerBox {
 impl BlockStateExt<V1_21_2> for RedShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12376,9 +12376,9 @@ impl BlockState<V1_21_2> for BlackShulkerBox {
 impl BlockStateExt<V1_21_2> for BlackShulkerBox {
     type Attributes = FacingEnumAttribute_North_East_South_West_Up_Down;
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12395,9 +12395,9 @@ impl BlockState<V1_21_2> for WhiteGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for WhiteGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12414,9 +12414,9 @@ impl BlockState<V1_21_2> for OrangeGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for OrangeGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12433,9 +12433,9 @@ impl BlockState<V1_21_2> for MagentaGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for MagentaGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12452,9 +12452,9 @@ impl BlockState<V1_21_2> for LightBlueGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for LightBlueGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12471,9 +12471,9 @@ impl BlockState<V1_21_2> for YellowGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for YellowGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12490,9 +12490,9 @@ impl BlockState<V1_21_2> for LimeGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for LimeGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12509,9 +12509,9 @@ impl BlockState<V1_21_2> for PinkGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for PinkGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12528,9 +12528,9 @@ impl BlockState<V1_21_2> for GrayGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for GrayGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12547,9 +12547,9 @@ impl BlockState<V1_21_2> for LightGrayGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for LightGrayGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12566,9 +12566,9 @@ impl BlockState<V1_21_2> for CyanGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for CyanGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12585,9 +12585,9 @@ impl BlockState<V1_21_2> for PurpleGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for PurpleGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12604,9 +12604,9 @@ impl BlockState<V1_21_2> for BlueGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for BlueGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12623,9 +12623,9 @@ impl BlockState<V1_21_2> for BrownGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for BrownGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12642,9 +12642,9 @@ impl BlockState<V1_21_2> for GreenGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for GreenGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12661,9 +12661,9 @@ impl BlockState<V1_21_2> for RedGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for RedGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12680,9 +12680,9 @@ impl BlockState<V1_21_2> for BlackGlazedTerracotta {
 impl BlockStateExt<V1_21_2> for BlackGlazedTerracotta {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -12699,9 +12699,9 @@ impl BlockState<V1_21_2> for WhiteConcrete {
 impl BlockStateExt<V1_21_2> for WhiteConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12718,9 +12718,9 @@ impl BlockState<V1_21_2> for OrangeConcrete {
 impl BlockStateExt<V1_21_2> for OrangeConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12737,9 +12737,9 @@ impl BlockState<V1_21_2> for MagentaConcrete {
 impl BlockStateExt<V1_21_2> for MagentaConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12756,9 +12756,9 @@ impl BlockState<V1_21_2> for LightBlueConcrete {
 impl BlockStateExt<V1_21_2> for LightBlueConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12775,9 +12775,9 @@ impl BlockState<V1_21_2> for YellowConcrete {
 impl BlockStateExt<V1_21_2> for YellowConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12794,9 +12794,9 @@ impl BlockState<V1_21_2> for LimeConcrete {
 impl BlockStateExt<V1_21_2> for LimeConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12813,9 +12813,9 @@ impl BlockState<V1_21_2> for PinkConcrete {
 impl BlockStateExt<V1_21_2> for PinkConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12832,9 +12832,9 @@ impl BlockState<V1_21_2> for GrayConcrete {
 impl BlockStateExt<V1_21_2> for GrayConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12851,9 +12851,9 @@ impl BlockState<V1_21_2> for LightGrayConcrete {
 impl BlockStateExt<V1_21_2> for LightGrayConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12870,9 +12870,9 @@ impl BlockState<V1_21_2> for CyanConcrete {
 impl BlockStateExt<V1_21_2> for CyanConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12889,9 +12889,9 @@ impl BlockState<V1_21_2> for PurpleConcrete {
 impl BlockStateExt<V1_21_2> for PurpleConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12908,9 +12908,9 @@ impl BlockState<V1_21_2> for BlueConcrete {
 impl BlockStateExt<V1_21_2> for BlueConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12927,9 +12927,9 @@ impl BlockState<V1_21_2> for BrownConcrete {
 impl BlockStateExt<V1_21_2> for BrownConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12946,9 +12946,9 @@ impl BlockState<V1_21_2> for GreenConcrete {
 impl BlockStateExt<V1_21_2> for GreenConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12965,9 +12965,9 @@ impl BlockState<V1_21_2> for RedConcrete {
 impl BlockStateExt<V1_21_2> for RedConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -12984,9 +12984,9 @@ impl BlockState<V1_21_2> for BlackConcrete {
 impl BlockStateExt<V1_21_2> for BlackConcrete {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13003,9 +13003,9 @@ impl BlockState<V1_21_2> for WhiteConcretePowder {
 impl BlockStateExt<V1_21_2> for WhiteConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13022,9 +13022,9 @@ impl BlockState<V1_21_2> for OrangeConcretePowder {
 impl BlockStateExt<V1_21_2> for OrangeConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13041,9 +13041,9 @@ impl BlockState<V1_21_2> for MagentaConcretePowder {
 impl BlockStateExt<V1_21_2> for MagentaConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13060,9 +13060,9 @@ impl BlockState<V1_21_2> for LightBlueConcretePowder {
 impl BlockStateExt<V1_21_2> for LightBlueConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13079,9 +13079,9 @@ impl BlockState<V1_21_2> for YellowConcretePowder {
 impl BlockStateExt<V1_21_2> for YellowConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13098,9 +13098,9 @@ impl BlockState<V1_21_2> for LimeConcretePowder {
 impl BlockStateExt<V1_21_2> for LimeConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13117,9 +13117,9 @@ impl BlockState<V1_21_2> for PinkConcretePowder {
 impl BlockStateExt<V1_21_2> for PinkConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13136,9 +13136,9 @@ impl BlockState<V1_21_2> for GrayConcretePowder {
 impl BlockStateExt<V1_21_2> for GrayConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13155,9 +13155,9 @@ impl BlockState<V1_21_2> for LightGrayConcretePowder {
 impl BlockStateExt<V1_21_2> for LightGrayConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13174,9 +13174,9 @@ impl BlockState<V1_21_2> for CyanConcretePowder {
 impl BlockStateExt<V1_21_2> for CyanConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13193,9 +13193,9 @@ impl BlockState<V1_21_2> for PurpleConcretePowder {
 impl BlockStateExt<V1_21_2> for PurpleConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13212,9 +13212,9 @@ impl BlockState<V1_21_2> for BlueConcretePowder {
 impl BlockStateExt<V1_21_2> for BlueConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13231,9 +13231,9 @@ impl BlockState<V1_21_2> for BrownConcretePowder {
 impl BlockStateExt<V1_21_2> for BrownConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13250,9 +13250,9 @@ impl BlockState<V1_21_2> for GreenConcretePowder {
 impl BlockStateExt<V1_21_2> for GreenConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13269,9 +13269,9 @@ impl BlockState<V1_21_2> for RedConcretePowder {
 impl BlockStateExt<V1_21_2> for RedConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13288,9 +13288,9 @@ impl BlockState<V1_21_2> for BlackConcretePowder {
 impl BlockStateExt<V1_21_2> for BlackConcretePowder {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13307,9 +13307,9 @@ impl BlockState<V1_21_2> for Kelp {
 impl BlockStateExt<V1_21_2> for Kelp {
     type Attributes = AgeIntRangeAttribute_0_25;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13326,9 +13326,9 @@ impl BlockState<V1_21_2> for KelpPlant {
 impl BlockStateExt<V1_21_2> for KelpPlant {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13345,9 +13345,9 @@ impl BlockState<V1_21_2> for DriedKelpBlock {
 impl BlockStateExt<V1_21_2> for DriedKelpBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13364,9 +13364,9 @@ impl BlockState<V1_21_2> for TurtleEgg {
 impl BlockStateExt<V1_21_2> for TurtleEgg {
     type Attributes = (EggsIntRangeAttribute, HatchIntRangeAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13383,9 +13383,9 @@ impl BlockState<V1_21_2> for SnifferEgg {
 impl BlockStateExt<V1_21_2> for SnifferEgg {
     type Attributes = HatchIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13402,9 +13402,9 @@ impl BlockState<V1_21_2> for DeadTubeCoralBlock {
 impl BlockStateExt<V1_21_2> for DeadTubeCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13421,9 +13421,9 @@ impl BlockState<V1_21_2> for DeadBrainCoralBlock {
 impl BlockStateExt<V1_21_2> for DeadBrainCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13440,9 +13440,9 @@ impl BlockState<V1_21_2> for DeadBubbleCoralBlock {
 impl BlockStateExt<V1_21_2> for DeadBubbleCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13459,9 +13459,9 @@ impl BlockState<V1_21_2> for DeadFireCoralBlock {
 impl BlockStateExt<V1_21_2> for DeadFireCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13478,9 +13478,9 @@ impl BlockState<V1_21_2> for DeadHornCoralBlock {
 impl BlockStateExt<V1_21_2> for DeadHornCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13497,9 +13497,9 @@ impl BlockState<V1_21_2> for TubeCoralBlock {
 impl BlockStateExt<V1_21_2> for TubeCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13516,9 +13516,9 @@ impl BlockState<V1_21_2> for BrainCoralBlock {
 impl BlockStateExt<V1_21_2> for BrainCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13535,9 +13535,9 @@ impl BlockState<V1_21_2> for BubbleCoralBlock {
 impl BlockStateExt<V1_21_2> for BubbleCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13554,9 +13554,9 @@ impl BlockState<V1_21_2> for FireCoralBlock {
 impl BlockStateExt<V1_21_2> for FireCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13573,9 +13573,9 @@ impl BlockState<V1_21_2> for HornCoralBlock {
 impl BlockStateExt<V1_21_2> for HornCoralBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -13592,9 +13592,9 @@ impl BlockState<V1_21_2> for DeadTubeCoral {
 impl BlockStateExt<V1_21_2> for DeadTubeCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13611,9 +13611,9 @@ impl BlockState<V1_21_2> for DeadBrainCoral {
 impl BlockStateExt<V1_21_2> for DeadBrainCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13630,9 +13630,9 @@ impl BlockState<V1_21_2> for DeadBubbleCoral {
 impl BlockStateExt<V1_21_2> for DeadBubbleCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13649,9 +13649,9 @@ impl BlockState<V1_21_2> for DeadFireCoral {
 impl BlockStateExt<V1_21_2> for DeadFireCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13668,9 +13668,9 @@ impl BlockState<V1_21_2> for DeadHornCoral {
 impl BlockStateExt<V1_21_2> for DeadHornCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13687,9 +13687,9 @@ impl BlockState<V1_21_2> for TubeCoral {
 impl BlockStateExt<V1_21_2> for TubeCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13706,9 +13706,9 @@ impl BlockState<V1_21_2> for BrainCoral {
 impl BlockStateExt<V1_21_2> for BrainCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13725,9 +13725,9 @@ impl BlockState<V1_21_2> for BubbleCoral {
 impl BlockStateExt<V1_21_2> for BubbleCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13744,9 +13744,9 @@ impl BlockState<V1_21_2> for FireCoral {
 impl BlockStateExt<V1_21_2> for FireCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13763,9 +13763,9 @@ impl BlockState<V1_21_2> for HornCoral {
 impl BlockStateExt<V1_21_2> for HornCoral {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13782,9 +13782,9 @@ impl BlockState<V1_21_2> for DeadTubeCoralFan {
 impl BlockStateExt<V1_21_2> for DeadTubeCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13801,9 +13801,9 @@ impl BlockState<V1_21_2> for DeadBrainCoralFan {
 impl BlockStateExt<V1_21_2> for DeadBrainCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13820,9 +13820,9 @@ impl BlockState<V1_21_2> for DeadBubbleCoralFan {
 impl BlockStateExt<V1_21_2> for DeadBubbleCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13839,9 +13839,9 @@ impl BlockState<V1_21_2> for DeadFireCoralFan {
 impl BlockStateExt<V1_21_2> for DeadFireCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13858,9 +13858,9 @@ impl BlockState<V1_21_2> for DeadHornCoralFan {
 impl BlockStateExt<V1_21_2> for DeadHornCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13877,9 +13877,9 @@ impl BlockState<V1_21_2> for TubeCoralFan {
 impl BlockStateExt<V1_21_2> for TubeCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13896,9 +13896,9 @@ impl BlockState<V1_21_2> for BrainCoralFan {
 impl BlockStateExt<V1_21_2> for BrainCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13915,9 +13915,9 @@ impl BlockState<V1_21_2> for BubbleCoralFan {
 impl BlockStateExt<V1_21_2> for BubbleCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13934,9 +13934,9 @@ impl BlockState<V1_21_2> for FireCoralFan {
 impl BlockStateExt<V1_21_2> for FireCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13953,9 +13953,9 @@ impl BlockState<V1_21_2> for HornCoralFan {
 impl BlockStateExt<V1_21_2> for HornCoralFan {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13972,9 +13972,9 @@ impl BlockState<V1_21_2> for DeadTubeCoralWallFan {
 impl BlockStateExt<V1_21_2> for DeadTubeCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -13991,9 +13991,9 @@ impl BlockState<V1_21_2> for DeadBrainCoralWallFan {
 impl BlockStateExt<V1_21_2> for DeadBrainCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14010,9 +14010,9 @@ impl BlockState<V1_21_2> for DeadBubbleCoralWallFan {
 impl BlockStateExt<V1_21_2> for DeadBubbleCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14029,9 +14029,9 @@ impl BlockState<V1_21_2> for DeadFireCoralWallFan {
 impl BlockStateExt<V1_21_2> for DeadFireCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14048,9 +14048,9 @@ impl BlockState<V1_21_2> for DeadHornCoralWallFan {
 impl BlockStateExt<V1_21_2> for DeadHornCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14067,9 +14067,9 @@ impl BlockState<V1_21_2> for TubeCoralWallFan {
 impl BlockStateExt<V1_21_2> for TubeCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14086,9 +14086,9 @@ impl BlockState<V1_21_2> for BrainCoralWallFan {
 impl BlockStateExt<V1_21_2> for BrainCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14105,9 +14105,9 @@ impl BlockState<V1_21_2> for BubbleCoralWallFan {
 impl BlockStateExt<V1_21_2> for BubbleCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14124,9 +14124,9 @@ impl BlockState<V1_21_2> for FireCoralWallFan {
 impl BlockStateExt<V1_21_2> for FireCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14143,9 +14143,9 @@ impl BlockState<V1_21_2> for HornCoralWallFan {
 impl BlockStateExt<V1_21_2> for HornCoralWallFan {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14162,9 +14162,9 @@ impl BlockState<V1_21_2> for SeaPickle {
 impl BlockStateExt<V1_21_2> for SeaPickle {
     type Attributes = (PicklesIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14181,9 +14181,9 @@ impl BlockState<V1_21_2> for BlueIce {
 impl BlockStateExt<V1_21_2> for BlueIce {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -14200,9 +14200,9 @@ impl BlockState<V1_21_2> for Conduit {
 impl BlockStateExt<V1_21_2> for Conduit {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14219,9 +14219,9 @@ impl BlockState<V1_21_2> for BambooSapling {
 impl BlockStateExt<V1_21_2> for BambooSapling {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -14238,9 +14238,9 @@ impl BlockState<V1_21_2> for Bamboo {
 impl BlockStateExt<V1_21_2> for Bamboo {
     type Attributes = (AgeIntRangeAttribute_0_1, LeavesEnumAttribute, StageIntRangeAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14257,9 +14257,9 @@ impl BlockState<V1_21_2> for PottedBamboo {
 impl BlockStateExt<V1_21_2> for PottedBamboo {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -14276,9 +14276,9 @@ impl BlockState<V1_21_2> for VoidAir {
 impl BlockStateExt<V1_21_2> for VoidAir {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -14295,9 +14295,9 @@ impl BlockState<V1_21_2> for CaveAir {
 impl BlockStateExt<V1_21_2> for CaveAir {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -14314,9 +14314,9 @@ impl BlockState<V1_21_2> for BubbleColumn {
 impl BlockStateExt<V1_21_2> for BubbleColumn {
     type Attributes = DragBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14333,9 +14333,9 @@ impl BlockState<V1_21_2> for PolishedGraniteStairs {
 impl BlockStateExt<V1_21_2> for PolishedGraniteStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14352,9 +14352,9 @@ impl BlockState<V1_21_2> for SmoothRedSandstoneStairs {
 impl BlockStateExt<V1_21_2> for SmoothRedSandstoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14371,9 +14371,9 @@ impl BlockState<V1_21_2> for MossyStoneBrickStairs {
 impl BlockStateExt<V1_21_2> for MossyStoneBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14390,9 +14390,9 @@ impl BlockState<V1_21_2> for PolishedDioriteStairs {
 impl BlockStateExt<V1_21_2> for PolishedDioriteStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14409,9 +14409,9 @@ impl BlockState<V1_21_2> for MossyCobblestoneStairs {
 impl BlockStateExt<V1_21_2> for MossyCobblestoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14428,9 +14428,9 @@ impl BlockState<V1_21_2> for EndStoneBrickStairs {
 impl BlockStateExt<V1_21_2> for EndStoneBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14447,9 +14447,9 @@ impl BlockState<V1_21_2> for StoneStairs {
 impl BlockStateExt<V1_21_2> for StoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14466,9 +14466,9 @@ impl BlockState<V1_21_2> for SmoothSandstoneStairs {
 impl BlockStateExt<V1_21_2> for SmoothSandstoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14485,9 +14485,9 @@ impl BlockState<V1_21_2> for SmoothQuartzStairs {
 impl BlockStateExt<V1_21_2> for SmoothQuartzStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14504,9 +14504,9 @@ impl BlockState<V1_21_2> for GraniteStairs {
 impl BlockStateExt<V1_21_2> for GraniteStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14523,9 +14523,9 @@ impl BlockState<V1_21_2> for AndesiteStairs {
 impl BlockStateExt<V1_21_2> for AndesiteStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14542,9 +14542,9 @@ impl BlockState<V1_21_2> for RedNetherBrickStairs {
 impl BlockStateExt<V1_21_2> for RedNetherBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14561,9 +14561,9 @@ impl BlockState<V1_21_2> for PolishedAndesiteStairs {
 impl BlockStateExt<V1_21_2> for PolishedAndesiteStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14580,9 +14580,9 @@ impl BlockState<V1_21_2> for DioriteStairs {
 impl BlockStateExt<V1_21_2> for DioriteStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14599,9 +14599,9 @@ impl BlockState<V1_21_2> for PolishedGraniteSlab {
 impl BlockStateExt<V1_21_2> for PolishedGraniteSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14618,9 +14618,9 @@ impl BlockState<V1_21_2> for SmoothRedSandstoneSlab {
 impl BlockStateExt<V1_21_2> for SmoothRedSandstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14637,9 +14637,9 @@ impl BlockState<V1_21_2> for MossyStoneBrickSlab {
 impl BlockStateExt<V1_21_2> for MossyStoneBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14656,9 +14656,9 @@ impl BlockState<V1_21_2> for PolishedDioriteSlab {
 impl BlockStateExt<V1_21_2> for PolishedDioriteSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14675,9 +14675,9 @@ impl BlockState<V1_21_2> for MossyCobblestoneSlab {
 impl BlockStateExt<V1_21_2> for MossyCobblestoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14694,9 +14694,9 @@ impl BlockState<V1_21_2> for EndStoneBrickSlab {
 impl BlockStateExt<V1_21_2> for EndStoneBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14713,9 +14713,9 @@ impl BlockState<V1_21_2> for SmoothSandstoneSlab {
 impl BlockStateExt<V1_21_2> for SmoothSandstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14732,9 +14732,9 @@ impl BlockState<V1_21_2> for SmoothQuartzSlab {
 impl BlockStateExt<V1_21_2> for SmoothQuartzSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14751,9 +14751,9 @@ impl BlockState<V1_21_2> for GraniteSlab {
 impl BlockStateExt<V1_21_2> for GraniteSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14770,9 +14770,9 @@ impl BlockState<V1_21_2> for AndesiteSlab {
 impl BlockStateExt<V1_21_2> for AndesiteSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14789,9 +14789,9 @@ impl BlockState<V1_21_2> for RedNetherBrickSlab {
 impl BlockStateExt<V1_21_2> for RedNetherBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14808,9 +14808,9 @@ impl BlockState<V1_21_2> for PolishedAndesiteSlab {
 impl BlockStateExt<V1_21_2> for PolishedAndesiteSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14827,9 +14827,9 @@ impl BlockState<V1_21_2> for DioriteSlab {
 impl BlockStateExt<V1_21_2> for DioriteSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14846,9 +14846,9 @@ impl BlockState<V1_21_2> for BrickWall {
 impl BlockStateExt<V1_21_2> for BrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14865,9 +14865,9 @@ impl BlockState<V1_21_2> for PrismarineWall {
 impl BlockStateExt<V1_21_2> for PrismarineWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14884,9 +14884,9 @@ impl BlockState<V1_21_2> for RedSandstoneWall {
 impl BlockStateExt<V1_21_2> for RedSandstoneWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14903,9 +14903,9 @@ impl BlockState<V1_21_2> for MossyStoneBrickWall {
 impl BlockStateExt<V1_21_2> for MossyStoneBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14922,9 +14922,9 @@ impl BlockState<V1_21_2> for GraniteWall {
 impl BlockStateExt<V1_21_2> for GraniteWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14941,9 +14941,9 @@ impl BlockState<V1_21_2> for StoneBrickWall {
 impl BlockStateExt<V1_21_2> for StoneBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14960,9 +14960,9 @@ impl BlockState<V1_21_2> for MudBrickWall {
 impl BlockStateExt<V1_21_2> for MudBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14979,9 +14979,9 @@ impl BlockState<V1_21_2> for NetherBrickWall {
 impl BlockStateExt<V1_21_2> for NetherBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -14998,9 +14998,9 @@ impl BlockState<V1_21_2> for AndesiteWall {
 impl BlockStateExt<V1_21_2> for AndesiteWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15017,9 +15017,9 @@ impl BlockState<V1_21_2> for RedNetherBrickWall {
 impl BlockStateExt<V1_21_2> for RedNetherBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15036,9 +15036,9 @@ impl BlockState<V1_21_2> for SandstoneWall {
 impl BlockStateExt<V1_21_2> for SandstoneWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15055,9 +15055,9 @@ impl BlockState<V1_21_2> for EndStoneBrickWall {
 impl BlockStateExt<V1_21_2> for EndStoneBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15074,9 +15074,9 @@ impl BlockState<V1_21_2> for DioriteWall {
 impl BlockStateExt<V1_21_2> for DioriteWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15093,9 +15093,9 @@ impl BlockState<V1_21_2> for Scaffolding {
 impl BlockStateExt<V1_21_2> for Scaffolding {
     type Attributes = (BottomBooleanAttribute, DistanceIntRangeAttribute_0_7, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15112,9 +15112,9 @@ impl BlockState<V1_21_2> for Loom {
 impl BlockStateExt<V1_21_2> for Loom {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15131,9 +15131,9 @@ impl BlockState<V1_21_2> for Barrel {
 impl BlockStateExt<V1_21_2> for Barrel {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, OpenBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15150,9 +15150,9 @@ impl BlockState<V1_21_2> for Smoker {
 impl BlockStateExt<V1_21_2> for Smoker {
     type Attributes = (FacingEnumAttribute_North_South_West_East, LitBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15169,9 +15169,9 @@ impl BlockState<V1_21_2> for BlastFurnace {
 impl BlockStateExt<V1_21_2> for BlastFurnace {
     type Attributes = (FacingEnumAttribute_North_South_West_East, LitBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15188,9 +15188,9 @@ impl BlockState<V1_21_2> for CartographyTable {
 impl BlockStateExt<V1_21_2> for CartographyTable {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15207,9 +15207,9 @@ impl BlockState<V1_21_2> for FletchingTable {
 impl BlockStateExt<V1_21_2> for FletchingTable {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15226,9 +15226,9 @@ impl BlockState<V1_21_2> for Grindstone {
 impl BlockStateExt<V1_21_2> for Grindstone {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East);
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15245,9 +15245,9 @@ impl BlockState<V1_21_2> for Lectern {
 impl BlockStateExt<V1_21_2> for Lectern {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HasBookBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15264,9 +15264,9 @@ impl BlockState<V1_21_2> for SmithingTable {
 impl BlockStateExt<V1_21_2> for SmithingTable {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15283,9 +15283,9 @@ impl BlockState<V1_21_2> for Stonecutter {
 impl BlockStateExt<V1_21_2> for Stonecutter {
     type Attributes = FacingEnumAttribute_North_South_West_East;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15302,9 +15302,9 @@ impl BlockState<V1_21_2> for Bell {
 impl BlockStateExt<V1_21_2> for Bell {
     type Attributes = (AttachmentEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15321,9 +15321,9 @@ impl BlockState<V1_21_2> for Lantern {
 impl BlockStateExt<V1_21_2> for Lantern {
     type Attributes = (HangingBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15340,9 +15340,9 @@ impl BlockState<V1_21_2> for SoulLantern {
 impl BlockStateExt<V1_21_2> for SoulLantern {
     type Attributes = (HangingBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15359,9 +15359,9 @@ impl BlockState<V1_21_2> for Campfire {
 impl BlockStateExt<V1_21_2> for Campfire {
     type Attributes = (FacingEnumAttribute_North_South_West_East, LitBooleanAttribute, SignalFireBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15378,9 +15378,9 @@ impl BlockState<V1_21_2> for SoulCampfire {
 impl BlockStateExt<V1_21_2> for SoulCampfire {
     type Attributes = (FacingEnumAttribute_North_South_West_East, LitBooleanAttribute, SignalFireBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15397,9 +15397,9 @@ impl BlockState<V1_21_2> for SweetBerryBush {
 impl BlockStateExt<V1_21_2> for SweetBerryBush {
     type Attributes = AgeIntRangeAttribute_0_3;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15416,9 +15416,9 @@ impl BlockState<V1_21_2> for WarpedStem {
 impl BlockStateExt<V1_21_2> for WarpedStem {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15435,9 +15435,9 @@ impl BlockState<V1_21_2> for StrippedWarpedStem {
 impl BlockStateExt<V1_21_2> for StrippedWarpedStem {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15454,9 +15454,9 @@ impl BlockState<V1_21_2> for WarpedHyphae {
 impl BlockStateExt<V1_21_2> for WarpedHyphae {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15473,9 +15473,9 @@ impl BlockState<V1_21_2> for StrippedWarpedHyphae {
 impl BlockStateExt<V1_21_2> for StrippedWarpedHyphae {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15492,9 +15492,9 @@ impl BlockState<V1_21_2> for WarpedNylium {
 impl BlockStateExt<V1_21_2> for WarpedNylium {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15511,9 +15511,9 @@ impl BlockState<V1_21_2> for WarpedFungus {
 impl BlockStateExt<V1_21_2> for WarpedFungus {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15530,9 +15530,9 @@ impl BlockState<V1_21_2> for WarpedWartBlock {
 impl BlockStateExt<V1_21_2> for WarpedWartBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15549,9 +15549,9 @@ impl BlockState<V1_21_2> for WarpedRoots {
 impl BlockStateExt<V1_21_2> for WarpedRoots {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15568,9 +15568,9 @@ impl BlockState<V1_21_2> for NetherSprouts {
 impl BlockStateExt<V1_21_2> for NetherSprouts {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15587,9 +15587,9 @@ impl BlockState<V1_21_2> for CrimsonStem {
 impl BlockStateExt<V1_21_2> for CrimsonStem {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15606,9 +15606,9 @@ impl BlockState<V1_21_2> for StrippedCrimsonStem {
 impl BlockStateExt<V1_21_2> for StrippedCrimsonStem {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15625,9 +15625,9 @@ impl BlockState<V1_21_2> for CrimsonHyphae {
 impl BlockStateExt<V1_21_2> for CrimsonHyphae {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15644,9 +15644,9 @@ impl BlockState<V1_21_2> for StrippedCrimsonHyphae {
 impl BlockStateExt<V1_21_2> for StrippedCrimsonHyphae {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15663,9 +15663,9 @@ impl BlockState<V1_21_2> for CrimsonNylium {
 impl BlockStateExt<V1_21_2> for CrimsonNylium {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15682,9 +15682,9 @@ impl BlockState<V1_21_2> for CrimsonFungus {
 impl BlockStateExt<V1_21_2> for CrimsonFungus {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15701,9 +15701,9 @@ impl BlockState<V1_21_2> for Shroomlight {
 impl BlockStateExt<V1_21_2> for Shroomlight {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15720,9 +15720,9 @@ impl BlockState<V1_21_2> for WeepingVines {
 impl BlockStateExt<V1_21_2> for WeepingVines {
     type Attributes = AgeIntRangeAttribute_0_25;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15739,9 +15739,9 @@ impl BlockState<V1_21_2> for WeepingVinesPlant {
 impl BlockStateExt<V1_21_2> for WeepingVinesPlant {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15758,9 +15758,9 @@ impl BlockState<V1_21_2> for TwistingVines {
 impl BlockStateExt<V1_21_2> for TwistingVines {
     type Attributes = AgeIntRangeAttribute_0_25;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15777,9 +15777,9 @@ impl BlockState<V1_21_2> for TwistingVinesPlant {
 impl BlockStateExt<V1_21_2> for TwistingVinesPlant {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15796,9 +15796,9 @@ impl BlockState<V1_21_2> for CrimsonRoots {
 impl BlockStateExt<V1_21_2> for CrimsonRoots {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15815,9 +15815,9 @@ impl BlockState<V1_21_2> for CrimsonPlanks {
 impl BlockStateExt<V1_21_2> for CrimsonPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15834,9 +15834,9 @@ impl BlockState<V1_21_2> for WarpedPlanks {
 impl BlockStateExt<V1_21_2> for WarpedPlanks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -15853,9 +15853,9 @@ impl BlockState<V1_21_2> for CrimsonSlab {
 impl BlockStateExt<V1_21_2> for CrimsonSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15872,9 +15872,9 @@ impl BlockState<V1_21_2> for WarpedSlab {
 impl BlockStateExt<V1_21_2> for WarpedSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15891,9 +15891,9 @@ impl BlockState<V1_21_2> for CrimsonPressurePlate {
 impl BlockStateExt<V1_21_2> for CrimsonPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15910,9 +15910,9 @@ impl BlockState<V1_21_2> for WarpedPressurePlate {
 impl BlockStateExt<V1_21_2> for WarpedPressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15929,9 +15929,9 @@ impl BlockState<V1_21_2> for CrimsonFence {
 impl BlockStateExt<V1_21_2> for CrimsonFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15948,9 +15948,9 @@ impl BlockState<V1_21_2> for WarpedFence {
 impl BlockStateExt<V1_21_2> for WarpedFence {
     type Attributes = (EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(31u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15967,9 +15967,9 @@ impl BlockState<V1_21_2> for CrimsonTrapdoor {
 impl BlockStateExt<V1_21_2> for CrimsonTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -15986,9 +15986,9 @@ impl BlockState<V1_21_2> for WarpedTrapdoor {
 impl BlockStateExt<V1_21_2> for WarpedTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16005,9 +16005,9 @@ impl BlockState<V1_21_2> for CrimsonFenceGate {
 impl BlockStateExt<V1_21_2> for CrimsonFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16024,9 +16024,9 @@ impl BlockState<V1_21_2> for WarpedFenceGate {
 impl BlockStateExt<V1_21_2> for WarpedFenceGate {
     type Attributes = (FacingEnumAttribute_North_South_West_East, InWallBooleanAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16043,9 +16043,9 @@ impl BlockState<V1_21_2> for CrimsonStairs {
 impl BlockStateExt<V1_21_2> for CrimsonStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16062,9 +16062,9 @@ impl BlockState<V1_21_2> for WarpedStairs {
 impl BlockStateExt<V1_21_2> for WarpedStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16081,9 +16081,9 @@ impl BlockState<V1_21_2> for CrimsonButton {
 impl BlockStateExt<V1_21_2> for CrimsonButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16100,9 +16100,9 @@ impl BlockState<V1_21_2> for WarpedButton {
 impl BlockStateExt<V1_21_2> for WarpedButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16119,9 +16119,9 @@ impl BlockState<V1_21_2> for CrimsonDoor {
 impl BlockStateExt<V1_21_2> for CrimsonDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16138,9 +16138,9 @@ impl BlockState<V1_21_2> for WarpedDoor {
 impl BlockStateExt<V1_21_2> for WarpedDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16157,9 +16157,9 @@ impl BlockState<V1_21_2> for CrimsonSign {
 impl BlockStateExt<V1_21_2> for CrimsonSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16176,9 +16176,9 @@ impl BlockState<V1_21_2> for WarpedSign {
 impl BlockStateExt<V1_21_2> for WarpedSign {
     type Attributes = (RotationIntRangeAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16195,9 +16195,9 @@ impl BlockState<V1_21_2> for CrimsonWallSign {
 impl BlockStateExt<V1_21_2> for CrimsonWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16214,9 +16214,9 @@ impl BlockState<V1_21_2> for WarpedWallSign {
 impl BlockStateExt<V1_21_2> for WarpedWallSign {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16233,9 +16233,9 @@ impl BlockState<V1_21_2> for StructureBlock {
 impl BlockStateExt<V1_21_2> for StructureBlock {
     type Attributes = ModeEnumAttribute_Save_Load_Corner_Data;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16252,9 +16252,9 @@ impl BlockState<V1_21_2> for Jigsaw {
 impl BlockStateExt<V1_21_2> for Jigsaw {
     type Attributes = OrientationEnumAttribute;
     const DEFAULT: Self = Self(10u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16271,9 +16271,9 @@ impl BlockState<V1_21_2> for Composter {
 impl BlockStateExt<V1_21_2> for Composter {
     type Attributes = LevelIntRangeAttribute_0_8;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16290,9 +16290,9 @@ impl BlockState<V1_21_2> for Target {
 impl BlockStateExt<V1_21_2> for Target {
     type Attributes = PowerIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16309,9 +16309,9 @@ impl BlockState<V1_21_2> for BeeNest {
 impl BlockStateExt<V1_21_2> for BeeNest {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HoneyLevelIntRangeAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16328,9 +16328,9 @@ impl BlockState<V1_21_2> for Beehive {
 impl BlockStateExt<V1_21_2> for Beehive {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HoneyLevelIntRangeAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16347,9 +16347,9 @@ impl BlockState<V1_21_2> for HoneyBlock {
 impl BlockStateExt<V1_21_2> for HoneyBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16366,9 +16366,9 @@ impl BlockState<V1_21_2> for HoneycombBlock {
 impl BlockStateExt<V1_21_2> for HoneycombBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16385,9 +16385,9 @@ impl BlockState<V1_21_2> for NetheriteBlock {
 impl BlockStateExt<V1_21_2> for NetheriteBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16404,9 +16404,9 @@ impl BlockState<V1_21_2> for AncientDebris {
 impl BlockStateExt<V1_21_2> for AncientDebris {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16423,9 +16423,9 @@ impl BlockState<V1_21_2> for CryingObsidian {
 impl BlockStateExt<V1_21_2> for CryingObsidian {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16442,9 +16442,9 @@ impl BlockState<V1_21_2> for RespawnAnchor {
 impl BlockStateExt<V1_21_2> for RespawnAnchor {
     type Attributes = ChargesIntRangeAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16461,9 +16461,9 @@ impl BlockState<V1_21_2> for PottedCrimsonFungus {
 impl BlockStateExt<V1_21_2> for PottedCrimsonFungus {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16480,9 +16480,9 @@ impl BlockState<V1_21_2> for PottedWarpedFungus {
 impl BlockStateExt<V1_21_2> for PottedWarpedFungus {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16499,9 +16499,9 @@ impl BlockState<V1_21_2> for PottedCrimsonRoots {
 impl BlockStateExt<V1_21_2> for PottedCrimsonRoots {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16518,9 +16518,9 @@ impl BlockState<V1_21_2> for PottedWarpedRoots {
 impl BlockStateExt<V1_21_2> for PottedWarpedRoots {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16537,9 +16537,9 @@ impl BlockState<V1_21_2> for Lodestone {
 impl BlockStateExt<V1_21_2> for Lodestone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16556,9 +16556,9 @@ impl BlockState<V1_21_2> for Blackstone {
 impl BlockStateExt<V1_21_2> for Blackstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16575,9 +16575,9 @@ impl BlockState<V1_21_2> for BlackstoneStairs {
 impl BlockStateExt<V1_21_2> for BlackstoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16594,9 +16594,9 @@ impl BlockState<V1_21_2> for BlackstoneWall {
 impl BlockStateExt<V1_21_2> for BlackstoneWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16613,9 +16613,9 @@ impl BlockState<V1_21_2> for BlackstoneSlab {
 impl BlockStateExt<V1_21_2> for BlackstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16632,9 +16632,9 @@ impl BlockState<V1_21_2> for PolishedBlackstone {
 impl BlockStateExt<V1_21_2> for PolishedBlackstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16651,9 +16651,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneBricks {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16670,9 +16670,9 @@ impl BlockState<V1_21_2> for CrackedPolishedBlackstoneBricks {
 impl BlockStateExt<V1_21_2> for CrackedPolishedBlackstoneBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16689,9 +16689,9 @@ impl BlockState<V1_21_2> for ChiseledPolishedBlackstone {
 impl BlockStateExt<V1_21_2> for ChiseledPolishedBlackstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16708,9 +16708,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneBrickSlab {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16727,9 +16727,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneBrickStairs {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16746,9 +16746,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneBrickWall {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16765,9 +16765,9 @@ impl BlockState<V1_21_2> for GildedBlackstone {
 impl BlockStateExt<V1_21_2> for GildedBlackstone {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16784,9 +16784,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneStairs {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16803,9 +16803,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneSlab {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16822,9 +16822,9 @@ impl BlockState<V1_21_2> for PolishedBlackstonePressurePlate {
 impl BlockStateExt<V1_21_2> for PolishedBlackstonePressurePlate {
     type Attributes = PoweredBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16841,9 +16841,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneButton {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneButton {
     type Attributes = (FaceEnumAttribute, FacingEnumAttribute_North_South_West_East, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16860,9 +16860,9 @@ impl BlockState<V1_21_2> for PolishedBlackstoneWall {
 impl BlockStateExt<V1_21_2> for PolishedBlackstoneWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16879,9 +16879,9 @@ impl BlockState<V1_21_2> for ChiseledNetherBricks {
 impl BlockStateExt<V1_21_2> for ChiseledNetherBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16898,9 +16898,9 @@ impl BlockState<V1_21_2> for CrackedNetherBricks {
 impl BlockStateExt<V1_21_2> for CrackedNetherBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16917,9 +16917,9 @@ impl BlockState<V1_21_2> for QuartzBricks {
 impl BlockStateExt<V1_21_2> for QuartzBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -16936,9 +16936,9 @@ impl BlockState<V1_21_2> for Candle {
 impl BlockStateExt<V1_21_2> for Candle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16955,9 +16955,9 @@ impl BlockState<V1_21_2> for WhiteCandle {
 impl BlockStateExt<V1_21_2> for WhiteCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16974,9 +16974,9 @@ impl BlockState<V1_21_2> for OrangeCandle {
 impl BlockStateExt<V1_21_2> for OrangeCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -16993,9 +16993,9 @@ impl BlockState<V1_21_2> for MagentaCandle {
 impl BlockStateExt<V1_21_2> for MagentaCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17012,9 +17012,9 @@ impl BlockState<V1_21_2> for LightBlueCandle {
 impl BlockStateExt<V1_21_2> for LightBlueCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17031,9 +17031,9 @@ impl BlockState<V1_21_2> for YellowCandle {
 impl BlockStateExt<V1_21_2> for YellowCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17050,9 +17050,9 @@ impl BlockState<V1_21_2> for LimeCandle {
 impl BlockStateExt<V1_21_2> for LimeCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17069,9 +17069,9 @@ impl BlockState<V1_21_2> for PinkCandle {
 impl BlockStateExt<V1_21_2> for PinkCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17088,9 +17088,9 @@ impl BlockState<V1_21_2> for GrayCandle {
 impl BlockStateExt<V1_21_2> for GrayCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17107,9 +17107,9 @@ impl BlockState<V1_21_2> for LightGrayCandle {
 impl BlockStateExt<V1_21_2> for LightGrayCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17126,9 +17126,9 @@ impl BlockState<V1_21_2> for CyanCandle {
 impl BlockStateExt<V1_21_2> for CyanCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17145,9 +17145,9 @@ impl BlockState<V1_21_2> for PurpleCandle {
 impl BlockStateExt<V1_21_2> for PurpleCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17164,9 +17164,9 @@ impl BlockState<V1_21_2> for BlueCandle {
 impl BlockStateExt<V1_21_2> for BlueCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17183,9 +17183,9 @@ impl BlockState<V1_21_2> for BrownCandle {
 impl BlockStateExt<V1_21_2> for BrownCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17202,9 +17202,9 @@ impl BlockState<V1_21_2> for GreenCandle {
 impl BlockStateExt<V1_21_2> for GreenCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17221,9 +17221,9 @@ impl BlockState<V1_21_2> for RedCandle {
 impl BlockStateExt<V1_21_2> for RedCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17240,9 +17240,9 @@ impl BlockState<V1_21_2> for BlackCandle {
 impl BlockStateExt<V1_21_2> for BlackCandle {
     type Attributes = (CandlesIntRangeAttribute, LitBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17259,9 +17259,9 @@ impl BlockState<V1_21_2> for CandleCake {
 impl BlockStateExt<V1_21_2> for CandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17278,9 +17278,9 @@ impl BlockState<V1_21_2> for WhiteCandleCake {
 impl BlockStateExt<V1_21_2> for WhiteCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17297,9 +17297,9 @@ impl BlockState<V1_21_2> for OrangeCandleCake {
 impl BlockStateExt<V1_21_2> for OrangeCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17316,9 +17316,9 @@ impl BlockState<V1_21_2> for MagentaCandleCake {
 impl BlockStateExt<V1_21_2> for MagentaCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17335,9 +17335,9 @@ impl BlockState<V1_21_2> for LightBlueCandleCake {
 impl BlockStateExt<V1_21_2> for LightBlueCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17354,9 +17354,9 @@ impl BlockState<V1_21_2> for YellowCandleCake {
 impl BlockStateExt<V1_21_2> for YellowCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17373,9 +17373,9 @@ impl BlockState<V1_21_2> for LimeCandleCake {
 impl BlockStateExt<V1_21_2> for LimeCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17392,9 +17392,9 @@ impl BlockState<V1_21_2> for PinkCandleCake {
 impl BlockStateExt<V1_21_2> for PinkCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17411,9 +17411,9 @@ impl BlockState<V1_21_2> for GrayCandleCake {
 impl BlockStateExt<V1_21_2> for GrayCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17430,9 +17430,9 @@ impl BlockState<V1_21_2> for LightGrayCandleCake {
 impl BlockStateExt<V1_21_2> for LightGrayCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17449,9 +17449,9 @@ impl BlockState<V1_21_2> for CyanCandleCake {
 impl BlockStateExt<V1_21_2> for CyanCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17468,9 +17468,9 @@ impl BlockState<V1_21_2> for PurpleCandleCake {
 impl BlockStateExt<V1_21_2> for PurpleCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17487,9 +17487,9 @@ impl BlockState<V1_21_2> for BlueCandleCake {
 impl BlockStateExt<V1_21_2> for BlueCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17506,9 +17506,9 @@ impl BlockState<V1_21_2> for BrownCandleCake {
 impl BlockStateExt<V1_21_2> for BrownCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17525,9 +17525,9 @@ impl BlockState<V1_21_2> for GreenCandleCake {
 impl BlockStateExt<V1_21_2> for GreenCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17544,9 +17544,9 @@ impl BlockState<V1_21_2> for RedCandleCake {
 impl BlockStateExt<V1_21_2> for RedCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17563,9 +17563,9 @@ impl BlockState<V1_21_2> for BlackCandleCake {
 impl BlockStateExt<V1_21_2> for BlackCandleCake {
     type Attributes = LitBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17582,9 +17582,9 @@ impl BlockState<V1_21_2> for AmethystBlock {
 impl BlockStateExt<V1_21_2> for AmethystBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17601,9 +17601,9 @@ impl BlockState<V1_21_2> for BuddingAmethyst {
 impl BlockStateExt<V1_21_2> for BuddingAmethyst {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17620,9 +17620,9 @@ impl BlockState<V1_21_2> for AmethystCluster {
 impl BlockStateExt<V1_21_2> for AmethystCluster {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17639,9 +17639,9 @@ impl BlockState<V1_21_2> for LargeAmethystBud {
 impl BlockStateExt<V1_21_2> for LargeAmethystBud {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17658,9 +17658,9 @@ impl BlockState<V1_21_2> for MediumAmethystBud {
 impl BlockStateExt<V1_21_2> for MediumAmethystBud {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17677,9 +17677,9 @@ impl BlockState<V1_21_2> for SmallAmethystBud {
 impl BlockStateExt<V1_21_2> for SmallAmethystBud {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17696,9 +17696,9 @@ impl BlockState<V1_21_2> for Tuff {
 impl BlockStateExt<V1_21_2> for Tuff {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17715,9 +17715,9 @@ impl BlockState<V1_21_2> for TuffSlab {
 impl BlockStateExt<V1_21_2> for TuffSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17734,9 +17734,9 @@ impl BlockState<V1_21_2> for TuffStairs {
 impl BlockStateExt<V1_21_2> for TuffStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17753,9 +17753,9 @@ impl BlockState<V1_21_2> for TuffWall {
 impl BlockStateExt<V1_21_2> for TuffWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17772,9 +17772,9 @@ impl BlockState<V1_21_2> for PolishedTuff {
 impl BlockStateExt<V1_21_2> for PolishedTuff {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17791,9 +17791,9 @@ impl BlockState<V1_21_2> for PolishedTuffSlab {
 impl BlockStateExt<V1_21_2> for PolishedTuffSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17810,9 +17810,9 @@ impl BlockState<V1_21_2> for PolishedTuffStairs {
 impl BlockStateExt<V1_21_2> for PolishedTuffStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17829,9 +17829,9 @@ impl BlockState<V1_21_2> for PolishedTuffWall {
 impl BlockStateExt<V1_21_2> for PolishedTuffWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17848,9 +17848,9 @@ impl BlockState<V1_21_2> for ChiseledTuff {
 impl BlockStateExt<V1_21_2> for ChiseledTuff {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17867,9 +17867,9 @@ impl BlockState<V1_21_2> for TuffBricks {
 impl BlockStateExt<V1_21_2> for TuffBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17886,9 +17886,9 @@ impl BlockState<V1_21_2> for TuffBrickSlab {
 impl BlockStateExt<V1_21_2> for TuffBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17905,9 +17905,9 @@ impl BlockState<V1_21_2> for TuffBrickStairs {
 impl BlockStateExt<V1_21_2> for TuffBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17924,9 +17924,9 @@ impl BlockState<V1_21_2> for TuffBrickWall {
 impl BlockStateExt<V1_21_2> for TuffBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -17943,9 +17943,9 @@ impl BlockState<V1_21_2> for ChiseledTuffBricks {
 impl BlockStateExt<V1_21_2> for ChiseledTuffBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17962,9 +17962,9 @@ impl BlockState<V1_21_2> for Calcite {
 impl BlockStateExt<V1_21_2> for Calcite {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -17981,9 +17981,9 @@ impl BlockState<V1_21_2> for TintedGlass {
 impl BlockStateExt<V1_21_2> for TintedGlass {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18000,9 +18000,9 @@ impl BlockState<V1_21_2> for PowderSnow {
 impl BlockStateExt<V1_21_2> for PowderSnow {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18019,9 +18019,9 @@ impl BlockState<V1_21_2> for SculkSensor {
 impl BlockStateExt<V1_21_2> for SculkSensor {
     type Attributes = (PowerIntRangeAttribute, SculkSensorPhaseEnumAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18038,9 +18038,9 @@ impl BlockState<V1_21_2> for CalibratedSculkSensor {
 impl BlockStateExt<V1_21_2> for CalibratedSculkSensor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, PowerIntRangeAttribute, SculkSensorPhaseEnumAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18057,9 +18057,9 @@ impl BlockState<V1_21_2> for Sculk {
 impl BlockStateExt<V1_21_2> for Sculk {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18076,9 +18076,9 @@ impl BlockState<V1_21_2> for SculkVein {
 impl BlockStateExt<V1_21_2> for SculkVein {
     type Attributes = (DownBooleanAttribute, EastBooleanAttribute, NorthBooleanAttribute, SouthBooleanAttribute, UpBooleanAttribute, WaterloggedBooleanAttribute, WestBooleanAttribute);
     const DEFAULT: Self = Self(127u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18095,9 +18095,9 @@ impl BlockState<V1_21_2> for SculkCatalyst {
 impl BlockStateExt<V1_21_2> for SculkCatalyst {
     type Attributes = BloomBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18114,9 +18114,9 @@ impl BlockState<V1_21_2> for SculkShrieker {
 impl BlockStateExt<V1_21_2> for SculkShrieker {
     type Attributes = (CanSummonBooleanAttribute, ShriekingBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(7u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18133,9 +18133,9 @@ impl BlockState<V1_21_2> for CopperBlock {
 impl BlockStateExt<V1_21_2> for CopperBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18152,9 +18152,9 @@ impl BlockState<V1_21_2> for ExposedCopper {
 impl BlockStateExt<V1_21_2> for ExposedCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18171,9 +18171,9 @@ impl BlockState<V1_21_2> for WeatheredCopper {
 impl BlockStateExt<V1_21_2> for WeatheredCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18190,9 +18190,9 @@ impl BlockState<V1_21_2> for OxidizedCopper {
 impl BlockStateExt<V1_21_2> for OxidizedCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18209,9 +18209,9 @@ impl BlockState<V1_21_2> for CopperOre {
 impl BlockStateExt<V1_21_2> for CopperOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18228,9 +18228,9 @@ impl BlockState<V1_21_2> for DeepslateCopperOre {
 impl BlockStateExt<V1_21_2> for DeepslateCopperOre {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18247,9 +18247,9 @@ impl BlockState<V1_21_2> for OxidizedCutCopper {
 impl BlockStateExt<V1_21_2> for OxidizedCutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18266,9 +18266,9 @@ impl BlockState<V1_21_2> for WeatheredCutCopper {
 impl BlockStateExt<V1_21_2> for WeatheredCutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18285,9 +18285,9 @@ impl BlockState<V1_21_2> for ExposedCutCopper {
 impl BlockStateExt<V1_21_2> for ExposedCutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18304,9 +18304,9 @@ impl BlockState<V1_21_2> for CutCopper {
 impl BlockStateExt<V1_21_2> for CutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18323,9 +18323,9 @@ impl BlockState<V1_21_2> for OxidizedChiseledCopper {
 impl BlockStateExt<V1_21_2> for OxidizedChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18342,9 +18342,9 @@ impl BlockState<V1_21_2> for WeatheredChiseledCopper {
 impl BlockStateExt<V1_21_2> for WeatheredChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18361,9 +18361,9 @@ impl BlockState<V1_21_2> for ExposedChiseledCopper {
 impl BlockStateExt<V1_21_2> for ExposedChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18380,9 +18380,9 @@ impl BlockState<V1_21_2> for ChiseledCopper {
 impl BlockStateExt<V1_21_2> for ChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18399,9 +18399,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedChiseledCopper {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18418,9 +18418,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredChiseledCopper {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18437,9 +18437,9 @@ impl BlockState<V1_21_2> for WaxedExposedChiseledCopper {
 impl BlockStateExt<V1_21_2> for WaxedExposedChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18456,9 +18456,9 @@ impl BlockState<V1_21_2> for WaxedChiseledCopper {
 impl BlockStateExt<V1_21_2> for WaxedChiseledCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18475,9 +18475,9 @@ impl BlockState<V1_21_2> for OxidizedCutCopperStairs {
 impl BlockStateExt<V1_21_2> for OxidizedCutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18494,9 +18494,9 @@ impl BlockState<V1_21_2> for WeatheredCutCopperStairs {
 impl BlockStateExt<V1_21_2> for WeatheredCutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18513,9 +18513,9 @@ impl BlockState<V1_21_2> for ExposedCutCopperStairs {
 impl BlockStateExt<V1_21_2> for ExposedCutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18532,9 +18532,9 @@ impl BlockState<V1_21_2> for CutCopperStairs {
 impl BlockStateExt<V1_21_2> for CutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18551,9 +18551,9 @@ impl BlockState<V1_21_2> for OxidizedCutCopperSlab {
 impl BlockStateExt<V1_21_2> for OxidizedCutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18570,9 +18570,9 @@ impl BlockState<V1_21_2> for WeatheredCutCopperSlab {
 impl BlockStateExt<V1_21_2> for WeatheredCutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18589,9 +18589,9 @@ impl BlockState<V1_21_2> for ExposedCutCopperSlab {
 impl BlockStateExt<V1_21_2> for ExposedCutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18608,9 +18608,9 @@ impl BlockState<V1_21_2> for CutCopperSlab {
 impl BlockStateExt<V1_21_2> for CutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18627,9 +18627,9 @@ impl BlockState<V1_21_2> for WaxedCopperBlock {
 impl BlockStateExt<V1_21_2> for WaxedCopperBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18646,9 +18646,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCopper {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18665,9 +18665,9 @@ impl BlockState<V1_21_2> for WaxedExposedCopper {
 impl BlockStateExt<V1_21_2> for WaxedExposedCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18684,9 +18684,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCopper {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18703,9 +18703,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCutCopper {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18722,9 +18722,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCutCopper {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18741,9 +18741,9 @@ impl BlockState<V1_21_2> for WaxedExposedCutCopper {
 impl BlockStateExt<V1_21_2> for WaxedExposedCutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18760,9 +18760,9 @@ impl BlockState<V1_21_2> for WaxedCutCopper {
 impl BlockStateExt<V1_21_2> for WaxedCutCopper {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -18779,9 +18779,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCutCopperStairs {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18798,9 +18798,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCutCopperStairs {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18817,9 +18817,9 @@ impl BlockState<V1_21_2> for WaxedExposedCutCopperStairs {
 impl BlockStateExt<V1_21_2> for WaxedExposedCutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18836,9 +18836,9 @@ impl BlockState<V1_21_2> for WaxedCutCopperStairs {
 impl BlockStateExt<V1_21_2> for WaxedCutCopperStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18855,9 +18855,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCutCopperSlab {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18874,9 +18874,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCutCopperSlab {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18893,9 +18893,9 @@ impl BlockState<V1_21_2> for WaxedExposedCutCopperSlab {
 impl BlockStateExt<V1_21_2> for WaxedExposedCutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18912,9 +18912,9 @@ impl BlockState<V1_21_2> for WaxedCutCopperSlab {
 impl BlockStateExt<V1_21_2> for WaxedCutCopperSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18931,9 +18931,9 @@ impl BlockState<V1_21_2> for CopperDoor {
 impl BlockStateExt<V1_21_2> for CopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18950,9 +18950,9 @@ impl BlockState<V1_21_2> for ExposedCopperDoor {
 impl BlockStateExt<V1_21_2> for ExposedCopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18969,9 +18969,9 @@ impl BlockState<V1_21_2> for OxidizedCopperDoor {
 impl BlockStateExt<V1_21_2> for OxidizedCopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -18988,9 +18988,9 @@ impl BlockState<V1_21_2> for WeatheredCopperDoor {
 impl BlockStateExt<V1_21_2> for WeatheredCopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19007,9 +19007,9 @@ impl BlockState<V1_21_2> for WaxedCopperDoor {
 impl BlockStateExt<V1_21_2> for WaxedCopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19026,9 +19026,9 @@ impl BlockState<V1_21_2> for WaxedExposedCopperDoor {
 impl BlockStateExt<V1_21_2> for WaxedExposedCopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19045,9 +19045,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCopperDoor {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19064,9 +19064,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCopperDoor {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCopperDoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, HingeEnumAttribute, OpenBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19083,9 +19083,9 @@ impl BlockState<V1_21_2> for CopperTrapdoor {
 impl BlockStateExt<V1_21_2> for CopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19102,9 +19102,9 @@ impl BlockState<V1_21_2> for ExposedCopperTrapdoor {
 impl BlockStateExt<V1_21_2> for ExposedCopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19121,9 +19121,9 @@ impl BlockState<V1_21_2> for OxidizedCopperTrapdoor {
 impl BlockStateExt<V1_21_2> for OxidizedCopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19140,9 +19140,9 @@ impl BlockState<V1_21_2> for WeatheredCopperTrapdoor {
 impl BlockStateExt<V1_21_2> for WeatheredCopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19159,9 +19159,9 @@ impl BlockState<V1_21_2> for WaxedCopperTrapdoor {
 impl BlockStateExt<V1_21_2> for WaxedCopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19178,9 +19178,9 @@ impl BlockState<V1_21_2> for WaxedExposedCopperTrapdoor {
 impl BlockStateExt<V1_21_2> for WaxedExposedCopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19197,9 +19197,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCopperTrapdoor {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19216,9 +19216,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCopperTrapdoor {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCopperTrapdoor {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, OpenBooleanAttribute, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(15u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19235,9 +19235,9 @@ impl BlockState<V1_21_2> for CopperGrate {
 impl BlockStateExt<V1_21_2> for CopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19254,9 +19254,9 @@ impl BlockState<V1_21_2> for ExposedCopperGrate {
 impl BlockStateExt<V1_21_2> for ExposedCopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19273,9 +19273,9 @@ impl BlockState<V1_21_2> for WeatheredCopperGrate {
 impl BlockStateExt<V1_21_2> for WeatheredCopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19292,9 +19292,9 @@ impl BlockState<V1_21_2> for OxidizedCopperGrate {
 impl BlockStateExt<V1_21_2> for OxidizedCopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19311,9 +19311,9 @@ impl BlockState<V1_21_2> for WaxedCopperGrate {
 impl BlockStateExt<V1_21_2> for WaxedCopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19330,9 +19330,9 @@ impl BlockState<V1_21_2> for WaxedExposedCopperGrate {
 impl BlockStateExt<V1_21_2> for WaxedExposedCopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19349,9 +19349,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCopperGrate {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19368,9 +19368,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCopperGrate {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCopperGrate {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19387,9 +19387,9 @@ impl BlockState<V1_21_2> for CopperBulb {
 impl BlockStateExt<V1_21_2> for CopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19406,9 +19406,9 @@ impl BlockState<V1_21_2> for ExposedCopperBulb {
 impl BlockStateExt<V1_21_2> for ExposedCopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19425,9 +19425,9 @@ impl BlockState<V1_21_2> for WeatheredCopperBulb {
 impl BlockStateExt<V1_21_2> for WeatheredCopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19444,9 +19444,9 @@ impl BlockState<V1_21_2> for OxidizedCopperBulb {
 impl BlockStateExt<V1_21_2> for OxidizedCopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19463,9 +19463,9 @@ impl BlockState<V1_21_2> for WaxedCopperBulb {
 impl BlockStateExt<V1_21_2> for WaxedCopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19482,9 +19482,9 @@ impl BlockState<V1_21_2> for WaxedExposedCopperBulb {
 impl BlockStateExt<V1_21_2> for WaxedExposedCopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19501,9 +19501,9 @@ impl BlockState<V1_21_2> for WaxedWeatheredCopperBulb {
 impl BlockStateExt<V1_21_2> for WaxedWeatheredCopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19520,9 +19520,9 @@ impl BlockState<V1_21_2> for WaxedOxidizedCopperBulb {
 impl BlockStateExt<V1_21_2> for WaxedOxidizedCopperBulb {
     type Attributes = (LitBooleanAttribute, PoweredBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19539,9 +19539,9 @@ impl BlockState<V1_21_2> for LightningRod {
 impl BlockStateExt<V1_21_2> for LightningRod {
     type Attributes = (FacingEnumAttribute_North_East_South_West_Up_Down, PoweredBooleanAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(19u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19558,9 +19558,9 @@ impl BlockState<V1_21_2> for PointedDripstone {
 impl BlockStateExt<V1_21_2> for PointedDripstone {
     type Attributes = (ThicknessEnumAttribute, VerticalDirectionEnumAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(5u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19577,9 +19577,9 @@ impl BlockState<V1_21_2> for DripstoneBlock {
 impl BlockStateExt<V1_21_2> for DripstoneBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19596,9 +19596,9 @@ impl BlockState<V1_21_2> for CaveVines {
 impl BlockStateExt<V1_21_2> for CaveVines {
     type Attributes = (AgeIntRangeAttribute_0_25, BerriesBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19615,9 +19615,9 @@ impl BlockState<V1_21_2> for CaveVinesPlant {
 impl BlockStateExt<V1_21_2> for CaveVinesPlant {
     type Attributes = BerriesBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19634,9 +19634,9 @@ impl BlockState<V1_21_2> for SporeBlossom {
 impl BlockStateExt<V1_21_2> for SporeBlossom {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19653,9 +19653,9 @@ impl BlockState<V1_21_2> for Azalea {
 impl BlockStateExt<V1_21_2> for Azalea {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19672,9 +19672,9 @@ impl BlockState<V1_21_2> for FloweringAzalea {
 impl BlockStateExt<V1_21_2> for FloweringAzalea {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19691,9 +19691,9 @@ impl BlockState<V1_21_2> for MossCarpet {
 impl BlockStateExt<V1_21_2> for MossCarpet {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19710,9 +19710,9 @@ impl BlockState<V1_21_2> for PinkPetals {
 impl BlockStateExt<V1_21_2> for PinkPetals {
     type Attributes = (FacingEnumAttribute_North_South_West_East, FlowerAmountIntRangeAttribute);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19729,9 +19729,9 @@ impl BlockState<V1_21_2> for MossBlock {
 impl BlockStateExt<V1_21_2> for MossBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19748,9 +19748,9 @@ impl BlockState<V1_21_2> for BigDripleaf {
 impl BlockStateExt<V1_21_2> for BigDripleaf {
     type Attributes = (FacingEnumAttribute_North_South_West_East, TiltEnumAttribute, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19767,9 +19767,9 @@ impl BlockState<V1_21_2> for BigDripleafStem {
 impl BlockStateExt<V1_21_2> for BigDripleafStem {
     type Attributes = (FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19786,9 +19786,9 @@ impl BlockState<V1_21_2> for SmallDripleaf {
 impl BlockStateExt<V1_21_2> for SmallDripleaf {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Upper_Lower, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19805,9 +19805,9 @@ impl BlockState<V1_21_2> for HangingRoots {
 impl BlockStateExt<V1_21_2> for HangingRoots {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19824,9 +19824,9 @@ impl BlockState<V1_21_2> for RootedDirt {
 impl BlockStateExt<V1_21_2> for RootedDirt {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19843,9 +19843,9 @@ impl BlockState<V1_21_2> for Mud {
 impl BlockStateExt<V1_21_2> for Mud {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19862,9 +19862,9 @@ impl BlockState<V1_21_2> for Deepslate {
 impl BlockStateExt<V1_21_2> for Deepslate {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19881,9 +19881,9 @@ impl BlockState<V1_21_2> for CobbledDeepslate {
 impl BlockStateExt<V1_21_2> for CobbledDeepslate {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19900,9 +19900,9 @@ impl BlockState<V1_21_2> for CobbledDeepslateStairs {
 impl BlockStateExt<V1_21_2> for CobbledDeepslateStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19919,9 +19919,9 @@ impl BlockState<V1_21_2> for CobbledDeepslateSlab {
 impl BlockStateExt<V1_21_2> for CobbledDeepslateSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19938,9 +19938,9 @@ impl BlockState<V1_21_2> for CobbledDeepslateWall {
 impl BlockStateExt<V1_21_2> for CobbledDeepslateWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19957,9 +19957,9 @@ impl BlockState<V1_21_2> for PolishedDeepslate {
 impl BlockStateExt<V1_21_2> for PolishedDeepslate {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -19976,9 +19976,9 @@ impl BlockState<V1_21_2> for PolishedDeepslateStairs {
 impl BlockStateExt<V1_21_2> for PolishedDeepslateStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -19995,9 +19995,9 @@ impl BlockState<V1_21_2> for PolishedDeepslateSlab {
 impl BlockStateExt<V1_21_2> for PolishedDeepslateSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20014,9 +20014,9 @@ impl BlockState<V1_21_2> for PolishedDeepslateWall {
 impl BlockStateExt<V1_21_2> for PolishedDeepslateWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20033,9 +20033,9 @@ impl BlockState<V1_21_2> for DeepslateTiles {
 impl BlockStateExt<V1_21_2> for DeepslateTiles {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20052,9 +20052,9 @@ impl BlockState<V1_21_2> for DeepslateTileStairs {
 impl BlockStateExt<V1_21_2> for DeepslateTileStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20071,9 +20071,9 @@ impl BlockState<V1_21_2> for DeepslateTileSlab {
 impl BlockStateExt<V1_21_2> for DeepslateTileSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20090,9 +20090,9 @@ impl BlockState<V1_21_2> for DeepslateTileWall {
 impl BlockStateExt<V1_21_2> for DeepslateTileWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20109,9 +20109,9 @@ impl BlockState<V1_21_2> for DeepslateBricks {
 impl BlockStateExt<V1_21_2> for DeepslateBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20128,9 +20128,9 @@ impl BlockState<V1_21_2> for DeepslateBrickStairs {
 impl BlockStateExt<V1_21_2> for DeepslateBrickStairs {
     type Attributes = (FacingEnumAttribute_North_South_West_East, HalfEnumAttribute_Top_Bottom, ShapeEnumAttribute_Straight_InnerLeft_InnerRight_OuterLeft_OuterRight, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(11u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20147,9 +20147,9 @@ impl BlockState<V1_21_2> for DeepslateBrickSlab {
 impl BlockStateExt<V1_21_2> for DeepslateBrickSlab {
     type Attributes = (TypeEnumAttribute_Top_Bottom_Double, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20166,9 +20166,9 @@ impl BlockState<V1_21_2> for DeepslateBrickWall {
 impl BlockStateExt<V1_21_2> for DeepslateBrickWall {
     type Attributes = (EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, UpBooleanAttribute, WaterloggedBooleanAttribute, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(3u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20185,9 +20185,9 @@ impl BlockState<V1_21_2> for ChiseledDeepslate {
 impl BlockStateExt<V1_21_2> for ChiseledDeepslate {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20204,9 +20204,9 @@ impl BlockState<V1_21_2> for CrackedDeepslateBricks {
 impl BlockStateExt<V1_21_2> for CrackedDeepslateBricks {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20223,9 +20223,9 @@ impl BlockState<V1_21_2> for CrackedDeepslateTiles {
 impl BlockStateExt<V1_21_2> for CrackedDeepslateTiles {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20242,9 +20242,9 @@ impl BlockState<V1_21_2> for InfestedDeepslate {
 impl BlockStateExt<V1_21_2> for InfestedDeepslate {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20261,9 +20261,9 @@ impl BlockState<V1_21_2> for SmoothBasalt {
 impl BlockStateExt<V1_21_2> for SmoothBasalt {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20280,9 +20280,9 @@ impl BlockState<V1_21_2> for RawIronBlock {
 impl BlockStateExt<V1_21_2> for RawIronBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20299,9 +20299,9 @@ impl BlockState<V1_21_2> for RawCopperBlock {
 impl BlockStateExt<V1_21_2> for RawCopperBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20318,9 +20318,9 @@ impl BlockState<V1_21_2> for RawGoldBlock {
 impl BlockStateExt<V1_21_2> for RawGoldBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20337,9 +20337,9 @@ impl BlockState<V1_21_2> for PottedAzaleaBush {
 impl BlockStateExt<V1_21_2> for PottedAzaleaBush {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20356,9 +20356,9 @@ impl BlockState<V1_21_2> for PottedFloweringAzaleaBush {
 impl BlockStateExt<V1_21_2> for PottedFloweringAzaleaBush {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20375,9 +20375,9 @@ impl BlockState<V1_21_2> for OchreFroglight {
 impl BlockStateExt<V1_21_2> for OchreFroglight {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20394,9 +20394,9 @@ impl BlockState<V1_21_2> for VerdantFroglight {
 impl BlockStateExt<V1_21_2> for VerdantFroglight {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20413,9 +20413,9 @@ impl BlockState<V1_21_2> for PearlescentFroglight {
 impl BlockStateExt<V1_21_2> for PearlescentFroglight {
     type Attributes = AxisEnumAttribute_X_Y_Z;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20432,9 +20432,9 @@ impl BlockState<V1_21_2> for Frogspawn {
 impl BlockStateExt<V1_21_2> for Frogspawn {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20451,9 +20451,9 @@ impl BlockState<V1_21_2> for ReinforcedDeepslate {
 impl BlockStateExt<V1_21_2> for ReinforcedDeepslate {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20470,9 +20470,9 @@ impl BlockState<V1_21_2> for DecoratedPot {
 impl BlockStateExt<V1_21_2> for DecoratedPot {
     type Attributes = (CrackedBooleanAttribute, FacingEnumAttribute_North_South_West_East, WaterloggedBooleanAttribute);
     const DEFAULT: Self = Self(9u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20489,9 +20489,9 @@ impl BlockState<V1_21_2> for Crafter {
 impl BlockStateExt<V1_21_2> for Crafter {
     type Attributes = (CraftingBooleanAttribute, OrientationEnumAttribute, TriggeredBooleanAttribute);
     const DEFAULT: Self = Self(45u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20508,9 +20508,9 @@ impl BlockState<V1_21_2> for TrialSpawner {
 impl BlockStateExt<V1_21_2> for TrialSpawner {
     type Attributes = (OminousBooleanAttribute, TrialSpawnerStateEnumAttribute);
     const DEFAULT: Self = Self(6u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20527,9 +20527,9 @@ impl BlockState<V1_21_2> for Vault {
 impl BlockStateExt<V1_21_2> for Vault {
     type Attributes = (FacingEnumAttribute_North_South_West_East, OminousBooleanAttribute, VaultStateEnumAttribute);
     const DEFAULT: Self = Self(4u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20546,9 +20546,9 @@ impl BlockState<V1_21_2> for HeavyCore {
 impl BlockStateExt<V1_21_2> for HeavyCore {
     type Attributes = WaterloggedBooleanAttribute;
     const DEFAULT: Self = Self(1u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20565,9 +20565,9 @@ impl BlockState<V1_21_2> for PaleMossBlock {
 impl BlockStateExt<V1_21_2> for PaleMossBlock {
     type Attributes = ();
     const DEFAULT: Self = Self;
-    fn to_relative(&self) -> usize { 0usize }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
+    fn to_relative(&self) -> u16 { 0u16 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self) } else { None }
     }
 }
 
@@ -20584,9 +20584,9 @@ impl BlockState<V1_21_2> for PaleMossCarpet {
 impl BlockStateExt<V1_21_2> for PaleMossCarpet {
     type Attributes = (BottomBooleanAttribute, EastEnumAttribute_None_Low_Tall, NorthEnumAttribute_None_Low_Tall, SouthEnumAttribute_None_Low_Tall, WestEnumAttribute_None_Low_Tall);
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
@@ -20603,9 +20603,9 @@ impl BlockState<V1_21_2> for PaleHangingMoss {
 impl BlockStateExt<V1_21_2> for PaleHangingMoss {
     type Attributes = TipBooleanAttribute;
     const DEFAULT: Self = Self(0u16);
-    fn to_relative(&self) -> usize { usize::from(self.0) }
-    fn from_relative(relative: usize) -> Option<Self> {
-        if relative < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative as u16)) } else { None }
+    fn to_relative(&self) -> u16 { self.0 }
+    fn from_relative(relative: u16) -> Option<Self> {
+        if usize::from(relative) < <Self as BlockStateExt<V1_21_2>>::STATE_COUNT { Some(Self(relative)) } else { None }
     }
 }
 
