@@ -7,7 +7,7 @@ use bevy_reflect::Reflect;
 use froglight_protocol::versions::v1_21_0::V1_21_0;
 
 use super::{BlockBuilder, BlockStorage, BlockStorageArc, ReflectBlockBuilder};
-use crate::{attribute::*, block::*, BlockState, BlockStateExt};
+use crate::{attribute::*, block::*, BlockActions};
 
 #[test]
 fn storage() {
@@ -39,21 +39,15 @@ fn storage() {
         assert_eq!(storage.get_stored_default_type::<CoarseDirt>(), Some(&CoarseDirt));
 
         if let Some(block) = storage.get_stored_default_type::<GrassBlock>() {
-            assert_eq!(BlockState::<V1_21_0>::resource_key(block), "minecraft:grass_block");
-            assert_eq!(
-                <GrassBlock as BlockStateExt<V1_21_0>>::to_attributes(block),
-                SnowyBooleanAttribute(false)
-            );
+            assert_eq!(block.key::<V1_21_0>(), "minecraft:grass_block");
+            assert_eq!(block.to_attr::<V1_21_0>(), SnowyBooleanAttribute(false));
         } else {
             panic!("Grass block not found!");
         }
 
         if let Some(block) = storage.get_stored_default_type::<Podzol>() {
-            assert_eq!(BlockState::<V1_21_0>::resource_key(block), "minecraft:podzol");
-            assert_eq!(
-                <Podzol as BlockStateExt<V1_21_0>>::to_attributes(block),
-                SnowyBooleanAttribute(false)
-            );
+            assert_eq!(block.key::<V1_21_0>(), "minecraft:podzol");
+            assert_eq!(block.to_attr::<V1_21_0>(), SnowyBooleanAttribute(false));
         } else {
             panic!("Podzol block not found!");
         }
@@ -99,15 +93,11 @@ fn storage() {
         assert_eq!(storage.get_type(9), Some(TypeId::of::<GrassBlock>()));
 
         assert_eq!(
-            storage.get_block_id(&<GrassBlock as BlockStateExt<V1_21_0>>::from_attributes(
-                SnowyBooleanAttribute(true)
-            )),
+            storage.get_block_id(&GrassBlock::from_attr::<V1_21_0>(SnowyBooleanAttribute(true))),
             Some(8)
         );
         assert_eq!(
-            storage.get_block_id(&<GrassBlock as BlockStateExt<V1_21_0>>::from_attributes(
-                SnowyBooleanAttribute(false)
-            )),
+            storage.get_block_id(&GrassBlock::from_attr::<V1_21_0>(SnowyBooleanAttribute(false))),
             Some(9)
         );
 
@@ -115,15 +105,11 @@ fn storage() {
         assert_eq!(storage.get_type(13), Some(TypeId::of::<Podzol>()));
 
         assert_eq!(
-            storage.get_block_id(&<Podzol as BlockStateExt<V1_21_0>>::from_attributes(
-                SnowyBooleanAttribute(true)
-            )),
+            storage.get_block_id(&Podzol::from_attr::<V1_21_0>(SnowyBooleanAttribute(true))),
             Some(12)
         );
         assert_eq!(
-            storage.get_block_id(&<Podzol as BlockStateExt<V1_21_0>>::from_attributes(
-                SnowyBooleanAttribute(false)
-            )),
+            storage.get_block_id(&Podzol::from_attr::<V1_21_0>(SnowyBooleanAttribute(false))),
             Some(13)
         );
     }
