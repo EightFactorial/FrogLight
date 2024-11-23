@@ -62,14 +62,18 @@ impl PerformServerConnection for V1_21_0 {
                 // Wait for the server to send a response
                 while !finished.load(Ordering::Relaxed) {
                     let packet = read.recv().await?;
-                    bevy_log::debug!("Received packet: {:?}", packet);
-
-                    // Update the compression threshold if the server sends it.
-                    if let LoginClientboundPackets::LoginCompression(packet) = &packet {
-                        *read.compression.write().await =
-                            Some(packet.threshold.try_into().unwrap());
+                    match &packet {
+                        // If the server sends a key, prepare to set up encryption.
+                        LoginClientboundPackets::LoginHello(_packet) => {
+                            todo!("Support authentication and encryption")
+                        }
+                        // Update the compression threshold if the server sends it.
+                        LoginClientboundPackets::LoginCompression(packet) => {
+                            *read.compression.write().await =
+                                Some(packet.threshold.try_into().unwrap());
+                        }
+                        _ => {}
                     }
-
                     if channel.send_login(packet).await.is_err() {
                         break;
                     }
@@ -81,19 +85,20 @@ impl PerformServerConnection for V1_21_0 {
                 while !finished.load(Ordering::Relaxed) {
                     match channel.recv().await {
                         Ok(ChannelSendPacket::Login(packet)) => {
-                            bevy_log::debug!("Sending packet: {:?}", packet);
-
-                            // If the client acknowledges the connection is finished, stop the loop.
-                            if matches!(
-                                packet.as_ref(),
-                                LoginServerboundPackets::EnterConfiguration(..)
-                            ) {
-                                finished.store(true, Ordering::Relaxed);
-                                write.send_packet(&packet).await?;
-                                return Ok(());
+                            match packet.as_ref() {
+                                // If the client sends a key, setup encryption.
+                                LoginServerboundPackets::LoginKey(_packet) => {
+                                    todo!("Support authentication and encryption")
+                                }
+                                // If the client acknowledges the connection is finished,
+                                // stop the loop.
+                                LoginServerboundPackets::EnterConfiguration(..) => {
+                                    finished.store(true, Ordering::Relaxed);
+                                    write.send_packet(&packet).await?;
+                                    return Ok(());
+                                }
+                                _ => write.send_packet(&packet).await?,
                             }
-
-                            write.send_packet(&packet).await?;
                         }
                         Ok(other) => panic!("Expected Login packet, got {other:?}"),
                         Err(_) => break,
@@ -134,15 +139,16 @@ impl PerformServerConnection for V1_21_0 {
                 while !finished.load(Ordering::Relaxed) {
                     match channel.recv().await {
                         Ok(ChannelSendPacket::Config(packet)) => {
-                            // If the client acknowledges the connection is finished, stop the loop.
-                            if matches!(packet.as_ref(), ConfigurationServerboundPackets::Ready(..))
-                            {
-                                finished.store(true, Ordering::Relaxed);
-                                write.send_packet(&packet).await?;
-                                return Ok(());
+                            match packet.as_ref() {
+                                // If the client acknowledges the connection is finished,
+                                // stop the loop.
+                                ConfigurationServerboundPackets::Ready(..) => {
+                                    finished.store(true, Ordering::Relaxed);
+                                    write.send_packet(&packet).await?;
+                                    return Ok(());
+                                }
+                                _ => write.send_packet(&packet).await?,
                             }
-
-                            write.send_packet(&packet).await?;
                         }
                         Ok(other) => panic!("Expected Config packet, got {other:?}"),
                         Err(_) => break,
@@ -183,17 +189,16 @@ impl PerformServerConnection for V1_21_0 {
                 while !finished.load(Ordering::Relaxed) {
                     match channel.recv().await {
                         Ok(ChannelSendPacket::Play(packet)) => {
-                            // If the client acknowledges the connection is finished, stop the loop.
-                            if matches!(
-                                packet.as_ref(),
-                                PlayServerboundPackets::AcknowledgeReconfiguration(..)
-                            ) {
-                                finished.store(true, Ordering::Relaxed);
-                                write.send_packet(&packet).await?;
-                                return Ok(());
+                            match packet.as_ref() {
+                                // If the client acknowledges the connection is finished,
+                                // stop the loop.
+                                PlayServerboundPackets::AcknowledgeReconfiguration(..) => {
+                                    finished.store(true, Ordering::Relaxed);
+                                    write.send_packet(&packet).await?;
+                                    return Ok(());
+                                }
+                                _ => write.send_packet(&packet).await?,
                             }
-
-                            write.send_packet(&packet).await?;
                         }
                         Ok(other) => panic!("Expected Play packet, got {other:?}"),
                         Err(_) => break,

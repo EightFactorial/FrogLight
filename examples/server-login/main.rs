@@ -7,20 +7,17 @@ use std::{io::Cursor, num::NonZeroU8, sync::Arc};
 
 use bevy::prelude::*;
 use froglight::{
-    network::{
-        network::NetworkPreUpdateSet,
-        versions::v1_21_0::{
-            configuration::{
-                ConfigurationClientboundPackets, CookieResponsePacket, CustomPayloadC2SPacket,
-                ReadyC2SPacket, SelectKnownPacksC2SPacket,
-            },
-            login::{EnterConfigurationPacket, LoginClientboundPackets, LoginQueryResponsePacket},
-            play::{
-                AcknowledgeChunksPacket, PlayClientboundPackets, ResourcePackStatusPacket,
-                TeleportConfirmPacket,
-            },
-            V1_21_0,
+    network::versions::v1_21_0::{
+        configuration::{
+            ConfigurationClientboundPackets, CookieResponsePacket, CustomPayloadC2SPacket,
+            ReadyC2SPacket, SelectKnownPacksC2SPacket,
         },
+        login::{EnterConfigurationPacket, LoginClientboundPackets, LoginQueryResponsePacket},
+        play::{
+            AcknowledgeChunksPacket, PlayClientboundPackets, ResourcePackStatusPacket,
+            TeleportConfirmPacket,
+        },
+        V1_21_0,
     },
     prelude::{
         registry::{BlockRegistry, ItemRegistry},
@@ -37,15 +34,9 @@ fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins(HeadlessPlugins);
 
-    // I recommend polling for packets during the `PreUpdate` stage.
-    // This way you can handle packets and move/spawn entities,
-    // update inventories, etc. before the main game logic.
-    app.add_systems(
-        PreUpdate,
-        print_packets
-            .run_if(any_with_component::<ConnectionChannel<V1_21_0>>)
-            .in_set(NetworkPreUpdateSet),
-    );
+    // I recommend polling for packets during the `First` stage.
+    // This way you can handle packets before any other systems run.
+    app.add_systems(First, print_packets.run_if(any_with_component::<ConnectionChannel<V1_21_0>>));
 
     app.add_systems(
         Update,

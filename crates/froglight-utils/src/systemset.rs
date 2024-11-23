@@ -11,10 +11,7 @@ pub(super) fn build(app: &mut App) {
     app.configure_sets(PreUpdate, UtilityPreUpdateSet);
 
     #[cfg(feature = "froglight-network")]
-    app.configure_sets(
-        PreUpdate,
-        UtilityPreUpdateSet.after(froglight_network::network::NetworkPreUpdateSet),
-    );
+    app.configure_sets(PreUpdate, UtilityPreUpdateSet);
 
     // Create the `UtilityPreUpdateDeferredSet` that runs `apply_deferred`
     app.configure_sets(PreUpdate, UtilityPreUpdateDeferredSet.in_set(UtilityPreUpdateSet));

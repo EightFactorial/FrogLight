@@ -10,7 +10,7 @@ mod connect;
 pub use connect::ConnectTrait;
 
 mod systemset;
-pub use systemset::{NetworkPostUpdateSet, NetworkPreUpdateSet};
+pub use systemset::NetworkPostUpdateSet;
 
 mod task;
 pub use task::{
