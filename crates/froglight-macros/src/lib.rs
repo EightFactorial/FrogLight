@@ -22,6 +22,13 @@ pub fn impl_generated_blocks(input: proc_macro::TokenStream) -> proc_macro::Toke
     block::impl_generated_blocks(input)
 }
 
+/// A macro for implementing block traits.
+#[cfg(feature = "froglight-block")]
+#[proc_macro]
+pub fn impl_block_traits(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::impl_block_traits(input)
+}
+
 // --- Protocol Macros ---
 
 #[cfg(feature = "froglight-protocol")]
