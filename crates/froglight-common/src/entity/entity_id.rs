@@ -16,6 +16,8 @@ pub struct EntityId(pub u32);
 
 impl EntityId {
     /// Creates a new `EntityId` with the given value.
+    ///
+    /// Be careful, only ***very*** rarely should you need to use this.
     #[must_use]
     pub const fn new(value: u32) -> Self { EntityId(value) }
 }

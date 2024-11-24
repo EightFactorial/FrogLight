@@ -67,6 +67,7 @@ bevy_tasks = "0.14"
 bevy_time = "0.14"
 bevy_transform = "0.14"
 bevy_utils = "0.14"
+bevy_winit = { version = "0.14", default-features = false }
 bevy-inspector-egui = { version = "0.27.0", default-features = false }
 bitvec = "1.0.1"
 bytemuck = { version = "1.20.0", features = ["latest_stable_rust"] }
@@ -76,7 +77,7 @@ futures-lite = "2.5.0"
 glam = "0.27.0"
 hashbrown = "0.14.5"
 parking_lot = "0.12.3"
-phf = { version = "0.11.2", features = ["macros", "std"] }
+phf = { version = "0.11.2", features = ["macros"] }
 proptest = "1.5.0"
 serde = "1.0"
 serde_json = "1.0"

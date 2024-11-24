@@ -35,7 +35,7 @@ pub(super) fn build(app: &mut App) {
     );
 }
 
-/// A map of [`ChunkPosition`]s to [`Entity`]s.
+/// A map of [`Chunk`] [`ChunkPosition`]s to [`Entity`]s.
 ///
 /// Much faster than using a query and iterating over all entities.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]

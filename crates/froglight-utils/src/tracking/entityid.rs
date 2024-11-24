@@ -59,6 +59,7 @@ impl EntityIdMap {
 }
 
 #[test]
+#[expect(clippy::cast_possible_truncation)]
 fn entityid_map() -> bevy_app::AppExit {
     use bevy_app::{prelude::*, AppExit};
     use bevy_ecs::prelude::*;
@@ -81,7 +82,6 @@ fn entityid_map() -> bevy_app::AppExit {
                 assert_eq!(entity_map.get(entity_id), Some(&entity));
             }
 
-            #[allow(clippy::cast_possible_truncation)]
             let count = query.iter().count() as u32;
 
             // Spawn new entities until there are 512, then exit

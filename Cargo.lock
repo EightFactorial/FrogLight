@@ -746,7 +746,6 @@ dependencies = [
  "bevy_transform",
  "bevy_utils",
  "bevy_window",
- "bevy_winit",
 ]
 
 [[package]]
@@ -1828,6 +1827,7 @@ dependencies = [
  "bevy-inspector-egui",
  "bevy_ecs",
  "bevy_reflect",
+ "bevy_winit",
  "compact_str",
  "derive_more",
  "glam",
@@ -1855,10 +1855,12 @@ dependencies = [
 name = "froglight-entity"
 version = "0.1.0"
 dependencies = [
+ "bevy_app",
  "bevy_derive",
  "bevy_ecs",
  "bevy_math",
  "bevy_reflect",
+ "bevy_transform",
  "froglight-common",
 ]
 

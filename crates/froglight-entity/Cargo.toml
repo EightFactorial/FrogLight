@@ -16,10 +16,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_math = { workspace = true }
 bevy_reflect = { workspace = true }
+bevy_transform = { workspace = true }
 froglight-common = { version = "0.1.0", path = "../froglight-common", features = [
     "bevy",
 ] }

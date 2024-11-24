@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy_mod_debugdump = "0.11.0"
+bevy_mod_debugdump = "0.11.1"
 
 [dependencies]
 bevy = { workspace = true, optional = true, default-features = false }
@@ -41,12 +41,6 @@ hashbrown = { workspace = true, optional = true, features = ["nightly"] }
 parking_lot = { workspace = true, optional = true, features = [
     "hardware-lock-elision",
     "nightly",
-] }
-
-# Enable x11 on linux, prevents compilation errors
-[target.'cfg(target_os = "linux")'.dependencies]
-bevy = { workspace = true, optional = true, default-features = false, features = [
-    "x11",
 ] }
 
 [features]

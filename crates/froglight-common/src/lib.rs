@@ -3,7 +3,7 @@
 #![feature(trivial_bounds)]
 
 mod direction;
-pub use direction::Direction;
+pub use direction::{CardinalDirection, Direction};
 
 mod entity;
 pub use entity::{EntityId, EntityUuid};

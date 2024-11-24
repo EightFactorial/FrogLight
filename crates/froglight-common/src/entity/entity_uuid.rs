@@ -17,6 +17,8 @@ pub struct EntityUuid(pub Uuid);
 
 impl EntityUuid {
     /// Creates a new [`EntityUuid`] with the given value.
+    ///
+    /// Be careful, only ***very*** rarely should you need to use this.
     #[must_use]
     pub const fn new(value: Uuid) -> Self { EntityUuid(value) }
 }
@@ -27,6 +29,12 @@ impl std::fmt::Display for EntityUuid {
 
 impl AsRef<Uuid> for EntityUuid {
     fn as_ref(&self) -> &Uuid { &self.0 }
+}
+impl AsRef<[u8; 16]> for EntityUuid {
+    fn as_ref(&self) -> &[u8; 16] { self.0.as_bytes() }
+}
+impl AsRef<[u8]> for EntityUuid {
+    fn as_ref(&self) -> &[u8] { self.0.as_bytes() }
 }
 
 impl From<u128> for EntityUuid {

@@ -31,6 +31,9 @@ bevy_reflect = { workspace = true, optional = true }
 hashbrown = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive"] }
 
+# Enable x11 on linux, prevents compilation errors
+[target.'cfg(target_os = "linux")'.dependencies]
+bevy_winit = { workspace = true, features = ["x11"] }
 
 [features]
 default = ["bevy"]

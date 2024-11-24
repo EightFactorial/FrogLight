@@ -34,7 +34,7 @@ pub(super) fn build(app: &mut App) {
     );
 }
 
-/// A map of [`ChunkPosition`]s to a list of [`Entity`]s.
+/// A map of [`EntityId`] [`ChunkPosition`]s to a list of [`Entity`]s.
 ///
 /// Much faster than using a query and iterating over all entities.
 #[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource)]
@@ -72,6 +72,7 @@ impl EntityChunkMap {
 }
 
 #[test]
+#[expect(clippy::cast_possible_wrap, clippy::cast_possible_truncation)]
 fn entitychunk_map() -> bevy_app::AppExit {
     use bevy_app::{prelude::*, AppExit};
     use bevy_ecs::prelude::*;
@@ -98,14 +99,14 @@ fn entitychunk_map() -> bevy_app::AppExit {
             }
 
             let count = query.iter().count();
-
-            #[allow(clippy::cast_possible_wrap)]
-            let pos = ChunkPosition::splat(count as i64);
-            #[allow(clippy::cast_possible_truncation)]
+            let pos = ChunkPosition::splat((count % 13) as i64);
             let id = EntityId::new(count as u32);
 
             // Spawn new entities until there are 512, then exit
             if count >= 512 {
+                // Check that the EntityChunkMap contains the correct number of entities
+                assert_eq!(entity_map.get(&pos).unwrap().len(), 39);
+
                 events.send(AppExit::Success);
             } else {
                 commands.spawn((id, pos));
