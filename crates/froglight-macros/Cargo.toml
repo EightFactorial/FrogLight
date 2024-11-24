@@ -32,6 +32,9 @@ default = []
 # Enables `froglight-block` macros
 froglight-block = []
 
+# Enables `froglight-entity` macros
+froglight-entity = []
+
 # Enables `froglight-protocol` macros
 froglight-protocol = []
 # Emit extra logging for `froglight-protocol` macros

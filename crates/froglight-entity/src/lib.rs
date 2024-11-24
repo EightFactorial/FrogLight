@@ -6,3 +6,6 @@ pub use generated::{component, entity};
 
 mod plugin;
 pub use plugin::EntityPlugin;
+
+mod entity_size;
+pub use entity_size::EntitySize;

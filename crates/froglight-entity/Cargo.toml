@@ -20,8 +20,22 @@ bevy_app = { workspace = true }
 bevy_derive = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_math = { workspace = true }
-bevy_reflect = { workspace = true }
 bevy_transform = { workspace = true }
+compact_str = { workspace = true }
+derive_more = { workspace = true }
 froglight-common = { version = "0.1.0", path = "../froglight-common", features = [
     "bevy",
 ] }
+froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
+    "froglight-entity",
+] }
+uuid = { workspace = true }
+
+# Optional dependencies
+bevy_reflect = { workspace = true, optional = true }
+
+[features]
+default = []
+
+# Derives `Reflect` for entities and entity components.
+reflect = ["dep:bevy_reflect"]

@@ -1861,7 +1861,11 @@ dependencies = [
  "bevy_math",
  "bevy_reflect",
  "bevy_transform",
+ "compact_str",
+ "derive_more",
  "froglight-common",
+ "froglight-macros",
+ "uuid",
 ]
 
 [[package]]

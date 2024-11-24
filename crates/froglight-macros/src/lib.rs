@@ -29,6 +29,25 @@ pub fn impl_block_traits(input: proc_macro::TokenStream) -> proc_macro::TokenStr
     block::impl_block_traits(input)
 }
 
+// --- Entity Macros ---
+
+#[cfg(feature = "froglight-entity")]
+mod entity;
+
+/// A macro for generating entity components.
+#[cfg(feature = "froglight-entity")]
+#[proc_macro]
+pub fn impl_generated_components(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::impl_generated_components(input)
+}
+
+/// A macro for generating entities.
+#[cfg(feature = "froglight-entity")]
+#[proc_macro]
+pub fn impl_generated_entities(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::impl_generated_entities(input)
+}
+
 // --- Protocol Macros ---
 
 #[cfg(feature = "froglight-protocol")]
