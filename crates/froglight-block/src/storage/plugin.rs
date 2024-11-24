@@ -2,7 +2,9 @@ use bevy_app::{App, Plugin};
 
 use super::VanillaBuilder;
 
-/// A plugin for adding block storage.
+/// The `Block` plugin for Froglight.
+///
+/// Adds block definitions and functions for working with blocks.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct BlockPlugin;
 

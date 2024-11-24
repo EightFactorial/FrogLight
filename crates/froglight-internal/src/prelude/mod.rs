@@ -12,6 +12,7 @@ pub use froglight_block::{
     block::{self, Blocks},
     BlockState, BlockStateExt, BlockStorage, BlockStorageArc,
 };
+pub use froglight_entity::{component, entity};
 pub use froglight_network::{
     common::*,
     connection::{Clientbound, Connection, ConnectionError, Serverbound},

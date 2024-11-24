@@ -6,6 +6,7 @@ use crate::prelude::plugins::*;
 ///
 /// This includes:
 /// - [`BlockPlugin`]
+/// - [`EntityPlugin`]
 /// - [`NetworkPlugins`]
 /// - [`UtilityPlugin`]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -15,6 +16,6 @@ impl PluginGroup for BasicPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = PluginGroupBuilder::start::<Self>();
         builder = builder.add_group(NetworkPlugins);
-        builder.add(UtilityPlugin) // .add(BlockPlugin)
+        builder.add(BlockPlugin).add(EntityPlugin).add(UtilityPlugin)
     }
 }
