@@ -12,30 +12,30 @@ use uuid::Uuid;
 
 froglight_macros::impl_generated_components! {
     // Mob Categories and Types
-    Ambient,
-    Animal,
-    Hostile,
+    AmbientEntity,
+    AnimalEntity,
     HostileMobs,
+    HostileEntity,
     Immobile,
-    Living,
-    Mob,
-    Other,
-    Passive,
+    LivingEntity,
+    MobEntity,
+    OtherEntity,
     PassiveMobs,
-    Player,
-    Projectile,
+    PassiveEntity,
+    PlayerEntity,
+    ProjectileEntity,
     Projectiles,
     Unknown,
     Vehicles,
-    WaterCreature,
+    WaterCreatureEntity,
     // Entity Components
-    AirSupply => (u32),
+    AirSupply => (), // TODO
     ArmadilloState => (u32),
     ArrowCount => (), // TODO
     AttachFace => (), // TODO
     AttachedToTarget => (), // TODO
     AttackTarget => (), // TODO
-    Baby => (bool),
+    Baby => (bool) = false,
     BackgroundColor => (), // TODO
     BeamTarget => (), // TODO
     BillboardRenderConstraints => (), // TODO
@@ -45,7 +45,7 @@ froglight_macros::impl_generated_components! {
     BoostTime => (u32),
     BrightnessOverride => (u32),
     BubbleTime => (u32),
-    CanDuplicate => (bool),
+    CanDuplicate => (bool) = true,
     CarryState => (), // TODO
     Chest => (), // TODO
     ClientAngerLevel => (u32),
@@ -53,16 +53,16 @@ froglight_macros::impl_generated_components! {
     CollarColor => (), // TODO
     Color => (), // TODO
     CommandName => (), // TODO
-    Converting => (bool),
+    Converting => (bool) = false,
     Creepy => (), // TODO
     CustomDisplay => (), // TODO
     CustomName => (CompactString),
-    CustomNameVisible => (bool),
+    CustomNameVisible => (bool) = true,
     Damage => (), // TODO
-    Dancing => (bool),
-    Dangerous => (bool),
+    Dancing => (bool) = false,
+    Dangerous => (bool) = false,
     DarkTicksRemaining => (u32),
-    Dash => (bool),
+    Dash => (bool) = false,
     DisplayBlock => (u32),
     DisplayOffset => (), // TODO
     DropSeedAtTick => (u32),
@@ -73,8 +73,8 @@ froglight_macros::impl_generated_components! {
     EffectParticles => (), // TODO
     FireworksItem => (), // TODO
     Flags => (), // TODO
-    Foil => (), // TODO
-    FromBucket => (bool),
+    Foil => (bool) = false,
+    FromBucket => (bool) = false,
     Fuel => (bool),
     Fuse => (f32),
     GlowColorOverride => (), // TODO
@@ -89,18 +89,18 @@ froglight_macros::impl_generated_components! {
     HiddenGene => (), // TODO
     HomePos => (), // TODO
     HookedEntity => (), // TODO
-    Hurt => (bool),
+    Hurt => (bool) = false,
     ImmuneToZombification => (bool),
     Interested => (bool),
     Inv => (), // TODO
-    IsCelebrating => (bool),
-    IsCharging => (bool),
-    IsChargingCrossbow => (bool),
-    IsDancing => (bool),
-    IsIgnited => (bool),
-    IsLying => (bool),
-    IsPowered => (bool),
-    IsScreamingGoat => (bool),
+    IsCelebrating => (bool) = false,
+    IsCharging => (bool) = false,
+    IsChargingCrossbow => (bool) = false,
+    IsDancing => (bool) = false,
+    IsIgnited => (bool) = false,
+    IsLying => (bool) = false,
+    IsPowered => (bool) = false,
+    IsScreamingGoat => (bool) = false,
     Item => (), // TODO
     ItemDisplay => (), // TODO
     ItemStack => (), // TODO
@@ -112,24 +112,24 @@ froglight_macros::impl_generated_components! {
     LeftRotation => (f32),
     LineWidth => (), // TODO
     LivingEntityFlags => (), // TODO
-    Loyalty => (bool),
+    Loyalty => (bool) = false,
     MainGene => (), // TODO
     MobFlags => (), // TODO
     MoistnessLevel => (u32),
     Moving => (bool),
-    NoGravity => (bool),
+    NoGravity => (bool) = false,
     OwnerUuid => (Uuid),
-    PaddleLeft => (bool),
-    PaddleRight => (bool),
+    PaddleLeft => (bool) = false,
+    PaddleRight => (bool) = false,
     PaintingVariant => (u32),
     Particle => (), // TODO
     Peek => (bool),
     Phase => (u32),
-    PierceLevel => (u32),
+    PierceLevel => (u32) = 0,
     PlayerAbsorption => (u32),
-    PlayerMainHand => (bool),
+    PlayerMainHand => (bool) = true,
     PlayerModeCustomisation => (), // TODO
-    PlayingDead => (bool),
+    PlayingDead => (bool) = false,
     PosRotInterpolationDuration => (), // TODO
     Pose => (), // TODO
     PuffState => (u32),
@@ -153,7 +153,7 @@ froglight_macros::impl_generated_components! {
     ShoulderLeft => (bool),
     ShoulderRight => (bool),
     ShowBottom => (bool),
-    Silent => (bool),
+    Silent => (bool) = false,
     Size => (f32),
     SleepingPos => (), // TODO
     SneezeCounter => (u32),
@@ -167,13 +167,13 @@ froglight_macros::impl_generated_components! {
     StrayConversion => (), // TODO
     Strength => (f32),
     StyleFlags => (), // TODO
-    Suffocating => (bool),
+    Suffocating => (bool) = false,
     TargetA => (), // TODO
     TargetB => (), // TODO
     TargetC => (), // TODO
     Text => (), // TODO
     TextOpacity => (), // TODO
-    TicksFrozen => (u32),
+    TicksFrozen => (u32) = 0,
     TongueTarget => (), // TODO
     TransformationInterpolationDuration => (), // TODO
     TransformationInterpolationStartDeltaTicks => (), // TODO
@@ -187,7 +187,7 @@ froglight_macros::impl_generated_components! {
     Type => (u32),
     TypeVariant => (u32),
     UnhappyCounter => (u32),
-    UsingItem => (bool),
+    UsingItem => (bool) = false,
     Variant => (u32),
     ViewRange => (u32),
     VillagerData => (), // TODO
