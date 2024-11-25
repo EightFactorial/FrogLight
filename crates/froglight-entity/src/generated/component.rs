@@ -29,9 +29,9 @@ froglight_macros::impl_generated_components! {
     Vehicles,
     WaterCreatureEntity,
     // Entity Components
-    AirSupply => (), // TODO
-    ArmadilloState => (u32),
-    ArrowCount => (), // TODO
+    AirSupply => (u32),
+    ArmadilloState => (u32) = 0u32,
+    ArrowCount => (u32) = 0u32,
     AttachFace => (), // TODO
     AttachedToTarget => (), // TODO
     AttackTarget => (), // TODO
@@ -39,16 +39,16 @@ froglight_macros::impl_generated_components! {
     BackgroundColor => (), // TODO
     BeamTarget => (), // TODO
     BillboardRenderConstraints => (), // TODO
-    Biting => (bool),
+    Biting => (bool) = false,
     BlockState => (), // TODO
     BodyPose => (), // TODO
-    BoostTime => (u32),
-    BrightnessOverride => (u32),
-    BubbleTime => (u32),
+    BoostTime => (u32) = 0u32,
+    BrightnessOverride => (bool) = false,
+    BubbleTime => (u32) = 0u32,
     CanDuplicate => (bool) = true,
     CarryState => (), // TODO
     Chest => (), // TODO
-    ClientAngerLevel => (u32),
+    ClientAngerLevel => (u32) = 0u32,
     ClientFlags => (), // TODO
     CollarColor => (), // TODO
     Color => (), // TODO
@@ -61,11 +61,11 @@ froglight_macros::impl_generated_components! {
     Damage => (), // TODO
     Dancing => (bool) = false,
     Dangerous => (bool) = false,
-    DarkTicksRemaining => (u32),
+    DarkTicksRemaining => (u32) = 0u32,
     Dash => (bool) = false,
-    DisplayBlock => (u32),
+    DisplayBlock => (u32) = 9u32,
     DisplayOffset => (), // TODO
-    DropSeedAtTick => (u32),
+    DropSeedAtTick => (u32) = 0u32,
     DrownedConversion => (), // TODO
     EatCounter => (u32),
     EffectAmbience => (), // TODO
@@ -75,23 +75,23 @@ froglight_macros::impl_generated_components! {
     Flags => (), // TODO
     Foil => (bool) = false,
     FromBucket => (bool) = false,
-    Fuel => (bool),
-    Fuse => (f32),
+    Fuel => (bool) = false,
+    Fuse => (u32) = 40u32,
     GlowColorOverride => (), // TODO
-    GoingHome => (bool),
-    GotFish => (bool),
-    HasEgg => (bool),
-    HasLeftHorn => (bool),
-    HasRightHorn => (bool),
+    GoingHome => (bool) = false,
+    GotFish => (bool) = false,
+    HasEgg => (bool) = false,
+    HasLeftHorn => (bool) = true,
+    HasRightHorn => (bool) = true,
     HeadPose => (), // TODO
     Health => (f32),
-    Height => (f32),
+    Height => (f32) = 1f32,
     HiddenGene => (), // TODO
     HomePos => (), // TODO
     HookedEntity => (), // TODO
     Hurt => (bool) = false,
-    ImmuneToZombification => (bool),
-    Interested => (bool),
+    ImmuneToZombification => (bool) = false,
+    Interested => (bool) = false,
     Inv => (), // TODO
     IsCelebrating => (bool) = false,
     IsCharging => (bool) = false,
@@ -106,64 +106,62 @@ froglight_macros::impl_generated_components! {
     ItemStack => (), // TODO
     LastOutput => (), // TODO
     LastPoseChangeTick => (), // TODO
-    LayingEgg => (bool),
+    LayingEgg => (bool) = false,
     LeftArmPose => (), // TODO
     LeftLegPose => (), // TODO
-    LeftRotation => (f32),
+    LeftRotation => (f32) = 0f32,
     LineWidth => (), // TODO
     LivingEntityFlags => (), // TODO
     Loyalty => (bool) = false,
     MainGene => (), // TODO
     MobFlags => (), // TODO
-    MoistnessLevel => (u32),
-    Moving => (bool),
+    MoistnessLevel => (u32) = 0u32,
+    Moving => (bool) = false,
     NoGravity => (bool) = false,
     OwnerUuid => (Uuid),
     PaddleLeft => (bool) = false,
     PaddleRight => (bool) = false,
-    PaintingVariant => (u32),
+    PaintingVariant => (u32) = 0u32,
     Particle => (), // TODO
-    Peek => (bool),
-    Phase => (u32),
-    PierceLevel => (u32) = 0,
-    PlayerAbsorption => (u32),
+    Peek => (bool) = false,
+    Phase => (u32) = 0u32,
+    PierceLevel => (u32) = 0u32,
+    PlayerAbsorption => (u32) = 0u32,
     PlayerMainHand => (bool) = true,
     PlayerModeCustomisation => (), // TODO
     PlayingDead => (bool) = false,
     PosRotInterpolationDuration => (), // TODO
     Pose => (), // TODO
-    PuffState => (u32),
-    Pumpkin => (bool),
-    Radius => (f32),
-    RelaxStateOne => (bool),
-    RemainingAngerTime => (u32),
+    PuffState => (u32) = 0u32,
+    Pumpkin => (bool) = false,
+    Radius => (f32) = 1f32,
+    RelaxStateOne => (bool) = false,
+    RemainingAngerTime => (u32) = 0u32,
     Response => (), // TODO
     RightArmPose => (), // TODO
     RightLegPose => (), // TODO
-    RightRotation => (f32),
-    Rotation => (f32),
-    Saddle => (bool),
-    Scale => (f32),
-    Score => (u32),
+    RightRotation => (f32) = 0f32,
+    Rotation => (f32) = 0f32,
+    Saddle => (bool) = false,
+    Scale => (f32) = 1f32,
+    Score => (u32) = 0u32,
     ShadowRadius => (f32),
     ShadowStrength => (f32),
     SharedFlags => (), // TODO
-    Sheared => (bool),
+    Sheared => (bool) = false,
     ShotAtAngle => (), // TODO
-    ShoulderLeft => (bool),
-    ShoulderRight => (bool),
-    ShowBottom => (bool),
+    ShowBottom => (bool) = true,
     Silent => (bool) = false,
-    Size => (f32),
+    Size => (f32) = 1f32,
     SleepingPos => (), // TODO
-    SneezeCounter => (u32),
-    SpecialType => (u32),
-    SpellCasting => (bool),
-    Standing => (bool),
-    StaredAt => (bool),
+    SneezeCounter => (u32) = 0u32,
+    SpecialType => (bool) = false,
+    SpellCasting => (bool) = false,
+    Standing => (bool) = true,
+    StaredAt => (bool) = false,
     StartPos => (), // TODO
-    State => (u32),
-    StingerCount => (), // TODO
+    State => (u32) = 0u32,
+    StingerCount => (u32) = 0u32,
     StrayConversion => (), // TODO
     Strength => (f32),
     StyleFlags => (), // TODO
@@ -173,25 +171,25 @@ froglight_macros::impl_generated_components! {
     TargetC => (), // TODO
     Text => (), // TODO
     TextOpacity => (), // TODO
-    TicksFrozen => (u32) = 0,
+    TicksFrozen => (u32) = 0u32,
     TongueTarget => (), // TODO
     TransformationInterpolationDuration => (), // TODO
     TransformationInterpolationStartDeltaTicks => (), // TODO
     Translation => (), // TODO
     TravelPos => (), // TODO
-    Travelling => (bool),
+    Travelling => (bool) = false,
     TreasurePos => (), // TODO
     Trusted0 => (), // TODO
     Trusted1 => (), // TODO
-    Trusting => (bool),
-    Type => (u32),
-    TypeVariant => (u32),
-    UnhappyCounter => (u32),
+    Trusting => (bool) = false,
+    Type => (u32) = 0u32,
+    TypeVariant => (u32) = 0u32,
+    UnhappyCounter => (u32) = 0u32,
     UsingItem => (bool) = false,
-    Variant => (u32),
+    Variant => (u32) = 0u32,
     ViewRange => (u32),
     VillagerData => (), // TODO
-    Waiting => (bool),
-    Width => (f32),
-    Wool => (u32)
+    Waiting => (bool) = false,
+    Width => (f32) = 1f32,
+    Wool => (u32) = 0u32
 }
