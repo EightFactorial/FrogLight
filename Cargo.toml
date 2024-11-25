@@ -52,29 +52,29 @@ unnecessary_cast = "warn"
 
 [workspace.dependencies]
 async-std = { version = "1.13.0", default-features = false }
-bevy = { version = "0.14", default-features = false }
-bevy_app = "0.14"
-bevy_core = "0.14"
-bevy_derive = "0.14"
-bevy_diagnostic = "0.14"
-bevy_ecs = "0.14"
-bevy_hierarchy = "0.14"
-bevy_log = "0.14"
-bevy_math = "0.14"
-bevy_reflect = "0.14"
-bevy_state = "0.14"
-bevy_tasks = "0.14"
-bevy_time = "0.14"
-bevy_transform = "0.14"
-bevy_utils = "0.14"
-bevy_winit = { version = "0.14", default-features = false }
-bevy-inspector-egui = { version = "0.27.0", default-features = false }
+bevy = { version = "0.15.0-rc.3", default-features = false }
+bevy_app = "0.15.0-rc.3"
+bevy_core = "0.15.0-rc.3"
+bevy_derive = "0.15.0-rc.3"
+bevy_diagnostic = "0.15.0-rc.3"
+bevy_ecs = "0.15.0-rc.3"
+bevy_hierarchy = "0.15.0-rc.3"
+bevy_log = "0.15.0-rc.3"
+bevy_math = "0.15.0-rc.3"
+bevy_reflect = "0.15.0-rc.3"
+bevy_state = "0.15.0-rc.3"
+bevy_tasks = "0.15.0-rc.3"
+bevy_time = "0.15.0-rc.3"
+bevy_transform = "0.15.0-rc.3"
+bevy_utils = "0.15.0-rc.3"
+bevy_winit = { version = "0.15.0-rc.3", default-features = false }
+# bevy-inspector-egui = { version = "0.27.0", default-features = false }
 bitvec = "1.0.1"
 bytemuck = { version = "1.20.0", features = ["latest_stable_rust"] }
 compact_str = "0.8.0"
 derive_more = { version = "1.0.0", features = ["full"] }
 futures-lite = "2.5.0"
-glam = "0.27.0"
+glam = "0.29"
 hashbrown = "0.14.5"
 parking_lot = "0.12.3"
 phf = { version = "0.11.2", features = ["macros"] }
@@ -83,7 +83,7 @@ serde = "1.0"
 serde_json = "1.0"
 simdnbt = "0.6.1"
 smallvec = "1.13.2"
-thiserror = "1.0"
+thiserror = "2.0"
 uuid = "1.11.0"
 
 # --- FrogLight Crate ---

@@ -325,41 +325,41 @@ impl<'de> serde::Deserialize<'de> for ResourceKey {
     }
 }
 
-#[cfg(feature = "inspector")]
-impl bevy_inspector_egui::inspector_egui_impls::InspectorPrimitive for ResourceKey {
-    fn ui(
-        &mut self,
-        ui: &mut bevy_inspector_egui::egui::Ui,
-        _: &dyn std::any::Any,
-        _: bevy_inspector_egui::egui::Id,
-        _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
-    ) -> bool {
-        ui.text_edit_singleline(self).changed()
-    }
+// #[cfg(feature = "inspector")]
+// impl bevy_inspector_egui::inspector_egui_impls::InspectorPrimitive for
+// ResourceKey {     fn ui(
+//         &mut self,
+//         ui: &mut bevy_inspector_egui::egui::Ui,
+//         _: &dyn std::any::Any,
+//         _: bevy_inspector_egui::egui::Id,
+//         _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
+//     ) -> bool {
+//         ui.text_edit_singleline(self).changed()
+//     }
 
-    fn ui_readonly(
-        &self,
-        ui: &mut bevy_inspector_egui::egui::Ui,
-        _: &dyn std::any::Any,
-        _: bevy_inspector_egui::egui::Id,
-        _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
-    ) {
-        ui.label(self.as_str());
-    }
-}
+//     fn ui_readonly(
+//         &self,
+//         ui: &mut bevy_inspector_egui::egui::Ui,
+//         _: &dyn std::any::Any,
+//         _: bevy_inspector_egui::egui::Id,
+//         _: bevy_inspector_egui::reflect_inspector::InspectorUi<'_, '_>,
+//     ) {
+//         ui.label(self.as_str());
+//     }
+// }
 
-#[cfg(feature = "inspector")]
-impl bevy_inspector_egui::egui::TextBuffer for ResourceKey {
-    fn is_mutable(&self) -> bool { true }
+// #[cfg(feature = "inspector")]
+// impl bevy_inspector_egui::egui::TextBuffer for ResourceKey {
+//     fn is_mutable(&self) -> bool { true }
 
-    fn as_str(&self) -> &str { self }
+//     fn as_str(&self) -> &str { self }
 
-    fn insert_text(&mut self, text: &str, char_index: usize) -> usize {
-        self.0.insert_str(char_index, text);
-        char_index + text.len()
-    }
+//     fn insert_text(&mut self, text: &str, char_index: usize) -> usize {
+//         self.0.insert_str(char_index, text);
+//         char_index + text.len()
+//     }
 
-    fn delete_char_range(&mut self, char_range: std::ops::Range<usize>) {
-        self.0.replace_range(char_range, "");
-    }
-}
+//     fn delete_char_range(&mut self, char_range: std::ops::Range<usize>) {
+//         self.0.replace_range(char_range, "");
+//     }
+// }
