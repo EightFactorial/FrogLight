@@ -22,11 +22,11 @@ fn main() -> AppExit {
         Update,
         (
             // Send a status request to the server.
-            send_status_request.run_if(run_once()),
+            send_status_request.run_if(run_once),
             // Print the status response and exit.
-            print_status_response.run_if(on_event::<StatusResponseEvent>()),
+            print_status_response.run_if(on_event::<StatusResponseEvent>),
             // Exit if a network error occurs.
-            exit_on_error.run_if(on_event::<ConnectionErrorEvent>()),
+            exit_on_error.run_if(on_event::<ConnectionErrorEvent>),
         )
             .chain(),
     );

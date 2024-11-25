@@ -29,6 +29,6 @@ impl EntitySize {
 impl From<(f32, f32)> for EntitySize {
     fn from((width, height): (f32, f32)) -> Self { Self::new(width, height) }
 }
-impl Into<(f32, f32)> for EntitySize {
-    fn into(self) -> (f32, f32) { (self.width(), self.height()) }
+impl From<EntitySize> for (f32, f32) {
+    fn from(value: EntitySize) -> Self { (value.width(), value.height()) }
 }

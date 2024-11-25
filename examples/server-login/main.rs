@@ -48,11 +48,10 @@ fn main() -> AppExit {
         Update,
         (
             // Create a connection to the server once
-            create_connection.run_if(run_once()),
+            create_connection.run_if(run_once),
             // Exit if a network error occurs
-            exit_on_error.run_if(
-                any_component_removed::<PolledTask>().or_else(on_event::<ConnectionErrorEvent>()),
-            ),
+            exit_on_error
+                .run_if(any_component_removed::<PolledTask>.or(on_event::<ConnectionErrorEvent>)),
         )
             .chain(),
     );
