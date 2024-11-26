@@ -7,5 +7,11 @@ use bevy_app::{App, Plugin};
 pub struct EntityPlugin;
 
 impl Plugin for EntityPlugin {
-    fn build(&self, _app: &mut App) {}
+    fn build(&self, app: &mut App) {
+        #[cfg(feature = "reflect")]
+        {
+            crate::generated::component::register(app);
+            crate::generated::entity::register(app);
+        }
+    }
 }

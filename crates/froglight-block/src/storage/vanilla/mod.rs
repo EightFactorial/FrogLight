@@ -15,8 +15,10 @@ impl VanillaBuilder {
     pub(super) fn build(app: &mut App) {
         app.register_type::<Self>();
         app.register_type_data::<Self, ReflectBlockBuilder<V1_21_0>>();
-        app.init_resource::<BlockStorageArc<V1_21_0>>();
         app.register_type_data::<Self, ReflectBlockBuilder<V1_21_2>>();
+    }
+    pub(super) fn finish(app: &mut App) {
+        app.init_resource::<BlockStorageArc<V1_21_0>>();
         app.init_resource::<BlockStorageArc<V1_21_2>>();
     }
 }

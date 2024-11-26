@@ -46,10 +46,12 @@ use super::{BasicPlugins, TASKPOOL_SETTINGS};
 /// - [`StatesPlugin`](bevy::state::app::StatesPlugin)
 ///
 /// [`BasicPlugins`]:
+/// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
+/// - [`EntityPlugin`](crate::prelude::plugins::EntityPlugin)
 /// - [`NetworkPlugin`](crate::prelude::plugins::NetworkPlugin)
+/// - [`RegistryPlugin`](crate::prelude::plugins::RegistryPlugin)
 /// - [`ResolverPlugin`](crate::prelude::plugins::ResolverPlugin)
 /// - [`UtilityPlugin`](crate::prelude::plugins::UtilityPlugin)
-/// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ApplicationPlugins;
 

@@ -7,11 +7,14 @@ use syn::{
 
 pub(super) fn impl_generated_entities(tokens: TokenStream) -> TokenStream {
     let input = syn::parse2::<MacroInput>(tokens).unwrap();
+    let mut output = TokenStream::new();
 
-    input.0.into_iter().fold(TokenStream::new(), |mut tokens, item| {
-        tokens.extend(item.into_item());
-        tokens
-    })
+    for item in &input.0 {
+        output.extend(item.to_item());
+    }
+    output.extend(input.create_register());
+
+    output
 }
 
 struct MacroInput(Vec<MacroItem>);
@@ -28,6 +31,23 @@ impl Parse for MacroInput {
         }
 
         Ok(Self(items))
+    }
+}
+impl MacroInput {
+    fn create_register(&self) -> TokenStream {
+        let items = self.0.iter().map(|item| {
+            let ident = &item.ident;
+            quote! {
+                app.register_type::<#ident>();
+            }
+        });
+
+        quote! {
+            #[cfg(feature = "reflect")]
+            pub(crate) fn register(app: &mut bevy_app::App) {
+                #(#items)*
+            }
+        }
     }
 }
 
@@ -56,7 +76,7 @@ impl Parse for MacroItem {
     }
 }
 impl MacroItem {
-    fn into_item(self) -> TokenStream {
+    fn to_item(&self) -> TokenStream {
         let MacroItem { ident, components } = self;
 
         let mut required_tokens = TokenStream::new();

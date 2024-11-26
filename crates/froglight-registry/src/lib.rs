@@ -9,3 +9,8 @@ pub use generated::registry;
 
 mod traits;
 pub use traits::{RegistryId, RegistryKey};
+
+#[cfg(feature = "reflect")]
+mod plugin;
+#[cfg(feature = "reflect")]
+pub use plugin::RegistryPlugin;

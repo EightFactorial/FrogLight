@@ -7,12 +7,15 @@ use syn::{
 };
 
 pub(super) fn impl_generated_components(tokens: TokenStream) -> TokenStream {
-    let input = syn::parse2::<MacroInput>(tokens).unwrap();
+    let mut input = syn::parse2::<MacroInput>(tokens).unwrap();
+    let mut output = TokenStream::new();
 
-    input.0.into_iter().fold(TokenStream::new(), |mut tokens, item| {
-        tokens.extend(item.into_item());
-        tokens
-    })
+    for item in &mut input.0 {
+        output.extend(item.mut_and_create());
+    }
+    output.extend(input.create_register());
+
+    output
 }
 
 struct MacroInput(Vec<MacroItem>);
@@ -27,6 +30,23 @@ impl Parse for MacroInput {
             }
         }
         Ok(Self(items))
+    }
+}
+impl MacroInput {
+    fn create_register(&self) -> TokenStream {
+        let items = self.0.iter().map(|item| {
+            let ident = &item.ident;
+            quote! {
+                app.register_type::<#ident>();
+            }
+        });
+
+        quote! {
+            #[cfg(feature = "reflect")]
+            pub(crate) fn register(app: &mut bevy_app::App) {
+                #(#items)*
+            }
+        }
     }
 }
 
@@ -68,8 +88,8 @@ impl Parse for MacroItem {
     }
 }
 impl MacroItem {
-    fn into_item(self) -> TokenStream {
-        let MacroItem { ident, mut fields, default } = self;
+    fn mut_and_create(&mut self) -> TokenStream {
+        let MacroItem { ident, fields, default } = self;
         let fields_tokens = fields.to_token_stream().to_string();
 
         let clone_tokens = if fields_tokens.contains("String") {
@@ -115,7 +135,7 @@ impl MacroItem {
 
         // Mark fields with `CompactString` or `Uuid` as ignored.
         if fields_tokens.contains("CompactString") || fields_tokens.contains("Uuid") {
-            for field in &mut fields {
+            for field in fields.iter_mut() {
                 if let syn::Type::Path(path) = &mut field.ty {
                     let path_string = path.path.to_token_stream().to_string();
                     if path_string.contains("CompactString") || path_string.contains("Uuid") {
@@ -135,7 +155,7 @@ impl MacroItem {
         };
 
         // If the struct is unit or unnamed, add a semicolon after the struct.
-        if matches!(fields, Fields::Unit | Fields::Unnamed(..)) {
+        if matches!(&mut *fields, Fields::Unit | Fields::Unnamed(..)) {
             quote! {
                 #derives
                 pub struct #ident #fields;

@@ -7,6 +7,7 @@
 use froglight_macros::FrogRegistry;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ActivityRegistry {
     #[frog(key = "minecraft:admire_item")]
     AdmireItem,
@@ -63,6 +64,7 @@ pub enum ActivityRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ArmorMaterialRegistry {
     #[frog(key = "minecraft:armadillo")]
     Armadillo,
@@ -83,6 +85,7 @@ pub enum ArmorMaterialRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum AttributeRegistry {
     #[frog(key = "minecraft:armor")]
     Armor,
@@ -213,6 +216,7 @@ pub enum AttributeRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum BlockRegistry {
     #[frog(key = "minecraft:acacia_button")]
     AcaciaButton,
@@ -2386,6 +2390,7 @@ pub enum BlockRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum BlockEntityTypeRegistry {
     #[frog(key = "minecraft:banner")]
     Banner,
@@ -2480,6 +2485,7 @@ pub enum BlockEntityTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum BlockPredicateTypeRegistry {
     #[frog(key = "minecraft:all_of")]
     AllOf,
@@ -2510,6 +2516,7 @@ pub enum BlockPredicateTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum BlockTypeRegistry {
     #[frog(key = "minecraft:air")]
     Air,
@@ -3004,6 +3011,7 @@ pub enum BlockTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum CatVariantRegistry {
     #[frog(key = "minecraft:all_black")]
     AllBlack,
@@ -3030,6 +3038,7 @@ pub enum CatVariantRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ChunkStatusRegistry {
     #[frog(key = "minecraft:biomes")]
     Biomes,
@@ -3059,6 +3068,7 @@ pub enum ChunkStatusRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum CommandArgumentTypeRegistry {
     #[frog(key = "brigadier:bool")]
     BrigadierBool,
@@ -3171,6 +3181,7 @@ pub enum CommandArgumentTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ConsumeEffectTypeRegistry {
     #[frog(key = "minecraft:apply_effects")]
     ApplyEffects,
@@ -3185,6 +3196,7 @@ pub enum ConsumeEffectTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum CreativeModeTabRegistry {
     #[frog(key = "minecraft:building_blocks")]
     BuildingBlocks,
@@ -3217,6 +3229,7 @@ pub enum CreativeModeTabRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum CustomStatRegistry {
     #[frog(key = "minecraft:animals_bred")]
     AnimalsBred,
@@ -3371,6 +3384,7 @@ pub enum CustomStatRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum DataComponentTypeRegistry {
     #[frog(key = "minecraft:attribute_modifiers")]
     AttributeModifiers,
@@ -3511,6 +3525,7 @@ pub enum DataComponentTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum DecoratedPotPatternRegistry {
     #[frog(key = "minecraft:angler")]
     Angler,
@@ -3563,6 +3578,7 @@ pub enum DecoratedPotPatternRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EnchantmentEffectComponentTypeRegistry {
     #[frog(key = "minecraft:ammo_use")]
     AmmoUse,
@@ -3627,6 +3643,7 @@ pub enum EnchantmentEffectComponentTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EnchantmentEntityEffectTypeRegistry {
     #[frog(key = "minecraft:all_of")]
     AllOf,
@@ -3659,6 +3676,7 @@ pub enum EnchantmentEntityEffectTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EnchantmentLevelBasedValueTypeRegistry {
     #[frog(key = "minecraft:clamped")]
     Clamped,
@@ -3673,6 +3691,7 @@ pub enum EnchantmentLevelBasedValueTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EnchantmentLocationBasedEffectTypeRegistry {
     #[frog(key = "minecraft:all_of")]
     AllOf,
@@ -3707,6 +3726,7 @@ pub enum EnchantmentLocationBasedEffectTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EnchantmentProviderTypeRegistry {
     #[frog(key = "minecraft:by_cost")]
     ByCost,
@@ -3717,6 +3737,7 @@ pub enum EnchantmentProviderTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EnchantmentValueEffectTypeRegistry {
     #[frog(key = "minecraft:add")]
     Add,
@@ -3731,6 +3752,7 @@ pub enum EnchantmentValueEffectTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EntitySubPredicateTypeRegistry {
     #[frog(key = "minecraft:axolotl")]
     Axolotl,
@@ -3777,6 +3799,7 @@ pub enum EntitySubPredicateTypeRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum EntityTypeRegistry {
     #[frog(key = "minecraft:acacia_boat")]
     AcaciaBoat,
@@ -4086,6 +4109,7 @@ pub enum EntityTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum FloatProviderTypeRegistry {
     #[frog(key = "minecraft:clamped_normal")]
     ClampedNormal,
@@ -4098,6 +4122,7 @@ pub enum FloatProviderTypeRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum FluidRegistry {
     #[default]
     #[frog(key = "minecraft:empty")]
@@ -4113,6 +4138,7 @@ pub enum FluidRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum FrogVariantRegistry {
     #[frog(key = "minecraft:cold")]
     Cold,
@@ -4123,6 +4149,7 @@ pub enum FrogVariantRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum GameEventRegistry {
     #[frog(key = "minecraft:block_activate")]
     BlockActivate,
@@ -4248,6 +4275,7 @@ pub enum GameEventRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum HeightProviderTypeRegistry {
     #[frog(key = "minecraft:biased_to_bottom")]
     BiasedToBottom,
@@ -4264,6 +4292,7 @@ pub enum HeightProviderTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum InstrumentRegistry {
     #[frog(key = "minecraft:admire_goat_horn")]
     AdmireGoatHorn,
@@ -4284,6 +4313,7 @@ pub enum InstrumentRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum IntProviderTypeRegistry {
     #[frog(key = "minecraft:biased_to_bottom")]
     BiasedToBottom,
@@ -4300,6 +4330,7 @@ pub enum IntProviderTypeRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ItemRegistry {
     #[frog(key = "minecraft:acacia_boat")]
     AcaciaBoat,
@@ -7055,6 +7086,7 @@ pub enum ItemRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ItemSubPredicateTypeRegistry {
     #[frog(key = "minecraft:attribute_modifiers")]
     AttributeModifiers,
@@ -7087,6 +7119,7 @@ pub enum ItemSubPredicateTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum LootConditionTypeRegistry {
     #[frog(key = "minecraft:all_of")]
     AllOf,
@@ -7129,6 +7162,7 @@ pub enum LootConditionTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum LootFunctionTypeRegistry {
     #[frog(key = "minecraft:apply_bonus")]
     ApplyBonus,
@@ -7213,6 +7247,7 @@ pub enum LootFunctionTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum LootNbtProviderTypeRegistry {
     #[frog(key = "minecraft:context")]
     Context,
@@ -7221,6 +7256,7 @@ pub enum LootNbtProviderTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum LootNumberProviderTypeRegistry {
     #[frog(key = "minecraft:binomial")]
     Binomial,
@@ -7237,6 +7273,7 @@ pub enum LootNumberProviderTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum LootPoolEntryTypeRegistry {
     #[frog(key = "minecraft:alternatives")]
     Alternatives,
@@ -7257,6 +7294,7 @@ pub enum LootPoolEntryTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum LootScoreProviderTypeRegistry {
     #[frog(key = "minecraft:context")]
     Context,
@@ -7265,6 +7303,7 @@ pub enum LootScoreProviderTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum MapDecorationTypeRegistry {
     #[frog(key = "minecraft:banner_black")]
     BannerBlack,
@@ -7339,6 +7378,7 @@ pub enum MapDecorationTypeRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum MemoryModuleTypeRegistry {
     #[frog(key = "minecraft:admiring_disabled")]
     AdmiringDisabled,
@@ -7556,6 +7596,7 @@ pub enum MemoryModuleTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum MenuRegistry {
     #[frog(key = "minecraft:anvil")]
     Anvil,
@@ -7610,6 +7651,7 @@ pub enum MenuRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum MobEffectRegistry {
     #[frog(key = "minecraft:absorption")]
     Absorption,
@@ -7692,6 +7734,7 @@ pub enum MobEffectRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum NumberFormatTypeRegistry {
     #[frog(key = "minecraft:blank")]
     Blank,
@@ -7702,6 +7745,7 @@ pub enum NumberFormatTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ParticleTypeRegistry {
     #[frog(key = "minecraft:angry_villager")]
     AngryVillager,
@@ -7928,6 +7972,7 @@ pub enum ParticleTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum PointOfInterestTypeRegistry {
     #[frog(key = "minecraft:armorer")]
     Armorer,
@@ -7972,6 +8017,7 @@ pub enum PointOfInterestTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum PosRuleTestRegistry {
     #[frog(key = "minecraft:always_true")]
     AlwaysTrue,
@@ -7982,6 +8028,7 @@ pub enum PosRuleTestRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum PositionSourceTypeRegistry {
     #[frog(key = "minecraft:block")]
     Block,
@@ -7990,6 +8037,7 @@ pub enum PositionSourceTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum PotionRegistry {
     #[frog(key = "minecraft:awkward")]
     Awkward,
@@ -8086,6 +8134,7 @@ pub enum PotionRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum RecipeBookCategoryRegistry {
     #[frog(key = "minecraft:blast_furnace_blocks")]
     BlastFurnaceBlocks,
@@ -8116,6 +8165,7 @@ pub enum RecipeBookCategoryRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum RecipeDisplayRegistry {
     #[frog(key = "minecraft:crafting_shaped")]
     CraftingShaped,
@@ -8130,6 +8180,7 @@ pub enum RecipeDisplayRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum RecipeSerializerRegistry {
     #[frog(key = "minecraft:blasting")]
     Blasting,
@@ -8182,6 +8233,7 @@ pub enum RecipeSerializerRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum RecipeTypeRegistry {
     #[frog(key = "minecraft:blasting")]
     Blasting,
@@ -8200,6 +8252,7 @@ pub enum RecipeTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum RuleBlockEntityModifierRegistry {
     #[frog(key = "minecraft:append_loot")]
     AppendLoot,
@@ -8212,6 +8265,7 @@ pub enum RuleBlockEntityModifierRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum RuleTestRegistry {
     #[frog(key = "minecraft:always_true")]
     AlwaysTrue,
@@ -8228,6 +8282,7 @@ pub enum RuleTestRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum ScheduleRegistry {
     #[frog(key = "minecraft:empty")]
     Empty,
@@ -8240,6 +8295,7 @@ pub enum ScheduleRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum SensorTypeRegistry {
     #[frog(key = "minecraft:armadillo_scare_detected")]
     ArmadilloScareDetected,
@@ -8297,6 +8353,7 @@ pub enum SensorTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum SlotDisplayRegistry {
     #[frog(key = "minecraft:any_fuel")]
     AnyFuel,
@@ -8317,6 +8374,7 @@ pub enum SlotDisplayRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum SoundEventRegistry {
     #[frog(key = "minecraft:ambient.basalt_deltas.additions")]
     AmbientBasaltDeltasAdditions,
@@ -11597,6 +11655,7 @@ pub enum SoundEventRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum StatTypeRegistry {
     #[frog(key = "minecraft:broken")]
     Broken,
@@ -11619,6 +11678,7 @@ pub enum StatTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum TriggerTypeRegistry {
     #[frog(key = "minecraft:allay_drop_item_on_block")]
     AllayDropItemOnBlock,
@@ -11737,6 +11797,7 @@ pub enum TriggerTypeRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum VillagerProfessionRegistry {
     #[frog(key = "minecraft:armorer")]
     Armorer,
@@ -11772,6 +11833,7 @@ pub enum VillagerProfessionRegistry {
 
 }
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum VillagerTypeRegistry {
     #[frog(key = "minecraft:desert")]
     Desert,
@@ -11791,6 +11853,7 @@ pub enum VillagerTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenBiomeSourceRegistry {
     #[frog(key = "minecraft:checkerboard")]
     Checkerboard,
@@ -11803,6 +11866,7 @@ pub enum WorldgenBiomeSourceRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenBlockStateProviderTypeRegistry {
     #[frog(key = "minecraft:dual_noise_provider")]
     DualNoiseProvider,
@@ -11821,6 +11885,7 @@ pub enum WorldgenBlockStateProviderTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenCarverRegistry {
     #[frog(key = "minecraft:canyon")]
     Canyon,
@@ -11831,6 +11896,7 @@ pub enum WorldgenCarverRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenChunkGeneratorRegistry {
     #[frog(key = "minecraft:debug")]
     Debug,
@@ -11841,6 +11907,7 @@ pub enum WorldgenChunkGeneratorRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenDensityFunctionTypeRegistry {
     #[frog(key = "minecraft:abs")]
     Abs,
@@ -11909,6 +11976,7 @@ pub enum WorldgenDensityFunctionTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenFeatureRegistry {
     #[frog(key = "minecraft:bamboo")]
     Bamboo,
@@ -12037,6 +12105,7 @@ pub enum WorldgenFeatureRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenFeatureSizeTypeRegistry {
     #[frog(key = "minecraft:three_layers_feature_size")]
     ThreeLayersFeatureSize,
@@ -12045,6 +12114,7 @@ pub enum WorldgenFeatureSizeTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenFoliagePlacerTypeRegistry {
     #[frog(key = "minecraft:acacia_foliage_placer")]
     AcaciaFoliagePlacer,
@@ -12071,6 +12141,7 @@ pub enum WorldgenFoliagePlacerTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenMaterialConditionRegistry {
     #[frog(key = "minecraft:above_preliminary_surface")]
     AbovePreliminarySurface,
@@ -12097,6 +12168,7 @@ pub enum WorldgenMaterialConditionRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenMaterialRuleRegistry {
     #[frog(key = "minecraft:bandlands")]
     Bandlands,
@@ -12109,6 +12181,7 @@ pub enum WorldgenMaterialRuleRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenPlacementModifierTypeRegistry {
     #[frog(key = "minecraft:biome")]
     Biome,
@@ -12145,6 +12218,7 @@ pub enum WorldgenPlacementModifierTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenPoolAliasBindingRegistry {
     #[frog(key = "minecraft:direct")]
     Direct,
@@ -12155,12 +12229,14 @@ pub enum WorldgenPoolAliasBindingRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenRootPlacerTypeRegistry {
     #[frog(key = "minecraft:mangrove_root_placer")]
     MangroveRootPlacer,
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenStructurePieceRegistry {
     #[frog(key = "minecraft:btp")]
     Btp,
@@ -12277,6 +12353,7 @@ pub enum WorldgenStructurePieceRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenStructurePlacementRegistry {
     #[frog(key = "minecraft:concentric_rings")]
     ConcentricRings,
@@ -12285,6 +12362,7 @@ pub enum WorldgenStructurePlacementRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenStructurePoolElementRegistry {
     #[frog(key = "minecraft:empty_pool_element")]
     EmptyPoolElement,
@@ -12299,6 +12377,7 @@ pub enum WorldgenStructurePoolElementRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenStructureProcessorRegistry {
     #[frog(key = "minecraft:blackstone_replace")]
     BlackstoneReplace,
@@ -12325,6 +12404,7 @@ pub enum WorldgenStructureProcessorRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenStructureTypeRegistry {
     #[frog(key = "minecraft:buried_treasure")]
     BuriedTreasure,
@@ -12361,6 +12441,7 @@ pub enum WorldgenStructureTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenTreeDecoratorTypeRegistry {
     #[frog(key = "minecraft:alter_ground")]
     AlterGround,
@@ -12381,6 +12462,7 @@ pub enum WorldgenTreeDecoratorTypeRegistry {
 
 }
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, FrogRegistry)]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect))]
 pub enum WorldgenTrunkPlacerTypeRegistry {
     #[frog(key = "minecraft:bending_trunk_placer")]
     BendingTrunkPlacer,

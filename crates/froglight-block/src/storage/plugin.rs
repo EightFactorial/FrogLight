@@ -18,4 +18,6 @@ impl Plugin for BlockPlugin {
 
         VanillaBuilder::build(app);
     }
+
+    fn finish(&self, app: &mut App) { VanillaBuilder::finish(app); }
 }

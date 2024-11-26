@@ -35,9 +35,10 @@ bevy_reflect = { workspace = true, optional = true }
 [features]
 default = []
 
-# Adds a bevy plugin that registers registry types for reflection.
-bevy = ["dep:bevy_app", "dep:bevy_derive", "dep:bevy_ecs", "reflect"]
-
-# Derives `Reflect` for registry types.
-# WARNING: This massively increases compile times!
-reflect = ["dep:bevy_reflect"]
+# Enables type reflection for all registry enums
+reflect = [
+    "dep:bevy_app",
+    "dep:bevy_derive",
+    "dep:bevy_ecs",
+    "dep:bevy_reflect",
+]
