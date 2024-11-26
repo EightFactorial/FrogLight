@@ -118,3 +118,13 @@ default = ["nightly"]
 
 # Enable optimizations using the nightly compiler
 nightly = ["froglight-internal/nightly"]
+
+# Enables type reflection
+# WARNING: This massively increases compile times!
+reflect = ["froglight-internal/reflect"]
+
+# --- Examples ---
+
+[[example]]
+name = "reflection"
+required-features = ["reflect"]

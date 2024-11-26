@@ -36,6 +36,7 @@ bevy_reflect = { workspace = true, optional = true }
 default = []
 
 # Enables type reflection for all registry enums
+# WARNING: This will increase compile times!
 reflect = [
     "dep:bevy_app",
     "dep:bevy_derive",

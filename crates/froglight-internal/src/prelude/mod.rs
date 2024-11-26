@@ -31,3 +31,6 @@ pub use froglight_utils::{
     tracking::{ChunkPositionMap, EntityChunkMap, EntityIdMap, EntityUuidMap},
 };
 pub use froglight_world::{Chunk, ChunkSection};
+
+#[cfg(feature = "presets")]
+pub use crate::{ApplicationPlugins, BasicPlugins, HeadlessPlugins};
