@@ -7,6 +7,7 @@ use bevy_app::{App, Plugin};
 pub struct EntityPlugin;
 
 impl Plugin for EntityPlugin {
+    #[allow(unused_variables)]
     fn build(&self, app: &mut App) {
         #[cfg(feature = "reflect")]
         {
