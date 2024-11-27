@@ -132,7 +132,8 @@ where
     #[must_use]
     pub fn info_mut(&mut self) -> &mut ConnectionInformation { &mut self.info }
 
-    /// Split the connection into a read and write half.
+    /// Split the [`Connection`] into a
+    /// [`ReadConnection`] and a [`WriteConnection`].
     #[must_use]
     pub fn into_split(self) -> (ReadConnection<V, S, D>, WriteConnection<V, S, D>) {
         let compression = Arc::new(RwLock::new(self.compression));
@@ -160,6 +161,26 @@ where
         };
 
         (read, write)
+    }
+
+    /// Create a new [`Connection`] from a
+    /// [`ReadConnection`] and a [`WriteConnection`].
+    #[must_use]
+    #[expect(unused_variables)]
+    pub async fn from_split(
+        read: ReadConnection<V, S, D>,
+        write: WriteConnection<V, S, D>,
+    ) -> Self {
+        Self {
+            stream: read.stream,
+            bundle: read.bundle,
+            compression: *read.compression.read().await,
+            info: read.info.read().await.clone(),
+            account: read.account.read().await.clone(),
+            _version: PhantomData,
+            _state: PhantomData,
+            _direction: PhantomData,
+        }
     }
 
     /// Create a new connection from a [`std::net::TcpStream`].
