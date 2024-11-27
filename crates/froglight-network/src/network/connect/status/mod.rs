@@ -45,6 +45,6 @@ where
     Play: State<V>,
 {
     #[cfg(debug_assertions)]
-    bevy_log::debug!("Querying: \"{}:{}\"", conn.info.get_address(), conn.info.get_port());
+    bevy_log::debug!("Querying: \"{}:{}\"", conn.info().get_address(), conn.info().get_port());
     V::status_request(conn).await.map(|(_, status, duration)| (status, duration))
 }

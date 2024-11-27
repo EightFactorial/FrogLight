@@ -29,8 +29,8 @@ impl PerformServerConnection for V1_21_0 {
         // Send a Handshake to the server.
         conn.send(HandshakePacket {
             protocol: V1_21_0::ID,
-            address: conn.info.get_address(),
-            port: conn.info.get_port(),
+            address: conn.info().get_address(),
+            port: conn.info().get_port(),
             intent: ConnectionIntent::Login,
         })
         .await?;

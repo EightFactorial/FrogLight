@@ -41,7 +41,7 @@ where
     pub(crate) bundle: VecDeque<D::Recv>,
     pub(crate) compression: Option<i32>,
     /// Information about the connection.
-    pub info: ConnectionInformation,
+    info: ConnectionInformation,
     /// Information about the account.
     account: AccountInformation,
     _version: PhantomData<V>,

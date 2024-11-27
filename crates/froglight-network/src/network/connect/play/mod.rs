@@ -67,7 +67,7 @@ where
     Play: State<V>,
 {
     #[cfg(debug_assertions)]
-    bevy_log::debug!("Connecting: \"{}:{}\"", conn.info.get_address(), conn.info.get_port());
+    bevy_log::debug!("Connecting: \"{}:{}\"", conn.info().get_address(), conn.info().get_port());
 
     // Perform the handshake.
     let hand = V::perform_handshake(conn).await?;

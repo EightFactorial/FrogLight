@@ -2,7 +2,7 @@ use bevy::{
     app::{PluginGroup, PluginGroupBuilder},
     core::TaskPoolPlugin,
     log::LogPlugin,
-    MinimalPlugins as BevyMinimalPlugins,
+    HeadlessPlugins as BevyHeadlessPlugins,
 };
 
 use crate::{groups::basic::BasicPlugins, TASKPOOL_SETTINGS};
@@ -11,13 +11,19 @@ use crate::{groups::basic::BasicPlugins, TASKPOOL_SETTINGS};
 ///
 /// Contains all the plugins required to run a headless application.
 ///
-/// [`MinimalPlugins`](BevyMinimalPlugins):
-/// - [`TaskPoolPlugin`](bevy::core::TaskPoolPlugin)
+/// Bevy's [`HeadlessPlugins`](BevyHeadlessPlugins):
+/// - [`PanicHandlerPlugin`](bevy::app::PanicHandlerPlugin)
+/// - [`LogPlugin`]
+/// - [`TaskPoolPlugin`]
 /// - [`TypeRegistrationPlugin`](bevy::core::TypeRegistrationPlugin)
 /// - [`FrameCountPlugin`](bevy::core::FrameCountPlugin)
 /// - [`TimePlugin`](bevy::time::TimePlugin)
+/// - [`TransformPlugin`](bevy::transform::TransformPlugin)
+/// - [`HierarchyPlugin`](bevy::hierarchy::HierarchyPlugin)
+/// - [`DiagnosticsPlugin`](bevy::diagnostic::DiagnosticsPlugin)
 /// - [`ScheduleRunnerPlugin`](bevy::app::ScheduleRunnerPlugin)
-/// - [`LogPlugin`]
+/// - [`TerminalCtrlCHandlerPlugin`](bevy::app::TerminalCtrlCHandlerPlugin)
+/// - [`StatesPlugin`](bevy_state::app::StatesPlugin)
 ///
 /// And the following `FrogLight` plugins:
 /// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
@@ -30,7 +36,7 @@ pub struct HeadlessPlugins;
 impl PluginGroup for HeadlessPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = PluginGroupBuilder::start::<Self>();
-        builder = builder.add_group(BevyMinimalPlugins).add(LogPlugin::default());
+        builder = builder.add_group(BevyHeadlessPlugins).add(LogPlugin::default());
         builder = builder.add_group(BasicPlugins);
 
         // Configure the TaskPoolPlugin
