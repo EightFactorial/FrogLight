@@ -83,7 +83,7 @@ serde = "1.0"
 serde_json = "1.0"
 simdnbt = "0.6.1"
 smallvec = "1.13"
-thiserror = "1.0"
+thiserror = "2.0"
 uuid = "1.11"
 
 # --- FrogLight Crate ---
