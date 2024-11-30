@@ -6,9 +6,10 @@ use bevy::{
 
 use super::{BasicPlugins, TASKPOOL_SETTINGS};
 
-/// A [`PluginGroup`] for creating a custom client.
+/// The default FrogLight [`PluginGroup`].
 ///
-/// Contains all the plugins required to run a client application.
+/// Contains all the plugins required to create an application,
+/// including the default Bevy plugins.
 ///
 /// # Note
 /// Plugins are only added if the appropriate bevy features are enabled.
@@ -25,8 +26,10 @@ use super::{BasicPlugins, TASKPOOL_SETTINGS};
 /// - [`HierarchyPlugin`](bevy::hierarchy::HierarchyPlugin)
 /// - [`DiagnosticsPlugin`](bevy::diagnostic::DiagnosticsPlugin)
 /// - [`InputPlugin`](bevy::input::InputPlugin)
+/// - [`ScheduleRunnerPlugin`](bevy::app::ScheduleRunnerPlugin)
 /// - [`WindowPlugin`](bevy::window::WindowPlugin)
 /// - [`AccessibilityPlugin`](bevy::a11y::AccessibilityPlugin)
+/// - [`TerminalCtrlCHandlerPlugin`](bevy::app::TerminalCtrlCHandlerPlugin)
 /// - [`AssetPlugin`](bevy::asset::AssetPlugin)
 /// - [`ScenePlugin`](bevy::scene::ScenePlugin)
 /// - [`WinitPlugin`](bevy::winit::WinitPlugin)
@@ -44,6 +47,9 @@ use super::{BasicPlugins, TASKPOOL_SETTINGS};
 /// - [`AnimationPlugin`](bevy::animation::AnimationPlugin)
 /// - [`GizmoPlugin`](bevy::gizmos::GizmoPlugin)
 /// - [`StatesPlugin`](bevy::state::app::StatesPlugin)
+/// - [`DevToolsPlugin`](bevy::dev_tools::DevToolsPlugin)
+/// - [`CiTestingPlugin`](bevy::dev_tools::ci_testing::CiTestingPlugin)
+/// - [`DefaultPickingPlugins`](bevy::picking::DefaultPickingPlugins)
 ///
 /// [`BasicPlugins`]:
 /// - [`BlockPlugin`](crate::prelude::plugins::BlockPlugin)
@@ -53,9 +59,9 @@ use super::{BasicPlugins, TASKPOOL_SETTINGS};
 /// - [`ResolverPlugin`](crate::prelude::plugins::ResolverPlugin)
 /// - [`UtilityPlugin`](crate::prelude::plugins::UtilityPlugin)
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct ApplicationPlugins;
+pub struct DefaultPlugins;
 
-impl PluginGroup for ApplicationPlugins {
+impl PluginGroup for DefaultPlugins {
     fn build(self) -> PluginGroupBuilder {
         let mut builder = PluginGroupBuilder::start::<Self>();
         builder = builder.add_group(BevyDefaultPlugins);

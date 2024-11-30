@@ -4,11 +4,11 @@
 //! so it's not recommended to use it.
 
 use bevy::prelude::*;
-use froglight::prelude::HeadlessPlugins;
+use froglight::DefaultPlugins;
 
 fn main() -> AppExit {
     let mut app = App::new();
-    app.add_plugins(HeadlessPlugins);
+    app.add_plugins(DefaultPlugins);
 
     // Run `print_pale_blocks`, `print_entities` and `exit` in sequence.
     app.add_systems(Update, (print_pale_blocks, print_entities, exit).chain());

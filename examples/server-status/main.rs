@@ -9,14 +9,14 @@ use froglight::{
         versions::v1_21_0::V1_21_0,
     },
     prelude::*,
-    HeadlessPlugins,
+    DefaultPlugins,
 };
 
 const SERVER_ADDRESS: &str = "localhost";
 
 fn main() -> AppExit {
     let mut app = App::new();
-    app.add_plugins(HeadlessPlugins);
+    app.add_plugins(DefaultPlugins);
 
     app.add_systems(
         Update,

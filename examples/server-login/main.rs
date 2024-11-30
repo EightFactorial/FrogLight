@@ -27,7 +27,7 @@ use froglight::{
         *,
     },
     protocol::FrogWrite,
-    HeadlessPlugins,
+    DefaultPlugins,
 };
 
 /// The server address to connect to.
@@ -38,7 +38,7 @@ const ACCOUNT: AccountInformation = AccountInformation::const_new("froglight", U
 
 fn main() -> AppExit {
     let mut app = App::new();
-    app.add_plugins(HeadlessPlugins);
+    app.add_plugins(DefaultPlugins);
 
     // I recommend polling for packets during the `First` stage.
     // This way you can handle packets before any other systems run.

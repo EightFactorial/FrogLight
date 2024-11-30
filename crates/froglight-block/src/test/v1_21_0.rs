@@ -16,6 +16,7 @@ fn generated() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
     app.add_plugins(BlockPlugin);
+    app.finish();
 
     // Retrieve the block storage.
     let storage = app.world().resource::<BlockStorageArc<V1_21_0>>();
@@ -196,5 +197,4 @@ fn generated() {
         let downcast = block.as_any().downcast_ref::<CopperTrapdoor>().unwrap();
         assert_eq!(storage.get_block_id(downcast), Some(24179u32));
     }
-
 }

@@ -15,7 +15,7 @@ use bevy::{
 use bevy_mod_debugdump::schedule_graph::settings::{
     Settings as ScheduleSettings, Style as ScheduleStyle,
 };
-use froglight_internal::ApplicationPlugins;
+use froglight_internal::DefaultPlugins;
 use froglight_utils::schedules::{
     FiveSeconds, HalfSecond, OneSecond, OneTick, QuarterSecond, TenTicks, TwoSeconds, TwoTicks,
 };
@@ -51,7 +51,8 @@ static UTIL_FIXED_SCHEDULES: LazyLock<[InternedScheduleLabel; 8]> = LazyLock::ne
 
 fn main() {
     let mut app = App::new();
-    app.add_plugins(ApplicationPlugins);
+    app.add_plugins(DefaultPlugins);
+    app.finish();
 
     // Generate schedule graphs
     graph_schedules(&mut app, "main", &[Main.intern()]);
