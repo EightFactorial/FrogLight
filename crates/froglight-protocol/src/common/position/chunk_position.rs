@@ -92,6 +92,44 @@ impl ChunkPosition {
     #[must_use]
     #[inline]
     pub const fn z(&self) -> i64 { self.0.y }
+
+    /// Return an array of all chunk positions in a radius of `R`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::common::ChunkPosition;
+    ///
+    /// let pos = ChunkPosition::new(0, 0);
+    /// assert_eq!(pos.in_radius::<0>().len(), 1);
+    /// assert_eq!(pos.in_radius::<1>().len(), 9);
+    /// assert_eq!(pos.in_radius::<2>().len(), 25);
+    /// assert_eq!(pos.in_radius::<3>().len(), 49);
+    /// assert_eq!(pos.in_radius::<4>().len(), 81);
+    /// assert_eq!(pos.in_radius::<5>().len(), 121);
+    /// assert_eq!(pos.in_radius::<6>().len(), 169);
+    /// assert_eq!(pos.in_radius::<7>().len(), 225);
+    /// assert_eq!(pos.in_radius::<8>().len(), 289);
+    /// assert_eq!(pos.in_radius::<9>().len(), 361);
+    /// assert_eq!(pos.in_radius::<10>().len(), 441);
+    /// ```
+    #[must_use]
+    pub fn in_radius<const R: usize>(&self) -> [Self; (R + R + 1) * (R + R + 1)]
+    where
+        [(); (R + R + 1) * (R + R + 1)]: Sized,
+    {
+        let mut positions = [*self; (R + R + 1) * (R + R + 1)];
+        let radius: i64 = i64::try_from(R).unwrap_or_default();
+
+        let mut index = 0;
+        for x in -radius..=radius {
+            for z in -radius..=radius {
+                positions[index] += Self::new(x, z);
+                index += 1;
+            }
+        }
+
+        positions
+    }
 }
 
 /// Read as i32s and then converted to i64s.
