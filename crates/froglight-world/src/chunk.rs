@@ -4,7 +4,7 @@ use std::sync::Arc;
 use bevy_ecs::prelude::ReflectComponent;
 use froglight_protocol::{
     common::ChunkBlockPosition,
-    protocol::{FrogRead, ReadError},
+    protocol::{FrogRead, FrogWrite, ReadError, WriteError},
 };
 use parking_lot::RwLock;
 
@@ -207,9 +207,25 @@ impl Chunk {
             sections.push(ChunkSection::fg_read(buf)?);
         }
 
-        // TODO: Read heightmaps
-
         Ok(Self { max_height, height_offset, sections: Arc::new(RwLock::new(sections)) })
+    }
+
+    /// Writes the [`Chunk`] to the given buffer.
+    ///
+    /// # Errors
+    /// If the chunk could not be written to the buffer.
+    #[inline]
+    pub fn write_to(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+        self.fg_write(buf)
+    }
+}
+
+impl FrogWrite for Chunk {
+    fn fg_write(&self, buf: &mut (impl std::io::Write + ?Sized)) -> Result<(), WriteError> {
+        for section in self.sections.read().iter() {
+            section.fg_write(buf)?;
+        }
+        Ok(())
     }
 }
 

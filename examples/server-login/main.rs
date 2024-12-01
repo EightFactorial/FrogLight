@@ -324,12 +324,21 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("Play: ChunkData");
                         info!("    Position: {:?}", chunk_packet.position);
                         info!("    Entities: {:?}", chunk_packet.chunk_data.entities);
+                        // debug!("   Nbt: {:#?}", chunk_packet.chunk_data.heightmaps);
 
                         let mut cursor = Cursor::new(chunk_packet.chunk_data.data.as_slice());
-                        if let Err(err) = Chunk::read_from(320, -64, &mut cursor) {
-                            error!("    Error: {err}");
-                        } else {
-                            info!("    Valid!");
+                        match Chunk::read_from(320, -64, &mut cursor) {
+                            Err(err) => error!("    Error: {err}"),
+                            Ok(chunk) => {
+                                let mut buf = Vec::new();
+                                chunk.fg_write(&mut buf).unwrap();
+
+                                if chunk_packet.chunk_data.data.as_slice() == buf.as_slice() {
+                                    info!("    Valid!");
+                                } else {
+                                    warn!("    Data Mismatch!");
+                                }
+                            }
                         }
 
                         // Respond that we accepted the chunk
