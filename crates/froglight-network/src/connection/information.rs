@@ -4,6 +4,7 @@ use compact_str::{CompactString, ToCompactString};
 
 /// Information about a connection.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
 pub struct ConnectionInformation {
     /// The address of the remote host.
     ///

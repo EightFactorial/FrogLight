@@ -324,7 +324,8 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("Play: ChunkData");
                         info!("    Position: {:?}", chunk_packet.position);
                         info!("    Entities: {:?}", chunk_packet.chunk_data.entities);
-                        // debug!("   Nbt: {:#?}", chunk_packet.chunk_data.heightmaps);
+                        // trace!("   Nbt: {:?}", chunk_packet.chunk_data.heightmaps);
+                        // trace!("   Light: {:?}", chunk_packet.light_data);
 
                         let mut cursor = Cursor::new(chunk_packet.chunk_data.data.as_slice());
                         match Chunk::read_from(320, -64, &mut cursor) {
