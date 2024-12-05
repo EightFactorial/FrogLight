@@ -119,12 +119,14 @@ default = ["nightly"]
 # Enable optimizations using the nightly compiler
 nightly = ["froglight-internal/nightly"]
 
-# Enables type reflection
-# WARNING: This massively increases compile times!
+# Enables using type reflection for entities and registries
 reflect = ["froglight-internal/reflect"]
+# Enables using type reflection for blocks
+# WARNING: This massively increases compile times!
+reflect_block = ["froglight-internal/reflect_block"]
 
 # --- Examples ---
 
 [[example]]
 name = "reflection"
-required-features = ["reflect"]
+required-features = ["reflect", "reflect_block"]

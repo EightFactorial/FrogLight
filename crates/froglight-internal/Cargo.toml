@@ -55,13 +55,12 @@ inspector = ["froglight-common/inspector"]
 # Enable optimizations using the nightly compiler
 nightly = ["dep:bytemuck", "dep:glam", "dep:hashbrown", "dep:parking_lot"]
 
-# Enables using type reflection for blocks, entities, and registries
+# Enables using type reflection for entities and registries
+reflect = ["froglight-entity/reflect", "froglight-registry/reflect"]
+# Enables using type reflection for blocks
 # WARNING: This massively increases compile times!
-reflect = [
-    "froglight-block/reflect",
-    "froglight-entity/reflect",
-    "froglight-registry/reflect",
-]
+reflect_block = ["froglight-block/reflect"]
+
 
 # Generate graphs used for visualizing systems
 [[example]]
