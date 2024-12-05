@@ -11,6 +11,8 @@ impl Plugin for EntityPlugin {
     fn build(&self, app: &mut App) {
         #[cfg(feature = "reflect")]
         {
+            app.register_type::<crate::EntitySize>();
+
             crate::generated::component::register(app);
             crate::generated::entity::register(app);
         }
