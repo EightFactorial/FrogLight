@@ -106,7 +106,7 @@ fn print_packets(channels: Query<(Entity, &ConnectionChannel<V1_21_0>)>, mut com
                         info!("Login: Profile");
                         info!(
                             "    Username: \"{}\", Uuid: \"{}\"",
-                            profile_packet.profile.name, profile_packet.profile.uuid
+                            profile_packet.profile.username, profile_packet.profile.uuid
                         );
 
                         // Send an acknowledgement packet
