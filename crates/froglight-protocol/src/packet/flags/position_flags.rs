@@ -4,6 +4,7 @@ use froglight_macros::FrogReadWrite;
 ///
 /// Used to determine which position fields are relative and which are absolute.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(bitset, tests = ["read_verify", "write_verify"], bytes = [0])]
 pub struct RelativePositionFlags {
     /// The X-coordinate

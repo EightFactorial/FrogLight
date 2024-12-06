@@ -2,6 +2,7 @@ use froglight_macros::FrogReadWrite;
 
 /// The player's ability flags sent from the server.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(bitset, tests = ["read_verify", "write_verify"], bytes = [0])]
 pub struct ServerPlayerAbilityFlags {
     /// Whether the player is invulnerable.

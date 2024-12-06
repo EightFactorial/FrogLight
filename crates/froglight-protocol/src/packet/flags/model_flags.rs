@@ -2,6 +2,7 @@ use froglight_macros::FrogReadWrite;
 
 /// Model customization options for a player's skin.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(bitset, tests = ["read_example"], bytes = [0])]
 pub struct PlayerModelFlags {
     /// The player's cape.

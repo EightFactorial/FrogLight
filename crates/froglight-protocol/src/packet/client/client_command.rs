@@ -4,6 +4,7 @@ use froglight_macros::FrogReadWrite;
 ///
 /// Used to signal that the client has performed a certain action.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, FrogReadWrite)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[frog(tests = ["read_example"], bytes = [7])]
 pub enum ClientPlayerCommand {
     /// The client has started sneaking.
