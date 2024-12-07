@@ -269,6 +269,7 @@ fn chunk_blocks() {
     let mut app = App::new();
     app.add_plugins(MinimalPlugins);
     app.add_plugins(BlockPlugin);
+    app.finish();
 
     // Retrieve the block storage.
     let storage = app.world().resource::<BlockStorageArc<V1_21_0>>();

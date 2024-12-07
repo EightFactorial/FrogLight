@@ -197,4 +197,5 @@ fn generated() {
         let downcast = block.as_any().downcast_ref::<CopperTrapdoor>().unwrap();
         assert_eq!(storage.get_block_id(downcast), Some(24179u32));
     }
+
 }

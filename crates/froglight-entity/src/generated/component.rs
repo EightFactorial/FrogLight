@@ -47,6 +47,7 @@ froglight_macros::impl_generated_components! {
     BrightnessOverride => (bool) = false,
     BubbleTime => (u32) = 0u32,
     CanDuplicate => (bool) = true,
+    CanMove => (), // TODO
     CarryState => (), // TODO
     Chest => (), // TODO
     ClientAngerLevel => (u32) = 0u32,
@@ -94,6 +95,7 @@ froglight_macros::impl_generated_components! {
     ImmuneToZombification => (bool) = false,
     Interested => (bool) = false,
     Inv => (), // TODO
+    IsActive => (), // TODO
     IsCelebrating => (bool) = false,
     IsCharging => (bool) = false,
     IsChargingCrossbow => (bool) = false,
