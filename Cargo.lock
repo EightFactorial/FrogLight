@@ -366,9 +366,9 @@ dependencies = [
 
 [[package]]
 name = "async-std-resolver"
-version = "0.24.1"
+version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc3b454643291f9a4a3bbdb35fa62efa4ba7be5ea13fe243e3be4352182ff4b8"
+checksum = "fa5ee46ec0c518414838d2fdc7dd18f6ba7d934b6e728005c958621da450682d"
 dependencies = [
  "async-std",
  "async-trait",
