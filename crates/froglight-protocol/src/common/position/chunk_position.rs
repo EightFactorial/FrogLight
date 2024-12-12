@@ -49,23 +49,23 @@ impl ChunkPosition {
     pub const MAX: Self = Self(I64Vec2::MAX);
 
     /// Creates a new [`ChunkPosition`] with the given coordinates.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn new(x: i64, z: i64) -> Self { Self(I64Vec2::new(x, z)) }
 
     /// Creates a new [`ChunkPosition`] with the given coordinates.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn new_i32(x: i32, z: i32) -> Self { Self(I64Vec2::new(x as i64, z as i64)) }
 
     /// Creates a new [`ChunkPosition`] where all coordinates are the same.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn splat(v: i64) -> Self { Self(I64Vec2::splat(v)) }
 
     /// Creates a new [`ChunkPosition`] where all coordinates are the same.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn splat_i32(v: i32) -> Self { Self(I64Vec2::splat(v as i64)) }
 
     /// Inverts all coordinates.
@@ -79,19 +79,53 @@ impl ChunkPosition {
     ///
     /// assert_eq!(ChunkPosition::new(1, 2).invert(), ChunkPosition::new(-1, -2));
     /// ```
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn invert(self) -> Self { Self::new(-self.x(), -self.z()) }
 
     /// Gets the x-coordinate of the position.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn x(&self) -> i64 { self.0.x }
 
     /// Gets the z-coordinate of the position.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn z(&self) -> i64 { self.0.y }
+
+    /// Return a Vec of all chunk positions in a radius of `radius`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::common::ChunkPosition;
+    ///
+    /// let pos = ChunkPosition::new(0, 0);
+    /// assert_eq!(pos.radius_of(0).len(), 1);
+    /// assert_eq!(pos.radius_of(1).len(), 9);
+    /// assert_eq!(pos.radius_of(2).len(), 25);
+    /// assert_eq!(pos.radius_of(3).len(), 49);
+    /// assert_eq!(pos.radius_of(4).len(), 81);
+    /// assert_eq!(pos.radius_of(5).len(), 121);
+    /// assert_eq!(pos.radius_of(6).len(), 169);
+    /// assert_eq!(pos.radius_of(7).len(), 225);
+    /// assert_eq!(pos.radius_of(8).len(), 289);
+    /// assert_eq!(pos.radius_of(9).len(), 361);
+    /// assert_eq!(pos.radius_of(10).len(), 441)
+    /// ```
+    #[must_use]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn radius_of(&self, radius: usize) -> Vec<Self> {
+        let mut positions = Vec::with_capacity(((radius * 2) + 1).pow(2));
+        let radius = i64::try_from(radius).unwrap();
+
+        for x in -radius..=radius {
+            for z in -radius..=radius {
+                positions.push(*self + Self::new(x, z));
+            }
+        }
+
+        positions
+    }
 
     /// Return an array of all chunk positions in a radius of `R`.
     ///
@@ -100,25 +134,26 @@ impl ChunkPosition {
     /// use froglight_protocol::common::ChunkPosition;
     ///
     /// let pos = ChunkPosition::new(0, 0);
-    /// assert_eq!(pos.in_radius::<0>().len(), 1);
-    /// assert_eq!(pos.in_radius::<1>().len(), 9);
-    /// assert_eq!(pos.in_radius::<2>().len(), 25);
-    /// assert_eq!(pos.in_radius::<3>().len(), 49);
-    /// assert_eq!(pos.in_radius::<4>().len(), 81);
-    /// assert_eq!(pos.in_radius::<5>().len(), 121);
-    /// assert_eq!(pos.in_radius::<6>().len(), 169);
-    /// assert_eq!(pos.in_radius::<7>().len(), 225);
-    /// assert_eq!(pos.in_radius::<8>().len(), 289);
-    /// assert_eq!(pos.in_radius::<9>().len(), 361);
-    /// assert_eq!(pos.in_radius::<10>().len(), 441);
+    /// assert_eq!(pos.radius_of_arr::<0>().len(), 1);
+    /// assert_eq!(pos.radius_of_arr::<1>().len(), 9);
+    /// assert_eq!(pos.radius_of_arr::<2>().len(), 25);
+    /// assert_eq!(pos.radius_of_arr::<3>().len(), 49);
+    /// assert_eq!(pos.radius_of_arr::<4>().len(), 81);
+    /// assert_eq!(pos.radius_of_arr::<5>().len(), 121);
+    /// assert_eq!(pos.radius_of_arr::<6>().len(), 169);
+    /// assert_eq!(pos.radius_of_arr::<7>().len(), 225);
+    /// assert_eq!(pos.radius_of_arr::<8>().len(), 289);
+    /// assert_eq!(pos.radius_of_arr::<9>().len(), 361);
+    /// assert_eq!(pos.radius_of_arr::<10>().len(), 441);
     /// ```
     #[must_use]
-    pub fn in_radius<const R: usize>(&self) -> [Self; (R + R + 1) * (R + R + 1)]
+    #[allow(clippy::missing_panics_doc)]
+    pub fn radius_of_arr<const R: usize>(&self) -> [Self; ((R * 2) + 1).pow(2)]
     where
-        [(); (R + R + 1) * (R + R + 1)]: Sized,
+        [(); ((R * 2) + 1).pow(2)]:,
     {
-        let mut positions = [*self; (R + R + 1) * (R + R + 1)];
-        let radius: i64 = i64::try_from(R).unwrap_or_default();
+        let mut positions = [*self; ((R * 2) + 1).pow(2)];
+        let radius = i64::try_from(R).unwrap();
 
         let mut index = 0;
         for x in -radius..=radius {

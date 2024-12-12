@@ -1,4 +1,7 @@
-use std::io::{Cursor, Write};
+use std::{
+    io::{Cursor, Write},
+    ops::Not,
+};
 
 use bitvec::{array::BitArray, order::Msb0};
 
@@ -30,12 +33,12 @@ use crate::protocol::{FrogRead, FrogWrite, ReadError, WriteError};
 pub struct BitSet<const N: usize>(BitArray<[u8; N.div_ceil(8)], Msb0>)
 where
     [(); N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero;
+    Assert<{ N > 0 }>: IsTrue;
 
 impl<const N: usize> BitSet<N>
 where
-    [u8; N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero,
+    [(); N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsTrue,
 {
     /// Create a new empty bitset.
     ///
@@ -48,9 +51,9 @@ where
     /// assert_eq!(bitset.get_bit(1), Some(false));
     /// assert_eq!(bitset.get_bit(2), Some(false));
     /// ```
-    #[must_use]
     #[inline]
-    pub fn new() -> Self { Self(BitArray::default()) }
+    #[must_use]
+    pub const fn new() -> Self { Self(BitArray::<[u8; N.div_ceil(8)], Msb0>::ZERO) }
 
     /// Create a bitset from an array of bytes.
     ///
@@ -64,8 +67,8 @@ where
     /// let bitset = BitSet::<4>::from_array([0b10101010]);
     /// assert_eq!(bitset.get_byte(0), Some(0b10100000));
     /// ```
-    #[must_use]
     #[inline]
+    #[must_use]
     pub fn from_array(array: [u8; N.div_ceil(8)]) -> Self {
         let mut array = BitArray::new(array);
 
@@ -79,12 +82,14 @@ where
 
     /// Get the value of the bit at the given index.
     ///
+    /// Returns `None` if the index is out of bounds.
+    ///
     /// # Example
     /// ```rust
     /// use froglight_protocol::common::BitSet;
     ///
     /// let mut bitset = BitSet::<8>::new();
-    /// bitset.set_byte(0, 0b10101010).unwrap();
+    /// assert_eq!(bitset.set_byte(0, 0b10101010), Some(0));
     ///
     /// assert_eq!(bitset.get_byte(0), Some(0b10101010));
     ///
@@ -102,26 +107,10 @@ where
         }
     }
 
-    /// Get the value of the byte at the given index.
-    ///
-    /// # Example
-    /// ```rust
-    /// use froglight_protocol::common::BitSet;
-    ///
-    /// let mut bitset = BitSet::<8>::new();
-    /// bitset.set_byte(0, 0b10101010).unwrap();
-    ///
-    /// assert_eq!(bitset.get_byte(0), Some(0b10101010));
-    ///
-    /// assert_eq!(bitset.get_bit(0), Some(true));
-    /// assert_eq!(bitset.get_bit(1), Some(false));
-    /// assert_eq!(bitset.get_bit(2), Some(true));
-    /// // ...
-    /// ```
-    #[must_use]
-    pub fn get_byte(&self, index: usize) -> Option<u8> { self.0.data.get(index).copied() }
-
     /// Set the value of the bit at the given index.
+    ///
+    /// Returns the previous value,
+    /// or `None` if the index is out of bounds.
     ///
     /// # Example
     /// ```rust
@@ -133,34 +122,56 @@ where
     /// assert_eq!(bitset.get_bit(2), Some(false));
     /// assert_eq!(bitset.get_bit(3), Some(false));
     ///
-    /// bitset.set_bit(1, true);
-    /// bitset.set_bit(2, true);
+    /// assert_eq!(bitset.set_bit(1, true), Some(false));
+    /// assert_eq!(bitset.set_bit(2, true), Some(false));
     ///
     /// assert_eq!(bitset.get_bit(0), Some(false));
     /// assert_eq!(bitset.get_bit(1), Some(true));
     /// assert_eq!(bitset.get_bit(2), Some(true));
     /// assert_eq!(bitset.get_bit(3), Some(false));
     /// ```
+    pub fn set_bit(&mut self, index: usize, value: bool) -> Option<bool> {
+        self.0.get_mut(index).map(|mut bit| bit.replace(value))
+    }
+
+    /// Flip the value of the bit at the given index.
     ///
-    /// # Errors
-    /// Returns `Err` if the index is out of bounds.
-    #[allow(clippy::result_unit_err)]
-    pub fn set_bit(&mut self, index: usize, value: bool) -> Result<bool, ()> {
+    /// Returns the previous value,
+    /// or `None` if the index is out of bounds.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::common::BitSet;
+    ///
+    /// let mut bitset = BitSet::<4>::new();
+    /// assert_eq!(bitset.all(), false);
+    ///
+    /// assert_eq!(bitset.flip_bit(0), Some(false));
+    ///
+    /// assert_eq!(bitset.get_bit(0), Some(true));
+    /// assert_eq!(bitset.get_bit(1), Some(false));
+    /// assert_eq!(bitset.get_bit(2), Some(false));
+    /// assert_eq!(bitset.get_bit(3), Some(false));
+    /// ```
+    pub fn flip_bit(&mut self, index: usize) -> Option<bool> {
         if let Some(mut bit) = self.0.get_mut(index) {
-            Ok(bit.replace(value))
+            let flip = bit.eq(&false);
+            Some(bit.replace(flip))
         } else {
-            Err(())
+            None
         }
     }
 
-    /// Set the value of the byte at the given index.
+    /// Get the value of the byte at the given index.
+    ///
+    /// Returns `None` if the index is out of bounds.
     ///
     /// # Example
     /// ```rust
     /// use froglight_protocol::common::BitSet;
     ///
     /// let mut bitset = BitSet::<8>::new();
-    /// bitset.set_byte(0, 0b10101010).unwrap();
+    /// assert_eq!(bitset.set_byte(0, 0b10101010), Some(0));
     ///
     /// assert_eq!(bitset.get_byte(0), Some(0b10101010));
     ///
@@ -169,14 +180,54 @@ where
     /// assert_eq!(bitset.get_bit(2), Some(true));
     /// // ...
     /// ```
-    /// # Errors
-    /// Returns `Err` if the index is out of bounds.
-    #[allow(clippy::result_unit_err)]
-    pub fn set_byte(&mut self, index: usize, value: u8) -> Result<u8, ()> {
+    #[must_use]
+    pub fn get_byte(&self, index: usize) -> Option<u8> { self.0.data.get(index).copied() }
+
+    /// Set the value of the byte at the given index.
+    ///
+    /// Returns the previous value,
+    /// or `None` if the index is out of bounds.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::common::BitSet;
+    ///
+    /// let mut bitset = BitSet::<8>::new();
+    /// assert_eq!(bitset.set_byte(0, 0b10101010), Some(0));
+    ///
+    /// assert_eq!(bitset.get_byte(0), Some(0b10101010));
+    ///
+    /// assert_eq!(bitset.get_bit(0), Some(true));
+    /// assert_eq!(bitset.get_bit(1), Some(false));
+    /// assert_eq!(bitset.get_bit(2), Some(true));
+    /// // ...
+    /// ```
+    pub fn set_byte(&mut self, index: usize, value: u8) -> Option<u8> {
+        self.0.data.get_mut(index).map(|byte| std::mem::replace(byte, value))
+    }
+
+    /// Flip the value of the byte at the given index.
+    ///
+    /// Returns the previous value,
+    /// or `None` if the index is out of bounds.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::common::BitSet;
+    ///
+    /// let mut bitset = BitSet::<8>::new();
+    /// assert_eq!(bitset.set_byte(0, 0b10101010), Some(0));
+    ///
+    /// assert_eq!(bitset.flip_byte(0), Some(0b10101010));
+    ///
+    /// assert_eq!(bitset.get_byte(0), Some(0b01010101));
+    /// ```
+    pub fn flip_byte(&mut self, index: usize) -> Option<u8> {
         if let Some(byte) = self.0.data.get_mut(index) {
-            Ok(std::mem::replace(byte, value))
+            let flip = byte.not();
+            Some(std::mem::replace(byte, flip))
         } else {
-            Err(())
+            None
         }
     }
 
@@ -189,11 +240,13 @@ where
     /// let mut bitset = BitSet::<8>::new();
     /// assert!(!bitset.all());
     ///
-    /// assert!(bitset.set_byte(0, 0b11111111).is_ok());
+    /// assert_eq!(bitset.set_byte(0, 0b11111111), Some(0));
+    /// assert_eq!(bitset.get_byte(0), Some(0b11111111));
+    ///
     /// assert!(bitset.all());
     /// ```
-    #[must_use]
     #[inline]
+    #[must_use]
     pub fn all(&self) -> bool { self.0.all() }
 
     /// Get the number of bits in the bitset.
@@ -205,8 +258,8 @@ where
     /// let bitset = BitSet::<8>::new();
     /// assert_eq!(bitset.bit_len(), 8);
     /// ```
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn bit_len(&self) -> usize { N }
 
     /// Get the number of bytes in the bitset.
@@ -224,31 +277,30 @@ where
     /// assert_eq!(BitSet::<17>::new().byte_len(), 3);
     /// assert_eq!(BitSet::<24>::new().byte_len(), 3);
     /// ```
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn byte_len(&self) -> usize { N.div_ceil(8) }
 }
 
 /// Read a [`BitSet`] from a buffer.
 impl<const N: usize> FrogRead for BitSet<N>
 where
-    [u8; N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero,
+    [(); N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsTrue,
 {
     fn fg_read(buf: &mut Cursor<&[u8]>) -> Result<Self, ReadError>
     where
         Self: Sized,
     {
-        let arr = core::array::try_from_fn(|_| u8::fg_read(buf))?;
-        Ok(Self::from_array(arr))
+        Ok(Self::from_array(core::array::try_from_fn(|_| u8::fg_read(buf))?))
     }
 }
 
 /// Write a [`BitSet`] to a buffer.
 impl<const N: usize> FrogWrite for BitSet<N>
 where
-    [u8; N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero,
+    [(); N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsTrue,
 {
     fn fg_write(&self, buf: &mut (impl Write + ?Sized)) -> Result<(), WriteError> {
         self.0.data.fg_write(buf)
@@ -258,8 +310,8 @@ where
 /// Convert a byte array to a [`BitSet`].
 impl<const N: usize> From<[u8; N.div_ceil(8)]> for BitSet<N>
 where
-    [u8; N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero,
+    [(); N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsTrue,
 {
     fn from(value: [u8; N.div_ceil(8)]) -> Self { Self::from_array(value) }
 }
@@ -267,8 +319,8 @@ where
 /// Convert a [`BitSet`] to a byte array.
 impl<const N: usize> From<BitSet<N>> for [u8; N.div_ceil(8)]
 where
-    [u8; N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero,
+    [(); N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsTrue,
 {
     fn from(value: BitSet<N>) -> Self { value.0.data }
 }
@@ -276,8 +328,8 @@ where
 /// Convert a boolean array to a [`BitSet`].
 impl<const N: usize> From<[bool; N]> for BitSet<N>
 where
-    [u8; N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero,
+    [(); N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsTrue,
 {
     fn from(value: [bool; N]) -> Self {
         let mut bitarray = BitArray::default();
@@ -291,21 +343,21 @@ where
 /// Convert a [`BitSet`] to a boolean array.
 impl<const N: usize> From<BitSet<N>> for [bool; N]
 where
-    [u8; N.div_ceil(8)]:,
-    Assert<{ N > 0 }>: IsNotZero,
+    [(); N.div_ceil(8)]:,
+    Assert<{ N > 0 }>: IsTrue,
 {
     fn from(value: BitSet<N>) -> Self { core::array::from_fn(|i| value.0[i]) }
 }
 
-use sealed::{Assert, IsNotZero};
+use sealed::{Assert, IsTrue};
 /// Asserts that the given value is not zero.
 mod sealed {
     /// [`BitSet`](super::BitSet) size must be greater than 0.
-    pub trait IsNotZero {}
+    pub trait IsTrue {}
     /// A trait for asserting a boolean value.
     pub enum Assert<const CHECK: bool> {}
     /// Only implemented for `Assert<true>`.
-    impl IsNotZero for Assert<true> {}
+    impl IsTrue for Assert<true> {}
 }
 
 #[test]
@@ -332,16 +384,16 @@ fn bitset_getset() {
     let mut bitset = BitSet::<24>::new();
     assert!(!bitset.all());
 
-    assert_eq!(bitset.set_bit(0, true), Ok(false));
-    assert_eq!(bitset.set_bit(1, true), Ok(false));
+    assert_eq!(bitset.set_bit(0, true), Some(false));
+    assert_eq!(bitset.set_bit(1, true), Some(false));
 
     assert_eq!(bitset.get_bit(0), Some(true));
     assert_eq!(bitset.get_bit(1), Some(true));
     assert_eq!(bitset.get_bit(2), Some(false));
     assert_eq!(bitset.get_bit(3), Some(false));
 
-    assert_eq!(bitset.set_byte(0, 0b1010_1010), Ok(0b1100_0000));
-    assert_eq!(bitset.set_byte(1, 0b1010_1010), Ok(0b0000_0000));
+    assert_eq!(bitset.set_byte(0, 0b1010_1010), Some(0b1100_0000));
+    assert_eq!(bitset.set_byte(1, 0b1010_1010), Some(0b0000_0000));
 
     assert_eq!(bitset.get_byte(0), Some(0b1010_1010));
     assert_eq!(bitset.get_byte(1), Some(0b1010_1010));

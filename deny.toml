@@ -48,22 +48,10 @@ version = "=0.4.2"
 name = "hashbrown"
 version = "=0.14.5"
 [[bans.skip]]
-name = "hermit-abi"
-[[bans.skip]]
-name = "idna"
-version = "=0.4.0"
-[[bans.skip]]
-name = "raw-window-handle"
-[[bans.skip]]
 name = "regex-automata"
 version = "=0.1.10"
 [[bans.skip]]
 name = "regex-syntax"
-[[bans.skip]]
-name = "rustix"
-
-[[bans.skip]]
-name = "linux-raw-sys"
 
 [[bans.skip]]
 name = "redox_syscall"
@@ -86,7 +74,3 @@ name = "windows_x86_64_gnu"
 name = "windows_x86_64_gnullvm"
 [[bans.skip]]
 name = "windows_x86_64_msvc"
-[[bans.skip]]
-name = "winnow"
-[[bans.skip]]
-name = "winreg"
