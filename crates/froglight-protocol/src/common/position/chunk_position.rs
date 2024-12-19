@@ -89,10 +89,22 @@ impl ChunkPosition {
     #[must_use]
     pub const fn x(&self) -> i64 { self.0.x }
 
+    /// Gets the x-coordinate of the position as an [`i32`].
+    #[inline]
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation)]
+    pub const fn x_i32(&self) -> i32 { self.0.x as i32 }
+
     /// Gets the z-coordinate of the position.
     #[inline]
     #[must_use]
     pub const fn z(&self) -> i64 { self.0.y }
+
+    /// Gets the z-coordinate of the position as an [`i32`].
+    #[inline]
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation)]
+    pub const fn z_i32(&self) -> i32 { self.0.y as i32 }
 
     /// Return a Vec of all chunk positions in a radius of `radius`.
     ///

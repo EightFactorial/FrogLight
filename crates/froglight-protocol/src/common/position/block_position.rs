@@ -156,17 +156,37 @@ impl BlockPosition {
     pub fn distance_squared(self, other: Self) -> i64 { self.0.distance_squared(other.0) }
 
     /// Gets the x-coordinate of the position.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn x(&self) -> i64 { self.0.x }
+
+    /// Gets the x-coordinate of the position as an [`i32`].
+    #[inline]
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation)]
+    pub const fn x_i32(&self) -> i32 { self.x() as i32 }
+
     /// Gets the y-coordinate of the position.
-    #[must_use]
     #[inline]
+    #[must_use]
     pub const fn y(&self) -> i64 { self.0.y }
-    /// Gets the z-coordinate of the position.
-    #[must_use]
+
+    /// Gets the y-coordinate of the position as an [`i32`].
     #[inline]
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation)]
+    pub const fn y_i32(&self) -> i32 { self.y() as i32 }
+
+    /// Gets the z-coordinate of the position.
+    #[inline]
+    #[must_use]
     pub const fn z(&self) -> i64 { self.0.z }
+
+    /// Gets the z-coordinate of the position as an [`i32`].
+    #[inline]
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation)]
+    pub const fn z_i32(&self) -> i32 { self.z() as i32 }
 }
 
 impl BlockPosition {
