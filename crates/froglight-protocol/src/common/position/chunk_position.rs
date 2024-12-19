@@ -8,6 +8,7 @@ use derive_more::{Deref, DerefMut, From, Into};
 use froglight_macros::FrogTest;
 use glam::{DVec2, I64Vec2, IVec2, Vec2};
 
+use super::BlockPosition;
 use crate::protocol::{FrogRead, FrogVarRead, FrogVarWrite, FrogWrite, ReadError, WriteError};
 
 /// A position in the world, measured in chunks.
@@ -165,6 +166,62 @@ impl ChunkPosition {
 
         positions
     }
+
+    /// Return the [`ChunkPosition`] of a chunk containing a [`BlockPosition`].
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_protocol::common::{BlockPosition, ChunkPosition};
+    ///
+    /// let block = BlockPosition::new(-17, 0, -17);
+    /// let chunk = ChunkPosition::new(-2, -2);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(-16, 0, -16);
+    /// let chunk = ChunkPosition::new(-1, -1);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(-15, 0, -15);
+    /// let chunk = ChunkPosition::new(-1, -1);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(-1, 0, -1);
+    /// let chunk = ChunkPosition::new(-1, -1);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(0, 0, 0);
+    /// let chunk = ChunkPosition::new(0, 0);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(15, 0, 15);
+    /// let chunk = ChunkPosition::new(0, 0);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(16, 0, 16);
+    /// let chunk = ChunkPosition::new(1, 1);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(31, 0, 31);
+    /// let chunk = ChunkPosition::new(1, 1);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(32, 0, 32);
+    /// let chunk = ChunkPosition::new(2, 2);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(47, 0, 47);
+    /// let chunk = ChunkPosition::new(2, 2);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    ///
+    /// let block = BlockPosition::new(48, 0, 48);
+    /// let chunk = ChunkPosition::new(3, 3);
+    /// assert_eq!(ChunkPosition::from(block), chunk);
+    /// ```
+    #[inline]
+    #[must_use]
+    pub const fn from_block(block: BlockPosition) -> Self {
+        Self::new(block.x() >> 4, block.z() >> 4)
+    }
 }
 
 /// Read as i32s and then converted to i64s.
@@ -301,6 +358,11 @@ impl From<IVec2> for ChunkPosition {
 impl From<ChunkPosition> for IVec2 {
     #[inline]
     fn from(v: ChunkPosition) -> Self { v.as_ivec2() }
+}
+
+impl From<BlockPosition> for ChunkPosition {
+    #[inline]
+    fn from(value: BlockPosition) -> Self { Self::from_block(value) }
 }
 
 impl<T: Into<i64>> From<[T; 2]> for ChunkPosition {
