@@ -3,18 +3,18 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/froglight-block",
-    "crates/froglight-common",
-    "crates/froglight-diagnostic",
-    "crates/froglight-entity",
-    "crates/froglight-internal",
-    "crates/froglight-macros",
-    "crates/froglight-network",
-    "crates/froglight-physics",
-    "crates/froglight-protocol",
-    "crates/froglight-registry",
-    "crates/froglight-utils",
-    "crates/froglight-world",
+  "crates/froglight-block",
+  "crates/froglight-common",
+  "crates/froglight-diagnostic",
+  "crates/froglight-entity",
+  "crates/froglight-internal",
+  "crates/froglight-macros",
+  "crates/froglight-network",
+  "crates/froglight-physics",
+  "crates/froglight-protocol",
+  "crates/froglight-registry",
+  "crates/froglight-utils",
+  "crates/froglight-world",
 ]
 
 [workspace.package]
@@ -51,8 +51,8 @@ pedantic = { level = "warn", priority = -1 }
 unnecessary_cast = "warn"
 
 [workspace.dependencies]
-async-std = { version = "1.13.0", default-features = false }
-bevy = { version = "0.15.0", default-features = false }
+async-std = { version = "1.13", default-features = false }
+bevy = { version = "0.15", default-features = false }
 bevy_app = "0.15"
 bevy_core = "0.15"
 bevy_derive = "0.15"
@@ -70,7 +70,7 @@ bevy_utils = "0.15"
 bevy_winit = { version = "0.15", default-features = false }
 # bevy-inspector-egui = { version = "0.27.0", default-features = false }
 bitvec = "1.0"
-bytemuck = { version = "1.20", features = ["latest_stable_rust"] }
+bytemuck = { version = "1.21", features = ["latest_stable_rust"] }
 compact_str = "0.8"
 derive_more = { version = "1.0", features = ["full"] }
 futures-lite = "2.5"
