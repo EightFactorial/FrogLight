@@ -22,7 +22,7 @@ bevy = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_utils = { workspace = true }
 derive_more = { workspace = true }
-downcast-rs = "1.2.1"
+downcast-rs = "2.0.0"
 froglight-macros = { version = "0.1.0", path = "../froglight-macros", features = [
     "froglight-block",
 ] }
