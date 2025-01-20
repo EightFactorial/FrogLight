@@ -114,7 +114,7 @@ dependencies = [
  "ndk-context",
  "ndk-sys 0.6.0+11769913",
  "num_enum",
- "thiserror",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -1202,7 +1202,7 @@ dependencies = [
  "polling",
  "rustix",
  "slab",
- "thiserror",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -1615,7 +1615,7 @@ dependencies = [
  "const_panic",
  "encase_derive",
  "glam",
- "thiserror",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -1820,7 +1820,7 @@ dependencies = [
  "glam",
  "hashbrown 0.14.5",
  "serde",
- "thiserror",
+ "thiserror 1.0.69",
  "uuid",
 ]
 
@@ -1910,7 +1910,7 @@ dependencies = [
  "md-5",
  "parking_lot",
  "serde_json",
- "thiserror",
+ "thiserror 1.0.69",
  "uuid",
 ]
 
@@ -1948,7 +1948,7 @@ dependencies = [
  "serde_json",
  "simdnbt",
  "smallvec",
- "thiserror",
+ "thiserror 1.0.69",
  "uuid",
 ]
 
@@ -1964,7 +1964,7 @@ dependencies = [
  "froglight-macros",
  "froglight-protocol",
  "phf",
- "thiserror",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -1997,7 +1997,7 @@ dependencies = [
  "froglight-protocol",
  "parking_lot",
  "simdnbt",
- "thiserror",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -2180,7 +2180,7 @@ checksum = "c151a2a5ef800297b4e79efa4f4bec035c5f51d5ae587287c9b952bdf734cacd"
 dependencies = [
  "log",
  "presser",
- "thiserror",
+ "thiserror 1.0.69",
  "windows",
 ]
 
@@ -2270,7 +2270,7 @@ dependencies = [
  "ipnet",
  "once_cell",
  "rand",
- "thiserror",
+ "thiserror 1.0.69",
  "tinyvec",
  "tracing",
  "url",
@@ -2292,7 +2292,7 @@ dependencies = [
  "rand",
  "resolv-conf",
  "smallvec",
- "thiserror",
+ "thiserror 1.0.69",
  "tracing",
 ]
 
@@ -2526,7 +2526,7 @@ dependencies = [
  "combine",
  "jni-sys",
  "log",
- "thiserror",
+ "thiserror 1.0.69",
  "walkdir",
  "windows-sys 0.45.0",
 ]
@@ -2790,7 +2790,7 @@ dependencies = [
  "rustc-hash",
  "spirv",
  "termcolor",
- "thiserror",
+ "thiserror 1.0.69",
  "unicode-xid",
 ]
 
@@ -2809,7 +2809,7 @@ dependencies = [
  "regex",
  "regex-syntax 0.8.5",
  "rustc-hash",
- "thiserror",
+ "thiserror 1.0.69",
  "tracing",
  "unicode-ident",
 ]
@@ -2826,7 +2826,7 @@ dependencies = [
  "ndk-sys 0.6.0+11769913",
  "num_enum",
  "raw-window-handle",
- "thiserror",
+ "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -3765,23 +3765,22 @@ dependencies = [
 
 [[package]]
 name = "simdnbt"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67d972ab7303916ad0554fa4b1f539e09f6de628211d5b51254a69e95bbe6816"
+checksum = "1af1472d2425ec2edb429ed50c254ec74c403b6aab533d56ef9c59e9ed53ccc7"
 dependencies = [
  "byteorder",
  "flate2",
  "simd_cesu8",
  "simdnbt-derive",
- "thiserror",
- "valence_nbt",
+ "thiserror 2.0.11",
 ]
 
 [[package]]
 name = "simdnbt-derive"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10dbcddd4df92d15834757fb1f61ececc00840b96a2d7b0daf09aef596628c00"
+checksum = "dd1fe91ba0e4ee5cd6e565153b363fe06b19357ce9af07cc54371c450275d26e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3930,7 +3929,16 @@ version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
 dependencies = [
- "thiserror-impl",
+ "thiserror-impl 1.0.69",
+]
+
+[[package]]
+name = "thiserror"
+version = "2.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d452f284b73e6d76dd36758a0c8684b1d5be31f92b89d07fd5822175732206fc"
+dependencies = [
+ "thiserror-impl 2.0.11",
 ]
 
 [[package]]
@@ -3938,6 +3946,17 @@ name = "thiserror-impl"
 version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "2.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "26afc1baea8a989337eeb52b6e72a039780ce45c3edfcc9c5b9d112feeb173c2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4169,16 +4188,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "valence_nbt"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3cddc3222ed5ead4fa446881b3deeeee0dba60b0088b2bf12fedbac7eda2312"
-dependencies = [
- "byteorder",
- "cesu8",
-]
-
-[[package]]
 name = "valuable"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4357,7 +4366,7 @@ dependencies = [
  "raw-window-handle",
  "rustc-hash",
  "smallvec",
- "thiserror",
+ "thiserror 1.0.69",
  "wgpu-hal",
  "wgpu-types",
 ]
@@ -4399,7 +4408,7 @@ dependencies = [
  "renderdoc-sys",
  "rustc-hash",
  "smallvec",
- "thiserror",
+ "thiserror 1.0.69",
  "wasm-bindgen",
  "web-sys",
  "wgpu-types",
