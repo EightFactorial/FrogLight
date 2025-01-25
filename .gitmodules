@@ -1,0 +1,3 @@
+[submodule "froglight-tools"]
+	path = tools
+	url = https://github.com/EightFactorial/FrogLight-Tools

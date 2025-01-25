@@ -1,0 +1,15 @@
+# --- Generator Configuration --- #
+#
+# Version groups *must* have the same protocol id!
+#
+# [[version]]
+# name = "1.20.0" # The name of the version group
+# data = "1.20.1" # The version to use for data generation
+
+[[version]]
+name = "1.21.0"
+data = "1.21.1"
+
+[[version]]
+name = "1.21.2"
+data = "1.21.3"

@@ -1,0 +1,120 @@
+# --- Workspace Settings ---
+
+[workspace]
+resolver = "2"
+members = [
+  "crates/froglight-common",
+  "crates/froglight-internal",
+  "crates/froglight-io",
+  "crates/froglight-macros",
+  "crates/froglight-network",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["EightFactorial"]
+homepage = "https://github.com/EightFactorial/FrogLight"
+repository = "https://github.com/EightFactorial/FrogLight"
+readme = "README.md"
+
+[workspace.lints.rust]
+missing_docs = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unused_lifetimes = "warn"
+unused_import_braces = "warn"
+unreachable_pub = "warn"
+
+[workspace.lints.rustdoc]
+bare_urls = "deny"
+broken_intra_doc_links = "deny"
+private_intra_doc_links = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_rust_codeblocks = "deny"
+invalid_html_tags = "deny"
+
+[workspace.lints.clippy]
+cast_possible_truncation = "warn"
+cast_possible_wrap = "warn"
+module_name_repetitions = "allow"
+needless_pass_by_value = "allow"
+pedantic = { level = "warn", priority = -1 }
+unnecessary_cast = "warn"
+
+[workspace.dependencies]
+# Bevy
+bevy = { version = "0.15", default-features = false }
+bevy_app = "0.15"
+bevy_core = "0.15"
+bevy_derive = "0.15"
+bevy_diagnostic = "0.15"
+bevy_ecs = "0.15"
+bevy_hierarchy = "0.15"
+bevy_log = "0.15"
+bevy_math = "0.15"
+bevy_reflect = "0.15"
+bevy_state = "0.15"
+bevy_tasks = "0.15"
+bevy_time = "0.15"
+bevy_transform = "0.15"
+bevy_utils = "0.15"
+bevy_winit = { version = "0.15", default-features = false }
+
+# FrogLight
+froglight-common = { version = "0.1", path = "crates/froglight-common" }
+froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
+froglight-io = { version = "0.1", path = "crates/froglight-io" }
+froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
+froglight-network = { version = "0.1", path = "crates/froglight-network" }
+
+# Other
+async-io = "2.4"
+async-lock = "3.4"
+async-net = "2.0"
+derive_more = { version = "1.0", features = ["full"] }
+futures-lite = "2.6"
+glam = "0.29"
+hashbrown = "0.15"
+parking_lot = "0.12"
+phf = { version = "0.11", features = ["macros"] }
+proptest = "1.6"
+serde = "1.0"
+serde_json = "1.0"
+simdnbt = "0.7"
+smallvec = "1.13"
+smol_str = "0.2"
+thiserror = "2.0"
+uuid = "1.12"
+
+
+# --- FrogLight Crate ---
+
+[package]
+name = "froglight"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# [dev-dependencies]
+# bevy = { workspace = true }
+# hashbrown = { workspace = true }
+# serde_json = { workspace = true }
+
+[dependencies]
+froglight-internal = { workspace = true }
+
+[features]
+default = []

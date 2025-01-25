@@ -1,0 +1,29 @@
+[package]
+name = "froglight-macros"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lib]
+proc-macro = true
+
+[lints]
+workspace = true
+
+[dependencies]
+darling = "0.20"
+convert_case = "0.7"
+proc-macro2 = "1.0"
+quote = { version = "1.0", features = ["proc-macro"] }
+syn = { version = "2.0", features = ["full", "printing", "proc-macro"] }
+toml_edit = { version = "0.22", default-features = false, features = ["parse"] }
+
+[features]

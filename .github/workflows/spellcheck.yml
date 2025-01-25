@@ -1,0 +1,45 @@
+name: Spellcheck
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * SAT"
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+
+jobs:
+  spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      # Run Spellcheck and write fixes
+      - name: Spellcheck (Fix)
+        id: spellcheck-fix
+        uses: crate-ci/typos@master
+        with: 
+          write_changes: true
+        continue-on-error: true
+      # Run Spellcheck again to verify fixes were made
+      - name: Spellcheck (Verify)
+        id: spellcheck-verify
+        if: steps.spellcheck-fix.outcome != 'success'
+        uses: crate-ci/typos@master
+      # Create PR with fixes
+      - name: Pull Request
+        if: steps.spellcheck-fix.outcome != 'success' && steps.spellcheck-verify.outcome == 'success'
+        uses: peter-evans/create-pull-request@67ccf781d68cd99b580ae25a5c18a1cc84ffff1f # v7.0.6
+        with:
+          branch: "fix-typos"
+          branch-suffix: timestamp
+          delete-branch: true
+          title: "Fix Typos"
+          body: |
+            Automatically generated PR to fix typos.
+
+            Please add exclusions to [`typos.toml`](https://github.com/EightFactorial/FrogLight/blob/main/typos.toml) if necessary.

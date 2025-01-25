@@ -1,0 +1,49 @@
+name: Spellcheck Pull
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  checks: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+
+jobs:
+  spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      # Get all changed files
+      - name: Get Changes
+        id: changed-files
+        uses: tj-actions/changed-files@bab30c2299617f6615ec02a68b9a40d10bd21366 # v45
+      # Run Spellcheck (typos)
+      - name: Spellcheck
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: crate-ci/typos@master
+        with:
+          files: ${{ steps.changed-files.outputs.all_changed_files }}
+          write_changes: true
+      # Suggest Changes
+      - uses: reviewdog/action-suggester@db4abb16fbaabe386831e5addb7be1485d0d63d3 # v1
+        if: steps.changed-files.outputs.any_changed == 'true'
+        with:
+          tool_name: typos

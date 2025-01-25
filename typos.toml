@@ -1,0 +1,10 @@
+[default.extend-words]
+# Fix modules starting with 'entitys2c' being split into 'entitys' and '2c'
+entitys = "entitys"
+
+[files]
+extend-exclude = [
+    "*.svg",
+    "crates/froglight-block/src/generated/**/*.rs",
+    "crates/froglight-registry/src/generated/**/*.rs",
+]
