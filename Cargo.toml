@@ -70,8 +70,6 @@ froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
 
 # Other
-async-io = "2.4"
-async-lock = "3.4"
 async-net = "2.0"
 derive_more = { version = "1.0", features = ["full"] }
 futures-lite = "2.6"

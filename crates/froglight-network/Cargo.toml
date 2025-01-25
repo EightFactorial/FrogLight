@@ -16,8 +16,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-async-io = { workspace = true }
-async-lock = { workspace = true }
 async-net = { workspace = true }
 froglight-io = { workspace = true }
 futures-lite = { workspace = true }

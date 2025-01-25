@@ -233,13 +233,16 @@ impl RawWriteConnection {
 /// TODO: Decryption
 async fn read_type<T: FrogRead>(raw: &mut RawConnection) -> Result<T, ReadError> {
     let mut len_buf = [0u8; 5];
-    let mut len_cursor = Cursor::new(len_buf.as_mut_slice());
-    raw.stream.peek(len_cursor.get_mut()).await?;
+    raw.stream.peek(&mut len_buf).await?;
+    let mut len_cursor = Cursor::new(len_buf.as_slice());
 
-    let mut packet_buf: Vec<u8> = Vec::with_capacity(usize::frog_var_read(&mut len_cursor)?);
+    #[expect(clippy::cast_possible_truncation)]
+    let mut packet_buf: Vec<u8> =
+        Vec::with_capacity(usize::frog_var_read(&mut len_cursor)? + len_cursor.position() as usize);
     raw.stream.read_exact(packet_buf.as_mut_slice()).await?;
 
-    let mut packet_cursor = Cursor::new(packet_buf.as_slice());
+    #[expect(clippy::cast_possible_truncation)]
+    let mut packet_cursor = Cursor::new(&packet_buf[len_cursor.position() as usize..]);
     if raw.compression().is_some_and(|c| c >= 0) && 0 != u32::frog_var_read(&mut packet_cursor)? {
         unimplemented!("Packet Decompression")
     } else {
@@ -263,7 +266,7 @@ async fn write_type<T: FrogWrite + Send + Sync>(
 
         if compression.is_some() {
             (packet_len + 1).frog_var_write(&mut buf)?;
-            u32::frog_var_write(&0, &mut buf)?;
+            u8::frog_write(&0, &mut buf)?;
         } else {
             packet_len.frog_var_write(&mut buf)?;
         }

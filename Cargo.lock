@@ -372,8 +372,6 @@ dependencies = [
 name = "froglight-network"
 version = "0.1.0"
 dependencies = [
- "async-io",
- "async-lock",
  "async-net",
  "froglight-io",
  "futures-lite",
