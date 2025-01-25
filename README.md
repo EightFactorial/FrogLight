@@ -16,7 +16,7 @@ It is currently in a **very early alpha state**. Most things do not work yet!
 > [!Caution]
 > Some servers do not allow modified clients!
 > 
-> **I am not responsible for banned accounts!**
+> ### !! I am not responsible for banned accounts !!
 
 ## Version Support
 
