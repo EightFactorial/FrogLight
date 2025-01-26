@@ -7,9 +7,9 @@
 # data = "1.20.1" # The version to use for data generation
 
 [[version]]
-name = "1.21.0"
-data = "1.21.1"
+name = "1.21.4"
+data = "1.21.4"
 
 [[version]]
-name = "1.21.2"
-data = "1.21.3"
+name = "1.21.5"
+data = "1.21.5"

@@ -75,6 +75,9 @@ derive_more = { version = "1.0", features = ["full"] }
 futures-lite = "2.6"
 glam = "0.29"
 hashbrown = "0.15"
+hickory-resolver = { version = "0.24", default-features = false, features = [
+  "rustls",
+] }
 parking_lot = "0.12"
 phf = { version = "0.11", features = ["macros"] }
 proptest = "1.6"

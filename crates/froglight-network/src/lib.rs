@@ -2,3 +2,4 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub mod connection;
+pub mod version;

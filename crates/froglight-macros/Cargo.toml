@@ -27,3 +27,11 @@ syn = { version = "2.0", features = ["full", "printing", "proc-macro"] }
 toml_edit = { version = "0.22", default-features = false, features = ["parse"] }
 
 [features]
+default = []
+
+# Enable `froglight-common` macros.
+common = []
+# Enable `froglight-io` macros.
+io = []
+# Enable `froglight-network` macros.
+network = []

@@ -20,6 +20,7 @@ proptest = { workspace = true }
 
 [dependencies]
 thiserror = { workspace = true }
+froglight-macros = { workspace = true, features = ["io"] }
 
 # Optional dependencies
 glam = { workspace = true, optional = true }
@@ -32,7 +33,15 @@ smol_str = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = []
+default = [
+  "glam",
+  "hashbrown",
+  "serde",
+  "simdnbt",
+  "smallvec",
+  "smol_str",
+  "uuid",
+]
 
 # Enable support for `glam` types.
 glam = ["dep:glam"]

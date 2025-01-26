@@ -1,3 +1,5 @@
+//! A raw connection to a client or server.
+
 use std::{
     future::Future,
     io::Cursor,
@@ -91,6 +93,16 @@ impl RawConnection {
         })
     }
 
+    /// Get the underlying stream of the connection.
+    #[inline]
+    #[must_use]
+    pub fn as_stream(&mut self) -> &mut TcpStream { &mut self.stream }
+
+    /// Get the underlying [`TcpStream`] of the connection.
+    #[inline]
+    #[must_use]
+    pub fn into_stream(self) -> TcpStream { self.stream }
+
     /// Read a value from the connection.
     ///
     /// # Warning
@@ -141,7 +153,7 @@ impl RawConnection {
     }
 
     /// Recombine a [`RawReadConnection`] and a [`RawWriteConnection`]
-    /// into a single [`RawConnection`].
+    /// into a [`RawConnection`].
     ///
     /// Both parts must be from the same connection, otherwise this will panic.
     ///

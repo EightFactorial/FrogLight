@@ -1,4 +1,8 @@
-//! Versioned and raw connections.
+//! [`Client`](ClientConnection), [`Server`](ServerConnection),
+//! and [`Raw`](RawConnection) connections.
 
-mod raw;
-pub use raw::{RawConnection, RawReadConnection, RawWriteConnection};
+pub mod raw;
+pub use raw::RawConnection;
+
+pub mod state;
+pub use state::{ClientConnection, ServerConnection};
