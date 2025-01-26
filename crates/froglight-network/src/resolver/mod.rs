@@ -103,18 +103,30 @@ impl ServerResolver {
             address = &address[..idx];
         }
 
+        // If the address is a socket address, connect to it.
+        if let Ok(socket) = address.parse::<SocketAddr>() {
+            #[cfg(feature = "bevy")]
+            bevy_log::debug!("Connecting to \"{address}\" at \"{socket}\"");
+            return ClientConnection::connect_to(address, socket).await;
+        }
+
         // Parse the port from the address, if it exists.
         let mut port = None;
         if let Some(idx) = address.rfind(':') {
-            if let Ok(p) = address[idx + 1..].parse::<u16>() {
-                port = Some(p);
-                address = &address[..idx];
+            // Skip if there are two colons in a row, that's not a port.
+            if address.as_bytes()[idx - 1] != b':' {
+                if let Ok(p) = address[idx + 1..].parse::<u16>() {
+                    port = Some(p);
+                    address = &address[..idx];
+                }
             }
         }
 
         // If the address is an IP, connect to it.
-        if let Ok(ip) = address.parse::<IpAddr>() {
+        if let Ok(ip) = address.trim_start_matches('[').trim_end_matches(']').parse::<IpAddr>() {
             let socket = SocketAddr::new(ip, port.unwrap_or(Self::DEFAULT_PORT));
+            #[cfg(feature = "bevy")]
+            bevy_log::debug!("Connecting to \"{address}:{}\" at \"{socket}\"", socket.port());
             return ClientConnection::connect_to(address, socket).await;
         }
 
@@ -123,10 +135,18 @@ impl ServerResolver {
             if let Ok(srv) = self.lookup_srv(format!("{}{address}", Self::SRV_PREFIX)).await {
                 // Try to connect to every response, returning the first successful connection.
                 for srv in srv {
-                    let (address, port) = (srv.target().to_string(), port.unwrap_or(srv.port()));
-                    let lookup = self.lookup_ip(address.trim_end_matches('.')).await?;
+                    let (srv_address, srv_port) =
+                        (srv.target().to_string(), port.unwrap_or(srv.port()));
+                    let lookup = self.lookup_ip(srv_address.trim_end_matches('.')).await?;
 
-                    if let Ok(conn) = self.join_lookup(&address, lookup, port).await {
+                    #[cfg(feature = "bevy")]
+                    bevy_log::debug!(
+                        "Connecting to \"{}:{srv_port}\" instead of \"{address}:{}\"",
+                        srv_address.trim_end_matches('.'),
+                        port.unwrap_or(Self::DEFAULT_PORT)
+                    );
+
+                    if let Ok(conn) = self.join_lookup(&srv_address, lookup, srv_port).await {
                         return Ok(conn);
                     }
                 }
@@ -164,6 +184,8 @@ impl ServerResolver {
 
         for ip in lookup {
             let socket = SocketAddr::new(ip, port);
+            #[cfg(feature = "bevy")]
+            bevy_log::debug!("Connecting to \"{address}:{}\" at \"{socket}\"", socket.port());
             match ClientConnection::connect_to(address, socket).await {
                 Ok(conn) => return Ok(conn),
                 Err(err) => error = Some(err),
@@ -186,6 +208,7 @@ impl bevy_ecs::world::FromWorld for ServerResolver {
 
 #[test]
 #[cfg(feature = "bevy")]
+#[expect(clippy::too_many_lines)]
 fn resolver() {
     use froglight_common::Version;
     use froglight_io::prelude::*;
@@ -223,7 +246,11 @@ fn resolver() {
     let resolver = ServerResolver::new(ResolverConfig::cloudflare(), ResolverOpts::default());
 
     #[cfg(feature = "bevy")]
-    bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+    {
+        bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+        let _ =
+            bevy_log::tracing_subscriber::fmt().with_env_filter("froglight=debug,off").try_init();
+    }
 
     // `mc.hypixel.net` should resolve to `mc.hypixel.net` and port `25565`.
     {
@@ -247,26 +274,103 @@ fn resolver() {
     {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("localhost"));
-        assert!(connection.is_err());
+        match connection {
+            Ok(mut conn) => {
+                assert_eq!(conn.address(), "127.0.0.1");
+                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
+    }
+
+    // `localhost:25566` should resolve to `127.0.0.1` and port `25566`.
+    {
+        let connection =
+            futures_lite::future::block_on(resolver.connect_to_server::<Test>("localhost:25566"));
+        match connection {
+            Ok(mut conn) => {
+                assert_eq!(conn.address(), "127.0.0.1");
+                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25566);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
     }
 
     // `127.0.0.1` should resolve to `127.0.0.1` and port `25565`.
     {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("127.0.0.1"));
-        assert!(connection.is_err());
+        match connection {
+            Ok(mut conn) => {
+                assert_eq!(conn.address(), "127.0.0.1");
+                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
     }
 
-    // `::1` should resolve to `::1` and port `25565`.
+    // `::1` should resolve to `[::1]` and port `25565`.
     {
         let connection = futures_lite::future::block_on(resolver.connect_to_server::<Test>("::1"));
-        assert!(connection.is_err());
+        match connection {
+            Ok(mut conn) => {
+                assert_eq!(conn.address(), "[::1]");
+                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
     }
 
-    // `::1:25566` should resolve to `::1` and port `25566`.
+    // `::1:25566` should resolve to `[::1]` and port `25566`.
     {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("::1:25566"));
-        assert!(connection.is_err());
+        match connection {
+            Ok(mut conn) => {
+                assert_eq!(conn.address(), "[::1]");
+                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25566);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
+    }
+
+    // `[::1]` should resolve to `[::1]` and port `25565`.
+    {
+        let connection =
+            futures_lite::future::block_on(resolver.connect_to_server::<Test>("[::1]"));
+        match connection {
+            Ok(mut conn) => {
+                assert_eq!(conn.address(), "[::1]");
+                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
+    }
+
+    // `[::1]:25566` should resolve to `[::1]` and port `25566`.
+    {
+        let connection =
+            futures_lite::future::block_on(resolver.connect_to_server::<Test>("[::1]:25566"));
+        match connection {
+            Ok(mut conn) => {
+                assert_eq!(conn.address(), "[::1]");
+                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25566);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
     }
 }
