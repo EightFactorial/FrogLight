@@ -3,3 +3,6 @@
 
 pub mod connection;
 pub mod version;
+
+#[cfg(feature = "resolver")]
+pub mod resolver;

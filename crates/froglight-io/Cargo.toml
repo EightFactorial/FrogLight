@@ -33,15 +33,7 @@ smol_str = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = [
-  "glam",
-  "hashbrown",
-  "serde",
-  "simdnbt",
-  "smallvec",
-  "smol_str",
-  "uuid",
-]
+default = []
 
 # Enable support for `glam` types.
 glam = ["dep:glam"]
