@@ -47,7 +47,7 @@ nextest: (fetch-nextest)
 
 # Run all doc-tests
 doc-test:
-  cargo test --doc --workspace
+  cargo test --doc --workspace --all-features
 
 # ---- Tool Recipes ----
 

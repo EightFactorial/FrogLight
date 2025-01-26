@@ -75,7 +75,10 @@ froglight-io = { version = "0.1", path = "crates/froglight-io", features = [
   "uuid",
 ] }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
-froglight-network = { version = "0.1", path = "crates/froglight-network" }
+froglight-network = { version = "0.1", path = "crates/froglight-network", features = [
+  "bevy",
+  "resolver",
+] }
 
 # Other
 async-io = "2.4"
