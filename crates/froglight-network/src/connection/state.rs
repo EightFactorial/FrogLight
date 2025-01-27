@@ -61,6 +61,11 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, 
     #[must_use]
     pub fn address(&self) -> &str { self.0.address() }
 
+    /// Get the remote address the stream is connected to.
+    #[inline]
+    #[expect(clippy::missing_errors_doc)]
+    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
+
     /// Get the compression level of the connection.
     #[inline]
     #[must_use]
@@ -157,6 +162,11 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateReadConnection<V,
     #[must_use]
     pub fn address(&self) -> &str { self.0.address() }
 
+    /// Get the remote address the stream is connected to.
+    #[inline]
+    #[expect(clippy::missing_errors_doc)]
+    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
+
     /// Get the compression level of the connection.
     #[inline]
     #[must_use]
@@ -193,6 +203,11 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateWriteConnection<V
     #[inline]
     #[must_use]
     pub fn address(&self) -> &str { self.0.address() }
+
+    /// Get the remote address the stream is connected to.
+    #[inline]
+    #[expect(clippy::missing_errors_doc)]
+    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
 
     /// Get the compression level of the connection.
     #[inline]

@@ -34,6 +34,11 @@ impl RawConnection {
     #[must_use]
     pub fn address(&self) -> &str { &self.address }
 
+    /// Get the remote address the stream is connected to.
+    #[inline]
+    #[expect(clippy::missing_errors_doc)]
+    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.stream.peer_addr() }
+
     /// Get the compression level of the connection.
     #[must_use]
     pub fn compression(&self) -> Option<i32> {
@@ -181,6 +186,11 @@ impl RawReadConnection {
     #[must_use]
     pub fn address(&self) -> &str { self.0.address() }
 
+    /// Get the remote address the stream is connected to.
+    #[inline]
+    #[expect(clippy::missing_errors_doc)]
+    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
+
     /// Get the compression level of the connection.
     #[inline]
     #[must_use]
@@ -216,6 +226,11 @@ impl RawWriteConnection {
     #[inline]
     #[must_use]
     pub fn address(&self) -> &str { self.0.address() }
+
+    /// Get the remote address the stream is connected to.
+    #[inline]
+    #[expect(clippy::missing_errors_doc)]
+    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
 
     /// Get the compression level of the connection.
     #[inline]

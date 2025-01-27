@@ -212,6 +212,7 @@ impl bevy_ecs::world::FromWorld for ServerResolver {
 fn resolver() {
     use froglight_common::Version;
     use froglight_io::prelude::*;
+    use futures_lite::StreamExt;
 
     #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
     struct Test;
@@ -247,9 +248,27 @@ fn resolver() {
 
     #[cfg(feature = "bevy")]
     {
-        bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+        async fn bind_to(bind: &str) {
+            if let Ok(listener) = async_net::TcpListener::bind(bind).await {
+                while let Some(Ok(stream)) = listener.incoming().next().await {
+                    bevy_log::trace!(
+                        "Accepted from \"{}\" at \"{bind}\" ",
+                        stream.peer_addr().unwrap()
+                    );
+                }
+            } else {
+                bevy_log::error!("Failed to bind to \"{bind}\"!");
+            }
+        }
+
         let _ =
             bevy_log::tracing_subscriber::fmt().with_env_filter("froglight=debug,off").try_init();
+
+        bevy_log::debug!("Starting temporary listeners ...");
+        let taskpool = bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+        for socket in ["127.0.0.1:25565", "127.0.0.1:25566", "[::1]:25565", "[::1]:25566"] {
+            taskpool.spawn(bind_to(socket)).detach();
+        }
     }
 
     // `mc.hypixel.net` should resolve to `mc.hypixel.net` and port `25565`.
@@ -275,9 +294,9 @@ fn resolver() {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("localhost"));
         match connection {
-            Ok(mut conn) => {
-                assert_eq!(conn.address(), "127.0.0.1");
-                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+            Ok(conn) => {
+                assert_eq!(conn.address(), "localhost");
+                assert_eq!(conn.peer_addr().unwrap().port(), 25565);
             }
             Err(err) => {
                 assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
@@ -290,9 +309,9 @@ fn resolver() {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("localhost:25566"));
         match connection {
-            Ok(mut conn) => {
-                assert_eq!(conn.address(), "127.0.0.1");
-                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25566);
+            Ok(conn) => {
+                assert_eq!(conn.address(), "localhost");
+                assert_eq!(conn.peer_addr().unwrap().port(), 25566);
             }
             Err(err) => {
                 assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
@@ -305,9 +324,24 @@ fn resolver() {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("127.0.0.1"));
         match connection {
-            Ok(mut conn) => {
+            Ok(conn) => {
                 assert_eq!(conn.address(), "127.0.0.1");
-                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+                assert_eq!(conn.peer_addr().unwrap().port(), 25565);
+            }
+            Err(err) => {
+                assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
+            }
+        }
+    }
+
+    // `127.0.0.1/test` should resolve to `127.0.0.1` and port `25565`.
+    {
+        let connection =
+            futures_lite::future::block_on(resolver.connect_to_server::<Test>("127.0.0.1/test"));
+        match connection {
+            Ok(conn) => {
+                assert_eq!(conn.address(), "127.0.0.1");
+                assert_eq!(conn.peer_addr().unwrap().port(), 25565);
             }
             Err(err) => {
                 assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
@@ -319,9 +353,9 @@ fn resolver() {
     {
         let connection = futures_lite::future::block_on(resolver.connect_to_server::<Test>("::1"));
         match connection {
-            Ok(mut conn) => {
-                assert_eq!(conn.address(), "[::1]");
-                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+            Ok(conn) => {
+                assert_eq!(conn.address(), "::1");
+                assert_eq!(conn.peer_addr().unwrap().port(), 25565);
             }
             Err(err) => {
                 assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
@@ -334,9 +368,9 @@ fn resolver() {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("::1:25566"));
         match connection {
-            Ok(mut conn) => {
-                assert_eq!(conn.address(), "[::1]");
-                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25566);
+            Ok(conn) => {
+                assert_eq!(conn.address(), "::1");
+                assert_eq!(conn.peer_addr().unwrap().port(), 25566);
             }
             Err(err) => {
                 assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
@@ -349,9 +383,9 @@ fn resolver() {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("[::1]"));
         match connection {
-            Ok(mut conn) => {
+            Ok(conn) => {
                 assert_eq!(conn.address(), "[::1]");
-                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
+                assert_eq!(conn.peer_addr().unwrap().port(), 25565);
             }
             Err(err) => {
                 assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);
@@ -364,9 +398,9 @@ fn resolver() {
         let connection =
             futures_lite::future::block_on(resolver.connect_to_server::<Test>("[::1]:25566"));
         match connection {
-            Ok(mut conn) => {
-                assert_eq!(conn.address(), "[::1]");
-                assert_eq!(conn.as_raw().as_stream().peer_addr().unwrap().port(), 25566);
+            Ok(conn) => {
+                assert_eq!(conn.address(), "[::1]:25566");
+                assert_eq!(conn.peer_addr().unwrap().port(), 25566);
             }
             Err(err) => {
                 assert_eq!(err.kind(), std::io::ErrorKind::ConnectionRefused);

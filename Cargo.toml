@@ -45,18 +45,20 @@ unnecessary_cast = "warn"
 
 [workspace.dependencies]
 # Bevy
-bevy = { version = "0.15", default-features = false }
+bevy = { version = "0.15", default-features = false, features = [
+  "multi_threaded",
+] }
 bevy_app = "0.15"
 bevy_core = "0.15"
 bevy_derive = "0.15"
 bevy_diagnostic = "0.15"
-bevy_ecs = "0.15"
+bevy_ecs = { version = "0.15", features = ["multi_threaded"] }
 bevy_hierarchy = "0.15"
 bevy_log = "0.15"
 bevy_math = "0.15"
 bevy_reflect = "0.15"
 bevy_state = "0.15"
-bevy_tasks = "0.15"
+bevy_tasks = { version = "0.15", features = ["multi_threaded"] }
 bevy_time = "0.15"
 bevy_transform = "0.15"
 bevy_utils = "0.15"
@@ -81,6 +83,7 @@ froglight-network = { version = "0.1", path = "crates/froglight-network", featur
 ] }
 
 # Other
+async-channel = "2.3"
 async-io = "2.4"
 async-net = "2.0"
 derive_more = { version = "1.0", features = ["full"] }
