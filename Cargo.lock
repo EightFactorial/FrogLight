@@ -267,8 +267,11 @@ dependencies = [
  "disqualified",
  "downcast-rs",
  "erased-serde",
+ "glam",
  "serde",
  "smallvec",
+ "smol_str",
+ "uuid",
 ]
 
 [[package]]
@@ -473,6 +476,15 @@ dependencies = [
 
 [[package]]
 name = "convert_case"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
+name = "convert_case"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb402b8d4c85569410425650ce3eddc7d698ed96d39a73f941b08fb63082f1e7"
@@ -567,6 +579,7 @@ version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb7330aeadfbe296029522e6c40f315320aba36fc43a5b3632f3795348f3bd22"
 dependencies = [
+ "convert_case 0.6.0",
  "proc-macro2",
  "quote",
  "syn",
@@ -721,8 +734,13 @@ dependencies = [
 name = "froglight-common"
 version = "0.1.0"
 dependencies = [
+ "bevy_ecs",
+ "bevy_reflect",
+ "derive_more",
  "froglight-macros",
+ "serde",
  "smol_str",
+ "uuid",
 ]
 
 [[package]]
@@ -733,6 +751,7 @@ version = "0.1.0"
 name = "froglight-io"
 version = "0.1.0"
 dependencies = [
+ "froglight-common",
  "froglight-macros",
  "glam",
  "hashbrown 0.15.2",
@@ -750,7 +769,7 @@ dependencies = [
 name = "froglight-macros"
 version = "0.1.0"
 dependencies = [
- "convert_case",
+ "convert_case 0.7.1",
  "darling",
  "proc-macro2",
  "quote",

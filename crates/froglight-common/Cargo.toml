@@ -16,11 +16,23 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+derive_more = { workspace = true }
 froglight-macros = { workspace = true, features = ["common"] }
 smol_str = { workspace = true }
+uuid = { workspace = true }
+
+# Optional dependencies
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
 
 [features]
 default = []
+
+# Enable Bevy support
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect"]
+# Enable serde support
+serde = ["dep:serde", "smol_str/serde", "uuid/serde"]
 
 # Enable support for v1.21.4
 v1_21_4 = []

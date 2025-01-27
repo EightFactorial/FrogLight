@@ -2,6 +2,8 @@
 
 use std::io::{Read, Write};
 
+mod froglight_common_impl;
+mod smol_str_impl;
 mod std_impl;
 
 #[cfg(feature = "glam")]
@@ -10,8 +12,6 @@ mod glam_impl;
 mod hashbrown_impl;
 #[cfg(feature = "smallvec")]
 mod smallvec_impl;
-#[cfg(feature = "smol_str")]
-mod smol_str_impl;
 #[cfg(feature = "uuid")]
 mod uuid_impl;
 
@@ -52,13 +52,16 @@ pub enum ReadError {
     /// An error that occurred while reading from a buffer.
     #[error("Failed to read from buffer: {0}")]
     Io(#[from] std::io::Error),
+    /// An error that occurred while reading a string value.
+    #[error("Failed to parse UTF-8: {0}")]
+    Utf8(#[from] std::string::FromUtf8Error),
 
     /// An error that occurred while reading a bool value.
     #[error("Invalid bool value: {0}")]
     InvalidBool(u8),
-    /// An error that occurred while reading a string value.
-    #[error("Failed to parse UTF-8: {0}")]
-    Utf8(#[from] std::string::FromUtf8Error),
+    /// An error that occurred while reading an enum value.
+    #[error("Invalid enum variant for \"{0}\": {1}")]
+    InvalidEnum(&'static str, u32),
 
     /// An error that occurred while parsing a value from JSON.
     #[cfg(feature = "serde")]

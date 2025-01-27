@@ -2,6 +2,7 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub mod connection;
+pub mod types;
 pub mod version;
 
 #[cfg(feature = "resolver")]

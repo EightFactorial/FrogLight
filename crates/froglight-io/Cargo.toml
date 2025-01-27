@@ -19,8 +19,10 @@ workspace = true
 proptest = { workspace = true }
 
 [dependencies]
-thiserror = { workspace = true }
+froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["io"] }
+smol_str = { workspace = true }
+thiserror = { workspace = true }
 
 # Optional dependencies
 glam = { workspace = true, optional = true }
@@ -29,11 +31,10 @@ serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 simdnbt = { workspace = true, optional = true }
 smallvec = { workspace = true, optional = true }
-smol_str = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = []
+default = ["glam", "simdnbt", "uuid"]
 
 # Enable support for `glam` types.
 glam = ["dep:glam"]
@@ -43,8 +44,6 @@ hashbrown = ["dep:hashbrown"]
 simdnbt = ["dep:simdnbt"]
 # Enable support for `smallvec` types.
 smallvec = ["dep:smallvec"]
-# Enable support for `smol_str` types.
-smol_str = ["dep:smol_str"]
 # Enable support for `uuid` types.
 uuid = ["dep:uuid"]
 
@@ -55,6 +54,6 @@ serde = [
   "glam?/serde",
   "hashbrown?/serde",
   "smallvec?/serde",
-  "smol_str?/serde",
+  "smol_str/serde",
   "uuid?/serde",
 ]

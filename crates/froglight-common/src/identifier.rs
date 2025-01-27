@@ -1,7 +1,16 @@
+#![allow(clippy::unsafe_derive_deserialize)]
+
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use smol_str::SmolStr;
 
 /// A namespaced identifier.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Identifier(SmolStr);
 
 impl Identifier {
@@ -12,12 +21,27 @@ impl Identifier {
     /// # Panics
     /// Panics if the string is not a valid identifier.
     ///
-    /// To handle potential invalid identifiers,
+    /// To handle potentially invalid identifiers,
     /// use [`Identifier::try_new`] instead.
     #[must_use]
     pub fn new(content: &(impl AsRef<str> + ?Sized)) -> Self {
         Self::try_new(content).expect("Invalid identifier")
     }
+
+    /// Create a new [`Identifier`] without checking if the string is valid.
+    ///
+    /// It is recommended to use [`Identifier::try_new`] instead,
+    /// or at least [`Identifier::new`] to ensure the string is valid.
+    ///
+    /// # Safety
+    /// The string must be a valid identifier by:
+    /// - Not being empty
+    /// - Not containing non-ASCII characters
+    /// - Not starting or ending with a non-alphanumeric character
+    /// - Contain exactly one colon, separating the namespace and path
+    #[inline]
+    #[must_use]
+    pub unsafe fn new_unchecked(content: SmolStr) -> Self { Self(content) }
 
     /// Try to create a new [`Identifier`].
     ///

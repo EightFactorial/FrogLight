@@ -56,7 +56,7 @@ bevy_ecs = { version = "0.15", features = ["multi_threaded"] }
 bevy_hierarchy = "0.15"
 bevy_log = "0.15"
 bevy_math = "0.15"
-bevy_reflect = "0.15"
+bevy_reflect = { version = "0.15", features = ["glam", "smol_str", "uuid"] }
 bevy_state = "0.15"
 bevy_tasks = { version = "0.15", features = ["multi_threaded"] }
 bevy_time = "0.15"
@@ -67,20 +67,9 @@ bevy_winit = { version = "0.15", default-features = false }
 # FrogLight
 froglight-common = { version = "0.1", path = "crates/froglight-common" }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
-froglight-io = { version = "0.1", path = "crates/froglight-io", features = [
-  "glam",
-  "hashbrown",
-  "serde",
-  "simdnbt",
-  "smallvec",
-  "smol_str",
-  "uuid",
-] }
+froglight-io = { version = "0.1", path = "crates/froglight-io" }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
-froglight-network = { version = "0.1", path = "crates/froglight-network", features = [
-  "bevy",
-  "resolver",
-] }
+froglight-network = { version = "0.1", path = "crates/froglight-network" }
 
 # Other
 async-channel = "2.3"
