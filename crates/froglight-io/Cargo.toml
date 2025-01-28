@@ -34,7 +34,7 @@ smallvec = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = ["glam", "simdnbt", "uuid"]
+default = ["glam", "simdnbt", "smallvec", "uuid"]
 
 # Enable support for `glam` types.
 glam = ["dep:glam"]

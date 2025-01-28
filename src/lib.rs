@@ -9,5 +9,4 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 // Re-export everything from `froglight-internal`
-#[expect(unused_imports, unreachable_pub)]
 pub use froglight_internal::*;

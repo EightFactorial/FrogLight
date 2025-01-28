@@ -19,13 +19,14 @@ workspace = true
 async-io = { workspace = true }
 async-net = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
-froglight-macros = { workspace = true, features = ["network"] }
 froglight-io = { workspace = true, features = ["hashbrown", "serde"] }
+froglight-macros = { workspace = true, features = ["network"] }
 futures-lite = { workspace = true }
 glam = { workspace = true }
 hashbrown = { workspace = true }
 serde = { workspace = true }
 simdnbt = { workspace = true }
+smallvec = { workspace = true, features = ["write"] }
 smol_str = { workspace = true }
 uuid = { workspace = true }
 

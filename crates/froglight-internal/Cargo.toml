@@ -16,5 +16,24 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+froglight-block = { workspace = true, features = ["bevy"] }
+froglight-common = { workspace = true, features = ["bevy"] }
+froglight-network = { workspace = true, features = ["bevy"] }
+froglight-registry = { workspace = true, features = ["bevy"] }
+froglight-world = { workspace = true, features = ["bevy", "block"] }
 
 [features]
+default = []
+
+# Enable support for v1.21.4
+v1_21_4 = [
+  "froglight-block/v1_21_4",
+  "froglight-network/v1_21_4",
+  "froglight-registry/v1_21_4",
+]
+# Enable support for v1.21.5
+v1_21_5 = [
+  "froglight-block/v1_21_4",
+  "froglight-network/v1_21_5",
+  "froglight-registry/v1_21_5",
+]

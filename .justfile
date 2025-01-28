@@ -15,7 +15,7 @@ build-release: (build-profile "release" "")
 # Compile build with specified profile
 [private]
 build-profile profile="dev" args="":
-  cargo build --bin froglight --profile {{profile}} {{args}}
+  cargo build --package=froglight --profile {{profile}} {{args}}
 
 # Run development build
 alias run := run-profile
@@ -27,7 +27,7 @@ run-release: (run-profile "release" "")
 # Run build with specified profile
 [private]
 run-profile profile="dev" args="":
-  cargo run --bin froglight --profile {{profile}} {{args}}
+  cargo run --package=froglight --profile {{profile}} {{args}}
 
 # Clean build artifacts
 clean: (fetch-tools) (tools "clean")

@@ -1,0 +1,32 @@
+[package]
+name = "froglight-world"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+froglight-io = { workspace = true }
+
+# Optional dependencies
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+froglight-block = { workspace = true, optional = true }
+
+[features]
+default = []
+
+# Enable Bevy support
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-block?/bevy"]
+# Enable `froglight-block` support
+block = ["dep:froglight-block"]

@@ -3,11 +3,14 @@
 [workspace]
 resolver = "2"
 members = [
+  "crates/froglight-block",
   "crates/froglight-common",
   "crates/froglight-internal",
   "crates/froglight-io",
   "crates/froglight-macros",
   "crates/froglight-network",
+  "crates/froglight-registry",
+  "crates/froglight-world",
 ]
 
 [workspace.package]
@@ -65,11 +68,14 @@ bevy_utils = "0.15"
 bevy_winit = { version = "0.15", default-features = false }
 
 # FrogLight
+froglight-block = { version = "0.1", path = "crates/froglight-block" }
 froglight-common = { version = "0.1", path = "crates/froglight-common" }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
 froglight-io = { version = "0.1", path = "crates/froglight-io" }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
+froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
+froglight-world = { version = "0.1", path = "crates/froglight-world" }
 
 # Other
 async-channel = "2.3"

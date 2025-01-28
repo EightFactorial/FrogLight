@@ -11,13 +11,12 @@ pub mod resolver;
 pub mod prelude {
     //! Re-exports of commonly used types, traits, and macros.
 
-    pub use froglight_common::{Identifier, Version};
     pub use froglight_io::prelude::*;
 
     #[cfg(feature = "resolver")]
-    pub use crate::resolver::{ResolverConfig, ResolverOpts, ServerResolver};
+    pub use crate::resolver::ServerResolver;
     pub use crate::{
-        connection::{ClientConnection, RawConnection, ServerConnection},
+        connection::{ClientConnection, ServerConnection},
         version::state::{Config, Handshake, Login, Play, State, Status, ValidState},
     };
 }
