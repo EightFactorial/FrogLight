@@ -10,6 +10,6 @@ pub mod prelude {
 
     pub use crate::{
         block::{Block, BlockType, BlockTypeExt, UntypedBlock},
-        storage::{AppBlockStorage, Attribute, BlockAttributes, BlockStorage, GlobalBlockId},
+        storage::{AppBlockStorage, BlockStorage, GlobalBlockId},
     };
 }

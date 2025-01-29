@@ -16,17 +16,25 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-froglight-io = { workspace = true }
+bitvec = "1.0"
+parking_lot = { workspace = true }
+simdnbt = { workspace = true }
+thiserror = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
+froglight-io = { workspace = true, optional = true }
+
 
 [features]
 default = []
 
 # Enable Bevy support
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-block?/bevy"]
+
 # Enable `froglight-block` support
 block = ["dep:froglight-block"]
+# Enable `froglight-io` support
+io = ["dep:froglight-io"]

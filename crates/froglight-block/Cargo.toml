@@ -19,7 +19,7 @@ workspace = true
 derive_more = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
-froglight-macros = { workspace = true, features = ["common"] }
+froglight-macros = { workspace = true, features = ["block"] }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 rangemap = { version = "1.5", features = ["const_fn"] }
