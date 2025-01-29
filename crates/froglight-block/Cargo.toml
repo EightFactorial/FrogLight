@@ -17,8 +17,11 @@ workspace = true
 
 [dependencies]
 derive_more = { workspace = true }
+downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["common"] }
+parking_lot = { workspace = true }
+rangemap = "1.5"
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
