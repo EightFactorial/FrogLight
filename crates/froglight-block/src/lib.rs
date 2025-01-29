@@ -7,4 +7,9 @@ pub mod storage;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
+
+    pub use crate::{
+        block::{Block, BlockType, BlockTypeExt, UntypedBlock},
+        storage::{AppBlockStorage, Attribute, BlockAttributes, BlockStorage, GlobalBlockId},
+    };
 }

@@ -1,7 +1,7 @@
-// !TODO
-
-mod data;
-pub use data::{Block, GlobalBlockState, RelativeBlockState, UntypedBlock};
+//! !TODO
 
 mod traits;
-pub use traits::{BlockAttribute, BlockAttributes, BlockType, BlockTypeExt, StaticBlock};
+pub use traits::{BlockType, BlockTypeExt, StaticBlockType};
+
+mod types;
+pub use types::{Block, UntypedBlock};

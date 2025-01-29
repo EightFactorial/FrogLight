@@ -1,63 +1,38 @@
-use std::any::TypeId;
-
 use downcast_rs::DowncastSync;
 use froglight_common::{Identifier, Version};
 
-pub trait StaticBlock: Send + Sync {
+use crate::storage::BlockAttributes;
+
+/// A block type.
+pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
+    /// The identifier of the block.
+    fn identifier(&self) -> &'static Identifier;
+}
+
+/// An extension of the [`BlockType`] trait.
+pub trait BlockTypeExt<V: Version>: StaticBlockType + BlockType<V> {
+    /// The attributes of the block.
+    type Attributes: BlockAttributes + MaybeReflect;
+}
+
+/// A static block type.
+pub trait StaticBlockType: 'static {
+    /// Get the static block type.
     fn as_static() -> &'static Self;
 }
 
-#[cfg(feature = "bevy")]
-pub trait BlockType<V: Version>: bevy_reflect::Reflect + DowncastSync {
-    fn identifier(&self) -> &'static Identifier;
-}
+use sealed::MaybeReflect;
+mod sealed {
+    #[cfg(feature = "bevy")]
+    use bevy_reflect::Reflect;
 
-#[cfg(not(feature = "bevy"))]
-pub trait BlockType<V: Version>: DowncastSync {
-    fn identifier(&self) -> &'static Identifier;
-}
+    #[cfg(feature = "bevy")]
+    pub trait MaybeReflect: Reflect {}
+    #[cfg(feature = "bevy")]
+    impl<T: Reflect> MaybeReflect for T {}
 
-pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock + Sized + 'static {
-    type Attributes: BlockAttributes;
-}
-
-pub trait BlockAttribute: Copy + PartialEq + Into<usize> + Sized + 'static {
-    /// All possible states this attribute can be in, in ascending order.
-    const STATES: &'static [Self];
-}
-
-pub trait BlockAttributes: Sized {
-    /// The types of all block attributes.
-    const TYPES: &'static [TypeId];
-    /// The total number of block states.
-    const COUNT: usize;
-
-    fn from_index(index: usize) -> Self;
-    fn to_index(&self) -> usize;
-}
-
-impl BlockAttributes for () {
-    const TYPES: &'static [TypeId] = &[];
-    const COUNT: usize = 1;
-
-    fn from_index(index: usize) -> Self {
-        match index {
-            0 => (),
-            _ => panic!("Invalid BlockAttributes index!"),
-        }
-    }
-    fn to_index(&self) -> usize { 0 }
-}
-
-impl<A: BlockAttribute> BlockAttributes for A {
-    const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
-    const COUNT: usize = A::STATES.len();
-    fn from_index(index: usize) -> Self { A::STATES[index] }
-    fn to_index(&self) -> usize { Into::<usize>::into(*self) }
-}
-impl<A: BlockAttribute> BlockAttributes for (A,) {
-    const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
-    const COUNT: usize = A::STATES.len();
-    fn from_index(index: usize) -> Self { (A::STATES[index],) }
-    fn to_index(&self) -> usize { Into::<usize>::into(self.0) }
+    #[cfg(not(feature = "bevy"))]
+    pub trait MaybeReflect {}
+    #[cfg(not(feature = "bevy"))]
+    impl<T> MaybeReflect for T {}
 }

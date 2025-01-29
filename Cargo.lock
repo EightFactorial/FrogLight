@@ -742,10 +742,12 @@ version = "0.1.0"
 dependencies = [
  "bevy_ecs",
  "bevy_reflect",
+ "bevy_utils",
  "derive_more",
  "downcast-rs 2.0.1",
  "froglight-common",
  "froglight-macros",
+ "hashbrown 0.15.2",
  "parking_lot",
  "rangemap",
 ]
