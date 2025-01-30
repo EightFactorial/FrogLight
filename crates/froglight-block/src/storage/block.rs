@@ -59,6 +59,8 @@ impl<V: Version> BlockStorage<V> {
     pub fn new_empty() -> Self { Self { traits: RangeMap::new(), types: Default::default() } }
 
     /// Get the [`UntypedBlock`] for the given block.
+    ///
+    /// Returns `None` if no block with the given id was registered.
     #[must_use]
     pub fn get_untyped(&self, block: GlobalBlockId) -> Option<UntypedBlock<V>> {
         let (range, wrapper) = self.traits.get_key_value(&block)?;
@@ -66,6 +68,8 @@ impl<V: Version> BlockStorage<V> {
     }
 
     /// Get the [`GlobalBlockId`] for the given block.
+    ///
+    /// Returns `None` if the block was not registered.
     #[must_use]
     pub fn get_global(&self, block: impl Into<UntypedBlock<V>>) -> Option<GlobalBlockId> {
         let block: UntypedBlock<V> = block.into();
@@ -74,6 +78,8 @@ impl<V: Version> BlockStorage<V> {
     }
 
     /// Register a block type with the storage.
+    ///
+    /// This is required for converting between global ids and blocks.
     #[expect(clippy::cast_possible_truncation)]
     pub fn register<B: BlockTypeExt<V>>(&mut self) {
         let range = self.traits.last_range_value().map_or_else(
@@ -94,8 +100,9 @@ pub(crate) struct BlockWrapper<V: Version>(&'static dyn BlockType<V>);
 
 impl<V: Version> BlockWrapper<V> {
     /// Create a new [`BlockWrapper`] from the given block type.
+    #[inline]
     #[must_use]
-    pub(crate) fn new(block: &'static dyn BlockType<V>) -> Self { Self(block) }
+    pub(crate) const fn new(block: &'static dyn BlockType<V>) -> Self { Self(block) }
 }
 
 impl<V: Version> Eq for BlockWrapper<V> {}
