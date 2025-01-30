@@ -1,0 +1,123 @@
+//! TODO
+
+use super::VecChunk;
+use crate::section::Section;
+
+/// A chunk of blocks in a world.
+///
+/// Has a fixed amount of [`Sections`].
+#[derive(Clone)]
+pub struct ArrayChunk<const SECTIONS: usize, const OFFSET: isize>([Section; SECTIONS]);
+
+impl<const SECTIONS: usize, const OFFSET: isize> Default for ArrayChunk<SECTIONS, OFFSET> {
+    fn default() -> Self { Self(std::array::from_fn(|_| Section::default())) }
+}
+
+impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunk<SECTIONS, OFFSET> {
+    /// The total volume of the [`ArrayChunk`] in blocks.
+    pub const VOLUME: usize = Section::VOLUME * SECTIONS;
+    /// The height of the [`ArrayChunk`] in blocks.
+    pub const HEIGHT: usize = Section::HEIGHT * SECTIONS;
+    /// The width of the [`ArrayChunk`] in blocks.
+    pub const WIDTH: usize = Section::WIDTH;
+    /// The depth of the [`ArrayChunk`] in blocks.
+    pub const DEPTH: usize = Section::DEPTH;
+
+    /// The total volume of the [`ArrayChunk`] in blocks.
+    #[inline]
+    #[must_use]
+    pub const fn volume(&self) -> usize { Self::VOLUME }
+    /// The height of the [`ArrayChunk`] in blocks.
+    #[inline]
+    #[must_use]
+    pub const fn height(&self) -> usize { Self::HEIGHT }
+    /// The width of the [`ArrayChunk`] in blocks.
+    #[inline]
+    #[must_use]
+    pub const fn width(&self) -> usize { Self::WIDTH }
+    /// The depth of the [`ArrayChunk`] in blocks.
+    #[inline]
+    #[must_use]
+    pub const fn depth(&self) -> usize { Self::DEPTH }
+
+    /// Get a reference to the [`Section`]s in the [`ArrayChunk`].
+    #[inline]
+    #[must_use]
+    pub const fn sections(&self) -> &[Section; SECTIONS] { &self.0 }
+
+    /// Get a mutable reference to the [`Section`]s in the [`ArrayChunk`].
+    #[inline]
+    #[must_use]
+    pub const fn sections_mut(&mut self) -> &mut [Section; SECTIONS] { &mut self.0 }
+
+    /// Get a reference to a [`Section`] based on the `y` coordinate.
+    #[inline]
+    #[must_use]
+    pub fn get_section(&self, y: usize) -> Option<&Section> {
+        self.get_nonoffset_section(y.checked_add_signed(OFFSET)?)
+    }
+    /// Get a reference to a [`Section`] based on the `y` coordinate.
+    ///
+    /// # Note
+    /// This does not take into account the chunk offset.
+    #[inline]
+    #[must_use]
+    fn get_nonoffset_section(&self, y: usize) -> Option<&Section> { self.0.get(y / Self::HEIGHT) }
+
+    /// Get a mutable reference to a [`Section`] based on the `y` coordinate.
+    #[inline]
+    #[must_use]
+    pub fn get_section_mut(&mut self, y: usize) -> Option<&mut Section> {
+        self.get_nonoffset_section_mut(y.checked_add_signed(OFFSET)?)
+    }
+    /// Get a mutable reference to a [`Section`] based on the `y` coordinate.
+    ///
+    /// # Note
+    /// This does not take into account the chunk offset.
+    #[inline]
+    #[must_use]
+    fn get_nonoffset_section_mut(&mut self, y: usize) -> Option<&mut Section> {
+        self.0.get_mut(y / Section::HEIGHT)
+    }
+
+    /// Get a block from the [`ArrayChunk`].
+    ///
+    /// Returns `None` if the `y` coordinate is out of bounds.
+    #[must_use]
+    pub fn get_block_raw(&self, x: usize, mut y: usize, z: usize) -> Option<u32> {
+        y = y.checked_add_signed(-OFFSET)?;
+        self.get_nonoffset_section(y).map(|s| s.get_block(x, y, z))
+    }
+    /// Set a block in the [`ArrayChunk`].
+    ///
+    /// Returns `None` if the y coordinate is out of bounds.
+    #[must_use]
+    pub fn set_block_raw(&mut self, x: usize, mut y: usize, z: usize, block: u32) -> Option<u32> {
+        y = y.checked_add_signed(-OFFSET)?;
+        self.get_nonoffset_section_mut(y).map(|s| s.set_block(x, y, z, block))
+    }
+
+    /// Convert an [`ArrayChunk`] into a [`VecChunk`].
+    #[inline]
+    #[must_use]
+    pub fn into_vec(self) -> VecChunk { VecChunk::new_from(self.0, OFFSET) }
+}
+
+#[test]
+fn dimensions() {
+    // This is the same size as the Nether and End.
+    let normal = ArrayChunk::<16, 0>::default();
+    assert_eq!(normal.height(), 256, "Normal ArrayChunk height is incorrect!");
+    assert_eq!(normal.volume(), 65536, "Normal ArrayChunk volume is incorrect!");
+    let normal = normal.into_vec();
+    assert_eq!(normal.height(), 256, "Normal VecChunk height is incorrect!");
+    assert_eq!(normal.volume(), 65536, "Normal VecChunk volume is incorrect!");
+
+    // This is the same size as the Overworld.
+    let large = ArrayChunk::<24, -64>::default();
+    assert_eq!(large.height(), 384, "Large ArrayChunk height is incorrect!");
+    assert_eq!(large.volume(), 98304, "Large ArrayChunk volume is incorrect!");
+    let large = large.into_vec();
+    assert_eq!(large.height(), 384, "Large VecChunk height is incorrect!");
+    assert_eq!(large.volume(), 98304, "Large VecChunk volume is incorrect!");
+}

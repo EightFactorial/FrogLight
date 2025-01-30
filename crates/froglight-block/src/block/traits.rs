@@ -3,6 +3,12 @@ use froglight_common::{Identifier, Version};
 
 use crate::storage::BlockAttributes;
 
+/// A static block type.
+pub trait StaticBlockType: 'static {
+    /// Get the static block type.
+    fn as_static() -> &'static Self;
+}
+
 /// A block type.
 pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     /// The identifier of the block.
@@ -10,15 +16,9 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
 }
 
 /// An extension of the [`BlockType`] trait.
-pub trait BlockTypeExt<V: Version>: StaticBlockType + BlockType<V> {
+pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlockType {
     /// The attributes of the block.
     type Attributes: BlockAttributes + MaybeReflect;
-}
-
-/// A static block type.
-pub trait StaticBlockType: 'static {
-    /// Get the static block type.
-    fn as_static() -> &'static Self;
 }
 
 use sealed::MaybeReflect;

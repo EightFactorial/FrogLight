@@ -857,6 +857,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_reflect",
  "bitvec",
+ "derive_more",
  "froglight-block",
  "froglight-io",
  "parking_lot",

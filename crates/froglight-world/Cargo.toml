@@ -17,6 +17,7 @@ workspace = true
 
 [dependencies]
 bitvec = "1.0"
+derive_more = { workspace = true }
 parking_lot = { workspace = true }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }

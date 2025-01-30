@@ -6,7 +6,7 @@ use std::marker::PhantomData;
 use bevy_reflect::prelude::*;
 use froglight_common::{Identifier, Version};
 
-use super::BlockTypeExt;
+use super::{BlockConvert, BlockTypeExt};
 use crate::storage::{BlockAttributes, BlockWrapper, RelativeBlockState};
 
 /// A block with a state.
@@ -19,6 +19,38 @@ pub struct Block<B: BlockTypeExt<V>, V: Version> {
 }
 
 impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
+    /// Create a new [`Block`] from the given [`RelativeBlockState`].
+    pub(crate) const fn new(state: RelativeBlockState) -> Self {
+        Self { state, _phantom: PhantomData }
+    }
+
+    /// Get the internal [`RelativeBlockState`] of the [`Block`].
+    pub(crate) const fn state(&self) -> &RelativeBlockState { &self.state }
+
+    /// Convert a [`Block`] from another [`Version`] into this [`Version`].
+    #[inline]
+    #[must_use]
+    pub fn from_version<V2: Version>(block: Block<B, V2>) -> Block<B, V>
+    where
+        B: BlockConvert<V, V2>,
+    {
+        B::convert_from(block)
+    }
+
+    /// Convert this [`Block`] into a [`Block`] from another [`Version`].
+    #[inline]
+    #[must_use]
+    pub fn into_version<V2: Version>(self) -> Block<B, V2>
+    where
+        B: BlockConvert<V, V2>,
+    {
+        B::convert_into(self)
+    }
+
+    /// Convert the [`Block`] into an [`UntypedBlock`].
+    #[must_use]
+    pub fn into_untyped(self) -> UntypedBlock<V> { self.into() }
+
     /// Get the [`Attributes`](BlockTypeExt::Attributes) of the [`Block`].
     #[must_use]
     pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(self.state.into()) }
@@ -38,33 +70,9 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
         *self = Self::from_attr(f(self.into_attr()));
     }
 
-    /// Convert the [`Block`] into an [`UntypedBlock`].
-    #[must_use]
-    pub fn into_untyped(self) -> UntypedBlock<V> { self.into() }
-
     /// Get the identifier of the [`Block`].
     #[must_use]
     pub fn identifier() -> &'static Identifier { B::as_static().identifier() }
-}
-
-impl<A: BlockAttributes, B: BlockTypeExt<V, Attributes = A>, V: Version> Block<B, V> {
-    /// Convert the [`Block`] into a [`Block`] of another [`Version`].
-    #[must_use]
-    pub const fn into_version<V2: Version>(self) -> Block<B, V2>
-    where
-        B: BlockTypeExt<V2, Attributes = A>,
-    {
-        Block { state: self.state, _phantom: PhantomData }
-    }
-}
-impl<
-        A: BlockAttributes,
-        B: BlockTypeExt<V1, Attributes = A> + BlockTypeExt<V2, Attributes = A>,
-        V1: Version,
-        V2: Version,
-    > From<&Block<B, V1>> for Block<B, V2>
-{
-    fn from(block: &Block<B, V1>) -> Block<B, V2> { block.into_version::<V2>() }
 }
 
 /// An untyped block with a state.
