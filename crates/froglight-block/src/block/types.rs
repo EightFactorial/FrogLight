@@ -4,9 +4,10 @@ use std::marker::PhantomData;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use downcast_rs::Downcast;
 use froglight_common::{Identifier, Version};
 
-use super::{BlockConvert, BlockTypeExt};
+use super::{BlockConvert, BlockType, BlockTypeExt};
 use crate::storage::{BlockAttributes, BlockWrapper, RelativeBlockState};
 
 /// A block with a state.
@@ -75,6 +76,13 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     pub fn identifier() -> &'static Identifier { B::as_static().identifier() }
 }
 
+impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
+    type Error = ();
+    fn try_from(value: UntypedBlock<V>) -> Result<Self, Self::Error> {
+        value.downcast().map_or(Err(()), |b| Ok(b))
+    }
+}
+
 /// An untyped block with a state.
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(no_field_bounds, from_reflect = false, PartialEq))]
@@ -98,6 +106,26 @@ impl<V: Version> UntypedBlock<V> {
     /// Get the internal [`BlockWrapper`] of the [`UntypedBlock`].
     #[must_use]
     pub(crate) const fn wrapper(&self) -> &BlockWrapper<V> { &self.wrapper }
+
+    /// Returns `true` if the [`Block`] is of a [`BlockType`].
+    #[inline]
+    #[must_use]
+    pub fn is<B: BlockType<V>>(&self) -> bool {
+        <&'static dyn BlockType<V> as Downcast>::as_any(&self.wrapper).is::<B>()
+    }
+
+    /// Try to downcast an [`UntypedBlock`] into a [`Block`].
+    ///
+    /// Returns `None` if the [`BlockType`] does not match.
+    #[inline]
+    #[must_use]
+    pub fn downcast<B: BlockTypeExt<V>>(&self) -> Option<Block<B, V>> {
+        if self.is::<B>() {
+            Some(Block::new(self.state))
+        } else {
+            None
+        }
+    }
 
     /// Get the identifier of the [`UntypedBlock`].
     #[inline]
