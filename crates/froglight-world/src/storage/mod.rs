@@ -1,11 +1,16 @@
 //! TODO
 
-use std::any::TypeId;
+use std::{any::TypeId, marker::PhantomData};
 
 use bevy_ecs::{component::Component, reflect::ReflectComponent, system::Resource};
 use bevy_reflect::Reflect;
 use bevy_utils::TypeIdMap;
-use froglight_common::Identifier;
+use derive_more::derive::Deref;
+use froglight_block::{
+    block::UntypedBlock,
+    storage::{BlockStorage, GlobalBlockId},
+};
+use froglight_common::{Identifier, Version};
 use glam::IVec3;
 
 mod stored;
@@ -18,9 +23,9 @@ use crate::chunk::VecChunk;
 
 /// A storage for chunks.
 #[derive(Default, Resource)]
-pub struct ChunkStorage(TypeIdMap<Box<dyn Storable>>);
+pub struct ChunkStorage<V: Version>(TypeIdMap<Box<dyn Storable>>, PhantomData<V>);
 
-impl ChunkStorage {
+impl<V: Version> ChunkStorage<V> {
     /// Insert a [`Storable`] type into the [`ChunkStorage`].
     pub fn insert<T: Storable>(&mut self, value: T) {
         self.0.insert(TypeId::of::<T>(), Box::new(value));
@@ -62,39 +67,76 @@ impl ChunkStorage {
     }
 }
 
-impl ChunkStorage {
+impl<V: Version> ChunkStorage<V> {
     /// Get the storage identifier of a chunk in the [`ChunkStorage`].
-    pub fn identifier(&self, handle: &ChunkHandle) -> Option<&'static Identifier> {
-        self.get_untyped(handle.type_id).map(Storable::identifier)
+    pub fn identifier(&self, handle: &ChunkHandle<V>) -> Option<&'static Identifier> {
+        self.get_untyped(handle.0 .0).map(Storable::identifier)
     }
 
     /// Insert a chunk into the [`ChunkStorage`].
-    pub fn insert_chunk<T: Storable>(&mut self, chunk: VecChunk) -> Option<ChunkHandle> {
-        self.get_untyped_mut(TypeId::of::<T>()).map(|storage| storage.insert_chunk(chunk))
+    pub fn insert_chunk<T: Storable>(&mut self, chunk: VecChunk) -> Option<ChunkHandle<V>> {
+        self.get_untyped_mut(TypeId::of::<T>())
+            .map(|storage| ChunkHandle(storage.insert_chunk(chunk), PhantomData))
     }
     /// Remove a chunk from the [`ChunkStorage`].
-    pub fn remove_chunk(&mut self, handle: ChunkHandle) {
-        if let Some(storage) = self.get_untyped_mut(handle.type_id) {
-            storage.remove_chunk(handle);
+    pub fn remove_chunk(&mut self, handle: ChunkHandle<V>) {
+        if let Some(storage) = self.get_untyped_mut(handle.0 .0) {
+            storage.remove_chunk(handle.0);
         }
     }
 
-    /// Get a block from the [`ChunkStorage`].
+    /// Get a block id from the [`ChunkStorage`].
     #[must_use]
-    pub fn get_block(&self, handle: &ChunkHandle, position: IVec3) -> Option<u32> {
-        self.get_untyped(handle.type_id)?.get_block(handle, position)
+    pub fn get_block_raw(&self, handle: &ChunkHandle<V>, position: IVec3) -> Option<u32> {
+        self.get_untyped(handle.0 .0)?.get_block(handle, position)
     }
-    /// Set a block in the [`ChunkStorage`].
+    /// Set a block id in the [`ChunkStorage`].
     #[must_use]
-    pub fn set_block(&mut self, handle: &ChunkHandle, position: IVec3, block: u32) -> Option<u32> {
-        self.get_untyped_mut(handle.type_id)?.set_block(handle, position, block)
+    pub fn set_block_raw(
+        &mut self,
+        handle: &ChunkHandle<V>,
+        position: IVec3,
+        block: u32,
+    ) -> Option<u32> {
+        self.get_untyped_mut(handle.0 .0)?.set_block(handle, position, block)
+    }
+
+    /// Get a block from the [`ChunkStorage`] with data from a [`BlockStorage`].
+    ///
+    /// Returns `None` if the position is out of bounds
+    /// or no matching block is found.
+    #[must_use]
+    pub fn get_block_untyped(
+        &self,
+        handle: &ChunkHandle<V>,
+        position: IVec3,
+        storage: &BlockStorage<V>,
+    ) -> Option<UntypedBlock<V>> {
+        self.get_block_raw(handle, position)
+            .and_then(|id| storage.get_untyped(GlobalBlockId::new_unchecked(id)))
+    }
+    /// Set a block in the [`ChunkStorage`] using data from a [`BlockStorage`].
+    ///
+    /// Returns the previous block if it was set, or
+    /// `None` if the position is out of bounds or no matching block is found.
+    pub fn set_block_untyped(
+        &mut self,
+        handle: &ChunkHandle<V>,
+        position: IVec3,
+        block: UntypedBlock<V>,
+        storage: &BlockStorage<V>,
+    ) -> Option<UntypedBlock<V>> {
+        self.set_block_raw(handle, position, *storage.get_global(block)?)
+            .and_then(|id| storage.get_untyped(GlobalBlockId::new_unchecked(id)))
     }
 }
 
 /// A handle to a chunk in the [`ChunkStorage`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect, Deref)]
+#[reflect(Debug, PartialEq, Hash, Component)]
+pub struct ChunkHandle<V: Version>(#[deref] HandleInternal, PhantomData<V>);
+
+/// An internal handle to a chunk in the [`ChunkStorage`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
 #[reflect(Debug, PartialEq, Hash, Component)]
-pub struct ChunkHandle {
-    type_id: TypeId,
-    index: u32,
-}
+pub struct HandleInternal(TypeId, u32);

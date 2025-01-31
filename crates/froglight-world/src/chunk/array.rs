@@ -104,10 +104,45 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
         self.get_nonoffset_section_mut(position.y).map(|s| s.set_block(position, block))
     }
 
+    /// Get a block from the [`ArrayChunk`] with data from the [`BlockStorage`].
+    ///
+    /// Returns `None` if the position is out of bounds,
+    /// or if no matching block is found.
+    #[must_use]
+    #[cfg(feature = "block")]
+    pub fn get_block_untyped<V: froglight_common::Version>(
+        &self,
+        position: IVec3,
+        storage: &froglight_block::storage::BlockStorage<V>,
+    ) -> Option<froglight_block::block::UntypedBlock<V>> {
+        self.get_block_raw(position).and_then(|id| {
+            storage.get_untyped(froglight_block::storage::GlobalBlockId::new_unchecked(id))
+        })
+    }
+    /// Set a block in the [`ArrayChunk`] using data from the [`BlockStorage`].
+    ///
+    /// Returns the previous block if it was set, or
+    /// `None` if the position is out of bounds or no matching block is found.
+    #[cfg(feature = "block")]
+    pub fn set_block_untyped<V: froglight_common::Version>(
+        &mut self,
+        position: IVec3,
+        block: impl Into<froglight_block::block::UntypedBlock<V>>,
+        storage: &froglight_block::storage::BlockStorage<V>,
+    ) -> Option<froglight_block::block::UntypedBlock<V>> {
+        self.set_block_raw(position, *storage.get_global(block)?).and_then(|id| {
+            storage.get_untyped(froglight_block::storage::GlobalBlockId::new_unchecked(id))
+        })
+    }
+
     /// Convert an [`ArrayChunk`] into a [`VecChunk`].
     #[inline]
     #[must_use]
     pub fn into_vec(self) -> VecChunk { VecChunk::new_from(self.0, OFFSET) }
+}
+
+impl<const SECTIONS: usize, const OFFSET: i32> From<ArrayChunk<SECTIONS, OFFSET>> for VecChunk {
+    fn from(chunk: ArrayChunk<SECTIONS, OFFSET>) -> Self { chunk.into_vec() }
 }
 
 #[test]

@@ -3,13 +3,13 @@
 
 pub mod chunk;
 pub mod section;
-#[cfg(feature = "bevy")]
+#[cfg(all(feature = "bevy", feature = "block"))]
 pub mod storage;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    #[cfg(feature = "bevy")]
+    #[cfg(all(feature = "bevy", feature = "block"))]
     pub use crate::storage::{ChunkHandle, ChunkStorage, End, Nether, Overworld};
     pub use crate::{
         chunk::{ArrayChunk, VecChunk},
