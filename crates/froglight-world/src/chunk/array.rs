@@ -1,19 +1,22 @@
 //! TODO
 
+use derive_more::derive::{From, Into};
+use glam::IVec3;
+
 use super::VecChunk;
 use crate::section::Section;
 
 /// A chunk of blocks in a world.
 ///
 /// Has a fixed amount of [`Sections`].
-#[derive(Clone)]
-pub struct ArrayChunk<const SECTIONS: usize, const OFFSET: isize>([Section; SECTIONS]);
+#[derive(Clone, From, Into)]
+pub struct ArrayChunk<const SECTIONS: usize, const OFFSET: i32>([Section; SECTIONS]);
 
-impl<const SECTIONS: usize, const OFFSET: isize> Default for ArrayChunk<SECTIONS, OFFSET> {
+impl<const SECTIONS: usize, const OFFSET: i32> Default for ArrayChunk<SECTIONS, OFFSET> {
     fn default() -> Self { Self(std::array::from_fn(|_| Section::default())) }
 }
 
-impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunk<SECTIONS, OFFSET> {
+impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
     /// The total volume of the [`ArrayChunk`] in blocks.
     pub const VOLUME: usize = Section::VOLUME * SECTIONS;
     /// The height of the [`ArrayChunk`] in blocks.
@@ -53,8 +56,8 @@ impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunk<SECTIONS, OFFSET> {
     /// Get a reference to a [`Section`] based on the `y` coordinate.
     #[inline]
     #[must_use]
-    pub fn get_section(&self, y: usize) -> Option<&Section> {
-        self.get_nonoffset_section(y.checked_add_signed(OFFSET)?)
+    pub fn get_section(&self, y_coord: i32) -> Option<&Section> {
+        self.get_nonoffset_section(y_coord.checked_add(OFFSET)?)
     }
     /// Get a reference to a [`Section`] based on the `y` coordinate.
     ///
@@ -62,13 +65,16 @@ impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunk<SECTIONS, OFFSET> {
     /// This does not take into account the chunk offset.
     #[inline]
     #[must_use]
-    fn get_nonoffset_section(&self, y: usize) -> Option<&Section> { self.0.get(y / Self::HEIGHT) }
+    #[expect(clippy::cast_sign_loss)]
+    fn get_nonoffset_section(&self, y_coord: i32) -> Option<&Section> {
+        self.0.get(y_coord as usize / Self::HEIGHT)
+    }
 
     /// Get a mutable reference to a [`Section`] based on the `y` coordinate.
     #[inline]
     #[must_use]
-    pub fn get_section_mut(&mut self, y: usize) -> Option<&mut Section> {
-        self.get_nonoffset_section_mut(y.checked_add_signed(OFFSET)?)
+    pub fn get_section_mut(&mut self, y_coord: i32) -> Option<&mut Section> {
+        self.get_nonoffset_section_mut(y_coord.checked_add(OFFSET)?)
     }
     /// Get a mutable reference to a [`Section`] based on the `y` coordinate.
     ///
@@ -76,25 +82,26 @@ impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunk<SECTIONS, OFFSET> {
     /// This does not take into account the chunk offset.
     #[inline]
     #[must_use]
-    fn get_nonoffset_section_mut(&mut self, y: usize) -> Option<&mut Section> {
-        self.0.get_mut(y / Section::HEIGHT)
+    #[expect(clippy::cast_sign_loss)]
+    fn get_nonoffset_section_mut(&mut self, y_coord: i32) -> Option<&mut Section> {
+        self.0.get_mut(y_coord as usize / Section::HEIGHT)
     }
 
     /// Get a block from the [`ArrayChunk`].
     ///
     /// Returns `None` if the `y` coordinate is out of bounds.
     #[must_use]
-    pub fn get_block_raw(&self, x: usize, mut y: usize, z: usize) -> Option<u32> {
-        y = y.checked_add_signed(-OFFSET)?;
-        self.get_nonoffset_section(y).map(|s| s.get_block(x, y, z))
+    pub fn get_block_raw(&self, mut position: IVec3) -> Option<u32> {
+        position.y = position.y.checked_add(OFFSET)?;
+        self.get_nonoffset_section(position.y).map(|s| s.get_block(position))
     }
     /// Set a block in the [`ArrayChunk`].
     ///
     /// Returns `None` if the y coordinate is out of bounds.
     #[must_use]
-    pub fn set_block_raw(&mut self, x: usize, mut y: usize, z: usize, block: u32) -> Option<u32> {
-        y = y.checked_add_signed(-OFFSET)?;
-        self.get_nonoffset_section_mut(y).map(|s| s.set_block(x, y, z, block))
+    pub fn set_block_raw(&mut self, mut position: IVec3, block: u32) -> Option<u32> {
+        position.y = position.y.checked_add(OFFSET)?;
+        self.get_nonoffset_section_mut(position.y).map(|s| s.set_block(position, block))
     }
 
     /// Convert an [`ArrayChunk`] into a [`VecChunk`].

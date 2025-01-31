@@ -78,9 +78,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 
 impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
     type Error = ();
-    fn try_from(value: UntypedBlock<V>) -> Result<Self, Self::Error> {
-        value.downcast().map_or(Err(()), |b| Ok(b))
-    }
+    fn try_from(value: UntypedBlock<V>) -> Result<Self, Self::Error> { value.downcast().ok_or(()) }
 }
 
 /// An untyped block with a state.
@@ -114,12 +112,12 @@ impl<V: Version> UntypedBlock<V> {
         <&'static dyn BlockType<V> as Downcast>::as_any(&self.wrapper).is::<B>()
     }
 
-    /// Try to downcast an [`UntypedBlock`] into a [`Block`].
+    /// Downcast the [`UntypedBlock`] into a [`Block`].
     ///
-    /// Returns `None` if the [`BlockType`] does not match.
+    /// Returns `None` if the [`Block`] is not of the given [`BlockType`].
     #[inline]
     #[must_use]
-    pub fn downcast<B: BlockTypeExt<V>>(&self) -> Option<Block<B, V>> {
+    pub fn downcast<B: BlockTypeExt<V>>(self) -> Option<Block<B, V>> {
         if self.is::<B>() {
             Some(Block::new(self.state))
         } else {

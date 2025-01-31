@@ -20,7 +20,7 @@ froglight-block = { workspace = true, features = ["bevy"] }
 froglight-common = { workspace = true, features = ["bevy"] }
 froglight-network = { workspace = true, features = ["bevy"] }
 froglight-registry = { workspace = true, features = ["bevy"] }
-froglight-world = { workspace = true, features = ["bevy", "block"] }
+froglight-world = { workspace = true, features = ["bevy", "block", "io"] }
 
 [features]
 default = []

@@ -67,6 +67,18 @@ impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> BlockConverter<B, V1, V2
     #[must_use]
     pub const fn new() -> Self { Self { from_fn: B::convert_from, into_fn: B::convert_into } }
 
+    /// Extend the [`BlockChannel`] forward and backward another [`Version`].
+    #[must_use]
+    pub const fn extend<V0: Version, V3: Version>(self) -> BlockConverter<B, V0, V3>
+    where
+        B: BlockConvert<V0, V1> + BlockConvert<V1, V2> + BlockConvert<V2, V3>,
+    {
+        BlockConverter::<B, V0, V3> {
+            from_fn: |block| B::convert_from(B::convert_from(B::convert_from(block))),
+            into_fn: |block| B::convert_into(B::convert_into(B::convert_into(block))),
+        }
+    }
+
     /// Extend the [`BlockChannel`] forward an additional [`Version`].
     #[must_use]
     pub const fn extend_front<V3: Version>(self) -> BlockConverter<B, V1, V3>
@@ -88,18 +100,6 @@ impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> BlockConverter<B, V1, V2
         BlockConverter::<B, V0, V2> {
             from_fn: |block| B::convert_from(B::convert_from(block)),
             into_fn: |block| B::convert_into(B::convert_into(block)),
-        }
-    }
-
-    /// Expand the [`BlockChannel`] forward and backward another [`Version`].
-    #[must_use]
-    pub const fn expand<V0: Version, V3: Version>(self) -> BlockConverter<B, V0, V3>
-    where
-        B: BlockConvert<V0, V1> + BlockConvert<V1, V2> + BlockConvert<V2, V3>,
-    {
-        BlockConverter::<B, V0, V3> {
-            from_fn: |block| B::convert_from(B::convert_from(B::convert_from(block))),
-            into_fn: |block| B::convert_into(B::convert_into(B::convert_into(block))),
         }
     }
 

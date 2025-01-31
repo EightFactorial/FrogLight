@@ -3,6 +3,7 @@
 #![allow(dead_code, unreachable_code, unreachable_pub)]
 
 use bitvec::{order::Msb0, vec::BitVec};
+use glam::IVec3;
 
 /// The internal block and biome data of a chunk.
 #[derive(Default, Clone)]
@@ -28,19 +29,21 @@ impl Section {
 
     /// Get a block from the section.
     #[must_use]
-    pub fn get_block(&self, mut x: usize, mut y: usize, mut z: usize) -> u32 {
-        x %= Section::WIDTH;
-        y %= Section::HEIGHT;
-        z %= Section::DEPTH;
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    pub fn get_block(&self, mut position: IVec3) -> u32 {
+        position.x %= Section::WIDTH as i32;
+        position.y %= Section::HEIGHT as i32;
+        position.z %= Section::DEPTH as i32;
 
         todo!()
     }
 
     /// Set a block in the section.
-    pub fn set_block(&mut self, mut x: usize, mut y: usize, mut z: usize, block: u32) -> u32 {
-        x %= Section::WIDTH;
-        y %= Section::HEIGHT;
-        z %= Section::DEPTH;
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    pub fn set_block(&mut self, mut position: IVec3, block: u32) -> u32 {
+        position.x %= Section::WIDTH as i32;
+        position.y %= Section::HEIGHT as i32;
+        position.z %= Section::DEPTH as i32;
 
         let result = todo!();
 

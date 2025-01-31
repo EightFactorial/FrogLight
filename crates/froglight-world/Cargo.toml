@@ -18,13 +18,18 @@ workspace = true
 [dependencies]
 bitvec = "1.0"
 derive_more = { workspace = true }
+froglight-common = { workspace = true }
+glam = { workspace = true }
+hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 simdnbt = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
+bevy_utils = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+downcast-rs = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 
@@ -33,7 +38,14 @@ froglight-io = { workspace = true, optional = true }
 default = []
 
 # Enable Bevy support
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-block?/bevy"]
+bevy = [
+  "dep:bevy_ecs",
+  "dep:bevy_utils",
+  "dep:bevy_reflect",
+  "dep:downcast-rs",
+  "froglight-block?/bevy",
+  "froglight-common/bevy",
+]
 
 # Enable `froglight-block` support
 block = ["dep:froglight-block"]
