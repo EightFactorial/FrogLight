@@ -8,4 +8,5 @@ mod identifier;
 pub use identifier::Identifier;
 
 pub mod version;
+pub use froglight_macros::Version;
 pub use version::Version;

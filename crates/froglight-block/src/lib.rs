@@ -9,6 +9,8 @@ pub mod storage;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    pub use froglight_macros::StaticBlock;
+
     pub use crate::{
         block::{Block, BlockConvert, BlockConverter, BlockType, BlockTypeExt, UntypedBlock},
         storage::{AppBlockStorage, BlockStorage, GlobalBlockId},
