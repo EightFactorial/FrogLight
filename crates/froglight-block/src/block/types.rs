@@ -8,7 +8,7 @@ use downcast_rs::Downcast;
 use froglight_common::{Identifier, Version};
 
 use super::{BlockConvert, BlockType, BlockTypeExt};
-use crate::storage::{BlockAttributes, BlockWrapper, RelativeBlockState};
+use crate::storage::{Attribute, BlockAttributes, BlockWrapper, RelativeBlockState};
 
 /// A block with a state.
 #[cfg_attr(feature = "bevy", derive(Reflect))]
@@ -21,11 +21,15 @@ pub struct Block<B: BlockTypeExt<V>, V: Version> {
 
 impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Create a new [`Block`] from the given [`RelativeBlockState`].
+    #[inline]
+    #[must_use]
     pub(crate) const fn new(state: RelativeBlockState) -> Self {
         Self { state, _phantom: PhantomData }
     }
 
     /// Get the internal [`RelativeBlockState`] of the [`Block`].
+    #[inline]
+    #[must_use]
     pub(crate) const fn state(&self) -> &RelativeBlockState { &self.state }
 
     /// Convert a [`Block`] from another [`Version`] into this [`Version`].
@@ -49,15 +53,18 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     }
 
     /// Convert the [`Block`] into an [`UntypedBlock`].
+    #[inline]
     #[must_use]
     pub fn into_untyped(self) -> UntypedBlock<V> { self.into() }
 
     /// Get the [`Attributes`](BlockTypeExt::Attributes) of the [`Block`].
+    #[inline]
     #[must_use]
     pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(self.state.into()) }
 
     /// Create a [`Block`] from the given
     /// [`Attributes`](BlockTypeExt::Attributes).
+    #[inline]
     #[must_use]
     pub fn from_attr(attributes: B::Attributes) -> Self {
         Self { state: RelativeBlockState::from(attributes.into_index()), _phantom: PhantomData }
@@ -67,11 +74,22 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     ///
     /// This is shorthand for calling
     /// [`Block::into_attr`] and [`Block::from_attr`].
+    #[inline]
     pub fn scoped_attr(&mut self, f: fn(B::Attributes) -> B::Attributes) {
         *self = Self::from_attr(f(self.into_attr()));
     }
 
+    /// Get the [`Attributes`](BlockTypeExt::Attributes) of the [`Block`].
+    ///
+    /// Returns `None` if the [`Attribute`] is not present.
+    #[inline]
+    #[must_use]
+    pub fn get_attr<T: Attribute>(&self) -> Option<T> {
+        B::Attributes::get_attr::<T>(&self.into_attr())
+    }
+
     /// Get the identifier of the [`Block`].
+    #[inline]
     #[must_use]
     pub fn identifier() -> &'static Identifier { B::as_static().identifier() }
 }
@@ -93,15 +111,18 @@ pub struct UntypedBlock<V: Version> {
 impl<V: Version> UntypedBlock<V> {
     /// Create a new [`UntypedBlock`] from the given
     /// [`Block`] and [`BlockWrapper`].
+    #[inline]
     #[must_use]
     pub(crate) const fn new(state: RelativeBlockState, wrapper: BlockWrapper<V>) -> Self {
         Self { state, wrapper }
     }
 
     /// Get the internal [`RelativeBlockState`] of the [`UntypedBlock`].
+    #[inline]
     #[must_use]
     pub(crate) const fn state(&self) -> &RelativeBlockState { &self.state }
     /// Get the internal [`BlockWrapper`] of the [`UntypedBlock`].
+    #[inline]
     #[must_use]
     pub(crate) const fn wrapper(&self) -> &BlockWrapper<V> { &self.wrapper }
 

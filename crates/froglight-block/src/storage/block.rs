@@ -95,8 +95,7 @@ impl<V: Version> BlockStorage<V> {
 /// A wrapper around a [`&'static dyn BlockType`](BlockType)
 /// that implements [`PartialEq`] and [`Eq`].
 #[derive(Clone, Copy, Deref)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy", reflect(PartialEq))]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(PartialEq))]
 pub(crate) struct BlockWrapper<V: Version>(&'static dyn BlockType<V>);
 
 impl<V: Version> BlockWrapper<V> {

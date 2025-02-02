@@ -20,16 +20,24 @@ pub trait BlockAttributes: Sized + 'static {
     fn from_index(index: usize) -> Self;
     /// Return the index of the [`BlockAttributes`].
     fn into_index(self) -> usize;
+
+    /// Get the [`Attribute`] of the given type.
+    ///
+    /// Returns `None` if the [`Attribute`] is not present.
+    fn get_attr<T: Attribute>(&self) -> Option<T>;
 }
 
 // Implement for zero attributes
 impl BlockAttributes for () {
-    const TYPES: &'static [TypeId] = &[];
+    const TYPES: &'static [TypeId] = &[TypeId::of::<()>()];
     const COUNT: usize = 1;
     fn from_index(index: usize) -> Self {
-        assert_eq!(index, 0, "Invalid BlockAttributes index!");
+        debug_assert_eq!(index, 0, "Invalid BlockAttributes index!");
     }
     fn into_index(self) -> usize { 0 }
+    fn get_attr<T: Attribute>(&self) -> Option<T> {
+        TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[0])
+    }
 }
 
 // Implement for one attribute
@@ -38,12 +46,18 @@ impl<A: Attribute> BlockAttributes for A {
     const COUNT: usize = A::STATES.len();
     fn from_index(index: usize) -> Self { A::STATES[index] }
     fn into_index(self) -> usize { self.into() }
+    fn get_attr<T: Attribute>(&self) -> Option<T> {
+        TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(*self)])
+    }
 }
 impl<A: Attribute> BlockAttributes for (A,) {
     const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
     const COUNT: usize = A::STATES.len();
     fn from_index(index: usize) -> Self { (A::STATES[index],) }
     fn into_index(self) -> usize { self.0.into() }
+    fn get_attr<T: Attribute>(&self) -> Option<T> {
+        TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(self.0)])
+    }
 }
 
 macro_rules! impl_attributes {
@@ -81,6 +95,14 @@ macro_rules! impl_attributes {
             fn into_index(self) -> usize {
                 let ($($attr),*) = self;
                 impl_attributes!(@to_index $($attr),*)
+            }
+
+            fn get_attr<T: Attribute>(&self) -> Option<T> {
+                let ($($attr),*) = self;
+                match TypeId::of::<T>() {
+                    $(id if id == TypeId::of::<$attr>() => Some(T::STATES[Into::<usize>::into(*$attr)])),*,
+                    _ => None,
+                }
             }
         }
     };
