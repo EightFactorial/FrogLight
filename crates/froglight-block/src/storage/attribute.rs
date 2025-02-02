@@ -4,6 +4,8 @@ use std::any::TypeId;
 pub trait Attribute: Into<usize> + Copy + Eq + Sized + 'static {
     /// All possible states of the [`Attribute`].
     const STATES: &'static [Self];
+    /// The string values of the [`Attribute`].
+    const VALUES: &'static [&'static str];
 }
 
 /// A collection of zero or more [`Attribute`]s.
@@ -25,6 +27,11 @@ pub trait BlockAttributes: Sized + 'static {
     ///
     /// Returns `None` if the [`Attribute`] is not present.
     fn get_attr<T: Attribute>(&self) -> Option<T>;
+    /// Get the string value of an [`Attribute`].
+    ///
+    /// # Panics
+    /// This function will panic if the attribute index is out of bounds.
+    fn get_attr_str(&self, attr_index: usize) -> &'static str;
 }
 
 // Implement for zero attributes
@@ -35,8 +42,13 @@ impl BlockAttributes for () {
         debug_assert_eq!(index, 0, "Invalid BlockAttributes index!");
     }
     fn into_index(self) -> usize { 0 }
+
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[0])
+    }
+    fn get_attr_str(&self, attr_index: usize) -> &'static str {
+        debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
+        ""
     }
 }
 
@@ -46,8 +58,13 @@ impl<A: Attribute> BlockAttributes for A {
     const COUNT: usize = A::STATES.len();
     fn from_index(index: usize) -> Self { A::STATES[index] }
     fn into_index(self) -> usize { self.into() }
+
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(*self)])
+    }
+    fn get_attr_str(&self, attr_index: usize) -> &'static str {
+        debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
+        A::VALUES[Into::<usize>::into(*self)]
     }
 }
 impl<A: Attribute> BlockAttributes for (A,) {
@@ -55,8 +72,13 @@ impl<A: Attribute> BlockAttributes for (A,) {
     const COUNT: usize = A::STATES.len();
     fn from_index(index: usize) -> Self { (A::STATES[index],) }
     fn into_index(self) -> usize { self.0.into() }
+
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(self.0)])
+    }
+    fn get_attr_str(&self, attr_index: usize) -> &'static str {
+        debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
+        A::VALUES[Into::<usize>::into(self.0)]
     }
 }
 
@@ -78,6 +100,15 @@ macro_rules! impl_attributes {
         impl_attributes!(@to_index $($rest),*) + Into::<usize>::into($attr) * ($(<$rest>::COUNT *)* 1)
     };
 
+    (@get_attr_str $index:expr, $val:expr, $attr:ident, $($rest:ident),*) => {
+        if $index == $val { return <$attr>::VALUES[Into::<usize>::into(*$attr)] }
+        impl_attributes!(@get_attr_str $index, $val + 1, $($rest),*)
+    };
+    (@get_attr_str $index:expr, $val:expr, $attr:ident) => {
+        if $index == $val { return <$attr>::VALUES[Into::<usize>::into(*$attr)] }
+    };
+
+
     ($($attr:ident),*) => {
         #[allow(non_snake_case, unused_assignments)]
         impl<$($attr: Attribute),*> BlockAttributes for ($($attr),*)
@@ -91,7 +122,6 @@ macro_rules! impl_attributes {
                 impl_attributes!(@from_index index, $($attr),*);
                 ($($attr),*)
             }
-
             fn into_index(self) -> usize {
                 let ($($attr),*) = self;
                 impl_attributes!(@to_index $($attr),*)
@@ -103,6 +133,11 @@ macro_rules! impl_attributes {
                     $(id if id == TypeId::of::<$attr>() => Some(T::STATES[Into::<usize>::into(*$attr)])),*,
                     _ => None,
                 }
+            }
+            fn get_attr_str(&self, attr_index: usize) -> &'static str {
+                let ($($attr),*) = self;
+                impl_attributes!(@get_attr_str attr_index, 0, $($attr),*);
+                panic!("Invalid BlockAttributes index!");
             }
         }
     };

@@ -19,6 +19,8 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
 pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock {
     /// The attributes of the block.
     type Attributes: BlockAttributes + MaybeReflect;
+    /// The names of the block attributes.
+    const NAMES: &'static [&'static str];
 }
 
 use sealed::MaybeReflect;

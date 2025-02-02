@@ -88,6 +88,15 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
         B::Attributes::get_attr::<T>(&self.into_attr())
     }
 
+    /// Get the string value of an [`Attribute`].
+    ///
+    /// Returns `None` if the [`Attribute`] is not present.
+    #[must_use]
+    pub fn get_attr_str(&self, attr: &str) -> Option<&'static str> {
+        let index = B::NAMES.iter().position(|&name| name == attr)?;
+        Some(self.into_attr().get_attr_str(index))
+    }
+
     /// Get the identifier of the [`Block`].
     #[inline]
     #[must_use]
