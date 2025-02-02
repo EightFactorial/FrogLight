@@ -80,11 +80,12 @@ impl<V: Version> BlockStorage<V> {
     /// Register a block type with the storage.
     ///
     /// This is required for converting between global ids and blocks.
-    #[expect(clippy::cast_possible_truncation)]
+    #[expect(clippy::missing_panics_doc)]
     pub fn register<B: BlockTypeExt<V>>(&mut self) {
+        let count = u32::try_from(B::Attributes::COUNT).expect("BlockType has too many states!");
         let range = self.traits.last_range_value().map_or_else(
-            || Range { start: 0, end: B::Attributes::COUNT as u32 },
-            |(r, _)| Range { start: r.end + 1, end: r.end + B::Attributes::COUNT as u32 },
+            || Range { start: 0, end: count },
+            |(r, _)| Range { start: r.end + 1, end: r.end + count },
         );
         self.types.insert(TypeId::of::<B>(), range.start);
         self.traits.insert(range, BlockWrapper::new(B::as_static()));

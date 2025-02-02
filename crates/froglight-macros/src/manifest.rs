@@ -20,12 +20,12 @@ impl CrateManifest {
             path.push("Cargo.toml");
             assert!(path.exists(), "Expected Cargo.toml at \"{}\"", path.display());
 
-            let manifest = std::fs::read_to_string(&path).unwrap_or_else(|_| {
-                panic!("Unable to read Cargo.toml at \"{}\"", path.display());
+            let manifest = std::fs::read_to_string(&path).unwrap_or_else(|err| {
+                panic!("Unable to read Cargo.toml at \"{}\": {err}", path.display());
             });
 
-            CrateManifest(manifest.parse().unwrap_or_else(|_| {
-                panic!("Unable to parse Cargo.toml at \"{}\"", path.display());
+            CrateManifest(manifest.parse().unwrap_or_else(|err| {
+                panic!("Unable to parse Cargo.toml at \"{}\": {err}", path.display());
             }))
         })
     }
@@ -111,12 +111,12 @@ impl CrateManifest {
         })
     }
 
-    /// A shortcut to find `bevy` packages.
+    /// A shortcut for finding `bevy` packages.
     #[inline]
     #[must_use]
     pub fn bevy(name: &str) -> syn::Path { Self::find(name, "bevy") }
 
-    /// A shortcut to find `froglight` packages.
+    /// A shortcut for finding `froglight` packages.
     #[inline]
     #[must_use]
     pub fn froglight(name: &str) -> syn::Path { Self::find(name, "froglight") }

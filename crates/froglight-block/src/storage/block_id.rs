@@ -24,13 +24,31 @@ impl GlobalBlockId {
 pub(crate) struct RelativeBlockState(u16);
 
 impl From<u32> for RelativeBlockState {
-    #[expect(clippy::cast_possible_truncation)]
-    fn from(state: u32) -> Self { Self(state as u16) }
+    fn from(state: u32) -> Self {
+        Self(
+            #[cfg(debug_assertions)]
+            u16::try_from(state).expect("RelativeBlockState is too large!"),
+            #[cfg(not(debug_assertions))]
+            #[expect(clippy::cast_possible_truncation)]
+            {
+                state as u16
+            },
+        )
+    }
 }
 
 impl From<usize> for RelativeBlockState {
-    #[expect(clippy::cast_possible_truncation)]
-    fn from(state: usize) -> Self { Self(state as u16) }
+    fn from(state: usize) -> Self {
+        Self(
+            #[cfg(debug_assertions)]
+            u16::try_from(state).expect("RelativeBlockState is too large!"),
+            #[cfg(not(debug_assertions))]
+            #[expect(clippy::cast_possible_truncation)]
+            {
+                state as u16
+            },
+        )
+    }
 }
 impl From<RelativeBlockState> for usize {
     fn from(state: RelativeBlockState) -> Self { usize::from(state.0) }
