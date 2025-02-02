@@ -109,6 +109,7 @@ impl<V: Version> BlockWrapper<V> {
 impl<V: Version> Eq for BlockWrapper<V> {}
 impl<V: Version> PartialEq for BlockWrapper<V> {
     fn eq(&self, other: &Self) -> bool {
-        std::ptr::eq(self, other) && (self.0.type_id() == other.0.type_id())
+        <&'static dyn BlockType<V> as Downcast>::as_any(&self.0).type_id()
+            == <&'static dyn BlockType<V> as Downcast>::as_any(&other.0).type_id()
     }
 }
