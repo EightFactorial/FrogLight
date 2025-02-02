@@ -49,10 +49,13 @@ impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> From<&&Block<B, V2>> for
 
 /// A helper for converting blocks between multiple [`Version`]s.
 ///
-/// Allows for chaining [`BlockConvert`] implementations.
+/// # Note
+/// It is much faster to use the [`BlockConvert`] trait directly,
+/// but where many conversions are needed this can be more convenient.
+#[expect(clippy::type_complexity)]
 pub struct BlockConverter<B: BlockTypeExt<V1> + BlockTypeExt<V2>, V1: Version, V2: Version> {
-    from_fn: fn(Block<B, V2>) -> Block<B, V1>,
-    into_fn: fn(Block<B, V1>) -> Block<B, V2>,
+    from_fn: Box<dyn Fn(Block<B, V2>) -> Block<B, V1>>,
+    into_fn: Box<dyn Fn(Block<B, V1>) -> Block<B, V2>>,
 }
 
 impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> Default for BlockConverter<B, V1, V2> {
@@ -60,46 +63,51 @@ impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> Default for BlockConvert
     fn default() -> Self { Self::new() }
 }
 
-impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> BlockConverter<B, V1, V2> {
+impl<B: BlockTypeExt<V1> + BlockTypeExt<V2>, V1: Version, V2: Version> BlockConverter<B, V1, V2> {
     /// Create a new [`BlockChannel`] for
     /// converting blocks between two [`Version`]s.
     #[inline]
     #[must_use]
-    pub const fn new() -> Self { Self { from_fn: B::convert_from, into_fn: B::convert_into } }
+    pub fn new() -> Self
+    where
+        B: BlockConvert<V1, V2>,
+    {
+        Self { from_fn: Box::new(B::convert_from), into_fn: Box::new(B::convert_into) }
+    }
 
     /// Extend the [`BlockChannel`] forward and backward another [`Version`].
     #[must_use]
-    pub const fn extend<V0: Version, V3: Version>(self) -> BlockConverter<B, V0, V3>
+    pub fn extend<V0: Version, V3: Version>(self) -> BlockConverter<B, V0, V3>
     where
-        B: BlockConvert<V0, V1> + BlockConvert<V1, V2> + BlockConvert<V2, V3>,
+        B: BlockConvert<V0, V1> + BlockConvert<V2, V3>,
     {
         BlockConverter::<B, V0, V3> {
-            from_fn: |block| B::convert_from(B::convert_from(B::convert_from(block))),
-            into_fn: |block| B::convert_into(B::convert_into(B::convert_into(block))),
+            from_fn: Box::new(move |block| B::convert_from((self.from_fn)(B::convert_from(block)))),
+            into_fn: Box::new(move |block| B::convert_into((self.into_fn)(B::convert_into(block)))),
         }
     }
 
     /// Extend the [`BlockChannel`] forward an additional [`Version`].
     #[must_use]
-    pub const fn extend_front<V3: Version>(self) -> BlockConverter<B, V1, V3>
+    pub fn extend_front<V3: Version>(self) -> BlockConverter<B, V1, V3>
     where
         B: BlockConvert<V2, V3>,
     {
         BlockConverter::<B, V1, V3> {
-            from_fn: |block| B::convert_from(B::convert_from(block)),
-            into_fn: |block| B::convert_into(B::convert_into(block)),
+            from_fn: Box::new(move |block| (self.from_fn)(B::convert_from(block))),
+            into_fn: Box::new(move |block| B::convert_into((self.into_fn)(block))),
         }
     }
 
     /// Extend the [`BlockChannel`] backward an additional [`Version`].
     #[must_use]
-    pub const fn extend_back<V0: Version>(self) -> BlockConverter<B, V0, V2>
+    pub fn extend_back<V0: Version>(self) -> BlockConverter<B, V0, V2>
     where
-        B: BlockConvert<V0, V1>,
+        B: BlockConvert<V0, V1> + BlockConvert<V1, V2>,
     {
         BlockConverter::<B, V0, V2> {
-            from_fn: |block| B::convert_from(B::convert_from(block)),
-            into_fn: |block| B::convert_into(B::convert_into(block)),
+            from_fn: Box::new(move |block| B::convert_from((self.from_fn)(block))),
+            into_fn: Box::new(move |block| (self.into_fn)(B::convert_into(block))),
         }
     }
 
