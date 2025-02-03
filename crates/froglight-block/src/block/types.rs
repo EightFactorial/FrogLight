@@ -8,7 +8,10 @@ use downcast_rs::Downcast;
 use froglight_common::{Identifier, Version};
 
 use super::{BlockConvert, BlockType, BlockTypeExt};
-use crate::storage::{Attribute, BlockAttributes, BlockWrapper, RelativeBlockState};
+use crate::{
+    resolve::BlockResolver,
+    storage::{Attribute, BlockAttributes, BlockWrapper, RelativeBlockState},
+};
 
 /// A block with a state.
 #[cfg_attr(feature = "bevy", derive(Reflect))]
@@ -134,6 +137,13 @@ impl<V: Version> UntypedBlock<V> {
     #[inline]
     #[must_use]
     pub(crate) const fn wrapper(&self) -> &BlockWrapper<V> { &self.wrapper }
+
+    /// Resolve the [`UntypedBlock`] into a typed [`Block`].
+    ///
+    /// Returns `None` if the block is not in the resolver.
+    #[inline]
+    #[must_use]
+    pub fn resolve<R: BlockResolver<V>>(self) -> Option<R::BlockEnum> { R::resolve(self) }
 
     /// Returns `true` if the [`Block`] is of a [`BlockType`].
     #[inline]

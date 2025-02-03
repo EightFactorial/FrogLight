@@ -1,5 +1,9 @@
 use std::{any::TypeId, ops::Range, sync::Arc};
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::{reflect::ReflectResource, system::Resource};
+#[cfg(feature = "bevy")]
+use bevy_reflect::Reflect;
 use derive_more::derive::Deref;
 use downcast_rs::Downcast;
 use froglight_common::Version;
@@ -9,22 +13,38 @@ use rangemap::RangeMap;
 use super::{GlobalBlockId, RelativeBlockState};
 use crate::{
     block::{BlockType, BlockTypeExt, UntypedBlock},
+    resolve::{BlockResolver, Vanilla},
     storage::BlockAttributes,
 };
 
 /// A thread-safe dynamic storage for block types.
 ///
 /// Allows for the registration and retrieval of block types at runtime.
-#[derive(Default, Clone, Deref)]
+#[derive(Clone, Deref)]
+#[cfg_attr(feature = "bevy", derive(Reflect, Resource), reflect(Resource))]
 pub struct AppBlockStorage<V: Version>(Arc<RwLock<BlockStorage<V>>>);
 
+impl<V: Version> Default for AppBlockStorage<V>
+where
+    Vanilla: BlockResolver<V>,
+{
+    fn default() -> Self { Self::new() }
+}
+
 impl<V: Version> AppBlockStorage<V> {
-    /// Create a new [`AppBlockStorage`].
+    /// Create a new [`AppBlockStorage`] with the
+    /// [`VanillaBlock`] types registered.
     #[inline]
     #[must_use]
-    pub fn new() -> Self { Self::default() }
+    pub fn new() -> Self
+    where
+        Vanilla: BlockResolver<V>,
+    {
+        Self::from_storage(BlockStorage::new())
+    }
 
     /// Create a new [`AppBlockStorage`] from a [`BlockStorage`].
+    #[inline]
     #[must_use]
     pub fn from_storage(storage: BlockStorage<V>) -> Self { Self(Arc::new(RwLock::new(storage))) }
 }
@@ -40,16 +60,23 @@ pub struct BlockStorage<V: Version> {
     types: hashbrown::HashMap<TypeId, u32>,
 }
 
-impl<V: Version> Default for BlockStorage<V> {
+impl<V: Version> Default for BlockStorage<V>
+where
+    Vanilla: BlockResolver<V>,
+{
     fn default() -> Self { Self::new() }
 }
 
 impl<V: Version> BlockStorage<V> {
-    /// Create a new [`BlockStorage`] with the default block types registered.
+    /// Create a new [`BlockStorage`] with the [`VanillaBlock`] types
+    /// registered.
     #[must_use]
-    #[expect(unused_mut, clippy::let_and_return)]
-    pub fn new() -> Self {
+    pub fn new() -> Self
+    where
+        Vanilla: BlockResolver<V>,
+    {
         let mut storage = Self::new_empty();
+        <Vanilla as BlockResolver<V>>::register(&mut storage);
         storage
     }
 
@@ -58,7 +85,7 @@ impl<V: Version> BlockStorage<V> {
     #[expect(clippy::default_trait_access)]
     pub fn new_empty() -> Self { Self { traits: RangeMap::new(), types: Default::default() } }
 
-    /// Get the [`UntypedBlock`] for the given block.
+    /// Get the [`UntypedBlock`] for the given block id.
     ///
     /// Returns `None` if no block with the given id was registered.
     #[must_use]
@@ -75,6 +102,16 @@ impl<V: Version> BlockStorage<V> {
         let block: UntypedBlock<V> = block.into();
         let start = self.types.get(&Downcast::as_any(block.wrapper()).type_id())?;
         Some(GlobalBlockId::new_unchecked(*start + u32::from(**block.state())))
+    }
+
+    /// Get a typed block for the given block id.
+    ///
+    /// Returns `None` if no block with the given id was registered,
+    /// or the block does not exist in the resolver.
+    #[inline]
+    #[must_use]
+    pub fn get_typed<R: BlockResolver<V>>(&self, block: GlobalBlockId) -> Option<R::BlockEnum> {
+        self.get_untyped(block).and_then(R::resolve)
     }
 
     /// Register a block type with the storage.

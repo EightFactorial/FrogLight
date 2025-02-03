@@ -21,6 +21,7 @@ downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["block"] }
 hashbrown = { workspace = true }
+hashify = "0.2.6"
 parking_lot = { workspace = true }
 rangemap = { version = "1.5", features = ["const_fn"] }
 

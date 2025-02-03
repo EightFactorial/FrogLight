@@ -8,6 +8,7 @@ use bevy_utils::TypeIdMap;
 use derive_more::derive::Deref;
 use froglight_block::{
     block::UntypedBlock,
+    resolve::BlockResolver,
     storage::{BlockStorage, GlobalBlockId},
 };
 use froglight_common::{Identifier, Version};
@@ -123,11 +124,46 @@ impl<V: Version> ChunkStorage<V> {
         &mut self,
         handle: &ChunkHandle<V>,
         position: IVec3,
-        block: UntypedBlock<V>,
+        block: impl Into<UntypedBlock<V>>,
         storage: &BlockStorage<V>,
     ) -> Option<UntypedBlock<V>> {
         self.set_block_raw(handle, position, *storage.get_global(block)?)
             .and_then(|id| storage.get_untyped(GlobalBlockId::new_unchecked(id)))
+    }
+
+    /// Get a block from the [`ChunkStorage`] with data from a [`BlockStorage`].
+    ///
+    /// If you don't need specific block-type details,
+    /// consider using [`ChunkStorage::get_block_untyped`] instead.
+    ///
+    /// Returns `None` if the position is out of bounds
+    /// or no matching block is found.
+    #[inline]
+    #[must_use]
+    pub fn get_block<R: BlockResolver<V>>(
+        &self,
+        handle: &ChunkHandle<V>,
+        position: IVec3,
+        storage: &BlockStorage<V>,
+    ) -> Option<R::BlockEnum> {
+        self.get_block_untyped(handle, position, storage).and_then(|block| R::resolve(block))
+    }
+    /// Set a block in the [`ChunkStorage`] using data from a [`BlockStorage`].
+    ///
+    /// If you don't need type details about the previous block,
+    /// consider using [`ChunkStorage::set_block_untyped`] instead.
+    ///
+    /// Returns the previous block if it was set, or
+    /// `None` if the position is out of bounds or no matching block is found.
+    #[inline]
+    pub fn set_block<R: BlockResolver<V>>(
+        &mut self,
+        handle: &ChunkHandle<V>,
+        position: IVec3,
+        block: impl Into<UntypedBlock<V>>,
+        storage: &BlockStorage<V>,
+    ) -> Option<R::BlockEnum> {
+        self.set_block_untyped(handle, position, block, storage).and_then(|block| R::resolve(block))
     }
 }
 

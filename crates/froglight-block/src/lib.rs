@@ -4,6 +4,7 @@
 
 pub mod block;
 pub mod generated;
+pub mod resolve;
 pub mod storage;
 
 pub mod prelude {
@@ -13,6 +14,7 @@ pub mod prelude {
 
     pub use crate::{
         block::{Block, BlockConvert, BlockConverter, BlockType, BlockTypeExt, UntypedBlock},
+        resolve::Vanilla,
         storage::{AppBlockStorage, BlockStorage, GlobalBlockId},
     };
 }

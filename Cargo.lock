@@ -760,6 +760,7 @@ dependencies = [
  "froglight-common",
  "froglight-macros",
  "hashbrown 0.15.2",
+ "hashify",
  "parking_lot",
  "rangemap",
 ]
@@ -990,6 +991,17 @@ dependencies = [
  "equivalent",
  "foldhash",
  "serde",
+]
+
+[[package]]
+name = "hashify"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f208758247e68e239acaa059e72e4ce1f30f2a4b6523f19c1b923d25b7e9cceb"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -1867,9 +1879,9 @@ dependencies = [
 
 [[package]]
 name = "simdnbt"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1af1472d2425ec2edb429ed50c254ec74c403b6aab533d56ef9c59e9ed53ccc7"
+checksum = "960b88bb7ea0984fbba94e53f1a2181ba6654e68a0eb53e45843e0eed402f10e"
 dependencies = [
  "byteorder",
  "flate2",
