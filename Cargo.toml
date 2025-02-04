@@ -72,7 +72,7 @@ bevy_winit = { version = "0.15", default-features = false }
 bitvec = "1.0"
 bytemuck = { version = "1.21", features = ["latest_stable_rust"] }
 compact_str = "0.8"
-derive_more = { version = "1.0", features = ["full"] }
+derive_more = { version = "2.0", features = ["full"] }
 futures-lite = "2.5"
 glam = "0.29"
 hashbrown = "0.14"
