@@ -1,15 +1,2 @@
-# --- Generator Configuration --- #
-#
-# Version groups *must* have the same protocol id!
-#
-# [[version]]
-# name = "1.20.0" # The name of the version group
-# data = "1.20.1" # The version to use for data generation
-
-[[version]]
-name = "1.21.4"
-data = "1.21.4"
-
-[[version]]
-name = "1.21.5"
-data = "1.21.5"
+# --- Froglight-Tools Configuration --- #
+versions = ["1.21.4"]

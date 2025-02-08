@@ -71,9 +71,13 @@ fmt:
 tools arg0="" arg1="" arg2="" arg3="" arg4="" arg5="" arg6="" arg7="": (fetch-tools)
   @just --justfile tools/.justfile {{arg0}} {{arg1}} {{arg2}} {{arg3}} {{arg4}} {{arg5}} {{arg6}} {{arg7}}
 
-# Generate froglight-internal graphs
-graph:
-  RUST_LOG=info cargo run --package=froglight-internal --example=system-graph
+# Run the `froglight-tools` code generator
+generate: (fetch-tools)
+  cargo run --manifest-path=tools/Cargo.toml --package=froglight-tools --release -- --config=generator.toml
+
+# # Generate froglight-internal graphs
+# graph:
+#   RUST_LOG=info cargo run --package=froglight-internal --example=system-graph
 
 # ---- Fetch Recipes ----
 

@@ -95,12 +95,11 @@ phf = { version = "0.11", features = ["macros"] }
 proptest = "1.6"
 serde = "1.0"
 serde_json = "1.0"
-simdnbt = "0.7"
+simdnbt = "0.7.1"
 smallvec = "1.13"
 smol_str = "0.2"
 thiserror = "2.0"
 uuid = "1.12"
-
 
 # --- FrogLight Crate ---
 
