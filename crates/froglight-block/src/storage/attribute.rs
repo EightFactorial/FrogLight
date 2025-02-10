@@ -27,11 +27,17 @@ pub trait BlockAttributes: Sized + 'static {
     ///
     /// Returns `None` if the [`Attribute`] is not present.
     fn get_attr<T: Attribute>(&self) -> Option<T>;
+
     /// Get the string value of an [`Attribute`].
     ///
     /// # Panics
     /// This function will panic if the attribute index is out of bounds.
     fn get_attr_str(&self, attr_index: usize) -> &'static str;
+    /// Set the string value of an [`Attribute`].
+    ///
+    /// # Panics
+    /// This function will panic if the attribute index is out of bounds.
+    fn set_attr_str(&mut self, attr_index: usize, value: &'static str) -> &'static str;
 }
 
 // Implement for zero attributes
@@ -50,6 +56,11 @@ impl BlockAttributes for () {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         ""
     }
+    fn set_attr_str(&mut self, attr_index: usize, attr_str: &'static str) -> &'static str {
+        debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
+        debug_assert_eq!(attr_str, "", "Invalid BlockAttributes value!");
+        ""
+    }
 }
 
 // Implement for one attribute
@@ -66,6 +77,16 @@ impl<A: Attribute> BlockAttributes for A {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         A::VALUES[Into::<usize>::into(*self)]
     }
+    fn set_attr_str(&mut self, attr_index: usize, attr_str: &'static str) -> &'static str {
+        debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
+        if let Some(new_index) = A::VALUES.iter().position(|&val| val == attr_str) {
+            let old_str = A::VALUES[Into::<usize>::into(*self)];
+            *self = A::STATES[new_index];
+            old_str
+        } else {
+            panic!("Invalid BlockAttributes value!");
+        }
+    }
 }
 impl<A: Attribute> BlockAttributes for (A,) {
     const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
@@ -79,6 +100,16 @@ impl<A: Attribute> BlockAttributes for (A,) {
     fn get_attr_str(&self, attr_index: usize) -> &'static str {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         A::VALUES[Into::<usize>::into(self.0)]
+    }
+    fn set_attr_str(&mut self, attr_index: usize, attr_str: &'static str) -> &'static str {
+        debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
+        if let Some(new_index) = A::VALUES.iter().position(|&val| val == attr_str) {
+            let old_str = A::VALUES[Into::<usize>::into(self.0)];
+            self.0 = A::STATES[new_index];
+            old_str
+        } else {
+            panic!("Invalid BlockAttributes value!");
+        }
     }
 }
 
@@ -106,6 +137,28 @@ macro_rules! impl_attributes {
     };
     (@get_attr_str $index:expr, $val:expr, $attr:ident) => {
         if $index == $val { return <$attr>::VALUES[Into::<usize>::into(*$attr)] }
+    };
+
+    (@set_attr_str  $attr_str:ident, $index:expr, $val:expr, $attr:ident, $($rest:ident),*) => {
+        if $index == $val {
+            if let Some(new_index) = <$attr>::VALUES.iter().position(|&val| val == $attr_str) {
+                let old_str = <$attr>::VALUES[Into::<usize>::into(*$attr)];
+                *$attr = <$attr>::STATES[new_index];
+                return old_str;
+            }
+            panic!("Invalid BlockAttributes value!");
+        }
+        impl_attributes!(@set_attr_str $attr_str, $index, $val + 1, $($rest),*)
+    };
+    (@set_attr_str  $attr_str:ident, $index:expr, $val:expr, $attr:ident) => {
+        if $index == $val {
+            if let Some(new_index) = <$attr>::VALUES.iter().position(|&val| val == $attr_str) {
+                let old_str = <$attr>::VALUES[Into::<usize>::into(*$attr)];
+                *$attr = <$attr>::STATES[new_index];
+                return old_str;
+            }
+            panic!("Invalid BlockAttributes value!");
+        }
     };
 
 
@@ -137,6 +190,11 @@ macro_rules! impl_attributes {
             fn get_attr_str(&self, attr_index: usize) -> &'static str {
                 let ($($attr),*) = self;
                 impl_attributes!(@get_attr_str attr_index, 0, $($attr),*);
+                panic!("Invalid BlockAttributes index!");
+            }
+            fn set_attr_str(&mut self, attr_index: usize, attr_str: &'static str) -> &'static str {
+                let ($($attr),*) = self;
+                impl_attributes!(@set_attr_str attr_str, attr_index, 0, $($attr),*);
                 panic!("Invalid BlockAttributes index!");
             }
         }

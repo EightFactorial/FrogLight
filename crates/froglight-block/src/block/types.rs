@@ -60,11 +60,6 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     #[must_use]
     pub fn into_untyped(self) -> UntypedBlock<V> { self.into() }
 
-    /// Get the [`Attributes`](BlockTypeExt::Attributes) of the [`Block`].
-    #[inline]
-    #[must_use]
-    pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(self.state.into()) }
-
     /// Create a [`Block`] from the given
     /// [`Attributes`](BlockTypeExt::Attributes).
     #[inline]
@@ -72,6 +67,11 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     pub fn from_attr(attributes: B::Attributes) -> Self {
         Self { state: RelativeBlockState::from(attributes.into_index()), _phantom: PhantomData }
     }
+
+    /// Get the [`Attributes`](BlockTypeExt::Attributes) of the [`Block`].
+    #[inline]
+    #[must_use]
+    pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(self.state.into()) }
 
     /// Modify the [`Attributes`](BlockTypeExt::Attributes) of the [`Block`].
     ///
@@ -100,10 +100,23 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
         Some(self.into_attr().get_attr_str(index))
     }
 
+    /// Set the string value of an [`Attribute`].
+    ///
+    /// Returns the previous value of the [`Attribute`],
+    /// or `None` if the [`Attribute`] is not present.
+    pub fn set_attr_str(&mut self, attr: &str, value: &'static str) -> Option<&'static str> {
+        let index = B::NAMES.iter().position(|&name| name == attr)?;
+        Some(self.into_attr().set_attr_str(index, value))
+    }
+
     /// Get the identifier of the [`Block`].
     #[inline]
     #[must_use]
     pub fn identifier() -> &'static Identifier { B::as_static().identifier() }
+}
+
+impl<B: BlockTypeExt<V>, V: Version> Default for Block<B, V> {
+    fn default() -> Self { Self::new(RelativeBlockState::from(B::DEFAULT)) }
 }
 
 impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
