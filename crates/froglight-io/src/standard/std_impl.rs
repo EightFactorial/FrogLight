@@ -2,6 +2,7 @@
 use std::io::Cursor;
 use std::{
     collections::{HashMap, HashSet},
+    ffi::{CStr, CString},
     hash::{BuildHasher, Hash},
     io::{Read, Write},
 };
@@ -623,6 +624,54 @@ proptest::proptest! {
     fn proto_hashset_option_u32(data in proptest::collection::hash_set(proptest::option::of(proptest::num::u32::ANY), 0..128)) {
         let buffer: Vec<u8> = data.frog_to_buf().unwrap();
         assert_eq!(HashSet::<Option<u32>>::frog_read(&mut Cursor::new(&buffer)).unwrap(), data);
+        assert_eq!(data.frog_len(), buffer.len());
+    }
+}
+
+impl FrogRead for CString {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        let mut bytes = Vec::new();
+        loop {
+            match u8::frog_read(buffer) {
+                Ok(0u8) => return CString::new(bytes).map_err(ReadError::NulError),
+                Ok(byte) => bytes.push(byte),
+                Err(err) => return Err(err),
+            }
+        }
+    }
+}
+impl FrogWrite for CString {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        <CStr>::frog_write(self.as_c_str(), buffer)
+    }
+    #[inline]
+    fn frog_len(&self) -> usize { <CStr>::frog_len(self.as_c_str()) }
+}
+impl FrogWrite for CStr {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        buffer.write_all(self.to_bytes_with_nul())?;
+        Ok(self.to_bytes_with_nul().len())
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { self.to_bytes_with_nul().len() }
+}
+
+#[cfg(test)]
+proptest::proptest! {
+    #![proptest_config(ProptestConfig::with_cases(256))]
+
+    #[test]
+    fn proto_cstring(data in ".*") {
+        let Ok(data) = CString::new(data) else {
+            return Ok(());
+        };
+
+        let buffer: Vec<u8> = data.frog_to_buf().unwrap();
+        assert_eq!(CString::frog_read(&mut Cursor::new(&buffer)).unwrap(), data);
         assert_eq!(data.frog_len(), buffer.len());
     }
 }

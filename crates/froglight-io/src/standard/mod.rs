@@ -1,6 +1,9 @@
 //! Traits and implementations for encoding and decoding types.
 
-use std::io::{Read, Write};
+use std::{
+    ffi::NulError,
+    io::{Read, Write},
+};
 
 mod froglight_common_impl;
 mod smol_str_impl;
@@ -62,6 +65,9 @@ pub enum ReadError {
     /// An error that occurred while reading an enum value.
     #[error("Invalid enum variant for \"{0}\": {1}")]
     InvalidEnum(&'static str, u32),
+    /// An error that occurred while reading a null-terminated string.
+    #[error("Failed to parse null-terminated string: {0}")]
+    NulError(#[from] NulError),
 
     /// An error that occurred while parsing a value from JSON.
     #[cfg(feature = "serde")]
