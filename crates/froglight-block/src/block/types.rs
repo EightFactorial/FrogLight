@@ -106,7 +106,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// or `None` if the [`Attribute`] is not present.
     pub fn set_attr_str(&mut self, attr: &str, value: &'static str) -> Option<&'static str> {
         let index = B::NAMES.iter().position(|&name| name == attr)?;
-        Some(self.into_attr().set_attr_str(index, value))
+        self.into_attr().set_attr_str(index, value)
     }
 
     /// Get the identifier of the [`Block`].
