@@ -96,7 +96,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Returns `None` if the [`Attribute`] is not present.
     #[must_use]
     pub fn get_attr_str(&self, attr: &str) -> Option<&'static str> {
-        let index = B::NAMES.iter().position(|&name| name == attr)?;
+        let index = B::ATTRIBUTES.iter().position(|&name| name == attr)?;
         Some(self.into_attr().get_attr_str(index))
     }
 
@@ -105,7 +105,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Returns the previous value of the [`Attribute`],
     /// or `None` if the [`Attribute`] is not present.
     pub fn set_attr_str(&mut self, attr: &str, value: &'static str) -> Option<&'static str> {
-        let index = B::NAMES.iter().position(|&name| name == attr)?;
+        let index = B::ATTRIBUTES.iter().position(|&name| name == attr)?;
         self.into_attr().set_attr_str(index, value)
     }
 
@@ -120,8 +120,10 @@ impl<B: BlockTypeExt<V>, V: Version> Default for Block<B, V> {
 }
 
 impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
-    type Error = ();
-    fn try_from(value: UntypedBlock<V>) -> Result<Self, Self::Error> { value.downcast().ok_or(()) }
+    type Error = UntypedBlock<V>;
+    fn try_from(value: UntypedBlock<V>) -> Result<Self, Self::Error> {
+        value.downcast().ok_or(value)
+    }
 }
 
 /// An untyped block with a state.

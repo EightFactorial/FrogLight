@@ -20,7 +20,7 @@ pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock {
     /// The attributes of the block.
     type Attributes: BlockAttributes + MaybeReflect;
     /// The names of the block attributes.
-    const NAMES: &'static [&'static str];
+    const ATTRIBUTES: &'static [&'static str];
     /// The default state of the block.
     const DEFAULT: u16;
 }
