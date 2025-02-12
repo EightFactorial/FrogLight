@@ -31,6 +31,13 @@ pub fn derive_static_block(input: proc_macro::TokenStream) -> proc_macro::TokenS
     block::derive_static_block(input.into()).into()
 }
 
+/// Derive the appropriate traits on blocks.
+#[cfg(feature = "block")]
+#[proc_macro]
+pub fn blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::blocks(input.into()).into()
+}
+
 /// Derive the appropriate traits on block attributes.
 #[cfg(feature = "block")]
 #[proc_macro]
@@ -38,11 +45,11 @@ pub fn block_attributes(input: proc_macro::TokenStream) -> proc_macro::TokenStre
     block::block_attributes(input.into()).into()
 }
 
-/// Derive the appropriate traits on blocks.
+/// Derive the appropriate traits on block properties.
 #[cfg(feature = "block")]
 #[proc_macro]
-pub fn blocks(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    block::blocks(input.into()).into()
+pub fn block_properties(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    block::block_properties(input.into()).into()
 }
 
 // ------------------- `froglight-common` -------------------

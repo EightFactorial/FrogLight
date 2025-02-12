@@ -96,8 +96,10 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Returns `None` if the [`Attribute`] is not present.
     #[must_use]
     pub fn get_attr_str(&self, attr: &str) -> Option<&'static str> {
-        let index = B::ATTRIBUTES.iter().position(|&name| name == attr)?;
-        Some(self.into_attr().get_attr_str(index))
+        B::ATTRIBUTES
+            .iter()
+            .position(|&name| name == attr)
+            .map(|i| self.into_attr().get_attr_str(i))
     }
 
     /// Set the string value of an [`Attribute`].
@@ -105,8 +107,10 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Returns the previous value of the [`Attribute`],
     /// or `None` if the [`Attribute`] is not present.
     pub fn set_attr_str(&mut self, attr: &str, value: &'static str) -> Option<&'static str> {
-        let index = B::ATTRIBUTES.iter().position(|&name| name == attr)?;
-        self.into_attr().set_attr_str(index, value)
+        B::ATTRIBUTES
+            .iter()
+            .position(|&name| name == attr)
+            .and_then(|i| self.into_attr().set_attr_str(i, value))
     }
 
     /// Get the identifier of the [`Block`].
@@ -163,8 +167,9 @@ impl<V: Version> UntypedBlock<V> {
     /// Returns `true` if the [`Block`] is of a [`BlockType`].
     #[inline]
     #[must_use]
-    pub fn is<B: BlockType<V>>(&self) -> bool {
-        <&'static dyn BlockType<V> as Downcast>::as_any(&self.wrapper).is::<B>()
+    pub fn is<B: BlockTypeExt<V>>(&self) -> bool {
+        <dyn BlockType<V> as Downcast>::as_any(*self.wrapper).type_id()
+            == <dyn BlockType<V> as Downcast>::as_any(B::as_static()).type_id()
     }
 
     /// Downcast the [`UntypedBlock`] into a [`Block`].
@@ -173,11 +178,7 @@ impl<V: Version> UntypedBlock<V> {
     #[inline]
     #[must_use]
     pub fn downcast<B: BlockTypeExt<V>>(self) -> Option<Block<B, V>> {
-        if self.is::<B>() {
-            Some(Block::new(self.state))
-        } else {
-            None
-        }
+        self.is::<B>().then(|| Block::new(self.state))
     }
 
     /// Get the identifier of the [`UntypedBlock`].
@@ -194,6 +195,11 @@ impl<B: BlockTypeExt<V>, V: Version> From<Block<B, V>> for UntypedBlock<V> {
 
 // ---- Manual trait implementations to avoid trait bounds ----
 
+impl<B: BlockTypeExt<V>, V: Version> std::fmt::Debug for Block<B, V> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Block").field(&self.state).finish()
+    }
+}
 impl<B: BlockTypeExt<V>, V: Version> Copy for Block<B, V> {}
 #[allow(clippy::expl_impl_clone_on_copy, clippy::non_canonical_clone_impl)]
 impl<B: BlockTypeExt<V>, V: Version> Clone for Block<B, V> {
@@ -204,6 +210,11 @@ impl<B: BlockTypeExt<V>, V: Version> PartialEq for Block<B, V> {
     fn eq(&self, other: &Self) -> bool { self.state == other.state }
 }
 
+impl<V: Version> std::fmt::Debug for UntypedBlock<V> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("UntypedBlock").field(&self.state).field(&self.wrapper.identifier()).finish()
+    }
+}
 impl<V: Version> Copy for UntypedBlock<V> {}
 #[allow(clippy::expl_impl_clone_on_copy, clippy::non_canonical_clone_impl)]
 impl<V: Version> Clone for UntypedBlock<V> {
