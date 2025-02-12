@@ -1,8 +1,10 @@
 //! This file is generated, do not modify it manually.
 //!
 //! TODO: Documentation
+#![allow(missing_docs)]
 
 froglight_macros::blocks! {
+    crate,
     pub struct AcaciaButton;
     pub struct AcaciaDoor;
     pub struct AcaciaFence;

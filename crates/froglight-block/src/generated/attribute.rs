@@ -1,8 +1,10 @@
 //! This file is generated, do not modify it manually.
 //!
 //! TODO: Documentation
+#![allow(missing_docs, non_camel_case_types)]
 
 froglight_macros::block_attributes! {
+    crate,
     pub enum ActiveBool { True, False } { "true", "false" },
     pub enum AgeInt0To1 { _0, _1 } { "0", "1" },
     pub enum AgeInt0To2 { _0, _1, _2 } { "0", "1", "2" },
