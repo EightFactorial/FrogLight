@@ -1,4 +1,3 @@
-use convert_case::{Case, Casing};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
@@ -130,14 +129,9 @@ impl BlockAttribute {
     }
 
     fn create_tests(attrs: &Punctuated<Self, Token![,]>, path: &Path) -> TokenStream {
-        let tests = attrs.iter().fold(
+        let attribute_tests = attrs.iter().fold(
             TokenStream::new(),
             |mut tokens, BlockAttribute { ident, variants, .. }| {
-                let test_fn = Ident::new(
-                    &format!("test_{}", ident.to_string().to_case(Case::Snake)),
-                    ident.span(),
-                );
-
                 let attribute_tests = variants.iter().enumerate().fold(TokenStream::new(), |mut tokens, (i, v)| {
                     tokens.extend(quote! {{
                         assert_eq!(Into::<usize>::into(#ident::#v), #i, "Invalid Attribute index for `{:?}`!", #ident::#v);
@@ -153,15 +147,12 @@ impl BlockAttribute {
                     tokens
                 });
 
-                tokens.extend(quote! {
-                    #[test]
-                    fn #test_fn() {
+                tokens.extend(quote! {{
                         assert_eq!(#ident::STATES.len(), #ident::COUNT, "Invalid state count for `{}`!", stringify!(#ident));
                         assert_eq!(&[std::any::TypeId::of::<#ident>()], #ident::TYPES, "Invalid type ID for `{}`!", stringify!(#ident));
 
                         #attribute_tests
-                    }
-                });
+                }});
 
                 tokens
             },
@@ -171,10 +162,12 @@ impl BlockAttribute {
             #[cfg(test)]
             mod test {
                 use super::*;
-
                 use #path::storage::{BlockAttributes, Attribute};
 
-                #tests
+                #[test]
+                fn attributes() {
+                    #attribute_tests
+                }
             }
         }
     }

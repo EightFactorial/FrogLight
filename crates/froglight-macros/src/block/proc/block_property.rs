@@ -1,4 +1,3 @@
-use convert_case::{Case, Casing};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
@@ -55,11 +54,6 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             attributes: AttributeInput { names, idents },
         } in blocks
         {
-            let test_fn = Ident::new(
-                &format!("test_{}", block.to_string().to_case(Case::Snake)),
-                block.span(),
-            );
-            let default: u16 = default.base10_parse().unwrap();
 
             // Build the `VersionBlocks` enum
             blocks_enum.extend(quote! { #block(#block_path::block::Block<#block, #version>), });
@@ -89,9 +83,8 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                 })
                 .collect();
 
-            block_tests.extend(quote! {
-                #[test]
-                fn #test_fn() {
+            let default: u16 = default.base10_parse().unwrap();
+            block_tests.extend(quote! {{
                     let mut block = #block_path::block::Block::<#block, #version>::default();
                     assert_eq!(block.state(), &#default.into());
                     assert_eq!(block, block);
@@ -131,12 +124,19 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             }
 
             #[cfg(test)]
-            mod tests {
+            mod test {
                 use super::*;
                 use #block_path::prelude::*;
 
-                #block_tests
-                #resolve_tests
+                #[test]
+                fn blocks() {
+                    #block_tests
+                }
+
+                #[test]
+                fn resolver() {
+                    #resolve_tests
+                }
             }
         }
     });
