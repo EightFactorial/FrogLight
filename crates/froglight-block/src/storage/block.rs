@@ -91,7 +91,7 @@ impl<V: Version> BlockStorage<V> {
     #[must_use]
     pub fn get_untyped(&self, block: GlobalBlockId) -> Option<UntypedBlock<V>> {
         let (range, wrapper) = self.traits.get_key_value(&block)?;
-        Some(UntypedBlock::new(RelativeBlockState::from(range.start - *block), *wrapper))
+        Some(UntypedBlock::new(RelativeBlockState::from(*block - range.start), *wrapper))
     }
 
     /// Get the [`GlobalBlockId`] for the given block.
@@ -146,7 +146,7 @@ impl<V: Version> BlockWrapper<V> {
 impl<V: Version> Eq for BlockWrapper<V> {}
 impl<V: Version> PartialEq for BlockWrapper<V> {
     fn eq(&self, other: &Self) -> bool {
-        <&'static dyn BlockType<V> as Downcast>::as_any(&self.0).type_id()
-            == <&'static dyn BlockType<V> as Downcast>::as_any(&other.0).type_id()
+        <dyn BlockType<V> as Downcast>::as_any(self.0).type_id()
+            == <dyn BlockType<V> as Downcast>::as_any(other.0).type_id()
     }
 }

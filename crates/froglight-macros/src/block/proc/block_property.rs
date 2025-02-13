@@ -72,9 +72,11 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
 
             // Create resolver tests
             resolver_tests.extend(quote! {{
-                let block = #block_path::block::Block::<#block, #version>::default();
-                assert!(storage.get_global(block).is_some(), "Block \"{}\" not registered!", #ident);
-                assert_eq!(block.into_untyped().resolve::<Vanilla>(), Some(VersionBlocks::#block(block)), "Failed to resolve \"{}\"!", #ident);
+                let block = storage.get_untyped(GlobalBlockId::new_unchecked(global)).unwrap();
+                assert_eq!(block.identifier().as_str(), #ident, "Block \"{}\" identifier mismatch!", #ident);
+                assert_eq!(block.resolve::<Vanilla>(), block.downcast().map(|block| VersionBlocks::#block(block)), "Failed to resolve \"{}\"!", #ident);
+                #[expect(clippy::cast_possible_truncation)]
+                { global += <#block as #block_path::block::BlockTypeExt<#version>>::Attributes::COUNT as u32; }
             }});
 
             // Create block tests
@@ -132,7 +134,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             #[cfg(test)]
             mod test {
                 use super::*;
-                use #block_path::prelude::*;
+                use #block_path::{prelude::*, storage::BlockAttributes};
 
                 #[test]
                 fn blocks() {
@@ -142,6 +144,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                 #[test]
                 fn resolver() {
                     let mut storage = #block_path::storage::BlockStorage::<#version>::new();
+                    let mut global = 0u32;
 
                     #resolver_tests
                 }
