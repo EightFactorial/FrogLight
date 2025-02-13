@@ -2,7 +2,7 @@
 <p align="center">A collection of Minecraft libraries written in Rust</p>
 
 <p align="center">
-  <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>  
+  <a href="https://github.com/EightFactorial/FrogLight"><img alt="Documentation" src="https://img.shields.io/badge/docs-main-green.svg"></a>
   <img alt="License" src="https://img.shields.io/badge/license-MIT/Apache--2.0---?color=blue">
   <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/testing.yml/badge.svg"></a>
 </p>
@@ -11,17 +11,18 @@
 
 FrogLight is a set of libraries for creating Minecraft clients. Each crate is designed to be used independently, but plugins are provided for the [Bevy](https://github.com/bevyengine/bevy/) engine.
 
-It is currently in a **very early alpha state**. Most things do not work yet!
+It is currently in an **early alpha state**. Some things do not work yet!
 
 > [!Caution]
 > Some servers do not allow modified clients!
-> 
+>
 > ### !! I am not responsible for banned accounts !!
 
 ## Version Support
 
 FrogLight has support for:
-- v1.21.0 - v1.21.1
+- v1.21.4
+- ~~v1.21.5~~
 
 ## Usage
 

@@ -72,7 +72,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
 
             // Create resolver tests
             resolver_tests.extend(quote! {{
-                let block = storage.get_untyped(GlobalBlockId::new_unchecked(global)).unwrap();
+                let block = storage.get_untyped(GlobalBlockId::new_unchecked(global)).expect("No block found for expected GlobalBlockId!");
                 assert_eq!(block.identifier().as_str(), #ident, "Block \"{}\" identifier mismatch!", #ident);
                 assert_eq!(block.resolve::<Vanilla>(), block.downcast().map(|block| VersionBlocks::#block(block)), "Failed to resolve \"{}\"!", #ident);
                 #[expect(clippy::cast_possible_truncation)]
