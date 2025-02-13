@@ -43,8 +43,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
 
         let mut vanilla_register = TokenStream::new();
         let mut vanilla_resolve = TokenStream::new();
-        // TODO: Write tests for the resolver
-        let resolve_tests = TokenStream::new();
+        let mut resolver_tests = TokenStream::new();
 
         let mut block_tests = TokenStream::new();
 
@@ -71,14 +70,21 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                 #ident => |block| block.downcast::<#block>().unwrap().into(),
             });
 
+            // Create resolver tests
+            resolver_tests.extend(quote! {{
+                let block = #block_path::block::Block::<#block, #version>::default();
+                assert!(storage.get_global(block).is_some(), "Block \"{}\" not registered!", #ident);
+                assert_eq!(block.into_untyped().resolve::<Vanilla>(), Some(VersionBlocks::#block(block)), "Failed to resolve \"{}\"!", #ident);
+            }});
+
             // Create block tests
             let get_attr_tokens: TokenStream = idents
                 .iter()
                 .zip(names.iter())
-                .map(|(ident, name)| {
+                .map(|(attr_ident, attr_name)| {
                     quote! {
-                        assert!(block.get_attr::<#ident>().is_some());
-                        assert!(block.get_attr_str(#name).is_some());
+                        assert!(block.get_attr::<#attr_ident>().is_some(), "Block \"{}\" missing attribute \"{}\"!", #ident, stringify!(#attr_ident));
+                        assert!(block.get_attr_str(#attr_name).is_some(), "Block \"{}\" missing string attribute \"{}\"!", #ident, #attr_name);
                     }
                 })
                 .collect();
@@ -86,14 +92,14 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             let default: u16 = default.base10_parse().unwrap();
             block_tests.extend(quote! {{
                     let mut block = #block_path::block::Block::<#block, #version>::default();
-                    assert_eq!(block.state(), &#default.into());
-                    assert_eq!(block, block);
-                    assert_eq!(block, block.into_version::<#version>());
-                    assert_eq!(block, #block_path::block::Block::from_attr(block.into_attr()));
+                    assert_eq!(block.state(), &#default.into(), "Block \"{}\" default state mismatch!", #ident);
+                    assert_eq!(block, block, "Block \"{}\" equality failed!", #ident);
+                    assert_eq!(block, block.into_version::<#version>(), "Block \"{}\" `into_version` failed!", #ident);
+                    assert_eq!(block, #block_path::block::Block::from_attr(block.into_attr()), "Block \"{}\" attribute round-trip failed!", #ident);
 
-                    assert_eq!(#block_path::block::Block::<#block, #version>::identifier().as_str(), #ident);
-                    assert_eq!(block.into_untyped().identifier().as_str(), #ident);
-                    assert_eq!(block.into_untyped().downcast().unwrap(), block);
+                    assert_eq!(#block_path::block::Block::<#block, #version>::identifier().as_str(), #ident, "Block \"{}\" typed identifier mismatch!", #ident);
+                    assert_eq!(block.into_untyped().identifier().as_str(), #ident, "Block \"{}\" untyped identifier mismatch!", #ident);
+                    assert_eq!(block.into_untyped().downcast().unwrap(), block, "Block \"{}\" downcast failed!", #ident);
 
                     #get_attr_tokens
                 }
@@ -135,7 +141,9 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
 
                 #[test]
                 fn resolver() {
-                    #resolve_tests
+                    let mut storage = #block_path::storage::BlockStorage::<#version>::new();
+
+                    #resolver_tests
                 }
             }
         }

@@ -100,8 +100,9 @@ impl<V: Version> BlockStorage<V> {
     #[must_use]
     pub fn get_global(&self, block: impl Into<UntypedBlock<V>>) -> Option<GlobalBlockId> {
         let block: UntypedBlock<V> = block.into();
-        let start = self.types.get(&Downcast::as_any(block.wrapper()).type_id())?;
-        Some(GlobalBlockId::new_unchecked(*start + u32::from(**block.state())))
+        self.types
+            .get(&<dyn BlockType<V> as Downcast>::as_any(**block.wrapper()).type_id())
+            .map(|start| GlobalBlockId::new_unchecked(*start + u32::from(**block.state())))
     }
 
     /// Get a typed block for the given block id.
@@ -122,7 +123,7 @@ impl<V: Version> BlockStorage<V> {
         let count = u32::try_from(B::Attributes::COUNT).expect("BlockType has too many states!");
         let range = self.traits.last_range_value().map_or_else(
             || Range { start: 0, end: count },
-            |(r, _)| Range { start: r.end + 1, end: r.end + count },
+            |(r, _)| Range { start: r.end, end: r.end + count },
         );
         self.types.insert(TypeId::of::<B>(), range.start);
         self.traits.insert(range, BlockWrapper::new(B::as_static()));
