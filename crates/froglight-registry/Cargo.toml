@@ -20,8 +20,9 @@ downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["registry"] }
 hashbrown = { workspace = true }
-parking_lot = { workspace = true }
 indexmap = { workspace = true }
+parking_lot = { workspace = true }
+simdnbt = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }

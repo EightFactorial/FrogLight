@@ -100,7 +100,8 @@ impl<V: Version> RegistryStorage<V> {
         self.0.get(&TypeId::of::<R>()).is_some_and(|map| map.contains_key(ident))
     }
 
-    /// Get an iterator over all [`RegistryType`]s in the [`RegistryStorage`].
+    /// Iterate over all [`RegistryType`]s in the [`RegistryStorage`]
+    /// in an arbitrary order.
     pub fn keys(&self) -> impl Iterator<Item = &TypeId> + '_ { self.0.keys() }
 
     /// Get an iterator over all [`RegistryValue`]s of a specific
@@ -191,5 +192,60 @@ impl<V: Version> RegistryStorage<V> {
     /// Keeps the allocated memory for future use.
     pub fn clear<R: RegistryType<V>>(&mut self) {
         self.0.get_mut(&TypeId::of::<R>()).map(IndexMap::clear);
+    }
+}
+
+impl<V: Version> RegistryStorage<V> {
+    /// Get a [`RegistryValue`] as [`BaseNbt`]
+    /// by it's [`RegistryType`] and identifier.
+    ///
+    /// ### Note
+    /// If the value does not implement [`Copy`],
+    /// use [`RegistryStorage::get_cloned_nbt`] instead.
+    #[inline]
+    pub fn get_copied_nbt<R: RegistryType<V>>(
+        &self,
+        ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
+    ) -> Option<simdnbt::owned::BaseNbt>
+    where
+        R::Value: Copy + simdnbt::Serialize,
+    {
+        self.get::<R>(ident).copied().map(<R::Value as simdnbt::Serialize>::to_nbt)
+    }
+
+    /// Get a [`RegistryValue`] as [`BaseNbt`]
+    /// by it's [`RegistryType`] and identifier.
+    ///
+    /// ### Note
+    /// If the value implements [`Copy`],
+    /// prefer [`RegistryStorage::get_copied_nbt`] instead.
+    #[inline]
+    pub fn get_cloned_nbt<R: RegistryType<V>>(
+        &self,
+        ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
+    ) -> Option<simdnbt::owned::BaseNbt>
+    where
+        R::Value: Clone + simdnbt::Serialize,
+    {
+        self.get::<R>(ident).cloned().map(<R::Value as simdnbt::Serialize>::to_nbt)
+    }
+
+    /// Insert a serialized [`RegistryValue`] into the [`RegistryStorage`].
+    ///
+    /// Returns the previous value if it existed.
+    ///
+    /// # Errors
+    /// Returns an error if the value could not be deserialized.
+    #[inline]
+    pub fn insert_nbt<R: RegistryType<V>>(
+        &mut self,
+        ident: Identifier,
+        nbt: &simdnbt::borrow::BaseNbt,
+    ) -> Result<Option<R::Value>, simdnbt::DeserializeError>
+    where
+        R::Value: simdnbt::Deserialize,
+    {
+        <R::Value as simdnbt::Deserialize>::from_nbt(nbt)
+            .map(|value: R::Value| self.insert::<R>(ident, value))
     }
 }
