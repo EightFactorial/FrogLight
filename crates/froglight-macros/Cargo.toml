@@ -37,3 +37,5 @@ common = []
 io = []
 # Enable `froglight-network` macros.
 network = []
+# Enable `froglight-registry` macros.
+registry = []

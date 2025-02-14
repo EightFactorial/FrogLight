@@ -40,11 +40,20 @@ external-default-features = "allow"
 workspace-default-features = "allow"
 
 [[bans.skip]]
-name = "convert_case"
-version = "=0.6.0"
+name = "derive_more"
+version = "=1.0.0"
+[[bans.skip]]
+name = "derive_more-impl"
+version = "=1.0.0"
+[[bans.skip]]
+name = "downcast-rs"
+version = "=1.2.1"
 [[bans.skip]]
 name = "fixedbitset"
 version = "=0.4.2"
+[[bans.skip]]
+name = "getrandom"
+version = "=0.2.15"
 [[bans.skip]]
 name = "hashbrown"
 version = "=0.14.5"
@@ -60,6 +69,10 @@ version = "=1.0.69"
 [[bans.skip]]
 name = "thiserror-impl"
 version = "=1.0.69"
+[[bans.skip]]
+name = "wasi"
+version = "=0.11.0"
+
 
 [[bans.skip]]
 name = "windows-sys"

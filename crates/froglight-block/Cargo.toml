@@ -16,7 +16,6 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-derive_more = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["block"] }

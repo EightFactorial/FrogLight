@@ -1,5 +1,7 @@
 #![allow(clippy::unsafe_derive_deserialize)]
 
+use std::borrow::Borrow;
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use smol_str::SmolStr;
@@ -133,10 +135,22 @@ impl AsRef<str> for Identifier {
     fn as_ref(&self) -> &str { &self.0 }
 }
 
+impl Borrow<SmolStr> for Identifier {
+    fn borrow(&self) -> &SmolStr { &self.0 }
+}
+impl Borrow<str> for Identifier {
+    fn borrow(&self) -> &str { &self.0 }
+}
+
 impl std::fmt::Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }
 }
 impl std::ops::Deref for Identifier {
     type Target = SmolStr;
     fn deref(&self) -> &Self::Target { &self.0 }
+}
+
+impl<T: PartialEq<str>> PartialEq<T> for Identifier {
+    #[inline]
+    fn eq(&self, other: &T) -> bool { other.eq(self.as_str()) }
 }

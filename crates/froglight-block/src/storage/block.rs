@@ -4,7 +4,6 @@ use std::{any::TypeId, ops::Range, sync::Arc};
 use bevy_ecs::{reflect::ReflectResource, system::Resource};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
-use derive_more::derive::Deref;
 use downcast_rs::Downcast;
 use froglight_common::Version;
 use parking_lot::RwLock;
@@ -20,7 +19,7 @@ use crate::{
 /// A thread-safe dynamic storage for block types.
 ///
 /// Allows for the registration and retrieval of block types at runtime.
-#[derive(Clone, Deref)]
+#[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Reflect, Resource), reflect(Resource))]
 pub struct AppBlockStorage<V: Version>(Arc<RwLock<BlockStorage<V>>>);
 
@@ -29,6 +28,10 @@ where
     Vanilla: BlockResolver<V>,
 {
     fn default() -> Self { Self::new() }
+}
+impl<V: Version> std::ops::Deref for AppBlockStorage<V> {
+    type Target = Arc<RwLock<BlockStorage<V>>>;
+    fn deref(&self) -> &Self::Target { &self.0 }
 }
 
 impl<V: Version> AppBlockStorage<V> {
@@ -132,7 +135,7 @@ impl<V: Version> BlockStorage<V> {
 
 /// A wrapper around a [`&'static dyn BlockType`](BlockType)
 /// that implements [`PartialEq`] and [`Eq`].
-#[derive(Clone, Copy, Deref)]
+#[derive(Clone, Copy)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(PartialEq))]
 pub(crate) struct BlockWrapper<V: Version>(&'static dyn BlockType<V>);
 
@@ -149,4 +152,8 @@ impl<V: Version> PartialEq for BlockWrapper<V> {
         <dyn BlockType<V> as Downcast>::as_any(self.0).type_id()
             == <dyn BlockType<V> as Downcast>::as_any(other.0).type_id()
     }
+}
+impl<V: Version> std::ops::Deref for BlockWrapper<V> {
+    type Target = &'static dyn BlockType<V>;
+    fn deref(&self) -> &Self::Target { &self.0 }
 }

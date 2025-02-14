@@ -13,6 +13,6 @@ pub mod prelude {
     pub use froglight_block::prelude::*;
     pub use froglight_common::{EntityId, EntityUuid, Identifier, version::*};
     pub use froglight_network::prelude::*;
-    // pub use froglight_registry::prelude::*;
+    pub use froglight_registry::prelude::*;
     pub use froglight_world::prelude::*;
 }
