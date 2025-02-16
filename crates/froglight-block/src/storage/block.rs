@@ -27,6 +27,7 @@ impl<V: Version> Default for AppBlockStorage<V>
 where
     Vanilla: BlockResolver<V>,
 {
+    #[inline]
     fn default() -> Self { Self::new() }
 }
 impl<V: Version> std::ops::Deref for AppBlockStorage<V> {
@@ -84,6 +85,7 @@ impl<V: Version> BlockStorage<V> {
     }
 
     /// Create a new [`BlockStorage`] with no registered block types.
+    #[inline]
     #[must_use]
     #[expect(clippy::default_trait_access)]
     pub fn new_empty() -> Self { Self { traits: RangeMap::new(), types: Default::default() } }

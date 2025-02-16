@@ -128,6 +128,15 @@ impl Identifier {
     pub fn split(&self) -> (&str, &str) { self.0.split_once(':').unwrap() }
 }
 
+impl std::fmt::Display for Identifier {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }
+}
+
+impl std::ops::Deref for Identifier {
+    type Target = SmolStr;
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
 impl AsRef<SmolStr> for Identifier {
     fn as_ref(&self) -> &SmolStr { &self.0 }
 }
@@ -140,14 +149,6 @@ impl Borrow<SmolStr> for Identifier {
 }
 impl Borrow<str> for Identifier {
     fn borrow(&self) -> &str { &self.0 }
-}
-
-impl std::fmt::Display for Identifier {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }
-}
-impl std::ops::Deref for Identifier {
-    type Target = SmolStr;
-    fn deref(&self) -> &Self::Target { &self.0 }
 }
 
 impl<T: PartialEq<str>> PartialEq<T> for Identifier {

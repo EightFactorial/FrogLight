@@ -58,6 +58,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             blocks_enum.extend(quote! { #block(#block_path::block::Block<#block, #version>), });
             blocks_from_impls.extend(quote! {
                 impl From<#block_path::block::Block<#block, #version>> for VersionBlocks {
+                    #[inline]
                     fn from(block: #block_path::block::Block<#block, #version>) -> Self {
                         Self::#block(block)
                     }
@@ -67,7 +68,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             // Register the blocks with the resolver
             vanilla_register.extend(quote! { storage.register::<#block>(); });
             vanilla_resolve.extend(quote! {
-                #ident => |block| block.downcast::<#block>().unwrap().into(),
+                #ident => |block| block.downcast::<#block>().map(VersionBlocks::#block),
             });
 
             // Create resolver tests
@@ -122,12 +123,12 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                     #vanilla_register
                 }
                 fn resolve(block: #block_path::block::UntypedBlock<#version>) -> Option<VersionBlocks> {
-                    type ResolveFn = fn(#block_path::block::UntypedBlock<#version>) -> VersionBlocks;
+                    type ResolveFn = fn(#block_path::block::UntypedBlock<#version>) -> Option<VersionBlocks>;
                     hashify::map! {
                         block.identifier().as_bytes(),
                         ResolveFn,
                         #vanilla_resolve
-                    }.map(|f| f(block))
+                    }.and_then(|f| f(block))
                 }
             }
 

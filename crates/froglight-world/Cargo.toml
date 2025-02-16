@@ -33,7 +33,6 @@ downcast-rs = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 
-
 [features]
 default = []
 

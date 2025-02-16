@@ -33,7 +33,7 @@ uuid = { workspace = true }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
-bevy_tasks = { workspace = true, optional = true }
+bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
 hickory-resolver = { workspace = true, optional = true }
 
 [features]

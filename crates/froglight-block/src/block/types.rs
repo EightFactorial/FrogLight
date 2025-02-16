@@ -188,6 +188,7 @@ impl<V: Version> UntypedBlock<V> {
 }
 
 impl<B: BlockTypeExt<V>, V: Version> From<Block<B, V>> for UntypedBlock<V> {
+    #[inline]
     fn from(block: Block<B, V>) -> Self {
         UntypedBlock::new(block.state, BlockWrapper::new(B::as_static()))
     }
