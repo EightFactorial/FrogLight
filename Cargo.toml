@@ -97,10 +97,10 @@ proptest = "1.6"
 serde = "1.0"
 serde_json = "1.0"
 simdnbt = "0.7.1"
-smallvec = "1.13"
+smallvec = "1.14"
 smol_str = "0.2"
 thiserror = "2.0"
-uuid = "1.13"
+uuid = "1.12"
 
 # --- FrogLight Crate ---
 
