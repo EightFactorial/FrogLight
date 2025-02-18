@@ -18,6 +18,9 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
     let mut output = blocks.iter().fold(
         TokenStream::new(),
         |mut tokens, BlockInput { block, properties: PropertyInput { ident, default }, attributes: AttributeInput { names, idents } }| {
+            // If there is not exactly one attribute, make a unit or tuple struct
+            let attrs = idents.len().ne(&1).then(|| quote!((#idents))).unwrap_or_else(|| quote!(#idents));
+
             tokens.extend(quote! {
                 impl #block_path::block::BlockType<#version> for #block {
                     fn identifier(&self) -> &'static #common_path::Identifier {
@@ -26,7 +29,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                     }
                 }
                 impl #block_path::block::BlockTypeExt<#version> for #block {
-                    type Attributes = (#idents);
+                    type Attributes = #attrs;
                     const ATTRIBUTES: &'static [&'static str] = &[#names];
                     const DEFAULT: u16 = #default;
                 }
@@ -68,7 +71,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             // Register the blocks with the resolver
             vanilla_register.extend(quote! { storage.register::<#block>(); });
             vanilla_resolve.extend(quote! {
-                #ident => |block| block.downcast::<#block>().map(VersionBlocks::#block),
+                #ident => { return block.downcast::<#block>().map(VersionBlocks::#block) },
             });
 
             // Create resolver tests
@@ -123,12 +126,12 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                     #vanilla_register
                 }
                 fn resolve(block: #block_path::block::UntypedBlock<#version>) -> Option<VersionBlocks> {
-                    type ResolveFn = fn(#block_path::block::UntypedBlock<#version>) -> Option<VersionBlocks>;
-                    hashify::map! {
+                    hashify::fnc_map!(
                         block.identifier().as_bytes(),
-                        ResolveFn,
                         #vanilla_resolve
-                    }.and_then(|f| f(block))
+                        _ => { return None }
+                    );
+                    unreachable!("All possible cases handled by `hashify::fnc_map` macro")
                 }
             }
 
