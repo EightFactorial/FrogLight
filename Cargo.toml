@@ -90,7 +90,7 @@ hickory-resolver = { version = "0.24", default-features = false, features = [
   "system-config",
   "rustls",
 ] }
-indexmap = "2.7.1"
+indexmap = "2.7"
 parking_lot = "0.12"
 phf = { version = "0.11", features = ["macros"] }
 proptest = "1.6"
