@@ -10,6 +10,8 @@ pub(crate) fn derive_static_block(input: TokenStream) -> TokenStream {
 
     quote! {
         impl #block::block::StaticBlock for #ident {
+            #[inline]
+            #[must_use]
             fn as_static() -> &'static Self { &Self }
         }
     }

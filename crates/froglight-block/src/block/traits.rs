@@ -23,6 +23,9 @@ pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock {
     const ATTRIBUTES: &'static [&'static str];
     /// The default state of the block.
     const DEFAULT: u16;
+
+    /// The identifier of the block.
+    const IDENTIFIER: &'static str;
 }
 
 use sealed::MaybeReflect;

@@ -23,8 +23,10 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
 
             tokens.extend(quote! {
                 impl #block_path::block::BlockType<#version> for #block {
+                    #[inline]
+                    #[must_use]
                     fn identifier(&self) -> &'static #common_path::Identifier {
-                        static IDENTIFIER: #common_path::Identifier = #common_path::Identifier::const_new(#ident);
+                        static IDENTIFIER: #common_path::Identifier = #common_path::Identifier::const_new(<#block as #block_path::block::BlockTypeExt<#version>>::IDENTIFIER);
                         &IDENTIFIER
                     }
                 }
@@ -32,6 +34,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                     type Attributes = #attrs;
                     const ATTRIBUTES: &'static [&'static str] = &[#names];
                     const DEFAULT: u16 = #default;
+                    const IDENTIFIER: &'static str = #ident;
                 }
             });
 
@@ -103,6 +106,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                     assert_eq!(block, block.into_version::<#version>(), "Block \"{}\" `into_version` failed!", #ident);
                     assert_eq!(block, #block_path::block::Block::from_attr(block.into_attr()), "Block \"{}\" attribute round-trip failed!", #ident);
 
+                    assert_eq!(<#block as #block_path::block::BlockTypeExt<#version>>::IDENTIFIER, #ident, "Block \"{}\" typed identifier mismatch!", #ident);
                     assert_eq!(#block_path::block::Block::<#block, #version>::identifier().as_str(), #ident, "Block \"{}\" typed identifier mismatch!", #ident);
                     assert_eq!(block.into_untyped().identifier().as_str(), #ident, "Block \"{}\" untyped identifier mismatch!", #ident);
                     assert_eq!(block.into_untyped().downcast().unwrap(), block, "Block \"{}\" downcast failed!", #ident);
