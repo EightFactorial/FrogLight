@@ -115,8 +115,9 @@ impl<V: Version> BlockStorage<V> {
     /// ```
     #[must_use]
     pub fn get_untyped(&self, block: GlobalBlockId) -> Option<UntypedBlock<V>> {
-        let (range, wrapper) = self.traits.get_key_value(&block)?;
-        Some(UntypedBlock::new(RelativeBlockState::from(*block - range.start), *wrapper))
+        self.traits.get_key_value(&block).map(|(range, wrapper)| {
+            UntypedBlock::new(RelativeBlockState::from(*block - range.start), *wrapper)
+        })
     }
 
     /// Get the [`GlobalBlockId`] for the given block.

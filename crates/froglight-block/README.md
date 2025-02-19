@@ -69,10 +69,15 @@ fn main() {
     let attributes = Block::<block::OakLeaves, V1_21_4>::default().into_attr();
     assert_eq!(attributes, (attribute::DistanceInt1To7::_7, attribute::PersistentBool::False, attribute::WaterloggedBool::False));
 
-
     // Block Versions
-    // let stone_a: Block<block::Stone, V1_21_4> = Block::default();
-    // let stone_b: Block<block::Stone, V1_21_5> = stone_a.into_version();
+
+    #[cfg(feature = "v1_21_5")]
+    {
+        // Create a `V1_21_4` block
+        let _stone_a: Block<block::Stone, V1_21_4> = Block::default();
+        // Convert it into a `V1_21_5` block
+        // let stone_b: Block<block::Stone, V1_21_5> = stone_a.into_version();
+    }
 }
 ```
 

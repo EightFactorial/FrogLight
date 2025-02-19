@@ -190,10 +190,39 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     pub fn set_attr_str(&mut self, attr: &str, value: &'static str) -> Option<&'static str> {
         B::ATTRIBUTES.iter().position(|&name| name == attr).and_then(|i| {
             let mut attr = self.into_attr();
-            let result = attr.set_attr_str(i, value);
-            *self = Self::from_attr(attr);
-            result
+            attr.set_attr_str(i, value).inspect(|_| *self = Self::from_attr(attr))
         })
+    }
+
+    /// Iterate over the [`Attributes`](BlockTypeExt::Attributes) of the
+    /// [`Block`].
+    ///
+    /// ```rust
+    /// use froglight_block::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // `Air` does not have any attributes
+    ///     let air = Block::<block::Air, V1_21_4>::default();
+    ///     assert!(air.iter_attr_str().collect::<Vec<_>>().is_empty());
+    ///
+    ///     // `GrassBlock` has the `SnowyBool` attribute
+    ///     let grass = Block::<block::GrassBlock, V1_21_4>::default();
+    ///     assert_eq!(grass.iter_attr_str().collect::<Vec<_>>(), vec![("snowy", "false")]);
+    ///
+    ///     // `OakLeaves` has the `DistanceInt`, `PersistentBool`, and `WaterloggedBool` attributes
+    ///     let leaves = Block::<block::OakLeaves, V1_21_4>::default();
+    ///     assert_eq!(
+    ///         leaves.iter_attr_str().collect::<Vec<_>>(),
+    ///         vec![("distance", "7"), ("persistent", "false"), ("waterlogged", "false")]
+    ///     );
+    /// }
+    /// ```
+    pub fn iter_attr_str(&self) -> impl Iterator<Item = (&'static str, &'static str)> {
+        let attr = self.into_attr();
+        B::ATTRIBUTES.iter().enumerate().map(move |(i, name)| (*name, attr.get_attr_str(i)))
     }
 
     /// Convert the [`Block`] into an [`UntypedBlock`].
