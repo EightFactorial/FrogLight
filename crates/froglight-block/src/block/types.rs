@@ -107,10 +107,12 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Returns the previous value of the [`Attribute`],
     /// or `None` if the [`Attribute`] is not present.
     pub fn set_attr_str(&mut self, attr: &str, value: &'static str) -> Option<&'static str> {
-        B::ATTRIBUTES
-            .iter()
-            .position(|&name| name == attr)
-            .and_then(|i| self.into_attr().set_attr_str(i, value))
+        B::ATTRIBUTES.iter().position(|&name| name == attr).and_then(|i| {
+            let mut attr = self.into_attr();
+            let result = attr.set_attr_str(i, value);
+            *self = Self::from_attr(attr);
+            result
+        })
     }
 
     /// Get the identifier of the [`Block`].
