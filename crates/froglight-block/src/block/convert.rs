@@ -20,11 +20,11 @@ pub trait BlockConvert<V1: Version, V2: Version>:
 //
 // This also covers the `BlockConvert<V, V>` case.
 impl<
-        A: BlockAttributes,
-        B: BlockTypeExt<V1, Attributes = A> + BlockTypeExt<V2, Attributes = A>,
-        V1: Version,
-        V2: Version,
-    > BlockConvert<V1, V2> for B
+    A: BlockAttributes,
+    B: BlockTypeExt<V1, Attributes = A> + BlockTypeExt<V2, Attributes = A>,
+    V1: Version,
+    V2: Version,
+> BlockConvert<V1, V2> for B
 {
     #[inline]
     #[must_use]
@@ -43,6 +43,30 @@ impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> From<&&Block<B, V2>> for
     #[inline]
     #[must_use]
     fn from(block: &&Block<B, V2>) -> Self { B::convert_from(**block) }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
+    /// Convert a [`Block`] from another [`Version`] into this [`Version`].
+    #[inline]
+    #[must_use]
+    pub fn from_version<V2: Version>(block: Block<B, V2>) -> Block<B, V>
+    where
+        B: BlockConvert<V, V2>,
+    {
+        B::convert_from(block)
+    }
+
+    /// Convert this [`Block`] into a [`Block`] from another [`Version`].
+    #[inline]
+    #[must_use]
+    pub fn into_version<V2: Version>(self) -> Block<B, V2>
+    where
+        B: BlockConvert<V, V2>,
+    {
+        B::convert_into(self)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

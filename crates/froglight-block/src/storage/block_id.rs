@@ -17,6 +17,10 @@ impl GlobalBlockId {
     pub const fn new_unchecked(block: u32) -> Self { Self(block) }
 }
 
+impl From<GlobalBlockId> for u32 {
+    fn from(id: GlobalBlockId) -> Self { id.0 }
+}
+
 impl std::ops::Deref for GlobalBlockId {
     type Target = u32;
     fn deref(&self) -> &Self::Target { &self.0 }

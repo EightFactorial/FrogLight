@@ -5,13 +5,37 @@ use crate::storage::BlockAttributes;
 
 /// A static block type.
 pub trait StaticBlock: 'static {
-    /// Get the static block type.
+    /// Get a static reference to the block type.
+    ///
+    /// Useful when working internally with generic blocks.
+    ///
+    /// ```rust
+    /// use froglight_block::{block::StaticBlock, generated::block::Air};
+    ///
+    /// assert_eq!(Air::as_static(), &Air);
+    /// ```
     fn as_static() -> &'static Self;
 }
 
 /// A block type.
 pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     /// The identifier of the block.
+    ///
+    /// ```rust
+    /// use froglight_block::{
+    ///     block::{BlockType, BlockTypeExt, StaticBlock},
+    ///     generated::block::Air,
+    /// };
+    /// #[cfg(feature = "v1_21_4")]
+    /// use froglight_common::version::V1_21_4;
+    ///
+    /// // Accessing the static identifier through the `BlockType` trait.
+    /// assert_eq!(Air::as_static().identifier().as_str(), "minecraft:air");
+    ///
+    /// // Accessing the constant identifier through the `BlockTypeExt` trait.
+    /// #[cfg(feature = "v1_21_4")]
+    /// assert_eq!(<Air as BlockTypeExt<V1_21_4>>::IDENTIFIER, "minecraft:air");
+    /// ```
     fn identifier(&self) -> &'static Identifier;
 }
 

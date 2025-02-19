@@ -107,7 +107,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                     assert_eq!(block, #block_path::block::Block::from_attr(block.into_attr()), "Block \"{}\" attribute round-trip failed!", #ident);
 
                     assert_eq!(<#block as #block_path::block::BlockTypeExt<#version>>::IDENTIFIER, #ident, "Block \"{}\" typed identifier mismatch!", #ident);
-                    assert_eq!(#block_path::block::Block::<#block, #version>::identifier().as_str(), #ident, "Block \"{}\" typed identifier mismatch!", #ident);
+                    assert_eq!(block.identifier().as_str(), #ident, "Block \"{}\" typed identifier mismatch!", #ident);
                     assert_eq!(block.into_untyped().identifier().as_str(), #ident, "Block \"{}\" untyped identifier mismatch!", #ident);
                     assert_eq!(block.into_untyped().downcast().unwrap(), block, "Block \"{}\" downcast failed!", #ident);
 
