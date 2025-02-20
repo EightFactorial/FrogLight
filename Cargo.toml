@@ -8,6 +8,7 @@ members = [
   "crates/froglight-internal",
   "crates/froglight-io",
   "crates/froglight-macros",
+  "crates/froglight-nbt",
   "crates/froglight-network",
   "crates/froglight-registry",
   "crates/froglight-world",
@@ -73,6 +74,7 @@ froglight-common = { version = "0.1", path = "crates/froglight-common" }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
 froglight-io = { version = "0.1", path = "crates/froglight-io" }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
+froglight-nbt = { version = "0.1", path = "crates/froglight-nbt" }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
 froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
 froglight-world = { version = "0.1", path = "crates/froglight-world" }
