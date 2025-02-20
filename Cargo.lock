@@ -825,6 +825,7 @@ version = "0.1.0"
 dependencies = [
  "froglight-block",
  "froglight-common",
+ "froglight-nbt",
  "froglight-network",
  "froglight-registry",
  "froglight-world",
@@ -865,6 +866,7 @@ name = "froglight-nbt"
 version = "0.1.0"
 dependencies = [
  "derive_more 2.0.1",
+ "froglight-io",
  "indexmap",
  "proptest",
  "rkyv",
@@ -885,6 +887,7 @@ dependencies = [
  "froglight-common",
  "froglight-io",
  "froglight-macros",
+ "froglight-nbt",
  "futures-lite",
  "glam",
  "hashbrown 0.15.2",

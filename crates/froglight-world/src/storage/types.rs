@@ -1,8 +1,8 @@
 use std::{
     any::TypeId,
     sync::{
-        atomic::{AtomicU32, Ordering},
         Arc,
+        atomic::{AtomicU32, Ordering},
     },
 };
 
@@ -46,8 +46,8 @@ macro_rules! create_storage {
             }
 
             fn insert_chunk(&mut self, chunk: VecChunk) -> HandleInternal {
-                let index = self.0 .0.fetch_add(1, Ordering::Relaxed);
-                self.0 .1.write().insert(
+                let index = self.0.0.fetch_add(1, Ordering::Relaxed);
+                self.0.1.write().insert(
                     index,
                     match chunk.try_into_array() {
                         Ok(array) => StoredChunk::Array(array),
@@ -57,11 +57,11 @@ macro_rules! create_storage {
                 HandleInternal(TypeId::of::<Self>(), index)
             }
             fn remove_chunk(&mut self, handle: HandleInternal) {
-                self.0 .1.write().remove(&handle.1);
+                self.0.1.write().remove(&handle.1);
             }
 
             fn get_block(&self, handle: &HandleInternal, position: IVec3) -> Option<u32> {
-                self.0 .1.read().get(&handle.1)?.get_block_raw(position)
+                self.0.1.read().get(&handle.1)?.get_block_raw(position)
             }
             fn set_block(
                 &mut self,
@@ -69,7 +69,7 @@ macro_rules! create_storage {
                 position: IVec3,
                 block: u32,
             ) -> Option<u32> {
-                self.0 .1.write().get_mut(&handle.1)?.set_block_raw(position, block)
+                self.0.1.write().get_mut(&handle.1)?.set_block_raw(position, block)
             }
         }
     };

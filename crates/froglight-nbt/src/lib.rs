@@ -4,11 +4,17 @@
 pub mod mutf8;
 pub mod nbt;
 
+#[cfg(feature = "io")]
+mod io;
+
+#[cfg(feature = "rkyv")]
+pub mod rkyv;
+
 pub mod prelude {
     //! Re-exports of common types and traits.
 
     pub use crate::{
         mutf8::{Mutf8Str, Mutf8String},
-        nbt::{NamedNbt, NbtCompound, NbtListTag, NbtTag, UnnamedNbt},
+        nbt::{NamedNbt, NbtCompound, NbtTag, UnnamedNbt},
     };
 }

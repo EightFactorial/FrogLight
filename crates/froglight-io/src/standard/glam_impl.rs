@@ -6,14 +6,14 @@ use glam::{
     bool::{BVec2, BVec3, BVec4},
     f32::{Vec2, Vec3, Vec4},
     f64::{DVec2, DVec3, DVec4},
+    i8::{I8Vec2, I8Vec3, I8Vec4},
     i16::{I16Vec2, I16Vec3, I16Vec4},
     i32::{IVec2, IVec3, IVec4},
     i64::{I64Vec2, I64Vec3, I64Vec4},
-    i8::{I8Vec2, I8Vec3, I8Vec4},
+    u8::{U8Vec2, U8Vec3, U8Vec4},
     u16::{U16Vec2, U16Vec3, U16Vec4},
     u32::{UVec2, UVec3, UVec4},
     u64::{U64Vec2, U64Vec3, U64Vec4},
-    u8::{U8Vec2, U8Vec3, U8Vec4},
 };
 #[cfg(test)]
 use proptest::prelude::*;

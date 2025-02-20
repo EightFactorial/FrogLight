@@ -71,7 +71,7 @@ impl<V: Version> ChunkStorage<V> {
 impl<V: Version> ChunkStorage<V> {
     /// Get the storage identifier of a chunk in the [`ChunkStorage`].
     pub fn identifier(&self, handle: &ChunkHandle<V>) -> Option<&'static Identifier> {
-        self.get_untyped(handle.0 .0).map(Storable::identifier)
+        self.get_untyped(handle.0.0).map(Storable::identifier)
     }
 
     /// Insert a chunk into the [`ChunkStorage`].
@@ -81,7 +81,7 @@ impl<V: Version> ChunkStorage<V> {
     }
     /// Remove a chunk from the [`ChunkStorage`].
     pub fn remove_chunk(&mut self, handle: ChunkHandle<V>) {
-        if let Some(storage) = self.get_untyped_mut(handle.0 .0) {
+        if let Some(storage) = self.get_untyped_mut(handle.0.0) {
             storage.remove_chunk(handle.0);
         }
     }
@@ -89,7 +89,7 @@ impl<V: Version> ChunkStorage<V> {
     /// Get a block id from the [`ChunkStorage`].
     #[must_use]
     pub fn get_block_raw(&self, handle: &ChunkHandle<V>, position: IVec3) -> Option<u32> {
-        self.get_untyped(handle.0 .0)?.get_block(handle, position)
+        self.get_untyped(handle.0.0)?.get_block(handle, position)
     }
     /// Set a block id in the [`ChunkStorage`].
     #[must_use]
@@ -99,7 +99,7 @@ impl<V: Version> ChunkStorage<V> {
         position: IVec3,
         block: u32,
     ) -> Option<u32> {
-        self.get_untyped_mut(handle.0 .0)?.set_block(handle, position, block)
+        self.get_untyped_mut(handle.0.0)?.set_block(handle, position, block)
     }
 
     /// Get a block from the [`ChunkStorage`] with data from a [`BlockStorage`].

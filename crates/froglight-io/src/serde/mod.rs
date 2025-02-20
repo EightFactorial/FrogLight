@@ -2,7 +2,7 @@
 
 use std::io::{Cursor, Write};
 
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 
 use crate::standard::{FrogRead, FrogWrite, ReadError, WriteError};
 

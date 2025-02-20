@@ -5,8 +5,8 @@ use std::{
     io::Cursor,
     net::SocketAddr,
     sync::{
-        atomic::{AtomicI32, Ordering},
         Arc,
+        atomic::{AtomicI32, Ordering},
     },
 };
 

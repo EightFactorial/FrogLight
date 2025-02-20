@@ -7,12 +7,12 @@ use std::{
 };
 
 pub use hickory_resolver::{
+    IntoName, Name, TryParseIp,
     config::{
         LookupIpStrategy, NameServerConfig, NameServerConfigGroup, ResolverConfig, ResolverOpts,
     },
     lookup::{Lookup, SrvLookup, TxtLookup},
     lookup_ip::LookupIp,
-    IntoName, Name, TryParseIp,
 };
 use hickory_resolver::{error::ResolveError, proto::Executor};
 

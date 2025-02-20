@@ -9,10 +9,10 @@ use std::{
 use async_net::{TcpStream, UdpSocket};
 use futures_lite::{AsyncRead, AsyncWrite, FutureExt};
 use hickory_resolver::{
+    AsyncResolver,
     config::{NameServerConfig, ResolverOpts},
     name_server::{ConnectionProvider, GenericConnector, RuntimeProvider, Spawn},
-    proto::{error::ProtoError, tcp::DnsTcpStream, udp::DnsUdpSocket, Executor, Time},
-    AsyncResolver,
+    proto::{Executor, Time, error::ProtoError, tcp::DnsTcpStream, udp::DnsUdpSocket},
 };
 
 /// A DNS resolver for server addresses.

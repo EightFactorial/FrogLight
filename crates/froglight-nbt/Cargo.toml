@@ -21,18 +21,27 @@ proptest = { workspace = true }
 [dependencies]
 derive_more = { workspace = true }
 indexmap = { workspace = true }
-rkyv = { version = "0.8.10", features = [
-  "big_endian",
-  "bytecheck",
-  "indexmap-2",
-  "unaligned",
-] }
-serde = { workspace = true, optional = true }
 simd_cesu8 = "1.0"
 thiserror = { workspace = true }
 
+# Optional dependencies
+froglight-io = { workspace = true, optional = true }
+rkyv = { version = "0.8.10", optional = true, features = [
+    "big_endian",
+    "bytecheck",
+    "indexmap-2",
+    "unaligned",
+] }
+serde = { workspace = true, optional = true }
+
+
 [features]
-default = []
+default = ["rkyv"]
+
+# Enable support for `froglight-io` serialization.
+io = ["dep:froglight-io"]
+# Enable support for `rkyv` serialization.
+rkyv = ["dep:rkyv"]
 
 # Enable support for serializing to/from JSON.
 serde = ["dep:serde", "indexmap/serde"]

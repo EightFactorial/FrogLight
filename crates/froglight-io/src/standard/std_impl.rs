@@ -527,11 +527,7 @@ proptest::proptest! {
 
 impl<T: FrogRead> FrogRead for Option<T> {
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        if bool::frog_read(buffer)? {
-            T::frog_read(buffer).map(Some)
-        } else {
-            Ok(None)
-        }
+        if bool::frog_read(buffer)? { T::frog_read(buffer).map(Some) } else { Ok(None) }
     }
 }
 impl<T: FrogWrite> FrogWrite for Option<T> {
