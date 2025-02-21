@@ -12,9 +12,9 @@ use crate::prelude::*;
 /// A macro for generating tests
 macro_rules! test {
     ($test:ident, $file:expr) => {
-        test!($test, data, $file);
+        test!($test, raw, $file);
     };
-    ($test:ident, $read:tt, $file:expr) => {
+    ($test:ident, $reader:tt, $file:expr) => {
         #[test]
         #[cfg(feature = "io")]
         fn $test() {
@@ -22,7 +22,7 @@ macro_rules! test {
             *LOG;
 
             // Read the NBT data from the file
-            let bytes = test!(@$read $file);
+            let bytes = test!(@$reader $file);
             let data = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
 
             // Compare the expected length to the actual length
@@ -32,16 +32,23 @@ macro_rules! test {
             let buffer: Vec<u8>  = data.frog_to_buf().unwrap();
             assert_eq!(buffer.len(), bytes.len(), "Written length does not match actual length!");
             assert_eq!(buffer, bytes, "Written NBT does not match original data!");
+
+            #[cfg(feature = "rkyv")]
+            {
+                // use rkyv::{ArchiveUnsized, DeserializeUnsized, SerializeUnsized};
+
+            }
+
         }
     };
 
     // Helpers for specifying how to read test data
-    (@data $file:expr) => {{
+    (@raw $file:expr) => {{
         include_bytes!(concat!(env!("CARGO_MANIFEST_DIR"), "/test/", $file)).as_slice()
     }};
     (@gzip $file:expr) => {{
         let mut decoder = flate2::write::GzDecoder::new(Vec::new());
-        decoder.write_all(test!(@data $file)).unwrap();
+        decoder.write_all(test!(@raw $file)).unwrap();
         decoder.finish().unwrap()
     }};
 }
@@ -53,10 +60,12 @@ static LOG: std::sync::LazyLock<()> = std::sync::LazyLock::new(|| {
     let _ = fmt().with_env_filter(EnvFilter::from_default_env()).try_init();
 });
 
+// Raw NBT
 test!(hello_world, "hello_world.nbt");
 test!(hypixel, "hypixel.nbt");
 test!(inttest1023, "inttest1023.nbt");
 
+// Gzip-compressed NBT
 test!(bigtest, gzip, "bigtest.nbt");
 test!(level, gzip, "level.dat");
 test!(simple_player, gzip, "simple_player.dat");

@@ -7,6 +7,7 @@ use indexmap::Equivalent;
 /// A MUTF-8 string.
 ///
 /// Equivalent to a [`String`], but with a different encoding.
+#[repr(transparent)]
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Mutf8String(Vec<u8>);
 
@@ -125,9 +126,9 @@ impl std::fmt::Debug for Mutf8String {
 /// A MUTF-8 string slice.
 ///
 /// Equivalent to a [`str`], but with a different encoding.
+#[repr(transparent)]
 #[derive(PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "rkyv", derive(rkyv::Portable))]
-#[repr(transparent)]
 pub struct Mutf8Str([u8]);
 
 impl Mutf8Str {

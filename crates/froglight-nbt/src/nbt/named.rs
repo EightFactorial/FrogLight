@@ -3,22 +3,23 @@ use derive_more::{From, Into};
 use crate::{mutf8::Mutf8String, nbt::NbtCompound};
 
 /// A named set of NBT tags.
+#[repr(transparent)]
 #[derive(Debug, PartialEq, From, Into)]
-pub struct NamedNbt(Mutf8String, Option<NbtCompound>);
+pub struct NamedNbt(Mutf8String, UnnamedNbt);
 
 impl NamedNbt {
     /// Create a new [`NamedNbt`] from a name and [`NbtCompound`].
     #[inline]
     #[must_use]
     pub const fn new(name: Mutf8String, compound: NbtCompound) -> Self {
-        Self::new_from(name, Some(compound))
+        Self::new_from(name, UnnamedNbt::new(compound))
     }
 
     /// Create a new [`NamedNbt`] from a name and optional [`NbtCompound`].
     #[inline]
     #[must_use]
     pub const fn new_from(name: Mutf8String, compound: Option<NbtCompound>) -> Self {
-        Self(name, compound)
+        Self(name, UnnamedNbt::new_from(compound))
     }
 
     /// Get the name of the [`NamedNbt`].
@@ -42,20 +43,13 @@ impl NamedNbt {
     pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.1.as_mut() }
 
     /// Get an [`UnnamedNbt`] from a [`NamedNbt`].
-    ///
-    /// # Safety
-    /// This function is *probably* safe, but will be
-    /// marked as unsafe until it is proven to be safe.
     #[must_use]
-    pub unsafe fn as_unnamed(&self) -> &UnnamedNbt {
-        // SAFETY: `UnnamedNbt` is a newtype over a `NbtCompound`
-        unsafe { &*std::ptr::from_ref::<Option<NbtCompound>>(&self.1).cast::<UnnamedNbt>() }
-    }
+    pub fn as_unnamed(&self) -> &UnnamedNbt { &self.1 }
 
     /// Create an [`UnnamedNbt`] from this [`NamedNbt`].
     #[inline]
     #[must_use]
-    pub fn into_unnamed(self) -> UnnamedNbt { UnnamedNbt::new_from(self.1) }
+    pub const fn into_unnamed(self) -> UnnamedNbt { UnnamedNbt::new_from(self.1) }
 }
 
 impl AsRef<Option<NbtCompound>> for NamedNbt {
@@ -66,7 +60,7 @@ impl AsMut<Option<NbtCompound>> for NamedNbt {
 }
 
 impl std::ops::Deref for NamedNbt {
-    type Target = Option<NbtCompound>;
+    type Target = UnnamedNbt;
     fn deref(&self) -> &Self::Target { &self.1 }
 }
 impl std::ops::DerefMut for NamedNbt {
@@ -76,6 +70,7 @@ impl std::ops::DerefMut for NamedNbt {
 // -------------------------------------------------------------------------------------------------
 
 /// An unnamed set of NBT tags.
+#[repr(transparent)]
 #[derive(Debug, Default, PartialEq, From, Into)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
 pub struct UnnamedNbt(Option<NbtCompound>);

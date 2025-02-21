@@ -4,6 +4,7 @@ use indexmap::IndexMap;
 use crate::mutf8::Mutf8String;
 
 /// A map of named NBT tags.
+#[repr(transparent)]
 #[derive(Debug, Default, Clone, PartialEq, From, Into)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
 pub struct NbtCompound(IndexMap<Mutf8String, NbtTag>);
