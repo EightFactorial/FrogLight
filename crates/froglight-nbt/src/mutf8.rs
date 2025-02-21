@@ -148,6 +148,16 @@ impl Mutf8Str {
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] { &self.0 }
 
+    /// Returns the number of bytes in the [`Mutf8Str`].
+    #[inline]
+    #[must_use]
+    pub fn len(&self) -> usize { self.as_bytes().len() }
+
+    /// Returns `true` if the [`Mutf8Str`] is empty.
+    #[inline]
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.as_bytes().is_empty() }
+
     /// Convert a [`Mutf8Str`] to a [`Mutf8String`].
     #[inline]
     #[must_use]

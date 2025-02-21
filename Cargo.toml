@@ -102,6 +102,8 @@ simdnbt = "0.7.1"
 smallvec = "1.14"
 smol_str = "0.2"
 thiserror = "2.0"
+tracing-log = "0.2"
+tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
 uuid = "1.12"
 
 # --- FrogLight Crate ---

@@ -9,6 +9,11 @@ use crate::mutf8::Mutf8String;
 pub struct NbtCompound(IndexMap<Mutf8String, NbtTag>);
 
 impl NbtCompound {
+    /// Create a new empty [`NbtCompound`].
+    #[inline]
+    #[must_use]
+    pub fn new() -> Self { Self(IndexMap::new()) }
+
     /// Return the number of tags in the [`NbtCompound`].
     #[inline]
     #[must_use]
@@ -177,6 +182,7 @@ impl std::ops::IndexMut<usize> for NbtCompound {
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
+#[cfg_attr(feature = "serde", expect(clippy::unsafe_derive_deserialize))]
 pub enum NbtTag {
     /// A signed 8-bit integer.
     Byte(i8) = NbtTag::BYTE,
@@ -205,6 +211,8 @@ pub enum NbtTag {
 }
 
 impl NbtTag {
+    /// The end of a [`NbtTag::Compound`] or [`NbtTag::List`].
+    pub const END: u8 = 0;
     /// The tag of a [`NbtTag::Byte`].
     pub const BYTE: u8 = 1;
     /// The tag of a [`NbtTag::Short`].
@@ -252,26 +260,31 @@ impl NbtTag {
     /// Unwrap this value to the [`NbtTag::Byte`] variant. Panics if the value
     /// is of any other type.
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_byte(self) -> u8 { self.unwrap_byte() as u8 }
 
     /// Unwrap this value to the [`NbtTag::Short`] variant. Panics if the value
     /// is of any other type.
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_short(self) -> u16 { self.unwrap_short() as u16 }
 
     /// Unwrap this value to the [`NbtTag::Int`] variant. Panics if the value
     /// is of any other type.
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_int(self) -> u32 { self.unwrap_int() as u32 }
 
     /// Unwrap this value to the [`NbtTag::Long`] variant. Panics if the value
     /// is of any other type.
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_long(self) -> u64 { self.unwrap_long() as u64 }
 
     /// Unwrap this value to the [`NbtTag::ByteArray`] variant. Panics if the
     /// value is of any other type.
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_byte_array(self) -> Vec<u8> {
         self.unwrap_byte_array().into_iter().map(|b| b as u8).collect()
     }
@@ -279,6 +292,7 @@ impl NbtTag {
     /// Unwrap this value to the [`NbtTag::IntArray`] variant. Panics if the
     /// value is of any other type.
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_int_array(self) -> Vec<u32> {
         self.unwrap_int_array().into_iter().map(|i| i as u32).collect()
     }
@@ -286,6 +300,7 @@ impl NbtTag {
     /// Unwrap this value to the [`NbtTag::LongArray`] variant. Panics if the
     /// value is of any other type.
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_long_array(self) -> Vec<u64> {
         self.unwrap_long_array().into_iter().map(|l| l as u64).collect()
     }
@@ -303,6 +318,7 @@ impl NbtTag {
     /// Returns `None` if the value is of any other type.
     #[inline]
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn as_unsigned_byte(&self) -> Option<u8> { self.as_byte().map(|byte| byte as u8) }
 
     /// Get the value of a [`NbtTag::Short`] variant, if it is one.
@@ -318,6 +334,7 @@ impl NbtTag {
     /// Returns `None` if the value is of any other type.
     #[inline]
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn as_unsigned_short(&self) -> Option<u16> { self.as_short().map(|short| short as u16) }
 
     /// Get the value of a [`NbtTag::Int`] variant, if it is one.
@@ -333,6 +350,7 @@ impl NbtTag {
     /// Returns `None` if the value is of any other type.
     #[inline]
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn as_unsigned_int(&self) -> Option<u32> { self.as_int().map(|int| int as u32) }
 
     /// Get the value of a [`NbtTag::Long`] variant, if it is one.
@@ -348,6 +366,7 @@ impl NbtTag {
     /// Returns `None` if the value is of any other type.
     #[inline]
     #[must_use]
+    #[expect(clippy::cast_sign_loss)]
     pub fn as_unsigned_long(&self) -> Option<u64> { self.as_long().map(|long| long as u64) }
 
     /// Get the value of a [`NbtTag::Float`] variant, if it is one.
@@ -390,7 +409,7 @@ impl NbtTag {
     #[must_use]
     pub fn as_unsigned_byte_array(&self) -> Option<&[u8]> {
         self.as_byte_array().map(|array| unsafe {
-            std::slice::from_raw_parts(array.as_ptr() as *const u8, array.len())
+            std::slice::from_raw_parts(array.as_ptr().cast::<u8>(), array.len())
         })
     }
 
@@ -402,7 +421,7 @@ impl NbtTag {
     #[must_use]
     pub fn as_unsigned_byte_array_mut(&mut self) -> Option<&mut [u8]> {
         self.as_byte_array_mut().map(|array| unsafe {
-            std::slice::from_raw_parts_mut(array.as_mut_ptr() as *mut u8, array.len())
+            std::slice::from_raw_parts_mut(array.as_mut_ptr().cast::<u8>(), array.len())
         })
     }
 
@@ -478,7 +497,7 @@ impl NbtTag {
     #[must_use]
     pub fn as_unsigned_int_array(&self) -> Option<&[u32]> {
         self.as_int_array().map(|array| unsafe {
-            std::slice::from_raw_parts(array.as_ptr() as *const u32, array.len())
+            std::slice::from_raw_parts(array.as_ptr().cast::<u32>(), array.len())
         })
     }
 
@@ -490,7 +509,7 @@ impl NbtTag {
     #[must_use]
     pub fn as_unsigned_int_array_mut(&mut self) -> Option<&mut [u32]> {
         self.as_int_array_mut().map(|array| unsafe {
-            std::slice::from_raw_parts_mut(array.as_mut_ptr() as *mut u32, array.len())
+            std::slice::from_raw_parts_mut(array.as_mut_ptr().cast::<u32>(), array.len())
         })
     }
 
@@ -518,7 +537,7 @@ impl NbtTag {
     #[must_use]
     pub fn as_unsigned_long_array(&self) -> Option<&[u64]> {
         self.as_long_array().map(|array| unsafe {
-            std::slice::from_raw_parts(array.as_ptr() as *const u64, array.len())
+            std::slice::from_raw_parts(array.as_ptr().cast::<u64>(), array.len())
         })
     }
 
@@ -530,7 +549,7 @@ impl NbtTag {
     #[must_use]
     pub fn as_unsigned_long_array_mut(&mut self) -> Option<&mut [u64]> {
         self.as_long_array_mut().map(|array| unsafe {
-            std::slice::from_raw_parts_mut(array.as_mut_ptr() as *mut u64, array.len())
+            std::slice::from_raw_parts_mut(array.as_mut_ptr().cast::<u64>(), array.len())
         })
     }
 }
@@ -582,6 +601,8 @@ impl std::ops::IndexMut<usize> for NbtTag {
 #[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
 pub enum NbtListTag {
+    /// An empty list.
+    Empty = NbtTag::END,
     /// A list of signed 8-bit integers.
     Byte(Vec<i8>) = NbtTag::BYTE,
     /// A list of signed 16-bit integers.
@@ -613,6 +634,7 @@ impl NbtListTag {
     #[must_use]
     pub const fn tag_id(&self) -> u8 {
         match self {
+            NbtListTag::Empty => NbtTag::END,
             NbtListTag::Byte(_) => NbtTag::BYTE,
             NbtListTag::Short(_) => NbtTag::SHORT,
             NbtListTag::Int(_) => NbtTag::INT,

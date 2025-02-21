@@ -7,6 +7,7 @@ authors = { workspace = true }
 homepage = { workspace = true }
 repository = { workspace = true }
 readme = { workspace = true }
+exclude = ["/test"]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -16,7 +17,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
+flate2 = "1.0"
 proptest = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 [dependencies]
 derive_more = { workspace = true }
@@ -27,12 +30,13 @@ thiserror = { workspace = true }
 # Optional dependencies
 froglight-io = { workspace = true, optional = true }
 rkyv = { version = "0.8.10", optional = true, features = [
-    "big_endian",
-    "bytecheck",
-    "indexmap-2",
-    "unaligned",
+  "big_endian",
+  "bytecheck",
+  "indexmap-2",
+  "unaligned",
 ] }
-serde = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
+tracing-log = { workspace = true, optional = true }
 
 
 [features]
@@ -42,6 +46,8 @@ default = ["rkyv"]
 io = ["dep:froglight-io"]
 # Enable support for `rkyv` serialization.
 rkyv = ["dep:rkyv"]
-
 # Enable support for serializing to/from JSON.
 serde = ["dep:serde", "indexmap/serde"]
+
+# Enable debug logging.
+debug = ["dep:tracing-log"]

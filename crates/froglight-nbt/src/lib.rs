@@ -6,9 +6,10 @@ pub mod nbt;
 
 #[cfg(feature = "io")]
 mod io;
-
 #[cfg(feature = "rkyv")]
 pub mod rkyv;
+#[cfg(test)]
+mod test;
 
 pub mod prelude {
     //! Re-exports of common types and traits.
