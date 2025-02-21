@@ -14,12 +14,16 @@ impl FrogRead for NamedNbt {
     // Tag + Name + Payload
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         let byte = u8::frog_read(buffer)?;
-        let name = Mutf8String::frog_read(buffer)?;
+        if byte == NbtTag::END {
+            Ok(Self::new_from(Mutf8String::from_bytes(Vec::new()), None))
+        } else {
+            let name = Mutf8String::frog_read(buffer)?;
 
-        #[cfg(feature = "debug")]
-        tracing_log::log::trace!("Reading NamedNbt: \"{}\"", name.to_str_lossy());
+            #[cfg(feature = "debug")]
+            tracing_log::log::trace!("Reading NamedNbt: \"{}\"", name.to_str_lossy());
 
-        UnnamedNbt::frog_read_inner(byte, buffer).map(|unnamed| unnamed.into_named(name))
+            UnnamedNbt::frog_read_inner(byte, buffer).map(|unnamed| unnamed.into_named(name))
+        }
     }
 }
 impl FrogWrite for NamedNbt {
@@ -36,10 +40,9 @@ impl FrogWrite for NamedNbt {
     }
 
     fn frog_len(&self) -> usize {
-        self.compound().map_or_else(
-            || NbtTag::END.frog_len(),
-            |nbt| NbtTag::COMPOUND.frog_len() + self.name().frog_len() + nbt.frog_len(),
-        )
+        self.compound().map_or(std::mem::size_of::<u8>(), |nbt| {
+            std::mem::size_of::<u8>() + self.name().frog_len() + nbt.frog_len()
+        })
     }
 }
 
@@ -66,10 +69,8 @@ impl FrogWrite for UnnamedNbt {
 
     #[inline]
     fn frog_len(&self) -> usize {
-        self.compound().map_or_else(
-            || NbtTag::END.frog_len(),
-            |nbt| NbtTag::COMPOUND.frog_len() + nbt.frog_len(),
-        )
+        self.compound()
+            .map_or(std::mem::size_of::<u8>(), |nbt| std::mem::size_of::<u8>() + nbt.frog_len())
     }
 }
 
@@ -116,7 +117,11 @@ impl FrogRead for NbtCompound {
 impl FrogWrite for NbtCompound {
     fn frog_write(&self, _buffer: &mut impl Write) -> Result<usize, WriteError> { todo!() }
 
-    fn frog_len(&self) -> usize { todo!() }
+    fn frog_len(&self) -> usize {
+        self.iter().fold(std::mem::size_of::<u8>(), |acc, (key, value)| {
+            acc + key.frog_len() + value.frog_len()
+        })
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -130,7 +135,30 @@ impl FrogRead for NbtTag {
 impl FrogWrite for NbtTag {
     fn frog_write(&self, _buffer: &mut impl Write) -> Result<usize, WriteError> { todo!() }
 
-    fn frog_len(&self) -> usize { todo!() }
+    fn frog_len(&self) -> usize {
+        // Tag + Payload
+        std::mem::size_of::<u8>()
+            + match self {
+                NbtTag::Byte(_) => std::mem::size_of::<i8>(),
+                NbtTag::Short(_) => std::mem::size_of::<i16>(),
+                NbtTag::Int(_) => std::mem::size_of::<i32>(),
+                NbtTag::Long(_) => std::mem::size_of::<i64>(),
+                NbtTag::Float(_) => std::mem::size_of::<f32>(),
+                NbtTag::Double(_) => std::mem::size_of::<f64>(),
+                NbtTag::String(string) => string.frog_len(),
+                NbtTag::List(list) => list.frog_len(),
+                NbtTag::Compound(compound) => compound.frog_len(),
+                NbtTag::ByteArray(items) => {
+                    std::mem::size_of::<u32>() + (items.len() * std::mem::size_of::<i8>())
+                }
+                NbtTag::IntArray(items) => {
+                    std::mem::size_of::<u32>() + (items.len() * std::mem::size_of::<i32>())
+                }
+                NbtTag::LongArray(items) => {
+                    std::mem::size_of::<u32>() + (items.len() * std::mem::size_of::<i64>())
+                }
+            }
+    }
 }
 
 impl NbtTag {
@@ -167,7 +195,35 @@ impl FrogRead for NbtListTag {
 impl FrogWrite for NbtListTag {
     fn frog_write(&self, _buffer: &mut impl Write) -> Result<usize, WriteError> { todo!() }
 
-    fn frog_len(&self) -> usize { todo!() }
+    fn frog_len(&self) -> usize {
+        // Tag + Length + Payload
+        std::mem::size_of::<u8>()
+            + std::mem::size_of::<u32>()
+            + match self {
+                NbtListTag::Empty => 0,
+                NbtListTag::Byte(items) => items.len() * std::mem::size_of::<i8>(),
+                NbtListTag::Short(items) => items.len() * std::mem::size_of::<i16>(),
+                NbtListTag::Int(items) => items.len() * std::mem::size_of::<i32>(),
+                NbtListTag::Long(items) => items.len() * std::mem::size_of::<i64>(),
+                NbtListTag::Float(items) => items.len() * std::mem::size_of::<f32>(),
+                NbtListTag::Double(items) => items.len() * std::mem::size_of::<f64>(),
+                NbtListTag::String(items) => items.iter().map(|i| i.frog_len()).sum(),
+                NbtListTag::List(items) => items.iter().map(|i| i.frog_len()).sum(),
+                NbtListTag::Compound(items) => items.iter().map(|i| i.frog_len()).sum(),
+                NbtListTag::ByteArray(items) => items
+                    .iter()
+                    .map(|i| std::mem::size_of::<u32>() + (i.len() * std::mem::size_of::<i8>()))
+                    .sum(),
+                NbtListTag::IntArray(items) => items
+                    .iter()
+                    .map(|i| std::mem::size_of::<u32>() + (i.len() * std::mem::size_of::<i32>()))
+                    .sum(),
+                NbtListTag::LongArray(items) => items
+                    .iter()
+                    .map(|i| std::mem::size_of::<u32>() + (i.len() * std::mem::size_of::<i64>()))
+                    .sum(),
+            }
+    }
 }
 
 impl NbtListTag {
@@ -234,5 +290,6 @@ impl FrogWrite for Mutf8Str {
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { 2 + self.as_bytes().len() }
+    #[expect(clippy::cast_possible_truncation)]
+    fn frog_len(&self) -> usize { std::mem::size_of::<u16>() + self.as_bytes().len() }
 }

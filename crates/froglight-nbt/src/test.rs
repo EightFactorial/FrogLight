@@ -23,11 +23,12 @@ macro_rules! test {
 
             // Read the NBT data from the file
             let bytes = test!(@$read $file);
-            let _data = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
+            let data = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
 
             // Write the NBT data to a buffer and compare it to the original
             // let buffer: Vec<u8> = data.frog_to_buf().unwrap();
             // assert_eq!(buffer, bytes, "Written NBT does not match original data!");
+            assert_eq!(data.frog_len(), bytes.len(), "Predicted length does not match actual length!");
         }
     };
 
