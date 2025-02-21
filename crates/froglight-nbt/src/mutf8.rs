@@ -126,6 +126,8 @@ impl std::fmt::Debug for Mutf8String {
 ///
 /// Equivalent to a [`str`], but with a different encoding.
 #[derive(PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "rkyv", derive(rkyv::Portable))]
+#[repr(transparent)]
 pub struct Mutf8Str([u8]);
 
 impl Mutf8Str {

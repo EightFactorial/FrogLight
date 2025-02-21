@@ -35,6 +35,8 @@ block = []
 common = []
 # Enable `froglight-io` macros.
 io = []
+# Enable `froglight-nbt` macros.
+nbt = []
 # Enable `froglight-network` macros.
 network = []
 # Enable `froglight-registry` macros.
