@@ -32,9 +32,9 @@ impl FrogWrite for NamedNbt {
         match self.compound() {
             None => NbtTag::END.frog_write(buffer),
             Some(compound) => {
-                NbtTag::COMPOUND.frog_write(buffer)?;
-                self.name().frog_write(buffer)?;
-                compound.frog_write(buffer)
+                let tag = NbtTag::COMPOUND.frog_write(buffer)?;
+                let name = self.name().frog_write(buffer)?;
+                compound.frog_write(buffer).map(|payload| tag + name + payload)
             }
         }
     }
@@ -61,8 +61,8 @@ impl FrogWrite for UnnamedNbt {
         match self.compound() {
             None => NbtTag::END.frog_write(buffer),
             Some(compound) => {
-                NbtTag::COMPOUND.frog_write(buffer)?;
-                compound.frog_write(buffer)
+                let tag = NbtTag::COMPOUND.frog_write(buffer)?;
+                compound.frog_write(buffer).map(|payload| tag + payload)
             }
         }
     }
@@ -115,7 +115,16 @@ impl FrogRead for NbtCompound {
     }
 }
 impl FrogWrite for NbtCompound {
-    fn frog_write(&self, _buffer: &mut impl Write) -> Result<usize, WriteError> { todo!() }
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        let payload =
+            self.iter().try_fold::<_, _, Result<usize, WriteError>>(0, |acc, (key, value)| {
+                Ok(acc
+                    + value.tag_id().frog_write(buffer)?
+                    + key.frog_write(buffer)?
+                    + value.frog_write_inner(buffer)?)
+            })?;
+        NbtTag::END.frog_write(buffer).map(|tag| payload + tag)
+    }
 
     fn frog_len(&self) -> usize {
         self.iter().fold(std::mem::size_of::<u8>(), |acc, (key, value)| {
@@ -133,7 +142,10 @@ impl FrogRead for NbtTag {
     }
 }
 impl FrogWrite for NbtTag {
-    fn frog_write(&self, _buffer: &mut impl Write) -> Result<usize, WriteError> { todo!() }
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        let tag = self.tag_id().frog_write(buffer)?;
+        self.frog_write_inner(buffer).map(|payload| tag + payload)
+    }
 
     fn frog_len(&self) -> usize {
         // Tag + Payload
@@ -182,6 +194,23 @@ impl NbtTag {
             unk => Err(ReadError::InvalidEnum(std::any::type_name::<Self>(), unk.into())),
         }
     }
+
+    fn frog_write_inner(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        match self {
+            NbtTag::Byte(byte) => byte.frog_write(buffer),
+            NbtTag::Short(short) => short.frog_write(buffer),
+            NbtTag::Int(int) => int.frog_write(buffer),
+            NbtTag::Long(long) => long.frog_write(buffer),
+            NbtTag::Float(float) => float.frog_write(buffer),
+            NbtTag::Double(double) => double.frog_write(buffer),
+            NbtTag::String(string) => string.frog_write(buffer),
+            NbtTag::List(list) => list.frog_write(buffer),
+            NbtTag::Compound(compound) => compound.frog_write(buffer),
+            NbtTag::ByteArray(items) => NbtListTag::frog_write_array(items, buffer),
+            NbtTag::IntArray(items) => NbtListTag::frog_write_array(items, buffer),
+            NbtTag::LongArray(items) => NbtListTag::frog_write_array(items, buffer),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -189,11 +218,67 @@ impl NbtTag {
 impl FrogRead for NbtListTag {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        NbtListTag::frog_read_inner(u8::frog_read(buffer)?, buffer)
+        match u8::frog_read(buffer)? {
+            NbtTag::END => u32::frog_read(buffer).map(|_| Self::Empty),
+            NbtTag::BYTE => Self::frog_read_array(buffer).map(Self::Byte),
+            NbtTag::SHORT => Self::frog_read_array(buffer).map(Self::Short),
+            NbtTag::INT => Self::frog_read_array(buffer).map(Self::Int),
+            NbtTag::LONG => Self::frog_read_array(buffer).map(Self::Long),
+            NbtTag::FLOAT => Self::frog_read_array(buffer).map(Self::Float),
+            NbtTag::DOUBLE => Self::frog_read_array(buffer).map(Self::Double),
+            NbtTag::STRING => Self::frog_read_array(buffer).map(Self::String),
+            NbtTag::LIST => Self::frog_read_array(buffer).map(Self::List),
+            NbtTag::COMPOUND => Self::frog_read_array(buffer).map(Self::Compound),
+            NbtTag::BYTE_ARRAY => Self::frog_read_array_array(buffer).map(Self::ByteArray),
+            NbtTag::INT_ARRAY => Self::frog_read_array_array(buffer).map(Self::IntArray),
+            NbtTag::LONG_ARRAY => Self::frog_read_array_array(buffer).map(Self::LongArray),
+            unk => Err(ReadError::InvalidEnum(std::any::type_name::<Self>(), unk.into())),
+        }
     }
 }
 impl FrogWrite for NbtListTag {
-    fn frog_write(&self, _buffer: &mut impl Write) -> Result<usize, WriteError> { todo!() }
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        let tag = self.tag_id().frog_write(buffer)?;
+        match self {
+            NbtListTag::Empty => 0u32.frog_write(buffer).map(|payload| tag + payload),
+            NbtListTag::Byte(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::Short(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::Int(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::Long(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::Float(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::Double(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::String(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::Compound(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::ByteArray(items) => {
+                NbtListTag::frog_write_array_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::IntArray(items) => {
+                NbtListTag::frog_write_array_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::LongArray(items) => {
+                NbtListTag::frog_write_array_array(items, buffer).map(|payload| tag + payload)
+            }
+            NbtListTag::List(items) => {
+                NbtListTag::frog_write_array(items, buffer).map(|payload| tag + payload)
+            }
+        }
+    }
 
     fn frog_len(&self) -> usize {
         // Tag + Length + Payload
@@ -227,29 +312,7 @@ impl FrogWrite for NbtListTag {
 }
 
 impl NbtListTag {
-    fn frog_read_inner(tag: u8, buffer: &mut impl Read) -> Result<Self, ReadError> {
-        #[cfg(feature = "debug")]
-        tracing_log::log::trace!("NbtListTag: Tag -> {tag}");
-
-        match tag {
-            NbtTag::END => u32::frog_read(buffer).map(|_| Self::Empty),
-            NbtTag::BYTE => Self::frog_read_array(buffer).map(Self::Byte),
-            NbtTag::SHORT => Self::frog_read_array(buffer).map(Self::Short),
-            NbtTag::INT => Self::frog_read_array(buffer).map(Self::Int),
-            NbtTag::LONG => Self::frog_read_array(buffer).map(Self::Long),
-            NbtTag::FLOAT => Self::frog_read_array(buffer).map(Self::Float),
-            NbtTag::DOUBLE => Self::frog_read_array(buffer).map(Self::Double),
-            NbtTag::STRING => Self::frog_read_array(buffer).map(Self::String),
-            NbtTag::LIST => Self::frog_read_array(buffer).map(Self::List),
-            NbtTag::COMPOUND => Self::frog_read_array(buffer).map(Self::Compound),
-            NbtTag::BYTE_ARRAY => Self::frog_read_array_array(buffer).map(Self::ByteArray),
-            NbtTag::INT_ARRAY => Self::frog_read_array_array(buffer).map(Self::IntArray),
-            NbtTag::LONG_ARRAY => Self::frog_read_array_array(buffer).map(Self::LongArray),
-            unk => Err(ReadError::InvalidEnum(std::any::type_name::<Self>(), unk.into())),
-        }
-    }
-
-    // NBT uses a plain `u32` for the length instead to the usual variable encoding
+    // NBT uses a plain `u32` for the length instead of the usual variable encoding
     fn frog_read_array<T: FrogRead>(buffer: &mut impl Read) -> Result<Vec<T>, ReadError> {
         (0..u32::frog_read(buffer)? as usize).map(|_| T::frog_read(buffer)).collect()
     }
@@ -258,6 +321,25 @@ impl NbtListTag {
         buffer: &mut impl Read,
     ) -> Result<Vec<Vec<T>>, ReadError> {
         (0..u32::frog_read(buffer)? as usize).map(|_| Self::frog_read_array::<T>(buffer)).collect()
+    }
+
+    // NBT uses a plain `u32` for the length instead of the usual variable encoding
+    fn frog_write_array<T: FrogWrite>(
+        items: &[T],
+        buffer: &mut impl Write,
+    ) -> Result<usize, WriteError> {
+        items.iter().try_fold((items.len() as u32).frog_write(buffer)?, |acc, item| {
+            item.frog_write(buffer).map(|item| acc + item)
+        })
+    }
+
+    fn frog_write_array_array<T: FrogWrite>(
+        items: &[Vec<T>],
+        buffer: &mut impl Write,
+    ) -> Result<usize, WriteError> {
+        items.iter().try_fold((items.len() as u32).frog_write(buffer)?, |acc, item| {
+            Self::frog_write_array(item, buffer).map(|item| acc + item)
+        })
     }
 }
 
