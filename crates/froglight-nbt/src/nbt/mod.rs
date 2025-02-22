@@ -1,10 +1,10 @@
 //! TODO
 
 mod compound;
-pub use compound::{NbtCompound, NbtListTag, NbtTag};
-
-mod error;
-pub use error::{NbtReadError, NbtWriteError};
+pub use compound::NbtCompound;
 
 mod named;
 pub use named::{NamedNbt, UnnamedNbt};
+
+mod tag;
+pub use tag::{NbtListTag, NbtTag};

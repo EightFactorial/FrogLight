@@ -20,22 +20,22 @@ pub struct ArchivedNamedNbt([u8]);
 
 impl ArchivedNamedNbt {
     /// Get the [`Mutf8Str`] name of the [`ArchivedNamedNbt`].
+    ///
+    /// Returns `None` if the NBT is empty.
     #[must_use]
     pub fn name(&self) -> Option<&Mutf8Str> {
-        self.has_compound().then(|| {
-            // Not `unsafe`, but could cause a nasty surprise later
-            Mutf8Str::from_bytes(self.name_bytes())
-        })
+        self.has_compound().then(|| Mutf8Str::from_bytes(self.name_bytes()))
     }
 
     /// Get the [`ArchivedNbtCompound`] of the [`ArchivedNamedNbt`].
     ///
-    /// TODO: Check if this is safe.
+    /// Returns `None` if the NBT is empty.
     #[must_use]
-    pub fn compound(&self) -> Option<&ArchivedNbtCompound> {
+    pub fn unsized_compound(&self) -> Option<ArchivedNbtCompound> {
         self.has_compound().then(|| {
             // SAFETY: Checked `ArchivedNamedNbt` contains an `ArchivedNbtCompound`.
-            Some(unsafe { ArchivedNbtCompound::from_bytes(&self.compound_bytes()) })
+            // unsafe { ArchivedNbtCompound::from_bytes(&self.compound_bytes()) }
+            todo!()
         })
     }
 
@@ -138,13 +138,12 @@ impl ArchivedUnnamedNbt {
     ///
     /// TODO: Check if this is safe.
     #[must_use]
-    pub fn compound(&self) -> Option<&ArchivedNbtCompound> {
-        if self.has_compound() {
+    pub fn compound(&self) -> Option<ArchivedNbtCompound<'_>> {
+        self.has_compound().then(|| {
             // SAFETY: Checked `ArchivedUnnamedNbt` contains an `ArchivedNbtCompound`
-            Some(unsafe { ArchivedNbtCompound::from_bytes(self.compound_bytes()) })
-        } else {
-            None
-        }
+            // unsafe { ArchivedNbtCompound::from_bytes(self.compound_bytes()) }
+            todo!()
+        })
     }
 
     /// Get the base tag of the [`ArchivedUnnamedNbt`].

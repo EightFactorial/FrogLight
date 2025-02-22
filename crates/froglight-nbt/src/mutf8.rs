@@ -161,6 +161,12 @@ impl Mutf8Str {
     #[must_use]
     pub fn is_empty(&self) -> bool { self.as_bytes().is_empty() }
 
+    /// Returns `true` if the [`Mutf8Str`] is valid.
+    #[must_use]
+    pub fn is_valid(&self) -> bool {
+        !simd_cesu8::implementation::active::contains_utf8_4_byte_char_header(self.as_bytes())
+    }
+
     /// Convert a [`Mutf8Str`] to a [`Mutf8String`].
     #[inline]
     #[must_use]
