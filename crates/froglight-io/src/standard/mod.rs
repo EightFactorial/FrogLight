@@ -36,7 +36,7 @@ pub trait FrogWrite {
     /// Returns an error if the buffer fails be written to.
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError>;
 
-    /// Return the length of the encoded data.
+    /// Return the length of the data if it were to be encoded.
     fn frog_len(&self) -> usize;
 
     /// Create a buffer containing the encoded data.

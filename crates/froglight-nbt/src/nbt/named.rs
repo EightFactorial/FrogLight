@@ -3,7 +3,6 @@ use derive_more::{From, Into};
 use crate::{mutf8::Mutf8String, nbt::NbtCompound};
 
 /// A named set of NBT tags.
-#[repr(transparent)]
 #[derive(Debug, PartialEq, From, Into)]
 pub struct NamedNbt(Mutf8String, UnnamedNbt);
 
@@ -12,7 +11,7 @@ impl NamedNbt {
     #[inline]
     #[must_use]
     pub const fn new(name: Mutf8String, compound: NbtCompound) -> Self {
-        Self::new_from(name, UnnamedNbt::new(compound))
+        Self(name, UnnamedNbt::new(compound))
     }
 
     /// Create a new [`NamedNbt`] from a name and optional [`NbtCompound`].
@@ -35,12 +34,12 @@ impl NamedNbt {
     /// Get the [`NbtCompound`] of the [`NamedNbt`].
     #[inline]
     #[must_use]
-    pub fn compound(&self) -> Option<&NbtCompound> { self.1.as_ref() }
+    pub fn compound(&self) -> Option<&NbtCompound> { self.1.as_ref().as_ref() }
 
     /// Get the [`NbtCompound`] of the [`NamedNbt`] mutably.
     #[inline]
     #[must_use]
-    pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.1.as_mut() }
+    pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.1.as_mut().as_mut() }
 
     /// Get an [`UnnamedNbt`] from a [`NamedNbt`].
     #[must_use]
@@ -49,7 +48,7 @@ impl NamedNbt {
     /// Create an [`UnnamedNbt`] from this [`NamedNbt`].
     #[inline]
     #[must_use]
-    pub const fn into_unnamed(self) -> UnnamedNbt { UnnamedNbt::new_from(self.1) }
+    pub fn into_unnamed(self) -> UnnamedNbt { self.1 }
 }
 
 impl AsRef<Option<NbtCompound>> for NamedNbt {

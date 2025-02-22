@@ -45,7 +45,7 @@ default = ["io", "rkyv"]
 # Enable support for `froglight-io` serialization.
 io = ["dep:froglight-io"]
 # Enable support for `rkyv` serialization.
-rkyv = ["dep:rkyv"]
+rkyv = ["dep:rkyv", "io"]
 # Enable support for serializing to/from JSON.
 serde = ["dep:serde", "indexmap/serde"]
 

@@ -27,6 +27,7 @@ where
     }
 }
 impl<D: Fallible + ?Sized> DeserializeUnsized<Mutf8Str, D> for Mutf8String {
+    #[inline]
     unsafe fn deserialize_unsized(
         &self,
         deserializer: &mut D,
@@ -47,8 +48,9 @@ impl<D: Fallible + ?Sized> DeserializeUnsized<Mutf8Str, D> for Mutf8String {
         }
     }
 
+    #[inline]
     fn deserialize_metadata(&self) -> <Mutf8Str as Pointee>::Metadata {
-        rkyv::ptr_meta::metadata::<Mutf8Str>(std::ptr::from_ref(self.as_mutf8_str()))
+        <Mutf8Str as DeserializeUnsized<Mutf8Str, D>>::deserialize_metadata(self.as_mutf8_str())
     }
 }
 
@@ -75,6 +77,7 @@ impl<D: Fallible + ?Sized> DeserializeUnsized<Mutf8Str, D> for Mutf8Str
 where
     [u8]: DeserializeUnsized<[u8], D>,
 {
+    #[inline]
     unsafe fn deserialize_unsized(
         &self,
         deserializer: &mut D,
@@ -95,8 +98,9 @@ where
         }
     }
 
+    #[inline]
     fn deserialize_metadata(&self) -> <Mutf8Str as Pointee>::Metadata {
-        rkyv::ptr_meta::metadata::<[u8]>(std::ptr::from_ref(self.as_bytes()))
+        <[u8] as DeserializeUnsized<[u8], D>>::deserialize_metadata(self.as_bytes())
     }
 }
 
