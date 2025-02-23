@@ -29,7 +29,7 @@ macro_rules! test {
                 Ok((nbt_ref, remainder)) => (nbt_ref, remainder),
                 Err(err) => panic!("Failed to parse NBT data: {err:?}"),
             };
-            assert_eq!(nbt_ref.len() + remainder.len(), bytes.len(), "Ref parsed length does not match actual length!");
+            assert_eq!(nbt_ref.as_bytes().len() + remainder.len(), bytes.len(), "Ref parsed length does not match actual length!");
 
             // Test using `froglight-io` if the feature is enabled
             #[cfg(feature = "io")]
@@ -37,8 +37,21 @@ macro_rules! test {
                 // Parse the NBT data using the `froglight-io` reader
                 let nbt_io = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
 
-                // Compare the expected length to the actual length
+                // Compare the NBT object names and lengths
+                assert_eq!(nbt_ref.name(), nbt_io.name(), "Ref name does not match IO name!");
                 assert_eq!(nbt_io.frog_len(), bytes.len(), "Expected IO length does not match actual length!");
+
+                // Compare the Ref and IO NBT tags
+                if let Some(ref_compound) = nbt_ref.compound() {
+                    let mut tag_count = 0;
+
+                    let io_compound = nbt_io.compound().unwrap();
+                    for (ref_name, _ref_tag) in ref_compound.iter() {
+                        tag_count += 1;
+                        assert!(io_compound.get_tag_bytes(ref_name).is_some(), "Ref `{}` not found in IO!", ref_name.to_str_lossy());
+                    }
+                    assert_eq!(tag_count, io_compound.len(), "Ref is missing tags from IO!");
+                }
 
                 // Write the NBT data using the `froglight-io` writer and compare the results
                 let buf_io: Vec<u8>  = nbt_io.frog_to_buf().unwrap();

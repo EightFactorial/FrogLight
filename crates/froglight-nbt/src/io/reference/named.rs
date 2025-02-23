@@ -1,5 +1,5 @@
 use super::{NbtCompoundRef, NbtStreamError};
-use crate::nbt::NbtTag;
+use crate::{mutf8::Mutf8Str, nbt::NbtTag};
 
 /// A reference to named NBT data.
 ///
@@ -19,17 +19,9 @@ impl<'a> NamedNbtRef<'a> {
     pub const fn new(data: &'a [u8]) -> Self {
         match Self::try_new(data) {
             Ok((named, _)) => named,
-            Err(_) => panic!("Attempted to create `NamedNbtRef` over invalid data"),
+            Err(_) => panic!("Attempted to create `NamedNbtRef` from invalid data!"),
         }
     }
-
-    /// Create a new [`NamedNbtRef`] from the given data.
-    ///
-    /// # Warning
-    /// This will not check ahead of time if the data is valid.
-    #[inline]
-    #[must_use]
-    pub const fn new_unchecked(data: &'a [u8]) -> Self { Self(data) }
 
     /// Try to create a new [`NamedNbtRef`] from the given data,
     /// returning the remaining data if successful.
@@ -40,7 +32,7 @@ impl<'a> NamedNbtRef<'a> {
         match Self::size_of(data) {
             Ok(size) => {
                 let (data, remaining) = data.split_at(size);
-                Ok((Self::new_unchecked(data), remaining))
+                Ok((Self(data), remaining))
             }
             Err(err) => Err(err),
         }
@@ -78,11 +70,51 @@ impl<'a> NamedNbtRef<'a> {
         Err(NbtStreamError::EndOfStream)
     }
 
-    /// Returns the number of bytes that this [`NamedNbtRef`] represents.
+    /// Get the internal data of the [`NamedNbtRef`].
     #[inline]
     #[must_use]
-    #[expect(clippy::len_without_is_empty)]
-    pub const fn len(&self) -> usize { self.0.len() }
+    pub const fn as_bytes(&self) -> &'a [u8] { self.0 }
+
+    /// Create a new [`NamedNbtRef`] from the given data.
+    ///
+    /// # Safety
+    /// The caller must ensure that the data is valid NBT.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn new_unchecked(data: &'a [u8]) -> Self { Self(data) }
+
+    /// Get the name of the NBT data, if it has one.
+    #[must_use]
+    #[expect(clippy::missing_panics_doc)]
+    pub const fn name(&self) -> Option<&Mutf8Str> {
+        let (&tag, data) = self.0.split_first().unwrap();
+        match tag {
+            NbtTag::END => None,
+            NbtTag::COMPOUND => {
+                let (&length, data) = data.split_first_chunk::<2>().unwrap();
+                let (data, _) = data.split_at(u16::from_be_bytes(length) as usize);
+                Some(Mutf8Str::from_bytes(data))
+            }
+            _ => panic!("Only `END` and `COMPOUND` tags are valid"),
+        }
+    }
+
+    /// Get the [`NbtCompoundRef`] of the NBT data, if it has one.
+    #[must_use]
+    #[expect(clippy::missing_panics_doc)]
+    pub const fn compound(&self) -> Option<NbtCompoundRef<'a>> {
+        let (&tag, data) = self.0.split_first().unwrap();
+        match tag {
+            NbtTag::END => None,
+            NbtTag::COMPOUND => {
+                let (&length, data) = data.split_first_chunk::<2>().unwrap();
+                let (_, data) = data.split_at(u16::from_be_bytes(length) as usize);
+                // SAFETY: The data is valid NBT.
+                Some(unsafe { NbtCompoundRef::from_bytes(data) })
+            }
+            _ => panic!("Only `END` and `COMPOUND` tags are valid"),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -109,14 +141,6 @@ impl<'a> UnnamedNbtRef<'a> {
         }
     }
 
-    /// Create a new [`UnnamedNbtRef`] from the given data.
-    ///
-    /// # Warning
-    /// This will not check ahead of time if the data is valid.
-    #[inline]
-    #[must_use]
-    pub const fn new_unchecked(data: &'a [u8]) -> Self { Self(data) }
-
     /// Try to create a new [`UnnamedNbtRef`] from the given data,
     /// returning the remaining data if successful.
     ///
@@ -126,7 +150,7 @@ impl<'a> UnnamedNbtRef<'a> {
         match Self::size_of(data) {
             Ok(size) => {
                 let (data, remaining) = data.split_at(size);
-                Ok((Self::new_unchecked(data), remaining))
+                Ok((Self(data), remaining))
             }
             Err(err) => Err(err),
         }
@@ -154,9 +178,16 @@ impl<'a> UnnamedNbtRef<'a> {
         }
     }
 
-    /// Returns the number of bytes that this [`UnnamedNbtRef`] represents.
+    /// Get the internal data of the [`UnnamedNbtRef`].
     #[inline]
     #[must_use]
-    #[expect(clippy::len_without_is_empty)]
-    pub const fn len(&self) -> usize { self.0.len() }
+    pub const fn as_bytes(&self) -> &'a [u8] { self.0 }
+
+    /// Create a new [`UnnamedNbtRef`] from the given data.
+    ///
+    /// # Safety
+    /// The caller must ensure that the data is valid NBT.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn new_unchecked(data: &'a [u8]) -> Self { Self(data) }
 }

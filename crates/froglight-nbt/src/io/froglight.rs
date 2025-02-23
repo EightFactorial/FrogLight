@@ -15,14 +15,17 @@ impl FrogRead for NamedNbt {
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         let byte = u8::frog_read(buffer)?;
         if byte == NbtTag::END {
-            Ok(Self::new_from(Mutf8String::from_bytes(Vec::new()), None))
+            Ok(Self::new_empty())
         } else {
             let name = Mutf8String::frog_read(buffer)?;
 
             #[cfg(feature = "debug")]
             tracing_log::log::trace!("Reading NamedNbt: \"{}\"", name.to_str_lossy());
 
-            UnnamedNbt::frog_read_inner(byte, buffer).map(|unnamed| unnamed.into_named(name))
+            UnnamedNbt::frog_read_inner(byte, buffer).map(|unnamed| match unnamed.into_inner() {
+                None => Self::new_empty(),
+                Some(compound) => Self::new(name, compound),
+            })
         }
     }
 }
@@ -33,7 +36,7 @@ impl FrogWrite for NamedNbt {
             None => NbtTag::END.frog_write(buffer),
             Some(compound) => {
                 let tag = NbtTag::COMPOUND.frog_write(buffer)?;
-                let name = self.name().frog_write(buffer)?;
+                let name = self.name().unwrap().frog_write(buffer)?;
                 compound.frog_write(buffer).map(|payload| tag + name + payload)
             }
         }
@@ -41,7 +44,7 @@ impl FrogWrite for NamedNbt {
 
     fn frog_len(&self) -> usize {
         self.compound().map_or(std::mem::size_of::<u8>(), |nbt| {
-            std::mem::size_of::<u8>() + self.name().frog_len() + nbt.frog_len()
+            std::mem::size_of::<u8>() + self.name().unwrap().frog_len() + nbt.frog_len()
         })
     }
 }
@@ -80,7 +83,7 @@ impl UnnamedNbt {
         tracing_log::log::trace!("UnnamedNbt: Tag -> {tag}");
 
         match tag {
-            NbtTag::END => Ok(Self::new_from(None)),
+            NbtTag::END => Ok(Self::new_empty()),
             NbtTag::COMPOUND => NbtCompound::frog_read(buffer).map(UnnamedNbt::new),
             unk => Err(ReadError::InvalidEnum(std::any::type_name::<Self>(), unk.into())),
         }

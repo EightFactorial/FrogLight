@@ -1,13 +1,50 @@
 use super::NbtStreamError;
-use crate::nbt::NbtTag;
+use crate::{mutf8::Mutf8Str, nbt::NbtTag};
 
 /// A reference to an NBT compound.
 ///
 /// The raw form of [`NbtCompound`](crate::nbt::NbtCompound).
 #[repr(transparent)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NbtCompoundRef<'a>(&'a [u8]);
 
-impl NbtCompoundRef<'_> {
+impl<'a> NbtCompoundRef<'a> {
+    /// Get the next tag in the [`NbtCompoundRef`].
+    ///
+    /// Returns `None` if there are no more tags.
+    #[must_use]
+    #[expect(clippy::missing_panics_doc)]
+    pub const fn next_tag(&mut self) -> Option<(&'a Mutf8Str, NbtTagRef<'a>)> {
+        let Some((&tag, data)) = self.0.split_first() else { return None };
+
+        if tag == NbtTag::END {
+            None
+        } else {
+            // Get the name
+            let (&length, data) = data.split_first_chunk::<2>().unwrap();
+            let (name, data) = data.split_at(u16::from_be_bytes(length) as usize);
+            // Get the tag
+            let Ok(length) = NbtTagRef::size_of_tag(tag, data) else { return None };
+            let (tag, remaining) = data.split_at(length);
+
+            // Update the remaining data
+            self.0 = remaining;
+
+            // SAFETY: The data is valid NBT.
+            Some((Mutf8Str::from_bytes(name), unsafe { NbtTagRef::from_bytes(tag) }))
+        }
+    }
+
+    /// Get the internal data of the [`NbtCompoundRef`].
+    #[inline]
+    #[must_use]
+    pub const fn as_bytes(&self) -> &'a [u8] { self.0 }
+
+    /// Create a new [`NbtCompoundRef`] from the given data.
+    #[inline]
+    #[must_use]
+    pub(super) const unsafe fn from_bytes(data: &'a [u8]) -> Self { Self(data) }
+
     /// Get the size of the [`NbtCompoundRef`] from the given data,
     /// or an error if the data is invalid.
     pub(super) const fn size_of(data: &[u8]) -> Result<usize, NbtStreamError> {
@@ -67,9 +104,20 @@ impl NbtCompoundRef<'_> {
 ///
 /// The raw form of [`NbtTag`](crate::nbt::NbtTag).
 #[repr(transparent)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NbtTagRef<'a>(&'a [u8]);
 
-impl NbtTagRef<'_> {
+impl<'a> NbtTagRef<'a> {
+    /// Get the internal data of the [`NbtTagRef`].
+    #[inline]
+    #[must_use]
+    pub const fn as_bytes(&self) -> &'a [u8] { self.0 }
+
+    /// Create a new [`NbtTagRef`] from the given data.
+    #[inline]
+    #[must_use]
+    pub(super) const unsafe fn from_bytes(data: &'a [u8]) -> Self { Self(data) }
+
     /// Get the size of the [`NbtTagRef`] from the given data,
     /// or an error if the data is invalid.
     const fn size_of_tag(tag: u8, data: &[u8]) -> Result<usize, NbtStreamError> {
@@ -103,6 +151,7 @@ impl NbtTagRef<'_> {
 ///
 /// The raw form of [`NbtListTag`](crate::nbt::NbtListTag).
 #[repr(transparent)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NbtListTagRef<'a>(&'a [u8]);
 
 impl NbtListTagRef<'_> {

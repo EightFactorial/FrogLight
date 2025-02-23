@@ -30,14 +30,28 @@ impl NbtCompound {
     #[inline]
     #[must_use]
     pub fn get_tag<Q: AsRef<str> + ?Sized>(&self, key: &Q) -> Option<&NbtTag> {
-        self.0.get(key.as_ref().as_bytes())
+        self.get_tag_bytes(key.as_ref().as_bytes())
+    }
+
+    /// Get a reference to a [`NbtTag`] by it's key's bytes.
+    #[inline]
+    #[must_use]
+    pub fn get_tag_bytes<Q: AsRef<[u8]> + ?Sized>(&self, key: &Q) -> Option<&NbtTag> {
+        self.0.get(key.as_ref())
     }
 
     /// Get a mutable reference to a [`NbtTag`] by it's key.
     #[inline]
     #[must_use]
     pub fn get_tag_mut<Q: AsRef<str> + ?Sized>(&mut self, key: &Q) -> Option<&mut NbtTag> {
-        self.0.get_mut(key.as_ref().as_bytes())
+        self.get_tag_bytes_mut(key.as_ref().as_bytes())
+    }
+
+    /// Get a mutable reference to a [`NbtTag`] by it's key's bytes.
+    #[inline]
+    #[must_use]
+    pub fn get_tag_bytes_mut<Q: AsRef<[u8]> + ?Sized>(&mut self, key: &Q) -> Option<&mut NbtTag> {
+        self.0.get_mut(key.as_ref())
     }
 
     /// Get a reference to a [`NbtTag`] by it's index.

@@ -1,25 +1,27 @@
 use derive_more::{From, Into};
 
-use crate::{mutf8::Mutf8String, nbt::NbtCompound};
+use crate::{
+    mutf8::{Mutf8Str, Mutf8String},
+    nbt::NbtCompound,
+};
 
 /// A named set of NBT tags.
+#[repr(transparent)]
 #[derive(Debug, PartialEq, From, Into)]
-pub struct NamedNbt(Mutf8String, UnnamedNbt);
+pub struct NamedNbt(Option<(Mutf8String, NbtCompound)>);
 
 impl NamedNbt {
     /// Create a new [`NamedNbt`] from a name and [`NbtCompound`].
     #[inline]
     #[must_use]
     pub const fn new(name: Mutf8String, compound: NbtCompound) -> Self {
-        Self(name, UnnamedNbt::new(compound))
+        Self(Some((name, compound)))
     }
 
-    /// Create a new [`NamedNbt`] from a name and optional [`NbtCompound`].
+    /// Create a new empty [`NamedNbt`].
     #[inline]
     #[must_use]
-    pub const fn new_from(name: Mutf8String, compound: Option<NbtCompound>) -> Self {
-        Self(name, UnnamedNbt::new_from(compound))
-    }
+    pub const fn new_empty() -> Self { Self(None) }
 
     /// Read a [`NamedNbt`] from a reader.
     ///
@@ -49,46 +51,32 @@ impl NamedNbt {
     /// Get the name of the [`NamedNbt`].
     #[inline]
     #[must_use]
-    pub fn name(&self) -> &Mutf8String { &self.0 }
+    pub fn name(&self) -> Option<&Mutf8Str> { self.0.as_ref().map(|(a, _)| a.as_mutf8_str()) }
 
     /// Get the name of the [`NamedNbt`] mutably.
     #[inline]
     #[must_use]
-    pub fn name_mut(&mut self) -> &mut Mutf8String { &mut self.0 }
+    pub fn name_mut(&mut self) -> Option<&mut Mutf8String> { self.0.as_mut().map(|(a, _)| a) }
 
     /// Get the [`NbtCompound`] of the [`NamedNbt`].
     #[inline]
     #[must_use]
-    pub fn compound(&self) -> Option<&NbtCompound> { self.1.as_ref().as_ref() }
+    pub fn compound(&self) -> Option<&NbtCompound> { self.0.as_ref().map(|(_, b)| b) }
 
     /// Get the [`NbtCompound`] of the [`NamedNbt`] mutably.
     #[inline]
     #[must_use]
-    pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.1.as_mut().as_mut() }
-
-    /// Get an [`UnnamedNbt`] from a [`NamedNbt`].
-    #[must_use]
-    pub fn as_unnamed(&self) -> &UnnamedNbt { &self.1 }
+    pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.0.as_mut().map(|(_, b)| b) }
 
     /// Create an [`UnnamedNbt`] from this [`NamedNbt`].
     #[inline]
     #[must_use]
-    pub fn into_unnamed(self) -> UnnamedNbt { self.1 }
-}
-
-impl AsRef<Option<NbtCompound>> for NamedNbt {
-    fn as_ref(&self) -> &Option<NbtCompound> { &self.1 }
-}
-impl AsMut<Option<NbtCompound>> for NamedNbt {
-    fn as_mut(&mut self) -> &mut Option<NbtCompound> { &mut self.1 }
-}
-
-impl std::ops::Deref for NamedNbt {
-    type Target = UnnamedNbt;
-    fn deref(&self) -> &Self::Target { &self.1 }
-}
-impl std::ops::DerefMut for NamedNbt {
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.1 }
+    pub fn into_unnamed(self) -> UnnamedNbt {
+        match self.0 {
+            Some((_, compound)) => UnnamedNbt::new(compound),
+            None => UnnamedNbt::new_empty(),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -103,12 +91,12 @@ impl UnnamedNbt {
     /// Create a new [`UnnamedNbt`] from a [`NbtCompound`].
     #[inline]
     #[must_use]
-    pub const fn new(compound: NbtCompound) -> Self { Self::new_from(Some(compound)) }
+    pub const fn new(compound: NbtCompound) -> Self { Self(Some(compound)) }
 
-    /// Create a new [`UnnamedNbt`] from an optional [`NbtCompound`].
+    /// Create a new empty [`UnnamedNbt`].
     #[inline]
     #[must_use]
-    pub const fn new_from(compound: Option<NbtCompound>) -> Self { Self(compound) }
+    pub const fn new_empty() -> Self { Self(None) }
 
     /// Read an [`UnnamedNbt`] from a reader.
     ///
@@ -150,13 +138,6 @@ impl UnnamedNbt {
     #[inline]
     #[must_use]
     pub fn into_inner(self) -> Option<NbtCompound> { self.0 }
-
-    /// Create a new [`NamedNbt`] from an [`UnnamedNbt`].
-    #[inline]
-    #[must_use]
-    pub fn into_named(self, name: impl Into<Mutf8String>) -> NamedNbt {
-        NamedNbt::new_from(name.into(), self.0)
-    }
 }
 
 impl AsRef<Option<NbtCompound>> for UnnamedNbt {
