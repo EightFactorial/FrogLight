@@ -47,21 +47,17 @@ impl BlockAttributes for () {
     const TYPES: &'static [TypeId] = &[TypeId::of::<()>()];
     const COUNT: usize = 1;
     #[inline]
-    #[must_use]
     fn from_index(index: usize) -> Self {
         debug_assert_eq!(index, 0, "Invalid BlockAttributes index!");
     }
     #[inline]
-    #[must_use]
     fn into_index(self) -> usize { 0 }
 
     #[inline]
-    #[must_use]
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[0])
     }
     #[inline]
-    #[must_use]
     fn get_attr_str(&self, attr_index: usize) -> &'static str {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         ""
@@ -78,19 +74,15 @@ impl<A: Attribute> BlockAttributes for A {
     const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
     const COUNT: usize = A::STATES.len();
     #[inline]
-    #[must_use]
     fn from_index(index: usize) -> Self { A::STATES[index] }
     #[inline]
-    #[must_use]
     fn into_index(self) -> usize { self.into() }
 
     #[inline]
-    #[must_use]
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(*self)])
     }
     #[inline]
-    #[must_use]
     fn get_attr_str(&self, attr_index: usize) -> &'static str {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         A::VALUES[Into::<usize>::into(*self)]
@@ -108,19 +100,15 @@ impl<A: Attribute> BlockAttributes for (A,) {
     const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
     const COUNT: usize = A::STATES.len();
     #[inline]
-    #[must_use]
     fn from_index(index: usize) -> Self { (A::STATES[index],) }
     #[inline]
-    #[must_use]
     fn into_index(self) -> usize { self.0.into() }
 
     #[inline]
-    #[must_use]
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(self.0)])
     }
     #[inline]
-    #[must_use]
     fn get_attr_str(&self, attr_index: usize) -> &'static str {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         A::VALUES[Into::<usize>::into(self.0)]

@@ -16,30 +16,30 @@ macro_rules! test {
     };
     ($test:ident, $reader:tt, $file:expr) => {
         #[test]
-        #[cfg(feature = "io")]
         fn $test() {
             #[cfg(feature = "debug")]
             *LOG;
 
             // Read the NBT data from the file
             let bytes = test!(@$reader $file);
-            let data = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
 
-            // Compare the expected length to the actual length
-            assert_eq!(data.frog_len(), bytes.len(), "Predicted length does not match actual length!");
+            // Parse the NBT data using the slice-based reader
+            // let ref_data = crate::io::NamedNbtRef::new(&bytes);
 
-            // Write the NBT data to a buffer and compare it to the original
-            let buffer: Vec<u8>  = data.frog_to_buf().unwrap();
-            assert_eq!(buffer.len(), bytes.len(), "Written length does not match actual length!");
-            assert_eq!(buffer, bytes, "Written NBT does not match original data!");
-
-            #[cfg(feature = "rkyv")]
+            #[cfg(feature = "io")]
             {
-                // use rkyv::{ArchiveUnsized, DeserializeUnsized, SerializeUnsized};
+                // Parse the NBT data using the `froglight-io` reader
+                let io_data = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
 
+                // Compare the expected length to the actual length
+                assert_eq!(io_data.frog_len(), bytes.len(), "Expected length does not match actual length!");
+
+                // Write the NBT data using the `froglight-io` writer and compare the results
+                let buffer: Vec<u8>  = io_data.frog_to_buf().unwrap();
+                assert_eq!(buffer.len(), bytes.len(), "Written length does not match actual length!");
+                assert_eq!(buffer, bytes, "Written NBT does not match original data!");
             }
-
-        }
+       }
     };
 
     // Helpers for specifying how to read test data

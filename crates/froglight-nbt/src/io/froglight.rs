@@ -292,9 +292,9 @@ impl FrogWrite for NbtListTag {
                 NbtListTag::Long(items) => items.len() * std::mem::size_of::<i64>(),
                 NbtListTag::Float(items) => items.len() * std::mem::size_of::<f32>(),
                 NbtListTag::Double(items) => items.len() * std::mem::size_of::<f64>(),
-                NbtListTag::String(items) => items.iter().map(|i| i.frog_len()).sum(),
-                NbtListTag::List(items) => items.iter().map(|i| i.frog_len()).sum(),
-                NbtListTag::Compound(items) => items.iter().map(|i| i.frog_len()).sum(),
+                NbtListTag::String(items) => items.iter().map(FrogWrite::frog_len).sum(),
+                NbtListTag::List(items) => items.iter().map(FrogWrite::frog_len).sum(),
+                NbtListTag::Compound(items) => items.iter().map(FrogWrite::frog_len).sum(),
                 NbtListTag::ByteArray(items) => items
                     .iter()
                     .map(|i| std::mem::size_of::<u32>() + (i.len() * std::mem::size_of::<i8>()))
@@ -324,6 +324,7 @@ impl NbtListTag {
     }
 
     // NBT uses a plain `u32` for the length instead of the usual variable encoding
+    #[expect(clippy::cast_possible_truncation)]
     fn frog_write_array<T: FrogWrite>(
         items: &[T],
         buffer: &mut impl Write,
@@ -333,6 +334,7 @@ impl NbtListTag {
         })
     }
 
+    #[expect(clippy::cast_possible_truncation)]
     fn frog_write_array_array<T: FrogWrite>(
         items: &[Vec<T>],
         buffer: &mut impl Write,
@@ -372,6 +374,5 @@ impl FrogWrite for Mutf8Str {
     }
 
     #[inline]
-    #[expect(clippy::cast_possible_truncation)]
     fn frog_len(&self) -> usize { std::mem::size_of::<u16>() + self.as_bytes().len() }
 }

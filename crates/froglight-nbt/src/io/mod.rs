@@ -2,5 +2,6 @@
 
 #[cfg(feature = "io")]
 mod froglight;
-#[cfg(feature = "rkyv")]
-pub mod rkyv;
+
+pub mod reference;
+pub use reference::{iterator::*, named::*};

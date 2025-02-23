@@ -38,6 +38,21 @@ impl Mutf8String {
     #[must_use]
     pub fn as_bytes(&self) -> &[u8] { &self.0 }
 
+    /// Returns the number of bytes in the [`Mutf8String`].
+    #[inline]
+    #[must_use]
+    pub fn len(&self) -> usize { self.0.len() }
+
+    /// Returns `true` if the [`Mutf8String`] is empty.
+    #[inline]
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.0.is_empty() }
+
+    /// Returns `true` if the [`Mutf8String`] is valid.
+    #[inline]
+    #[must_use]
+    pub fn is_valid(&self) -> bool { self.as_mutf8_str().is_valid() }
+
     /// Convert a [`Mutf8String`] to a [`Mutf8Str`].
     #[inline]
     #[must_use]
@@ -128,7 +143,6 @@ impl std::fmt::Debug for Mutf8String {
 /// Equivalent to a [`str`], but with a different encoding.
 #[repr(transparent)]
 #[derive(PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "rkyv", derive(rkyv::Portable))]
 pub struct Mutf8Str([u8]);
 
 impl Mutf8Str {

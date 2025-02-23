@@ -27,21 +27,17 @@ impl<
 > BlockConvert<V1, V2> for B
 {
     #[inline]
-    #[must_use]
     fn convert_from(block: Block<B, V2>) -> Block<B, V1> { Block::new(*block.state()) }
     #[inline]
-    #[must_use]
     fn convert_into(block: Block<B, V1>) -> Block<B, V2> { Block::new(*block.state()) }
 }
 
 impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> From<&Block<B, V1>> for Block<B, V2> {
     #[inline]
-    #[must_use]
     fn from(block: &Block<B, V1>) -> Self { B::convert_into(*block) }
 }
 impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> From<&&Block<B, V2>> for Block<B, V1> {
     #[inline]
-    #[must_use]
     fn from(block: &&Block<B, V2>) -> Self { B::convert_from(**block) }
 }
 
