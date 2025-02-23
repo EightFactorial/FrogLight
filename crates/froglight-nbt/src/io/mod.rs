@@ -4,4 +4,4 @@
 mod froglight;
 
 pub mod reference;
-pub use reference::{iterator::*, named::*};
+pub use reference::{NamedNbtRef, NbtRefIterator, NbtStreamError, UnnamedNbtRef};

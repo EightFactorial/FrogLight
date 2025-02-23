@@ -1,4 +1,4 @@
-use super::NbtStreamError;
+use super::{NbtStreamError, PrefixedArray};
 use crate::{mutf8::Mutf8Str, nbt::NbtTag};
 
 /// A reference to an NBT compound.
@@ -25,13 +25,13 @@ impl<'a> NbtCompoundRef<'a> {
             let (name, data) = data.split_at(u16::from_be_bytes(length) as usize);
             // Get the tag
             let Ok(length) = NbtTagRef::size_of_tag(tag, data) else { return None };
-            let (tag, remaining) = data.split_at(length);
+            let (tag_data, remaining) = data.split_at(length);
 
             // Update the remaining data
             self.0 = remaining;
 
             // SAFETY: The data is valid NBT.
-            Some((Mutf8Str::from_bytes(name), unsafe { NbtTagRef::from_bytes(tag) }))
+            Some((Mutf8Str::from_bytes(name), unsafe { NbtTagRef::from_bytes(tag, tag_data) }))
         }
     }
 
@@ -41,9 +41,12 @@ impl<'a> NbtCompoundRef<'a> {
     pub const fn as_bytes(&self) -> &'a [u8] { self.0 }
 
     /// Create a new [`NbtCompoundRef`] from the given data.
+    ///
+    /// # Safety
+    /// The caller must ensure that the data is valid NBT.
     #[inline]
     #[must_use]
-    pub(super) const unsafe fn from_bytes(data: &'a [u8]) -> Self { Self(data) }
+    pub const unsafe fn from_bytes(data: &'a [u8]) -> Self { Self(data) }
 
     /// Get the size of the [`NbtCompoundRef`] from the given data,
     /// or an error if the data is invalid.
@@ -103,20 +106,128 @@ impl<'a> NbtCompoundRef<'a> {
 /// A reference to an NBT tag.
 ///
 /// The raw form of [`NbtTag`](crate::nbt::NbtTag).
-#[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub struct NbtTagRef<'a>(&'a [u8]);
+pub struct NbtTagRef<'a>(u8, &'a [u8]);
+
+/// The data of an [`NbtTagRef`].
+#[repr(u8)]
+#[derive(Clone, Copy, PartialEq)]
+pub enum NbtTagRefData<'a> {
+    /// A signed 8-bit integer.
+    Byte(i8) = NbtTag::BYTE,
+    /// A signed 16-bit integer.
+    Short(i16) = NbtTag::SHORT,
+    /// A signed 32-bit integer.
+    Int(i32) = NbtTag::INT,
+    /// A signed 64-bit integer.
+    Long(i64) = NbtTag::LONG,
+    /// A 32-bit floating point number.
+    Float(f32) = NbtTag::FLOAT,
+    /// A 64-bit floating point number.
+    Double(f64) = NbtTag::DOUBLE,
+    /// An array of signed 8-bit integers.
+    ByteArray(PrefixedArray<'a, i8>) = NbtTag::BYTE_ARRAY,
+    /// A MUTF-8 string.
+    String(&'a Mutf8Str) = NbtTag::STRING,
+    /// A [`NbtListTag`].
+    List(NbtListTagRef<'a>) = NbtTag::LIST,
+    /// An [`NbtCompound`].
+    Compound(NbtCompoundRef<'a>) = NbtTag::COMPOUND,
+    /// An array of signed 32-bit integers.
+    IntArray(PrefixedArray<'a, i32>) = NbtTag::INT_ARRAY,
+    /// An array of signed 64-bit integers.
+    LongArray(PrefixedArray<'a, i64>) = NbtTag::LONG_ARRAY,
+}
 
 impl<'a> NbtTagRef<'a> {
-    /// Get the internal data of the [`NbtTagRef`].
+    /// Get the tag of the [`NbtTagRef`].
     #[inline]
     #[must_use]
-    pub const fn as_bytes(&self) -> &'a [u8] { self.0 }
+    pub const fn tag(&self) -> u8 { self.0 }
+
+    /// Get the internal data of the [`NbtTagRef`].
+    ///
+    /// # Note
+    /// This does not include the tag byte.
+    ///
+    /// See [`NbtTagRef::tag`] for the tag.
+    #[inline]
+    #[must_use]
+    pub const fn tag_bytes(&self) -> &'a [u8] { self.1 }
+
+    /// Get the data of the [`NbtTagRef`] as a [`NbtTagRefData`].
+    #[must_use]
+    #[expect(clippy::missing_panics_doc)]
+    pub const fn tag_data(&self) -> NbtTagRefData<'a> {
+        match self.0 {
+            #[allow(clippy::cast_possible_wrap)]
+            NbtTag::BYTE => {
+                let (&data, _) =
+                    self.1.split_first().expect("Invalid data length for `NbtTag::BYTE`");
+                NbtTagRefData::Byte(data as i8)
+            }
+            NbtTag::SHORT => {
+                let (&data, _) =
+                    self.1.split_first_chunk().expect("Invalid data length for `NbtTag::SHORT`");
+                NbtTagRefData::Short(i16::from_be_bytes(data))
+            }
+            NbtTag::INT => {
+                let (&data, _) =
+                    self.1.split_first_chunk().expect("Invalid data length for `NbtTag::INT`");
+                NbtTagRefData::Int(i32::from_be_bytes(data))
+            }
+            NbtTag::LONG => {
+                let (&data, _) =
+                    self.1.split_first_chunk().expect("Invalid data length for `NbtTag::LONG`");
+                NbtTagRefData::Long(i64::from_be_bytes(data))
+            }
+            NbtTag::FLOAT => {
+                let (&data, _) =
+                    self.1.split_first_chunk().expect("Invalid data length for `NbtTag::FLOAT`");
+                NbtTagRefData::Float(f32::from_be_bytes(data))
+            }
+            NbtTag::DOUBLE => {
+                let (&data, _) =
+                    self.1.split_first_chunk().expect("Invalid data length for `NbtTag::DOUBLE`");
+                NbtTagRefData::Double(f64::from_be_bytes(data))
+            }
+            NbtTag::STRING => {
+                let (&length, data) =
+                    self.1.split_first_chunk().expect("Invalid data length for `NbtTag::STRING`");
+                let (data, _) = data.split_at(u16::from_be_bytes(length) as usize);
+                NbtTagRefData::String(Mutf8Str::from_bytes(data))
+            }
+            NbtTag::LIST => {
+                // SAFETY: The data is valid NBT.
+                NbtTagRefData::List(unsafe { NbtListTagRef::from_bytes(self.1) })
+            }
+            NbtTag::COMPOUND => {
+                // SAFETY: The data is valid NBT.
+                NbtTagRefData::Compound(unsafe { NbtCompoundRef::from_bytes(self.1) })
+            }
+            NbtTag::BYTE_ARRAY => {
+                // SAFETY: The tag guarantees the data type is `i8`.
+                NbtTagRefData::ByteArray(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::INT_ARRAY => {
+                // SAFETY: The tag guarantees the data type is `i32`.
+                NbtTagRefData::IntArray(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::LONG_ARRAY => {
+                // SAFETY: The tag guarantees the data type is `i64`.
+                NbtTagRefData::LongArray(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            _ => panic!("Found invalid tag when parsing `NbtTagRefData`!"),
+        }
+    }
 
     /// Create a new [`NbtTagRef`] from the given data.
+    ///
+    /// # Safety
+    /// The caller must ensure that the data is valid NBT.
     #[inline]
     #[must_use]
-    pub(super) const unsafe fn from_bytes(data: &'a [u8]) -> Self { Self(data) }
+    pub const unsafe fn from_bytes(tag: u8, data: &'a [u8]) -> Self { Self(tag, data) }
 
     /// Get the size of the [`NbtTagRef`] from the given data,
     /// or an error if the data is invalid.
@@ -154,10 +265,18 @@ impl<'a> NbtTagRef<'a> {
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub struct NbtListTagRef<'a>(&'a [u8]);
 
-impl NbtListTagRef<'_> {
+impl<'a> NbtListTagRef<'a> {
+    /// Create a new [`NbtListTagRef`] from the given data.
+    ///
+    /// # Safety
+    /// The caller must ensure that the data is valid NBT.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn from_bytes(data: &'a [u8]) -> Self { Self(data) }
+
     /// Get the size of the [`NbtListTagRef`] from the given data,
     /// or an error if the data is invalid.
-    const fn size_of(data: &[u8]) -> Result<usize, NbtStreamError> {
+    pub(super) const fn size_of(data: &[u8]) -> Result<usize, NbtStreamError> {
         if let Some((&tag, data)) = data.split_first() {
             let result = match tag {
                 NbtTag::END => Ok(4),
