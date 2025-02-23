@@ -2,6 +2,7 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 mod manifest;
+#[allow(unused_imports)]
 pub(crate) use manifest::CrateManifest;
 
 // ------------------- `froglight-block` -------------------

@@ -1,6 +1,7 @@
 //! Tests for reading and writing NBT data
 //!
 //! Definitely not taken from `simdnbt` :)
+#![allow(unused_imports)]
 
 use std::io::{Cursor, Write};
 
@@ -24,20 +25,25 @@ macro_rules! test {
             let bytes = test!(@$reader $file);
 
             // Parse the NBT data using the slice-based reader
-            // let ref_data = crate::io::NamedNbtRef::new(&bytes);
+            let (nbt_ref, remainder) = match crate::io::NamedNbtRef::try_new(&bytes) {
+                Ok((nbt_ref, remainder)) => (nbt_ref, remainder),
+                Err(err) => panic!("Failed to parse NBT data: {err:?}"),
+            };
+            assert_eq!(nbt_ref.len() + remainder.len(), bytes.len(), "Ref parsed length does not match actual length!");
 
+            // Test using `froglight-io` if the feature is enabled
             #[cfg(feature = "io")]
             {
                 // Parse the NBT data using the `froglight-io` reader
-                let io_data = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
+                let nbt_io = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
 
                 // Compare the expected length to the actual length
-                assert_eq!(io_data.frog_len(), bytes.len(), "Expected length does not match actual length!");
+                assert_eq!(nbt_io.frog_len(), bytes.len(), "Expected IO length does not match actual length!");
 
                 // Write the NBT data using the `froglight-io` writer and compare the results
-                let buffer: Vec<u8>  = io_data.frog_to_buf().unwrap();
-                assert_eq!(buffer.len(), bytes.len(), "Written length does not match actual length!");
-                assert_eq!(buffer, bytes, "Written NBT does not match original data!");
+                let buf_io: Vec<u8>  = nbt_io.frog_to_buf().unwrap();
+                assert_eq!(buf_io.len(), bytes.len(), "IO written length does not match actual length!");
+                assert_eq!(buf_io, bytes, "IO written NBT does not match original data!");
             }
        }
     };

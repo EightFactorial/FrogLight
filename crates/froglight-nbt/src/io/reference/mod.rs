@@ -1,11 +1,10 @@
 //! TODO
-#![expect(missing_docs, dead_code)]
 
 pub(super) mod iterator;
 pub(super) mod named;
 
 mod component;
-pub use component::{NbtComponentRef, NbtTagRef};
+pub use component::{NbtCompoundRef, NbtListTagRef, NbtTagRef};
 
 mod error;
 pub use error::NbtStreamError;

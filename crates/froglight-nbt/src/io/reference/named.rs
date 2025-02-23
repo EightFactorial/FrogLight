@@ -1,8 +1,12 @@
-use super::{NbtComponentRef, NbtStreamError};
+use super::{NbtCompoundRef, NbtStreamError};
 use crate::nbt::NbtTag;
 
+/// A reference to named NBT data.
+///
+/// The raw form of [`NamedNbt`](crate::nbt::NamedNbt).
 #[repr(transparent)]
-pub struct NamedNbtRef<'a>(UnnamedNbtRef<'a>);
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct NamedNbtRef<'a>(&'a [u8]);
 
 impl<'a> NamedNbtRef<'a> {
     /// Create a new [`NamedNbtRef`] from the given data.
@@ -25,7 +29,7 @@ impl<'a> NamedNbtRef<'a> {
     /// This will not check ahead of time if the data is valid.
     #[inline]
     #[must_use]
-    pub const fn new_unchecked(data: &'a [u8]) -> Self { Self(UnnamedNbtRef::new_unchecked(data)) }
+    pub const fn new_unchecked(data: &'a [u8]) -> Self { Self(data) }
 
     /// Try to create a new [`NamedNbtRef`] from the given data,
     /// returning the remaining data if successful.
@@ -47,7 +51,7 @@ impl<'a> NamedNbtRef<'a> {
     ///
     /// # Errors
     /// Returns an error if the data is invalid NBT.
-    pub const fn size_of(data: &'a [u8]) -> Result<usize, NbtStreamError> {
+    const fn size_of(data: &'a [u8]) -> Result<usize, NbtStreamError> {
         // Take the tag from the data.
         if let Some((&tag, data)) = data.split_first() {
             // If the tag is `END`, then the stream is empty.
@@ -58,7 +62,8 @@ impl<'a> NamedNbtRef<'a> {
             // Take the name from the data.
             if let Some((&length, data)) = data.split_first_chunk::<2>() {
                 let length = u16::from_be_bytes(length) as usize;
-                if let Some((_, data)) = data.split_at_checked(2 + length) {
+                #[allow(clippy::used_underscore_binding, unreachable_code, unused_variables)]
+                if let Some((_str, data)) = data.split_at_checked(length) {
                     //
 
                     // Add the tag and name to the result
@@ -72,11 +77,21 @@ impl<'a> NamedNbtRef<'a> {
 
         Err(NbtStreamError::EndOfStream)
     }
+
+    /// Returns the number of bytes that this [`NamedNbtRef`] represents.
+    #[inline]
+    #[must_use]
+    #[expect(clippy::len_without_is_empty)]
+    pub const fn len(&self) -> usize { self.0.len() }
 }
 
 // -------------------------------------------------------------------------------------------------
 
+/// A reference to unnamed NBT data.
+///
+/// The raw form of [`UnnamedNbt`](crate::nbt::UnnamedNbt).
 #[repr(transparent)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct UnnamedNbtRef<'a>(&'a [u8]);
 
 impl<'a> UnnamedNbtRef<'a> {
@@ -122,7 +137,7 @@ impl<'a> UnnamedNbtRef<'a> {
     ///
     /// # Errors
     /// Returns an error if the data is invalid NBT.
-    pub const fn size_of(data: &'a [u8]) -> Result<usize, NbtStreamError> {
+    const fn size_of(data: &'a [u8]) -> Result<usize, NbtStreamError> {
         // Take the tag from the data.
         if let Some((&tag, data)) = data.split_first() {
             UnnamedNbtRef::size_of_tag(tag, data)
@@ -134,8 +149,14 @@ impl<'a> UnnamedNbtRef<'a> {
     const fn size_of_tag(tag: u8, data: &'a [u8]) -> Result<usize, NbtStreamError> {
         match tag {
             NbtTag::END => Ok(1),
-            NbtTag::COMPOUND => NbtComponentRef::size_of(data),
+            NbtTag::COMPOUND => NbtCompoundRef::size_of(data),
             other => Err(NbtStreamError::InvalidTag(other)),
         }
     }
+
+    /// Returns the number of bytes that this [`UnnamedNbtRef`] represents.
+    #[inline]
+    #[must_use]
+    #[expect(clippy::len_without_is_empty)]
+    pub const fn len(&self) -> usize { self.0.len() }
 }

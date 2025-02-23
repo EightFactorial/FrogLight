@@ -21,6 +21,31 @@ impl NamedNbt {
         Self(name, UnnamedNbt::new_from(compound))
     }
 
+    /// Read a [`NamedNbt`] from a reader.
+    ///
+    /// # Errors
+    /// Returns a [`froglight_io::standard::ReadError`] if the read fails.
+    #[inline]
+    #[cfg(feature = "io")]
+    pub fn read_from(
+        reader: &mut impl std::io::Read,
+    ) -> Result<Self, froglight_io::standard::ReadError> {
+        froglight_io::standard::FrogRead::frog_read(reader)
+    }
+
+    /// Write a [`NamedNbt`] to a writer, returning the number of bytes written.
+    ///
+    /// # Errors
+    /// Returns a [`froglight_io::standard::WriteError`] if the write fails.
+    #[inline]
+    #[cfg(feature = "io")]
+    pub fn write_to(
+        &self,
+        writer: &mut impl std::io::Write,
+    ) -> Result<usize, froglight_io::standard::WriteError> {
+        froglight_io::standard::FrogWrite::frog_write(self, writer)
+    }
+
     /// Get the name of the [`NamedNbt`].
     #[inline]
     #[must_use]
@@ -84,6 +109,32 @@ impl UnnamedNbt {
     #[inline]
     #[must_use]
     pub const fn new_from(compound: Option<NbtCompound>) -> Self { Self(compound) }
+
+    /// Read an [`UnnamedNbt`] from a reader.
+    ///
+    /// # Errors
+    /// Returns a [`froglight_io::standard::ReadError`] if the read fails.
+    #[inline]
+    #[cfg(feature = "io")]
+    pub fn read_from(
+        reader: &mut impl std::io::Read,
+    ) -> Result<Self, froglight_io::standard::ReadError> {
+        froglight_io::standard::FrogRead::frog_read(reader)
+    }
+
+    /// Write an [`UnnamedNbt`] to a writer, returning the number of bytes
+    /// written.
+    ///
+    /// # Errors
+    /// Returns a [`froglight_io::standard::WriteError`] if the write fails.
+    #[inline]
+    #[cfg(feature = "io")]
+    pub fn write_to(
+        &self,
+        writer: &mut impl std::io::Write,
+    ) -> Result<usize, froglight_io::standard::WriteError> {
+        froglight_io::standard::FrogWrite::frog_write(self, writer)
+    }
 
     /// Get the [`NbtCompound`] of the [`UnnamedNbt`].
     #[inline]
