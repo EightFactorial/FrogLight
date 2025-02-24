@@ -59,7 +59,8 @@ pub trait PrefixedArrayItem<'a> {
     /// The caller must ensure that the data is a valid
     /// representation of the type.
     unsafe fn from_bytes(data: &'a [u8]) -> Self;
-    /// Return the size of the item in bytes, given the data.
+    /// Return the size of the item in bytes and the remaining data
+    /// after reading the size.
     fn size_of(data: &'a [u8]) -> (usize, &'a [u8]);
 }
 
@@ -95,7 +96,7 @@ impl<'a> PrefixedArrayItem<'a> for &'a Mutf8Str {
     fn size_of(data: &[u8]) -> (usize, &[u8]) {
         let (&length, data) = data.split_first_chunk::<2>().unwrap();
         let length = u16::from_be_bytes(length) as usize;
-        (2 + length, &data[length..])
+        (length, data)
     }
 }
 
@@ -106,7 +107,7 @@ impl<'a> PrefixedArrayItem<'a> for NbtCompoundRef<'a> {
     }
     fn size_of(data: &'a [u8]) -> (usize, &'a [u8]) {
         let size = NbtCompoundRef::size_of(data).expect("Invalid NBTCompoundRef");
-        (size, &data[size..])
+        (size, data)
     }
 }
 impl<'a> PrefixedArrayItem<'a> for NbtListTagRef<'a> {
@@ -116,7 +117,28 @@ impl<'a> PrefixedArrayItem<'a> for NbtListTagRef<'a> {
     }
     fn size_of(data: &'a [u8]) -> (usize, &'a [u8]) {
         let size = NbtListTagRef::size_of(data).expect("Invalid NBTListTagRef");
-        (size, &data[size..])
+        (size, data)
+    }
+}
+
+impl<'a, T: PrefixedArrayItem<'a>> PrefixedArrayItem<'a> for PrefixedArray<'a, T> {
+    unsafe fn from_bytes(data: &'a [u8]) -> Self {
+        // SAFETY: The caller ensured the data is valid PrefixedArray.
+        unsafe { PrefixedArray::from_bytes(data) }
+    }
+
+    fn size_of(data: &'a [u8]) -> (usize, &'a [u8]) {
+        let (&item_count, data) = data.split_first_chunk::<4>().unwrap();
+        let item_count = u32::from_be_bytes(item_count) as usize;
+
+        let mut split_data = data;
+        let size = (0..item_count).fold(4, |size, _| {
+            let (item_size, data) = T::size_of(split_data);
+            split_data = &data[item_size..];
+            size + item_size
+        });
+
+        (size, data)
     }
 }
 

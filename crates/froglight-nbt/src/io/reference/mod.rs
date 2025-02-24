@@ -10,7 +10,7 @@ mod named;
 pub use named::{NamedNbtRef, UnnamedNbtRef};
 
 mod compound;
-pub use compound::{NbtCompoundRef, NbtListTagRef, NbtTagRef, NbtTagRefData};
+pub use compound::{NbtCompoundRef, NbtListTagRef, NbtListTagRefData, NbtTagRef, NbtTagRefData};
 
 mod error;
 pub use error::NbtStreamError;

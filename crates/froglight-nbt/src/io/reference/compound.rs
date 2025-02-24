@@ -129,9 +129,9 @@ pub enum NbtTagRefData<'a> {
     ByteArray(PrefixedArray<'a, i8>) = NbtTag::BYTE_ARRAY,
     /// A MUTF-8 string.
     String(&'a Mutf8Str) = NbtTag::STRING,
-    /// A [`NbtListTag`].
+    /// A [`NbtListTagRef`].
     List(NbtListTagRef<'a>) = NbtTag::LIST,
-    /// An [`NbtCompound`].
+    /// An [`NbtCompoundRef`].
     Compound(NbtCompoundRef<'a>) = NbtTag::COMPOUND,
     /// An array of signed 32-bit integers.
     IntArray(PrefixedArray<'a, i32>) = NbtTag::INT_ARRAY,
@@ -261,18 +261,125 @@ impl<'a> NbtTagRef<'a> {
 /// A reference to an NBT list tag.
 ///
 /// The raw form of [`NbtListTag`](crate::nbt::NbtListTag).
-#[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub struct NbtListTagRef<'a>(&'a [u8]);
+pub struct NbtListTagRef<'a>(u8, &'a [u8]);
+
+/// The data of an [`NbtListTagRef`].
+#[repr(u8)]
+#[derive(Clone, Copy, PartialEq)]
+pub enum NbtListTagRefData<'a> {
+    /// An empty list.
+    Empty = NbtTag::END,
+    /// A list of signed 8-bit integers.
+    Byte(PrefixedArray<'a, i8>) = NbtTag::BYTE,
+    /// A list of signed 16-bit integers.
+    Short(PrefixedArray<'a, i16>) = NbtTag::SHORT,
+    /// A list of signed 32-bit integers.
+    Int(PrefixedArray<'a, i32>) = NbtTag::INT,
+    /// A list of signed 64-bit integers.
+    Long(PrefixedArray<'a, i64>) = NbtTag::LONG,
+    /// A list of 32-bit floating point numbers.
+    Float(PrefixedArray<'a, f32>) = NbtTag::FLOAT,
+    /// A list of 64-bit floating point numbers.
+    Double(PrefixedArray<'a, f64>) = NbtTag::DOUBLE,
+    /// A list of MUTF-8 strings.
+    String(PrefixedArray<'a, &'a Mutf8Str>) = NbtTag::STRING,
+    /// A list of [`NbtListTagRef`].
+    List(PrefixedArray<'a, NbtListTagRef<'a>>) = NbtTag::LIST,
+    /// A list of [`NbtCompoundRef`].
+    Compound(PrefixedArray<'a, NbtCompoundRef<'a>>) = NbtTag::COMPOUND,
+    /// A list of arrays of signed 8-bit integers.
+    ByteArray(PrefixedArray<'a, PrefixedArray<'a, i8>>) = NbtTag::BYTE_ARRAY,
+    /// A list of arrays of signed 32-bit integers.
+    IntArray(PrefixedArray<'a, PrefixedArray<'a, i32>>) = NbtTag::INT_ARRAY,
+    /// A list of arrays of signed 64-bit integers.
+    LongArray(PrefixedArray<'a, PrefixedArray<'a, i64>>) = NbtTag::LONG_ARRAY,
+}
 
 impl<'a> NbtListTagRef<'a> {
+    /// Get the data of the [`NbtListTagRef`] as a [`NbtListTagRefData`].
+    #[inline]
+    #[must_use]
+    pub const fn tag(&self) -> u8 { self.0 }
+
+    /// Get the internal data of the [`NbtListTagRef`].
+    ///
+    /// # Note
+    /// This does not include the tag byte.
+    ///
+    /// See [`NbtListTagRef::tag`] for the tag.
+    #[inline]
+    #[must_use]
+    pub const fn list_bytes(&self) -> &'a [u8] { self.1 }
+
+    /// Get the data of the [`NbtListTagRef`] as a [`NbtListTagRefData`].
+    #[must_use]
+    pub const fn list_data(&self) -> NbtListTagRefData<'a> {
+        match self.0 {
+            NbtTag::END => NbtListTagRefData::Empty,
+            NbtTag::BYTE => {
+                // SAFETY: The tag guarantees the data type is `i8`.
+                NbtListTagRefData::Byte(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::SHORT => {
+                // SAFETY: The tag guarantees the data type is `i16`.
+                NbtListTagRefData::Short(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::INT => {
+                // SAFETY: The tag guarantees the data type is `i32`.
+                NbtListTagRefData::Int(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::LONG => {
+                // SAFETY: The tag guarantees the data type is `i64`.
+                NbtListTagRefData::Long(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::FLOAT => {
+                // SAFETY: The tag guarantees the data type is `f32`.
+                NbtListTagRefData::Float(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::DOUBLE => {
+                // SAFETY: The tag guarantees the data type is `f64`.
+                NbtListTagRefData::Double(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::STRING => {
+                // SAFETY: The tag guarantees the data type is `&Mutf8Str`.
+                NbtListTagRefData::String(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::LIST => {
+                // SAFETY: The tag guarantees the data type is `NbtListTagRef`.
+                NbtListTagRefData::List(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::COMPOUND => {
+                // SAFETY: The tag guarantees the data type is `NbtCompoundRef`.
+                NbtListTagRefData::Compound(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::BYTE_ARRAY => {
+                // SAFETY: The tag guarantees the data type is `PrefixedArray<i8>`.
+                NbtListTagRefData::ByteArray(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::INT_ARRAY => {
+                // SAFETY: The tag guarantees the data type is `PrefixedArray<i32>`.
+                NbtListTagRefData::IntArray(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            NbtTag::LONG_ARRAY => {
+                // SAFETY: The tag guarantees the data type is `PrefixedArray<i64>`.
+                NbtListTagRefData::LongArray(unsafe { PrefixedArray::from_bytes(self.1) })
+            }
+            _ => panic!("Found invalid tag when parsing `NbtListTagRefData`!"),
+        }
+    }
+
     /// Create a new [`NbtListTagRef`] from the given data.
     ///
     /// # Safety
     /// The caller must ensure that the data is valid NBT.
     #[inline]
     #[must_use]
-    pub const unsafe fn from_bytes(data: &'a [u8]) -> Self { Self(data) }
+    #[expect(clippy::missing_panics_doc)]
+    pub const unsafe fn from_bytes(data: &'a [u8]) -> Self {
+        let (&tag, data) = data.split_first().expect("Unable to get `NbtListTagRef` tag");
+        Self(tag, data)
+    }
 
     /// Get the size of the [`NbtListTagRef`] from the given data,
     /// or an error if the data is invalid.

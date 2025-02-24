@@ -8,7 +8,7 @@ use std::io::{Cursor, Write};
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
 
-use crate::{io::reference::*, nbt::*};
+use crate::{io::reference::*, mutf8::Mutf8Str, nbt::*};
 
 /// A macro for generating tests
 macro_rules! test {
@@ -103,10 +103,11 @@ fn test_data(bytes: &[u8]) {
 /// Test that a [`NbtCompoundRef`] matches a [`NbtCompound`]
 fn test_compound(ref_compound: NbtCompoundRef, io_compound: &NbtCompound) {
     let mut tag_count = 0;
-    for (ref_name, ref_tag) in &ref_compound {
-        let io_tag = io_compound.get_tag_bytes(ref_name).unwrap_or_else(|| {
-            panic!("Ref \"{}\" is missing tag from IO!", ref_name.to_str_lossy())
+    for (index, (ref_name, ref_tag)) in ref_compound.iter().enumerate() {
+        let (io_name, io_tag) = io_compound.get_index(index).unwrap_or_else(|| {
+            panic!("Ref tag at index #{index} does not have a corresponding IO tag!")
         });
+        assert_eq!(io_name, ref_name, "Ref name does not match IO name!");
 
         tag_count += 1;
         test_tag(ref_tag, io_tag);
@@ -182,6 +183,110 @@ fn test_tag(ref_tag: NbtTagRef, io_tag: &NbtTag) {
 }
 
 /// Test that a [`NbtListTagRef`] matches a [`NbtListTag`]
-///
-/// TODO: Implement this function
-fn test_list(_ref_list: NbtListTagRef, _io_list: &NbtListTag) {}
+#[expect(clippy::too_many_lines)]
+fn test_list(ref_list: NbtListTagRef, io_list: &NbtListTag) {
+    match ref_list.list_data() {
+        NbtListTagRefData::Empty => {
+            assert_eq!(io_list.tag_id(), NbtListTag::Empty.tag_id(), "Ref list is not `EMPTY`!");
+        }
+        NbtListTagRefData::Byte(ref_val) => {
+            assert_eq!(
+                io_list.as_byte().unwrap(),
+                ref_val.into_iter().collect::<Vec<_>>(),
+                "Ref byte list does not match IO byte list!"
+            );
+        }
+        NbtListTagRefData::Short(ref_val) => {
+            assert_eq!(
+                io_list.as_short().unwrap(),
+                ref_val.into_iter().collect::<Vec<_>>(),
+                "Ref short list does not match IO short list!"
+            );
+        }
+        NbtListTagRefData::Int(ref_val) => {
+            assert_eq!(
+                io_list.as_int().unwrap(),
+                ref_val.into_iter().collect::<Vec<_>>(),
+                "Ref int list does not match IO int list!"
+            );
+        }
+        NbtListTagRefData::Long(ref_val) => {
+            assert_eq!(
+                io_list.as_long().unwrap(),
+                ref_val.into_iter().collect::<Vec<_>>(),
+                "Ref long list does not match IO long list!"
+            );
+        }
+        NbtListTagRefData::Float(ref_val) => {
+            assert_eq!(
+                io_list.as_float().unwrap(),
+                ref_val.into_iter().collect::<Vec<_>>(),
+                "Ref float list does not match IO float list!"
+            );
+        }
+        NbtListTagRefData::Double(ref_val) => {
+            assert_eq!(
+                io_list.as_double().unwrap(),
+                ref_val.into_iter().collect::<Vec<_>>(),
+                "Ref double list does not match IO double list!"
+            );
+        }
+        NbtListTagRefData::ByteArray(ref_val) => {
+            assert_eq!(
+                io_list.as_byte_array().unwrap(),
+                ref_val
+                    .into_iter()
+                    .map(|v| v.into_iter().collect::<Vec<_>>())
+                    .collect::<Vec<Vec<_>>>(),
+                "Ref byte array list does not match IO byte array list!"
+            );
+        }
+        NbtListTagRefData::String(ref_val) => {
+            assert_eq!(
+                io_list.as_string().unwrap(),
+                ref_val.into_iter().map(Mutf8Str::to_mutf8_string).collect::<Vec<_>>(),
+                "Ref string list does not match IO string list!"
+            );
+        }
+        NbtListTagRefData::List(ref_val) => {
+            let io_list = io_list.as_list().unwrap();
+            assert_eq!(ref_val.len(), io_list.len(), "Ref list list does not match IO list list!");
+
+            for (index, ref_list) in ref_val.into_iter().enumerate() {
+                test_list(ref_list, &io_list[index]);
+            }
+        }
+        NbtListTagRefData::Compound(ref_val) => {
+            let io_compound = io_list.as_compound().unwrap();
+            assert_eq!(
+                ref_val.len(),
+                io_compound.len(),
+                "Ref compound list does not match IO compound list!"
+            );
+
+            for (index, ref_compound) in ref_val.into_iter().enumerate() {
+                test_compound(ref_compound, &io_compound[index]);
+            }
+        }
+        NbtListTagRefData::IntArray(ref_val) => {
+            assert_eq!(
+                io_list.as_int_array().unwrap(),
+                ref_val
+                    .into_iter()
+                    .map(|v| v.into_iter().collect::<Vec<_>>())
+                    .collect::<Vec<Vec<_>>>(),
+                "Ref int array list does not match IO int array list!"
+            );
+        }
+        NbtListTagRefData::LongArray(ref_val) => {
+            assert_eq!(
+                io_list.as_long_array().unwrap(),
+                ref_val
+                    .into_iter()
+                    .map(|v| v.into_iter().collect::<Vec<_>>())
+                    .collect::<Vec<Vec<_>>>(),
+                "Ref long array list does not match IO long array list!"
+            );
+        }
+    }
+}

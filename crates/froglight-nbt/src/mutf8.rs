@@ -122,6 +122,13 @@ impl TryFrom<Mutf8String> for String {
     fn try_from(value: Mutf8String) -> Result<Self, Self::Error> { value.try_as_string() }
 }
 
+impl PartialEq<Mutf8Str> for Mutf8String {
+    fn eq(&self, other: &Mutf8Str) -> bool { self.as_bytes() == other.as_bytes() }
+}
+impl PartialEq<Mutf8Str> for &Mutf8String {
+    fn eq(&self, other: &Mutf8Str) -> bool { self.as_bytes() == other.as_bytes() }
+}
+
 impl Equivalent<Mutf8Str> for Mutf8String {
     fn equivalent(&self, key: &Mutf8Str) -> bool { self.as_bytes() == key.as_bytes() }
 }
@@ -229,6 +236,13 @@ impl Borrow<[u8]> for Mutf8Str {
 impl ToOwned for Mutf8Str {
     type Owned = Mutf8String;
     fn to_owned(&self) -> Self::Owned { self.to_mutf8_string() }
+}
+
+impl PartialEq<Mutf8String> for Mutf8Str {
+    fn eq(&self, other: &Mutf8String) -> bool { self.as_bytes() == other.as_bytes() }
+}
+impl PartialEq<Mutf8String> for &Mutf8Str {
+    fn eq(&self, other: &Mutf8String) -> bool { self.as_bytes() == other.as_bytes() }
 }
 
 impl Equivalent<str> for Mutf8Str {
