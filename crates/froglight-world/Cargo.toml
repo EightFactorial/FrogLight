@@ -22,13 +22,12 @@ froglight-common = { workspace = true }
 glam = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
-simdnbt = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
-bevy_utils = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+bevy_utils = { workspace = true, optional = true }
 downcast-rs = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }

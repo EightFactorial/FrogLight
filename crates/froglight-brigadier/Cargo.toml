@@ -1,5 +1,5 @@
 [package]
-name = "froglight-io"
+name = "froglight-brigadier"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -15,42 +15,28 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
-[dev-dependencies]
-proptest = { workspace = true }
-
 [dependencies]
+bevy_app = { workspace = true, features = ["reflect_functions"] }
+bevy_ecs = { workspace = true, features = ["reflect_functions"] }
+bevy_reflect = { workspace = true, features = ["functions"] }
 froglight-common = { workspace = true }
-froglight-macros = { workspace = true, features = ["io"] }
+hashbrown = { workspace = true }
+petgraph = { workspace = true }
 smol_str = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
 glam = { workspace = true, optional = true }
-hashbrown = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
-serde_json = { workspace = true, optional = true }
-smallvec = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = ["glam", "smallvec", "uuid"]
+default = ["glam", "uuid"]
 
 # Enable support for `glam` types.
 glam = ["dep:glam"]
-# Enable support for `hashbrown` types.
-hashbrown = ["dep:hashbrown"]
-# Enable support for `smallvec` types.
-smallvec = ["dep:smallvec"]
 # Enable support for `uuid` types.
 uuid = ["dep:uuid"]
 
-# Enable support for serializing to/from JSON.
-serde = [
-  "dep:serde",
-  "dep:serde_json",
-  "glam?/serde",
-  "hashbrown?/serde",
-  "smallvec?/serde",
-  "smol_str/serde",
-  "uuid?/serde",
-]
+# Enable support for serializing to/from text formats.
+serde = ["dep:serde", "glam?/serde", "smol_str/serde", "uuid?/serde"]

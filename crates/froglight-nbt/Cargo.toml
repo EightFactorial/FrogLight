@@ -38,7 +38,7 @@ default = ["io"]
 
 # Enable support for `froglight-io` serialization.
 io = ["dep:froglight-io"]
-# Enable support for serializing to/from JSON.
+# Enable support for serializing to/from text formats.
 serde = ["dep:serde", "indexmap/serde"]
 
 # Enable debug logging.

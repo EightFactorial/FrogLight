@@ -26,7 +26,6 @@ futures-lite = { workspace = true }
 glam = { workspace = true }
 hashbrown = { workspace = true }
 serde = { workspace = true }
-simdnbt = { workspace = true }
 smallvec = { workspace = true, features = ["write"] }
 smol_str = { workspace = true }
 uuid = { workspace = true }
@@ -42,10 +41,10 @@ default = ["resolver"]
 
 # Enable support for Bevy.
 bevy = [
-    "dep:bevy_ecs",
-    "dep:bevy_log",
-    "dep:bevy_tasks",
-    "froglight-common/bevy",
+  "dep:bevy_ecs",
+  "dep:bevy_log",
+  "dep:bevy_tasks",
+  "froglight-common/bevy",
 ]
 # Enable server address and port lookup.
 resolver = ["dep:hickory-resolver"]

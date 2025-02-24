@@ -725,9 +725,9 @@ checksum = "1d674e81391d1e1ab681a28d99df07927c6d4aa5b027d7da16ba32d1d21ecd99"
 
 [[package]]
 name = "flate2"
-version = "1.0.35"
+version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c936bfdafb507ebbf50b8074c54fa31c5be9a1e7e5f467dd659697041407d07c"
+checksum = "11faaf5a5236997af9848be0bef4db95824b1d534ebc64d0f0c6cf3e67bd38dc"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
@@ -778,6 +778,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "froglight-brigadier"
+version = "0.1.0"
+dependencies = [
+ "bevy_app",
+ "bevy_ecs",
+ "bevy_reflect",
+ "froglight-common",
+ "glam",
+ "hashbrown 0.15.2",
+ "petgraph",
+ "serde",
+ "smol_str",
+ "thiserror 2.0.11",
+ "uuid",
+]
+
+[[package]]
 name = "froglight-common"
 version = "0.1.0"
 dependencies = [
@@ -813,7 +830,6 @@ dependencies = [
  "proptest",
  "serde",
  "serde_json",
- "simdnbt",
  "smallvec",
  "smol_str",
  "thiserror 2.0.11",
@@ -867,7 +883,6 @@ dependencies = [
  "hashbrown 0.15.2",
  "hickory-resolver",
  "serde",
- "simdnbt",
  "smallvec",
  "smol_str",
  "uuid",
@@ -883,10 +898,10 @@ dependencies = [
  "downcast-rs 2.0.1",
  "froglight-common",
  "froglight-macros",
+ "froglight-nbt",
  "hashbrown 0.15.2",
  "indexmap",
  "parking_lot",
- "simdnbt",
 ]
 
 [[package]]
@@ -905,7 +920,6 @@ dependencies = [
  "glam",
  "hashbrown 0.15.2",
  "parking_lot",
- "simdnbt",
  "thiserror 2.0.11",
 ]
 
@@ -1913,30 +1927,6 @@ checksum = "7c14f02c32cc4ef5068b0e15bee4513942f59165add7778a518b4d507b3b97ab"
 dependencies = [
  "rustc_version",
  "simdutf8",
-]
-
-[[package]]
-name = "simdnbt"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "960b88bb7ea0984fbba94e53f1a2181ba6654e68a0eb53e45843e0eed402f10e"
-dependencies = [
- "byteorder",
- "flate2",
- "simd_cesu8",
- "simdnbt-derive",
- "thiserror 2.0.11",
-]
-
-[[package]]
-name = "simdnbt-derive"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd1fe91ba0e4ee5cd6e565153b363fe06b19357ce9af07cc54371c450275d26e"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

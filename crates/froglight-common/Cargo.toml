@@ -29,9 +29,9 @@ serde = { workspace = true, optional = true, features = ["derive"] }
 [features]
 default = []
 
-# Enable Bevy support
+# Enable `bevy` support
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect"]
-# Enable serde support
+# Enable `serde` support
 serde = ["dep:serde", "smol_str/serde", "uuid/serde"]
 
 # Enable support for v1.21.4

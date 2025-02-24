@@ -10,6 +10,11 @@ use bevy_reflect::prelude::*;
 use bevy_utils::TypeIdMap;
 use downcast_rs::Downcast;
 use froglight_common::{Identifier, Version};
+use froglight_nbt::{
+    convert::ConvertError,
+    nbt::{NbtCompound, UnnamedNbt},
+    prelude::ConvertNbt,
+};
 use hashbrown::Equivalent;
 use indexmap::IndexMap;
 use parking_lot::RwLock;
@@ -206,11 +211,11 @@ impl<V: Version> RegistryStorage<V> {
     pub fn get_copied_nbt<R: RegistryType<V>>(
         &self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
-    ) -> Option<simdnbt::owned::BaseNbt>
+    ) -> Option<UnnamedNbt>
     where
-        R::Value: Copy + simdnbt::Serialize,
+        R::Value: Copy + ConvertNbt,
     {
-        self.get::<R>(ident).copied().map(<R::Value as simdnbt::Serialize>::to_nbt)
+        self.get::<R>(ident).copied().map(<R::Value as ConvertNbt>::into_nbt)
     }
 
     /// Get a [`RegistryValue`] as [`BaseNbt`]
@@ -223,11 +228,11 @@ impl<V: Version> RegistryStorage<V> {
     pub fn get_cloned_nbt<R: RegistryType<V>>(
         &self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
-    ) -> Option<simdnbt::owned::BaseNbt>
+    ) -> Option<UnnamedNbt>
     where
-        R::Value: Clone + simdnbt::Serialize,
+        R::Value: Clone + ConvertNbt,
     {
-        self.get::<R>(ident).cloned().map(<R::Value as simdnbt::Serialize>::to_nbt)
+        self.get::<R>(ident).cloned().map(<R::Value as ConvertNbt>::into_nbt)
     }
 
     /// Insert a serialized [`RegistryValue`] into the [`RegistryStorage`].
@@ -240,12 +245,12 @@ impl<V: Version> RegistryStorage<V> {
     pub fn insert_nbt<R: RegistryType<V>>(
         &mut self,
         ident: Identifier,
-        nbt: &simdnbt::borrow::BaseNbt,
-    ) -> Result<Option<R::Value>, simdnbt::DeserializeError>
+        nbt: NbtCompound,
+    ) -> Result<Option<R::Value>, ConvertError>
     where
-        R::Value: simdnbt::Deserialize,
+        R::Value: ConvertNbt,
     {
-        <R::Value as simdnbt::Deserialize>::from_nbt(nbt)
+        <R::Value as ConvertNbt>::from_compound(nbt)
             .map(|value: R::Value| self.insert::<R>(ident, value))
     }
 }
