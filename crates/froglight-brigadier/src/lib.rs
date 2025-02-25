@@ -10,7 +10,8 @@ pub mod prelude {
     //! Re-exports of common types and traits.
 
     pub use crate::{
-        argument::{ArgumentError, ArgumentParser},
+        argument::{ArgumentError, ArgumentParser, ReflectArgumentParser},
+        function::CommandBuilder,
         graph::{AppBrigadierGraph, BrigadierError, BrigadierGraph},
     };
 }

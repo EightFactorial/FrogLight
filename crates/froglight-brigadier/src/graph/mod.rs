@@ -14,7 +14,10 @@ use parking_lot::RwLock;
 use petgraph::{Direction::Outgoing, graph::NodeIndex, prelude::StableDiGraph, visit::EdgeRef};
 use smol_str::SmolStr;
 
-use crate::argument::{ArgumentError, ReflectArgumentParser};
+use crate::{
+    argument::{ArgumentError, ReflectArgumentParser},
+    function::{Full, WorldRef},
+};
 
 mod component;
 pub(crate) use component::{BrigadierEdge, BrigadierNode};
@@ -46,13 +49,12 @@ impl BrigadierGraph {
         command: impl AsRef<str>,
         registry: &TypeRegistry,
         functions: &FunctionRegistry,
-        world: &mut World,
+        world: &mut WorldRef<Full>,
     ) -> Result<(), BrigadierError> {
-        let args = ArgList::new().push_arg(ArgValue::Owned(Box::new(entity)));
-        let (node, mut args) = self.build_command(command.as_ref(), args, registry, world)?;
-
-        // TODO: Somehow fit a `World` in here.
-        args = args.push_owned(entity);
+        let args = ArgList::new().push_owned(entity);
+        let (node, mut args) =
+            self.build_command(command.as_ref(), args, registry, &world.value())?;
+        args = args.push_owned(world.clone());
 
         if let Some(function) = node.function.as_ref() {
             match functions.call(function.as_ref(), args) {
@@ -80,7 +82,7 @@ impl BrigadierGraph {
         command: impl AsRef<str>,
         registry: &TypeRegistry,
         functions: &FunctionRegistry,
-        world: &mut World,
+        world: &World,
     ) -> Result<(), BrigadierError> {
         let args = ArgList::new().push_owned(entity);
         let (node, _) = self.build_command(command.as_ref(), args, registry, world)?;
