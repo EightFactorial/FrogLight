@@ -45,8 +45,9 @@ impl BrigadierGraph {
         command: impl AsRef<str>,
         registry: &TypeRegistry,
         functions: &FunctionRegistry,
+        world: &mut World,
     ) -> Result<(), BrigadierError> {
-        let (node, args) = self.build_command(command.as_ref(), registry)?;
+        let (node, args) = self.build_command(command.as_ref(), registry, world)?;
         if let Some(function) = node.function.as_ref() {
             match functions.call(function.as_str(), args) {
                 Some(FunctionResult::Ok(_)) => Ok(()),
@@ -72,8 +73,9 @@ impl BrigadierGraph {
         command: impl AsRef<str>,
         registry: &TypeRegistry,
         functions: &FunctionRegistry,
+        world: &mut World,
     ) -> Result<(), BrigadierError> {
-        let (node, _) = self.build_command(command.as_ref(), registry)?;
+        let (node, _) = self.build_command(command.as_ref(), registry, world)?;
         if let Some(function) = node.function.as_ref() {
             if functions.contains(function.as_str()) {
                 Ok(())
@@ -95,6 +97,7 @@ impl BrigadierGraph {
         &'a self,
         mut command: &'a str,
         registry: &TypeRegistry,
+        world: &World,
     ) -> Result<(&'a BridagierNode, ArgList<'a>), BrigadierError> {
         command = command.trim();
 
@@ -135,7 +138,8 @@ impl BrigadierGraph {
                         }
                     }
                     BridagierEdge::Argument(type_id) => {
-                        let (argument, remaining) = Self::parse_argument(arg, *type_id, registry)?;
+                        let (argument, remaining) =
+                            Self::parse_argument(arg, *type_id, registry, world)?;
 
                         // If an argument was parsed, add it to the list.
                         if let Some(argument) = argument {
@@ -170,6 +174,7 @@ impl BrigadierGraph {
         arguments: &'a str,
         type_id: TypeId,
         registry: &TypeRegistry,
+        world: &World,
     ) -> Result<(Option<ArgValue<'a>>, &'a str), BrigadierError> {
         // Immediately return an error if the parser is unknown.
         let Some(parser_type) = registry.get(type_id) else {
@@ -185,7 +190,7 @@ impl BrigadierGraph {
 
         // Attempt to parse the argument.
         if let Some(parser) = parser_type.data::<ReflectArgumentParser>() {
-            parser.parse(arguments).map_or_else(
+            parser.parse(arguments, world).map_or_else(
                 |err| match err {
                     // Ignore when the argument does not match
                     ArgumentError::DoesNotMatch => Ok((None, arguments)),
