@@ -1,7 +1,10 @@
 //! TODO
 
 use bevy_ecs::world::World;
-use bevy_reflect::{FromType, func::ArgValue};
+use bevy_reflect::func::ArgValue;
+
+mod reflect;
+pub use reflect::ReflectArgumentParser;
 
 /// A trait for parsing arguments from a string.
 pub trait ArgumentParser: 'static {
@@ -16,29 +19,6 @@ pub trait ArgumentParser: 'static {
         arguments: &'a str,
         world: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError>;
-}
-
-/// Reflection data holding a parser function.
-#[derive(Clone, Copy)]
-#[expect(clippy::type_complexity)]
-pub(crate) struct ReflectArgumentParser {
-    /// The parser function.
-    parser: for<'a> fn(&'a str, &World) -> Result<(ArgValue<'a>, &'a str), ArgumentError>,
-}
-
-impl ReflectArgumentParser {
-    /// Parse the command arguments.
-    #[inline]
-    pub(crate) fn parse<'a>(
-        self,
-        arguments: &'a str,
-        world: &World,
-    ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-        (self.parser)(arguments, world)
-    }
-}
-impl<T: ArgumentParser> FromType<T> for ReflectArgumentParser {
-    fn from_type() -> Self { ReflectArgumentParser { parser: T::parse_input } }
 }
 
 /// An error that occurred while parsing an argument.
