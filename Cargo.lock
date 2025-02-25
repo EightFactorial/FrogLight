@@ -790,6 +790,7 @@ dependencies = [
  "hashbrown 0.15.2",
  "parking_lot",
  "petgraph",
+ "proptest",
  "serde",
  "smol_str",
  "thiserror 2.0.11",

@@ -1,6 +1,6 @@
 //! TODO
 
-use std::{any::TypeId, sync::Arc};
+use std::{any::TypeId, borrow::Cow, sync::Arc};
 
 use bevy_ecs::prelude::*;
 use bevy_reflect::{
@@ -17,7 +17,7 @@ use smol_str::SmolStr;
 use crate::argument::{ArgumentError, ReflectArgumentParser};
 
 mod component;
-use component::{BridagierEdge, BridagierNode};
+pub(crate) use component::{BrigadierEdge, BrigadierNode};
 
 mod error;
 pub use error::BrigadierError;
@@ -30,8 +30,8 @@ pub struct AppBrigadierGraph(Arc<RwLock<BrigadierGraph>>);
 /// A brigadier-style command graph.
 #[derive(Debug, Default, Clone)]
 pub struct BrigadierGraph {
-    commands: HashMap<SmolStr, NodeIndex<u32>>,
-    graph: StableDiGraph<BridagierNode, BridagierEdge>,
+    pub(crate) commands: HashMap<SmolStr, NodeIndex<u32>>,
+    pub(crate) graph: StableDiGraph<BrigadierNode, BrigadierEdge>,
 }
 
 impl BrigadierGraph {
@@ -42,14 +42,20 @@ impl BrigadierGraph {
     /// or if an argument was invalid.
     pub fn execute(
         &self,
+        entity: Entity,
         command: impl AsRef<str>,
         registry: &TypeRegistry,
         functions: &FunctionRegistry,
         world: &mut World,
     ) -> Result<(), BrigadierError> {
-        let (node, args) = self.build_command(command.as_ref(), registry, world)?;
+        let args = ArgList::new().push_arg(ArgValue::Owned(Box::new(entity)));
+        let (node, mut args) = self.build_command(command.as_ref(), args, registry, world)?;
+
+        // TODO: Somehow fit a `World` in here.
+        args = args.push_owned(entity);
+
         if let Some(function) = node.function.as_ref() {
-            match functions.call(function.as_str(), args) {
+            match functions.call(function.as_ref(), args) {
                 Some(FunctionResult::Ok(_)) => Ok(()),
                 Some(FunctionResult::Err(err)) => Err(BrigadierError::Function(err)),
                 None => Err(BrigadierError::UnknownCommand(function.clone())),
@@ -70,14 +76,16 @@ impl BrigadierGraph {
     /// or if an argument was invalid.
     pub fn parse(
         &self,
+        entity: Entity,
         command: impl AsRef<str>,
         registry: &TypeRegistry,
         functions: &FunctionRegistry,
         world: &mut World,
     ) -> Result<(), BrigadierError> {
-        let (node, _) = self.build_command(command.as_ref(), registry, world)?;
+        let args = ArgList::new().push_owned(entity);
+        let (node, _) = self.build_command(command.as_ref(), args, registry, world)?;
         if let Some(function) = node.function.as_ref() {
-            if functions.contains(function.as_str()) {
+            if functions.contains(function.as_ref()) {
                 Ok(())
             } else {
                 Err(BrigadierError::UnknownFunction(function.clone()))
@@ -96,9 +104,10 @@ impl BrigadierGraph {
     fn build_command<'a>(
         &'a self,
         mut command: &'a str,
+        mut arguments: ArgList<'a>,
         registry: &TypeRegistry,
         world: &World,
-    ) -> Result<(&'a BridagierNode, ArgList<'a>), BrigadierError> {
+    ) -> Result<(&'a BrigadierNode, ArgList<'a>), BrigadierError> {
         command = command.trim();
 
         let (com, mut arg) = match command.split_once(' ') {
@@ -108,17 +117,16 @@ impl BrigadierGraph {
 
         // Get the starting command node.
         let Some(mut index) = self.commands.get(com).copied() else {
-            return Err(BrigadierError::UnknownCommand(com.into()));
+            return Err(BrigadierError::UnknownCommand(Cow::from(com.to_string())));
         };
 
         // Parse the command and build the argument list.
-        let mut list = ArgList::new();
         'node: while let Some(node) = self.graph.node_weight(index) {
             // Stop if the argument string is empty.
             if arg.is_empty() {
                 // No more arguments, but executable.
                 if node.function.is_some() {
-                    return Ok((node, list));
+                    return Ok((node, arguments));
                 }
 
                 // No more arguments, but not executable.
@@ -127,7 +135,7 @@ impl BrigadierGraph {
 
             for edge in self.graph.edges_directed(index, Outgoing) {
                 match edge.weight() {
-                    BridagierEdge::Literal(str) => {
+                    BrigadierEdge::Literal(str) => {
                         if let Some(remaining) = Self::parse_literal(arg, str) {
                             // Update the remaining arguments.
                             arg = remaining;
@@ -137,13 +145,13 @@ impl BrigadierGraph {
                             continue 'node;
                         }
                     }
-                    BridagierEdge::Argument(type_id) => {
+                    BrigadierEdge::Argument(type_id) => {
                         let (argument, remaining) =
                             Self::parse_argument(arg, *type_id, registry, world)?;
 
                         // If an argument was parsed, add it to the list.
                         if let Some(argument) = argument {
-                            list = list.push_arg(argument);
+                            arguments = arguments.push_arg(argument);
                         }
 
                         // Update the remaining argument string.
@@ -160,13 +168,15 @@ impl BrigadierGraph {
         }
 
         // Unable to find a node, return an error.
-        Err(BrigadierError::Argument(ArgumentError::InvalidArgument(
-            command.len() - (com.len() + arg.len()),
-        )))
+        Err(BrigadierError::Argument(ArgumentError::InvalidArgument(command.len() - arg.len())))
     }
 
     fn parse_literal<'a>(arg: &'a str, literal: &str) -> Option<&'a str> {
-        if let Some(stripped) = arg.strip_prefix(literal) { Some(stripped) } else { None }
+        if let Some(stripped) = arg.strip_prefix(literal) {
+            Some(stripped.trim_start())
+        } else {
+            None
+        }
     }
 
     #[expect(clippy::match_wildcard_for_single_variants)]
