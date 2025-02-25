@@ -19,8 +19,10 @@ workspace = true
 bevy_app = { workspace = true, features = ["reflect_functions"] }
 bevy_ecs = { workspace = true, features = ["reflect_functions"] }
 bevy_reflect = { workspace = true, features = ["functions"] }
+derive_more = { workspace = true }
 froglight-common = { workspace = true }
 hashbrown = { workspace = true }
+parking_lot = { workspace = true }
 petgraph = { workspace = true }
 smol_str = { workspace = true }
 thiserror = { workspace = true }

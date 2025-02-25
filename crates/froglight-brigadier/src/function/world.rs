@@ -22,7 +22,7 @@ impl DerefMut for WorldRef<'_> {
 }
 
 impl FromArg for WorldRef<'_> {
-    type This<'b> = WorldRef<'b>;
+    type This<'a> = WorldRef<'a>;
 
     fn from_arg(arg: Arg<'_>) -> Result<Self::This<'_>, ArgError> {
         if !matches!(arg.value(), ArgValue::Mut(_)) {
