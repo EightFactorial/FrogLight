@@ -26,8 +26,12 @@ impl Plugin for ArgumentParserPlugin {
 
         registry.register_type_data::<String, ReflectArgumentParser>();
         registry.register_type_data::<Cow<'static, str>, ReflectArgumentParser>();
-        registry.register_type_data::<Identifier, ReflectArgumentParser>();
+
+        registry.register::<SmolStr>();
         registry.register_type_data::<SmolStr, ReflectArgumentParser>();
+
+        registry.register::<Identifier>();
+        registry.register_type_data::<Identifier, ReflectArgumentParser>();
 
         registry.register_type_data::<bool, ReflectArgumentParser>();
         registry.register_type_data::<i8, ReflectArgumentParser>();
@@ -48,6 +52,7 @@ impl Plugin for ArgumentParserPlugin {
         registry.register_type_data::<f64, ReflectArgumentParser>();
         // registry.register_type_data::<f128, ReflectArgumentParser>();
 
+        registry.register::<Uuid>();
         registry.register_type_data::<Uuid, ReflectArgumentParser>();
     }
 }

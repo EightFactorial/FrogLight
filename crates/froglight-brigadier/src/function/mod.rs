@@ -10,9 +10,6 @@ use smol_str::SmolStr;
 mod build;
 pub use build::FunctionBuilder;
 
-#[cfg(test)]
-mod test;
-
 mod world;
 pub use world::{Empty, Full, WorldRef};
 
@@ -76,7 +73,7 @@ impl<Function> CommandBuilder<'_, Function> {
     ///
     /// # Panics
     /// Panics if the command could not be built.
-    pub fn build<Marker>(self, f: Function)
+    pub fn command<Marker>(self, f: Function)
     where
         Function: IntoFunction<'static, Marker>,
     {

@@ -5,6 +5,10 @@
 pub mod argument;
 pub mod function;
 pub mod graph;
+pub mod plugin;
+
+#[cfg(test)]
+mod test;
 
 pub mod prelude {
     //! Re-exports of common types and traits.
@@ -13,5 +17,8 @@ pub mod prelude {
         argument::{ArgumentError, ArgumentParser, ReflectArgumentParser},
         function::CommandBuilder,
         graph::{AppBrigadierGraph, BrigadierError, BrigadierGraph},
+        plugin::{
+            BrigadierBuilder, BrigadierCommand, BrigadierCommands, BrigadierEvent, BrigadierPlugin,
+        },
     };
 }

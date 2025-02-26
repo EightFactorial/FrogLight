@@ -8,11 +8,11 @@ use bevy_ecs::prelude::*;
 use bevy_reflect::prelude::*;
 use parking_lot::{Mutex, MutexGuard};
 
-/// A cloneable [`World`] that can be used in a [`Function`].
-#[derive(Default, Clone, Resource, Reflect)]
-#[reflect(opaque, from_reflect = false)]
+/// A [`World`] that can be used in a [`Function`].
 #[expect(private_bounds)]
-pub struct WorldRef<RefType: WorldRefType>(Arc<Mutex<World>>, PhantomData<RefType>);
+#[derive(Default, Clone, Reflect)]
+#[reflect(opaque, from_reflect = false)]
+pub struct WorldRef<RefType: WorldRefType = Full>(Arc<Mutex<World>>, PhantomData<RefType>);
 
 trait WorldRefType: Clone + Reflect + Send + Sync + 'static {}
 
@@ -38,7 +38,7 @@ impl WorldRef<Empty> {
     pub(crate) fn scoped<R: Sized>(
         &mut self,
         world: &mut World,
-        f: impl Fn(&mut WorldRef<Full>) -> R,
+        mut f: impl FnMut(&mut WorldRef<Full>) -> R,
     ) -> R {
         std::mem::swap(&mut *self.0.lock(), world);
         let result = f(&mut self.full());
