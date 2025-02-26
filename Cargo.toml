@@ -71,6 +71,7 @@ bevy_winit = { version = "0.15", default-features = false }
 
 # FrogLight
 froglight-block = { version = "0.1", path = "crates/froglight-block" }
+froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier" }
 froglight-common = { version = "0.1", path = "crates/froglight-common" }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
 froglight-io = { version = "0.1", path = "crates/froglight-io" }
@@ -86,13 +87,10 @@ async-io = "2.4"
 async-net = "2.0"
 derive_more = { version = "2.0", features = ["full"] }
 downcast-rs = "2.0"
+flate2 = "1.1"
 futures-lite = "2.6"
 glam = "0.29"
 hashbrown = "0.15"
-hickory-resolver = { version = "0.24", default-features = false, features = [
-  "system-config",
-  "rustls",
-] }
 indexmap = "2.7"
 parking_lot = "0.12"
 petgraph = "0.6"

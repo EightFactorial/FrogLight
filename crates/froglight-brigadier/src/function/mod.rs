@@ -13,6 +13,9 @@ pub use build::FunctionBuilder;
 #[cfg(test)]
 mod test;
 
+mod world;
+pub use world::{Empty, Full, WorldRef};
+
 use crate::graph::{BrigadierEdge, BrigadierError, BrigadierGraph, BrigadierNode};
 
 /// A builder for adding commands to a [`BrigadierGraph`].
@@ -26,7 +29,7 @@ pub struct CommandBuilder<'env, Function> {
 }
 
 #[allow(dead_code)]
-impl<'env> CommandBuilder<'env, fn(Entity, Entity)> {
+impl<'env> CommandBuilder<'env, fn(Entity, WorldRef<Full>)> {
     /// Create a new [`CommandBuilder`] for a [`BrigadierGraph`].
     ///
     /// # Panics

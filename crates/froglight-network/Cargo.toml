@@ -34,7 +34,10 @@ uuid = { workspace = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
-hickory-resolver = { workspace = true, optional = true }
+hickory-resolver = { version = "0.24", optional = true, default-features = false, features = [
+  "system-config",
+  "rustls",
+] }
 
 [features]
 default = ["resolver"]

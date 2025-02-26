@@ -2,7 +2,7 @@ use std::{any::TypeId, marker::PhantomData};
 
 use bevy_ecs::entity::Entity;
 
-use super::CommandBuilder;
+use super::{CommandBuilder, Full, WorldRef};
 use crate::{argument::ArgumentParser, graph::BrigadierEdge};
 
 /// A trait for building functions to add to the
@@ -16,10 +16,10 @@ pub trait FunctionBuilder<'env, Parser: ArgumentParser, Function, NewFunction> {
 macro_rules! impl_builder {
     ($ignored:ident $(,)? $($arg:ident),*) => {
         impl<'env, $($arg,)* Parser: ArgumentParser, Function>
-            FunctionBuilder<'env, Parser, fn(Entity, $($arg,)* Entity), fn(Entity, $($arg,)* Parser::Arg, Entity)>
+            FunctionBuilder<'env, Parser, fn(Entity, $($arg,)* WorldRef<Full>), fn(Entity, $($arg,)* Parser::Arg, WorldRef<Full>)>
             for CommandBuilder<'env, Function>
         {
-            fn argument(self) -> CommandBuilder<'env, fn(Entity, $($arg,)* Parser::Arg, Entity)> { self.convert() }
+            fn argument(self) -> CommandBuilder<'env, fn(Entity, $($arg,)* Parser::Arg, WorldRef<Full>)> { self.convert() }
         }
 
         impl_builder! { $($arg),* }
