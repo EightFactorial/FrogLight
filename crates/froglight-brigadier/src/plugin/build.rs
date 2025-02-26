@@ -33,11 +33,11 @@ impl BrigadierBuilder for World {
         command: impl Into<SmolStr>,
         mut f: impl FnMut(CommandBuilder<'_, fn(Entity, WorldRef)>),
     ) -> &mut Self {
-        let registry = self.resource::<AppFunctionRegistry>().clone();
-        let mut registry = registry.write();
-
         let graph = self.resource::<AppBrigadierGraph>().clone();
         let mut graph = graph.write();
+
+        let registry = self.resource::<AppFunctionRegistry>().clone();
+        let mut registry = registry.write();
 
         f(CommandBuilder::new(command, &mut graph, &mut registry));
 

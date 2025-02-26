@@ -1,19 +1,15 @@
 //! TODO
 
-use std::borrow::Cow;
-
 use bevy_app::{App, Plugin};
-use bevy_ecs::reflect::AppTypeRegistry;
-use froglight_common::Identifier;
-use smol_str::SmolStr;
+use bevy_ecs::{reflect::AppTypeRegistry, world::World};
+use bevy_reflect::func::ArgValue;
 
-pub mod parse;
-pub use parse::*;
-use uuid::Uuid;
+mod reflect;
+pub use reflect::ReflectArgumentParser;
 
-mod integer;
-mod other;
-mod string;
+#[cfg(feature = "glam")]
+mod glam_impl;
+mod std_impl;
 
 /// A [`Plugin`] for registering argument parsers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -22,37 +18,46 @@ pub struct ArgumentParserPlugin;
 impl Plugin for ArgumentParserPlugin {
     fn build(&self, app: &mut App) {
         let world = app.world_mut();
-        let registry = &mut *world.resource::<AppTypeRegistry>().write();
+        let mut registry = world.resource::<AppTypeRegistry>().write();
 
-        registry.register_type_data::<String, ReflectArgumentParser>();
-        registry.register_type_data::<Cow<'static, str>, ReflectArgumentParser>();
+        std_impl::register_types(&mut registry);
 
-        registry.register::<SmolStr>();
-        registry.register_type_data::<SmolStr, ReflectArgumentParser>();
+        #[cfg(feature = "glam")]
+        glam_impl::register_types(&mut registry);
 
-        registry.register::<Identifier>();
-        registry.register_type_data::<Identifier, ReflectArgumentParser>();
+        #[cfg(feature = "uuid")]
+        {
+            use uuid::Uuid;
 
-        registry.register_type_data::<bool, ReflectArgumentParser>();
-        registry.register_type_data::<i8, ReflectArgumentParser>();
-        registry.register_type_data::<i16, ReflectArgumentParser>();
-        registry.register_type_data::<i32, ReflectArgumentParser>();
-        registry.register_type_data::<i64, ReflectArgumentParser>();
-        registry.register_type_data::<i128, ReflectArgumentParser>();
-        registry.register_type_data::<isize, ReflectArgumentParser>();
-        registry.register_type_data::<u8, ReflectArgumentParser>();
-        registry.register_type_data::<u16, ReflectArgumentParser>();
-        registry.register_type_data::<u32, ReflectArgumentParser>();
-        registry.register_type_data::<u64, ReflectArgumentParser>();
-        registry.register_type_data::<u128, ReflectArgumentParser>();
-        registry.register_type_data::<usize, ReflectArgumentParser>();
-
-        // registry.register_type_data::<f16, ReflectArgumentParser>();
-        registry.register_type_data::<f32, ReflectArgumentParser>();
-        registry.register_type_data::<f64, ReflectArgumentParser>();
-        // registry.register_type_data::<f128, ReflectArgumentParser>();
-
-        registry.register::<Uuid>();
-        registry.register_type_data::<Uuid, ReflectArgumentParser>();
+            registry.register::<Uuid>();
+            registry.register_type_data::<Uuid, ReflectArgumentParser>();
+        }
     }
+}
+
+/// A trait for parsing arguments from a string.
+pub trait ArgumentParser: 'static {
+    /// The type of argument to parse.
+    type Arg: Sized;
+    /// Parse the string for an argument,
+    /// returning the remaining string and the argument.
+    ///
+    /// # Errors
+    /// Returns an error if the argument is invalid.
+    fn parse_input<'a>(
+        arguments: &'a str,
+        world: &World,
+    ) -> Result<(ArgValue<'a>, &'a str), ArgumentError>;
+}
+
+/// An error that occurred while parsing an argument.
+#[derive(Debug, thiserror::Error)]
+pub enum ArgumentError {
+    /// The argument does not match the expected type.
+    #[error("Argument does not match expected type")]
+    DoesNotMatch,
+
+    /// An invalid argument was provided.
+    #[error("Invalid argument at position {0}")]
+    InvalidArgument(usize),
 }

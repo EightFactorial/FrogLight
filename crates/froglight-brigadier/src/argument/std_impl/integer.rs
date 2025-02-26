@@ -1,7 +1,7 @@
 use bevy_ecs::world::World;
 use bevy_reflect::func::ArgValue;
 
-use super::{ArgumentError, ArgumentParser};
+use crate::argument::{ArgumentError, ArgumentParser};
 
 /// A macro for implementing the [`ArgumentParser`] trait for numbers.
 macro_rules! impl_number {

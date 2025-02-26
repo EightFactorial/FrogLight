@@ -21,10 +21,9 @@ fn execute() -> AppExit {
 
     // Add a command with multiple arguments
     app.add_command("test_2", |builder| {
-        let builder = builder.arg::<u32, _>().arg::<f64, _>().arg::<String, _>().arg::<String, _>();
-        builder.command(|entity, num, float, string_1, string_2, _world| {
-            assert_eq!(num, 42);
-            assert_eq!(float.total_cmp(&42.0), std::cmp::Ordering::Equal);
+        let builder = builder.arg::<UVec2, _>().arg::<String, _>().arg::<String, _>();
+        builder.command(|entity, vec2, string_1, string_2, _| {
+            assert_eq!(vec2, [42, 42].into());
             info!("Entity {entity}: {string_1} {string_2}");
         });
     });
@@ -32,9 +31,9 @@ fn execute() -> AppExit {
     // Add a command with a literal argument and showing how to access the `World`
     app.add_command("test_3", |builder| {
         let builder = builder.arg::<u32, _>().literal("literal").arg::<f64, _>();
-        builder.command(|entity, num, float, mut world| {
-            assert_eq!(num, 1000);
-            assert_eq!(float.total_cmp(&40320.0), std::cmp::Ordering::Equal);
+        builder.command(|entity, int, double, mut world| {
+            assert_eq!(int, 1000);
+            assert_eq!(double.total_cmp(&40320.0), std::cmp::Ordering::Equal);
 
             let world = world.value();
             let components = world.inspect_entity(entity).map(ComponentInfo::name);
@@ -54,8 +53,8 @@ fn execute() -> AppExit {
     app.add_systems(Update, |mut commands: Commands| {
         let mut entity = commands.spawn((EntityId::from(0), EntityUuid::from(Uuid::nil())));
         entity.run_command("test");
-        entity.run_command("test_2 42 42.0 foo bar");
-        entity.run_command("test_3 1000 literal 40320.0");
+        entity.run_command("test_2 42 42 foo bar");
+        entity.run_command("test_3 1000 literal 40320");
         entity.run_command("stop");
     });
 

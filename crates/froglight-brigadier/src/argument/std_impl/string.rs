@@ -4,7 +4,7 @@ use bevy_ecs::world::World;
 use bevy_reflect::func::ArgValue;
 use smol_str::SmolStr;
 
-use super::{ArgumentError, ArgumentParser};
+use crate::argument::{ArgumentError, ArgumentParser};
 
 impl ArgumentParser for String {
     type Arg = String;
