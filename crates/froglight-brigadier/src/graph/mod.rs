@@ -110,6 +110,7 @@ impl BrigadierGraph {
     ) -> Result<(&'a BrigadierNode, ArgList<'a>), BrigadierError> {
         command = command.trim();
 
+        // Split the command from the arguments.
         let (com, mut arg) = match command.split_once(' ') {
             Some((com, arg)) => (com, arg),
             None => (command, ""),
@@ -145,9 +146,9 @@ impl BrigadierGraph {
                             continue 'node;
                         }
                     }
-                    BrigadierEdge::Argument(type_id) => {
+                    BrigadierEdge::Argument { type_id, type_name } => {
                         let (argument, remaining) =
-                            Self::parse_argument(arg, *type_id, registry, world)?;
+                            Self::parse_argument(arg, type_name, *type_id, registry, world)?;
 
                         // If an argument was parsed, add it to the list.
                         if let Some(argument) = argument {
@@ -182,24 +183,18 @@ impl BrigadierGraph {
     #[expect(clippy::match_wildcard_for_single_variants)]
     fn parse_argument<'a>(
         arguments: &'a str,
+        type_name: &'static str,
         type_id: TypeId,
         registry: &TypeRegistry,
         world: &World,
     ) -> Result<(Option<ArgValue<'a>>, &'a str), BrigadierError> {
-        // Immediately return an error if the parser is unknown.
+        // Immediately return an error if the parser type is unknown.
         let Some(parser_type) = registry.get(type_id) else {
-            return Err(BrigadierError::UnknownParser(None));
+            return Err(BrigadierError::UnknownParser(type_name));
         };
 
-        // Immediately return an error if the parser has no data.
-        let Some(parser_type) = registry.get(type_id) else {
-            return Err(BrigadierError::UnknownParser(Some(
-                parser_type.type_info().type_path_table().short_path(),
-            )));
-        };
-
-        // Attempt to parse the argument.
         if let Some(parser) = parser_type.data::<ReflectArgumentParser>() {
+            // Attempt to parse the argument using the stored parser.
             parser.parse(arguments, world).map_or_else(
                 |err| match err {
                     // Ignore when the argument does not match
@@ -210,7 +205,8 @@ impl BrigadierGraph {
                 |(value, remaining)| Ok((Some(value), remaining)),
             )
         } else {
-            Ok((None, arguments))
+            // Parser has no associated `ReflectArgumentParser`.
+            Err(BrigadierError::UnknownParser(type_name))
         }
     }
 }

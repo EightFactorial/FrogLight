@@ -4,6 +4,7 @@ use std::marker::PhantomData;
 
 use bevy_ecs::entity::Entity;
 use bevy_reflect::func::{FunctionRegistry, IntoFunction};
+use petgraph::graph::NodeIndex;
 use smol_str::SmolStr;
 
 mod build;
@@ -17,7 +18,8 @@ use crate::graph::{BrigadierEdge, BrigadierError, BrigadierGraph, BrigadierNode}
 /// A builder for adding commands to a [`BrigadierGraph`].
 pub struct CommandBuilder<'env, Function> {
     command: SmolStr,
-    nodes: Vec<(BrigadierEdge, BrigadierNode)>,
+    entrypoint: Option<NodeIndex<u32>>,
+    previous: Option<(NodeIndex<u32>, BrigadierEdge)>,
     graph: &'env mut BrigadierGraph,
     registry: &'env mut FunctionRegistry,
     _function: PhantomData<Function>,
@@ -54,7 +56,14 @@ impl<'env> CommandBuilder<'env, fn(Entity, Entity)> {
         if graph.commands.contains_key(&command) {
             Err(BrigadierError::DuplicateCommand(command))
         } else {
-            Ok(Self { command, nodes: Vec::new(), graph, registry, _function: PhantomData })
+            Ok(Self {
+                command,
+                graph,
+                registry,
+                entrypoint: None,
+                previous: None,
+                _function: PhantomData,
+            })
         }
     }
 }
@@ -76,52 +85,36 @@ impl<Function> CommandBuilder<'_, Function> {
     /// Build the command using the given function.
     ///
     /// # Errors
-    /// Returns an error if the command could not be built.
-    #[expect(clippy::missing_panics_doc)]
+    /// Returns an error if the command could not be built or registered.
     pub fn try_build<Marker>(self, f: Function) -> Result<(), BrigadierError>
     where
         Function: IntoFunction<'static, Marker>,
     {
         // Make sure the function has a name.
         let mut dynamic = f.into_function();
-        if dynamic.name().is_none() {
-            dynamic = dynamic.with_name(format!("brigadier_{}", self.command));
-        }
-        let command = BrigadierNode { function: dynamic.name().cloned() };
+        dynamic = match dynamic.name().cloned() {
+            Some(name) => dynamic.with_name(format!("brigadier_{name}")),
+            None => dynamic.with_name(format!("brigadier_{}", self.command)),
+        };
 
-        if self.nodes.is_empty() {
-            // Add the command node.
-            let entrypoint = self.graph.graph.add_node(command);
+        // Create the command node and register the function.
+        let command = BrigadierNode { function: dynamic.name().cloned() };
+        self.registry.register(dynamic)?;
+
+        if let (Some((previous, edge)), Some(entrypoint)) = (self.previous, self.entrypoint) {
+            // Add the command node to the graph.
+            let current = self.graph.graph.add_node(command);
+            self.graph.graph.add_edge(previous, current, edge);
+
             // Set the command entrypoint.
             self.graph.commands.insert(self.command, entrypoint);
         } else {
-            // Add all the argument parser nodes to the graph.
-            let mut nodes = self.nodes.into_iter();
-
-            // Add the first node.
-            let (mut edge, node) = nodes.next().unwrap();
-            let first_id = self.graph.graph.add_node(node);
-
-            // Add the rest of the nodes.
-            let mut id = first_id;
-            for (next_edge, next_node) in nodes {
-                let next_id = self.graph.graph.add_node(next_node);
-                self.graph.graph.add_edge(id, next_id, edge);
-
-                edge = next_edge;
-                id = next_id;
-            }
-
-            // Add the command node.
-            let command_id = self.graph.graph.add_node(command);
-            self.graph.graph.add_edge(id, command_id, edge);
+            // Add the command node to the graph.
+            let entrypoint = self.graph.graph.add_node(command);
 
             // Set the command entrypoint.
-            self.graph.commands.insert(self.command, first_id);
+            self.graph.commands.insert(self.command, entrypoint);
         }
-
-        // Register the function.
-        self.registry.register(dynamic).unwrap();
 
         Ok(())
     }
@@ -129,7 +122,34 @@ impl<Function> CommandBuilder<'_, Function> {
     /// Add a string literal to the command.
     #[must_use]
     pub fn literal(mut self, literal: impl Into<SmolStr>) -> Self {
-        self.nodes.push((BrigadierEdge::Literal(literal.into()), BrigadierNode { function: None }));
+        self.add_edge(BrigadierEdge::Literal(literal.into()));
         self
+    }
+
+    /// Add an empty [`BrigadierNode`] with the given [`BrigadierEdge`].
+    ///
+    /// This is equivalent to adding a parser to the command.
+    #[inline]
+    pub(crate) fn add_edge(&mut self, edge: BrigadierEdge) {
+        self.add_node(BrigadierNode { function: None }, edge);
+    }
+
+    /// Add a [`BrigadierNode`] with the given [`BrigadierEdge`].
+    pub(crate) fn add_node(&mut self, node: BrigadierNode, edge: BrigadierEdge) {
+        // Add the new node to the graph.
+        let current = self.graph.graph.add_node(node);
+
+        // If the entrypoint is not set, set it to the new node.
+        if self.entrypoint.is_none() {
+            self.entrypoint = Some(current);
+        }
+
+        // Add an edge connecting the previous node to the new node.
+        if let Some((previous, edge)) = self.previous.take() {
+            self.graph.graph.add_edge(previous, current, edge);
+        }
+
+        // Store the new node and edge for the next call.
+        self.previous = Some((current, edge));
     }
 }

@@ -3,10 +3,7 @@ use std::{any::TypeId, marker::PhantomData};
 use bevy_ecs::entity::Entity;
 
 use super::CommandBuilder;
-use crate::{
-    argument::ArgumentParser,
-    graph::{BrigadierEdge, BrigadierNode},
-};
+use crate::{argument::ArgumentParser, graph::BrigadierEdge};
 
 /// A trait for building functions to add to the
 /// [`BrigadierGraph`](super::BrigadierGraph).
@@ -53,8 +50,11 @@ impl<'env, Function> CommandBuilder<'env, Function> {
     where
         Self: FunctionBuilder<'env, Parser, Function, NewFunction>,
     {
-        self.nodes
-            .push((BrigadierEdge::from(TypeId::of::<Parser>()), BrigadierNode { function: None }));
+        self.add_edge(BrigadierEdge::Argument {
+            type_id: TypeId::of::<Parser>(),
+            type_name: std::any::type_name::<Parser>(),
+        });
+
         <Self as FunctionBuilder<'env, Parser, Function, NewFunction>>::argument(self)
     }
 
@@ -68,7 +68,8 @@ impl<'env, Function> CommandBuilder<'env, Function> {
     fn convert<Other>(self) -> CommandBuilder<'env, Other> {
         CommandBuilder {
             command: self.command,
-            nodes: self.nodes,
+            entrypoint: self.entrypoint,
+            previous: self.previous,
             graph: self.graph,
             registry: self.registry,
             _function: PhantomData,
