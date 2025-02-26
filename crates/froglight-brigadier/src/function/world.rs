@@ -8,7 +8,7 @@ use bevy_ecs::prelude::*;
 use bevy_reflect::prelude::*;
 use parking_lot::{Mutex, MutexGuard};
 
-/// A clonable [`World`] that can be used in a [`Function`].
+/// A cloneable [`World`] that can be used in a [`Function`].
 #[derive(Default, Clone, Resource, Reflect)]
 #[reflect(opaque, from_reflect = false)]
 #[expect(private_bounds)]
