@@ -2,7 +2,10 @@ use bevy_app::App;
 use bevy_ecs::{entity::Entity, reflect::AppFunctionRegistry, world::World};
 use smol_str::SmolStr;
 
-use crate::{function::WorldRef, graph::AppBrigadierGraph, prelude::CommandBuilder};
+use crate::{
+    function::{CommandBuilder, WorldRef, build::Arg},
+    graph::AppBrigadierGraph,
+};
 
 /// A trait for adding commands to the
 /// [`BrigadierGraph`](crate::graph::BrigadierGraph).
@@ -11,7 +14,7 @@ pub trait BrigadierBuilder {
     fn add_command(
         &mut self,
         command: impl Into<SmolStr>,
-        f: impl FnMut(CommandBuilder<'_, fn(Entity, WorldRef)>),
+        f: impl FnMut(CommandBuilder<'_, Arg, fn(Entity, WorldRef)>),
     ) -> &mut Self;
 }
 
@@ -20,7 +23,7 @@ impl BrigadierBuilder for App {
     fn add_command(
         &mut self,
         command: impl Into<SmolStr>,
-        f: impl FnMut(CommandBuilder<'_, fn(Entity, WorldRef)>),
+        f: impl FnMut(CommandBuilder<'_, Arg, fn(Entity, WorldRef)>),
     ) -> &mut Self {
         self.world_mut().add_command(command, f);
         self
@@ -31,7 +34,7 @@ impl BrigadierBuilder for World {
     fn add_command(
         &mut self,
         command: impl Into<SmolStr>,
-        mut f: impl FnMut(CommandBuilder<'_, fn(Entity, WorldRef)>),
+        mut f: impl FnMut(CommandBuilder<'_, Arg, fn(Entity, WorldRef)>),
     ) -> &mut Self {
         let graph = self.resource::<AppBrigadierGraph>().clone();
         let mut graph = graph.write();

@@ -14,7 +14,7 @@ use parking_lot::{Mutex, MutexGuard};
 #[reflect(opaque, from_reflect = false)]
 pub struct WorldRef<RefType: WorldRefType = Full>(Arc<Mutex<World>>, PhantomData<RefType>);
 
-trait WorldRefType: Clone + Reflect + Send + Sync + 'static {}
+trait WorldRefType: Copy + Reflect + Send + Sync + 'static {}
 
 /// A [`WorldRef`] that contains a full [`World`].
 #[derive(Clone, Copy, Reflect)]

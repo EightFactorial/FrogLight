@@ -124,19 +124,16 @@ impl BrigadierGraph {
 
         // Parse the command and build the argument list.
         'node: while let Some(node) = self.graph.node_weight(index) {
-            // Stop if the argument string is empty.
-            if arg.is_empty() {
-                // No more arguments, but executable.
-                if node.function.is_some() {
-                    return Ok((node, arguments));
-                }
-
-                // No more arguments, but not executable.
-                return Err(BrigadierError::UnexpectedEnd(SmolStr::from(command)));
+            // If done parsing and this is a command, return the node.
+            if node.function.is_some() && arg.is_empty() {
+                return Ok((node, arguments));
             }
 
+            // Iterate over all non-command edges from the current node.
             for edge in self.graph.edges_directed(index, Outgoing) {
+                // Check the edge type.
                 match edge.weight() {
+                    // Attempt to parse a literal, continue if successful.
                     BrigadierEdge::Literal(str) => {
                         if let Some(remaining) = Self::parse_literal(arg, str) {
                             // Update the remaining arguments.
@@ -147,6 +144,7 @@ impl BrigadierGraph {
                             continue 'node;
                         }
                     }
+                    // Attempt to parse an argument, continue if successful.
                     BrigadierEdge::Argument { type_id, type_name } => {
                         let (argument, remaining) =
                             Self::parse_argument(arg, type_name, *type_id, types, world)?;
@@ -163,14 +161,30 @@ impl BrigadierGraph {
                         index = edge.target();
                         continue 'node;
                     }
+                    BrigadierEdge::Command => {}
+                }
+            }
+
+            // Iterate over all command edges from the current node.
+            for edge in self.graph.edges_directed(index, Outgoing) {
+                // Check the edge type.
+                if let BrigadierEdge::Command = edge.weight() {
+                    // Move to the next node.
+                    index = edge.target();
+                    continue 'node;
                 }
             }
 
             break;
         }
 
-        // Unable to find a node, return an error.
-        Err(BrigadierError::Argument(ArgumentError::InvalidArgument(command.len() - arg.len())))
+        if arg.is_empty() {
+            // Command ended without executing.
+            Err(BrigadierError::UnexpectedEnd(SmolStr::from(command)))
+        } else {
+            // Command ended with remaining arguments.
+            Err(BrigadierError::Argument(ArgumentError::InvalidArgument(command.len() - arg.len())))
+        }
     }
 
     fn parse_literal<'a>(arg: &'a str, literal: &str) -> Option<&'a str> {

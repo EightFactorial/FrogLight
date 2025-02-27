@@ -4,17 +4,17 @@ use bevy_log::{Level, LogPlugin};
 use froglight_common::entity::{EntityId, EntityUuid};
 use uuid::Uuid;
 
-use crate::prelude::*;
+use crate::{function::WorldRef, prelude::*};
 
 #[test]
 fn execute() -> AppExit {
     let mut app = App::new();
-    app.add_plugins((MinimalPlugins, LogPlugin { level: Level::DEBUG, ..default() }));
+    app.add_plugins((MinimalPlugins, LogPlugin { level: Level::INFO, ..default() }));
     app.add_plugins(BrigadierPlugin::default());
 
     // Add a basic command with no arguments
     app.add_command("test", |builder| {
-        builder.command(|entity, _world| {
+        builder.command(|entity, _| {
             info!("Entity {entity}: Hello, world!");
         });
     });
@@ -41,6 +41,38 @@ fn execute() -> AppExit {
         });
     });
 
+    // Add a command showing how to use forked commands.
+    app.add_command("test_4", |builder| {
+        builder.fork(|mut builder| {
+            builder.start().literal("first").command(|entity, _| {
+                info!("Entity {entity}: First command");
+            });
+            builder.start().literal("second").arg::<f32, _>().command(|entity, int, _| {
+                info!("Entity {entity}: Second command: \"{int}\"");
+            });
+        });
+    });
+
+    // Add a command with optional arguments
+    app.add_command("test_5", |builder| {
+        fn function(entity: Entity, message: String, index: usize, _: WorldRef) {
+            info!("Entity {entity}: Message \"{message}\", Index {index}");
+            assert!(matches!(index, 0 | 10));
+        }
+
+        // Provide a default "Message" and "Index" value
+        let builder = builder
+            .command(|entity, world| function(entity, String::from("Default"), 0usize, world));
+
+        // Provide a default "Index" value
+        let builder = builder
+            .arg::<String, _>()
+            .command(|entity, string, world| function(entity, string, 0usize, world));
+
+        // Parse all arguments
+        builder.arg::<usize, _>().command(function);
+    });
+
     // Add a command to stop the application and exit
     app.add_command("stop", |builder| {
         builder.command(|entity, mut world| {
@@ -57,6 +89,14 @@ fn execute() -> AppExit {
         entity.run_command("test");
         entity.run_command("test_2 42 42 foo bar");
         entity.run_command("test_3 1000 literal 40320");
+
+        entity.run_command("test_4 first");
+        entity.run_command("test_4 second 3.14159");
+
+        entity.run_command("test_5");
+        entity.run_command("test_5 Provided");
+        entity.run_command("test_5 Provided 10");
+
         entity.run_command("stop");
     });
 
