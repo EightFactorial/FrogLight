@@ -46,10 +46,10 @@ fn execute() -> AppExit {
     // Add a command showing how to use forked commands.
     app.add_command("test_4", |builder| {
         builder.fork(|mut builder| {
-            builder.start().literal("first").command(|entity, _| {
+            builder.branch().literal("first").command(|entity, _| {
                 info!("Entity {entity}: First command");
             });
-            builder.start().literal("second").arg::<f32, _>().command(|entity, int, _| {
+            builder.branch().literal("second").arg::<f32, _>().command(|entity, int, _| {
                 info!("Entity {entity}: Second command: \"{int}\"");
             });
         });

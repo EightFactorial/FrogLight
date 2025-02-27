@@ -111,12 +111,11 @@ impl<'env, Function> CommandBuilder<'env, Command, Function> {
 
 // You cannot add arguments or commands during the `Fork` state.
 impl<Function> CommandBuilder<'_, Fork, Function> {
-    /// Start a new forked command.
+    /// Start a new branched command.
     #[must_use]
-    pub fn start(&mut self) -> CommandBuilder<'_, Command, Function> {
+    pub fn branch(&mut self) -> CommandBuilder<'_, Command, Function> {
         CommandBuilder {
             command: self.command.clone(),
-            entrypoint: self.entrypoint,
             previous: self.previous,
             graph: self.graph,
             registry: self.registry,

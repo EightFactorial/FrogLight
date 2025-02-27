@@ -16,7 +16,6 @@ use crate::graph::{BrigadierEdge, BrigadierError, BrigadierGraph, BrigadierNode}
 /// A builder for adding commands to a [`BrigadierGraph`].
 pub struct CommandBuilder<'env, State: BuilderState, Function> {
     pub(super) command: SmolStr,
-    pub(super) entrypoint: NodeIndex<u32>,
     pub(super) previous: NodeIndex<u32>,
     pub(super) graph: &'env mut BrigadierGraph,
     pub(super) registry: &'env mut FunctionRegistry,
@@ -38,14 +37,9 @@ impl<'env> CommandBuilder<'env, Arg, fn(Entity, WorldRef<Full>)> {
             Err(BrigadierError::DuplicateCommand(command))
         } else {
             let entrypoint = graph.graph.add_node(BrigadierNode { function: None });
-            Ok(Self {
-                command,
-                graph,
-                registry,
-                entrypoint,
-                previous: entrypoint,
-                _phantom: PhantomData,
-            })
+            graph.commands.insert(command.clone(), entrypoint);
+
+            Ok(Self { command, graph, registry, previous: entrypoint, _phantom: PhantomData })
         }
     }
 }
@@ -63,11 +57,6 @@ impl<'env, Function> CommandBuilder<'env, Arg, Function> {
     where
         Function: IntoFunction<'static, Marker>,
     {
-        // Set the command entrypoint, if one has not been set.
-        if !self.graph.commands.contains_key(&self.command) {
-            self.graph.commands.insert(self.command.clone(), self.entrypoint);
-        }
-
         // Convert the function into a dynamic function.
         let mut dynamic = f.into_function();
 
@@ -136,7 +125,6 @@ impl<'env, State: BuilderState, Function> CommandBuilder<'env, State, Function> 
     ) -> CommandBuilder<'env, OtherState, OtherFunction> {
         CommandBuilder {
             command: self.command,
-            entrypoint: self.entrypoint,
             previous: self.previous,
             graph: self.graph,
             registry: self.registry,
