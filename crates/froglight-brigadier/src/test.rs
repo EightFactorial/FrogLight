@@ -9,7 +9,7 @@ use crate::prelude::*;
 #[test]
 fn execute() -> AppExit {
     let mut app = App::new();
-    app.add_plugins((MinimalPlugins, LogPlugin { level: Level::INFO, ..default() }));
+    app.add_plugins((MinimalPlugins, LogPlugin { level: Level::DEBUG, ..default() }));
     app.add_plugins(BrigadierPlugin::default());
 
     // Add a basic command with no arguments
@@ -51,7 +51,9 @@ fn execute() -> AppExit {
 
     // Add a system spawn an entity and run the commands
     app.add_systems(Update, |mut commands: Commands| {
-        let mut entity = commands.spawn((EntityId::from(0), EntityUuid::from(Uuid::nil())));
+        let bundle = (Name::new("TestEntity"), EntityId::from(0), EntityUuid::from(Uuid::nil()));
+        let mut entity = commands.spawn(bundle);
+
         entity.run_command("test");
         entity.run_command("test_2 42 42 foo bar");
         entity.run_command("test_3 1000 literal 40320");

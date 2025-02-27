@@ -20,7 +20,7 @@ impl FrogRead for NamedNbt {
             let name = Mutf8String::frog_read(buffer)?;
 
             #[cfg(feature = "debug")]
-            tracing_log::log::trace!("Reading NamedNbt: \"{}\"", name.to_str_lossy());
+            tracing::trace!("Reading NamedNbt: \"{}\"", name.to_str_lossy());
 
             UnnamedNbt::frog_read_inner(byte, buffer).map(|unnamed| match unnamed.into_inner() {
                 None => Self::new_empty(),
@@ -80,7 +80,7 @@ impl FrogWrite for UnnamedNbt {
 impl UnnamedNbt {
     fn frog_read_inner(tag: u8, buffer: &mut impl Read) -> Result<Self, ReadError> {
         #[cfg(feature = "debug")]
-        tracing_log::log::trace!("UnnamedNbt: Tag -> {tag}");
+        tracing::trace!("UnnamedNbt: Tag -> {tag}");
 
         match tag {
             NbtTag::END => Ok(Self::new_empty()),
@@ -95,7 +95,7 @@ impl UnnamedNbt {
 impl FrogRead for NbtCompound {
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         #[cfg(feature = "debug")]
-        tracing_log::log::trace!("NbtCompound: ! Start !");
+        tracing::trace!("NbtCompound: ! Start !");
 
         let mut tag = u8::frog_read(buffer)?;
         let mut compound = Self::new();
@@ -106,13 +106,13 @@ impl FrogRead for NbtCompound {
             tag = u8::frog_read(buffer)?;
 
             #[cfg(feature = "debug")]
-            tracing_log::log::trace!("NbtCompound: \"{}\": {data:?}", string.to_str_lossy());
+            tracing::trace!("NbtCompound: \"{}\": {data:?}", string.to_str_lossy());
 
             compound.insert(string, data);
         }
 
         #[cfg(feature = "debug")]
-        tracing_log::log::trace!("NbtCompound: ! Finish !");
+        tracing::trace!("NbtCompound: ! Finish !");
 
         Ok(compound)
     }
@@ -179,7 +179,7 @@ impl FrogWrite for NbtTag {
 impl NbtTag {
     fn frog_read_inner(tag: u8, buffer: &mut impl Read) -> Result<Self, ReadError> {
         #[cfg(feature = "debug")]
-        tracing_log::log::trace!("NbtTag: Tag -> {tag}");
+        tracing::trace!("NbtTag: Tag -> {tag}");
 
         match tag {
             NbtTag::BYTE => i8::frog_read(buffer).map(Self::Byte),

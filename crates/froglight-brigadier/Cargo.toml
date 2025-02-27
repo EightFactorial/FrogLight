@@ -21,6 +21,7 @@ proptest = { workspace = true }
 
 [dependencies]
 bevy_app = { workspace = true, features = ["reflect_functions"] }
+bevy_core = { workspace = true, features = ["bevy_reflect"] }
 bevy_ecs = { workspace = true, features = ["reflect_functions"] }
 bevy_log = { workspace = true }
 bevy_reflect = { workspace = true, features = ["functions"] }
@@ -31,6 +32,7 @@ parking_lot = { workspace = true }
 petgraph = { workspace = true }
 smol_str = { workspace = true }
 thiserror = { workspace = true }
+tracing = { workspace = true }
 
 # Optional dependencies
 froglight-nbt = { workspace = true, optional = true, features = ["bevy"] }

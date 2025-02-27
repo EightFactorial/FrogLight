@@ -1479,6 +1479,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_app",
+ "bevy_core",
  "bevy_ecs",
  "bevy_log",
  "bevy_reflect",
@@ -1493,6 +1494,7 @@ dependencies = [
  "serde",
  "smol_str",
  "thiserror 2.0.11",
+ "tracing",
  "uuid",
 ]
 
@@ -1565,7 +1567,7 @@ dependencies = [
  "serde",
  "simd_cesu8",
  "thiserror 2.0.11",
- "tracing-log",
+ "tracing",
  "tracing-subscriber",
 ]
 

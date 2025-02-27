@@ -1,6 +1,7 @@
 //! TODO
 
 use bevy_app::{App, Last, Plugin};
+use bevy_core::Name;
 use bevy_ecs::{
     event::Events,
     reflect::{AppFunctionRegistry, AppTypeRegistry},
@@ -10,7 +11,8 @@ use bevy_ecs::{
     system::Local,
     world::World,
 };
-use bevy_log::error;
+use bevy_log::{debug, error};
+use derive_more::From;
 
 mod build;
 pub use build::BrigadierBuilder;
@@ -20,6 +22,7 @@ pub use command::{BrigadierCommand, BrigadierCommands};
 
 mod event;
 pub use event::BrigadierEvent;
+use tracing::Level;
 
 use crate::{
     argument::ArgumentParserPlugin,
@@ -30,7 +33,7 @@ use crate::{
 /// A plugin for integrating Brigadier into a Bevy application.
 ///
 /// By default, this runs during [`Last`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, From)]
 pub struct BrigadierPlugin(InternedScheduleLabel);
 
 impl Default for BrigadierPlugin {
@@ -70,8 +73,16 @@ pub fn brigadier_listener(world: &mut World, mut world_ref: Local<WorldRef<Empty
     let functions = functions.read();
 
     world.resource_scope::<Events<BrigadierEvent>, _>(|world, mut events| {
-        world_ref.scoped(world, |world| {
+        world_ref.with_world(world, |world| {
             for event in events.drain() {
+                if tracing::enabled!(Level::DEBUG) {
+                    if let Some(name) = world.value().get::<Name>(event.entity()) {
+                        debug!("{name} ({}) ran \"{}\"", event.entity(), event.command());
+                    } else {
+                        debug!("Entity ({}) ran \"{}\"", event.entity(), event.command());
+                    }
+                }
+
                 if let Err(err) =
                     graph.execute(event.entity(), event.command(), &types, &functions, world)
                 {

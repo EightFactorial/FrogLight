@@ -46,14 +46,13 @@ impl BrigadierGraph {
     pub fn execute(
         &self,
         entity: Entity,
-        command: impl AsRef<str>,
-        registry: &TypeRegistry,
+        command: &str,
+        types: &TypeRegistry,
         functions: &FunctionRegistry,
         world: &mut WorldRef<Full>,
     ) -> Result<(), BrigadierError> {
         let args = ArgList::new().push_owned(entity);
-        let (node, mut args) =
-            self.build_command(command.as_ref(), args, registry, &world.value())?;
+        let (node, mut args) = self.build_command(command.as_ref(), args, types, &world.value())?;
         args = args.push_owned(world.clone());
 
         if let Some(function) = node.function.as_ref() {
@@ -64,7 +63,7 @@ impl BrigadierGraph {
             }
         } else {
             // Shouldn't happen, but just in case.
-            Err(BrigadierError::UnexpectedEnd(SmolStr::from(command.as_ref())))
+            Err(BrigadierError::UnexpectedEnd(SmolStr::from(command)))
         }
     }
 
@@ -79,13 +78,13 @@ impl BrigadierGraph {
     pub fn parse(
         &self,
         entity: Entity,
-        command: impl AsRef<str>,
-        registry: &TypeRegistry,
+        command: &str,
+        types: &TypeRegistry,
         functions: &FunctionRegistry,
         world: &World,
     ) -> Result<(), BrigadierError> {
         let args = ArgList::new().push_owned(entity);
-        let (node, _) = self.build_command(command.as_ref(), args, registry, world)?;
+        let (node, _) = self.build_command(command.as_ref(), args, types, world)?;
         if let Some(function) = node.function.as_ref() {
             if functions.contains(function.as_ref()) {
                 Ok(())
@@ -94,7 +93,7 @@ impl BrigadierGraph {
             }
         } else {
             // Shouldn't happen, but just in case.
-            Err(BrigadierError::UnexpectedEnd(SmolStr::from(command.as_ref())))
+            Err(BrigadierError::UnexpectedEnd(SmolStr::from(command)))
         }
     }
 
@@ -107,7 +106,7 @@ impl BrigadierGraph {
         &'a self,
         mut command: &'a str,
         mut arguments: ArgList<'a>,
-        registry: &TypeRegistry,
+        types: &TypeRegistry,
         world: &World,
     ) -> Result<(&'a BrigadierNode, ArgList<'a>), BrigadierError> {
         command = command.trim();
@@ -150,7 +149,7 @@ impl BrigadierGraph {
                     }
                     BrigadierEdge::Argument { type_id, type_name } => {
                         let (argument, remaining) =
-                            Self::parse_argument(arg, type_name, *type_id, registry, world)?;
+                            Self::parse_argument(arg, type_name, *type_id, types, world)?;
 
                         // If an argument was parsed, add it to the list.
                         if let Some(argument) = argument {

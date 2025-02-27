@@ -11,6 +11,9 @@ pub enum BrigadierError {
     /// A command with the same name already exists.
     #[error("duplicate command \"{0}\"")]
     DuplicateCommand(SmolStr),
+    /// An unexpected end of the command was reached.
+    #[error("unexpected end of command \"{0}\"")]
+    UnexpectedEnd(SmolStr),
 
     /// An unknown command was provided.
     #[error("unknown command \"{0}\"")]
@@ -21,10 +24,6 @@ pub enum BrigadierError {
     /// An unknown parser was provided.
     #[error("unknown parser \"{0:?}\"")]
     UnknownParser(&'static str),
-
-    /// An unexpected end of the command was reached.
-    #[error("unexpected end of command \"{0}\"")]
-    UnexpectedEnd(SmolStr),
 
     /// An error occurred while parsing an argument.
     #[error("invalid argument, {0}")]

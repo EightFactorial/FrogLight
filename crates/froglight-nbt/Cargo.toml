@@ -32,7 +32,7 @@ thiserror = { workspace = true }
 bevy_reflect = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive"] }
-tracing-log = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
 
 [features]
 default = ["io"]
@@ -46,4 +46,4 @@ serde = ["dep:serde", "indexmap/serde"]
 
 
 # Enable debug logging.
-debug = ["dep:tracing-log"]
+debug = ["dep:tracing"]

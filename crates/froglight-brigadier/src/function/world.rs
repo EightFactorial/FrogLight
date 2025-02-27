@@ -30,12 +30,10 @@ impl WorldRef<Empty> {
     /// Create a new [`WorldRef`]
     #[inline]
     #[must_use]
-    #[allow(dead_code)]
-    pub(crate) fn new() -> WorldRef<Empty> { Self::default() }
+    pub fn new() -> WorldRef<Empty> { Self::default() }
 
     /// Temporarily use a [`World`] in a [`WorldRef`].
-    #[allow(dead_code)]
-    pub(crate) fn scoped<R: Sized>(
+    pub fn with_world<R: Sized>(
         &mut self,
         world: &mut World,
         mut f: impl FnMut(&mut WorldRef<Full>) -> R,
