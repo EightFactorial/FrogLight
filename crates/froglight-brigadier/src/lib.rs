@@ -7,6 +7,9 @@ pub mod function;
 pub mod graph;
 pub mod plugin;
 
+#[cfg(feature = "io")]
+mod io;
+
 #[cfg(test)]
 mod test;
 

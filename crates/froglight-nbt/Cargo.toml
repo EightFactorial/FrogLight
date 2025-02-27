@@ -44,6 +44,5 @@ io = ["dep:froglight-io"]
 # Enable `serde` support.
 serde = ["dep:serde", "indexmap/serde"]
 
-
 # Enable debug logging.
 debug = ["dep:tracing"]

@@ -17,10 +17,17 @@ workspace = true
 
 [dependencies]
 froglight-block = { workspace = true }
-froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
+froglight-brigadier = { workspace = true, optional = true, features = [
+  "io",
+  "nbt",
+] }
 froglight-common = { workspace = true }
 froglight-nbt = { workspace = true, features = ["io"] }
-froglight-network = { workspace = true, features = ["nbt", "resolver", "world"] }
+froglight-network = { workspace = true, features = [
+  "nbt",
+  "resolver",
+  "world",
+] }
 froglight-registry = { workspace = true }
 froglight-world = { workspace = true, features = ["block", "io"] }
 

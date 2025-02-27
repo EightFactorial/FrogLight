@@ -33,8 +33,14 @@ uuid = { workspace = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
-froglight-brigadier = { workspace = true, optional = true, features = ["io", "serde"] }
-froglight-nbt = { workspace = true, optional = true, features = ["io", "serde"] }
+froglight-brigadier = { workspace = true, optional = true, features = [
+  "io",
+  "serde",
+] }
+froglight-nbt = { workspace = true, optional = true, features = [
+  "io",
+  "serde",
+] }
 froglight-world = { workspace = true, optional = true, features = ["io"] }
 hickory-resolver = { version = "0.24", optional = true, default-features = false, features = [
   "system-config",
@@ -44,15 +50,15 @@ hickory-resolver = { version = "0.24", optional = true, default-features = false
 [features]
 default = ["resolver"]
 
+# Enable server address and port lookup.
+resolver = ["dep:hickory-resolver"]
+
 # Enable `froglight-brigadier` support.
 brigadier = ["dep:froglight-brigadier", "bevy"]
 # Enable `froglight-nbt` support.
-nbt = ["dep:froglight-nbt"]
+nbt = ["dep:froglight-nbt", "froglight-brigadier?/nbt"]
 # Enable `froglight-world` support.
 world = ["dep:froglight-world"]
-
-# Enable server address and port lookup.
-resolver = ["dep:hickory-resolver"]
 
 # Enable `bevy` support.
 bevy = [
