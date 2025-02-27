@@ -24,14 +24,14 @@ use crate::{
 pub struct AppBlockStorage<V: Version>(Arc<RwLock<BlockStorage<V>>>);
 
 impl<V: Version> Default for AppBlockStorage<V>
-where
-    Vanilla: BlockResolver<V>,
+where Vanilla: BlockResolver<V>
 {
     #[inline]
     fn default() -> Self { Self::new() }
 }
 impl<V: Version> std::ops::Deref for AppBlockStorage<V> {
     type Target = Arc<RwLock<BlockStorage<V>>>;
+
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
@@ -41,9 +41,7 @@ impl<V: Version> AppBlockStorage<V> {
     #[inline]
     #[must_use]
     pub fn new() -> Self
-    where
-        Vanilla: BlockResolver<V>,
-    {
+    where Vanilla: BlockResolver<V> {
         Self::from_storage(BlockStorage::new())
     }
 
@@ -65,8 +63,7 @@ pub struct BlockStorage<V: Version> {
 }
 
 impl<V: Version> Default for BlockStorage<V>
-where
-    Vanilla: BlockResolver<V>,
+where Vanilla: BlockResolver<V>
 {
     fn default() -> Self { Self::new() }
 }
@@ -76,9 +73,7 @@ impl<V: Version> BlockStorage<V> {
     /// registered.
     #[must_use]
     pub fn new() -> Self
-    where
-        Vanilla: BlockResolver<V>,
-    {
+    where Vanilla: BlockResolver<V> {
         let mut storage = Self::new_empty();
         <Vanilla as BlockResolver<V>>::register(&mut storage);
         storage
@@ -259,5 +254,6 @@ impl<V: Version> PartialEq for BlockWrapper<V> {
 }
 impl<V: Version> std::ops::Deref for BlockWrapper<V> {
     type Target = &'static dyn BlockType<V>;
+
     fn deref(&self) -> &Self::Target { &self.0 }
 }

@@ -13,6 +13,7 @@ macro_rules! impl_glam {
     ($count:expr, $field:ty, $ty:ty) => {
         impl ArgumentParser for $ty {
             type Arg = Self;
+
             fn parse_input<'a>(
                 mut arguments: &'a str,
                 _: &World,

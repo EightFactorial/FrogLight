@@ -32,6 +32,7 @@ impl_string!(String, SmolStr);
 
 impl ArgumentParser for Cow<'static, str> {
     type Arg = Self;
+
     fn parse_input<'a>(
         arguments: &'a str,
         _: &World,

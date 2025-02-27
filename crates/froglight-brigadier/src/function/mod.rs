@@ -55,9 +55,7 @@ impl<'env, Function> CommandBuilder<'env, Arg, Function> {
     pub fn arg<Parser: ArgumentParser, NewFunction>(
         mut self,
     ) -> CommandBuilder<'env, Arg, NewFunction>
-    where
-        Self: FunctionBuilder<'env, Parser, Arg, Function, NewFunction>,
-    {
+    where Self: FunctionBuilder<'env, Parser, Arg, Function, NewFunction> {
         self.add_edge(BrigadierEdge::argument::<Parser>());
         self.argument().convert()
     }
@@ -67,9 +65,7 @@ impl<'env, Function> CommandBuilder<'env, Arg, Function> {
     /// # Panics
     /// Panics if the command could not be built.
     pub fn command<Marker>(self, f: Function) -> CommandBuilder<'env, Command, Function>
-    where
-        Function: IntoFunction<'static, Marker>,
-    {
+    where Function: IntoFunction<'static, Marker> {
         match self.try_command(f) {
             Ok(builder) => builder,
             Err(err) => {
@@ -101,9 +97,7 @@ impl<'env, Function> CommandBuilder<'env, Command, Function> {
     pub fn arg<Parser: ArgumentParser, NewFunction>(
         mut self,
     ) -> CommandBuilder<'env, Arg, NewFunction>
-    where
-        Self: FunctionBuilder<'env, Parser, Command, Function, NewFunction>,
-    {
+    where Self: FunctionBuilder<'env, Parser, Command, Function, NewFunction> {
         self.add_edge(BrigadierEdge::argument::<Parser>());
         self.argument().convert()
     }

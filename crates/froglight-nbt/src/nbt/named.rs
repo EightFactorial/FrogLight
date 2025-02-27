@@ -153,6 +153,7 @@ impl AsMut<Option<NbtCompound>> for UnnamedNbt {
 
 impl std::ops::Deref for UnnamedNbt {
     type Target = Option<NbtCompound>;
+
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 impl std::ops::DerefMut for UnnamedNbt {
@@ -167,8 +168,7 @@ impl<T: Into<NbtCompound>> From<T> for UnnamedNbt {
 }
 
 impl<T> FromIterator<T> for UnnamedNbt
-where
-    NbtCompound: FromIterator<T>,
+where NbtCompound: FromIterator<T>
 {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
         Self::new(iter.into_iter().collect())

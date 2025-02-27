@@ -11,23 +11,26 @@ use crate::section::Section;
 pub struct VecChunk(Vec<Section>, i32);
 
 impl VecChunk {
-    /// The width of the [`VecChunk`] in blocks.
-    pub const WIDTH: usize = Section::WIDTH;
     /// The depth of the [`VecChunk`] in blocks.
     pub const DEPTH: usize = Section::DEPTH;
+    /// The width of the [`VecChunk`] in blocks.
+    pub const WIDTH: usize = Section::WIDTH;
 
     /// The total volume of the [`VecChunk`] in blocks.
     #[inline]
     #[must_use]
     pub fn volume(&self) -> usize { self.0.len() * Section::VOLUME }
+
     /// The height of the [`VecChunk`] in blocks.
     #[inline]
     #[must_use]
     pub fn height(&self) -> usize { self.0.len() * Section::HEIGHT }
+
     /// The width of the [`VecChunk`] in blocks.
     #[inline]
     #[must_use]
     pub const fn width(&self) -> usize { Self::WIDTH }
+
     /// The depth of the [`VecChunk`] in blocks.
     #[inline]
     #[must_use]
@@ -59,6 +62,7 @@ impl VecChunk {
     pub fn get_section(&self, y_coord: i32) -> Option<&Section> {
         self.get_nonoffset_section(y_coord.checked_add(self.1)?)
     }
+
     /// Get a reference to a [`Section`] based on the `y` coordinate.
     ///
     /// # Note
@@ -76,6 +80,7 @@ impl VecChunk {
     pub fn get_section_mut(&mut self, y_coord: i32) -> Option<&mut Section> {
         self.get_nonoffset_section_mut(y_coord.checked_add(self.1)?)
     }
+
     /// Get a mutable reference to a [`Section`] based on the `y` coordinate.
     ///
     /// # Note
@@ -95,6 +100,7 @@ impl VecChunk {
         position.y = position.y.checked_add(self.1)?;
         self.get_nonoffset_section(position.y).map(|s| s.get_block(position))
     }
+
     /// Set a block in the [`VecChunk`].
     ///
     /// Returns `None` if the y coordinate is out of bounds.
@@ -119,6 +125,7 @@ impl VecChunk {
             storage.get_untyped(froglight_block::storage::GlobalBlockId::new_unchecked(id))
         })
     }
+
     /// Set a block in the [`VecChunk`] using data from the [`BlockStorage`].
     ///
     /// Returns the previous block if it was set, or
@@ -156,6 +163,7 @@ impl VecChunk {
 
 impl<const SECTIONS: usize, const OFFSET: i32> TryFrom<VecChunk> for ArrayChunk<SECTIONS, OFFSET> {
     type Error = VecChunk;
+
     fn try_from(value: VecChunk) -> Result<Self, Self::Error> { value.try_into_array() }
 }
 

@@ -23,6 +23,7 @@ impl From<GlobalBlockId> for u32 {
 
 impl std::ops::Deref for GlobalBlockId {
     type Target = u32;
+
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
@@ -74,5 +75,6 @@ impl From<RelativeBlockState> for usize {
 
 impl std::ops::Deref for RelativeBlockState {
     type Target = u16;
+
     fn deref(&self) -> &Self::Target { &self.0 }
 }

@@ -1,3 +1,5 @@
+#![allow(clippy::disallowed_types)]
+
 #[cfg(test)]
 use std::io::Cursor;
 use std::{
@@ -53,6 +55,7 @@ impl FrogWrite for bool {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         u8::from(*self).frog_write(buffer)
     }
+
     #[inline]
     fn frog_len(&self) -> usize { std::mem::size_of::<bool>() }
 }
@@ -217,6 +220,7 @@ impl FrogWrite for String {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         <str>::frog_write(self, buffer)
     }
+
     #[inline]
     fn frog_len(&self) -> usize { <str>::frog_len(self) }
 }
@@ -642,6 +646,7 @@ impl FrogWrite for CString {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         <CStr>::frog_write(self.as_c_str(), buffer)
     }
+
     #[inline]
     fn frog_len(&self) -> usize { <CStr>::frog_len(self.as_c_str()) }
 }

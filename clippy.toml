@@ -1,1 +1,2 @@
-
+# Force using `hashbrown` instead of `std` collections.
+disallowed-types = ["std::collections::HashMap", "std::collections::HashSet"]

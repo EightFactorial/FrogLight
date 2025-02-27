@@ -31,6 +31,7 @@ impl<V: Version> ChunkStorage<V> {
     pub fn insert<T: Storable>(&mut self, value: T) {
         self.0.insert(TypeId::of::<T>(), Box::new(value));
     }
+
     /// Take a [`Storable`] type from the [`ChunkStorage`].
     #[must_use]
     #[expect(clippy::missing_panics_doc)]
@@ -46,6 +47,7 @@ impl<V: Version> ChunkStorage<V> {
     fn get_untyped(&self, type_id: TypeId) -> Option<&dyn Storable> {
         self.0.get(&type_id).map(AsRef::as_ref)
     }
+
     /// Get a mutable untyped [`Storable`] type from the [`ChunkStorage`].
     #[inline]
     #[must_use]
@@ -59,6 +61,7 @@ impl<V: Version> ChunkStorage<V> {
     pub fn get<T: Storable>(&self) -> Option<&T> {
         self.get_untyped(TypeId::of::<T>()).map(|value| value.as_any().downcast_ref::<T>().unwrap())
     }
+
     /// Get a mutable [`Storable`] type from the [`ChunkStorage`].
     #[must_use]
     #[expect(clippy::missing_panics_doc)]
@@ -79,6 +82,7 @@ impl<V: Version> ChunkStorage<V> {
         self.get_untyped_mut(TypeId::of::<T>())
             .map(|storage| ChunkHandle(storage.insert_chunk(chunk), PhantomData))
     }
+
     /// Remove a chunk from the [`ChunkStorage`].
     pub fn remove_chunk(&mut self, handle: ChunkHandle<V>) {
         if let Some(storage) = self.get_untyped_mut(handle.0.0) {
@@ -91,6 +95,7 @@ impl<V: Version> ChunkStorage<V> {
     pub fn get_block_raw(&self, handle: &ChunkHandle<V>, position: IVec3) -> Option<u32> {
         self.get_untyped(handle.0.0)?.get_block(handle, position)
     }
+
     /// Set a block id in the [`ChunkStorage`].
     #[must_use]
     pub fn set_block_raw(
@@ -116,6 +121,7 @@ impl<V: Version> ChunkStorage<V> {
         self.get_block_raw(handle, position)
             .and_then(|id| storage.get_untyped(GlobalBlockId::new_unchecked(id)))
     }
+
     /// Set a block in the [`ChunkStorage`] using data from a [`BlockStorage`].
     ///
     /// Returns the previous block if it was set, or
@@ -148,6 +154,7 @@ impl<V: Version> ChunkStorage<V> {
     ) -> Option<R::BlockEnum> {
         self.get_block_untyped(handle, position, storage).and_then(|block| R::resolve(block))
     }
+
     /// Set a block in the [`ChunkStorage`] using data from a [`BlockStorage`].
     ///
     /// If you don't need type details about the previous block,

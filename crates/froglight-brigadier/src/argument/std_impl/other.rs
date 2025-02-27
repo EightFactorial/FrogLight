@@ -6,6 +6,7 @@ use crate::argument::{ArgumentError, ArgumentParser};
 
 impl ArgumentParser for Identifier {
     type Arg = Identifier;
+
     fn parse_input<'a>(
         arguments: &'a str,
         _: &World,
@@ -21,6 +22,7 @@ impl ArgumentParser for Identifier {
 #[cfg(feature = "uuid")]
 impl ArgumentParser for uuid::Uuid {
     type Arg = uuid::Uuid;
+
     fn parse_input<'a>(
         arguments: &'a str,
         _: &World,

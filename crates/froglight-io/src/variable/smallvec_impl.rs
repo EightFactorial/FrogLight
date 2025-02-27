@@ -10,8 +10,7 @@ use super::{FrogVarRead, FrogVarWrite};
 use crate::standard::{ReadError, WriteError};
 
 impl<A: Array> FrogVarRead for SmallVec<A>
-where
-    A::Item: FrogVarRead,
+where A::Item: FrogVarRead
 {
     #[inline]
     fn frog_var_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
@@ -20,8 +19,7 @@ where
 }
 
 impl<A: Array> FrogVarWrite for SmallVec<A>
-where
-    A::Item: FrogVarWrite,
+where A::Item: FrogVarWrite
 {
     #[inline]
     fn frog_var_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {

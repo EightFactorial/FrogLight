@@ -43,6 +43,7 @@ invalid_html_tags = "deny"
 [workspace.lints.clippy]
 cast_possible_truncation = "warn"
 cast_possible_wrap = "warn"
+doc_markdown = "allow"
 module_name_repetitions = "allow"
 needless_pass_by_value = "allow"
 pedantic = { level = "warn", priority = -1 }

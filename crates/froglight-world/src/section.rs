@@ -18,14 +18,14 @@ pub struct Section {
 
 #[allow(unused_assignments, unused_variables)]
 impl Section {
-    /// The total volume of the section in blocks.
-    pub const VOLUME: usize = Self::HEIGHT * Self::WIDTH * Self::DEPTH;
-    /// The height of the section in blocks.
-    pub const HEIGHT: usize = 16;
-    /// The width of the section in blocks.
-    pub const WIDTH: usize = 16;
     /// The depth of the section in blocks.
     pub const DEPTH: usize = 16;
+    /// The height of the section in blocks.
+    pub const HEIGHT: usize = 16;
+    /// The total volume of the section in blocks.
+    pub const VOLUME: usize = Self::HEIGHT * Self::WIDTH * Self::DEPTH;
+    /// The width of the section in blocks.
+    pub const WIDTH: usize = 16;
 
     /// Get a block from the section.
     #[must_use]

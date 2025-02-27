@@ -17,27 +17,30 @@ impl<const SECTIONS: usize, const OFFSET: i32> Default for ArrayChunk<SECTIONS, 
 }
 
 impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
-    /// The total volume of the [`ArrayChunk`] in blocks.
-    pub const VOLUME: usize = Section::VOLUME * SECTIONS;
-    /// The height of the [`ArrayChunk`] in blocks.
-    pub const HEIGHT: usize = Section::HEIGHT * SECTIONS;
-    /// The width of the [`ArrayChunk`] in blocks.
-    pub const WIDTH: usize = Section::WIDTH;
     /// The depth of the [`ArrayChunk`] in blocks.
     pub const DEPTH: usize = Section::DEPTH;
+    /// The height of the [`ArrayChunk`] in blocks.
+    pub const HEIGHT: usize = Section::HEIGHT * SECTIONS;
+    /// The total volume of the [`ArrayChunk`] in blocks.
+    pub const VOLUME: usize = Section::VOLUME * SECTIONS;
+    /// The width of the [`ArrayChunk`] in blocks.
+    pub const WIDTH: usize = Section::WIDTH;
 
     /// The total volume of the [`ArrayChunk`] in blocks.
     #[inline]
     #[must_use]
     pub const fn volume(&self) -> usize { Self::VOLUME }
+
     /// The height of the [`ArrayChunk`] in blocks.
     #[inline]
     #[must_use]
     pub const fn height(&self) -> usize { Self::HEIGHT }
+
     /// The width of the [`ArrayChunk`] in blocks.
     #[inline]
     #[must_use]
     pub const fn width(&self) -> usize { Self::WIDTH }
+
     /// The depth of the [`ArrayChunk`] in blocks.
     #[inline]
     #[must_use]
@@ -59,6 +62,7 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
     pub fn get_section(&self, y_coord: i32) -> Option<&Section> {
         self.get_nonoffset_section(y_coord.checked_add(OFFSET)?)
     }
+
     /// Get a reference to a [`Section`] based on the `y` coordinate.
     ///
     /// # Note
@@ -76,6 +80,7 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
     pub fn get_section_mut(&mut self, y_coord: i32) -> Option<&mut Section> {
         self.get_nonoffset_section_mut(y_coord.checked_add(OFFSET)?)
     }
+
     /// Get a mutable reference to a [`Section`] based on the `y` coordinate.
     ///
     /// # Note
@@ -95,6 +100,7 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
         position.y = position.y.checked_add(OFFSET)?;
         self.get_nonoffset_section(position.y).map(|s| s.get_block(position))
     }
+
     /// Set a block in the [`ArrayChunk`].
     ///
     /// Returns `None` if the y coordinate is out of bounds.
@@ -119,6 +125,7 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
             storage.get_untyped(froglight_block::storage::GlobalBlockId::new_unchecked(id))
         })
     }
+
     /// Set a block in the [`ArrayChunk`] using data from the [`BlockStorage`].
     ///
     /// Returns the previous block if it was set, or

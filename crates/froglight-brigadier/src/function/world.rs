@@ -62,6 +62,7 @@ pub struct WorldValueRef<'a>(MutexGuard<'a, World>);
 
 impl Deref for WorldValueRef<'_> {
     type Target = World;
+
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 impl DerefMut for WorldValueRef<'_> {

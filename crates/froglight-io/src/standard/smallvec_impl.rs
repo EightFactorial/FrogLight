@@ -5,8 +5,7 @@ use smallvec::{Array, SmallVec};
 use super::{FrogRead, FrogWrite, ReadError, WriteError};
 
 impl<A: Array> FrogRead for SmallVec<A>
-where
-    A::Item: FrogRead,
+where A::Item: FrogRead
 {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
@@ -15,8 +14,7 @@ where
 }
 
 impl<A: Array> FrogWrite for SmallVec<A>
-where
-    A::Item: FrogWrite,
+where A::Item: FrogWrite
 {
     #[inline]
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {

@@ -295,6 +295,7 @@ impl<B: BlockTypeExt<V>, V: Version> Default for Block<B, V> {
 
 impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
     type Error = UntypedBlock<V>;
+
     fn try_from(value: UntypedBlock<V>) -> Result<Self, Self::Error> {
         value.downcast().ok_or(value)
     }
@@ -322,6 +323,7 @@ impl<V: Version> UntypedBlock<V> {
     #[inline]
     #[must_use]
     pub(crate) const fn state(&self) -> &RelativeBlockState { &self.state }
+
     /// Get the internal [`BlockWrapper`] of the [`UntypedBlock`].
     #[inline]
     #[must_use]

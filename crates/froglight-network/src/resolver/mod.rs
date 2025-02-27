@@ -83,8 +83,8 @@ impl ServerResolver {
 }
 
 impl ServerResolver {
-    const SRV_PREFIX: &'static str = "_minecraft._tcp.";
     const DEFAULT_PORT: u16 = 25565;
+    const SRV_PREFIX: &'static str = "_minecraft._tcp.";
 
     /// Resolve a server's IP and port from a given address and connect to it.
     ///
@@ -227,6 +227,7 @@ fn resolver() {
     }
     impl FrogWrite for ClientboundTest {
         fn frog_write(&self, _: &mut impl std::io::Write) -> Result<usize, WriteError> { todo!() }
+
         fn frog_len(&self) -> usize { todo!() }
     }
 
@@ -236,6 +237,7 @@ fn resolver() {
     }
     impl FrogWrite for ServerboundTest {
         fn frog_write(&self, _: &mut impl std::io::Write) -> Result<usize, WriteError> { todo!() }
+
         fn frog_len(&self) -> usize { todo!() }
     }
 

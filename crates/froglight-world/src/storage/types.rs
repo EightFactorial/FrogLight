@@ -56,6 +56,7 @@ macro_rules! create_storage {
                 );
                 HandleInternal(TypeId::of::<Self>(), index)
             }
+
             fn remove_chunk(&mut self, handle: HandleInternal) {
                 self.0.1.write().remove(&handle.1);
             }
@@ -63,6 +64,7 @@ macro_rules! create_storage {
             fn get_block(&self, handle: &HandleInternal, position: IVec3) -> Option<u32> {
                 self.0.1.read().get(&handle.1)?.get_block_raw(position)
             }
+
             fn set_block(
                 &mut self,
                 handle: &HandleInternal,

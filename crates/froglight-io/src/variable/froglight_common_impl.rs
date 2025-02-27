@@ -16,6 +16,7 @@ impl FrogVarWrite for EntityId {
     fn frog_var_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         u32::frog_var_write(self, buffer)
     }
+
     #[inline]
     fn frog_var_len(&self) -> usize { u32::frog_var_len(self) }
 }

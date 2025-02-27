@@ -20,6 +20,7 @@ impl FrogWrite for Identifier {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         SmolStr::frog_write(self.as_ref(), buffer)
     }
+
     #[inline]
     fn frog_len(&self) -> usize { SmolStr::frog_len(self.as_ref()) }
 }
@@ -35,6 +36,7 @@ impl FrogWrite for EntityId {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         u32::frog_write(self, buffer)
     }
+
     #[inline]
     fn frog_len(&self) -> usize { u32::frog_len(self) }
 }
@@ -50,6 +52,7 @@ impl FrogWrite for EntityUuid {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         Uuid::frog_write(self, buffer)
     }
+
     #[inline]
     fn frog_len(&self) -> usize { Uuid::frog_len(self) }
 }

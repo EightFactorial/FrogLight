@@ -29,20 +29,20 @@ pub trait ConnectionType<V, S>: Debug + Default + Copy + Eq + Hash + Send + Sync
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Client;
 impl<V: ValidState<S>, S: State> ConnectionType<V, S> for Client {
-    /// Send serverbound data.
-    type Send = <V as ValidState<S>>::Serverbound;
     /// Receive clientbound data.
     type Recv = <V as ValidState<S>>::Clientbound;
+    /// Send serverbound data.
+    type Send = <V as ValidState<S>>::Serverbound;
 }
 
 /// A connection from a server to a client.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Server;
 impl<V: ValidState<S>, S: State> ConnectionType<V, S> for Server {
-    /// Send clientbound data.
-    type Send = <V as ValidState<S>>::Clientbound;
     /// Receive serverbound data.
     type Recv = <V as ValidState<S>>::Serverbound;
+    /// Send clientbound data.
+    type Send = <V as ValidState<S>>::Clientbound;
 }
 
 /// A connection with a [`Version`] and [`State`].

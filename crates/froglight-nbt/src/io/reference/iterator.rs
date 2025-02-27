@@ -6,6 +6,7 @@ pub struct NbtRefIterator<'a>(NbtCompoundRef<'a>);
 
 impl<'a> Iterator for NbtRefIterator<'a> {
     type Item = (&'a Mutf8Str, NbtTagRef<'a>);
+
     fn next(&mut self) -> Option<Self::Item> { self.0.next_tag() }
 }
 
@@ -18,7 +19,8 @@ impl<'a> NbtCompoundRef<'a> {
     pub fn iter(&self) -> NbtRefIterator<'a> { self.into_iter() }
 }
 impl<'a> IntoIterator for &NbtCompoundRef<'a> {
-    type Item = (&'a Mutf8Str, NbtTagRef<'a>);
     type IntoIter = NbtRefIterator<'a>;
+    type Item = (&'a Mutf8Str, NbtTagRef<'a>);
+
     fn into_iter(self) -> Self::IntoIter { NbtRefIterator(*self) }
 }

@@ -41,9 +41,9 @@ impl Executor for ResolverRuntimeProvider {
 
 impl RuntimeProvider for ResolverRuntimeProvider {
     type Handle = ResolverRuntimeHandle;
+    type Tcp = ResolverTcpConnection;
     type Timer = ResolverTime;
     type Udp = ResolverUdpSocket;
-    type Tcp = ResolverTcpConnection;
 
     fn create_handle(&self) -> Self::Handle { ResolverRuntimeHandle }
 
@@ -103,9 +103,7 @@ pub(super) struct ResolverRuntimeHandle;
 
 impl Spawn for ResolverRuntimeHandle {
     fn spawn_bg<F>(&mut self, future: F)
-    where
-        F: Future<Output = Result<(), ProtoError>> + Send + 'static,
-    {
+    where F: Future<Output = Result<(), ProtoError>> + Send + 'static {
         #[cfg(feature = "bevy")]
         {
             bevy_tasks::IoTaskPool::get().spawn(future).detach();

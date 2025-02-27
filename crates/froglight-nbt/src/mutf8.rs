@@ -122,6 +122,7 @@ impl From<Vec<u8>> for Mutf8String {
 }
 impl TryFrom<Mutf8String> for String {
     type Error = simd_cesu8::DecodingError;
+
     fn try_from(value: Mutf8String) -> Result<Self, Self::Error> { value.try_as_string() }
 }
 
@@ -238,6 +239,7 @@ impl Borrow<[u8]> for Mutf8Str {
 
 impl ToOwned for Mutf8Str {
     type Owned = Mutf8String;
+
     fn to_owned(&self) -> Self::Owned { self.to_mutf8_string() }
 }
 
@@ -267,10 +269,12 @@ impl<'a> From<&'a [u8]> for &'a Mutf8Str {
 
 impl<'a> TryFrom<&'a Mutf8Str> for String {
     type Error = simd_cesu8::DecodingError;
+
     fn try_from(value: &'a Mutf8Str) -> Result<Self, Self::Error> { value.try_as_string() }
 }
 impl<'a> TryFrom<&'a Mutf8Str> for Cow<'a, str> {
     type Error = simd_cesu8::DecodingError;
+
     fn try_from(value: &'a Mutf8Str) -> Result<Self, Self::Error> { value.try_as_str() }
 }
 
@@ -284,18 +288,14 @@ impl std::fmt::Debug for Mutf8Str {
 impl serde::Serialize for Mutf8String {
     #[inline]
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
+    where S: serde::Serializer {
         self.as_mutf8_str().serialize(serializer)
     }
 }
 #[cfg(feature = "serde")]
 impl<'de> serde::Deserialize<'de> for Mutf8String {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
+    where D: serde::Deserializer<'de> {
         String::deserialize(deserializer).map(Mutf8String::from)
     }
 }
@@ -303,9 +303,7 @@ impl<'de> serde::Deserialize<'de> for Mutf8String {
 #[cfg(feature = "serde")]
 impl serde::Serialize for Mutf8Str {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
+    where S: serde::Serializer {
         self.try_as_str().map_err(serde::ser::Error::custom)?.serialize(serializer)
     }
 }

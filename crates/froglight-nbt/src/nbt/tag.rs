@@ -38,6 +38,7 @@ pub enum NbtTag {
     LongArray(Vec<i64>) = NbtTag::LONG_ARRAY,
 }
 
+#[rustfmt::skip]
 impl NbtTag {
     /// The end of a [`NbtTag::Compound`] or [`NbtTag::List`].
     pub const END: u8 = 0;
@@ -384,6 +385,7 @@ impl NbtTag {
 
 impl<'a> std::ops::Index<&'a str> for NbtTag {
     type Output = NbtTag;
+
     fn index(&self, key: &'a str) -> &Self::Output {
         if let NbtTag::Compound(compound) = self {
             &compound[key]
@@ -404,6 +406,7 @@ impl<'a> std::ops::IndexMut<&'a str> for NbtTag {
 
 impl std::ops::Index<usize> for NbtTag {
     type Output = NbtTag;
+
     fn index(&self, index: usize) -> &Self::Output {
         if let NbtTag::Compound(compound) = self {
             &compound[index]

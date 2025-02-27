@@ -155,13 +155,15 @@ impl NbtCompound {
 }
 
 impl<'a> std::iter::IntoIterator for &'a NbtCompound {
-    type Item = (&'a Mutf8String, &'a NbtTag);
     type IntoIter = indexmap::map::Iter<'a, Mutf8String, NbtTag>;
+    type Item = (&'a Mutf8String, &'a NbtTag);
+
     fn into_iter(self) -> Self::IntoIter { self.iter() }
 }
 impl<'a> std::iter::IntoIterator for &'a mut NbtCompound {
-    type Item = (&'a Mutf8String, &'a mut NbtTag);
     type IntoIter = indexmap::map::IterMut<'a, Mutf8String, NbtTag>;
+    type Item = (&'a Mutf8String, &'a mut NbtTag);
+
     fn into_iter(self) -> Self::IntoIter { self.iter_mut() }
 }
 
@@ -173,6 +175,7 @@ impl FromIterator<(Mutf8String, NbtTag)> for NbtCompound {
 
 impl<'a> std::ops::Index<&'a str> for NbtCompound {
     type Output = NbtTag;
+
     fn index(&self, key: &'a str) -> &Self::Output {
         self.get_tag(key).expect("Compound does not contain key")
     }
@@ -185,6 +188,7 @@ impl<'a> std::ops::IndexMut<&'a str> for NbtCompound {
 
 impl std::ops::Index<usize> for NbtCompound {
     type Output = NbtTag;
+
     fn index(&self, index: usize) -> &Self::Output {
         self.get_index(index).map(|(_, tag)| tag).expect("Compound does not contain index")
     }

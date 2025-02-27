@@ -1,3 +1,5 @@
+#![expect(clippy::disallowed_types)]
+
 #[cfg(test)]
 use std::io::Cursor;
 use std::{
@@ -74,6 +76,7 @@ impl FrogVarWrite for usize {
     fn frog_var_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         u32::try_from(*self).unwrap_or(u32::MAX).frog_var_write(buffer)
     }
+
     #[inline]
     fn frog_var_len(&self) -> usize { u32::try_from(*self).unwrap_or(u32::MAX).frog_var_len() }
 }
@@ -91,6 +94,7 @@ impl FrogVarWrite for isize {
             .unwrap_or(if self.is_negative() { i32::MIN } else { i32::MAX })
             .frog_var_write(buffer)
     }
+
     #[inline]
     fn frog_var_len(&self) -> usize { i32::try_from(*self).unwrap_or(i32::MAX).frog_var_len() }
 }
@@ -390,6 +394,7 @@ impl<T: FrogVarWrite> FrogVarWrite for Vec<T> {
     fn frog_var_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         <[T]>::frog_var_write(self, buffer)
     }
+
     #[inline]
     fn frog_var_len(&self) -> usize { <[T]>::frog_var_len(self) }
 }
@@ -399,6 +404,7 @@ impl<T: FrogVarWrite> FrogVarWrite for [T] {
             item.frog_var_write(buffer).map(|len| acc + len)
         })
     }
+
     fn frog_var_len(&self) -> usize {
         self.iter().fold(self.len().frog_var_len(), |acc, item| acc + item.frog_var_len())
     }
@@ -413,6 +419,7 @@ impl<T: FrogVarWrite, const N: usize> FrogVarWrite for [T; N] {
     fn frog_var_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         self.iter().try_fold(0, |acc, item| item.frog_var_write(buffer).map(|len| acc + len))
     }
+
     fn frog_var_len(&self) -> usize { self.iter().fold(0, |acc, item| acc + item.frog_var_len()) }
 }
 

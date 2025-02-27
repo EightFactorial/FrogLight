@@ -44,12 +44,14 @@ pub trait BlockAttributes: Sized + 'static {
 
 // Implement for zero attributes
 impl BlockAttributes for () {
-    const TYPES: &'static [TypeId] = &[TypeId::of::<()>()];
     const COUNT: usize = 1;
+    const TYPES: &'static [TypeId] = &[TypeId::of::<()>()];
+
     #[inline]
     fn from_index(index: usize) -> Self {
         debug_assert_eq!(index, 0, "Invalid BlockAttributes index!");
     }
+
     #[inline]
     fn into_index(self) -> usize { 0 }
 
@@ -57,11 +59,13 @@ impl BlockAttributes for () {
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[0])
     }
+
     #[inline]
     fn get_attr_str(&self, attr_index: usize) -> &'static str {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         ""
     }
+
     #[inline]
     fn set_attr_str(&mut self, attr_index: usize, attr_str: &'static str) -> Option<&'static str> {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
@@ -71,10 +75,12 @@ impl BlockAttributes for () {
 
 // Implement for one attribute
 impl<A: Attribute> BlockAttributes for A {
-    const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
     const COUNT: usize = A::STATES.len();
+    const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
+
     #[inline]
     fn from_index(index: usize) -> Self { A::STATES[index] }
+
     #[inline]
     fn into_index(self) -> usize { self.into() }
 
@@ -82,11 +88,13 @@ impl<A: Attribute> BlockAttributes for A {
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(*self)])
     }
+
     #[inline]
     fn get_attr_str(&self, attr_index: usize) -> &'static str {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         A::VALUES[Into::<usize>::into(*self)]
     }
+
     #[inline]
     fn set_attr_str(&mut self, attr_index: usize, attr_str: &'static str) -> Option<&'static str> {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
@@ -97,10 +105,12 @@ impl<A: Attribute> BlockAttributes for A {
     }
 }
 impl<A: Attribute> BlockAttributes for (A,) {
-    const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
     const COUNT: usize = A::STATES.len();
+    const TYPES: &'static [TypeId] = &[TypeId::of::<A>()];
+
     #[inline]
     fn from_index(index: usize) -> Self { (A::STATES[index],) }
+
     #[inline]
     fn into_index(self) -> usize { self.0.into() }
 
@@ -108,11 +118,13 @@ impl<A: Attribute> BlockAttributes for (A,) {
     fn get_attr<T: Attribute>(&self) -> Option<T> {
         TypeId::of::<Self>().eq(&TypeId::of::<T>()).then(|| T::STATES[Into::<usize>::into(self.0)])
     }
+
     #[inline]
     fn get_attr_str(&self, attr_index: usize) -> &'static str {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");
         A::VALUES[Into::<usize>::into(self.0)]
     }
+
     #[inline]
     fn set_attr_str(&mut self, attr_index: usize, attr_str: &'static str) -> Option<&'static str> {
         debug_assert_eq!(attr_index, 0, "Invalid BlockAttributes index!");

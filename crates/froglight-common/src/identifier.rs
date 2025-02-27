@@ -134,6 +134,7 @@ impl std::fmt::Display for Identifier {
 
 impl std::ops::Deref for Identifier {
     type Target = SmolStr;
+
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
