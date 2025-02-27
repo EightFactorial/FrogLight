@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy_ecs::component::ComponentInfo;
 use bevy_log::{Level, LogPlugin};
@@ -98,6 +100,17 @@ fn execute() -> AppExit {
         entity.run_command("test_5 Provided 10");
 
         entity.run_command("stop");
+    });
+
+    // Add a system to force the application to exit after some time
+    #[expect(clippy::manual_assert)]
+    app.add_systems(Update, |time: Res<Time>, mut timer: Local<Timer>| {
+        if timer.elapsed().is_zero() {
+            timer.set_duration(Duration::from_millis(100));
+        }
+        if timer.tick(time.elapsed()).just_finished() {
+            panic!("Application did not exit after 100ms!");
+        }
     });
 
     app.run()
