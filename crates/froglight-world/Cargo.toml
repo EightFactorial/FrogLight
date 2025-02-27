@@ -35,7 +35,7 @@ froglight-io = { workspace = true, optional = true }
 [features]
 default = []
 
-# Enable Bevy support
+# Enable `bevy` support.
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_utils",

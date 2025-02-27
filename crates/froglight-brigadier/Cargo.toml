@@ -33,13 +33,16 @@ smol_str = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
+froglight-nbt = { workspace = true, optional = true, features = ["bevy"] }
 glam = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = ["glam", "uuid"]
+default = ["nbt", "glam", "uuid"]
 
+# Enable support for `froglight-nbt` types.
+nbt = ["dep:froglight-nbt"]
 # Enable support for `glam` types.
 glam = ["dep:glam"]
 # Enable support for `uuid` types.

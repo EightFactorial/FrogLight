@@ -29,6 +29,7 @@ simd_cesu8 = "1.0"
 thiserror = { workspace = true }
 
 # Optional dependencies
+bevy_reflect = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive"] }
 tracing-log = { workspace = true, optional = true }
@@ -36,10 +37,13 @@ tracing-log = { workspace = true, optional = true }
 [features]
 default = ["io"]
 
-# Enable support for `froglight-io` serialization.
+# Enable `bevy` support.
+bevy = ["dep:bevy_reflect"]
+# Enable `froglight-io` support.
 io = ["dep:froglight-io"]
-# Enable support for serializing to/from text formats.
+# Enable `serde` support.
 serde = ["dep:serde", "indexmap/serde"]
+
 
 # Enable debug logging.
 debug = ["dep:tracing-log"]

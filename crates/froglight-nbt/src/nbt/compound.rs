@@ -1,3 +1,5 @@
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use derive_more::{From, Into};
 use indexmap::IndexMap;
 
@@ -8,6 +10,7 @@ use crate::mutf8::Mutf8String;
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, PartialEq, From, Into)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque, Debug, Default, PartialEq))]
 pub struct NbtCompound(IndexMap<Mutf8String, NbtTag>);
 
 impl NbtCompound {

@@ -32,12 +32,13 @@ bevy_utils = { workspace = true, optional = true }
 [features]
 default = []
 
-# Enable Bevy support
+# Enable `bevy` support.
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_reflect",
   "dep:bevy_utils",
   "froglight-common/bevy",
+  "froglight-nbt/bevy",
 ]
 
 # Enable support for v1.21.4

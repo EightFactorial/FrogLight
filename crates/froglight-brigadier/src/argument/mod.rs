@@ -27,10 +27,8 @@ impl Plugin for ArgumentParserPlugin {
 
         #[cfg(feature = "uuid")]
         {
-            use uuid::Uuid;
-
-            registry.register::<Uuid>();
-            registry.register_type_data::<Uuid, ReflectArgumentParser>();
+            registry.register::<uuid::Uuid>();
+            registry.register_type_data::<uuid::Uuid, ReflectArgumentParser>();
         }
     }
 }

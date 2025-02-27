@@ -2,6 +2,8 @@
 
 use std::borrow::{Borrow, Cow};
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use indexmap::Equivalent;
 
 /// A MUTF-8 string.
@@ -9,6 +11,7 @@ use indexmap::Equivalent;
 /// Equivalent to a [`String`], but with a different encoding.
 #[repr(transparent)]
 #[derive(Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 pub struct Mutf8String(Vec<u8>);
 
 impl Mutf8String {
@@ -279,6 +282,7 @@ impl std::fmt::Debug for Mutf8Str {
 
 #[cfg(feature = "serde")]
 impl serde::Serialize for Mutf8String {
+    #[inline]
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,

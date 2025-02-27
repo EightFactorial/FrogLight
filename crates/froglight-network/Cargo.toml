@@ -42,7 +42,7 @@ hickory-resolver = { version = "0.24", optional = true, default-features = false
 [features]
 default = ["resolver"]
 
-# Enable support for Bevy.
+# Enable `bevy` support.
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_log",

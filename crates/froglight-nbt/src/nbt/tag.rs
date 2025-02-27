@@ -1,3 +1,5 @@
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use derive_more::{From, IsVariant, TryInto, TryUnwrap, Unwrap};
 
 use super::NbtCompound;
@@ -8,6 +10,7 @@ use crate::mutf8::Mutf8String;
 #[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
 #[cfg_attr(feature = "serde", expect(clippy::unsafe_derive_deserialize))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
 pub enum NbtTag {
     /// A signed 8-bit integer.
     Byte(i8) = NbtTag::BYTE,
@@ -425,6 +428,7 @@ impl std::ops::IndexMut<usize> for NbtTag {
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
 pub enum NbtListTag {
     /// An empty list.
     Empty = NbtTag::END,
