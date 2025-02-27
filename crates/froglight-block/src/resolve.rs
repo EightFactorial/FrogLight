@@ -1,6 +1,6 @@
 //! TODO
 
-use froglight_common::Version;
+use froglight_common::version::Version;
 
 use crate::{block::UntypedBlock, storage::BlockStorage};
 

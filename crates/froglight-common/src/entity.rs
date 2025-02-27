@@ -1,3 +1,5 @@
+//! [`EntityId`] and [`EntityUuid`] types.
+
 use std::borrow::Borrow;
 
 #[cfg(feature = "bevy")]

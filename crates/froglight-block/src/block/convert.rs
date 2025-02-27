@@ -1,4 +1,4 @@
-use froglight_common::Version;
+use froglight_common::version::Version;
 
 use super::{Block, BlockTypeExt};
 use crate::storage::BlockAttributes;

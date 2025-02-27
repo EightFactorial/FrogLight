@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use bevy_reflect::TypeRegistry;
-use froglight_common::Identifier;
+use froglight_common::identifier::Identifier;
 use smol_str::SmolStr;
 
 use super::ReflectArgumentParser;

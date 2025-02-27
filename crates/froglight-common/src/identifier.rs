@@ -1,3 +1,5 @@
+//! Namespaced identifiers.
+
 #![allow(clippy::unsafe_derive_deserialize)]
 
 use std::borrow::Borrow;

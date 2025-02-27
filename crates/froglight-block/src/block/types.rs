@@ -5,7 +5,7 @@ use std::marker::PhantomData;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use downcast_rs::Downcast;
-use froglight_common::{Identifier, Version};
+use froglight_common::{identifier::Identifier, version::Version};
 
 use super::{BlockType, BlockTypeExt};
 use crate::{

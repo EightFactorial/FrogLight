@@ -210,7 +210,7 @@ impl bevy_ecs::world::FromWorld for ServerResolver {
 #[cfg(feature = "bevy")]
 #[expect(clippy::too_many_lines)]
 fn resolver() {
-    use froglight_common::Version;
+    use froglight_common::version::Version;
     use froglight_io::prelude::*;
     use futures_lite::StreamExt;
 

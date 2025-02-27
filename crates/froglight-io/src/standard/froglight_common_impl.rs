@@ -1,6 +1,9 @@
 use std::io::{Read, Write};
 
-use froglight_common::{EntityId, EntityUuid, Identifier};
+use froglight_common::{
+    entity::{EntityId, EntityUuid},
+    identifier::Identifier,
+};
 use smol_str::SmolStr;
 use uuid::Uuid;
 

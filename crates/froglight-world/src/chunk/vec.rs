@@ -110,7 +110,7 @@ impl VecChunk {
     /// or if no matching block is found.
     #[must_use]
     #[cfg(feature = "block")]
-    pub fn get_block_untyped<V: froglight_common::Version>(
+    pub fn get_block_untyped<V: froglight_common::version::Version>(
         &self,
         position: IVec3,
         storage: &froglight_block::storage::BlockStorage<V>,
@@ -124,7 +124,7 @@ impl VecChunk {
     /// Returns the previous block if it was set, or
     /// `None` if the position is out of bounds or no matching block is found.
     #[cfg(feature = "block")]
-    pub fn set_block_untyped<V: froglight_common::Version>(
+    pub fn set_block_untyped<V: froglight_common::version::Version>(
         &mut self,
         position: IVec3,
         block: impl Into<froglight_block::block::UntypedBlock<V>>,

@@ -25,8 +25,8 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                 impl #block_path::block::BlockType<#version> for #block {
                     #[inline]
                     #[must_use]
-                    fn identifier(&self) -> &'static #common_path::Identifier {
-                        static IDENTIFIER: #common_path::Identifier = #common_path::Identifier::const_new(<#block as #block_path::block::BlockTypeExt<#version>>::IDENTIFIER);
+                    fn identifier(&self) -> &'static #common_path::identifier::Identifier {
+                        static IDENTIFIER: #common_path::identifier::Identifier = #common_path::identifier::Identifier::const_new(<#block as #block_path::block::BlockTypeExt<#version>>::IDENTIFIER);
                         &IDENTIFIER
                     }
                 }

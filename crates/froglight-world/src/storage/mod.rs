@@ -11,7 +11,7 @@ use froglight_block::{
     resolve::BlockResolver,
     storage::{BlockStorage, GlobalBlockId},
 };
-use froglight_common::{Identifier, Version};
+use froglight_common::{identifier::Identifier, version::Version};
 use glam::IVec3;
 
 mod stored;

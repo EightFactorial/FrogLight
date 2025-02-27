@@ -2,6 +2,8 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub use froglight_block as block;
+#[cfg(feature = "brigadier")]
+pub use froglight_brigadier as brigadier;
 pub use froglight_common as common;
 pub use froglight_nbt as nbt;
 pub use froglight_network as network;
@@ -12,7 +14,9 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use froglight_block::prelude::*;
-    pub use froglight_common::{EntityId, EntityUuid, Identifier, version::*};
+    #[cfg(feature = "brigadier")]
+    pub use froglight_brigadier::prelude::*;
+    pub use froglight_common::prelude::*;
     pub use froglight_nbt::prelude::*;
     pub use froglight_network::prelude::*;
     pub use froglight_registry::prelude::*;

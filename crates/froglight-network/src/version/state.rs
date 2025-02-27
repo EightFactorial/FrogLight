@@ -1,7 +1,7 @@
 //! All possible states of the network.
 use std::{fmt::Debug, hash::Hash};
 
-use froglight_common::Version;
+use froglight_common::version::Version;
 use froglight_io::prelude::{FrogRead, FrogWrite};
 
 /// A trait for all possible states of the network.

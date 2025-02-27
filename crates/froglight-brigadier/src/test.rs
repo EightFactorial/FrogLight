@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs::component::ComponentInfo;
 use bevy_log::{Level, LogPlugin};
-use froglight_common::{EntityId, EntityUuid};
+use froglight_common::entity::{EntityId, EntityUuid};
 use uuid::Uuid;
 
 use crate::prelude::*;

@@ -1,7 +1,7 @@
 //! TODO
 
 use downcast_rs::DowncastSync;
-use froglight_common::Version;
+use froglight_common::version::Version;
 
 /// A registry type.
 pub trait RegistryType<V: Version>: MaybeReflect {

@@ -8,7 +8,7 @@ use std::{
 
 use derive_more::derive::Deref;
 use downcast_rs::DowncastSync;
-use froglight_common::Identifier;
+use froglight_common::identifier::Identifier;
 use glam::IVec3;
 use hashbrown::HashMap;
 use parking_lot::RwLock;

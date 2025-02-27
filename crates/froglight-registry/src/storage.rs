@@ -9,7 +9,7 @@ use bevy_reflect::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_utils::TypeIdMap;
 use downcast_rs::Downcast;
-use froglight_common::{Identifier, Version};
+use froglight_common::{identifier::Identifier, version::Version};
 use froglight_nbt::{
     convert::ConvertError,
     nbt::{NbtCompound, UnnamedNbt},

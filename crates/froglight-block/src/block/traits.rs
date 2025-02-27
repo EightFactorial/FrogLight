@@ -1,5 +1,5 @@
 use downcast_rs::DowncastSync;
-use froglight_common::{Identifier, Version};
+use froglight_common::{identifier::Identifier, version::Version};
 
 use crate::storage::BlockAttributes;
 

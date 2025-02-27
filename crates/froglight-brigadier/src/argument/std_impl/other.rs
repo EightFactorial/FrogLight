@@ -1,6 +1,6 @@
 use bevy_ecs::world::World;
 use bevy_reflect::func::ArgValue;
-use froglight_common::Identifier;
+use froglight_common::identifier::Identifier;
 
 use crate::argument::{ArgumentError, ArgumentParser};
 

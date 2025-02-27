@@ -5,7 +5,7 @@ use bevy_ecs::{reflect::ReflectResource, system::Resource};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use downcast_rs::Downcast;
-use froglight_common::Version;
+use froglight_common::version::Version;
 use parking_lot::RwLock;
 use rangemap::RangeMap;
 

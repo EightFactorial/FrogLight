@@ -3,11 +3,18 @@
 
 pub use froglight_macros::Version;
 
-mod entity;
-pub use entity::{EntityId, EntityUuid};
-
-mod identifier;
-pub use identifier::Identifier;
-
+pub mod entity;
+pub mod identifier;
 pub mod version;
-pub use version::Version;
+
+pub mod prelude {
+    //! Re-exports of common types, traits, and macros.
+
+    pub use froglight_macros::Version;
+
+    pub use crate::{
+        entity::{EntityId, EntityUuid},
+        identifier::Identifier,
+        version::Version,
+    };
+}

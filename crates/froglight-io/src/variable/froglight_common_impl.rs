@@ -1,6 +1,6 @@
 use std::io::{Read, Write};
 
-use froglight_common::EntityId;
+use froglight_common::entity::EntityId;
 
 use super::{FrogVarRead, FrogVarWrite};
 use crate::prelude::{ReadError, WriteError};
