@@ -17,23 +17,24 @@ workspace = true
 
 [dependencies]
 froglight-block = { workspace = true }
-froglight-brigadier = { workspace = true, optional = true }
+froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
 froglight-common = { workspace = true }
 froglight-nbt = { workspace = true, features = ["io"] }
-froglight-network = { workspace = true, features = ["resolver"] }
+froglight-network = { workspace = true, features = ["nbt", "resolver", "world"] }
 froglight-registry = { workspace = true }
 froglight-world = { workspace = true, features = ["block", "io"] }
 
 [features]
-default = ["brigadier"]
+default = ["bevy", "brigadier"]
 
 # Enable the `froglight-brigadier` crate.
-brigadier = ["dep:froglight-brigadier"]
+brigadier = ["dep:froglight-brigadier", "bevy"]
 
 # Enable `bevy` support.
 bevy = [
   "froglight-block/bevy",
   "froglight-common/bevy",
+  "froglight-nbt/bevy",
   "froglight-network/bevy",
   "froglight-registry/bevy",
   "froglight-world/bevy",

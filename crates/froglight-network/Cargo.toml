@@ -21,7 +21,6 @@ async-net = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
 froglight-io = { workspace = true, features = ["hashbrown", "serde"] }
 froglight-macros = { workspace = true, features = ["network"] }
-froglight-nbt = { workspace = true, features = ["io", "serde"] }
 futures-lite = { workspace = true }
 glam = { workspace = true }
 hashbrown = { workspace = true }
@@ -34,6 +33,9 @@ uuid = { workspace = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
+froglight-brigadier = { workspace = true, optional = true, features = ["io", "serde"] }
+froglight-nbt = { workspace = true, optional = true, features = ["io", "serde"] }
+froglight-world = { workspace = true, optional = true, features = ["io"] }
 hickory-resolver = { version = "0.24", optional = true, default-features = false, features = [
   "system-config",
   "rustls",
@@ -42,15 +44,25 @@ hickory-resolver = { version = "0.24", optional = true, default-features = false
 [features]
 default = ["resolver"]
 
+# Enable `froglight-brigadier` support.
+brigadier = ["dep:froglight-brigadier", "bevy"]
+# Enable `froglight-nbt` support.
+nbt = ["dep:froglight-nbt"]
+# Enable `froglight-world` support.
+world = ["dep:froglight-world"]
+
+# Enable server address and port lookup.
+resolver = ["dep:hickory-resolver"]
+
 # Enable `bevy` support.
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_log",
   "dep:bevy_tasks",
   "froglight-common/bevy",
+  "froglight-nbt?/bevy",
+  "froglight-world?/bevy",
 ]
-# Enable server address and port lookup.
-resolver = ["dep:hickory-resolver"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4"]
