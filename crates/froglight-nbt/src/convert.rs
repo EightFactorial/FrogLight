@@ -12,6 +12,7 @@ pub trait ConvertNbt: Sized {
     fn from_compound(nbt: NbtCompound) -> Result<Self, ConvertError>;
 
     /// Convert the type into [`NbtCompound`].
+    #[must_use]
     fn into_compound(self) -> NbtCompound;
 
     /// Convert the type into [`UnnamedNbt`].

@@ -66,7 +66,9 @@ impl NbtTag {
     pub const INT_ARRAY: u8 = 11;
     /// The tag of a [`NbtTag::LongArray`].
     pub const LONG_ARRAY: u8 = 12;
+}
 
+impl NbtTag {
     /// Get the tag ID of the [`NbtTag`].
     #[must_use]
     pub const fn tag_id(&self) -> u8 {

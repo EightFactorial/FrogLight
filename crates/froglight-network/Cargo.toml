@@ -33,14 +33,8 @@ uuid = { workspace = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
-froglight-brigadier = { workspace = true, optional = true, features = [
-  "io",
-  "serde",
-] }
-froglight-nbt = { workspace = true, optional = true, features = [
-  "io",
-  "serde",
-] }
+froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
+froglight-nbt = { workspace = true, optional = true, features = ["io"] }
 froglight-world = { workspace = true, optional = true, features = ["io"] }
 hickory-resolver = { version = "0.24", optional = true, default-features = false, features = [
   "system-config",

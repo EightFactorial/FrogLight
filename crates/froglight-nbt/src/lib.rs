@@ -5,7 +5,6 @@ pub mod convert;
 pub mod io;
 pub mod mutf8;
 pub mod nbt;
-#[cfg(feature = "serde")]
 pub mod snbt;
 
 #[cfg(test)]
@@ -18,5 +17,6 @@ pub mod prelude {
         convert::ConvertNbt,
         mutf8::{Mutf8Str, Mutf8String},
         nbt::{NamedNbt, NbtCompound, NbtTag, UnnamedNbt},
+        snbt::Snbt,
     };
 }

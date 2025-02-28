@@ -1,4 +1,6 @@
 //! TODO
+#![allow(clippy::all)]
+#![cfg_attr(rustfmt, rustfmt::skip)]
 
 pub mod attribute;
 pub mod block;

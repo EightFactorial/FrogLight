@@ -36,10 +36,7 @@ tracing = { workspace = true }
 
 # Optional dependencies
 froglight-io = { workspace = true, optional = true }
-froglight-nbt = { workspace = true, optional = true, features = [
-  "bevy",
-  "serde",
-] }
+froglight-nbt = { workspace = true, optional = true, features = ["bevy"] }
 glam = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }

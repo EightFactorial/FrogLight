@@ -8,7 +8,7 @@ use std::io::{Cursor, Write};
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
 
-use crate::{io::reference::*, mutf8::Mutf8Str, nbt::*};
+use crate::{io::slice::*, mutf8::Mutf8Str, nbt::*};
 
 /// A macro for generating tests
 macro_rules! test {

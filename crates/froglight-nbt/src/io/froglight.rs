@@ -5,10 +5,14 @@
 use std::io::{Read, Write};
 
 use froglight_io::prelude::*;
+use smol_str::SmolStr;
 
-use crate::mutf8::{Mutf8Str, Mutf8String};
 #[allow(clippy::wildcard_imports)]
 use crate::nbt::*;
+use crate::{
+    mutf8::{Mutf8Str, Mutf8String},
+    snbt::{Snbt, SnbtType},
+};
 
 impl FrogRead for NamedNbt {
     // Tag + Name + Payload
@@ -360,97 +364,97 @@ impl NbtListTag {
 impl FrogRead for ByteArray {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        <Vec<i8>>::frog_read(buffer).map(Self::from)
+        Vec::<i8>::frog_read(buffer).map(Self::from)
     }
 }
 impl FrogWrite for ByteArray {
     #[inline]
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
-        <Vec<i8>>::frog_write(self, buffer)
+        Vec::<i8>::frog_write(self, buffer)
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { <Vec<i8>>::frog_len(self) }
+    fn frog_len(&self) -> usize { Vec::<i8>::frog_len(self) }
 }
 
 impl FrogRead for ShortArray {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        <Vec<i16>>::frog_read(buffer).map(Self::from)
+        Vec::<i16>::frog_read(buffer).map(Self::from)
     }
 }
 impl FrogWrite for ShortArray {
     #[inline]
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
-        <Vec<i16>>::frog_write(self, buffer)
+        Vec::<i16>::frog_write(self, buffer)
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { <Vec<i16>>::frog_len(self) }
+    fn frog_len(&self) -> usize { Vec::<i16>::frog_len(self) }
 }
 
 impl FrogRead for IntArray {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        <Vec<i32>>::frog_read(buffer).map(Self::from)
+        Vec::<i32>::frog_read(buffer).map(Self::from)
     }
 }
 impl FrogWrite for IntArray {
     #[inline]
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
-        <Vec<i32>>::frog_write(self, buffer)
+        Vec::<i32>::frog_write(self, buffer)
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { <Vec<i32>>::frog_len(self) }
+    fn frog_len(&self) -> usize { Vec::<i32>::frog_len(self) }
 }
 
 impl FrogRead for LongArray {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        <Vec<i64>>::frog_read(buffer).map(Self::from)
+        Vec::<i64>::frog_read(buffer).map(Self::from)
     }
 }
 impl FrogWrite for LongArray {
     #[inline]
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
-        <Vec<i64>>::frog_write(self, buffer)
+        Vec::<i64>::frog_write(self, buffer)
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { <Vec<i64>>::frog_len(self) }
+    fn frog_len(&self) -> usize { Vec::<i64>::frog_len(self) }
 }
 
 impl FrogRead for FloatArray {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        <Vec<f32>>::frog_read(buffer).map(Self::from)
+        Vec::<f32>::frog_read(buffer).map(Self::from)
     }
 }
 impl FrogWrite for FloatArray {
     #[inline]
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
-        <Vec<f32>>::frog_write(self, buffer)
+        Vec::<f32>::frog_write(self, buffer)
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { <Vec<f32>>::frog_len(self) }
+    fn frog_len(&self) -> usize { Vec::<f32>::frog_len(self) }
 }
 
 impl FrogRead for DoubleArray {
     #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        <Vec<f64>>::frog_read(buffer).map(Self::from)
+        Vec::<f64>::frog_read(buffer).map(Self::from)
     }
 }
 impl FrogWrite for DoubleArray {
     #[inline]
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
-        <Vec<f64>>::frog_write(self, buffer)
+        Vec::<f64>::frog_write(self, buffer)
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { <Vec<f64>>::frog_len(self) }
+    fn frog_len(&self) -> usize { Vec::<f64>::frog_len(self) }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -483,4 +487,22 @@ impl FrogWrite for Mutf8Str {
 
     #[inline]
     fn frog_len(&self) -> usize { std::mem::size_of::<u16>() + self.as_bytes().len() }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<T: SnbtType> FrogRead for Snbt<T> {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        SmolStr::frog_read(buffer).map(Self::new_unchecked)
+    }
+}
+impl<T: SnbtType> FrogWrite for Snbt<T> {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        SmolStr::frog_write(self.as_ref(), buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { SmolStr::frog_len(self.as_ref()) }
 }
