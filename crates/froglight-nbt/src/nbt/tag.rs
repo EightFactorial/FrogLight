@@ -2,15 +2,15 @@
 use bevy_reflect::prelude::*;
 use derive_more::{From, IsVariant, TryInto, TryUnwrap, Unwrap};
 
-use super::NbtCompound;
+use super::{ByteArray, DoubleArray, FloatArray, IntArray, LongArray, NbtCompound, ShortArray};
 use crate::mutf8::Mutf8String;
 
 /// A NBT tag.
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
-#[cfg_attr(feature = "serde", expect(clippy::unsafe_derive_deserialize))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub enum NbtTag {
     /// A signed 8-bit integer.
     Byte(i8) = NbtTag::BYTE,
@@ -25,7 +25,7 @@ pub enum NbtTag {
     /// A 64-bit floating point number.
     Double(f64) = NbtTag::DOUBLE,
     /// An array of signed 8-bit integers.
-    ByteArray(Vec<i8>) = NbtTag::BYTE_ARRAY,
+    ByteArray(ByteArray) = NbtTag::BYTE_ARRAY,
     /// A MUTF-8 string.
     String(Mutf8String) = NbtTag::STRING,
     /// A [`NbtListTag`].
@@ -33,9 +33,9 @@ pub enum NbtTag {
     /// An [`NbtCompound`].
     Compound(NbtCompound) = NbtTag::COMPOUND,
     /// An array of signed 32-bit integers.
-    IntArray(Vec<i32>) = NbtTag::INT_ARRAY,
+    IntArray(IntArray) = NbtTag::INT_ARRAY,
     /// An array of signed 64-bit integers.
-    LongArray(Vec<i64>) = NbtTag::LONG_ARRAY,
+    LongArray(LongArray) = NbtTag::LONG_ARRAY,
 }
 
 #[rustfmt::skip]
@@ -115,7 +115,7 @@ impl NbtTag {
     #[must_use]
     #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_byte_array(self) -> Vec<u8> {
-        self.unwrap_byte_array().into_iter().map(|b| b as u8).collect()
+        Into::<Vec<i8>>::into(self.unwrap_byte_array()).into_iter().map(|b| b as u8).collect()
     }
 
     /// Unwrap this value to the [`NbtTag::IntArray`] variant. Panics if the
@@ -123,7 +123,7 @@ impl NbtTag {
     #[must_use]
     #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_int_array(self) -> Vec<u32> {
-        self.unwrap_int_array().into_iter().map(|i| i as u32).collect()
+        Into::<Vec<i32>>::into(self.unwrap_int_array()).into_iter().map(|i| i as u32).collect()
     }
 
     /// Unwrap this value to the [`NbtTag::LongArray`] variant. Panics if the
@@ -131,7 +131,7 @@ impl NbtTag {
     #[must_use]
     #[expect(clippy::cast_sign_loss)]
     pub fn unwrap_unsigned_long_array(self) -> Vec<u64> {
-        self.unwrap_long_array().into_iter().map(|l| l as u64).collect()
+        Into::<Vec<i64>>::into(self.unwrap_long_array()).into_iter().map(|l| l as u64).collect()
     }
 
     /// Get the value of a [`NbtTag::Byte`] variant, if it is one.
@@ -218,7 +218,7 @@ impl NbtTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_byte_array(&self) -> Option<&[i8]> {
+    pub fn as_byte_array(&self) -> Option<&ByteArray> {
         if let NbtTag::ByteArray(array) = self { Some(array) } else { None }
     }
 
@@ -226,32 +226,8 @@ impl NbtTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_byte_array_mut(&mut self) -> Option<&mut [i8]> {
+    pub fn as_byte_array_mut(&mut self) -> Option<&mut ByteArray> {
         if let NbtTag::ByteArray(array) = self { Some(array) } else { None }
-    }
-
-    /// Get the value of a [`NbtTag::ByteArray`] variant, if it is one.
-    ///
-    /// Returns `None` if the value is of any other type.
-    ///
-    /// TODO: Check if this is safe
-    #[must_use]
-    pub fn as_unsigned_byte_array(&self) -> Option<&[u8]> {
-        self.as_byte_array().map(|array| unsafe {
-            std::slice::from_raw_parts(array.as_ptr().cast::<u8>(), array.len())
-        })
-    }
-
-    /// Get the value of a [`NbtTag::ByteArray`] variant mutably, if it is one.
-    ///
-    /// Returns `None` if the value is of any other type.
-    ///
-    /// TODO: Check if this is safe
-    #[must_use]
-    pub fn as_unsigned_byte_array_mut(&mut self) -> Option<&mut [u8]> {
-        self.as_byte_array_mut().map(|array| unsafe {
-            std::slice::from_raw_parts_mut(array.as_mut_ptr().cast::<u8>(), array.len())
-        })
     }
 
     /// Get the value of a [`NbtTag::String`] variant, if it is one.
@@ -306,7 +282,7 @@ impl NbtTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_int_array(&self) -> Option<&[i32]> {
+    pub fn as_int_array(&self) -> Option<&IntArray> {
         if let NbtTag::IntArray(array) = self { Some(array) } else { None }
     }
 
@@ -314,39 +290,15 @@ impl NbtTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_int_array_mut(&mut self) -> Option<&mut [i32]> {
+    pub fn as_int_array_mut(&mut self) -> Option<&mut IntArray> {
         if let NbtTag::IntArray(array) = self { Some(array) } else { None }
     }
 
-    /// Get the value of a [`NbtTag::IntArray`] variant, if it is one.
-    ///
-    /// Returns `None` if the value is of any other type.
-    ///
-    /// TODO: Check if this is safe
-    #[must_use]
-    pub fn as_unsigned_int_array(&self) -> Option<&[u32]> {
-        self.as_int_array().map(|array| unsafe {
-            std::slice::from_raw_parts(array.as_ptr().cast::<u32>(), array.len())
-        })
-    }
-
-    /// Get the value of a [`NbtTag::IntArray`] variant mutably, if it is one.
-    ///
-    /// Returns `None` if the value is of any other type.
-    ///
-    /// TODO: Check if this is safe
-    #[must_use]
-    pub fn as_unsigned_int_array_mut(&mut self) -> Option<&mut [u32]> {
-        self.as_int_array_mut().map(|array| unsafe {
-            std::slice::from_raw_parts_mut(array.as_mut_ptr().cast::<u32>(), array.len())
-        })
-    }
-
     /// Get the value of a [`NbtTag::LongArray`] variant, if it is one.
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_long_array(&self) -> Option<&[i64]> {
+    pub fn as_long_array(&self) -> Option<&LongArray> {
         if let NbtTag::LongArray(array) = self { Some(array) } else { None }
     }
 
@@ -354,32 +306,8 @@ impl NbtTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_long_array_mut(&mut self) -> Option<&mut [i64]> {
+    pub fn as_long_array_mut(&mut self) -> Option<&mut LongArray> {
         if let NbtTag::LongArray(array) = self { Some(array) } else { None }
-    }
-
-    /// Get the value of a [`NbtTag::LongArray`] variant, if it is one.
-    ///
-    /// Returns `None` if the value is of any other type.
-    ///
-    /// TODO: Check if this is safe
-    #[must_use]
-    pub fn as_unsigned_long_array(&self) -> Option<&[u64]> {
-        self.as_long_array().map(|array| unsafe {
-            std::slice::from_raw_parts(array.as_ptr().cast::<u64>(), array.len())
-        })
-    }
-
-    /// Get the value of a [`NbtTag::LongArray`] variant mutably, if it is one.
-    ///
-    /// Returns `None` if the value is of any other type.
-    ///
-    /// TODO: Check if this is safe
-    #[must_use]
-    pub fn as_unsigned_long_array_mut(&mut self) -> Option<&mut [u64]> {
-        self.as_long_array_mut().map(|array| unsafe {
-            std::slice::from_raw_parts_mut(array.as_mut_ptr().cast::<u64>(), array.len())
-        })
     }
 }
 
@@ -432,23 +360,24 @@ impl std::ops::IndexMut<usize> for NbtTag {
 #[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub enum NbtListTag {
     /// An empty list.
     Empty = NbtTag::END,
     /// A list of signed 8-bit integers.
-    Byte(Vec<i8>) = NbtTag::BYTE,
+    Byte(ByteArray) = NbtTag::BYTE,
     /// A list of signed 16-bit integers.
-    Short(Vec<i16>) = NbtTag::SHORT,
+    Short(ShortArray) = NbtTag::SHORT,
     /// A list of signed 32-bit integers.
-    Int(Vec<i32>) = NbtTag::INT,
+    Int(IntArray) = NbtTag::INT,
     /// A list of signed 64-bit integers.
-    Long(Vec<i64>) = NbtTag::LONG,
+    Long(LongArray) = NbtTag::LONG,
     /// A list of 32-bit floating point numbers.
-    Float(Vec<f32>) = NbtTag::FLOAT,
+    Float(FloatArray) = NbtTag::FLOAT,
     /// A list of 64-bit floating point numbers.
-    Double(Vec<f64>) = NbtTag::DOUBLE,
+    Double(DoubleArray) = NbtTag::DOUBLE,
     /// A list of byte arrays.
-    ByteArray(Vec<Vec<i8>>) = NbtTag::BYTE_ARRAY,
+    ByteArray(Vec<ByteArray>) = NbtTag::BYTE_ARRAY,
     /// A list of MUTF-8 strings.
     String(Vec<Mutf8String>) = NbtTag::STRING,
     /// A list of [`NbtTagList`]s.
@@ -456,9 +385,9 @@ pub enum NbtListTag {
     /// A list of [`NbtCompound`]s.
     Compound(Vec<NbtCompound>) = NbtTag::COMPOUND,
     /// A list of signed 32-bit integers.
-    IntArray(Vec<Vec<i32>>) = NbtTag::INT_ARRAY,
+    IntArray(Vec<IntArray>) = NbtTag::INT_ARRAY,
     /// A list of signed 64-bit integers.
-    LongArray(Vec<Vec<i64>>) = NbtTag::LONG_ARRAY,
+    LongArray(Vec<LongArray>) = NbtTag::LONG_ARRAY,
 }
 
 impl NbtListTag {
@@ -486,7 +415,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_byte(&self) -> Option<&[i8]> {
+    pub fn as_byte(&self) -> Option<&ByteArray> {
         if let NbtListTag::Byte(byte) = self { Some(byte) } else { None }
     }
 
@@ -494,7 +423,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_byte_mut(&mut self) -> Option<&mut Vec<i8>> {
+    pub fn as_byte_mut(&mut self) -> Option<&mut ByteArray> {
         if let NbtListTag::Byte(byte) = self { Some(byte) } else { None }
     }
 
@@ -502,7 +431,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_short(&self) -> Option<&[i16]> {
+    pub fn as_short(&self) -> Option<&ShortArray> {
         if let NbtListTag::Short(short) = self { Some(short) } else { None }
     }
 
@@ -510,7 +439,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_short_mut(&mut self) -> Option<&mut Vec<i16>> {
+    pub fn as_short_mut(&mut self) -> Option<&mut ShortArray> {
         if let NbtListTag::Short(short) = self { Some(short) } else { None }
     }
 
@@ -518,7 +447,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_int(&self) -> Option<&[i32]> {
+    pub fn as_int(&self) -> Option<&IntArray> {
         if let NbtListTag::Int(int) = self { Some(int) } else { None }
     }
 
@@ -526,7 +455,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_int_mut(&mut self) -> Option<&mut Vec<i32>> {
+    pub fn as_int_mut(&mut self) -> Option<&mut IntArray> {
         if let NbtListTag::Int(int) = self { Some(int) } else { None }
     }
 
@@ -534,7 +463,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_long(&self) -> Option<&[i64]> {
+    pub fn as_long(&self) -> Option<&LongArray> {
         if let NbtListTag::Long(long) = self { Some(long) } else { None }
     }
 
@@ -542,7 +471,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_long_mut(&mut self) -> Option<&mut Vec<i64>> {
+    pub fn as_long_mut(&mut self) -> Option<&mut LongArray> {
         if let NbtListTag::Long(long) = self { Some(long) } else { None }
     }
 
@@ -550,7 +479,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_float(&self) -> Option<&[f32]> {
+    pub fn as_float(&self) -> Option<&FloatArray> {
         if let NbtListTag::Float(float) = self { Some(float) } else { None }
     }
 
@@ -558,7 +487,7 @@ impl NbtListTag {
     ///
     ///    Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_float_mut(&mut self) -> Option<&mut Vec<f32>> {
+    pub fn as_float_mut(&mut self) -> Option<&mut FloatArray> {
         if let NbtListTag::Float(float) = self { Some(float) } else { None }
     }
 
@@ -574,7 +503,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_double_mut(&mut self) -> Option<&mut Vec<f64>> {
+    pub fn as_double_mut(&mut self) -> Option<&mut DoubleArray> {
         if let NbtListTag::Double(double) = self { Some(double) } else { None }
     }
 
@@ -582,7 +511,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_byte_array(&self) -> Option<&[Vec<i8>]> {
+    pub fn as_byte_array(&self) -> Option<&[ByteArray]> {
         if let NbtListTag::ByteArray(array) = self { Some(array) } else { None }
     }
 
@@ -591,7 +520,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_byte_array_mut(&mut self) -> Option<&mut Vec<Vec<i8>>> {
+    pub fn as_byte_array_mut(&mut self) -> Option<&mut Vec<ByteArray>> {
         if let NbtListTag::ByteArray(array) = self { Some(array) } else { None }
     }
 
@@ -648,7 +577,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_int_array(&self) -> Option<&[Vec<i32>]> {
+    pub fn as_int_array(&self) -> Option<&[IntArray]> {
         if let NbtListTag::IntArray(array) = self { Some(array) } else { None }
     }
 
@@ -657,7 +586,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_int_array_mut(&mut self) -> Option<&mut Vec<Vec<i32>>> {
+    pub fn as_int_array_mut(&mut self) -> Option<&mut Vec<IntArray>> {
         if let NbtListTag::IntArray(array) = self { Some(array) } else { None }
     }
 
@@ -665,7 +594,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_long_array(&self) -> Option<&[Vec<i64>]> {
+    pub fn as_long_array(&self) -> Option<&[LongArray]> {
         if let NbtListTag::LongArray(array) = self { Some(array) } else { None }
     }
 
@@ -674,7 +603,7 @@ impl NbtListTag {
     ///
     /// Returns `None` if the value is of any other type.
     #[must_use]
-    pub fn as_long_array_mut(&mut self) -> Option<&mut Vec<Vec<i64>>> {
+    pub fn as_long_array_mut(&mut self) -> Option<&mut Vec<LongArray>> {
         if let NbtListTag::LongArray(array) = self { Some(array) } else { None }
     }
 }

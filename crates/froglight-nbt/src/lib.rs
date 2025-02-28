@@ -5,6 +5,8 @@ pub mod convert;
 pub mod io;
 pub mod mutf8;
 pub mod nbt;
+#[cfg(feature = "serde")]
+pub mod snbt;
 
 #[cfg(test)]
 mod test;

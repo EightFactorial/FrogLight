@@ -316,14 +316,21 @@ impl FrogWrite for NbtListTag {
 
 impl NbtListTag {
     // NBT uses a plain `u32` for the length instead of the usual variable encoding
-    fn frog_read_array<T: FrogRead>(buffer: &mut impl Read) -> Result<Vec<T>, ReadError> {
-        (0..u32::frog_read(buffer)? as usize).map(|_| T::frog_read(buffer)).collect()
+    fn frog_read_array<A: From<Vec<T>>, T: FrogRead>(
+        buffer: &mut impl Read,
+    ) -> Result<A, ReadError> {
+        (0..u32::frog_read(buffer)? as usize)
+            .map(|_| T::frog_read(buffer))
+            .collect::<Result<Vec<T>, _>>()
+            .map(A::from)
     }
 
-    fn frog_read_array_array<T: FrogRead>(
+    fn frog_read_array_array<A: From<Vec<T>>, T: FrogRead>(
         buffer: &mut impl Read,
-    ) -> Result<Vec<Vec<T>>, ReadError> {
-        (0..u32::frog_read(buffer)? as usize).map(|_| Self::frog_read_array::<T>(buffer)).collect()
+    ) -> Result<Vec<A>, ReadError> {
+        (0..u32::frog_read(buffer)? as usize)
+            .map(|_| Self::frog_read_array::<A, T>(buffer))
+            .collect::<Result<Vec<A>, _>>()
     }
 
     // NBT uses a plain `u32` for the length instead of the usual variable encoding
@@ -338,14 +345,112 @@ impl NbtListTag {
     }
 
     #[expect(clippy::cast_possible_truncation)]
-    fn frog_write_array_array<T: FrogWrite>(
-        items: &[Vec<T>],
+    fn frog_write_array_array<A: AsRef<Vec<T>>, T: FrogWrite>(
+        items: &[A],
         buffer: &mut impl Write,
     ) -> Result<usize, WriteError> {
         items.iter().try_fold((items.len() as u32).frog_write(buffer)?, |acc, item| {
-            Self::frog_write_array(item, buffer).map(|item| acc + item)
+            Self::frog_write_array::<T>(item.as_ref(), buffer).map(|item| acc + item)
         })
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl FrogRead for ByteArray {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        <Vec<i8>>::frog_read(buffer).map(Self::from)
+    }
+}
+impl FrogWrite for ByteArray {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        <Vec<i8>>::frog_write(self, buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { <Vec<i8>>::frog_len(self) }
+}
+
+impl FrogRead for ShortArray {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        <Vec<i16>>::frog_read(buffer).map(Self::from)
+    }
+}
+impl FrogWrite for ShortArray {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        <Vec<i16>>::frog_write(self, buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { <Vec<i16>>::frog_len(self) }
+}
+
+impl FrogRead for IntArray {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        <Vec<i32>>::frog_read(buffer).map(Self::from)
+    }
+}
+impl FrogWrite for IntArray {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        <Vec<i32>>::frog_write(self, buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { <Vec<i32>>::frog_len(self) }
+}
+
+impl FrogRead for LongArray {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        <Vec<i64>>::frog_read(buffer).map(Self::from)
+    }
+}
+impl FrogWrite for LongArray {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        <Vec<i64>>::frog_write(self, buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { <Vec<i64>>::frog_len(self) }
+}
+
+impl FrogRead for FloatArray {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        <Vec<f32>>::frog_read(buffer).map(Self::from)
+    }
+}
+impl FrogWrite for FloatArray {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        <Vec<f32>>::frog_write(self, buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { <Vec<f32>>::frog_len(self) }
+}
+
+impl FrogRead for DoubleArray {
+    #[inline]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        <Vec<f64>>::frog_read(buffer).map(Self::from)
+    }
+}
+impl FrogWrite for DoubleArray {
+    #[inline]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        <Vec<f64>>::frog_write(self, buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { <Vec<f64>>::frog_len(self) }
 }
 
 // -------------------------------------------------------------------------------------------------

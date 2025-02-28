@@ -147,8 +147,8 @@ fn test_tag(ref_tag: NbtTagRef, io_tag: &NbtTag) {
         }
         NbtTagRefData::ByteArray(ref_val) => {
             assert_eq!(
-                io_tag.as_byte_array().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_tag.as_byte_array().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref byte array does not match IO byte array!"
             );
         }
@@ -167,15 +167,15 @@ fn test_tag(ref_tag: NbtTagRef, io_tag: &NbtTag) {
         }
         NbtTagRefData::IntArray(ref_val) => {
             assert_eq!(
-                io_tag.as_int_array().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_tag.as_int_array().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref int array does not match IO int array!"
             );
         }
         NbtTagRefData::LongArray(ref_val) => {
             assert_eq!(
-                io_tag.as_long_array().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_tag.as_long_array().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref long array does not match IO long array!"
             );
         }
@@ -191,43 +191,43 @@ fn test_list(ref_list: NbtListTagRef, io_list: &NbtListTag) {
         }
         NbtListTagRefData::Byte(ref_val) => {
             assert_eq!(
-                io_list.as_byte().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_list.as_byte().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref byte list does not match IO byte list!"
             );
         }
         NbtListTagRefData::Short(ref_val) => {
             assert_eq!(
-                io_list.as_short().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_list.as_short().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref short list does not match IO short list!"
             );
         }
         NbtListTagRefData::Int(ref_val) => {
             assert_eq!(
-                io_list.as_int().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_list.as_int().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref int list does not match IO int list!"
             );
         }
         NbtListTagRefData::Long(ref_val) => {
             assert_eq!(
-                io_list.as_long().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_list.as_long().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref long list does not match IO long list!"
             );
         }
         NbtListTagRefData::Float(ref_val) => {
             assert_eq!(
-                io_list.as_float().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_list.as_float().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref float list does not match IO float list!"
             );
         }
         NbtListTagRefData::Double(ref_val) => {
             assert_eq!(
-                io_list.as_double().unwrap(),
-                ref_val.into_iter().collect::<Vec<_>>(),
+                io_list.as_double().unwrap().as_ref(),
+                &ref_val.into_iter().collect::<Vec<_>>(),
                 "Ref double list does not match IO double list!"
             );
         }
@@ -236,8 +236,8 @@ fn test_list(ref_list: NbtListTagRef, io_list: &NbtListTag) {
                 io_list.as_byte_array().unwrap(),
                 ref_val
                     .into_iter()
-                    .map(|v| v.into_iter().collect::<Vec<_>>())
-                    .collect::<Vec<Vec<_>>>(),
+                    .map(|v| v.into_iter().collect::<Vec<_>>().into())
+                    .collect::<Vec<ByteArray>>(),
                 "Ref byte array list does not match IO byte array list!"
             );
         }
@@ -273,8 +273,8 @@ fn test_list(ref_list: NbtListTagRef, io_list: &NbtListTag) {
                 io_list.as_int_array().unwrap(),
                 ref_val
                     .into_iter()
-                    .map(|v| v.into_iter().collect::<Vec<_>>())
-                    .collect::<Vec<Vec<_>>>(),
+                    .map(|v| v.into_iter().collect::<Vec<_>>().into())
+                    .collect::<Vec<IntArray>>(),
                 "Ref int array list does not match IO int array list!"
             );
         }
@@ -283,8 +283,8 @@ fn test_list(ref_list: NbtListTagRef, io_list: &NbtListTag) {
                 io_list.as_long_array().unwrap(),
                 ref_val
                     .into_iter()
-                    .map(|v| v.into_iter().collect::<Vec<_>>())
-                    .collect::<Vec<Vec<_>>>(),
+                    .map(|v| v.into_iter().collect::<Vec<_>>().into())
+                    .collect::<Vec<LongArray>>(),
                 "Ref long array list does not match IO long array list!"
             );
         }

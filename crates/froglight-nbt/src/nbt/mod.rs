@@ -1,5 +1,8 @@
 //! TODO
 
+mod array;
+pub use array::{ByteArray, DoubleArray, FloatArray, IntArray, LongArray, ShortArray};
+
 mod compound;
 pub use compound::NbtCompound;
 

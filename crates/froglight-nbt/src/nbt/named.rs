@@ -89,6 +89,7 @@ impl NamedNbt {
 #[derive(Debug, Default, PartialEq, From, Into)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct UnnamedNbt(Option<NbtCompound>);
 
 impl UnnamedNbt {
