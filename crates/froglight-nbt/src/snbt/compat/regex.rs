@@ -1,5 +1,3 @@
-#![expect(dead_code)]
-
 use std::sync::LazyLock;
 
 use regex::RegexSet;
