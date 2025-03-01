@@ -16,7 +16,7 @@ pub struct Standard;
 impl super::SnbtType for Standard {}
 
 impl ConvertNbt for Snbt<Standard> {
-    fn from_compound(_nbt: NbtCompound) -> Result<Self, ConvertError> { todo!() }
+    fn from_compound(_nbt: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
 
-    fn into_compound(self) -> NbtCompound { todo!() }
+    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
 }

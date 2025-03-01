@@ -223,7 +223,6 @@ impl NbtTag {
 // -------------------------------------------------------------------------------------------------
 
 impl FrogRead for NbtListTag {
-    #[inline]
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         match u8::frog_read(buffer)? {
             NbtTag::END => u32::frog_read(buffer).map(|_| Self::Empty),

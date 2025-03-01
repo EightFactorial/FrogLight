@@ -36,6 +36,8 @@ impl<T: SnbtType> Snbt<T> {
     /// # Warning
     /// This function does not validate the input!
     ///
-    /// Using invalid SNBT *will* result in panics!
+    /// This will cause errors later when converting to an
+    /// [`NbtCompound`](crate::prelude::NbtCompound).
+    #[must_use]
     pub const fn new_unchecked(inner: SmolStr) -> Self { Self { inner, _marker: PhantomData } }
 }

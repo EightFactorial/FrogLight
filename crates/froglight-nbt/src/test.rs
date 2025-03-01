@@ -8,7 +8,7 @@ use std::io::{Cursor, Write};
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
 
-use crate::{io::slice::*, mutf8::Mutf8Str, nbt::*};
+use crate::{io::slice::*, nbt::*, prelude::*, snbt::Compat};
 
 /// A macro for generating tests
 macro_rules! test {
@@ -79,6 +79,11 @@ fn test_data(bytes: &[u8]) {
     {
         // Parse the NBT data using the `froglight-io` reader
         let nbt_io = NamedNbt::frog_read(&mut Cursor::new(&bytes)).unwrap();
+
+        // Convert the NBT into SNBT (Compat)
+        // TODO: Move out of `IO` tests after implementing `IntoOwned` for `*NbtRef`
+        let _snbt = Snbt::<Compat>::from_compound(nbt_io.compound().as_ref().unwrap()).unwrap();
+        // println!("SNBT: {}", _snbt.as_ref());
 
         // Compare the NBT object names and lengths
         assert_eq!(nbt_ref.name(), nbt_io.name(), "Ref name does not match IO name!");

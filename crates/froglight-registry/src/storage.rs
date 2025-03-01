@@ -208,31 +208,14 @@ impl<V: Version> RegistryStorage<V> {
     /// If the value does not implement [`Copy`],
     /// use [`RegistryStorage::get_cloned_nbt`] instead.
     #[inline]
-    pub fn get_copied_nbt<R: RegistryType<V>>(
+    pub fn get_nbt<R: RegistryType<V>>(
         &self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
     ) -> Option<UnnamedNbt>
     where
         R::Value: Copy + ConvertNbt,
     {
-        self.get::<R>(ident).copied().map(<R::Value as ConvertNbt>::into_nbt)
-    }
-
-    /// Get a [`RegistryValue`] as [`BaseNbt`]
-    /// by it's [`RegistryType`] and identifier.
-    ///
-    /// ### Note
-    /// If the value implements [`Copy`],
-    /// prefer [`RegistryStorage::get_copied_nbt`] instead.
-    #[inline]
-    pub fn get_cloned_nbt<R: RegistryType<V>>(
-        &self,
-        ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
-    ) -> Option<UnnamedNbt>
-    where
-        R::Value: Clone + ConvertNbt,
-    {
-        self.get::<R>(ident).cloned().map(<R::Value as ConvertNbt>::into_nbt)
+        self.get::<R>(ident).and_then(|val: &R::Value| <R::Value as ConvertNbt>::into_nbt(val).ok())
     }
 
     /// Insert a serialized [`RegistryValue`] into the [`RegistryStorage`].
@@ -245,12 +228,12 @@ impl<V: Version> RegistryStorage<V> {
     pub fn insert_nbt<R: RegistryType<V>>(
         &mut self,
         ident: Identifier,
-        nbt: NbtCompound,
+        nbt: &NbtCompound,
     ) -> Result<Option<R::Value>, ConvertError>
     where
         R::Value: ConvertNbt,
     {
-        <R::Value as ConvertNbt>::from_compound(nbt)
+        <R::Value as ConvertNbt>::from_compound(&nbt)
             .map(|value: R::Value| self.insert::<R>(ident, value))
     }
 }

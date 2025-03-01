@@ -1,6 +1,11 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
+mod regex;
+
+mod traits;
+use traits::ConvertCompat;
+
 use super::Snbt;
 use crate::{
     convert::{ConvertError, ConvertNbt},
@@ -16,24 +21,13 @@ pub struct Compat;
 impl super::SnbtType for Compat {}
 
 impl ConvertNbt for Snbt<Compat> {
-    fn from_compound(_nbt: NbtCompound) -> Result<Self, ConvertError> { todo!() }
+    fn from_compound(nbt: &NbtCompound) -> Result<Self, ConvertError> {
+        let mut content = String::new();
+        nbt.write_to_string(&mut content);
+        Ok(Self::new_unchecked(content.into()))
+    }
 
-    fn into_compound(self) -> NbtCompound { todo!() }
+    fn into_compound(&self) -> Result<NbtCompound, ConvertError> {
+        NbtCompound::read_from_string(self.as_str()).map(|(nbt, _)| nbt)
+    }
 }
-
-#[rustfmt::skip]
-#[expect(dead_code)]
-impl Compat {
-    const BYTE_REGEX: &'static str = r"(-?\d+(b|B))|true|false";
-    const SHORT_REGEX: &'static str = r"-?\d+(s|S)";
-    const INT_REGEX: &'static str = r"-?\d+";
-    const LONG_REGEX: &'static str = r"-?\d+(l|L)";
-    const FLOAT_REGEX: &'static str = r"-?\d+\.\d+(f|F)";
-    const DOUBLE_REGEX: &'static str = r"-?\d+\.\d+(d|D)?";
-
-    const BYTE_ARRAY_REGEX: &'static str = r"";
-    const INT_ARRAY_REGEX: &'static str = r"";
-    const LONG_ARRAY_REGEX: &'static str = r"";
-}
-
-impl Compat {}
