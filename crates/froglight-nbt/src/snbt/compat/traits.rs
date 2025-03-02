@@ -55,18 +55,87 @@ impl ConvertCompat for NbtCompound {
 // -------------------------------------------------------------------------------------------------
 
 impl ConvertCompat for NbtTag {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
-        match content.trim_start().chars().next().unwrap() {
+    fn read_from_string(mut content: &str) -> Result<(Self, &str), ConvertError> {
+        content = content.trim_start();
+
+        let mut chars = content.chars();
+        match chars.next().unwrap() {
             '{' => NbtCompound::read_from_string(content).map(|(c, r)| (NbtTag::Compound(c), r)),
-            '[' => {
-                todo!("Guess whether *Array or List: {content:?}");
-            }
+            '[' => match (chars.next(), chars.next()) {
+                (Some(']'), None) => Ok((NbtTag::List(NbtListTag::Empty), &content[1..])),
+                (Some('B'), Some(';')) => {
+                    ByteArray::read_from_string(content).map(|(a, r)| (NbtTag::ByteArray(a), r))
+                }
+                (Some('I'), Some(';')) => {
+                    IntArray::read_from_string(content).map(|(a, r)| (NbtTag::IntArray(a), r))
+                }
+                (Some('L'), Some(';')) => {
+                    LongArray::read_from_string(content).map(|(a, r)| (NbtTag::LongArray(a), r))
+                }
+                // Not an `*Array`, must be a `List`.
+                _ => NbtListTag::read_from_string(content).map(|(l, r)| (NbtTag::List(l), r)),
+            },
             '\"' | '\'' => {
                 Mutf8String::read_from_string(content).map(|(s, r)| (NbtTag::String(s), r))
             }
             _ => {
-                let _matches = FIELD_REGEX.matches_at(content, 0);
-                todo!("Guess the type of the tag from the content: {content:?}");
+                let (content, remaining) =
+                    content.split_once([':', ',', ' ', ']', '}']).unwrap_or((content, ""));
+                let matches = FIELD_REGEX.matches_at(content, 0);
+
+                match (
+                    matches.matched(0), // STRING
+                    matches.matched(1), // BYTE
+                    matches.matched(2), // SHORT
+                    matches.matched(3), // INT
+                    matches.matched(4), // LONG
+                    matches.matched(5), // FLOAT
+                    matches.matched(6), // DOUBLE
+                ) {
+                    (_, true, ..) => {
+                        content.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                            |_| Err(ConvertError::UnexpectedData(content.to_string())),
+                            |i| Ok((NbtTag::Byte(i), remaining)),
+                        )
+                    }
+                    (_, _, true, ..) => {
+                        content.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                            |_| Err(ConvertError::UnexpectedData(content.to_string())),
+                            |i| Ok((NbtTag::Short(i), remaining)),
+                        )
+                    }
+                    (_, _, _, _, true, ..) => {
+                        content.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                            |_| Err(ConvertError::UnexpectedData(content.to_string())),
+                            |i| Ok((NbtTag::Long(i), remaining)),
+                        )
+                    }
+                    // Check for `Int` after all other integer types.
+                    (_, _, _, true, ..) => {
+                        content.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                            |_| Err(ConvertError::UnexpectedData(content.to_string())),
+                            |i| Ok((NbtTag::Int(i), remaining)),
+                        )
+                    }
+                    (_, _, _, _, _, true, _) => {
+                        content.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                            |_| Err(ConvertError::UnexpectedData(content.to_string())),
+                            |i| Ok((NbtTag::Float(i), remaining)),
+                        )
+                    }
+                    // Check for `Double` after all other floating-point types.
+                    (_, _, _, _, _, _, true) => {
+                        content.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                            |_| Err(ConvertError::UnexpectedData(content.to_string())),
+                            |i| Ok((NbtTag::Double(i), remaining)),
+                        )
+                    }
+                    // If all else fails, parse the content as a string.
+                    (true, ..) => {
+                        Mutf8String::read_from_string(content).map(|(s, r)| (NbtTag::String(s), r))
+                    }
+                    _ => Err(ConvertError::UnexpectedData(content.to_string())),
+                }
             }
         }
     }
@@ -109,24 +178,157 @@ impl ConvertCompat for NbtTag {
 
 impl ConvertCompat for NbtListTag {
     fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
-        let (content, remaining) = read_enclosed(content, '[', ']')?;
+        let (mut content, remaining) = read_enclosed(content, '[', ']')?;
         if content.is_empty() {
             return Ok((NbtListTag::Empty, remaining));
         }
 
         match content.chars().next().unwrap() {
             '{' => {
-                todo!("Read a list of compounds: {content:?}");
+                let mut list = Vec::new();
+                while !content.is_empty() {
+                    let (value, remaining) = NbtCompound::read_from_string(content)?;
+                    content = remaining.trim_start_matches([' ', ',']);
+                    list.push(value);
+                }
+                Ok((NbtListTag::Compound(list), remaining))
             }
             '[' => {
                 todo!("Guess whether *Array or List: {content:?}");
             }
             '\"' | '\'' => {
-                todo!("Read a list of strings: {content:?}");
+                let mut list = Vec::new();
+                while !content.is_empty() {
+                    let (value, remaining) = Mutf8String::read_from_string(content)?;
+                    content = remaining.trim_start_matches([' ', ',']);
+                    list.push(value);
+                }
+                Ok((NbtListTag::String(list), remaining))
             }
             _ => {
-                let _matches = FIELD_REGEX.matches_at(content, 0);
-                todo!("Guess the type of the tag from the content: {content:?}");
+                let (mut content, remaining) =
+                    content.split_once([':', ',', ' ', ']', '}']).unwrap_or((content, ""));
+                let matches = FIELD_REGEX.matches_at(content, 0);
+
+                match (
+                    matches.matched(0), // STRING
+                    matches.matched(1), // BYTE
+                    matches.matched(2), // SHORT
+                    matches.matched(3), // INT
+                    matches.matched(4), // LONG
+                    matches.matched(5), // FLOAT
+                    matches.matched(6), // DOUBLE
+                ) {
+                    (_, true, ..) => {
+                        let mut list = Vec::new();
+                        while !content.is_empty() {
+                            let (value, remaining) =
+                                content.split_once([' ', ',']).unwrap_or((content, ""));
+                            content = remaining.trim_start_matches([' ', ',']);
+
+                            list.push(
+                                value.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                                    |_| Err(ConvertError::UnexpectedData(value.to_string())),
+                                    |i| Ok(i),
+                                )?,
+                            );
+                        }
+                        Ok((NbtListTag::Byte(ByteArray::from(list)), remaining))
+                    }
+                    (_, _, true, ..) => {
+                        let mut list = Vec::new();
+                        while !content.is_empty() {
+                            let (value, remaining) =
+                                content.split_once([' ', ',']).unwrap_or((content, ""));
+                            content = remaining.trim_start_matches([' ', ',']);
+
+                            list.push(
+                                value.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                                    |_| Err(ConvertError::UnexpectedData(value.to_string())),
+                                    |i| Ok(i),
+                                )?,
+                            );
+                        }
+                        Ok((NbtListTag::Short(ShortArray::from(list)), remaining))
+                    }
+                    (_, _, _, _, true, ..) => {
+                        let mut list = Vec::new();
+                        while !content.is_empty() {
+                            let (value, remaining) =
+                                content.split_once([' ', ',']).unwrap_or((content, ""));
+                            content = remaining.trim_start_matches([' ', ',']);
+
+                            list.push(
+                                value.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                                    |_| Err(ConvertError::UnexpectedData(value.to_string())),
+                                    |i| Ok(i),
+                                )?,
+                            );
+                        }
+                        Ok((NbtListTag::Long(LongArray::from(list)), remaining))
+                    }
+                    // Check for `Int` after all other integer types.
+                    (_, _, _, true, ..) => {
+                        let mut list = Vec::new();
+                        while !content.is_empty() {
+                            let (value, remaining) =
+                                content.split_once([' ', ',']).unwrap_or((content, ""));
+                            content = remaining.trim_start_matches([' ', ',']);
+
+                            list.push(
+                                value.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                                    |_| Err(ConvertError::UnexpectedData(value.to_string())),
+                                    |i| Ok(i),
+                                )?,
+                            );
+                        }
+                        Ok((NbtListTag::Int(IntArray::from(list)), remaining))
+                    }
+                    (_, _, _, _, _, true, _) => {
+                        let mut list = Vec::new();
+                        while !content.is_empty() {
+                            let (value, remaining) =
+                                content.split_once([' ', ',']).unwrap_or((content, ""));
+                            content = remaining.trim_start_matches([' ', ',']);
+
+                            list.push(
+                                value.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                                    |_| Err(ConvertError::UnexpectedData(value.to_string())),
+                                    |i| Ok(i),
+                                )?,
+                            );
+                        }
+                        Ok((NbtListTag::Float(FloatArray::from(list)), remaining))
+                    }
+                    // Check for `Double` after all other floating-point types.
+                    (_, _, _, _, _, _, true) => {
+                        let mut list = Vec::new();
+                        while !content.is_empty() {
+                            let (value, remaining) =
+                                content.split_once([' ', ',']).unwrap_or((content, ""));
+                            content = remaining.trim_start_matches([' ', ',']);
+
+                            list.push(
+                                value.trim_end_matches(char::is_alphabetic).parse().map_or_else(
+                                    |_| Err(ConvertError::UnexpectedData(value.to_string())),
+                                    |i| Ok(i),
+                                )?,
+                            );
+                        }
+                        Ok((NbtListTag::Double(DoubleArray::from(list)), remaining))
+                    }
+                    // If all else fails, parse the content as a string.
+                    (true, ..) => {
+                        let mut list = Vec::new();
+                        while !content.is_empty() {
+                            let (value, remaining) = Mutf8String::read_from_string(content)?;
+                            content = remaining.trim_start_matches([' ', ',']);
+                            list.push(value);
+                        }
+                        Ok((NbtListTag::String(list), remaining))
+                    }
+                    _ => Err(ConvertError::UnexpectedData(content.to_string())),
+                }
             }
         }
     }
@@ -302,7 +504,8 @@ fn read_enclosed(content: &str, open: char, close: char) -> Result<(&str, &str),
             c if c == close => {
                 counter -= 1;
                 if counter == 0 {
-                    return Ok(content.split_at(i));
+                    let (left, right) = content.split_at(i);
+                    return Ok((&left[1..], right));
                 }
             }
             _ => {}
@@ -350,19 +553,33 @@ fn write_array<T: ToString>(
 // -------------------------------------------------------------------------------------------------
 
 impl ConvertCompat for Mutf8String {
-    fn read_from_string(_content: &str) -> Result<(Self, &str), ConvertError> {
-        todo!()
-        // if content.starts_with('\"') && content.ends_with('\"') {
-        //     // Un-escape double quotes.
-        //     let content = &content[1..content.len() - 1].replace("\\\"",
-        // "\"");     Ok((Mutf8String::from_string(content), ""))
-        // } else if content.starts_with('\'') && content.ends_with('\'') {
-        //     // Un-escape single quotes.
-        //     let content = &content[1..content.len() - 1].replace("\\'", "'");
-        //     Ok((Mutf8String::from_string(content), ""))
-        // } else {
-        //     Ok((Mutf8String::from_string(content), ""))
-        // }
+    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+        let mut chars = content.trim().chars();
+        match chars.next().unwrap() {
+            char @ '"' | char @ '\'' => {
+                let mut chars = chars
+                    .enumerate()
+                    .map_windows::<_, _, 2>(|[(i, a), (_, b)]| (*i, (*a != '\\' && *b == char)));
+
+                if let Some(position) = chars.find_map(|(i, b)| b.then_some(i + 5)) {
+                    let (content, remaining) = (&content[1..position], &content[position..]);
+                    let content = if char == '"' {
+                        content.replace("\\\"", "\"")
+                    } else {
+                        content.replace("\\\'", "\'")
+                    };
+                    Ok((Mutf8String::from_string(&content), remaining))
+                } else {
+                    Err(ConvertError::UnexpectedData(content.to_string()))
+                }
+            }
+            _ => {
+                let (content, remaining) =
+                    content.split_once([':', ',', ' ', ']', '}']).unwrap_or((content, ""));
+
+                Ok((Self::from_string(content), remaining))
+            }
+        }
     }
 
     /// If a string only contains basic characters,

@@ -82,8 +82,9 @@ fn test_data(bytes: &[u8]) {
 
         // Convert the NBT into SNBT (Compat)
         // TODO: Move out of `IO` tests after implementing `IntoOwned` for `*NbtRef`
-        let _snbt = Snbt::<Compat>::from_compound(nbt_io.compound().as_ref().unwrap()).unwrap();
-        // println!("SNBT: {}", _snbt.as_ref());
+        let snbt = Snbt::<Compat>::from_compound(nbt_io.compound().as_ref().unwrap()).unwrap();
+        println!("SNBT: {}", snbt.as_ref());
+        assert_eq!(&snbt.into_compound().unwrap(), nbt_io.compound().unwrap());
 
         // Compare the NBT object names and lengths
         assert_eq!(nbt_ref.name(), nbt_io.name(), "Ref name does not match IO name!");

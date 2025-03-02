@@ -1,5 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![feature(iter_map_windows)]
 
 pub mod convert;
 pub mod io;
