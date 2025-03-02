@@ -117,13 +117,17 @@ impl Borrow<Mutf8Str> for Mutf8String {
 impl From<String> for Mutf8String {
     fn from(value: String) -> Self { Self::from_string(&value) }
 }
-impl From<Vec<u8>> for Mutf8String {
-    fn from(value: Vec<u8>) -> Self { Self::from_bytes(value) }
+impl<'a> From<&'a str> for Mutf8String {
+    fn from(value: &'a str) -> Self { Self::from_string(value) }
 }
 impl TryFrom<Mutf8String> for String {
     type Error = simd_cesu8::DecodingError;
 
     fn try_from(value: Mutf8String) -> Result<Self, Self::Error> { value.try_as_string() }
+}
+
+impl From<Vec<u8>> for Mutf8String {
+    fn from(value: Vec<u8>) -> Self { Self::from_bytes(value) }
 }
 
 impl PartialEq<Mutf8Str> for Mutf8String {

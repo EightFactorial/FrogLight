@@ -3,8 +3,11 @@ use bevy_reflect::prelude::*;
 
 mod regex;
 
-mod traits;
-use traits::ConvertCompat;
+mod read;
+use read::ReadCompat;
+
+mod write;
+use write::WriteCompat;
 
 use super::Snbt;
 use crate::{

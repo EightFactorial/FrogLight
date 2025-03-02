@@ -172,6 +172,9 @@ impl FromIterator<(Mutf8String, NbtTag)> for NbtCompound {
         Self(IndexMap::from_iter(iter))
     }
 }
+impl From<Vec<(Mutf8String, NbtTag)>> for NbtCompound {
+    fn from(pair: Vec<(Mutf8String, NbtTag)>) -> Self { Self::from_iter(pair) }
+}
 
 impl<'a> std::ops::Index<&'a str> for NbtCompound {
     type Output = NbtTag;
