@@ -51,6 +51,7 @@ proptest::proptest! {
         assert_eq!(data.frog_len(), buffer.len());
     }
     #[test]
+    #[expect(clippy::disallowed_types)]
     fn proto_hashmap_uuid_u8(data in proptest::collection::hash_map(proptest::num::u128::ANY, proptest::num::u8::ANY, 0..256)) {
         let buffer: Vec<u8> = data.frog_to_buf().unwrap();
         assert_eq!(std::collections::HashMap::<Uuid, u8>::frog_read(&mut Cursor::new(&buffer)).unwrap(), data.iter().map(|(k, v)| (Uuid::from_u128(*k), *v)).collect());

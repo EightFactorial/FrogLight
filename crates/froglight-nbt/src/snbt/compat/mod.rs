@@ -30,7 +30,7 @@ impl ConvertNbt for Snbt<Compat> {
         Ok(Self::new_unchecked(content.into()))
     }
 
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> {
+    fn as_compound(&self) -> Result<NbtCompound, ConvertError> {
         NbtCompound::read_from_string(self.as_str()).map(|(nbt, _)| nbt)
     }
 }

@@ -53,10 +53,12 @@ impl WriteCompat for NbtTag {
                 content.push_str(&item.to_string());
                 content.push('L');
             }
+            #[expect(clippy::format_push_string)]
             NbtTag::Float(item) => {
                 content.push_str(&format!("{item:?}"));
                 content.push('F');
             }
+            #[expect(clippy::format_push_string)]
             NbtTag::Double(item) => {
                 content.push_str(&format!("{item:?}"));
             }
@@ -302,6 +304,7 @@ fn write_array<T: Debug>(
     // Push the array items, separated by commas.
     let last = iter.len().saturating_sub(1);
     for (i, item) in iter.enumerate() {
+        #[expect(clippy::format_push_string)]
         content.push_str(&format!("{item:?}"));
         if let Some(char) = suffix {
             content.push(char);
@@ -354,7 +357,6 @@ impl WriteCompat for Mutf8String {
             content.push_str(&string);
         } else {
             content.push('"');
-            // Escape quotes.
             content.push_str(&string.replace('"', "\\\""));
             content.push('"');
         }
@@ -373,6 +375,6 @@ fn test_write_string() {
     assert_eq!(content, "test-1");
 
     let mut content = String::new();
-    Mutf8String::from_string("123 \" 456").write_to_string(&mut content);
+    Mutf8String::from_string(r#"123 " 456"#).write_to_string(&mut content);
     assert_eq!(content, r#""123 \" 456""#);
 }

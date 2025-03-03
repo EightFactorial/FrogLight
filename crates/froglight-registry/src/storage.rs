@@ -215,7 +215,7 @@ impl<V: Version> RegistryStorage<V> {
     where
         R::Value: Copy + ConvertNbt,
     {
-        self.get::<R>(ident).and_then(|val: &R::Value| <R::Value as ConvertNbt>::into_nbt(val).ok())
+        self.get::<R>(ident).and_then(|val: &R::Value| <R::Value as ConvertNbt>::as_nbt(val).ok())
     }
 
     /// Insert a serialized [`RegistryValue`] into the [`RegistryStorage`].
@@ -233,7 +233,7 @@ impl<V: Version> RegistryStorage<V> {
     where
         R::Value: ConvertNbt,
     {
-        <R::Value as ConvertNbt>::from_compound(&nbt)
+        <R::Value as ConvertNbt>::from_compound(nbt)
             .map(|value: R::Value| self.insert::<R>(ident, value))
     }
 }
