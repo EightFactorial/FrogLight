@@ -62,11 +62,6 @@ impl PartialEq<[i64]> for LongArray {
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct FloatArray(Vec<f32>);
 
-impl PartialEq<[f32]> for FloatArray {
-    #[inline]
-    fn eq(&self, other: &[f32]) -> bool { self.0.as_slice() == other }
-}
-
 /// A wrapper around a [`Vec<f64>`] that represents a NBT double array.
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, From, Into, AsRef, AsMut, Deref, DerefMut)]
@@ -74,8 +69,3 @@ impl PartialEq<[f32]> for FloatArray {
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct DoubleArray(Vec<f64>);
-
-impl PartialEq<[f64]> for DoubleArray {
-    #[inline]
-    fn eq(&self, other: &[f64]) -> bool { self.0.as_slice() == other }
-}

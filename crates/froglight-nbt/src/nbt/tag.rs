@@ -359,7 +359,7 @@ impl std::ops::IndexMut<usize> for NbtTag {
 
 /// A list of NBT tag values.
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
+#[derive(Debug, Clone, TryInto, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -607,5 +607,57 @@ impl NbtListTag {
     #[must_use]
     pub fn as_long_array_mut(&mut self) -> Option<&mut Vec<LongArray>> {
         if let NbtListTag::LongArray(array) = self { Some(array) } else { None }
+    }
+}
+
+impl PartialEq for NbtListTag {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (NbtListTag::Empty, NbtListTag::Empty) => true,
+            (NbtListTag::Byte(f0_self), NbtListTag::Byte(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::Short(f0_self), NbtListTag::Short(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::Int(f0_self), NbtListTag::Int(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::Long(f0_self), NbtListTag::Long(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::Float(f0_self), NbtListTag::Float(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::Double(f0_self), NbtListTag::Double(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::ByteArray(f0_self), NbtListTag::ByteArray(f0_other)) => {
+                f0_self.eq(f0_other)
+            }
+            (NbtListTag::String(f0_self), NbtListTag::String(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::List(f0_self), NbtListTag::List(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::Compound(f0_self), NbtListTag::Compound(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::IntArray(f0_self), NbtListTag::IntArray(f0_other)) => f0_self.eq(f0_other),
+            (NbtListTag::LongArray(f0_self), NbtListTag::LongArray(f0_other)) => {
+                f0_self.eq(f0_other)
+            }
+
+            // Make `Empty` equal to everything *only if* the other list is empty.
+            (NbtListTag::Empty, NbtListTag::Byte(list))
+            | (NbtListTag::Byte(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::Short(list))
+            | (NbtListTag::Short(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::Int(list))
+            | (NbtListTag::Int(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::Long(list))
+            | (NbtListTag::Long(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::Float(list))
+            | (NbtListTag::Float(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::Double(list))
+            | (NbtListTag::Double(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::ByteArray(list))
+            | (NbtListTag::ByteArray(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::String(list))
+            | (NbtListTag::String(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::List(list))
+            | (NbtListTag::List(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::Compound(list))
+            | (NbtListTag::Compound(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::IntArray(list))
+            | (NbtListTag::IntArray(list), NbtListTag::Empty) => list.is_empty(),
+            (NbtListTag::Empty, NbtListTag::LongArray(list))
+            | (NbtListTag::LongArray(list), NbtListTag::Empty) => list.is_empty(),
+
+            _unused => false,
+        }
     }
 }
