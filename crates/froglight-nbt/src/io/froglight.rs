@@ -195,9 +195,11 @@ impl NbtTag {
             NbtTag::STRING => Mutf8String::frog_read(buffer).map(Self::String),
             NbtTag::LIST => NbtListTag::frog_read(buffer).map(Self::List),
             NbtTag::COMPOUND => NbtCompound::frog_read(buffer).map(Self::Compound),
-            NbtTag::BYTE_ARRAY => NbtListTag::frog_read_array(buffer).map(Self::ByteArray),
-            NbtTag::INT_ARRAY => NbtListTag::frog_read_array(buffer).map(Self::IntArray),
-            NbtTag::LONG_ARRAY => NbtListTag::frog_read_array(buffer).map(Self::LongArray),
+            NbtTag::BYTE_ARRAY => NbtListTag::frog_read_array::<_, i8>(buffer).map(Self::ByteArray),
+            NbtTag::INT_ARRAY => NbtListTag::frog_read_array::<_, i32>(buffer).map(Self::IntArray),
+            NbtTag::LONG_ARRAY => {
+                NbtListTag::frog_read_array::<_, i64>(buffer).map(Self::LongArray)
+            }
             unk => Err(ReadError::InvalidEnum(std::any::type_name::<Self>(), unk.into())),
         }
     }
@@ -226,18 +228,20 @@ impl FrogRead for NbtListTag {
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         match u8::frog_read(buffer)? {
             NbtTag::END => u32::frog_read(buffer).map(|_| Self::Empty),
-            NbtTag::BYTE => Self::frog_read_array(buffer).map(Self::Byte),
-            NbtTag::SHORT => Self::frog_read_array(buffer).map(Self::Short),
-            NbtTag::INT => Self::frog_read_array(buffer).map(Self::Int),
-            NbtTag::LONG => Self::frog_read_array(buffer).map(Self::Long),
+            NbtTag::BYTE => Self::frog_read_array::<_, i8>(buffer).map(Self::Byte),
+            NbtTag::SHORT => Self::frog_read_array::<_, i16>(buffer).map(Self::Short),
+            NbtTag::INT => Self::frog_read_array::<_, i32>(buffer).map(Self::Int),
+            NbtTag::LONG => Self::frog_read_array::<_, i64>(buffer).map(Self::Long),
             NbtTag::FLOAT => Self::frog_read_array(buffer).map(Self::Float),
             NbtTag::DOUBLE => Self::frog_read_array(buffer).map(Self::Double),
             NbtTag::STRING => Self::frog_read_array(buffer).map(Self::String),
             NbtTag::LIST => Self::frog_read_array(buffer).map(Self::List),
             NbtTag::COMPOUND => Self::frog_read_array(buffer).map(Self::Compound),
-            NbtTag::BYTE_ARRAY => Self::frog_read_array_array(buffer).map(Self::ByteArray),
-            NbtTag::INT_ARRAY => Self::frog_read_array_array(buffer).map(Self::IntArray),
-            NbtTag::LONG_ARRAY => Self::frog_read_array_array(buffer).map(Self::LongArray),
+            NbtTag::BYTE_ARRAY => Self::frog_read_array_array::<_, i8>(buffer).map(Self::ByteArray),
+            NbtTag::INT_ARRAY => Self::frog_read_array_array::<_, i32>(buffer).map(Self::IntArray),
+            NbtTag::LONG_ARRAY => {
+                Self::frog_read_array_array::<_, i64>(buffer).map(Self::LongArray)
+            }
             unk => Err(ReadError::InvalidEnum(std::any::type_name::<Self>(), unk.into())),
         }
     }

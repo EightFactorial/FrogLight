@@ -12,7 +12,9 @@ pub mod snbt;
 mod test;
 
 pub mod prelude {
-    //! Re-exports of common types and traits.
+    //! Re-exports of common types, traits, and macros.
+
+    pub use froglight_macros::FrogNbt;
 
     pub use crate::{
         convert::ConvertNbt,

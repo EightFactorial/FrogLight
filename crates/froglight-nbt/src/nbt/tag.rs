@@ -313,6 +313,49 @@ impl NbtTag {
     }
 }
 
+impl From<u8> for NbtTag {
+    #[expect(clippy::cast_possible_wrap)]
+    fn from(value: u8) -> Self { NbtTag::Byte(value as i8) }
+}
+impl From<u16> for NbtTag {
+    #[expect(clippy::cast_possible_wrap)]
+    fn from(value: u16) -> Self { NbtTag::Short(value as i16) }
+}
+impl From<u32> for NbtTag {
+    #[expect(clippy::cast_possible_wrap)]
+    fn from(value: u32) -> Self { NbtTag::Int(value as i32) }
+}
+impl From<u64> for NbtTag {
+    #[expect(clippy::cast_possible_wrap)]
+    fn from(value: u64) -> Self { NbtTag::Long(value as i64) }
+}
+
+impl From<Vec<i8>> for NbtTag {
+    fn from(value: Vec<i8>) -> Self { NbtTag::ByteArray(ByteArray::from(value)) }
+}
+impl From<Vec<u8>> for NbtTag {
+    fn from(value: Vec<u8>) -> Self { NbtTag::ByteArray(ByteArray::from(value)) }
+}
+impl From<Vec<i32>> for NbtTag {
+    fn from(value: Vec<i32>) -> Self { NbtTag::IntArray(IntArray::from(value)) }
+}
+impl From<Vec<u32>> for NbtTag {
+    fn from(value: Vec<u32>) -> Self { NbtTag::IntArray(IntArray::from(value)) }
+}
+impl From<Vec<i64>> for NbtTag {
+    fn from(value: Vec<i64>) -> Self { NbtTag::LongArray(LongArray::from(value)) }
+}
+impl From<Vec<u64>> for NbtTag {
+    fn from(value: Vec<u64>) -> Self { NbtTag::LongArray(LongArray::from(value)) }
+}
+
+impl From<String> for NbtTag {
+    fn from(value: String) -> Self { NbtTag::String(value.into()) }
+}
+impl<'a> From<&'a str> for NbtTag {
+    fn from(value: &'a str) -> Self { NbtTag::String(value.into()) }
+}
+
 impl<'a> std::ops::Index<&'a str> for NbtTag {
     type Output = NbtTag;
 
@@ -607,6 +650,79 @@ impl NbtListTag {
     #[must_use]
     pub fn as_long_array_mut(&mut self) -> Option<&mut Vec<LongArray>> {
         if let NbtListTag::LongArray(array) = self { Some(array) } else { None }
+    }
+}
+
+impl From<Vec<i8>> for NbtListTag {
+    fn from(value: Vec<i8>) -> Self { NbtListTag::Byte(ByteArray::from(value)) }
+}
+impl From<Vec<u8>> for NbtListTag {
+    fn from(value: Vec<u8>) -> Self { NbtListTag::Byte(ByteArray::from(value)) }
+}
+impl From<Vec<i16>> for NbtListTag {
+    fn from(value: Vec<i16>) -> Self { NbtListTag::Short(ShortArray::from(value)) }
+}
+impl From<Vec<u16>> for NbtListTag {
+    fn from(value: Vec<u16>) -> Self { NbtListTag::Short(ShortArray::from(value)) }
+}
+impl From<Vec<i32>> for NbtListTag {
+    fn from(value: Vec<i32>) -> Self { NbtListTag::Int(IntArray::from(value)) }
+}
+impl From<Vec<u32>> for NbtListTag {
+    fn from(value: Vec<u32>) -> Self { NbtListTag::Int(IntArray::from(value)) }
+}
+impl From<Vec<i64>> for NbtListTag {
+    fn from(value: Vec<i64>) -> Self { NbtListTag::Long(LongArray::from(value)) }
+}
+impl From<Vec<u64>> for NbtListTag {
+    fn from(value: Vec<u64>) -> Self { NbtListTag::Long(LongArray::from(value)) }
+}
+impl From<Vec<f32>> for NbtListTag {
+    fn from(value: Vec<f32>) -> Self { NbtListTag::Float(FloatArray::from(value)) }
+}
+impl From<Vec<f64>> for NbtListTag {
+    fn from(value: Vec<f64>) -> Self { NbtListTag::Double(DoubleArray::from(value)) }
+}
+
+impl From<Vec<String>> for NbtListTag {
+    fn from(value: Vec<String>) -> Self {
+        NbtListTag::String(value.into_iter().map(Mutf8String::from).collect())
+    }
+}
+impl<'a> From<Vec<&'a str>> for NbtListTag {
+    fn from(value: Vec<&'a str>) -> Self {
+        NbtListTag::String(value.into_iter().map(Mutf8String::from).collect())
+    }
+}
+
+impl From<Vec<Vec<i8>>> for NbtListTag {
+    fn from(value: Vec<Vec<i8>>) -> Self {
+        NbtListTag::ByteArray(value.into_iter().map(ByteArray::from).collect())
+    }
+}
+impl From<Vec<Vec<u8>>> for NbtListTag {
+    fn from(value: Vec<Vec<u8>>) -> Self {
+        NbtListTag::ByteArray(value.into_iter().map(ByteArray::from).collect())
+    }
+}
+impl From<Vec<Vec<i32>>> for NbtListTag {
+    fn from(value: Vec<Vec<i32>>) -> Self {
+        NbtListTag::IntArray(value.into_iter().map(IntArray::from).collect())
+    }
+}
+impl From<Vec<Vec<u32>>> for NbtListTag {
+    fn from(value: Vec<Vec<u32>>) -> Self {
+        NbtListTag::IntArray(value.into_iter().map(IntArray::from).collect())
+    }
+}
+impl From<Vec<Vec<i64>>> for NbtListTag {
+    fn from(value: Vec<Vec<i64>>) -> Self {
+        NbtListTag::LongArray(value.into_iter().map(LongArray::from).collect())
+    }
+}
+impl From<Vec<Vec<u64>>> for NbtListTag {
+    fn from(value: Vec<Vec<u64>>) -> Self {
+        NbtListTag::LongArray(value.into_iter().map(LongArray::from).collect())
     }
 }
 

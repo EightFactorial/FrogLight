@@ -125,15 +125,15 @@ fn test_write_tag() {
     assert_eq!(compounds, r#"{"hello world":1,empty_compound:{},empty_list:[]}"#);
 
     let mut bytes = String::new();
-    NbtTag::ByteArray(ByteArray::from(vec![1, 2, 3])).write_to_string(&mut bytes);
+    NbtTag::ByteArray(ByteArray::from(vec![1i8, 2, 3])).write_to_string(&mut bytes);
     assert_eq!(bytes, "[B;1B,2B,3B]");
 
     let mut integers = String::new();
-    NbtTag::IntArray(IntArray::from(vec![1, 2, 3])).write_to_string(&mut integers);
+    NbtTag::IntArray(IntArray::from(vec![1i32, 2, 3])).write_to_string(&mut integers);
     assert_eq!(integers, "[I;1,2,3]");
 
     let mut longs = String::new();
-    NbtTag::LongArray(LongArray::from(vec![1, 2, 3])).write_to_string(&mut longs);
+    NbtTag::LongArray(LongArray::from(vec![1i64, 2, 3])).write_to_string(&mut longs);
     assert_eq!(longs, "[L;1L,2L,3L]");
 }
 
@@ -185,19 +185,19 @@ fn test_write_list() {
     assert_eq!(empty, "[]");
 
     let mut bytes = String::new();
-    NbtListTag::Byte(ByteArray::from(vec![1, 2, 3])).write_to_string(&mut bytes);
+    NbtListTag::Byte(ByteArray::from(vec![1i8, 2, 3])).write_to_string(&mut bytes);
     assert_eq!(bytes, "[1B,2B,3B]");
 
     let mut shorts = String::new();
-    NbtListTag::Short(ShortArray::from(vec![1, 2, 3])).write_to_string(&mut shorts);
+    NbtListTag::Short(ShortArray::from(vec![1i16, 2, 3])).write_to_string(&mut shorts);
     assert_eq!(shorts, "[1S,2S,3S]");
 
     let mut integers = String::new();
-    NbtListTag::Int(IntArray::from(vec![1, 2, 3])).write_to_string(&mut integers);
+    NbtListTag::Int(IntArray::from(vec![1i32, 2, 3])).write_to_string(&mut integers);
     assert_eq!(integers, "[1,2,3]");
 
     let mut longs = String::new();
-    NbtListTag::Long(LongArray::from(vec![1, 2, 3])).write_to_string(&mut longs);
+    NbtListTag::Long(LongArray::from(vec![1i64, 2, 3])).write_to_string(&mut longs);
     assert_eq!(longs, "[1L,2L,3L]");
 
     let mut floats = String::new();
@@ -222,18 +222,21 @@ fn test_write_list() {
     assert_eq!(compounds, "[{},{}]");
 
     let mut bytes = String::new();
-    NbtListTag::ByteArray(vec![ByteArray::from(vec![1, 2, 3]), ByteArray::from(vec![4, 5, 6])])
+    NbtListTag::ByteArray(vec![ByteArray::from(vec![1i8, 2, 3]), ByteArray::from(vec![4i8, 5, 6])])
         .write_to_string(&mut bytes);
     assert_eq!(bytes, "[[B;1B,2B,3B],[B;4B,5B,6B]]");
 
     let mut integers = String::new();
-    NbtListTag::IntArray(vec![IntArray::from(vec![1, 2, 3]), IntArray::from(vec![4, 5, 6])])
+    NbtListTag::IntArray(vec![IntArray::from(vec![1i32, 2, 3]), IntArray::from(vec![4i32, 5, 6])])
         .write_to_string(&mut integers);
     assert_eq!(integers, "[[I;1,2,3],[I;4,5,6]]");
 
     let mut longs = String::new();
-    NbtListTag::LongArray(vec![LongArray::from(vec![1, 2, 3]), LongArray::from(vec![4, 5, 6])])
-        .write_to_string(&mut longs);
+    NbtListTag::LongArray(vec![
+        LongArray::from(vec![1i64, 2, 3]),
+        LongArray::from(vec![4i64, 5, 6]),
+    ])
+    .write_to_string(&mut longs);
     assert_eq!(longs, "[[L;1L,2L,3L],[L;4L,5L,6L]]");
 }
 
@@ -322,19 +325,19 @@ fn write_array<T: Debug>(
 #[cfg(test)]
 fn test_write_array() {
     let mut bytes = String::new();
-    ByteArray::from(vec![1, 2, 3]).write_to_string(&mut bytes);
+    ByteArray::from(vec![1i8, 2, 3]).write_to_string(&mut bytes);
     assert_eq!(bytes, "[B;1B,2B,3B]");
 
     let mut shorts = String::new();
-    ShortArray::from(vec![1, 2, 3]).write_to_string(&mut shorts);
+    ShortArray::from(vec![1i16, 2, 3]).write_to_string(&mut shorts);
     assert_eq!(shorts, "[1S,2S,3S]");
 
     let mut integers = String::new();
-    IntArray::from(vec![1, 2, 3]).write_to_string(&mut integers);
+    IntArray::from(vec![1i32, 2, 3]).write_to_string(&mut integers);
     assert_eq!(integers, "[I;1,2,3]");
 
     let mut longs = String::new();
-    LongArray::from(vec![1, 2, 3]).write_to_string(&mut longs);
+    LongArray::from(vec![1i64, 2, 3]).write_to_string(&mut longs);
     assert_eq!(longs, "[L;1L,2L,3L]");
 
     let mut floats = String::new();

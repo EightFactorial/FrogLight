@@ -165,9 +165,21 @@ mod io;
 /// }
 /// ```
 #[cfg(feature = "io")]
-#[proc_macro_derive(FrogBuf)]
+#[proc_macro_derive(FrogBuf, attributes(frog))]
 pub fn derive_frogbuf(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     io::derive_frogbuf(input.into()).into()
+}
+
+// --------------------- `froglight-nbt` --------------------
+
+#[cfg(feature = "nbt")]
+mod nbt;
+
+/// Derive `ConvertNbt` for an item.
+#[cfg(feature = "nbt")]
+#[proc_macro_derive(FrogNbt, attributes(frog))]
+pub fn derive_frognbt(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    nbt::derive_frognbt(input.into()).into()
 }
 
 // ------------------- `froglight-network` -------------------

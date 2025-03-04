@@ -228,17 +228,17 @@ fn test_read_tag() {
 
     let content = String::from("[B;1B,2B,-3B,true,false]");
     let (tag, remaining) = NbtTag::read_from_string(&content).unwrap();
-    assert_eq!(tag, NbtTag::ByteArray(ByteArray::from(vec![1, 2, -3, 1, 0])));
+    assert_eq!(tag, NbtTag::ByteArray(ByteArray::from(vec![1i8, 2, -3, 1, 0])));
     assert_eq!(remaining, "");
 
     let content = String::from("[I;1,2,-3]");
     let (tag, remaining) = NbtTag::read_from_string(&content).unwrap();
-    assert_eq!(tag, NbtTag::IntArray(IntArray::from(vec![1, 2, -3])));
+    assert_eq!(tag, NbtTag::IntArray(IntArray::from(vec![1i32, 2, -3])));
     assert_eq!(remaining, "");
 
     let content = String::from("[L;1L,2L,-3L]");
     let (tag, remaining) = NbtTag::read_from_string(&content).unwrap();
-    assert_eq!(tag, NbtTag::LongArray(LongArray::from(vec![1, 2, -3])));
+    assert_eq!(tag, NbtTag::LongArray(LongArray::from(vec![1i64, 2, -3])));
     assert_eq!(remaining, "");
 }
 
@@ -400,22 +400,22 @@ fn test_read_list() {
 
     let content = String::from("[1B,2B,3B]");
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
-    assert_eq!(list, NbtListTag::Byte(ByteArray::from(vec![1, 2, 3])));
+    assert_eq!(list, NbtListTag::Byte(ByteArray::from(vec![1i8, 2, 3])));
     assert_eq!(remaining, "");
 
     let content = String::from("[1S,2S,3S]");
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
-    assert_eq!(list, NbtListTag::Short(ShortArray::from(vec![1, 2, 3])));
+    assert_eq!(list, NbtListTag::Short(ShortArray::from(vec![1i16, 2, 3])));
     assert_eq!(remaining, "");
 
     let content = String::from("[1,2,3]");
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
-    assert_eq!(list, NbtListTag::Int(IntArray::from(vec![1, 2, 3])));
+    assert_eq!(list, NbtListTag::Int(IntArray::from(vec![1i32, 2, 3])));
     assert_eq!(remaining, "");
 
     let content = String::from("[1L,2L,3L]");
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
-    assert_eq!(list, NbtListTag::Long(LongArray::from(vec![1, 2, 3])));
+    assert_eq!(list, NbtListTag::Long(LongArray::from(vec![1i64, 2, 3])));
     assert_eq!(remaining, "");
 
     let content = String::from("[1.0F,2.0F,3.0F]");
@@ -458,8 +458,8 @@ fn test_read_list() {
     assert_eq!(
         list,
         NbtListTag::List(vec![
-            NbtListTag::Byte(ByteArray::from(vec![1, 2, 3])),
-            NbtListTag::Byte(ByteArray::from(vec![4, 5, 6]))
+            NbtListTag::Byte(ByteArray::from(vec![1i8, 2, 3])),
+            NbtListTag::Byte(ByteArray::from(vec![4i8, 5, 6]))
         ])
     );
     assert_eq!(remaining, "");
@@ -468,7 +468,10 @@ fn test_read_list() {
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
     assert_eq!(
         list,
-        NbtListTag::ByteArray(vec![ByteArray::from(vec![1, 2, 3]), ByteArray::from(vec![4, 5, 6])])
+        NbtListTag::ByteArray(vec![
+            ByteArray::from(vec![1i8, 2, 3]),
+            ByteArray::from(vec![4i8, 5, 6])
+        ])
     );
     assert_eq!(remaining, "");
 
@@ -476,7 +479,10 @@ fn test_read_list() {
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
     assert_eq!(
         list,
-        NbtListTag::IntArray(vec![IntArray::from(vec![1, 2, 3]), IntArray::from(vec![4, 5, 6])])
+        NbtListTag::IntArray(vec![
+            IntArray::from(vec![1i32, 2, 3]),
+            IntArray::from(vec![4i32, 5, 6])
+        ])
     );
     assert_eq!(remaining, "");
 
@@ -484,7 +490,10 @@ fn test_read_list() {
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
     assert_eq!(
         list,
-        NbtListTag::LongArray(vec![LongArray::from(vec![1, 2, 3]), LongArray::from(vec![4, 5, 6])])
+        NbtListTag::LongArray(vec![
+            LongArray::from(vec![1i64, 2, 3]),
+            LongArray::from(vec![4i64, 5, 6])
+        ])
     );
     assert_eq!(remaining, "");
 }
@@ -505,7 +514,7 @@ impl ReadCompat for ByteArray {
 
         // Return an empty array if no content is found.
         if content.is_empty() {
-            return Ok((ByteArray::from(Vec::new()), remaining));
+            return Ok((ByteArray::from(Vec::<i8>::new()), remaining));
         }
 
         // Parse the array content
@@ -527,21 +536,21 @@ impl ReadCompat for ByteArray {
 /// IntArray-specific format: `[I;{INT}?(,{INT})*]`
 impl ReadCompat for IntArray {
     fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
-        read_array(Some('I'), None, content)
+        read_array::<_, i32>(Some('I'), None, content)
     }
 }
 
 /// LongArray-specific format: `[L;({LONG}L)?(,{LONG}L)*]`
 impl ReadCompat for LongArray {
     fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
-        read_array(Some('L'), Some('L'), content)
+        read_array::<_, i64>(Some('L'), Some('L'), content)
     }
 }
 
 /// List-based format: `[({SHORT}S?)(,{SHORT}S)*]`
 impl ReadCompat for ShortArray {
     fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
-        read_array(None, Some('S'), content)
+        read_array::<_, i16>(None, Some('S'), content)
     }
 }
 
