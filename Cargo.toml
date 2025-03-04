@@ -84,6 +84,7 @@ froglight-world = { version = "0.1", path = "crates/froglight-world" }
 
 # Other
 async-channel = "2.3"
+async-compression = { version = "0.4", default-features = false }
 async-io = "2.4"
 async-net = "2.0"
 derive_more = { version = "2.0", features = ["full"] }
@@ -94,7 +95,6 @@ glam = "0.29"
 hashbrown = "0.15"
 indexmap = "2.7"
 parking_lot = "0.12"
-petgraph = "0.6"
 proptest = "1.6"
 regex = "1.11"
 serde = "1.0"

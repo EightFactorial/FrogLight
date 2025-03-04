@@ -107,11 +107,11 @@ impl<V: Version> RegistryStorage<V> {
 
     /// Iterate over all [`RegistryType`]s in the [`RegistryStorage`]
     /// in an arbitrary order.
-    pub fn keys(&self) -> impl Iterator<Item = &TypeId> + '_ { self.0.keys() }
+    pub fn keys(&self) -> impl Iterator<Item = &TypeId> { self.0.keys() }
 
     /// Get an iterator over all [`RegistryValue`]s of a specific
     /// [`RegistryType`].
-    pub fn iter<R: RegistryType<V>>(&self) -> impl Iterator<Item = (&Identifier, &R::Value)> + '_ {
+    pub fn iter<R: RegistryType<V>>(&self) -> impl Iterator<Item = (&Identifier, &R::Value)> {
         self.0.get(&TypeId::of::<R>()).into_iter().flat_map(|map| {
             map.iter().filter_map(|(k, v)| {
                 <dyn RegistryValue as Downcast>::as_any(v.as_ref()).downcast_ref().map(|v| (k, v))
@@ -123,7 +123,7 @@ impl<V: Version> RegistryStorage<V> {
     /// [`RegistryType`].
     pub fn iter_mut<R: RegistryType<V>>(
         &mut self,
-    ) -> impl Iterator<Item = (&Identifier, &mut R::Value)> + '_ {
+    ) -> impl Iterator<Item = (&Identifier, &mut R::Value)> {
         self.0.entry(TypeId::of::<R>()).or_default().iter_mut().filter_map(|(k, v)| {
             <dyn RegistryValue as Downcast>::as_any_mut(v.as_mut()).downcast_mut().map(|v| (k, v))
         })
@@ -161,6 +161,20 @@ impl<V: Version> RegistryStorage<V> {
             .and_then(|v| {
                 <dyn RegistryValue as Downcast>::into_any(v).downcast().map_or(None, |v| Some(*v))
             })
+    }
+
+    /// Extend the [`RegistryStorage`] with a collection of [`RegistryValue`]s.
+    ///
+    /// This is the same as calling [`RegistryStorage::insert`] for each item.
+    ///
+    /// See [`IndexMap::extend`] for more information.
+    pub fn extend<R: RegistryType<V>, I: IntoIterator<Item = (Identifier, R::Value)>>(
+        &mut self,
+        iter: I,
+    ) {
+        self.0.entry(TypeId::of::<R>()).or_default().extend(iter.into_iter().map(
+            |(ident, value)| -> (Identifier, Box<dyn RegistryValue>) { (ident, Box::new(value)) },
+        ));
     }
 
     /// Remove a [`RegistryValue`] from the [`RegistryStorage`].
@@ -207,7 +221,6 @@ impl<V: Version> RegistryStorage<V> {
     /// ### Note
     /// If the value does not implement [`Copy`],
     /// use [`RegistryStorage::get_cloned_nbt`] instead.
-    #[inline]
     pub fn get_nbt<R: RegistryType<V>>(
         &self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
@@ -224,7 +237,6 @@ impl<V: Version> RegistryStorage<V> {
     ///
     /// # Errors
     /// Returns an error if the value could not be deserialized.
-    #[inline]
     pub fn insert_nbt<R: RegistryType<V>>(
         &mut self,
         ident: Identifier,
@@ -235,5 +247,59 @@ impl<V: Version> RegistryStorage<V> {
     {
         <R::Value as ConvertNbt>::from_compound(nbt)
             .map(|value: R::Value| self.insert::<R>(ident, value))
+    }
+
+    /// Extend the [`RegistryStorage`] with a collection of serialized
+    /// [`RegistryValue`]s.
+    ///
+    /// This is the same as calling [`RegistryStorage::insert_nbt`] for each
+    /// item.
+    ///
+    /// # Errors
+    /// Returns an error if any value could not be deserialized.
+    pub fn extend_nbt<R: RegistryType<V>, I: IntoIterator<Item = (Identifier, NbtCompound)>>(
+        &mut self,
+        iter: I,
+    ) -> Result<(), ConvertError>
+    where
+        R::Value: ConvertNbt,
+    {
+        let values: Vec<(Identifier, R::Value)> = iter
+            .into_iter()
+            .map(|(ident, nbt)| R::Value::from_compound(&nbt).map(|v| (ident, v)))
+            .collect::<Result<_, _>>()?;
+
+        self.extend::<R, Vec<_>>(values);
+        Ok(())
+    }
+
+    /// Extend the [`RegistryStorage`] with an [`NbtCompound`] of serialized
+    /// [`RegistryValue`]s.
+    ///
+    /// This is the same as calling [`RegistryStorage::insert_nbt`] for each
+    /// item inside the [`NbtCompound`].
+    ///
+    /// # Note
+    /// This will silently ignore invalid identifiers and non-compound values.
+    ///
+    /// # Errors
+    /// Returns an error if any value could not be deserialized.
+    pub fn extend_compound<R: RegistryType<V>>(
+        &mut self,
+        compound: &NbtCompound,
+    ) -> Result<(), ConvertError>
+    where
+        R::Value: ConvertNbt,
+    {
+        let values: Vec<(Identifier, R::Value)> = compound
+            .iter()
+            .filter_map(|(ident, comp)| comp.as_compound().map(|c| (ident, c)))
+            .filter_map(|(ident, comp)| ident.try_as_str().ok().map(|ident| (ident, comp)))
+            .filter_map(|(ident, comp)| Identifier::try_new(&ident).map(|ident| (ident, comp)))
+            .map(|(ident, comp)| R::Value::from_compound(comp).map(|v| (ident, v)))
+            .collect::<Result<Vec<_>, _>>()?;
+
+        self.extend::<R, Vec<_>>(values);
+        Ok(())
     }
 }

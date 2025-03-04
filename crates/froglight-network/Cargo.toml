@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+async-compression = { workspace = true, features = ["futures-io", "zlib"] }
 async-io = { workspace = true }
 async-net = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
@@ -32,6 +33,7 @@ uuid = { workspace = true }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
 froglight-nbt = { workspace = true, optional = true, features = ["io"] }
@@ -58,6 +60,7 @@ world = ["dep:froglight-world"]
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_log",
+  "dep:bevy_reflect",
   "dep:bevy_tasks",
   "froglight-common/bevy",
   "froglight-nbt?/bevy",

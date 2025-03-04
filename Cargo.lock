@@ -140,6 +140,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-compression"
+version = "0.4.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "310c9bcae737a48ef5cdee3174184e6d548b292739ede61a1f955ef76a738861"
+dependencies = [
+ "flate2",
+ "futures-core",
+ "futures-io",
+ "memchr",
+ "pin-project-lite",
+]
+
+[[package]]
 name = "async-executor"
 version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1577,10 +1590,12 @@ dependencies = [
 name = "froglight-network"
 version = "0.1.0"
 dependencies = [
+ "async-compression",
  "async-io",
  "async-net",
  "bevy_ecs",
  "bevy_log",
+ "bevy_reflect",
  "bevy_tasks",
  "froglight-brigadier",
  "froglight-common",
