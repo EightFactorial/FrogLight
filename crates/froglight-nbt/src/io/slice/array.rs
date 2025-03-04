@@ -35,6 +35,11 @@ impl<'a, T: PrefixedArrayItem<'a>> PrefixedArray<'a, T> {
     #[must_use]
     pub fn is_empty(&self) -> bool { self.0 == 0 }
 
+    /// Create a [`Vec`] from the items in the array.
+    #[inline]
+    #[must_use]
+    pub fn to_vec(self) -> Vec<T> { self.into() }
+
     /// Create a new [`PrefixedArray`] from the given data.
     ///
     /// # Safety
@@ -47,6 +52,10 @@ impl<'a, T: PrefixedArrayItem<'a>> PrefixedArray<'a, T> {
         let (&length, data) = data.split_first_chunk::<4>().unwrap();
         Self(u32::from_be_bytes(length) as usize, data, PhantomData)
     }
+}
+
+impl<'a, T: PrefixedArrayItem<'a>> From<PrefixedArray<'a, T>> for Vec<T> {
+    fn from(array: PrefixedArray<'a, T>) -> Self { array.into_iter().collect() }
 }
 
 // -------------------------------------------------------------------------------------------------

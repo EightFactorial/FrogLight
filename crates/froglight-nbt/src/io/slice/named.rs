@@ -190,4 +190,19 @@ impl<'a> UnnamedNbtRef<'a> {
     #[inline]
     #[must_use]
     pub const unsafe fn new_unchecked(data: &'a [u8]) -> Self { Self(data) }
+
+    /// Get the [`NbtCompoundRef`] of the NBT data, if it has one.
+    #[must_use]
+    #[expect(clippy::missing_panics_doc)]
+    pub const fn compound(&self) -> Option<NbtCompoundRef<'a>> {
+        let (&tag, data) = self.0.split_first().unwrap();
+        match tag {
+            NbtTag::END => None,
+            NbtTag::COMPOUND => {
+                // SAFETY: The data is valid NBT.
+                Some(unsafe { NbtCompoundRef::from_bytes(data) })
+            }
+            _ => panic!("Only `END` and `COMPOUND` tags are valid"),
+        }
+    }
 }

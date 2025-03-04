@@ -26,7 +26,7 @@ impl super::SnbtType for Compat {}
 impl ConvertNbt for Snbt<Compat> {
     fn from_compound(nbt: &NbtCompound) -> Result<Self, ConvertError> {
         let mut content = String::new();
-        nbt.write_to_string(&mut content);
+        NbtCompound::write_to_string(nbt, &mut content);
         Ok(Self::new_unchecked(content.into()))
     }
 
