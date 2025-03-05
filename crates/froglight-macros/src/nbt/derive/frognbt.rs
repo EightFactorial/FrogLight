@@ -1,29 +1,29 @@
-use darling::{FromField, FromVariant};
+use darling::{FromDeriveInput, FromField};
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{DeriveInput, LitStr, Path};
+use syn::{DataEnum, DataStruct, DeriveInput, Field, Fields, Ident, LitStr, Path};
 
 use crate::manifest::CrateManifest;
 
 pub(crate) fn derive_frognbt(input: TokenStream) -> TokenStream {
     let input: DeriveInput = syn::parse2(input).unwrap();
+
+    let FrogNbtMacro { path } = FrogNbtMacro::from_derive_input(&input).unwrap();
+    let path = path.unwrap_or_else(|| CrateManifest::froglight("froglight-nbt"));
+
     let DeriveInput { ident, data, .. } = input;
 
-    let path = CrateManifest::froglight("froglight-nbt");
-
-    let from_tokens = TokenStream::new();
-    let as_tokens = TokenStream::new();
-
-    match data {
-        syn::Data::Struct(_data) => {}
-        syn::Data::Enum(_data) => {}
+    let (from_tokens, as_tokens) = match data {
+        syn::Data::Struct(data) => generate_struct(&path, data),
+        syn::Data::Enum(data) => generate_enum(&path, data),
         syn::Data::Union(..) => panic!("`FrogNbt` does not support unions!"),
-    }
+    };
 
     quote! {
+        #[automatically_derived]
         impl #path::convert::ConvertNbt for #ident {
             fn from_compound(nbt: &#path::nbt::NbtCompound) -> Result<Self, #path::convert::ConvertError> {
-                #from_tokens
+                Ok(#from_tokens)
             }
 
             fn as_compound(&self) -> Result<#path::nbt::NbtCompound, #path::convert::ConvertError> {
@@ -33,19 +33,84 @@ pub(crate) fn derive_frognbt(input: TokenStream) -> TokenStream {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, FromDeriveInput)]
+#[darling(attributes(frog))]
+struct FrogNbtMacro {
+    #[darling(default)]
+    path: Option<Path>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, FromField)]
 #[darling(attributes(frog))]
 struct FrogNbtField {
-    tag: Option<LitStr>,
-    with: Option<Path>,
+    #[darling(rename = "ident")]
+    name: LitStr,
+    tag: LitStr,
+    with: Option<Ident>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, FromVariant)]
-#[darling(attributes(frog))]
-struct FrogNbtVariant {
-    tag: LitStr,
-    with: Option<Path>,
+// -------------------------------------------------------------------------------------------------
+
+fn generate_struct(path: &Path, data: DataStruct) -> (TokenStream, TokenStream) {
+    let mut from_tokens = TokenStream::new();
+    let as_tokens = quote! { todo!() };
+
+    for (attributes, Field { ident, ty, .. }) in
+        data.fields.iter().map(|f| (FrogNbtField::from_field(f).unwrap(), f))
+    {
+        // Use the `#[frog(ident = "name")]`.
+        let identifier = attributes.name.value();
+        // Use the `#[frog(tag = "type")]`.
+        let tag_type = TagType::tag_type(&attributes.tag);
+
+        // `from_tokens`
+        {
+            // Use the `#[frog(with = `function`)]` attribute or `Into::into`.
+            let value = if let Some(with) = attributes.with {
+                quote!(#with::from_data(value)?)
+            } else {
+                quote!(#ty::try_from(value.clone()).map_err(|err| #path::convert::ConvertError::ConversionError(std::any::type_name::<#ty>(), Box::new(err)))?)
+            };
+
+            // Match the `NbtTag` to the expected type.
+            let tokens = quote! {
+                match nbt.get_tag(#identifier) {
+                    Some(#path::nbt::NbtTag::#tag_type(value)) => #value,
+                    None => Err(#path::convert::ConvertError::MissingField(String::from(#identifier)))?,
+                    _ => Err(#path::convert::ConvertError::MismatchedTag(String::from(#identifier)))?,
+                },
+            };
+
+            match ident {
+                Some(ident) => from_tokens.extend(quote!(#ident: #tokens)),
+                None => from_tokens.extend(tokens),
+            }
+        }
+
+        // `as_tokens`
+        {}
+    }
+
+    // Wrap `from_tokens` in the appropriate struct constructor.
+    let from_tokens = match data.fields {
+        Fields::Named(_) => quote! { Self{#from_tokens} },
+        Fields::Unnamed(_) => quote! { Self(#from_tokens) },
+        Fields::Unit => panic!("`FrogNbt` does not support unit structs!"),
+    };
+
+    (from_tokens, as_tokens)
 }
+
+// -------------------------------------------------------------------------------------------------
+
+fn generate_enum(_path: &Path, _data: DataEnum) -> (TokenStream, TokenStream) {
+    let from_tokens = TokenStream::new();
+    let as_tokens = TokenStream::new();
+
+    (from_tokens, as_tokens)
+}
+
+// -------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum TagType {
@@ -61,6 +126,25 @@ enum TagType {
     Compound,
     IntArray,
     LongArray,
+}
+
+impl TagType {
+    fn tag_type(str: &LitStr) -> Ident {
+        match TagType::from(str.value().as_str()) {
+            TagType::Byte => Ident::new("Byte", str.span()),
+            TagType::Short => Ident::new("Short", str.span()),
+            TagType::Int => Ident::new("Int", str.span()),
+            TagType::Long => Ident::new("Long", str.span()),
+            TagType::Float => Ident::new("Float", str.span()),
+            TagType::Double => Ident::new("Double", str.span()),
+            TagType::ByteArray => Ident::new("ByteArray", str.span()),
+            TagType::String => Ident::new("String", str.span()),
+            TagType::List => Ident::new("List", str.span()),
+            TagType::Compound => Ident::new("Compound", str.span()),
+            TagType::IntArray => Ident::new("IntArray", str.span()),
+            TagType::LongArray => Ident::new("LongArray", str.span()),
+        }
+    }
 }
 impl<'a> From<&'a str> for TagType {
     fn from(value: &'a str) -> Self {

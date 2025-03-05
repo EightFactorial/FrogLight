@@ -266,8 +266,8 @@ impl<V: Version> RegistryStorage<V> {
     {
         let values: Vec<(Identifier, R::Value)> = iter
             .into_iter()
-            .map(|(ident, nbt)| R::Value::from_compound(&nbt).map(|v| (ident, v)))
-            .collect::<Result<_, _>>()?;
+            .map(|(ident, nbt)| R::Value::from_compound(&nbt).map(|val: R::Value| (ident, val)))
+            .collect::<Result<Vec<_>, _>>()?;
 
         self.extend::<R, Vec<_>>(values);
         Ok(())
@@ -296,7 +296,7 @@ impl<V: Version> RegistryStorage<V> {
             .filter_map(|(ident, comp)| comp.as_compound().map(|c| (ident, c)))
             .filter_map(|(ident, comp)| ident.try_as_str().ok().map(|ident| (ident, comp)))
             .filter_map(|(ident, comp)| Identifier::try_new(&ident).map(|ident| (ident, comp)))
-            .map(|(ident, comp)| R::Value::from_compound(comp).map(|v| (ident, v)))
+            .map(|(ident, comp)| R::Value::from_compound(comp).map(|val: R::Value| (ident, val)))
             .collect::<Result<Vec<_>, _>>()?;
 
         self.extend::<R, Vec<_>>(values);
