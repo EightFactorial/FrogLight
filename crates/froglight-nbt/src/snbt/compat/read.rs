@@ -1,20 +1,19 @@
 use crate::{
-    convert::ConvertError,
     mutf8::Mutf8String,
     nbt::{
         ByteArray, DoubleArray, FloatArray, IntArray, LongArray, NbtCompound, NbtListTag, NbtTag,
         ShortArray,
     },
-    snbt::compat::regex::FIELD_REGEX,
+    snbt::{SnbtError, compat::regex::FIELD_REGEX},
 };
 
 pub(super) trait ReadCompat: Sized {
     /// Read the content from a string, returning the remaining content.
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError>;
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError>;
 }
 
 impl ReadCompat for NbtCompound {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         let (mut content, remaining) = read_enclosed(content.trim(), '{', '}')?;
 
         let mut compound = NbtCompound::new();
@@ -84,7 +83,7 @@ fn test_read_compound() {
 // -------------------------------------------------------------------------------------------------
 
 impl ReadCompat for NbtTag {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         let mut chars = content.chars();
         match chars.next().unwrap() {
             '\'' | '"' => {
@@ -135,34 +134,34 @@ impl ReadCompat for NbtTag {
                 "false" => Ok((NbtTag::Byte(0), remaining)),
                 content => match content.trim_end_matches('B').parse::<i8>() {
                     Ok(value) => Ok((NbtTag::Byte(value), remaining)),
-                    Err(_) => Err(ConvertError::UnexpectedData(content.to_string())),
+                    Err(_) => Err(SnbtError::UnexpectedData(content.to_string())),
                 },
             },
             (_, _, true, ..) => match content.trim_end_matches('S').parse::<i16>() {
                 Ok(value) => Ok((NbtTag::Short(value), remaining)),
-                Err(_) => Err(ConvertError::UnexpectedData(content.to_string())),
+                Err(_) => Err(SnbtError::UnexpectedData(content.to_string())),
             },
             (_, _, _, _, true, ..) => match content.trim_end_matches('L').parse::<i64>() {
                 Ok(value) => Ok((NbtTag::Long(value), remaining)),
-                Err(_) => Err(ConvertError::UnexpectedData(content.to_string())),
+                Err(_) => Err(SnbtError::UnexpectedData(content.to_string())),
             },
             (_, _, _, true, ..) => match content.parse::<i32>() {
                 Ok(value) => Ok((NbtTag::Int(value), remaining)),
-                Err(_) => Err(ConvertError::UnexpectedData(content.to_string())),
+                Err(_) => Err(SnbtError::UnexpectedData(content.to_string())),
             },
             (_, _, _, _, _, true, _) => match content.trim_end_matches('F').parse::<f32>() {
                 Ok(value) => Ok((NbtTag::Float(value), remaining)),
-                Err(_) => Err(ConvertError::UnexpectedData(content.to_string())),
+                Err(_) => Err(SnbtError::UnexpectedData(content.to_string())),
             },
             (_, _, _, _, _, _, true) => match content.parse::<f64>() {
                 Ok(value) => Ok((NbtTag::Double(value), remaining)),
-                Err(_) => Err(ConvertError::UnexpectedData(content.to_string())),
+                Err(_) => Err(SnbtError::UnexpectedData(content.to_string())),
             },
             (true, ..) => {
                 let (string, _) = Mutf8String::read_from_string(content)?;
                 Ok((NbtTag::String(string), remaining))
             }
-            _ => Err(ConvertError::UnexpectedData(content.to_string())),
+            _ => Err(SnbtError::UnexpectedData(content.to_string())),
         }
     }
 }
@@ -246,7 +245,7 @@ fn test_read_tag() {
 
 impl ReadCompat for NbtListTag {
     #[expect(clippy::too_many_lines)]
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         let (content, remaining) = read_enclosed(content.trim(), '[', ']')?;
 
         // Return an empty list if no content is found.
@@ -307,7 +306,7 @@ impl ReadCompat for NbtListTag {
                         item => match item.trim_end_matches('B').parse::<i8>() {
                             Ok(value) => acc.push(value),
                             Err(_) => {
-                                return Err(ConvertError::UnexpectedData(item.to_string()));
+                                return Err(SnbtError::UnexpectedData(item.to_string()));
                             }
                         },
                     }
@@ -319,7 +318,7 @@ impl ReadCompat for NbtListTag {
                 let list = content.split(',').try_fold(Vec::new(), |mut acc, item| {
                     match item.trim_end_matches('S').parse::<i16>() {
                         Ok(value) => acc.push(value),
-                        Err(_) => return Err(ConvertError::UnexpectedData(item.to_string())),
+                        Err(_) => return Err(SnbtError::UnexpectedData(item.to_string())),
                     }
                     Ok(acc)
                 })?;
@@ -329,7 +328,7 @@ impl ReadCompat for NbtListTag {
                 let list = content.split(',').try_fold(Vec::new(), |mut acc, item| {
                     match item.trim_end_matches('L').parse::<i64>() {
                         Ok(value) => acc.push(value),
-                        Err(_) => return Err(ConvertError::UnexpectedData(content.to_string())),
+                        Err(_) => return Err(SnbtError::UnexpectedData(content.to_string())),
                     }
                     Ok(acc)
                 })?;
@@ -339,7 +338,7 @@ impl ReadCompat for NbtListTag {
                 let list = content.split(',').try_fold(Vec::new(), |mut acc, item| {
                     match item.parse::<i32>() {
                         Ok(value) => acc.push(value),
-                        Err(_) => return Err(ConvertError::UnexpectedData(item.to_string())),
+                        Err(_) => return Err(SnbtError::UnexpectedData(item.to_string())),
                     }
                     Ok(acc)
                 })?;
@@ -349,7 +348,7 @@ impl ReadCompat for NbtListTag {
                 let list = content.split(',').try_fold(Vec::new(), |mut acc, item| {
                     match item.trim_end_matches('F').parse::<f32>() {
                         Ok(value) => acc.push(value),
-                        Err(_) => return Err(ConvertError::UnexpectedData(item.to_string())),
+                        Err(_) => return Err(SnbtError::UnexpectedData(item.to_string())),
                     }
                     Ok(acc)
                 })?;
@@ -359,7 +358,7 @@ impl ReadCompat for NbtListTag {
                 let list = content.split(',').try_fold(Vec::new(), |mut acc, item| {
                     match item.parse::<f64>() {
                         Ok(value) => acc.push(value),
-                        Err(_) => return Err(ConvertError::UnexpectedData(item.to_string())),
+                        Err(_) => return Err(SnbtError::UnexpectedData(item.to_string())),
                     }
                     Ok(acc)
                 })?;
@@ -375,12 +374,12 @@ impl ReadCompat for NbtListTag {
                 }
                 Ok((NbtListTag::String(list), remaining))
             }
-            _ => Err(ConvertError::UnexpectedData(content.to_string())),
+            _ => Err(SnbtError::UnexpectedData(content.to_string())),
         }
     }
 }
 
-fn read_list<T: ReadCompat>(mut content: &str) -> Result<Vec<T>, ConvertError> {
+fn read_list<T: ReadCompat>(mut content: &str) -> Result<Vec<T>, SnbtError> {
     let mut list = Vec::new();
     while !content.is_empty() {
         let (item, remaining) = T::read_from_string(content)?;
@@ -502,14 +501,14 @@ fn test_read_list() {
 
 /// ByteArray-specific format: `[B;({BYTE}B)?(,{BYTE}B)*]`
 impl ReadCompat for ByteArray {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         let (mut content, remaining) = read_enclosed(content.trim(), '[', ']')?;
 
         // Strip the array prefix
         if let Some(stripped) = content.strip_prefix("B;") {
             content = stripped;
         } else {
-            return Err(ConvertError::UnexpectedData(content.to_string()));
+            return Err(SnbtError::UnexpectedData(content.to_string()));
         }
 
         // Return an empty array if no content is found.
@@ -525,7 +524,7 @@ impl ReadCompat for ByteArray {
                 "false" => array.push(0),
                 item => match item.strip_suffix('B').and_then(|s| s.parse::<i8>().ok()) {
                     Some(value) => array.push(value),
-                    None => return Err(ConvertError::UnexpectedData(item.to_string())),
+                    None => return Err(SnbtError::UnexpectedData(item.to_string())),
                 },
             }
         }
@@ -535,35 +534,35 @@ impl ReadCompat for ByteArray {
 
 /// IntArray-specific format: `[I;{INT}?(,{INT})*]`
 impl ReadCompat for IntArray {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         read_array::<_, i32>(Some('I'), None, content)
     }
 }
 
 /// LongArray-specific format: `[L;({LONG}L)?(,{LONG}L)*]`
 impl ReadCompat for LongArray {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         read_array::<_, i64>(Some('L'), Some('L'), content)
     }
 }
 
 /// List-based format: `[({SHORT}S?)(,{SHORT}S)*]`
 impl ReadCompat for ShortArray {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         read_array::<_, i16>(None, Some('S'), content)
     }
 }
 
 /// List-based format: `[({FLOAT}F)?(,{FLOAT}F)*]`
 impl ReadCompat for FloatArray {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         read_array(None, Some('F'), content)
     }
 }
 
 /// List-based format: `[{DOUBLE}?(,{DOUBLE})*]`
 impl ReadCompat for DoubleArray {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         read_array(None, None, content)
     }
 }
@@ -581,7 +580,7 @@ fn read_array<T: From<Vec<I>>, I: std::str::FromStr>(
     prefix: Option<char>,
     suffix: Option<char>,
     content: &str,
-) -> Result<(T, &str), ConvertError> {
+) -> Result<(T, &str), SnbtError> {
     let (mut content, remaining) = read_enclosed(content.trim(), '[', ']')?;
 
     // Strip the array prefix, erroring if one was expected but not found.
@@ -589,7 +588,7 @@ fn read_array<T: From<Vec<I>>, I: std::str::FromStr>(
         if let Some(stripped) = content.strip_prefix(prefix).and_then(|s| s.strip_prefix(';')) {
             content = stripped;
         } else {
-            return Err(ConvertError::UnexpectedData(content.to_string()));
+            return Err(SnbtError::UnexpectedData(content.to_string()));
         }
     }
 
@@ -605,13 +604,13 @@ fn read_array<T: From<Vec<I>>, I: std::str::FromStr>(
             if let Some(stripped) = item.strip_suffix(suffix) {
                 item = stripped;
             } else {
-                return Err(ConvertError::UnexpectedData(item.to_string()));
+                return Err(SnbtError::UnexpectedData(item.to_string()));
             }
         }
 
         match item.parse::<I>() {
             Ok(value) => array.push(value),
-            Err(_) => return Err(ConvertError::UnexpectedData(item.to_string())),
+            Err(_) => return Err(SnbtError::UnexpectedData(item.to_string())),
         }
     }
 
@@ -668,7 +667,7 @@ fn test_read_array() {
 }
 
 /// Read the content enclosed by a pair of characters.
-fn read_enclosed(content: &str, open: char, close: char) -> Result<(&str, &str), ConvertError> {
+fn read_enclosed(content: &str, open: char, close: char) -> Result<(&str, &str), SnbtError> {
     debug_assert_eq!(content.chars().next().unwrap(), open);
 
     let mut count = 1u32;
@@ -687,7 +686,7 @@ fn read_enclosed(content: &str, open: char, close: char) -> Result<(&str, &str),
         }
     }
 
-    Err(ConvertError::UnexpectedData(content.to_string()))
+    Err(SnbtError::UnexpectedData(content.to_string()))
 }
 
 #[test]
@@ -717,7 +716,7 @@ fn test_read_enclosed() {
 // -------------------------------------------------------------------------------------------------
 
 impl ReadCompat for Mutf8String {
-    fn read_from_string(content: &str) -> Result<(Self, &str), ConvertError> {
+    fn read_from_string(content: &str) -> Result<(Self, &str), SnbtError> {
         if content.is_empty() {
             return Ok((Self::from_string(""), content));
         }
@@ -751,7 +750,7 @@ impl ReadCompat for Mutf8String {
                         remaining.trim_start_matches([':', ',', ' ']),
                     ))
                 } else {
-                    Err(ConvertError::UnexpectedData(content.to_string()))
+                    Err(SnbtError::UnexpectedData(content.to_string()))
                 }
             }
             _ => {

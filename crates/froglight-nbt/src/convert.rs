@@ -27,26 +27,22 @@ pub trait ConvertNbt: Sized {
     fn as_nbt(&self) -> Result<UnnamedNbt, ConvertError> { self.as_compound().map(UnnamedNbt::new) }
 }
 
+impl ConvertNbt for NbtCompound {
+    fn from_compound(nbt: &NbtCompound) -> Result<Self, ConvertError> { Ok(nbt.clone()) }
+
+    fn as_compound(&self) -> Result<NbtCompound, ConvertError> { Ok(self.clone()) }
+}
+
 /// An error that can occur when converting between a type and NBT.
 #[derive(Debug, thiserror::Error)]
 pub enum ConvertError {
     /// A field was missing from the NBT compound.
     #[error("Missing field: \"{0}\"")]
-    MissingField(String),
+    MissingField(&'static str),
     /// A field's tag did not match the expected tag.
     #[error("Mismatched tag for: \"{0}\"")]
-    MismatchedTag(String),
+    MismatchedTag(&'static str),
     /// An error occurred while converting a field.
     #[error("Failed to create \"{0}\": {1}")]
     ConversionError(&'static str, Box<dyn std::error::Error>),
-
-    /// Unexpected data was left over after parsing.
-    #[error("Unexpected data remaining: \"{0}\"")]
-    UnexpectedData(String),
-    /// An error occurred while parsing content formats.
-    #[error("Invalid format: expected '{0}', found '{1}'")]
-    InvalidFormat(char, char),
-    /// An error occurred while parsing a type from a string.
-    #[error("Failed to parse type: \"{0}\"")]
-    FromString(&'static str),
 }

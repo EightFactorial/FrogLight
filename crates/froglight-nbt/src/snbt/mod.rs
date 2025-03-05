@@ -13,6 +13,9 @@ pub use compat::Compat;
 mod standard;
 pub use standard::Standard;
 
+mod error;
+pub use error::SnbtError;
+
 /// A stringified [`NbtCompound`](crate::prelude::NbtCompound).
 ///
 /// Uses [`SmolStr`] internally for cheap cloning.

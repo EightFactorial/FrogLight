@@ -31,6 +31,9 @@ impl ConvertNbt for Snbt<Compat> {
     }
 
     fn as_compound(&self) -> Result<NbtCompound, ConvertError> {
-        NbtCompound::read_from_string(self.as_str()).map(|(nbt, _)| nbt)
+        NbtCompound::read_from_string(self.as_str()).map_or_else(
+            |err| Err(ConvertError::ConversionError(std::any::type_name::<Self>(), Box::new(err))),
+            |(val, _)| Ok(val),
+        )
     }
 }

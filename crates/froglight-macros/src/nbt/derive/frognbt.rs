@@ -1,7 +1,7 @@
 use darling::{FromDeriveInput, FromField};
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::{DataEnum, DataStruct, DeriveInput, Field, Fields, Ident, LitStr, Path};
+use quote::{ToTokens, quote};
+use syn::{DataEnum, DataStruct, DeriveInput, Field, Fields, Ident, LitStr, Path, Type};
 
 use crate::manifest::CrateManifest;
 
@@ -55,29 +55,33 @@ fn generate_struct(path: &Path, data: DataStruct) -> (TokenStream, TokenStream) 
     let mut from_tokens = TokenStream::new();
     let as_tokens = quote! { todo!() };
 
-    for (attributes, Field { ident, ty, .. }) in
+    for (FrogNbtField { name, tag, with }, Field { ident, ty, .. }) in
         data.fields.iter().map(|f| (FrogNbtField::from_field(f).unwrap(), f))
     {
-        // Use the `#[frog(ident = "name")]`.
-        let identifier = attributes.name.value();
-        // Use the `#[frog(tag = "type")]`.
-        let tag_type = TagType::tag_type(&attributes.tag);
+        // Use `#[frog(ident = "name")]`.
+        let identifier = name.value();
+        // Use `#[frog(tag = "type")]`.
+        let (tag_type, tag_code) = TagType::tag_type(&tag, path, ty);
 
         // `from_tokens`
         {
-            // Use the `#[frog(with = `function`)]` attribute or `Into::into`.
-            let value = if let Some(with) = attributes.with {
-                quote!(#with::from_data(value)?)
+            // Use `#[frog(with = `function`)]` or `TryFrom::try_from`.
+            let value = if let Some(with) = with {
+                quote!(#with::from_data(#tag_code)?)
             } else {
-                quote!(#ty::try_from(value.clone()).map_err(|err| #path::convert::ConvertError::ConversionError(std::any::type_name::<#ty>(), Box::new(err)))?)
+                quote! {
+                    <#ty>::try_from(#tag_code).map_err(|err| {
+                        #path::convert::ConvertError::ConversionError(std::any::type_name::<#ty>(), Box::new(err))
+                    })?
+                }
             };
 
             // Match the `NbtTag` to the expected type.
             let tokens = quote! {
                 match nbt.get_tag(#identifier) {
                     Some(#path::nbt::NbtTag::#tag_type(value)) => #value,
-                    None => Err(#path::convert::ConvertError::MissingField(String::from(#identifier)))?,
-                    _ => Err(#path::convert::ConvertError::MismatchedTag(String::from(#identifier)))?,
+                    None => Err(#path::convert::ConvertError::MissingField(#identifier))?,
+                    _ => Err(#path::convert::ConvertError::MismatchedTag(#tag))?,
                 },
             };
 
@@ -129,23 +133,50 @@ enum TagType {
 }
 
 impl TagType {
-    fn tag_type(str: &LitStr) -> Ident {
-        match TagType::from(str.value().as_str()) {
-            TagType::Byte => Ident::new("Byte", str.span()),
-            TagType::Short => Ident::new("Short", str.span()),
-            TagType::Int => Ident::new("Int", str.span()),
-            TagType::Long => Ident::new("Long", str.span()),
-            TagType::Float => Ident::new("Float", str.span()),
-            TagType::Double => Ident::new("Double", str.span()),
-            TagType::ByteArray => Ident::new("ByteArray", str.span()),
-            TagType::String => Ident::new("String", str.span()),
-            TagType::List => Ident::new("List", str.span()),
-            TagType::Compound => Ident::new("Compound", str.span()),
-            TagType::IntArray => Ident::new("IntArray", str.span()),
-            TagType::LongArray => Ident::new("LongArray", str.span()),
+    fn tag_type(lit: &LitStr, path: &Path, ty: &Type) -> (Ident, TokenStream) {
+        let tag = Self::from(lit.value().as_str());
+
+        let ident = match tag {
+            TagType::Byte => Ident::new("Byte", lit.span()),
+            TagType::Short => Ident::new("Short", lit.span()),
+            TagType::Int => Ident::new("Int", lit.span()),
+            TagType::Long => Ident::new("Long", lit.span()),
+            TagType::Float => Ident::new("Float", lit.span()),
+            TagType::Double => Ident::new("Double", lit.span()),
+            TagType::ByteArray => Ident::new("ByteArray", lit.span()),
+            TagType::String => Ident::new("String", lit.span()),
+            TagType::List => Ident::new("List", lit.span()),
+            TagType::Compound => Ident::new("Compound", lit.span()),
+            TagType::IntArray => Ident::new("IntArray", lit.span()),
+            TagType::LongArray => Ident::new("LongArray", lit.span()),
+        };
+
+        (ident, tag.tag_code(path, ty))
+    }
+
+    fn tag_code(self, path: &Path, ty: &Type) -> TokenStream {
+        match self {
+            Self::Float | Self::Double => quote!(*value),
+            Self::Byte | Self::Short | Self::Int | Self::Long => quote!(*value as #ty),
+            Self::Compound => quote!(<#ty as #path::convert::ConvertNbt>::from_compound(&value)?),
+            Self::String | Self::List => quote!(value.clone()),
+            Self::ByteArray | Self::IntArray | Self::LongArray => {
+                let ty = ty.to_token_stream().to_string().to_lowercase();
+
+                if ty.contains("u8") {
+                    quote!(value.iter().map(|&v| v as u8).collect::<Vec<u8>>())
+                } else if ty.contains("u32") {
+                    quote!(value.iter().map(|&v| v as u32).collect::<Vec<u32>>())
+                } else if ty.contains("u64") {
+                    quote!(value.iter().map(|&v| v as u64).collect::<Vec<u64>>())
+                } else {
+                    quote!(value.clone())
+                }
+            }
         }
     }
 }
+
 impl<'a> From<&'a str> for TagType {
     fn from(value: &'a str) -> Self {
         match value.to_lowercase().as_str() {
@@ -158,9 +189,9 @@ impl<'a> From<&'a str> for TagType {
             "string" | "str" => TagType::String,
             "list" | "vec" => TagType::List,
             "compound" | "object" => TagType::Compound,
-            "bytearray" | "vec<i8>" | "vec<u8>" | "[i8]" | "[u8]" => TagType::ByteArray,
-            "intarray" | "vec<i32>" | "vec<u32>" | "[i32]" | "[u32]" => TagType::IntArray,
-            "longarray" | "vec<i64>" | "vec<u64>" | "[i64]" | "[u64]" => TagType::LongArray,
+            "bytearray" | "vec<i8>" | "[i8]" | "vec<u8>" | "[u8]" => TagType::ByteArray,
+            "intarray" | "vec<i32>" | "[i32]" | "vec<u32>" | "[u32]" => TagType::IntArray,
+            "longarray" | "vec<i64>" | "[i64]" | "vec<u64>" | "[u64]" => TagType::LongArray,
             _ => panic!("Unknown tag type: \"{value}\""),
         }
     }
