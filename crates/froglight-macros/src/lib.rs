@@ -197,6 +197,13 @@ pub fn derive_static_item(input: proc_macro::TokenStream) -> proc_macro::TokenSt
     item::derive_static_item(input.into()).into()
 }
 
+/// Derive the appropriate traits on items.
+#[cfg(feature = "item")]
+#[proc_macro]
+pub fn items(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    item::items(input.into()).into()
+}
+
 // --------------------- `froglight-nbt` --------------------
 
 #[cfg(feature = "nbt")]
