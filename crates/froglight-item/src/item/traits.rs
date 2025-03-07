@@ -44,8 +44,8 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     /// #[cfg(feature = "v1_21_4")]
     /// use froglight_common::version::V1_21_4;
     /// use froglight_item::{
-    ///    generated::item::Air,
-    ///   item::{ItemRarity, ItemType, ItemTypeExt, StaticItem},
+    ///     generated::item::Air,
+    ///     item::{ItemRarity, ItemType, ItemTypeExt, StaticItem},
     /// };
     ///
     /// // Accessing the static rarity through the `ItemType` trait.
@@ -54,6 +54,7 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     /// // Accessing the constant rarity through the `ItemTypeExt` trait.
     /// #[cfg(feature = "v1_21_4")]
     /// assert_eq!(<Air as ItemTypeExt<V1_21_4>>::RARITY, ItemRarity::Common);
+    /// ```
     fn rarity(&self) -> ItemRarity;
 }
 

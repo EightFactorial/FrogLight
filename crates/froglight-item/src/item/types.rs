@@ -38,12 +38,12 @@ impl<I: ItemTypeExt<V>, V: Version> Item<I, V> {
     /// {
     ///     use froglight_common::version::V1_21_4;
     ///
-    ///     assert_eq!(Item::<item::Air, V1_21_4>::default().rarity(), ItemRarity::Common);
+    ///     assert_eq!(Item::<item::Air, V1_21_4>::const_rarity(), ItemRarity::Common);
     /// }
     /// ```
     #[inline]
     #[must_use]
-    pub fn const_rarity(&self) -> ItemRarity { I::RARITY }
+    pub const fn const_rarity() -> ItemRarity { I::RARITY }
 
     /// Get the identifier of the [`Item`].
     ///
@@ -59,7 +59,7 @@ impl<I: ItemTypeExt<V>, V: Version> Item<I, V> {
     /// {
     ///     use froglight_common::version::V1_21_4;
     ///
-    ///     assert_eq!(Item::<item::Air, V1_21_4>::default().identifier().as_str(), "minecraft:air");
+    ///     assert_eq!(Item::<item::Air, V1_21_4>::default().identifier(), "minecraft:air");
     /// }
     /// ```
     #[inline]

@@ -8,6 +8,7 @@ pub mod storage;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
+
     pub use froglight_macros::StaticItem;
 
     pub use crate::{

@@ -9,7 +9,7 @@ use bevy_reflect::prelude::*;
 use smol_str::SmolStr;
 
 /// A namespaced identifier.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -152,7 +152,7 @@ impl Borrow<str> for Identifier {
     fn borrow(&self) -> &str { &self.0 }
 }
 
-impl<T: PartialEq<str>> PartialEq<T> for Identifier {
+impl<T: PartialEq<str> + ?Sized> PartialEq<T> for Identifier {
     #[inline]
     fn eq(&self, other: &T) -> bool { other.eq(self.as_str()) }
 }

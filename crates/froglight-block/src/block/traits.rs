@@ -30,7 +30,7 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     /// use froglight_common::version::V1_21_4;
     ///
     /// // Accessing the static identifier through the `BlockType` trait.
-    /// assert_eq!(Air::as_static().identifier().as_str(), "minecraft:air");
+    /// assert_eq!(Air::as_static().identifier(), "minecraft:air");
     ///
     /// // Accessing the constant identifier through the `BlockTypeExt` trait.
     /// #[cfg(feature = "v1_21_4")]

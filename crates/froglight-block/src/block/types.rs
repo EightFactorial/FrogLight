@@ -281,7 +281,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// {
     ///     use froglight_common::version::V1_21_4;
     ///
-    ///     assert_eq!(Block::<block::Air, V1_21_4>::default().identifier().as_str(), "minecraft:air");
+    ///     assert_eq!(Block::<block::Air, V1_21_4>::default().identifier(), "minecraft:air");
     /// }
     /// ```
     #[inline]
@@ -406,7 +406,7 @@ impl<V: Version> UntypedBlock<V> {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     let block = Block::<block::Air, V1_21_4>::default();
-    ///     assert_eq!(block.into_untyped().identifier().as_str(), "minecraft:air");
+    ///     assert_eq!(block.into_untyped().identifier(), "minecraft:air");
     /// }
     /// ```
     #[inline]

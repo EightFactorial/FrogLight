@@ -4,8 +4,7 @@
 #![allow(missing_docs)]
 
 #[allow(clippy::wildcard_imports)]
-use super::item::*;
-use crate::item::ItemRarity;
+use crate::{generated::item::*, item::ItemRarity};
 
 froglight_macros::item_properties! {
     path = crate,
