@@ -18,7 +18,7 @@ FrogLight-Block provides a set of utilities for converting between block IDs, st
 ```rust
 use froglight_block::prelude::*;
 #[cfg(feature = "v1_21_4")]
-use froglight_common::version::V1_21_4;
+use froglight_common::{vanilla::Vanilla, version::V1_21_4};
 
 #[cfg(not(feature = "v1_21_4"))]
 fn main() {}

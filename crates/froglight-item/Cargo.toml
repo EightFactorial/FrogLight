@@ -1,5 +1,5 @@
 [package]
-name = "froglight-block"
+name = "froglight-item"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -18,16 +18,16 @@ workspace = true
 [dependencies]
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
-froglight-macros = { workspace = true, features = ["block"] }
+froglight-macros = { workspace = true, features = ["item"] }
+froglight-nbt = { workspace = true }
 hashbrown = { workspace = true }
 hashify = { workspace = true }
+indexmap = { workspace = true }
 parking_lot = { workspace = true }
-rangemap = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
-bevy_utils = { workspace = true, optional = true }
 
 [features]
 default = []
@@ -36,8 +36,8 @@ default = []
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_reflect",
-  "dep:bevy_utils",
   "froglight-common/bevy",
+  "froglight-nbt/bevy",
 ]
 
 # Enable support for v1.21.4

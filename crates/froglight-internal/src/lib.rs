@@ -5,6 +5,7 @@ pub use froglight_block as block;
 #[cfg(feature = "brigadier")]
 pub use froglight_brigadier as brigadier;
 pub use froglight_common as common;
+pub use froglight_item as item;
 pub use froglight_nbt as nbt;
 pub use froglight_network as network;
 pub use froglight_registry as registry;

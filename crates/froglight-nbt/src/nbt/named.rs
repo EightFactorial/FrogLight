@@ -9,7 +9,7 @@ use crate::{
 
 /// A named set of NBT tags.
 #[repr(transparent)]
-#[derive(Debug, PartialEq, From, Into)]
+#[derive(Debug, PartialEq, Clone, From, Into)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 pub struct NamedNbt(Option<(Mutf8String, NbtCompound)>);
 
@@ -86,7 +86,7 @@ impl NamedNbt {
 
 /// An unnamed set of NBT tags.
 #[repr(transparent)]
-#[derive(Debug, Default, PartialEq, From, Into)]
+#[derive(Debug, Default, Clone, PartialEq, From, Into)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]

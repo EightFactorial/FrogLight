@@ -37,7 +37,7 @@ serde = { workspace = true, optional = true, features = ["derive"] }
 tracing = { workspace = true, optional = true }
 
 [features]
-default = ["io", "serde"]
+default = []
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_reflect"]

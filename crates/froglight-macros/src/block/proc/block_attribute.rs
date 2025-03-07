@@ -93,11 +93,13 @@ impl BlockAttribute {
             && matches!(variants.last().unwrap().ident.to_string().as_str(), "True" | "False")
         {
             quote! {
+                #[automatically_derived]
                 impl From<bool> for #ident {
                     fn from(v: bool) -> Self {
                         if v { #ident::True } else { #ident::False }
                     }
                 }
+                #[automatically_derived]
                 impl From<#ident> for bool {
                     fn from(v: #ident) -> Self {
                         match v {
@@ -115,10 +117,12 @@ impl BlockAttribute {
             #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
             #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
             #vis #token #ident { #variants }
+            #[automatically_derived]
             impl #path::storage::Attribute for #ident {
                 const STATES: &'static [#ident] = &[#state_tokens];
                 const VALUES: &'static [&'static str] = &[#strings];
             }
+            #[automatically_derived]
             impl From<#ident> for usize {
                 fn from(v: #ident) -> Self {
                     match v { #usize_tokens }

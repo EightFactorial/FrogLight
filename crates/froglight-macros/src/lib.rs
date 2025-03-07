@@ -170,6 +170,33 @@ pub fn derive_frogbuf(input: proc_macro::TokenStream) -> proc_macro::TokenStream
     io::derive_frogbuf(input.into()).into()
 }
 
+// ------------------- `froglight-item` -------------------
+
+#[cfg(feature = "item")]
+mod item;
+
+/// Derive `frogligt_item::item::StaticItem` for a struct.
+///
+/// # Example
+/// ```rust,ignore
+/// use froglight_macros::StaticItem;
+///
+/// #[derive(StaticItem)]
+/// struct MyItem;
+///
+/// // |
+/// // V
+///
+/// impl froglight_item::item::StaticItem for MyItem {
+///    fn as_static() -> &'static Self { &Self }
+/// }
+/// ```
+#[cfg(feature = "item")]
+#[proc_macro_derive(StaticItem)]
+pub fn derive_static_item(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    item::derive_static_item(input.into()).into()
+}
+
 // --------------------- `froglight-nbt` --------------------
 
 #[cfg(feature = "nbt")]

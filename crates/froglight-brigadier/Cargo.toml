@@ -50,7 +50,7 @@ io = ["dep:froglight-io"]
 # Enable support for `glam` types.
 glam = ["dep:glam"]
 # Enable support for `froglight-nbt` types.
-nbt = ["dep:froglight-nbt", "serde"]
+nbt = ["dep:froglight-nbt"]
 # Enable support for `uuid` types.
 uuid = ["dep:uuid"]
 

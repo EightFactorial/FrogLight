@@ -301,6 +301,8 @@ impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// An untyped block with a state.
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(no_field_bounds, from_reflect = false, PartialEq))]
@@ -335,6 +337,7 @@ impl<V: Version> UntypedBlock<V> {
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
+    /// use froglight_common::vanilla::Vanilla;
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -353,6 +356,7 @@ impl<V: Version> UntypedBlock<V> {
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
+    /// use froglight_common::vanilla::Vanilla;
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -375,6 +379,7 @@ impl<V: Version> UntypedBlock<V> {
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
+    /// use froglight_common::vanilla::Vanilla;
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -394,6 +399,7 @@ impl<V: Version> UntypedBlock<V> {
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
+    /// use froglight_common::vanilla::Vanilla;
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -415,7 +421,7 @@ impl<B: BlockTypeExt<V>, V: Version> From<Block<B, V>> for UntypedBlock<V> {
     }
 }
 
-// ---- Manual trait implementations to avoid trait bounds ----
+// ------------- Manual trait implementations to avoid trait bounds -----------
 
 impl<B: BlockTypeExt<V>, V: Version> std::fmt::Debug for Block<B, V> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

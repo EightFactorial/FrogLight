@@ -22,6 +22,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             let attrs = idents.len().ne(&1).then(|| quote!((#idents))).unwrap_or_else(|| quote!(#idents));
 
             tokens.extend(quote! {
+                #[automatically_derived]
                 impl #block_path::block::BlockType<#version> for #block {
                     #[inline]
                     #[must_use]
@@ -30,6 +31,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                         &IDENTIFIER
                     }
                 }
+                #[automatically_derived]
                 impl #block_path::block::BlockTypeExt<#version> for #block {
                     type Attributes = #attrs;
                     const ATTRIBUTES: &'static [&'static str] = &[#names];
@@ -63,6 +65,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             // Build the `VersionBlocks` enum
             blocks_enum.extend(quote! { #block(#block_path::block::Block<#block, #version>), });
             blocks_from_impls.extend(quote! {
+                #[automatically_derived]
                 impl From<#block_path::block::Block<#block, #version>> for VersionBlocks {
                     #[inline]
                     fn from(block: #block_path::block::Block<#block, #version>) -> Self {
@@ -124,7 +127,8 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             }
             #blocks_from_impls
 
-            impl #block_path::resolve::BlockResolver<#version> for #block_path::resolve::Vanilla {
+            #[automatically_derived]
+            impl #block_path::resolve::BlockResolver<#version> for #common_path::vanilla::Vanilla {
                 type BlockEnum = VersionBlocks;
                 fn register(storage: &mut #block_path::storage::BlockStorage<#version>) {
                     #vanilla_register
@@ -143,6 +147,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             mod test {
                 use super::*;
                 use #block_path::{prelude::*, storage::BlockAttributes};
+                use #common_path::vanilla::Vanilla;
 
                 #[test]
                 fn blocks() {

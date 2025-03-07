@@ -5,14 +5,14 @@ use bevy_ecs::{reflect::ReflectResource, system::Resource};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use downcast_rs::Downcast;
-use froglight_common::version::Version;
+use froglight_common::{vanilla::Vanilla, version::Version};
 use parking_lot::RwLock;
 use rangemap::RangeMap;
 
 use super::{GlobalBlockId, RelativeBlockState};
 use crate::{
     block::{BlockType, BlockTypeExt, UntypedBlock},
-    resolve::{BlockResolver, Vanilla},
+    resolve::BlockResolver,
     storage::BlockAttributes,
 };
 
@@ -36,8 +36,7 @@ impl<V: Version> std::ops::Deref for AppBlockStorage<V> {
 }
 
 impl<V: Version> AppBlockStorage<V> {
-    /// Create a new [`AppBlockStorage`] with the
-    /// [`VanillaBlock`] types registered.
+    /// Create a new [`AppBlockStorage`] with the [`Vanilla`] types registered.
     #[inline]
     #[must_use]
     pub fn new() -> Self
@@ -50,6 +49,8 @@ impl<V: Version> AppBlockStorage<V> {
     #[must_use]
     pub fn from_storage(storage: BlockStorage<V>) -> Self { Self(Arc::new(RwLock::new(storage))) }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A dynamic storage for block types.
 ///
@@ -69,7 +70,7 @@ where Vanilla: BlockResolver<V>
 }
 
 impl<V: Version> BlockStorage<V> {
-    /// Create a new [`BlockStorage`] with the [`VanillaBlock`] types
+    /// Create a new [`BlockStorage`] with the [`Vanilla`] types
     /// registered.
     #[must_use]
     pub fn new() -> Self
@@ -153,6 +154,7 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
+    /// use froglight_common::vanilla::Vanilla;
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -231,6 +233,8 @@ impl<V: Version> BlockStorage<V> {
         self.traits.insert(range, BlockWrapper::new(B::as_static()));
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A wrapper around a [`&'static dyn BlockType`](BlockType)
 /// that implements [`PartialEq`] and [`Eq`].

@@ -17,30 +17,27 @@ workspace = true
 
 [dependencies]
 froglight-block = { workspace = true }
-froglight-brigadier = { workspace = true, optional = true, features = [
-  "io",
-  "nbt",
-] }
 froglight-common = { workspace = true }
+froglight-item = { workspace = true }
 froglight-nbt = { workspace = true, features = ["io"] }
-froglight-network = { workspace = true, features = [
-  "nbt",
-  "resolver",
-  "world",
-] }
+froglight-network = { workspace = true, features = ["nbt", "world"] }
 froglight-registry = { workspace = true }
 froglight-world = { workspace = true, features = ["block", "io"] }
+
+# Optional dependencies
+froglight-brigadier = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "brigadier"]
 
 # Enable the `froglight-brigadier` crate.
-brigadier = ["dep:froglight-brigadier", "bevy"]
+brigadier = ["dep:froglight-brigadier", "froglight-network/brigadier", "bevy"]
 
 # Enable `bevy` support.
 bevy = [
   "froglight-block/bevy",
   "froglight-common/bevy",
+  "froglight-item/bevy",
   "froglight-nbt/bevy",
   "froglight-network/bevy",
   "froglight-registry/bevy",
@@ -50,12 +47,14 @@ bevy = [
 # Enable support for v1.21.4
 v1_21_4 = [
   "froglight-block/v1_21_4",
+  "froglight-item/v1_21_4",
   "froglight-network/v1_21_4",
   "froglight-registry/v1_21_4",
 ]
 # Enable support for v1.21.5
 v1_21_5 = [
   "froglight-block/v1_21_4",
+  "froglight-item/v1_21_4",
   "froglight-network/v1_21_5",
   "froglight-registry/v1_21_5",
 ]

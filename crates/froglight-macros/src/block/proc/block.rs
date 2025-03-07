@@ -43,10 +43,9 @@ impl MacroInput {
         path: &Path,
     ) -> TokenStream {
         quote! {
-            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticBlock)]
             #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
             #vis #struct_token #ident #semi_token
-            impl #path::block::StaticBlock for #ident { fn as_static() -> &'static Self { &Self } }
         }
     }
 }

@@ -163,6 +163,15 @@ impl<V: Version> RegistryStorage<V> {
             })
     }
 
+    /// Insert the default values for a [`RegistryType`] into the
+    /// [`RegistryStorage`].
+    ///
+    /// # Note
+    /// This will overwrite any existing values.
+    pub fn insert_default<R: RegistryType<V>>(&mut self) {
+        self.extend::<R, _>(<R as RegistryType<V>>::defaults());
+    }
+
     /// Extend the [`RegistryStorage`] with a collection of [`RegistryValue`]s.
     ///
     /// This is the same as calling [`RegistryStorage::insert`] for each item.
@@ -212,10 +221,16 @@ impl<V: Version> RegistryStorage<V> {
     pub fn clear<R: RegistryType<V>>(&mut self) {
         self.0.get_mut(&TypeId::of::<R>()).map(IndexMap::clear);
     }
+
+    /// Remove all [`RegistryValue`]s of all [`RegistryType`]s.
+    ///
+    /// Keeps the allocated memory for future use.
+    #[inline]
+    pub fn clear_all(&mut self) { self.0.clear(); }
 }
 
 impl<V: Version> RegistryStorage<V> {
-    /// Get a [`RegistryValue`] as [`BaseNbt`]
+    /// Get a [`RegistryValue`] as [`UnnamedNbt`]
     /// by it's [`RegistryType`] and identifier.
     ///
     /// ### Note
@@ -240,13 +255,15 @@ impl<V: Version> RegistryStorage<V> {
     pub fn insert_nbt<R: RegistryType<V>>(
         &mut self,
         ident: Identifier,
-        nbt: &NbtCompound,
+        nbt: &UnnamedNbt,
     ) -> Result<Option<R::Value>, ConvertError>
     where
         R::Value: ConvertNbt,
     {
-        <R::Value as ConvertNbt>::from_compound(nbt)
-            .map(|value: R::Value| self.insert::<R>(ident, value))
+        nbt.compound()
+            .map(R::Value::from_compound)
+            .map(|result| result.map(|value: R::Value| self.insert::<R>(ident, value)))
+            .map_or(Ok(None), |result| result)
     }
 
     /// Extend the [`RegistryStorage`] with a collection of serialized
