@@ -12,7 +12,7 @@ pub mod prelude {
     pub use froglight_macros::StaticItem;
 
     pub use crate::{
-        generated::item,
+        generated::{item, property},
         item::{Item, ItemRarity, ItemType, ItemTypeExt, StaticItem, UntypedItem},
         storage::{AppItemStorage, GlobalItemId, ItemStorage},
     };

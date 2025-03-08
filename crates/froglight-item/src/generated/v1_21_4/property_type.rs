@@ -5,7 +5,7 @@
 
 use super::data::*;
 #[allow(clippy::wildcard_imports)]
-use crate::generated::attribute::*;
+use crate::generated::property::*;
 
 froglight_macros::item_attributes! {
     path = crate,
