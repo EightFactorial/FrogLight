@@ -18,9 +18,10 @@ workspace = true
 [dependencies]
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
+froglight-inventory = { workspace = true }
 froglight-item = { workspace = true }
 froglight-nbt = { workspace = true, features = ["io"] }
-froglight-network = { workspace = true, features = ["nbt", "world"] }
+froglight-network = { workspace = true, features = ["inventory", "world"] }
 froglight-registry = { workspace = true }
 froglight-world = { workspace = true, features = ["block", "io"] }
 
@@ -37,6 +38,7 @@ brigadier = ["dep:froglight-brigadier", "froglight-network/brigadier", "bevy"]
 bevy = [
   "froglight-block/bevy",
   "froglight-common/bevy",
+  "froglight-inventory/bevy",
   "froglight-item/bevy",
   "froglight-nbt/bevy",
   "froglight-network/bevy",

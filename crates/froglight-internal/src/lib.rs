@@ -5,6 +5,7 @@ pub use froglight_block as block;
 #[cfg(feature = "brigadier")]
 pub use froglight_brigadier as brigadier;
 pub use froglight_common as common;
+pub use froglight_inventory as inventory;
 pub use froglight_item as item;
 pub use froglight_nbt as nbt;
 pub use froglight_network as network;
@@ -18,6 +19,8 @@ pub mod prelude {
     #[cfg(feature = "brigadier")]
     pub use froglight_brigadier::prelude::*;
     pub use froglight_common::prelude::*;
+    pub use froglight_inventory::prelude::*;
+    pub use froglight_item::prelude::*;
     pub use froglight_nbt::prelude::*;
     pub use froglight_network::prelude::*;
     pub use froglight_registry::prelude::*;

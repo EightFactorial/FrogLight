@@ -1531,11 +1531,24 @@ dependencies = [
  "froglight-block",
  "froglight-brigadier",
  "froglight-common",
+ "froglight-inventory",
  "froglight-item",
  "froglight-nbt",
  "froglight-network",
  "froglight-registry",
  "froglight-world",
+]
+
+[[package]]
+name = "froglight-inventory"
+version = "0.1.0"
+dependencies = [
+ "bevy_ecs",
+ "bevy_reflect",
+ "froglight-common",
+ "froglight-io",
+ "froglight-item",
+ "parking_lot",
 ]
 
 [[package]]
@@ -1616,6 +1629,7 @@ dependencies = [
  "bevy_tasks",
  "froglight-brigadier",
  "froglight-common",
+ "froglight-inventory",
  "froglight-io",
  "froglight-macros",
  "froglight-nbt",
