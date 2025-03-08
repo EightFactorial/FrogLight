@@ -118,15 +118,16 @@ impl<V: Version> ItemStorage<V> {
     /// Get a typed item for the given item id.
     ///
     /// Returns `None` if no item with the given id was registered,
-    /// or the item does not exist in the resolver.
+    /// `Ok` if the item was registered and resolved successfully,
+    /// and `Err` if the item was registered but could not be resolved.
     #[inline]
     #[must_use]
     pub fn get_typed<R: ItemResolver<V>>(
         &self,
         item: GlobalItemId,
         data: Option<UnnamedNbt>,
-    ) -> Option<R::ItemEnum> {
-        self.get_untyped(item, data).and_then(R::resolve)
+    ) -> Option<Result<R::ItemEnum, UntypedItem<V>>> {
+        self.get_untyped(item, data).map(R::resolve)
     }
 
     /// Register an item type with the storage.

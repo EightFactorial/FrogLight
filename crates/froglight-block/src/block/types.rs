@@ -15,7 +15,7 @@ use crate::{
 
 /// A block with a state.
 #[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(no_field_bounds, from_reflect = false, PartialEq))]
+#[cfg_attr(feature = "bevy", reflect(no_field_bounds, PartialEq, Default))]
 pub struct Block<B: BlockTypeExt<V>, V: Version> {
     state: RelativeBlockState,
     #[cfg_attr(feature = "bevy", reflect(ignore))]
@@ -241,10 +241,10 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     ///     blocks.push(Block::<block::GrassBlock, V1_21_4>::default().into_untyped());
     ///
     ///     assert_eq!(blocks.len(), 4);
-    ///     assert_eq!(blocks[0].identifier().as_str(), "minecraft:air");
-    ///     assert_eq!(blocks[1].identifier().as_str(), "minecraft:stone");
-    ///     assert_eq!(blocks[2].identifier().as_str(), "minecraft:dirt");
-    ///     assert_eq!(blocks[3].identifier().as_str(), "minecraft:grass_block");
+    ///     assert_eq!(blocks[0].identifier(), "minecraft:air");
+    ///     assert_eq!(blocks[1].identifier(), "minecraft:stone");
+    ///     assert_eq!(blocks[2].identifier(), "minecraft:dirt");
+    ///     assert_eq!(blocks[3].identifier(), "minecraft:grass_block");
     /// }
     /// ```
     #[inline]
@@ -297,7 +297,7 @@ impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
     type Error = UntypedBlock<V>;
 
     fn try_from(value: UntypedBlock<V>) -> Result<Self, Self::Error> {
-        value.downcast().ok_or(value)
+        if let Some(value) = value.downcast::<B>() { Ok(value) } else { Err(value) }
     }
 }
 
@@ -366,7 +366,6 @@ impl<V: Version> UntypedBlock<V> {
     ///     assert!(block.into_untyped().is::<block::Air>());
     /// }
     /// ```
-    #[inline]
     #[must_use]
     pub fn is<B: BlockTypeExt<V>>(&self) -> bool {
         <dyn BlockType<V> as Downcast>::as_any(*self.wrapper).type_id()
@@ -389,7 +388,6 @@ impl<V: Version> UntypedBlock<V> {
     ///     assert_eq!(block.into_untyped().downcast::<block::Air>(), Some(block));
     /// }
     /// ```
-    #[inline]
     #[must_use]
     pub fn downcast<B: BlockTypeExt<V>>(self) -> Option<Block<B, V>> {
         self.is::<B>().then(|| Block::new(self.state))

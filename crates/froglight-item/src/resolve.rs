@@ -14,5 +14,9 @@ pub trait ItemResolver<V: Version> {
     fn register(storage: &mut ItemStorage<V>);
 
     /// Resolve the item type for the given [`UntypedItem`].
-    fn resolve(item: UntypedItem<V>) -> Option<Self::ItemEnum>;
+    ///
+    /// If the item type cannot be resolved,
+    /// the original [`UntypedItem`] is returned.
+    #[expect(clippy::missing_errors_doc)]
+    fn resolve(item: UntypedItem<V>) -> Result<Self::ItemEnum, UntypedItem<V>>;
 }

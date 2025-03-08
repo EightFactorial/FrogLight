@@ -94,3 +94,4 @@ fn main() {
   - [x] Generate Block Attributes
   - [ ] Generate Block Upgrades/Downgrades
     - [x] Conversions with matching attributes
+    - [ ] Conversions with different attributes

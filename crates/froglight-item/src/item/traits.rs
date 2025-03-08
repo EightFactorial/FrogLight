@@ -1,5 +1,6 @@
 use downcast_rs::DowncastSync;
 use froglight_common::{identifier::Identifier, version::Version};
+use froglight_nbt::nbt::UnnamedNbt;
 
 use super::ItemRarity;
 
@@ -9,7 +10,7 @@ pub trait StaticItem: 'static {
     ///
     /// Useful when working internally with generic items.
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use froglight_item::{generated::item::Air, item::StaticItem};
     ///
     /// assert_eq!(Air::as_static(), &Air);
@@ -21,7 +22,7 @@ pub trait StaticItem: 'static {
 pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     /// The identifier of the item.
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// #[cfg(feature = "v1_21_4")]
     /// use froglight_common::version::V1_21_4;
     /// use froglight_item::{
@@ -40,7 +41,7 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
 
     /// The rarity of the item.
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// #[cfg(feature = "v1_21_4")]
     /// use froglight_common::version::V1_21_4;
     /// use froglight_item::{
@@ -64,6 +65,9 @@ pub trait ItemTypeExt<V: Version>: ItemType<V> + StaticItem {
     const IDENTIFIER: &'static str;
     /// The rarity of the item.
     const RARITY: ItemRarity;
+
+    /// Get the default data of the item.
+    fn default_data() -> UnnamedNbt;
 }
 
 use sealed::MaybeReflect;

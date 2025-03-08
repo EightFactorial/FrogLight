@@ -26,30 +26,10 @@ impl NamedNbt {
     #[must_use]
     pub const fn new_empty() -> Self { Self(None) }
 
-    /// Read a [`NamedNbt`] from a reader.
-    ///
-    /// # Errors
-    /// Returns a [`froglight_io::standard::ReadError`] if the read fails.
+    /// Returns `true` if the [`NamedNbt`] is empty.
     #[inline]
-    #[cfg(feature = "io")]
-    pub fn read_from(
-        reader: &mut impl std::io::Read,
-    ) -> Result<Self, froglight_io::standard::ReadError> {
-        froglight_io::standard::FrogRead::frog_read(reader)
-    }
-
-    /// Write a [`NamedNbt`] to a writer, returning the number of bytes written.
-    ///
-    /// # Errors
-    /// Returns a [`froglight_io::standard::WriteError`] if the write fails.
-    #[inline]
-    #[cfg(feature = "io")]
-    pub fn write_to(
-        &self,
-        writer: &mut impl std::io::Write,
-    ) -> Result<usize, froglight_io::standard::WriteError> {
-        froglight_io::standard::FrogWrite::frog_write(self, writer)
-    }
+    #[must_use]
+    pub const fn is_empty(&self) -> bool { self.0.is_none() }
 
     /// Get the name of the [`NamedNbt`].
     #[inline]
@@ -80,6 +60,32 @@ impl NamedNbt {
             None => UnnamedNbt::new_empty(),
         }
     }
+
+    /// Read a [`NamedNbt`] from a reader.
+    ///
+    /// # Errors
+    /// Returns a [`froglight_io::standard::ReadError`] if the read fails.
+    #[inline]
+    #[cfg(feature = "io")]
+    pub fn read_from(
+        reader: &mut impl std::io::Read,
+    ) -> Result<Self, froglight_io::standard::ReadError> {
+        froglight_io::standard::FrogRead::frog_read(reader)
+    }
+
+    /// Write a [`NamedNbt`] to a writer, returning the number of bytes written.
+    ///
+    /// # Errors
+    /// Returns a [`froglight_io::standard::WriteError`] if the write fails.
+    #[inline]
+    #[cfg(feature = "io")]
+    pub fn write_to(
+        &self,
+        writer: &mut impl std::io::Write,
+    ) -> Result<usize, froglight_io::standard::WriteError> {
+        froglight_io::standard::FrogWrite::frog_write(self, writer)
+    }
+
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -102,6 +108,26 @@ impl UnnamedNbt {
     #[inline]
     #[must_use]
     pub const fn new_empty() -> Self { Self(None) }
+
+    /// Returns `true` if the [`UnnamedNbt`] is empty.
+    #[inline]
+    #[must_use]
+    pub const fn is_empty(&self) -> bool { self.0.is_none() }
+
+    /// Get the [`NbtCompound`] of the [`UnnamedNbt`].
+    #[inline]
+    #[must_use]
+    pub fn compound(&self) -> Option<&NbtCompound> { self.0.as_ref() }
+
+    /// Get the [`NbtCompound`] of the [`UnnamedNbt`] mutably.
+    #[inline]
+    #[must_use]
+    pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.0.as_mut() }
+
+    /// Get the inner [`NbtCompound`] of the [`UnnamedNbt`].
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> Option<NbtCompound> { self.0 }
 
     /// Read an [`UnnamedNbt`] from a reader.
     ///
@@ -128,21 +154,6 @@ impl UnnamedNbt {
     ) -> Result<usize, froglight_io::standard::WriteError> {
         froglight_io::standard::FrogWrite::frog_write(self, writer)
     }
-
-    /// Get the [`NbtCompound`] of the [`UnnamedNbt`].
-    #[inline]
-    #[must_use]
-    pub fn compound(&self) -> Option<&NbtCompound> { self.0.as_ref() }
-
-    /// Get the [`NbtCompound`] of the [`UnnamedNbt`] mutably.
-    #[inline]
-    #[must_use]
-    pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.0.as_mut() }
-
-    /// Get the inner [`NbtCompound`] of the [`UnnamedNbt`].
-    #[inline]
-    #[must_use]
-    pub fn into_inner(self) -> Option<NbtCompound> { self.0 }
 }
 
 impl AsRef<Option<NbtCompound>> for UnnamedNbt {
