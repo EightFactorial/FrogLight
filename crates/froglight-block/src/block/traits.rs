@@ -19,6 +19,22 @@ pub trait StaticBlock: 'static {
 
 /// A block type.
 pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
+    /// Get the value of an attribute as a string.
+    ///
+    /// ```rust
+    /// use froglight_block::{
+    ///     block::{BlockType, BlockTypeExt, StaticBlock},
+    ///     generated::block::GrassBlock,
+    /// };
+    /// #[cfg(feature = "v1_21_4")]
+    /// use froglight_common::version::V1_21_4;
+    ///
+    /// // Accessing the attribute through the `BlockType` trait.
+    /// assert_eq!(GrassBlock::as_static().get_attr_str(0, "snowy"), Some("true"));
+    /// assert_eq!(GrassBlock::as_static().get_attr_str(1, "snowy"), Some("false"));
+    /// ```
+    fn get_attr_str(&self, state: u16, attr: &str) -> Option<&'static str>;
+
     /// The identifier of the block.
     ///
     /// ```rust

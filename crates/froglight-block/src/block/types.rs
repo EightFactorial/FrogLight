@@ -410,6 +410,28 @@ impl<V: Version> UntypedBlock<V> {
     #[inline]
     #[must_use]
     pub fn identifier(&self) -> &'static Identifier { self.wrapper.identifier() }
+
+    /// Get the value of an [`Attribute`] as a string.
+    ///
+    /// Returns `None` if the [`Attribute`] is not present.
+    ///
+    /// ```rust
+    /// use froglight_block::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     let mut block = Block::<block::GrassBlock, V1_21_4>::default().into_untyped();
+    ///
+    ///     // Check the default value of the attribute
+    ///     assert_eq!(block.get_attr_str("snowy"), Some("false"));
+    /// }
+    /// ```
+    #[must_use]
+    pub fn get_attr_str(&self, attr: &str) -> Option<&'static str> {
+        self.wrapper.get_attr_str(self.state.into(), attr)
+    }
 }
 
 impl<B: BlockTypeExt<V>, V: Version> From<Block<B, V>> for UntypedBlock<V> {

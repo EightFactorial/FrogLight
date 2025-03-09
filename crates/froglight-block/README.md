@@ -34,10 +34,16 @@ fn main() {
     let untyped_block: UntypedBlock<V1_21_4> = storage.get_untyped(GlobalBlockId::new_unchecked(0)).unwrap();
     assert_eq!(storage.get_global(untyped_block), Some(GlobalBlockId::new_unchecked(0)));
 
-    // Untyped blocks have limited functionality, but can be resolved into typed blocks
+    // Untyped blocks have limited functionality, but their identifer and attributes can be accessed
     assert_eq!(untyped_block.identifier().as_str(), "minecraft:air");
     assert_eq!(untyped_block.resolve::<Vanilla>(), Some(Block::<block::Air, V1_21_4>::default().into()));
 
+    let untyped_block: UntypedBlock<V1_21_4> = storage.get_untyped(GlobalBlockId::new_unchecked(9)).unwrap();
+    assert_eq!(untyped_block.identifier().as_str(), "minecraft:grass_block");
+    assert_eq!(untyped_block.get_attr_str("snowy"), Some("false"));
+    assert_eq!(untyped_block.resolve::<Vanilla>(), Some(Block::<block::GrassBlock, V1_21_4>::default().into()));
+
+    // Untyped blocks can be converted into typed blocks, which allows for more functionality
     let state_id = GlobalBlockId::new_unchecked(1);
     assert_eq!(storage.get_typed::<Vanilla>(state_id), Some(Block::<block::Stone, V1_21_4>::default().into()));
     assert_eq!(storage.get_global(Block::<block::Stone, V1_21_4>::default()), Some(state_id));

@@ -24,6 +24,15 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             tokens.extend(quote! {
                 #[automatically_derived]
                 impl #block_path::block::BlockType<#version> for #block {
+                    #[must_use]
+                    fn get_attr_str(&self, state: u16, attr: &str) -> Option<&'static str> {
+                        if <<#block as #block_path::block::BlockTypeExt<#version>>::Attributes as #block_path::storage::BlockAttributes>::COUNT > state as usize {
+                            #block_path::block::Block::<#block, #version>::new(state.into()).get_attr_str(attr)
+                        } else {
+                            None
+                        }
+                    }
+
                     #[inline]
                     #[must_use]
                     fn identifier(&self) -> &'static #common_path::identifier::Identifier {

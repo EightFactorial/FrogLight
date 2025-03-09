@@ -33,9 +33,11 @@ impl std::ops::Deref for GlobalBlockId {
 pub(crate) struct RelativeBlockState(u16);
 
 impl From<u16> for RelativeBlockState {
+    #[inline]
     fn from(state: u16) -> Self { Self(state) }
 }
 impl From<RelativeBlockState> for u16 {
+    #[inline]
     fn from(state: RelativeBlockState) -> Self { state.0 }
 }
 
