@@ -34,7 +34,7 @@ fn main() {
     let untyped_block: UntypedBlock<V1_21_4> = storage.get_untyped(GlobalBlockId::new_unchecked(0)).unwrap();
     assert_eq!(storage.get_global(untyped_block), Some(GlobalBlockId::new_unchecked(0)));
 
-    // Untyped blocks have limited functionality, but their identifer and attributes can be accessed
+    // Untyped blocks have limited functionality, but their identifier and attributes can be accessed
     assert_eq!(untyped_block.identifier().as_str(), "minecraft:air");
     assert_eq!(untyped_block.resolve::<Vanilla>(), Some(Block::<block::Air, V1_21_4>::default().into()));
 

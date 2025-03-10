@@ -31,9 +31,17 @@ bevy_utils = { workspace = true, optional = true }
 downcast-rs = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
+froglight-nbt = { workspace = true, optional = true }
 
 [features]
-default = []
+default = ["nbt"]
+
+# Enable `froglight-block` support
+block = ["dep:froglight-block"]
+# Enable `froglight-io` support
+io = ["dep:froglight-io"]
+# Enable `froglight-nbt` support
+nbt = ["dep:froglight-nbt"]
 
 # Enable `bevy` support.
 bevy = [
@@ -43,9 +51,5 @@ bevy = [
   "dep:downcast-rs",
   "froglight-block?/bevy",
   "froglight-common/bevy",
+  "froglight-nbt?/bevy",
 ]
-
-# Enable `froglight-block` support
-block = ["dep:froglight-block"]
-# Enable `froglight-io` support
-io = ["dep:froglight-io"]

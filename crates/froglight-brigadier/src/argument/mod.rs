@@ -7,6 +7,7 @@ use bevy_reflect::func::ArgValue;
 mod reflect;
 pub use reflect::ReflectArgumentParser;
 
+mod brigadier_impl;
 #[cfg(feature = "glam")]
 mod glam_impl;
 mod std_impl;
@@ -20,10 +21,10 @@ impl Plugin for ArgumentParserPlugin {
         let world = app.world_mut();
         let mut registry = world.resource::<AppTypeRegistry>().write();
 
-        std_impl::register_types(&mut registry);
-
+        brigadier_impl::register_types(&mut registry);
         #[cfg(feature = "glam")]
         glam_impl::register_types(&mut registry);
+        std_impl::register_types(&mut registry);
 
         #[cfg(feature = "uuid")]
         {

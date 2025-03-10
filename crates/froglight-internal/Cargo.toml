@@ -18,7 +18,7 @@ workspace = true
 [dependencies]
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
-froglight-inventory = { workspace = true }
+froglight-inventory = { workspace = true, features = ["world"] }
 froglight-item = { workspace = true }
 froglight-nbt = { workspace = true, features = ["io"] }
 froglight-network = { workspace = true, features = ["inventory", "world"] }

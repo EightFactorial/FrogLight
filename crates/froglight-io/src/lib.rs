@@ -11,12 +11,12 @@ pub mod serde;
 pub mod prelude {
     //! Re-exports of all protocol traits, error types, and macros.
 
+    pub use froglight_macros::FrogBuf;
+
     #[cfg(feature = "serde")]
     pub use crate::serde::FrogJson;
     pub use crate::{
         standard::{FrogRead, FrogWrite, ReadError, WriteError},
         variable::{FrogVarRead, FrogVarWrite},
     };
-
-    // pub use froglight_macros::FrogBuf;
 }

@@ -69,7 +69,7 @@ impl<'env, Function> CommandBuilder<'env, Arg, Function> {
         match self.try_command(f) {
             Ok(builder) => builder,
             Err(err) => {
-                panic!("Failed to build Command: {err}");
+                panic!("Failed to build Command, {err}");
             }
         }
     }
