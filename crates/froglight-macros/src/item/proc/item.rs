@@ -9,10 +9,11 @@ use crate::CrateManifest;
 
 pub(crate) fn items(input: TokenStream) -> TokenStream {
     let MacroInput { path, items } = syn::parse2(input).unwrap();
-    let block = path.unwrap_or_else(|| CrateManifest::froglight("froglight-item"));
+    let item = path.unwrap_or_else(|| CrateManifest::froglight("froglight-item"));
+    let block = CrateManifest::froglight("froglight-block");
 
-    items.iter().fold(TokenStream::new(), |mut acc, item| {
-        acc.extend(MacroInput::as_tokens(item, &block));
+    items.iter().fold(TokenStream::new(), |mut acc, input| {
+        acc.extend(MacroInput::as_tokens(input, &item, &block));
         acc
     })
 }
@@ -39,13 +40,31 @@ impl Parse for MacroInput {
 }
 impl MacroInput {
     fn as_tokens(
-        ItemStruct { vis, struct_token, ident, semi_token, .. }: &ItemStruct,
+        ItemStruct { attrs, vis, struct_token, ident, semi_token, .. }: &ItemStruct,
         path: &Path,
+        block: &Path,
     ) -> TokenStream {
-        quote! {
-            #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticItem)]
-            #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
-            #vis #struct_token #ident #semi_token
+        if attrs.iter().any(|attr| attr.path().is_ident("block")) {
+            quote! {
+                #[cfg(not(feature = "block"))]
+                #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticItem)]
+                #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
+                #vis #struct_token #ident #semi_token
+
+                #[cfg(feature = "block")]
+                pub use #block::generated::block::#ident;
+                #[cfg(feature = "block")]
+                #[automatically_derived]
+                impl #path::prelude::StaticItem for #ident {
+                    #[inline] #[must_use] fn as_static() -> &'static Self { &Self }
+                }
+            }
+        } else {
+            quote! {
+                #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticItem)]
+                #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
+                #vis #struct_token #ident #semi_token
+            }
         }
     }
 }

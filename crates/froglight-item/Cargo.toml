@@ -28,14 +28,19 @@ parking_lot = { workspace = true }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+froglight-block = { workspace = true, optional = true }
 
 [features]
 default = []
+
+# Enable `froglight-block` support.
+block = ["dep:froglight-block"]
 
 # Enable `bevy` support.
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_reflect",
+  "froglight-block?/bevy",
   "froglight-common/bevy",
   "froglight-nbt/bevy",
 ]

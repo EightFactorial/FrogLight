@@ -19,7 +19,7 @@ workspace = true
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-inventory = { workspace = true, features = ["world"] }
-froglight-item = { workspace = true }
+froglight-item = { workspace = true, features = ["block"] }
 froglight-nbt = { workspace = true, features = ["io"] }
 froglight-network = { workspace = true, features = ["inventory", "world"] }
 froglight-registry = { workspace = true }
