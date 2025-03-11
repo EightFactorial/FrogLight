@@ -1658,28 +1658,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "froglight-chat"
-version = "0.1.0"
-dependencies = [
- "aes",
- "bevy_ecs",
- "bevy_reflect",
- "cfb8",
- "derive_more 2.0.1",
- "froglight-common",
- "froglight-io",
- "froglight-nbt",
- "md-5",
- "parking_lot",
- "rsa",
- "serde",
- "serde_json",
- "smol_str",
- "ureq",
- "uuid",
-]
-
-[[package]]
 name = "froglight-common"
 version = "0.1.0"
 dependencies = [
@@ -1698,12 +1676,12 @@ version = "0.1.0"
 dependencies = [
  "froglight-block",
  "froglight-brigadier",
- "froglight-chat",
  "froglight-common",
  "froglight-inventory",
  "froglight-item",
  "froglight-nbt",
  "froglight-network",
+ "froglight-player",
  "froglight-registry",
  "froglight-world",
 ]
@@ -1801,12 +1779,12 @@ dependencies = [
  "bevy_reflect",
  "bevy_tasks",
  "froglight-brigadier",
- "froglight-chat",
  "froglight-common",
  "froglight-inventory",
  "froglight-io",
  "froglight-macros",
  "froglight-nbt",
+ "froglight-player",
  "froglight-world",
  "futures-lite",
  "glam",
@@ -1815,6 +1793,30 @@ dependencies = [
  "serde",
  "smallvec",
  "smol_str",
+ "uuid",
+]
+
+[[package]]
+name = "froglight-player"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "base64 0.22.1",
+ "bevy_ecs",
+ "bevy_reflect",
+ "cfb8",
+ "derive_more 2.0.1",
+ "froglight-common",
+ "froglight-io",
+ "froglight-nbt",
+ "hashbrown 0.15.2",
+ "md-5",
+ "parking_lot",
+ "rsa",
+ "serde",
+ "serde_json",
+ "smol_str",
+ "ureq",
  "uuid",
 ]
 

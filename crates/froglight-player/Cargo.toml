@@ -1,5 +1,5 @@
 [package]
-name = "froglight-chat"
+name = "froglight-player"
 version = { workspace = true }
 edition = { workspace = true }
 license = { workspace = true }
@@ -17,17 +17,19 @@ workspace = true
 
 [dependencies]
 aes = { workspace = true }
+base64 = { workspace = true }
 cfb8 = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
 froglight-nbt = { workspace = true, features = ["serde"] }
+hashbrown = { workspace = true, features = ["serde"] }
 md-5 = { workspace = true }
 parking_lot = { workspace = true }
 rsa = { workspace = true, features = ["serde", "sha2"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
-uuid = { workspace = true, features = ["md5", "serde"] }
 smol_str = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["md5", "serde"] }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }

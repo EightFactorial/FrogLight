@@ -5,7 +5,6 @@ resolver = "2"
 members = [
   "crates/froglight-block",
   "crates/froglight-brigadier",
-  "crates/froglight-chat",
   "crates/froglight-common",
   "crates/froglight-internal",
   "crates/froglight-inventory",
@@ -14,6 +13,7 @@ members = [
   "crates/froglight-macros",
   "crates/froglight-nbt",
   "crates/froglight-network",
+  "crates/froglight-player",
   "crates/froglight-registry",
   "crates/froglight-world",
 ]
@@ -76,7 +76,6 @@ bevy_winit = { version = "0.15", default-features = false }
 # FrogLight
 froglight-block = { version = "0.1", path = "crates/froglight-block" }
 froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier" }
-froglight-chat = { version = "0.1", path = "crates/froglight-chat" }
 froglight-common = { version = "0.1", path = "crates/froglight-common" }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
 froglight-inventory = { version = "0.1", path = "crates/froglight-inventory" }
@@ -85,6 +84,7 @@ froglight-item = { version = "0.1", path = "crates/froglight-item" }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
 froglight-nbt = { version = "0.1", path = "crates/froglight-nbt" }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
+froglight-player = { version = "0.1", path = "crates/froglight-player" }
 froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
 froglight-world = { version = "0.1", path = "crates/froglight-world" }
 
@@ -94,6 +94,7 @@ async-channel = "2.3"
 async-compression = { version = "0.4", default-features = false }
 async-io = "2.4"
 async-net = "2.0"
+base64 = "0.22"
 cfb8 = { version = "0.8.1", features = ["std"] }
 derive_more = { version = "2.0", features = ["full"] }
 downcast-rs = "2.0"
