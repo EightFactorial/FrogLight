@@ -14,7 +14,7 @@ pub mod prelude {
     pub use froglight_io::prelude::*;
 
     #[cfg(feature = "resolver")]
-    pub use crate::resolver::ServerResolver;
+    pub use crate::resolver::{FroglightAgent, FroglightResolver};
     pub use crate::{
         connection::{ClientConnection, ServerConnection},
         version::state::{Config, Handshake, Login, Play, State, Status, ValidState},

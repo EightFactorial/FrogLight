@@ -44,12 +44,13 @@ hickory-resolver = { version = "0.24", optional = true, default-features = false
   "system-config",
   "rustls",
 ] }
+ureq = { workspace = true, optional = true }
 
 [features]
 default = ["resolver", "nbt"]
 
 # Enable server address and port lookup.
-resolver = ["dep:hickory-resolver"]
+resolver = ["dep:hickory-resolver", "dep:ureq"]
 
 # Enable `froglight-brigadier` support.
 brigadier = ["dep:froglight-brigadier", "bevy"]

@@ -18,7 +18,7 @@ use hickory_resolver::{
 /// A DNS resolver for server addresses.
 ///
 /// See [`AsyncResolver`] for more information.
-pub(super) type FroglightResolver = AsyncResolver<ResolverConnectionProvider>;
+pub(super) type FroglightInnerResolver = AsyncResolver<ResolverConnectionProvider>;
 
 #[derive(Clone)]
 pub(super) struct ResolverRuntimeProvider;
@@ -102,6 +102,7 @@ impl ConnectionProvider for ResolverConnectionProvider {
 pub(super) struct ResolverRuntimeHandle;
 
 impl Spawn for ResolverRuntimeHandle {
+    #[allow(unused_variables)]
     fn spawn_bg<F>(&mut self, future: F)
     where F: Future<Output = Result<(), ProtoError>> + Send + 'static {
         #[cfg(feature = "bevy")]
