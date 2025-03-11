@@ -26,33 +26,32 @@ impl NamedNbt {
     #[must_use]
     pub const fn new_empty() -> Self { Self(None) }
 
-    /// Returns `true` if the [`NamedNbt`] is empty.
+    /// Returns `true` if there is no inner [`NbtCompound`].
     #[inline]
     #[must_use]
-    pub const fn is_empty(&self) -> bool { self.0.is_none() }
+    pub const fn is_none(&self) -> bool { self.0.is_none() }
+
+    /// Returns `true` if there is no inner [`NbtCompound`] or if it is empty.
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.0.as_ref().is_none_or(|(_, c)| c.is_empty()) }
 
     /// Get the name of the [`NamedNbt`].
-    #[inline]
     #[must_use]
     pub fn name(&self) -> Option<&Mutf8Str> { self.0.as_ref().map(|(a, _)| a.as_mutf8_str()) }
 
     /// Get the name of the [`NamedNbt`] mutably.
-    #[inline]
     #[must_use]
     pub fn name_mut(&mut self) -> Option<&mut Mutf8String> { self.0.as_mut().map(|(a, _)| a) }
 
     /// Get the [`NbtCompound`] of the [`NamedNbt`].
-    #[inline]
     #[must_use]
     pub fn compound(&self) -> Option<&NbtCompound> { self.0.as_ref().map(|(_, b)| b) }
 
     /// Get the [`NbtCompound`] of the [`NamedNbt`] mutably.
-    #[inline]
     #[must_use]
     pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.0.as_mut().map(|(_, b)| b) }
 
     /// Create an [`UnnamedNbt`] from this [`NamedNbt`].
-    #[inline]
     #[must_use]
     pub fn into_unnamed(self) -> UnnamedNbt {
         match self.0 {
@@ -85,7 +84,6 @@ impl NamedNbt {
     ) -> Result<usize, froglight_io::standard::WriteError> {
         froglight_io::standard::FrogWrite::frog_write(self, writer)
     }
-
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -109,18 +107,20 @@ impl UnnamedNbt {
     #[must_use]
     pub const fn new_empty() -> Self { Self(None) }
 
-    /// Returns `true` if the [`UnnamedNbt`] is empty.
+    /// Returns `true` if there is no inner [`NbtCompound`].
     #[inline]
     #[must_use]
-    pub const fn is_empty(&self) -> bool { self.0.is_none() }
+    pub const fn is_none(&self) -> bool { self.0.is_none() }
+
+    /// Returns `true` if there is no inner [`NbtCompound`] or if it is empty.
+    #[must_use]
+    pub fn is_empty(&self) -> bool { self.0.as_ref().is_none_or(NbtCompound::is_empty) }
 
     /// Get the [`NbtCompound`] of the [`UnnamedNbt`].
-    #[inline]
     #[must_use]
     pub fn compound(&self) -> Option<&NbtCompound> { self.0.as_ref() }
 
     /// Get the [`NbtCompound`] of the [`UnnamedNbt`] mutably.
-    #[inline]
     #[must_use]
     pub fn compound_mut(&mut self) -> Option<&mut NbtCompound> { self.0.as_mut() }
 
