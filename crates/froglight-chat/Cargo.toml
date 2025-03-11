@@ -1,0 +1,43 @@
+[package]
+name = "froglight-chat"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+derive_more = { workspace = true }
+froglight-common = { workspace = true }
+froglight-nbt = { workspace = true, features = ["serde"] }
+parking_lot = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Optional dependencies
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+froglight-io = { workspace = true, optional = true }
+
+[features]
+default = []
+
+# Enable `froglight-io` support.
+io = ["dep:froglight-io"]
+
+# Enable `bevy` support.
+bevy = [
+  "dep:bevy_ecs",
+  "dep:bevy_reflect",
+  "froglight-common/bevy",
+  "froglight-nbt/bevy",
+]

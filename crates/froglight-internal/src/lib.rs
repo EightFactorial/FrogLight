@@ -4,6 +4,7 @@
 pub use froglight_block as block;
 #[cfg(feature = "brigadier")]
 pub use froglight_brigadier as brigadier;
+pub use froglight_chat as chat;
 pub use froglight_common as common;
 pub use froglight_inventory as inventory;
 pub use froglight_item as item;
@@ -18,6 +19,7 @@ pub mod prelude {
     pub use froglight_block::prelude::*;
     #[cfg(feature = "brigadier")]
     pub use froglight_brigadier::prelude::*;
+    pub use froglight_chat::prelude::*;
     pub use froglight_common::prelude::*;
     pub use froglight_inventory::prelude::*;
     pub use froglight_item::prelude::*;

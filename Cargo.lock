@@ -1506,6 +1506,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "froglight-chat"
+version = "0.1.0"
+dependencies = [
+ "bevy_ecs",
+ "bevy_reflect",
+ "derive_more 2.0.1",
+ "froglight-common",
+ "froglight-io",
+ "froglight-nbt",
+ "parking_lot",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "froglight-common"
 version = "0.1.0"
 dependencies = [
@@ -1524,6 +1539,7 @@ version = "0.1.0"
 dependencies = [
  "froglight-block",
  "froglight-brigadier",
+ "froglight-chat",
  "froglight-common",
  "froglight-inventory",
  "froglight-item",
@@ -1626,6 +1642,7 @@ dependencies = [
  "bevy_reflect",
  "bevy_tasks",
  "froglight-brigadier",
+ "froglight-chat",
  "froglight-common",
  "froglight-inventory",
  "froglight-io",

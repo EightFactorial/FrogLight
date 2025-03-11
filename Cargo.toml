@@ -5,6 +5,7 @@ resolver = "2"
 members = [
   "crates/froglight-block",
   "crates/froglight-brigadier",
+  "crates/froglight-chat",
   "crates/froglight-common",
   "crates/froglight-internal",
   "crates/froglight-inventory",
@@ -75,6 +76,7 @@ bevy_winit = { version = "0.15", default-features = false }
 # FrogLight
 froglight-block = { version = "0.1", path = "crates/froglight-block" }
 froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier" }
+froglight-chat = { version = "0.1", path = "crates/froglight-chat" }
 froglight-common = { version = "0.1", path = "crates/froglight-common" }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
 froglight-inventory = { version = "0.1", path = "crates/froglight-inventory" }
