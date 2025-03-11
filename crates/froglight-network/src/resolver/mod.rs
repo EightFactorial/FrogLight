@@ -1,8 +1,4 @@
-//! A [`FroglightResolver`] and [`FroglightAgent`] implemented using
-//! [`hickory_resolver`].
-
-mod agent;
-pub use agent::FroglightAgent;
+//! A [`FroglightResolver`] implemented using [`hickory_resolver`].
 
 mod provider;
 use provider::{FroglightInnerResolver, ResolverConnectionProvider};

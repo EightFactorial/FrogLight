@@ -30,6 +30,8 @@ pub struct FroglightResolver {
 
 impl FroglightResolver {
     /// Create a new [`FroglightResolver`].
+    ///
+    /// See [`ResolverConfig`] on how to configure the resolver.
     #[must_use]
     pub fn new(config: ResolverConfig, options: ResolverOpts) -> Self {
         let resolver =
@@ -197,7 +199,7 @@ impl FroglightResolver {
 impl bevy_ecs::world::FromWorld for FroglightResolver {
     fn from_world(_: &mut bevy_ecs::world::World) -> Self {
         Self::system_config().unwrap_or_else(|err| {
-            bevy_log::warn!("Failed to load system resolver, defaulting to cloudflare: {err}");
+            bevy_log::error!("Failed to load system resolver, defaulting to cloudflare: {err}");
             Self::new(ResolverConfig::cloudflare(), ResolverOpts::default())
         })
     }
