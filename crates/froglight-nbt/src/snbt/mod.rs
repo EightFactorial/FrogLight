@@ -22,6 +22,8 @@ pub use error::SnbtError;
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Into, Deref, AsRef)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Snbt<Type: SnbtType = Standard> {
     #[deref]
     #[as_ref]
