@@ -33,6 +33,7 @@ uuid = { workspace = true, features = ["md5", "serde"] }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
+bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true, features = ["serde"] }
 ureq = { workspace = true, optional = true, features = ["json"] }
@@ -49,6 +50,7 @@ io = ["dep:froglight-io"]
 # Enable `bevy` support.
 bevy = [
   "dep:bevy_ecs",
+  "dep:bevy_log",
   "dep:bevy_reflect",
   "froglight-common/bevy",
   "froglight-nbt/bevy",

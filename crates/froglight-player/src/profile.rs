@@ -23,7 +23,7 @@ pub struct PlayerProfile {
     /// The player's username.
     pub username: PlayerUsername,
     /// The player's textures.
-    pub textures: PlayerTextures,
+    pub textures: PlayerProfileTextures,
     /// The player's properties.
     #[cfg_attr(feature = "bevy", reflect(ignore))]
     pub properties: HashMap<SmolStr, serde_json::Value>,
@@ -33,26 +33,26 @@ impl PlayerProfile {
     /// Create a new [`PlayerProfile`] from a username and [`Uuid`].
     #[must_use]
     pub fn new(username: impl Into<SmolStr>, uuid: Uuid) -> Self {
-        Self::new_with_textures(PlayerUsername::new(username), uuid, PlayerTextures::new())
-    }
-
-    /// Create a new offline [`PlayerProfile`] from a username.
-    #[must_use]
-    pub fn new_offline(username: impl Into<SmolStr>) -> Self {
-        let username = PlayerUsername::new(username);
-        let uuid = username.offline_uuid();
-        Self::new_with_textures(username, uuid, PlayerTextures::new())
+        Self::new_with_textures(PlayerUsername::new(username), uuid, PlayerProfileTextures::new())
     }
 
     /// Create a new [`PlayerProfile`] from a
-    /// [`PlayerUsername`], [`Uuid`], and [`PlayerTextures`].
+    /// [`PlayerUsername`], [`Uuid`], and [`PlayerProfileTextures`].
     #[must_use]
     pub fn new_with_textures(
         username: PlayerUsername,
         uuid: Uuid,
-        textures: PlayerTextures,
+        textures: PlayerProfileTextures,
     ) -> Self {
         Self { uuid, username, textures, properties: HashMap::new() }
+    }
+
+    /// Create a new offline [`PlayerProfile`] from a username.
+    #[must_use]
+    pub fn offline_profile(username: impl Into<SmolStr>) -> Self {
+        let username = PlayerUsername::new(username);
+        let uuid = username.offline_uuid();
+        Self::new_with_textures(username, uuid, PlayerProfileTextures::new())
     }
 }
 
@@ -61,7 +61,7 @@ impl PlayerProfile {
 /// The textures of a player.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
-pub struct PlayerTextures {
+pub struct PlayerProfileTextures {
     /// The timestamp the textures were retrieved.
     #[cfg_attr(feature = "bevy", reflect(ignore))]
     pub timestamp: SystemTime,
@@ -73,13 +73,13 @@ pub struct PlayerTextures {
     pub cape: Option<SmolStr>,
 }
 
-impl Default for PlayerTextures {
+impl Default for PlayerProfileTextures {
     #[inline]
     fn default() -> Self { Self::new() }
 }
 
-impl PlayerTextures {
-    /// Create a new default [`PlayerTextures`].
+impl PlayerProfileTextures {
+    /// Create a new default [`PlayerProfileTextures`].
     #[must_use]
     pub fn new() -> Self {
         Self { timestamp: SystemTime::now(), slim: false, skin: None, cape: None }
@@ -232,59 +232,87 @@ impl PlayerProfile {
 impl TryFrom<ProfileResponse> for PlayerProfile {
     type Error = serde::de::value::Error;
 
-    fn try_from(value: ProfileResponse) -> Result<Self, Self::Error> {
-        let mut textures = PlayerTextures::new();
+    fn try_from(response: ProfileResponse) -> Result<Self, Self::Error> {
         let mut properties = HashMap::new();
+        let mut textures = None;
 
-        for property in value.properties {
+        for property in response.properties {
             if let Ok(data) = BASE64_URL_SAFE.decode(&property.value) {
                 if let Ok(value) = serde_json::from_slice(&data) {
-                    // Check if the property is the textures property.
+                    //
+
+                    // If the property is "textures", parse it into a PlayerProfileTextures.
                     if property.name == "textures" {
-                        textures = PlayerTextures::try_from(&value)?;
+                        match PlayerProfileTextures::try_from(&value) {
+                            Ok(texts) => textures = Some(texts),
+                            // Bevy logging.
+                            #[cfg(feature = "bevy")]
+                            Err(err) => bevy_log::warn!(
+                                "Failed to parse \"{}\"'s textures, {err}",
+                                response.username
+                            ),
+                            // No logging.
+                            #[cfg(not(feature = "bevy"))]
+                            Err(_) => {}
+                        }
                     }
+
                     // Add the property to the properties map.
                     properties.insert(property.name, value);
+
+                    // Skip warning below.
+                    #[cfg(feature = "bevy")]
+                    continue;
                 }
             }
+
+            #[cfg(feature = "bevy")]
+            bevy_log::warn!(
+                "Failed to decode \"{}\"'s profile at \"{}\"",
+                response.username,
+                property.value
+            );
         }
 
-        Ok(Self { textures, properties, uuid: value.uuid, username: value.username.into() })
+        Ok(Self {
+            properties,
+            uuid: response.uuid,
+            username: response.username.into(),
+            textures: textures.unwrap_or_default(),
+        })
     }
 }
 
-impl TryFrom<&serde_json::Value> for PlayerTextures {
+impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
     type Error = serde::de::value::Error;
 
     fn try_from(value: &serde_json::Value) -> Result<Self, Self::Error> {
+        let Some(timestamp) = value.get("timestamp").and_then(serde_json::Value::as_u64) else {
+            return Err(serde::de::Error::custom("\"timestamp\" not found"));
+        };
+        let Some(textures) = value.get("textures") else {
+            return Err(serde::de::Error::custom("\"textures\" not found"));
+        };
+
         Ok(Self {
-            timestamp: {
-                let duration = Duration::from_millis(value["timestamp"].as_u64().unwrap());
-                SystemTime::UNIX_EPOCH.checked_add(duration).expect("SystemTime overflow!")
-            },
-            slim: {
-                if let Some(skin) = value["textures"].get("SKIN") {
-                    skin.get("metadata")
-                        .and_then(|meta| meta.get("model"))
-                        .is_some_and(|model| model.as_str() == Some("slim"))
-                } else {
-                    false
-                }
-            },
-            skin: {
-                if let Some(skin) = value["textures"].get("SKIN") {
-                    skin.get("url").map(|url| url.as_str().unwrap().into())
-                } else {
-                    None
-                }
-            },
-            cape: {
-                if let Some(cape) = value["textures"].get("CAPE") {
-                    cape.get("url").map(|url| url.as_str().unwrap().into())
-                } else {
-                    None
-                }
-            },
+            timestamp: SystemTime::UNIX_EPOCH
+                .checked_add(Duration::from_millis(timestamp))
+                .expect("SystemTime overflow!"),
+            slim: textures
+                .get("SKIN")
+                .and_then(|skin| skin.get("model"))
+                .and_then(serde_json::Value::as_str)
+                .is_some_and(|model| model == "slim"),
+            skin: textures
+                .get("SKIN")
+                .and_then(|skin| skin.get("url"))
+                .and_then(serde_json::Value::as_str)
+                .map(SmolStr::from),
+            cape: textures
+                .get("CAPE")
+                .and_then(|cape| cape.get("url"))
+                .and_then(serde_json::Value::as_str)
+                .map(SmolStr::from),
         })
     }
 }
@@ -293,17 +321,24 @@ impl TryFrom<&serde_json::Value> for PlayerTextures {
 
 #[test]
 #[cfg(test)]
+fn offline_profile() {
+    let profile = PlayerProfile::new_offline("Mr_Sus_");
+    assert_eq!(profile.username, "Mr_Sus_");
+    assert_eq!(profile.uuid.to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
+    assert_eq!(profile.textures.slim, false);
+    assert!(profile.textures.skin.is_none());
+    assert!(profile.textures.cape.is_none());
+}
+
+#[test]
+#[cfg(test)]
 #[cfg(feature = "online")]
-fn profile() {
+fn online_profile() {
     let agent = ureq::Agent::new_with_defaults();
+    let profile = PlayerProfile::profile_of_player("Mr_Sus_", &agent).unwrap();
 
-    let username = PlayerUsername::new_static("Mr_Sus_");
-    let uuid = username.player_uuid(&agent).unwrap();
-
-    let profile = PlayerProfile::profile_of(&uuid, &agent).unwrap();
-
-    assert_eq!(username, profile.username);
-    assert_eq!(uuid, profile.uuid);
+    assert_eq!(profile.username, "Mr_Sus_");
+    assert_eq!(profile.uuid.to_string(), "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3");
     assert_eq!(profile.textures.slim, false);
     assert!(profile.textures.skin.is_some());
     assert!(profile.textures.cape.is_none());

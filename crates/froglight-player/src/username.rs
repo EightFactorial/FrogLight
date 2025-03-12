@@ -263,15 +263,14 @@ where SmolStr: Deref<Target = T>
 #[test]
 #[cfg(test)]
 fn username() {
-    #[cfg(feature = "online")]
-    let agent = ureq::Agent::new_with_defaults();
-
     let username = PlayerUsername::new_static("Mr_Sus_");
     assert_eq!(username.offline_uuid().to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
 
     #[cfg(feature = "online")]
-    assert_eq!(
-        username.player_uuid(&agent).unwrap().to_string(),
-        "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3"
-    );
+    {
+        let agent = ureq::Agent::new_with_defaults();
+
+        let uuid = username.player_uuid(&agent).unwrap();
+        assert_eq!(uuid.to_string(), "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3");
+    }
 }
