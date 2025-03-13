@@ -69,7 +69,7 @@ impl BrigadierGraph {
 
     /// Attempt to parse a command.
     ///
-    /// Similar to [`BridagierGraph::execute`],
+    /// Similar to [`BrigadierGraph::execute`],
     /// but does not actually execute the command.
     ///
     /// # Errors

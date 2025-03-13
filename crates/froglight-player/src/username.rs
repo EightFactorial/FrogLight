@@ -23,15 +23,15 @@ use uuid::{Builder, Uuid};
 pub struct PlayerUsername(SmolStr);
 
 impl PlayerUsername {
-    /// Create a new [`Username`] from a static string.
+    /// Create a new [`PlayerUsername`] from a static string.
     #[must_use]
     pub const fn new_static(s: &'static str) -> Self { Self(SmolStr::new_static(s)) }
 
-    /// Create a new [`Username`] from a string.
+    /// Create a new [`PlayerUsername`] from a string.
     #[must_use]
     pub fn new(s: impl Into<SmolStr>) -> Self { Self(s.into()) }
 
-    /// Get the [`Username`] as a string slice.
+    /// Get the [`PlayerUsername`] as a string slice.
     #[inline]
     #[must_use]
     pub fn as_str(&self) -> &str { self.0.as_str() }
@@ -142,7 +142,7 @@ impl PlayerUsername {
     const MOJANG_UUID_API: &'static str =
         "https://api.minecraftservices.com/minecraft/profile/lookup/name/";
 
-    /// Get the [`Uuid`] of the player with this [`Username`].
+    /// Get the [`Uuid`] of the player with this [`PlayerUsername`].
     ///
     /// Will automatically retry up to 3 times if the request fails.
     ///
@@ -170,7 +170,7 @@ impl PlayerUsername {
         self.player_uuid_at::<UuidResponse>(Self::MOJANG_UUID_API, agent).map(|res| res.uuid)
     }
 
-    /// Get the [`Uuid`] of the player with this [`Username`] and API.
+    /// Get the [`Uuid`] of the player with this [`PlayerUsername`] and API.
     ///
     /// Will automatically retry up to 3 times if the request fails.
     ///

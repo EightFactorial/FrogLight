@@ -28,7 +28,7 @@ pub trait InventoryQuery: 'static {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A read-only [`Query`] for an entity's inventory.
+/// A read-only [`Query`](bevy_ecs::system::Query) for an entity's inventory.
 #[derive(QueryData)]
 pub struct Inventory<I: InventoryQuery>
 where I::WorldQuery: ReadOnlyQueryData
@@ -47,7 +47,7 @@ where I::WorldQuery: ReadOnlyQueryData
 
 // -------------------------------------------------------------------------------------------------
 
-/// A mutable [`Query`] for an entity's inventory.
+/// A mutable [`Query`](bevy_ecs::system::Query) for an entity's inventory.
 #[derive(QueryData)]
 #[query_data(mutable)]
 pub struct InventoryMut<I: InventoryQuery> {

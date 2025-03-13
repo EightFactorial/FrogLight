@@ -5,14 +5,15 @@ use froglight_common::{prelude::Identifier, version::Version};
 
 /// A registry type.
 pub trait RegistryType<V: Version>: MaybeReflect {
-    /// The type of value stored in the [`RegistryStorage`].
+    /// The type of value stored in the
+    /// [`RegistryStorage`](crate::storage::RegistryStorage).
     type Value: RegistryValue;
 
     /// The default values for this registry.
     fn defaults() -> Vec<(Identifier, Self::Value)>;
 }
 
-/// A value stored in a [`RegistryStorage`].
+/// A value stored in a [`RegistryStorage`](crate::storage::RegistryStorage).
 pub trait RegistryValue: DowncastSync + MaybeReflect {}
 
 use sealed::MaybeReflect;

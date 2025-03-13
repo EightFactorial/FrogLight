@@ -425,7 +425,7 @@ pub enum NbtListTag {
     ByteArray(Vec<ByteArray>) = NbtTag::BYTE_ARRAY,
     /// A list of MUTF-8 strings.
     String(Vec<Mutf8String>) = NbtTag::STRING,
-    /// A list of [`NbtTagList`]s.
+    /// A list of [`NbtListTag`]s.
     List(Vec<NbtListTag>) = NbtTag::LIST,
     /// A list of [`NbtCompound`]s.
     Compound(Vec<NbtCompound>) = NbtTag::COMPOUND,

@@ -8,7 +8,7 @@ use crate::section::Section;
 
 /// A chunk of blocks in a world.
 ///
-/// Has a fixed amount of [`Sections`].
+/// Has a fixed amount of [`Section`]s.
 #[derive(Clone, From, Into)]
 pub struct ArrayChunk<const SECTIONS: usize, const OFFSET: i32>([Section; SECTIONS]);
 
@@ -110,7 +110,8 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
         self.get_nonoffset_section_mut(position.y).map(|s| s.set_block(position, block))
     }
 
-    /// Get a block from the [`ArrayChunk`] with data from the [`BlockStorage`].
+    /// Get a block from the [`ArrayChunk`] with data from the
+    /// [`BlockStorage`](froglight_block::storage::BlockStorage).
     ///
     /// Returns `None` if the position is out of bounds,
     /// or if no matching block is found.
@@ -126,7 +127,8 @@ impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunk<SECTIONS, OFFSET> {
         })
     }
 
-    /// Set a block in the [`ArrayChunk`] using data from the [`BlockStorage`].
+    /// Set a block in the [`ArrayChunk`] using data from the
+    /// [`BlockStorage`](froglight_block::storage::BlockStorage).
     ///
     /// Returns the previous block if it was set, or
     /// `None` if the position is out of bounds or no matching block is found.

@@ -10,9 +10,9 @@ pub trait Attribute: Into<usize> + Copy + Eq + Sized + 'static {
 
 /// A collection of zero or more [`Attribute`]s.
 pub trait BlockAttributes: Sized + 'static {
-    /// The types of the [`Attributes`].
+    /// The types of [`Attribute`]s that make this [`BlockAttributes`].
     const TYPES: &'static [TypeId];
-    /// The total number of combinations of [`Attributes`].
+    /// The total number of combinations of [`Attribute`]s.
     const COUNT: usize;
 
     /// Return the [`BlockAttributes`] for the given index.

@@ -232,16 +232,12 @@ impl<V: Version> RegistryStorage<V> {
 impl<V: Version> RegistryStorage<V> {
     /// Get a [`RegistryValue`] as [`UnnamedNbt`]
     /// by it's [`RegistryType`] and identifier.
-    ///
-    /// ### Note
-    /// If the value does not implement [`Copy`],
-    /// use [`RegistryStorage::get_cloned_nbt`] instead.
     pub fn get_nbt<R: RegistryType<V>>(
         &self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
     ) -> Option<UnnamedNbt>
     where
-        R::Value: Copy + ConvertNbt,
+        R::Value: ConvertNbt,
     {
         self.get::<R>(ident).and_then(|val: &R::Value| <R::Value as ConvertNbt>::as_nbt(val).ok())
     }

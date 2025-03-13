@@ -1,4 +1,5 @@
-//! A connection with a [`Version`] and [`State`].
+//! A connection with a [`Version`](froglight_common::version::Version) and
+//! [`State`].
 //!
 //! This is a wrapper around a [`RawConnection`] that
 //! guarantees the correct packets are being sent and received.
@@ -45,7 +46,8 @@ impl<V: ValidState<S>, S: State> ConnectionType<V, S> for Server {
     type Send = <V as ValidState<S>>::Clientbound;
 }
 
-/// A connection with a [`Version`] and [`State`].
+/// A connection with a [`Version`](froglight_common::version::Version) and
+/// [`State`].
 ///
 /// This is a wrapper around a [`RawConnection`] that
 /// guarantees the correct packets are being sent and received.
@@ -146,7 +148,8 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, 
     pub fn into_raw(self) -> RawConnection { self.0 }
 }
 
-/// A read-only connection with a [`Version`] and [`State`].
+/// A read-only connection with a
+/// [`Version`](froglight_common::version::Version) and [`State`].
 ///
 /// This is a wrapper around a [`RawReadConnection`] that
 /// guarantees the correct packets are being received.
@@ -188,7 +191,8 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateReadConnection<V,
     pub fn as_raw(&mut self) -> &mut RawReadConnection { &mut self.0 }
 }
 
-/// A write-only connection with a [`Version`] and [`State`].
+/// A write-only connection with a
+/// [`Version`](froglight_common::version::Version) and [`State`].
 ///
 /// This is a wrapper around a [`RawWriteConnection`] that
 /// guarantees the correct packets are being sent.
@@ -259,7 +263,7 @@ impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
 }
 
 impl<V: ValidState<Handshake>, T: ConnectionType<V, Handshake>> StateConnection<V, Handshake, T> {
-    /// Set the state of the connection to [`Query`].
+    /// Set the state of the connection to [`Query`](bevy_ecs::system::Query).
     #[inline]
     #[must_use]
     pub fn query(self) -> StateConnection<V, Status, T>

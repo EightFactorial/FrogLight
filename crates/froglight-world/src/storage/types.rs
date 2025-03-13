@@ -16,7 +16,8 @@ use parking_lot::RwLock;
 use super::{HandleInternal, StoredChunk};
 use crate::chunk::VecChunk;
 
-/// A trait for types that can be stored in a [`ChunkStorage`].
+/// A trait for types that can be stored in a
+/// [`ChunkStorage`](super::ChunkStorage).
 pub trait Storable: DowncastSync + 'static {
     /// The storage identifier.
     fn identifier(&self) -> &'static Identifier;

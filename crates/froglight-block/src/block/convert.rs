@@ -81,7 +81,7 @@ impl<B: BlockConvert<V1, V2>, V1: Version, V2: Version> Default for BlockConvert
 }
 
 impl<B: BlockTypeExt<V1> + BlockTypeExt<V2>, V1: Version, V2: Version> BlockConverter<B, V1, V2> {
-    /// Create a new [`BlockChannel`] for
+    /// Create a new [`BlockConverter`] for
     /// converting blocks between two [`Version`]s.
     #[inline]
     #[must_use]
@@ -90,7 +90,7 @@ impl<B: BlockTypeExt<V1> + BlockTypeExt<V2>, V1: Version, V2: Version> BlockConv
         Self { from_fn: Box::new(B::convert_from), into_fn: Box::new(B::convert_into) }
     }
 
-    /// Extend the [`BlockChannel`] forward and backward another [`Version`].
+    /// Extend the [`BlockConverter`] forward and backward another [`Version`].
     #[must_use]
     pub fn extend<V0: Version, V3: Version>(self) -> BlockConverter<B, V0, V3>
     where B: BlockConvert<V0, V1> + BlockConvert<V2, V3> {
@@ -100,7 +100,7 @@ impl<B: BlockTypeExt<V1> + BlockTypeExt<V2>, V1: Version, V2: Version> BlockConv
         }
     }
 
-    /// Extend the [`BlockChannel`] forward an additional [`Version`].
+    /// Extend the [`BlockConverter`] forward an additional [`Version`].
     #[must_use]
     pub fn extend_front<V3: Version>(self) -> BlockConverter<B, V1, V3>
     where B: BlockConvert<V2, V3> {
@@ -110,7 +110,7 @@ impl<B: BlockTypeExt<V1> + BlockTypeExt<V2>, V1: Version, V2: Version> BlockConv
         }
     }
 
-    /// Extend the [`BlockChannel`] backward an additional [`Version`].
+    /// Extend the [`BlockConverter`] backward an additional [`Version`].
     #[must_use]
     pub fn extend_back<V0: Version>(self) -> BlockConverter<B, V0, V2>
     where B: BlockConvert<V0, V1> + BlockConvert<V1, V2> {

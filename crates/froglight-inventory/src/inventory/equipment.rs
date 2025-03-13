@@ -22,7 +22,7 @@ impl<V: Version> Default for EntityEquipment<V> {
 }
 
 impl<V: Version> EntityEquipment<V> {
-    /// Create a new empty [`EquipmentInventory`].
+    /// Create a new empty [`EntityEquipment`].
     #[must_use]
     pub const fn new() -> Self {
         Self::new_from(
@@ -33,7 +33,7 @@ impl<V: Version> EntityEquipment<V> {
         )
     }
 
-    /// Create a new [`EquipmentInventory`] from the given slots.
+    /// Create a new [`EntityEquipment`] from the given slots.
     #[must_use]
     pub const fn new_from(
         head: InventorySlot<V>,

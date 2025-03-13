@@ -1,4 +1,4 @@
-//! Implementations for reading and writing using [`rkyv`].
+//! Implementations for reading and writing NBT data.
 
 #[cfg(feature = "io")]
 mod froglight;
