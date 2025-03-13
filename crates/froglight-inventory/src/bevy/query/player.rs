@@ -6,14 +6,14 @@ use bevy_ecs::world::{Mut, Ref};
 use froglight_common::version::Version;
 
 use super::InventoryQuery;
-use crate::prelude::{EquipmentInventory, InventorySlot, PlayerInventory, PlayerInventoryMenu};
+use crate::prelude::{EntityEquipment, InventorySlot, PlayerInventory, PlayerInventoryMenu};
 
 impl<V: Version> InventoryQuery for &'static PlayerInventory<V> {
     type InventoryId = ();
     type InventoryResult<'query> = PlayerInventoryQuery<'query, V>;
     type WorldQuery = (
         Ref<'static, PlayerInventoryMenu<V>>,
-        Ref<'static, EquipmentInventory<V>>,
+        Ref<'static, EntityEquipment<V>>,
         Ref<'static, PlayerInventory<V>>,
     );
 
@@ -27,7 +27,7 @@ impl<V: Version> InventoryQuery for &'static PlayerInventoryMenu<V> {
     type InventoryResult<'query> = PlayerInventoryQuery<'query, V>;
     type WorldQuery = (
         Ref<'static, PlayerInventoryMenu<V>>,
-        Ref<'static, EquipmentInventory<V>>,
+        Ref<'static, EntityEquipment<V>>,
         Ref<'static, PlayerInventory<V>>,
     );
 
@@ -39,7 +39,7 @@ impl<V: Version> InventoryQuery for &'static PlayerInventoryMenu<V> {
 /// A [`Query`](bevy_ecs::system::Query) for a player's inventory.
 pub struct PlayerInventoryQuery<'query, V: Version> {
     menu: &'query Ref<'static, PlayerInventoryMenu<V>>,
-    equipment: &'query Ref<'static, EquipmentInventory<V>>,
+    equipment: &'query Ref<'static, EntityEquipment<V>>,
     inventory: &'query Ref<'static, PlayerInventory<V>>,
 }
 
@@ -52,7 +52,7 @@ impl<'query, V: Version> PlayerInventoryQuery<'query, V> {
     /// Access the player's equipment.
     #[inline]
     #[must_use]
-    pub fn equipment(&self) -> &'query Ref<EquipmentInventory<V>> { self.equipment }
+    pub fn equipment(&self) -> &'query Ref<EntityEquipment<V>> { self.equipment }
 
     /// Access the player's inventory.
     #[inline]
@@ -95,7 +95,7 @@ impl<V: Version> InventoryQuery for &'static mut PlayerInventory<V> {
     type InventoryResult<'query> = PlayerInventoryQueryMut<'query, V>;
     type WorldQuery = (
         Mut<'static, PlayerInventoryMenu<V>>,
-        Mut<'static, EquipmentInventory<V>>,
+        Mut<'static, EntityEquipment<V>>,
         Mut<'static, PlayerInventory<V>>,
     );
 
@@ -110,7 +110,7 @@ impl<V: Version> InventoryQuery for &'static mut PlayerInventoryMenu<V> {
     type InventoryResult<'query> = PlayerInventoryQueryMut<'query, V>;
     type WorldQuery = (
         Mut<'static, PlayerInventoryMenu<V>>,
-        Mut<'static, EquipmentInventory<V>>,
+        Mut<'static, EntityEquipment<V>>,
         Mut<'static, PlayerInventory<V>>,
     );
 
@@ -127,7 +127,7 @@ impl<V: Version> InventoryQuery for &'static mut PlayerInventoryMenu<V> {
 /// even if the value is not changed.
 pub struct PlayerInventoryQueryMut<'query, V: Version> {
     menu: &'query mut Mut<'static, PlayerInventoryMenu<V>>,
-    equipment: &'query mut Mut<'static, EquipmentInventory<V>>,
+    equipment: &'query mut Mut<'static, EntityEquipment<V>>,
     inventory: &'query mut Mut<'static, PlayerInventory<V>>,
 }
 
@@ -145,12 +145,12 @@ impl<V: Version> PlayerInventoryQueryMut<'_, V> {
     /// Access the player's equipment.
     #[inline]
     #[must_use]
-    pub fn equipment(&self) -> &EquipmentInventory<V> { self.equipment }
+    pub fn equipment(&self) -> &EntityEquipment<V> { self.equipment }
 
     /// Access the player's equipment mutably.
     #[inline]
     #[must_use]
-    pub fn equipment_mut(&mut self) -> &mut Mut<'static, EquipmentInventory<V>> { self.equipment }
+    pub fn equipment_mut(&mut self) -> &mut Mut<'static, EntityEquipment<V>> { self.equipment }
 
     /// Access the player's inventory.
     #[inline]

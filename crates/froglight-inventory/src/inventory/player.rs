@@ -10,7 +10,7 @@ use super::InventorySlot;
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
 #[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
-#[cfg_attr(feature = "bevy", require(PlayerInventoryMenu<V>, super::EquipmentInventory<V>))]
+#[cfg_attr(feature = "bevy", require(PlayerInventoryMenu<V>, super::EntityEquipment<V>))]
 pub struct PlayerInventory<V: Version> {
     inventory: [InventorySlot<V>; 27],
     hotbar: [InventorySlot<V>; 9],

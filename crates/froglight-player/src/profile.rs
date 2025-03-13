@@ -322,7 +322,7 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
 #[test]
 #[cfg(test)]
 fn offline_profile() {
-    let profile = PlayerProfile::new_offline("Mr_Sus_");
+    let profile = PlayerProfile::offline_profile("Mr_Sus_");
     assert_eq!(profile.username, "Mr_Sus_");
     assert_eq!(profile.uuid.to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
     assert_eq!(profile.textures.slim, false);

@@ -10,18 +10,18 @@ use super::InventorySlot;
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
 #[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
-pub struct EquipmentInventory<V: Version> {
+pub struct EntityEquipment<V: Version> {
     head: InventorySlot<V>,
     chest: InventorySlot<V>,
     legs: InventorySlot<V>,
     feet: InventorySlot<V>,
 }
 
-impl<V: Version> Default for EquipmentInventory<V> {
+impl<V: Version> Default for EntityEquipment<V> {
     fn default() -> Self { Self::new() }
 }
 
-impl<V: Version> EquipmentInventory<V> {
+impl<V: Version> EntityEquipment<V> {
     /// Create a new empty [`EquipmentInventory`].
     #[must_use]
     pub const fn new() -> Self {

@@ -2,7 +2,6 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub mod inventory;
-pub mod io;
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
@@ -13,6 +12,6 @@ pub mod prelude {
     #[cfg(feature = "bevy")]
     pub use crate::bevy::{Inventory, InventoryMut};
     pub use crate::inventory::{
-        EquipmentInventory, InventorySlot, PlayerInventory, PlayerInventoryMenu,
+        EntityEquipment, InventorySlot, PlayerInventory, PlayerInventoryMenu,
     };
 }

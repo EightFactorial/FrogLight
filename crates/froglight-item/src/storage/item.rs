@@ -79,7 +79,17 @@ impl<V: Version> ItemStorage<V> {
     #[must_use]
     pub fn new_empty() -> Self { Self(IndexMap::default()) }
 
-    /// Get the [`UntypedItem`] for the given item id.
+    /// Get the [`ItemType`] for the given [`GlobalItemId`].
+    ///
+    /// Handy for storing many item types and bulk operations.
+    ///
+    /// Returns `None` if no item with the given id was registered.
+    #[must_use]
+    pub fn get_trait(&self, item: GlobalItemId) -> Option<&'static dyn ItemType<V>> {
+        self.0.get_index((*item) as usize).map(|(_, wrapper)| **wrapper)
+    }
+
+    /// Get the [`UntypedItem`] for the given [`GlobalItemId`].
     ///
     /// Returns `None` if no item with the given id was registered.
     #[must_use]
@@ -91,6 +101,21 @@ impl<V: Version> ItemStorage<V> {
         self.0
             .get_index(*item as usize)
             .map(|(_, wrapper)| UntypedItem::new(data.unwrap_or_default(), *wrapper))
+    }
+
+    /// Get a typed item for the given [`GlobalItemId`].
+    ///
+    /// Returns `None` if no item with the given id was registered,
+    /// `Ok` if the item was registered and resolved successfully,
+    /// and `Err` if the item was registered but could not be resolved.
+    #[inline]
+    #[must_use]
+    pub fn get_typed<R: ItemResolver<V>>(
+        &self,
+        item: GlobalItemId,
+        data: Option<UnnamedNbt>,
+    ) -> Option<Result<R::ItemEnum, UntypedItem<V>>> {
+        self.get_untyped(item, data).map(R::resolve)
     }
 
     /// Get the [`GlobalItemId`] for the given item.
@@ -113,21 +138,6 @@ impl<V: Version> ItemStorage<V> {
         self.0
             .get_index_of(&TypeId::of::<I>())
             .map(|index| GlobalItemId::new_unchecked(index as u32))
-    }
-
-    /// Get a typed item for the given item id.
-    ///
-    /// Returns `None` if no item with the given id was registered,
-    /// `Ok` if the item was registered and resolved successfully,
-    /// and `Err` if the item was registered but could not be resolved.
-    #[inline]
-    #[must_use]
-    pub fn get_typed<R: ItemResolver<V>>(
-        &self,
-        item: GlobalItemId,
-        data: Option<UnnamedNbt>,
-    ) -> Option<Result<R::ItemEnum, UntypedItem<V>>> {
-        self.get_untyped(item, data).map(R::resolve)
     }
 
     /// Register an item type with the storage.

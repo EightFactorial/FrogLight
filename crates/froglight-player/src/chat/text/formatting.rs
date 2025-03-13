@@ -81,7 +81,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::text::TextColor;
+    /// use froglight_player::chat::text::TextColor;
     ///
     /// let color = TextColor::from_color("black").unwrap();
     /// assert_eq!(color, TextColor::Black);
@@ -125,7 +125,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::text::TextColor;
+    /// use froglight_player::chat::text::TextColor;
     ///
     /// let color = TextColor::from_hex_string("#000000").unwrap();
     /// assert_eq!(color, TextColor::Black);
@@ -174,7 +174,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::text::TextColor;
+    /// use froglight_player::chat::text::TextColor;
     ///
     /// assert_eq!(TextColor::Black.as_named_str(), "black");
     /// assert_eq!(TextColor::DarkBlue.as_named_str(), "dark_blue");
@@ -212,7 +212,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::text::TextColor;
+    /// use froglight_player::chat::text::TextColor;
     ///
     /// assert_eq!(TextColor::Black.as_hex_str(), "#000000");
     /// assert_eq!(TextColor::DarkBlue.as_hex_str(), "#0000AA");

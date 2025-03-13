@@ -86,9 +86,13 @@ impl<V: Version> BlockStorage<V> {
     #[expect(clippy::default_trait_access)]
     pub fn new_empty() -> Self { Self { traits: RangeMap::new(), types: Default::default() } }
 
-    /// Get the [`UntypedBlock`] for the given block id.
+    /// Get the [`BlockType`] for the given [`GlobalBlockId`].
+    ///
+    /// Handy for storing many block types and bulk operations.
     ///
     /// Returns `None` if no block with the given id was registered.
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
@@ -100,13 +104,52 @@ impl<V: Version> BlockStorage<V> {
     ///     // Create a new block storage.
     ///     let storage = BlockStorage::<V1_21_4>::new();
     ///
+    ///     // Get the trait with the global id of `0`.
+    ///     let block = storage.get_trait(GlobalBlockId::new_unchecked(0)).unwrap();
+    ///     assert_eq!(block.identifier(), "minecraft:air");
+    ///
+    ///     // Get the trait with the global id of `1`.
+    ///     let block = storage.get_trait(GlobalBlockId::new_unchecked(1)).unwrap();
+    ///     assert_eq!(block.identifier(), "minecraft:stone");
+    /// }
+    /// ```
+    #[must_use]
+    pub fn get_trait(&self, block: GlobalBlockId) -> Option<&'static dyn BlockType<V>> {
+        self.traits.get(&block).map(|wrapper| **wrapper)
+    }
+
+    /// Get the [`UntypedBlock`] for the given [`GlobalBlockId`].
+    ///
+    /// Returns `None` if no block with the given id was registered.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use froglight_block::prelude::*;
+    /// use froglight_common::vanilla::Vanilla;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // Create a new block storage.
+    ///     let storage = BlockStorage::<V1_21_4>::new();
+    ///
     ///     // Get the block with the global id of `0`.
     ///     let block = storage.get_untyped(GlobalBlockId::new_unchecked(0)).unwrap();
-    ///     assert_eq!(block.identifier().as_str(), "minecraft:air");
+    ///     assert_eq!(block.identifier(), "minecraft:air");
+    ///     assert_eq!(
+    ///         block.resolve::<Vanilla>(),
+    ///         Some(Block::<block::Air, V1_21_4>::default().into())
+    ///     );
     ///
     ///     // Get the block with the global id of `1`.
     ///     let block = storage.get_untyped(GlobalBlockId::new_unchecked(1)).unwrap();
-    ///     assert_eq!(block.identifier().as_str(), "minecraft:stone");
+    ///     assert_eq!(block.identifier(), "minecraft:stone");
+    ///     assert_eq!(
+    ///         block.resolve::<Vanilla>(),
+    ///         Some(Block::<block::Stone, V1_21_4>::default().into())
+    ///     );
     /// }
     /// ```
     #[must_use]
@@ -116,9 +159,53 @@ impl<V: Version> BlockStorage<V> {
         })
     }
 
+    /// Get a typed block for the given block id.
+    ///
+    /// Returns `None` if no block with the given id was registered,
+    /// or the block does not exist in the resolver.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use froglight_block::prelude::*;
+    /// use froglight_common::vanilla::Vanilla;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_block::generated::v1_21_4::VersionBlocks;
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // Create a new block storage.
+    ///     let storage = BlockStorage::<V1_21_4>::new();
+    ///
+    ///     // Get the block with the global id of `0`.
+    ///     let block = storage.get_typed::<Vanilla>(GlobalBlockId::new_unchecked(0));
+    ///     if let Some(VersionBlocks::Air(air)) = block {
+    ///         assert_eq!(air.identifier(), "minecraft:air");
+    ///     } else {
+    ///         panic!("Block was not `Air`!");
+    ///     }
+    ///
+    ///     // Get the block with the global id of `1`.
+    ///     let block = storage.get_typed::<Vanilla>(GlobalBlockId::new_unchecked(1));
+    ///     if let Some(VersionBlocks::Stone(stone)) = block {
+    ///         assert_eq!(stone.identifier(), "minecraft:stone");
+    ///     } else {
+    ///         panic!("Block was not `Stone`!");
+    ///     }
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn get_typed<R: BlockResolver<V>>(&self, block: GlobalBlockId) -> Option<R::BlockEnum> {
+        self.get_untyped(block).and_then(R::resolve)
+    }
+
     /// Get the [`GlobalBlockId`] for the given block.
     ///
     /// Returns `None` if the block was not registered.
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
@@ -147,46 +234,6 @@ impl<V: Version> BlockStorage<V> {
             .map(|start| GlobalBlockId::new_unchecked(*start + u32::from(**block.state())))
     }
 
-    /// Get a typed block for the given block id.
-    ///
-    /// Returns `None` if no block with the given id was registered,
-    /// or the block does not exist in the resolver.
-    ///
-    /// ```rust
-    /// use froglight_block::prelude::*;
-    /// use froglight_common::vanilla::Vanilla;
-    ///
-    /// #[cfg(feature = "v1_21_4")]
-    /// {
-    ///     use froglight_block::generated::v1_21_4::VersionBlocks;
-    ///     use froglight_common::version::V1_21_4;
-    ///
-    ///     // Create a new block storage.
-    ///     let storage = BlockStorage::<V1_21_4>::new();
-    ///
-    ///     // Get the block with the global id of `0`.
-    ///     let block = storage.get_typed::<Vanilla>(GlobalBlockId::new_unchecked(0));
-    ///     if let Some(VersionBlocks::Air(air)) = block {
-    ///         assert_eq!(air.identifier().as_str(), "minecraft:air");
-    ///     } else {
-    ///         panic!("Block was not `Air`!");
-    ///     }
-    ///
-    ///     // Get the block with the global id of `1`.
-    ///     let block = storage.get_typed::<Vanilla>(GlobalBlockId::new_unchecked(1));
-    ///     if let Some(VersionBlocks::Stone(stone)) = block {
-    ///         assert_eq!(stone.identifier().as_str(), "minecraft:stone");
-    ///     } else {
-    ///         panic!("Block was not `Stone`!");
-    ///     }
-    /// }
-    /// ```
-    #[inline]
-    #[must_use]
-    pub fn get_typed<R: BlockResolver<V>>(&self, block: GlobalBlockId) -> Option<R::BlockEnum> {
-        self.get_untyped(block).and_then(R::resolve)
-    }
-
     /// Register a block type with the storage.
     ///
     /// This is required for converting between global ids and blocks.
@@ -196,6 +243,8 @@ impl<V: Version> BlockStorage<V> {
     ///
     /// If a block is registered out of order, all following blocks will have
     /// their global ids shifted incorrectly.
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
