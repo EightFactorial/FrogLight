@@ -51,4 +51,4 @@ jobs:
         run: cargo nextest run --workspace --all-targets
       # Run doctests separately
       - name: Run Doctests
-        run: cargo test --doc --workspace
+        run: cargo test --doc --workspace --features=v1_21_4
