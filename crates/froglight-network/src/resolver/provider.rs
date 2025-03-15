@@ -112,8 +112,7 @@ impl Spawn for ResolverRuntimeHandle {
 
         #[cfg(not(feature = "bevy"))]
         {
-            // let _ = async_io::block_on(future);
-            todo!("REQUIRES A TASKPOOL")
+            blocking::unblock(|| futures_lite::future::block_on(future)).detach();
         }
     }
 }

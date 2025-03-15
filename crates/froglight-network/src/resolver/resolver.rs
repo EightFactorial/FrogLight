@@ -206,12 +206,10 @@ impl bevy_ecs::world::FromWorld for FroglightResolver {
 }
 
 #[test]
-#[cfg(feature = "bevy")]
 #[expect(clippy::too_many_lines)]
 fn resolver() {
     use froglight_common::version::Version;
     use froglight_io::prelude::*;
-    use futures_lite::StreamExt;
 
     #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
     struct Test;
@@ -249,6 +247,8 @@ fn resolver() {
 
     #[cfg(feature = "bevy")]
     {
+        use futures_lite::StreamExt;
+
         async fn bind_to(bind: &str) {
             if let Ok(listener) = async_net::TcpListener::bind(bind).await {
                 while let Some(Ok(stream)) = listener.incoming().next().await {

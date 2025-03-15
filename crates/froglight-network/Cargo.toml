@@ -19,6 +19,7 @@ workspace = true
 async-compression = { workspace = true, features = ["futures-io", "zlib"] }
 async-io = { workspace = true }
 async-net = { workspace = true }
+blocking = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
 froglight-io = { workspace = true, features = ["hashbrown", "serde"] }
 froglight-macros = { workspace = true, features = ["network"] }

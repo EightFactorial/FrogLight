@@ -321,6 +321,7 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
 
 #[test]
 #[cfg(test)]
+#[expect(clippy::bool_assert_comparison)]
 fn offline_profile() {
     let profile = PlayerProfile::offline_profile("Mr_Sus_");
     assert_eq!(profile.username, "Mr_Sus_");
@@ -333,6 +334,7 @@ fn offline_profile() {
 #[test]
 #[cfg(test)]
 #[cfg(feature = "online")]
+#[expect(clippy::bool_assert_comparison)]
 fn online_profile() {
     let agent = ureq::Agent::new_with_defaults();
     let profile = PlayerProfile::profile_of_player("Mr_Sus_", &agent).unwrap();
