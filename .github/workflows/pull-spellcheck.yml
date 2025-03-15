@@ -36,6 +36,7 @@ jobs:
         uses: crate-ci/typos@master
         with:
           write_changes: true
+        continue-on-error: true
       # Suggest Changes
       - uses: reviewdog/action-suggester@db4abb16fbaabe386831e5addb7be1485d0d63d3 # v1
         if: steps.changed-files.outputs.any_changed == 'true'
