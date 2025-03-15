@@ -27,7 +27,7 @@ futures-lite = { workspace = true }
 glam = { workspace = true }
 hashbrown = { workspace = true }
 serde = { workspace = true }
-smallvec = { workspace = true, features = ["write"] }
+smallvec = { workspace = true }
 smol_str = { workspace = true }
 ureq = { workspace = true }
 uuid = { workspace = true }

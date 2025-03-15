@@ -2,6 +2,7 @@
 db-path = "~/.cargo/advisory-db"
 db-urls = ["https://github.com/rustsec/advisory-db"]
 version = 2
+ignore = ["RUSTSEC-2023-0071"]
 
 [licenses]
 allow = [
@@ -10,12 +11,12 @@ allow = [
   "CC0-1.0",
   "ISC",
   "MIT",
+  "MPL-2.0",
   "Unicode-3.0",
   "Zlib",
   # "0BSD",
   # "BSD-2-Clause",
   # "BSL-1.0",
-  # "MPL-2.0",
   # "OpenSSL",
 ]
 
@@ -61,11 +62,20 @@ version = "=0.1.10"
 name = "regex-syntax"
 version = "=0.6.29"
 [[bans.skip]]
+name = "rustls"
+version = "=0.21.12"
+[[bans.skip]]
+name = "rustls-webpki"
+version = "=0.101.7"
+[[bans.skip]]
 name = "thiserror"
 version = "=1.0.69"
 [[bans.skip]]
 name = "thiserror-impl"
 version = "=1.0.69"
+[[bans.skip]]
+name = "zerocopy"
+version = "=0.7.35"
 
 
 [[bans.skip]]

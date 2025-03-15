@@ -55,4 +55,10 @@ nbt = ["dep:froglight-nbt"]
 uuid = ["dep:uuid"]
 
 # Enable support for serializing to/from text formats.
-serde = ["dep:serde", "glam?/serde", "smol_str/serde", "uuid?/serde"]
+serde = [
+  "dep:serde",
+  "bevy_core/serialize",
+  "glam?/serde",
+  "smol_str/serde",
+  "uuid?/serde",
+]
