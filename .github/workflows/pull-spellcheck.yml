@@ -39,7 +39,8 @@ jobs:
           write_changes: true
         continue-on-error: true
       # Suggest Changes
-      - uses: reviewdog/action-suggester@db4abb16fbaabe386831e5addb7be1485d0d63d3 # v1
+      - name: Suggest Changes
+        uses: reviewdog/action-suggester@db4abb16fbaabe386831e5addb7be1485d0d63d3 # v1
         if: steps.spellcheck.conclusion == 'failure'
         with:
           tool_name: typos
