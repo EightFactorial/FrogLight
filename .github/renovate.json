@@ -3,7 +3,6 @@
   "extends": [
     "config:recommended",
     "helpers:pinGitHubActionDigests",
-    "default:automergePatch",
     "default:semanticCommits"
   ],
   "git-submodules": {
