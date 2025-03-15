@@ -13,6 +13,7 @@ pub trait StaticItem: 'static {
     /// ```rust
     /// use froglight_item::{generated::item::Air, item::StaticItem};
     ///
+    /// #[cfg(feature = "v1_21_4")]
     /// assert_eq!(Air::as_static(), &Air);
     /// ```
     fn as_static() -> &'static Self;
@@ -23,38 +24,42 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     /// The identifier of the item.
     ///
     /// ```rust
-    /// #[cfg(feature = "v1_21_4")]
-    /// use froglight_common::version::V1_21_4;
     /// use froglight_item::{
     ///     generated::item::Air,
     ///     item::{ItemType, ItemTypeExt, StaticItem},
     /// };
     ///
-    /// // Accessing the static identifier through the `ItemType` trait.
-    /// assert_eq!(Air::as_static().identifier().as_str(), "minecraft:air");
-    ///
-    /// // Accessing the constant identifier through the `ItemTypeExt` trait.
     /// #[cfg(feature = "v1_21_4")]
-    /// assert_eq!(<Air as ItemTypeExt<V1_21_4>>::IDENTIFIER, "minecraft:air");
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // Accessing the static identifier through the `ItemType` trait.
+    ///     assert_eq!(Air::as_static().identifier().as_str(), "minecraft:air");
+    ///
+    ///     // Accessing the constant identifier through the `ItemTypeExt` trait.
+    ///     assert_eq!(<Air as ItemTypeExt<V1_21_4>>::IDENTIFIER, "minecraft:air");
+    /// }
     /// ```
     fn identifier(&self) -> &'static Identifier;
 
     /// The rarity of the item.
     ///
     /// ```rust
-    /// #[cfg(feature = "v1_21_4")]
-    /// use froglight_common::version::V1_21_4;
     /// use froglight_item::{
     ///     generated::item::Air,
     ///     item::{ItemRarity, ItemType, ItemTypeExt, StaticItem},
     /// };
     ///
-    /// // Accessing the static rarity through the `ItemType` trait.
-    /// assert_eq!(Air::as_static().rarity(), ItemRarity::Common);
-    ///
-    /// // Accessing the constant rarity through the `ItemTypeExt` trait.
     /// #[cfg(feature = "v1_21_4")]
-    /// assert_eq!(<Air as ItemTypeExt<V1_21_4>>::RARITY, ItemRarity::Common);
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // Accessing the static rarity through the `ItemType` trait.
+    ///     assert_eq!(Air::as_static().rarity(), ItemRarity::Common);
+    ///
+    ///     // Accessing the constant rarity through the `ItemTypeExt` trait.
+    ///     assert_eq!(<Air as ItemTypeExt<V1_21_4>>::RARITY, ItemRarity::Common);
+    /// }
     /// ```
     fn rarity(&self) -> ItemRarity;
 }
