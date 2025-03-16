@@ -1,11 +1,12 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+#[cfg(feature = "io")]
+use froglight_io::prelude::*;
 use glam::IVec3;
 
 /// A block position in the world.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "io", derive(froglight_io::prelude::FrogBuf))]
 pub struct BlockPos(IVec3);
 
 impl BlockPos {
@@ -32,6 +33,30 @@ impl BlockPos {
     /// ```
     #[must_use]
     pub const fn new(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
+
+    /// Create a new [`BlockPos`] with all coordinates set to the same value.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::position::BlockPos;
+    ///
+    /// let block = BlockPos::splat(0);
+    /// assert_eq!(block.x(), 0);
+    /// assert_eq!(block.y(), 0);
+    /// assert_eq!(block.z(), 0);
+    ///
+    /// let block = BlockPos::splat(1);
+    /// assert_eq!(block.x(), 1);
+    /// assert_eq!(block.y(), 1);
+    /// assert_eq!(block.z(), 1);
+    ///
+    /// let block = BlockPos::splat(-1000);
+    /// assert_eq!(block.x(), -1000);
+    /// assert_eq!(block.y(), -1000);
+    /// assert_eq!(block.z(), -1000);
+    /// ```
+    #[must_use]
+    pub const fn splat(v: i32) -> Self { Self(IVec3::splat(v)) }
 
     /// The x-coordinate of this block.
     #[must_use]
@@ -60,8 +85,49 @@ where IVec3: From<T>
 {
     fn from(value: T) -> Self { Self(From::from(value)) }
 }
-impl Into<IVec3> for BlockPos {
-    fn into(self) -> IVec3 { self.0 }
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(feature = "io")]
+impl BlockPos {
+    // <3 Azalea
+    const PACKED_X_LENGTH: i64 = 1 + 25;
+    const PACKED_X_MASK: i64 = (1 << Self::PACKED_X_LENGTH) - 1;
+    const PACKED_Y_LENGTH: i64 = 64 - Self::PACKED_X_LENGTH - Self::PACKED_Z_LENGTH;
+    const PACKED_Y_MASK: i64 = (1 << Self::PACKED_Y_LENGTH) - 1;
+    const PACKED_Z_LENGTH: i64 = Self::PACKED_X_LENGTH;
+    const PACKED_Z_MASK: i64 = (1 << Self::PACKED_Z_LENGTH) - 1;
+    const X_OFFSET: i64 = Self::PACKED_Y_LENGTH + Self::PACKED_Z_LENGTH;
+    const Z_OFFSET: i64 = Self::PACKED_Y_LENGTH;
+}
+
+#[cfg(feature = "io")]
+impl FrogRead for BlockPos {
+    fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
+        let val = i64::frog_read(buffer)?;
+
+        let x = (val << (64 - Self::X_OFFSET - Self::PACKED_X_LENGTH)
+            >> (64 - Self::PACKED_X_LENGTH)) as i32;
+        let y = (val << (64 - Self::PACKED_Y_LENGTH) >> (64 - Self::PACKED_Y_LENGTH)) as i32;
+        let z = (val << (64 - Self::Z_OFFSET - Self::PACKED_Z_LENGTH)
+            >> (64 - Self::PACKED_Z_LENGTH)) as i32;
+
+        Ok(Self::new(x, y, z))
+    }
+}
+
+#[cfg(feature = "io")]
+impl FrogWrite for BlockPos {
+    fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
+        let mut val: i64 = 0;
+        val |= (i64::from(self.x()) & Self::PACKED_X_MASK) << Self::X_OFFSET;
+        val |= i64::from(self.y()) & Self::PACKED_Y_MASK;
+        val |= (i64::from(self.z()) & Self::PACKED_Z_MASK) << Self::Z_OFFSET;
+        val.frog_write(buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { i64::frog_len(&0) }
 }
 
 // -------------------------------------------------------------------------------------------------

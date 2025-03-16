@@ -1,6 +1,9 @@
+use derive_more::{From, Into};
+
 use super::Section;
 
 /// A vertical slice of the world.
+#[derive(Clone)]
 pub enum ChunkStorage {
     /// A large chunk.
     ///
@@ -21,7 +24,7 @@ impl ChunkStorage {
     ///
     /// This is the build limit for this chunk.
     #[must_use]
-    pub fn height_max(&self) -> usize {
+    pub const fn height_max(&self) -> usize {
         match self {
             ChunkStorage::Large(..) => 384 - 64,
             ChunkStorage::Normal(..) => 256,
@@ -35,7 +38,7 @@ impl ChunkStorage {
     ///
     /// This is the bedrock floor for this chunk.
     #[must_use]
-    pub fn height_min(&self) -> isize {
+    pub const fn height_min(&self) -> isize {
         match self {
             ChunkStorage::Large(..) => -64,
             ChunkStorage::Normal(..) => 0,
@@ -48,7 +51,7 @@ impl ChunkStorage {
     /// This is the total height of the chunk
     /// from the bedrock floor to the build limit.
     #[must_use]
-    pub fn total_height(&self) -> usize {
+    pub const fn total_height(&self) -> usize {
         match self {
             ChunkStorage::Large(..) => 384,
             ChunkStorage::Normal(..) => 256,
@@ -58,11 +61,13 @@ impl ChunkStorage {
 
     /// The total volume of this chunk in blocks.
     #[must_use]
-    pub fn total_volume(&self) -> usize { self.total_height() * Section::WIDTH * Section::DEPTH }
+    pub const fn total_volume(&self) -> usize {
+        self.total_height() * Section::WIDTH * Section::DEPTH
+    }
 
     /// The the number of [`Section`]s in this chunk.
     #[must_use]
-    pub fn sections(&self) -> usize {
+    pub const fn sections(&self) -> usize {
         match self {
             ChunkStorage::Large(..) => 24,
             ChunkStorage::Normal(..) => 16,
@@ -89,6 +94,22 @@ impl ChunkStorage {
             ChunkStorage::Other(storage) => storage.0.as_mut(),
         }
     }
+
+    /// Create a new [`ChunkStorage`] from the given [`Section`]s and offset.
+    #[must_use]
+    pub fn from_sections(sections: Vec<Section>, offset: isize) -> Self {
+        match (sections.len(), offset) {
+            (24, -64) => ChunkStorage::Large(
+                ArrayChunkStorage::try_from(sections)
+                    .unwrap_or_else(|_| unreachable!("Length of `Vec` is equal to `SECTIONS`")),
+            ),
+            (16, 0) => ChunkStorage::Normal(
+                ArrayChunkStorage::try_from(sections)
+                    .unwrap_or_else(|_| unreachable!("Length of `Vec` is equal to `SECTIONS`")),
+            ),
+            _ => ChunkStorage::Other(VecChunkStorage::new(sections, offset)),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -96,11 +117,55 @@ impl ChunkStorage {
 /// A vertical slice of the world.
 ///
 /// Has a constant, known number of sections and a known offset.
+///
+/// ---
+///
+/// Storing [`Sections`] in a fixed-size array has two main benefits:
+///
+/// 1. It guarantees that the number of sections is always correct.
+/// 2. It prevents unnecessary bounds checks when accessing the array.
+#[derive(Clone, From, Into)]
 pub struct ArrayChunkStorage<const SECTIONS: usize, const OFFSET: isize>(Box<[Section; SECTIONS]>);
+
+impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunkStorage<SECTIONS, OFFSET> {
+    /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
+    #[must_use]
+    pub fn new(sections: [Section; SECTIONS]) -> Self { Self(Box::new(sections)) }
+
+    /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
+    #[must_use]
+    pub const fn const_new(sections: Box<[Section; SECTIONS]>) -> Self { Self(sections) }
+}
+
+impl<const SECTIONS: usize, const OFFSET: isize> TryFrom<Vec<Section>>
+    for ArrayChunkStorage<SECTIONS, OFFSET>
+{
+    type Error = Vec<Section>;
+
+    fn try_from(value: Vec<Section>) -> Result<Self, Self::Error> {
+        if value.len() == SECTIONS {
+            if let Ok(sections) = value.into_boxed_slice().try_into() {
+                Ok(Self::const_new(sections))
+            } else {
+                unreachable!("Length of `Vec` is equal to `SECTIONS`")
+            }
+        } else {
+            Err(value)
+        }
+    }
+}
 
 // -------------------------------------------------------------------------------------------------
 
 /// A vertical slice of the world.
 ///
 /// Has a variable number of sections and a known offset.
+#[derive(Clone)]
 pub struct VecChunkStorage(Vec<Section>, isize);
+
+impl VecChunkStorage {
+    /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
+    /// offset.
+    #[must_use]
+    pub const fn new(sections: Vec<Section>, offset: isize) -> Self { Self(sections, offset) }
+}

@@ -7,19 +7,21 @@ use crate::chunk::Section;
 
 /// A block position in a [`Section`](crate::prelude::Section).
 ///
-/// Wraps around if the values are greater than the section's width.
+/// Wraps around if the values are larger than a section.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "io", derive(froglight_io::prelude::FrogBuf))]
 pub struct SectionBlockPos(u16);
 
 impl SectionBlockPos {
-    pub const BITS: u8 = Self::MASK.leading_zeros() as u8;
-    pub const MASK: u8 = Section::WIDTH as u8 - 1;
+    #[expect(clippy::cast_possible_truncation)]
+    const BITS: u8 = (u8::BITS - Self::MASK.leading_zeros()) as u8;
+    #[expect(clippy::cast_possible_truncation)]
+    const MASK: u8 = Section::HEIGHT as u8 - 1;
 
     /// Create a new [`SectionBlockPos`] from the given coordinates.
     ///
-    /// The values will wrap around if they are greater than a section's width.
+    /// The values will wrap around if they are larger than a section.
     ///
     /// # Example
     /// ```rust
@@ -55,21 +57,49 @@ impl SectionBlockPos {
         )
     }
 
+    /// Create a new [`SectionBlockPos`] with all coordinates set to the same
+    /// value.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::position::SectionBlockPos;
+    ///
+    /// let block = SectionBlockPos::splat(0);
+    /// assert_eq!(block.x(), 0);
+    /// assert_eq!(block.y(), 0);
+    /// assert_eq!(block.z(), 0);
+    ///
+    /// let block = SectionBlockPos::splat(1);
+    /// assert_eq!(block.x(), 1);
+    /// assert_eq!(block.y(), 1);
+    /// assert_eq!(block.z(), 1);
+    ///
+    /// let block = SectionBlockPos::splat(255);
+    /// assert_eq!(block.x(), 15);
+    /// assert_eq!(block.y(), 15);
+    /// assert_eq!(block.z(), 15);
+    /// ```
+    #[must_use]
+    pub const fn splat(v: u8) -> Self { Self::new(v, v, v) }
+
     /// The x-coordinate of this block.
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub const fn x(&self) -> u8 { self.0 as u8 & Self::MASK }
 
     /// The y-coordinate of this block.
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub const fn y(&self) -> u8 { (self.0 >> Self::BITS) as u8 & Self::MASK }
 
     /// The z-coordinate of this block.
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub const fn z(&self) -> u8 { (self.0 >> (Self::BITS * 2)) as u8 & Self::MASK }
 
     /// Create a [`SectionBlockPos`] from the given [`BlockPos`].
     ///
-    /// The values will wrap around if they are greater than a section's width.
+    /// The values will wrap around if they are larger than a section.
     ///
     /// # Example
     /// ```rust
@@ -97,15 +127,83 @@ impl SectionBlockPos {
     /// assert_eq!(SectionBlockPos::from(block), SectionBlockPos::new(0, 0, 8));
     /// ```
     #[must_use]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     pub const fn from_block(block: BlockPos) -> Self {
-        Self::new(block.x() as u8, block.y() as u8, block.z() as u8)
+        Self::new(block.x() as _, block.y() as _, block.z() as _)
+    }
+
+    /// Create a [`SectionBlockPos`] from the given index.
+    ///
+    /// # Panics
+    /// This function will panic if the index is greater than `4095`.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::position::SectionBlockPos;
+    ///
+    /// let block = SectionBlockPos::from_index(0);
+    /// assert_eq!(block, SectionBlockPos::new(0, 0, 0));
+    ///
+    /// let block = SectionBlockPos::from_index(1);
+    /// assert_eq!(block, SectionBlockPos::new(1, 0, 0));
+    ///
+    /// let block = SectionBlockPos::from_index(16);
+    /// assert_eq!(block, SectionBlockPos::new(0, 0, 1));
+    ///
+    /// let block = SectionBlockPos::from_index(255);
+    /// assert_eq!(block, SectionBlockPos::new(15, 0, 15));
+    ///
+    /// let block = SectionBlockPos::from_index(256);
+    /// assert_eq!(block, SectionBlockPos::new(0, 1, 0));
+    ///
+    /// let block = SectionBlockPos::from_index(4095);
+    /// assert_eq!(block, SectionBlockPos::new(15, 15, 15));
+    /// ```
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation)]
+    pub const fn from_index(index: usize) -> Self {
+        assert!(index < 4096, "Section index out of bounds!");
+
+        let x = index.rem_euclid(16) as u8;
+        let z = index.div_euclid(16).rem_euclid(16) as u8;
+        let y = index.div_euclid(256).rem_euclid(16) as u8;
+
+        Self::new(x, y, z)
+    }
+
+    /// Get the index of this [`SectionBlockPos`].
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::position::SectionBlockPos;
+    ///
+    /// let block = SectionBlockPos::new(0, 0, 0);
+    /// assert_eq!(block.into_index(), 0);
+    ///
+    /// let block = SectionBlockPos::new(1, 0, 0);
+    /// assert_eq!(block.into_index(), 1);
+    ///
+    /// let block = SectionBlockPos::new(0, 0, 1);
+    /// assert_eq!(block.into_index(), 16);
+    ///
+    /// let block = SectionBlockPos::new(0, 1, 0);
+    /// assert_eq!(block.into_index(), 256);
+    ///
+    /// let block = SectionBlockPos::new(15, 15, 15);
+    /// assert_eq!(block.into_index(), 4095);
+    /// ```
+    #[must_use]
+    pub const fn into_index(self) -> usize {
+        (self.x() as usize) + (self.y() as usize * 256) + (self.z() as usize * 16)
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl Into<IVec3> for SectionBlockPos {
-    fn into(self) -> IVec3 { IVec3::new(self.x() as i32, self.y() as i32, self.z() as i32) }
+impl From<SectionBlockPos> for IVec3 {
+    fn from(value: SectionBlockPos) -> Self {
+        IVec3::new(value.x().into(), value.y().into(), value.z().into())
+    }
 }
 
 impl From<BlockPos> for SectionBlockPos {

@@ -33,6 +33,27 @@ impl ChunkPos {
     #[must_use]
     pub const fn new(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
 
+    /// Create a new [`ChunkPos`] with all coordinates set to the same value.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::position::ChunkPos;
+    ///
+    /// let chunk = ChunkPos::splat(0);
+    /// assert_eq!(chunk.x(), 0);
+    /// assert_eq!(chunk.z(), 0);
+    ///
+    /// let chunk = ChunkPos::splat(1);
+    /// assert_eq!(chunk.x(), 1);
+    /// assert_eq!(chunk.z(), 1);
+    ///
+    /// let chunk = ChunkPos::splat(-1000);
+    /// assert_eq!(chunk.x(), -1000);
+    /// assert_eq!(chunk.z(), -1000);
+    /// ```
+    #[must_use]
+    pub const fn splat(v: i32) -> Self { Self(IVec2::splat(v)) }
+
     /// The x-coordinate of this chunk.
     #[must_use]
     pub const fn x(&self) -> i32 { self.0.x }
@@ -88,9 +109,6 @@ where IVec2: From<T>
 {
     fn from(value: T) -> Self { Self(From::from(value)) }
 }
-impl Into<IVec2> for ChunkPos {
-    fn into(self) -> IVec2 { self.0 }
-}
 
 impl From<BlockPos> for ChunkPos {
     #[inline]
@@ -105,7 +123,7 @@ impl FrogRead for ChunkPos {
         // Note: The x and z(y) coordinates are swapped here.
         let y = i32::frog_read(buffer)?;
         let x = i32::frog_read(buffer)?;
-        Ok(Self(IVec2::new(x, y)))
+        Ok(Self::new(x, y))
     }
 }
 #[cfg(feature = "io")]
@@ -123,16 +141,16 @@ impl FrogWrite for ChunkPos {
 #[cfg(feature = "io")]
 impl FrogVarRead for ChunkPos {
     fn frog_var_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
-        // Note: The x and z coordinates are swapped here.
+        // Note: The x and z(y) coordinates are swapped here.
         let y = i32::frog_var_read(buffer)?;
         let x = i32::frog_var_read(buffer)?;
-        Ok(Self(IVec2::new(x, y)))
+        Ok(Self::new(x, y))
     }
 }
 #[cfg(feature = "io")]
 impl FrogVarWrite for ChunkPos {
     fn frog_var_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
-        // Note: The x and z coordinates are swapped here.
+        // Note: The x and z(y) coordinates are swapped here.
         self.0.y.frog_var_write(buffer)?;
         self.0.x.frog_var_write(buffer)
     }

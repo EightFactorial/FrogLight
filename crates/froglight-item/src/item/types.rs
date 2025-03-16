@@ -63,10 +63,10 @@ impl<I: ItemTypeExt<V>, V: Version> Item<I, V> {
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
-    ///    use froglight_common::version::V1_21_4;
+    ///     use froglight_common::version::V1_21_4;
     ///
-    ///   let item = Item::<item::Air, V1_21_4>::default();
-    ///   assert_eq!(item.raw_data().is_empty(), true);
+    ///     let item = Item::<item::Air, V1_21_4>::default();
+    ///     assert_eq!(item.raw_data().is_empty(), true);
     /// }
     /// ```
     #[inline]
@@ -81,10 +81,10 @@ impl<I: ItemTypeExt<V>, V: Version> Item<I, V> {
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
-    ///    use froglight_common::version::V1_21_4;
+    ///     use froglight_common::version::V1_21_4;
     ///
-    ///   let mut item = Item::<item::Air, V1_21_4>::default();
-    ///   *item.raw_data_mut() = UnnamedNbt::new_empty();
+    ///     let mut item = Item::<item::Air, V1_21_4>::default();
+    ///     *item.raw_data_mut() = UnnamedNbt::new_empty();
     /// }
     /// ```
     #[inline]
@@ -203,10 +203,10 @@ impl<V: Version> UntypedItem<V> {
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
-    ///    use froglight_common::version::V1_21_4;
+    ///     use froglight_common::version::V1_21_4;
     ///
-    ///   let item = Item::<item::Air, V1_21_4>::default().into_untyped();
-    ///   assert_eq!(item.raw_data().is_empty(), true);
+    ///     let item = Item::<item::Air, V1_21_4>::default().into_untyped();
+    ///     assert_eq!(item.raw_data().is_empty(), true);
     /// }
     /// ```
     #[inline]
@@ -221,10 +221,10 @@ impl<V: Version> UntypedItem<V> {
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
-    ///    use froglight_common::version::V1_21_4;
+    ///     use froglight_common::version::V1_21_4;
     ///
-    ///   let mut item = Item::<item::Air, V1_21_4>::default().into_untyped();
-    ///   *item.raw_data_mut() = UnnamedNbt::new_empty();
+    ///     let mut item = Item::<item::Air, V1_21_4>::default().into_untyped();
+    ///     *item.raw_data_mut() = UnnamedNbt::new_empty();
     /// }
     /// ```
     #[inline]

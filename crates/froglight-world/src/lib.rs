@@ -5,7 +5,10 @@ pub mod chunk;
 pub mod position;
 
 pub mod prelude {
-    //! Re-exports of common types, traits, and macros.
+    //! Re-exports of common types and traits.
 
-    pub use crate::position::{BlockPos, ChunkPos};
+    pub use crate::{
+        chunk::Section,
+        position::{BlockPos, ChunkPos, DimensionPos},
+    };
 }
