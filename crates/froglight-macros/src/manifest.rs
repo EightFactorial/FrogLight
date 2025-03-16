@@ -3,31 +3,36 @@
 //! [`BevyManifest`]: https://github.com/bevyengine/bevy/blob/main/crates/bevy_macro_utils/src/bevy_manifest.rs
 #![allow(dead_code, unreachable_pub)]
 
-use std::{path::PathBuf, sync::OnceLock};
+use std::{collections::BTreeMap, path::PathBuf};
 
+use parking_lot::{MappedRwLockReadGuard, RwLock, RwLockReadGuard};
 use proc_macro::TokenStream;
 
 pub struct CrateManifest(toml_edit::DocumentMut);
 
 impl CrateManifest {
-    pub fn shared() -> &'static Self {
-        static MANIFEST: OnceLock<CrateManifest> = OnceLock::new();
+    pub fn shared() -> MappedRwLockReadGuard<'static, CrateManifest> {
+        static MANIFEST: RwLock<BTreeMap<PathBuf, CrateManifest>> = RwLock::new(BTreeMap::new());
 
-        MANIFEST.get_or_init(|| {
-            let manifest_dir = std::env::var_os("CARGO_MANIFEST_DIR").map(PathBuf::from);
-            let mut path = manifest_dir.expect("CARGO_MANIFEST_DIR not defined!");
+        let manifest_dir = std::env::var_os("CARGO_MANIFEST_DIR").map(PathBuf::from);
+        let mut path = manifest_dir.expect("CARGO_MANIFEST_DIR not defined!");
+        path.push("Cargo.toml");
 
-            path.push("Cargo.toml");
+        // If the manifest hasn't been parsed yet, read and parse it.
+        if !MANIFEST.read().contains_key(&path) {
             assert!(path.exists(), "Expected Cargo.toml at \"{}\"", path.display());
 
             let manifest = std::fs::read_to_string(&path).unwrap_or_else(|err| {
                 panic!("Unable to read Cargo.toml at \"{}\": {err}", path.display());
             });
 
-            CrateManifest(manifest.parse().unwrap_or_else(|err| {
+            let manifest = CrateManifest(manifest.parse().unwrap_or_else(|err| {
                 panic!("Unable to parse Cargo.toml at \"{}\": {err}", path.display());
-            }))
-        })
+            }));
+            MANIFEST.write().insert(path.clone(), manifest);
+        }
+
+        RwLockReadGuard::map(MANIFEST.read(), |manifests| manifests.get(&path).unwrap())
     }
 
     /// Find the path to a package in the manifest.

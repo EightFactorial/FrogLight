@@ -118,9 +118,10 @@ mod io;
 /// }
 /// impl froglight_io::prelude::FrogWrite for MyStruct {
 ///     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, froglight_io::prelude::WriteError> {
-///         let a_len = froglight_io::prelude::FrogWrite::frog_write(&self.a, buffer)?;
-///         let b_len = froglight_io::prelude::FrogWrite::frog_write(&self.b, buffer)?;
-///         Ok(a_len + b_len)
+///         let mut written = 0;
+///         written += froglight_io::prelude::FrogWrite::frog_write(&self.a, buffer)?;
+///         written += froglight_io::prelude::FrogWrite::frog_write(&self.b, buffer)?;
+///         Ok(written)
 ///     }
 ///     fn frog_len(&self) -> usize {
 ///         froglight_io::prelude::FrogWrite::frog_len(&self.a) +
@@ -139,16 +140,18 @@ mod io;
 /// }
 /// impl froglight_io::prelude::FrogWrite for MyEnum {
 ///     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, froglight_io::prelude::WriteError> {
+///         let mut written = 0;
 ///         match self {
 ///             Self::A(a) => {
-///                 let prefix = froglight_io::prelude::FrogVarWrite::frog_var_write(&0u32, buffer)?;
-///                 froglight_io::prelude::FrogWrite::frog_write(a, buffer).map(|len| len + prefix)
+///                 written += froglight_io::prelude::FrogVarWrite::frog_var_write(&0u32, buffer)?;
+///                 written += froglight_io::prelude::FrogWrite::frog_write(a, buffer)?;
 ///             },
 ///             Self::B(b) => {
-///                 let prefix = froglight_io::prelude::FrogVarWrite::frog_var_write(&1u32, buffer)?;
-///                 froglight_io::prelude::FrogWrite::frog_write(b, buffer).map(|len| len + prefix)
+///                 written += froglight_io::prelude::FrogVarWrite::frog_var_write(&1u32, buffer)?;
+///                 written += froglight_io::prelude::FrogWrite::frog_write(b, buffer)?;
 ///             }
 ///         }
+///         Ok(written)
 ///     }
 ///     fn frog_len(&self) -> usize {
 ///         match self {

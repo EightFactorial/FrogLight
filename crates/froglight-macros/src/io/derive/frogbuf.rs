@@ -172,6 +172,7 @@ fn derive_struct(ident: Ident, data: DataStruct, traits: FrogBufTraits, path: Pa
     // Add `FrogRead`
     if let Some(read) = read {
         tokens.extend(quote! {
+            #[automatically_derived]
             impl #path::standard::FrogRead for #ident {
                 fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
                     #read
@@ -182,6 +183,7 @@ fn derive_struct(ident: Ident, data: DataStruct, traits: FrogBufTraits, path: Pa
     // Add `FrogWrite`
     if let (Some(write), Some(write_len)) = (write, write_len) {
         tokens.extend(quote! {
+            #[automatically_derived]
             impl #path::standard::FrogWrite for #ident {
                 fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
                     let mut written = 0;
@@ -196,6 +198,7 @@ fn derive_struct(ident: Ident, data: DataStruct, traits: FrogBufTraits, path: Pa
     // Add `FrogVarRead`
     if let Some(var_read) = var_read {
         tokens.extend(quote! {
+            #[automatically_derived]
             impl #path::variable::FrogVarRead for #ident {
                 fn frog_var_read(buffer: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
                     #var_read
@@ -206,6 +209,7 @@ fn derive_struct(ident: Ident, data: DataStruct, traits: FrogBufTraits, path: Pa
     // Add `FrogVarWrite`
     if let (Some(var_write), Some(var_write_len)) = (var_write, var_write_len) {
         tokens.extend(quote! {
+            #[automatically_derived]
             impl #path::variable::FrogVarWrite for #ident {
                 fn frog_var_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
                     let mut written = 0;
@@ -358,7 +362,9 @@ fn derive_field_length(fields: &Fields, traits: TraitMethod, path: &Path) -> Tok
                 .as_ref()
                 .map_or_else(|| Index::from(index).into_token_stream(), Ident::to_token_stream);
 
-            derive_field(Some(field_name), ReadWriteMode::WriteLength, traits, path)
+            let field = derive_field(Some(field_name), ReadWriteMode::WriteLength, traits, path);
+
+            if index < fields.len().saturating_sub(1) { quote!(#field +) } else { field }
         })
         .collect()
 }
