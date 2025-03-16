@@ -8,7 +8,7 @@ use syn::{
 
 use crate::CrateManifest;
 
-#[allow(clippy::too_many_lines)]
+#[allow(clippy::obfuscated_if_else, clippy::too_many_lines)]
 pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
     let MacroInput { path, version, blocks } = syn::parse2(input).unwrap();
     let block_path = path.unwrap_or_else(|| CrateManifest::froglight("froglight-block"));
