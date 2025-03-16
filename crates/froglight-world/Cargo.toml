@@ -18,7 +18,6 @@ workspace = true
 [dependencies]
 bitvec = "1.0"
 derive_more = { workspace = true }
-froglight-common = { workspace = true }
 glam = { workspace = true }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
@@ -30,6 +29,7 @@ bevy_reflect = { workspace = true, optional = true }
 bevy_utils = { workspace = true, optional = true }
 downcast-rs = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
+froglight-common = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 froglight-nbt = { workspace = true, optional = true }
 
@@ -37,9 +37,9 @@ froglight-nbt = { workspace = true, optional = true }
 default = ["nbt"]
 
 # Enable `froglight-block` support
-block = ["dep:froglight-block"]
+block = ["dep:froglight-block", "dep:froglight-common"]
 # Enable `froglight-io` support
-io = ["dep:froglight-io"]
+io = ["dep:froglight-io", "froglight-nbt?/io"]
 # Enable `froglight-nbt` support
 nbt = ["dep:froglight-nbt"]
 
