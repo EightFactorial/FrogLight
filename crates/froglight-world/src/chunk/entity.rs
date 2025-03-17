@@ -10,7 +10,7 @@ pub struct PackedEntity {
     /// The entity's chunk-relative position.
     pub position: RelativeBlockPos,
     /// The entity's type.
-    #[frog(var)]
+    #[cfg_attr(feature = "io", frog(var))]
     pub entity_type: u32,
     /// The entity's NBT data.
     pub entity_data: UnnamedNbt,
