@@ -2,6 +2,17 @@
 
 #[cfg(feature = "block")]
 use froglight_block::{prelude::*, resolve::BlockResolver};
+#[cfg(feature = "io")]
+use froglight_io::prelude::*;
+#[cfg(feature = "nbt")]
+use froglight_nbt::nbt::UnnamedNbt;
+#[cfg(feature = "nbt")]
+use hashbrown::HashMap;
+
+#[cfg(feature = "nbt")]
+mod entity;
+#[cfg(feature = "nbt")]
+pub use entity::PackedEntity;
 
 mod palette;
 pub use palette::SectionPalette;
@@ -12,6 +23,8 @@ pub use section::{Section, SectionData};
 mod storage;
 pub use storage::{ArrayChunkStorage, ChunkStorage, VecChunkStorage};
 
+#[cfg(feature = "nbt")]
+use crate::position::RelativeBlockPos;
 use crate::prelude::BlockPos;
 
 #[cfg(test)]
@@ -19,19 +32,23 @@ mod test;
 
 /// A chunk of the world.
 pub struct Chunk {
-    #[cfg(feature = "nbt")]
-    data: froglight_nbt::nbt::UnnamedNbt,
     storage: ChunkStorage,
+    #[cfg(feature = "nbt")]
+    chunk_data: UnnamedNbt,
+    #[cfg(feature = "nbt")]
+    block_data: HashMap<RelativeBlockPos, PackedEntity>,
 }
 
 impl Chunk {
     /// Create a new [`Chunk`] with the given [`ChunkStorage`].
     #[must_use]
-    pub const fn new(storage: ChunkStorage) -> Self {
+    pub fn new(storage: ChunkStorage) -> Self {
         Self {
-            #[cfg(feature = "nbt")]
-            data: froglight_nbt::nbt::UnnamedNbt::new_empty(),
             storage,
+            #[cfg(feature = "nbt")]
+            chunk_data: UnnamedNbt::new_empty(),
+            #[cfg(feature = "nbt")]
+            block_data: HashMap::new(),
         }
     }
 
@@ -45,6 +62,9 @@ impl Chunk {
     ///
     /// Returns the previous block id,
     /// or `None` if the position is out of bounds.
+    ///
+    /// # Note
+    /// `is_air` is a function that returns `true` if the block id is air.
     pub fn set_raw_block(
         &mut self,
         pos: BlockPos,
@@ -59,7 +79,17 @@ impl Chunk {
     /// Returns `None` if the position is out of bounds.
     #[must_use]
     pub fn get_raw_biome(&self, pos: BlockPos) -> Option<u32> { self.storage.get_raw_biome(pos) }
+
+    /// Set a raw biome id at the given [`BlockPos`].
+    ///
+    /// Returns the previous biome id,
+    /// or `None` if the position is out of bounds.
+    pub fn set_raw_biome(&mut self, pos: BlockPos, biome_id: u32) -> Option<u32> {
+        self.storage.set_raw_biome(pos, biome_id)
+    }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(feature = "block")]
 impl Chunk {
@@ -116,61 +146,99 @@ impl Chunk {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 #[cfg(feature = "nbt")]
 impl Chunk {
     /// Create a new [`Chunk`] with the given
-    /// [`ChunkStorage`] and [`UnnamedNbt`](froglight_nbt::nbt::UnnamedNbt).
+    /// [`ChunkStorage`] and [`UnnamedNbt`].
     #[must_use]
-    pub const fn new_with(storage: ChunkStorage, data: froglight_nbt::nbt::UnnamedNbt) -> Self {
-        Self { data, storage }
+    pub const fn new_with(
+        storage: ChunkStorage,
+        chunk_data: UnnamedNbt,
+        block_data: HashMap<RelativeBlockPos, PackedEntity>,
+    ) -> Self {
+        Self { storage, chunk_data, block_data }
     }
 
-    /// Get the [`UnnamedNbt`](froglight_nbt::nbt::UnnamedNbt) of the [`Chunk`].
+    /// Get the [`UnnamedNbt`] of the [`Chunk`].
     #[inline]
     #[must_use]
-    pub const fn chunk_data(&self) -> &froglight_nbt::nbt::UnnamedNbt { &self.data }
+    pub const fn chunk_data(&self) -> &UnnamedNbt { &self.chunk_data }
 
-    /// Get the [`UnnamedNbt`](froglight_nbt::nbt::UnnamedNbt) of the [`Chunk`]
+    /// Get the [`UnnamedNbt`] of the [`Chunk`]
     /// mutably.
     #[inline]
     #[must_use]
-    pub const fn chunk_data_mut(&mut self) -> &mut froglight_nbt::nbt::UnnamedNbt { &mut self.data }
+    pub const fn chunk_data_mut(&mut self) -> &mut UnnamedNbt { &mut self.chunk_data }
 
-    /// Get the [`UnnamedNbt`](froglight_nbt::nbt::UnnamedNbt) of a [`Section`].
+    /// Get the [`UnnamedNbt`] of a [`BlockPos`].
+    #[inline]
     #[must_use]
-    pub fn section_data(
-        &self,
-        pos: BlockPos,
-    ) -> Option<&hashbrown::HashMap<crate::position::SectionBlockPos, froglight_nbt::nbt::UnnamedNbt>>
-    {
-        self.storage.get(pos).map(Section::block_data)
+    pub fn block_data(&self, pos: BlockPos) -> Option<&UnnamedNbt> {
+        self.block_data
+            .get(&RelativeBlockPos::from_block(pos, self.storage.height_min()))
+            .map(|entity| &entity.entity_data)
     }
 
-    /// Get the [`UnnamedNbt`](froglight_nbt::nbt::UnnamedNbt) of a [`Section`]
-    /// mutably.
+    /// Get the [`UnnamedNbt`] of a [`BlockPos`] mutably.
+    #[inline]
     #[must_use]
-    pub fn section_data_mut(
+    pub fn block_data_mut(&mut self, pos: BlockPos) -> Option<&mut UnnamedNbt> {
+        self.block_data
+            .get_mut(&RelativeBlockPos::from_block(pos, self.storage.height_min()))
+            .map(|entity| &mut entity.entity_data)
+    }
+
+    /// Get a [`BlockPos`]'s NBT data entry.
+    #[inline]
+    #[must_use]
+    pub fn block_data_entry(
         &mut self,
         pos: BlockPos,
-    ) -> Option<
-        &mut hashbrown::HashMap<crate::position::SectionBlockPos, froglight_nbt::nbt::UnnamedNbt>,
-    > {
-        self.storage.get_mut(pos).map(Section::block_data_mut)
+    ) -> hashbrown::hash_map::Entry<'_, RelativeBlockPos, PackedEntity, hashbrown::DefaultHashBuilder>
+    {
+        self.block_data.entry(RelativeBlockPos::from_block(pos, self.storage.height_min()))
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(all(feature = "io", feature = "nbt"))]
+impl Chunk {
+    /// Read the data from the given buffer.
+    ///
+    /// # Errors
+    /// Returns an error if the type does not match the buffer,
+    /// or if the buffer fails to be read from.
+    pub fn frog_read(offset: isize, buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
+        let chunk_data = UnnamedNbt::frog_read(buffer)?;
+        let sections = Vec::<Section>::frog_read(buffer)?;
+        let block_data = Vec::<PackedEntity>::frog_read(buffer)?;
+        Ok(Self {
+            chunk_data,
+            block_data: PackedEntity::list_into_map(block_data),
+            storage: ChunkStorage::from_sections(sections, offset),
+        })
+    }
+}
+
+#[cfg(all(feature = "io", feature = "nbt"))]
+impl FrogWrite for Chunk {
+    fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
+        let mut written = 0;
+        written += self.chunk_data.frog_write(buffer)?;
+        written += self.storage.sections_ref().frog_write(buffer)?;
+        written += self
+            .block_data
+            .values()
+            .try_fold(0, |acc, entity| entity.frog_write(buffer).map(|w| acc + w))?;
+        Ok(written)
     }
 
-    /// Get the [`UnnamedNbt`](froglight_nbt::nbt::UnnamedNbt) of a [`BlockPos`]
-    /// in the [`Chunk`].
-    #[must_use]
-    pub fn block_data(&self, pos: BlockPos) -> Option<&froglight_nbt::nbt::UnnamedNbt> {
-        self.section_data(pos)
-            .and_then(|section| section.get(&crate::position::SectionBlockPos::from_block(pos)))
-    }
-
-    /// Get the [`UnnamedNbt`](froglight_nbt::nbt::UnnamedNbt) of a [`BlockPos`]
-    /// in the [`Chunk`] mutably.
-    #[must_use]
-    pub fn block_data_mut(&mut self, pos: BlockPos) -> Option<&mut froglight_nbt::nbt::UnnamedNbt> {
-        self.section_data_mut(pos)
-            .and_then(|section| section.get_mut(&crate::position::SectionBlockPos::from_block(pos)))
+    fn frog_len(&self) -> usize {
+        self.chunk_data.frog_len()
+            + self.storage.sections_ref().frog_len()
+            + self.block_data.values().map(PackedEntity::frog_len).sum::<usize>()
     }
 }

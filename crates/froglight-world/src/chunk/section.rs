@@ -15,13 +15,8 @@ use crate::position::SectionBlockPos;
 pub struct Section {
     /// The number of non-air blocks in the section.
     solid: u32,
-
     /// Binary block data.
     block: SectionData<Block>,
-    /// Nbt block entity data.
-    #[cfg(feature = "nbt")]
-    block_data: hashbrown::HashMap<SectionBlockPos, froglight_nbt::nbt::UnnamedNbt>,
-
     /// Binary biome data.
     biome: SectionData<Biome>,
 }
@@ -51,11 +46,6 @@ impl Section {
     #[must_use]
     pub const fn blocks_raw(&self) -> &SectionData<Block> { &self.block }
 
-    /// Get the raw biome [`SectionData`].
-    #[inline]
-    #[must_use]
-    pub const fn biomes_raw(&self) -> &SectionData<Biome> { &self.biome }
-
     /// Get the block id at the given block index.
     #[must_use]
     pub fn get_block(&self, pos: SectionBlockPos) -> u32 { self.block.get(pos.into_index()) }
@@ -70,6 +60,11 @@ impl Section {
         self.block.set(pos.into_index(), block_id)
     }
 
+    /// Get the raw biome [`SectionData`].
+    #[inline]
+    #[must_use]
+    pub const fn biomes_raw(&self) -> &SectionData<Biome> { &self.biome }
+
     /// Get the biome id at the given block index.
     #[must_use]
     pub fn get_biome(&self, pos: SectionBlockPos) -> u32 { self.biome.get(pos.into_index()) }
@@ -79,25 +74,6 @@ impl Section {
     /// Returns the previous biome id.
     pub fn set_biome(&mut self, pos: SectionBlockPos, biome_id: u32) -> u32 {
         self.biome.set(pos.into_index(), biome_id)
-    }
-}
-
-#[cfg(feature = "nbt")]
-impl Section {
-    /// Get the raw block NBT data.
-    #[must_use]
-    pub const fn block_data(
-        &self,
-    ) -> &hashbrown::HashMap<SectionBlockPos, froglight_nbt::nbt::UnnamedNbt> {
-        &self.block_data
-    }
-
-    /// Get the raw block NBT data mutably.
-    #[must_use]
-    pub const fn block_data_mut(
-        &mut self,
-    ) -> &mut hashbrown::HashMap<SectionBlockPos, froglight_nbt::nbt::UnnamedNbt> {
-        &mut self.block_data
     }
 }
 
@@ -147,17 +123,20 @@ impl<T: SectionType> SectionData<T> {
     /// Get the raw section data.
     #[inline]
     #[must_use]
-    pub const fn raw(&self) -> &BitVec<u64, LocalBits> { &self.data }
+    pub const fn raw_data(&self) -> &BitVec<u64, LocalBits> { &self.data }
 
     /// Get the raw section data mutably.
     #[inline]
     #[must_use]
-    pub const fn raw_mut(&mut self) -> &mut BitVec<u64, LocalBits> { &mut self.data }
+    pub const fn raw_data_mut(&mut self) -> &mut BitVec<u64, LocalBits> { &mut self.data }
 }
 
 #[expect(private_bounds)]
 impl<T: SectionType> SectionData<T> {
     /// Get the value at the given index.
+    ///
+    /// # Panics
+    /// Panics if the index is over `4096`.
     #[must_use]
     pub fn get(&self, index: usize) -> u32 {
         match self.palette() {
@@ -168,6 +147,9 @@ impl<T: SectionType> SectionData<T> {
     }
 
     /// Set the value at the given index.
+    ///
+    /// # Panics
+    /// Panics if the index is over `4096`.
     pub fn set(&mut self, index: usize, value: u32) -> u32 {
         let previous = self.get(index);
 
@@ -178,7 +160,7 @@ impl<T: SectionType> SectionData<T> {
                 if item != value {
                     *self.bits_mut() = 1;
                     *self.palette_mut() = SectionPalette::Vector(vec![item, value]);
-                    *self.raw_mut() = BitVec::repeat(false, Section::VOLUME);
+                    *self.raw_data_mut() = BitVec::repeat(false, Section::VOLUME);
                     // Set the new value.
                     self.slice_at_mut(index).store(value);
                 }
@@ -245,7 +227,7 @@ impl<T: SectionType> SectionData<T> {
 
         // Set the new bits and data.
         *self.bits_mut() = required;
-        *self.raw_mut() = new_data;
+        *self.raw_data_mut() = new_data;
     }
 
     /// Convert the palette to a global palette.
@@ -279,7 +261,7 @@ impl<T: SectionType> SectionData<T> {
 
         // Set the new bits and data.
         *self.bits_mut() = required;
-        *self.raw_mut() = new_data;
+        *self.raw_data_mut() = new_data;
     }
 
     /// Get a reference to the entry at the given index.

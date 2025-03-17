@@ -168,6 +168,9 @@ impl ChunkStorage {
     ///
     /// Returns the previous block id,
     /// or `None` if the position is out of bounds.
+    ///
+    ///  # Note
+    /// `is_air` is a function that returns `true` if the block id is air.
     pub fn set_raw_block(
         &mut self,
         pos: BlockPos,
