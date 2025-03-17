@@ -8,7 +8,7 @@ pub mod prelude {
     //! Re-exports of common types and traits.
 
     pub use crate::{
-        chunk::Section,
+        chunk::{Chunk, Section},
         position::{BlockPos, ChunkPos, DimensionPos},
     };
 }

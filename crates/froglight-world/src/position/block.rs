@@ -1,12 +1,13 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+use derive_more::Display;
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
 use glam::IVec3;
 
 /// A block position in the world.
 #[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Display, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct BlockPos(IVec3);
 
 impl BlockPos {

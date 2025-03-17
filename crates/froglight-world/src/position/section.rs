@@ -127,9 +127,13 @@ impl SectionBlockPos {
     /// assert_eq!(SectionBlockPos::from(block), SectionBlockPos::new(0, 0, 8));
     /// ```
     #[must_use]
-    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-    pub const fn from_block(block: BlockPos) -> Self {
-        Self::new(block.x() as _, block.y() as _, block.z() as _)
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    pub fn from_block(block: BlockPos) -> Self {
+        Self::new(
+            block.x().rem_euclid(Section::WIDTH as i32) as _,
+            block.y().rem_euclid(Section::HEIGHT as i32) as _,
+            block.z().rem_euclid(Section::DEPTH as i32) as _,
+        )
     }
 
     /// Create a [`SectionBlockPos`] from the given index.
@@ -164,9 +168,9 @@ impl SectionBlockPos {
     pub const fn from_index(index: usize) -> Self {
         assert!(index < 4096, "Section index out of bounds!");
 
-        let x = index.rem_euclid(16) as u8;
-        let z = index.div_euclid(16).rem_euclid(16) as u8;
-        let y = index.div_euclid(256).rem_euclid(16) as u8;
+        let x = index.rem_euclid(Section::WIDTH) as u8;
+        let z = index.div_euclid(Section::WIDTH).rem_euclid(Section::DEPTH) as u8;
+        let y = index.div_euclid(Section::WIDTH * Section::DEPTH).rem_euclid(Section::HEIGHT) as u8;
 
         Self::new(x, y, z)
     }
@@ -194,7 +198,9 @@ impl SectionBlockPos {
     /// ```
     #[must_use]
     pub const fn into_index(self) -> usize {
-        (self.x() as usize) + (self.y() as usize * 256) + (self.z() as usize * 16)
+        (self.x() as usize)
+            + (self.y() as usize * Section::WIDTH * Section::DEPTH)
+            + (self.z() as usize * Section::WIDTH)
     }
 }
 

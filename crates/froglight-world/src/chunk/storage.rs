@@ -1,6 +1,7 @@
 use derive_more::{From, Into};
 
 use super::Section;
+use crate::{position::SectionBlockPos, prelude::BlockPos};
 
 /// A vertical slice of the world.
 #[derive(Clone)]
@@ -20,6 +21,18 @@ pub enum ChunkStorage {
 }
 
 impl ChunkStorage {
+    /// The minimum height of this chunk in blocks.
+    ///
+    /// This is the bedrock floor for this chunk.
+    #[must_use]
+    pub const fn height_min(&self) -> isize {
+        match self {
+            ChunkStorage::Large(..) => -64,
+            ChunkStorage::Normal(..) => 0,
+            ChunkStorage::Other(storage) => storage.1,
+        }
+    }
+
     /// The maximum height of this chunk in blocks.
     ///
     /// This is the build limit for this chunk.
@@ -34,15 +47,24 @@ impl ChunkStorage {
         }
     }
 
-    /// The minimum height of this chunk in blocks.
-    ///
-    /// This is the bedrock floor for this chunk.
+    /// The minimum [`BlockPos`] of this chunk.
     #[must_use]
-    pub const fn height_min(&self) -> isize {
-        match self {
-            ChunkStorage::Large(..) => -64,
-            ChunkStorage::Normal(..) => 0,
-            ChunkStorage::Other(storage) => storage.1,
+    pub fn position_min(&self) -> BlockPos {
+        if let Ok(y) = self.height_min().try_into() {
+            BlockPos::new(0i32, y, 0i32)
+        } else {
+            unreachable!("Minimum height is out of bounds?")
+        }
+    }
+
+    /// The maximum [`BlockPos`] of this chunk.
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    pub fn position_max(&self) -> BlockPos {
+        if let Ok(y) = i32::try_from(self.height_max()) {
+            BlockPos::new(Section::WIDTH as i32 - 1i32, y - 1i32, Section::DEPTH as i32 - 1i32)
+        } else {
+            unreachable!("Maximum height is out of bounds?")
         }
     }
 
@@ -67,7 +89,7 @@ impl ChunkStorage {
 
     /// The the number of [`Section`]s in this chunk.
     #[must_use]
-    pub const fn sections(&self) -> usize {
+    pub const fn sections_len(&self) -> usize {
         match self {
             ChunkStorage::Large(..) => 24,
             ChunkStorage::Normal(..) => 16,
@@ -95,6 +117,27 @@ impl ChunkStorage {
         }
     }
 
+    /// Get a reference to the [`Section`] that holds the given [`BlockPos`].
+    #[must_use]
+    pub fn get(&self, pos: BlockPos) -> Option<&Section> {
+        match self {
+            ChunkStorage::Large(storage) => storage.get(pos),
+            ChunkStorage::Normal(storage) => storage.get(pos),
+            ChunkStorage::Other(storage) => storage.get(pos),
+        }
+    }
+
+    /// Get a mutable reference to the [`Section`] that holds the given
+    /// [`BlockPos`].
+    #[must_use]
+    pub fn get_mut(&mut self, pos: BlockPos) -> Option<&mut Section> {
+        match self {
+            ChunkStorage::Large(storage) => storage.get_mut(pos),
+            ChunkStorage::Normal(storage) => storage.get_mut(pos),
+            ChunkStorage::Other(storage) => storage.get_mut(pos),
+        }
+    }
+
     /// Create a new [`ChunkStorage`] from the given [`Section`]s and offset.
     #[must_use]
     pub fn from_sections(sections: Vec<Section>, offset: isize) -> Self {
@@ -109,6 +152,62 @@ impl ChunkStorage {
             ),
             _ => ChunkStorage::Other(VecChunkStorage::new(sections, offset)),
         }
+    }
+}
+
+impl ChunkStorage {
+    /// Get the block id at the given [`BlockPos`].
+    ///
+    /// Returns `None` if the position is out of bounds.
+    #[must_use]
+    pub fn get_raw_block(&self, pos: BlockPos) -> Option<u32> {
+        self.get(pos).map(|section| section.get_block(SectionBlockPos::from_block(pos)))
+    }
+
+    /// Set the block id at the given [`BlockPos`].
+    ///
+    /// Returns the previous block id,
+    /// or `None` if the position is out of bounds.
+    pub fn set_raw_block(
+        &mut self,
+        pos: BlockPos,
+        block: u32,
+        is_air: impl Fn(u32) -> bool,
+    ) -> Option<u32> {
+        // Set the block and return the previous block id.
+        let section = self.get_mut(pos)?;
+        let previous = section.set_block(SectionBlockPos::from_block(pos), block);
+
+        // Update the block count using the provided function.
+        match (is_air(previous), is_air(block)) {
+            // Air -> Block
+            (true, false) => {
+                *section.blocks_mut() += 1;
+            }
+            // Block -> Air
+            (false, true) => {
+                *section.blocks_mut() -= 1;
+            }
+            _ => {}
+        }
+
+        Some(previous)
+    }
+
+    /// Get the biome id at the given [`BlockPos`].
+    ///
+    /// Returns `None` if the position is out of bounds.
+    #[must_use]
+    pub fn get_raw_biome(&self, pos: BlockPos) -> Option<u32> {
+        self.get(pos).map(|section| section.get_biome(SectionBlockPos::from_block(pos)))
+    }
+
+    /// Set the biome id at the given [`BlockPos`].
+    ///
+    /// Returns the previous biome id,
+    /// or `None` if the position is out of bounds.
+    pub fn set_raw_biome(&mut self, pos: BlockPos, biome: u32) -> Option<u32> {
+        self.get_mut(pos).map(|section| section.set_biome(SectionBlockPos::from_block(pos), biome))
     }
 }
 
@@ -135,6 +234,27 @@ impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunkStorage<SECTIONS, OFF
     /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
     #[must_use]
     pub const fn const_new(sections: Box<[Section; SECTIONS]>) -> Self { Self(sections) }
+
+    /// Get a reference to the [`Section`] that holds the given [`BlockPos`].
+    #[must_use]
+    pub fn get(&self, pos: BlockPos) -> Option<&Section> {
+        let pos: usize = (pos.y() as isize).saturating_sub(OFFSET).try_into().ok()?;
+        self.0.get(pos / Section::HEIGHT)
+    }
+
+    /// Get a mutable reference to the [`Section`] that holds the given
+    /// [`BlockPos`].
+    #[must_use]
+    pub fn get_mut(&mut self, pos: BlockPos) -> Option<&mut Section> {
+        let pos: usize = (pos.y() as isize).saturating_sub(OFFSET).try_into().ok()?;
+        self.0.get_mut(pos / Section::HEIGHT)
+    }
+}
+
+impl<const SECTIONS: usize, const OFFSET: isize> Default for ArrayChunkStorage<SECTIONS, OFFSET>
+where [Section; SECTIONS]: Default
+{
+    fn default() -> Self { Self::new(Default::default()) }
 }
 
 impl<const SECTIONS: usize, const OFFSET: isize> TryFrom<Vec<Section>>
@@ -168,4 +288,17 @@ impl VecChunkStorage {
     /// offset.
     #[must_use]
     pub const fn new(sections: Vec<Section>, offset: isize) -> Self { Self(sections, offset) }
+
+    /// Get a reference to the [`Section`] that holds the given [`BlockPos`].
+    #[must_use]
+    pub fn get(&self, pos: BlockPos) -> Option<&Section> {
+        self.0.get::<usize>((pos.y() as isize).saturating_sub(self.1).try_into().ok()?)
+    }
+
+    /// Get a mutable reference to the [`Section`] that holds the given
+    /// [`BlockPos`].
+    #[must_use]
+    pub fn get_mut(&mut self, pos: BlockPos) -> Option<&mut Section> {
+        self.0.get_mut::<usize>((pos.y() as isize).saturating_sub(self.1).try_into().ok()?)
+    }
 }

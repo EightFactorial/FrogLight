@@ -56,24 +56,6 @@ impl Section {
     #[must_use]
     pub const fn biomes_raw(&self) -> &SectionData<Biome> { &self.biome }
 
-    /// Get the raw block NBT data.
-    #[must_use]
-    #[cfg(feature = "nbt")]
-    pub const fn block_data(
-        &self,
-    ) -> &hashbrown::HashMap<SectionBlockPos, froglight_nbt::nbt::UnnamedNbt> {
-        &self.block_data
-    }
-
-    /// Get the raw block NBT data mutably.
-    #[must_use]
-    #[cfg(feature = "nbt")]
-    pub const fn block_data_mut(
-        &mut self,
-    ) -> &mut hashbrown::HashMap<SectionBlockPos, froglight_nbt::nbt::UnnamedNbt> {
-        &mut self.block_data
-    }
-
     /// Get the block id at the given block index.
     #[must_use]
     pub fn get_block(&self, pos: SectionBlockPos) -> u32 { self.block.get(pos.into_index()) }
@@ -97,6 +79,25 @@ impl Section {
     /// Returns the previous biome id.
     pub fn set_biome(&mut self, pos: SectionBlockPos, biome_id: u32) -> u32 {
         self.biome.set(pos.into_index(), biome_id)
+    }
+}
+
+#[cfg(feature = "nbt")]
+impl Section {
+    /// Get the raw block NBT data.
+    #[must_use]
+    pub const fn block_data(
+        &self,
+    ) -> &hashbrown::HashMap<SectionBlockPos, froglight_nbt::nbt::UnnamedNbt> {
+        &self.block_data
+    }
+
+    /// Get the raw block NBT data mutably.
+    #[must_use]
+    pub const fn block_data_mut(
+        &mut self,
+    ) -> &mut hashbrown::HashMap<SectionBlockPos, froglight_nbt::nbt::UnnamedNbt> {
+        &mut self.block_data
     }
 }
 
@@ -250,7 +251,7 @@ impl<T: SectionType> SectionData<T> {
     /// Convert the palette to a global palette.
     ///
     /// # Panics
-    /// Panics if the [`SectionPalette`] not [`SectionPalette::Vector`].
+    /// Panics if the [`SectionPalette`] is not a [`SectionPalette::Vector`].
     fn convert_global_palette(&mut self, index: usize, next: u32) {
         // Take the items out of the palette.
         let SectionPalette::Vector(items) =
