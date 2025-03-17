@@ -39,6 +39,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     ///
     /// Returns `None` if the [`Attribute`] is not present.
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     ///
@@ -64,6 +66,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// This is shorthand for calling
     /// [`Block::into_attr`] and [`Block::from_attr`].
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     ///
@@ -87,6 +91,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 
     /// Create a [`Block`] from the given
     /// [`Attributes`](BlockTypeExt::Attributes).
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
@@ -114,6 +120,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 
     /// Get the [`Attributes`](BlockTypeExt::Attributes) of the [`Block`].
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     ///
@@ -139,6 +147,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Get the value of an [`Attribute`] as a string.
     ///
     /// Returns `None` if the [`Attribute`] is not present.
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
@@ -170,6 +180,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// Returns the previous value of the [`Attribute`],
     /// or `None` if the [`Attribute`] is not present.
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     ///
@@ -196,6 +208,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 
     /// Iterate over the [`Attributes`](BlockTypeExt::Attributes) of the
     /// [`Block`].
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
@@ -227,6 +241,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 
     /// Convert the [`Block`] into an [`UntypedBlock`].
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     ///
@@ -253,6 +269,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 
     /// Get the identifier of the [`Block`].
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     ///
@@ -274,6 +292,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// If you need `const` access, see
     /// [`Block::const_identifier`] or [`BlockTypeExt::IDENTIFIER`].
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     ///
@@ -287,6 +307,49 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     #[inline]
     #[must_use]
     pub fn identifier(&self) -> &'static Identifier { B::as_static().identifier() }
+
+    /// Get whether the [`Block`] is a type of air.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use froglight_block::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     assert!(Block::<block::Air, V1_21_4>::const_is_air());
+    ///     assert!(!Block::<block::Stone, V1_21_4>::const_is_air());
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub const fn const_is_air() -> bool { B::IS_AIR }
+
+    /// Get whether the [`Block`] is a type of air.
+    ///
+    /// Matches [`UntypedBlock::is_air`] for consistency.
+    ///
+    /// If you need `const` access, see
+    /// [`Block::const_is_air`] or [`BlockTypeExt::IS_AIR`].
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use froglight_block::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     assert!(Block::<block::Air, V1_21_4>::default().is_air());
+    ///     assert!(!Block::<block::Stone, V1_21_4>::default().is_air());
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn is_air(&self) -> bool { B::as_static().is_air() }
 }
 
 impl<B: BlockTypeExt<V>, V: Version> Default for Block<B, V> {
@@ -335,6 +398,8 @@ impl<V: Version> UntypedBlock<V> {
     ///
     /// Returns `None` if the block is not in the resolver.
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     /// use froglight_common::vanilla::Vanilla;
@@ -353,6 +418,8 @@ impl<V: Version> UntypedBlock<V> {
     pub fn resolve<R: BlockResolver<V>>(self) -> Option<R::BlockEnum> { R::resolve(self) }
 
     /// Returns `true` if the [`Block`] is of a [`BlockType`].
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;
@@ -376,6 +443,8 @@ impl<V: Version> UntypedBlock<V> {
     ///
     /// Returns `None` if the [`Block`] is not of the given [`BlockType`].
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     /// use froglight_common::vanilla::Vanilla;
@@ -395,6 +464,8 @@ impl<V: Version> UntypedBlock<V> {
 
     /// Get the identifier of the [`UntypedBlock`].
     ///
+    /// # Example
+    ///
     /// ```rust
     /// use froglight_block::prelude::*;
     /// use froglight_common::vanilla::Vanilla;
@@ -411,9 +482,33 @@ impl<V: Version> UntypedBlock<V> {
     #[must_use]
     pub fn identifier(&self) -> &'static Identifier { self.wrapper.identifier() }
 
+    /// Get whether the [`UntypedBlock`] is a type of air.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use froglight_block::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     let block = Block::<block::Air, V1_21_4>::default();
+    ///     assert!(block.into_untyped().is_air());
+    ///
+    ///     let block = Block::<block::Stone, V1_21_4>::default();
+    ///     assert!(!block.into_untyped().is_air());
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn is_air(&self) -> bool { self.wrapper.is_air() }
+
     /// Get the value of an [`Attribute`] as a string.
     ///
     /// Returns `None` if the [`Attribute`] is not present.
+    ///
+    /// # Example
     ///
     /// ```rust
     /// use froglight_block::prelude::*;

@@ -1,9 +1,9 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
-    Ident, LitInt, LitStr, Path, Token,
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
+    Ident, LitBool, LitInt, LitStr, Path, Token,
 };
 
 use crate::CrateManifest;
@@ -17,7 +17,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
     // Generate the block implementations
     let mut output = blocks.iter().fold(
         TokenStream::new(),
-        |mut tokens, BlockInput { block, properties: PropertyInput { ident, default }, attributes: AttributeInput { names, idents } }| {
+        |mut tokens, BlockInput { block, properties: PropertyInput { ident, default, is_air }, attributes: AttributeInput { names, idents } }| {
             // If there is not exactly one attribute, make a unit or tuple struct
             let attrs = idents.len().ne(&1).then(|| quote!((#idents))).unwrap_or_else(|| quote!(#idents));
 
@@ -39,13 +39,19 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                         static IDENTIFIER: #common_path::identifier::Identifier = #common_path::identifier::Identifier::const_new(<#block as #block_path::block::BlockTypeExt<#version>>::IDENTIFIER);
                         &IDENTIFIER
                     }
+
+                    #[inline]
+                    #[must_use]
+                    fn is_air(&self) -> bool { <#block as #block_path::block::BlockTypeExt<#version>>::IS_AIR }
                 }
                 #[automatically_derived]
                 impl #block_path::block::BlockTypeExt<#version> for #block {
                     type Attributes = #attrs;
                     const ATTRIBUTES: &'static [&'static str] = &[#names];
                     const DEFAULT: u16 = #default;
+
                     const IDENTIFIER: &'static str = #ident;
+                    const IS_AIR: bool = #is_air;
                 }
             });
 
@@ -66,7 +72,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
 
         for BlockInput {
             block,
-            properties: PropertyInput { ident, default },
+            properties: PropertyInput { ident, default, .. },
             attributes: AttributeInput { names, idents },
         } in blocks
         {
@@ -289,16 +295,18 @@ impl Parse for BlockInput {
 /// Example:
 ///
 /// ```text
-/// properties: { ident: "minecraft:andesite_slab", default: 3 }
+/// properties: { ident: "minecraft:andesite_slab", default: 3, is_air: false }
 /// ```
 struct PropertyInput {
     ident: LitStr,
     default: LitInt,
+    is_air: LitBool,
 }
 impl Parse for PropertyInput {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let mut ident = None;
         let mut default = None;
+        let mut is_air = None;
 
         while !input.is_empty() {
             let key: Ident = input.parse()?;
@@ -311,6 +319,9 @@ impl Parse for PropertyInput {
                 "default" => {
                     default = Some(input.parse()?);
                 }
+                "is_air" => {
+                    is_air = Some(input.parse()?);
+                }
                 unk => {
                     return Err(syn::Error::new(
                         key.span(),
@@ -322,7 +333,7 @@ impl Parse for PropertyInput {
             if input.peek(Token![,]) {
                 input.parse::<Token![,]>()?;
             }
-            if ident.is_some() && default.is_some() {
+            if ident.is_some() && default.is_some() && is_air.is_some() {
                 break;
             }
         }
@@ -332,6 +343,8 @@ impl Parse for PropertyInput {
                 .ok_or_else(|| syn::Error::new(input.span(), "missing property key 'ident'"))?,
             default: default
                 .ok_or_else(|| syn::Error::new(input.span(), "missing property key 'default'"))?,
+            is_air: is_air
+                .ok_or_else(|| syn::Error::new(input.span(), "missing property key 'is_air'"))?,
         })
     }
 }

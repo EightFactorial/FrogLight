@@ -59,6 +59,27 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     /// }
     /// ```
     fn identifier(&self) -> &'static Identifier;
+
+    /// Returns `true` if the block is air.
+    ///
+    /// ```rust
+    /// use froglight_block::{
+    ///     block::{BlockType, BlockTypeExt, StaticBlock},
+    ///     generated::block::Air,
+    /// };
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // Accessing the static identifier through the `BlockType` trait.
+    ///     assert_eq!(Air::as_static().is_air(), true);
+    ///
+    ///     // Accessing the constant identifier through the `BlockTypeExt` trait.
+    ///     assert_eq!(<Air as BlockTypeExt<V1_21_4>>::IS_AIR, true);
+    /// }
+    /// ```
+    fn is_air(&self) -> bool;
 }
 
 /// An extension of the [`BlockType`] trait.
@@ -72,6 +93,8 @@ pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock {
 
     /// The identifier of the block.
     const IDENTIFIER: &'static str;
+    /// Whether the block is air.
+    const IS_AIR: bool;
 }
 
 use sealed::MaybeReflect;
