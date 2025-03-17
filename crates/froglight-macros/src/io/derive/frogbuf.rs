@@ -1,4 +1,4 @@
-use darling::{FromDeriveInput, FromMeta, util::Flag};
+use darling::{FromDeriveInput, FromField, FromMeta, util::Flag};
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::{
@@ -42,6 +42,16 @@ enum ReadWriteMode {
 enum TraitMethod {
     Standard,
     Variable,
+    Json,
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[derive(FromField)]
+#[darling(attributes(frog))]
+struct FrogFieldFlags {
+    var: Flag,
+    json: Flag,
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -317,7 +327,8 @@ fn derive_named_fields(
 ) -> TokenStream {
     fields.named.iter().fold(TokenStream::new(), |mut acc, field| {
         let ident = field.ident.as_ref().unwrap();
-        let field = derive_field(Some(ident.to_token_stream()), mode, traits, path);
+        let flags = FrogFieldFlags::from_field(field).unwrap();
+        let field = derive_field(Some(ident.to_token_stream()), flags, mode, traits, path);
 
         match mode {
             ReadWriteMode::Read => acc.extend(quote!(#ident: #field,)),
@@ -340,7 +351,9 @@ fn derive_unnamed_fields(
             .ident
             .as_ref()
             .map_or_else(|| Index::from(index).into_token_stream(), Ident::to_token_stream);
-        let field = derive_field(Some(field_name), mode, traits, path);
+
+        let flags = FrogFieldFlags::from_field(field).unwrap();
+        let field = derive_field(Some(field_name), flags, mode, traits, path);
 
         match mode {
             ReadWriteMode::Read => acc.extend(quote!(#field,)),
@@ -362,7 +375,9 @@ fn derive_field_length(fields: &Fields, traits: TraitMethod, path: &Path) -> Tok
                 .as_ref()
                 .map_or_else(|| Index::from(index).into_token_stream(), Ident::to_token_stream);
 
-            let field = derive_field(Some(field_name), ReadWriteMode::WriteLength, traits, path);
+            let flags = FrogFieldFlags::from_field(field).unwrap();
+            let field =
+                derive_field(Some(field_name), flags, ReadWriteMode::WriteLength, traits, path);
 
             if index < fields.len().saturating_sub(1) { quote!(#field +) } else { field }
         })
@@ -371,10 +386,19 @@ fn derive_field_length(fields: &Fields, traits: TraitMethod, path: &Path) -> Tok
 
 fn derive_field(
     field: Option<TokenStream>,
+    flags: FrogFieldFlags,
     mode: ReadWriteMode,
-    traits: TraitMethod,
+    mut traits: TraitMethod,
     path: &Path,
 ) -> TokenStream {
+    // Update the trait method based on the field attributes.
+    match (flags.var.is_present(), flags.json.is_present()) {
+        (true, false) => traits = TraitMethod::Variable,
+        (false, true) => traits = TraitMethod::Json,
+        (true, true) => panic!("Cannot use both `var` and `json` attributes on a field!"),
+        _ => (),
+    }
+
     match (field, mode, traits) {
         // Read the field from the buffer.
         (_, ReadWriteMode::Read, TraitMethod::Standard) => {
@@ -383,12 +407,19 @@ fn derive_field(
         (_, ReadWriteMode::Read, TraitMethod::Variable) => {
             quote!(#path::variable::FrogVarRead::frog_var_read(buffer)?)
         }
+        (_, ReadWriteMode::Read, TraitMethod::Json) => {
+            quote!(#path::serde::FrogJson::frog_from_json(buffer)?)
+        }
+
         // Write the field to the buffer.
         (Some(field), ReadWriteMode::Write, TraitMethod::Standard) => {
             quote!(#path::standard::FrogWrite::frog_write(&self.#field, buffer)?;)
         }
         (Some(field), ReadWriteMode::Write, TraitMethod::Variable) => {
             quote!(#path::variable::FrogVarWrite::frog_var_write(&self.#field, buffer)?;)
+        }
+        (Some(field), ReadWriteMode::Write, TraitMethod::Json) => {
+            quote!(#path::serde::FrogJson::frog_to_json(&self.#field, buffer)?;)
         }
         (None, ReadWriteMode::Write, _) => panic!("Attempted to write unnamed field into buffer!"),
 
@@ -398,6 +429,9 @@ fn derive_field(
         }
         (Some(field), ReadWriteMode::WriteLength, TraitMethod::Variable) => {
             quote!(#path::variable::FrogVarWrite::frog_var_len(&self.#field))
+        }
+        (Some(field), ReadWriteMode::WriteLength, TraitMethod::Json) => {
+            quote!(#path::serde::FrogJson::frog_json_len(&self.#field))
         }
         (None, ReadWriteMode::WriteLength, _) => {
             panic!("Attempted to get length of unnamed field!")

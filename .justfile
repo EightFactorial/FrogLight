@@ -43,11 +43,11 @@ test: (nextest) (doc-test)
 
 # Run all tests
 nextest: (fetch-nextest)
-  cargo nextest run --workspace --all-features
+  cargo nextest run --workspace --release --all-features
 
 # Run all doc-tests
 doc-test:
-  cargo test --doc --workspace --all-features
+  cargo test --doc --workspace --release --all-features
 
 # ---- Tool Recipes ----
 

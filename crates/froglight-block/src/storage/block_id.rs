@@ -2,6 +2,7 @@
 use bevy_reflect::prelude::*;
 
 /// A raw block id that represents a type of block.
+#[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
 pub struct GlobalBlockId(u32);
