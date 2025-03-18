@@ -7,9 +7,12 @@ fn section_single() {
     let section = Section::default();
     assert_eq!(section.blocks(), 0);
 
-    // Check all blocks
+    // Check all blocks and biomes
+    assert!(section.blocks_raw().palette().is_single());
+    assert!(section.biomes_raw().palette().is_single());
     for index in 0..4096 {
         assert_eq!(section.get_block(SectionBlockPos::from_index(index)), 0);
+        assert_eq!(section.get_biome(SectionBlockPos::from_index(index)), 0);
     }
 }
 
@@ -27,9 +30,31 @@ fn section_vector() {
         assert_eq!(section.get_block(pos), index as u32, "Invalid block at {index}!");
     }
     // Check all blocks one more time
+    assert!(section.blocks_raw().palette().is_vector());
     for index in 0..256 {
         let pos = SectionBlockPos::from_index(index);
         assert_eq!(section.get_block(pos), index as u32, "Invalid block at {index}!");
+    }
+
+    // Set all biomes and check them
+    for y in 0..2 {
+        for z in 0..2 {
+            for x in 0..2 {
+                let pos = SectionBlockPos::new(x * 4, y * 4, z * 4);
+                assert_eq!(section.set_biome(pos, pos.into_index() as u32), 0);
+                assert_eq!(section.get_biome(pos), pos.into_index() as u32);
+            }
+        }
+    }
+    // Check all biomes one more time
+    assert!(section.biomes_raw().palette().is_vector());
+    for y in 0..2 {
+        for z in 0..2 {
+            for x in 0..2 {
+                let pos = SectionBlockPos::new(x * 4, y * 4, z * 4);
+                assert_eq!(section.get_biome(pos), pos.into_index() as u32);
+            }
+        }
     }
 }
 
@@ -47,10 +72,32 @@ fn section_global() {
         assert_eq!(section.get_block(pos), index as u32, "Invalid block at {index}!");
     }
     // Check all blocks one more time
+    assert!(section.blocks_raw().palette().is_global());
     for index in 0..4096 {
         let pos = SectionBlockPos::from_index(index);
         assert_eq!(section.get_block(pos), index as u32, "Invalid block at {index}!");
     }
+
+    // // Set all biomes and check them
+    // for y in 0..4 {
+    //     for z in 0..4 {
+    //         for x in 0..4 {
+    //             let pos = SectionBlockPos::new(x * 4, y * 4, z * 4);
+    //             assert_eq!(section.set_biome(pos, pos.into_index() as u32),
+    // 0);             assert_eq!(section.get_biome(pos), pos.into_index()
+    // as u32);         }
+    //     }
+    // }
+    // // Check all biomes one more time
+    // assert!(section.biomes_raw().palette().is_global());
+    // for y in 0..4 {
+    //     for z in 0..4 {
+    //         for x in 0..4 {
+    //             let pos = SectionBlockPos::new(x * 4, y * 4, z * 4);
+    //             assert_eq!(section.get_biome(pos), pos.into_index() as u32);
+    //         }
+    //     }
+    // }
 }
 
 // -------------------------------------------------------------------------------------------------

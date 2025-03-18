@@ -199,11 +199,95 @@ impl SectionBlockPos {
     /// let block = SectionBlockPos::new(15, 15, 15);
     /// assert_eq!(block.into_index(), 4095);
     /// ```
+    #[inline]
     #[must_use]
-    pub const fn into_index(self) -> usize {
-        (self.x() as usize)
-            + (self.y() as usize * Section::WIDTH * Section::DEPTH)
-            + (self.z() as usize * Section::WIDTH)
+    pub const fn into_index(self) -> usize { self.into_quantized_index::<1>() }
+
+    /// Get the index of this [`SectionBlockPos`] using the given scale.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::position::SectionBlockPos;
+    ///
+    /// let block = SectionBlockPos::new(15, 15, 15);
+    ///
+    /// // 1:1 scale
+    /// assert_eq!(block.into_quantized_index::<1>(), 4095);
+    ///
+    /// // 8:1 scale
+    /// assert_eq!(block.into_quantized_index::<2>(), 511);
+    ///
+    /// // 16:1 scale
+    /// assert_eq!(block.into_quantized_index::<4>(), 63);
+    ///
+    /// // 32:1 scale
+    /// assert_eq!(block.into_quantized_index::<8>(), 7);
+    ///
+    /// // When `QUANTIZATION = 1` each position represents one block.
+    /// //  ____________________
+    /// // |\         \         \
+    /// // | \         \         \
+    /// // |  \_________\_________\
+    /// // |  |\         \         \
+    /// // |\ | \         \         \
+    /// // | \|  \_________\_________\
+    /// // |  \  |         |         |
+    /// // \  |\ | (0,1,0) | (1,1,0) |
+    /// //  \ | \|_________|_________|
+    /// //   \|  |         |         |
+    /// //    \  | (0,0,0) | (1,0,0) |
+    /// //     \ |_________|_________|
+    ///
+    /// let block = SectionBlockPos::new(0, 0, 0);
+    /// assert_eq!(block.into_quantized_index::<1>(), 0);
+    ///
+    /// let block = SectionBlockPos::new(1, 0, 0);
+    /// assert_eq!(block.into_quantized_index::<1>(), 1);
+    ///
+    /// let block = SectionBlockPos::new(2, 0, 0);
+    /// assert_eq!(block.into_quantized_index::<1>(), 2);
+    ///
+    /// let block = SectionBlockPos::new(3, 0, 0);
+    /// assert_eq!(block.into_quantized_index::<1>(), 3);
+    ///
+    /// // When `QUANTIZATION = 2` each position represents 1/4 block.
+    /// //  ____________________
+    /// // |\                   \
+    /// // | \                   \
+    /// // |  \                   \
+    /// // |   \                   \
+    /// // |    \                   \
+    /// // |     \___________________\
+    /// // |     |                   |
+    /// // \     | (0,1,0)   (1,1,0) |
+    /// //  \    |                   |
+    /// //   \   |                   |
+    /// //    \  | (0,0,0)   (1,0,0) |
+    /// //     \ |___________________|
+    ///
+    /// let block = SectionBlockPos::new(0, 0, 0);
+    /// assert_eq!(block.into_quantized_index::<2>(), 0);
+    ///
+    /// let block = SectionBlockPos::new(1, 0, 0);
+    /// assert_eq!(block.into_quantized_index::<2>(), 0);
+    ///
+    /// let block = SectionBlockPos::new(0, 0, 1);
+    /// assert_eq!(block.into_quantized_index::<2>(), 0);
+    ///
+    /// let block = SectionBlockPos::new(0, 1, 0);
+    /// assert_eq!(block.into_quantized_index::<2>(), 0);
+    ///
+    /// let block = SectionBlockPos::new(1, 1, 1);
+    /// assert_eq!(block.into_quantized_index::<2>(), 0);
+    /// ```
+    #[must_use]
+    pub const fn into_quantized_index<const QUANTIZATION: usize>(self) -> usize {
+        let width = Section::WIDTH / QUANTIZATION;
+        let depth = Section::DEPTH / QUANTIZATION;
+
+        (self.x() as usize / QUANTIZATION)
+            + (self.z() as usize / QUANTIZATION * width)
+            + (self.y() as usize / QUANTIZATION * width * depth)
     }
 }
 

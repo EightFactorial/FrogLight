@@ -49,7 +49,9 @@ impl Section {
 
     /// Get the block id at the given block index.
     #[must_use]
-    pub fn get_block(&self, pos: SectionBlockPos) -> u32 { self.block.get(pos.into_index()) }
+    pub fn get_block(&self, pos: SectionBlockPos) -> u32 {
+        self.block.get(pos.into_quantized_index::<1>())
+    }
 
     /// Set the block id at the given block index.
     ///
@@ -58,7 +60,7 @@ impl Section {
     /// # Warning
     /// This does not update the block count! This ***must*** be done manually!
     pub fn set_block(&mut self, pos: SectionBlockPos, block_id: u32) -> u32 {
-        self.block.set(pos.into_index(), block_id)
+        self.block.set(pos.into_quantized_index::<1>(), block_id)
     }
 
     /// Get the raw biome [`SectionData`].
@@ -68,13 +70,15 @@ impl Section {
 
     /// Get the biome id at the given block index.
     #[must_use]
-    pub fn get_biome(&self, pos: SectionBlockPos) -> u32 { self.biome.get(pos.into_index()) }
+    pub fn get_biome(&self, pos: SectionBlockPos) -> u32 {
+        self.biome.get(pos.into_quantized_index::<4>())
+    }
 
     /// Set the biome id at the given block index.
     ///
     /// Returns the previous biome id.
     pub fn set_biome(&mut self, pos: SectionBlockPos, biome_id: u32) -> u32 {
-        self.biome.set(pos.into_index(), biome_id)
+        self.biome.set(pos.into_quantized_index::<4>(), biome_id)
     }
 }
 
@@ -138,7 +142,7 @@ impl<T: SectionType> SectionData<T> {
     /// Get the value at the given index.
     ///
     /// # Panics
-    /// Panics if the index is over `4096`.
+    /// Panics if the index is over `T::VOLUME`.
     #[must_use]
     pub fn get(&self, index: usize) -> u32 {
         match self.palette() {
@@ -151,7 +155,7 @@ impl<T: SectionType> SectionData<T> {
     /// Set the value at the given index.
     ///
     /// # Panics
-    /// Panics if the index is over `4096`.
+    /// Panics if the index is over `T::VOLUME`.
     pub fn set(&mut self, index: usize, value: u32) -> u32 {
         let previous = self.get(index);
 
@@ -162,9 +166,9 @@ impl<T: SectionType> SectionData<T> {
                 if item != value {
                     *self.bits_mut() = 1;
                     *self.palette_mut() = SectionPalette::Vector(vec![item, value]);
-                    *self.raw_data_mut() = BitVec::repeat(false, Section::VOLUME);
+                    *self.raw_data_mut() = BitVec::repeat(false, T::VOLUME);
                     // Set the new value.
-                    self.slice_at_mut(index).store(value);
+                    self.slice_at_mut(index).store(1);
                 }
             }
             SectionPalette::Vector(items) => {
@@ -218,12 +222,12 @@ impl<T: SectionType> SectionData<T> {
             return;
         }
 
-        let mut new_data = BitVec::repeat(false, Section::VOLUME * required);
+        let mut new_data = BitVec::repeat(false, T::VOLUME * required);
         {
-            for index in 0..Section::VOLUME {
+            for index in 0..T::VOLUME {
                 let old = Self::slice_of(self.bits, &self.data, index);
                 let new = Self::slice_of_mut(required, &mut new_data, index);
-                new[0..required - 1].copy_from_bitslice(old);
+                new[required - 1 - self.bits..required - 1].copy_from_bitslice(old);
             }
         }
 
@@ -249,12 +253,12 @@ impl<T: SectionType> SectionData<T> {
 
         // Expand the data to the required number of bits,
         // while converting the data to use a global palette.
-        let mut new_data = BitVec::repeat(false, Section::VOLUME * required);
+        let mut new_data = BitVec::repeat(false, T::VOLUME * required);
         {
-            for index in 0..Section::VOLUME {
+            for index in 0..T::VOLUME {
                 let new = Self::slice_of_mut(required, &mut new_data, index);
                 let old = self.slice_at(index);
-                new[0..required - 1].store(items[old.load::<usize>()]);
+                new[required - 1 - self.bits..required - 1].store(items[old.load::<usize>()]);
             }
         }
 
@@ -269,7 +273,7 @@ impl<T: SectionType> SectionData<T> {
     /// Get a reference to the entry at the given index.
     ///
     /// # Panics
-    /// Panics if the index is over `4096`,
+    /// Panics if the index is over `T::VOLUME`,
     /// or if the [`SectionPalette`] is [`SectionPalette::Single`]
     #[inline]
     #[must_use]
@@ -280,7 +284,7 @@ impl<T: SectionType> SectionData<T> {
     /// Get a mutable reference to the entry at the given index.
     ///
     /// # Panics
-    /// Panics if the index is over `4096`,
+    /// Panics if the index is over `T::VOLUME`,
     /// or if the [`SectionPalette`] is [`SectionPalette::Single`]
     #[inline]
     #[must_use]
@@ -291,7 +295,7 @@ impl<T: SectionType> SectionData<T> {
     /// Get a reference to the entry at the given index.
     ///
     /// # Panics
-    /// Panics if the index is over `4096`,
+    /// Panics if the index is over `T::VOLUME`,
     /// or if the [`SectionPalette`] is [`SectionPalette::Single`]
     #[must_use]
     fn slice_of(
@@ -299,7 +303,7 @@ impl<T: SectionType> SectionData<T> {
         data: &BitVec<u64, LocalBits>,
         index: usize,
     ) -> &BitSlice<u64, LocalBits> {
-        debug_assert!(index < Section::VOLUME);
+        debug_assert!(index < T::VOLUME);
 
         let range = Self::slice_range(bits, index);
         data.get(range).unwrap_or_else(|| {
@@ -318,7 +322,7 @@ impl<T: SectionType> SectionData<T> {
         data: &mut BitVec<u64, LocalBits>,
         index: usize,
     ) -> &mut BitSlice<u64, LocalBits> {
-        debug_assert!(index < Section::VOLUME);
+        debug_assert!(index < T::VOLUME);
 
         let range = Self::slice_range(bits, index);
         data.get_mut(range).unwrap_or_else(|| {
@@ -361,13 +365,15 @@ fn slice() {
 
 #[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-pub struct Biome;
+pub struct Block;
 
-impl SectionType for Biome {
+impl SectionType for Block {
+    const QUANTIZATION: usize = 1;
+
     fn palette_for(bits: usize) -> SectionPalette {
         match bits {
             0 => SectionPalette::Single(0u32),
-            1..=3 => SectionPalette::Vector(Vec::new()),
+            1..=8 => SectionPalette::Vector(Vec::new()),
             _ => SectionPalette::Global,
         }
     }
@@ -375,13 +381,15 @@ impl SectionType for Biome {
 
 #[derive(Default, Clone, Copy)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-pub struct Block;
+pub struct Biome;
 
-impl SectionType for Block {
+impl SectionType for Biome {
+    const QUANTIZATION: usize = 4;
+
     fn palette_for(bits: usize) -> SectionPalette {
         match bits {
             0 => SectionPalette::Single(0u32),
-            1..=8 => SectionPalette::Vector(Vec::new()),
+            1..=3 => SectionPalette::Vector(Vec::new()),
             _ => SectionPalette::Global,
         }
     }
@@ -395,6 +403,10 @@ mod sealed {
 
     /// A type of [`Section`] storage.
     pub(crate) trait SectionType: Default + Clone + Send + Sync + 'static {
+        const VOLUME: usize =
+            Section::VOLUME / Self::QUANTIZATION / Self::QUANTIZATION / Self::QUANTIZATION;
+        const QUANTIZATION: usize;
+
         /// Get a [`SectionPalette`] for this number of bits.
         fn palette_for(bits: usize) -> SectionPalette;
 
