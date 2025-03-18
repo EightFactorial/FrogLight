@@ -41,7 +41,7 @@ bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
 froglight-inventory = { workspace = true, optional = true, features = ["io"] }
 froglight-nbt = { workspace = true, optional = true, features = ["io"] }
-hickory-resolver = { version = "0.24", optional = true, default-features = false, features = [
+hickory-resolver = { version = "0.25", optional = true, default-features = false, features = [
   "system-config",
   "rustls",
 ] }
