@@ -33,7 +33,7 @@ smallvec = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = ["glam", "smallvec", "uuid"]
+default = ["glam", "hashbrown", "smallvec", "uuid"]
 
 # Enable support for `glam` types.
 glam = ["dep:glam"]

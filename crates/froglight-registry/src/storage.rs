@@ -15,8 +15,7 @@ use froglight_nbt::{
     nbt::{NbtCompound, UnnamedNbt},
     prelude::ConvertNbt,
 };
-use hashbrown::Equivalent;
-use indexmap::IndexMap;
+use indexmap::{Equivalent, IndexMap};
 use parking_lot::RwLock;
 
 use crate::traits::{RegistryType, RegistryValue};

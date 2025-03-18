@@ -1,5 +1,9 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::prelude::*;
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use derive_more::Display;
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
@@ -10,6 +14,8 @@ use super::BlockPos;
 /// A chunk position in the world.
 #[repr(transparent)]
 #[derive(Debug, Display, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Default, PartialEq, Hash, Component))]
 pub struct ChunkPos(IVec2);
 
 impl ChunkPos {

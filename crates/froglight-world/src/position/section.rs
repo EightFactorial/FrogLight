@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use glam::IVec3;
 
 use super::BlockPos;
@@ -11,6 +13,7 @@ use crate::chunk::Section;
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "io", derive(froglight_io::prelude::FrogBuf))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq, Hash))]
 pub struct SectionBlockPos(u16);
 
 impl SectionBlockPos {

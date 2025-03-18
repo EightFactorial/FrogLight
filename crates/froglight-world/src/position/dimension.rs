@@ -1,3 +1,5 @@
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use froglight_common::prelude::Identifier;
 
 use super::BlockPos;
@@ -5,6 +7,7 @@ use super::BlockPos;
 /// A position in a specific dimension.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "io", derive(froglight_io::prelude::FrogBuf))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
 pub struct DimensionPos {
     dim: Identifier,
     pos: BlockPos,

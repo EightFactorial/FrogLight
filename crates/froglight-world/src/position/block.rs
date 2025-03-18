@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use derive_more::Display;
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
@@ -8,6 +10,7 @@ use glam::IVec3;
 /// A block position in the world.
 #[repr(transparent)]
 #[derive(Debug, Display, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq, Hash))]
 pub struct BlockPos(IVec3);
 
 impl BlockPos {

@@ -21,7 +21,7 @@ async-io = { workspace = true }
 async-net = { workspace = true }
 blocking = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
-froglight-io = { workspace = true, features = ["hashbrown", "serde"] }
+froglight-io = { workspace = true, features = ["serde"] }
 froglight-macros = { workspace = true, features = ["network"] }
 froglight-player = { workspace = true, features = ["io"] }
 futures-lite = { workspace = true }

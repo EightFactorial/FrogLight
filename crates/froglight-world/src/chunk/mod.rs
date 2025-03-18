@@ -1,5 +1,9 @@
 //! [`Chunk`], [`ChunkStorage`], [`Section`], and [`SectionData`].
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::prelude::*;
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 #[cfg(feature = "block")]
 use froglight_block::{prelude::*, resolve::BlockResolver};
 #[cfg(feature = "io")]
@@ -7,7 +11,7 @@ use froglight_io::prelude::*;
 #[cfg(feature = "nbt")]
 use froglight_nbt::nbt::UnnamedNbt;
 #[cfg(feature = "nbt")]
-use hashbrown::HashMap;
+use hashbrown::hash_map::{DefaultHashBuilder, Entry, HashMap};
 
 #[cfg(feature = "nbt")]
 mod entity;
@@ -31,6 +35,8 @@ use crate::prelude::BlockPos;
 mod test;
 
 /// A chunk of the world.
+#[derive(Clone)]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect), reflect(Component))]
 pub struct Chunk {
     storage: ChunkStorage,
     #[cfg(feature = "nbt")]
@@ -196,8 +202,7 @@ impl Chunk {
     pub fn block_data_entry(
         &mut self,
         pos: BlockPos,
-    ) -> hashbrown::hash_map::Entry<'_, RelativeBlockPos, PackedEntity, hashbrown::DefaultHashBuilder>
-    {
+    ) -> Entry<'_, RelativeBlockPos, PackedEntity, DefaultHashBuilder> {
         self.block_data.entry(RelativeBlockPos::from_block(pos, self.storage.height_min()))
     }
 }

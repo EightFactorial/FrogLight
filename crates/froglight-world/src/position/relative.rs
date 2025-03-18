@@ -1,5 +1,7 @@
 use std::ops::{Add, AddAssign, Sub, SubAssign};
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
 use glam::U8Vec2;
@@ -9,6 +11,8 @@ use crate::chunk::Section;
 
 /// A relative position in a [`Chunk`](crate::chunk::Chunk).
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Default, PartialEq, Hash))]
 pub struct RelativeBlockPos(U8Vec2, u16);
 
 impl RelativeBlockPos {

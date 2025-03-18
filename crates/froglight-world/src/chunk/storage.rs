@@ -5,6 +5,7 @@ use crate::{position::SectionBlockPos, prelude::BlockPos};
 
 /// A vertical slice of the world.
 #[derive(Clone)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub enum ChunkStorage {
     /// A large chunk.
     ///
@@ -227,6 +228,7 @@ impl ChunkStorage {
 /// 1. It guarantees that the number of sections is always correct.
 /// 2. It prevents unnecessary bounds checks when accessing the array.
 #[derive(Clone, From, Into)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(opaque))]
 pub struct ArrayChunkStorage<const SECTIONS: usize, const OFFSET: isize>(Box<[Section; SECTIONS]>);
 
 impl<const SECTIONS: usize, const OFFSET: isize> ArrayChunkStorage<SECTIONS, OFFSET> {
@@ -284,6 +286,7 @@ impl<const SECTIONS: usize, const OFFSET: isize> TryFrom<Vec<Section>>
 ///
 /// Has a variable number of sections and a known offset.
 #[derive(Clone)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct VecChunkStorage(Vec<Section>, isize);
 
 impl VecChunkStorage {

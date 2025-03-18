@@ -12,6 +12,7 @@ use crate::position::SectionBlockPos;
 /// Contains both block and biome data.
 #[derive(Default, Clone)]
 #[cfg_attr(feature = "io", derive(FrogBuf))]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct Section {
     /// The number of non-air blocks in the section.
     solid: u32,
@@ -82,8 +83,9 @@ impl Section {
 /// A bit-packed cube of world data.
 ///
 /// Contains either [`Block`] or [`Biome`] data.
-#[derive(Default, Clone)]
 #[expect(private_bounds)]
+#[derive(Default, Clone)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(opaque))]
 pub struct SectionData<T: SectionType> {
     bits: usize,
     palette: SectionPalette,
@@ -358,6 +360,7 @@ fn slice() {
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct Biome;
 
 impl SectionType for Biome {
@@ -371,6 +374,7 @@ impl SectionType for Biome {
 }
 
 #[derive(Default, Clone, Copy)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct Block;
 
 impl SectionType for Block {
