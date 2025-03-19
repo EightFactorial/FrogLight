@@ -7,6 +7,8 @@ use froglight_common::version::Version;
 use super::InventorySlot;
 
 /// A player's inventory.
+///
+/// Includes the player's inventory, hotbar, and the item held by the cursor.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
 #[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
@@ -111,10 +113,14 @@ impl<V: Version> PlayerInventory<V> {
     pub fn cursor_mut(&mut self) -> &mut InventorySlot<V> { &mut self.cursor }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// A player's inventory crafting menu.
+///
+/// Include's the player's crafting slots and offhand slot.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
-#[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
+#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Default, PartialEq, Component))]
 pub struct PlayerInventoryMenu<V: Version> {
     crafting_result: InventorySlot<V>,
     crafting: [InventorySlot<V>; 4],
