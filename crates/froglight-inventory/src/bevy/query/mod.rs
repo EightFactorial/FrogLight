@@ -23,7 +23,7 @@ pub trait InventoryRequest<
     /// Data required to access a specific inventory.
     type Accessor;
     /// The result of accessing the inventory.
-    type Result<'a>;
+    type Result<'access>;
 
     /// Access the inventory.
     fn access<'request: 'access, 'access>(
@@ -38,12 +38,12 @@ pub trait InventoryRequest<
 /// A marker for the access level of an [`InventoryRequest`].
 pub trait InventoryMarker<Type>: 'static {
     /// The component type for the marker.
-    type Component<'request>
-    where Type: Component + 'request;
+    type Component<'a>: AsRef<Type>
+    where Type: Component + 'a;
 
     /// The reference type for the marker.
-    type Reference<'request>
-    where Type: 'request;
+    type Reference<'a>
+    where Type: 'a;
 }
 
 /// A marker for access to an inventory.
@@ -52,13 +52,13 @@ pub trait InventoryMarker<Type>: 'static {
 pub struct ReadOnly;
 impl<Type> InventoryMarker<Type> for ReadOnly {
     /// The component type for the marker.
-    type Component<'request>
-        = Ref<'request, Type>
-    where Type: Component + 'request;
+    type Component<'a>
+        = Ref<'a, Type>
+    where Type: Component + 'a;
     /// The reference type for the marker.
-    type Reference<'request>
-        = &'request Type
-    where Type: 'request;
+    type Reference<'a>
+        = &'a Type
+    where Type: 'a;
 }
 
 /// A marker for mutable access to an inventory.
@@ -67,13 +67,13 @@ impl<Type> InventoryMarker<Type> for ReadOnly {
 pub struct Mutable;
 impl<Type> InventoryMarker<Type> for Mutable {
     /// The component type for the marker.
-    type Component<'request>
-        = Mut<'request, Type>
-    where Type: Component + 'request;
+    type Component<'a>
+        = Mut<'a, Type>
+    where Type: Component + 'a;
     /// The reference type for the marker.
-    type Reference<'request>
-        = &'request mut Type
-    where Type: 'request;
+    type Reference<'a>
+        = &'a mut Type
+    where Type: 'a;
 }
 
 // -------------------------------------------------------------------------------------------------

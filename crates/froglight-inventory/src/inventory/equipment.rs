@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut};
+
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
@@ -71,4 +73,23 @@ impl<V: Version> EntityEquipment<V> {
     #[inline]
     #[must_use]
     pub fn feet_mut(&mut self) -> &mut InventorySlot<V> { &mut self.0[3] }
+}
+
+impl<V: Version> Index<usize> for EntityEquipment<V> {
+    type Output = InventorySlot<V>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        match index {
+            index @ 0..=3 => &self.0[index],
+            _ => panic!("`EntityEquipment` index out of bounds"),
+        }
+    }
+}
+impl<V: Version> IndexMut<usize> for EntityEquipment<V> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            index @ 0..=3 => &mut self.0[index],
+            _ => panic!("`EntityEquipment` index out of bounds"),
+        }
+    }
 }
