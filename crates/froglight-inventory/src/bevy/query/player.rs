@@ -76,6 +76,18 @@ fn player_inventory_menu() {
     use bevy_ecs::{prelude::*, system::SystemState};
     use froglight_common::version::V1_21_4;
 
+    /// Example system that uses `PlayerInventoryMenu`.
+    #[expect(dead_code)]
+    fn example(_inv: Inventory<PlayerInventoryMenu<V1_21_4>>) {
+        // Whatever you want to do with inventories.
+    }
+
+    /// Example system that uses a filter with `PlayerInventoryMenu`.
+    #[expect(dead_code)]
+    fn example_filter(_inv: Inventory<PlayerInventoryMenu<V1_21_4>, With<Observer>>) {
+        // Whatever you want to do with inventories.
+    }
+
     let mut world = World::new();
     world.init_resource::<Dummy>();
 
