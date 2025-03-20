@@ -42,6 +42,28 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     /// ```
     fn identifier(&self) -> &'static Identifier;
 
+    /// The default NBT of the item.
+    ///
+    /// ```rust
+    /// use froglight_item::{
+    ///     generated::item::Air,
+    ///     item::{ItemType, ItemTypeExt, StaticItem},
+    /// };
+    /// use froglight_nbt::nbt::UnnamedNbt;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // Accessing the  default NBT through the `ItemType` trait.
+    ///     let _nbt = Air::as_static().default_nbt();
+    ///
+    ///     // Accessing the constant default NBT through the `ItemTypeExt` trait.
+    ///     let _nbt = <Air as ItemTypeExt<V1_21_4>>::default_nbt();
+    /// }
+    /// ```
+    fn default_nbt(&self) -> UnnamedNbt;
+
     /// The rarity of the item.
     ///
     /// ```rust
@@ -71,8 +93,8 @@ pub trait ItemTypeExt<V: Version>: ItemType<V> + StaticItem {
     /// The rarity of the item.
     const RARITY: ItemRarity;
 
-    /// Get the default data of the item.
-    fn default_data() -> UnnamedNbt;
+    /// Get the default NBT of the item.
+    fn default_nbt() -> UnnamedNbt;
 }
 
 use sealed::MaybeReflect;

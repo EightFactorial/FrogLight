@@ -24,6 +24,22 @@ impl<I: ItemTypeExt<V>, V: Version> Item<I, V> {
     #[must_use]
     pub(crate) const fn new(data: UnnamedNbt) -> Self { Self { data, _phantom: PhantomData } }
 
+    /// Get the default data of the [`UntypedItem`].
+    ///
+    /// ```rust
+    /// use froglight_item::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     let _data = Item::<item::Air, V1_21_4>::const_default_nbt();
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn const_default_nbt() -> UnnamedNbt { <I as ItemTypeExt<V>>::default_nbt() }
+
     /// Get the identifier of the [`Item`].
     ///
     /// ```rust
@@ -55,6 +71,28 @@ impl<I: ItemTypeExt<V>, V: Version> Item<I, V> {
     #[inline]
     #[must_use]
     pub const fn const_rarity() -> ItemRarity { I::RARITY }
+
+    /// Get the default data of the [`Item`].
+    ///
+    /// Matches [`UntypedItem::default_nbt`] for consistency.
+    ///
+    /// If you need access without a `self` reference, see
+    /// [`Item::const_default_nbt`] or [`ItemTypeExt::default_nbt`].
+    ///
+    /// ```rust
+    /// use froglight_item::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     let item = Item::<item::Air, V1_21_4>::default();
+    ///     let _data = item.default_nbt();
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn default_nbt(&self) -> UnnamedNbt { <I as ItemTypeExt<V>>::default_nbt() }
 
     /// Get the internal [`UnnamedNbt`] of the [`Item`].
     ///
@@ -161,7 +199,7 @@ impl<I: ItemTypeExt<V>, V: Version> Item<I, V> {
 }
 
 impl<I: ItemTypeExt<V>, V: Version> Default for Item<I, V> {
-    fn default() -> Self { Self::new(I::default_data()) }
+    fn default() -> Self { Self::new(<I as ItemTypeExt<V>>::default_nbt()) }
 }
 
 impl<I: ItemTypeExt<V>, V: Version> TryFrom<UntypedItem<V>> for Item<I, V> {
@@ -195,6 +233,23 @@ impl<V: Version> UntypedItem<V> {
     #[inline]
     #[must_use]
     pub(crate) const fn wrapper(&self) -> &ItemWrapper<V> { &self.wrapper }
+
+    /// Get the default data of the [`UntypedItem`].
+    ///
+    /// ```rust
+    /// use froglight_item::prelude::*;
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     let item = Item::<item::Air, V1_21_4>::default();
+    ///     let _data = item.into_untyped().default_nbt();
+    /// }
+    /// ```
+    #[inline]
+    #[must_use]
+    pub fn default_nbt(&self) -> UnnamedNbt { self.wrapper.default_nbt() }
 
     /// Get the internal [`UnnamedNbt`] of the [`UntypedItem`].
     ///
@@ -230,6 +285,11 @@ impl<V: Version> UntypedItem<V> {
     #[inline]
     #[must_use]
     pub const fn raw_data_mut(&mut self) -> &mut UnnamedNbt { &mut self.data }
+
+    /// Consume the [`UntypedItem`] and return it's internal [`UnnamedNbt`].
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> UnnamedNbt { self.data }
 
     /// Resolve the [`UntypedItem`] into a typed [`Item`].
     ///
@@ -345,7 +405,6 @@ impl<V: Version> std::fmt::Debug for UntypedItem<V> {
 impl<V: Version> Clone for UntypedItem<V> {
     fn clone(&self) -> Self { Self { data: self.data.clone(), wrapper: self.wrapper } }
 }
-impl<V: Version> Eq for UntypedItem<V> {}
 impl<V: Version> PartialEq for UntypedItem<V> {
     fn eq(&self, other: &Self) -> bool { self.data == other.data }
 }

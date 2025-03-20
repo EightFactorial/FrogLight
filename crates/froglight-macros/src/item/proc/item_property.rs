@@ -31,13 +31,17 @@ pub(crate) fn item_properties(input: TokenStream) -> TokenStream {
 
                     #[inline]
                     #[must_use]
+                    fn default_nbt(&self) -> #nbt_path::nbt::UnnamedNbt { <#item as #item_path::item::ItemTypeExt<#version>>::default_nbt() }
+
+                    #[inline]
+                    #[must_use]
                     fn rarity(&self) -> #item_path::item::ItemRarity { <#item as #item_path::item::ItemTypeExt<#version>>::RARITY }
                 }
                 #[automatically_derived]
                 impl #item_path::item::ItemTypeExt<#version> for #item {
                     const IDENTIFIER: &'static str = #ident;
                     const RARITY: #item_path::item::ItemRarity = #rarity;
-                    fn default_data() -> #nbt_path::nbt::UnnamedNbt { #nbt_path::nbt::UnnamedNbt::default() }
+                    fn default_nbt() -> #nbt_path::nbt::UnnamedNbt { #nbt_path::nbt::UnnamedNbt::default() }
                 }
             });
 

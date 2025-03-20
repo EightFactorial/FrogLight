@@ -3,8 +3,7 @@ use bevy_reflect::prelude::*;
 use derive_more::{From, Into};
 use indexmap::IndexMap;
 
-use super::NbtTag;
-use crate::mutf8::Mutf8String;
+use crate::{mutf8::Mutf8String, nbt::NbtTag};
 
 /// A map of named NBT tags.
 #[repr(transparent)]
@@ -28,6 +27,21 @@ impl NbtCompound {
     #[inline]
     #[must_use]
     pub fn is_empty(&self) -> bool { self.0.is_empty() }
+
+    /// Return `true` if the [`NbtCompound`] contains a tag with the given key.
+    #[inline]
+    #[must_use]
+    pub fn contains_key<Q: ?Sized + AsRef<str>>(&self, key: &Q) -> bool {
+        self.contains_key_bytes(key.as_ref().as_bytes())
+    }
+
+    /// Return `true` if the [`NbtCompound`] contains a tag with the given key's
+    /// bytes.
+    #[inline]
+    #[must_use]
+    pub fn contains_key_bytes<Q: ?Sized + AsRef<[u8]>>(&self, key: &Q) -> bool {
+        self.0.contains_key(key.as_ref())
+    }
 
     /// Get a reference to a [`NbtTag`] by it's key.
     #[inline]
@@ -154,6 +168,12 @@ impl NbtCompound {
     pub fn iter_mut(&mut self) -> indexmap::map::IterMut<Mutf8String, NbtTag> { self.0.iter_mut() }
 }
 
+impl std::iter::IntoIterator for NbtCompound {
+    type IntoIter = indexmap::map::IntoIter<Mutf8String, NbtTag>;
+    type Item = (Mutf8String, NbtTag);
+
+    fn into_iter(self) -> Self::IntoIter { self.0.into_iter() }
+}
 impl<'a> std::iter::IntoIterator for &'a NbtCompound {
     type IntoIter = indexmap::map::Iter<'a, Mutf8String, NbtTag>;
     type Item = (&'a Mutf8String, &'a NbtTag);

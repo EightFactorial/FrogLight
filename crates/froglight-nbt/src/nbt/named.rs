@@ -4,7 +4,7 @@ use derive_more::{From, Into};
 
 use crate::{
     mutf8::{Mutf8Str, Mutf8String},
-    nbt::NbtCompound,
+    nbt::{NbtCompound, NbtTag},
 };
 
 /// A named set of NBT tags.
@@ -128,6 +128,29 @@ impl UnnamedNbt {
     #[inline]
     #[must_use]
     pub fn into_inner(self) -> Option<NbtCompound> { self.0 }
+
+    /// Insert a new [`NbtTag`] into the [`UnnamedNbt`].
+    ///
+    /// Returns the previous value associated with the key, if any.
+    pub fn insert(&mut self, key: impl Into<Mutf8String>, value: NbtTag) -> Option<NbtTag> {
+        self.0.get_or_insert_default().insert(key.into(), value)
+    }
+
+    /// Returns `true` if the [`UnnamedNbt`] contains the specified key.
+    ///
+    /// Returns `false` if the [`UnnamedNbt`] is empty.
+    #[must_use]
+    pub fn contains_key(&self, key: &(impl AsRef<str> + ?Sized)) -> bool {
+        self.contains_key_bytes(key.as_ref().as_bytes())
+    }
+
+    /// Returns `true` if the [`UnnamedNbt`] contains the specified key.
+    ///
+    /// Returns `false` if the [`UnnamedNbt`] is empty.
+    #[must_use]
+    pub fn contains_key_bytes(&self, key: &(impl AsRef<[u8]> + ?Sized)) -> bool {
+        self.0.as_ref().is_some_and(|c| c.contains_key_bytes(key.as_ref()))
+    }
 
     /// Read an [`UnnamedNbt`] from a reader.
     ///

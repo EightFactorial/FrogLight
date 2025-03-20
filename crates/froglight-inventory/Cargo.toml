@@ -20,6 +20,8 @@ derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-item = { workspace = true }
 froglight-nbt = { workspace = true }
+hashbrown = { workspace = true }
+indexmap = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
@@ -32,7 +34,7 @@ froglight-world = { workspace = true, optional = true, features = ["nbt"] }
 default = []
 
 # Enable `froglight-io` support.
-io = ["dep:froglight-io"]
+io = ["dep:froglight-io", "froglight-nbt/io"]
 # Enable `froglight-world` support.
 world = ["dep:froglight-world"]
 

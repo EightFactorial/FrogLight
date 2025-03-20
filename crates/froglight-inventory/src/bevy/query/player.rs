@@ -19,14 +19,14 @@ impl<Filter: QueryFilter + 'static, V: Version> InventoryRequest<Filter, ReadOnl
         Ref<'static, EntityEquipment<V>>,
     );
     type Resource = Dummy;
-    type Result<'access> = PlayerInventoryRef<'access, V, ReadOnly>;
+    type Result<'a> = PlayerInventoryRef<'a, V, ReadOnly>;
 
-    fn access<'request: 'access, 'access>(
+    fn access<'a>(
         (): (),
-        (inventory, menu, equipment): <Self::Query as WorldQuery>::Item<'request>,
+        (inventory, menu, equipment): <Self::Query as WorldQuery>::Item<'a>,
         _: &Dummy,
-    ) -> Self::Result<'access> {
-        PlayerInventoryRef { inventory, menu, equipment }
+    ) -> Self::Result<'a> {
+        PlayerInventoryRef::new(inventory, menu, equipment)
     }
 }
 
@@ -40,14 +40,14 @@ impl<Filter: QueryFilter + 'static, V: Version> InventoryRequest<Filter, Mutable
         Mut<'static, EntityEquipment<V>>,
     );
     type Resource = Dummy;
-    type Result<'access> = PlayerInventoryRef<'access, V, Mutable>;
+    type Result<'a> = PlayerInventoryRef<'a, V, Mutable>;
 
-    fn access<'request: 'access, 'access>(
+    fn access<'a>(
         (): (),
-        (inventory, menu, equipment): <Self::Query as WorldQuery>::Item<'request>,
+        (inventory, menu, equipment): <Self::Query as WorldQuery>::Item<'a>,
         _: &mut Dummy,
-    ) -> Self::Result<'access> {
-        PlayerInventoryRef { inventory, menu, equipment }
+    ) -> Self::Result<'a> {
+        PlayerInventoryRef::new(inventory, menu, equipment)
     }
 }
 
@@ -57,21 +57,31 @@ impl<Filter: QueryFilter + 'static, V: Version> InventoryRequest<Filter, Mutable
 ///
 /// This is used to access the player's inventory, hotbar,
 /// cursor item, crafting grid, and equipment.
-pub struct PlayerInventoryRef<'access, V: Version, Marker>
+pub struct PlayerInventoryRef<'a, V: Version, Marker>
 where Marker: InventoryMarker<PlayerInventory<V>>
         + InventoryMarker<PlayerInventoryMenu<V>>
         + InventoryMarker<EntityEquipment<V>>
 {
-    inventory: <Marker as InventoryMarker<PlayerInventory<V>>>::Component<'access>,
-    menu: <Marker as InventoryMarker<PlayerInventoryMenu<V>>>::Component<'access>,
-    equipment: <Marker as InventoryMarker<EntityEquipment<V>>>::Component<'access>,
+    inventory: <Marker as InventoryMarker<PlayerInventory<V>>>::Component<'a>,
+    menu: <Marker as InventoryMarker<PlayerInventoryMenu<V>>>::Component<'a>,
+    equipment: <Marker as InventoryMarker<EntityEquipment<V>>>::Component<'a>,
 }
 
-impl<V: Version, Marker> PlayerInventoryRef<'_, V, Marker>
+impl<'a, V: Version, Marker> PlayerInventoryRef<'a, V, Marker>
 where Marker: InventoryMarker<PlayerInventory<V>>
         + InventoryMarker<PlayerInventoryMenu<V>>
         + InventoryMarker<EntityEquipment<V>>
 {
+    /// Create a new [`PlayerInventoryRef`].
+    #[must_use]
+    pub const fn new(
+        inventory: <Marker as InventoryMarker<PlayerInventory<V>>>::Component<'a>,
+        menu: <Marker as InventoryMarker<PlayerInventoryMenu<V>>>::Component<'a>,
+        equipment: <Marker as InventoryMarker<EntityEquipment<V>>>::Component<'a>,
+    ) -> Self {
+        Self { inventory, menu, equipment }
+    }
+
     /// Access the player's [`PlayerInventory`].
     #[must_use]
     pub fn inventory(&self) -> &PlayerInventory<V> { self.inventory.as_ref() }

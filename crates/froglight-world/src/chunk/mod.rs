@@ -209,7 +209,7 @@ impl Chunk {
 
 // -------------------------------------------------------------------------------------------------
 
-#[cfg(all(feature = "io", feature = "nbt"))]
+#[cfg(feature = "io")]
 impl Chunk {
     /// Read the data from the given buffer.
     ///
@@ -228,7 +228,7 @@ impl Chunk {
     }
 }
 
-#[cfg(all(feature = "io", feature = "nbt"))]
+#[cfg(feature = "io")]
 impl FrogWrite for Chunk {
     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
         let mut written = 0;

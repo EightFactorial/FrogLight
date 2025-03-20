@@ -23,14 +23,14 @@ pub trait InventoryRequest<
     /// Data required to access a specific inventory.
     type Accessor;
     /// The result of accessing the inventory.
-    type Result<'access>;
+    type Result<'a>;
 
     /// Access the inventory.
-    fn access<'request: 'access, 'access>(
+    fn access<'a>(
         accessor: Self::Accessor,
-        query: <Self::Query as WorldQuery>::Item<'request>,
-        resource: <Marker as InventoryMarker<Self::Resource>>::Reference<'request>,
-    ) -> Self::Result<'access>;
+        query: <Self::Query as WorldQuery>::Item<'a>,
+        resource: <Marker as InventoryMarker<Self::Resource>>::Reference<'a>,
+    ) -> Self::Result<'a>;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -98,7 +98,7 @@ pub struct Inventory<
     resource: Res<'w, <Type as InventoryRequest<Filter, ReadOnly>>::Resource>,
 }
 
-impl<'request, Type: InventoryRequest<Filter, ReadOnly>, Filter: QueryFilter + 'static>
+impl<'a, Type: InventoryRequest<Filter, ReadOnly>, Filter: QueryFilter + 'static>
     Inventory<'_, '_, Type, Filter>
 where Type::Query: ReadOnlyQueryData
 {
@@ -107,10 +107,10 @@ where Type::Query: ReadOnlyQueryData
     /// # Errors
     /// Returns an error if the entity does not have the required inventory.
     pub fn get(
-        &'request self,
+        &'a self,
         entity: Entity,
         data: Type::Accessor,
-    ) -> Result<Type::Result<'request>, QueryEntityError<'request>> {
+    ) -> Result<Type::Result<'a>, QueryEntityError<'a>> {
         self.query.get(entity).map(|queried| Type::access(data, queried, &self.resource))
     }
 }
@@ -130,7 +130,7 @@ pub struct InventoryMut<
 }
 
 impl<
-    'request,
+    'a,
     Type: InventoryRequest<
             Filter,
             Mutable,
@@ -138,19 +138,19 @@ impl<
         > + InventoryRequest<Filter, ReadOnly>,
     Filter: QueryFilter + 'static,
 > InventoryMut<'_, '_, Type, Filter>
-where <<<Type as InventoryRequest<Filter, Mutable>>::Query as QueryData>::ReadOnly as WorldQuery>::Item<'request>: Into<<<Type as InventoryRequest<Filter, ReadOnly>>::Query as WorldQuery>::Item<'request>>
+where <<<Type as InventoryRequest<Filter, Mutable>>::Query as QueryData>::ReadOnly as WorldQuery>::Item<'a>: Into<<<Type as InventoryRequest<Filter, ReadOnly>>::Query as WorldQuery>::Item<'a>>
 {
     /// Get the inventory of an [`Entity`].
     ///
     /// # Errors
     /// Returns an error if the entity does not have the required inventory.
     pub fn get(
-        &'request self,
+        &'a self,
         entity: Entity,
         data: <Type as InventoryRequest<Filter, ReadOnly>>::Accessor,
     ) -> Result<
-        <Type as InventoryRequest<Filter, ReadOnly>>::Result<'request>,
-        QueryEntityError<'request>,
+        <Type as InventoryRequest<Filter, ReadOnly>>::Result<'a>,
+        QueryEntityError<'a>,
     > {
         self.query.get(entity).map(|queried| {
             <Type as InventoryRequest<Filter, ReadOnly>>::access(
@@ -162,7 +162,7 @@ where <<<Type as InventoryRequest<Filter, Mutable>>::Query as QueryData>::ReadOn
     }
 }
 
-impl<'request, Type: InventoryRequest<Filter, Mutable>, Filter: QueryFilter + 'static>
+impl<'a, Type: InventoryRequest<Filter, Mutable>, Filter: QueryFilter + 'static>
     InventoryMut<'_, '_, Type, Filter>
 {
     /// Get the inventory of an [`Entity`] mutably.
@@ -170,10 +170,10 @@ impl<'request, Type: InventoryRequest<Filter, Mutable>, Filter: QueryFilter + 's
     /// # Errors
     /// Returns an error if the entity does not have the required inventory.
     pub fn get_mut(
-        &'request mut self,
+        &'a mut self,
         entity: Entity,
         data: Type::Accessor,
-    ) -> Result<Type::Result<'request>, QueryEntityError<'request>> {
+    ) -> Result<Type::Result<'a>, QueryEntityError<'a>> {
         self.query.get_mut(entity).map(|queried| Type::access(data, queried, &mut self.resource))
     }
 }

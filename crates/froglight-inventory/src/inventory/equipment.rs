@@ -6,10 +6,10 @@ use bevy_ecs::prelude::*;
 use bevy_reflect::prelude::*;
 use froglight_common::version::Version;
 
-use super::InventorySlot;
+use crate::slot::InventorySlot;
 
 /// A entity's equipment.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
 #[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
 pub struct EntityEquipment<V: Version>([InventorySlot<V>; 4]);

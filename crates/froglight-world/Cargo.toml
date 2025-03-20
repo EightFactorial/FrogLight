@@ -39,7 +39,7 @@ default = ["nbt"]
 # Enable `froglight-block` support
 block = ["dep:froglight-block"]
 # Enable `froglight-io` support
-io = ["dep:froglight-io", "froglight-nbt?/io"]
+io = ["dep:froglight-io", "froglight-nbt/io", "nbt"]
 # Enable `froglight-nbt` support
 nbt = ["dep:froglight-nbt"]
 
