@@ -1,8 +1,8 @@
 //! A raw connection to a client or server.
+#![allow(clippy::manual_async_fn)]
 
 use std::{
     future::Future,
-    io::Cursor,
     net::SocketAddr,
     sync::{
         Arc,
@@ -11,21 +11,23 @@ use std::{
 };
 
 use async_net::TcpStream;
+use froglight_common::version::Version;
 use froglight_io::{
-    standard::{FrogRead, FrogWrite, ReadError, WriteError},
-    variable::{FrogVarRead, FrogVarWrite},
+    prelude::*,
+    version::{FrogReadVersion, FrogWriteVersion},
 };
-use futures_lite::{AsyncReadExt, AsyncWriteExt};
 use smol_str::SmolStr;
+
+use super::io::{read_type, read_type_version, write_type, write_type_version};
 
 /// A low-level connection to a server.
 ///
 /// Can be used to read and write data directly.
 #[derive(Debug)]
 pub struct RawConnection {
-    address: SmolStr,
-    stream: TcpStream,
-    compression: Arc<AtomicI32>,
+    pub(super) address: SmolStr,
+    pub(super) stream: TcpStream,
+    pub(super) compression: Arc<AtomicI32>,
 }
 
 impl RawConnection {
@@ -122,6 +124,20 @@ impl RawConnection {
         read_type(self)
     }
 
+    /// Read a value from the connection.
+    ///
+    /// # Warning
+    /// There are is no guarantee that type being read is the same
+    /// as the type being written!
+    ///
+    /// This is a low-level API.
+    #[inline]
+    pub fn read_version<'a, T: FrogReadVersion<V> + Send + Sync + 'a, V: Version>(
+        &'a mut self,
+    ) -> impl Future<Output = Result<T, ReadError>> + Send + Sync + 'a {
+        read_type_version(self)
+    }
+
     /// Write a value to the connection.
     ///
     /// # Warning
@@ -135,6 +151,21 @@ impl RawConnection {
         val: &'a T,
     ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
         write_type(self, val)
+    }
+
+    /// Write a value to the connection.
+    ///
+    /// # Warning
+    /// There are is no guarantee that type being written is the same
+    /// as the type being read!
+    ///
+    /// This is a low-level API.
+    #[inline]
+    pub fn write_version<'a, T: FrogWriteVersion<V> + Send + Sync, V: Version>(
+        &'a mut self,
+        val: &'a T,
+    ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
+        write_type_version(self, val)
     }
 
     /// Split the [`RawConnection`] into a
@@ -173,6 +204,8 @@ impl RawConnection {
         Self { address: write.0.address, stream: write.0.stream, compression: write.0.compression }
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A low-level read-only connection to a server.
 ///
@@ -213,7 +246,23 @@ impl RawReadConnection {
     ) -> impl Future<Output = Result<T, ReadError>> + Send + Sync + 'a {
         read_type(&mut self.0)
     }
+
+    /// Read a value from the connection.
+    ///
+    /// # Warning
+    /// There are is no guarantee that type being read is the same
+    /// as the type being written!
+    ///
+    /// This is a low-level API.
+    #[inline]
+    pub fn read_version<'a, T: FrogReadVersion<V> + Send + Sync + 'a, V: Version>(
+        &'a mut self,
+    ) -> impl Future<Output = Result<T, ReadError>> + Send + Sync + 'a {
+        read_type_version(&mut self.0)
+    }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A low-level write-only connection to a server.
 ///
@@ -255,50 +304,19 @@ impl RawWriteConnection {
     ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
         write_type(&mut self.0, val)
     }
-}
 
-/// TODO: Decryption
-async fn read_type<T: FrogRead>(raw: &mut RawConnection) -> Result<T, ReadError> {
-    let mut len_buf = [0u8; 5];
-    raw.stream.peek(&mut len_buf).await?;
-    let mut len_cursor = Cursor::new(len_buf.as_slice());
-
-    #[expect(clippy::cast_possible_truncation)]
-    let mut packet_buf: Vec<u8> =
-        Vec::with_capacity(usize::frog_var_read(&mut len_cursor)? + len_cursor.position() as usize);
-    raw.stream.read_exact(packet_buf.as_mut_slice()).await?;
-
-    #[expect(clippy::cast_possible_truncation)]
-    let mut packet_cursor = Cursor::new(&packet_buf[len_cursor.position() as usize..]);
-    if raw.compression().is_some_and(|c| c >= 0) && 0 != u32::frog_var_read(&mut packet_cursor)? {
-        unimplemented!("Packet Decompression")
-    } else {
-        T::frog_read(&mut packet_cursor)
-    }
-}
-
-/// TODO: Encryption
-async fn write_type<T: FrogWrite + Send + Sync>(
-    raw: &mut RawConnection,
-    val: &T,
-) -> Result<(), WriteError> {
-    let packet_len = val.frog_len();
-    let prefixed_len = packet_len + packet_len.frog_var_len();
-
-    let compression = raw.compression();
-    if compression.is_some_and(|c| i32::try_from(prefixed_len).unwrap_or_default() >= c) {
-        unimplemented!("Packet Compression");
-    } else {
-        let mut buf = Vec::with_capacity(prefixed_len);
-
-        if compression.is_some() {
-            (packet_len + 1).frog_var_write(&mut buf)?;
-            u8::frog_write(&0, &mut buf)?;
-        } else {
-            packet_len.frog_var_write(&mut buf)?;
-        }
-
-        val.frog_write(&mut buf)?;
-        raw.stream.write_all(&buf).await.map_err(WriteError::Io)
+    /// Write a value to the connection.
+    ///
+    /// # Warning
+    /// There are is no guarantee that type being written is the same
+    /// as the type being read!
+    ///
+    /// This is a low-level API.
+    #[inline]
+    pub fn write_version<'a, T: FrogWriteVersion<V> + Send + Sync, V: Version>(
+        &'a mut self,
+        val: &'a T,
+    ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
+        write_type_version(&mut self.0, val)
     }
 }

@@ -6,7 +6,11 @@
 
 use std::{fmt::Debug, future::Future, hash::Hash, marker::PhantomData, net::SocketAddr};
 
-use froglight_io::prelude::{FrogRead, FrogWrite, ReadError, WriteError};
+use froglight_common::version::Version;
+use froglight_io::{
+    prelude::{ReadError, WriteError},
+    version::{FrogReadVersion, FrogWriteVersion},
+};
 
 use crate::{
     connection::raw::{RawConnection, RawReadConnection, RawWriteConnection},
@@ -18,12 +22,16 @@ pub type ClientConnection<V, S> = StateConnection<V, S, Client>;
 /// A connection from a server to a client.
 pub type ServerConnection<V, S> = StateConnection<V, S, Server>;
 
+// -------------------------------------------------------------------------------------------------
+
 /// A connection type, either [`Client`] or a [`Server`].
-pub trait ConnectionType<V, S>: Debug + Default + Copy + Eq + Hash + Send + Sync + 'static {
+pub trait ConnectionType<V: Version, S>:
+    Debug + Default + Copy + Eq + Hash + Send + Sync + 'static
+{
     /// The type of data sent on this connection.
-    type Send: FrogWrite + Send + Sync + 'static;
+    type Send: FrogWriteVersion<V> + Send + Sync + 'static;
     /// The type of data received on this connection.
-    type Recv: FrogRead + Send + Sync + 'static;
+    type Recv: FrogReadVersion<V> + Send + Sync + 'static;
 }
 
 /// A connection from a client to a server.
@@ -45,6 +53,8 @@ impl<V: ValidState<S>, S: State> ConnectionType<V, S> for Server {
     /// Send clientbound data.
     type Send = <V as ValidState<S>>::Clientbound;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A connection with a [`Version`](froglight_common::version::Version) and
 /// [`State`].
@@ -82,8 +92,8 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, 
     /// # Errors
     /// Returns an error if the packet could not be read.
     #[inline]
-    pub fn read(&mut self) -> impl Future<Output = Result<T::Recv, ReadError>> + Send + Sync + '_ {
-        self.0.read()
+    pub fn read(&mut self) -> impl Future<Output = Result<T::Recv, ReadError>> + Send + Sync {
+        self.0.read_version()
     }
 
     /// Write a packet to the connection.
@@ -92,7 +102,7 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, 
     /// Returns an error if the packet could not be written.
     #[inline]
     pub async fn write(&mut self, packet: impl Into<T::Send>) -> Result<(), WriteError> {
-        self.0.write(&packet.into()).await
+        self.0.write_version(&packet.into()).await
     }
 
     /// Write a packet to the connection.
@@ -104,7 +114,7 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, 
         &'a mut self,
         packet: &'a impl AsRef<T::Send>,
     ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
-        self.0.write(packet.as_ref())
+        self.0.write_version(packet.as_ref())
     }
 
     /// Split the [`StateConnection`] into a
@@ -148,6 +158,8 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, 
     pub fn into_raw(self) -> RawConnection { self.0 }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// A read-only connection with a
 /// [`Version`](froglight_common::version::Version) and [`State`].
 ///
@@ -181,8 +193,8 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateReadConnection<V,
 
     /// Read a packet from the connection.
     #[inline]
-    pub fn read(&mut self) -> impl Future<Output = Result<T::Recv, ReadError>> + Send + Sync + '_ {
-        self.0.read()
+    pub fn read(&mut self) -> impl Future<Output = Result<T::Recv, ReadError>> + Send + Sync {
+        self.0.read_version()
     }
 
     /// Get a mutable reference to the inner [`RawReadConnection`].
@@ -190,6 +202,8 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateReadConnection<V,
     #[must_use]
     pub fn as_raw(&mut self) -> &mut RawReadConnection { &mut self.0 }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A write-only connection with a
 /// [`Version`](froglight_common::version::Version) and [`State`].
@@ -228,7 +242,7 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateWriteConnection<V
         &'a mut self,
         packet: &'a T::Send,
     ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
-        self.0.write(packet)
+        self.0.write_version(packet)
     }
 
     /// Get a mutable reference to the inner [`RawWriteConnection`].
@@ -236,6 +250,8 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateWriteConnection<V
     #[must_use]
     pub fn as_raw(&mut self) -> &mut RawWriteConnection { &mut self.0 }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
     /// Connect to a server by resolving the address.

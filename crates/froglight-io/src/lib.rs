@@ -4,6 +4,7 @@
 
 pub mod standard;
 pub mod variable;
+pub mod version;
 
 #[cfg(feature = "serde")]
 pub mod serde;
