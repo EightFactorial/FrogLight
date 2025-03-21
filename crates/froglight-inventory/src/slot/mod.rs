@@ -8,9 +8,7 @@ use froglight_common::version::Version;
 use froglight_item::item::UntypedItem;
 
 #[cfg(feature = "io")]
-mod component;
-#[cfg(feature = "io")]
-pub use component::InventoryComponents;
+pub mod component;
 
 #[cfg(feature = "io")]
 mod raw;

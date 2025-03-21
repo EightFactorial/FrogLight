@@ -91,6 +91,8 @@ impl<V: Version> ItemStorage<V> {
 
     /// Get the [`UntypedItem`] for the given [`GlobalItemId`].
     ///
+    /// If no data is provided, the item's default NBT data will be used.
+    ///
     /// Returns `None` if no item with the given id was registered.
     #[must_use]
     pub fn get_untyped(
@@ -98,9 +100,9 @@ impl<V: Version> ItemStorage<V> {
         item: GlobalItemId,
         data: Option<UnnamedNbt>,
     ) -> Option<UntypedItem<V>> {
-        self.0
-            .get_index(*item as usize)
-            .map(|(_, wrapper)| UntypedItem::new(data.unwrap_or_default(), *wrapper))
+        self.0.get_index(*item as usize).map(|(_, wrapper)| {
+            UntypedItem::new(data.unwrap_or_else(|| wrapper.default_nbt()), *wrapper)
+        })
     }
 
     /// Get a typed item for the given [`GlobalItemId`].
