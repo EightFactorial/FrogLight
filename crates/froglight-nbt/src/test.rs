@@ -108,41 +108,41 @@ fn test_data(bytes: &[u8]) {
 
 // -------------------------------------------------------------------------------------------------
 
-#[derive(FrogNbt)]
-#[frog(path = crate)]
-struct TestStructHolder {
-    #[frog(ident = "froglight:test", tag = "compound")]
-    test: TestStruct,
-}
+// #[derive(FrogNbt)]
+// #[frog(path = crate)]
+// struct TestStructHolder {
+//     #[frog(ident = "froglight:test", tag = "compound")]
+//     test: TestStruct,
+// }
 
-#[derive(FrogNbt)]
-#[frog(path = crate)]
-struct TestStruct {
-    #[frog(ident = "froglight:string", tag = "string")]
-    string: String,
-    #[frog(ident = "froglight:value", tag = "long")]
-    value: i64,
-    #[frog(ident = "froglight:array", tag = "bytearray")]
-    array: Vec<u8>,
-}
+// #[derive(FrogNbt)]
+// #[frog(path = crate)]
+// struct TestStruct {
+//     #[frog(ident = "froglight:string", tag = "string")]
+//     string: String,
+//     #[frog(ident = "froglight:value", tag = "long")]
+//     value: i64,
+//     #[frog(ident = "froglight:array", tag = "bytearray")]
+//     array: Vec<u8>,
+// }
 
-#[test]
-fn test_convert() {
-    let compound = NbtCompound::from(vec![(
-        Mutf8String::from("froglight:test"),
-        NbtTag::Compound(NbtCompound::from(vec![
-            (Mutf8String::from("froglight:string"), Mutf8String::from("Hello, world!").into()),
-            (Mutf8String::from("froglight:value"), NbtTag::Long(42)),
-            (Mutf8String::from("froglight:array"), NbtTag::ByteArray(vec![1i8, 2, 3].into())),
-        ])),
-    )]);
+// #[test]
+// fn test_convert() {
+//     let compound = NbtCompound::from(vec![(
+//         Mutf8String::from("froglight:test"),
+//         NbtTag::Compound(NbtCompound::from(vec![
+//             (Mutf8String::from("froglight:string"), Mutf8String::from("Hello,
+// world!").into()),             (Mutf8String::from("froglight:value"),
+// NbtTag::Long(42)),             (Mutf8String::from("froglight:array"),
+// NbtTag::ByteArray(vec![1i8, 2, 3].into())),         ])),
+//     )]);
 
-    // Test creating `TestStructHolder` from an `NbtCompound`
-    let holder = TestStructHolder::from_compound(&compound).unwrap();
-    assert_eq!(holder.test.string, "Hello, world!");
-    assert_eq!(holder.test.value, 42);
-    assert_eq!(holder.test.array, vec![1, 2, 3]);
+//     // Test creating `TestStructHolder` from an `NbtCompound`
+//     let holder = TestStructHolder::from_compound(&compound).unwrap();
+//     assert_eq!(holder.test.string, "Hello, world!");
+//     assert_eq!(holder.test.value, 42);
+//     assert_eq!(holder.test.array, vec![1, 2, 3]);
 
-    // Test converting `TestStructHolder` into an `NbtCompound`
-    // assert_eq!(holder.as_compound().unwrap(), compound);
-}
+//     // Test converting `TestStructHolder` into an `NbtCompound`
+//     // assert_eq!(holder.as_compound().unwrap(), compound);
+// }

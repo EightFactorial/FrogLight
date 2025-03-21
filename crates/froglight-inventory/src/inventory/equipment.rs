@@ -23,10 +23,10 @@ impl<V: Version> EntityEquipment<V> {
     #[must_use]
     pub const fn new() -> Self {
         Self::new_from([
-            InventorySlot::new(),
-            InventorySlot::new(),
-            InventorySlot::new(),
-            InventorySlot::new(),
+            InventorySlot::new_empty(),
+            InventorySlot::new_empty(),
+            InventorySlot::new_empty(),
+            InventorySlot::new_empty(),
         ])
     }
 

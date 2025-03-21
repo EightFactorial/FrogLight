@@ -10,11 +10,6 @@ use bevy_reflect::prelude::*;
 use bevy_utils::TypeIdMap;
 use downcast_rs::Downcast;
 use froglight_common::{identifier::Identifier, version::Version};
-use froglight_nbt::{
-    convert::ConvertError,
-    nbt::{NbtCompound, UnnamedNbt},
-    prelude::ConvertNbt,
-};
 use indexmap::{Equivalent, IndexMap};
 use parking_lot::RwLock;
 
@@ -226,92 +221,4 @@ impl<V: Version> RegistryStorage<V> {
     /// Keeps the allocated memory for future use.
     #[inline]
     pub fn clear_all(&mut self) { self.0.clear(); }
-}
-
-impl<V: Version> RegistryStorage<V> {
-    /// Get a [`RegistryValue`] as [`UnnamedNbt`]
-    /// by it's [`RegistryType`] and identifier.
-    pub fn get_nbt<R: RegistryType<V>>(
-        &self,
-        ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
-    ) -> Option<UnnamedNbt>
-    where
-        R::Value: ConvertNbt,
-    {
-        self.get::<R>(ident).and_then(|val: &R::Value| <R::Value as ConvertNbt>::as_nbt(val).ok())
-    }
-
-    /// Insert a serialized [`RegistryValue`] into the [`RegistryStorage`].
-    ///
-    /// Returns the previous value if it existed.
-    ///
-    /// # Errors
-    /// Returns an error if the value could not be deserialized.
-    pub fn insert_nbt<R: RegistryType<V>>(
-        &mut self,
-        ident: Identifier,
-        nbt: &UnnamedNbt,
-    ) -> Result<Option<R::Value>, ConvertError>
-    where
-        R::Value: ConvertNbt,
-    {
-        nbt.compound()
-            .map(R::Value::from_compound)
-            .map(|result| result.map(|value: R::Value| self.insert::<R>(ident, value)))
-            .map_or(Ok(None), |result| result)
-    }
-
-    /// Extend the [`RegistryStorage`] with a collection of serialized
-    /// [`RegistryValue`]s.
-    ///
-    /// This is the same as calling [`RegistryStorage::insert_nbt`] for each
-    /// item.
-    ///
-    /// # Errors
-    /// Returns an error if any value could not be deserialized.
-    pub fn extend_nbt<R: RegistryType<V>, I: IntoIterator<Item = (Identifier, NbtCompound)>>(
-        &mut self,
-        iter: I,
-    ) -> Result<(), ConvertError>
-    where
-        R::Value: ConvertNbt,
-    {
-        let values: Vec<(Identifier, R::Value)> = iter
-            .into_iter()
-            .map(|(ident, nbt)| R::Value::from_compound(&nbt).map(|val: R::Value| (ident, val)))
-            .collect::<Result<Vec<_>, _>>()?;
-
-        self.extend::<R, Vec<_>>(values);
-        Ok(())
-    }
-
-    /// Extend the [`RegistryStorage`] with an [`NbtCompound`] of serialized
-    /// [`RegistryValue`]s.
-    ///
-    /// This is the same as calling [`RegistryStorage::insert_nbt`] for each
-    /// item inside the [`NbtCompound`].
-    ///
-    /// # Note
-    /// This will silently ignore invalid identifiers and non-compound values.
-    ///
-    /// # Errors
-    /// Returns an error if any value could not be deserialized.
-    pub fn extend_compound<R: RegistryType<V>>(
-        &mut self,
-        compound: &NbtCompound,
-    ) -> Result<(), ConvertError>
-    where
-        R::Value: ConvertNbt,
-    {
-        let values: Vec<(Identifier, R::Value)> = compound
-            .iter()
-            .filter_map(|(ident, comp)| comp.as_compound().map(|c| (ident, c)))
-            .filter_map(|(ident, comp)| ident.try_as_str().ok().map(|ident| (ident, comp)))
-            .filter_map(|(ident, comp)| Identifier::try_new(&ident).map(|ident| (ident, comp)))
-            .map(|(ident, comp)| R::Value::from_compound(comp).map(|val: R::Value| (ident, val)))
-            .collect::<Result<Vec<_>, _>>()?;
-
-        self.extend::<R, Vec<_>>(values);
-        Ok(())
-    }
 }

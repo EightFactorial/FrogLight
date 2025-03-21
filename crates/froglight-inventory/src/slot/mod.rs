@@ -27,7 +27,7 @@ pub struct InventorySlot<V: Version>(Option<(NonZeroU8, UntypedItem<V>)>);
 impl<V: Version> InventorySlot<V> {
     /// Create a new empty [`InventorySlot`].
     #[must_use]
-    pub const fn new() -> Self { Self(None) }
+    pub const fn new_empty() -> Self { Self(None) }
 
     /// Create a new [`InventorySlot`] with the given item.
     #[must_use]

@@ -3,7 +3,7 @@ use bevy_reflect::prelude::*;
 
 use super::Snbt;
 use crate::{
-    convert::{ConvertError, ConvertNbt},
+    convert::{ConvertError, FromCompound, IntoCompound},
     nbt::NbtCompound,
 };
 
@@ -15,8 +15,9 @@ use crate::{
 pub struct Standard;
 impl super::SnbtType for Standard {}
 
-impl ConvertNbt for Snbt<Standard> {
-    fn from_compound(_nbt: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
-
-    fn as_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
+impl FromCompound for Snbt<Standard> {
+    fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
+}
+impl IntoCompound for Snbt<Standard> {
+    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
 }

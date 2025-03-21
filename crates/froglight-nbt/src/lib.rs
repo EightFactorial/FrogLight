@@ -17,7 +17,7 @@ pub mod prelude {
     pub use froglight_macros::FrogNbt;
 
     pub use crate::{
-        convert::ConvertNbt,
+        convert::{FromCompound, FromTag, IntoCompound, IntoTag},
         mutf8::{Mutf8Str, Mutf8String},
         nbt::{NamedNbt, NbtCompound, NbtTag, UnnamedNbt},
         snbt::Snbt,

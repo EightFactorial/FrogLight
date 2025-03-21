@@ -2,7 +2,10 @@ use std::{any::TypeId, sync::LazyLock};
 
 use froglight_common::{prelude::Identifier, version::Version};
 use froglight_io::prelude::*;
-use froglight_nbt::nbt::NbtTag;
+use froglight_nbt::{
+    nbt::NbtTag,
+    prelude::{FromTag, IntoTag},
+};
 use hashbrown::HashMap;
 use indexmap::IndexMap;
 use parking_lot::{
@@ -48,25 +51,6 @@ pub trait VersionComponents: Version {
 
 // -------------------------------------------------------------------------------------------------
 
-/// An item component that can be serialized/deserialized as an NBT tag.
-pub trait InventoryComponent: FrogRead + FrogWrite {
-    /// Convert this component into an NBT tag.
-    fn into_tag(self) -> NbtTag;
-    /// Convert an NBT tag into this component.
-    fn from_tag(tag: &NbtTag) -> Result<Self, WriteError>;
-}
-
-impl<T: InventoryComponent> From<T> for ComponentFns {
-    fn from(_: T) -> Self {
-        Self {
-            read: |mut buffer| Ok(T::frog_read(&mut &mut buffer)?.into_tag()),
-            write: |tag, mut buffer| T::from_tag(tag)?.frog_write(&mut &mut buffer),
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
 pub struct ComponentFns {
     read: fn(&mut dyn std::io::Read) -> Result<NbtTag, ReadError>,
     write: fn(&NbtTag, &mut dyn std::io::Write) -> Result<usize, WriteError>,
@@ -93,5 +77,32 @@ impl ComponentFns {
         buffer: &mut impl std::io::Write,
     ) -> Result<usize, WriteError> {
         (self.write)(tag, buffer)
+    }
+}
+
+impl<T: FrogRead + FrogWrite + FromTag + IntoTag> From<T> for ComponentFns {
+    fn from(_: T) -> Self {
+        use std::io::{Error, ErrorKind};
+
+        Self {
+            read: |mut buffer| {
+                T::frog_read(&mut buffer)?.into_tag().map_err(|_| {
+                    ReadError::Io(Error::new(
+                        ErrorKind::InvalidData,
+                        "Failed to convert data to/from NBT",
+                    ))
+                })
+            },
+            write: |tag, mut buffer| {
+                T::from_tag(tag)
+                    .map_err(|_| {
+                        WriteError::Io(Error::new(
+                            ErrorKind::InvalidData,
+                            "Failed to convert data to/from NBT",
+                        ))
+                    })?
+                    .frog_write(&mut buffer)
+            },
+        }
     }
 }
