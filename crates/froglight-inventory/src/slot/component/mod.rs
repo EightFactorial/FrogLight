@@ -28,8 +28,8 @@ pub use types::*;
 /// Used to identify and serialize/deserialize components over the network.
 pub struct InventoryComponents;
 
-static COMPONENTS: StaticMap = LazyLock::new(|| RwLock::new(HashMap::new()));
-type StaticMap = LazyLock<RwLock<HashMap<TypeId, ComponentMap>>>;
+static COMPONENTS: LazyLock<StaticMap> = LazyLock::new(StaticMap::default);
+type StaticMap = RwLock<HashMap<TypeId, ComponentMap>>;
 type ComponentMap = IndexMap<Identifier, ComponentFns>;
 
 impl InventoryComponents {
@@ -46,7 +46,7 @@ impl InventoryComponents {
     pub fn read<V: Version>() -> MappedRwLockReadGuard<'static, ComponentMap> {
         // Insert the components if they do not exist.
         if !{ COMPONENTS.read().contains_key(&TypeId::of::<V>()) } {
-            COMPONENTS.write().insert(TypeId::of::<V>(), Self::init_type(TypeId::of::<V>()));
+            COMPONENTS.write().insert(TypeId::of::<V>(), Self::init_type::<V>());
         }
 
         RwLockReadGuard::map(COMPONENTS.read(), |data: &HashMap<TypeId, ComponentMap>| {
@@ -67,18 +67,25 @@ impl InventoryComponents {
     ///
     /// # Panics
     /// Panics if the version type is not recognized.
-    fn init_type(type_id: TypeId) -> ComponentMap {
-        #[cfg(feature = "v1_21_4")]
-        use froglight_common::version::V1_21_4;
-        #[cfg(feature = "v1_21_5")]
-        use froglight_common::version::V1_21_5;
+    fn init_type<V: Version>() -> ComponentMap {
+        macro_rules! generate_match {
+            ($($version:ident = $feature:literal),* $(,)?) => {
+                match TypeId::of::<V>() {
+                    $(
+                        #[cfg(feature = $feature)]
+                        id if id == TypeId::of::<froglight_common::version::$version>() => froglight_common::version::$version::components(),
+                    )*
+                    _ => panic!(
+                        "No `ComponentMap` for \"{}\", was one not initialized?",
+                        std::any::type_name::<V>()
+                    ),
+                }
+            };
+        }
 
-        match type_id {
-            #[cfg(feature = "v1_21_4")]
-            id if id == TypeId::of::<V1_21_4>() => <V1_21_4 as VersionComponents>::components(),
-            #[cfg(feature = "v1_21_5")]
-            id if id == TypeId::of::<V1_21_5>() => <V1_21_5 as VersionComponents>::components(),
-            _ => panic!("Unknown `ComponentMap` version, did you initialize it?"),
+        generate_match! {
+            V1_21_4 = "v1_21_4",
+            V1_21_5 = "v1_21_5",
         }
     }
 }

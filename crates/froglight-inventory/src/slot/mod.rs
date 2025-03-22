@@ -15,6 +15,9 @@ mod raw;
 #[cfg(feature = "io")]
 pub use raw::RawInventorySlot;
 
+#[cfg(all(test, feature = "io"))]
+mod test;
+
 /// A slot in an inventory.
 ///
 /// May contain an item or be empty.

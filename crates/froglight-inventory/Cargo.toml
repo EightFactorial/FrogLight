@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+paste = "1.0"
+
 [dependencies]
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
