@@ -13,7 +13,7 @@ pub mod component;
 #[cfg(feature = "io")]
 mod raw;
 #[cfg(feature = "io")]
-pub use raw::RawInventorySlot;
+pub use raw::{RawInventorySlot, RawInventorySlotRef};
 
 #[cfg(all(test, feature = "io"))]
 mod test;
