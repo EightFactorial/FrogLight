@@ -7,12 +7,11 @@ use std::{
 };
 
 use hickory_resolver::{
-    IntoName, TryParseIp,
+    IntoName, ResolveError,
     config::{ResolverConfig, ResolverOpts},
-    error::ResolveError,
     lookup::{SrvLookup, TxtLookup},
     lookup_ip::LookupIp,
-    proto::Executor,
+    proto::runtime::Executor,
     system_conf::read_system_conf,
 };
 
@@ -34,9 +33,10 @@ impl FroglightResolver {
     /// See [`ResolverConfig`] on how to configure the resolver.
     #[must_use]
     pub fn new(config: ResolverConfig, options: ResolverOpts) -> Self {
-        let resolver =
-            FroglightInnerResolver::new(config, options, ResolverConnectionProvider::new());
-        Self { resolver: Arc::new(resolver) }
+        let mut resolver =
+            FroglightInnerResolver::builder_with_config(config, ResolverConnectionProvider::new());
+        *resolver.options_mut() = options;
+        Self { resolver: Arc::new(resolver.build()) }
     }
 
     /// Create a new [`FroglightResolver`] from the system configuration.
@@ -51,11 +51,11 @@ impl FroglightResolver {
     /// Lookup an IP address for a given hostname.
     ///
     /// See [`hickory_resolver::AsyncResolver::lookup_ip`] for more information.
-    pub fn lookup_ip<'a, N: IntoName + TryParseIp + 'a>(
+    pub fn lookup_ip<'a, N: IntoName + 'a>(
         &'a self,
         host: N,
     ) -> impl Future<Output = Result<LookupIp, ResolveError>> + 'a {
-        self.resolver.lookup_ip::<N>(host)
+        self.resolver.lookup_ip(host)
     }
 
     /// Lookup SRV records for a given hostname.

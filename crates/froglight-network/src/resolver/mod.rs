@@ -11,7 +11,7 @@ pub mod hickory {
     //! Re-exports of relevant types from the [`hickory_resolver`] crate.
 
     pub use hickory_resolver::{
-        IntoName, Name, TryParseIp,
+        IntoName, Name,
         config::{
             LookupIpStrategy, NameServerConfig, NameServerConfigGroup, ResolverConfig, ResolverOpts,
         },

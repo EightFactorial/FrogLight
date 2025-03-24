@@ -53,8 +53,20 @@ version = "=1.2.1"
 name = "fixedbitset"
 version = "=0.4.2"
 [[bans.skip]]
+name = "getrandom"
+version = "=0.2.15"
+[[bans.skip]]
 name = "hashbrown"
 version = "=0.14.5"
+[[bans.skip]]
+name = "rand"
+version = "=0.8.5"
+[[bans.skip]]
+name = "rand_chacha"
+version = "=0.3.1"
+[[bans.skip]]
+name = "rand_core"
+version = "=0.6.4"
 [[bans.skip]]
 name = "regex-automata"
 version = "=0.1.10"
@@ -62,22 +74,23 @@ version = "=0.1.10"
 name = "regex-syntax"
 version = "=0.6.29"
 [[bans.skip]]
-name = "rustls"
-version = "=0.21.12"
-[[bans.skip]]
-name = "rustls-webpki"
-version = "=0.101.7"
-[[bans.skip]]
 name = "thiserror"
 version = "=1.0.69"
 [[bans.skip]]
 name = "thiserror-impl"
 version = "=1.0.69"
 [[bans.skip]]
+name = "wasi"
+version = "=0.11.0"
+[[bans.skip]]
 name = "zerocopy"
 version = "=0.7.35"
 
 
+[[bans.skip]]
+name = "windows"
+[[bans.skip]]
+name = "windows-core"
 [[bans.skip]]
 name = "windows-sys"
 [[bans.skip]]

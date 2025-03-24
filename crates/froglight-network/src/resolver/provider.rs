@@ -9,16 +9,21 @@ use std::{
 use async_net::{TcpStream, UdpSocket};
 use futures_lite::{AsyncRead, AsyncWrite, FutureExt};
 use hickory_resolver::{
-    AsyncResolver,
+    Resolver,
     config::{NameServerConfig, ResolverOpts},
-    name_server::{ConnectionProvider, GenericConnector, RuntimeProvider, Spawn},
-    proto::{Executor, Time, error::ProtoError, tcp::DnsTcpStream, udp::DnsUdpSocket},
+    name_server::{ConnectionProvider, GenericConnector},
+    proto::{
+        ProtoError,
+        runtime::{Executor, RuntimeProvider, Spawn, Time},
+        tcp::DnsTcpStream,
+        udp::DnsUdpSocket,
+    },
 };
 
 /// A DNS resolver for server addresses.
 ///
 /// See [`AsyncResolver`] for more information.
-pub(super) type FroglightInnerResolver = AsyncResolver<ResolverConnectionProvider>;
+pub(super) type FroglightInnerResolver = Resolver<ResolverConnectionProvider>;
 
 #[derive(Clone)]
 pub(super) struct ResolverRuntimeProvider;
@@ -50,6 +55,8 @@ impl RuntimeProvider for ResolverRuntimeProvider {
     fn connect_tcp(
         &self,
         server_addr: SocketAddr,
+        _bind_addr: Option<SocketAddr>,
+        _timeout: Option<Duration>,
     ) -> Pin<Box<dyn Send + Future<Output = std::io::Result<Self::Tcp>>>> {
         Box::pin(async move {
             let stream = TcpStream::connect(server_addr).await?;
@@ -93,7 +100,7 @@ impl ConnectionProvider for ResolverConnectionProvider {
         &self,
         config: &NameServerConfig,
         options: &ResolverOpts,
-    ) -> Self::FutureConn {
+    ) -> Result<Self::FutureConn, std::io::Error> {
         self.connection.new_connection(config, options)
     }
 }

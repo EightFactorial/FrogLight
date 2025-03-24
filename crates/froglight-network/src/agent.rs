@@ -6,6 +6,8 @@ use std::sync::Arc;
 use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+#[cfg(feature = "resolver")]
+use hickory_resolver::{ResolveErrorKind, proto::ProtoErrorKind};
 use ureq::{self, Agent};
 
 #[cfg(feature = "resolver")]
@@ -92,7 +94,7 @@ impl ureq::unversioned::resolver::Resolver for FroglightResolver {
                 Ok(result)
             }
             Err(err) => match err.kind() {
-                hickory_resolver::error::ResolveErrorKind::Timeout => {
+                ResolveErrorKind::Proto(err) if matches!(err.kind(), ProtoErrorKind::Timeout) => {
                     Err(ureq::Error::Timeout(ureq::Timeout::Resolve))
                 }
                 _ => Err(ureq::Error::Io(std::io::Error::from(err))),
