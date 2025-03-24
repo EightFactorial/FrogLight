@@ -223,7 +223,7 @@ impl ChunkStorage {
 ///
 /// ---
 ///
-/// Storing [`Sections`] in a fixed-size array has two main benefits:
+/// Storing [`Section`]s in a fixed-size array has two main benefits:
 ///
 /// 1. It guarantees that the number of sections is always correct.
 /// 2. It prevents unnecessary bounds checks when accessing the array.

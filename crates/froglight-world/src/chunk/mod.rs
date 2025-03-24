@@ -1,4 +1,5 @@
 //! [`Chunk`], [`ChunkStorage`], [`Section`], and [`SectionData`].
+#![allow(clippy::struct_field_names)]
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;

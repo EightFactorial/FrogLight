@@ -85,8 +85,6 @@ impl Section {
 // -------------------------------------------------------------------------------------------------
 
 /// A bit-packed cube of world data.
-///
-/// Contains either [`Block`] or [`Biome`] data.
 #[expect(private_bounds)]
 #[derive(Default, Clone)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(opaque))]

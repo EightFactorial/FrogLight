@@ -1,5 +1,4 @@
-//! A connection with a [`Version`](froglight_common::version::Version) and
-//! [`State`].
+//! A connection with a [`Version`] and [`State`].
 //!
 //! This is a wrapper around a [`RawConnection`] that
 //! guarantees the correct packets are being sent and received.
@@ -56,8 +55,7 @@ impl<V: ValidState<S>, S: State> ConnectionType<V, S> for Server {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A connection with a [`Version`](froglight_common::version::Version) and
-/// [`State`].
+/// A connection with a [`Version`] and [`State`].
 ///
 /// This is a wrapper around a [`RawConnection`] that
 /// guarantees the correct packets are being sent and received.
@@ -160,8 +158,7 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, 
 
 // -------------------------------------------------------------------------------------------------
 
-/// A read-only connection with a
-/// [`Version`](froglight_common::version::Version) and [`State`].
+/// A read-only connection with a [`Version`] and [`State`].
 ///
 /// This is a wrapper around a [`RawReadConnection`] that
 /// guarantees the correct packets are being received.
@@ -205,8 +202,7 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateReadConnection<V,
 
 // -------------------------------------------------------------------------------------------------
 
-/// A write-only connection with a
-/// [`Version`](froglight_common::version::Version) and [`State`].
+/// A write-only connection with a [`Version`] and [`State`].
 ///
 /// This is a wrapper around a [`RawWriteConnection`] that
 /// guarantees the correct packets are being sent.

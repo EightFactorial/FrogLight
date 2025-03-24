@@ -1,7 +1,7 @@
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
 
-/// A palette for a [`Section`].
+/// A palette for a [`Section`](super::Section).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SectionPalette {
     /// All items in the section have the same id.

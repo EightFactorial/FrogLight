@@ -30,7 +30,8 @@ pub struct InventoryComponents;
 
 static COMPONENTS: LazyLock<StaticMap> = LazyLock::new(StaticMap::default);
 type StaticMap = RwLock<HashMap<TypeId, ComponentMap>>;
-type ComponentMap = IndexMap<Identifier, ComponentFns>;
+/// A map of identifiers to component functions.
+pub type ComponentMap = IndexMap<Identifier, ComponentFns>;
 
 impl InventoryComponents {
     /// Get access to the [`InventoryComponents`] map.
