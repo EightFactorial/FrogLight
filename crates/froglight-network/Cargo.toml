@@ -43,7 +43,6 @@ froglight-inventory = { workspace = true, optional = true, features = ["io"] }
 froglight-nbt = { workspace = true, optional = true, features = ["io"] }
 hickory-resolver = { version = "0.25", optional = true, default-features = false, features = [
   "system-config",
-  "rustls",
 ] }
 
 [features]
