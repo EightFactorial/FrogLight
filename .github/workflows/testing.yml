@@ -5,16 +5,14 @@ on:
     branches:
       - main
     paths:
-      - "Cargo.lock"
-      - "src/**.rs"
-      - "crates/**.rs"
+      - "**/Cargo.toml"
+      - "**.rs"
   push:
     branches:
       - main
     paths:
-      - "Cargo.lock"
-      - "src/**.rs"
-      - "crates/**.rs"
+      - "**/Cargo.toml"
+      - "**.rs"
       - ".github/workflows/testing.yml"
 
 env:
