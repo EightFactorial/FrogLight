@@ -8,7 +8,7 @@ use bevy_ecs::prelude::*;
 use bevy_reflect::prelude::*;
 #[cfg(feature = "resolver")]
 use hickory_resolver::{ResolveErrorKind, proto::ProtoErrorKind};
-use ureq::{self, Agent};
+use ureq::Agent;
 
 #[cfg(feature = "resolver")]
 use crate::resolver::FroglightResolver;
