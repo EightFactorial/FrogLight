@@ -250,6 +250,7 @@ froglight_macros::items! {
     #[block]
     pub struct BlueConcretePowder;
     pub struct BlueDye;
+    pub struct BlueEgg;
     #[block]
     pub struct BlueGlazedTerracotta;
     #[block]
@@ -315,6 +316,7 @@ froglight_macros::items! {
     #[block]
     pub struct BrownConcretePowder;
     pub struct BrownDye;
+    pub struct BrownEgg;
     #[block]
     pub struct BrownGlazedTerracotta;
     #[block]
@@ -350,7 +352,11 @@ froglight_macros::items! {
     pub struct Bundle;
     pub struct BurnPotterySherd;
     #[block]
+    pub struct Bush;
+    #[block]
     pub struct Cactus;
+    #[block]
+    pub struct CactusFlower;
     #[block]
     pub struct Cake;
     #[block]
@@ -834,6 +840,8 @@ froglight_macros::items! {
     pub struct FireCoralBlock;
     #[block]
     pub struct FireCoralFan;
+    #[block]
+    pub struct FireflyBush;
     pub struct FireworkRocket;
     pub struct FireworkStar;
     pub struct FishingRod;
@@ -1091,6 +1099,8 @@ froglight_macros::items! {
     pub struct LargeFern;
     pub struct LavaBucket;
     pub struct Lead;
+    #[block]
+    pub struct LeafLitter;
     pub struct Leather;
     pub struct LeatherBoots;
     pub struct LeatherCap;
@@ -1836,6 +1846,8 @@ froglight_macros::items! {
     pub struct ShelterPotterySherd;
     pub struct Shield;
     #[block]
+    pub struct ShortDryGrass;
+    #[block]
     pub struct ShortGrass;
     #[block]
     pub struct Shroomlight;
@@ -2044,11 +2056,17 @@ froglight_macros::items! {
     pub struct SweetBerries;
     pub struct TadpoleSpawnEgg;
     #[block]
+    pub struct TallDryGrass;
+    #[block]
     pub struct TallGrass;
     #[block]
     pub struct Target;
     #[block]
     pub struct Terracotta;
+    #[block]
+    pub struct TestBlock;
+    #[block]
+    pub struct TestInstanceBlock;
     pub struct TideArmorTrimSmithingTemplate;
     #[block]
     pub struct TintedGlass;
@@ -2277,6 +2295,8 @@ froglight_macros::items! {
     #[block]
     pub struct WhiteWool;
     pub struct WildArmorTrimSmithingTemplate;
+    #[block]
+    pub struct Wildflowers;
     pub struct WindCharge;
     pub struct WitchSpawnEgg;
     #[block]

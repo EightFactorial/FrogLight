@@ -1,2 +1,2 @@
 # --- Froglight-Tools Configuration --- #
-versions = ["1.21.4"]
+versions = ["1.21.4", "1.21.5"]

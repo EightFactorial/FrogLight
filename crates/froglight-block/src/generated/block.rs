@@ -165,7 +165,9 @@ froglight_macros::blocks! {
     pub struct BubbleCoralFan;
     pub struct BubbleCoralWallFan;
     pub struct BuddingAmethyst;
+    pub struct Bush;
     pub struct Cactus;
+    pub struct CactusFlower;
     pub struct Cake;
     pub struct CakeWithBlackCandle;
     pub struct CakeWithBlueCandle;
@@ -407,6 +409,7 @@ froglight_macros::blocks! {
     pub struct FireCoralBlock;
     pub struct FireCoralFan;
     pub struct FireCoralWallFan;
+    pub struct FireflyBush;
     pub struct FletchingTable;
     pub struct FlowerPot;
     pub struct FloweringAzalea;
@@ -505,6 +508,7 @@ froglight_macros::blocks! {
     pub struct LargeFern;
     pub struct Lava;
     pub struct LavaCauldron;
+    pub struct LeafLitter;
     pub struct Lectern;
     pub struct Lever;
     pub struct Light;
@@ -874,6 +878,7 @@ froglight_macros::blocks! {
     pub struct SeaLantern;
     pub struct SeaPickle;
     pub struct Seagrass;
+    pub struct ShortDryGrass;
     pub struct ShortGrass;
     pub struct Shroomlight;
     pub struct ShulkerBox;
@@ -965,10 +970,13 @@ froglight_macros::blocks! {
     pub struct SuspiciousGravel;
     pub struct SuspiciousSand;
     pub struct SweetBerryBush;
+    pub struct TallDryGrass;
     pub struct TallGrass;
     pub struct TallSeagrass;
     pub struct Target;
     pub struct Terracotta;
+    pub struct TestBlock;
+    pub struct TestInstanceBlock;
     pub struct TintedGlass;
     pub struct Tnt;
     pub struct Torch;
@@ -1082,6 +1090,7 @@ froglight_macros::blocks! {
     pub struct WhiteTulip;
     pub struct WhiteWallBanner;
     pub struct WhiteWool;
+    pub struct Wildflowers;
     pub struct WitherRose;
     pub struct WitherSkeletonSkull;
     pub struct WitherSkeletonWallSkull;
