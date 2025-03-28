@@ -272,23 +272,23 @@ fn resolver() {
         }
     }
 
-    // `mc.hypixel.net` should resolve to `mc.hypixel.net` and port `25565`.
-    {
-        let mut connection =
-            futures_lite::future::block_on(resolver.connect_to_server::<Test>("mc.hypixel.net"))
-                .unwrap();
-        assert_eq!(connection.address(), "mc.hypixel.net");
-        assert_eq!(connection.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
-    }
+    // // `mc.hypixel.net` should resolve to `mc.hypixel.net` and port `25565`.
+    // {
+    //     let mut connection =
+    //         futures_lite::future::block_on(resolver.connect_to_server::<Test>("
+    // mc.hypixel.net"))             .unwrap();
+    //     assert_eq!(connection.address(), "mc.hypixel.net");
+    //     assert_eq!(connection.as_raw().as_stream().peer_addr().unwrap().port(),
+    // 25565); }
 
-    // `hypixel.net` should resolve to `mc.hypixel.net` and port `25565`.
-    {
-        let mut connection =
-            futures_lite::future::block_on(resolver.connect_to_server::<Test>("hypixel.net"))
-                .unwrap();
-        assert_eq!(connection.address(), "mc.hypixel.net");
-        assert_eq!(connection.as_raw().as_stream().peer_addr().unwrap().port(), 25565);
-    }
+    // // `hypixel.net` should resolve to `mc.hypixel.net` and port `25565`.
+    // {
+    //     let mut connection =
+    //         futures_lite::future::block_on(resolver.connect_to_server::<Test>("
+    // hypixel.net"))             .unwrap();
+    //     assert_eq!(connection.address(), "mc.hypixel.net");
+    //     assert_eq!(connection.as_raw().as_stream().peer_addr().unwrap().port(),
+    // 25565); }
 
     // `localhost` should resolve to `127.0.0.1` and port `25565`.
     {

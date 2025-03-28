@@ -13,7 +13,6 @@ pub trait StaticItem: 'static {
     /// ```rust
     /// use froglight_item::{generated::item::Air, item::StaticItem};
     ///
-    /// #[cfg(feature = "v1_21_4")]
     /// assert_eq!(Air::as_static(), &Air);
     /// ```
     fn as_static() -> &'static Self;
@@ -34,10 +33,21 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static identifier through the `ItemType` trait.
-    ///     assert_eq!(Air::as_static().identifier().as_str(), "minecraft:air");
+    ///     assert_eq!(<Air as ItemType<V1_21_4>>::identifier(Air::as_static()), "minecraft:air");
     ///
     ///     // Accessing the constant identifier through the `ItemTypeExt` trait.
     ///     assert_eq!(<Air as ItemTypeExt<V1_21_4>>::IDENTIFIER, "minecraft:air");
+    /// }
+    ///
+    /// #[cfg(feature = "v1_21_5")]
+    /// {
+    ///     use froglight_common::version::V1_21_5;
+    ///
+    ///     // Accessing the static identifier through the `ItemType` trait.
+    ///     assert_eq!(<Air as ItemType<V1_21_5>>::identifier(Air::as_static()), "minecraft:air");
+    ///
+    ///     // Accessing the constant identifier through the `ItemTypeExt` trait.
+    ///     assert_eq!(<Air as ItemTypeExt<V1_21_5>>::IDENTIFIER, "minecraft:air");
     /// }
     /// ```
     fn identifier(&self) -> &'static Identifier;
@@ -55,11 +65,22 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     /// {
     ///     use froglight_common::version::V1_21_4;
     ///
-    ///     // Accessing the  default NBT through the `ItemType` trait.
-    ///     let _nbt = Air::as_static().default_nbt();
+    ///     // Accessing the default NBT through the `ItemType` trait.
+    ///     let _nbt = <Air as ItemType<V1_21_4>>::default_nbt(Air::as_static());
     ///
-    ///     // Accessing the constant default NBT through the `ItemTypeExt` trait.
+    ///     // Accessing the default NBT through the `ItemTypeExt` trait.
     ///     let _nbt = <Air as ItemTypeExt<V1_21_4>>::default_nbt();
+    /// }
+    ///
+    /// #[cfg(feature = "v1_21_5")]
+    /// {
+    ///     use froglight_common::version::V1_21_5;
+    ///
+    ///     // Accessing the default NBT through the `ItemType` trait.
+    ///     let _nbt = <Air as ItemType<V1_21_5>>::default_nbt(Air::as_static());
+    ///
+    ///     // Accessing the default NBT through the `ItemTypeExt` trait.
+    ///     let _nbt = <Air as ItemTypeExt<V1_21_5>>::default_nbt();
     /// }
     /// ```
     fn default_nbt(&self) -> UnnamedNbt;
@@ -77,10 +98,21 @@ pub trait ItemType<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static rarity through the `ItemType` trait.
-    ///     assert_eq!(Air::as_static().rarity(), ItemRarity::Common);
+    ///     assert_eq!(<Air as ItemType<V1_21_4>>::rarity(Air::as_static()), ItemRarity::Common);
     ///
     ///     // Accessing the constant rarity through the `ItemTypeExt` trait.
     ///     assert_eq!(<Air as ItemTypeExt<V1_21_4>>::RARITY, ItemRarity::Common);
+    /// }
+    ///
+    /// #[cfg(feature = "v1_21_5")]
+    /// {
+    ///     use froglight_common::version::V1_21_5;
+    ///
+    ///     // Accessing the static rarity through the `ItemType` trait.
+    ///     assert_eq!(<Air as ItemType<V1_21_5>>::rarity(Air::as_static()), ItemRarity::Common);
+    ///
+    ///     // Accessing the constant rarity through the `ItemTypeExt` trait.
+    ///     assert_eq!(<Air as ItemTypeExt<V1_21_5>>::RARITY, ItemRarity::Common);
     /// }
     /// ```
     fn rarity(&self) -> ItemRarity;

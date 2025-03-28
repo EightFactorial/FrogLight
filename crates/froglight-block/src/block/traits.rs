@@ -12,7 +12,6 @@ pub trait StaticBlock: 'static {
     /// ```rust
     /// use froglight_block::{block::StaticBlock, generated::block::Air};
     ///
-    /// #[cfg(feature = "v1_21_4")]
     /// assert_eq!(Air::as_static(), &Air);
     /// ```
     fn as_static() -> &'static Self;
@@ -33,8 +32,29 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the attribute through the `BlockType` trait.
-    ///     assert_eq!(GrassBlock::as_static().get_attr_str(0, "snowy"), Some("true"));
-    ///     assert_eq!(GrassBlock::as_static().get_attr_str(1, "snowy"), Some("false"));
+    ///     assert_eq!(
+    ///         <GrassBlock as BlockType<V1_21_4>>::get_attr_str(GrassBlock::as_static(), 0, "snowy"),
+    ///         Some("true")
+    ///     );
+    ///     assert_eq!(
+    ///         <GrassBlock as BlockType<V1_21_4>>::get_attr_str(GrassBlock::as_static(), 1, "snowy"),
+    ///         Some("false")
+    ///     );
+    /// }
+    ///
+    /// #[cfg(feature = "v1_21_5")]
+    /// {
+    ///     use froglight_common::version::V1_21_5;
+    ///
+    ///     // Accessing the attribute through the `BlockType` trait.
+    ///     assert_eq!(
+    ///         <GrassBlock as BlockType<V1_21_5>>::get_attr_str(GrassBlock::as_static(), 0, "snowy"),
+    ///         Some("true")
+    ///     );
+    ///     assert_eq!(
+    ///         <GrassBlock as BlockType<V1_21_5>>::get_attr_str(GrassBlock::as_static(), 1, "snowy"),
+    ///         Some("false")
+    ///     );
     /// }
     /// ```
     fn get_attr_str(&self, state: u16, attr: &str) -> Option<&'static str>;
@@ -52,10 +72,21 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static identifier through the `BlockType` trait.
-    ///     assert_eq!(Air::as_static().identifier(), "minecraft:air");
+    ///     assert_eq!(<Air as BlockType<V1_21_4>>::identifier(Air::as_static()), "minecraft:air");
     ///
     ///     // Accessing the constant identifier through the `BlockTypeExt` trait.
     ///     assert_eq!(<Air as BlockTypeExt<V1_21_4>>::IDENTIFIER, "minecraft:air");
+    /// }
+    ///
+    /// #[cfg(feature = "v1_21_5")]
+    /// {
+    ///     use froglight_common::version::V1_21_5;
+    ///
+    ///     // Accessing the static identifier through the `BlockType` trait.
+    ///     assert_eq!(<Air as BlockType<V1_21_5>>::identifier(Air::as_static()), "minecraft:air");
+    ///
+    ///     // Accessing the constant identifier through the `BlockTypeExt` trait.
+    ///     assert_eq!(<Air as BlockTypeExt<V1_21_5>>::IDENTIFIER, "minecraft:air");
     /// }
     /// ```
     fn identifier(&self) -> &'static Identifier;
@@ -73,10 +104,21 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static identifier through the `BlockType` trait.
-    ///     assert_eq!(Air::as_static().is_air(), true);
+    ///     assert_eq!(<Air as BlockType<V1_21_4>>::is_air(Air::as_static()), true);
     ///
     ///     // Accessing the constant identifier through the `BlockTypeExt` trait.
     ///     assert_eq!(<Air as BlockTypeExt<V1_21_4>>::IS_AIR, true);
+    /// }
+    ///
+    /// #[cfg(feature = "v1_21_5")]
+    /// {
+    ///     use froglight_common::version::V1_21_5;
+    ///
+    ///     // Accessing the static identifier through the `BlockType` trait.
+    ///     assert_eq!(<Air as BlockType<V1_21_5>>::is_air(Air::as_static()), true);
+    ///
+    ///     // Accessing the constant identifier through the `BlockTypeExt` trait.
+    ///     assert_eq!(<Air as BlockTypeExt<V1_21_5>>::IS_AIR, true);
     /// }
     /// ```
     fn is_air(&self) -> bool;
