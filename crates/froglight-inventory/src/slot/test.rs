@@ -5,7 +5,7 @@ use froglight_io::version::{FrogReadVersion, FrogWriteVersion};
 use froglight_item::{prelude::*, resolve::ItemResolver};
 use paste::paste;
 
-use crate::slot::{InventorySlot, RawInventorySlot, component::VersionComponents};
+use crate::slot::{InventorySlot, component::VersionComponents, network::RawInventorySlot};
 
 macro_rules! generate_tests {
     // Generate `empty` and `full` tests
@@ -47,7 +47,10 @@ macro_rules! generate_tests {
 }
 
 fn template<I: froglight_item::item::ItemTypeExt<V>, V: VersionComponents>()
-where Vanilla: ItemResolver<V> {
+where
+    Vanilla: ItemResolver<V>,
+    RawInventorySlot<V>: FrogReadVersion<V> + FrogWriteVersion<V>,
+{
     let storage = ItemStorage::<V>::new();
 
     let item = Item::<I, V>::default().into_untyped();
@@ -62,7 +65,10 @@ where Vanilla: ItemResolver<V> {
 fn roundtrip<V: VersionComponents>(
     slot: &InventorySlot<V>,
     storage: &ItemStorage<V>,
-) -> InventorySlot<V> {
+) -> InventorySlot<V>
+where
+    RawInventorySlot<V>: FrogReadVersion<V> + FrogWriteVersion<V>,
+{
     let original = RawInventorySlot::<V>::from_slot(slot, storage).unwrap();
 
     let mut buffer = Vec::new();
@@ -116,3 +122,45 @@ generate_tests!(
     DeepslateEmeraldOre,
     Beacon
 );
+
+// #[cfg(feature = "v1_21_5")]
+// generate_tests!(
+//     V1_21_5,
+//     Air,
+//     Stone,
+//     GrassBlock,
+//     Anvil,
+//     AcaciaSign,
+//     OakSlab,
+//     OminousBottle,
+//     TotemOfUndying,
+//     Shield,
+//     BambooRaft,
+//     SpruceBoat,
+//     SpruceChestBoat,
+//     GoldenShovel,
+//     IronSword,
+//     DiamondPickaxe,
+//     LeatherCap,
+//     LeatherBoots,
+//     LeatherHorseArmor,
+//     NetheriteHoe,
+//     Netherrack,
+//     NetherWart,
+//     Wheat,
+//     WheatSeeds,
+//     CarvedPumpkin,
+//     PumpkinPie,
+//     MelonSlice,
+//     Beetroot,
+//     BeetrootSeeds,
+//     GoldIngot,
+//     RawGold,
+//     BlockOfGold,
+//     BlockOfRawGold,
+//     Emerald,
+//     BlockOfEmerald,
+//     EmeraldOre,
+//     DeepslateEmeraldOre,
+//     Beacon
+// );

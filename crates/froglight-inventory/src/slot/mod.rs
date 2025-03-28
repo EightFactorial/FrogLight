@@ -9,11 +9,8 @@ use froglight_item::item::UntypedItem;
 
 #[cfg(feature = "io")]
 pub mod component;
-
 #[cfg(feature = "io")]
-mod raw;
-#[cfg(feature = "io")]
-pub use raw::{RawInventorySlot, RawInventorySlotRef};
+pub mod network;
 
 #[cfg(all(test, feature = "io"))]
 mod test;
