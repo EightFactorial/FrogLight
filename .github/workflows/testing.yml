@@ -35,7 +35,7 @@ jobs:
           toolchain: nightly-2024-11-11
       # Install the nextest tool
       - name: Install Nextest
-        uses: taiki-e/install-action@a86da1a3cb51967612c80d6dc98c5cac03a73025 # v2
+        uses: taiki-e/install-action@1c861c252bd329898ca0817dc2913d5963834965 # v2
         with:
           tool: nextest
       # Checkout the repository
