@@ -13,6 +13,7 @@ use bevy_ecs::{
 };
 use bevy_log::{debug, error};
 use derive_more::From;
+use tracing::Level;
 
 mod build;
 pub use build::BrigadierBuilder;
@@ -22,7 +23,6 @@ pub use command::{BrigadierCommand, BrigadierCommands};
 
 mod event;
 pub use event::BrigadierEvent;
-use tracing::Level;
 
 use crate::{
     argument::ArgumentParserPlugin,
@@ -32,7 +32,8 @@ use crate::{
 
 /// A plugin for integrating Brigadier into a Bevy application.
 ///
-/// By default, this runs during [`Last`].
+/// By default this plugin runs commands during [`Last`],
+/// but this can be configured using [`BrigadierPlugin::new`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, From)]
 pub struct BrigadierPlugin(InternedScheduleLabel);
 

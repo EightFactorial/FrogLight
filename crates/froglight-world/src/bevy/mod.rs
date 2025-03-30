@@ -14,8 +14,9 @@ use crate::prelude::{Chunk, ChunkPos};
 /// A [`Plugin`] that adds various world-related systems and components.
 ///
 /// # Warning
-/// This plugin does not add the [`WorldPlugin::update_entity_position_map`]
-/// system to the [`App`]. You must add and schedule it yourself.
+/// This plugin does not add the [`WorldPlugin::update_position_maps`] system.
+///
+/// You **_must_** add and schedule it yourself!
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
 pub struct WorldPlugin;
 
@@ -43,9 +44,10 @@ impl Plugin for WorldPlugin {
 }
 
 impl WorldPlugin {
-    /// A [`System`] that updates the [`EntityPositionMap`] resource.
+    /// A [`System`] that updates the
+    /// [`EntityPositionMap`] and [`ChunkPositionMap`] resources.
     #[expect(clippy::type_complexity)]
-    pub fn update_entity_position_map(
+    pub fn update_position_maps(
         query: Query<(Entity, &ChunkPos), (Changed<ChunkPos>, Without<Chunk>)>,
         mut positions: ResMut<EntityPositionMap>,
     ) {
