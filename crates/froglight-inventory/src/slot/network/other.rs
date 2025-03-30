@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use froglight_io::{
     prelude::*,
     version::{FrogReadVersion, FrogWriteVersion},
@@ -5,6 +7,7 @@ use froglight_io::{
 
 use super::{RawInventorySlot, RawInventorySlotRef};
 
+#[allow(unused_macros)]
 macro_rules! impl_networking {
     ($version:ident) => {
         impl FrogReadVersion<froglight_common::version::$version>

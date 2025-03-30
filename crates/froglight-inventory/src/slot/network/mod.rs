@@ -18,6 +18,8 @@ use super::{
 };
 
 mod other;
+
+#[cfg(feature = "v1_21_4")]
 mod v1_21_4;
 
 /// A raw inventory slot.

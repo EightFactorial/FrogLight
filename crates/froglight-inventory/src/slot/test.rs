@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use std::num::NonZeroU8;
 
 use froglight_common::vanilla::Vanilla;
@@ -7,6 +9,7 @@ use paste::paste;
 
 use crate::slot::{InventorySlot, component::VersionComponents, network::RawInventorySlot};
 
+#[allow(unused_macros)]
 macro_rules! generate_tests {
     // Generate `empty` and `full` tests
     ($version:ident, $($item:ty),*) => {
