@@ -1,6 +1,6 @@
 //! TODO
 
-use std::{any::TypeId, borrow::Cow, sync::Arc};
+use std::{borrow::Cow, sync::Arc};
 
 use bevy_ecs::prelude::*;
 use bevy_reflect::{
@@ -31,7 +31,7 @@ pub use error::BrigadierError;
 pub struct AppBrigadierGraph(Arc<RwLock<BrigadierGraph>>);
 
 /// A brigadier-style command graph.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default)]
 pub struct BrigadierGraph {
     pub(crate) commands: HashMap<SmolStr, NodeIndex<u32>>,
     pub(crate) graph: StableDiGraph<BrigadierNode, BrigadierEdge>,
@@ -145,9 +145,9 @@ impl BrigadierGraph {
                         }
                     }
                     // Attempt to parse an argument, continue if successful.
-                    BrigadierEdge::Argument { type_id, type_name } => {
+                    BrigadierEdge::Argument(parser) => {
                         let (argument, remaining) =
-                            Self::parse_argument(arg, type_name, *type_id, types, world)?;
+                            Self::parse_argument(arg, parser.as_ref(), types, world)?;
 
                         // If an argument was parsed, add it to the list.
                         if let Some(argument) = argument {
@@ -198,19 +198,22 @@ impl BrigadierGraph {
     #[expect(clippy::match_wildcard_for_single_variants)]
     fn parse_argument<'a>(
         arguments: &'a str,
-        type_name: &'static str,
-        type_id: TypeId,
+        parser: &dyn PartialReflect,
         registry: &TypeRegistry,
         world: &World,
     ) -> Result<(Option<ArgValue<'a>>, &'a str), BrigadierError> {
+        let type_info = parser
+            .get_represented_type_info()
+            .expect("Unable to get `TypeInfo` for `ArgumentParser`");
+
         // Immediately return an error if the parser type is unknown.
-        let Some(parser_type) = registry.get(type_id) else {
-            return Err(BrigadierError::UnknownParser(type_name));
+        let Some(parser_type) = registry.get(type_info.type_id()) else {
+            return Err(BrigadierError::UnknownParser(type_info.type_path()));
         };
 
-        if let Some(parser) = parser_type.data::<ReflectArgumentParser>() {
+        if let Some(reflect) = parser_type.data::<ReflectArgumentParser>() {
             // Attempt to parse the argument using the stored parser.
-            parser.parse(arguments, world).map_or_else(
+            reflect.parse(parser, arguments, world).map_or_else(
                 |err| match err {
                     // Ignore when the argument does not match
                     ArgumentError::DoesNotMatch => Ok((None, arguments)),
@@ -221,7 +224,7 @@ impl BrigadierGraph {
             )
         } else {
             // Parser has no associated `ReflectArgumentParser`.
-            Err(BrigadierError::UnknownParser(type_name))
+            Err(BrigadierError::UnknownParser(type_info.type_path()))
         }
     }
 }

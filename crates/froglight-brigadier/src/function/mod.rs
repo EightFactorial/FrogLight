@@ -50,13 +50,29 @@ impl<'env, Function> CommandBuilder<'env, Arg, Function> {
     }
 
     /// Add an argument to the function.
+    ///
+    /// Uses the default parser for the argument type.
     #[must_use]
     #[expect(private_bounds)]
-    pub fn arg<Parser: ArgumentParser, NewFunction>(
+    pub fn arg<Parser: Default + ArgumentParser, NewFunction>(
         mut self,
     ) -> CommandBuilder<'env, Arg, NewFunction>
     where Self: FunctionBuilder<'env, Parser, Arg, Function, NewFunction> {
-        self.add_edge(BrigadierEdge::argument::<Parser>());
+        self.add_edge(BrigadierEdge::argument::<Parser>(Parser::default()));
+        self.argument().convert()
+    }
+
+    /// Add an argument to the function using a custom parser.
+    #[must_use]
+    #[expect(private_bounds)]
+    pub fn arg_using<Parser: ArgumentParser, NewFunction>(
+        mut self,
+        parser: Parser,
+    ) -> CommandBuilder<'env, Arg, NewFunction>
+    where
+        Self: FunctionBuilder<'env, Parser, Arg, Function, NewFunction>,
+    {
+        self.add_edge(BrigadierEdge::argument::<Parser>(parser));
         self.argument().convert()
     }
 
@@ -92,13 +108,29 @@ impl<'env, Function> CommandBuilder<'env, Command, Function> {
     }
 
     /// Add an argument to the function.
+    ///
+    /// Uses the default parser for the argument type.
     #[must_use]
     #[expect(private_bounds)]
-    pub fn arg<Parser: ArgumentParser, NewFunction>(
+    pub fn arg<Parser: Default + ArgumentParser, NewFunction>(
         mut self,
     ) -> CommandBuilder<'env, Arg, NewFunction>
     where Self: FunctionBuilder<'env, Parser, Command, Function, NewFunction> {
-        self.add_edge(BrigadierEdge::argument::<Parser>());
+        self.add_edge(BrigadierEdge::argument::<Parser>(Parser::default()));
+        self.argument().convert()
+    }
+
+    /// Add an argument to the function using a custom parser.
+    #[must_use]
+    #[expect(private_bounds)]
+    pub fn arg_using<Parser: ArgumentParser, NewFunction>(
+        mut self,
+        parser: Parser,
+    ) -> CommandBuilder<'env, Arg, NewFunction>
+    where
+        Self: FunctionBuilder<'env, Parser, Command, Function, NewFunction>,
+    {
+        self.add_edge(BrigadierEdge::argument::<Parser>(parser));
         self.argument().convert()
     }
 }

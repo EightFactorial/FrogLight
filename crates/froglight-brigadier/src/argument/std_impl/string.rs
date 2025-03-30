@@ -13,6 +13,7 @@ macro_rules! impl_string {
             impl ArgumentParser for $ty {
                 type Arg = Self;
                 fn parse_input<'a>(
+                    &self,
                     arguments: &'a str,
                     _: &World,
                 ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
@@ -34,6 +35,7 @@ impl ArgumentParser for Cow<'static, str> {
     type Arg = Self;
 
     fn parse_input<'a>(
+        &self,
         arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {

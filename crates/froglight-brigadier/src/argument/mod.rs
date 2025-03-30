@@ -2,12 +2,14 @@
 
 use bevy_app::{App, Plugin};
 use bevy_ecs::{reflect::AppTypeRegistry, world::World};
-use bevy_reflect::func::ArgValue;
+use bevy_reflect::{PartialReflect, func::ArgValue};
 
 mod reflect;
 pub use reflect::ReflectArgumentParser;
 
 mod brigadier_impl;
+pub use brigadier_impl::*;
+
 #[cfg(feature = "glam")]
 mod glam_impl;
 mod std_impl;
@@ -35,7 +37,7 @@ impl Plugin for ArgumentParserPlugin {
 }
 
 /// A trait for parsing arguments from a string.
-pub trait ArgumentParser: 'static {
+pub trait ArgumentParser: PartialReflect + 'static {
     /// The type of argument to parse.
     type Arg: Sized;
     /// Parse the string for an argument,
@@ -44,6 +46,7 @@ pub trait ArgumentParser: 'static {
     /// # Errors
     /// Returns an error if the argument is invalid.
     fn parse_input<'a>(
+        &self,
         arguments: &'a str,
         world: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError>;

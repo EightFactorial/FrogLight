@@ -8,6 +8,7 @@ impl ArgumentParser for Identifier {
     type Arg = Identifier;
 
     fn parse_input<'a>(
+        &self,
         arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
@@ -24,6 +25,7 @@ impl ArgumentParser for uuid::Uuid {
     type Arg = uuid::Uuid;
 
     fn parse_input<'a>(
+        &self,
         arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {

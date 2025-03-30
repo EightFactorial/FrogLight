@@ -15,6 +15,7 @@ macro_rules! impl_glam {
             type Arg = Self;
 
             fn parse_input<'a>(
+                &self,
                 mut arguments: &'a str,
                 _: &World,
             ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {

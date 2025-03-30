@@ -10,6 +10,7 @@ macro_rules! impl_number {
             impl ArgumentParser for $ty {
                 type Arg = Self;
                 fn parse_input<'a>(
+                    &self,
                     arguments: &'a str,
                     _: &World,
                 ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
@@ -30,6 +31,7 @@ impl ArgumentParser for bool {
     type Arg = Self;
 
     fn parse_input<'a>(
+        &self,
         arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {

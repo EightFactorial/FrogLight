@@ -1,5 +1,6 @@
-use std::{any::TypeId, borrow::Cow};
+use std::borrow::Cow;
 
+use bevy_reflect::PartialReflect;
 use smol_str::SmolStr;
 
 use crate::prelude::ArgumentParser;
@@ -9,14 +10,14 @@ pub(crate) struct BrigadierNode {
     pub(crate) function: Option<Cow<'static, str>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug)]
 pub(crate) enum BrigadierEdge {
     /// A command.
     Command,
     /// A literal argument.
     Literal(SmolStr),
     /// An argument parser.
-    Argument { type_id: TypeId, type_name: &'static str },
+    Argument(Box<dyn PartialReflect>),
 }
 
 impl BrigadierEdge {
@@ -26,10 +27,7 @@ impl BrigadierEdge {
 
     /// Create a new [`BrigadierEdge::Argument`].
     #[must_use]
-    pub(crate) fn argument<Parser: ArgumentParser>() -> Self {
-        Self::Argument {
-            type_id: TypeId::of::<Parser>(),
-            type_name: std::any::type_name::<Parser>(),
-        }
+    pub(crate) fn argument<Parser: ArgumentParser>(parser: Parser) -> Self {
+        Self::Argument(Box::new(parser))
     }
 }
