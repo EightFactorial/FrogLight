@@ -114,6 +114,7 @@ regex = "1.11"
 rsa = { version = "0.9.8", features = ["std", "pem"] }
 serde = "1.0"
 serde_json = "1.0"
+simd_cesu8 = "1.0"
 smallvec = "1.14"
 smol_str = "0.2"
 thiserror = "2.0"
@@ -121,6 +122,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
 ureq = "3.0"
 uuid = "1.12"
+
 
 # --- FrogLight Crate ---
 

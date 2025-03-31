@@ -30,12 +30,13 @@ froglight-world = { workspace = true, features = ["block"] }
 froglight-brigadier = { workspace = true, optional = true }
 
 # Nightly dependencies
-hashbrown = { workspace = true, optional = true, features = ["nightly"] }
 crc32fast = { workspace = true, optional = true, features = ["nightly"] }
 glam = { workspace = true, optional = true, features = ["core-simd"] }
+hashbrown = { workspace = true, optional = true, features = ["nightly"] }
 parking_lot = { workspace = true, optional = true, features = ["nightly"] }
 rangemap = { workspace = true, optional = true, features = ["nightly"] }
 rsa = { workspace = true, optional = true, features = ["nightly"] }
+simd_cesu8 = { workspace = true, optional = true, features = ["nightly"] }
 
 [features]
 default = ["bevy", "brigadier"]
@@ -56,12 +57,13 @@ bevy = [
 ]
 # Enable nightly features.
 nightly = [
-  "dep:hashbrown",
   "dep:crc32fast",
   "dep:glam",
+  "dep:hashbrown",
   "dep:parking_lot",
   "dep:rangemap",
   "dep:rsa",
+  "dep:simd_cesu8",
 ]
 
 # Enable support for v1.21.4
