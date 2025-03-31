@@ -19,6 +19,7 @@ workspace = true
 paste = "1.0"
 
 [dependencies]
+crc32fast = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-item = { workspace = true }

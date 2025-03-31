@@ -96,7 +96,8 @@ async-io = "2.4"
 async-net = "2.0"
 base64 = "0.22"
 blocking = "1.6"
-cfb8 = { version = "0.8.1", features = ["std"] }
+cfb8 = { version = "0.8.1", features = ["std", "zeroize"] }
+crc32fast = "1.4.2"
 derive_more = { version = "2.0", features = ["full"] }
 downcast-rs = "2.0"
 flate2 = "1.1"
@@ -110,7 +111,7 @@ parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
 regex = "1.11"
-rsa = { version = "0.9.7", features = ["default"] }
+rsa = { version = "0.9.8", features = ["std", "pem"] }
 serde = "1.0"
 serde_json = "1.0"
 smallvec = "1.14"
@@ -118,8 +119,8 @@ smol_str = "0.2"
 thiserror = "2.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
-uuid = "1.12"
 ureq = "3.0"
+uuid = "1.12"
 
 # --- FrogLight Crate ---
 
@@ -150,6 +151,8 @@ default = ["bevy", "brigadier"]
 bevy = ["froglight-internal/bevy"]
 # Enable the `froglight-brigadier` crate.
 brigadier = ["bevy", "froglight-internal/brigadier"]
+# Enable nightly features.
+nightly = ["froglight-internal/nightly"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-internal/v1_21_4"]

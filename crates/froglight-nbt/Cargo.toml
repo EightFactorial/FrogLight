@@ -22,12 +22,12 @@ proptest = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 [dependencies]
-smol_str = { workspace = true }
 derive_more = { workspace = true }
 froglight-macros = { workspace = true, features = ["nbt"] }
 indexmap = { workspace = true }
 regex = { workspace = true }
 simd_cesu8 = "1.0"
+smol_str = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies

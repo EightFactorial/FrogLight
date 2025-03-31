@@ -29,6 +29,14 @@ froglight-world = { workspace = true, features = ["block"] }
 # Optional dependencies
 froglight-brigadier = { workspace = true, optional = true }
 
+# Nightly dependencies
+hashbrown = { workspace = true, optional = true, features = ["nightly"] }
+crc32fast = { workspace = true, optional = true, features = ["nightly"] }
+glam = { workspace = true, optional = true, features = ["core-simd"] }
+parking_lot = { workspace = true, optional = true, features = ["nightly"] }
+rangemap = { workspace = true, optional = true, features = ["nightly"] }
+rsa = { workspace = true, optional = true, features = ["nightly"] }
+
 [features]
 default = ["bevy", "brigadier"]
 
@@ -45,6 +53,15 @@ bevy = [
   "froglight-network/bevy",
   "froglight-registry/bevy",
   "froglight-world/bevy",
+]
+# Enable nightly features.
+nightly = [
+  "dep:hashbrown",
+  "dep:crc32fast",
+  "dep:glam",
+  "dep:parking_lot",
+  "dep:rangemap",
+  "dep:rsa",
 ]
 
 # Enable support for v1.21.4
