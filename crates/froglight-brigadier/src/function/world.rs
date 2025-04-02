@@ -46,7 +46,7 @@ impl WorldRef<Empty> {
 
     /// Mark a [`WorldRef`] as [`Full`].
     #[must_use]
-    fn full(&self) -> WorldRef<Full> { WorldRef(self.0.clone(), PhantomData) }
+    fn full(&self) -> WorldRef<Full> { WorldRef(Arc::clone(&self.0), PhantomData) }
 }
 
 impl WorldRef<Full> {

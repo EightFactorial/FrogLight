@@ -178,7 +178,7 @@ impl RawConnection {
             RawReadConnection(Self {
                 address: self.address.clone(),
                 stream: self.stream.clone(),
-                compression: self.compression.clone(),
+                compression: Arc::clone(&self.compression),
             }),
             RawWriteConnection(Self {
                 address: self.address,

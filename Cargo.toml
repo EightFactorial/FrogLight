@@ -46,6 +46,7 @@ invalid_html_tags = "deny"
 [workspace.lints.clippy]
 cast_possible_truncation = "warn"
 cast_possible_wrap = "warn"
+clone_on_ref_ptr = "warn"
 doc_markdown = "allow"
 module_name_repetitions = "allow"
 needless_pass_by_value = "allow"
@@ -105,7 +106,7 @@ futures-lite = "2.6"
 glam = "0.29"
 hashbrown = "0.14"
 hashify = "0.2.6"
-indexmap = "2.7"
+indexmap = "2.8"
 md-5 = { version = "0.10.6", features = ["std"] }
 parking_lot = "0.12"
 proptest = "1.6"
@@ -122,7 +123,6 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
 ureq = "3.0"
 uuid = "1.12"
-
 
 # --- FrogLight Crate ---
 
