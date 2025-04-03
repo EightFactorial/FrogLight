@@ -1,0 +1,33 @@
+[package]
+name = "froglight-schedule"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+authors = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+bevy = { workspace = true }
+
+[dependencies]
+bevy_app = { workspace = true }
+bevy_ecs = { workspace = true }
+bevy_reflect = { workspace = true }
+bevy_time = { workspace = true }
+froglight-common = { workspace = true, features = ["bevy"] }
+parking_lot = { workspace = true }
+
+[features]
+default = []
+
+# Enable the `SubAppPlugin`
+subapp = []

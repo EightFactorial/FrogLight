@@ -15,6 +15,7 @@ members = [
   "crates/froglight-network",
   "crates/froglight-player",
   "crates/froglight-registry",
+  "crates/froglight-schedule",
   "crates/froglight-world",
 ]
 
@@ -87,6 +88,7 @@ froglight-nbt = { version = "0.1", path = "crates/froglight-nbt" }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
 froglight-player = { version = "0.1", path = "crates/froglight-player" }
 froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
+froglight-schedule = { version = "0.1", path = "crates/froglight-schedule" }
 froglight-world = { version = "0.1", path = "crates/froglight-world" }
 
 # Other
