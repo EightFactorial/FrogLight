@@ -19,7 +19,6 @@ workspace = true
 paste = "1.0"
 
 [dependencies]
-crc32fast = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-item = { workspace = true }
@@ -31,6 +30,7 @@ parking_lot = { workspace = true }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+crc32fast = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 froglight-world = { workspace = true, optional = true, features = ["nbt"] }
 
@@ -38,7 +38,7 @@ froglight-world = { workspace = true, optional = true, features = ["nbt"] }
 default = []
 
 # Enable `froglight-io` support.
-io = ["dep:froglight-io", "froglight-nbt/io"]
+io = ["dep:crc32fast", "dep:froglight-io", "froglight-nbt/io"]
 # Enable `froglight-world` support.
 world = ["dep:froglight-world"]
 

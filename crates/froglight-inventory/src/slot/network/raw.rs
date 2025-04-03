@@ -29,6 +29,11 @@ pub struct RawInventorySlot<V: Version>(
 );
 
 impl<V: VersionComponents> RawInventorySlot<V> {
+    /// Returns `true` if the slot is empty.
+    #[inline]
+    #[must_use]
+    pub const fn is_empty(&self) -> bool { self.0.is_none() }
+
     /// Create a [`RawInventorySlot`] from an [`InventorySlot`].
     ///
     /// Returns `None` if the item is not registered in the [`ItemStorage`].
@@ -65,6 +70,11 @@ pub struct RawInventorySlotRef<'a, V: Version>(
 );
 
 impl<'a, V: Version> RawInventorySlotRef<'a, V> {
+    /// Returns `true` if the slot is empty.
+    #[inline]
+    #[must_use]
+    pub const fn is_empty(&self) -> bool { self.0.is_none() }
+
     /// Create a [`RawInventorySlotRef`] to a [`RawInventorySlot`].
     ///
     /// This is cheap and doesn't require any calculations.
