@@ -67,7 +67,7 @@ impl TickSettings {
     #[must_use]
     pub const fn target(&self) -> u32 { self.target }
 
-    /// The maxmimum amount of ticks that can be run per frame.
+    /// The maximum amount of ticks that can be run per frame.
     #[inline]
     #[must_use]
     pub const fn maximum(&self) -> u32 { self.max_per_frame }

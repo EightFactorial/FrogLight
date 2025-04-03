@@ -24,7 +24,7 @@ mod test;
 /// A [`Plugin`] that adds network and tick
 /// [`Schedule`](bevy_ecs::schedule::Schedule)s to an [`App`].
 ///
-/// In an app with the default schedules, the order looks like (abreviated):
+/// In an app with the default schedules, the order looks like (abbreviated):
 /// - First, PreNet, PreUpd, PreT, Tick, PostT, Update, PostUpd, PostNet, Last
 ///
 /// In an app with `First` and `Last`, the order looks like:
