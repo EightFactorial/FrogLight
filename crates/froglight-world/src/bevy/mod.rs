@@ -1,7 +1,12 @@
 //! TODO
 
-use bevy_app::{App, Plugin};
-use bevy_ecs::{component::ComponentId, prelude::*, world::DeferredWorld};
+use bevy_app::{App, Last, Plugin};
+use bevy_ecs::{
+    component::ComponentId,
+    prelude::*,
+    schedule::{InternedScheduleLabel, ScheduleLabel},
+    world::DeferredWorld,
+};
 
 mod chunk_map;
 pub use chunk_map::ChunkPositionMap;
@@ -11,14 +16,17 @@ pub use entity_map::EntityPositionMap;
 
 use crate::prelude::{Chunk, ChunkPos};
 
-/// A [`Plugin`] that adds various world-related systems and components.
+/// A [`Plugin`] that adds various world-related systems.
 ///
-/// # Warning
-/// This plugin does not add the [`WorldPlugin::update_position_maps`] system.
-///
-/// You **_must_** add and schedule it yourself!
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
-pub struct WorldPlugin;
+/// By default this plugin updates
+/// [`EntityPositionMap`] and [`ChunkPositionMap`] during [`Last`],
+/// but this can be configured using [`WorldPlugin::new`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WorldPlugin(InternedScheduleLabel);
+
+impl Default for WorldPlugin {
+    fn default() -> Self { Self::new(&Last) }
+}
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
@@ -40,10 +48,18 @@ impl Plugin for WorldPlugin {
             hooks.on_add(Self::insert_hook).on_insert(Self::insert_hook);
             hooks.on_remove(Self::remove_hook).on_replace(Self::remove_hook);
         }
+
+        // Add the `update_position_maps` system to the schedule.
+        app.add_systems(self.0, Self::update_position_maps.run_if(any_with_component::<ChunkPos>));
     }
 }
 
 impl WorldPlugin {
+    /// Create a new [`WorldPlugin`] with the given [`ScheduleLabel`].
+    #[inline]
+    #[must_use]
+    pub fn new<Schedule: ScheduleLabel>(schedule: &Schedule) -> Self { Self(schedule.intern()) }
+
     /// A [`System`] that updates the
     /// [`EntityPositionMap`] and [`ChunkPositionMap`] resources.
     #[expect(clippy::type_complexity)]
