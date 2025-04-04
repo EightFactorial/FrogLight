@@ -18,6 +18,8 @@ pub use tick::*;
 mod time;
 pub use time::*;
 
+use crate::systemset::SystemSetPlugin;
+
 #[cfg(test)]
 mod test;
 
@@ -47,7 +49,7 @@ impl Plugin for SchedulePlugin {
         app.init_schedule(PostNetwork);
 
         // Update `TickSettings` at the start of every frame.
-        app.add_systems(First, Self::tick_update);
+        app.add_systems(First, Self::tick_update.after(bevy_time::time_system));
 
         if let Some(mut order) = app.world_mut().get_resource_mut::<MainScheduleOrder>() {
             // Add `PreNetwork`
@@ -88,12 +90,15 @@ impl Plugin for SchedulePlugin {
             }
 
             // Setup the `OnTick` schedules, systems and resources.
-            OnTick::<PreNetwork>::setup(PreNetwork, app);
-            OnTick::<PreTick>::setup(PreTick, app);
-            OnTick::<Tick>::setup(Tick, app);
-            OnTick::<PostTick>::setup(PostTick, app);
-            OnTick::<PostNetwork>::setup(PostNetwork, app);
+            OnTick::<PreNetwork>::setup(app, PreNetwork);
+            OnTick::<PreTick>::setup(app, PreTick);
+            OnTick::<Tick>::setup(app, Tick);
+            OnTick::<PostTick>::setup(app, PostTick);
+            OnTick::<PostNetwork>::setup(app, PostNetwork);
         }
+
+        // Add the `SystemSetPlugin` to the app.
+        app.add_plugins(SystemSetPlugin);
     }
 }
 
@@ -106,26 +111,56 @@ impl SchedulePlugin {
 // -------------------------------------------------------------------------------------------------
 
 /// A wrapper [`ScheduleLabel`] for running schedules on every tick.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
+#[derive(Debug, ScheduleLabel)]
 pub struct OnTick<Label: ScheduleLabel>(PhantomData<Label>);
 
+/// A wrapper [`Resource`] for the [`OnTick`] schedule label.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Resource)]
 struct OnTickLabel<Label: ScheduleLabel>(InternedScheduleLabel, PhantomData<Label>);
 
 impl<Label: ScheduleLabel> OnTick<Label> {
-    fn setup(label: Label, app: &mut App) {
+    fn setup(app: &mut App, label: Label) {
         app.insert_resource(OnTickLabel::<Label>(label.intern(), PhantomData));
 
         let mut schedule = Schedule::new(label);
         schedule.set_executor_kind(ExecutorKind::SingleThreaded);
         app.add_schedule(schedule);
 
-        app.add_systems(OnTick::<PreNetwork>::default(), OnTick::<PreNetwork>::execute_schedule);
+        app.add_systems(
+            OnTick::<Label>::default(),
+            OnTick::<Label>::execute_schedule.run_if(Self::any_ticks),
+        );
     }
 
+    /// A [`Condition`] that checks if there are any ticks to run.
+    fn any_ticks(tick: Res<TickSettings>) -> bool { tick.ticks() > 0 }
+
+    /// A [`System`] that runs the `Label` schedule
+    /// for the amount of ticks that need to be run.
     fn execute_schedule(world: &mut World) {
         let ticks = world.resource::<TickSettings>().ticks();
         let label = world.resource::<OnTickLabel<Label>>().0;
         (0..ticks).for_each(|_| world.run_schedule(label));
     }
+}
+
+// Manual implementations to avoid trait bounds
+
+impl<Label: ScheduleLabel> Default for OnTick<Label> {
+    fn default() -> Self { Self(PhantomData) }
+}
+
+impl<Label: ScheduleLabel> Clone for OnTick<Label> {
+    #[allow(clippy::non_canonical_clone_impl)]
+    fn clone(&self) -> Self { Self(PhantomData) }
+}
+impl<Label: ScheduleLabel> Copy for OnTick<Label> {}
+
+impl<Label: ScheduleLabel> PartialEq for OnTick<Label> {
+    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
+}
+impl<Label: ScheduleLabel> Eq for OnTick<Label> {}
+
+impl<Label: ScheduleLabel> std::hash::Hash for OnTick<Label> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state) }
 }

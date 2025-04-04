@@ -8,8 +8,9 @@ use bevy_ecs::{
 use bevy_time::{Fixed, Real, Time, TimeUpdateStrategy, Virtual};
 use parking_lot::Mutex;
 
-use crate::schedule::{
-    PostNetwork, PostTick, PreNetwork, PreTick, SchedulePlugin, Tick, TickSettings,
+use crate::{
+    schedule::{PostNetwork, PostTick, PreNetwork, PreTick, SchedulePlugin, Tick, TickSettings},
+    systemset::SystemSetPlugin,
 };
 
 mod reflect;
@@ -77,8 +78,12 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             sub_app.init_resource::<TickSettings>().register_type::<TickSettings>();
             sub_app.add_systems(
                 Main,
-                (bevy_time::time_system, SchedulePlugin::tick_update, run_main).chain(),
+                (bevy_time::time_system, SchedulePlugin::tick_update, run_main.run_if(any_ticks))
+                    .chain(),
             );
+
+            // Add the `SystemSetPlugin` to the subapp.
+            sub_app.add_plugins(SystemSetPlugin);
         }
 
         app.insert_sub_app(self.subapp_label.lock().take().unwrap(), sub_app);
@@ -114,6 +119,9 @@ impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
         });
     }
 }
+
+/// A [`Condition`] that checks if there are any ticks to run.
+fn any_ticks(ticks: Res<TickSettings>) -> bool { ticks.ticks() > 0 }
 
 /// A [`System`] that runs [`Main::run_main`]
 /// for the amount of ticks that need to be run.
