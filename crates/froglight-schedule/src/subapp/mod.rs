@@ -14,10 +14,13 @@ use crate::{
 };
 
 mod reflect;
-pub use reflect::*;
+pub use reflect::ReflectSubAppSync;
 
 mod sync;
-pub use sync::*;
+pub use sync::{SubAppSync, SyncStorage};
+
+mod tick;
+pub use tick::CurrentTick;
 
 #[cfg(test)]
 mod test;
@@ -41,9 +44,7 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
 
         {
             // Set the subapp's extract function.
-            let extract = self.extract_fn.lock().take();
-            let extract = extract.unwrap_or_else(|| Box::new(Self::extract));
-            sub_app.set_extract(extract);
+            sub_app.set_extract(self.take_extract());
         }
 
         {
@@ -74,7 +75,7 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             sub_app.init_resource::<Time<Fixed>>().register_type::<Time<Fixed>>();
             sub_app.init_resource::<TimeUpdateStrategy>();
 
-            // Update time, the tick counter, and run `Main` if needed.
+            // Update the time and current tick, run `Main` if needed.
             sub_app.init_resource::<TickSettings>().register_type::<TickSettings>();
             sub_app.add_systems(
                 Main,
@@ -82,10 +83,15 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
                     .chain(),
             );
 
+            // Add the `CurrentTick` counter and increment it every tick.
+            sub_app.init_resource::<CurrentTick>().register_type::<CurrentTick>();
+            sub_app.add_systems(First, CurrentTick::increment_tick);
+
             // Add the `SystemSetPlugin` to the subapp.
             sub_app.add_plugins(SystemSetPlugin);
         }
 
+        // Insert the subapp into the main app.
         app.insert_sub_app(self.subapp_label.lock().take().unwrap(), sub_app);
     }
 
@@ -110,9 +116,16 @@ impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
         self
     }
 
-    /// The default [`SubApp`] extract function.
+    /// Take the [`SubApp`]'s extract function.
+    #[must_use]
+    #[expect(clippy::type_complexity)]
+    pub fn take_extract(&self) -> Box<dyn Fn(&mut World, &mut World) + Send> {
+        self.extract_fn.lock().take().unwrap_or_else(|| Box::new(Self::extract))
+    }
+
+    /// The default [`SubAppPlugin`] extract function.
     ///
-    /// Runs all [`SubAppSync`] functions in the [`SyncStorage`].
+    /// Runs all registered [`SubAppSync`] functions from the [`SyncStorage`].
     pub fn extract(app: &mut World, sub: &mut World) {
         app.resource_scope::<SyncStorage<SubApp>, ()>(|app, storage| {
             storage.iter().for_each(|sync| sync.sync(app, sub));

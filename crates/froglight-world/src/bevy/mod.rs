@@ -25,7 +25,7 @@ use crate::prelude::{Chunk, ChunkPos};
 pub struct WorldPlugin(InternedScheduleLabel);
 
 impl Default for WorldPlugin {
-    fn default() -> Self { Self::new(&Last) }
+    fn default() -> Self { Self::new(Last) }
 }
 
 impl Plugin for WorldPlugin {
@@ -58,7 +58,7 @@ impl WorldPlugin {
     /// Create a new [`WorldPlugin`] with the given [`ScheduleLabel`].
     #[inline]
     #[must_use]
-    pub fn new<Schedule: ScheduleLabel>(schedule: &Schedule) -> Self { Self(schedule.intern()) }
+    pub fn new<Schedule: ScheduleLabel>(schedule: Schedule) -> Self { Self(schedule.intern()) }
 
     /// A [`System`] that updates the
     /// [`EntityPositionMap`] and [`ChunkPositionMap`] resources.

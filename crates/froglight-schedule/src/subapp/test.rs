@@ -1,6 +1,6 @@
 use bevy::{MinimalPlugins, app::AppLabel, log::LogPlugin, prelude::*};
 
-use super::SubAppPlugin;
+use super::{CurrentTick, SubAppPlugin};
 use crate::schedule::{PostNetwork, PostTick, PreNetwork, PreTick, Tick};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, AppLabel)]
@@ -14,7 +14,7 @@ fn app() -> AppExit {
 
     // Exit the app after 0.5 seconds
     app.add_systems(Update, |time: Res<Time>, mut commands: Commands| {
-        time.elapsed_secs().gt(&0.5).then(|| {
+        time.elapsed_secs().gt(&0.501).then(|| {
             commands.send_event(AppExit::Success);
         });
     });
@@ -25,7 +25,11 @@ fn app() -> AppExit {
         sub.add_systems(First, || info_once!("First!"));
         sub.add_systems(PreNetwork, || info_once!("PreNetwork!"));
         sub.add_systems(PreTick, || info_once!("PreTick!"));
-        sub.add_systems(Tick, || info!("Tick!"));
+
+        sub.add_systems(Tick, |tick: Res<CurrentTick>| {
+            info!("Tick! ({})", **tick);
+        });
+
         sub.add_systems(PostTick, || info_once!("PostTick!"));
         sub.add_systems(PostNetwork, || info_once!("PostNetwork!"));
         sub.add_systems(Last, || info_once!("Last!"));

@@ -1,8 +1,7 @@
-use std::ops::{Deref, DerefMut};
-
 use bevy_app::AppLabel;
 use bevy_ecs::prelude::*;
 use bevy_reflect::prelude::*;
+use derive_more::{Deref, DerefMut};
 
 use super::ReflectSubAppSync;
 
@@ -20,28 +19,19 @@ pub trait SubAppSync<SubApp: AppLabel> {
 // -------------------------------------------------------------------------------------------------
 
 /// A [`Resource`] containing all related [`SubAppSync`] functions.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Resource, Reflect)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Resource, Reflect, Deref, DerefMut)]
 #[reflect(Debug, Resource)]
 pub struct SyncStorage<SubApp: AppLabel>(Vec<ReflectSubAppSync<SubApp>>);
 
 impl<SubApp: AppLabel> FromWorld for SyncStorage<SubApp> {
     fn from_world(world: &mut World) -> Self {
-        let registry = world.resource::<AppTypeRegistry>().read();
-
         Self(
-            registry
+            world
+                .resource::<AppTypeRegistry>()
+                .read()
                 .iter_with_data::<ReflectSubAppSync<SubApp>>()
-                .map(|(_type, reflect)| *reflect)
+                .map(|(_, reflect)| *reflect)
                 .collect(),
         )
     }
-}
-
-impl<SubApp: AppLabel> Deref for SyncStorage<SubApp> {
-    type Target = Vec<ReflectSubAppSync<SubApp>>;
-
-    fn deref(&self) -> &Self::Target { &self.0 }
-}
-impl<SubApp: AppLabel> DerefMut for SyncStorage<SubApp> {
-    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }

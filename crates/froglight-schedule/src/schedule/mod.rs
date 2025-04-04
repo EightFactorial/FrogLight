@@ -9,16 +9,13 @@ use bevy_ecs::{
 };
 use bevy_time::{Real, Time};
 
-mod network;
-pub use network::*;
+use crate::systemset::SystemSetPlugin;
+
+mod label;
+pub use label::*;
 
 mod tick;
 pub use tick::*;
-
-mod time;
-pub use time::*;
-
-use crate::systemset::SystemSetPlugin;
 
 #[cfg(test)]
 mod test;
@@ -144,7 +141,7 @@ impl<Label: ScheduleLabel> OnTick<Label> {
     }
 }
 
-// Manual implementations to avoid trait bounds
+// -------------------------------------------------------------------------------------------------
 
 impl<Label: ScheduleLabel> Default for OnTick<Label> {
     fn default() -> Self { Self(PhantomData) }

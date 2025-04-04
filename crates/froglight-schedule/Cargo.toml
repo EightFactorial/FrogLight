@@ -23,7 +23,7 @@ bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_reflect = { workspace = true }
 bevy_time = { workspace = true }
-froglight-common = { workspace = true, features = ["bevy"] }
+derive_more = { workspace = true }
 parking_lot = { workspace = true }
 
 [features]

@@ -38,14 +38,14 @@ use crate::{
 pub struct BrigadierPlugin(InternedScheduleLabel);
 
 impl Default for BrigadierPlugin {
-    fn default() -> Self { Self::new(&Last) }
+    fn default() -> Self { Self::new(Last) }
 }
 
 impl BrigadierPlugin {
     /// Create a new [`BrigadierPlugin`] with the given [`ScheduleLabel`].
     #[inline]
     #[must_use]
-    pub fn new<Schedule: ScheduleLabel>(schedule: &Schedule) -> Self { Self(schedule.intern()) }
+    pub fn new<Schedule: ScheduleLabel>(schedule: Schedule) -> Self { Self(schedule.intern()) }
 }
 
 impl Plugin for BrigadierPlugin {

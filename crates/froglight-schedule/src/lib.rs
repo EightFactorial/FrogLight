@@ -11,4 +11,6 @@ pub mod prelude {
     //! Re-exports of common types and traits.
 
     pub use crate::schedule::{PostNetwork, PostTick, PreNetwork, PreTick, Tick, TickSettings};
+    #[cfg(feature = "subapp")]
+    pub use crate::subapp::CurrentTick;
 }

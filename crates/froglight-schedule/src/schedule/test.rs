@@ -10,7 +10,7 @@ fn app() -> AppExit {
 
     // Exit the app after 0.5 seconds
     app.add_systems(Update, |time: Res<Time>, mut commands: Commands| {
-        time.elapsed_secs().gt(&0.5).then(|| {
+        time.elapsed_secs().gt(&0.501).then(|| {
             commands.send_event(AppExit::Success);
         });
     });

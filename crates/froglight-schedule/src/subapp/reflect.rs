@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use bevy_app::AppLabel;
 use bevy_ecs::prelude::*;
-use bevy_reflect::{FromType, prelude::*};
+use bevy_reflect::FromType;
 
 use super::SubAppSync;
 
@@ -14,6 +14,10 @@ pub struct ReflectSubAppSync<SubApp: AppLabel> {
     _phantom: PhantomData<SubApp>,
 }
 
+impl<T: SubAppSync<SubApp>, SubApp: AppLabel> FromType<T> for ReflectSubAppSync<SubApp> {
+    fn from_type() -> Self { Self { sync_fn: T::sync, _phantom: PhantomData } }
+}
+
 impl<SubApp: AppLabel> ReflectSubAppSync<SubApp> {
     /// Sync the main [`App`](bevy_app::App)
     /// with the [`SubApp`](bevy_app::SubApp).
@@ -21,13 +25,9 @@ impl<SubApp: AppLabel> ReflectSubAppSync<SubApp> {
     pub fn sync(&self, app: &mut World, sub: &mut World) { (self.sync_fn)(app, sub); }
 }
 
-impl<T: SubAppSync<SubApp> + PartialReflect, SubApp: AppLabel> FromType<T>
-    for ReflectSubAppSync<SubApp>
-{
-    fn from_type() -> Self { Self { sync_fn: T::sync, _phantom: PhantomData } }
-}
+// -------------------------------------------------------------------------------------------------
 
-// Manual implementations to avoid trait bounds on `SubApp`.
+// Manual implementations to avoid trait bounds.
 
 impl<SubApp: AppLabel> Clone for ReflectSubAppSync<SubApp> {
     #[allow(clippy::non_canonical_clone_impl)]
