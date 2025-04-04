@@ -7,7 +7,6 @@ use bevy_ecs::{
     prelude::*,
     schedule::{ExecutorKind, InternedScheduleLabel, ScheduleLabel},
 };
-use bevy_time::{Real, Time};
 
 use crate::systemset::SystemSetPlugin;
 
@@ -36,17 +35,22 @@ pub struct SchedulePlugin;
 
 impl Plugin for SchedulePlugin {
     fn build(&self, app: &mut App) {
-        // Add and initialize `TickSettings`.
-        app.init_resource::<TickSettings>().register_type::<TickSettings>();
-
         app.init_schedule(PreNetwork);
         app.init_schedule(PreTick);
         app.init_schedule(Tick);
         app.init_schedule(PostTick);
         app.init_schedule(PostNetwork);
 
-        // Update `TickSettings` at the start of every frame.
-        app.add_systems(First, Self::tick_update.after(bevy_time::time_system));
+        // Add and initialize `CurrentTick`, `TickRate`, and `ShouldTick`.
+        app.init_resource::<CurrentTick>().register_type::<CurrentTick>();
+        app.init_resource::<TickRate>().register_type::<TickRate>();
+        app.init_resource::<ShouldTick>().register_type::<ShouldTick>();
+
+        app.add_systems(
+            First,
+            (ShouldTick::update_tick, CurrentTick::increment_tick.run_if(ShouldTick::should_tick))
+                .chain(),
+        );
 
         if let Some(mut order) = app.world_mut().get_resource_mut::<MainScheduleOrder>() {
             // Add `PreNetwork`
@@ -99,12 +103,6 @@ impl Plugin for SchedulePlugin {
     }
 }
 
-impl SchedulePlugin {
-    pub(crate) fn tick_update(mut tick: ResMut<TickSettings>, time: Res<Time<Real>>) {
-        tick.update(&time);
-    }
-}
-
 // -------------------------------------------------------------------------------------------------
 
 /// A wrapper [`ScheduleLabel`] for running schedules on every tick.
@@ -125,19 +123,14 @@ impl<Label: ScheduleLabel> OnTick<Label> {
 
         app.add_systems(
             OnTick::<Label>::default(),
-            OnTick::<Label>::execute_schedule.run_if(Self::any_ticks),
+            OnTick::<Label>::execute_schedule.run_if(ShouldTick::should_tick),
         );
     }
-
-    /// A [`Condition`] that checks if there are any ticks to run.
-    fn any_ticks(tick: Res<TickSettings>) -> bool { tick.ticks() > 0 }
 
     /// A [`System`] that runs the `Label` schedule
     /// for the amount of ticks that need to be run.
     fn execute_schedule(world: &mut World) {
-        let ticks = world.resource::<TickSettings>().ticks();
-        let label = world.resource::<OnTickLabel<Label>>().0;
-        (0..ticks).for_each(|_| world.run_schedule(label));
+        world.run_schedule(world.resource::<OnTickLabel<Label>>().0);
     }
 }
 

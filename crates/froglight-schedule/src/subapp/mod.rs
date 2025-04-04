@@ -5,11 +5,12 @@ use bevy_ecs::{
     prelude::*,
     schedule::{ExecutorKind, ScheduleLabel},
 };
-use bevy_time::{Fixed, Real, Time, TimeUpdateStrategy, Virtual};
+use bevy_time::{TimeUpdateStrategy, prelude::*};
 use parking_lot::Mutex;
 
 use crate::{
-    schedule::{PostNetwork, PostTick, PreNetwork, PreTick, SchedulePlugin, Tick, TickSettings},
+    prelude::CurrentTick,
+    schedule::{PostNetwork, PostTick, PreNetwork, PreTick, ShouldTick, Tick, TickRate},
     systemset::SystemSetPlugin,
 };
 
@@ -18,9 +19,6 @@ pub use reflect::ReflectSubAppSync;
 
 mod sync;
 pub use sync::{SubAppSync, SyncStorage};
-
-mod tick;
-pub use tick::CurrentTick;
 
 #[cfg(test)]
 mod test;
@@ -54,6 +52,14 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             sub_app.add_schedule(main_schedule);
             sub_app.update_schedule = Some(Main.intern());
 
+            // Add `bevy_time` support.
+            sub_app.init_resource::<Time>().register_type::<Time>();
+            sub_app.init_resource::<Time<Real>>().register_type::<Time<Real>>();
+            sub_app.init_resource::<Time<Virtual>>().register_type::<Time<Virtual>>();
+            sub_app.init_resource::<Time<Fixed>>().register_type::<Time<Fixed>>();
+            sub_app.init_resource::<TimeUpdateStrategy>().register_type::<Timer>();
+            sub_app.add_systems(Main, bevy_time::time_system);
+
             // Add the schedules in the order they will be run.
             sub_app.insert_resource(MainScheduleOrder {
                 labels: vec![
@@ -68,24 +74,21 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
                 ..Default::default()
             });
 
-            // Add and register the `Time` resources
-            sub_app.init_resource::<Time>().register_type::<Time>();
-            sub_app.init_resource::<Time<Real>>().register_type::<Time<Real>>();
-            sub_app.init_resource::<Time<Virtual>>().register_type::<Time<Virtual>>();
-            sub_app.init_resource::<Time<Fixed>>().register_type::<Time<Fixed>>();
-            sub_app.init_resource::<TimeUpdateStrategy>();
+            // Add and initialize `CurrentTick`, `TickRate`, and `ShouldTick`.
+            sub_app.init_resource::<CurrentTick>().register_type::<CurrentTick>();
+            sub_app.init_resource::<TickRate>().register_type::<TickRate>();
+            sub_app.init_resource::<ShouldTick>().register_type::<ShouldTick>();
 
-            // Update the time and current tick, run `Main` if needed.
-            sub_app.init_resource::<TickSettings>().register_type::<TickSettings>();
+            // Update the tick and run `Main` if needed.
             sub_app.add_systems(
                 Main,
-                (bevy_time::time_system, SchedulePlugin::tick_update, run_main.run_if(any_ticks))
+                (
+                    ShouldTick::update_tick,
+                    CurrentTick::increment_tick.run_if(ShouldTick::should_tick),
+                    Main::run_main.after(bevy_time::time_system).run_if(ShouldTick::should_tick),
+                )
                     .chain(),
             );
-
-            // Add the `CurrentTick` counter and increment it every tick.
-            sub_app.init_resource::<CurrentTick>().register_type::<CurrentTick>();
-            sub_app.add_systems(First, CurrentTick::increment_tick);
 
             // Add the `SystemSetPlugin` to the subapp.
             sub_app.add_plugins(SystemSetPlugin);
@@ -131,14 +134,4 @@ impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
             storage.iter().for_each(|sync| sync.sync(app, sub));
         });
     }
-}
-
-/// A [`Condition`] that checks if there are any ticks to run.
-fn any_ticks(ticks: Res<TickSettings>) -> bool { ticks.ticks() > 0 }
-
-/// A [`System`] that runs [`Main::run_main`]
-/// for the amount of ticks that need to be run.
-fn run_main(world: &mut World) {
-    let ticks = world.resource::<TickSettings>().ticks();
-    (0..ticks).for_each(|_| world.run_system_cached(Main::run_main).unwrap());
 }

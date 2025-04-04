@@ -1,7 +1,7 @@
 use bevy::{MinimalPlugins, app::AppLabel, log::LogPlugin, prelude::*};
 
-use super::{CurrentTick, SubAppPlugin};
-use crate::schedule::{PostNetwork, PostTick, PreNetwork, PreTick, Tick};
+use super::SubAppPlugin;
+use crate::prelude::*;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, AppLabel)]
 struct Test;
@@ -22,6 +22,10 @@ fn app() -> AppExit {
     // Print the system order.
     {
         let sub = app.sub_app_mut(Test);
+
+        // Execute ticks based on `TickRate`
+        sub.add_systems(Main, trigger_tick.after(ShouldTick::update_tick));
+
         sub.add_systems(First, || info_once!("First!"));
         sub.add_systems(PreNetwork, || info_once!("PreNetwork!"));
         sub.add_systems(PreTick, || info_once!("PreTick!"));
@@ -36,4 +40,18 @@ fn app() -> AppExit {
     }
 
     app.run()
+}
+
+/// Execute ticks based on `TickRate`.
+fn trigger_tick(
+    rate: Res<TickRate>,
+    time: Res<Time<Real>>,
+    mut should: ResMut<ShouldTick>,
+    mut timer: Local<Option<Timer>>,
+) {
+    let timer = timer.get_or_insert_with(|| Timer::new(rate.duration(), TimerMode::Repeating));
+
+    if timer.tick(time.delta()).just_finished() {
+        should.set_next();
+    }
 }

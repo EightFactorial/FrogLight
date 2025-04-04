@@ -22,7 +22,7 @@ bevy = { workspace = true }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_reflect = { workspace = true }
-bevy_time = { workspace = true }
+bevy_time = { workspace = true, optional = true }
 derive_more = { workspace = true }
 parking_lot = { workspace = true }
 
@@ -30,4 +30,4 @@ parking_lot = { workspace = true }
 default = []
 
 # Enable the `SubAppPlugin`
-subapp = []
+subapp = ["dep:bevy_time"]

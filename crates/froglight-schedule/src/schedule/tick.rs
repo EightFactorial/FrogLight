@@ -1,107 +1,90 @@
-use std::time::Duration;
+use std::{
+    sync::atomic::{AtomicBool, Ordering},
+    time::Duration,
+};
 
 use bevy_ecs::prelude::*;
 use bevy_reflect::prelude::*;
-use bevy_time::{Real, Time, Timer, TimerMode};
+use derive_more::{Deref, DerefMut};
 
-/// Settings for how ticks should be executed.
-#[derive(Debug, Clone, PartialEq, Eq, Resource, Reflect)]
-#[reflect(Debug, Default, PartialEq, Resource)]
-pub struct TickSettings {
-    /// The tick timer.
-    timer: Timer,
+/// A counter for the current tick.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Resource, Reflect, Deref, DerefMut)]
+#[reflect(Debug, Default, PartialEq, Hash, Resource)]
+pub struct CurrentTick(u128);
 
-    /// The target amount of ticks per second.
-    target: u32,
-    /// The maximum number of ticks to run per frame.
-    maximum: u32,
+impl CurrentTick {
+    /// A [`System`] that increments the [`CurrentTick`].
+    pub fn increment_tick(mut tick: ResMut<Self>) { tick.increment(); }
 
-    /// The tick this frame started at.
-    start: u128,
-    /// The amount of ticks that will run this frame.
-    running: u32,
-    /// The amount of ticks to catch up to real time.
-    remaining: u32,
+    /// Increment the [`CurrentTick`].
+    pub fn increment(&mut self) { self.0 = self.0.wrapping_add(1); }
 }
 
-impl Default for TickSettings {
-    fn default() -> Self {
-        Self {
-            start: 0,
-            running: 0,
-            remaining: 0,
-            target: TickSettings::DEFAULT_TPS,
-            maximum: TickSettings::DEFAULT_MAX_PER_FRAME,
-            timer: Timer::new(
-                Duration::from_secs_f64(1.0 / f64::from(TickSettings::DEFAULT_TPS)),
-                TimerMode::Repeating,
-            ),
-        }
-    }
+// -------------------------------------------------------------------------------------------------
+
+/// How many ticks should be executed per second.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Resource, Reflect)]
+#[reflect(Debug, Default, PartialEq, Hash, Resource)]
+pub struct TickRate(u32);
+
+impl Default for TickRate {
+    fn default() -> Self { Self(20) }
 }
 
-impl TickSettings {
-    /// The default maximum amount of ticks per frame.
-    pub const DEFAULT_MAX_PER_FRAME: u32 = 5;
-    /// The default number of ticks per second.
-    pub const DEFAULT_TPS: u32 = 20;
-
-    /// The amount of ticks that will be run this frame.
+impl TickRate {
+    /// Get the expected number of ticks per second.
     #[inline]
     #[must_use]
-    pub const fn ticks(&self) -> u32 { self.running }
+    pub const fn per_second(&self) -> u32 { self.0 }
 
-    /// The tick this frame started at.
+    /// Get the expected number of seconds between ticks.
     #[inline]
     #[must_use]
-    pub const fn ticks_start(&self) -> u128 { self.start }
-
-    /// The amount of ticks needed to catch up to real time.
-    #[inline]
-    #[must_use]
-    pub const fn ticks_behind(&self) -> u32 { self.remaining }
-
-    /// The timer used to track the next tick.
-    #[inline]
-    #[must_use]
-    pub const fn timer(&self) -> &Timer { &self.timer }
-
-    /// The target amount of ticks per second.
-    #[inline]
-    #[must_use]
-    pub const fn target(&self) -> u32 { self.target }
-
-    /// Set the target amount of ticks to run per second.
-    pub fn set_target(&mut self, tps: u32) {
-        self.timer.set_duration(Duration::from_secs_f64(1.0 / f64::from(tps)));
-        self.target = tps;
+    pub const fn duration_f64(&self) -> f64 {
+        match self.0 {
+            0 => 0f64,
+            x => (x as f64).recip(),
+        }
     }
 
-    /// The maximum amount of ticks that can be run per frame.
-    #[inline]
+    /// Get the expected [`Duration`] between ticks.
     #[must_use]
-    pub const fn maximum(&self) -> u32 { self.maximum }
+    pub fn duration(&self) -> Duration { Duration::from_secs_f64(self.duration_f64()) }
+}
 
-    /// Set the maximum amount of ticks that can be run per frame.
-    #[inline]
-    pub fn set_maximum(&mut self, max: u32) { self.maximum = max; }
+// -------------------------------------------------------------------------------------------------
 
-    /// Update the [`TickSettings`] [`Timer`].
-    pub fn update(&mut self, time: &Time<Real>) {
-        // Update the current tick.
-        self.start = self.start.wrapping_add(u128::from(self.running));
+/// Whether a tick should be executed during the next update.
+#[derive(Debug, Default, Resource, Reflect)]
+#[reflect(Debug, Default, Resource)]
+pub struct ShouldTick {
+    current: AtomicBool,
+    next: AtomicBool,
+}
 
-        // Update the timer.
-        self.timer.tick(time.delta());
-        if self.timer.just_finished() {
-            // Add the amount of ticks that have passed
-            self.remaining = self.remaining.saturating_add(self.timer.times_finished_this_tick());
-            self.timer.set_elapsed(self.timer.elapsed());
-        }
+impl ShouldTick {
+    /// Get whether a tick should execute this update.
+    #[must_use]
+    pub fn get_current(&self) -> bool { self.current.load(Ordering::Relaxed) }
 
-        // Set the amount of ticks that will run this frame
-        self.running = self.remaining.min(self.maximum);
-        // Subtract the amount of tick that will be run.
-        self.remaining = self.remaining.saturating_sub(self.running);
+    /// Get whether a tick should execute next update.
+    #[must_use]
+    pub fn get_next(&self) -> bool { self.next.load(Ordering::Relaxed) }
+
+    /// Trigger a tick next update.
+    pub fn set_next(&mut self) { self.next.store(true, Ordering::Relaxed); }
+
+    /// Cancel a tick from running next update.
+    pub fn clear_next(&mut self) { self.next.store(false, Ordering::Relaxed); }
+
+    /// A [`Condition`] that returns `true` if a tick should execute.
+    #[must_use]
+    pub fn should_tick(tick: Res<Self>) -> bool { tick.get_current() }
+
+    /// A [`System`] that updates [`ShouldTick`] at the start of a frame.
+    pub fn update_tick(mut tick: ResMut<Self>) {
+        let Self { current, next } = &mut *tick;
+        std::mem::swap(current, next);
+        next.store(false, Ordering::Relaxed);
     }
 }
