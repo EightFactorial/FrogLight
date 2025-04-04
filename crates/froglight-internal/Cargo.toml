@@ -28,6 +28,7 @@ froglight-world = { workspace = true, features = ["block"] }
 
 # Optional dependencies
 froglight-brigadier = { workspace = true, optional = true }
+froglight-schedule = { workspace = true, optional = true }
 
 # Nightly dependencies
 crc32fast = { workspace = true, optional = true, features = ["nightly"] }
@@ -46,6 +47,7 @@ brigadier = ["dep:froglight-brigadier", "froglight-network/brigadier", "bevy"]
 
 # Enable `bevy` support.
 bevy = [
+  "dep:froglight-schedule",
   "froglight-block/bevy",
   "froglight-common/bevy",
   "froglight-inventory/bevy",

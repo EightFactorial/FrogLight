@@ -11,6 +11,8 @@ pub use froglight_nbt as nbt;
 pub use froglight_network as network;
 pub use froglight_player as player;
 pub use froglight_registry as registry;
+#[cfg(feature = "bevy")]
+pub use froglight_schedule as schedule;
 pub use froglight_world as world;
 
 pub mod prelude {
@@ -26,5 +28,7 @@ pub mod prelude {
     pub use froglight_network::prelude::*;
     pub use froglight_player::prelude::*;
     pub use froglight_registry::prelude::*;
+    #[cfg(feature = "bevy")]
+    pub use froglight_schedule::prelude::*;
     pub use froglight_world::prelude::*;
 }

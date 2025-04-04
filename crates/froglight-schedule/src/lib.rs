@@ -8,7 +8,7 @@ pub mod systemset;
 pub mod subapp;
 
 pub mod prelude {
-    //! Re-exports of common types, traits, and macros.
+    //! Re-exports of common types and traits.
 
     pub use crate::schedule::{PostNetwork, PostTick, PreNetwork, PreTick, Tick, TickSettings};
 }
