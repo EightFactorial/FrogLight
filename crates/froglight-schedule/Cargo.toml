@@ -31,3 +31,7 @@ default = []
 
 # Enable the `SubAppPlugin`
 subapp = ["dep:bevy_time"]
+
+[[example]]
+name = "subapp"
+required-features = ["subapp"]

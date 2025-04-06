@@ -8,16 +8,10 @@ use bevy_ecs::{
     schedule::{ExecutorKind, InternedScheduleLabel, ScheduleLabel},
 };
 
-use crate::systemset::SystemSetPlugin;
+use crate::{prelude::*, systemset::SystemSetPlugin};
 
 mod label;
 pub use label::*;
-
-mod tick;
-pub use tick::*;
-
-#[cfg(test)]
-mod test;
 
 /// A [`Plugin`] that adds network and tick
 /// [`Schedule`](bevy_ecs::schedule::Schedule)s to an [`App`].

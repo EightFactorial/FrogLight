@@ -1,20 +1,19 @@
-use bevy::{MinimalPlugins, app::AppLabel, log::LogPlugin, prelude::*};
+//! TODO
 
-use super::SubAppPlugin;
-use crate::prelude::*;
+use bevy::{MinimalPlugins, app::AppLabel, log::LogPlugin, prelude::*};
+use froglight_schedule::{prelude::*, subapp::SubAppPlugin};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, AppLabel)]
 struct Test;
 
-#[test]
-fn app() -> AppExit {
+fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins((MinimalPlugins, LogPlugin::default()));
     app.add_plugins(SubAppPlugin::new(Test));
 
-    // Exit the app after 0.5 seconds
+    // Exit the app after 1 second
     app.add_systems(Update, |time: Res<Time>, mut commands: Commands| {
-        time.elapsed_secs().gt(&0.501).then(|| {
+        time.elapsed_secs().gt(&1.001).then(|| {
             commands.send_event(AppExit::Success);
         });
     });
@@ -22,6 +21,7 @@ fn app() -> AppExit {
     // Print the system order.
     {
         let sub = app.sub_app_mut(Test);
+        **sub.world_mut().resource_mut::<TickRate>() = u32::MAX;
 
         // Execute ticks based on `TickRate`
         sub.add_systems(Main, trigger_tick.after(ShouldTick::update_tick));

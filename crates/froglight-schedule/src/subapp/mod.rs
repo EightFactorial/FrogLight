@@ -8,20 +8,13 @@ use bevy_ecs::{
 use bevy_time::{TimeUpdateStrategy, prelude::*};
 use parking_lot::Mutex;
 
-use crate::{
-    prelude::CurrentTick,
-    schedule::{PostNetwork, PostTick, PreNetwork, PreTick, ShouldTick, Tick, TickRate},
-    systemset::SystemSetPlugin,
-};
+use crate::{prelude::*, systemset::SystemSetPlugin};
 
 mod reflect;
 pub use reflect::ReflectSubAppSync;
 
 mod sync;
 pub use sync::{SubAppSync, SyncStorage};
-
-#[cfg(test)]
-mod test;
 
 /// A [`Plugin`] that creates a new [`SubApp`] with a given [`AppLabel`].
 pub struct SubAppPlugin<SubApp: AppLabel> {
@@ -52,14 +45,6 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             sub_app.add_schedule(main_schedule);
             sub_app.update_schedule = Some(Main.intern());
 
-            // Add `bevy_time` support.
-            sub_app.init_resource::<Time>().register_type::<Time>();
-            sub_app.init_resource::<Time<Real>>().register_type::<Time<Real>>();
-            sub_app.init_resource::<Time<Virtual>>().register_type::<Time<Virtual>>();
-            sub_app.init_resource::<Time<Fixed>>().register_type::<Time<Fixed>>();
-            sub_app.init_resource::<TimeUpdateStrategy>().register_type::<Timer>();
-            sub_app.add_systems(Main, bevy_time::time_system);
-
             // Add the schedules in the order they will be run.
             sub_app.insert_resource(MainScheduleOrder {
                 labels: vec![
@@ -73,6 +58,14 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
                 ],
                 ..Default::default()
             });
+
+            // Add `bevy_time` support.
+            sub_app.init_resource::<Time>().register_type::<Time>();
+            sub_app.init_resource::<Time<Real>>().register_type::<Time<Real>>();
+            sub_app.init_resource::<Time<Virtual>>().register_type::<Time<Virtual>>();
+            sub_app.init_resource::<Time<Fixed>>().register_type::<Time<Fixed>>();
+            sub_app.init_resource::<TimeUpdateStrategy>().register_type::<Timer>();
+            sub_app.add_systems(Main, bevy_time::time_system);
 
             // Add and initialize `CurrentTick`, `TickRate`, and `ShouldTick`.
             sub_app.init_resource::<CurrentTick>().register_type::<CurrentTick>();

@@ -1,3 +1,5 @@
+//! TODO
+
 use std::{
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
@@ -23,7 +25,7 @@ impl CurrentTick {
 // -------------------------------------------------------------------------------------------------
 
 /// How many ticks should be executed per second.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Resource, Reflect)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Resource, Reflect, Deref, DerefMut)]
 #[reflect(Debug, Default, PartialEq, Hash, Resource)]
 pub struct TickRate(u32);
 
