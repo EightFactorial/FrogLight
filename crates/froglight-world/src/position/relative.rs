@@ -54,15 +54,15 @@ impl RelativeBlockPos {
     /// assert_eq!(relative.y(), 0);
     /// assert_eq!(relative.z(), 0);
     ///
-    /// let relative = RelativeBlockPos::from_block(16, 16, 0);
+    /// let relative = RelativeBlockPos::from_coordinates(16, 16, 0);
     /// assert_eq!(relative.x(), 0); // Wrapped around back to 0
     /// assert_eq!(relative.y(), 16); // Y does not wrap around
     /// assert_eq!(relative.z(), 0);
     ///
-    /// let relative = RelativeBlockPos::from_block(17, 16, -1);
-    /// assert_eq!(relative.x(), 0); // Wrapped around back to 1
-    /// assert_eq!(relative.y(), 0); // Y does not wrap around
-    /// assert_eq!(relative.z(), 0); // Wrapped around back to 15
+    /// let relative = RelativeBlockPos::from_coordinates(17, 128, -1);
+    /// assert_eq!(relative.x(), 1); // Wrapped around back to 1
+    /// assert_eq!(relative.y(), 128); // Y does not wrap around
+    /// assert_eq!(relative.z(), 15); // Wrapped around back to 15
     /// ```
     #[must_use]
     #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]

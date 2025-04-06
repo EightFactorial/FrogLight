@@ -377,8 +377,8 @@ proptest::proptest! {
     #[test]
     fn block_position(data in proptest::array::uniform3(proptest::num::i32::ANY)) {
         let pos = SectionBlockPos::from_block(crate::prelude::BlockPos::from(data));
-        assert_eq!(pos.x(), data[0].rem_euclid(16).try_into().unwrap());
-        assert_eq!(pos.y(), data[1].rem_euclid(16).try_into().unwrap());
-        assert_eq!(pos.z(), data[2].rem_euclid(16).try_into().unwrap());
+        assert_eq!(pos.x(), u8::try_from(data[0].rem_euclid(16)).unwrap());
+        assert_eq!(pos.y(), u8::try_from(data[1].rem_euclid(16)).unwrap());
+        assert_eq!(pos.z(), u8::try_from(data[2].rem_euclid(16)).unwrap());
     }
 }
