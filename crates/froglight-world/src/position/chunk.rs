@@ -37,6 +37,7 @@ impl ChunkPos {
     /// assert_eq!(chunk.x(), -1000);
     /// assert_eq!(chunk.z(), 1000);
     /// ```
+    #[inline]
     #[must_use]
     pub const fn new(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
 
@@ -58,14 +59,17 @@ impl ChunkPos {
     /// assert_eq!(chunk.x(), -1000);
     /// assert_eq!(chunk.z(), -1000);
     /// ```
+    #[inline]
     #[must_use]
     pub const fn splat(v: i32) -> Self { Self(IVec2::splat(v)) }
 
     /// The x-coordinate of this chunk.
+    #[inline]
     #[must_use]
     pub const fn x(&self) -> i32 { self.0.x }
 
     /// The z-coordinate of this chunk.
+    #[inline]
     #[must_use]
     pub const fn z(&self) -> i32 { self.0.y }
 
@@ -96,6 +100,7 @@ impl ChunkPos {
     /// let block = BlockPos::new(-17, 0, -17);
     /// assert_eq!(ChunkPos::from_block(block), ChunkPos::new(-2, -2));
     /// ```
+    #[inline]
     #[must_use]
     pub const fn from_block(block: BlockPos) -> Self {
         Self::new(block.x().div_euclid(16), block.z().div_euclid(16))
@@ -126,6 +131,7 @@ impl From<BlockPos> for ChunkPos {
 
 #[cfg(feature = "io")]
 impl FrogRead for ChunkPos {
+    #[inline]
     fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
         // Note: The x and z(y) coordinates are swapped here.
         let y = i32::frog_read(buffer)?;
@@ -135,6 +141,7 @@ impl FrogRead for ChunkPos {
 }
 #[cfg(feature = "io")]
 impl FrogWrite for ChunkPos {
+    #[inline]
     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
         // Note: The x and z(y) coordinates are swapped here.
         self.0.y.frog_write(buffer)?;
@@ -147,6 +154,7 @@ impl FrogWrite for ChunkPos {
 
 #[cfg(feature = "io")]
 impl FrogVarRead for ChunkPos {
+    #[inline]
     fn frog_var_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
         // Note: The x and z(y) coordinates are swapped here.
         let y = i32::frog_var_read(buffer)?;
@@ -156,6 +164,7 @@ impl FrogVarRead for ChunkPos {
 }
 #[cfg(feature = "io")]
 impl FrogVarWrite for ChunkPos {
+    #[inline]
     fn frog_var_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
         // Note: The x and z(y) coordinates are swapped here.
         self.0.y.frog_var_write(buffer)?;

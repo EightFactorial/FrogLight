@@ -35,6 +35,7 @@ impl BlockPos {
     /// assert_eq!(block.y(), 1000);
     /// assert_eq!(block.z(), -1000);
     /// ```
+    #[inline]
     #[must_use]
     pub const fn new(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
 
@@ -59,18 +60,22 @@ impl BlockPos {
     /// assert_eq!(block.y(), -1000);
     /// assert_eq!(block.z(), -1000);
     /// ```
+    #[inline]
     #[must_use]
     pub const fn splat(v: i32) -> Self { Self(IVec3::splat(v)) }
 
     /// The x-coordinate of this block.
+    #[inline]
     #[must_use]
     pub const fn x(&self) -> i32 { self.0.x }
 
     /// The y-coordinate of this block.
+    #[inline]
     #[must_use]
     pub const fn y(&self) -> i32 { self.0.y }
 
     /// The z-coordinate of this block.
+    #[inline]
     #[must_use]
     pub const fn z(&self) -> i32 { self.0.z }
 }

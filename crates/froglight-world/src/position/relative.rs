@@ -43,11 +43,43 @@ impl RelativeBlockPos {
         Self(U8Vec2::new(x % Section::WIDTH as u8, z % Section::DEPTH as u8), y)
     }
 
+    /// Create a new [`RelativeBlockPos`] from the given absolute coordinates.
+    ///
+    /// # Example
+    /// ```rust
+    /// use froglight_world::position::RelativeBlockPos;
+    ///
+    /// let relative = RelativeBlockPos::from_coordinates(0, 0, 0);
+    /// assert_eq!(relative.x(), 0);
+    /// assert_eq!(relative.y(), 0);
+    /// assert_eq!(relative.z(), 0);
+    ///
+    /// let relative = RelativeBlockPos::from_block(16, 16, 0);
+    /// assert_eq!(relative.x(), 0); // Wrapped around back to 0
+    /// assert_eq!(relative.y(), 16); // Y does not wrap around
+    /// assert_eq!(relative.z(), 0);
+    ///
+    /// let relative = RelativeBlockPos::from_block(17, 16, -1);
+    /// assert_eq!(relative.x(), 0); // Wrapped around back to 1
+    /// assert_eq!(relative.y(), 0); // Y does not wrap around
+    /// assert_eq!(relative.z(), 0); // Wrapped around back to 15
+    /// ```
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+    pub const fn from_coordinates(x: i32, y: u16, z: i32) -> Self {
+        Self::new(
+            x.rem_euclid(Section::WIDTH as i32) as u8,
+            y,
+            z.rem_euclid(Section::DEPTH as i32) as u8,
+        )
+    }
+
     /// Create a new [`RelativeBlockPos`] from the given [`BlockPos`] and
     /// offset.
     ///
     /// # Panics
-    /// Panics if the `BlockPos` is lower vertically than the offset.
+    /// Panics if the `BlockPos` `Y` is less the offset
+    /// or higher than `u16::MAX - offset`.
     ///
     /// # Example
     /// ```rust
@@ -69,13 +101,17 @@ impl RelativeBlockPos {
     /// assert_eq!(relative.z(), 0);
     /// ```
     #[must_use]
-    #[expect(clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::cast_sign_loss)]
+    #[expect(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
     pub const fn from_block(pos: BlockPos, offset: isize) -> Self {
-        Self::new(
-            pos.x().rem_euclid(Section::WIDTH as i32) as u8,
-            pos.y().checked_add(offset as i32).expect("`BlockPos` out of range!") as u16,
-            pos.z().rem_euclid(Section::DEPTH as i32) as u8,
-        )
+        const MIN: i32 = u16::MIN as i32;
+        const MAX: i32 = u16::MAX as i32;
+
+        match pos.y().checked_add(offset as i32).expect("`BlockPos` Y overflowed from offset!") {
+            // Safe, inside of valid range
+            pos_y @ MIN..=MAX => Self::from_coordinates(pos.x(), pos_y as u16, pos.z()),
+            // Panic, outside of valid range
+            _ => panic!("`BlockPos` Y out of valid range!"),
+        }
     }
 
     /// The x-coordinate of this block.
@@ -145,4 +181,51 @@ impl Sub<RelativeBlockPos> for RelativeBlockPos {
 }
 impl SubAssign<RelativeBlockPos> for RelativeBlockPos {
     fn sub_assign(&mut self, rhs: Self) { *self = *self - rhs; }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(test)]
+proptest::proptest! {
+    #[test]
+    fn verify(x in proptest::num::u8::ANY, y in proptest::num::u16::ANY, z in proptest::num::u8::ANY) {
+        let pos = RelativeBlockPos::new(x, y, z);
+        assert_eq!(pos.x(), x % 16);
+        assert_eq!(pos.y(), y);
+        assert_eq!(pos.z(), z % 16);
+    }
+
+    #[test]
+    fn addition(x1 in proptest::num::u8::ANY, y1 in proptest::num::u16::ANY, z1 in proptest::num::u8::ANY,
+                       x2 in proptest::num::u8::ANY, y2 in proptest::num::u16::ANY, z2 in proptest::num::u8::ANY) {
+        let result = RelativeBlockPos::new(x1, y1, z1) + RelativeBlockPos::new(x2, y2, z2);
+        assert_eq!(result.x(), x1.wrapping_add(x2) % 16);
+        assert_eq!(result.y(), y1.wrapping_add(y2));
+        assert_eq!(result.z(), z1.wrapping_add(z2) % 16);
+    }
+
+    #[test]
+    fn subtraction(x1 in proptest::num::u8::ANY, y1 in proptest::num::u16::ANY, z1 in proptest::num::u8::ANY,
+                          x2 in proptest::num::u8::ANY, y2 in proptest::num::u16::ANY, z2 in proptest::num::u8::ANY) {
+        let result = RelativeBlockPos::new(x1, y1, z1) - RelativeBlockPos::new(x2, y2, z2);
+        assert_eq!(result.x(), x1.wrapping_sub(x2) % 16);
+        assert_eq!(result.y(), y1.wrapping_sub(y2));
+        assert_eq!(result.z(), z1.wrapping_sub(z2) % 16);
+    }
+
+    #[test]
+    fn block_position(data in proptest::array::uniform3(proptest::num::i32::ANY)) {
+        let pos = crate::prelude::BlockPos::new(data[0], data[1].clamp(u16::MIN as i32, u16::MAX as i32), data[2]);
+        let relative = RelativeBlockPos::from_block(pos, 0);
+        assert_eq!(relative.x() as i32, pos.x().rem_euclid(16));
+        assert_eq!(relative.z() as i32, pos.z().rem_euclid(16));
+    }
+
+    #[test]
+    fn coord_position(data in proptest::array::uniform3(proptest::num::i32::ANY)) {
+        let pos = crate::prelude::BlockPos::new(data[0], data[1].clamp(u16::MIN as i32, u16::MAX as i32), data[2]);
+        let relative = RelativeBlockPos::from_block(pos, 0);
+        assert_eq!(relative.x() as i32, pos.x().rem_euclid(16));
+        assert_eq!(relative.z() as i32, pos.z().rem_euclid(16));
+    }
 }

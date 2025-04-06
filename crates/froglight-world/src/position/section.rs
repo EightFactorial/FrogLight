@@ -82,6 +82,7 @@ impl SectionBlockPos {
     /// assert_eq!(block.y(), 15);
     /// assert_eq!(block.z(), 15);
     /// ```
+    #[inline]
     #[must_use]
     pub const fn splat(v: u8) -> Self { Self::new(v, v, v) }
 
@@ -224,19 +225,19 @@ impl SectionBlockPos {
     /// assert_eq!(block.into_quantized_index::<8>(), 7);
     ///
     /// // When `QUANTIZATION = 1` each position represents one block.
-    /// //  ____________________
+    /// //  _________________________
     /// // |\         \         \
     /// // | \         \         \
-    /// // |  \_________\_________\
+    /// // |  \_________\_________\_____
     /// // |  |\         \         \
     /// // |\ | \         \         \
-    /// // | \|  \_________\_________\
+    /// // | \|  \_________\_________\_____
     /// // |  \  |         |         |
     /// // \  |\ | (0,1,0) | (1,1,0) |
-    /// //  \ | \|_________|_________|
+    /// //  \ | \|_________|_________|_____
     /// //   \|  |         |         |
     /// //    \  | (0,0,0) | (1,0,0) |
-    /// //     \ |_________|_________|
+    /// //     \ |_________|_________|_____
     ///
     /// let block = SectionBlockPos::new(0, 0, 0);
     /// assert_eq!(block.into_quantized_index::<1>(), 0);
@@ -251,19 +252,19 @@ impl SectionBlockPos {
     /// assert_eq!(block.into_quantized_index::<1>(), 3);
     ///
     /// // When `QUANTIZATION = 2` each position represents 1/4 block.
-    /// //  ____________________
+    /// //  _________________________
     /// // |\                   \
     /// // | \                   \
     /// // |  \                   \
     /// // |   \                   \
     /// // |    \                   \
-    /// // |     \___________________\
+    /// // |     \___________________\_____
     /// // |     |                   |
     /// // \     | (0,1,0)   (1,1,0) |
     /// //  \    |                   |
     /// //   \   |                   |
     /// //    \  | (0,0,0)   (1,0,0) |
-    /// //     \ |___________________|
+    /// //     \ |___________________|_____
     ///
     /// let block = SectionBlockPos::new(0, 0, 0);
     /// assert_eq!(block.into_quantized_index::<2>(), 0);
@@ -333,4 +334,51 @@ impl Sub<SectionBlockPos> for SectionBlockPos {
 }
 impl SubAssign<SectionBlockPos> for SectionBlockPos {
     fn sub_assign(&mut self, rhs: Self) { *self = *self - rhs; }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(test)]
+proptest::proptest! {
+    #[test]
+    fn verify(data in proptest::array::uniform3(proptest::num::u8::ANY)) {
+        let pos = SectionBlockPos::new(data[0], data[1], data[2]);
+        assert_eq!(SectionBlockPos::from_index(pos.into_index()), pos);
+        assert_eq!(pos.x(), data[0] % 16);
+        assert_eq!(pos.y(), data[1] % 16);
+        assert_eq!(pos.z(), data[2] % 16);
+    }
+
+    #[test]
+    fn index(index in 0usize..4096usize) {
+        let pos = SectionBlockPos::from_index(index);
+        assert_eq!(pos.into_index(), index);
+        assert!(pos.x() <= 16);
+        assert!(pos.y() <= 16);
+        assert!(pos.z() <= 16);
+    }
+
+    #[test]
+    fn addition(data in proptest::array::uniform6(proptest::num::u8::ANY)) {
+        let result = SectionBlockPos::new(data[0], data[1], data[2]) + SectionBlockPos::new(data[3], data[4], data[5]);
+        assert_eq!(result.x(), data[0].wrapping_add(data[3]) % 16);
+        assert_eq!(result.y(), data[1].wrapping_add(data[4]) % 16);
+        assert_eq!(result.z(), data[2].wrapping_add(data[5]) % 16);
+    }
+
+    #[test]
+    fn subtraction(data in proptest::array::uniform6(proptest::num::u8::ANY)) {
+        let result = SectionBlockPos::new(data[0], data[1], data[2]) - SectionBlockPos::new(data[3], data[4], data[5]);
+        assert_eq!(result.x(), data[0].wrapping_sub(data[3]) % 16);
+        assert_eq!(result.y(), data[1].wrapping_sub(data[4]) % 16);
+        assert_eq!(result.z(), data[2].wrapping_sub(data[5]) % 16);
+    }
+
+    #[test]
+    fn block_position(data in proptest::array::uniform3(proptest::num::i32::ANY)) {
+        let pos = SectionBlockPos::from_block(crate::prelude::BlockPos::from(data));
+        assert_eq!(pos.x(), data[0].rem_euclid(16).try_into().unwrap());
+        assert_eq!(pos.y(), data[1].rem_euclid(16).try_into().unwrap());
+        assert_eq!(pos.z(), data[2].rem_euclid(16).try_into().unwrap());
+    }
 }
