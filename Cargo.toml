@@ -106,7 +106,7 @@ downcast-rs = "2.0"
 flate2 = "1.1"
 futures-lite = "2.6"
 glam = "0.29"
-hashbrown = "0.14"
+hashbrown = "0.15"
 hashify = "0.2.6"
 indexmap = "2.9"
 md-5 = { version = "0.10.6", features = ["std"] }
