@@ -1,5 +1,7 @@
 //! [`SubAppPlugin`] for creating [`SubApp`]s.
 
+use std::time::Instant;
+
 use bevy_app::{AppLabel, MainScheduleOrder, prelude::*};
 use bevy_ecs::{
     prelude::*,
@@ -39,11 +41,10 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
         }
 
         {
-            // Add the `Main` schedule.
+            // Add the `Main` schedule and set it as the update schedule.
             let mut main_schedule = Schedule::new(Main);
             main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-            sub_app.add_schedule(main_schedule);
-            sub_app.update_schedule = Some(Main.intern());
+            sub_app.add_schedule(main_schedule).update_schedule = Some(Main.intern());
 
             // Add the schedules in the order they will be run.
             sub_app.insert_resource(MainScheduleOrder {
@@ -65,20 +66,20 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             sub_app.init_resource::<Time<Virtual>>().register_type::<Time<Virtual>>();
             sub_app.init_resource::<Time<Fixed>>().register_type::<Time<Fixed>>();
             sub_app.init_resource::<TimeUpdateStrategy>().register_type::<Timer>();
-            sub_app.add_systems(Main, bevy_time::time_system);
 
             // Add and initialize `CurrentTick`, `TickRate`, and `ShouldTick`.
             sub_app.init_resource::<CurrentTick>().register_type::<CurrentTick>();
             sub_app.init_resource::<TickRate>().register_type::<TickRate>();
             sub_app.init_resource::<ShouldTick>().register_type::<ShouldTick>();
 
-            // Update the tick and run `Main` if needed.
+            // Update the time and tick, run `Main` if needed.
             sub_app.add_systems(
                 Main,
                 (
+                    time_system,
                     ShouldTick::update_tick,
                     CurrentTick::increment_tick.run_if(ShouldTick::should_tick),
-                    Main::run_main.after(bevy_time::time_system).run_if(ShouldTick::should_tick),
+                    Main::run_main.run_if(ShouldTick::should_tick),
                 )
                     .chain(),
             );
@@ -116,15 +117,31 @@ impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
     #[must_use]
     #[expect(clippy::type_complexity)]
     pub fn take_extract(&self) -> Box<dyn Fn(&mut World, &mut World) + Send> {
-        self.extract_fn.lock().take().unwrap_or_else(|| Box::new(Self::extract))
+        self.extract_fn.lock().take().unwrap_or_else(|| Box::new(Self::default_extract))
     }
 
     /// The default [`SubAppPlugin`] extract function.
     ///
     /// Runs all registered [`SubAppSync`] functions from the [`SyncStorage`].
-    pub fn extract(app: &mut World, sub: &mut World) {
+    pub fn default_extract(app: &mut World, sub: &mut World) {
         app.resource_scope::<SyncStorage<SubApp>, ()>(|app, storage| {
             storage.iter().for_each(|sync| sync.sync(app, sub));
         });
     }
+}
+
+/// The system used to update the [`Time`] used by app logic.
+pub fn time_system(
+    mut generic_time: ResMut<Time>,
+    mut real_time: ResMut<Time<Real>>,
+    mut virtual_time: ResMut<Time<Virtual>>,
+    update_strategy: Res<TimeUpdateStrategy>,
+) {
+    match update_strategy.as_ref() {
+        TimeUpdateStrategy::Automatic => real_time.update_with_instant(Instant::now()),
+        TimeUpdateStrategy::ManualInstant(instant) => real_time.update_with_instant(*instant),
+        TimeUpdateStrategy::ManualDuration(duration) => real_time.update_with_duration(*duration),
+    }
+
+    bevy_time::update_virtual_time(&mut generic_time, &mut virtual_time, &real_time);
 }

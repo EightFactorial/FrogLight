@@ -22,22 +22,34 @@ fn main() -> AppExit {
     {
         app.add_systems(
             First,
-            (|| info_once!("First!"))
+            (|| info!("First!"))
                 .after(ShouldTick::update_tick)
-                .run_if(ShouldTick::should_tick),
+                .run_if(ShouldTick::should_tick)
+                .run_if(run_once),
         );
-        app.add_systems(PreUpdate, (|| info_once!("PreUpdate!")).run_if(ShouldTick::should_tick));
-        app.add_systems(Update, (|| info_once!("Update!")).run_if(ShouldTick::should_tick));
-        app.add_systems(PostUpdate, (|| info_once!("PostUpdate!")).run_if(ShouldTick::should_tick));
-        app.add_systems(Last, (|| info_once!("Last!")).run_if(ShouldTick::should_tick));
+        app.add_systems(
+            PreUpdate,
+            (|| info!("PreUpdate!")).run_if(ShouldTick::should_tick).run_if(run_once),
+        );
+        app.add_systems(
+            Update,
+            (|| info!("Update!")).run_if(ShouldTick::should_tick).run_if(run_once),
+        );
+        app.add_systems(
+            PostUpdate,
+            (|| info!("PostUpdate!")).run_if(ShouldTick::should_tick).run_if(run_once),
+        );
+        app.add_systems(Last, (|| info!("Last!")).run_if(ShouldTick::should_tick).run_if(run_once));
 
-        app.add_systems(PreNetwork, || info_once!("PreNetwork!"));
-        app.add_systems(PreTick, || info_once!("PreTick!"));
+        app.add_systems(PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));
+        app.add_systems(PreTick, (|| info!("PreTick!")).run_if(run_once));
+
         app.add_systems(Tick, |tick: Res<CurrentTick>| {
             info!("Tick! ({})", **tick);
         });
-        app.add_systems(PostTick, || info_once!("PostTick!"));
-        app.add_systems(PostNetwork, || info_once!("PostNetwork!"));
+
+        app.add_systems(PostTick, (|| info!("PostTick!")).run_if(run_once));
+        app.add_systems(PostNetwork, (|| info!("PostNetwork!")).run_if(run_once));
     }
 
     app.run()
@@ -47,7 +59,7 @@ fn main() -> AppExit {
 fn trigger_tick(
     rate: Res<TickRate>,
     time: Res<Time<Real>>,
-    mut should: ResMut<ShouldTick>,
+    should: ResMut<ShouldTick>,
     mut timer: Local<Option<Timer>>,
 ) {
     let timer = timer.get_or_insert_with(|| Timer::new(rate.duration(), TimerMode::Repeating));

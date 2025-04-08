@@ -40,7 +40,6 @@ impl TickRate {
     pub const fn per_second(&self) -> u32 { self.0 }
 
     /// Get the expected number of seconds between ticks.
-    #[inline]
     #[must_use]
     pub const fn duration_f64(&self) -> f64 {
         match self.0 {
@@ -50,6 +49,7 @@ impl TickRate {
     }
 
     /// Get the expected [`Duration`] between ticks.
+    #[inline]
     #[must_use]
     pub fn duration(&self) -> Duration { Duration::from_secs_f64(self.duration_f64()) }
 }
@@ -66,18 +66,22 @@ pub struct ShouldTick {
 
 impl ShouldTick {
     /// Get whether a tick should execute this update.
+    #[inline]
     #[must_use]
     pub fn get_current(&self) -> bool { self.current.load(Ordering::Relaxed) }
 
     /// Get whether a tick should execute next update.
+    #[inline]
     #[must_use]
     pub fn get_next(&self) -> bool { self.next.load(Ordering::Relaxed) }
 
     /// Trigger a tick next update.
-    pub fn set_next(&mut self) { self.next.store(true, Ordering::Relaxed); }
+    #[inline]
+    pub fn set_next(&self) { self.next.store(true, Ordering::Relaxed); }
 
     /// Cancel a tick from running next update.
-    pub fn clear_next(&mut self) { self.next.store(false, Ordering::Relaxed); }
+    #[inline]
+    pub fn clear_next(&self) { self.next.store(false, Ordering::Relaxed); }
 
     /// A [`Condition`] that returns `true` if a tick should execute.
     #[must_use]
