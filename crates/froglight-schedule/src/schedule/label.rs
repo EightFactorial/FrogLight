@@ -1,27 +1,29 @@
 use bevy_ecs::schedule::ScheduleLabel;
 
-/// A [`Schedule`](bevy_ecs::schedule::Schedule) for early-frame networking.
-///
-/// Typically used for receiving network messages.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct PreNetwork;
-
-/// A [`Schedule`](bevy_ecs::schedule::Schedule) for late-frame networking.
-///
-/// Typically used for sending network messages.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct PostNetwork;
+/// The [`Network::PreNetwork`] and [`Network::PostNetwork`] schedules.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
+pub enum Network {
+    /// A [`Schedule`](bevy_ecs::schedule::Schedule) for early-frame networking.
+    ///
+    /// Typically used for receiving network messages.
+    PreNetwork,
+    /// A [`Schedule`](bevy_ecs::schedule::Schedule) for late-frame networking.
+    ///
+    /// Typically used for sending network messages.
+    PostNetwork,
+}
 
 // -------------------------------------------------------------------------------------------------
 
-/// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs before [`Tick`].
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct PreTick;
-
-/// The main `Tick` schedule.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct Tick;
-
-/// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs after [`Tick`].
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct PostTick;
+/// The [`Tick::PreTick`], [`Tick::Tick`], and [`Tick::PostTick`] schedules.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
+pub enum Tick {
+    /// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs before
+    /// [`Tick::Tick`].
+    PreTick,
+    /// The main `Tick` [`Schedule`](bevy_ecs::schedule::Schedule).
+    Tick,
+    /// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs after
+    /// [`Tick::Tick`].
+    PostTick,
+}

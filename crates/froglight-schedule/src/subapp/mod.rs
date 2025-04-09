@@ -50,11 +50,11 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             sub_app.insert_resource(MainScheduleOrder {
                 labels: vec![
                     First.intern(),
-                    PreNetwork.intern(),
-                    PreTick.intern(),
-                    Tick.intern(),
-                    PostTick.intern(),
-                    PostNetwork.intern(),
+                    Network::PreNetwork.intern(),
+                    Tick::PreTick.intern(),
+                    Tick::Tick.intern(),
+                    Tick::PostTick.intern(),
+                    Network::PostNetwork.intern(),
                     Last.intern(),
                 ],
                 ..Default::default()

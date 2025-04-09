@@ -27,15 +27,15 @@ fn main() -> AppExit {
         sub.add_systems(Main, trigger_tick.after(ShouldTick::update_tick).before(Main::run_main));
 
         sub.add_systems(First, (|| info!("First!")).run_if(run_once));
-        sub.add_systems(PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));
-        sub.add_systems(PreTick, (|| info!("PreTick!")).run_if(run_once));
+        sub.add_systems(Network::PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));
+        sub.add_systems(Tick::PreTick, (|| info!("PreTick!")).run_if(run_once));
 
-        sub.add_systems(Tick, |tick: Res<CurrentTick>| {
+        sub.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
             info!("Tick! ({})", **tick);
         });
 
-        sub.add_systems(PostTick, (|| info!("PostTick!")).run_if(run_once));
-        sub.add_systems(PostNetwork, (|| info!("PostNetwork!")).run_if(run_once));
+        sub.add_systems(Tick::PostTick, (|| info!("PostTick!")).run_if(run_once));
+        sub.add_systems(Network::PostNetwork, (|| info!("PostNetwork!")).run_if(run_once));
         sub.add_systems(Last, (|| info!("Last!")).run_if(run_once));
     }
 

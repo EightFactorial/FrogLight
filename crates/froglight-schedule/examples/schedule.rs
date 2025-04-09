@@ -24,32 +24,31 @@ fn main() -> AppExit {
             First,
             (|| info!("First!"))
                 .after(ShouldTick::update_tick)
-                .run_if(ShouldTick::should_tick)
-                .run_if(run_once),
+                .run_if(ShouldTick::should_tick.and(run_once)),
         );
         app.add_systems(
             PreUpdate,
-            (|| info!("PreUpdate!")).run_if(ShouldTick::should_tick).run_if(run_once),
+            (|| info!("PreUpdate!")).run_if(ShouldTick::should_tick.and(run_once)),
         );
         app.add_systems(
             Update,
-            (|| info!("Update!")).run_if(ShouldTick::should_tick).run_if(run_once),
+            (|| info!("Update!")).run_if(ShouldTick::should_tick.and(run_once)),
         );
         app.add_systems(
             PostUpdate,
-            (|| info!("PostUpdate!")).run_if(ShouldTick::should_tick).run_if(run_once),
+            (|| info!("PostUpdate!")).run_if(ShouldTick::should_tick.and(run_once)),
         );
-        app.add_systems(Last, (|| info!("Last!")).run_if(ShouldTick::should_tick).run_if(run_once));
+        app.add_systems(Last, (|| info!("Last!")).run_if(ShouldTick::should_tick.and(run_once)));
 
-        app.add_systems(PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));
-        app.add_systems(PreTick, (|| info!("PreTick!")).run_if(run_once));
+        app.add_systems(Network::PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));
+        app.add_systems(Tick::PreTick, (|| info!("PreTick!")).run_if(run_once));
 
-        app.add_systems(Tick, |tick: Res<CurrentTick>| {
+        app.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
             info!("Tick! ({})", **tick);
         });
 
-        app.add_systems(PostTick, (|| info!("PostTick!")).run_if(run_once));
-        app.add_systems(PostNetwork, (|| info!("PostNetwork!")).run_if(run_once));
+        app.add_systems(Tick::PostTick, (|| info!("PostTick!")).run_if(run_once));
+        app.add_systems(Network::PostNetwork, (|| info!("PostNetwork!")).run_if(run_once));
     }
 
     app.run()

@@ -1,11 +1,11 @@
 //! Network and Tick [`ScheduleLabel`](bevy_ecs::schedule::ScheduleLabel)s
 
-use std::marker::PhantomData;
+use std::{fmt::Debug, hash::Hash};
 
 use bevy_app::{MainScheduleOrder, prelude::*};
 use bevy_ecs::{
     prelude::*,
-    schedule::{ExecutorKind, InternedScheduleLabel, ScheduleLabel},
+    schedule::{ExecutorKind, ScheduleLabel},
 };
 
 use crate::{prelude::*, systemset::SystemSetPlugin};
@@ -29,11 +29,11 @@ pub struct SchedulePlugin;
 
 impl Plugin for SchedulePlugin {
     fn build(&self, app: &mut App) {
-        app.init_schedule(PreNetwork);
-        app.init_schedule(PreTick);
-        app.init_schedule(Tick);
-        app.init_schedule(PostTick);
-        app.init_schedule(PostNetwork);
+        app.init_schedule(Network::PreNetwork);
+        app.init_schedule(Tick::PreTick);
+        app.init_schedule(Tick::Tick);
+        app.init_schedule(Tick::PostTick);
+        app.init_schedule(Network::PostNetwork);
 
         // Add and initialize `CurrentTick`, `TickRate`, and `ShouldTick`.
         app.init_resource::<CurrentTick>().register_type::<CurrentTick>();
@@ -47,49 +47,53 @@ impl Plugin for SchedulePlugin {
         );
 
         if let Some(mut order) = app.world_mut().get_resource_mut::<MainScheduleOrder>() {
-            // Add `PreNetwork`
+            let pre_network = OnTick(Network::PreNetwork);
+            let pre_tick = OnTick(Tick::PreTick);
+            let tick = OnTick(Tick::Tick);
+            let post_tick = OnTick(Tick::PostTick);
+            let post_network = OnTick(Network::PostNetwork);
+
+            // Add `Network::PreNetwork`
             if order.labels.contains(&PreUpdate.intern()) {
-                // First, ..., PreNetwork, PreUpdate, ...
-                order.insert_before(PreUpdate, OnTick::<PreNetwork>::default());
+                // First, ..., Network::PreNetwork, PreUpdate, ...
+                order.insert_before(PreUpdate, pre_network);
             } else if order.labels.contains(&First.intern()) {
-                // First, PreNetwork, ...
-                order.insert_after(First, OnTick::<PreNetwork>::default());
+                // First, Network::PreNetwork, ...
+                order.insert_after(First, pre_network);
             } else {
-                // ..., PreNetwork
-                order.labels.push(OnTick::<PreNetwork>::default().intern());
+                // ..., Network::PreNetwork
+                order.labels.push(pre_network.intern());
             }
 
-            // Add `PreTick`, `Tick`, and `PostTick`
+            // Add `Tick::PreTick`, `Tick::Tick`, and `Tick::PostTick`
             if order.labels.contains(&Update.intern()) {
                 // ..., PreTick, Tick, PostTick, Update, ...
-                order.insert_before(Update, OnTick::<PreTick>::default());
-                order.insert_after(OnTick::<PreTick>::default(), OnTick::<Tick>::default());
-                order.insert_after(OnTick::<Tick>::default(), OnTick::<PostTick>::default());
+                order.insert_before(Update, pre_tick);
             } else {
-                // ..., PreNetwork, PreTick, Tick, PostTick, ...
-                order.insert_after(OnTick::<PreNetwork>::default(), OnTick::<PreTick>::default());
-                order.insert_after(OnTick::<PreTick>::default(), OnTick::<Tick>::default());
-                order.insert_after(OnTick::<Tick>::default(), OnTick::<PostTick>::default());
+                // ..., Network::PreNetwork, Tick::PreTick, Tick::Tick, Tick::PostTick, ...
+                order.insert_after(pre_network, pre_tick);
             }
+            order.insert_after(pre_tick, tick);
+            order.insert_after(tick, post_tick);
 
-            // Add `PostNetwork`
+            // Add `Network::PostNetwork`
             if order.labels.contains(&PostUpdate.intern()) {
-                // ..., PostUpdate, PostNetwork, ...
-                order.insert_after(PostUpdate, OnTick::<PostNetwork>::default());
+                // ..., PostUpdate, Network::PostNetwork, ...
+                order.insert_after(PostUpdate, post_network);
             } else if order.labels.contains(&Last.intern()) {
-                // ..., PostNetwork, Last
-                order.insert_before(Last, OnTick::<PostNetwork>::default());
+                // ..., Network::PostNetwork, Last
+                order.insert_before(Last, post_network);
             } else {
-                // ..., PostNetwork
-                order.insert_after(OnTick::<PostTick>::default(), OnTick::<PostNetwork>::default());
+                // ..., Tick::PostTick, Network::PostNetwork
+                order.insert_after(post_tick, post_network);
             }
 
             // Setup the `OnTick` schedules, systems and resources.
-            OnTick::<PreNetwork>::setup(app, PreNetwork);
-            OnTick::<PreTick>::setup(app, PreTick);
-            OnTick::<Tick>::setup(app, Tick);
-            OnTick::<PostTick>::setup(app, PostTick);
-            OnTick::<PostNetwork>::setup(app, PostNetwork);
+            OnTick::setup(app, Network::PreNetwork);
+            OnTick::setup(app, Tick::PreTick);
+            OnTick::setup(app, Tick::Tick);
+            OnTick::setup(app, Tick::PostTick);
+            OnTick::setup(app, Network::PostNetwork);
         }
 
         // Add the `SystemSetPlugin` to the app.
@@ -100,51 +104,21 @@ impl Plugin for SchedulePlugin {
 // -------------------------------------------------------------------------------------------------
 
 /// A wrapper [`ScheduleLabel`] for running schedules on every tick.
-#[derive(Debug, ScheduleLabel)]
-pub struct OnTick<Label: ScheduleLabel>(PhantomData<Label>);
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
+pub struct OnTick<Label: Debug + Copy + Eq + Hash + ScheduleLabel>(Label);
 
-/// A wrapper [`Resource`] for the [`OnTick`] schedule label.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Resource)]
-struct OnTickLabel<Label: ScheduleLabel>(InternedScheduleLabel, PhantomData<Label>);
-
-impl<Label: ScheduleLabel> OnTick<Label> {
+impl<Label: Debug + Copy + Eq + Hash + ScheduleLabel> OnTick<Label> {
     fn setup(app: &mut App, label: Label) {
-        app.insert_resource(OnTickLabel::<Label>(label.intern(), PhantomData));
-
+        // Create a new `Schedule` for the label.
         let mut schedule = Schedule::new(label);
         schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-        app.add_schedule(schedule);
 
-        app.add_systems(
-            OnTick::<Label>::default(),
-            OnTick::<Label>::execute_schedule.run_if(ShouldTick::should_tick),
-        );
+        // Execute the schedule with the provided label.
+        let execute = move |world: &mut World| {
+            world.run_schedule(label);
+        };
+
+        app.add_schedule(schedule)
+            .add_systems(OnTick::<Label>(label), execute.run_if(ShouldTick::should_tick));
     }
-
-    /// A [`System`] that runs the `Label` schedule
-    /// for the amount of ticks that need to be run.
-    fn execute_schedule(world: &mut World) {
-        world.run_schedule(world.resource::<OnTickLabel<Label>>().0);
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl<Label: ScheduleLabel> Default for OnTick<Label> {
-    fn default() -> Self { Self(PhantomData) }
-}
-
-impl<Label: ScheduleLabel> Clone for OnTick<Label> {
-    #[allow(clippy::non_canonical_clone_impl)]
-    fn clone(&self) -> Self { Self(PhantomData) }
-}
-impl<Label: ScheduleLabel> Copy for OnTick<Label> {}
-
-impl<Label: ScheduleLabel> PartialEq for OnTick<Label> {
-    fn eq(&self, other: &Self) -> bool { self.0 == other.0 }
-}
-impl<Label: ScheduleLabel> Eq for OnTick<Label> {}
-
-impl<Label: ScheduleLabel> std::hash::Hash for OnTick<Label> {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) { self.0.hash(state) }
 }
