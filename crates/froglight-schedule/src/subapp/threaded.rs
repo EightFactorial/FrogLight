@@ -30,15 +30,15 @@ impl ThreadedSubApps {
         // TODO: Also spawn a task for `app.update()`
         let pool = bevy_tasks::ComputeTaskPool::get();
         loop {
-            // Update the App and non-threaded SubApps locally.
-            app.update();
-
-            // Sync and spawn tasks for all SubApps.
-            pool.scope(|pool| {
+            pool.scope::<_, ()>(|scope| {
+                // Sync and spawn tasks for all multi-threaded SubApps.
                 for sub_app in &mut sub_apps {
                     sub_app.extract(app.world_mut());
-                    pool.spawn(async { sub_app.update() });
+                    scope.spawn(async { sub_app.update() });
                 }
+
+                // Update the App and single-threaded SubApps locally.
+                app.update();
             });
 
             // Exit if requested.

@@ -31,7 +31,7 @@ fn main() -> AppExit {
         sub.add_systems(Tick::PreTick, (|| info!("PreTick!")).run_if(run_once));
 
         sub.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
-            if **tick > 115_000 {
+            if **tick > 130_000 {
                 info!("Tick! ({})", **tick);
             }
         });
