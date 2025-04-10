@@ -7,9 +7,9 @@ fn main() -> AppExit {
     let mut app = App::new();
     app.add_plugins((MinimalPlugins, LogPlugin::default(), SchedulePlugin));
 
-    // Exit the app after 1 second
+    // Exit the app after 5 seconds
     app.add_systems(Update, |time: Res<Time>, mut commands: Commands| {
-        time.elapsed_secs().gt(&1.001).then(|| {
+        time.elapsed_secs().gt(&5.001).then(|| {
             commands.send_event(AppExit::Success);
         });
     });
@@ -44,9 +44,10 @@ fn main() -> AppExit {
         app.add_systems(Tick::PreTick, (|| info!("PreTick!")).run_if(run_once));
 
         app.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
-            info!("Tick! ({})", **tick);
+            if **tick > 130_000 {
+                info!("Tick! ({})", **tick);
+            }
         });
-
         app.add_systems(Tick::PostTick, (|| info!("PostTick!")).run_if(run_once));
         app.add_systems(Network::PostNetwork, (|| info!("PostNetwork!")).run_if(run_once));
     }

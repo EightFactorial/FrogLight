@@ -11,9 +11,9 @@ fn main() -> AppExit {
     app.add_plugins((MinimalPlugins, LogPlugin::default()));
     app.add_plugins(SubAppPlugin::new(Test));
 
-    // Exit the app after 1 second
+    // Exit the app after 5 seconds
     app.add_systems(Update, |time: Res<Time>, mut commands: Commands| {
-        time.elapsed_secs().gt(&1.001).then(|| {
+        time.elapsed_secs().gt(&5.001).then(|| {
             commands.send_event(AppExit::Success);
         });
     });
@@ -31,7 +31,9 @@ fn main() -> AppExit {
         sub.add_systems(Tick::PreTick, (|| info!("PreTick!")).run_if(run_once));
 
         sub.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
-            info!("Tick! ({})", **tick);
+            if **tick > 115_000 {
+                info!("Tick! ({})", **tick);
+            }
         });
 
         sub.add_systems(Tick::PostTick, (|| info!("PostTick!")).run_if(run_once));

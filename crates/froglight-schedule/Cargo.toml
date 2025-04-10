@@ -26,6 +26,7 @@ derive_more = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
+bevy_tasks = { workspace = true, optional = true }
 bevy_time = { workspace = true, optional = true }
 
 [features]
@@ -33,6 +34,8 @@ default = []
 
 # Enable the `SubAppPlugin`
 subapp = ["dep:bevy_time"]
+# Enable the multi-threaded SubApp executor
+multi_threaded = ["dep:bevy_tasks", "subapp"]
 
 [[example]]
 name = "subapp"

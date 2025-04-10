@@ -18,6 +18,11 @@ pub use reflect::ReflectSubAppSync;
 mod sync;
 pub use sync::{SubAppSync, SyncStorage};
 
+#[cfg(feature = "multi_threaded")]
+mod threaded;
+#[cfg(feature = "multi_threaded")]
+use threaded::ThreadedSubApps;
+
 /// A [`Plugin`] that creates a new [`SubApp`] with a given [`AppLabel`].
 pub struct SubAppPlugin<SubApp: AppLabel> {
     #[expect(clippy::type_complexity)]
@@ -27,6 +32,12 @@ pub struct SubAppPlugin<SubApp: AppLabel> {
 
 impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
     fn build(&self, app: &mut App) {
+        assert!(
+            app.get_sub_app(self.subapp_label.lock().as_ref().unwrap().intern()).is_none(),
+            "`SubAppPlugin<{}>` tried to create a `SubApp` that already exists!",
+            std::any::type_name::<SubAppLabel>()
+        );
+
         // Create a new subapp with the label.
         let mut sub_app = SubApp::new();
 
@@ -88,12 +99,24 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             sub_app.add_plugins(SystemSetPlugin);
         }
 
+        #[cfg(feature = "multi_threaded")]
+        {
+            // Setup the multi-threaded executor if not already set.
+            if !app.world().contains_resource::<ThreadedSubApps>() {
+                app.set_runner(ThreadedSubApps::runner);
+            }
+            // Add the label to the list of multi-threaded subapps.
+            app.world_mut()
+                .get_resource_or_init::<ThreadedSubApps>()
+                .push(self.subapp_label.lock().as_ref().unwrap().intern());
+        }
+
         // Insert the subapp into the main app.
         app.insert_sub_app(self.subapp_label.lock().take().unwrap(), sub_app);
     }
 
     fn finish(&self, app: &mut App) {
-        // Build the subapp's `SyncStorage`.
+        // Initialize a `SyncStorage` if it does not already exist.
         app.init_resource::<SyncStorage<SubAppLabel>>();
     }
 }
@@ -129,6 +152,8 @@ impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
         });
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// The system used to update the [`Time`] used by app logic.
 pub fn time_system(
