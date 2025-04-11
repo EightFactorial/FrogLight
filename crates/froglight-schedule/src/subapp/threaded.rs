@@ -34,7 +34,7 @@ impl ThreadedSubApps {
             sub_apps = labels
                 .0
                 .into_iter()
-                .filter_map(|label| app.remove_sub_app(label).map(|sub| (sub, label)))
+                .filter_map(|label| app.remove_sub_app(label).zip(Some(label)))
                 .collect();
         }
 

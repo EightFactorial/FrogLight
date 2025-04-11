@@ -30,6 +30,14 @@ fn main() -> AppExit {
         sub.add_systems(Network::PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));
         sub.add_systems(Tick::PreTick, (|| info!("PreTick!")).run_if(run_once));
 
+        #[cfg(not(feature = "multi_threaded"))]
+        sub.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
+            if **tick > 115_000 {
+                info!("Tick! ({})", **tick);
+            }
+        });
+
+        #[cfg(feature = "multi_threaded")]
         sub.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
             if **tick > 130_000 {
                 info!("Tick! ({})", **tick);

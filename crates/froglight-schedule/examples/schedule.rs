@@ -48,6 +48,7 @@ fn main() -> AppExit {
                 info!("Tick! ({})", **tick);
             }
         });
+
         app.add_systems(Tick::PostTick, (|| info!("PostTick!")).run_if(run_once));
         app.add_systems(Network::PostNetwork, (|| info!("PostNetwork!")).run_if(run_once));
     }
