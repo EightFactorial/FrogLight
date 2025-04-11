@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy = { workspace = true, default-features = true }
+bevy = { workspace = true, default-features = true, features = ["trace_tracy"] }
 
 [dependencies]
 bevy_app = { workspace = true }
@@ -26,6 +26,7 @@ derive_more = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
+bevy_log = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true }
 bevy_time = { workspace = true, optional = true }
 
@@ -36,6 +37,9 @@ default = []
 subapp = ["dep:bevy_time"]
 # Enable the multi-threaded SubApp executor
 multi_threaded = ["dep:bevy_tasks", "subapp"]
+
+# Enable tracing
+trace = ["dep:bevy_log"]
 
 [[example]]
 name = "subapp"

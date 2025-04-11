@@ -21,7 +21,7 @@ pub use sync::{SubAppSync, SyncStorage};
 #[cfg(feature = "multi_threaded")]
 mod threaded;
 #[cfg(feature = "multi_threaded")]
-use threaded::ThreadedSubApps;
+pub use threaded::ThreadedSubApps;
 
 /// A [`Plugin`] that creates a new [`SubApp`] with a given [`AppLabel`].
 pub struct SubAppPlugin<SubApp: AppLabel> {
@@ -103,7 +103,7 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
         {
             // Setup the multi-threaded executor if not already set.
             if !app.world().contains_resource::<ThreadedSubApps>() {
-                app.set_runner(ThreadedSubApps::runner);
+                app.set_runner(ThreadedSubApps::threaded_runner);
             }
             // Add the label to the list of multi-threaded subapps.
             app.world_mut()
