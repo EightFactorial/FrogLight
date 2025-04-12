@@ -1,20 +1,14 @@
 //! TODO
 
 use bevy_ecs::{component::ComponentId, prelude::*, world::DeferredWorld};
+use bevy_log::error;
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut};
 use froglight_common::identifier::Identifier;
-use hashbrown::HashMap;
+use hashbrown::{HashMap, hash_map::Entry};
 
 mod reflect;
 pub use reflect::{ReflectSubWorldSync, SubWorldSync};
-
-/// A map of [`Entity`]s to their respective [`SubWorld`]s
-#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource, Reflect)]
-#[reflect(Debug, Default, PartialEq, Resource)]
-pub struct SubWorlds(HashMap<Identifier, Entity>);
-
-// -------------------------------------------------------------------------------------------------
 
 /// A [`World`] that belongs to an [`Entity`].
 #[derive(Debug, Deref, DerefMut, Component)]
@@ -61,9 +55,9 @@ impl SubWorld {
         }
 
         let mut sub_world = World::new();
-        let registry = world.resource::<AppTypeRegistry>();
 
         // Share the `AppTypeRegistry` with the `SubWorld`.
+        let registry = world.resource::<AppTypeRegistry>();
         sub_world.insert_resource(registry.clone());
 
         // Use `SubWorldSync` to initialize the `SubWorld`.
@@ -74,24 +68,53 @@ impl SubWorld {
         Ok(Self { identifier, world: sub_world })
     }
 
-    /// Insert an [`Entity`]-[`Identifier`] relationship into the map.
+    /// Run the registered `SubWorldSync::on_add` hooks.
     fn insert_hook(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
-        if let Some(identifier) = world.get::<Self>(entity).map(SubWorld::identifier).cloned() {
+        let registry = world.resource::<AppTypeRegistry>().clone();
+        for (_, reflect) in registry.read().iter_with_data::<ReflectSubWorldSync>() {
+            reflect.on_add(entity, &mut world);
+        }
+    }
+
+    /// Run the registered `SubWorldSync::on_add` hooks.
+    fn remove_hook(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
+        let registry = world.resource::<AppTypeRegistry>().clone();
+        for (_, reflect) in registry.read().iter_with_data::<ReflectSubWorldSync>() {
+            reflect.on_remove(entity, &mut world);
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A map of [`Entity`]s to their respective [`SubWorld`]s
+#[derive(Debug, Default, Clone, PartialEq, Eq, Deref, DerefMut, Resource, Reflect)]
+#[reflect(Debug, Default, PartialEq, Resource, SubWorldSync)]
+pub struct SubWorlds(HashMap<Identifier, Entity>);
+
+impl SubWorldSync for SubWorlds {
+    /// Do nothing.
+    fn initialize(_: &Identifier, _: &mut World, _: &mut World) {}
+
+    /// Insert an [`Entity`]-[`Identifier`] relationship into the map.
+    fn on_add(entity: Entity, world: &mut DeferredWorld) {
+        if let Some(identifier) = world.get::<SubWorld>(entity).map(SubWorld::identifier).cloned() {
             if let Some(mut map) = world.get_resource_mut::<SubWorlds>() {
-                if map.contains_key(&identifier) {
-                    bevy_log::error!(
-                        "A SubWorld with the identifier \"{identifier}\" already exists!"
-                    );
-                } else {
-                    map.insert(identifier, entity);
+                match map.entry(identifier) {
+                    Entry::Vacant(entry) => {
+                        entry.insert(entity);
+                    }
+                    Entry::Occupied(entry) => {
+                        error!("The SubWorld \"{}\" already exists!", entry.key());
+                    }
                 }
             }
         }
     }
 
     /// Remove an [`Entity`]-[`Identifier`] relationship from the map.
-    fn remove_hook(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
-        if let Some(identifier) = world.get::<Self>(entity).map(SubWorld::identifier).cloned() {
+    fn on_remove(entity: Entity, world: &mut DeferredWorld) {
+        if let Some(identifier) = world.get::<SubWorld>(entity).map(SubWorld::identifier).cloned() {
             world.get_resource_mut::<SubWorlds>().and_then(|mut map| map.remove(&identifier));
         }
     }

@@ -8,7 +8,10 @@ use bevy_ecs::{
     schedule::{ExecutorKind, ScheduleLabel},
 };
 
-use crate::tick::{CurrentTick, ShouldTick, TickRate};
+use crate::{
+    subworld::SubWorlds,
+    tick::{CurrentTick, ShouldTick, TickRate},
+};
 
 pub mod label;
 use label::{Network, Tick};
@@ -32,6 +35,8 @@ pub struct SchedulePlugin;
 
 impl Plugin for SchedulePlugin {
     fn build(&self, app: &mut App) {
+        app.register_type::<SubWorlds>();
+
         app.init_schedule(Network::PreNetwork);
         app.init_schedule(Tick::PreTick);
         app.init_schedule(Tick::Tick);

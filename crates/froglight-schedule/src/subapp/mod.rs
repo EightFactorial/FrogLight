@@ -35,6 +35,8 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
             std::any::type_name::<SubAppLabel>()
         );
 
+        app.register_type::<SubWorlds>();
+
         // Create a new subapp with the label.
         let mut sub_app = SubApp::new();
 
