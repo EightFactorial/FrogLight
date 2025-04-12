@@ -26,7 +26,7 @@ derive_more = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
-bevy_log = { workspace = true, optional = true }
+bevy_log = { workspace = true, optional = true, features = ["trace"] }
 bevy_tasks = { workspace = true, optional = true }
 bevy_time = { workspace = true, optional = true }
 
