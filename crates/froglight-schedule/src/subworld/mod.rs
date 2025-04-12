@@ -13,9 +13,8 @@ pub use reflect::{ReflectSubWorldSync, SubWorldSync};
 /// A [`World`] that belongs to an [`Entity`].
 #[derive(Debug, Deref, DerefMut, Component)]
 #[component(
-    on_add = SubWorld::insert_hook,
+    on_insert = SubWorld::insert_hook,
     on_replace = SubWorld::remove_hook,
-    on_remove = SubWorld::remove_hook,
 )]
 pub struct SubWorld {
     identifier: Identifier,

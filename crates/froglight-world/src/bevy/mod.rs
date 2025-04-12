@@ -41,12 +41,10 @@ impl Plugin for WorldPlugin {
         // Register hooks for the `Chunk` and `ChunkPos` components.
         {
             let hooks = app.world_mut().register_component_hooks::<Chunk>();
-            hooks.on_add(Self::insert_hook).on_insert(Self::insert_hook);
-            hooks.on_remove(Self::remove_hook).on_replace(Self::remove_hook);
+            hooks.on_insert(Self::insert_hook).on_replace(Self::remove_hook);
 
             let hooks = app.world_mut().register_component_hooks::<ChunkPos>();
-            hooks.on_add(Self::insert_hook).on_insert(Self::insert_hook);
-            hooks.on_remove(Self::remove_hook).on_replace(Self::remove_hook);
+            hooks.on_insert(Self::insert_hook).on_replace(Self::remove_hook);
         }
 
         // Add the `update_position_maps` system to the schedule.
