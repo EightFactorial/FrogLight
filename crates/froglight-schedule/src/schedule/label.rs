@@ -1,7 +1,9 @@
-use bevy_ecs::schedule::ScheduleLabel;
+//! [`ScheduleLabel`]s and [`SystemSet`]s
+
+use bevy_ecs::schedule::{ScheduleLabel, SystemSet};
 
 /// The [`Network::PreNetwork`] and [`Network::PostNetwork`] schedules.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, ScheduleLabel)]
 pub enum Network {
     /// A [`Schedule`](bevy_ecs::schedule::Schedule) for early-frame networking.
     ///
@@ -16,7 +18,7 @@ pub enum Network {
 // -------------------------------------------------------------------------------------------------
 
 /// The [`Tick::PreTick`], [`Tick::Tick`], and [`Tick::PostTick`] schedules.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, ScheduleLabel)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, ScheduleLabel)]
 pub enum Tick {
     /// A [`Schedule`](bevy_ecs::schedule::Schedule) that runs before
     /// [`Tick::Tick`].
@@ -27,3 +29,9 @@ pub enum Tick {
     /// [`Tick::Tick`].
     PostTick,
 }
+
+// -------------------------------------------------------------------------------------------------
+
+/// A placeholder for future [`SystemSet`]s.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, SystemSet)]
+pub enum Placeholder {}

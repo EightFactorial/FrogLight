@@ -1,5 +1,3 @@
-//! TODO
-
 use bevy_app::{App, Plugin};
 
 /// A [`Plugin`] that adds various

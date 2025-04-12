@@ -10,13 +10,10 @@ use bevy_ecs::{
 use bevy_time::{TimeUpdateStrategy, prelude::*};
 use parking_lot::Mutex;
 
-use crate::{prelude::*, systemset::SystemSetPlugin};
+use crate::{prelude::*, schedule::SystemSetPlugin};
 
 mod reflect;
-pub use reflect::ReflectSubAppSync;
-
-mod sync;
-pub use sync::{SubAppSync, SyncStorage};
+pub use reflect::{AppSyncStorage, ReflectSubAppSync, SubAppSync};
 
 #[cfg(feature = "multi_threaded")]
 mod threaded;
@@ -117,7 +114,7 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
 
     fn finish(&self, app: &mut App) {
         // Initialize a `SyncStorage` if it does not already exist.
-        app.init_resource::<SyncStorage<SubAppLabel>>();
+        app.init_resource::<AppSyncStorage<SubAppLabel>>();
     }
 }
 
@@ -147,7 +144,7 @@ impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
     ///
     /// Runs all registered [`SubAppSync`] functions from the [`SyncStorage`].
     pub fn default_extract(app: &mut World, sub: &mut World) {
-        app.resource_scope::<SyncStorage<SubApp>, ()>(|app, storage| {
+        app.resource_scope::<AppSyncStorage<SubApp>, ()>(|app, storage| {
             storage.iter().for_each(|sync| sync.sync(app, sub));
         });
     }

@@ -1,4 +1,4 @@
-//! Network and Tick [`ScheduleLabel`](bevy_ecs::schedule::ScheduleLabel)s
+//! [`SchedulePlugin`] and [`SystemSetPlugin`]
 
 use std::{fmt::Debug, hash::Hash};
 
@@ -8,10 +8,13 @@ use bevy_ecs::{
     schedule::{ExecutorKind, ScheduleLabel},
 };
 
-use crate::{prelude::*, systemset::SystemSetPlugin};
+use crate::tick::{CurrentTick, ShouldTick, TickRate};
 
-mod label;
-pub use label::*;
+pub mod label;
+use label::{Network, Tick};
+
+mod set;
+pub use set::*;
 
 /// A [`Plugin`] that adds network and tick
 /// [`Schedule`](bevy_ecs::schedule::Schedule)s to an [`App`].

@@ -17,16 +17,19 @@ workspace = true
 
 [dev-dependencies]
 bevy = { workspace = true, default-features = true }
+froglight-common = { workspace = true, features = ["bevy"] }
 
 [dependencies]
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
+bevy_log = { workspace = true }
 bevy_reflect = { workspace = true }
 derive_more = { workspace = true }
+froglight-common = { workspace = true, features = ["bevy"] }
+hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
-bevy_log = { workspace = true, optional = true, features = ["trace"] }
 bevy_tasks = { workspace = true, optional = true }
 bevy_time = { workspace = true, optional = true }
 
@@ -39,7 +42,7 @@ subapp = ["dep:bevy_time"]
 multi_threaded = ["dep:bevy_tasks", "subapp"]
 
 # Enable tracing
-trace = ["dep:bevy_log", "bevy/trace_tracy"]
+trace = ["bevy_log/trace", "bevy/trace_tracy"]
 
 [[example]]
 name = "subapp"
