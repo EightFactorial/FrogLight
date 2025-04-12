@@ -22,23 +22,15 @@ fn main() -> AppExit {
     {
         app.add_systems(
             First,
-            (|| info!("First!"))
-                .after(ShouldTick::update_tick)
-                .run_if(ShouldTick::should_tick.and(run_once)),
+            (|| info!("First!")).after(ShouldTick::update).run_if(ShouldTick::tick.and(run_once)),
         );
-        app.add_systems(
-            PreUpdate,
-            (|| info!("PreUpdate!")).run_if(ShouldTick::should_tick.and(run_once)),
-        );
-        app.add_systems(
-            Update,
-            (|| info!("Update!")).run_if(ShouldTick::should_tick.and(run_once)),
-        );
+        app.add_systems(PreUpdate, (|| info!("PreUpdate!")).run_if(ShouldTick::tick.and(run_once)));
+        app.add_systems(Update, (|| info!("Update!")).run_if(ShouldTick::tick.and(run_once)));
         app.add_systems(
             PostUpdate,
-            (|| info!("PostUpdate!")).run_if(ShouldTick::should_tick.and(run_once)),
+            (|| info!("PostUpdate!")).run_if(ShouldTick::tick.and(run_once)),
         );
-        app.add_systems(Last, (|| info!("Last!")).run_if(ShouldTick::should_tick.and(run_once)));
+        app.add_systems(Last, (|| info!("Last!")).run_if(ShouldTick::tick.and(run_once)));
 
         app.add_systems(Network::PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));
         app.add_systems(Tick::PreTick, (|| info!("PreTick!")).run_if(run_once));

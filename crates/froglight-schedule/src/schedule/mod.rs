@@ -45,8 +45,7 @@ impl Plugin for SchedulePlugin {
 
         app.add_systems(
             First,
-            (ShouldTick::update_tick, CurrentTick::increment_tick.run_if(ShouldTick::should_tick))
-                .chain(),
+            (ShouldTick::update, CurrentTick::increment_tick.run_if(ShouldTick::tick)).chain(),
         );
 
         if let Some(mut order) = app.world_mut().get_resource_mut::<MainScheduleOrder>() {
@@ -122,6 +121,6 @@ impl<Label: Debug + Copy + Eq + Hash + ScheduleLabel> OnTick<Label> {
         };
 
         app.add_schedule(schedule)
-            .add_systems(OnTick::<Label>(label), execute.run_if(ShouldTick::should_tick));
+            .add_systems(OnTick::<Label>(label), execute.run_if(ShouldTick::tick));
     }
 }

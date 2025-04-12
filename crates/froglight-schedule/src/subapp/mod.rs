@@ -85,9 +85,9 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
                 Main,
                 (
                     time_system,
-                    ShouldTick::update_tick,
-                    CurrentTick::increment_tick.run_if(ShouldTick::should_tick),
-                    Main::run_main.run_if(ShouldTick::should_tick),
+                    ShouldTick::update,
+                    CurrentTick::increment_tick.run_if(ShouldTick::tick),
+                    Main::run_main.run_if(ShouldTick::tick),
                 )
                     .chain(),
             );

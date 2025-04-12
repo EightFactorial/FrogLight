@@ -24,7 +24,7 @@ fn main() -> AppExit {
         **sub.world_mut().resource_mut::<TickRate>() = u32::MAX;
 
         // Execute ticks based on `TickRate`
-        sub.add_systems(Main, trigger_tick.after(ShouldTick::update_tick).before(Main::run_main));
+        sub.add_systems(Main, trigger_tick.after(ShouldTick::update).before(Main::run_main));
 
         sub.add_systems(First, (|| info!("First!")).run_if(run_once));
         sub.add_systems(Network::PreNetwork, (|| info!("PreNetwork!")).run_if(run_once));

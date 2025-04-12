@@ -85,10 +85,10 @@ impl ShouldTick {
 
     /// A [`Condition`] that returns `true` if a tick should execute.
     #[must_use]
-    pub fn should_tick(tick: Res<Self>) -> bool { tick.get_current() }
+    pub fn tick(tick: Res<Self>) -> bool { tick.get_current() }
 
     /// A [`System`] that updates [`ShouldTick`] at the start of a frame.
-    pub fn update_tick(mut tick: ResMut<Self>) {
+    pub fn update(mut tick: ResMut<Self>) {
         let Self { current, next } = &mut *tick;
         std::mem::swap(current, next);
         next.store(false, Ordering::Relaxed);
