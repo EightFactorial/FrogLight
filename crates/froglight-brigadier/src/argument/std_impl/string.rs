@@ -4,7 +4,7 @@ use bevy_ecs::world::World;
 use bevy_reflect::func::ArgValue;
 use smol_str::SmolStr;
 
-use crate::argument::{ArgumentError, ArgumentParser};
+use crate::argument::{ArgumentError, ArgumentParser, BrigadierPhrase};
 
 /// A macro for implementing the [`ArgumentParser`] trait for strings.
 macro_rules! impl_string {
@@ -15,35 +15,19 @@ macro_rules! impl_string {
                 fn parse_input<'a>(
                     &self,
                     arguments: &'a str,
-                    _: &World,
+                    world: &World,
                 ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-                    if arguments.trim().is_empty() {
-                        Err(ArgumentError::DoesNotMatch)
-                    } else {
-                        let (start, end) = arguments.trim().split_once(' ').unwrap_or((arguments, ""));
-                        Ok((ArgValue::Owned(Box::new(<$ty>::from(start))), end))
-                   }
+                    if let (ArgValue::Owned(string), remainder) = BrigadierPhrase.parse_input(arguments, world)? {
+                        if let Ok(string) = string.try_take::<String>() {
+                            return Ok((ArgValue::Owned(Box::<$ty>::new(string.into())), remainder));
+                        }
+                    }
+
+                    unreachable!("BrigadierPhrase always returns an owned String");
                 }
             }
         )*
     };
 }
 
-impl_string!(String, SmolStr);
-
-impl ArgumentParser for Cow<'static, str> {
-    type Arg = Self;
-
-    fn parse_input<'a>(
-        &self,
-        arguments: &'a str,
-        _: &World,
-    ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-        if arguments.trim().is_empty() {
-            Err(ArgumentError::DoesNotMatch)
-        } else {
-            let (start, end) = arguments.trim().split_once(' ').unwrap_or((arguments, ""));
-            Ok((ArgValue::Owned(Box::new(Cow::<'static, str>::from(start.to_string()))), end))
-        }
-    }
-}
+impl_string!(String, SmolStr, Cow<'static, str>);
