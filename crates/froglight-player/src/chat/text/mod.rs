@@ -6,7 +6,7 @@ mod formatting;
 pub use formatting::{TextColor, TextFormatting};
 
 mod json;
-mod snbt;
+mod nbt;
 
 /// A formatted text message.
 #[derive(Debug, Clone, PartialEq, Eq)]

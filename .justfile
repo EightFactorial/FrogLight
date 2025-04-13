@@ -61,7 +61,7 @@ update:
 
 # Run clippy
 clippy:
-  cargo clippy --workspace
+  cargo clippy --workspace --all-features
 
 # Run cargo fmt
 fmt:

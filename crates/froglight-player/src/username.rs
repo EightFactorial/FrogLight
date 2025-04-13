@@ -118,7 +118,7 @@ impl PlayerUsername {
         api: &str,
         agent: &ureq::Agent,
     ) -> Result<T, ureq::Error> {
-        Self::retry_request::<_, 3>(&format!("{api}{}", uuid.as_simple()), agent)
+        crate::retry_request::<_, 3>(&format!("{api}{}", uuid.as_simple()), agent)
     }
 }
 
@@ -184,38 +184,7 @@ impl PlayerUsername {
         api: &(impl AsRef<str> + ?Sized),
         agent: &ureq::Agent,
     ) -> Result<T, ureq::Error> {
-        Self::retry_request::<T, 3>(&format!("{}{}", api.as_ref(), self.0), agent)
-    }
-
-    /// Retry a request up to N times if it fails.
-    ///
-    /// # Warning
-    /// This function will block until the request is complete!
-    fn retry_request<T: serde::de::DeserializeOwned, const N: usize>(
-        uri: &str,
-        agent: &ureq::Agent,
-    ) -> Result<T, ureq::Error> {
-        let mut response = Self::handle_request::<T>(uri, agent);
-
-        // Retry up to N times if the request fails.
-        let mut attempts = 0;
-        while response.is_err() && attempts < N {
-            response = Self::handle_request::<T>(uri, agent);
-            attempts += 1;
-        }
-
-        response
-    }
-
-    /// Get player information from the given API endpoint.
-    ///
-    /// # Warning
-    /// This function will block until the request is complete!
-    fn handle_request<T: serde::de::DeserializeOwned>(
-        uri: &str,
-        agent: &ureq::Agent,
-    ) -> Result<T, ureq::Error> {
-        agent.get(uri).call()?.into_body().read_json()
+        crate::retry_request::<T, 3>(&format!("{}{}", api.as_ref(), self.0), agent)
     }
 }
 

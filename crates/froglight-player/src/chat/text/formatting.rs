@@ -3,35 +3,141 @@ use smol_str::SmolStr;
 
 /// The formatting of a [`Text`](super::Text) component.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[expect(clippy::struct_excessive_bools)]
 pub struct TextFormatting {
-    /// The color of the text.
-    color: TextColor,
     /// The font of the text.
-    font: Identifier,
+    font: Option<Identifier>,
+    /// The color of the text.
+    color: Option<TextColor>,
     /// Whether the text is bold.
-    bold: bool,
+    bold: Option<bool>,
     /// Whether the text is italic.
-    italic: bool,
+    italic: Option<bool>,
     /// Whether the text is underlined.
-    underlined: bool,
+    underlined: Option<bool>,
     /// Whether the text is strikedthrough.
-    strikethrough: bool,
+    strikethrough: Option<bool>,
     /// Whether the text is obfuscated.
-    obfuscated: bool,
+    obfuscated: Option<bool>,
 }
 
 impl Default for TextFormatting {
-    fn default() -> Self {
+    fn default() -> Self { Self::DEFAULT }
+}
+
+impl TextFormatting {
+    /// [`TextFormatting`] with the default settings.
+    pub const DEFAULT: Self = Self {
+        font: Some(Self::DEFAULT_FONT),
+        color: Some(Self::DEFAULT_COLOR),
+        bold: Some(false),
+        italic: Some(false),
+        underlined: Some(false),
+        strikethrough: Some(false),
+        obfuscated: Some(false),
+    };
+    /// The default color used for text.
+    pub const DEFAULT_COLOR: TextColor = TextColor::White;
+    /// The default font used for text.
+    pub const DEFAULT_FONT: Identifier = Identifier::const_new("minecraft:default");
+    /// [`TextFormatting`] with no formatting.
+    ///
+    /// Should be used when inheriting from another [`TextFormatting`].
+    pub const EMPTY: Self = Self {
+        font: None,
+        color: None,
+        bold: None,
+        italic: None,
+        underlined: None,
+        strikethrough: None,
+        obfuscated: None,
+    };
+
+    /// [`TextFormatting`] with no formatting.
+    ///
+    /// Should be used when inheriting from another [`TextFormatting`].
+    #[must_use]
+    pub const fn empty() -> Self { Self::EMPTY }
+
+    /// Create a new [`TextFormatting`] with all uninitialized fields
+    /// set to the default values.
+    #[must_use]
+    pub fn or_default(&self) -> Self { self.inherit_from(&Self::default()) }
+
+    /// Create a new [`TextFormatting`] that inherits from the given parent.
+    ///
+    /// This guarantees that all fields are initialized.
+    #[must_use]
+    pub fn inherit_from(&self, parent: &Self) -> Self {
+        let font =
+            self.font.as_ref().map_or_else(|| parent.font.clone(), |font| Some(font.clone()));
+        let color =
+            self.color.as_ref().map_or_else(|| parent.color.clone(), |color| Some(color.clone()));
+
         Self {
-            color: TextColor::White,
-            font: Identifier::const_new("minecraft:default"),
-            bold: false,
-            italic: false,
-            underlined: false,
-            strikethrough: false,
-            obfuscated: false,
+            font: font.or(Some(Self::DEFAULT_FONT)),
+            color: color.or(Some(TextColor::White)),
+            bold: self.bold.or(parent.bold).or(Some(false)),
+            italic: self.italic.or(parent.italic).or(Some(false)),
+            underlined: self.underlined.or(parent.underlined).or(Some(false)),
+            strikethrough: self.strikethrough.or(parent.strikethrough).or(Some(false)),
+            obfuscated: self.obfuscated.or(parent.obfuscated).or(Some(false)),
         }
+    }
+
+    /// Set the font of the [`TextFormatting`].
+    #[inline]
+    #[must_use]
+    pub fn with_font(mut self, font: Identifier) -> Self {
+        self.font = Some(font);
+        self
+    }
+
+    /// Set the color of the [`TextFormatting`].
+    #[inline]
+    #[must_use]
+    pub fn with_color(mut self, color: TextColor) -> Self {
+        self.color = Some(color);
+        self
+    }
+
+    /// Set whether the [`TextFormatting`] is bold.
+    #[inline]
+    #[must_use]
+    pub fn with_bold(mut self, bold: bool) -> Self {
+        self.bold = Some(bold);
+        self
+    }
+
+    /// Set whether the [`TextFormatting`] is italic.
+    #[inline]
+    #[must_use]
+    pub fn with_italic(mut self, italic: bool) -> Self {
+        self.italic = Some(italic);
+        self
+    }
+
+    /// Set whether the [`TextFormatting`] is underlined.
+    #[inline]
+    #[must_use]
+    pub fn with_underlined(mut self, underlined: bool) -> Self {
+        self.underlined = Some(underlined);
+        self
+    }
+
+    /// Set whether the [`TextFormatting`] is strikethrough.
+    #[inline]
+    #[must_use]
+    pub fn with_strikethrough(mut self, strikethrough: bool) -> Self {
+        self.strikethrough = Some(strikethrough);
+        self
+    }
+
+    /// Set whether the [`TextFormatting`] is obfuscated.
+    #[inline]
+    #[must_use]
+    pub fn with_obfuscated(mut self, obfuscated: bool) -> Self {
+        self.obfuscated = Some(obfuscated);
+        self
     }
 }
 
@@ -97,7 +203,7 @@ impl TextColor {
     /// ```
     #[must_use]
     pub fn from_color(color: impl Into<SmolStr>) -> Option<Self> {
-        let color = color.into();
+        let color: SmolStr = color.into();
         match color.as_str() {
             "black" => Some(Self::Black),
             "dark_blue" => Some(Self::DarkBlue),
@@ -140,7 +246,7 @@ impl TextColor {
     /// assert_eq!(TextColor::from_hex_string("invalid"), None);
     #[must_use]
     pub fn from_hex_string(color: impl Into<SmolStr>) -> Option<Self> {
-        let color = color.into();
+        let color: SmolStr = color.into();
 
         if color.starts_with('#')
             && color.len() == 7
@@ -245,4 +351,37 @@ impl TextColor {
             Self::Custom(color) => color.as_ref(),
         }
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[test]
+fn inheritance() {
+    let green = TextFormatting::empty().with_color(TextColor::DarkGreen);
+    assert_eq!(green.or_default(), TextFormatting::default().with_color(TextColor::DarkGreen));
+
+    let blue = TextFormatting::empty().with_color(TextColor::DarkBlue);
+    assert_eq!(blue.or_default(), TextFormatting::default().with_color(TextColor::DarkBlue));
+
+    let blue_bold = blue.with_bold(true);
+    assert_eq!(
+        blue_bold.or_default(),
+        TextFormatting::default().with_color(TextColor::DarkBlue).with_bold(true)
+    );
+
+    let red_obfuscated =
+        TextFormatting::empty().with_color(TextColor::DarkRed).with_obfuscated(true);
+    assert_eq!(
+        red_obfuscated.or_default(),
+        TextFormatting::default().with_color(TextColor::DarkRed).with_obfuscated(true)
+    );
+
+    let red_obfuscated_italic = red_obfuscated.with_italic(true);
+    assert_eq!(
+        red_obfuscated_italic.or_default(),
+        TextFormatting::default()
+            .with_color(TextColor::DarkRed)
+            .with_obfuscated(true)
+            .with_italic(true)
+    );
 }
