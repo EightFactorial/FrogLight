@@ -30,4 +30,4 @@ macro_rules! impl_string {
     };
 }
 
-impl_string!(String, SmolStr, Cow<'static, str>);
+impl_string!(String, Cow<'static, str>, SmolStr);

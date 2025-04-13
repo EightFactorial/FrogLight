@@ -30,11 +30,10 @@ pub(super) fn register_types(registry: &mut TypeRegistry) {
     registry.register_type_data::<f64, ReflectArgumentParser>();
     // registry.register_type_data::<f128, ReflectArgumentParser>();
 
+    registry.register::<String>();
     registry.register_type_data::<String, ReflectArgumentParser>();
-
     registry.register::<Cow<'static, str>>();
     registry.register_type_data::<Cow<'static, str>, ReflectArgumentParser>();
-
     registry.register::<SmolStr>();
     registry.register_type_data::<SmolStr, ReflectArgumentParser>();
 
