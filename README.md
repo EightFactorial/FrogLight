@@ -22,7 +22,7 @@ It is currently in an **early alpha state**. Some things do not work yet!
 
 FrogLight has support for:
 - v1.21.4
-- ~~v1.21.5~~
+- v1.21.5
 
 ## Usage
 
