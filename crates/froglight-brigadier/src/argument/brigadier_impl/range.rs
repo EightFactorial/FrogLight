@@ -58,7 +58,7 @@ impl<T: Debug + Clone + PartialOrd + FromStr + Reflect + TypePath> ArgumentParse
         arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-        let (start, end) = arguments.trim().split_once(' ').unwrap_or((arguments, ""));
+        let (start, end) = arguments.trim_start().split_once(' ').unwrap_or((arguments, ""));
         let value: T = start.parse::<T>().map_err(|_| ArgumentError::DoesNotMatch)?;
 
         if (self.min.clone(), self.max.clone()).contains(&value) {

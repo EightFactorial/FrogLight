@@ -16,8 +16,8 @@ impl ArgumentParser for BrigadierWord {
         mut arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-        arguments = arguments.trim();
-        if arguments.is_empty() {
+        arguments = arguments.trim_start();
+        if arguments.is_empty() || arguments.starts_with(['"', '\'']) {
             Err(ArgumentError::DoesNotMatch)
         } else {
             let (start, end) = arguments.split_once(' ').unwrap_or((arguments, ""));
@@ -41,10 +41,10 @@ impl ArgumentParser for BrigadierPhrase {
         mut arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-        arguments = arguments.trim();
+        arguments = arguments.trim_start();
         if arguments.is_empty() {
             Err(ArgumentError::DoesNotMatch)
-        } else if arguments.starts_with('"') {
+        } else if arguments.starts_with(['"', '\'']) {
             todo!()
         } else {
             let (start, end) = arguments.split_once(' ').unwrap_or((arguments, ""));
@@ -68,7 +68,7 @@ impl ArgumentParser for BrigadierTail {
         mut arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-        arguments = arguments.trim();
+        arguments = arguments.trim_start();
         if arguments.is_empty() {
             Err(ArgumentError::DoesNotMatch)
         } else {

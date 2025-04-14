@@ -16,7 +16,7 @@ impl ArgumentParser for BrigadierBool {
         arguments: &'a str,
         _: &World,
     ) -> Result<(ArgValue<'a>, &'a str), ArgumentError> {
-        let (start, end) = arguments.trim().split_once(' ').unwrap_or((arguments, ""));
+        let (start, end) = arguments.trim_start().split_once(' ').unwrap_or((arguments, ""));
 
         if start.eq_ignore_ascii_case("true") {
             Ok((ArgValue::Owned(Box::new(true)), end))

@@ -23,6 +23,7 @@ impl WorldRefType for Full {}
 
 /// A [`WorldRef`] that contains an empty [`World`].
 #[derive(Default, Clone, Copy, Reflect)]
+#[reflect(Default)]
 pub struct Empty;
 impl WorldRefType for Empty {}
 
