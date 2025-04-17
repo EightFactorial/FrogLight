@@ -1,30 +1,36 @@
-//! Player profiles and textures.
+//! [`PlayerProfile`] and [`PlayerProfileTextures`]
 
-use std::time::{Duration, SystemTime};
+#[cfg(feature = "serde")]
+use std::time::Duration;
+use std::time::SystemTime;
 
+#[cfg(feature = "online")]
 use base64::{Engine, prelude::BASE64_URL_SAFE};
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+#[cfg(feature = "serde")]
 use hashbrown::HashMap;
+#[cfg(feature = "online")]
 use serde::Deserialize;
 use smol_str::SmolStr;
 use uuid::Uuid;
 
-use crate::username::PlayerUsername;
+use super::{username::PlayerUsername, uuid::PlayerUuid};
 
 /// A player's profile.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect), reflect(Debug, PartialEq, Component))]
 pub struct PlayerProfile {
     /// The player's [`Uuid`].
-    pub uuid: Uuid,
+    pub uuid: PlayerUuid,
     /// The player's username.
     pub username: PlayerUsername,
     /// The player's textures.
     pub textures: PlayerProfileTextures,
     /// The player's properties.
+    #[cfg(feature = "serde")]
     #[cfg_attr(feature = "bevy", reflect(ignore))]
     pub properties: HashMap<SmolStr, serde_json::Value>,
 }
@@ -32,8 +38,12 @@ pub struct PlayerProfile {
 impl PlayerProfile {
     /// Create a new [`PlayerProfile`] from a username and [`Uuid`].
     #[must_use]
-    pub fn new(username: impl Into<SmolStr>, uuid: Uuid) -> Self {
-        Self::new_with_textures(PlayerUsername::new(username), uuid, PlayerProfileTextures::new())
+    pub fn new(username: impl Into<SmolStr>, uuid: impl Into<Uuid>) -> Self {
+        Self::new_with_textures(
+            PlayerUsername::new(username),
+            PlayerUuid::new(uuid),
+            PlayerProfileTextures::new(),
+        )
     }
 
     /// Create a new [`PlayerProfile`] from a
@@ -41,10 +51,18 @@ impl PlayerProfile {
     #[must_use]
     pub fn new_with_textures(
         username: PlayerUsername,
-        uuid: Uuid,
+        uuid: PlayerUuid,
         textures: PlayerProfileTextures,
     ) -> Self {
-        Self { uuid, username, textures, properties: HashMap::new() }
+        #[cfg(feature = "serde")]
+        {
+            Self { uuid, username, textures, properties: HashMap::new() }
+        }
+
+        #[cfg(not(feature = "serde"))]
+        {
+            Self { uuid, username, textures }
+        }
     }
 
     /// Create a new offline [`PlayerProfile`] from a username.
@@ -53,6 +71,26 @@ impl PlayerProfile {
         let username = PlayerUsername::new(username);
         let uuid = username.offline_uuid();
         Self::new_with_textures(username, uuid, PlayerProfileTextures::new())
+    }
+
+    /// Create a new [`PlayerProfile`] from a username.
+    ///
+    /// Uses Mojang's API to fetch player data.
+    ///
+    /// # Warning
+    /// This function will block until the request is complete!
+    ///
+    /// # Errors
+    /// Returns an error if the request to Mojang's API fails.
+    #[cfg(feature = "online")]
+    pub fn online_profile(
+        username: impl Into<SmolStr>,
+        agent: Option<&ureq::Agent>,
+    ) -> Result<Self, ureq::Error> {
+        match agent {
+            Some(agent) => Self::profile_of_player(username, agent),
+            None => Self::profile_of_player(username, &ureq::Agent::new_with_defaults()),
+        }
     }
 }
 
@@ -90,21 +128,23 @@ impl PlayerProfileTextures {
 
 /// The response from the Mojang API when querying a player's profile.
 #[cfg(feature = "online")]
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 pub struct ProfileResponse {
     /// The username of the player.
     #[serde(rename = "name")]
-    pub username: SmolStr,
+    pub username: PlayerUsername,
     /// The [`Uuid`] of the player.
     #[serde(rename = "id")]
-    pub uuid: Uuid,
+    pub uuid: PlayerUuid,
     /// The properties of the player.
     pub properties: Vec<ProfileResponseProperty>,
 }
 
 /// A property of a player's profile.
 #[cfg(feature = "online")]
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "serde", derive(Deserialize))]
 pub struct ProfileResponseProperty {
     /// The name of the property.
     pub name: SmolStr,
@@ -134,7 +174,6 @@ impl PlayerProfile {
     /// # Example
     /// ```rust
     /// use froglight_player::prelude::PlayerProfile;
-    /// use uuid::Uuid;
     ///
     /// let agent = ureq::Agent::new_with_defaults();
     ///
@@ -146,7 +185,7 @@ impl PlayerProfile {
         username: impl Into<SmolStr>,
         agent: &ureq::Agent,
     ) -> Result<PlayerProfile, ureq::Error> {
-        Self::profile_of(&PlayerUsername::new(username).player_uuid(agent)?, agent)
+        Self::profile_of(&PlayerUsername::new(username).player_online_uuid(agent)?, agent)
     }
 
     /// Get the player profile of the player with the given [`Uuid`].
@@ -164,19 +203,22 @@ impl PlayerProfile {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_player::prelude::PlayerProfile;
+    /// use froglight_player::prelude::{PlayerProfile, PlayerUuid};
     /// use uuid::Uuid;
     ///
     /// let agent = ureq::Agent::new_with_defaults();
-    /// let uuid = Uuid::parse_str("352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3").unwrap();
+    /// let uuid: PlayerUuid = Uuid::parse_str("352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3").unwrap().into();
     ///
     /// let profile = PlayerProfile::profile_of(&uuid, &agent).unwrap();
     /// assert_eq!(profile.username, "Mr_Sus_");
     /// assert_eq!(profile.uuid, uuid);
     /// ```
     #[expect(clippy::missing_panics_doc)]
-    pub fn profile_of(uuid: &Uuid, agent: &ureq::Agent) -> Result<PlayerProfile, ureq::Error> {
-        Self::profile_at::<ProfileResponse>(uuid, Self::MOJANG_PROFILE_API, agent)
+    pub fn profile_of(
+        uuid: &PlayerUuid,
+        agent: &ureq::Agent,
+    ) -> Result<PlayerProfile, ureq::Error> {
+        Self::profile_at::<ProfileResponse>(uuid.as_ref(), Self::MOJANG_PROFILE_API, agent)
             .map(|res| res.try_into().expect("Mojang API returned invalid response!"))
     }
 
@@ -194,10 +236,11 @@ impl PlayerProfile {
         api: &str,
         agent: &ureq::Agent,
     ) -> Result<T, ureq::Error> {
-        crate::retry_request::<T, 3>(&format!("{api}{}", uuid.as_simple()), agent)
+        super::retry_request::<T, 3>(&format!("{api}{}", uuid.as_simple()), agent)
     }
 }
 
+#[cfg(feature = "online")]
 impl TryFrom<ProfileResponse> for PlayerProfile {
     type Error = serde::de::value::Error;
 
@@ -246,12 +289,13 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
         Ok(Self {
             properties,
             uuid: response.uuid,
-            username: response.username.into(),
+            username: response.username,
             textures: textures.unwrap_or_default(),
         })
     }
 }
 
+#[cfg(feature = "serde")]
 impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
     type Error = serde::de::value::Error;
 
@@ -290,12 +334,11 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
 
 #[test]
 #[cfg(test)]
-#[expect(clippy::bool_assert_comparison)]
 fn offline_profile() {
     let profile = PlayerProfile::offline_profile("Mr_Sus_");
     assert_eq!(profile.username, "Mr_Sus_");
     assert_eq!(profile.uuid.to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
-    assert_eq!(profile.textures.slim, false);
+    assert!(!profile.textures.slim);
     assert!(profile.textures.skin.is_none());
     assert!(profile.textures.cape.is_none());
 }
@@ -303,14 +346,12 @@ fn offline_profile() {
 #[test]
 #[cfg(test)]
 #[cfg(feature = "online")]
-#[expect(clippy::bool_assert_comparison)]
 fn online_profile() {
-    let agent = ureq::Agent::new_with_defaults();
-    let profile = PlayerProfile::profile_of_player("Mr_Sus_", &agent).unwrap();
+    let profile = PlayerProfile::online_profile("Mr_Sus_", None).unwrap();
 
     assert_eq!(profile.username, "Mr_Sus_");
     assert_eq!(profile.uuid.to_string(), "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3");
-    assert_eq!(profile.textures.slim, false);
+    assert!(!profile.textures.slim);
     assert!(profile.textures.skin.is_some());
     assert!(profile.textures.cape.is_none());
 }

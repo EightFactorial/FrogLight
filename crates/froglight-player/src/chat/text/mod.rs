@@ -5,6 +5,7 @@ use smol_str::SmolStr;
 mod formatting;
 pub use formatting::{TextColor, TextFormatting};
 
+#[cfg(feature = "serde")]
 mod json;
 mod nbt;
 

@@ -26,8 +26,6 @@ hashbrown = { workspace = true, features = ["serde"] }
 md-5 = { workspace = true }
 parking_lot = { workspace = true }
 rsa = { workspace = true, features = ["serde", "sha2"] }
-serde = { workspace = true }
-serde_json = { workspace = true }
 smol_str = { workspace = true, features = ["serde"] }
 uuid = { workspace = true, features = ["md5", "serde"] }
 
@@ -36,13 +34,18 @@ bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true, features = ["serde"] }
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
 ureq = { workspace = true, optional = true, features = ["json"] }
 
+
 [features]
-default = ["online"]
+default = ["online", "serde"]
 
 # Enable accessing online APIs.
-online = ["dep:ureq"]
+online = ["dep:ureq", "serde"]
+# Enable `serde` support.
+serde = ["dep:serde", "dep:serde_json"]
 
 # Enable `froglight-io` support.
 io = ["dep:froglight-io"]

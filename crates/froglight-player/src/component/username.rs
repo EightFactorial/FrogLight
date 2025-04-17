@@ -11,30 +11,34 @@ use md5::{
     Md5,
     digest::{Digest, Update},
 };
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use uuid::{Builder, Uuid};
 
+use super::uuid::PlayerUuid;
+
 /// A player's username.
 #[repr(transparent)]
-#[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Serialize, Deserialize))]
+#[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PlayerUsername(SmolStr);
 
 impl PlayerUsername {
+    /// Create a new [`PlayerUsername`] from a [`SmolStr`].
+    #[must_use]
+    pub const fn const_new(s: SmolStr) -> Self { Self(s) }
+
     /// Create a new [`PlayerUsername`] from a static string.
     #[must_use]
-    pub const fn new_static(s: &'static str) -> Self { Self(SmolStr::new_static(s)) }
+    pub const fn static_new(s: &'static str) -> Self { Self::const_new(SmolStr::new_static(s)) }
 
     /// Create a new [`PlayerUsername`] from a string.
     #[must_use]
     pub fn new(s: impl Into<SmolStr>) -> Self { Self(s.into()) }
-
-    /// Get the [`PlayerUsername`] as a string slice.
-    #[inline]
-    #[must_use]
-    pub fn as_str(&self) -> &str { self.0.as_str() }
 
     /// Get the offline [`Uuid`] of the player with this [`PlayerUsername`].
     ///
@@ -42,83 +46,45 @@ impl PlayerUsername {
     /// ```rust
     /// use froglight_player::prelude::PlayerUsername;
     ///
-    /// let username = PlayerUsername::new_static("Mr_Sus_");
+    /// let username = PlayerUsername::static_new("Mr_Sus_");
     /// assert_eq!(username.offline_uuid().to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
     /// ```
     #[must_use]
-    pub fn offline_uuid(&self) -> Uuid {
-        Md5::new()
-            .chain(format!("OfflinePlayer:{}", self.0))
-            .finalize()
-            .first_chunk::<16>()
-            .map_or(Uuid::nil(), |&data| Builder::from_md5_bytes(data).into_uuid())
+    pub fn offline_uuid(&self) -> PlayerUuid {
+        PlayerUuid::new(
+            Md5::new()
+                .chain(format!("OfflinePlayer:{}", self.0))
+                .finalize()
+                .first_chunk::<16>()
+                .map_or(Uuid::nil(), |&data| Builder::from_md5_bytes(data).into_uuid()),
+        )
     }
-}
 
-// -------------------------------------------------------------------------------------------------
-
-/// The response from the Mojang API when querying a player's username.
-#[cfg(feature = "online")]
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-pub struct UsernameResponse {
-    /// The username of the player.
-    #[serde(rename = "name")]
-    pub username: SmolStr,
-    /// The [`Uuid`] of the player.
-    #[serde(rename = "id")]
-    pub uuid: Uuid,
-}
-
-#[cfg(feature = "online")]
-impl PlayerUsername {
-    /// The Mojang username API endpoint.
-    const MOJANG_USERNAME_API: &'static str =
-        "https://api.minecraftservices.com/minecraft/profile/lookup/";
-
-    /// Get the username of the player with the given [`Uuid`].
+    /// Get the [`Uuid`] of the player with this [`PlayerUsername`].
     ///
-    /// Will automatically retry up to 3 times if the request fails.
-    ///
-    /// See the [Minecraft Wiki](https://minecraft.wiki/w/Mojang_API#Query_player_information)
-    /// for more information.
+    /// Uses Mojang's API to fetch player data.
     ///
     /// # Warning
     /// This function will block until the request is complete!
     ///
     /// # Errors
-    /// Returns an error if the request fails.
+    /// Returns an error if the request to Mojang's API fails.
     ///
     /// # Example
     /// ```rust
     /// use froglight_player::prelude::PlayerUsername;
-    /// use uuid::Uuid;
     ///
-    /// let agent = ureq::Agent::new_with_defaults();
-    ///
-    /// let uuid = Uuid::parse_str("352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3").unwrap();
-    /// assert_eq!(PlayerUsername::username_of(&uuid, &agent).unwrap(), "Mr_Sus_");
+    /// match PlayerUsername::static_new("Mr_Sus_").online_uuid(None) {
+    ///     Ok(uuid) => assert_eq!(uuid.to_string(), "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3"),
+    ///     Err(err) => eprintln!("Failed to fetch UUID: {}", err),
+    /// }
     /// ```
-    #[inline]
-    pub fn username_of(uuid: &Uuid, agent: &ureq::Agent) -> Result<PlayerUsername, ureq::Error> {
-        Self::username_at::<UsernameResponse>(uuid, Self::MOJANG_USERNAME_API, agent)
-            .map(|res| PlayerUsername::from(res.username))
-    }
-
-    /// Get the username of the player with the given [`Uuid`] and API.
-    ///
-    /// Will automatically retry up to 3 times if the request fails.
-    ///
-    /// # Warning
-    /// This function will block until the request is complete!
-    ///
-    /// # Errors
-    /// Returns an error if the request fails.
-    pub fn username_at<T: serde::de::DeserializeOwned>(
-        uuid: &Uuid,
-        api: &str,
-        agent: &ureq::Agent,
-    ) -> Result<T, ureq::Error> {
-        crate::retry_request::<_, 3>(&format!("{api}{}", uuid.as_simple()), agent)
+    #[cfg(feature = "online")]
+    pub fn online_uuid(&self, agent: Option<&ureq::Agent>) -> Result<PlayerUuid, ureq::Error> {
+        match agent {
+            Some(agent) => self.player_online_uuid(agent),
+            None => self.player_online_uuid(&ureq::Agent::new_with_defaults()),
+        }
     }
 }
 
@@ -130,10 +96,10 @@ impl PlayerUsername {
 pub struct UuidResponse {
     /// The username of the player.
     #[serde(rename = "name")]
-    pub username: String,
+    pub username: PlayerUsername,
     /// The [`Uuid`] of the player.
     #[serde(rename = "id")]
-    pub uuid: Uuid,
+    pub uuid: PlayerUuid,
 }
 
 #[cfg(feature = "online")]
@@ -161,13 +127,13 @@ impl PlayerUsername {
     /// use uuid::Uuid;
     ///
     /// let agent = ureq::Agent::new_with_defaults();
-    /// let username = PlayerUsername::new_static("Mr_Sus_");
+    /// let username = PlayerUsername::static_new("Mr_Sus_");
     ///
-    /// let uuid = username.player_uuid(&agent).unwrap();
+    /// let uuid = username.player_online_uuid(&agent).unwrap();
     /// assert_eq!(uuid.to_string(), "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3");
     /// ```
-    pub fn player_uuid(&self, agent: &ureq::Agent) -> Result<Uuid, ureq::Error> {
-        self.player_uuid_at::<UuidResponse>(Self::MOJANG_UUID_API, agent).map(|res| res.uuid)
+    pub fn player_online_uuid(&self, agent: &ureq::Agent) -> Result<PlayerUuid, ureq::Error> {
+        Self::player_uuid_at::<UuidResponse>(self, Self::MOJANG_UUID_API, agent).map(|res| res.uuid)
     }
 
     /// Get the [`Uuid`] of the player with this [`PlayerUsername`] and API.
@@ -180,11 +146,11 @@ impl PlayerUsername {
     /// # Errors
     /// Returns an error if the request fails.
     pub fn player_uuid_at<T: serde::de::DeserializeOwned>(
-        &self,
+        username: &(impl AsRef<str> + ?Sized),
         api: &(impl AsRef<str> + ?Sized),
         agent: &ureq::Agent,
     ) -> Result<T, ureq::Error> {
-        crate::retry_request::<T, 3>(&format!("{}{}", api.as_ref(), self.0), agent)
+        super::retry_request::<T, 3>(&format!("{}{}", api.as_ref(), username.as_ref()), agent)
     }
 }
 
@@ -232,14 +198,12 @@ where SmolStr: Deref<Target = T>
 #[test]
 #[cfg(test)]
 fn username() {
-    let username = PlayerUsername::new_static("Mr_Sus_");
+    let username = PlayerUsername::static_new("Mr_Sus_");
     assert_eq!(username.offline_uuid().to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
 
     #[cfg(feature = "online")]
     {
-        let agent = ureq::Agent::new_with_defaults();
-
-        let uuid = username.player_uuid(&agent).unwrap();
+        let uuid = username.online_uuid(None).unwrap();
         assert_eq!(uuid.to_string(), "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3");
     }
 }
