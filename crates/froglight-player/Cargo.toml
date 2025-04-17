@@ -20,32 +20,29 @@ aes = { workspace = true }
 base64 = { workspace = true }
 cfb8 = { workspace = true }
 derive_more = { workspace = true }
-froglight-common = { workspace = true, features = ["serde"] }
-froglight-nbt = { workspace = true, features = ["serde"] }
-hashbrown = { workspace = true, features = ["serde"] }
+froglight-common = { workspace = true }
+froglight-nbt = { workspace = true }
+hashbrown = { workspace = true }
 md-5 = { workspace = true }
 parking_lot = { workspace = true }
-rsa = { workspace = true, features = ["serde", "sha2"] }
-smol_str = { workspace = true, features = ["serde"] }
-uuid = { workspace = true, features = ["md5", "serde"] }
+rsa = { workspace = true, features = ["sha2"] }
+smol_str = { workspace = true }
+uuid = { workspace = true, features = ["md5"] }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
-froglight-io = { workspace = true, optional = true, features = ["serde"] }
+froglight-io = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
 ureq = { workspace = true, optional = true, features = ["json"] }
-
 
 [features]
 default = ["online", "serde"]
 
 # Enable accessing online APIs.
 online = ["dep:ureq", "serde"]
-# Enable `serde` support.
-serde = ["dep:serde", "dep:serde_json"]
 
 # Enable `froglight-io` support.
 io = ["dep:froglight-io"]
@@ -57,4 +54,16 @@ bevy = [
   "dep:bevy_reflect",
   "froglight-common/bevy",
   "froglight-nbt/bevy",
+]
+# Enable `serde` support.
+serde = [
+  "dep:serde",
+  "dep:serde_json",
+  "froglight-common/serde",
+  "froglight-io?/serde",
+  "froglight-nbt/serde",
+  "hashbrown/serde",
+  "rsa/serde",
+  "smol_str/serde",
+  "uuid/serde",
 ]
