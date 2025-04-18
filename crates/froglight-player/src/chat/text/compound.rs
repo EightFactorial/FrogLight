@@ -7,21 +7,24 @@ use froglight_nbt::{
     prelude::{FromCompound, IntoCompound},
 };
 
-use super::{Text, TextColor, TextContent, TextFormatting};
+use super::{
+    FormattedContent, FormattedText,
+    formatting::{TextColor, TextFormatting},
+};
 
-impl FromCompound for Text {
+impl FromCompound for FormattedText {
     fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
 }
-impl IntoCompound for Text {
+impl IntoCompound for FormattedText {
     fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl FromCompound for TextContent {
+impl FromCompound for FormattedContent {
     fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
 }
-impl IntoCompound for TextContent {
+impl IntoCompound for FormattedContent {
     fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
 }
 

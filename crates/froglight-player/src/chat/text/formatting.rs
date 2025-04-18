@@ -1,22 +1,39 @@
+//! TODO
+
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
+use derive_more::{Deref, DerefMut, From, Into};
 use froglight_common::prelude::Identifier;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
-/// The formatting of a [`Text`](super::Text) component.
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// The formatting of a [`FormattedText`](super::FormattedText) component.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct TextFormatting {
     /// The font of the text.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     font: Option<Identifier>,
     /// The color of the text.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     color: Option<TextColor>,
     /// Whether the text is bold.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     bold: Option<bool>,
     /// Whether the text is italic.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     italic: Option<bool>,
     /// Whether the text is underlined.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     underlined: Option<bool>,
     /// Whether the text is strikedthrough.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     strikethrough: Option<bool>,
     /// Whether the text is obfuscated.
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     obfuscated: Option<bool>,
 }
 
@@ -143,8 +160,9 @@ impl TextFormatting {
 
 // -------------------------------------------------------------------------------------------------
 
-/// The font color of a [`Text`](super::Text) component.
-#[derive(Debug, Clone, PartialEq, Eq)]
+/// The font color of a [`FormattedText`](super::FormattedText) component.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
 pub enum TextColor {
     /// Hex `#000000`
     Black,
@@ -187,7 +205,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::TextColor;
+    /// use froglight_player::chat::text::formatting::TextColor;
     ///
     /// let color = TextColor::from_color("black").unwrap();
     /// assert_eq!(color, TextColor::Black);
@@ -231,7 +249,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::TextColor;
+    /// use froglight_player::chat::text::formatting::TextColor;
     ///
     /// let color = TextColor::from_hex_string("#000000").unwrap();
     /// assert_eq!(color, TextColor::Black);
@@ -280,7 +298,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::TextColor;
+    /// use froglight_player::chat::text::formatting::TextColor;
     ///
     /// assert_eq!(TextColor::Black.as_named_str(), "black");
     /// assert_eq!(TextColor::DarkBlue.as_named_str(), "dark_blue");
@@ -318,7 +336,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::TextColor;
+    /// use froglight_player::chat::text::formatting::TextColor;
     ///
     /// assert_eq!(TextColor::Black.as_hex_str(), "#000000");
     /// assert_eq!(TextColor::DarkBlue.as_hex_str(), "#0000AA");
@@ -350,6 +368,49 @@ impl TextColor {
             Self::White => "#FFFFFF",
             Self::Custom(color) => color.as_ref(),
         }
+    }
+
+    /// Returns the [`IntegerTextColor`] that represents this [`TextColor`].
+    #[inline]
+    #[must_use]
+    pub fn as_integer(&self) -> IntegerTextColor { IntegerTextColor::from_color(self) }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A [`TextColor`] represented by a [`u32`].
+#[repr(transparent)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+pub struct IntegerTextColor(u32);
+
+impl IntegerTextColor {
+    /// Create a [`IntegerTextColor`] from a [`u32`].
+    #[must_use]
+    pub const fn new(color: u32) -> Self { Self(color) }
+
+    /// Create a [`IntegerTextColor`] from a [`TextColor`].
+    #[must_use]
+    pub fn from_color(color: &TextColor) -> Self {
+        if let Some(color) = color.as_hex_str().strip_prefix('#') {
+            let color = u32::from_str_radix(color, 16);
+            Self::new(
+                color.unwrap_or_else(|_| unreachable!("TextColor contains invalid hexadecimal!")),
+            )
+        } else {
+            unreachable!("TextColor always starts with a '#'!")
+        }
+    }
+
+    /// Create a [`TextColor`] from an [`IntegerTextColor`].
+    ///
+    /// Returns `None` if the color is invalid.
+    #[inline]
+    #[must_use]
+    pub fn try_into_color(&self) -> Option<TextColor> {
+        TextColor::from_hex_string(format!("{:X}", self.0))
     }
 }
 
@@ -384,4 +445,24 @@ fn inheritance() {
             .with_obfuscated(true)
             .with_italic(true)
     );
+}
+
+#[test]
+fn integer_color() {
+    assert_eq!(*TextColor::Black.as_integer(), 0x000000);
+    assert_eq!(*TextColor::DarkBlue.as_integer(), 0x0000AA);
+    assert_eq!(*TextColor::DarkGreen.as_integer(), 0x00AA00);
+    assert_eq!(*TextColor::DarkAqua.as_integer(), 0x00AAAA);
+    assert_eq!(*TextColor::DarkRed.as_integer(), 0xAA0000);
+    assert_eq!(*TextColor::DarkPurple.as_integer(), 0xAA00AA);
+    assert_eq!(*TextColor::Gold.as_integer(), 0xFFAA00);
+    assert_eq!(*TextColor::Gray.as_integer(), 0xAAAAAA);
+    assert_eq!(*TextColor::DarkGray.as_integer(), 0x555555);
+    assert_eq!(*TextColor::Blue.as_integer(), 0x5555FF);
+    assert_eq!(*TextColor::Green.as_integer(), 0x55FF55);
+    assert_eq!(*TextColor::Aqua.as_integer(), 0x55FFFF);
+    assert_eq!(*TextColor::Red.as_integer(), 0xFF5555);
+    assert_eq!(*TextColor::LightPurple.as_integer(), 0xFF55FF);
+    assert_eq!(*TextColor::Yellow.as_integer(), 0xFFFF55);
+    assert_eq!(*TextColor::White.as_integer(), 0xFFFFFF);
 }

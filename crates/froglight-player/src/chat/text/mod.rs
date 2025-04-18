@@ -1,66 +1,52 @@
 //! Text parsing and formatting.
 
-use smol_str::SmolStr;
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 
-mod formatting;
+pub mod component;
+use component::{
+    KeybindComponent, ScoreComponent, SelectorComponent, TextComponent, TranslateComponent,
+    ValueComponent,
+};
+
+pub mod formatting;
 pub use formatting::{TextColor, TextFormatting};
 
+mod compound;
 #[cfg(feature = "serde")]
-mod json;
-mod nbt;
+mod serde;
 
 /// A formatted text message.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Text {
-    /// The content of the text component.
-    pub content: TextContent,
-    /// Extra text components.
-    ///
-    /// These are appended to the parent text component
-    /// and inherit its formatting.
-    pub extra: Vec<Text>,
-    /// The formatting of the text.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq, Hash))]
+pub struct FormattedText {
+    /// The content of the message.
+    pub content: FormattedContent,
+    /// The formatting of the message.
     pub formatting: TextFormatting,
+
+    /// Children message components.
+    ///
+    /// These are appended to the parent and inherit its formatting.
+    pub children: Vec<FormattedText>,
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// The content of a [`Text`] component.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum TextContent {
+/// The content of a [`FormattedText`].
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+pub enum FormattedContent {
     /// A plain-text component.
-    Text {
-        /// The plain text.
-        text: SmolStr,
-    },
+    Text(TextComponent),
     /// A translation component.
-    Translation {
-        /// The translation identifier.
-        translate: SmolStr,
-        /// An optional fallback string.
-        fallback: Option<SmolStr>,
-        /// The translation arguments.
-        with: Vec<Text>,
-    },
+    Translation(TranslateComponent),
     /// A score component.
-    Score {
-        /// The name of the score holder.
-        name: SmolStr,
-        /// The objective to display the score of.
-        objective: SmolStr,
-    },
+    Score(ScoreComponent),
     /// A selector component.
-    Selector {
-        /// The selector.
-        selector: SmolStr,
-        /// An optional separator between multiple selected entities.
-        separator: Option<SmolStr>,
-    },
+    Selector(SelectorComponent),
     /// A keybind component.
-    Keybind {
-        /// The keybind identifier.
-        keybind: SmolStr,
-    },
+    Keybind(KeybindComponent),
     /// An Nbt component.
-    Nbt {},
+    Nbt(ValueComponent),
 }

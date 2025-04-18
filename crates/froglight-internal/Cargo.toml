@@ -54,6 +54,7 @@ bevy = [
   "froglight-item/bevy",
   "froglight-nbt/bevy",
   "froglight-network/bevy",
+  "froglight-player/bevy",
   "froglight-registry/bevy",
   "froglight-world/bevy",
 ]
