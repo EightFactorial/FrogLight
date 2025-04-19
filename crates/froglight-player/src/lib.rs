@@ -10,7 +10,7 @@ pub mod prelude {
     pub use crate::{
         chat::{
             signature::MessageSignatureCtx,
-            text::{FormattedText, TextColor, TextFormatting},
+            text::{FormattedText, FormattedTextRef, TextColor, TextFormatting},
         },
         component::{profile::PlayerProfile, username::PlayerUsername, uuid::PlayerUuid},
     };

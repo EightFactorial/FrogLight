@@ -34,7 +34,7 @@ bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
-serde = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
 serde_json = { workspace = true, optional = true }
 ureq = { workspace = true, optional = true, features = ["json"] }
 

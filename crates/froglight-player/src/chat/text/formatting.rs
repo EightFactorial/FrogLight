@@ -78,13 +78,13 @@ impl TextFormatting {
     /// Create a new [`TextFormatting`] with all uninitialized fields
     /// set to the default values.
     #[must_use]
-    pub fn or_default(&self) -> Self { self.inherit_from(&Self::default()) }
+    pub fn or_default(&self) -> Self { self.inherit(&Self::default()) }
 
     /// Create a new [`TextFormatting`] that inherits from the given parent.
     ///
     /// This guarantees that all fields are initialized.
     #[must_use]
-    pub fn inherit_from(&self, parent: &Self) -> Self {
+    pub fn inherit(&self, parent: &Self) -> Self {
         let font =
             self.font.as_ref().map_or_else(|| parent.font.clone(), |font| Some(font.clone()));
         let color =
@@ -98,6 +98,28 @@ impl TextFormatting {
             underlined: self.underlined.or(parent.underlined).or(Some(false)),
             strikethrough: self.strikethrough.or(parent.strikethrough).or(Some(false)),
             obfuscated: self.obfuscated.or(parent.obfuscated).or(Some(false)),
+        }
+    }
+
+    /// Create a new [`TextFormatting`] returns only the differences.
+    #[must_use]
+    pub fn difference(&self, other: &Self) -> Self {
+        /// Returns `None` if both options are None or equal.
+        fn xor<'a, T: PartialEq>(a: Option<&'a T>, b: Option<&'a T>) -> Option<&'a T> {
+            match (a, b) {
+                (Some(a), Some(b)) if a == b => None,
+                _ => a.or(b),
+            }
+        }
+
+        Self {
+            font: xor(self.font.as_ref(), other.font.as_ref()).cloned(),
+            color: xor(self.color.as_ref(), other.color.as_ref()).cloned(),
+            bold: xor(self.bold.as_ref(), other.bold.as_ref()).copied(),
+            italic: xor(self.italic.as_ref(), other.italic.as_ref()).copied(),
+            underlined: xor(self.underlined.as_ref(), other.underlined.as_ref()).copied(),
+            strikethrough: xor(self.strikethrough.as_ref(), other.strikethrough.as_ref()).copied(),
+            obfuscated: xor(self.obfuscated.as_ref(), other.obfuscated.as_ref()).copied(),
         }
     }
 
