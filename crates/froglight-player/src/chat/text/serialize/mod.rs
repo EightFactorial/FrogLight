@@ -1,2 +1,2 @@
-mod color;
 mod text;
+mod value;

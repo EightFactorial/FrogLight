@@ -16,7 +16,7 @@ pub mod formatting;
 pub use formatting::{TextColor, TextFormatting};
 
 pub mod interaction;
-use interaction::InteractComponent;
+pub use interaction::TextInteraction;
 
 mod compound;
 #[cfg(feature = "serde")]
@@ -32,11 +32,11 @@ pub struct FormattedText {
     /// The formatting of the message.
     pub formatting: TextFormatting,
     /// The interactability of the message.
-    pub interact: Option<InteractComponent>,
+    pub interact: TextInteraction,
 
-    /// Children message components.
+    /// Child message components.
     ///
-    /// These are appended to the parent and inherit its formatting.
+    /// These are appended after the parent and inherit its formatting.
     pub children: Vec<FormattedText>,
 }
 

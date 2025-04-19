@@ -1,12 +1,21 @@
 use serde::{
-    __private::ser::FlatMapSerializer,
-    Deserialize, Deserializer, Serialize, Serializer,
+    __private::{
+        de::{Content, ContentDeserializer, ContentRefDeserializer},
+        ser::FlatMapSerializer,
+    },
+    Deserialize, Deserializer, Serialize, Serializer, de,
     ser::{SerializeMap, SerializeSeq},
 };
 
 use crate::{
-    chat::text::{FormattedContent, FormattedText, TextFormatting},
-    prelude::FormattedTextRef,
+    chat::text::{
+        FormattedContent,
+        component::{
+            KeybindComponent, ScoreComponent, SelectorComponent, TextComponent, TranslateComponent,
+            ValueComponent,
+        },
+    },
+    prelude::*,
 };
 
 impl Serialize for FormattedText {
@@ -79,9 +88,7 @@ impl Serialize for Child<'_> {
         diff.serialize(FlatMapSerializer(&mut ser))?;
 
         // Serialize the text's interaction settings
-        if let Some(interact) = &self.0.interact {
-            interact.serialize(FlatMapSerializer(&mut ser))?;
-        }
+        self.0.interact.serialize(FlatMapSerializer(&mut ser))?;
 
         ser.end()
     }
@@ -90,9 +97,88 @@ impl Serialize for Child<'_> {
 // -------------------------------------------------------------------------------------------------
 
 impl<'de> Deserialize<'de> for FormattedText {
-    fn deserialize<D>(_de: D) -> Result<Self, D::Error>
+    fn deserialize<D>(de: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
-        todo!()
+        let content = Content::deserialize(de)?;
+
+        let Content::Map(map) = &content else {
+            return Err(de::Error::custom("expected a map"));
+        };
+        let children =
+            match map.iter().find_map(|(n, c)| (n.as_str() == Some("extra")).then_some(c)) {
+                Some(children) => Vec::deserialize(ContentRefDeserializer::new(children))?,
+                None => Vec::new(),
+            };
+
+        Ok(Self {
+            content: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
+            formatting: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
+            interact: Deserialize::deserialize(ContentDeserializer::new(content))?,
+            children,
+        })
+    }
+}
+
+impl<'de> Deserialize<'de> for FormattedContent {
+    fn deserialize<D>(de: D) -> Result<Self, D::Error>
+    where D: Deserializer<'de> {
+        /// Deserialize a [`FormattedContent`] using the provided content type.
+        fn deserialize<'de, D: Deserializer<'de>, T: Into<FormattedContent> + Deserialize<'de>>(
+            content: Content<'de>,
+        ) -> Result<FormattedContent, D::Error> {
+            Ok(T::deserialize(ContentDeserializer::<'de, D::Error>::new(content))?.into())
+        }
+
+        // Deserialize the provided content for interpretation
+        let content = Content::deserialize(de)?;
+        let Content::Map(content_map) = &content else {
+            return Err(de::Error::custom("expected a map"));
+        };
+
+        // Loop over the provided map keys for hints on the type of interaction
+        for (item, item_content) in content_map {
+            let Some(name) = item.as_str() else { continue };
+            match name {
+                // Received the type of content
+                "type" => {
+                    let content_type = item_content
+                        .as_str()
+                        .ok_or_else(|| de::Error::custom("expected `type` to be a string"))?;
+
+                    return match content_type {
+                        "text" => deserialize::<D, TextComponent>(content),
+                        "translatable" => deserialize::<D, TranslateComponent>(content),
+                        "score" => deserialize::<D, ScoreComponent>(content),
+                        "selector" => deserialize::<D, SelectorComponent>(content),
+                        "keybind" => deserialize::<D, KeybindComponent>(content),
+                        "nbt" => deserialize::<D, ValueComponent>(content),
+                        unknown => {
+                            Err(de::Error::custom(format!("unknown content `type`: \"{unknown}\"")))
+                        }
+                    };
+                }
+                // Guess `FormattedContent::Text`
+                "text" => return deserialize::<D, TextComponent>(content),
+                // Guess `FormattedContent::Translation`
+                "translate" | "fallback" | "with" => {
+                    return deserialize::<D, TranslateComponent>(content);
+                }
+                // Guess `FormattedContent::Score`
+                "score" => return deserialize::<D, ScoreComponent>(content),
+                // Guess `FormattedContent::Selector`
+                "selector" => return deserialize::<D, SelectorComponent>(content),
+                // Guess `FormattedContent::Keybind`
+                "keybind" => return deserialize::<D, KeybindComponent>(content),
+                // Guess `FormattedContent::Nbt`
+                "source" | "path" | "interpret" => {
+                    return deserialize::<D, ValueComponent>(content);
+                }
+                // Ambiguous or unknown fields, unable to make any guesses
+                _ => {}
+            }
+        }
+
+        Err(de::Error::custom("no `type` flag and unable to guess type"))
     }
 }
 
@@ -102,53 +188,59 @@ impl<'de> Deserialize<'de> for FormattedText {
 fn formatted_text() {
     use std::borrow::Cow;
 
-    use crate::chat::text::formatting::{TextColor, TextFormatting};
+    use crate::prelude::*;
+
+    fn from_str(json: &str) -> FormattedText { serde_json::from_str(json).unwrap() }
+    fn roundtrip(value: &FormattedText) -> FormattedText {
+        let json = serde_json::to_string_pretty(value).unwrap();
+        #[cfg(debug_assertions)]
+        println!("{json}");
+        from_str(&json)
+    }
 
     // Test the default formatting.
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default(),
-        interact: None,
+        formatting: TextFormatting::empty(),
+        interact: TextInteraction::empty(),
         children: Vec::new(),
     };
-    assert_eq!(serde_json::to_string(&text).unwrap(), r#"{"type":"text","text":"Hello, World!"}"#);
+    assert_eq!(roundtrip(&text), text);
+    assert_eq!(from_str(r#"{"text":"Hello, World!"}"#), text);
 
     // Test the default formatting with the color set.
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_color(TextColor::Red),
-        interact: None,
+        interact: TextInteraction::empty(),
         children: Vec::new(),
     };
-    assert_eq!(
-        serde_json::to_string(&text).unwrap(),
-        r#"{"type":"text","text":"Hello, World!","color":"red"}"#
-    );
+    assert_eq!(roundtrip(&text), text);
+    assert_eq!(from_str(r#"{"text":"Hello, World!","color":"red"}"#), text);
 
     // Test the default formatting with bold and italic text.
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_bold(true).with_italic(true),
-        interact: None,
+        interact: TextInteraction::empty(),
         children: Vec::new(),
     };
-    assert_eq!(
-        serde_json::to_string(&text).unwrap(),
-        r#"{"type":"text","text":"Hello, World!","bold":true,"italic":true}"#
-    );
+    assert_eq!(roundtrip(&text), text);
+    assert_eq!(from_str(r#"{"bold":true,"italic":true,"text":"Hello, World!"}"#), text);
 
     // Test the default formatting with children.
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default(),
-        interact: None,
+        interact: TextInteraction::empty(),
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty(),
-            interact: None,
+            interact: TextInteraction::empty(),
             children: Vec::new(),
         }],
     };
+    assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
         r#"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"}]}"#,
@@ -159,14 +251,15 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default(),
-        interact: None,
+        interact: TextInteraction::empty(),
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty().with_color(TextColor::Red),
-            interact: None,
+            interact: TextInteraction::empty(),
             children: Vec::new(),
         }],
     };
+    assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
         r#"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child","color":"red"}]}"#,
@@ -177,14 +270,15 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_color(TextColor::Red),
-        interact: None,
+        interact: TextInteraction::empty(),
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty(),
-            interact: None,
+            interact: TextInteraction::empty(),
             children: Vec::new(),
         }],
     };
+    assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
         r#"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"}],"color":"red"}"#,
@@ -195,14 +289,15 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_color(TextColor::Red),
-        interact: None,
+        interact: TextInteraction::empty(),
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty().with_color(TextColor::Red),
-            interact: None,
+            interact: TextInteraction::empty(),
             children: Vec::new(),
         }],
     };
+    assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
         r#"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"}],"color":"red"}"#,
@@ -213,12 +308,12 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default(),
-        interact: None,
+        interact: TextInteraction::empty(),
         children: vec![
             FormattedText {
                 content: FormattedContent::Text(Cow::Borrowed("Child").into()),
                 formatting: TextFormatting::default(),
-                interact: None,
+                interact: TextInteraction::empty(),
                 children: Vec::new(),
             },
             FormattedText {
@@ -226,11 +321,12 @@ fn formatted_text() {
                 formatting: TextFormatting::empty()
                     .with_color(TextColor::Custom("#111111".into()))
                     .with_bold(true),
-                interact: None,
+                interact: TextInteraction::empty(),
                 children: Vec::new(),
             },
         ],
     };
+    assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
         r##"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"},{"type":"text","text":"Child 2","color":"#111111","bold":true}]}"##,

@@ -70,8 +70,8 @@ pub struct ScoreObjectiveComponent {
 // -------------------------------------------------------------------------------------------------
 
 /// An entity selector component.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct SelectorComponent {
@@ -96,8 +96,8 @@ pub struct KeybindComponent {
 // -------------------------------------------------------------------------------------------------
 
 /// A NBT value component.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, From, Into)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq, Deref, DerefMut, From, Into)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct ValueComponent {
     /// The source of the data.
@@ -105,8 +105,8 @@ pub struct ValueComponent {
 }
 
 /// A NBT value component source.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 pub struct ValueComponentSource {
     /// The source of the data.
     pub source: ValueSourceKind,

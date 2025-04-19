@@ -9,8 +9,8 @@ use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
 /// The formatting of a [`FormattedText`](super::FormattedText) component.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, Eq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct TextFormatting {
@@ -35,6 +35,30 @@ pub struct TextFormatting {
     /// Whether the text is obfuscated.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     obfuscated: Option<bool>,
+}
+
+// Is this a valid implementation? No, probably not.
+impl PartialEq for TextFormatting {
+    fn eq(&self, other: &Self) -> bool {
+        let font = self.font == other.font || self.font.is_none() || other.font.is_none();
+        let color = self.color == other.color || self.color.is_none() || other.color.is_none();
+        let bold = self.bold == other.bold || self.bold.is_none() || other.bold.is_none();
+        let italic = self.italic == other.italic || self.italic.is_none() || other.italic.is_none();
+
+        let underlined = self.underlined == other.underlined
+            || self.underlined.is_none()
+            || other.underlined.is_none();
+
+        let strikethrough = self.strikethrough == other.strikethrough
+            || self.strikethrough.is_none()
+            || other.strikethrough.is_none();
+
+        let obfuscated = self.obfuscated == other.obfuscated
+            || self.obfuscated.is_none()
+            || other.obfuscated.is_none();
+
+        font && color && bold && italic && underlined && strikethrough && obfuscated
+    }
 }
 
 impl Default for TextFormatting {
@@ -400,6 +424,24 @@ impl TextColor {
 
 // -------------------------------------------------------------------------------------------------
 
+#[cfg(feature = "serde")]
+impl Serialize for TextColor {
+    fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
+    where S: serde::Serializer {
+        ser.serialize_str(self.as_named_str())
+    }
+}
+#[cfg(feature = "serde")]
+impl<'de> Deserialize<'de> for TextColor {
+    fn deserialize<D>(de: D) -> Result<Self, D::Error>
+    where D: serde::Deserializer<'de> {
+        let string = String::deserialize::<D>(de)?;
+        TextColor::from_color(string).ok_or_else(|| serde::de::Error::custom("invalid color"))
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 /// A [`TextColor`] represented by a [`u32`].
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, DerefMut, From, Into)]
@@ -467,6 +509,31 @@ fn inheritance() {
             .with_obfuscated(true)
             .with_italic(true)
     );
+}
+
+#[test]
+fn text_color() {
+    assert_eq!(serde_json::to_string(&TextColor::Aqua).unwrap(), "\"aqua\"");
+    assert_eq!(serde_json::to_string(&TextColor::Black).unwrap(), "\"black\"");
+    assert_eq!(serde_json::to_string(&TextColor::DarkBlue).unwrap(), "\"dark_blue\"");
+    assert_eq!(serde_json::to_string(&TextColor::DarkGreen).unwrap(), "\"dark_green\"");
+    assert_eq!(serde_json::to_string(&TextColor::Gold).unwrap(), "\"gold\"");
+    assert_eq!(serde_json::to_string(&TextColor::LightPurple).unwrap(), "\"light_purple\"");
+    assert_eq!(serde_json::to_string(&TextColor::Red).unwrap(), "\"red\"");
+    assert_eq!(serde_json::to_string(&TextColor::Yellow).unwrap(), "\"yellow\"");
+
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#000000\"").unwrap(), TextColor::Black);
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#0000AA\"").unwrap(), TextColor::DarkBlue);
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#00AA00\"").unwrap(), TextColor::DarkGreen);
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#00AAAA\"").unwrap(), TextColor::DarkAqua);
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#AA0000\"").unwrap(), TextColor::DarkRed);
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#AAAAAA\"").unwrap(), TextColor::Gray);
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#FFFF55\"").unwrap(), TextColor::Yellow);
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#FFFFFF\"").unwrap(), TextColor::White);
+
+    let custom = TextColor::Custom("#123456".into());
+    assert_eq!(serde_json::to_string(&custom).unwrap(), "\"#123456\"");
+    assert_eq!(serde_json::from_str::<'_, TextColor>("\"#123456\"").unwrap(), custom);
 }
 
 #[test]
