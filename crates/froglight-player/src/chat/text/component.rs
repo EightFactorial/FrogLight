@@ -1,4 +1,5 @@
-//! TODO
+//! [`TextComponent`], [`TranslateComponent`], and other [`FormattedText`]
+//! components.
 
 use std::borrow::Cow;
 
@@ -23,8 +24,8 @@ pub struct TextComponent {
 // -------------------------------------------------------------------------------------------------
 
 /// A translated text component.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TranslateComponent {

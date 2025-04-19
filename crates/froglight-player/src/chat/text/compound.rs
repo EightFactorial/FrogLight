@@ -1,5 +1,4 @@
-//! TODO:
-//!   1. Carry `TextFormatting` down through `Text` children.
+//! [`FromCompound`] and [`IntoCompound`] implementations for [`FormattedText`]
 
 use froglight_nbt::{
     convert::ConvertError,

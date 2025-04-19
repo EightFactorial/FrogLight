@@ -15,19 +15,24 @@ use component::{
 pub mod formatting;
 pub use formatting::{TextColor, TextFormatting};
 
+pub mod interaction;
+use interaction::InteractComponent;
+
 mod compound;
 #[cfg(feature = "serde")]
 mod serialize;
 
 /// A formatted text message.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct FormattedText {
     /// The content of the message.
     pub content: FormattedContent,
     /// The formatting of the message.
     pub formatting: TextFormatting,
+    /// The interactability of the message.
+    pub interact: Option<InteractComponent>,
 
     /// Children message components.
     ///
@@ -38,8 +43,8 @@ pub struct FormattedText {
 // -------------------------------------------------------------------------------------------------
 
 /// The content of a [`FormattedText`].
-#[derive(Debug, Clone, PartialEq, Eq, Hash, From)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq, From)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 pub enum FormattedContent {
     /// A plain-text component.
     Text(TextComponent),
@@ -60,8 +65,8 @@ pub enum FormattedContent {
 /// A reference to a [`FormattedText`] message.
 ///
 /// Used to avoid cloning the message while applying custom formatting.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, derive_more::Deref)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq, derive_more::Deref)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize))]
 pub struct FormattedTextRef<'a> {
     /// The original message.

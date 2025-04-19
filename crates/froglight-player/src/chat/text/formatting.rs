@@ -1,4 +1,4 @@
-//! TODO
+//! [`TextFormatting`] and [`TextColor`]
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;

@@ -78,6 +78,11 @@ impl Serialize for Child<'_> {
         let diff = inherit.difference(self.1);
         diff.serialize(FlatMapSerializer(&mut ser))?;
 
+        // Serialize the text's interaction settings
+        if let Some(interact) = &self.0.interact {
+            interact.serialize(FlatMapSerializer(&mut ser))?;
+        }
+
         ser.end()
     }
 }
@@ -103,6 +108,7 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default(),
+        interact: None,
         children: Vec::new(),
     };
     assert_eq!(serde_json::to_string(&text).unwrap(), r#"{"type":"text","text":"Hello, World!"}"#);
@@ -111,6 +117,7 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_color(TextColor::Red),
+        interact: None,
         children: Vec::new(),
     };
     assert_eq!(
@@ -122,6 +129,7 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_bold(true).with_italic(true),
+        interact: None,
         children: Vec::new(),
     };
     assert_eq!(
@@ -133,9 +141,11 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default(),
+        interact: None,
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty(),
+            interact: None,
             children: Vec::new(),
         }],
     };
@@ -149,9 +159,11 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default(),
+        interact: None,
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty().with_color(TextColor::Red),
+            interact: None,
             children: Vec::new(),
         }],
     };
@@ -165,9 +177,11 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_color(TextColor::Red),
+        interact: None,
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty(),
+            interact: None,
             children: Vec::new(),
         }],
     };
@@ -181,9 +195,11 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default().with_color(TextColor::Red),
+        interact: None,
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Child").into()),
             formatting: TextFormatting::empty().with_color(TextColor::Red),
+            interact: None,
             children: Vec::new(),
         }],
     };
@@ -197,10 +213,12 @@ fn formatted_text() {
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
         formatting: TextFormatting::default(),
+        interact: None,
         children: vec![
             FormattedText {
                 content: FormattedContent::Text(Cow::Borrowed("Child").into()),
                 formatting: TextFormatting::default(),
+                interact: None,
                 children: Vec::new(),
             },
             FormattedText {
@@ -208,6 +226,7 @@ fn formatted_text() {
                 formatting: TextFormatting::empty()
                     .with_color(TextColor::Custom("#111111".into()))
                     .with_bold(true),
+                interact: None,
                 children: Vec::new(),
             },
         ],
