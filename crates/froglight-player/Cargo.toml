@@ -27,6 +27,7 @@ md-5 = { workspace = true }
 parking_lot = { workspace = true }
 rsa = { workspace = true, features = ["sha2"] }
 smol_str = { workspace = true }
+thiserror = { workspace = true }
 uuid = { workspace = true, features = ["md5"] }
 
 # Optional dependencies
