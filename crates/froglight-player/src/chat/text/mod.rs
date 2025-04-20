@@ -18,7 +18,7 @@ pub use formatting::{TextColor, TextFormatting};
 pub mod interaction;
 pub use interaction::TextInteraction;
 
-pub mod printing;
+pub mod message;
 
 mod compound;
 #[cfg(feature = "serde")]

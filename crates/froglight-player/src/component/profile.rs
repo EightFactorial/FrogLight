@@ -47,7 +47,7 @@ impl PlayerProfile {
     }
 
     /// Create a new [`PlayerProfile`] from a
-    /// [`PlayerUsername`], [`Uuid`], and [`PlayerProfileTextures`].
+    /// [`PlayerUsername`], [`PlayerUuid`], and [`PlayerProfileTextures`].
     #[must_use]
     pub fn new_with_textures(
         username: PlayerUsername,

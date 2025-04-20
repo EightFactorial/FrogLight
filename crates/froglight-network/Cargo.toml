@@ -23,7 +23,7 @@ blocking = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
 froglight-io = { workspace = true, features = ["serde"] }
 froglight-macros = { workspace = true, features = ["network"] }
-froglight-player = { workspace = true, features = ["io"] }
+froglight-player = { workspace = true, features = ["io", "serde"] }
 futures-lite = { workspace = true }
 glam = { workspace = true }
 hashbrown = { workspace = true }
@@ -46,7 +46,7 @@ hickory-resolver = { version = "0.25", optional = true, default-features = false
 ] }
 
 [features]
-default = ["resolver", "nbt"]
+default = ["inventory", "nbt", "resolver"]
 
 # Enable server address and port lookup.
 resolver = ["dep:hickory-resolver"]
@@ -67,6 +67,7 @@ bevy = [
   "froglight-common/bevy",
   "froglight-inventory?/bevy",
   "froglight-nbt?/bevy",
+  "froglight-player/bevy",
 ]
 
 # Enable support for v1.21.4

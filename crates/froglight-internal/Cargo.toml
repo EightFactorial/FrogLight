@@ -21,13 +21,13 @@ froglight-common = { workspace = true }
 froglight-inventory = { workspace = true, features = ["world"] }
 froglight-item = { workspace = true, features = ["block"] }
 froglight-nbt = { workspace = true }
-froglight-network = { workspace = true, features = ["inventory"] }
-froglight-player = { workspace = true }
+froglight-network = { workspace = true, features = ["resolver"] }
+froglight-player = { workspace = true, features = ["ansi", "online"] }
 froglight-registry = { workspace = true }
 froglight-world = { workspace = true, features = ["block"] }
 
 # Optional dependencies
-froglight-brigadier = { workspace = true, optional = true }
+froglight-brigadier = { workspace = true, optional = true, features = ["nbt"] }
 froglight-schedule = { workspace = true, optional = true }
 
 # Nightly dependencies
