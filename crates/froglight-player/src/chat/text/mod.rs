@@ -19,6 +19,7 @@ pub mod interaction;
 pub use interaction::TextInteraction;
 
 mod compound;
+mod printing;
 #[cfg(feature = "serde")]
 mod serialize;
 
@@ -38,6 +39,71 @@ pub struct FormattedText {
     ///
     /// These are appended after the parent and inherit its formatting.
     pub children: Vec<FormattedText>,
+}
+
+impl FormattedText {
+    /// Create a [`FormattedText`] from a string and formatting.
+    #[inline]
+    #[must_use]
+    pub fn from_string(text: impl Into<String>) -> Self {
+        Self::from_string_with(text.into(), TextFormatting::empty())
+    }
+
+    /// Create a [`FormattedText`] from a static string.
+    #[inline]
+    #[must_use]
+    pub const fn from_static(text: &'static str) -> Self {
+        FormattedText {
+            formatting: TextFormatting::empty(),
+            content: FormattedContent::Text(TextComponent { text: Cow::Borrowed(text) }),
+            interact: TextInteraction::empty(),
+            children: Vec::new(),
+        }
+    }
+
+    /// Create a [`FormattedText`] from a [`String`] and [`TextFormatting`].
+    #[must_use]
+    pub const fn from_string_with(text: String, formatting: TextFormatting) -> Self {
+        FormattedText {
+            formatting,
+            content: FormattedContent::Text(TextComponent { text: Cow::Owned(text) }),
+            interact: TextInteraction::empty(),
+            children: Vec::new(),
+        }
+    }
+
+    /// Use the provided [`TextFormatting`] for this message.
+    #[inline]
+    #[must_use]
+    pub fn with_formatting(mut self, formatting: TextFormatting) -> Self {
+        self.formatting = formatting;
+        self
+    }
+
+    /// Use the provided [`TextInteraction`] for this message.
+    #[inline]
+    #[must_use]
+    pub fn with_interaction(mut self, interaction: TextInteraction) -> Self {
+        self.interact = interaction;
+        self
+    }
+
+    /// Append a child message component to this message.
+    #[inline]
+    #[must_use]
+    pub fn with_child(mut self, child: FormattedText) -> Self {
+        self.children.push(child);
+        self
+    }
+}
+
+impl From<&str> for FormattedText {
+    #[inline]
+    fn from(value: &str) -> Self { Self::from_string(value.to_string()) }
+}
+impl From<String> for FormattedText {
+    #[inline]
+    fn from(value: String) -> Self { Self::from_string(value) }
 }
 
 // -------------------------------------------------------------------------------------------------

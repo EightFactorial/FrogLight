@@ -192,7 +192,7 @@ fn formatted_text() {
 
     fn from_str(json: &str) -> FormattedText { serde_json::from_str(json).unwrap() }
     fn roundtrip(value: &FormattedText) -> FormattedText {
-        let json = serde_json::to_string_pretty(value).unwrap();
+        let json = serde_json::to_string(value).unwrap();
         #[cfg(debug_assertions)]
         println!("{json}");
         from_str(&json)

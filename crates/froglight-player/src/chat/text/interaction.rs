@@ -54,24 +54,24 @@ impl TextInteraction {
     /// Update the [`InteractComponent`] with the given insertion text.
     #[inline]
     #[must_use]
-    pub fn with_insert(mut self, insert: Cow<'static, str>) -> Self {
-        self.insertion = Some(insert);
+    pub fn with_insert(mut self, insert: impl Into<Cow<'static, str>>) -> Self {
+        self.insertion = Some(insert.into());
         self
     }
 
     /// Update the [`InteractComponent`] with the given [`TextClickInteract`].
     #[inline]
     #[must_use]
-    pub fn with_click(mut self, click: TextClickInteract) -> Self {
-        self.click = Some(click);
+    pub fn with_click(mut self, click: impl Into<TextClickInteract>) -> Self {
+        self.click = Some(click.into());
         self
     }
 
     /// Update the [`InteractComponent`] with the given [`TextHoverInteract`].
     #[inline]
     #[must_use]
-    pub fn with_hover(mut self, hover: TextHoverInteract) -> Self {
-        self.hover = Some(hover);
+    pub fn with_hover(mut self, hover: impl Into<TextHoverInteract>) -> Self {
+        self.hover = Some(hover.into());
         self
     }
 }
@@ -287,7 +287,7 @@ impl<'de> Deserialize<'de> for TextHoverInteract {
 fn serde() {
     fn from_str(json: &str) -> TextInteraction { serde_json::from_str(json).unwrap() }
     fn roundtrip(value: &TextInteraction) -> TextInteraction {
-        let json = serde_json::to_string_pretty(value).unwrap();
+        let json = serde_json::to_string(value).unwrap();
         #[cfg(debug_assertions)]
         println!("{json}");
         from_str(&json)
@@ -297,14 +297,13 @@ fn serde() {
     assert_eq!(roundtrip(&none), none);
     assert_eq!(from_str("{}"), none);
 
-    let with_insert = TextInteraction::default().with_insert("Hello, World!".into());
+    let with_insert = TextInteraction::default().with_insert("Hello, World!");
     assert_eq!(roundtrip(&with_insert), with_insert);
     assert_eq!(from_str(r#"{"insertion":"Hello, World!"}"#), with_insert);
 
     let click_suggest =
         TextClickInteract { action: TextClickAction::SuggestCommand, value: "@a".into() };
-    let with_suggest =
-        TextInteraction::default().with_insert("@a".into()).with_click(click_suggest);
+    let with_suggest = TextInteraction::default().with_insert("@a").with_click(click_suggest);
     assert_eq!(roundtrip(&with_suggest), with_suggest);
     assert_eq!(
         from_str(r#"{"insertion":"@a","clickEvent":{"action":"suggest_command","value":"@a"}}"#),

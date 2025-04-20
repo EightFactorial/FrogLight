@@ -32,8 +32,8 @@ pub struct TranslateComponent {
     /// The translation key of the [`TranslateComponent`].
     pub translate: Cow<'static, str>,
     /// The fallback message to use if the translation key is not found.
-    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "str::is_empty"))]
-    pub fallback: Cow<'static, str>,
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
+    pub fallback: Option<Cow<'static, str>>,
 
     /// Arguments to be used with the translated message.
     #[cfg_attr(

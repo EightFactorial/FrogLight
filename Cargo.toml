@@ -110,6 +110,7 @@ hashbrown = "0.14"
 hashify = "0.2.6"
 indexmap = "2.9"
 md-5 = { version = "0.10.6", features = ["std"] }
+nu-ansi-term = "0.46"
 parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
