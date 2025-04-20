@@ -105,8 +105,6 @@ impl TextFormatting {
     pub fn or_default(&self) -> Self { self.inherit(&Self::default()) }
 
     /// Create a new [`TextFormatting`] that inherits from the given parent.
-    ///
-    /// This guarantees that all fields are initialized.
     #[must_use]
     pub fn inherit(&self, parent: &Self) -> Self {
         let font =
@@ -115,13 +113,13 @@ impl TextFormatting {
             self.color.as_ref().map_or_else(|| parent.color.clone(), |color| Some(color.clone()));
 
         Self {
-            font: font.or(Some(Self::DEFAULT_FONT)),
-            color: color.or(Some(TextColor::White)),
-            bold: self.bold.or(parent.bold).or(Some(false)),
-            italic: self.italic.or(parent.italic).or(Some(false)),
-            underlined: self.underlined.or(parent.underlined).or(Some(false)),
-            strikethrough: self.strikethrough.or(parent.strikethrough).or(Some(false)),
-            obfuscated: self.obfuscated.or(parent.obfuscated).or(Some(false)),
+            font,
+            color,
+            bold: self.bold.or(parent.bold),
+            italic: self.italic.or(parent.italic),
+            underlined: self.underlined.or(parent.underlined),
+            strikethrough: self.strikethrough.or(parent.strikethrough),
+            obfuscated: self.obfuscated.or(parent.obfuscated),
         }
     }
 
@@ -155,6 +153,14 @@ impl TextFormatting {
         self
     }
 
+    /// Remove the font from the [`TextFormatting`].
+    #[inline]
+    #[must_use]
+    pub fn without_font(mut self) -> Self {
+        self.font = None;
+        self
+    }
+
     /// Set the color of the [`TextFormatting`].
     #[inline]
     #[must_use]
@@ -163,10 +169,18 @@ impl TextFormatting {
         self
     }
 
+    /// Remove the color from the [`TextFormatting`].
+    #[inline]
+    #[must_use]
+    pub fn without_color(mut self) -> Self {
+        self.color = None;
+        self
+    }
+
     /// Set whether the [`TextFormatting`] is bold.
     #[inline]
     #[must_use]
-    pub fn with_bold(mut self, bold: bool) -> Self {
+    pub const fn with_bold(mut self, bold: bool) -> Self {
         self.bold = Some(bold);
         self
     }
@@ -174,7 +188,7 @@ impl TextFormatting {
     /// Set whether the [`TextFormatting`] is italic.
     #[inline]
     #[must_use]
-    pub fn with_italic(mut self, italic: bool) -> Self {
+    pub const fn with_italic(mut self, italic: bool) -> Self {
         self.italic = Some(italic);
         self
     }
@@ -182,7 +196,7 @@ impl TextFormatting {
     /// Set whether the [`TextFormatting`] is underlined.
     #[inline]
     #[must_use]
-    pub fn with_underlined(mut self, underlined: bool) -> Self {
+    pub const fn with_underline(mut self, underlined: bool) -> Self {
         self.underlined = Some(underlined);
         self
     }
@@ -190,7 +204,7 @@ impl TextFormatting {
     /// Set whether the [`TextFormatting`] is strikethrough.
     #[inline]
     #[must_use]
-    pub fn with_strikethrough(mut self, strikethrough: bool) -> Self {
+    pub const fn with_strikethrough(mut self, strikethrough: bool) -> Self {
         self.strikethrough = Some(strikethrough);
         self
     }
@@ -198,7 +212,7 @@ impl TextFormatting {
     /// Set whether the [`TextFormatting`] is obfuscated.
     #[inline]
     #[must_use]
-    pub fn with_obfuscated(mut self, obfuscated: bool) -> Self {
+    pub const fn with_obfuscated(mut self, obfuscated: bool) -> Self {
         self.obfuscated = Some(obfuscated);
         self
     }

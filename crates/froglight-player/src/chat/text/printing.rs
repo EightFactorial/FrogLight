@@ -84,22 +84,25 @@ impl<'a> FormattedTextRef<'a> {
         let mut string = match &self.content {
             FormattedContent::Text(text) => text.to_string(),
             FormattedContent::Translation(translate) => {
-                // Retrieve the translated message
+                // Retrieve the translated or fallback message
                 let translation = t.get(translate.translate.as_ref()).map_or_else(
                     || translate.fallback.as_ref().map(AsRef::as_ref),
                     |t| Some(t.as_str()),
                 )?;
+
                 // Format and insert the message arguments
-                Self::format_message_ansi(translation, &translate.arguments, t)?
+                Self::format_message_ansi(translation, &self.formatting, &translate.arguments, t)?
             }
 
             _ => return None,
         };
         // Apply the message's formatting
-        string = nu_ansi_term::Style::from(self.formatting.as_ref()).paint(string).to_string();
+        string = nu_ansi_term::Style::from(&*self.formatting).paint(string).to_string();
 
         // Append children messages
         for child in &self.children {
+            let formatting = child.formatting.inherit(&self.formatting);
+            let child = FormattedTextRef::new_with(child, &formatting);
             string.push_str(&child.chat_message_ansi(t)?.to_string());
         }
 
@@ -109,13 +112,17 @@ impl<'a> FormattedTextRef<'a> {
     #[cfg(feature = "ansi")]
     fn format_message_ansi(
         message: &str,
+        formatting: &TextFormatting,
         arguments: &[FormattedText],
         t: &TextTranslations,
     ) -> Option<String> {
         let mut formatted = message.to_string();
 
         for (index, argument) in arguments.iter().enumerate() {
+            let formatting = argument.formatting.inherit(formatting);
+            let argument = FormattedTextRef::new_with(argument, &formatting);
             let resolved = argument.chat_message_ansi(t)?.to_string();
+
             // Replace the next occurrence of `%s`
             formatted = formatted.replacen("%s", &resolved, 1);
             // Replace all occurrences of `%<index>$s`
@@ -208,11 +215,11 @@ fn chat_message() {
     assert_eq!(
         FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-            formatting: TextFormatting::empty().with_underlined(true),
+            formatting: TextFormatting::empty().with_underline(true),
             interact: TextInteraction::default(),
             children: vec![FormattedText {
                 content: FormattedContent::Text(Cow::Borrowed("World!").into()),
-                formatting: TextFormatting::empty().with_underlined(false).with_italic(true),
+                formatting: TextFormatting::empty().with_underline(false).with_italic(true),
                 interact: TextInteraction::default(),
                 children: Vec::new(),
             }],
@@ -276,11 +283,11 @@ fn chat_message_ansi() {
 
     let text = FormattedText {
         content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-        formatting: TextFormatting::empty().with_underlined(true),
+        formatting: TextFormatting::empty().with_underline(true),
         interact: TextInteraction::default(),
         children: vec![FormattedText {
             content: FormattedContent::Text(Cow::Borrowed("World!").into()),
-            formatting: TextFormatting::empty().with_underlined(false).with_bold(true),
+            formatting: TextFormatting::empty().with_underline(false).with_bold(true),
             interact: TextInteraction::default(),
             children: Vec::new(),
         }],
@@ -289,4 +296,46 @@ fn chat_message_ansi() {
     let message = text.chat_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1mWorld!\u{1b}[0m");
+
+    let text = FormattedText {
+        content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
+        formatting: TextFormatting::empty().with_underline(true),
+        interact: TextInteraction::empty(),
+        children: vec![FormattedText {
+            content: FormattedContent::Text(Cow::Borrowed("World!").into()),
+            formatting: TextFormatting::empty().with_bold(true),
+            interact: TextInteraction::empty(),
+            children: Vec::new(),
+        }],
+    };
+
+    let message = text.chat_message_ansi(&t).unwrap().to_string();
+    println!("{message}");
+    assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1;4mWorld!\u{1b}[0m");
+
+    let text = FormattedText {
+        content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
+        formatting: TextFormatting::empty().with_strikethrough(true),
+        interact: TextInteraction::empty(),
+        children: vec![FormattedText {
+            content: FormattedContent::Text(Cow::Borrowed("World").into()),
+            formatting: TextFormatting::empty().with_underline(true).with_strikethrough(false),
+            interact: TextInteraction::empty(),
+            children: vec![FormattedText {
+                content: FormattedContent::Text(Cow::Borrowed("!").into()),
+                formatting: TextFormatting::empty()
+                    .with_color(TextColor::Red)
+                    .with_strikethrough(true),
+                interact: TextInteraction::empty(),
+                children: Vec::new(),
+            }],
+        }],
+    };
+
+    let message = text.chat_message_ansi(&t).unwrap().to_string();
+    println!("{message}");
+    assert_eq!(
+        message,
+        "\u{1b}[9mHello, \u{1b}[0m\u{1b}[4mWorld\u{1b}[0m\u{1b}[4;9;38;2;255;85;85m!\u{1b}[0m"
+    );
 }
