@@ -1,12 +1,12 @@
 [package]
-name = "froglight-registry"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
 homepage = { workspace = true }
-repository = { workspace = true }
+license = { workspace = true }
+name = "froglight-registry"
 readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -33,13 +33,7 @@ bevy_utils = { workspace = true, optional = true }
 default = []
 
 # Enable `bevy` support.
-bevy = [
-  "dep:bevy_ecs",
-  "dep:bevy_reflect",
-  "dep:bevy_utils",
-  "froglight-common/bevy",
-  "froglight-nbt/bevy",
-]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_utils", "froglight-common/bevy", "froglight-nbt/bevy"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4"]

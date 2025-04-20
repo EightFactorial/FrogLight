@@ -1,12 +1,12 @@
 [package]
-name = "froglight-common"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
 homepage = { workspace = true }
-repository = { workspace = true }
+license = { workspace = true }
+name = "froglight-common"
 readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -23,7 +23,7 @@ uuid = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 serde = { workspace = true, optional = true, features = ["derive"] }
 
 [features]

@@ -1,12 +1,12 @@
 [package]
-name = "froglight-network"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
 homepage = { workspace = true }
-repository = { workspace = true }
+license = { workspace = true }
+name = "froglight-network"
 readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -36,14 +36,12 @@ uuid = { workspace = true }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallvec", "smol_str", "uuid"] }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
 froglight-inventory = { workspace = true, optional = true, features = ["io"] }
 froglight-nbt = { workspace = true, optional = true, features = ["io"] }
-hickory-resolver = { version = "0.25", optional = true, default-features = false, features = [
-  "system-config",
-] }
+hickory-resolver = { version = "0.25", optional = true, default-features = false, features = ["system-config"] }
 
 [features]
 default = ["inventory", "nbt", "resolver"]
@@ -52,7 +50,7 @@ default = ["inventory", "nbt", "resolver"]
 resolver = ["dep:hickory-resolver"]
 
 # Enable `froglight-brigadier` support.
-brigadier = ["dep:froglight-brigadier", "bevy"]
+brigadier = ["bevy", "dep:froglight-brigadier"]
 # Enable `froglight-inventory` support.
 inventory = ["dep:froglight-inventory"]
 # Enable `froglight-nbt` support.

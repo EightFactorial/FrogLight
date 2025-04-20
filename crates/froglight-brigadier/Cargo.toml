@@ -1,12 +1,12 @@
 [package]
-name = "froglight-brigadier"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
 homepage = { workspace = true }
-repository = { workspace = true }
+license = { workspace = true }
+name = "froglight-brigadier"
 readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -48,17 +48,11 @@ default = ["glam", "nbt", "uuid"]
 io = ["dep:froglight-io"]
 
 # Enable support for `glam` types.
-glam = ["dep:glam"]
+glam = ["bevy_reflect/glam", "dep:glam"]
 # Enable support for `froglight-nbt` types.
 nbt = ["dep:froglight-nbt"]
 # Enable support for `uuid` types.
-uuid = ["dep:uuid"]
+uuid = ["bevy_reflect/uuid", "dep:uuid"]
 
 # Enable support for serializing to/from text formats.
-serde = [
-  "dep:serde",
-  "bevy_core/serialize",
-  "glam?/serde",
-  "smol_str/serde",
-  "uuid?/serde",
-]
+serde = ["bevy_core/serialize", "dep:serde", "glam?/serde", "smol_str/serde", "uuid?/serde"]

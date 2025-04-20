@@ -1,12 +1,12 @@
 [package]
-name = "froglight-player"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
 homepage = { workspace = true }
-repository = { workspace = true }
+license = { workspace = true }
+name = "froglight-player"
 readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -33,7 +33,7 @@ uuid = { workspace = true, features = ["md5"] }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive"] }
@@ -52,13 +52,7 @@ online = ["dep:ureq", "serde"]
 io = ["dep:froglight-io"]
 
 # Enable `bevy` support.
-bevy = [
-  "dep:bevy_ecs",
-  "dep:bevy_log",
-  "dep:bevy_reflect",
-  "froglight-common/bevy",
-  "froglight-nbt/bevy",
-]
+bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect", "froglight-common/bevy", "froglight-nbt/bevy"]
 # Enable `serde` support.
 serde = [
   "dep:serde",

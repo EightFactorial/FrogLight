@@ -1,7 +1,6 @@
 # --- Workspace Settings ---
 
 [workspace]
-resolver = "2"
 members = [
   "crates/froglight-block",
   "crates/froglight-brigadier",
@@ -18,31 +17,32 @@ members = [
   "crates/froglight-schedule",
   "crates/froglight-world",
 ]
+resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
-edition = "2024"
-license = "MIT OR Apache-2.0"
 authors = ["EightFactorial"]
+edition = "2024"
 homepage = "https://github.com/EightFactorial/FrogLight"
-repository = "https://github.com/EightFactorial/FrogLight"
+license = "MIT OR Apache-2.0"
 readme = "README.md"
+repository = "https://github.com/EightFactorial/FrogLight"
+version = "0.1.0"
 
 [workspace.lints.rust]
 missing_docs = "warn"
 trivial_casts = "warn"
 trivial_numeric_casts = "warn"
-unused_lifetimes = "warn"
-unused_import_braces = "warn"
 unreachable_pub = "warn"
+unused_import_braces = "warn"
+unused_lifetimes = "warn"
 
 [workspace.lints.rustdoc]
 bare_urls = "deny"
 broken_intra_doc_links = "deny"
-private_intra_doc_links = "deny"
 invalid_codeblock_attributes = "deny"
-invalid_rust_codeblocks = "deny"
 invalid_html_tags = "deny"
+invalid_rust_codeblocks = "deny"
+private_intra_doc_links = "deny"
 
 [workspace.lints.clippy]
 cast_possible_truncation = "warn"
@@ -56,9 +56,7 @@ unnecessary_cast = "warn"
 
 [workspace.dependencies]
 # Bevy
-bevy = { version = "0.15", default-features = false, features = [
-  "multi_threaded",
-] }
+bevy = { version = "0.15", default-features = false, features = ["multi_threaded"] }
 bevy_app = "0.15"
 bevy_core = "0.15"
 bevy_derive = "0.15"
@@ -67,7 +65,7 @@ bevy_ecs = { version = "0.15", features = ["multi_threaded"] }
 bevy_hierarchy = "0.15"
 bevy_log = "0.15"
 bevy_math = "0.15"
-bevy_reflect = { version = "0.15", features = ["glam", "smol_str", "uuid"] }
+bevy_reflect = { version = "0.15" }
 bevy_state = "0.15"
 bevy_tasks = { version = "0.15", features = ["multi_threaded"] }
 bevy_time = "0.15"
@@ -115,7 +113,7 @@ parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
 regex = "1.11"
-rsa = { version = "0.9.8", features = ["std", "pem"] }
+rsa = { version = "0.9.8", features = ["pem", "std"] }
 serde = "1.0"
 serde_json = "1.0"
 simd_cesu8 = "1.0"
@@ -130,14 +128,14 @@ uuid = "1.12"
 # --- FrogLight Crate ---
 
 [package]
-name = "froglight"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
 homepage = { workspace = true }
-repository = { workspace = true }
+license = { workspace = true }
+name = "froglight"
 readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -174,12 +172,12 @@ opt-level = 1
 opt-level = 3
 
 [profile.dev.package.froglight-block]
-inherits = "dev"
 incremental = true
+inherits = "dev"
 
 [profile.dev.package.froglight-item]
-inherits = "dev"
 incremental = true
+inherits = "dev"
 
 # Release Builds
 [profile.release]
@@ -189,9 +187,9 @@ opt-level = 3
 opt-level = 3
 
 [profile.release.package.froglight-block]
-inherits = "release"
 incremental = true
+inherits = "release"
 
 [profile.release.package.froglight-item]
-inherits = "release"
 incremental = true
+inherits = "release"

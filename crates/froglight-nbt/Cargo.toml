@@ -1,13 +1,13 @@
 [package]
-name = "froglight-nbt"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
-homepage = { workspace = true }
-repository = { workspace = true }
-readme = { workspace = true }
+edition = { workspace = true }
 exclude = ["/test"]
+homepage = { workspace = true }
+license = { workspace = true }
+name = "froglight-nbt"
+readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -31,7 +31,7 @@ smol_str = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
-bevy_reflect = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["smol_str"] }
 froglight-io = { workspace = true, optional = true }
 serde = { workspace = true, optional = true, features = ["derive"] }
 tracing = { workspace = true, optional = true }
@@ -44,7 +44,7 @@ bevy = ["dep:bevy_reflect"]
 # Enable `froglight-io` support.
 io = ["dep:froglight-io"]
 # Enable `serde` support.
-serde = ["dep:serde", "indexmap/serde"]
+serde = ["dep:serde", "indexmap/serde", "smol_str/serde"]
 
 # Enable debug logging.
 debug = ["dep:tracing"]

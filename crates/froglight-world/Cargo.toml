@@ -1,12 +1,12 @@
 [package]
-name = "froglight-world"
-version = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
 authors = { workspace = true }
+edition = { workspace = true }
 homepage = { workspace = true }
-repository = { workspace = true }
+license = { workspace = true }
+name = "froglight-world"
 readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [package.metadata.docs.rs]
 all-features = true
@@ -30,7 +30,7 @@ thiserror = { workspace = true }
 # Optional dependencies
 bevy_app = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["glam"] }
 downcast-rs = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }

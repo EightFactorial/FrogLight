@@ -1,8 +1,8 @@
 [advisories]
 db-path = "~/.cargo/advisory-db"
 db-urls = ["https://github.com/rustsec/advisory-db"]
-version = 2
 ignore = ["RUSTSEC-2023-0071", "RUSTSEC-2024-0436"]
+version = 2
 
 [licenses]
 allow = [
@@ -21,23 +21,23 @@ allow = [
 ]
 
 [[licenses.clarify]]
-name = "ring"
 expression = "OpenSSL"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+name = "ring"
 # [[licenses.exceptions]]
 # name = "unicode-ident"
 # allow = ["Unicode-DFS-2016"]
 
 [sources]
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 unknown-git = "deny"
 unknown-registry = "deny"
-allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 
 [bans]
-highlight = "all"
-wildcards = "deny"
-multiple-versions = "warn"
 external-default-features = "allow"
+highlight = "all"
+multiple-versions = "warn"
+wildcards = "deny"
 workspace-default-features = "allow"
 
 [[bans.skip]]
@@ -85,7 +85,6 @@ version = "=0.11.0"
 [[bans.skip]]
 name = "zerocopy"
 version = "=0.7.35"
-
 
 [[bans.skip]]
 name = "windows"
