@@ -16,25 +16,25 @@ use smol_str::SmolStr;
 pub struct TextFormatting {
     /// The font of the text.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    font: Option<Identifier>,
+    pub font: Option<Identifier>,
     /// The color of the text.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    color: Option<TextColor>,
+    pub color: Option<TextColor>,
     /// Whether the text is bold.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    bold: Option<bool>,
+    pub bold: Option<bool>,
     /// Whether the text is italic.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    italic: Option<bool>,
+    pub italic: Option<bool>,
     /// Whether the text is underlined.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    underlined: Option<bool>,
+    pub underlined: Option<bool>,
     /// Whether the text is strikedthrough.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    strikethrough: Option<bool>,
+    pub strikethrough: Option<bool>,
     /// Whether the text is obfuscated.
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
-    obfuscated: Option<bool>,
+    pub obfuscated: Option<bool>,
 }
 
 // Is this a valid implementation? No, probably not.
@@ -468,13 +468,58 @@ impl IntegerTextColor {
         }
     }
 
+    /// Create an [`IntegerTextColor`] from RGB values.
+    ///
+    /// # Examples
+    /// ```
+    /// use froglight_player::chat::text::formatting::{IntegerTextColor, TextColor};
+    ///
+    /// let from_color = IntegerTextColor::from_color(&TextColor::Red);
+    /// let from_rgb = IntegerTextColor::from_rgb(255, 85, 85);
+    ///
+    /// assert_eq!(from_color, from_rgb);
+    /// assert_eq!(from_rgb.try_into_color(), Some(TextColor::Red));
+    /// ```
+    #[must_use]
+    pub const fn from_rgb(r: u8, g: u8, b: u8) -> Self {
+        Self((r as u32) << 16 | (g as u32) << 8 | b as u32)
+    }
+
     /// Create a [`TextColor`] from an [`IntegerTextColor`].
     ///
     /// Returns `None` if the color is invalid.
+    ///
+    /// # Examples
+    /// ```
+    /// use froglight_player::chat::text::formatting::{IntegerTextColor, TextColor};
+    ///
+    /// let from_color = IntegerTextColor::from_color(&TextColor::Red);
+    /// assert_eq!(from_color.try_into_color(), Some(TextColor::Red));
+    ///
+    /// let from_rgb = IntegerTextColor::from_rgb(255, 85, 85);
+    /// assert_eq!(from_rgb.try_into_color(), Some(TextColor::Red));
+    /// ```
     #[inline]
     #[must_use]
     pub fn try_into_color(&self) -> Option<TextColor> {
-        TextColor::from_hex_string(format!("{:X}", self.0))
+        TextColor::from_hex_string(format!("#{:X}", self.0))
+    }
+
+    /// Separate a color into its red, green, and blue components.
+    ///
+    ///     /// # Examples
+    /// ```
+    /// use froglight_player::chat::text::formatting::{IntegerTextColor, TextColor};
+    ///
+    /// let into_rgb = IntegerTextColor::from_color(&TextColor::Red).into_rgb();
+    /// assert_eq!(into_rgb, (255, 85, 85));
+    /// ```
+    #[must_use]
+    pub const fn into_rgb(&self) -> (u8, u8, u8) {
+        let r = ((self.0 >> 16) & 0xFF) as u8;
+        let g = ((self.0 >> 8) & 0xFF) as u8;
+        let b = (self.0 & 0xFF) as u8;
+        (r, g, b)
     }
 }
 
