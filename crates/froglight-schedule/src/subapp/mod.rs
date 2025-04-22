@@ -21,17 +21,17 @@ mod threaded;
 pub use threaded::ThreadedSubApps;
 
 /// A [`Plugin`] that creates a new [`SubApp`] with a given [`AppLabel`].
-pub struct SubAppPlugin<SubApp: AppLabel> {
+pub struct SubAppPlugin<SubAppLabel: AppLabel> {
     #[expect(clippy::type_complexity)]
     extract_fn: Mutex<Option<Box<dyn Fn(&mut World, &mut World) + Send>>>,
-    subapp_label: Mutex<Option<SubApp>>,
+    subapp_label: Mutex<Option<SubAppLabel>>,
 }
 
-impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
+impl<SubAppLabel: AppLabel> SubAppPlugin<SubAppLabel> {
     /// Creates a new [`SubAppPlugin`].
     #[inline]
     #[must_use]
-    pub fn new(label: SubApp) -> Self {
+    pub const fn new(label: SubAppLabel) -> Self {
         Self { extract_fn: Mutex::new(None), subapp_label: Mutex::new(Some(label)) }
     }
 
@@ -53,7 +53,7 @@ impl<SubApp: AppLabel> SubAppPlugin<SubApp> {
     ///
     /// Runs all registered [`SubAppSync`] functions from the [`SyncStorage`].
     pub fn default_extract(app: &mut World, sub: &mut World) {
-        app.resource_scope::<AppSyncStorage<SubApp>, ()>(|app, storage| {
+        app.resource_scope::<AppSyncStorage<SubAppLabel>, ()>(|app, storage| {
             storage.iter().for_each(|reflect| reflect.sync(app, sub));
         });
     }
