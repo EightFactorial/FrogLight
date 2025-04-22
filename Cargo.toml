@@ -174,10 +174,12 @@ opt-level = 3
 [profile.dev.package.froglight-block]
 incremental = true
 inherits = "dev"
+opt-level = 3
 
 [profile.dev.package.froglight-item]
 incremental = true
 inherits = "dev"
+opt-level = 3
 
 # Release Builds
 [profile.release]
