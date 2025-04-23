@@ -265,7 +265,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::formatting::TextColor;
+    /// use froglight_player::text::formatting::TextColor;
     ///
     /// let color = TextColor::from_color("black").unwrap();
     /// assert_eq!(color, TextColor::Black);
@@ -309,7 +309,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::formatting::TextColor;
+    /// use froglight_player::text::formatting::TextColor;
     ///
     /// let color = TextColor::from_hex_string("#000000").unwrap();
     /// assert_eq!(color, TextColor::Black);
@@ -358,7 +358,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::formatting::TextColor;
+    /// use froglight_player::text::formatting::TextColor;
     ///
     /// assert_eq!(TextColor::Black.as_named_str(), "black");
     /// assert_eq!(TextColor::DarkBlue.as_named_str(), "dark_blue");
@@ -396,7 +396,7 @@ impl TextColor {
     ///
     /// # Examples
     /// ```rust
-    /// use froglight_player::chat::text::formatting::TextColor;
+    /// use froglight_player::text::formatting::TextColor;
     ///
     /// assert_eq!(TextColor::Black.as_hex_str(), "#000000");
     /// assert_eq!(TextColor::DarkBlue.as_hex_str(), "#0000AA");
@@ -486,7 +486,7 @@ impl IntegerTextColor {
     ///
     /// # Examples
     /// ```
-    /// use froglight_player::chat::text::formatting::{IntegerTextColor, TextColor};
+    /// use froglight_player::text::formatting::{IntegerTextColor, TextColor};
     ///
     /// let from_color = IntegerTextColor::from_color(&TextColor::Red);
     /// let from_rgb = IntegerTextColor::from_rgb(255, 85, 85);
@@ -505,7 +505,7 @@ impl IntegerTextColor {
     ///
     /// # Examples
     /// ```
-    /// use froglight_player::chat::text::formatting::{IntegerTextColor, TextColor};
+    /// use froglight_player::text::formatting::{IntegerTextColor, TextColor};
     ///
     /// let from_color = IntegerTextColor::from_color(&TextColor::Red);
     /// assert_eq!(from_color.try_into_color(), Some(TextColor::Red));
@@ -523,7 +523,7 @@ impl IntegerTextColor {
     ///
     ///     /// # Examples
     /// ```
-    /// use froglight_player::chat::text::formatting::{IntegerTextColor, TextColor};
+    /// use froglight_player::text::formatting::{IntegerTextColor, TextColor};
     ///
     /// let into_rgb = IntegerTextColor::from_color(&TextColor::Red).into_rgb();
     /// assert_eq!(into_rgb, (255, 85, 85));
