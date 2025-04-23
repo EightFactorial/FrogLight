@@ -1,6 +1,6 @@
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::chat::text::component::ValueComponent;
+use crate::text::component::ValueComponent;
 
 impl Serialize for ValueComponent {
     fn serialize<S>(&self, _ser: S) -> Result<S::Ok, S::Error>
@@ -14,5 +14,3 @@ impl<'de> Deserialize<'de> for ValueComponent {
         todo!()
     }
 }
-
-// -------------------------------------------------------------------------------------------------

@@ -89,16 +89,21 @@ froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
 froglight-schedule = { version = "0.1", path = "crates/froglight-schedule" }
 froglight-world = { version = "0.1", path = "crates/froglight-world" }
 
-# Other
+# Hashing / Cryptography
 aes = { version = "0.8.4", features = ["zeroize"] }
+base64 = "0.22.1"
+cfb8 = { version = "0.8.1", features = ["std", "zeroize"] }
+crc32fast = "1.4.2"
+md-5 = { version = "0.10.6", features = ["std"] }
+rsa = { version = "0.9.8", features = ["pem", "std"] }
+sha2 = "0.10.8"
+
+# Other
 async-channel = "2.3"
 async-compression = { version = "0.4", default-features = false }
 async-io = "2.4"
 async-net = "2.0"
-base64 = "0.22"
 blocking = "1.6"
-cfb8 = { version = "0.8.1", features = ["std", "zeroize"] }
-crc32fast = "1.4.2"
 derive_more = { version = "2.0", features = ["full"] }
 downcast-rs = "2.0"
 flate2 = "1.1"
@@ -107,13 +112,11 @@ glam = "0.29"
 hashbrown = "0.14"
 hashify = "0.2.6"
 indexmap = "2.9"
-md-5 = { version = "0.10.6", features = ["std"] }
 nu-ansi-term = "0.46"
 parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
 regex = "1.11"
-rsa = { version = "0.9.8", features = ["pem", "std"] }
 serde = "1.0"
 serde_json = "1.0"
 simd_cesu8 = "1.0"

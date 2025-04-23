@@ -8,14 +8,14 @@ use serde::{
 };
 
 use crate::{
-    chat::text::{
-        FormattedContent,
+    prelude::*,
+    text::{
+        FormattedContent, FormattedTextRef,
         component::{
             KeybindComponent, ScoreComponent, SelectorComponent, TextComponent, TranslateComponent,
             ValueComponent,
         },
     },
-    prelude::*,
 };
 
 impl Serialize for FormattedText {
@@ -188,7 +188,7 @@ impl<'de> Deserialize<'de> for FormattedContent {
 fn formatted_text() {
     use std::borrow::Cow;
 
-    use crate::prelude::*;
+    use crate::{prelude::*, text::TextInteraction};
 
     fn from_str(json: &str) -> FormattedText { serde_json::from_str(json).unwrap() }
     fn roundtrip(value: &FormattedText) -> FormattedText {

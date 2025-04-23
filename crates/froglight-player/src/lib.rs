@@ -2,16 +2,17 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 pub mod chat;
-pub mod component;
+pub mod player;
+pub mod text;
+pub mod translate;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::{
-        chat::{
-            signature::MessageSignatureCtx,
-            text::{FormattedText, FormattedTextRef, TextColor, TextFormatting, TextInteraction},
-        },
-        component::{profile::PlayerProfile, username::PlayerUsername, uuid::PlayerUuid},
+        chat::signature::MessageSignatureCtx,
+        player::{profile::PlayerProfile, username::PlayerUsername, uuid::PlayerUuid},
+        text::{FormattedText, TextColor, TextFormatting},
+        translate::TextTranslations,
     };
 }

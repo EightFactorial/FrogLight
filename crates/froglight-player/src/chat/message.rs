@@ -2,8 +2,10 @@
 
 use std::borrow::Cow;
 
-use super::FormattedContent;
-use crate::{chat::translate::TextTranslations, prelude::*};
+use crate::{
+    prelude::*,
+    text::{FormattedContent, FormattedTextRef},
+};
 
 impl FormattedText {
     /// Extract the message as a [`String`]
@@ -212,6 +214,8 @@ impl From<&TextFormatting> for nu_ansi_term::Style {
 fn chat_message() {
     use std::borrow::Cow;
 
+    use crate::{prelude::*, text::TextInteraction};
+
     let t = TextTranslations::default();
 
     assert_eq!(FormattedText::from("Hello, World!").as_chat_message(&t).unwrap(), "Hello, World!");
@@ -272,6 +276,8 @@ fn chat_message() {
 #[cfg(feature = "ansi")]
 fn chat_message_ansi() {
     use std::borrow::Cow;
+
+    use crate::{prelude::*, text::TextInteraction};
 
     let t = TextTranslations::default();
 

@@ -18,8 +18,6 @@ pub use formatting::{TextColor, TextFormatting};
 pub mod interaction;
 pub use interaction::TextInteraction;
 
-pub mod message;
-
 mod compound;
 #[cfg(feature = "serde")]
 mod serialize;
