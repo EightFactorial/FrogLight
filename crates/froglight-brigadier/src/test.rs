@@ -38,7 +38,7 @@ fn execute() -> AppExit {
             assert_eq!(double.total_cmp(&40320.0), std::cmp::Ordering::Equal);
 
             let world = world.value();
-            let components = world.inspect_entity(entity).map(ComponentInfo::name);
+            let components = world.inspect_entity(entity).unwrap().map(ComponentInfo::name);
             info!("Entity {entity}: {}", components.collect::<Vec<_>>().join(", "));
         });
     });

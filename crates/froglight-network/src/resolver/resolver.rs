@@ -22,7 +22,7 @@ use crate::prelude::{ClientConnection, Handshake, ValidState};
 ///
 /// This resolver is cheaply cloneable and can be shared between threads.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "bevy", derive(bevy_ecs::system::Resource))]
+#[cfg_attr(feature = "bevy", derive(bevy_ecs::resource::Resource))]
 pub struct FroglightResolver {
     resolver: Arc<FroglightInnerResolver>,
 }

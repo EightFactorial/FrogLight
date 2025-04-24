@@ -1,7 +1,6 @@
 use bevy_ecs::{
-    entity::Entity,
     system::{EntityCommand, EntityCommands},
-    world::{EntityWorldMut, World},
+    world::EntityWorldMut,
 };
 use derive_more::{Deref, From};
 
@@ -26,8 +25,9 @@ impl BrigadierCommand {
 }
 
 impl EntityCommand for BrigadierCommand {
-    fn apply(self, entity: Entity, world: &mut World) {
-        world.send_event(BrigadierEvent::new(entity, self.0));
+    fn apply(self, mut entity: EntityWorldMut) {
+        let event = BrigadierEvent::new(entity.id(), self.0);
+        entity.world_scope(|world| world.send_event(event));
     }
 }
 

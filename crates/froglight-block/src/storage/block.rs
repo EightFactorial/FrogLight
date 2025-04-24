@@ -1,7 +1,7 @@
 use std::{any::TypeId, ops::Range, sync::Arc};
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::{reflect::ReflectResource, system::Resource};
+use bevy_ecs::{reflect::ReflectResource, resource::Resource};
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use downcast_rs::Downcast;

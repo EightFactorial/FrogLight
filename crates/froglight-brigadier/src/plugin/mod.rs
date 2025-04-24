@@ -1,12 +1,12 @@
 //! TODO
 
 use bevy_app::{App, Last, Plugin};
-use bevy_core::Name;
 use bevy_ecs::{
     event::Events,
+    name::Name,
     reflect::{AppFunctionRegistry, AppTypeRegistry},
     schedule::{
-        InternedScheduleLabel, IntoSystemConfigs, ScheduleLabel, common_conditions::on_event,
+        InternedScheduleLabel, IntoScheduleConfigs, ScheduleLabel, common_conditions::on_event,
     },
     system::Local,
     world::World,

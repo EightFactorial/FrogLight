@@ -1,3 +1,4 @@
+use bevy_platform::collections::HashMap;
 use froglight_nbt::nbt::UnnamedNbt;
 
 use crate::position::RelativeBlockPos;
@@ -19,7 +20,7 @@ pub struct PackedEntity {
 impl PackedEntity {
     /// A helper function to convert a list of entities into a position map.
     #[must_use]
-    pub fn list_into_map(entities: Vec<Self>) -> hashbrown::HashMap<RelativeBlockPos, Self> {
+    pub fn list_into_map(entities: Vec<Self>) -> HashMap<RelativeBlockPos, Self> {
         entities.into_iter().map(|entity| (entity.position, entity)).collect()
     }
 }

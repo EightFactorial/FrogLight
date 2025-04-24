@@ -83,7 +83,8 @@ impl<'env, Function> CommandBuilder<'env, Arg, Function> {
         index: usize,
     ) -> DynamicFunction<'a> {
         // Generate a unique name for the function using the arguments.
-        let arguments = dynamic.info().args().iter().map(|arg| arg.type_path_table().short_path());
+        let signature = &dynamic.info().signatures()[0];
+        let arguments = signature.args().iter().map(|arg| arg.type_path_table().short_path());
         let arguments = arguments.collect::<Vec<_>>().join("_");
 
         match dynamic.name().cloned() {

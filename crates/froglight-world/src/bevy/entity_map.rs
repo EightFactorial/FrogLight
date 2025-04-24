@@ -1,6 +1,6 @@
 use bevy_ecs::{entity::EntityHash, prelude::*};
+use bevy_platform::collections::{HashMap, HashSet};
 use bevy_reflect::prelude::*;
-use hashbrown::{HashMap, HashSet};
 
 use crate::prelude::ChunkPos;
 

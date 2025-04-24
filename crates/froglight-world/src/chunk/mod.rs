@@ -3,6 +3,11 @@
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
+#[cfg(feature = "nbt")]
+use bevy_platform::{
+    collections::{HashMap, hash_map::Entry},
+    hash::FixedHasher,
+};
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 #[cfg(feature = "block")]
@@ -11,8 +16,6 @@ use froglight_block::{prelude::*, resolve::BlockResolver};
 use froglight_io::prelude::*;
 #[cfg(feature = "nbt")]
 use froglight_nbt::nbt::UnnamedNbt;
-#[cfg(feature = "nbt")]
-use hashbrown::hash_map::{DefaultHashBuilder, Entry, HashMap};
 
 #[cfg(feature = "nbt")]
 mod entity;
@@ -203,7 +206,7 @@ impl Chunk {
     pub fn block_data_entry(
         &mut self,
         pos: BlockPos,
-    ) -> Entry<'_, RelativeBlockPos, PackedEntity, DefaultHashBuilder> {
+    ) -> Entry<'_, RelativeBlockPos, PackedEntity, FixedHasher> {
         self.block_data.entry(RelativeBlockPos::from_block(pos, self.storage.height_min()))
     }
 }

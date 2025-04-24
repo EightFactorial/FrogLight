@@ -33,6 +33,7 @@ uuid = { workspace = true, features = ["md5"] }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
+bevy_platform = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }
@@ -52,9 +53,17 @@ online = ["dep:ureq", "serde"]
 io = ["dep:froglight-io"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect", "froglight-common/bevy", "froglight-nbt/bevy"]
+bevy = [
+  "dep:bevy_ecs",
+  "dep:bevy_log",
+  "dep:bevy_platform",
+  "dep:bevy_reflect",
+  "froglight-common/bevy",
+  "froglight-nbt/bevy",
+]
 # Enable `serde` support.
 serde = [
+  "bevy_platform?/serialize",
   "dep:serde",
   "dep:serde_json",
   "froglight-common/serde",

@@ -1,7 +1,7 @@
 //! TODO
 
 use bevy::{MinimalPlugins, log::LogPlugin, prelude::*};
-use bevy_ecs::{component::ComponentId, system::RunSystemOnce, world::DeferredWorld};
+use bevy_ecs::{component::HookContext, system::RunSystemOnce, world::DeferredWorld};
 use froglight_common::prelude::*;
 use froglight_schedule::prelude::*;
 
@@ -72,9 +72,9 @@ impl EntityA {
 
     /// A [`ComponentHook`](bevy_ecs::component::ComponentHook)
     /// that logs when an [`EntityA`] is added to a world.
-    fn on_add(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
-        info!("Spawned EntityA ({}v{})", entity.generation(), entity.index());
-        if let Some(mut sub) = world.get_mut::<SubWorld>(entity) {
+    fn on_add(mut world: DeferredWorld, ctx: HookContext) {
+        info!("Spawned EntityA ({}v{})", ctx.entity.generation(), ctx.entity.index());
+        if let Some(mut sub) = world.get_mut::<SubWorld>(ctx.entity) {
             info!("EntityA has SubWorld \"{}\"", sub.identifier());
             sub.run_system_once(EntityB::spawn_with_subworld).unwrap();
         } else {
@@ -109,9 +109,9 @@ impl EntityB {
 
     /// A [`ComponentHook`](bevy_ecs::component::ComponentHook)
     /// that logs when an [`EntityA`] is added to a world.
-    fn on_add(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
-        info!("Spawned EntityB ({}v{})", entity.generation(), entity.index());
-        if let Some(mut sub) = world.get_mut::<SubWorld>(entity) {
+    fn on_add(mut world: DeferredWorld, ctx: HookContext) {
+        info!("Spawned EntityB ({}v{})", ctx.entity.generation(), ctx.entity.index());
+        if let Some(mut sub) = world.get_mut::<SubWorld>(ctx.entity) {
             info!("EntityB has SubWorld \"{}\"", sub.identifier());
             sub.spawn(Name::new("NestedEntity"));
             sub.spawn(Transform::default());

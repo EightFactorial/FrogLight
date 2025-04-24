@@ -51,9 +51,9 @@ impl BrigadierGraph {
         functions: &FunctionRegistry,
         world: &mut WorldRef<Full>,
     ) -> Result<(), BrigadierError> {
-        let args = ArgList::new().push_owned(entity);
+        let args = ArgList::new().with_arg(ArgValue::Owned(Box::new(entity)));
         let (node, mut args) = self.build_command(command.as_ref(), args, types, &world.value())?;
-        args = args.push_owned(world.clone());
+        args.push_owned(world.clone());
 
         if let Some(function) = node.function.as_ref() {
             match functions.call(function.as_ref(), args) {
@@ -83,7 +83,7 @@ impl BrigadierGraph {
         functions: &FunctionRegistry,
         world: &World,
     ) -> Result<(), BrigadierError> {
-        let args = ArgList::new().push_owned(entity);
+        let args = ArgList::new().with_arg(ArgValue::Owned(Box::new(entity)));
         let (node, _) = self.build_command(command.as_ref(), args, types, world)?;
         if let Some(function) = node.function.as_ref() {
             if functions.contains(function.as_ref()) {
@@ -151,7 +151,7 @@ impl BrigadierGraph {
 
                         // If an argument was parsed, add it to the list.
                         if let Some(argument) = argument {
-                            arguments = arguments.push_arg(argument);
+                            arguments.push_arg(argument);
                         }
 
                         // Update the remaining argument string.

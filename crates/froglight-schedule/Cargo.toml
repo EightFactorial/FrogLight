@@ -23,10 +23,10 @@ froglight-common = { workspace = true, features = ["bevy"] }
 bevy_app = { workspace = true }
 bevy_ecs = { workspace = true }
 bevy_log = { workspace = true }
+bevy_platform = { workspace = true, features = ["alloc"] }
 bevy_reflect = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["bevy"] }
-hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies

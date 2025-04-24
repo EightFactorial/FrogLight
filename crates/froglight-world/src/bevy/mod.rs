@@ -2,7 +2,7 @@
 
 use bevy_app::{App, Last, Plugin};
 use bevy_ecs::{
-    component::ComponentId,
+    component::HookContext,
     prelude::*,
     schedule::{InternedScheduleLabel, ScheduleLabel},
     world::DeferredWorld,
@@ -77,18 +77,18 @@ impl WorldPlugin {
     }
 
     /// Insert a [`ChunkPos`]-[`Entity`] relationship into a map.
-    fn insert_hook(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
-        if let Ok(entity_ref) = world.get_entity(entity) {
+    fn insert_hook(mut world: DeferredWorld, ctx: HookContext) {
+        if let Ok(entity_ref) = world.get_entity(ctx.entity) {
             match entity_ref.get_components::<(&ChunkPos, Option<&Chunk>)>() {
                 // If the entity has a `Chunk` component,
                 // insert it into the `ChunkPositionMap`.
                 Some((&position, Some(..))) => {
-                    world.resource_mut::<ChunkPositionMap>().try_insert(position, entity);
-                    world.resource_mut::<EntityPositionMap>().remove_entity(position, entity);
+                    world.resource_mut::<ChunkPositionMap>().try_insert(position, ctx.entity);
+                    world.resource_mut::<EntityPositionMap>().remove_entity(position, ctx.entity);
                 }
                 // Otherwise, insert it into the `EntityPositionMap`.
                 Some((&position, None)) => {
-                    world.resource_mut::<EntityPositionMap>().insert(position, entity);
+                    world.resource_mut::<EntityPositionMap>().insert(position, ctx.entity);
                 }
                 None => {}
             }
@@ -96,17 +96,17 @@ impl WorldPlugin {
     }
 
     /// Remove a [`ChunkPos`]-[`Entity`] relationship from a map.
-    fn remove_hook(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
-        if let Ok(entity_ref) = world.get_entity(entity) {
+    fn remove_hook(mut world: DeferredWorld, ctx: HookContext) {
+        if let Ok(entity_ref) = world.get_entity(ctx.entity) {
             match entity_ref.get_components::<(&ChunkPos, Option<&Chunk>)>() {
                 // If the entity has a `Chunk` component,
                 // remove it from the `ChunkPositionMap`.
                 Some((&position, Some(..))) => {
-                    world.resource_mut::<ChunkPositionMap>().try_remove(position, entity);
+                    world.resource_mut::<ChunkPositionMap>().try_remove(position, ctx.entity);
                 }
                 // Otherwise, remove it from the `EntityPositionMap`.
                 Some((&position, None)) => {
-                    world.resource_mut::<EntityPositionMap>().remove_entity(position, entity);
+                    world.resource_mut::<EntityPositionMap>().remove_entity(position, ctx.entity);
                 }
                 None => {}
             }

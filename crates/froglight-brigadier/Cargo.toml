@@ -21,15 +21,15 @@ proptest = { workspace = true }
 
 [dependencies]
 bevy_app = { workspace = true, features = ["reflect_functions"] }
-bevy_core = { workspace = true, features = ["bevy_reflect"] }
 bevy_ecs = { workspace = true, features = ["reflect_functions"] }
 bevy_log = { workspace = true }
-bevy_reflect = { workspace = true, features = ["functions"] }
+bevy_platform = { workspace = true }
+bevy_reflect = { workspace = true, features = ["functions", "petgraph", "smol_str"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["bevy"] }
 hashbrown = { workspace = true }
 parking_lot = { workspace = true }
-petgraph = "0.6"
+petgraph = "0.7"
 smol_str = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
@@ -55,4 +55,4 @@ nbt = ["dep:froglight-nbt"]
 uuid = ["bevy_reflect/uuid", "dep:uuid"]
 
 # Enable support for serializing to/from text formats.
-serde = ["bevy_core/serialize", "dep:serde", "glam?/serde", "smol_str/serde", "uuid?/serde"]
+serde = ["bevy_platform/serialize", "dep:serde", "glam?/serde", "smol_str/serde", "uuid?/serde"]

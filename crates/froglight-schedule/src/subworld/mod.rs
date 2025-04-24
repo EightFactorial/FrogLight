@@ -1,11 +1,11 @@
 //! TODO
 
-use bevy_ecs::{component::ComponentId, prelude::*, world::DeferredWorld};
+use bevy_ecs::{component::HookContext, prelude::*, world::DeferredWorld};
 use bevy_log::error;
+use bevy_platform::collections::{HashMap, hash_map::Entry};
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut};
 use froglight_common::identifier::Identifier;
-use hashbrown::{HashMap, hash_map::Entry};
 
 mod reflect;
 pub use reflect::{ReflectSubWorldSync, SubWorldSync};
@@ -68,18 +68,18 @@ impl SubWorld {
     }
 
     /// Run the registered `SubWorldSync::on_add` hooks.
-    fn insert_hook(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
+    fn insert_hook(mut world: DeferredWorld, ctx: HookContext) {
         let registry = world.resource::<AppTypeRegistry>().clone();
         for (_, reflect) in registry.read().iter_with_data::<ReflectSubWorldSync>() {
-            reflect.on_add(entity, &mut world);
+            reflect.on_add(ctx.entity, &mut world);
         }
     }
 
     /// Run the registered `SubWorldSync::on_add` hooks.
-    fn remove_hook(mut world: DeferredWorld, entity: Entity, _: ComponentId) {
+    fn remove_hook(mut world: DeferredWorld, ctx: HookContext) {
         let registry = world.resource::<AppTypeRegistry>().clone();
         for (_, reflect) in registry.read().iter_with_data::<ReflectSubWorldSync>() {
-            reflect.on_remove(entity, &mut world);
+            reflect.on_remove(ctx.entity, &mut world);
         }
     }
 }
