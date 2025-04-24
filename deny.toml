@@ -8,7 +8,7 @@ version = 2
 allow = [
   "Apache-2.0",
   "BSD-3-Clause",
-  "CC0-1.0",
+  # "CC0-1.0",
   "ISC",
   "MIT",
   "MPL-2.0",
@@ -47,17 +47,8 @@ version = "=1.0.0"
 name = "derive_more-impl"
 version = "=1.0.0"
 [[bans.skip]]
-name = "downcast-rs"
-version = "=1.2.1"
-[[bans.skip]]
-name = "fixedbitset"
-version = "=0.4.2"
-[[bans.skip]]
 name = "getrandom"
-version = "=0.2.15"
-[[bans.skip]]
-name = "hashbrown"
-version = "=0.14.5"
+version = "=0.2.16"
 [[bans.skip]]
 name = "rand"
 version = "=0.8.5"
@@ -82,14 +73,7 @@ version = "=1.0.69"
 [[bans.skip]]
 name = "wasi"
 version = "=0.11.0"
-[[bans.skip]]
-name = "zerocopy"
-version = "=0.7.35"
 
-[[bans.skip]]
-name = "windows"
-[[bans.skip]]
-name = "windows-core"
 [[bans.skip]]
 name = "windows-sys"
 [[bans.skip]]
