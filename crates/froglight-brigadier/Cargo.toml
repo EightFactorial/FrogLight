@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy = { workspace = true }
+bevy = { workspace = true, features = ["bevy_log"] }
 proptest = { workspace = true }
 
 [dependencies]
