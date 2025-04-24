@@ -7,6 +7,8 @@ use crate::standard::{ReadError, WriteError};
 mod froglight_common_impl;
 mod std_impl;
 
+#[cfg(feature = "bevy_platform")]
+mod bevy_impl;
 #[cfg(feature = "glam")]
 mod glam_impl;
 #[cfg(feature = "hashbrown")]

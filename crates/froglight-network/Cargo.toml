@@ -21,7 +21,7 @@ async-io = { workspace = true }
 async-net = { workspace = true }
 blocking = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
-froglight-io = { workspace = true, features = ["serde"] }
+froglight-io = { workspace = true, features = ["glam", "serde", "smallvec", "uuid"] }
 froglight-macros = { workspace = true, features = ["network"] }
 froglight-player = { workspace = true, features = ["io", "serde"] }
 futures-lite = { workspace = true }
@@ -36,6 +36,7 @@ uuid = { workspace = true }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
+bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
 bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallvec", "smol_str", "uuid"] }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
@@ -64,6 +65,7 @@ bevy = [
   "dep:bevy_tasks",
   "froglight-common/bevy",
   "froglight-inventory?/bevy",
+  "froglight-io/bevy_platform",
   "froglight-nbt?/bevy",
   "froglight-player/bevy",
 ]

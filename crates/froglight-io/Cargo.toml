@@ -25,6 +25,7 @@ smol_str = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
+bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
 glam = { workspace = true, optional = true }
 hashbrown = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
@@ -33,7 +34,7 @@ smallvec = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
 
 [features]
-default = ["glam", "hashbrown", "smallvec", "uuid"]
+default = ["glam", "uuid"]
 
 # Enable support for `glam` types.
 glam = ["dep:glam"]
@@ -43,6 +44,8 @@ hashbrown = ["dep:hashbrown"]
 smallvec = ["dep:smallvec"]
 # Enable support for `uuid` types.
 uuid = ["dep:uuid"]
+# Enable support for `bevy_platform` types.
+bevy_platform = ["dep:bevy_platform"]
 
 # Enable support for serializing to/from JSON.
 serde = [

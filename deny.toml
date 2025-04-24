@@ -6,24 +6,25 @@ version = 2
 
 [licenses]
 allow = [
+  # "0BSD",
   "Apache-2.0",
+  # "BSD-2-Clause",
   "BSD-3-Clause",
+  # "BSL-1.0",
   # "CC0-1.0",
   "ISC",
   "MIT",
   "MPL-2.0",
+  # "OpenSSL",
   "Unicode-3.0",
   "Zlib",
-  # "0BSD",
-  # "BSD-2-Clause",
-  # "BSL-1.0",
-  # "OpenSSL",
 ]
 
 [[licenses.clarify]]
 expression = "OpenSSL"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
 name = "ring"
+
 # [[licenses.exceptions]]
 # name = "unicode-ident"
 # allow = ["Unicode-DFS-2016"]
