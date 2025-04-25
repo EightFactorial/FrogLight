@@ -3,13 +3,13 @@
 use std::{borrow::Cow, sync::Arc};
 
 use bevy_ecs::prelude::*;
+use bevy_platform::collections::HashMap;
 use bevy_reflect::{
     TypeRegistry,
     func::{ArgList, ArgValue, FunctionRegistry, FunctionResult},
     prelude::*,
 };
 use derive_more::Deref;
-use hashbrown::HashMap;
 use parking_lot::RwLock;
 use petgraph::{Direction::Outgoing, graph::NodeIndex, prelude::StableDiGraph, visit::EdgeRef};
 use smol_str::SmolStr;

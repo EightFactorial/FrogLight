@@ -23,11 +23,10 @@ proptest = { workspace = true }
 bevy_app = { workspace = true, features = ["reflect_functions"] }
 bevy_ecs = { workspace = true, features = ["reflect_functions"] }
 bevy_log = { workspace = true }
-bevy_platform = { workspace = true }
+bevy_platform = { workspace = true, features = ["alloc"] }
 bevy_reflect = { workspace = true, features = ["functions", "petgraph", "smol_str"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["bevy"] }
-hashbrown = { workspace = true }
 parking_lot = { workspace = true }
 petgraph = "0.7"
 smol_str = { workspace = true }

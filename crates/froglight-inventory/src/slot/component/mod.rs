@@ -2,12 +2,15 @@
 
 use std::{any::TypeId, sync::LazyLock};
 
+#[cfg(feature = "bevy")]
+use bevy_platform::collections::HashMap;
 use froglight_common::{prelude::Identifier, version::Version};
 use froglight_io::prelude::*;
 use froglight_nbt::{
     nbt::NbtTag,
     prelude::{FromTag, IntoTag},
 };
+#[cfg(not(feature = "bevy"))]
 use hashbrown::HashMap;
 use indexmap::IndexMap;
 use parking_lot::{
@@ -28,10 +31,11 @@ pub use types::*;
 /// Used to identify and serialize/deserialize components over the network.
 pub struct InventoryComponents;
 
-static COMPONENTS: LazyLock<StaticMap> = LazyLock::new(StaticMap::default);
-type StaticMap = RwLock<HashMap<TypeId, ComponentMap>>;
 /// A map of identifiers to component functions.
 pub type ComponentMap = IndexMap<Identifier, ComponentFns>;
+
+static COMPONENTS: LazyLock<StaticMap> = LazyLock::new(StaticMap::default);
+type StaticMap = RwLock<HashMap<TypeId, ComponentMap>>;
 
 impl InventoryComponents {
     /// Get access to the [`InventoryComponents`] map.

@@ -8,9 +8,11 @@ use std::time::SystemTime;
 use base64::{Engine, prelude::BASE64_URL_SAFE};
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
+#[cfg(all(feature = "serde", feature = "bevy"))]
+use bevy_platform::collections::HashMap;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-#[cfg(feature = "serde")]
+#[cfg(all(feature = "serde", not(feature = "bevy")))]
 use hashbrown::HashMap;
 #[cfg(feature = "online")]
 use serde::Deserialize;

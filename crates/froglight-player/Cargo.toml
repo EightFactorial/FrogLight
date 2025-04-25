@@ -33,7 +33,7 @@ uuid = { workspace = true, features = ["md5"] }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
-bevy_platform = { workspace = true, optional = true }
+bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }
