@@ -149,26 +149,28 @@ impl<T: FrogRead + FrogWrite + FromTag + IntoTag> From<T> for ComponentFns {
         use std::io::{Error, ErrorKind};
 
         Self {
-            read: |mut buffer| {
-                T::frog_read(&mut buffer)?.into_tag().map_err(|_| {
+            read: |mut buffer| match T::frog_read(&mut buffer) {
+                Ok(val) => val.into_tag().map_err(|err| {
                     ReadError::Io(Error::new(
                         ErrorKind::InvalidData,
-                        "Failed to convert data to/from NBT",
+                        format!("Failed to convert data to NBT: {err}"),
                     ))
-                })
+                }),
+                Err(err) => Err(ReadError::Io(Error::new(
+                    ErrorKind::InvalidData,
+                    format!("Failed to read data from buffer: {err}"),
+                ))),
             },
-            write: |tag, mut buffer| {
-                T::from_tag(tag)
-                    .map_err(|_| {
-                        WriteError::Io(Error::new(
-                            ErrorKind::InvalidData,
-                            "Failed to convert data to/from NBT",
-                        ))
-                    })?
-                    .frog_write(&mut buffer)
+            write: |tag, mut buffer| match T::from_tag(tag) {
+                Ok(val) => val.frog_write(&mut buffer),
+                Err(err) => Err(WriteError::Io(Error::new(
+                    ErrorKind::InvalidData,
+                    format!("Failed to convert data from NBT: {err}"),
+                ))),
             },
-            write_len: |tag| {
-                T::from_tag(tag).expect("Failed to convert data to/from NBT").frog_len()
+            write_len: |tag| match T::from_tag(tag) {
+                Ok(val) => val.frog_len(),
+                Err(err) => panic!("Failed to convert data from NBT: {err}"),
             },
         }
     }
