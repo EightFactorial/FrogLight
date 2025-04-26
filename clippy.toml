@@ -1,2 +1,2 @@
-# Force using `hashbrown` instead of `std` collections.
+# Force using `bevy_platform` or `hashbrown` instead of `std` collections.
 disallowed-types = ["std::collections::HashMap", "std::collections::HashSet"]

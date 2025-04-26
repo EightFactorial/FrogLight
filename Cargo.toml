@@ -55,6 +55,7 @@ pedantic = { level = "warn", priority = -1 }
 unnecessary_cast = "warn"
 
 [workspace.dependencies]
+# Bevy
 bevy = { version = "0.16", default-features = false, features = ["async_executor", "multi_threaded"] }
 bevy_app = "0.16"
 bevy_derive = "0.16"
@@ -196,4 +197,3 @@ inherits = "release"
 [profile.release.package.froglight-item]
 incremental = true
 inherits = "release"
-# Bevy
