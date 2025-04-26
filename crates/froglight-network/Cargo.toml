@@ -20,9 +20,10 @@ async-compression = { workspace = true, features = ["futures-io", "zlib"] }
 async-io = { workspace = true }
 async-net = { workspace = true }
 blocking = { workspace = true }
+derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
 froglight-io = { workspace = true, features = ["glam", "serde", "smallvec", "uuid"] }
-froglight-macros = { workspace = true, features = ["network"] }
+froglight-macros = { workspace = true, features = ["io", "network"] }
 froglight-player = { workspace = true, features = ["io", "serde"] }
 futures-lite = { workspace = true }
 glam = { workspace = true }

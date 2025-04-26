@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
+pub use froglight_io as io;
+
 pub mod agent;
 pub mod connection;
 pub mod types;

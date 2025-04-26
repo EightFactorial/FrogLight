@@ -2,8 +2,8 @@ use darling::{FromDeriveInput, FromField, FromMeta, util::Flag};
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::{
-    DataEnum, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed, Ident, Index, Path,
-    Variant, punctuated::Punctuated, token::Comma,
+    DataEnum, DataStruct, DeriveInput, Fields, FieldsNamed, FieldsUnnamed, Ident, Index, LitInt,
+    Path, Variant, punctuated::Punctuated, token::Comma,
 };
 
 use crate::CrateManifest;
@@ -62,8 +62,10 @@ pub(crate) fn derive_frogbuf(input: TokenStream) -> TokenStream {
     let FrogBufMacro { traits } = FrogBufMacro::from_derive_input(&input).unwrap();
     let DeriveInput { ident, data, .. } = input;
 
-    let path = CrateManifest::try_find("froglight-network", "froglight")
-        .unwrap_or_else(|| CrateManifest::froglight("froglight-io"));
+    let path = CrateManifest::try_find("froglight-network", "froglight").map_or_else(
+        || CrateManifest::froglight("froglight-io"),
+        |path| syn::parse2(quote!(#path::io)).unwrap(),
+    );
 
     match data {
         syn::Data::Struct(data) => derive_struct(ident, data, traits, path),
@@ -247,12 +249,17 @@ fn derive_enum(ident: Ident, data: DataEnum, traits: FrogBufTraits, path: Path) 
 
         let write =
             derive_variants(&data.variants, ReadWriteMode::Write, TraitMethod::Standard, &path);
-        let write_length = derive_variant_length(&data.variants, TraitMethod::Standard, &path);
+        let write_length = derive_variants(
+            &data.variants,
+            ReadWriteMode::WriteLength,
+            TraitMethod::Standard,
+            &path,
+        );
 
         tokens.extend(quote! {
             impl #path::standard::FrogRead for #ident {
                 fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
-                    match <u32 as #path::variable::FrogVarRead>::frog_read(buffer)? {
+                    match <u32 as #path::variable::FrogVarRead>::frog_var_read(buffer)? {
                         #read
                     }
                 }
@@ -275,7 +282,12 @@ fn derive_enum(ident: Ident, data: DataEnum, traits: FrogBufTraits, path: Path) 
 
         let write =
             derive_variants(&data.variants, ReadWriteMode::Write, TraitMethod::Variable, &path);
-        let write_length = derive_variant_length(&data.variants, TraitMethod::Variable, &path);
+        let write_length = derive_variants(
+            &data.variants,
+            ReadWriteMode::WriteLength,
+            TraitMethod::Variable,
+            &path,
+        );
 
         tokens.extend(quote! {
             impl #path::variable::FrogVarRead for #ident {
@@ -301,20 +313,56 @@ fn derive_enum(ident: Ident, data: DataEnum, traits: FrogBufTraits, path: Path) 
 }
 
 fn derive_variants(
-    _variants: &Punctuated<Variant, Comma>,
-    _mode: ReadWriteMode,
-    _traits: TraitMethod,
-    _path: &Path,
+    variants: &Punctuated<Variant, Comma>,
+    mode: ReadWriteMode,
+    traits: TraitMethod,
+    path: &Path,
 ) -> TokenStream {
-    TokenStream::new()
+    let mut tokens = TokenStream::new();
+    let mut discriminant = 0;
+    for variant in variants {
+        tokens.extend(derive_variant(variant, &mut discriminant, mode, traits, path));
+    }
+    tokens
 }
 
-fn derive_variant_length(
-    _variants: &Punctuated<Variant, Comma>,
-    _traits: TraitMethod,
-    _path: &Path,
+fn derive_variant(
+    variant: &Variant,
+    discriminant: &mut i32,
+    mode: ReadWriteMode,
+    traits: TraitMethod,
+    path: &Path,
 ) -> TokenStream {
-    TokenStream::new()
+    // Update the discriminant if one was provided
+    if let Some((_eq, desc)) = &variant.discriminant {
+        let integer: LitInt = syn::parse2(desc.to_token_stream()).unwrap();
+        *discriminant = integer.base10_parse().unwrap();
+    }
+
+    // Get tokens to parse the fields
+    let fields = &variant.fields;
+    let fields_tokens = match &fields {
+        Fields::Named(fields) => derive_named_fields(fields, mode, traits, path),
+        Fields::Unnamed(fields) => derive_unnamed_fields(fields, mode, traits, path),
+        Fields::Unit => TokenStream::new(),
+    };
+
+    // Write the enum discriminant to the buffer
+    let disc = *discriminant;
+    let prefix = match mode {
+        ReadWriteMode::Write => quote! {
+            written += #path::variable::FrogVarWrite::frog_var_write(&#disc, &mut buffer)?;
+        },
+        ReadWriteMode::Read | ReadWriteMode::WriteLength => TokenStream::new(),
+    };
+
+    let ident = &variant.ident;
+    quote! {
+        Self::#ident #fields => {
+            #prefix
+            #fields_tokens
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
