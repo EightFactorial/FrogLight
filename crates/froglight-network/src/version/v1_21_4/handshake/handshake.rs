@@ -1,6 +1,7 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use froglight_macros::FrogBuf;
+use smol_str::SmolStr;
 
 use crate::types::ConnectionIntent;
 
@@ -9,7 +10,7 @@ use crate::types::ConnectionIntent;
 pub struct HandshakePacket {
     #[frog(var)]
     pub protocol: i32,
-    pub address: String,
+    pub address: SmolStr,
     pub port: u16,
     pub intent: ConnectionIntent,
 }

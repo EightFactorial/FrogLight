@@ -10,7 +10,7 @@ use futures_lite::{AsyncReadExt, AsyncWriteExt};
 use super::RawConnection;
 
 macro_rules! fn_with_generics {
-    // TODO: Decryption
+    // TODO: Decryption + Decompression
     (@read $name:ident, $($tmpl:tt)*) => {
         pub(super) async fn $name $($tmpl)* (
             raw: &mut RawConnection,
@@ -21,7 +21,7 @@ macro_rules! fn_with_generics {
 
             #[expect(clippy::cast_possible_truncation)]
             let mut packet_buf: Vec<u8> =
-                Vec::with_capacity(usize::frog_var_read(&mut len_cursor)? + len_cursor.position() as usize);
+                vec![0u8; usize::frog_var_read(&mut len_cursor)? + len_cursor.position() as usize];
             raw.stream.read_exact(packet_buf.as_mut_slice()).await?;
 
             #[expect(clippy::cast_possible_truncation)]
@@ -33,7 +33,7 @@ macro_rules! fn_with_generics {
             }
         }
     };
-    // TODO: Decryption
+    // TODO: Compression + Encryption
     (@write $name:ident, $($tmpl:tt)*) => {
         pub(super) async fn $name $($tmpl)* (
             raw: &mut RawConnection,

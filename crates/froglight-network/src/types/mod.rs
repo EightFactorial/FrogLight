@@ -17,3 +17,6 @@ pub use intent::*;
 
 mod position;
 // pub use position::*;
+
+pub mod status;
+pub use status::ServerStatus;

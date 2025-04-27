@@ -27,8 +27,9 @@ froglight-macros = { workspace = true, features = ["io", "network"] }
 froglight-player = { workspace = true, features = ["io", "serde"] }
 futures-lite = { workspace = true }
 glam = { workspace = true }
-hashbrown = { workspace = true }
-serde = { workspace = true }
+hashbrown = { workspace = true, features = ["serde"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 smallvec = { workspace = true }
 smol_str = { workspace = true }
 ureq = { workspace = true }
@@ -37,7 +38,7 @@ uuid = { workspace = true }
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
 bevy_log = { workspace = true, optional = true }
-bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
+bevy_platform = { workspace = true, optional = true, features = ["alloc", "serialize"] }
 bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallvec", "smol_str", "uuid"] }
 bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["io"] }
@@ -62,6 +63,7 @@ nbt = ["dep:froglight-nbt", "froglight-brigadier?/nbt"]
 bevy = [
   "dep:bevy_ecs",
   "dep:bevy_log",
+  "dep:bevy_platform",
   "dep:bevy_reflect",
   "dep:bevy_tasks",
   "froglight-common/bevy",
@@ -75,3 +77,9 @@ bevy = [
 v1_21_4 = ["froglight-common/v1_21_4"]
 # Enable support for v1.21.5
 v1_21_5 = ["froglight-common/v1_21_5"]
+
+# --- Examples ---
+
+[[example]]
+name = "status"
+required-features = ["bevy", "resolver", "v1_21_4"]

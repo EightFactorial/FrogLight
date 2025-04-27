@@ -57,7 +57,10 @@ pub(super) fn derive_enum(
             }
         });
         length_tokens.extend(quote! {
-            Self::#ident #fields => { #length }
+            Self::#ident #fields => {
+                length += #path::variable::FrogVarWrite::frog_var_len(&#discriminant);
+                #length
+            }
         });
 
         discriminant += 1;

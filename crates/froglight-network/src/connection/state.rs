@@ -250,13 +250,31 @@ impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateWriteConnection<V
 // -------------------------------------------------------------------------------------------------
 
 impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
-    /// Connect to a server by resolving the address.
+    /// Connect to a server by resolving the address
+    /// using the provided resolver.
     ///
     /// # Errors
     /// Returns an error if the connection could not be established,
     /// or if the stream could not set `nodelay` to `true`.
     #[inline]
-    pub async fn connect(address: &(impl AsRef<str> + ?Sized)) -> Result<Self, std::io::Error> {
+    #[cfg(feature = "resolver")]
+    pub async fn connect(
+        address: &(impl AsRef<str> + ?Sized),
+        resolver: crate::resolver::FroglightResolver,
+    ) -> Result<Self, std::io::Error> {
+        resolver.connect_to_server(address.as_ref()).await
+    }
+
+    /// Connect to a server by resolving the address
+    /// using the default system resolver.
+    ///
+    /// # Errors
+    /// Returns an error if the connection could not be established,
+    /// or if the stream could not set `nodelay` to `true`.
+    #[inline]
+    pub async fn connect_system(
+        address: &(impl AsRef<str> + ?Sized),
+    ) -> Result<Self, std::io::Error> {
         Ok(Self(RawConnection::connect(address).await?, PhantomData))
     }
 
@@ -275,10 +293,10 @@ impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
 }
 
 impl<V: ValidState<Handshake>, T: ConnectionType<V, Handshake>> StateConnection<V, Handshake, T> {
-    /// Set the state of the connection to [`Query`](bevy_ecs::system::Query).
+    /// Set the state of the connection to [`Status`].
     #[inline]
     #[must_use]
-    pub fn query(self) -> StateConnection<V, Status, T>
+    pub fn status(self) -> StateConnection<V, Status, T>
     where
         V: ValidState<Status>,
         T: ConnectionType<V, Status>,
