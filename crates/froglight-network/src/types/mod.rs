@@ -13,7 +13,7 @@ mod hand;
 // pub use hand::*;
 
 mod intent;
-// pub use intent::*;
+pub use intent::*;
 
 mod position;
 // pub use position::*;

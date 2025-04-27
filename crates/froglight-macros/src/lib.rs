@@ -230,3 +230,10 @@ pub fn derive_frognbt(input: proc_macro::TokenStream) -> proc_macro::TokenStream
 
 #[cfg(feature = "network")]
 mod network;
+
+/// Derive `FrogReadVersion`/`FrogWriteVersion` for a packet enum.
+#[cfg(feature = "network")]
+#[proc_macro_derive(FrogPackets, attributes(frog))]
+pub fn derive_frogpackets(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    network::derive_frogpackets(input.into()).into()
+}

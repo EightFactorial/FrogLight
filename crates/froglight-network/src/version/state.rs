@@ -2,7 +2,7 @@
 use std::{fmt::Debug, hash::Hash};
 
 use froglight_common::version::Version;
-use froglight_io::prelude::{FrogRead, FrogWrite};
+use froglight_io::version::{FrogReadVersion, FrogWriteVersion};
 
 /// A trait for all possible states of the network.
 pub trait State: Debug + Default + Copy + Eq + Hash + Send + Sync + 'static {}
@@ -10,9 +10,9 @@ pub trait State: Debug + Default + Copy + Eq + Hash + Send + Sync + 'static {}
 /// A trait implemented for all valid states of the network for a given version.
 pub trait ValidState<S: State>: Version {
     /// Packets sent from the server to the client.
-    type Clientbound: FrogRead + FrogWrite + Send + Sync;
+    type Clientbound: FrogReadVersion<Self> + FrogWriteVersion<Self> + Send + Sync;
     /// Packets sent from the client to the server.
-    type Serverbound: FrogRead + FrogWrite + Send + Sync;
+    type Serverbound: FrogReadVersion<Self> + FrogWriteVersion<Self> + Send + Sync;
 }
 
 /// The initial handshake between client and server.
