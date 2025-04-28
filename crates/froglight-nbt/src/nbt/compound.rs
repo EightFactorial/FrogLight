@@ -31,7 +31,7 @@ impl NbtCompound {
     /// Return `true` if the [`NbtCompound`] contains a tag with the given key.
     #[inline]
     #[must_use]
-    pub fn contains_key<Q: ?Sized + AsRef<str>>(&self, key: &Q) -> bool {
+    pub fn contains_key<Q: AsRef<str>>(&self, key: Q) -> bool {
         self.contains_key_bytes(key.as_ref().as_bytes())
     }
 
@@ -39,35 +39,35 @@ impl NbtCompound {
     /// bytes.
     #[inline]
     #[must_use]
-    pub fn contains_key_bytes<Q: ?Sized + AsRef<[u8]>>(&self, key: &Q) -> bool {
+    pub fn contains_key_bytes<Q: AsRef<[u8]>>(&self, key: Q) -> bool {
         self.0.contains_key(key.as_ref())
     }
 
     /// Get a reference to a [`NbtTag`] by it's key.
     #[inline]
     #[must_use]
-    pub fn get_tag<Q: AsRef<str> + ?Sized>(&self, key: &Q) -> Option<&NbtTag> {
+    pub fn get_tag<Q: AsRef<str>>(&self, key: Q) -> Option<&NbtTag> {
         self.get_tag_bytes(key.as_ref().as_bytes())
     }
 
     /// Get a reference to a [`NbtTag`] by it's key's bytes.
     #[inline]
     #[must_use]
-    pub fn get_tag_bytes<Q: AsRef<[u8]> + ?Sized>(&self, key: &Q) -> Option<&NbtTag> {
+    pub fn get_tag_bytes<Q: AsRef<[u8]>>(&self, key: Q) -> Option<&NbtTag> {
         self.0.get(key.as_ref())
     }
 
     /// Get a mutable reference to a [`NbtTag`] by it's key.
     #[inline]
     #[must_use]
-    pub fn get_tag_mut<Q: AsRef<str> + ?Sized>(&mut self, key: &Q) -> Option<&mut NbtTag> {
+    pub fn get_tag_mut<Q: AsRef<str>>(&mut self, key: Q) -> Option<&mut NbtTag> {
         self.get_tag_bytes_mut(key.as_ref().as_bytes())
     }
 
     /// Get a mutable reference to a [`NbtTag`] by it's key's bytes.
     #[inline]
     #[must_use]
-    pub fn get_tag_bytes_mut<Q: AsRef<[u8]> + ?Sized>(&mut self, key: &Q) -> Option<&mut NbtTag> {
+    pub fn get_tag_bytes_mut<Q: AsRef<[u8]>>(&mut self, key: Q) -> Option<&mut NbtTag> {
         self.0.get_mut(key.as_ref())
     }
 

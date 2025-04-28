@@ -26,7 +26,7 @@ impl Identifier {
     /// To handle potentially invalid identifiers,
     /// use [`Identifier::try_new`] instead.
     #[must_use]
-    pub fn new(content: &(impl AsRef<str> + ?Sized)) -> Self {
+    pub fn new(content: impl AsRef<str>) -> Self {
         Self::try_new(content).expect("Invalid identifier")
     }
 
@@ -48,7 +48,7 @@ impl Identifier {
     /// Try to create a new [`Identifier`].
     ///
     /// Returns `None` if the string is not a valid identifier.
-    pub fn try_new(content: &(impl AsRef<str> + ?Sized)) -> Option<Self> {
+    pub fn try_new(content: impl AsRef<str>) -> Option<Self> {
         let content = content.as_ref().trim();
 
         // Check if the string is empty or contains non-ASCII characters

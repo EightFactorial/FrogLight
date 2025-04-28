@@ -146,8 +146,8 @@ impl PlayerUsername {
     /// # Errors
     /// Returns an error if the request fails.
     pub fn player_uuid_at<T: serde::de::DeserializeOwned>(
-        username: &(impl AsRef<str> + ?Sized),
-        api: &(impl AsRef<str> + ?Sized),
+        username: impl AsRef<str>,
+        api: impl AsRef<str>,
         agent: &ureq::Agent,
     ) -> Result<T, ureq::Error> {
         super::retry_request::<T, 3>(&format!("{}{}", api.as_ref(), username.as_ref()), agent)

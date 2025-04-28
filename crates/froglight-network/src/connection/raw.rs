@@ -62,7 +62,7 @@ impl RawConnection {
     /// # Errors
     /// Returns an error if the connection could not be established,
     /// or if the stream could not set `nodelay` to `true`.
-    pub async fn connect(address: &(impl AsRef<str> + ?Sized)) -> Result<Self, std::io::Error> {
+    pub async fn connect(address: impl AsRef<str>) -> Result<Self, std::io::Error> {
         TcpStream::connect(address.as_ref())
             .await
             .and_then(|stream| Self::from_stream(address, stream))
@@ -76,7 +76,7 @@ impl RawConnection {
     /// Returns an error if the connection could not be established,
     /// or if the stream could not set `nodelay` to `true`.
     pub async fn connect_to(
-        address: &(impl AsRef<str> + ?Sized),
+        address: impl AsRef<str>,
         socket: SocketAddr,
     ) -> Result<Self, std::io::Error> {
         TcpStream::connect(socket).await.and_then(|stream| Self::from_stream(address, stream))
@@ -89,7 +89,7 @@ impl RawConnection {
     /// # Errors
     /// Returns an error if the stream could not set `nodelay` to `true`.
     pub fn from_stream(
-        address: &(impl AsRef<str> + ?Sized),
+        address: impl AsRef<str>,
         stream: TcpStream,
     ) -> Result<Self, std::io::Error> {
         stream.set_nodelay(true)?;

@@ -259,7 +259,7 @@ impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
     #[inline]
     #[cfg(feature = "resolver")]
     pub async fn connect(
-        address: &(impl AsRef<str> + ?Sized),
+        address: impl AsRef<str>,
         resolver: crate::resolver::FroglightResolver,
     ) -> Result<Self, std::io::Error> {
         resolver.connect_to_server(address.as_ref()).await
@@ -272,9 +272,7 @@ impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
     /// Returns an error if the connection could not be established,
     /// or if the stream could not set `nodelay` to `true`.
     #[inline]
-    pub async fn connect_system(
-        address: &(impl AsRef<str> + ?Sized),
-    ) -> Result<Self, std::io::Error> {
+    pub async fn connect_system(address: impl AsRef<str>) -> Result<Self, std::io::Error> {
         Ok(Self(RawConnection::connect(address).await?, PhantomData))
     }
 
@@ -285,7 +283,7 @@ impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
     /// or if the stream could not set `nodelay` to `true`.
     #[inline]
     pub async fn connect_to(
-        address: &(impl AsRef<str> + ?Sized),
+        address: impl AsRef<str>,
         socket: SocketAddr,
     ) -> Result<Self, std::io::Error> {
         Ok(Self(RawConnection::connect_to(address, socket).await?, PhantomData))

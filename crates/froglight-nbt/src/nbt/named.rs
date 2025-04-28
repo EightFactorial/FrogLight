@@ -140,7 +140,7 @@ impl UnnamedNbt {
     ///
     /// Returns `false` if the [`UnnamedNbt`] is empty.
     #[must_use]
-    pub fn contains_key(&self, key: &(impl AsRef<str> + ?Sized)) -> bool {
+    pub fn contains_key(&self, key: impl AsRef<str>) -> bool {
         self.contains_key_bytes(key.as_ref().as_bytes())
     }
 

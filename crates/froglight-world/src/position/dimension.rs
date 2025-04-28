@@ -26,7 +26,7 @@ impl DimensionPos {
     ///
     /// Returns `None` if the dimension identifier is invalid.
     #[must_use]
-    pub fn try_new(dimension: &(impl AsRef<str> + ?Sized), position: BlockPos) -> Option<Self> {
+    pub fn try_new(dimension: impl AsRef<str>, position: BlockPos) -> Option<Self> {
         Some(Self { dim: Identifier::try_new(dimension)?, pos: position })
     }
 
