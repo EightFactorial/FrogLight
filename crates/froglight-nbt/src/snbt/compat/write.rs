@@ -1,8 +1,8 @@
-#[cfg(not(feature = "std"))]
-use alloc::{
-    format,
-    string::{String, ToString},
-};
+// #[cfg(not(feature = "std"))]
+// use alloc::{
+//     format,
+//     string::{String, ToString},
+// };
 use core::fmt::Debug;
 
 use super::regex::STRING_REGEX;
@@ -78,7 +78,7 @@ impl WriteCompat for NbtTag {
 }
 
 #[test]
-#[cfg(all(feature = "std", test))]
+#[cfg(test)]
 fn test_write_tag() {
     let mut bytes = String::new();
     NbtTag::Byte(1).write_to_string(&mut bytes);
@@ -183,7 +183,7 @@ fn write_list<'a, T: WriteCompat + 'a>(
 }
 
 #[test]
-#[cfg(all(feature = "std", test))]
+#[cfg(test)]
 fn test_write_list() {
     let mut empty = String::new();
     NbtListTag::Empty.write_to_string(&mut empty);
@@ -327,7 +327,7 @@ fn write_array<T: Debug>(
 }
 
 #[test]
-#[cfg(all(feature = "std", test))]
+#[cfg(test)]
 fn test_write_array() {
     let mut bytes = String::new();
     ByteArray::from(vec![1i8, 2, 3]).write_to_string(&mut bytes);

@@ -112,6 +112,7 @@ hashbrown = "0.15"
 hashify = "0.2.6"
 indexmap = { version = "2.9", default-features = false }
 nu-ansi-term = "0.46"
+once_cell = { version = "1.21", default-features = false, features = ["parking_lot"] }
 parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
@@ -200,4 +201,4 @@ std = ["froglight-internal/std"]
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-internal/v1_21_4"]
 # Enable support for v1.21.5
-v1_21_5 = ["froglight-internal/v1_21_4"]
+v1_21_5 = ["froglight-internal/v1_21_5"]

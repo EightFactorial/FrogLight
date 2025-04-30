@@ -1,8 +1,7 @@
-#[cfg(not(feature = "std"))]
-use alloc::{format, string::String, vec, vec::Vec};
-#[cfg(feature = "std")]
-use std::sync::LazyLock;
+// #[cfg(not(feature = "std"))]
+// use alloc::{format, string::String, vec, vec::Vec};
 
+use once_cell::sync::Lazy;
 use regex::RegexSet;
 
 use super::Compat;
@@ -19,11 +18,11 @@ impl Compat {
     const DOUBLE_REGEX: &'static str = r"-?\d+\.\d+(d|D)?";
 }
 
-pub(super) static FIELD_REGEX: LazyLock<RegexSet> = LazyLock::new(|| {
+pub(super) static FIELD_REGEX: Lazy<RegexSet> = Lazy::new(|| {
     RegexSet::new([STRING_REGEXES.iter(), NUMBER_REGEXES.iter()].into_iter().flatten()).unwrap()
 });
-pub(super) static STRING_REGEX: LazyLock<RegexSet> =
-    LazyLock::new(|| RegexSet::new(STRING_REGEXES.iter()).unwrap());
+pub(super) static STRING_REGEX: Lazy<RegexSet> =
+    Lazy::new(|| RegexSet::new(STRING_REGEXES.iter()).unwrap());
 
 /// Match unquoted strings.
 ///
@@ -31,8 +30,8 @@ pub(super) static STRING_REGEX: LazyLock<RegexSet> =
 /// - `hello123`
 /// - `test-1`
 /// - `1` / `+1` / `-1` / `1.0`
-static STRING_REGEXES: LazyLock<Vec<String>> =
-    LazyLock::new(|| vec![format!("^({})$", Compat::UNQUOTED_STRING_REGEX)]);
+static STRING_REGEXES: Lazy<Vec<String>> =
+    Lazy::new(|| vec![format!("^({})$", Compat::UNQUOTED_STRING_REGEX)]);
 
 /// Match all number types.
 ///
@@ -43,7 +42,7 @@ static STRING_REGEXES: LazyLock<Vec<String>> =
 /// - `0l` / `1l` / `2L` / `-3L`
 /// - `0.0f` / `1.0f` / `2.0F` / `-3.0F`
 /// - `0.0d` / `1.0d` / `2.0D` / `-3.0D`
-static NUMBER_REGEXES: LazyLock<Vec<String>> = LazyLock::new(|| {
+static NUMBER_REGEXES: Lazy<Vec<String>> = Lazy::new(|| {
     [
         Compat::BYTE_REGEX,
         Compat::SHORT_REGEX,

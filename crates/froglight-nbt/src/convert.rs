@@ -1,7 +1,7 @@
 //! TODO
 
-#[cfg(not(feature = "std"))]
-use alloc::{boxed::Box, string::String, vec::Vec};
+// #[cfg(not(feature = "std"))]
+// use alloc::{boxed::Box, string::String, vec::Vec};
 
 use crate::nbt::{NbtCompound, NbtTag, UnnamedNbt};
 
