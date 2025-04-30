@@ -1,6 +1,6 @@
 //! TODO
 
-use std::{fmt::Debug, marker::PhantomData};
+use core::{fmt::Debug, marker::PhantomData};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;

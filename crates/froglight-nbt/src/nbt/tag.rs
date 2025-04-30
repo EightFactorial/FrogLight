@@ -1,13 +1,16 @@
+#[cfg(not(feature = "std"))]
+use alloc::{string::String, vec::Vec};
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::{From, IsVariant, TryInto, TryUnwrap, Unwrap};
+use derive_more::{From, IsVariant, TryUnwrap, Unwrap};
 
 use super::{ByteArray, DoubleArray, FloatArray, IntArray, LongArray, NbtCompound, ShortArray};
 use crate::mutf8::Mutf8String;
 
 /// A NBT tag.
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, IsVariant, Unwrap, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -356,7 +359,7 @@ impl<'a> From<&'a str> for NbtTag {
     fn from(value: &'a str) -> Self { NbtTag::String(value.into()) }
 }
 
-impl<'a> std::ops::Index<&'a str> for NbtTag {
+impl<'a> core::ops::Index<&'a str> for NbtTag {
     type Output = NbtTag;
 
     fn index(&self, key: &'a str) -> &Self::Output {
@@ -367,7 +370,7 @@ impl<'a> std::ops::Index<&'a str> for NbtTag {
         }
     }
 }
-impl<'a> std::ops::IndexMut<&'a str> for NbtTag {
+impl<'a> core::ops::IndexMut<&'a str> for NbtTag {
     fn index_mut(&mut self, key: &'a str) -> &mut Self::Output {
         if let NbtTag::Compound(compound) = self {
             &mut compound[key]
@@ -377,7 +380,7 @@ impl<'a> std::ops::IndexMut<&'a str> for NbtTag {
     }
 }
 
-impl std::ops::Index<usize> for NbtTag {
+impl core::ops::Index<usize> for NbtTag {
     type Output = NbtTag;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -388,7 +391,7 @@ impl std::ops::Index<usize> for NbtTag {
         }
     }
 }
-impl std::ops::IndexMut<usize> for NbtTag {
+impl core::ops::IndexMut<usize> for NbtTag {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         if let NbtTag::Compound(compound) = self {
             &mut compound[index]
@@ -402,7 +405,7 @@ impl std::ops::IndexMut<usize> for NbtTag {
 
 /// A list of NBT tag values.
 #[repr(u8)]
-#[derive(Debug, Clone, TryInto, IsVariant, Unwrap, TryUnwrap)]
+#[derive(Debug, Clone, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]

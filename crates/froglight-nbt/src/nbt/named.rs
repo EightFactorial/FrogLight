@@ -186,12 +186,12 @@ impl AsMut<Option<NbtCompound>> for UnnamedNbt {
     fn as_mut(&mut self) -> &mut Option<NbtCompound> { &mut self.0 }
 }
 
-impl std::ops::Deref for UnnamedNbt {
+impl core::ops::Deref for UnnamedNbt {
     type Target = Option<NbtCompound>;
 
     fn deref(&self) -> &Self::Target { &self.0 }
 }
-impl std::ops::DerefMut for UnnamedNbt {
+impl core::ops::DerefMut for UnnamedNbt {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 

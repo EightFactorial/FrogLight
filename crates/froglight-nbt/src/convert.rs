@@ -1,5 +1,8 @@
 //! TODO
 
+#[cfg(not(feature = "std"))]
+use alloc::{boxed::Box, string::String, vec::Vec};
+
 use crate::nbt::{NbtCompound, NbtTag, UnnamedNbt};
 
 /// A trait for parsing types from [`NbtCompound`]s.
@@ -71,7 +74,7 @@ impl<T: FromCompound> FromTag for T {
     fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
         match tag {
             NbtTag::Compound(compound) => T::from_compound(compound),
-            _ => Err(ConvertError::MismatchedTag(std::any::type_name::<T>(), "Compound")),
+            _ => Err(ConvertError::MismatchedTag(core::any::type_name::<T>(), "Compound")),
         }
     }
 }
@@ -94,7 +97,7 @@ macro_rules! impl_from_into_tag {
                 fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
                     match tag {
                         NbtTag::$ty(value) => Ok(*value as Self),
-                        _ => Err(ConvertError::MismatchedTag(std::any::type_name::<Self>(), stringify!($ty))),
+                        _ => Err(ConvertError::MismatchedTag(core::any::type_name::<Self>(), stringify!($ty))),
                     }
                 }
             }
@@ -113,8 +116,8 @@ macro_rules! impl_from_into_tag {
             impl FromTag for $inner {
                 fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
                     match tag {
-                        NbtTag::$ty(value) => value.clone().try_into().map_err(|err| ConvertError::ConversionError(std::any::type_name::<Self>(), Box::new(err))),
-                        _ => Err(ConvertError::MismatchedTag(std::any::type_name::<Self>(), stringify!($ty))),
+                        NbtTag::$ty(value) => value.clone().try_into().map_err(|err| ConvertError::ConversionError(core::any::type_name::<Self>(), Box::new(err))),
+                        _ => Err(ConvertError::MismatchedTag(core::any::type_name::<Self>(), stringify!($ty))),
                     }
                 }
             }
@@ -172,5 +175,5 @@ pub enum ConvertError {
     MismatchedTag(&'static str, &'static str),
     /// An error occurred while converting a field.
     #[error("Failed to create \"{0}\": {1}")]
-    ConversionError(&'static str, Box<dyn std::error::Error>),
+    ConversionError(&'static str, Box<dyn core::error::Error>),
 }

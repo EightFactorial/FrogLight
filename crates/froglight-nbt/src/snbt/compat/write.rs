@@ -1,4 +1,9 @@
-use std::fmt::Debug;
+#[cfg(not(feature = "std"))]
+use alloc::{
+    format,
+    string::{String, ToString},
+};
+use core::fmt::Debug;
 
 use super::regex::STRING_REGEX;
 use crate::{
@@ -39,18 +44,18 @@ impl WriteCompat for NbtTag {
     fn write_to_string(&self, content: &mut String) {
         match self {
             NbtTag::Byte(item) => {
-                content.push_str(&item.to_string());
+                content.push_str(&<i8 as ToString>::to_string(item));
                 content.push('B');
             }
             NbtTag::Short(item) => {
-                content.push_str(&item.to_string());
+                content.push_str(&<i16 as ToString>::to_string(item));
                 content.push('S');
             }
             NbtTag::Int(item) => {
-                content.push_str(&item.to_string());
+                content.push_str(&<i32 as ToString>::to_string(item));
             }
             NbtTag::Long(item) => {
-                content.push_str(&item.to_string());
+                content.push_str(&<i64 as ToString>::to_string(item));
                 content.push('L');
             }
             #[expect(clippy::format_push_string)]
@@ -73,7 +78,7 @@ impl WriteCompat for NbtTag {
 }
 
 #[test]
-#[cfg(test)]
+#[cfg(all(feature = "std", test))]
 fn test_write_tag() {
     let mut bytes = String::new();
     NbtTag::Byte(1).write_to_string(&mut bytes);
@@ -178,7 +183,7 @@ fn write_list<'a, T: WriteCompat + 'a>(
 }
 
 #[test]
-#[cfg(test)]
+#[cfg(all(feature = "std", test))]
 fn test_write_list() {
     let mut empty = String::new();
     NbtListTag::Empty.write_to_string(&mut empty);
@@ -322,7 +327,7 @@ fn write_array<T: Debug>(
 }
 
 #[test]
-#[cfg(test)]
+#[cfg(all(feature = "std", test))]
 fn test_write_array() {
     let mut bytes = String::new();
     ByteArray::from(vec![1i8, 2, 3]).write_to_string(&mut bytes);

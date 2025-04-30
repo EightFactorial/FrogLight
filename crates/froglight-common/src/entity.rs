@@ -1,6 +1,6 @@
 //! [`EntityId`] and [`EntityUuid`] types.
 
-use std::borrow::Borrow;
+use core::borrow::Borrow;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;

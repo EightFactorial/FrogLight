@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::{From, Into};
@@ -168,19 +171,19 @@ impl NbtCompound {
     pub fn iter_mut(&mut self) -> indexmap::map::IterMut<Mutf8String, NbtTag> { self.0.iter_mut() }
 }
 
-impl std::iter::IntoIterator for NbtCompound {
+impl core::iter::IntoIterator for NbtCompound {
     type IntoIter = indexmap::map::IntoIter<Mutf8String, NbtTag>;
     type Item = (Mutf8String, NbtTag);
 
     fn into_iter(self) -> Self::IntoIter { self.0.into_iter() }
 }
-impl<'a> std::iter::IntoIterator for &'a NbtCompound {
+impl<'a> core::iter::IntoIterator for &'a NbtCompound {
     type IntoIter = indexmap::map::Iter<'a, Mutf8String, NbtTag>;
     type Item = (&'a Mutf8String, &'a NbtTag);
 
     fn into_iter(self) -> Self::IntoIter { self.iter() }
 }
-impl<'a> std::iter::IntoIterator for &'a mut NbtCompound {
+impl<'a> core::iter::IntoIterator for &'a mut NbtCompound {
     type IntoIter = indexmap::map::IterMut<'a, Mutf8String, NbtTag>;
     type Item = (&'a Mutf8String, &'a mut NbtTag);
 
@@ -196,27 +199,27 @@ impl From<Vec<(Mutf8String, NbtTag)>> for NbtCompound {
     fn from(pair: Vec<(Mutf8String, NbtTag)>) -> Self { Self::from_iter(pair) }
 }
 
-impl<'a> std::ops::Index<&'a str> for NbtCompound {
+impl<'a> core::ops::Index<&'a str> for NbtCompound {
     type Output = NbtTag;
 
     fn index(&self, key: &'a str) -> &Self::Output {
         self.get_tag(key).expect("Compound does not contain key")
     }
 }
-impl<'a> std::ops::IndexMut<&'a str> for NbtCompound {
+impl<'a> core::ops::IndexMut<&'a str> for NbtCompound {
     fn index_mut(&mut self, key: &'a str) -> &mut Self::Output {
         self.get_tag_mut(key).expect("Compound does not contain key")
     }
 }
 
-impl std::ops::Index<usize> for NbtCompound {
+impl core::ops::Index<usize> for NbtCompound {
     type Output = NbtTag;
 
     fn index(&self, index: usize) -> &Self::Output {
         self.get_index(index).map(|(_, tag)| tag).expect("Compound does not contain index")
     }
 }
-impl std::ops::IndexMut<usize> for NbtCompound {
+impl core::ops::IndexMut<usize> for NbtCompound {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         self.get_index_mut(index).map(|(_, tag)| tag).expect("Compound does not contain index")
     }

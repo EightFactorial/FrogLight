@@ -1,5 +1,8 @@
 #![allow(clippy::cast_possible_wrap, clippy::cast_sign_loss)]
 
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::{AsMut, AsRef, Deref, DerefMut, From, Into};

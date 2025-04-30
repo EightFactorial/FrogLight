@@ -37,14 +37,17 @@ serde = { workspace = true, optional = true, features = ["derive"] }
 tracing = { workspace = true, optional = true }
 
 [features]
-default = []
+default = ["std"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_reflect"]
 # Enable `froglight-io` support.
-io = ["dep:froglight-io"]
+io = ["dep:froglight-io", "std"]
 # Enable `serde` support.
 serde = ["dep:serde", "indexmap/serde", "smol_str/serde"]
+
+# Enable support for the rust standard library.
+std = ["indexmap/std"]
 
 # Enable debug logging.
 debug = ["dep:tracing"]

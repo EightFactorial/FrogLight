@@ -1,6 +1,6 @@
 //! The [`Version`] trait and generated versions.
 
-use std::{fmt::Debug, hash::Hash};
+use core::{fmt::Debug, hash::Hash};
 
 mod generated;
 #[allow(unreachable_pub, unused_imports)]

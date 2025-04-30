@@ -110,18 +110,18 @@ futures-lite = { version = "2.6", default-features = false, features = ["alloc"]
 glam = { version = "0.29", default-features = false }
 hashbrown = "0.15"
 hashify = "0.2.6"
-indexmap = "2.9"
+indexmap = { version = "2.9", default-features = false }
 nu-ansi-term = "0.46"
 parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
-regex = "1.11"
+regex = { version = "1.11", default-features = false, features = ["perf", "unicode"] }
 serde = { version = "1.0", default-features = false, features = ["alloc"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-simd_cesu8 = "1.0"
+simd_cesu8 = { version = "1.0", default-features = false }
 smallvec = { version = "1.15", features = ["const_new"] }
 smol_str = { version = "0.2", default-features = false }
-thiserror = { version = "1.0", default-features = false }
+thiserror = { version = "2.0", default-features = false }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
 ureq = "3.0"

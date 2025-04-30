@@ -1,8 +1,7 @@
 //! Namespaced identifiers.
-
 #![allow(clippy::unsafe_derive_deserialize)]
 
-use std::borrow::Borrow;
+use core::borrow::Borrow;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
@@ -16,6 +15,7 @@ use smol_str::SmolStr;
 pub struct Identifier(SmolStr);
 
 impl Identifier {
+    #[allow(dead_code)]
     const DEFAULT_NAMESPACE: &'static str = "minecraft";
 
     /// Create a new [`Identifier`].
@@ -26,6 +26,7 @@ impl Identifier {
     /// To handle potentially invalid identifiers,
     /// use [`Identifier::try_new`] instead.
     #[must_use]
+    #[cfg(feature = "alloc")]
     pub fn new(content: impl AsRef<str>) -> Self {
         Self::try_new(content).expect("Invalid identifier")
     }
@@ -48,6 +49,7 @@ impl Identifier {
     /// Try to create a new [`Identifier`].
     ///
     /// Returns `None` if the string is not a valid identifier.
+    #[cfg(feature = "alloc")]
     pub fn try_new(content: impl AsRef<str>) -> Option<Self> {
         let content = content.as_ref().trim();
 
@@ -64,7 +66,7 @@ impl Identifier {
 
         match content.chars().filter(|c| c == &':').count() {
             // Append the default namespace
-            0 => Some(Self(SmolStr::new(format!("{}:{content}", Self::DEFAULT_NAMESPACE)))),
+            0 => Some(Self(SmolStr::new(alloc::format!("{}:{content}", Self::DEFAULT_NAMESPACE)))),
             // Use the provided namespace
             1 => Some(Self(SmolStr::new(content))),
             _ => None,
@@ -128,11 +130,11 @@ impl Identifier {
     pub fn split(&self) -> (&str, &str) { self.0.split_once(':').unwrap() }
 }
 
-impl std::fmt::Display for Identifier {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result { self.0.fmt(f) }
+impl core::fmt::Display for Identifier {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result { self.0.fmt(f) }
 }
 
-impl std::ops::Deref for Identifier {
+impl core::ops::Deref for Identifier {
     type Target = SmolStr;
 
     fn deref(&self) -> &Self::Target { &self.0 }

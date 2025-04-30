@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
 /// An error that can occur when converting between a Nbt and Snbt.
 #[derive(Debug, thiserror::Error)]
 pub enum SnbtError {

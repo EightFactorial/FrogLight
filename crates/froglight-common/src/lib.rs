@@ -1,5 +1,9 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![no_std]
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 pub mod entity;
 pub mod identifier;

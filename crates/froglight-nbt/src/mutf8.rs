@@ -1,6 +1,14 @@
 //! TODO
 
-use std::borrow::{Borrow, Cow};
+#[cfg(not(feature = "std"))]
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::String,
+    vec::Vec,
+};
+use core::borrow::Borrow;
+#[cfg(feature = "std")]
+use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
@@ -147,8 +155,8 @@ impl Equivalent<[u8]> for Mutf8String {
     fn equivalent(&self, key: &[u8]) -> bool { self.as_bytes() == key }
 }
 
-impl std::fmt::Debug for Mutf8String {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for Mutf8String {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("Mutf8String").field(&self.to_str_lossy()).finish()
     }
 }
@@ -172,7 +180,7 @@ impl Mutf8Str {
     #[must_use]
     pub const fn from_bytes(bytes: &[u8]) -> &Self {
         // SAFETY: `Mutf8Str` is a newtype around `[u8]`, so this is safe.
-        unsafe { &*(std::ptr::from_ref::<[u8]>(bytes) as *const Mutf8Str) }
+        unsafe { &*(core::ptr::from_ref::<[u8]>(bytes) as *const Mutf8Str) }
     }
 
     /// Get the inner bytes of a [`Mutf8Str`].
@@ -282,8 +290,8 @@ impl<'a> TryFrom<&'a Mutf8Str> for Cow<'a, str> {
     fn try_from(value: &'a Mutf8Str) -> Result<Self, Self::Error> { value.try_as_str() }
 }
 
-impl std::fmt::Debug for Mutf8Str {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Debug for Mutf8Str {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("Mutf8Str").field(&self.to_str_lossy()).finish()
     }
 }

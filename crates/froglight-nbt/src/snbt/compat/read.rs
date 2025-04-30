@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::{string::ToString, vec::Vec};
+
 use crate::{
     mutf8::Mutf8String,
     nbt::{
@@ -33,7 +36,7 @@ impl ReadCompat for NbtCompound {
 }
 
 #[test]
-#[cfg(test)]
+#[cfg(all(feature = "std", test))]
 fn test_read_compound() {
     let content = String::from("{hello: world}");
     let (compound, remaining) = NbtCompound::read_from_string(&content).unwrap();
@@ -167,7 +170,7 @@ impl ReadCompat for NbtTag {
 }
 
 #[test]
-#[cfg(test)]
+#[cfg(all(feature = "std", test))]
 fn test_read_tag() {
     let content = String::from("123B");
     let (tag, remaining) = NbtTag::read_from_string(&content).unwrap();
@@ -390,7 +393,7 @@ fn read_list<T: ReadCompat>(mut content: &str) -> Result<Vec<T>, SnbtError> {
 }
 
 #[test]
-#[cfg(test)]
+#[cfg(all(feature = "std", test))]
 fn test_read_list() {
     let content = String::from("[]");
     let (list, remaining) = NbtListTag::read_from_string(&content).unwrap();
@@ -576,7 +579,7 @@ impl ReadCompat for DoubleArray {
 /// - `(None, None, "[1,2,3]")` -> `[1,2,3]`
 /// - `(None, Some('S'), "[1S,2S,3S]")` -> `[1,2,3]`
 /// - `(Some('B'), Some('B'), "[B;1B,2B,3B]")` -> `[1,2,3]`
-fn read_array<T: From<Vec<I>>, I: std::str::FromStr>(
+fn read_array<T: From<Vec<I>>, I: core::str::FromStr>(
     prefix: Option<char>,
     suffix: Option<char>,
     content: &str,
@@ -618,7 +621,7 @@ fn read_array<T: From<Vec<I>>, I: std::str::FromStr>(
 }
 
 #[test]
-#[cfg(test)]
+#[cfg(all(feature = "std", test))]
 fn test_read_array() {
     let content = String::from("[B;1B,2B,3B]");
     let (array, remaining) = ByteArray::read_from_string(&content).unwrap();

@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::{boxed::Box, string::String};
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
@@ -33,7 +36,7 @@ impl FromCompound for Snbt<Compat> {
 impl IntoCompound for Snbt<Compat> {
     fn into_compound(&self) -> Result<NbtCompound, ConvertError> {
         NbtCompound::read_from_string(self.as_str()).map_or_else(
-            |err| Err(ConvertError::ConversionError(std::any::type_name::<Self>(), Box::new(err))),
+            |err| Err(ConvertError::ConversionError(core::any::type_name::<Self>(), Box::new(err))),
             |(val, _)| Ok(val),
         )
     }

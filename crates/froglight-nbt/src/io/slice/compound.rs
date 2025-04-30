@@ -233,12 +233,12 @@ impl<'a> NbtTagRef<'a> {
     /// or an error if the data is invalid.
     const fn size_of_tag(tag: u8, data: &[u8]) -> Result<usize, NbtStreamError> {
         match tag {
-            NbtTag::BYTE => Ok(std::mem::size_of::<i8>()),
-            NbtTag::SHORT => Ok(std::mem::size_of::<i16>()),
-            NbtTag::INT => Ok(std::mem::size_of::<i32>()),
-            NbtTag::LONG => Ok(std::mem::size_of::<i64>()),
-            NbtTag::FLOAT => Ok(std::mem::size_of::<f32>()),
-            NbtTag::DOUBLE => Ok(std::mem::size_of::<f64>()),
+            NbtTag::BYTE => Ok(core::mem::size_of::<i8>()),
+            NbtTag::SHORT => Ok(core::mem::size_of::<i16>()),
+            NbtTag::INT => Ok(core::mem::size_of::<i32>()),
+            NbtTag::LONG => Ok(core::mem::size_of::<i64>()),
+            NbtTag::FLOAT => Ok(core::mem::size_of::<f32>()),
+            NbtTag::DOUBLE => Ok(core::mem::size_of::<f64>()),
             NbtTag::STRING => {
                 if let Some((&length, _)) = data.split_first_chunk::<2>() {
                     Ok(2 + u16::from_be_bytes(length) as usize)
@@ -248,9 +248,9 @@ impl<'a> NbtTagRef<'a> {
             }
             NbtTag::LIST => NbtListTagRef::size_of(data),
             NbtTag::COMPOUND => NbtCompoundRef::size_of(data),
-            NbtTag::BYTE_ARRAY => NbtListTagRef::size_of_array(std::mem::size_of::<i8>(), data),
-            NbtTag::INT_ARRAY => NbtListTagRef::size_of_array(std::mem::size_of::<i32>(), data),
-            NbtTag::LONG_ARRAY => NbtListTagRef::size_of_array(std::mem::size_of::<i64>(), data),
+            NbtTag::BYTE_ARRAY => NbtListTagRef::size_of_array(core::mem::size_of::<i8>(), data),
+            NbtTag::INT_ARRAY => NbtListTagRef::size_of_array(core::mem::size_of::<i32>(), data),
+            NbtTag::LONG_ARRAY => NbtListTagRef::size_of_array(core::mem::size_of::<i64>(), data),
             other => Err(NbtStreamError::InvalidTag(other)),
         }
     }
@@ -387,18 +387,18 @@ impl<'a> NbtListTagRef<'a> {
         if let Some((&tag, data)) = data.split_first() {
             let result = match tag {
                 NbtTag::END => Ok(4),
-                NbtTag::BYTE => Self::size_of_array(std::mem::size_of::<i8>(), data),
-                NbtTag::SHORT => Self::size_of_array(std::mem::size_of::<i16>(), data),
-                NbtTag::INT => Self::size_of_array(std::mem::size_of::<i32>(), data),
-                NbtTag::LONG => Self::size_of_array(std::mem::size_of::<i64>(), data),
-                NbtTag::FLOAT => Self::size_of_array(std::mem::size_of::<f32>(), data),
-                NbtTag::DOUBLE => Self::size_of_array(std::mem::size_of::<f64>(), data),
+                NbtTag::BYTE => Self::size_of_array(core::mem::size_of::<i8>(), data),
+                NbtTag::SHORT => Self::size_of_array(core::mem::size_of::<i16>(), data),
+                NbtTag::INT => Self::size_of_array(core::mem::size_of::<i32>(), data),
+                NbtTag::LONG => Self::size_of_array(core::mem::size_of::<i64>(), data),
+                NbtTag::FLOAT => Self::size_of_array(core::mem::size_of::<f32>(), data),
+                NbtTag::DOUBLE => Self::size_of_array(core::mem::size_of::<f64>(), data),
                 NbtTag::STRING => Self::size_of_string_array(data),
                 NbtTag::LIST => Self::size_of_list_array(data),
                 NbtTag::COMPOUND => Self::size_of_component_array(data),
-                NbtTag::BYTE_ARRAY => Self::size_of_array_array(std::mem::size_of::<i8>(), data),
-                NbtTag::INT_ARRAY => Self::size_of_array_array(std::mem::size_of::<i32>(), data),
-                NbtTag::LONG_ARRAY => Self::size_of_array_array(std::mem::size_of::<i64>(), data),
+                NbtTag::BYTE_ARRAY => Self::size_of_array_array(core::mem::size_of::<i8>(), data),
+                NbtTag::INT_ARRAY => Self::size_of_array_array(core::mem::size_of::<i32>(), data),
+                NbtTag::LONG_ARRAY => Self::size_of_array_array(core::mem::size_of::<i64>(), data),
                 other => Err(NbtStreamError::InvalidTag(other)),
             };
 

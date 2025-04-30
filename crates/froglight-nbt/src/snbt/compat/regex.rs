@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String, vec, vec::Vec};
+#[cfg(feature = "std")]
 use std::sync::LazyLock;
 
 use regex::RegexSet;
