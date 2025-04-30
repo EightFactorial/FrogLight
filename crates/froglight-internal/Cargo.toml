@@ -30,17 +30,8 @@ froglight-world = { workspace = true, features = ["block"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["nbt"] }
 froglight-schedule = { workspace = true, optional = true }
 
-# Nightly dependencies
-crc32fast = { workspace = true, optional = true, features = ["nightly"] }
-glam = { workspace = true, optional = true, features = ["core-simd"] }
-hashbrown = { workspace = true, optional = true, features = ["nightly"] }
-parking_lot = { workspace = true, optional = true, features = ["nightly"] }
-rangemap = { workspace = true, optional = true, features = ["nightly"] }
-rsa = { workspace = true, optional = true, features = ["nightly"] }
-simd_cesu8 = { workspace = true, optional = true, features = ["nightly"] }
-
 [features]
-default = ["bevy", "brigadier"]
+default = ["bevy", "brigadier", "std"]
 
 # Enable the `froglight-brigadier` crate.
 brigadier = ["bevy", "dep:froglight-brigadier", "froglight-network/brigadier"]
@@ -58,8 +49,33 @@ bevy = [
   "froglight-registry/bevy",
   "froglight-world/bevy",
 ]
+
 # Enable nightly features.
-nightly = ["dep:crc32fast", "dep:glam", "dep:hashbrown", "dep:parking_lot", "dep:rangemap", "dep:rsa", "dep:simd_cesu8"]
+nightly = [
+  # "froglight-block/std",
+  # "froglight-common/std",
+  # "froglight-inventory/std",
+  # "froglight-item/std",
+  # "froglight-nbt/std",
+  # "froglight-network/std",
+  # "froglight-player/std",
+  # "froglight-registry/std",
+  # "froglight-schedule?/nightly",
+  # "froglight-world/std",
+]
+# Enable support for rust's standard library.
+std = [
+  # "froglight-block/std",
+  # "froglight-common/std",
+  # "froglight-inventory/std",
+  # "froglight-item/std",
+  # "froglight-nbt/std",
+  # "froglight-network/std",
+  # "froglight-player/std",
+  # "froglight-registry/std",
+  # "froglight-schedule?/std",
+  # "froglight-world/std",
+]
 
 # Enable support for v1.21.4
 v1_21_4 = [

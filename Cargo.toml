@@ -76,7 +76,7 @@ bevy_winit = { version = "0.16", default-features = false }
 froglight-block = { version = "0.1", path = "crates/froglight-block" }
 froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier" }
 froglight-common = { version = "0.1", path = "crates/froglight-common" }
-froglight-internal = { version = "0.1", path = "crates/froglight-internal" }
+froglight-internal = { version = "0.1", path = "crates/froglight-internal", default-features = false }
 froglight-inventory = { version = "0.1", path = "crates/froglight-inventory" }
 froglight-io = { version = "0.1", path = "crates/froglight-io" }
 froglight-item = { version = "0.1", path = "crates/froglight-item" }
@@ -90,24 +90,24 @@ froglight-world = { version = "0.1", path = "crates/froglight-world" }
 
 # Hashing / Cryptography
 aes = { version = "0.8.4", features = ["zeroize"] }
-base64 = "0.22.1"
-cfb8 = { version = "0.8.1", features = ["std", "zeroize"] }
-crc32fast = "1.4.2"
-md-5 = { version = "0.10.6", features = ["std"] }
-rsa = { version = "0.9.8", features = ["pem", "std"] }
-sha2 = "0.10.8"
+base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
+cfb8 = { version = "0.8.1", features = ["alloc", "zeroize"] }
+crc32fast = { version = "1.4.2", default-features = false }
+md-5 = { version = "0.10.6", default-features = false }
+rsa = { version = "0.9.8", default-features = false, features = ["pem"] }
+sha2 = { version = "0.10.8", default-features = false }
 
 # Other
-async-channel = "2.3"
+async-channel = { version = "2.3", default-features = false }
 async-compression = { version = "0.4", default-features = false }
 async-io = "2.4"
 async-net = "2.0"
 blocking = "1.6"
-derive_more = { version = "2.0", features = ["full"] }
-downcast-rs = "2.0"
+derive_more = { version = "2.0", default-features = false, features = ["full"] }
+downcast-rs = { version = "2.0", default-features = false, features = ["sync"] }
 flate2 = "1.1"
-futures-lite = "2.6"
-glam = "0.29"
+futures-lite = { version = "2.6", default-features = false, features = ["alloc"] }
+glam = { version = "0.29", default-features = false }
 hashbrown = "0.15"
 hashify = "0.2.6"
 indexmap = "2.9"
@@ -116,53 +116,16 @@ parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
 regex = "1.11"
-serde = "1.0"
-serde_json = "1.0"
+serde = { version = "1.0", default-features = false, features = ["alloc"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 simd_cesu8 = "1.0"
-smallvec = "1.15"
-smol_str = "0.2"
-thiserror = "1.0"
+smallvec = { version = "1.15", features = ["const_new"] }
+smol_str = { version = "0.2", default-features = false }
+thiserror = { version = "1.0", default-features = false }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
 ureq = "3.0"
-uuid = "1.16"
-
-# --- FrogLight Crate ---
-
-[package]
-authors = { workspace = true }
-edition = { workspace = true }
-homepage = { workspace = true }
-license = { workspace = true }
-name = "froglight"
-readme = { workspace = true }
-repository = { workspace = true }
-version = { workspace = true }
-
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
-
-[lints]
-workspace = true
-
-[dependencies]
-froglight-internal = { workspace = true }
-
-[features]
-default = ["bevy", "brigadier"]
-
-# Enable `bevy` support.
-bevy = ["froglight-internal/bevy"]
-# Enable the `froglight-brigadier` crate.
-brigadier = ["bevy", "froglight-internal/brigadier"]
-# Enable nightly features.
-nightly = ["froglight-internal/nightly"]
-
-# Enable support for v1.21.4
-v1_21_4 = ["froglight-internal/v1_21_4"]
-# Enable support for v1.21.5
-v1_21_5 = ["froglight-internal/v1_21_4"]
+uuid = { version = "1.16", default-features = false }
 
 # --- Build Settings ---
 
@@ -197,3 +160,44 @@ inherits = "release"
 [profile.release.package.froglight-item]
 incremental = true
 inherits = "release"
+
+# --- FrogLight Crate ---
+
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+name = "froglight"
+readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+froglight-internal = { workspace = true }
+
+[features]
+default = ["bevy", "brigadier", "std"]
+
+# Enable the `froglight-brigadier` crate.
+brigadier = ["froglight-internal/brigadier"]
+
+# Enable `bevy` support.
+bevy = ["froglight-internal/bevy"]
+
+# Enable various crates' nightly features.
+nightly = ["froglight-internal/nightly"]
+# Enable support for rust's standard library.
+std = ["froglight-internal/std"]
+
+# Enable support for v1.21.4
+v1_21_4 = ["froglight-internal/v1_21_4"]
+# Enable support for v1.21.5
+v1_21_5 = ["froglight-internal/v1_21_4"]

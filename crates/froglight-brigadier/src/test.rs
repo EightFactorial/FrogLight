@@ -3,8 +3,7 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy_ecs::component::ComponentInfo;
 use bevy_log::{Level, LogPlugin};
-use froglight_common::entity::{EntityId, EntityUuid};
-use uuid::Uuid;
+use froglight_common::entity::EntityId;
 
 use crate::{function::WorldRef, prelude::*};
 
@@ -85,7 +84,7 @@ fn execute() -> AppExit {
 
     // Add a system spawn an entity and run the commands
     app.add_systems(Update, |mut commands: Commands| {
-        let bundle = (Name::new("TestEntity"), EntityId::from(0), EntityUuid::from(Uuid::nil()));
+        let bundle = (Name::new("TestEntity"), EntityId::from(0));
         let mut entity = commands.spawn(bundle);
 
         entity.run_command("test");
