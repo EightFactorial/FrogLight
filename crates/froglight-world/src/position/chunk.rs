@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
@@ -182,7 +182,7 @@ where IVec2: Add<T, Output = IVec2>
 {
     type Output = Self;
 
-    fn add(self, rhs: T) -> Self::Output { Self(self.0 + rhs) }
+    fn add(self, rhs: T) -> ChunkPos { Self(self.0 + rhs) }
 }
 impl<T> AddAssign<T> for ChunkPos
 where IVec2: AddAssign<T>
@@ -195,7 +195,7 @@ where IVec2: Sub<T, Output = IVec2>
 {
     type Output = Self;
 
-    fn sub(self, rhs: T) -> Self::Output { Self(self.0 - rhs) }
+    fn sub(self, rhs: T) -> ChunkPos { Self(self.0 - rhs) }
 }
 impl<T> SubAssign<T> for ChunkPos
 where IVec2: SubAssign<T>
@@ -208,7 +208,7 @@ where IVec2: Mul<T, Output = IVec2>
 {
     type Output = Self;
 
-    fn mul(self, rhs: T) -> Self::Output { Self(self.0 * rhs) }
+    fn mul(self, rhs: T) -> ChunkPos { Self(self.0 * rhs) }
 }
 impl<T> MulAssign<T> for ChunkPos
 where IVec2: MulAssign<T>
@@ -221,7 +221,7 @@ where IVec2: Div<T, Output = IVec2>
 {
     type Output = Self;
 
-    fn div(self, rhs: T) -> Self::Output { Self(self.0 / rhs) }
+    fn div(self, rhs: T) -> ChunkPos { Self(self.0 / rhs) }
 }
 impl<T> DivAssign<T> for ChunkPos
 where IVec2: DivAssign<T>

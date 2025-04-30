@@ -35,7 +35,7 @@ tracing = { workspace = true }
 
 # Optional dependencies
 froglight-io = { workspace = true, optional = true }
-froglight-nbt = { workspace = true, optional = true, features = ["bevy"] }
+froglight-nbt = { workspace = true, optional = true, features = ["reflect"] }
 glam = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 uuid = { workspace = true, optional = true }
@@ -53,5 +53,5 @@ nbt = ["dep:froglight-nbt"]
 # Enable support for `uuid` types.
 uuid = ["bevy_reflect/uuid", "dep:uuid"]
 
-# Enable support for serializing to/from text formats.
+# Enable support for `serde` serialization.
 serde = ["bevy_platform/serialize", "dep:serde", "glam?/serde", "smol_str/serde", "uuid?/serde"]

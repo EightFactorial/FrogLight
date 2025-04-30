@@ -1,7 +1,7 @@
-// #[cfg(not(feature = "std"))]
-// use alloc::{boxed::Box, string::String};
+#[cfg(not(feature = "std"))]
+use alloc::{boxed::Box, string::String};
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 
 mod regex;
@@ -22,7 +22,7 @@ use crate::{
 ///
 /// Used in versions `v1.21.4` and older.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, PartialEq))]
 pub struct Compat;
 impl super::SnbtType for Compat {}
 

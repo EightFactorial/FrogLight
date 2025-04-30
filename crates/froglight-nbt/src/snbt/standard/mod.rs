@@ -1,4 +1,4 @@
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 
 use super::Snbt;
@@ -11,7 +11,7 @@ use crate::{
 ///
 /// Used in versions `v1.21.5` and newer.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, Clone, PartialEq))]
 pub struct Standard;
 impl super::SnbtType for Standard {}
 

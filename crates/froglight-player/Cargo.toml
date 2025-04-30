@@ -59,7 +59,7 @@ bevy = [
   "dep:bevy_platform",
   "dep:bevy_reflect",
   "froglight-common/bevy",
-  "froglight-nbt/bevy",
+  "froglight-nbt/reflect",
 ]
 # Enable `serde` support.
 serde = [

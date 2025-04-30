@@ -1,7 +1,7 @@
-// #[cfg(not(feature = "std"))]
-// use alloc::{string::String, vec::Vec};
+#[cfg(not(feature = "std"))]
+use alloc::{string::String, vec::Vec};
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{From, IsVariant, TryUnwrap, Unwrap};
 
@@ -12,8 +12,8 @@ use crate::mutf8::Mutf8String;
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, From, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(no_field_bounds, Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub enum NbtTag {
     /// A signed 8-bit integer.
     Byte(i8) = NbtTag::BYTE,
@@ -407,8 +407,8 @@ impl core::ops::IndexMut<usize> for NbtTag {
 #[repr(u8)]
 #[derive(Debug, Clone, IsVariant, Unwrap, TryUnwrap)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(untagged))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(no_field_bounds, Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub enum NbtListTag {
     /// An empty list.
     Empty = NbtTag::END,

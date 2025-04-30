@@ -1,4 +1,6 @@
-use std::{marker::PhantomData, ops::Range};
+#[cfg(not(feature = "std"))]
+use alloc::{vec, vec::Vec};
+use core::{marker::PhantomData, ops::Range};
 
 use bitvec::{field::BitField, order::LocalBits, slice::BitSlice, vec::BitVec};
 #[cfg(feature = "io")]
@@ -241,7 +243,7 @@ impl<T: SectionType> SectionData<T> {
     fn convert_global_palette(&mut self, index: usize, next: u32) {
         // Take the items out of the palette.
         let SectionPalette::Vector(items) =
-            std::mem::replace(self.palette_mut(), SectionPalette::Global)
+            core::mem::replace(self.palette_mut(), SectionPalette::Global)
         else {
             unreachable!("Only `Vector` palettes can be converted to `Global`!")
         };

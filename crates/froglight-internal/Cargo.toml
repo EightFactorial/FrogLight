@@ -43,7 +43,7 @@ bevy = [
   "froglight-common/bevy",
   "froglight-inventory/bevy",
   "froglight-item/bevy",
-  "froglight-nbt/bevy",
+  "froglight-nbt/reflect",
   "froglight-network/bevy",
   "froglight-player/bevy",
   "froglight-registry/bevy",
@@ -66,12 +66,12 @@ nightly = [
 # Enable support for rust's standard library.
 std = [
   "froglight-common/alloc",
-  # "froglight-inventory/std",
-  # "froglight-nbt/std",
+  "froglight-inventory/std",
+  "froglight-nbt/std",
   # "froglight-player/std",
   # "froglight-registry/std",
   # "froglight-schedule?/std",
-  # "froglight-world/std",
+  "froglight-world/std",
 ]
 
 # Enable support for v1.21.4

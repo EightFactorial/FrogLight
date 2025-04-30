@@ -1,9 +1,9 @@
 #![allow(clippy::cast_possible_wrap, clippy::cast_sign_loss)]
 
-// #[cfg(not(feature = "std"))]
-// use alloc::vec::Vec;
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{AsMut, AsRef, Deref, DerefMut, From, Into};
 
@@ -11,8 +11,8 @@ use derive_more::{AsMut, AsRef, Deref, DerefMut, From, Into};
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, From, Into, AsRef, AsMut, Deref, DerefMut)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct ByteArray(Vec<i8>);
 
 impl PartialEq<[i8]> for ByteArray {
@@ -31,8 +31,8 @@ impl From<ByteArray> for Vec<u8> {
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, From, Into, AsRef, AsMut, Deref, DerefMut)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct ShortArray(Vec<i16>);
 
 impl PartialEq<[i16]> for ShortArray {
@@ -51,8 +51,8 @@ impl From<ShortArray> for Vec<u16> {
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, From, Into, AsRef, AsMut, Deref, DerefMut)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct IntArray(Vec<i32>);
 
 impl PartialEq<[i32]> for IntArray {
@@ -71,8 +71,8 @@ impl From<IntArray> for Vec<u32> {
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, From, Into, AsRef, AsMut, Deref, DerefMut)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct LongArray(Vec<i64>);
 
 impl PartialEq<[i64]> for LongArray {
@@ -91,14 +91,14 @@ impl From<LongArray> for Vec<u64> {
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, From, Into, AsRef, AsMut, Deref, DerefMut)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct FloatArray(Vec<f32>);
 
 /// A wrapper around a [`Vec<f64>`] that represents a NBT double array.
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, From, Into, AsRef, AsMut, Deref, DerefMut)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct DoubleArray(Vec<f64>);

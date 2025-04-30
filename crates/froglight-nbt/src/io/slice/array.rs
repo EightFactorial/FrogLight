@@ -1,5 +1,5 @@
-// #[cfg(not(feature = "std"))]
-// use alloc::vec::Vec;
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
 use core::marker::PhantomData;
 
 use super::{NbtCompoundRef, NbtListTagRef};

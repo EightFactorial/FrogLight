@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+bevy_platform = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["item"] }
@@ -36,9 +37,9 @@ default = []
 block = ["dep:froglight-block"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "froglight-block?/bevy", "froglight-common/bevy", "froglight-nbt/bevy"]
+bevy = ["dep:bevy_ecs", "froglight-block?/bevy", "froglight-common/bevy"]
 # Enable `bevy_reflect` support.
-reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-block?/reflect"]
+reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-block?/reflect", "froglight-nbt/reflect"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4"]

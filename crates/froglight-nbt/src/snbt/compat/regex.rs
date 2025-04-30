@@ -1,7 +1,7 @@
-// #[cfg(not(feature = "std"))]
-// use alloc::{format, string::String, vec, vec::Vec};
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::String, vec, vec::Vec};
 
-use once_cell::sync::Lazy;
+use bevy_platform::sync::LazyLock as Lazy;
 use regex::RegexSet;
 
 use super::Compat;

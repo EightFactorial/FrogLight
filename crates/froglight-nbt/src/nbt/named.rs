@@ -1,4 +1,4 @@
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{From, Into};
 
@@ -10,7 +10,7 @@ use crate::{
 /// A named set of NBT tags.
 #[repr(transparent)]
 #[derive(Debug, PartialEq, Clone, From, Into)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub struct NamedNbt(Option<(Mutf8String, NbtCompound)>);
 
 impl NamedNbt {
@@ -92,8 +92,8 @@ impl NamedNbt {
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, PartialEq, From, Into)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, Clone, PartialEq))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct UnnamedNbt(Option<NbtCompound>);
 
 impl UnnamedNbt {

@@ -22,11 +22,11 @@ proptest = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 [dependencies]
+bevy_platform = { workspace = true }
 derive_more = { workspace = true }
 froglight-macros = { workspace = true, features = ["nbt"] }
 hashbrown = { workspace = true }
-indexmap = { workspace = true, features = ["std"] }
-once_cell = { workspace = true, features = ["std"] }
+indexmap = { workspace = true }
 regex = { workspace = true }
 simd_cesu8 = { workspace = true }
 smol_str = { workspace = true }
@@ -39,19 +39,17 @@ serde = { workspace = true, optional = true, features = ["derive"] }
 tracing = { workspace = true, optional = true }
 
 [features]
-default = []
+default = ["std"]
 
-# Enable `bevy` support.
-bevy = ["dep:bevy_reflect"]
+# Enable `bevy_reflect` support.
+reflect = ["dep:bevy_reflect"]
 # Enable `froglight-io` support.
-io = ["dep:froglight-io"]
+io = ["dep:froglight-io", "std"]
 # Enable `serde` support.
 serde = ["dep:serde", "indexmap/serde", "smol_str/serde"]
 
-# # Enable support for the rust standard library.
-# std = ["indexmap/std", "once_cell/std"]
-# # Use `critical-section` for `once_cell`.
-# critical-section = ["once_cell/critical-section"]
+# Enable support for the rust standard library.
+std = ["bevy_platform/std", "bevy_reflect?/std", "indexmap/std"]
 
 # Enable debug logging.
 debug = ["dep:tracing"]

@@ -1,8 +1,8 @@
-// #[cfg(not(feature = "std"))]
-// use alloc::{
-//     format,
-//     string::{String, ToString},
-// };
+#[cfg(not(feature = "std"))]
+use alloc::{
+    format,
+    string::{String, ToString},
+};
 use core::fmt::Debug;
 
 use super::regex::STRING_REGEX;

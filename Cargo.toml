@@ -77,16 +77,16 @@ froglight-block = { version = "0.1", path = "crates/froglight-block" }
 froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier" }
 froglight-common = { version = "0.1", path = "crates/froglight-common" }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal", default-features = false }
-froglight-inventory = { version = "0.1", path = "crates/froglight-inventory" }
+froglight-inventory = { version = "0.1", path = "crates/froglight-inventory", default-features = false }
 froglight-io = { version = "0.1", path = "crates/froglight-io" }
 froglight-item = { version = "0.1", path = "crates/froglight-item" }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
-froglight-nbt = { version = "0.1", path = "crates/froglight-nbt" }
+froglight-nbt = { version = "0.1", path = "crates/froglight-nbt", default-features = false }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
 froglight-player = { version = "0.1", path = "crates/froglight-player" }
 froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
 froglight-schedule = { version = "0.1", path = "crates/froglight-schedule" }
-froglight-world = { version = "0.1", path = "crates/froglight-world" }
+froglight-world = { version = "0.1", path = "crates/froglight-world", default-features = false }
 
 # Hashing / Cryptography
 aes = { version = "0.8.4", features = ["zeroize"] }

@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
@@ -146,7 +146,7 @@ where IVec3: Add<T, Output = IVec3>
 {
     type Output = Self;
 
-    fn add(self, rhs: T) -> Self::Output { Self(self.0 + rhs) }
+    fn add(self, rhs: T) -> BlockPos { Self(self.0 + rhs) }
 }
 impl<T> AddAssign<T> for BlockPos
 where IVec3: AddAssign<T>
@@ -159,7 +159,7 @@ where IVec3: Sub<T, Output = IVec3>
 {
     type Output = Self;
 
-    fn sub(self, rhs: T) -> Self::Output { Self(self.0 - rhs) }
+    fn sub(self, rhs: T) -> BlockPos { Self(self.0 - rhs) }
 }
 impl<T> SubAssign<T> for BlockPos
 where IVec3: SubAssign<T>
@@ -172,7 +172,7 @@ where IVec3: Mul<T, Output = IVec3>
 {
     type Output = Self;
 
-    fn mul(self, rhs: T) -> Self::Output { Self(self.0 * rhs) }
+    fn mul(self, rhs: T) -> BlockPos { Self(self.0 * rhs) }
 }
 impl<T> MulAssign<T> for BlockPos
 where IVec3: MulAssign<T>
@@ -185,7 +185,7 @@ where IVec3: Div<T, Output = IVec3>
 {
     type Output = Self;
 
-    fn div(self, rhs: T) -> Self::Output { Self(self.0 / rhs) }
+    fn div(self, rhs: T) -> BlockPos { Self(self.0 / rhs) }
 }
 impl<T> DivAssign<T> for BlockPos
 where IVec3: DivAssign<T>

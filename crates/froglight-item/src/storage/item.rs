@@ -5,6 +5,7 @@ use core::any::TypeId;
 use bevy_ecs::reflect::ReflectResource;
 #[cfg(feature = "bevy")]
 use bevy_ecs::resource::Resource;
+use bevy_platform::hash::FixedHasher;
 #[cfg(feature = "reflect")]
 use bevy_reflect::Reflect;
 use downcast_rs::Downcast;
@@ -60,7 +61,7 @@ impl<V: Version> AppItemStorage<V> {
 /// A dynamic storage for item types.
 ///
 /// Allows for the registration and retrieval of item types at runtime.
-pub struct ItemStorage<V: Version>(IndexMap<TypeId, ItemWrapper<V>>);
+pub struct ItemStorage<V: Version>(IndexMap<TypeId, ItemWrapper<V>, FixedHasher>);
 
 impl<V: Version> Default for ItemStorage<V>
 where Vanilla: ItemResolver<V>

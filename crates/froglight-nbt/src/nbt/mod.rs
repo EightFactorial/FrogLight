@@ -1,5 +1,11 @@
 //! TODO
 
+#[cfg(feature = "std")]
+type CompoundMap = indexmap::IndexMap<crate::mutf8::Mutf8String, NbtTag>;
+#[cfg(not(feature = "std"))]
+type CompoundMap =
+    indexmap::IndexMap<crate::mutf8::Mutf8String, NbtTag, bevy_platform::hash::FixedState>;
+
 mod array;
 pub use array::{ByteArray, DoubleArray, FloatArray, IntArray, LongArray, ShortArray};
 

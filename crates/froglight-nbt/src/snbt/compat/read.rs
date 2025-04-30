@@ -1,5 +1,5 @@
-// #[cfg(not(feature = "std"))]
-// use alloc::{string::ToString, vec::Vec};
+#[cfg(not(feature = "std"))]
+use alloc::{string::ToString, vec::Vec};
 
 use crate::{
     mutf8::Mutf8String,

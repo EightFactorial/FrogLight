@@ -69,7 +69,7 @@ bevy = [
   "froglight-common/bevy",
   "froglight-inventory?/bevy",
   "froglight-io/bevy_platform",
-  "froglight-nbt?/bevy",
+  "froglight-nbt?/reflect",
   "froglight-player/bevy",
 ]
 

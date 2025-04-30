@@ -1,10 +1,10 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![feature(iter_map_windows)]
-// #![cfg_attr(not(feature = "std"), no_std)]
 
-// #[cfg(not(feature = "std"))]
-// extern crate alloc;
+#[cfg(not(feature = "std"))]
+extern crate alloc;
 
 pub mod convert;
 pub mod io;

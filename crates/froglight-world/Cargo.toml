@@ -19,7 +19,7 @@ workspace = true
 proptest = { workspace = true }
 
 [dependencies]
-bitvec = "1.0"
+bitvec = { version = "1.0", default-features = false, features = ["alloc"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 glam = { workspace = true }
@@ -37,14 +37,20 @@ froglight-io = { workspace = true, optional = true }
 froglight-nbt = { workspace = true, optional = true }
 
 [features]
-default = ["nbt"]
+default = ["nbt", "std"]
 
 # Enable `froglight-block` support
 block = ["dep:froglight-block"]
-# Enable `froglight-io` support
-io = ["dep:froglight-io", "froglight-nbt/io", "nbt"]
 # Enable `froglight-nbt` support
 nbt = ["dep:froglight-nbt"]
+
+# Enable `froglight-io` support
+io = ["dep:froglight-io", "froglight-nbt/io", "nbt"]
+
+# Enable support for the rust standard library.
+std = ["bevy_platform?/std", "bevy_reflect?/std", "bitvec/std", "glam/std"]
+# Enable `no_std` support for glam.
+libm = ["glam/libm"]
 
 # Enable `bevy` support.
 bevy = [
@@ -55,7 +61,7 @@ bevy = [
   "dep:downcast-rs",
   "froglight-block?/bevy",
   "froglight-common/bevy",
-  "froglight-nbt?/bevy",
+  "froglight-nbt?/reflect",
 ]
 
 # Enable support for v1.21.4

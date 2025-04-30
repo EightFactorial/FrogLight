@@ -2,7 +2,7 @@
 
 use core::{fmt::Debug, marker::PhantomData};
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{AsRef, Deref, Into};
 use smol_str::SmolStr;
@@ -21,14 +21,15 @@ pub use error::SnbtError;
 /// Uses [`SmolStr`] internally for cheap cloning.
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Into, Deref, AsRef)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect))]
+#[cfg_attr(feature = "reflect", reflect(no_field_bounds, Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Snbt<Type: SnbtType = Standard> {
     #[deref]
     #[as_ref]
     inner: SmolStr,
-    #[cfg_attr(feature = "bevy", reflect(ignore))]
+    #[cfg_attr(feature = "reflect", reflect(ignore))]
     _marker: PhantomData<Type>,
 }
 

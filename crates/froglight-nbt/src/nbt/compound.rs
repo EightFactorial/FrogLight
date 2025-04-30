@@ -1,25 +1,25 @@
-// #[cfg(not(feature = "std"))]
-// use alloc::vec::Vec;
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{From, Into};
-use indexmap::IndexMap;
 
+use super::CompoundMap;
 use crate::{mutf8::Mutf8String, nbt::NbtTag};
 
 /// A map of named NBT tags.
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, PartialEq, From, Into)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque, Debug, Default, PartialEq))]
-pub struct NbtCompound(IndexMap<Mutf8String, NbtTag>);
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(opaque, Debug, Default, Clone, PartialEq))]
+pub struct NbtCompound(CompoundMap);
 
 impl NbtCompound {
     /// Create a new empty [`NbtCompound`].
     #[inline]
     #[must_use]
-    pub fn new() -> Self { Self(IndexMap::new()) }
+    pub fn new() -> Self { Self(CompoundMap::with_hasher(Default::default())) }
 
     /// Return the number of tags in the [`NbtCompound`].
     #[inline]
@@ -192,7 +192,7 @@ impl<'a> core::iter::IntoIterator for &'a mut NbtCompound {
 
 impl FromIterator<(Mutf8String, NbtTag)> for NbtCompound {
     fn from_iter<T: IntoIterator<Item = (Mutf8String, NbtTag)>>(iter: T) -> Self {
-        Self(IndexMap::from_iter(iter))
+        Self(CompoundMap::from_iter(iter))
     }
 }
 impl From<Vec<(Mutf8String, NbtTag)>> for NbtCompound {

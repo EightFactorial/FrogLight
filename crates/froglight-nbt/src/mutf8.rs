@@ -1,15 +1,16 @@
 //! TODO
 
-// #[cfg(not(feature = "std"))]
-// use alloc::{
-//     borrow::{Cow, ToOwned},
-//     string::String,
-//     vec::Vec,
-// };
+#[cfg(not(feature = "std"))]
+use alloc::{
+    borrow::{Cow, ToOwned},
+    string::String,
+    vec::Vec,
+};
 use core::borrow::Borrow;
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use indexmap::Equivalent;
 
@@ -18,7 +19,7 @@ use indexmap::Equivalent;
 /// Equivalent to a [`String`], but with a different encoding.
 #[repr(transparent)]
 #[derive(Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 pub struct Mutf8String(Vec<u8>);
 
 impl Mutf8String {
