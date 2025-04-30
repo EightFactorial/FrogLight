@@ -153,7 +153,7 @@ impl BlockAttribute {
 
                 tokens.extend(quote! {{
                         assert_eq!(#ident::STATES.len(), #ident::COUNT, "Invalid state count for `{}`!", stringify!(#ident));
-                        assert_eq!(&[std::any::TypeId::of::<#ident>()], #ident::TYPES, "Invalid type ID for `{}`!", stringify!(#ident));
+                        assert_eq!(&[core::any::TypeId::of::<#ident>()], #ident::TYPES, "Invalid type ID for `{}`!", stringify!(#ident));
 
                         #attribute_tests
                 }});
