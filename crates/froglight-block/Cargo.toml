@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+bevy_platform = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["block"] }

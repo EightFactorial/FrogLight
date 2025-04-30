@@ -5,10 +5,12 @@ use core::{any::TypeId, ops::Range};
 use bevy_ecs::reflect::ReflectResource;
 #[cfg(feature = "bevy")]
 use bevy_ecs::resource::Resource;
+use bevy_platform::hash::NoOpHash;
 #[cfg(feature = "reflect")]
 use bevy_reflect::Reflect;
 use downcast_rs::Downcast;
 use froglight_common::{vanilla::Vanilla, version::Version};
+use hashbrown::HashMap;
 use parking_lot::RwLock;
 use rangemap::RangeMap;
 
@@ -62,10 +64,7 @@ impl<V: Version> AppBlockStorage<V> {
 /// Allows for the registration and retrieval of block types at runtime.
 pub struct BlockStorage<V: Version> {
     traits: RangeMap<u32, BlockWrapper<V>>,
-    #[cfg(feature = "bevy")]
-    types: bevy_utils::TypeIdMap<u32>,
-    #[cfg(not(feature = "bevy"))]
-    types: hashbrown::HashMap<TypeId, u32>,
+    types: HashMap<TypeId, u32, NoOpHash>,
 }
 
 impl<V: Version> Default for BlockStorage<V>
@@ -88,8 +87,9 @@ impl<V: Version> BlockStorage<V> {
     /// Create a new [`BlockStorage`] with no registered block types.
     #[inline]
     #[must_use]
-    #[expect(clippy::default_trait_access)]
-    pub fn new_empty() -> Self { Self { traits: RangeMap::new(), types: Default::default() } }
+    pub const fn new_empty() -> Self {
+        Self { traits: RangeMap::new(), types: HashMap::with_hasher(NoOpHash) }
+    }
 
     /// Get the [`BlockType`] for the given [`GlobalBlockId`].
     ///
