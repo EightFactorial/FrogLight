@@ -115,7 +115,7 @@ impl BlockAttribute {
 
         quote! {
             #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-            #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
+            #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Clone, PartialEq, Hash))]
             #vis #token #ident { #variants }
             #[automatically_derived]
             impl #path::storage::Attribute for #ident {

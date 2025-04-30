@@ -2,7 +2,7 @@ use std::ops::{Index, IndexMut};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use froglight_common::version::Version;
 
@@ -10,8 +10,9 @@ use crate::slot::InventorySlot;
 
 /// A entity's equipment.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
-#[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
+#[cfg_attr(feature = "bevy", derive(Component))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, Clone, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Component))]
 pub struct EntityEquipment<V: Version>([InventorySlot<V>; 4]);
 
 impl<V: Version> Default for EntityEquipment<V> {

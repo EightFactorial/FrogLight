@@ -1,9 +1,9 @@
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 
 /// An item's rarity level.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq, Hash))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, Clone, PartialEq, Hash))]
 pub enum ItemRarity {
     /// Common rarity.
     #[default]

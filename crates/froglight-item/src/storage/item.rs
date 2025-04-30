@@ -1,8 +1,11 @@
-use std::{any::TypeId, sync::Arc};
+use alloc::sync::Arc;
+use core::any::TypeId;
 
+#[cfg(all(feature = "bevy", feature = "reflect"))]
+use bevy_ecs::reflect::ReflectResource;
 #[cfg(feature = "bevy")]
-use bevy_ecs::{reflect::ReflectResource, resource::Resource};
-#[cfg(feature = "bevy")]
+use bevy_ecs::resource::Resource;
+#[cfg(feature = "reflect")]
 use bevy_reflect::Reflect;
 use downcast_rs::Downcast;
 use froglight_common::{vanilla::Vanilla, version::Version};
@@ -20,7 +23,9 @@ use crate::{
 ///
 /// Allows for the registration and retrieval of item types at runtime.
 #[derive(Clone)]
-#[cfg_attr(feature = "bevy", derive(Reflect, Resource), reflect(Resource))]
+#[cfg_attr(feature = "bevy", derive(Resource))]
+#[cfg_attr(feature = "reflect", derive(Reflect))]
+#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Clone, Resource))]
 pub struct AppItemStorage<V: Version>(Arc<RwLock<ItemStorage<V>>>);
 
 impl<V: Version> Default for AppItemStorage<V>
@@ -29,7 +34,7 @@ where Vanilla: ItemResolver<V>
     #[inline]
     fn default() -> Self { Self::new() }
 }
-impl<V: Version> std::ops::Deref for AppItemStorage<V> {
+impl<V: Version> core::ops::Deref for AppItemStorage<V> {
     type Target = Arc<RwLock<ItemStorage<V>>>;
 
     fn deref(&self) -> &Self::Target { &self.0 }
@@ -161,7 +166,7 @@ impl<V: Version> ItemStorage<V> {
 /// A wrapper around a [`&'static dyn ItemType`](ItemType)
 /// that implements [`PartialEq`] and [`Eq`].
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(PartialEq))]
+#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Clone, PartialEq))]
 pub(crate) struct ItemWrapper<V: Version>(&'static dyn ItemType<V>);
 
 impl<V: Version> ItemWrapper<V> {
@@ -178,7 +183,7 @@ impl<V: Version> PartialEq for ItemWrapper<V> {
             == <dyn ItemType<V> as Downcast>::as_any(other.0).type_id()
     }
 }
-impl<V: Version> std::ops::Deref for ItemWrapper<V> {
+impl<V: Version> core::ops::Deref for ItemWrapper<V> {
     type Target = &'static dyn ItemType<V>;
 
     fn deref(&self) -> &Self::Target { &self.0 }

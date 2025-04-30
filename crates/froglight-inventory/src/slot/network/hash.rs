@@ -1,6 +1,6 @@
 use std::{borrow::Cow, marker::PhantomData, num::NonZeroU8};
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use froglight_common::prelude::Version;
 use froglight_io::{
@@ -24,7 +24,7 @@ use crate::slot::{
 /// This is a hashed, serialization-friendly form of [`InventorySlot`].
 #[derive(Debug, Clone, PartialEq)]
 #[expect(clippy::type_complexity)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq))]
 pub struct HashedInventorySlot<V: Version>(
     pub(super) Option<(NonZeroU8, GlobalItemId, UnnamedNbt, Vec<(u32, u32)>)>,
     pub(super) PhantomData<V>,
@@ -75,7 +75,7 @@ impl<V: VersionComponents> HashedInventorySlot<V> {
 /// This is a hashed, serialization-friendly form of [`InventorySlot`].
 #[derive(Debug, Clone, PartialEq)]
 #[expect(clippy::type_complexity)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq))]
 pub struct HashedInventorySlotRef<'a, V: Version>(
     Option<(NonZeroU8, GlobalItemId, &'a UnnamedNbt, Cow<'a, [(u32, u32)]>)>,
     PhantomData<V>,

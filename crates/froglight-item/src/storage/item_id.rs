@@ -1,9 +1,9 @@
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 
 /// A raw item id that represents a type of item.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 pub struct GlobalItemId(u32);
 
 impl GlobalItemId {
@@ -21,7 +21,7 @@ impl From<GlobalItemId> for u32 {
     fn from(id: GlobalItemId) -> Self { id.0 }
 }
 
-impl std::ops::Deref for GlobalItemId {
+impl core::ops::Deref for GlobalItemId {
     type Target = u32;
 
     fn deref(&self) -> &Self::Target { &self.0 }

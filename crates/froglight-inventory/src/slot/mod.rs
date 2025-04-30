@@ -2,7 +2,7 @@
 
 use std::num::NonZeroU8;
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use froglight_common::version::Version;
 use froglight_item::item::UntypedItem;
@@ -12,14 +12,14 @@ pub mod component;
 #[cfg(feature = "io")]
 pub mod network;
 
-#[cfg(all(test, feature = "io"))]
+#[cfg(all(feature = "io", test))]
 mod test;
 
 /// A slot in an inventory.
 ///
 /// May contain an item or be empty.
 #[derive(Debug, Default, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, Clone, PartialEq))]
 pub struct InventorySlot<V: Version>(Option<(NonZeroU8, UntypedItem<V>)>);
 
 impl<V: Version> InventorySlot<V> {

@@ -1,10 +1,10 @@
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 
 /// A raw block id that represents a type of block.
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 pub struct GlobalBlockId(u32);
 
 impl GlobalBlockId {
@@ -22,7 +22,7 @@ impl From<GlobalBlockId> for u32 {
     fn from(id: GlobalBlockId) -> Self { id.0 }
 }
 
-impl std::ops::Deref for GlobalBlockId {
+impl core::ops::Deref for GlobalBlockId {
     type Target = u32;
 
     fn deref(&self) -> &Self::Target { &self.0 }
@@ -30,7 +30,7 @@ impl std::ops::Deref for GlobalBlockId {
 
 /// A block id that is relative to it's state range.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 pub(crate) struct RelativeBlockState(u16);
 
 impl From<u16> for RelativeBlockState {
@@ -76,7 +76,7 @@ impl From<RelativeBlockState> for usize {
     fn from(state: RelativeBlockState) -> Self { usize::from(state.0) }
 }
 
-impl std::ops::Deref for RelativeBlockState {
+impl core::ops::Deref for RelativeBlockState {
     type Target = u16;
 
     fn deref(&self) -> &Self::Target { &self.0 }

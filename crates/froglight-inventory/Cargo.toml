@@ -44,7 +44,9 @@ io = ["dep:crc32fast", "dep:froglight-io", "froglight-nbt/io"]
 world = ["dep:froglight-world"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_platform", "dep:bevy_reflect", "froglight-common/bevy", "froglight-item/bevy"]
+bevy = ["dep:bevy_ecs", "dep:bevy_platform", "froglight-common/bevy", "froglight-item/bevy"]
+# Enable `bevy_reflect` support.
+reflect = ["dep:bevy_reflect", "froglight-item/reflect"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4", "froglight-item/v1_21_4", "froglight-world?/v1_21_4"]

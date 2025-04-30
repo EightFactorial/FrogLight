@@ -65,11 +65,9 @@ nightly = [
 ]
 # Enable support for rust's standard library.
 std = [
-  # "froglight-block/std",
   "froglight-common/alloc",
   # "froglight-inventory/std",
-  # "froglight-item/std",
-  "froglight-nbt/std",
+  # "froglight-nbt/std",
   # "froglight-player/std",
   # "froglight-registry/std",
   # "froglight-schedule?/std",

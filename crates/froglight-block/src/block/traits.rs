@@ -141,16 +141,16 @@ pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock {
 
 use sealed::MaybeReflect;
 mod sealed {
-    #[cfg(feature = "bevy")]
+    #[cfg(feature = "reflect")]
     use bevy_reflect::Reflect;
 
-    #[cfg(feature = "bevy")]
+    #[cfg(feature = "reflect")]
     pub trait MaybeReflect: Reflect {}
-    #[cfg(feature = "bevy")]
+    #[cfg(feature = "reflect")]
     impl<T: Reflect> MaybeReflect for T {}
 
-    #[cfg(not(feature = "bevy"))]
+    #[cfg(not(feature = "reflect"))]
     pub trait MaybeReflect {}
-    #[cfg(not(feature = "bevy"))]
+    #[cfg(not(feature = "reflect"))]
     impl<T> MaybeReflect for T {}
 }

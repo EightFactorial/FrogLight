@@ -1,6 +1,6 @@
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use froglight_common::version::Version;
 
@@ -10,9 +10,10 @@ use crate::slot::InventorySlot;
 ///
 /// Includes the player's inventory, hotbar, and the item held by the cursor.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
-#[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
+#[cfg_attr(feature = "bevy", derive(Component))]
 #[cfg_attr(feature = "bevy", require(PlayerInventoryMenu<V>, super::EntityEquipment<V>))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, Clone, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Component))]
 pub struct PlayerInventory<V: Version> {
     inventory: [InventorySlot<V>; 27],
     hotbar: [InventorySlot<V>; 9],
@@ -119,8 +120,9 @@ impl<V: Version> PlayerInventory<V> {
 ///
 /// Include's the player's crafting slots and offhand slot.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Default, PartialEq, Component))]
+#[cfg_attr(feature = "bevy", derive(Component))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, Clone, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Component))]
 pub struct PlayerInventoryMenu<V: Version> {
     crafting_result: InventorySlot<V>,
     crafting: [InventorySlot<V>; 4],

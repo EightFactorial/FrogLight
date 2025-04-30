@@ -1,8 +1,8 @@
 //! !TODO
 
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use downcast_rs::Downcast;
 use froglight_common::{identifier::Identifier, version::Version};
@@ -14,11 +14,11 @@ use crate::{
 };
 
 /// A block with a state.
-#[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(no_field_bounds, PartialEq, Default))]
+#[cfg_attr(feature = "reflect", derive(Reflect))]
+#[cfg_attr(feature = "reflect", reflect(no_field_bounds, Default, Clone, PartialEq))]
 pub struct Block<B: BlockTypeExt<V>, V: Version> {
     state: RelativeBlockState,
-    #[cfg_attr(feature = "bevy", reflect(ignore))]
+    #[cfg_attr(feature = "reflect", reflect(ignore))]
     _phantom: PhantomData<(B, V)>,
 }
 
@@ -367,11 +367,11 @@ impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
 // -------------------------------------------------------------------------------------------------
 
 /// An untyped block with a state.
-#[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(no_field_bounds, from_reflect = false, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect))]
+#[cfg_attr(feature = "reflect", reflect(no_field_bounds, from_reflect = false, PartialEq))]
 pub struct UntypedBlock<V: Version> {
     state: RelativeBlockState,
-    #[cfg_attr(feature = "bevy", reflect(ignore))]
+    #[cfg_attr(feature = "reflect", reflect(ignore))]
     wrapper: BlockWrapper<V>,
 }
 
@@ -538,8 +538,8 @@ impl<B: BlockTypeExt<V>, V: Version> From<Block<B, V>> for UntypedBlock<V> {
 
 // ------------- Manual trait implementations to avoid trait bounds -----------
 
-impl<B: BlockTypeExt<V>, V: Version> std::fmt::Debug for Block<B, V> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<B: BlockTypeExt<V>, V: Version> core::fmt::Debug for Block<B, V> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("Block").field(&self.state).field(&Self::const_identifier()).finish()
     }
 }
@@ -553,8 +553,8 @@ impl<B: BlockTypeExt<V>, V: Version> PartialEq for Block<B, V> {
     fn eq(&self, other: &Self) -> bool { self.state == other.state }
 }
 
-impl<V: Version> std::fmt::Debug for UntypedBlock<V> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<V: Version> core::fmt::Debug for UntypedBlock<V> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("UntypedBlock").field(&self.state).field(&self.wrapper.identifier()).finish()
     }
 }

@@ -11,10 +11,16 @@ pub(crate) fn blocks(input: TokenStream) -> TokenStream {
     let MacroInput { path, blocks } = syn::parse2(input).unwrap();
     let block = path.unwrap_or_else(|| CrateManifest::froglight("froglight-block"));
 
-    blocks.iter().fold(TokenStream::new(), |mut acc, item| {
-        acc.extend(MacroInput::as_tokens(item, &block));
-        acc
-    })
+    blocks.iter().fold(
+        quote! {
+            #[cfg(feature = "reflect")]
+            use bevy_reflect::prelude::*;
+        },
+        |mut acc, item| {
+            acc.extend(MacroInput::as_tokens(item, &block));
+            acc
+        },
+    )
 }
 
 struct MacroInput {
@@ -44,7 +50,7 @@ impl MacroInput {
     ) -> TokenStream {
         quote! {
             #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticBlock)]
-            #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
+            #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Default, Clone, PartialEq, Hash))]
             #vis #struct_token #ident #semi_token
         }
     }

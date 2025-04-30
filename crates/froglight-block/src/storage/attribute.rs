@@ -1,4 +1,4 @@
-use std::any::TypeId;
+use core::any::TypeId;
 
 /// A block attribute.
 pub trait Attribute: Into<usize> + Copy + Eq + Sized + 'static {
@@ -101,7 +101,7 @@ impl<A: Attribute> BlockAttributes for A {
         A::VALUES
             .iter()
             .position(|&val| val == attr_str)
-            .map(|new_index| std::mem::replace(self, A::STATES[new_index]).get_attr_str(0))
+            .map(|new_index| core::mem::replace(self, A::STATES[new_index]).get_attr_str(0))
     }
 }
 impl<A: Attribute> BlockAttributes for (A,) {
@@ -131,7 +131,7 @@ impl<A: Attribute> BlockAttributes for (A,) {
         A::VALUES
             .iter()
             .position(|&val| val == attr_str)
-            .map(|new_index| std::mem::replace(&mut self.0, A::STATES[new_index]).get_attr_str(0))
+            .map(|new_index| core::mem::replace(&mut self.0, A::STATES[new_index]).get_attr_str(0))
     }
 }
 

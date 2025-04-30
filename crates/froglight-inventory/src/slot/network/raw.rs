@@ -3,7 +3,7 @@
 
 use std::{borrow::Cow, marker::PhantomData, num::NonZeroU8};
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use froglight_common::prelude::*;
 use froglight_io::{
@@ -22,7 +22,7 @@ use crate::slot::{
 ///
 /// This is a raw, serialization-friendly form of [`InventorySlot`].
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub struct RawInventorySlot<V: Version>(
     pub(super) Option<(NonZeroU8, GlobalItemId, UnnamedNbt, Vec<u32>)>,
     pub(super) PhantomData<V>,
@@ -63,7 +63,7 @@ impl<V: VersionComponents> RawInventorySlot<V> {
 ///
 /// This is a raw, serialization-friendly form of [`InventorySlot`].
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub struct RawInventorySlotRef<'a, V: Version>(
     Option<(NonZeroU8, GlobalItemId, &'a UnnamedNbt, Cow<'a, [u32]>)>,
     PhantomData<V>,

@@ -1,6 +1,6 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use downcast_rs::Downcast;
 use froglight_common::{prelude::Identifier, version::Version};
@@ -10,11 +10,11 @@ use super::{ItemRarity, ItemType, ItemTypeExt};
 use crate::{resolve::ItemResolver, storage::ItemWrapper};
 
 /// An item with optional data.
-#[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(no_field_bounds, from_reflect = false, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect))]
+#[cfg_attr(feature = "reflect", reflect(no_field_bounds, from_reflect = false, PartialEq))]
 pub struct Item<I: ItemTypeExt<V>, V: Version> {
     data: UnnamedNbt,
-    #[cfg_attr(feature = "bevy", reflect(ignore))]
+    #[cfg_attr(feature = "reflect", reflect(ignore))]
     _phantom: PhantomData<(I, V)>,
 }
 
@@ -212,11 +212,11 @@ impl<I: ItemTypeExt<V>, V: Version> TryFrom<UntypedItem<V>> for Item<I, V> {
 // -------------------------------------------------------------------------------------------------
 
 /// An untyped item with optional data.
-#[cfg_attr(feature = "bevy", derive(Reflect))]
-#[cfg_attr(feature = "bevy", reflect(no_field_bounds, from_reflect = false, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect))]
+#[cfg_attr(feature = "reflect", reflect(no_field_bounds, from_reflect = false, PartialEq))]
 pub struct UntypedItem<V: Version> {
     data: UnnamedNbt,
-    #[cfg_attr(feature = "bevy", reflect(ignore))]
+    #[cfg_attr(feature = "reflect", reflect(ignore))]
     wrapper: ItemWrapper<V>,
 }
 
@@ -384,8 +384,8 @@ impl<I: ItemTypeExt<V>, V: Version> From<Item<I, V>> for UntypedItem<V> {
 
 // ------------- Manual trait implementations to avoid trait bounds -----------
 
-impl<I: ItemTypeExt<V>, V: Version> std::fmt::Debug for Item<I, V> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<I: ItemTypeExt<V>, V: Version> core::fmt::Debug for Item<I, V> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("Item").field(&self.data).field(&Self::const_identifier()).finish()
     }
 }
@@ -397,8 +397,8 @@ impl<I: ItemTypeExt<V>, V: Version> PartialEq for Item<I, V> {
     fn eq(&self, other: &Self) -> bool { self.data == other.data }
 }
 
-impl<V: Version> std::fmt::Debug for UntypedItem<V> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<V: Version> core::fmt::Debug for UntypedItem<V> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("UntypedItem").field(&self.data).field(&self.wrapper.identifier()).finish()
     }
 }

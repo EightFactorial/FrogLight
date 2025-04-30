@@ -12,10 +12,16 @@ pub(crate) fn items(input: TokenStream) -> TokenStream {
     let item = path.unwrap_or_else(|| CrateManifest::froglight("froglight-item"));
     let block = CrateManifest::froglight("froglight-block");
 
-    items.iter().fold(TokenStream::new(), |mut acc, input| {
-        acc.extend(MacroInput::as_tokens(input, &item, &block));
-        acc
-    })
+    items.iter().fold(
+        quote! {
+            #[cfg(feature = "reflect")]
+            use bevy_reflect::prelude::*;
+        },
+        |mut acc, input| {
+            acc.extend(MacroInput::as_tokens(input, &item, &block));
+            acc
+        },
+    )
 }
 
 struct MacroInput {
@@ -48,7 +54,7 @@ impl MacroInput {
             quote! {
                 #[cfg(not(feature = "block"))]
                 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticItem)]
-                #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
+                #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Default, Clone, PartialEq, Hash))]
                 #vis #struct_token #ident #semi_token
 
                 #[cfg(feature = "block")]
@@ -62,7 +68,7 @@ impl MacroInput {
         } else {
             quote! {
                 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticItem)]
-                #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq, Hash))]
+                #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Default, Clone, PartialEq, Hash))]
                 #vis #struct_token #ident #semi_token
             }
         }

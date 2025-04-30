@@ -1,3 +1,5 @@
+use alloc::boxed::Box;
+
 use froglight_common::version::Version;
 
 use super::{Block, BlockTypeExt};
