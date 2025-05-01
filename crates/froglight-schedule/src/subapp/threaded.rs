@@ -1,5 +1,7 @@
 #![allow(clippy::used_underscore_binding)]
 
+use alloc::vec::Vec;
+
 use bevy_app::{AppLabel, InternedAppLabel, PluginsState, prelude::*};
 use bevy_ecs::{intern::Interned, prelude::*};
 #[cfg(feature = "trace")]

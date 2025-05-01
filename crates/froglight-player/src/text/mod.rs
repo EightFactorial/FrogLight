@@ -1,5 +1,12 @@
 //! Text parsing and formatting.
 
+#[cfg(not(feature = "std"))]
+use alloc::{
+    borrow::Cow,
+    string::{String, ToString},
+    vec::Vec,
+};
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]

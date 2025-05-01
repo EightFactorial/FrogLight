@@ -20,11 +20,11 @@ bevy = { workspace = true, features = ["bevy_log"] }
 proptest = { workspace = true }
 
 [dependencies]
-bevy_app = { workspace = true, features = ["reflect_functions"] }
-bevy_ecs = { workspace = true, features = ["reflect_functions"] }
+bevy_app = { workspace = true, features = ["reflect_functions", "std"] }
+bevy_ecs = { workspace = true, features = ["reflect_functions", "std"] }
 bevy_log = { workspace = true }
-bevy_platform = { workspace = true, features = ["alloc"] }
-bevy_reflect = { workspace = true, features = ["functions", "petgraph", "smol_str"] }
+bevy_platform = { workspace = true, features = ["alloc", "std"] }
+bevy_reflect = { workspace = true, features = ["functions", "petgraph", "smol_str", "std"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["bevy"] }
 parking_lot = { workspace = true }
@@ -35,10 +35,10 @@ tracing = { workspace = true }
 
 # Optional dependencies
 froglight-io = { workspace = true, optional = true }
-froglight-nbt = { workspace = true, optional = true, features = ["reflect"] }
-glam = { workspace = true, optional = true }
-serde = { workspace = true, optional = true }
-uuid = { workspace = true, optional = true }
+froglight-nbt = { workspace = true, optional = true, features = ["reflect", "std"] }
+glam = { workspace = true, optional = true, features = ["std"] }
+serde = { workspace = true, optional = true, features = ["std"] }
+uuid = { workspace = true, optional = true, features = ["std"] }
 
 [features]
 default = ["glam", "nbt", "uuid"]

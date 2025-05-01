@@ -57,25 +57,25 @@ unnecessary_cast = "warn"
 [workspace.dependencies]
 # Bevy
 bevy = { version = "0.16", default-features = false, features = ["async_executor", "multi_threaded"] }
-bevy_app = "0.16"
+bevy_app = { version = "0.16", default-features = false }
 bevy_derive = "0.16"
-bevy_diagnostic = "0.16"
-bevy_ecs = { version = "0.16" }
-bevy_log = "0.16"
-bevy_math = "0.16"
+bevy_diagnostic = { version = "0.16", default-features = false }
+bevy_ecs = { version = "0.16", default-features = false }
+bevy_log = { version = "0.16", default-features = false }
+bevy_math = { version = "0.16", default-features = false }
 bevy_platform = { version = "0.16", default-features = false }
-bevy_reflect = { version = "0.16" }
-bevy_state = "0.16"
-bevy_tasks = { version = "0.16" }
-bevy_time = "0.16"
-bevy_transform = "0.16"
-bevy_utils = "0.16"
+bevy_reflect = { version = "0.16", default-features = false }
+bevy_state = { version = "0.16", default-features = false }
+bevy_tasks = { version = "0.16", default-features = false }
+bevy_time = { version = "0.16", default-features = false }
+bevy_transform = { version = "0.16", default-features = false }
+bevy_utils = { version = "0.16", default-features = false }
 bevy_winit = { version = "0.16", default-features = false }
 
 # FrogLight
 froglight-block = { version = "0.1", path = "crates/froglight-block" }
 froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier" }
-froglight-common = { version = "0.1", path = "crates/froglight-common" }
+froglight-common = { version = "0.1", path = "crates/froglight-common", features = ["alloc"] }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal", default-features = false }
 froglight-inventory = { version = "0.1", path = "crates/froglight-inventory", default-features = false }
 froglight-io = { version = "0.1", path = "crates/froglight-io" }
@@ -83,9 +83,9 @@ froglight-item = { version = "0.1", path = "crates/froglight-item" }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
 froglight-nbt = { version = "0.1", path = "crates/froglight-nbt", default-features = false }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
-froglight-player = { version = "0.1", path = "crates/froglight-player" }
+froglight-player = { version = "0.1", path = "crates/froglight-player", default-features = false }
 froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
-froglight-schedule = { version = "0.1", path = "crates/froglight-schedule" }
+froglight-schedule = { version = "0.1", path = "crates/froglight-schedule", default-features = false }
 froglight-world = { version = "0.1", path = "crates/froglight-world", default-features = false }
 
 # Hashing / Cryptography
@@ -112,7 +112,6 @@ hashbrown = "0.15"
 hashify = "0.2.6"
 indexmap = { version = "2.9", default-features = false }
 nu-ansi-term = "0.46"
-once_cell = { version = "1.21", default-features = false, features = ["parking_lot"] }
 parking_lot = "0.12"
 proptest = "1.6"
 rangemap = { version = "1.5", features = ["const_fn"] }
@@ -123,7 +122,7 @@ simd_cesu8 = { version = "1.0", default-features = false }
 smallvec = { version = "1.15", features = ["const_new"] }
 smol_str = { version = "0.2", default-features = false }
 thiserror = { version = "2.0", default-features = false }
-tracing = "0.1"
+tracing = { version = "0.1", default-features = false }
 tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
 ureq = "3.0"
 uuid = { version = "1.16", default-features = false }
@@ -192,11 +191,13 @@ brigadier = ["froglight-internal/brigadier"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
-
 # Enable various crates' nightly features.
 nightly = ["froglight-internal/nightly"]
+
 # Enable support for rust's standard library.
 std = ["froglight-internal/std"]
+# Enable `no_std` support for glam.
+libm = ["froglight-internal/libm"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-internal/v1_21_4"]

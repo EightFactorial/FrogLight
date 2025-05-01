@@ -1,19 +1,18 @@
 //! [`PlayerProfile`] and [`PlayerProfileTextures`]
 
 #[cfg(feature = "serde")]
-use std::time::Duration;
+use core::time::Duration;
+#[cfg(feature = "std")]
 use std::time::SystemTime;
 
 #[cfg(feature = "online")]
 use base64::{Engine, prelude::BASE64_URL_SAFE};
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
-#[cfg(all(feature = "serde", feature = "bevy"))]
+#[cfg(feature = "serde")]
 use bevy_platform::collections::HashMap;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-#[cfg(all(feature = "serde", not(feature = "bevy")))]
-use hashbrown::HashMap;
 #[cfg(feature = "online")]
 use serde::Deserialize;
 use smol_str::SmolStr;
@@ -103,6 +102,7 @@ impl PlayerProfile {
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
 pub struct PlayerProfileTextures {
     /// The timestamp the textures were retrieved.
+    #[cfg(feature = "std")]
     #[cfg_attr(feature = "bevy", reflect(ignore))]
     pub timestamp: SystemTime,
     /// Whether the player has a slim model.
@@ -122,7 +122,13 @@ impl PlayerProfileTextures {
     /// Create a new default [`PlayerProfileTextures`].
     #[must_use]
     pub fn new() -> Self {
-        Self { timestamp: SystemTime::now(), slim: false, skin: None, cape: None }
+        Self {
+            #[cfg(feature = "std")]
+            timestamp: SystemTime::now(),
+            slim: false,
+            skin: None,
+            cape: None,
+        }
     }
 }
 
@@ -257,17 +263,8 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
 
                     // If the property is "textures", parse it into a PlayerProfileTextures.
                     if property.name == "textures" {
-                        match PlayerProfileTextures::try_from(&value) {
-                            Ok(texts) => textures = Some(texts),
-                            // Bevy logging.
-                            #[cfg(feature = "bevy")]
-                            Err(err) => bevy_log::warn!(
-                                "Failed to parse \"{}\"'s textures, {err}",
-                                response.username
-                            ),
-                            // No logging.
-                            #[cfg(not(feature = "bevy"))]
-                            Err(_) => {}
+                        if let Ok(tex) = PlayerProfileTextures::try_from(&value) {
+                            textures = Some(tex);
                         }
                     }
 
@@ -279,13 +276,6 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
                     continue;
                 }
             }
-
-            #[cfg(feature = "bevy")]
-            bevy_log::warn!(
-                "Failed to decode \"{}\"'s profile at \"{}\"",
-                response.username,
-                property.value
-            );
         }
 
         Ok(Self {

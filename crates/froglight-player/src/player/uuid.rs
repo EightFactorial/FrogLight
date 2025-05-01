@@ -1,9 +1,10 @@
 //! [`PlayerUUID`]
 
-use std::{
-    borrow::Borrow,
-    ops::{Deref, DerefMut},
-};
+#[cfg(not(feature = "std"))]
+use alloc::borrow::Borrow;
+use core::ops::{Deref, DerefMut};
+#[cfg(feature = "std")]
+use std::borrow::Borrow;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;

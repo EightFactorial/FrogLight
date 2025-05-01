@@ -1,6 +1,9 @@
 //! [`TextComponent`], [`TranslateComponent`], and other [`FormattedText`]
 //! components.
 
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::Cow, vec::Vec};
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]

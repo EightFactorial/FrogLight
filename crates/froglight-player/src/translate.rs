@@ -1,12 +1,9 @@
 //! [`TextTranslations`]
 
-#[cfg(feature = "bevy")]
 use bevy_platform::collections::HashMap;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
-#[cfg(not(feature = "bevy"))]
-use hashbrown::HashMap;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;

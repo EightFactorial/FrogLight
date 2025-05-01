@@ -1,6 +1,6 @@
 //! TODO
 
-use std::num::NonZeroU8;
+use core::num::NonZeroU8;
 
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;

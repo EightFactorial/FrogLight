@@ -1,5 +1,8 @@
 //! [`InteractComponent`]
 
+#[cfg(not(feature = "std"))]
+use alloc::borrow::Cow;
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]
@@ -7,17 +10,16 @@ use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
 use froglight_common::prelude::Identifier;
 use froglight_nbt::nbt::NbtCompound;
+#[cfg(feature = "serde")]
 use serde::{
     __private::{
         de::{Content, ContentDeserializer},
         ser::FlatMapSerializer,
     },
-    Deserializer, Serializer,
+    Deserialize, Deserializer, Serialize, Serializer,
     de::Error,
     ser::SerializeMap,
 };
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 /// Actions to take when interacting with a [`FormattedText`].

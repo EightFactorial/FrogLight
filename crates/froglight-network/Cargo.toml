@@ -26,14 +26,14 @@ froglight-io = { workspace = true, features = ["glam", "serde", "smallvec", "uui
 froglight-macros = { workspace = true, features = ["io", "network"] }
 froglight-player = { workspace = true, features = ["io", "serde"] }
 futures-lite = { workspace = true }
-glam = { workspace = true }
+glam = { workspace = true, features = ["std"] }
 hashbrown = { workspace = true, features = ["serde"] }
-serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive", "std"] }
+serde_json = { workspace = true, features = ["std"] }
 smallvec = { workspace = true }
-smol_str = { workspace = true }
+smol_str = { workspace = true, features = ["std"] }
 ureq = { workspace = true }
-uuid = { workspace = true }
+uuid = { workspace = true, features = ["std"] }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }

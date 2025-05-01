@@ -7,6 +7,7 @@
 //!   <a href="https://github.com/EightFactorial/FrogLight/actions"><img alt="Tests" src="https://github.com/EightFactorial/FrogLight/actions/workflows/testing.yml/badge.svg"></a>
 //! </p>
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 // Re-export everything from `froglight-internal`
 pub use froglight_internal::*;

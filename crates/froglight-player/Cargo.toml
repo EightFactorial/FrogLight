@@ -18,11 +18,11 @@ workspace = true
 [dependencies]
 aes = { workspace = true }
 base64 = { workspace = true }
+bevy_platform = { workspace = true, features = ["alloc"] }
 cfb8 = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-nbt = { workspace = true }
-hashbrown = { workspace = true }
 md-5 = { workspace = true }
 parking_lot = { workspace = true }
 rsa = { workspace = true, features = ["sha2"] }
@@ -32,8 +32,6 @@ uuid = { workspace = true, features = ["md5"] }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
-bevy_log = { workspace = true, optional = true }
-bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }
@@ -42,35 +40,41 @@ serde_json = { workspace = true, optional = true }
 ureq = { workspace = true, optional = true, features = ["json"] }
 
 [features]
-default = ["ansi", "online", "serde"]
+default = ["ansi", "online", "std"]
 
 # Enable ANSI terminal support.
-ansi = ["dep:nu-ansi-term"]
+ansi = ["dep:nu-ansi-term", "std"]
 # Enable accessing online APIs.
-online = ["dep:ureq", "serde"]
+online = ["dep:ureq", "serde", "std"]
 
 # Enable `froglight-io` support.
-io = ["dep:froglight-io"]
+io = ["dep:froglight-io", "std"]
 
 # Enable `bevy` support.
-bevy = [
-  "dep:bevy_ecs",
-  "dep:bevy_log",
-  "dep:bevy_platform",
-  "dep:bevy_reflect",
-  "froglight-common/bevy",
-  "froglight-nbt/reflect",
-]
-# Enable `serde` support.
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-nbt/reflect"]
+# Enable `serde` serialization support.
 serde = [
-  "bevy_platform?/serialize",
+  "bevy_platform/serialize",
   "dep:serde",
   "dep:serde_json",
   "froglight-common/serde",
   "froglight-io?/serde",
   "froglight-nbt/serde",
-  "hashbrown/serde",
   "rsa/serde",
   "smol_str/serde",
   "uuid/serde",
+]
+
+# Enable support for the rust standard library.
+std = [
+  "base64/std",
+  "bevy_ecs?/std",
+  "bevy_platform/std",
+  "bevy_reflect?/std",
+  "cfb8/std",
+  "froglight-nbt/std",
+  "md-5/std",
+  "rsa/std",
+  "serde?/std",
+  "serde_json?/std",
 ]

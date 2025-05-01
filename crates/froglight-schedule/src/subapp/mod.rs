@@ -1,12 +1,13 @@
 //! [`SubAppPlugin`] for creating [`SubApp`]s.
 
-use std::time::Instant;
+use alloc::{boxed::Box, vec};
 
 use bevy_app::{AppLabel, MainScheduleOrder, prelude::*};
 use bevy_ecs::{
     prelude::*,
     schedule::{ExecutorKind, ScheduleLabel},
 };
+use bevy_platform::time::Instant;
 use bevy_time::{TimeUpdateStrategy, prelude::*};
 use parking_lot::Mutex;
 
@@ -68,7 +69,7 @@ impl<SubAppLabel: AppLabel> Plugin for SubAppPlugin<SubAppLabel> {
         assert!(
             app.get_sub_app(label).is_none(),
             "`SubAppPlugin<{}>` tried to create a `SubApp` that already exists!",
-            std::any::type_name::<SubAppLabel>()
+            core::any::type_name::<SubAppLabel>()
         );
 
         app.register_type::<SubWorlds>();

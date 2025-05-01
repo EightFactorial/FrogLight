@@ -1,30 +1,31 @@
 //! TODO
 
-use std::{any::TypeId, hash::Hash, marker::PhantomData, sync::Arc};
+use alloc::{boxed::Box, sync::Arc};
+use core::{any::TypeId, hash::Hash, marker::PhantomData};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
+use bevy_platform::hash::{FixedHasher, NoOpHash};
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-#[cfg(feature = "bevy")]
-use bevy_utils::TypeIdMap;
+use derive_more::Deref;
 use downcast_rs::Downcast;
 use froglight_common::{identifier::Identifier, version::Version};
+use hashbrown::HashMap;
 use indexmap::{Equivalent, IndexMap};
 use parking_lot::RwLock;
 
 use crate::traits::{RegistryType, RegistryValue};
 
 /// A thread-safe storage container for [`RegistryValue`]s.
-#[derive(Clone)]
-#[cfg_attr(feature = "bevy", derive(Reflect, Resource), reflect(Resource))]
+#[derive(Clone, Deref)]
+#[cfg_attr(feature = "bevy", derive(Reflect, Resource), reflect(Clone, Resource))]
 pub struct AppRegistryStorage<V: Version>(Arc<RwLock<RegistryStorage<V>>>);
 
 /// A storage container for [`RegistryValue`]s.
 #[derive(Default)]
 pub struct RegistryStorage<V: Version>(
-    #[cfg(feature = "bevy")] TypeIdMap<IndexMap<Identifier, Box<dyn RegistryValue>>>,
-    #[cfg(not(feature = "bevy"))] HashMap<TypeId, IndexMap<Identifier, Box<dyn RegistryValue>>>,
+    HashMap<TypeId, IndexMap<Identifier, Box<dyn RegistryValue>, FixedHasher>, NoOpHash>,
     PhantomData<V>,
 );
 
@@ -32,7 +33,7 @@ impl<V: Version> RegistryStorage<V> {
     /// Create a new empty [`RegistryStorage`].
     #[inline]
     #[must_use]
-    pub fn new() -> Self { Self::default() }
+    pub const fn new_empty() -> Self { Self(HashMap::with_hasher(NoOpHash), PhantomData) }
 
     /// Get a [`RegistryValue`] by it's [`RegistryType`] and identifier.
     ///

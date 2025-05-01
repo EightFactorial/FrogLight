@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
 use bevy_platform::collections::HashMap;
 use froglight_nbt::nbt::UnnamedNbt;
 

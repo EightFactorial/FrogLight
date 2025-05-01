@@ -1,6 +1,6 @@
 //! TODO
 
-use std::{
+use core::{
     sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
@@ -90,7 +90,7 @@ impl ShouldTick {
     /// A [`System`] that updates [`ShouldTick`] at the start of a frame.
     pub fn update(mut tick: ResMut<Self>) {
         let Self { current, next } = &mut *tick;
-        std::mem::swap(current, next);
+        core::mem::swap(current, next);
         next.store(false, Ordering::Relaxed);
     }
 }

@@ -22,7 +22,7 @@ smol_str = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 serde = { workspace = true, optional = true, features = ["derive"] }
 

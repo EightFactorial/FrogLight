@@ -1,10 +1,12 @@
 //! TODO
 
+use alloc::vec::Vec;
+
 use downcast_rs::DowncastSync;
 use froglight_common::{prelude::Identifier, version::Version};
 
 /// A registry type.
-pub trait RegistryType<V: Version>: MaybeReflect {
+pub trait RegistryType<V: Version>: MaybeReflect + 'static {
     /// The type of value stored in the
     /// [`RegistryStorage`](crate::storage::RegistryStorage).
     type Value: RegistryValue;

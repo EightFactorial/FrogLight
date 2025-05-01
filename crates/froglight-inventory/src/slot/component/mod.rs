@@ -1,17 +1,18 @@
 //! Inventory components for Froglight.
 
-use std::{any::TypeId, sync::LazyLock};
+use core::any::TypeId;
 
-#[cfg(feature = "bevy")]
-use bevy_platform::collections::HashMap;
+use bevy_platform::{
+    collections::HashMap,
+    hash::{FixedHasher, NoOpHash},
+    sync::LazyLock,
+};
 use froglight_common::{prelude::Identifier, version::Version};
 use froglight_io::prelude::*;
 use froglight_nbt::{
     nbt::NbtTag,
     prelude::{FromTag, IntoTag},
 };
-#[cfg(not(feature = "bevy"))]
-use hashbrown::HashMap;
 use indexmap::IndexMap;
 use parking_lot::{
     MappedRwLockReadGuard, MappedRwLockWriteGuard, RwLock, RwLockReadGuard, RwLockWriteGuard,
@@ -32,10 +33,9 @@ pub use types::*;
 pub struct InventoryComponents;
 
 /// A map of identifiers to component functions.
-pub type ComponentMap = IndexMap<Identifier, ComponentFns>;
-
-static COMPONENTS: LazyLock<StaticMap> = LazyLock::new(StaticMap::default);
-type StaticMap = RwLock<HashMap<TypeId, ComponentMap>>;
+pub type ComponentMap = IndexMap<Identifier, ComponentFns, FixedHasher>;
+static COMPONENTS: LazyLock<RwLock<HashMap<TypeId, ComponentMap, NoOpHash>>> =
+    LazyLock::new(Default::default);
 
 impl InventoryComponents {
     /// Get access to the [`InventoryComponents`] map.
@@ -54,7 +54,7 @@ impl InventoryComponents {
             COMPONENTS.write().insert(TypeId::of::<V>(), Self::init_type::<V>());
         }
 
-        RwLockReadGuard::map(COMPONENTS.read(), |data: &HashMap<TypeId, ComponentMap>| {
+        RwLockReadGuard::map(COMPONENTS.read(), |data: &HashMap<TypeId, ComponentMap, NoOpHash>| {
             data.get(&TypeId::of::<V>())
                 .unwrap_or_else(|| unreachable!("Components guaranteed to exist"))
         })
@@ -62,9 +62,12 @@ impl InventoryComponents {
 
     /// Get mutable access to the [`InventoryComponents`] map.
     pub fn write<V: VersionComponents>() -> MappedRwLockWriteGuard<'static, ComponentMap> {
-        RwLockWriteGuard::map(COMPONENTS.write(), |data: &mut HashMap<TypeId, ComponentMap>| {
-            data.entry(TypeId::of::<V>()).or_insert_with(V::components)
-        })
+        RwLockWriteGuard::map(
+            COMPONENTS.write(),
+            |data: &mut HashMap<TypeId, ComponentMap, NoOpHash>| {
+                data.entry(TypeId::of::<V>()).or_insert_with(V::components)
+            },
+        )
     }
 
     /// Initialize the components for the given type,

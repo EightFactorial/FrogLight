@@ -1,5 +1,8 @@
 //! [`TextFormatting`] and [`TextColor`]
 
+#[cfg(not(feature = "std"))]
+use alloc::format;
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};

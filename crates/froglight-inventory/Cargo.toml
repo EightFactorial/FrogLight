@@ -19,17 +19,16 @@ workspace = true
 paste = "1.0"
 
 [dependencies]
+bevy_platform = { workspace = true, features = ["alloc"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-item = { workspace = true }
 froglight-nbt = { workspace = true }
-hashbrown = { workspace = true }
 indexmap = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
-bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
 bevy_reflect = { workspace = true, optional = true }
 crc32fast = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
@@ -44,12 +43,12 @@ io = ["dep:crc32fast", "dep:froglight-io", "froglight-nbt/io", "std"]
 world = ["dep:froglight-world"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_platform", "froglight-common/bevy", "froglight-item/bevy"]
+bevy = ["dep:bevy_ecs", "froglight-common/bevy", "froglight-item/bevy"]
 # Enable `bevy_reflect` support.
 reflect = ["dep:bevy_reflect", "froglight-item/reflect"]
 
 # Enable support for the rust standard library.
-std = ["bevy_platform?/std", "bevy_reflect?/std", "froglight-nbt/std", "froglight-world?/std"]
+std = ["bevy_platform/std", "bevy_reflect?/std", "froglight-nbt/std", "froglight-world?/std"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4", "froglight-item/v1_21_4", "froglight-world?/v1_21_4"]

@@ -1,6 +1,10 @@
 //! Player usernames and uuids.
 
-use std::{borrow::Borrow, ops::Deref};
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::Borrow, format};
+use core::ops::Deref;
+#[cfg(feature = "std")]
+use std::borrow::Borrow;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;

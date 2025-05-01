@@ -21,20 +21,20 @@ froglight-common = { workspace = true }
 froglight-inventory = { workspace = true, features = ["world"] }
 froglight-item = { workspace = true, features = ["block"] }
 froglight-nbt = { workspace = true }
-froglight-network = { workspace = true, features = ["resolver"] }
-froglight-player = { workspace = true, features = ["ansi", "online"] }
+froglight-player = { workspace = true }
 froglight-registry = { workspace = true }
 froglight-world = { workspace = true, features = ["block"] }
 
 # Optional dependencies
 froglight-brigadier = { workspace = true, optional = true, features = ["nbt"] }
+froglight-network = { workspace = true, optional = true, features = ["resolver"] }
 froglight-schedule = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "brigadier", "std"]
 
 # Enable the `froglight-brigadier` crate.
-brigadier = ["bevy", "dep:froglight-brigadier", "froglight-network/brigadier"]
+brigadier = ["bevy", "dep:froglight-brigadier", "froglight-network/brigadier", "std"]
 
 # Enable `bevy` support.
 bevy = [
@@ -44,7 +44,7 @@ bevy = [
   "froglight-inventory/bevy",
   "froglight-item/bevy",
   "froglight-nbt/reflect",
-  "froglight-network/bevy",
+  "froglight-network?/bevy",
   "froglight-player/bevy",
   "froglight-registry/bevy",
   "froglight-world/bevy",
@@ -52,34 +52,38 @@ bevy = [
 
 # Enable nightly features.
 nightly = [
-  # "froglight-block/std",
-  # "froglight-common/std",
-  # "froglight-inventory/std",
-  # "froglight-item/std",
-  # "froglight-nbt/std",
-  # "froglight-network/std",
-  # "froglight-player/std",
-  # "froglight-registry/std",
+  # "froglight-block/nightly",
+  # "froglight-common/nightly",
+  # "froglight-inventory/nightly",
+  # "froglight-item/nightly",
+  # "froglight-nbt/nightly",
+  # "froglight-network?/nightly",
+  # "froglight-player/nightly",
+  # "froglight-registry/nightly",
   # "froglight-schedule?/nightly",
-  # "froglight-world/std",
+  # "froglight-world/nightly",
 ]
+
 # Enable support for rust's standard library.
 std = [
+  "dep:froglight-network",
   "froglight-common/alloc",
   "froglight-inventory/std",
   "froglight-nbt/std",
-  # "froglight-player/std",
-  # "froglight-registry/std",
-  # "froglight-schedule?/std",
+  "froglight-player/ansi",
+  "froglight-player/online",
+  "froglight-schedule?/std",
   "froglight-world/std",
 ]
+# Enable `no_std` support for glam.
+libm = ["froglight-world/libm"]
 
 # Enable support for v1.21.4
 v1_21_4 = [
   "froglight-block/v1_21_4",
   "froglight-inventory/v1_21_4",
   "froglight-item/v1_21_4",
-  "froglight-network/v1_21_4",
+  "froglight-network?/v1_21_4",
   "froglight-registry/v1_21_4",
   "froglight-world/v1_21_4",
 ]
@@ -88,7 +92,7 @@ v1_21_5 = [
   "froglight-block/v1_21_5",
   "froglight-inventory/v1_21_5",
   "froglight-item/v1_21_5",
-  "froglight-network/v1_21_5",
+  "froglight-network?/v1_21_5",
   "froglight-registry/v1_21_5",
   "froglight-world/v1_21_5",
 ]

@@ -1,4 +1,5 @@
-use std::marker::PhantomData;
+use alloc::vec::Vec;
+use core::marker::PhantomData;
 
 use bevy_app::AppLabel;
 use bevy_ecs::prelude::*;

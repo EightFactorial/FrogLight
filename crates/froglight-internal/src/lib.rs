@@ -8,6 +8,7 @@ pub use froglight_common as common;
 pub use froglight_inventory as inventory;
 pub use froglight_item as item;
 pub use froglight_nbt as nbt;
+#[cfg(feature = "std")]
 pub use froglight_network as network;
 pub use froglight_player as player;
 pub use froglight_registry as registry;
@@ -25,6 +26,7 @@ pub mod prelude {
     pub use froglight_inventory::prelude::*;
     pub use froglight_item::prelude::*;
     pub use froglight_nbt::prelude::*;
+    #[cfg(feature = "std")]
     pub use froglight_network::prelude::*;
     pub use froglight_player::prelude::*;
     pub use froglight_registry::prelude::*;

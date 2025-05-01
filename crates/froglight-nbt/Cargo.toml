@@ -22,7 +22,7 @@ proptest = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 [dependencies]
-bevy_platform = { workspace = true }
+bevy_platform = { workspace = true, features = ["alloc"] }
 derive_more = { workspace = true }
 froglight-macros = { workspace = true, features = ["nbt"] }
 hashbrown = { workspace = true }
@@ -45,7 +45,8 @@ default = ["std"]
 reflect = ["dep:bevy_reflect"]
 # Enable `froglight-io` support.
 io = ["dep:froglight-io", "std"]
-# Enable `serde` support.
+
+# Enable support for `serde` serialization.
 serde = ["dep:serde", "indexmap/serde", "smol_str/serde"]
 
 # Enable support for the rust standard library.

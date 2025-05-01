@@ -20,9 +20,8 @@ bevy = { workspace = true, features = ["bevy_log"] }
 froglight-common = { workspace = true, features = ["bevy"] }
 
 [dependencies]
-bevy_app = { workspace = true }
-bevy_ecs = { workspace = true }
-bevy_log = { workspace = true }
+bevy_app = { workspace = true, features = ["bevy_reflect"] }
+bevy_ecs = { workspace = true, features = ["bevy_reflect"] }
 bevy_platform = { workspace = true, features = ["alloc"] }
 bevy_reflect = { workspace = true }
 derive_more = { workspace = true }
@@ -30,19 +29,23 @@ froglight-common = { workspace = true, features = ["bevy"] }
 parking_lot = { workspace = true }
 
 # Optional dependencies
+bevy_log = { workspace = true, optional = true, features = ["trace"] }
 bevy_tasks = { workspace = true, optional = true }
-bevy_time = { workspace = true, optional = true }
+bevy_time = { workspace = true, optional = true, features = ["bevy_reflect"] }
 
 [features]
-default = []
+default = ["std"]
 
 # Enable the `SubAppPlugin`
 subapp = ["dep:bevy_time"]
 # Enable the multi-threaded SubApp executor
 multi_threaded = ["dep:bevy_tasks", "subapp"]
 
+# Enable support for the rust standard library.
+std = ["bevy_app/std", "bevy_ecs/std", "bevy_platform/std", "bevy_reflect/std", "bevy_tasks?/std", "bevy_time?/std"]
+
 # Enable tracing
-trace = ["bevy/trace_tracy", "bevy_log/trace"]
+trace = ["bevy/trace_tracy", "dep:bevy_log", "std"]
 
 [[example]]
 name = "subapp"

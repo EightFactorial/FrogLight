@@ -1,5 +1,12 @@
 //! [`FormattedText::as_chat_message`] and the ansi equivalent if enabled.
 
+#[cfg(not(feature = "std"))]
+use alloc::{
+    borrow::Cow,
+    format,
+    string::{String, ToString},
+};
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
 use crate::{

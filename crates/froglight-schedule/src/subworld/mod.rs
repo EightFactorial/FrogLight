@@ -1,7 +1,6 @@
 //! TODO
 
 use bevy_ecs::{component::HookContext, prelude::*, world::DeferredWorld};
-use bevy_log::error;
 use bevy_platform::collections::{HashMap, hash_map::Entry};
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut};
@@ -49,6 +48,7 @@ impl SubWorld {
     pub fn from_world(identifier: Identifier, world: &mut World) -> Result<Self, ()> {
         // Return an error if the identifier is already in use.
         if world.get_resource_or_init::<SubWorlds>().contains_key(&identifier) {
+            #[cfg(feature = "trace")]
             bevy_log::error!("A SubWorld with the identifier \"{identifier}\" already exists!");
             return Err(());
         }
@@ -103,8 +103,10 @@ impl SubWorldSync for SubWorlds {
                     Entry::Vacant(entry) => {
                         entry.insert(entity);
                     }
-                    Entry::Occupied(entry) => {
-                        error!("The SubWorld \"{}\" already exists!", entry.key());
+                    #[allow(unused_variables, clippy::used_underscore_binding)]
+                    Entry::Occupied(_entry) => {
+                        #[cfg(feature = "trace")]
+                        bevy_log::error!("The SubWorld \"{}\" already exists!", _entry.key());
                     }
                 }
             }
