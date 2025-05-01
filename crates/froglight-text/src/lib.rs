@@ -6,7 +6,6 @@
 extern crate alloc;
 
 pub mod chat;
-pub mod player;
 pub mod text;
 pub mod translate;
 
@@ -16,7 +15,6 @@ pub mod prelude {
     #[cfg(feature = "std")]
     pub use crate::chat::signature::MessageSignatureCtx;
     pub use crate::{
-        player::{profile::PlayerProfile, username::PlayerUsername, uuid::PlayerUuid},
         text::{FormattedText, TextColor, TextFormatting},
         translate::TextTranslations,
     };

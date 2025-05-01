@@ -1,4 +1,6 @@
 //! [`FormattedText::as_chat_message`] and the ansi equivalent if enabled.
+//!
+//! TODO: Handle legacy formatting codes
 
 #[cfg(not(feature = "std"))]
 use alloc::{

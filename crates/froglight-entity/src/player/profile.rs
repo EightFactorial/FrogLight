@@ -288,6 +288,7 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
     type Error = serde::de::value::Error;
 
     fn try_from(value: &serde_json::Value) -> Result<Self, Self::Error> {
+        #[cfg(feature = "std")]
         let Some(timestamp) = value.get("timestamp").and_then(serde_json::Value::as_u64) else {
             return Err(serde::de::Error::custom("\"timestamp\" not found"));
         };
@@ -296,6 +297,7 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
         };
 
         Ok(Self {
+            #[cfg(feature = "std")]
             timestamp: SystemTime::UNIX_EPOCH
                 .checked_add(Duration::from_millis(timestamp))
                 .expect("SystemTime overflow!"),

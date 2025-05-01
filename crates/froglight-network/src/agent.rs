@@ -32,11 +32,11 @@ impl FroglightAgent {
         )))
     }
 
-    /// Create a new [`FroglightAgent`] with default settings.
+    /// Create a new [`FroglightAgent`] with the default settings.
     ///
     /// See [`Agent::new_with_defaults`] for more information.
     #[must_use]
-    pub fn new_without_resolver() -> Self { Self(Arc::new(Agent::new_with_defaults())) }
+    pub fn new_with_defaults() -> Self { Self(Arc::new(Agent::new_with_defaults())) }
 }
 
 impl std::ops::Deref for FroglightAgent {

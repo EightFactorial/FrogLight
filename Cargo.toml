@@ -5,6 +5,7 @@ members = [
   "crates/froglight-block",
   "crates/froglight-brigadier",
   "crates/froglight-common",
+  "crates/froglight-entity",
   "crates/froglight-internal",
   "crates/froglight-inventory",
   "crates/froglight-io",
@@ -12,9 +13,9 @@ members = [
   "crates/froglight-macros",
   "crates/froglight-nbt",
   "crates/froglight-network",
-  "crates/froglight-player",
   "crates/froglight-registry",
   "crates/froglight-schedule",
+  "crates/froglight-text",
   "crates/froglight-world",
 ]
 resolver = "2"
@@ -76,6 +77,7 @@ bevy_winit = { version = "0.16", default-features = false }
 froglight-block = { version = "0.1", path = "crates/froglight-block" }
 froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier", default-features = false }
 froglight-common = { version = "0.1", path = "crates/froglight-common", features = ["alloc"] }
+froglight-entity = { version = "0.1", path = "crates/froglight-entity", default-features = false }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal", default-features = false }
 froglight-inventory = { version = "0.1", path = "crates/froglight-inventory", default-features = false }
 froglight-io = { version = "0.1", path = "crates/froglight-io" }
@@ -83,9 +85,9 @@ froglight-item = { version = "0.1", path = "crates/froglight-item" }
 froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
 froglight-nbt = { version = "0.1", path = "crates/froglight-nbt", default-features = false }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
-froglight-player = { version = "0.1", path = "crates/froglight-player", default-features = false }
 froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
 froglight-schedule = { version = "0.1", path = "crates/froglight-schedule", default-features = false }
+froglight-text = { version = "0.1", path = "crates/froglight-text", default-features = false }
 froglight-world = { version = "0.1", path = "crates/froglight-world", default-features = false }
 
 # Hashing / Cryptography

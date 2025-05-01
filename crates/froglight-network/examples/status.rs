@@ -45,6 +45,12 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
         ClientboundStatusPackets::PingResult(..) => panic!("Got a ping response?"),
         ClientboundStatusPackets::QueryResponse(response) => {
             println!("{response:#?}");
+
+            assert!(
+                response.description.contains("Hypixel"),
+                "Did not find \"Hypixel\" in the server description?"
+            );
+
             Ok(())
         }
     }

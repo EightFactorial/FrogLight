@@ -1,0 +1,61 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+name = "froglight-entity"
+readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy_platform = { workspace = true, features = ["alloc"] }
+derive_more = { workspace = true }
+froglight-common = { workspace = true }
+froglight-nbt = { workspace = true }
+md-5 = { workspace = true }
+parking_lot = { workspace = true }
+smol_str = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true, features = ["md5"] }
+
+# Optional dependencies
+base64 = { workspace = true, optional = true, features = ["std"] }
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
+froglight-io = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
+serde_json = { workspace = true, optional = true }
+ureq = { workspace = true, optional = true, features = ["json"] }
+
+[features]
+default = ["online", "std"]
+
+# Enable accessing online APIs.
+online = ["dep:base64", "dep:ureq", "serde", "std"]
+# Enable `froglight-io` support.
+io = ["dep:froglight-io", "std"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-nbt/reflect"]
+# Enable `serde` serialization support.
+serde = [
+  "bevy_platform/serialize",
+  "dep:serde",
+  "dep:serde_json",
+  "froglight-common/serde",
+  "froglight-io?/serde",
+  "froglight-nbt/serde",
+  "smol_str/serde",
+  "uuid/serde",
+]
+
+# Enable support for the rust standard library.
+std = []
