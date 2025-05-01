@@ -1,6 +1,8 @@
 //! [`CommandBuilder`] and related types for building commands.
 
-use std::marker::PhantomData;
+#[cfg(not(feature = "std"))]
+use alloc::{format, vec::Vec};
+use core::marker::PhantomData;
 
 use bevy_ecs::entity::Entity;
 use bevy_reflect::{

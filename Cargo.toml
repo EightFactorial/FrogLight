@@ -74,7 +74,7 @@ bevy_winit = { version = "0.16", default-features = false }
 
 # FrogLight
 froglight-block = { version = "0.1", path = "crates/froglight-block" }
-froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier" }
+froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier", default-features = false }
 froglight-common = { version = "0.1", path = "crates/froglight-common", features = ["alloc"] }
 froglight-internal = { version = "0.1", path = "crates/froglight-internal", default-features = false }
 froglight-inventory = { version = "0.1", path = "crates/froglight-inventory", default-features = false }

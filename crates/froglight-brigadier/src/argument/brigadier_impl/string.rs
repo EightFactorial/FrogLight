@@ -1,3 +1,9 @@
+#[cfg(not(feature = "std"))]
+use alloc::{
+    boxed::Box,
+    string::{String, ToString},
+};
+
 use bevy_ecs::world::World;
 use bevy_reflect::{func::ArgValue, prelude::*};
 

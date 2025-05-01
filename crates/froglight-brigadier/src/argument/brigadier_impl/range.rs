@@ -1,4 +1,6 @@
-use std::{
+#[cfg(not(feature = "std"))]
+use alloc::boxed::Box;
+use core::{
     fmt::Debug,
     ops::{Bound, RangeBounds},
     str::FromStr,

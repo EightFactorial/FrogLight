@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
 use bevy_ecs::{
     system::{EntityCommand, EntityCommands},
     world::EntityWorldMut,

@@ -19,6 +19,7 @@ impl NbtCompound {
     /// Create a new empty [`NbtCompound`].
     #[inline]
     #[must_use]
+    #[expect(clippy::default_trait_access)]
     pub fn new() -> Self { Self(CompoundMap::with_hasher(Default::default())) }
 
     /// Return the number of tags in the [`NbtCompound`].

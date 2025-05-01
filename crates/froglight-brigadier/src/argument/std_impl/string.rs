@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::Cow, boxed::Box, string::String};
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
 use bevy_ecs::world::World;

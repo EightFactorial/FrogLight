@@ -60,7 +60,7 @@ bevy = [
 
 # Enable support for the rust standard library.
 std = ["bevy_platform/std", "bevy_reflect?/std", "bitvec/std", "glam/std"]
-# Enable `no_std` support for glam.
+# Enable `no_std` support for `glam`.
 libm = ["glam/libm"]
 
 # Enable support for v1.21.4

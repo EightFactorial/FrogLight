@@ -1,9 +1,14 @@
 //! TODO
 
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::Cow, boxed::Box, string::ToString};
+#[cfg(feature = "std")]
 use std::{borrow::Cow, sync::Arc};
 
 use bevy_ecs::prelude::*;
 use bevy_platform::collections::HashMap;
+#[cfg(not(feature = "std"))]
+use bevy_platform::sync::Arc;
 use bevy_reflect::{
     TypeRegistry,
     func::{ArgList, ArgValue, FunctionRegistry, FunctionResult},
@@ -27,7 +32,7 @@ pub use error::BrigadierError;
 
 /// A thread-safe brigadier-style command graph.
 #[derive(Debug, Default, Clone, Resource, Deref, Reflect)]
-#[reflect(opaque, Debug, Default, Resource)]
+#[reflect(opaque, Debug, Default, Clone, Resource)]
 pub struct AppBrigadierGraph(Arc<RwLock<BrigadierGraph>>);
 
 /// A brigadier-style command graph.
@@ -38,7 +43,7 @@ pub struct BrigadierGraph {
 }
 
 impl BrigadierGraph {
-    /// Parse and execute a command.
+    /// Attempt to parse and execute a command.
     ///
     /// # Errors
     /// Returns an error if the command was unknown,
@@ -69,7 +74,7 @@ impl BrigadierGraph {
 
     /// Attempt to parse a command.
     ///
-    /// Similar to [`BrigadierGraph::execute`],
+    /// Similar to [`BrigadierGraph::execute`]
     /// but does not actually execute the command.
     ///
     /// # Errors
@@ -135,7 +140,7 @@ impl BrigadierGraph {
                 match edge.weight() {
                     // Attempt to parse a literal, continue if successful.
                     BrigadierEdge::Literal(str) => {
-                        if let Some(remaining) = Self::parse_literal(arg, str) {
+                        if let Some(remaining) = Self::parse_literal(arg, str.as_ref()) {
                             // Update the remaining arguments.
                             arg = remaining;
 

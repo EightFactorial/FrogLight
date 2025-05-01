@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
 use bevy_ecs::{entity::Entity, event::Event};
 use bevy_reflect::Reflect;
 

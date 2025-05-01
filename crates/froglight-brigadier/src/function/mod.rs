@@ -1,6 +1,6 @@
 //! TODO
 
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 use bevy_ecs::entity::Entity;
 use bevy_reflect::func::{FunctionRegistry, IntoFunction};

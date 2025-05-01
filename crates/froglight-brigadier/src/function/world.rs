@@ -1,10 +1,10 @@
-use std::{
+use core::{
     marker::PhantomData,
     ops::{Deref, DerefMut},
-    sync::Arc,
 };
 
 use bevy_ecs::prelude::*;
+use bevy_platform::sync::Arc;
 use bevy_reflect::prelude::*;
 use parking_lot::{Mutex, MutexGuard};
 
@@ -39,9 +39,9 @@ impl WorldRef<Empty> {
         world: &mut World,
         mut f: impl FnMut(&mut WorldRef<Full>) -> R,
     ) -> R {
-        std::mem::swap(&mut *self.0.lock(), world);
+        core::mem::swap(&mut *self.0.lock(), world);
         let result = f(&mut self.full());
-        std::mem::swap(&mut *self.0.lock(), world);
+        core::mem::swap(&mut *self.0.lock(), world);
         result
     }
 

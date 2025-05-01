@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::borrow::Cow;
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
 use bevy_reflect::func::{FunctionError, FunctionRegistrationError};

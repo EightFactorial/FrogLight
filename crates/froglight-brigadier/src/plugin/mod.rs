@@ -1,9 +1,10 @@
 //! TODO
 
 use bevy_app::{App, Last, Plugin};
+#[cfg(feature = "std")]
+use bevy_ecs::name::Name;
 use bevy_ecs::{
     event::Events,
-    name::Name,
     reflect::{AppFunctionRegistry, AppTypeRegistry},
     schedule::{
         InternedScheduleLabel, IntoScheduleConfigs, ScheduleLabel, common_conditions::on_event,
@@ -11,8 +12,10 @@ use bevy_ecs::{
     system::Local,
     world::World,
 };
+#[cfg(feature = "std")]
 use bevy_log::{debug, error};
 use derive_more::From;
+#[cfg(feature = "std")]
 use tracing::Level;
 
 mod build;
@@ -76,6 +79,7 @@ pub fn brigadier_listener(world: &mut World, mut world_ref: Local<WorldRef<Empty
     world.resource_scope::<Events<BrigadierEvent>, _>(|world, mut events| {
         world_ref.with_world(world, |world| {
             for event in events.drain() {
+                #[cfg(feature = "std")]
                 if tracing::enabled!(Level::DEBUG) {
                     if let Some(name) = world.value().get::<Name>(event.entity()) {
                         debug!("{name} ({}) ran \"{}\"", event.entity(), event.command());
@@ -84,10 +88,12 @@ pub fn brigadier_listener(world: &mut World, mut world_ref: Local<WorldRef<Empty
                     }
                 }
 
-                if let Err(err) =
+                #[allow(unused_variables, clippy::used_underscore_binding)]
+                if let Err(_err) =
                     graph.execute(event.entity(), event.command(), &types, &functions, world)
                 {
-                    error!("Entity {} failed to execute command, {err}", event.entity());
+                    #[cfg(feature = "std")]
+                    error!("Entity {} failed to execute command, {_err}", event.entity());
                 }
             }
         });

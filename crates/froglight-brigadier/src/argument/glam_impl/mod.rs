@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::boxed::Box;
+
 use bevy_ecs::world::World;
 use bevy_reflect::{TypeRegistry, func::ArgValue};
 use glam::{

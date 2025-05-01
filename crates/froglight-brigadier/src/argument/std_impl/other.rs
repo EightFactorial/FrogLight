@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::boxed::Box;
+
 use bevy_ecs::world::World;
 use bevy_reflect::func::ArgValue;
 use froglight_common::identifier::Identifier;

@@ -1,7 +1,10 @@
-use std::time::Duration;
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+use core::{cmp::Ordering, time::Duration};
 
 use bevy::prelude::*;
 use bevy_ecs::component::ComponentInfo;
+#[cfg(feature = "std")]
 use bevy_log::{Level, LogPlugin};
 use froglight_common::entity::EntityId;
 
@@ -10,8 +13,9 @@ use crate::{function::WorldRef, prelude::*};
 #[test]
 fn execute() -> AppExit {
     let mut app = App::new();
-    app.add_plugins((MinimalPlugins, LogPlugin { level: Level::INFO, ..default() }));
-    app.add_plugins(BrigadierPlugin::default());
+    app.add_plugins((MinimalPlugins, BrigadierPlugin::default()));
+    #[cfg(feature = "std")]
+    app.add_plugins(LogPlugin { level: Level::INFO, ..default() });
 
     // Add a basic command with no arguments
     app.add_command("test", |builder| {
@@ -34,7 +38,7 @@ fn execute() -> AppExit {
         let builder = builder.arg::<u32, _>().literal("literal").arg::<f64, _>();
         builder.command(|entity, int, double, mut world| {
             assert_eq!(int, 1000);
-            assert_eq!(double.total_cmp(&40320.0), std::cmp::Ordering::Equal);
+            assert_eq!(double.total_cmp(&40320.0), Ordering::Equal);
 
             let world = world.value();
             let components = world.inspect_entity(entity).unwrap().map(ComponentInfo::name);

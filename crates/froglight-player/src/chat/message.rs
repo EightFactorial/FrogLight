@@ -32,14 +32,15 @@ impl FormattedText {
     /// or if a translation is not found.
     #[inline]
     #[cfg(feature = "ansi")]
-    pub fn as_chat_message_ansi(
-        &self,
+    pub fn as_chat_message_ansi<'a>(
+        &'a self,
         t: &TextTranslations,
-    ) -> Result<nu_ansi_term::AnsiString, ChatMessageError> {
+    ) -> Result<nu_ansi_term::AnsiString<'a>, ChatMessageError> {
         FormattedTextRef::new(self).as_chat_message_ansi(t)
     }
 }
 
+#[allow(clippy::elidable_lifetime_names)]
 impl<'a> FormattedTextRef<'a> {
     /// Extract the message as a [`String`]
     ///

@@ -270,10 +270,6 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
 
                     // Add the property to the properties map.
                     properties.insert(property.name, value);
-
-                    // Skip warning below.
-                    #[cfg(feature = "bevy")]
-                    continue;
                 }
             }
         }

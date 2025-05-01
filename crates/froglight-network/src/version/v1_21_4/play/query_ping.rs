@@ -15,7 +15,7 @@ impl QueryPingPacket {
     /// Create a new [`QueryPingPacket`] with the current time in milliseconds
     /// since the [`UNIX_EPOCH`].
     #[must_use]
-    #[allow(clippy::missing_panics_doc)]
+    #[allow(clippy::cast_possible_truncation, clippy::missing_panics_doc)]
     pub fn unix_epoch() -> Self {
         Self::from(SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64)
     }

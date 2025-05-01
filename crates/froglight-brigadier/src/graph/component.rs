@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::{borrow::Cow, boxed::Box};
+#[cfg(feature = "std")]
 use std::borrow::Cow;
 
 use bevy_reflect::PartialReflect;
