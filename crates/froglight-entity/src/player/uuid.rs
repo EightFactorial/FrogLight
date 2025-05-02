@@ -94,7 +94,7 @@ impl PlayerUuid {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_player::prelude::{PlayerUsername, PlayerUuid};
+    /// use froglight_entity::prelude::{PlayerUsername, PlayerUuid};
     /// use uuid::Uuid;
     ///
     /// let agent = ureq::Agent::new_with_defaults();

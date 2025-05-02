@@ -181,7 +181,7 @@ impl PlayerProfile {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_player::prelude::PlayerProfile;
+    /// use froglight_entity::prelude::PlayerProfile;
     ///
     /// let agent = ureq::Agent::new_with_defaults();
     ///
@@ -211,7 +211,7 @@ impl PlayerProfile {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_player::prelude::{PlayerProfile, PlayerUuid};
+    /// use froglight_entity::prelude::{PlayerProfile, PlayerUuid};
     /// use uuid::Uuid;
     ///
     /// let agent = ureq::Agent::new_with_defaults();

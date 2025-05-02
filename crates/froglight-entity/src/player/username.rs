@@ -48,7 +48,7 @@ impl PlayerUsername {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_player::prelude::PlayerUsername;
+    /// use froglight_entity::prelude::PlayerUsername;
     ///
     /// let username = PlayerUsername::static_new("Mr_Sus_");
     /// assert_eq!(username.offline_uuid().to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
@@ -76,7 +76,7 @@ impl PlayerUsername {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_player::prelude::PlayerUsername;
+    /// use froglight_entity::prelude::PlayerUsername;
     ///
     /// match PlayerUsername::static_new("Mr_Sus_").online_uuid(None) {
     ///     Ok(uuid) => assert_eq!(uuid.to_string(), "352f97ab-cb6a-4bdf-aedc-c8764b8f6fc3"),
@@ -127,7 +127,7 @@ impl PlayerUsername {
     ///
     /// # Example
     /// ```rust
-    /// use froglight_player::prelude::PlayerUsername;
+    /// use froglight_entity::prelude::PlayerUsername;
     /// use uuid::Uuid;
     ///
     /// let agent = ureq::Agent::new_with_defaults();
