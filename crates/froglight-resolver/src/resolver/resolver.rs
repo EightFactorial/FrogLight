@@ -43,13 +43,16 @@ impl FroglightResolver {
         Ok(Self::new(config, options))
     }
 
+    /// Create a new [`FroglightResolver`] that uses Cloudflare's DNS servers.
+    #[must_use]
+    pub fn cloudflare() -> Self { Self::new(ResolverConfig::cloudflare(), ResolverOpts::default()) }
+
     /// Create a new [`FroglightResolver`] from the system configuration,
     /// falling back to using Cloudflare's DNS servers if it cannot be read.
     #[inline]
     #[must_use]
-    pub fn system_config_or_cloudflare() -> Self {
-        Self::system_config()
-            .unwrap_or_else(|_| Self::new(ResolverConfig::cloudflare(), ResolverOpts::default()))
+    pub fn system_or_cloudflare() -> Self {
+        Self::system_config().unwrap_or_else(|_| Self::cloudflare())
     }
 
     /// Lookup an IP address for a given hostname.
@@ -98,4 +101,4 @@ impl bevy_ecs::world::FromWorld for FroglightResolver {
 // -------------------------------------------------------------------------------------------------
 
 #[test]
-fn resolver_lookup() {}
+fn resolve_lookup() {}

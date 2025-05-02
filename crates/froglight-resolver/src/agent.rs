@@ -41,7 +41,7 @@ impl FroglightAgent {
     /// falling back to using Cloudflare's DNS servers if it cannot be read.
     #[must_use]
     pub fn system_config_or_cloudflare() -> Self {
-        let resolver = FroglightResolver::system_config_or_cloudflare();
+        let resolver = FroglightResolver::system_or_cloudflare();
         Self(Arc::new(Agent::with_parts(Config::default(), DefaultConnector::new(), resolver)))
     }
 }

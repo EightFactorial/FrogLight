@@ -13,7 +13,7 @@ use froglight_io::{
 
 use crate::{
     connection::raw::{RawConnection, RawReadConnection, RawWriteConnection},
-    version::state::{Config, Handshake, Login, Play, State, Status, ValidState},
+    prelude::*,
 };
 
 /// A connection from a client to a server.
@@ -260,7 +260,7 @@ impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
     #[cfg(feature = "resolver")]
     pub async fn connect(
         address: impl AsRef<str>,
-        resolver: froglight_resolver::resolver::FroglightResolver,
+        resolver: FroglightResolver,
     ) -> Result<Self, std::io::Error> {
         let socket = resolver.lookup_minecraft(address.as_ref()).await?;
         Self::connect_to(address, socket).await

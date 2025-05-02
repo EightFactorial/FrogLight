@@ -18,8 +18,8 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
 }
 
 async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
-    // Create a resolver using Cloudflare DNS
-    let resolver = FroglightResolver::system_config_or_cloudflare();
+    // Create a resolver using Cloudflare's DNS servers
+    let resolver = FroglightResolver::cloudflare();
 
     // Connect and send the handshake packet
     let mut conn = ClientConnection::<V1_21_4, _>::connect(&SERVER_ADDRESS, resolver).await?;

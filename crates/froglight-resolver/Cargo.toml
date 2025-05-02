@@ -38,3 +38,10 @@ agent = ["dep:ureq"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect", "dep:bevy_tasks"]
+
+# --- Examples ---
+
+[[example]]
+name = "address"
+path = "examples/address.rs"
+required-features = ["bevy"]
