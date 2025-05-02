@@ -29,6 +29,7 @@ froglight-world = { workspace = true, features = ["block"] }
 # Optional dependencies
 froglight-brigadier = { workspace = true, optional = true, features = ["glam", "nbt", "uuid"] }
 froglight-network = { workspace = true, optional = true, features = ["inventory", "resolver"] }
+froglight-resolver = { workspace = true, optional = true, features = ["agent"] }
 froglight-schedule = { workspace = true, optional = true }
 
 [features]
@@ -48,6 +49,7 @@ bevy = [
   "froglight-nbt/reflect",
   "froglight-network?/bevy",
   "froglight-registry/bevy",
+  "froglight-resolver?/bevy",
   "froglight-world/bevy",
 ]
 
@@ -62,12 +64,14 @@ nightly = [
   # "froglight-network?/nightly",
   # "froglight-registry/nightly",
   # "froglight-schedule?/nightly",
+  # "froglight-resolver?/nightly",
   # "froglight-world/nightly",
 ]
 
 # Enable support for rust's standard library.
 std = [
   "dep:froglight-network",
+  "dep:froglight-resolver",
   "froglight-brigadier?/std",
   "froglight-common/alloc",
   "froglight-entity/online",
@@ -78,6 +82,7 @@ std = [
   "froglight-text/ansi",
   "froglight-text/std",
   "froglight-world/std",
+
 ]
 # Enable `no_std` support for `glam`.
 libm = ["froglight-brigadier?/libm", "froglight-world/libm"]

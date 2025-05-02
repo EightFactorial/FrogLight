@@ -17,9 +17,7 @@ workspace = true
 
 [dependencies]
 async-compression = { workspace = true, features = ["futures-io", "zlib"] }
-async-io = { workspace = true }
 async-net = { workspace = true }
-blocking = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
 froglight-entity = { workspace = true, features = ["io"] }
@@ -33,7 +31,6 @@ serde = { workspace = true, features = ["derive", "std"] }
 serde_json = { workspace = true, features = ["std"] }
 smallvec = { workspace = true }
 smol_str = { workspace = true, features = ["std"] }
-ureq = { workspace = true }
 uuid = { workspace = true, features = ["std"] }
 
 # Optional dependencies
@@ -45,13 +42,10 @@ bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["glam", "io", "uuid"] }
 froglight-inventory = { workspace = true, optional = true, features = ["io"] }
 froglight-nbt = { workspace = true, optional = true, features = ["io"] }
-hickory-resolver = { version = "0.25", optional = true, default-features = false, features = ["system-config"] }
+froglight-resolver = { workspace = true, optional = true }
 
 [features]
 default = ["inventory", "nbt", "resolver"]
-
-# Enable server address and port lookup.
-resolver = ["dep:hickory-resolver"]
 
 # Enable `froglight-brigadier` support.
 brigadier = ["bevy", "dep:froglight-brigadier"]
@@ -59,6 +53,8 @@ brigadier = ["bevy", "dep:froglight-brigadier"]
 inventory = ["dep:froglight-inventory", "nbt"]
 # Enable `froglight-nbt` support.
 nbt = ["dep:froglight-nbt", "froglight-brigadier?/nbt"]
+# Enable `froglight-resolver` support.
+resolver = ["dep:froglight-resolver"]
 
 # Enable `bevy` support.
 bevy = [

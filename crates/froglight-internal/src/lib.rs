@@ -12,6 +12,8 @@ pub use froglight_nbt as nbt;
 #[cfg(feature = "std")]
 pub use froglight_network as network;
 pub use froglight_registry as registry;
+#[cfg(feature = "std")]
+pub use froglight_resolver as resolver;
 #[cfg(feature = "bevy")]
 pub use froglight_schedule as schedule;
 pub use froglight_text as text;

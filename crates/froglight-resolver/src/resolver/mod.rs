@@ -1,5 +1,7 @@
 //! A [`FroglightResolver`] implemented using [`hickory_resolver`].
 
+mod minecraft;
+
 mod provider;
 use provider::{FroglightInnerResolver, ResolverConnectionProvider};
 

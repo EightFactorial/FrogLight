@@ -1,14 +1,9 @@
 //! TODO
 
 use bevy_log::tracing_subscriber::{EnvFilter, fmt};
-use bevy_tasks::{IoTaskPool, TaskPool, futures_lite::future::block_on};
+use bevy_tasks::{IoTaskPool, TaskPool, block_on};
 use froglight_common::version::Version;
-use froglight_network::{
-    prelude::*,
-    resolver::hickory::{ResolverConfig, ResolverOpts},
-    types::ConnectionIntent,
-    version::v1_21_4::prelude::*,
-};
+use froglight_network::{prelude::*, types::ConnectionIntent, version::v1_21_4::prelude::*};
 use smol_str::SmolStr;
 
 /// The address of the server to request the status from.
@@ -24,7 +19,7 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
 
 async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
     // Create a resolver using Cloudflare DNS
-    let resolver = FroglightResolver::new(ResolverConfig::cloudflare(), ResolverOpts::default());
+    let resolver = FroglightResolver::system_config_or_cloudflare();
 
     // Connect and send the handshake packet
     let mut conn = ClientConnection::<V1_21_4, _>::connect(&SERVER_ADDRESS, resolver).await?;

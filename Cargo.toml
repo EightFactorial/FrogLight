@@ -14,6 +14,7 @@ members = [
   "crates/froglight-nbt",
   "crates/froglight-network",
   "crates/froglight-registry",
+  "crates/froglight-resolver",
   "crates/froglight-schedule",
   "crates/froglight-text",
   "crates/froglight-world",
@@ -86,6 +87,7 @@ froglight-macros = { version = "0.1", path = "crates/froglight-macros" }
 froglight-nbt = { version = "0.1", path = "crates/froglight-nbt", default-features = false }
 froglight-network = { version = "0.1", path = "crates/froglight-network" }
 froglight-registry = { version = "0.1", path = "crates/froglight-registry" }
+froglight-resolver = { version = "0.1", path = "crates/froglight-resolver" }
 froglight-schedule = { version = "0.1", path = "crates/froglight-schedule", default-features = false }
 froglight-text = { version = "0.1", path = "crates/froglight-text", default-features = false }
 froglight-world = { version = "0.1", path = "crates/froglight-world", default-features = false }
@@ -97,7 +99,7 @@ cfb8 = { version = "0.8.1", features = ["alloc", "zeroize"] }
 crc32fast = { version = "1.4.2", default-features = false }
 md-5 = { version = "0.10.6", default-features = false }
 rsa = { version = "0.9.8", default-features = false, features = ["pem"] }
-sha2 = { version = "0.10.8", default-features = false }
+sha2 = { version = "0.10.9", default-features = false }
 
 # Other
 async-channel = { version = "2.3", default-features = false }
@@ -112,6 +114,7 @@ futures-lite = { version = "2.6", default-features = false, features = ["alloc"]
 glam = { version = "0.29", default-features = false }
 hashbrown = "0.15"
 hashify = "0.2.6"
+hickory-resolver = { version = "0.25", default-features = false }
 indexmap = { version = "2.9", default-features = false }
 nu-ansi-term = "0.46"
 parking_lot = "0.12"

@@ -260,9 +260,10 @@ impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
     #[cfg(feature = "resolver")]
     pub async fn connect(
         address: impl AsRef<str>,
-        resolver: crate::resolver::FroglightResolver,
+        resolver: froglight_resolver::resolver::FroglightResolver,
     ) -> Result<Self, std::io::Error> {
-        resolver.connect_to_server(address.as_ref()).await
+        let socket = resolver.lookup_minecraft(address.as_ref()).await?;
+        Self::connect_to(address, socket).await
     }
 
     /// Connect to a server by resolving the address

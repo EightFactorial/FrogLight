@@ -1,0 +1,40 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+name = "froglight-resolver"
+readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+async-io = { workspace = true }
+async-net = { workspace = true }
+blocking = { workspace = true }
+derive_more = { workspace = true }
+futures-lite = { workspace = true, features = ["std"] }
+hickory-resolver = { workspace = true, features = ["system-config"] }
+
+# Optional dependencies
+bevy_ecs = { workspace = true, optional = true, features = ["std"] }
+bevy_log = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["std"] }
+bevy_tasks = { workspace = true, optional = true, features = ["std"] }
+ureq = { workspace = true, optional = true }
+
+[features]
+default = ["agent"]
+
+# Enable `ureq` support.
+agent = ["dep:ureq"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect", "dep:bevy_tasks"]

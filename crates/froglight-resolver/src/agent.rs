@@ -1,16 +1,25 @@
-//! [`FroglightAgent`] for use in Bevy.
+//! A [`ureq::Agent`], backed by a [`FroglightResolver`]
 
-use std::sync::Arc;
+use std::{
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    sync::Arc,
+};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-#[cfg(feature = "resolver")]
 use hickory_resolver::{ResolveErrorKind, proto::ProtoErrorKind};
-use ureq::Agent;
+use ureq::{
+    Agent,
+    config::Config,
+    http::Uri,
+    unversioned::{
+        resolver::{self, ResolvedSocketAddrs},
+        transport::{DefaultConnector, NextTimeout},
+    },
+};
 
-#[cfg(feature = "resolver")]
 use crate::resolver::FroglightResolver;
 
 /// A thread-safe wrapper around an [`Agent`] for use in Bevy.
@@ -23,20 +32,18 @@ pub struct FroglightAgent(Arc<Agent>);
 impl FroglightAgent {
     /// Create a new [`FroglightAgent`] using the given [`FroglightResolver`].
     #[must_use]
-    #[cfg(feature = "resolver")]
     pub fn new(resolver: &FroglightResolver) -> Self {
-        Self(Arc::new(Agent::with_parts(
-            ureq::config::Config::default(),
-            ureq::unversioned::transport::DefaultConnector::new(),
-            resolver.clone(),
-        )))
+        let resolver = resolver.clone();
+        Self(Arc::new(Agent::with_parts(Config::default(), DefaultConnector::new(), resolver)))
     }
 
-    /// Create a new [`FroglightAgent`] with the default settings.
-    ///
-    /// See [`Agent::new_with_defaults`] for more information.
+    /// Create a new [`FroglightAgent`] using the system's settings,
+    /// falling back to using Cloudflare's DNS servers if it cannot be read.
     #[must_use]
-    pub fn new_with_defaults() -> Self { Self(Arc::new(Agent::new_with_defaults())) }
+    pub fn system_config_or_cloudflare() -> Self {
+        let resolver = FroglightResolver::system_config_or_cloudflare();
+        Self(Arc::new(Agent::with_parts(Config::default(), DefaultConnector::new(), resolver)))
+    }
 }
 
 impl std::ops::Deref for FroglightAgent {
@@ -50,27 +57,16 @@ impl std::ops::Deref for FroglightAgent {
 #[cfg(feature = "bevy")]
 impl bevy_ecs::world::FromWorld for FroglightAgent {
     #[allow(unused_variables)]
-    fn from_world(world: &mut World) -> Self {
-        #[cfg(feature = "resolver")]
-        {
-            Self::new(&world.get_resource_or_init())
-        }
-
-        #[cfg(not(feature = "resolver"))]
-        {
-            Self::new_without_resolver()
-        }
-    }
+    fn from_world(world: &mut World) -> Self { Self::new(&world.get_resource_or_init()) }
 }
 
-#[cfg(feature = "resolver")]
-impl ureq::unversioned::resolver::Resolver for FroglightResolver {
+impl resolver::Resolver for FroglightResolver {
     fn resolve(
         &self,
-        uri: &ureq::http::Uri,
-        _config: &ureq::config::Config,
-        _timeout: ureq::unversioned::transport::NextTimeout,
-    ) -> Result<ureq::unversioned::resolver::ResolvedSocketAddrs, ureq::Error> {
+        uri: &Uri,
+        _config: &Config,
+        _timeout: NextTimeout,
+    ) -> Result<ResolvedSocketAddrs, ureq::Error> {
         let host = uri.host().ok_or_else(|| ureq::Error::BadUri(uri.to_string()))?;
         let scheme = uri.scheme().unwrap_or(&ureq::http::uri::Scheme::HTTP);
 
@@ -82,14 +78,11 @@ impl ureq::unversioned::resolver::Resolver for FroglightResolver {
 
         match futures_lite::future::block_on(self.lookup_ip(host)) {
             Ok(addrs) => {
-                let mut result = ureq::unversioned::resolver::ResolvedSocketAddrs::from_fn(|_| {
-                    std::net::SocketAddr::new(
-                        std::net::IpAddr::V4(std::net::Ipv4Addr::UNSPECIFIED),
-                        0,
-                    )
+                let mut result = ResolvedSocketAddrs::from_fn(|_| {
+                    SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), 0)
                 });
                 for addr in addrs.into_iter().take(16) {
-                    result.push(std::net::SocketAddr::new(addr, port));
+                    result.push(SocketAddr::new(addr, port));
                 }
                 Ok(result)
             }
@@ -110,7 +103,6 @@ impl ureq::unversioned::resolver::Resolver for FroglightResolver {
 fn agent() {
     use std::io::ErrorKind;
 
-    #[cfg(feature = "resolver")]
     let agent = {
         use hickory_resolver::config::{ResolverConfig, ResolverOpts};
 
@@ -123,10 +115,7 @@ fn agent() {
         ))
     };
 
-    #[cfg(not(feature = "resolver"))]
-    let agent = FroglightAgent::new_without_resolver();
-
-    // Attempt to connect to local addresses
+    // Attempt to connect to ip addresses
     match agent.get("http://127.0.0.1").call() {
         Ok(..) | Err(ureq::Error::ConnectionFailed) => {}
         Err(ureq::Error::Io(err)) if err.kind() == ErrorKind::ConnectionRefused => {}
@@ -138,7 +127,7 @@ fn agent() {
         Err(err) => panic!("Failed to connect to \"1.1.1.1\": {err}"),
     }
 
-    // Attempt to resolve and connect to global addresses
+    // Attempt to resolve and connect to web addresses
     match agent.get("https://www.google.com").call() {
         Ok(..) | Err(ureq::Error::ConnectionFailed) => {}
         Err(ureq::Error::Io(err)) if err.kind() == ErrorKind::ConnectionRefused => {}
