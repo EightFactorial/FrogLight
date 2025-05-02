@@ -56,13 +56,24 @@ impl RuntimeProvider for ResolverRuntimeProvider {
         &self,
         server_addr: SocketAddr,
         _bind_addr: Option<SocketAddr>,
-        _timeout: Option<Duration>,
+        timeout: Option<Duration>,
     ) -> Pin<Box<dyn Send + Future<Output = std::io::Result<Self::Tcp>>>> {
-        Box::pin(async move {
+        // Create a future to connect to the server
+        let connect = async move {
             let stream = TcpStream::connect(server_addr).await?;
             stream.set_nodelay(true)?;
             Ok(ResolverTcpConnection(stream))
-        })
+        };
+
+        match timeout {
+            // If no timeout is specified, return the `connect` future directly
+            None => Box::pin(connect),
+            // Otherwise, return a future that times out after the specified duration
+            Some(timeout) => Box::pin(futures_lite::future::or(connect, async move {
+                async_io::Timer::after(timeout).await;
+                Err(std::io::Error::new(std::io::ErrorKind::TimedOut, "future timed out"))
+            })),
+        }
     }
 
     fn bind_udp(
@@ -119,7 +130,7 @@ impl Spawn for ResolverRuntimeHandle {
 
         #[cfg(not(feature = "bevy"))]
         {
-            blocking::unblock(|| futures_lite::future::block_on(future)).detach();
+            blocking::unblock(|| async_io::block_on(future)).detach();
         }
     }
 }
@@ -140,16 +151,13 @@ impl Time for ResolverTime {
     where
         F: 'static + Future + Send,
     {
-        Box::pin(async move {
-            futures_lite::future::or::<Result<F::Output, std::io::Error>, _, _>(
-                async { Ok(future.await) },
-                async {
-                    async_io::Timer::after(duration).await;
-                    Err(std::io::Error::new(std::io::ErrorKind::TimedOut, "future timed out"))
-                },
-            )
-            .await
-        })
+        Box::pin(futures_lite::future::or::<Result<F::Output, std::io::Error>, _, _>(
+            async move { Ok(future.await) },
+            async move {
+                async_io::Timer::after(duration).await;
+                Err(std::io::Error::new(std::io::ErrorKind::TimedOut, "future timed out"))
+            },
+        ))
     }
 }
 
