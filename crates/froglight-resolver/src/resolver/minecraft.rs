@@ -72,7 +72,9 @@ fn resolve_minecraft() {
 
     use futures_lite::future::block_on;
 
-    let resolver = FroglightResolver::system_or_cloudflare();
+    #[cfg(feature = "bevy")]
+    let _ = bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+    let resolver = FroglightResolver::cloudflare();
 
     // Test IPv4 addresses
     let addr = block_on(resolver.lookup_minecraft("127.0.0.1")).unwrap();
