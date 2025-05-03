@@ -29,7 +29,6 @@ thiserror = { workspace = true }
 async-compression = { workspace = true, optional = true, features = ["futures-io", "zlib"] }
 async-net = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 froglight-resolver = { workspace = true, optional = true }
@@ -48,12 +47,11 @@ resolver = ["dep:froglight-resolver", "std"]
 io = ["dep:froglight-io", "froglight-packet/io", "std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-resolver?/bevy"]
+bevy = ["dep:bevy_ecs", "dep:bevy_tasks", "froglight-resolver?/bevy"]
 
 # Enable support for the rust standard library.
 std = [
   "bevy_ecs?/std",
-  "bevy_reflect?/std",
   "bevy_tasks?/std",
   "dep:async-compression",
   "dep:async-net",

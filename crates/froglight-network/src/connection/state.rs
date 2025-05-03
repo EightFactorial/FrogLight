@@ -1,7 +1,7 @@
-//! [`StateConnection`] and its components
+//! [`Connection`] and its components
 
 #[cfg(not(feature = "std"))]
-use alloc::boxed::Box;
+use alloc::{boxed::Box, vec::Vec};
 use core::{error::Error, marker::PhantomData};
 
 use froglight_packet::{
@@ -11,9 +11,11 @@ use froglight_packet::{
 
 use super::{RawConnection, raw::RawPacketVersion};
 
-/// A wrapper over a [`RawConnection`] that manages the state of the connection.
-pub struct StateConnection<S: State, V: ValidState<S>, D: Direction<S, V>> {
+/// A [`RawConnection`] that manages the state of the connection.
+#[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
+pub struct Connection<V: ValidState<S>, S: State, D: Direction<V, S>> {
     raw: Box<dyn RawConnection>,
+    scratch: Vec<u8>,
     _phantom: PhantomData<(V, S, D)>,
 }
 
@@ -38,7 +40,7 @@ pub enum ConnectionError {
 // -------------------------------------------------------------------------------------------------
 
 /// The direction of the [`RawConnection`].
-pub trait Direction<S: State, V: ValidState<S>> {
+pub trait Direction<V: ValidState<S>, S: State> {
     /// The type of packet received by the connection.
     type Recv: Send + Sync;
     /// The type of packet sent by the connection.
@@ -48,7 +50,7 @@ pub trait Direction<S: State, V: ValidState<S>> {
 /// A [`RawConnection`] from a [`Client`] to a [`Server`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Client;
-impl<S: State, V: ValidState<S>> Direction<S, V> for Client {
+impl<V: ValidState<S>, S: State> Direction<V, S> for Client {
     type Recv = V::Clientbound;
     type Send = V::Serverbound;
 }
@@ -56,15 +58,15 @@ impl<S: State, V: ValidState<S>> Direction<S, V> for Client {
 /// A [`RawConnection`] from a [`Server`] to a [`Client`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Server;
-impl<S: State, V: ValidState<S>> Direction<S, V> for Server {
+impl<V: ValidState<S>, S: State> Direction<V, S> for Server {
     type Recv = V::Serverbound;
     type Send = V::Clientbound;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<S: State, V: ValidState<S>, D: Direction<S, V>> StateConnection<S, V, D> {
-    /// Read a raw type from the [`StateConnection`],
+impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
+    /// Read a raw type from the [`Connection`],
     /// regardless of the actual state.
     ///
     /// You should be using [`StateConnection::read_packet`] to read the
@@ -76,17 +78,10 @@ impl<S: State, V: ValidState<S>, D: Direction<S, V>> StateConnection<S, V, D> {
     pub async fn read_raw<T: RawPacketVersion<V, M>, M: 'static>(
         &mut self,
     ) -> Result<T, ConnectionError> {
-        let bytes = self.raw.read_raw().await.map_err(ConnectionError::ReadRawConnection)?;
-        let (packet, remainder) =
-            T::read_packet(bytes).await.map_err(ConnectionError::ReadRawPacket)?;
-
-        let packet_length = bytes.len() - remainder.len();
-        self.raw.consume_raw(packet_length).await;
-
-        Ok(packet)
+        T::read_packet(self.raw.as_mut(), &mut self.scratch).await
     }
 
-    /// Read a packet from the [`StateConnection`].
+    /// Read a packet from the [`Connection`].
     ///
     /// # Errors
     /// Returns an error if the packet could not be parsed,
@@ -97,7 +92,7 @@ impl<S: State, V: ValidState<S>, D: Direction<S, V>> StateConnection<S, V, D> {
         self.read_raw::<_, M>().await
     }
 
-    /// Write a raw type into the [`StateConnection`],
+    /// Write a raw type into the [`Connection`],
     /// regardless of the actual state.
     ///
     /// You should be using [`StateConnection::write_packet`] to write the
@@ -110,12 +105,10 @@ impl<S: State, V: ValidState<S>, D: Direction<S, V>> StateConnection<S, V, D> {
         &mut self,
         packet: &T,
     ) -> Result<(), ConnectionError> {
-        let bytes = packet.write_packet().await.map_err(ConnectionError::WriteRawPacket)?;
-        self.raw.write_raw(&bytes).await.map_err(ConnectionError::WriteRawConnection)?;
-        Ok(())
+        T::write_packet(packet, self.raw.as_mut(), &mut self.scratch).await
     }
 
-    /// Write a packet to the [`StateConnection`].
+    /// Write a packet to the [`Connection`].
     ///
     /// # Errors
     /// Returns an error if the packet could not be written,
@@ -131,7 +124,7 @@ impl<S: State, V: ValidState<S>, D: Direction<S, V>> StateConnection<S, V, D> {
         self.write_raw::<_, M>(&packet.into()).await
     }
 
-    /// Write a packet to the [`StateConnection`].
+    /// Write a packet to the [`Connection`].
     ///
     /// # Errors
     /// Returns an error if the packet could not be written,
@@ -147,28 +140,28 @@ impl<S: State, V: ValidState<S>, D: Direction<S, V>> StateConnection<S, V, D> {
         self.write_raw::<_, M>(packet).await
     }
 
-    /// Manually set the [`State`] of the [`StateConnection`].
+    /// Manually set the [`State`] of the [`Connection`].
     ///
     /// # Warning
     /// It is the responsibility of the caller to ensure the
     /// connection is expecting the state to be changed.
     #[inline]
     #[must_use]
-    pub fn transform<S2: State>(self) -> StateConnection<S2, V, D>
+    pub fn transform<S2: State>(self) -> Connection<V, S2, D>
     where
         V: ValidState<S2>,
-        D: Direction<S2, V>,
+        D: Direction<V, S2>,
     {
-        StateConnection { raw: self.raw, _phantom: PhantomData }
+        Connection { raw: self.raw, scratch: self.scratch, _phantom: PhantomData }
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-impl<V: ValidState<Handshake>, D: Direction<Handshake, V>> StateConnection<Handshake, V, D> {
-    /// Create a new [`StateConnection`] from a [`RawConnection`].
+impl<V: ValidState<Handshake>, D: Direction<V, Handshake>> Connection<V, Handshake, D> {
+    /// Create a new [`Connection`] from a [`RawConnection`].
     pub fn from_raw<T: RawConnection + 'static>(raw: T) -> Self {
-        StateConnection { raw: Box::new(raw), _phantom: PhantomData }
+        Connection { raw: Box::new(raw), scratch: Vec::new(), _phantom: PhantomData }
     }
 
     /// Enter the [`Status`] state.
@@ -176,10 +169,10 @@ impl<V: ValidState<Handshake>, D: Direction<Handshake, V>> StateConnection<Hands
     /// Use this when a connection is requesting the server's status.
     #[inline]
     #[must_use]
-    pub fn status(self) -> StateConnection<Status, V, D>
+    pub fn status(self) -> Connection<V, Status, D>
     where
         V: ValidState<Status>,
-        D: Direction<Status, V>,
+        D: Direction<V, Status>,
     {
         self.transform()
     }
@@ -189,55 +182,55 @@ impl<V: ValidState<Handshake>, D: Direction<Handshake, V>> StateConnection<Hands
     /// Use this when the client will join the server.
     #[inline]
     #[must_use]
-    pub fn login(self) -> StateConnection<Login, V, D>
+    pub fn login(self) -> Connection<V, Login, D>
     where
         V: ValidState<Login>,
-        D: Direction<Login, V>,
+        D: Direction<V, Login>,
     {
         self.transform()
     }
 }
 
-impl<V: ValidState<Login>, D: Direction<Login, V>> StateConnection<Login, V, D> {
+impl<V: ValidState<Login>, D: Direction<V, Login>> Connection<V, Login, D> {
     /// Enter the [`Config`] state.
     ///
     /// Use this when the client is ready to be configured.
     #[inline]
     #[must_use]
-    pub fn config(self) -> StateConnection<Config, V, D>
+    pub fn config(self) -> Connection<V, Config, D>
     where
         V: ValidState<Config>,
-        D: Direction<Config, V>,
+        D: Direction<V, Config>,
     {
         self.transform()
     }
 }
 
-impl<V: ValidState<Config>, D: Direction<Config, V>> StateConnection<Config, V, D> {
+impl<V: ValidState<Config>, D: Direction<V, Config>> Connection<V, Config, D> {
     /// Enter the [`Play`] state.
     ///
     /// Use this when the client has finished being configured.
     #[inline]
     #[must_use]
-    pub fn play(self) -> StateConnection<Play, V, D>
+    pub fn play(self) -> Connection<V, Play, D>
     where
         V: ValidState<Play>,
-        D: Direction<Play, V>,
+        D: Direction<V, Play>,
     {
         self.transform()
     }
 }
 
-impl<V: ValidState<Play>, D: Direction<Play, V>> StateConnection<Play, V, D> {
+impl<V: ValidState<Play>, D: Direction<V, Play>> Connection<V, Play, D> {
     /// Enter the [`Config`] state.
     ///
     /// Use this when the client is being reconfigured.
     #[inline]
     #[must_use]
-    pub fn config(self) -> StateConnection<Config, V, D>
+    pub fn config(self) -> Connection<V, Config, D>
     where
         V: ValidState<Config>,
-        D: Direction<Config, V>,
+        D: Direction<V, Config>,
     {
         self.transform()
     }

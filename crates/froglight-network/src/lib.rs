@@ -21,4 +21,6 @@ pub mod prelude {
     pub use froglight_packet::prelude::*;
     #[cfg(feature = "resolver")]
     pub use froglight_resolver::prelude::*;
+
+    pub use crate::connection::{ClientConnection, Connection, ServerConnection};
 }
