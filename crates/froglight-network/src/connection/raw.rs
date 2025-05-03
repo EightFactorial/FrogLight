@@ -23,7 +23,7 @@ pub trait RawConnection: Send + 'static {
     /// Write a packet to the connection, returning the number of bytes written.
     ///
     /// This should do all processing and write the final packet data.
-    async fn write_packet(&mut self, buf: &[u8]) -> Result<usize, ConnectionError>;
+    async fn write_packet(&mut self, buf: &[u8]) -> Result<(), ConnectionError>;
 
     /// Read data from the connection, filling the provided buffer.
     ///

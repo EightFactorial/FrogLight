@@ -1,6 +1,5 @@
 //! TODO
 
-use bevy_log::tracing_subscriber::{EnvFilter, fmt};
 use bevy_tasks::{IoTaskPool, TaskPool, block_on};
 use froglight_common::version::Version;
 use froglight_network::{
@@ -13,8 +12,7 @@ use smol_str::SmolStr;
 static SERVER_ADDRESS: SmolStr = SmolStr::new_static("hypixel.net");
 
 fn main() -> Result<(), Box<dyn core::error::Error>> {
-    // Initialize tracing and the `IoTaskPool`
-    let _ = fmt().with_env_filter(EnvFilter::from_default_env()).try_init();
+    // Initialize the `IoTaskPool`
     let _ = IoTaskPool::get_or_init(TaskPool::new);
 
     block_on(main_async())
@@ -25,7 +23,7 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
     let resolver = FroglightResolver::cloudflare();
 
     // Connect and send the handshake packet
-    let mut conn = ClientConnection::<V1_21_4, _>::connect(&SERVER_ADDRESS, resolver).await?;
+    let mut conn = ClientConnection::<V1_21_4, _>::connect(&SERVER_ADDRESS, &resolver).await?;
     conn.write(HandshakePacket {
         protocol: V1_21_4::PROTOCOL_ID as i32,
         address: SERVER_ADDRESS.clone(),

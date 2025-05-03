@@ -87,7 +87,7 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     /// Returns an error if the packet could not be parsed,
     /// or data could not be read from the connection.
     #[inline]
-    pub async fn read_packet<M: 'static>(&mut self) -> Result<D::Recv, ConnectionError>
+    pub async fn read<M: 'static>(&mut self) -> Result<D::Recv, ConnectionError>
     where D::Recv: RawPacketVersion<V, M> {
         self.read_raw::<_, M>().await
     }
@@ -114,7 +114,7 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     /// Returns an error if the packet could not be written,
     /// or data could not be written to the connection.
     #[inline]
-    pub async fn write_packet<M: 'static>(
+    pub async fn write<M: 'static>(
         &mut self,
         packet: impl Into<D::Send>,
     ) -> Result<(), ConnectionError>
@@ -130,13 +130,8 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     /// Returns an error if the packet could not be written,
     /// or data could not be written to the connection.
     #[inline]
-    pub async fn write_packet_ref<M: 'static>(
-        &mut self,
-        packet: &D::Send,
-    ) -> Result<(), ConnectionError>
-    where
-        D::Send: RawPacketVersion<V, M>,
-    {
+    pub async fn write_ref<M: 'static>(&mut self, packet: &D::Send) -> Result<(), ConnectionError>
+    where D::Send: RawPacketVersion<V, M> {
         self.write_raw::<_, M>(packet).await
     }
 

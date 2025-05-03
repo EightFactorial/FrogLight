@@ -1,14 +1,48 @@
 //! TODO
 
+use core::net::SocketAddr;
 use std::io::Cursor;
 
 use async_net::TcpStream;
 use async_trait::async_trait;
 use froglight_common::version::Version;
-use froglight_io::version::{FrogReadVersion, FrogWriteVersion};
+use froglight_io::{
+    prelude::{FrogVarRead, FrogVarWrite},
+    version::{FrogReadVersion, FrogWriteVersion},
+};
+use froglight_packet::{packet::ValidState, state::Handshake};
 use futures_lite::{AsyncReadExt, AsyncWriteExt};
 
-use crate::connection::{RawConnection, raw::RawPacketVersion, state::ConnectionError};
+use crate::{
+    connection::{RawConnection, raw::RawPacketVersion, state::ConnectionError},
+    prelude::ClientConnection,
+};
+
+impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
+    /// Connect to a server at the given address,
+    /// resolved using the provided
+    /// [`FroglightResolver`](crate::prelude::FroglightResolver).
+    #[cfg(feature = "resolver")]
+    pub async fn connect(
+        addr: &str,
+        resolver: &crate::prelude::FroglightResolver,
+    ) -> Result<Self, std::io::Error> {
+        IoTransport::connect(addr, resolver).await.map(Self::from_raw)
+    }
+
+    /// Connect to a server at the given address,
+    /// resolved using the default system resolver.
+    pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
+        IoTransport::connect_system(addr).await.map(Self::from_raw)
+    }
+
+    /// Connect to a server at the given [`SocketAddr`].
+    pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
+        IoTransport::connect_to(socket).await.map(Self::from_raw)
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 /// A marker struct for [`RawPacketVersion`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -17,35 +51,55 @@ pub struct IoPacket;
 impl<V: Version, T: FrogReadVersion<V> + FrogWriteVersion<V> + Send + Sync + 'static>
     RawPacketVersion<V, IoPacket> for T
 {
+    // Read a packet and clear the buffer
     async fn read_packet<'a, C: RawConnection + ?Sized>(
         conn: &'a mut C,
         buf: &'a mut Vec<u8>,
     ) -> Result<Self, ConnectionError> {
-        if let Err(err) = conn.read_packet(buf).await {
-            buf.clear();
-            return Err(ConnectionError::ReadRawConnection(Box::new(err)));
-        }
-
-        let mut cursor = Cursor::new(buf.as_mut_slice());
-        let result = T::frog_read(&mut cursor);
+        let result = read_inner(conn, buf).await;
         buf.clear();
-        result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))
+        result
     }
 
+    // Write a packet and clear the buffer
     async fn write_packet<'a, C: RawConnection + ?Sized>(
         &'a self,
         conn: &'a mut C,
         buf: &'a mut Vec<u8>,
     ) -> Result<(), ConnectionError> {
-        if let Err(err) = T::frog_write(self, buf) {
-            buf.clear();
-            return Err(ConnectionError::WriteRawPacket(Box::new(err)));
-        }
-
-        let result = conn.write_packet(buf).await;
+        let result = write_inner(self, conn, buf).await;
         buf.clear();
-        result.map(|_| ())
+        result
     }
+}
+
+/// Read a packet from the [`RawConnection`].
+///
+/// # Note
+/// The buffer must be cleared after the packet is read.
+async fn read_inner<V: Version, T: FrogReadVersion<V>, C: RawConnection + ?Sized>(
+    conn: &mut C,
+    buf: &mut Vec<u8>,
+) -> Result<T, ConnectionError> {
+    conn.read_packet(buf).await?;
+
+    let mut cursor = Cursor::new(buf.as_mut_slice());
+    let result = T::frog_read(&mut cursor);
+    result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))
+}
+
+/// Write a packet to the [`RawConnection`].
+///
+/// # Note
+/// The buffer must be cleared after the packet is written.
+async fn write_inner<V: Version, T: FrogWriteVersion<V>, C: RawConnection + ?Sized>(
+    packet: &T,
+    conn: &mut C,
+    buf: &mut Vec<u8>,
+) -> Result<(), ConnectionError> {
+    let result = packet.frog_write(buf);
+    result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
+    conn.write_packet(buf).await
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -54,6 +108,36 @@ impl<V: Version, T: FrogReadVersion<V> + FrogWriteVersion<V> + Send + Sync + 'st
 pub struct IoTransport {
     stream: TcpStream,
     compression: Option<i32>,
+    _compress_buf: Vec<u8>,
+}
+
+impl IoTransport {
+    /// Create an [`IoTransport`] from an address resolved
+    /// using the provided
+    /// [`FroglightResolver`](crate::prelude::FroglightResolver).
+    #[cfg(feature = "resolver")]
+    pub async fn connect(
+        addr: &str,
+        resolver: &crate::prelude::FroglightResolver,
+    ) -> Result<Self, std::io::Error> {
+        let socket = resolver.lookup_minecraft(addr).await?;
+        Self::connect_to(socket).await
+    }
+
+    /// Create an [`IoTransport`] from an address resolved
+    /// using the system's default resolver.
+    pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
+        let stream = TcpStream::connect(addr).await?;
+        stream.set_nodelay(true)?;
+        Ok(Self { stream, compression: None, _compress_buf: Vec::new() })
+    }
+
+    /// Create an [`IoTransport`] from a [`SocketAddr`].
+    pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
+        let stream = TcpStream::connect(socket).await?;
+        stream.set_nodelay(true)?;
+        Ok(Self { stream, compression: None, _compress_buf: Vec::new() })
+    }
 }
 
 #[async_trait]
@@ -64,14 +148,66 @@ impl RawConnection for IoTransport {
     #[inline]
     async fn get_compression(&self) -> Option<i32> { self.compression }
 
-    async fn read_packet(&mut self, _buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
-        // TODO: Decryption + Decompression
-        todo!()
+    // TODO: Decryption + Decompression
+    async fn read_packet(&mut self, buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
+        // Get the size of the packet and the size of the packet size
+        let mut len_buf = Cursor::new([0u8; 5]);
+        self.peek_raw(len_buf.get_mut().as_mut_slice()).await?;
+        let len = <u32 as FrogVarRead>::frog_var_read(&mut len_buf);
+        let len = len.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
+        let len_size = len_buf.position() as usize;
+
+        // Make sure the buffer can hold the packet, then read it
+        buf.resize(buf.len().max(len + len_size), 0u8);
+        let pbuf = &mut buf[..len + len_size];
+        self.read_raw(pbuf).await?;
+
+        // Create a cursor and skip the packet size
+        let mut cursor = Cursor::new(pbuf);
+        cursor.set_position(len_size as u64);
+
+        if self.compression.is_some_and(|c| c >= 0) {
+            let size = <u32 as FrogVarRead>::frog_var_read(&mut cursor);
+            let size = size.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
+
+            if size != 0 {
+                todo!("Packet Decompression")
+            }
+        }
+
+        // Move the packet to the beginning of the buffer and set the size.
+        let position = cursor.position() as usize;
+        buf.copy_within(position.., 0);
+        buf.truncate(buf.len() - position);
+
+        Ok(())
     }
 
-    async fn write_packet(&mut self, _buf: &[u8]) -> Result<usize, ConnectionError> {
-        // TODO: Compression + Encryption
-        todo!()
+    // TODO: Compression + Encryption
+    async fn write_packet(&mut self, buf: &[u8]) -> Result<(), ConnectionError> {
+        // Get the packet length and prefix length
+        let packet_len = buf.len();
+        let prefix_len = packet_len + packet_len.frog_var_len();
+
+        if self.compression.is_some_and(|c| c <= prefix_len.try_into().unwrap_or_default()) {
+            todo!("Packet Compression")
+        } else {
+            let mut prefix_buf = Vec::<u8>::with_capacity(8);
+
+            if self.compression.is_some() {
+                // Write the packet length and a `0` byte
+                let result = FrogVarWrite::frog_var_write(&(packet_len + 1), &mut prefix_buf);
+                result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
+                prefix_buf.push(0);
+            } else {
+                // Write the packet length
+                let result = FrogVarWrite::frog_var_write(&packet_len, &mut prefix_buf);
+                result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
+            }
+
+            self.write_raw(&prefix_buf).await?;
+            self.write_raw(buf).await
+        }
     }
 
     async fn read_raw(&mut self, buf: &mut [u8]) -> Result<(), ConnectionError> {

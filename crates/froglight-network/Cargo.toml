@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+smol_str = { workspace = true }
+
 [dependencies]
 async-trait = "0.1"
 bevy_platform = { workspace = true, features = ["alloc"] }
@@ -68,6 +71,6 @@ v1_21_5 = ["froglight-common/v1_21_5", "froglight-packet/v1_21_5"]
 
 # --- Examples ---
 
-# [[example]]
-# name = "status"
-# required-features = ["bevy", "io", "resolver", "v1_21_4"]
+[[example]]
+name = "status"
+required-features = ["bevy", "io", "resolver", "v1_21_4"]
