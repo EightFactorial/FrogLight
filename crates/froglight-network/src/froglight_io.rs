@@ -51,55 +51,29 @@ pub struct IoPacket;
 impl<V: Version, T: FrogReadVersion<V> + FrogWriteVersion<V> + Send + Sync + 'static>
     RawPacketVersion<V, IoPacket> for T
 {
-    // Read a packet and clear the buffer
     async fn read_packet<'a, C: RawConnection + ?Sized>(
         conn: &'a mut C,
         buf: &'a mut Vec<u8>,
     ) -> Result<Self, ConnectionError> {
-        let result = read_inner(conn, buf).await;
         buf.clear();
-        result
+
+        conn.read_packet(buf).await?;
+        let mut cursor = Cursor::new(buf.as_mut_slice());
+        let result = T::frog_read(&mut cursor);
+        result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))
     }
 
-    // Write a packet and clear the buffer
     async fn write_packet<'a, C: RawConnection + ?Sized>(
         &'a self,
         conn: &'a mut C,
         buf: &'a mut Vec<u8>,
     ) -> Result<(), ConnectionError> {
-        let result = write_inner(self, conn, buf).await;
         buf.clear();
-        result
+
+        let result = self.frog_write(buf);
+        result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
+        conn.write_packet(buf).await
     }
-}
-
-/// Read a packet from the [`RawConnection`].
-///
-/// # Note
-/// The buffer must be cleared after the packet is read.
-async fn read_inner<V: Version, T: FrogReadVersion<V>, C: RawConnection + ?Sized>(
-    conn: &mut C,
-    buf: &mut Vec<u8>,
-) -> Result<T, ConnectionError> {
-    conn.read_packet(buf).await?;
-
-    let mut cursor = Cursor::new(buf.as_mut_slice());
-    let result = T::frog_read(&mut cursor);
-    result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))
-}
-
-/// Write a packet to the [`RawConnection`].
-///
-/// # Note
-/// The buffer must be cleared after the packet is written.
-async fn write_inner<V: Version, T: FrogWriteVersion<V>, C: RawConnection + ?Sized>(
-    packet: &T,
-    conn: &mut C,
-    buf: &mut Vec<u8>,
-) -> Result<(), ConnectionError> {
-    let result = packet.frog_write(buf);
-    result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
-    conn.write_packet(buf).await
 }
 
 // -------------------------------------------------------------------------------------------------
