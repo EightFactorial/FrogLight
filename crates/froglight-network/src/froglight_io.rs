@@ -27,18 +27,18 @@ impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
         addr: &str,
         resolver: &crate::prelude::FroglightResolver,
     ) -> Result<Self, std::io::Error> {
-        IoTransport::connect(addr, resolver).await.map(Self::from_raw)
+        IoTransport::<TcpStream>::connect(addr, resolver).await.map(Self::from_raw)
     }
 
     /// Connect to a server at the given address,
     /// resolved using the default system resolver.
     pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
-        IoTransport::connect_system(addr).await.map(Self::from_raw)
+        IoTransport::<TcpStream>::connect_system(addr).await.map(Self::from_raw)
     }
 
     /// Connect to a server at the given [`SocketAddr`].
     pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
-        IoTransport::connect_to(socket).await.map(Self::from_raw)
+        IoTransport::<TcpStream>::connect_to(socket).await.map(Self::from_raw)
     }
 }
 
@@ -105,43 +105,24 @@ async fn write_inner<V: Version, T: FrogWriteVersion<V>, C: RawConnection + ?Siz
 // -------------------------------------------------------------------------------------------------
 
 /// The default [`RawConnection`] implementation.
-pub struct IoTransport {
-    stream: TcpStream,
+pub struct IoTransport<S> {
+    stream: S,
     compression: Option<i32>,
     _compress_buf: Vec<u8>,
 }
 
-impl IoTransport {
-    /// Create an [`IoTransport`] from an address resolved
-    /// using the provided
-    /// [`FroglightResolver`](crate::prelude::FroglightResolver).
-    #[cfg(feature = "resolver")]
-    pub async fn connect(
-        addr: &str,
-        resolver: &crate::prelude::FroglightResolver,
-    ) -> Result<Self, std::io::Error> {
-        let socket = resolver.lookup_minecraft(addr).await?;
-        Self::connect_to(socket).await
-    }
-
-    /// Create an [`IoTransport`] from an address resolved
-    /// using the system's default resolver.
-    pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
-        let stream = TcpStream::connect(addr).await?;
-        stream.set_nodelay(true)?;
-        Ok(Self { stream, compression: None, _compress_buf: Vec::new() })
-    }
-
-    /// Create an [`IoTransport`] from a [`SocketAddr`].
-    pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
-        let stream = TcpStream::connect(socket).await?;
-        stream.set_nodelay(true)?;
-        Ok(Self { stream, compression: None, _compress_buf: Vec::new() })
+impl<S> IoTransport<S> {
+    /// Creates a new [`IoTransport`] instance.
+    #[must_use]
+    pub const fn wrap(stream: S) -> Self {
+        Self { stream, compression: None, _compress_buf: Vec::new() }
     }
 }
 
 #[async_trait]
-impl RawConnection for IoTransport {
+impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnection
+    for IoTransport<S>
+{
     #[inline]
     async fn set_compression(&mut self, threshold: Option<i32>) { self.compression = threshold }
 
@@ -223,5 +204,49 @@ impl RawConnection for IoTransport {
     async fn write_raw(&mut self, buf: &[u8]) -> Result<(), ConnectionError> {
         let result = self.stream.write_all(buf).await;
         result.map_err(|err| ConnectionError::WriteRawConnection(Box::new(err)))
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// Extension trait for [`AsyncReadExt`]
+pub trait AsyncPeekExt: AsyncReadExt {
+    /// Peek at the next bytes in the stream without consuming them.
+    fn peek(&self, buf: &mut [u8]) -> impl Future<Output = std::io::Result<usize>> + Send;
+}
+
+impl AsyncPeekExt for TcpStream {
+    #[inline]
+    fn peek(&self, buf: &mut [u8]) -> impl Future<Output = std::io::Result<usize>> + Send {
+        self.peek(buf)
+    }
+}
+
+impl IoTransport<TcpStream> {
+    /// Create an [`IoTransport`] from an address resolved
+    /// using the provided
+    /// [`FroglightResolver`](crate::prelude::FroglightResolver).
+    #[inline]
+    #[cfg(feature = "resolver")]
+    pub async fn connect(
+        addr: &str,
+        resolver: &crate::prelude::FroglightResolver,
+    ) -> Result<Self, std::io::Error> {
+        Self::connect_to(resolver.lookup_minecraft(addr).await?).await
+    }
+
+    /// Create an [`IoTransport`] from an address resolved
+    /// using the system's default resolver.
+    pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
+        let stream = TcpStream::connect(addr).await?;
+        stream.set_nodelay(true)?;
+        Ok(Self::wrap(stream))
+    }
+
+    /// Create an [`IoTransport`] from a [`SocketAddr`].
+    pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
+        let stream = TcpStream::connect(socket).await?;
+        stream.set_nodelay(true)?;
+        Ok(Self::wrap(stream))
     }
 }
