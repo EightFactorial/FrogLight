@@ -217,16 +217,15 @@ impl IoTransport<TcpStream> {
     /// using the system's default resolver.
     pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
         let stream = TcpStream::connect(addr).await?;
-        let peer = stream.peer_addr()?;
+        let socket = stream.peer_addr()?;
         stream.set_nodelay(true)?;
-        Ok(Self::wrap(stream, peer))
+        Ok(Self::wrap(stream, socket))
     }
 
     /// Create an [`IoTransport`] from a [`SocketAddr`].
     pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
         let stream = TcpStream::connect(socket).await?;
-        let peer = stream.peer_addr()?;
         stream.set_nodelay(true)?;
-        Ok(Self::wrap(stream, peer))
+        Ok(Self::wrap(stream, socket))
     }
 }

@@ -20,7 +20,7 @@ bevy_platform = { workspace = true, features = ["alloc", "serialize"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true, features = ["serde"] }
 froglight-entity = { workspace = true, features = ["serde"] }
-froglight-macros = { workspace = true, features = ["io"] }
+froglight-macros = { workspace = true }
 froglight-nbt = { workspace = true, features = ["serde"] }
 froglight-text = { workspace = true, features = ["serde"] }
 glam = { workspace = true, features = ["serde"] }
@@ -51,6 +51,7 @@ io = [
   "froglight-brigadier?/io",
   "froglight-entity/io",
   "froglight-inventory/io",
+  "froglight-macros/io",
   "froglight-nbt/io",
   "froglight-text/io",
   "std",

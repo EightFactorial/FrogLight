@@ -9,6 +9,7 @@ pub mod common;
 pub mod state;
 
 pub mod v1_21_4;
+pub mod v1_21_5;
 
 pub mod prelude {
     //! Re-exports of commonly used types, traits, and macros.
