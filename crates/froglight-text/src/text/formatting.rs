@@ -1,7 +1,7 @@
 //! [`TextFormatting`] and [`TextColor`]
 
 #[cfg(not(feature = "std"))]
-use alloc::format;
+use alloc::{format, string::String};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;

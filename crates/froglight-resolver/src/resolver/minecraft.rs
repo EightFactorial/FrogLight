@@ -46,7 +46,7 @@ impl FroglightResolver {
             .prepend_label(Self::SRV_TCP_PREFIX)
             .and_then(|n| n.prepend_label(Self::SRV_MC_PREFIX))?;
 
-        // If an SRV record is found, use the first IP address given
+        // If a SRV record is found, use the first IP address given
         if let Ok(lookup) = self.lookup_srv(srv_name).await {
             for record in lookup.into_iter() {
                 if let Some(ip) = self.lookup_ip(record.target().clone()).await?.iter().next() {

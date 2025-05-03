@@ -5,12 +5,11 @@ use core::{any::TypeId, ops::Range};
 use bevy_ecs::reflect::ReflectResource;
 #[cfg(feature = "bevy")]
 use bevy_ecs::resource::Resource;
-use bevy_platform::hash::NoOpHash;
+use bevy_platform::{hash::NoOpHash, collections::HashMap};
 #[cfg(feature = "reflect")]
 use bevy_reflect::Reflect;
 use downcast_rs::Downcast;
 use froglight_common::{vanilla::Vanilla, version::Version};
-use hashbrown::HashMap;
 use parking_lot::RwLock;
 use rangemap::RangeMap;
 

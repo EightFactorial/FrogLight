@@ -1,3 +1,6 @@
+#[cfg(not(feature = "std"))]
+use alloc::{format, vec::Vec};
+
 use serde::{
     __private::{
         de::{Content, ContentDeserializer, ContentRefDeserializer},

@@ -25,7 +25,6 @@ tracing-subscriber = { workspace = true, features = ["env-filter"] }
 bevy_platform = { workspace = true, features = ["alloc"] }
 derive_more = { workspace = true }
 froglight-macros = { workspace = true, features = ["nbt"] }
-hashbrown = { workspace = true }
 indexmap = { workspace = true }
 regex = { workspace = true }
 simd_cesu8 = { workspace = true }

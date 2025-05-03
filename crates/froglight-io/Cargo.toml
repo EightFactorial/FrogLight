@@ -27,7 +27,7 @@ thiserror = { workspace = true }
 # Optional dependencies
 bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
 glam = { workspace = true, optional = true, features = ["std"] }
-hashbrown = { workspace = true, optional = true }
+hashbrown = { version = "0.15", optional = true, features = ["default"] }
 serde = { workspace = true, optional = true, features = ["std"] }
 serde_json = { workspace = true, optional = true, features = ["std"] }
 smallvec = { workspace = true, optional = true }

@@ -5,13 +5,12 @@ use core::{any::TypeId, hash::Hash, marker::PhantomData};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
-use bevy_platform::hash::{FixedHasher, NoOpHash};
+use bevy_platform::{hash::{FixedHasher, NoOpHash}, collections::HashMap};
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::Deref;
 use downcast_rs::Downcast;
 use froglight_common::{identifier::Identifier, version::Version};
-use hashbrown::HashMap;
 use indexmap::{Equivalent, IndexMap};
 use parking_lot::RwLock;
 

@@ -22,7 +22,6 @@ downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["registry"] }
 froglight-nbt = { workspace = true }
-hashbrown = { workspace = true }
 indexmap = { workspace = true }
 parking_lot = { workspace = true }
 

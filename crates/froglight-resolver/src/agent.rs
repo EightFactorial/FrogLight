@@ -9,13 +9,14 @@ use std::{
 use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use derive_more::Deref;
 use hickory_resolver::{ResolveErrorKind, proto::ProtoErrorKind};
 use ureq::{
     Agent,
     config::Config,
-    http::Uri,
+    http::{Uri, uri::Scheme},
     unversioned::{
-        resolver::{self, ResolvedSocketAddrs},
+        resolver::{ResolvedSocketAddrs, Resolver},
         transport::{DefaultConnector, NextTimeout},
     },
 };
@@ -25,7 +26,7 @@ use crate::resolver::FroglightResolver;
 /// A thread-safe wrapper around an [`Agent`] for use in Bevy.
 ///
 /// Uses [`FroglightResolver`] for DNS resolution if enabled.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deref)]
 #[cfg_attr(feature = "bevy", derive(Resource, Reflect), reflect(opaque, Debug, Resource))]
 pub struct FroglightAgent(Arc<Agent>);
 
@@ -46,21 +47,15 @@ impl FroglightAgent {
     }
 }
 
-impl std::ops::Deref for FroglightAgent {
-    type Target = Agent;
-
-    fn deref(&self) -> &Self::Target { &self.0 }
-}
-
-// -------------------------------------------------------------------------------------------------
-
 #[cfg(feature = "bevy")]
 impl bevy_ecs::world::FromWorld for FroglightAgent {
     #[allow(unused_variables)]
     fn from_world(world: &mut World) -> Self { Self::new(&world.get_resource_or_init()) }
 }
 
-impl resolver::Resolver for FroglightResolver {
+// -------------------------------------------------------------------------------------------------
+
+impl Resolver for FroglightResolver {
     fn resolve(
         &self,
         uri: &Uri,
@@ -68,7 +63,7 @@ impl resolver::Resolver for FroglightResolver {
         _timeout: NextTimeout,
     ) -> Result<ResolvedSocketAddrs, ureq::Error> {
         let host = uri.host().ok_or_else(|| ureq::Error::BadUri(uri.to_string()))?;
-        let scheme = uri.scheme().unwrap_or(&ureq::http::uri::Scheme::HTTP);
+        let scheme = uri.scheme().unwrap_or(&Scheme::HTTP);
 
         let port = uri.port_u16().unwrap_or_else(|| match scheme.as_str() {
             "https" => 443,

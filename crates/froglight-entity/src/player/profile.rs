@@ -1,6 +1,6 @@
 //! [`PlayerProfile`] and [`PlayerProfileTextures`]
 
-#[cfg(feature = "serde")]
+#[cfg(all(feature = "serde", feature = "std"))]
 use core::time::Duration;
 #[cfg(feature = "std")]
 use std::time::SystemTime;

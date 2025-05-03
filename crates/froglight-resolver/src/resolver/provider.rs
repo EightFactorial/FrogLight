@@ -25,6 +25,8 @@ use hickory_resolver::{
 /// See [`AsyncResolver`] for more information.
 pub(super) type FroglightInnerResolver = Resolver<ResolverConnectionProvider>;
 
+// -------------------------------------------------------------------------------------------------
+
 #[derive(Clone)]
 pub(super) struct ResolverRuntimeProvider;
 
@@ -85,6 +87,8 @@ impl RuntimeProvider for ResolverRuntimeProvider {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 #[derive(Clone)]
 pub(super) struct ResolverConnectionProvider {
     runtime: ResolverRuntimeProvider,
@@ -116,6 +120,8 @@ impl ConnectionProvider for ResolverConnectionProvider {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 #[derive(Clone)]
 pub(super) struct ResolverRuntimeHandle;
 
@@ -134,6 +140,8 @@ impl Spawn for ResolverRuntimeHandle {
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 pub(super) struct ResolverTime;
 
@@ -160,6 +168,8 @@ impl Time for ResolverTime {
         ))
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 pub(super) struct ResolverUdpSocket(UdpSocket);
 
@@ -208,6 +218,8 @@ impl DnsUdpSocket for ResolverUdpSocket {
         Box::pin(self.0.send_to(buf, target))
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 pub(super) struct ResolverTcpConnection(TcpStream);
 

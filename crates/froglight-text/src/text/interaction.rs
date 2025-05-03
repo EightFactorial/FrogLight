@@ -2,6 +2,8 @@
 
 #[cfg(not(feature = "std"))]
 use alloc::borrow::Cow;
+#[cfg(not(feature = "std"))]
+use alloc::{format, string::ToString};
 #[cfg(feature = "std")]
 use std::borrow::Cow;
 
