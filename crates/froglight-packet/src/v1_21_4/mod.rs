@@ -4,10 +4,7 @@
 use froglight_common::version::V1_21_4;
 
 #[cfg(feature = "v1_21_4")]
-use crate::{
-    packet::ValidState,
-    state::{Handshake, Status},
-};
+use crate::state::{Handshake, Status, ValidState};
 
 // pub mod config;
 pub mod handshake;

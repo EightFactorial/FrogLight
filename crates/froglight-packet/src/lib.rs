@@ -6,11 +6,9 @@
 extern crate alloc;
 
 pub mod common;
+pub mod state;
 
 pub mod v1_21_4;
-
-pub mod packet;
-pub mod state;
 
 pub mod prelude {
     //! Re-exports of commonly used types, traits, and macros.

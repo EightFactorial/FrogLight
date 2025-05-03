@@ -1,8 +1,18 @@
 //! Network connection states.
 use core::{fmt::Debug, hash::Hash};
 
+use froglight_common::version::Version;
+
 /// A marker trait for connection states.
 pub trait State: Debug + Default + Copy + Eq + Hash + Send + Sync + 'static {}
+
+/// A marker trait for valid connection states for a given [`Version`].
+pub trait ValidState<S: State>: Version {
+    /// Packets sent from the server to the client.
+    type Clientbound: Send + Sync;
+    /// Packets sent from the client to the server.
+    type Serverbound: Send + Sync;
+}
 
 // -------------------------------------------------------------------------------------------------
 

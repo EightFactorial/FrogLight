@@ -2,12 +2,9 @@
 
 #[cfg(not(feature = "std"))]
 use alloc::{boxed::Box, vec::Vec};
-use core::{error::Error, marker::PhantomData};
+use core::{error::Error, marker::PhantomData, net::SocketAddr};
 
-use froglight_packet::{
-    packet::ValidState,
-    state::{Config, Handshake, Login, Play, State, Status},
-};
+use froglight_packet::state::{Config, Handshake, Login, Play, State, Status, ValidState};
 
 use super::{RawConnection, raw::RawPacketVersion};
 
@@ -133,6 +130,15 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     pub async fn write_ref<M: 'static>(&mut self, packet: &D::Send) -> Result<(), ConnectionError>
     where D::Send: RawPacketVersion<V, M> {
         self.write_raw::<_, M>(packet).await
+    }
+
+    /// Get the peer address of the [`Connection`].
+    ///
+    /// # Errors
+    /// Returns an error if the peer address could not be retrieved.
+    #[inline]
+    pub async fn peer_addr(&self) -> Result<SocketAddr, ConnectionError> {
+        self.raw.peer_addr().await
     }
 
     /// Manually set the [`State`] of the [`Connection`].

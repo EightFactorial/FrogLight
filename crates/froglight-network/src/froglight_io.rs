@@ -10,7 +10,7 @@ use froglight_io::{
     prelude::{FrogVarRead, FrogVarWrite},
     version::{FrogReadVersion, FrogWriteVersion},
 };
-use froglight_packet::{packet::ValidState, state::Handshake};
+use froglight_packet::state::{Handshake, ValidState};
 use futures_lite::{AsyncReadExt, AsyncWriteExt};
 
 use crate::{
@@ -81,6 +81,7 @@ impl<V: Version, T: FrogReadVersion<V> + FrogWriteVersion<V> + Send + Sync + 'st
 /// The default [`RawConnection`] implementation.
 pub struct IoTransport<S> {
     stream: S,
+    peer: SocketAddr,
     compression: Option<i32>,
     _compress_buf: Vec<u8>,
 }
@@ -88,8 +89,8 @@ pub struct IoTransport<S> {
 impl<S> IoTransport<S> {
     /// Creates a new [`IoTransport`] instance.
     #[must_use]
-    pub const fn wrap(stream: S) -> Self {
-        Self { stream, compression: None, _compress_buf: Vec::new() }
+    pub const fn wrap(stream: S, peer: SocketAddr) -> Self {
+        Self { stream, peer, compression: None, _compress_buf: Vec::new() }
     }
 }
 
@@ -97,6 +98,9 @@ impl<S> IoTransport<S> {
 impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnection
     for IoTransport<S>
 {
+    #[inline]
+    async fn peer_addr(&self) -> Result<SocketAddr, ConnectionError> { Ok(self.peer) }
+
     #[inline]
     async fn set_compression(&mut self, threshold: Option<i32>) { self.compression = threshold }
 
@@ -213,14 +217,16 @@ impl IoTransport<TcpStream> {
     /// using the system's default resolver.
     pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
         let stream = TcpStream::connect(addr).await?;
+        let peer = stream.peer_addr()?;
         stream.set_nodelay(true)?;
-        Ok(Self::wrap(stream))
+        Ok(Self::wrap(stream, peer))
     }
 
     /// Create an [`IoTransport`] from a [`SocketAddr`].
     pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
         let stream = TcpStream::connect(socket).await?;
+        let peer = stream.peer_addr()?;
         stream.set_nodelay(true)?;
-        Ok(Self::wrap(stream))
+        Ok(Self::wrap(stream, peer))
     }
 }

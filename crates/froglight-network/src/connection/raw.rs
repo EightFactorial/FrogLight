@@ -2,6 +2,7 @@
 
 #[cfg(not(feature = "std"))]
 use alloc::{boxed::Box, vec::Vec};
+use core::net::SocketAddr;
 
 use async_trait::async_trait;
 use froglight_common::version::Version;
@@ -11,6 +12,9 @@ use super::state::ConnectionError;
 /// A dyn-compatible connection, either to a server or client.
 #[async_trait]
 pub trait RawConnection: Send + 'static {
+    /// Get the peer address of the connection.
+    async fn peer_addr(&self) -> Result<SocketAddr, ConnectionError>;
+
     /// Set the compression threshold for the connection.
     async fn set_compression(&mut self, threshold: Option<i32>);
     /// Get the compression threshold for the connection.

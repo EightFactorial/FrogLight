@@ -24,10 +24,11 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
 
     // Connect and send the handshake packet
     let mut conn = ClientConnection::<V1_21_4, _>::connect(&SERVER_ADDRESS, &resolver).await?;
+    let peer = conn.peer_addr().await?;
     conn.write(HandshakePacket {
         protocol: V1_21_4::PROTOCOL_ID as i32,
         address: SERVER_ADDRESS.clone(),
-        port: 25565,
+        port: peer.port(),
         intent: ConnectionIntent::Status,
     })
     .await?;
@@ -40,7 +41,7 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
     match conn.read().await? {
         ClientboundStatusPackets::PingResult(..) => panic!("Got a ping response?"),
         ClientboundStatusPackets::QueryResponse(response) => {
-            println!("{response:#?}");
+            println!("Connected to {peer} ->\n{response:#?}");
 
             assert!(
                 response.description.contains("Hypixel"),
