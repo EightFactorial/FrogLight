@@ -26,6 +26,7 @@ pub mod interaction;
 pub use interaction::TextInteraction;
 
 mod compound;
+mod message;
 #[cfg(feature = "serde")]
 mod serialize;
 

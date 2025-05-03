@@ -1,5 +1,7 @@
 #[cfg(not(feature = "std"))]
-use alloc::{format, vec::Vec};
+use alloc::{borrow::Cow, format, vec::Vec};
+#[cfg(feature = "std")]
+use std::borrow::Cow;
 
 use serde::{
     __private::{
@@ -13,7 +15,7 @@ use serde::{
 use crate::{
     prelude::*,
     text::{
-        FormattedContent, FormattedTextRef,
+        FormattedContent, FormattedTextRef, TextInteraction,
         component::{
             KeybindComponent, ScoreComponent, SelectorComponent, TextComponent, TranslateComponent,
             ValueComponent,
@@ -50,6 +52,16 @@ struct Child<'a>(FormattedTextRef<'a>, &'a TextFormatting);
 impl Serialize for Child<'_> {
     fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
     where S: Serializer {
+        // If there is only plain text, serialize it as a string
+        if let FormattedContent::Text(text) = &self.0.content {
+            if self.0.children.is_empty()
+                && self.1 == &TextFormatting::EMPTY
+                && self.0.interact == TextInteraction::EMPTY
+            {
+                return ser.serialize_str(&text.text);
+            }
+        }
+
         let mut ser = ser.serialize_map(None)?;
 
         // Serialize the text content
@@ -102,23 +114,37 @@ impl Serialize for Child<'_> {
 impl<'de> Deserialize<'de> for FormattedText {
     fn deserialize<D>(de: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
-        let content = Content::deserialize(de)?;
+        match Content::deserialize(de)? {
+            Content::String(string) => Ok(Self {
+                content: FormattedContent::Text(TextComponent { text: Cow::Owned(string) }),
+                formatting: TextFormatting::empty(),
+                interact: TextInteraction::empty(),
+                children: Vec::new(),
+            }),
+            Content::Str(str) => Ok(Self {
+                content: FormattedContent::Text(TextComponent { text: Cow::Owned(str.into()) }),
+                formatting: TextFormatting::empty(),
+                interact: TextInteraction::empty(),
+                children: Vec::new(),
+            }),
+            ref content @ Content::Map(ref map) => {
+                let children = match map
+                    .iter()
+                    .find_map(|(n, c)| (n.as_str() == Some("extra")).then_some(c))
+                {
+                    Some(children) => Vec::deserialize(ContentRefDeserializer::new(children))?,
+                    None => Vec::new(),
+                };
 
-        let Content::Map(map) = &content else {
-            return Err(de::Error::custom("expected a map"));
-        };
-        let children =
-            match map.iter().find_map(|(n, c)| (n.as_str() == Some("extra")).then_some(c)) {
-                Some(children) => Vec::deserialize(ContentRefDeserializer::new(children))?,
-                None => Vec::new(),
-            };
-
-        Ok(Self {
-            content: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
-            formatting: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
-            interact: Deserialize::deserialize(ContentDeserializer::new(content))?,
-            children,
-        })
+                Ok(Self {
+                    content: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
+                    formatting: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
+                    interact: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
+                    children,
+                })
+            }
+            _other => Err(de::Error::custom("expected a string or map")),
+        }
     }
 }
 

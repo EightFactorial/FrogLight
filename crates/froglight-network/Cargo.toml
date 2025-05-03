@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
+froglight-text = { workspace = true, features = ["ansi"] }
 smol_str = { workspace = true }
 
 [dependencies]

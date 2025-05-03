@@ -5,7 +5,9 @@
 #[cfg(not(feature = "std"))]
 extern crate alloc;
 
+#[cfg(feature = "std")]
 pub mod chat;
+
 pub mod text;
 pub mod translate;
 
@@ -13,7 +15,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     #[cfg(feature = "std")]
-    pub use crate::chat::signature::MessageSignatureCtx;
+    pub use crate::chat::MessageSignatureCtx;
     pub use crate::{
         text::{FormattedText, TextColor, TextFormatting},
         translate::TextTranslations,

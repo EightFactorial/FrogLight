@@ -1,4 +1,4 @@
-//! [`FormattedText::as_chat_message`] and the ansi equivalent if enabled.
+//! [`FormattedText::as_message`] and the ansi equivalent if enabled.
 //!
 //! TODO: Handle legacy formatting codes
 
@@ -20,25 +20,25 @@ impl FormattedText {
     /// Extract the message as a [`String`]
     ///
     /// # Errors
-    /// Returns an error if the message is not a chat message,
+    /// Returns an error if the [`FormattedText`] is not a message,
     /// or if a translation is not found.
     #[inline]
-    pub fn as_chat_message(&self, t: &TextTranslations) -> Result<String, ChatMessageError> {
-        FormattedTextRef::new(self).as_chat_message(t)
+    pub fn as_message(&self, t: &TextTranslations) -> Result<String, ChatMessageError> {
+        FormattedTextRef::new(self).as_message(t)
     }
 
     /// Extract the message as an [`AnsiString`](nu_ansi_term::AnsiString).
     ///
     /// # Errors
-    /// Returns an error if the message is not a chat message,
+    /// Returns an error if the [`FormattedText`] is not a message,
     /// or if a translation is not found.
     #[inline]
     #[cfg(feature = "ansi")]
-    pub fn as_chat_message_ansi<'a>(
+    pub fn as_message_ansi<'a>(
         &'a self,
         t: &TextTranslations,
     ) -> Result<nu_ansi_term::AnsiString<'a>, ChatMessageError> {
-        FormattedTextRef::new(self).as_chat_message_ansi(t)
+        FormattedTextRef::new(self).as_message_ansi(t)
     }
 }
 
@@ -47,9 +47,9 @@ impl<'a> FormattedTextRef<'a> {
     /// Extract the message as a [`String`]
     ///
     /// # Errors
-    /// Returns an error if the message is not a chat message,
+    /// Returns an error if the [`FormattedText`] is not a message,
     /// or if a translation is not found.
-    pub fn as_chat_message(&self, t: &TextTranslations) -> Result<String, ChatMessageError> {
+    pub fn as_message(&self, t: &TextTranslations) -> Result<String, ChatMessageError> {
         // Get the message content
         let mut string = match &self.content {
             FormattedContent::Text(text) => text.to_string(),
@@ -73,7 +73,7 @@ impl<'a> FormattedTextRef<'a> {
 
         // Append children messages
         for child in &self.children {
-            string.push_str(&child.as_chat_message(t)?.to_string());
+            string.push_str(&child.as_message(t)?.to_string());
         }
 
         Ok(string)
@@ -87,7 +87,7 @@ impl<'a> FormattedTextRef<'a> {
         let mut formatted = message.to_string();
 
         for (index, argument) in arguments.iter().enumerate() {
-            let resolved = argument.as_chat_message(t)?;
+            let resolved = argument.as_message(t)?;
             // Replace the next occurrence of `%s`
             formatted = formatted.replacen("%s", &resolved, 1);
             // Replace all occurrences of `%<index>$s`
@@ -100,10 +100,10 @@ impl<'a> FormattedTextRef<'a> {
     /// Extract the message as an [`AnsiString`](nu_ansi_term::AnsiString).
     ///
     /// # Errors
-    /// Returns an error if the message is not a chat message,
+    /// Returns an error if the [`FormattedText`] is not a message,
     /// or if a translation is not found.
     #[cfg(feature = "ansi")]
-    pub fn as_chat_message_ansi(
+    pub fn as_message_ansi(
         &self,
         t: &TextTranslations,
     ) -> Result<nu_ansi_term::AnsiString<'a>, ChatMessageError> {
@@ -140,7 +140,7 @@ impl<'a> FormattedTextRef<'a> {
         for child in &self.children {
             let formatting = child.formatting.inherit(&self.formatting);
             let child = FormattedTextRef::new_with(child, &formatting);
-            string.push_str(&child.as_chat_message_ansi(t)?.to_string());
+            string.push_str(&child.as_message_ansi(t)?.to_string());
         }
 
         Ok(string.into())
@@ -158,7 +158,7 @@ impl<'a> FormattedTextRef<'a> {
         for (index, argument) in arguments.iter().enumerate() {
             let formatting = argument.formatting.inherit(formatting);
             let argument = FormattedTextRef::new_with(argument, &formatting);
-            let resolved = argument.as_chat_message_ansi(t)?.to_string();
+            let resolved = argument.as_message_ansi(t)?.to_string();
 
             // Replace the next occurrence of `%s`
             formatted = formatted.replacen("%s", &resolved, 1);
@@ -228,11 +228,11 @@ fn chat_message() {
 
     let t = TextTranslations::default();
 
-    assert_eq!(FormattedText::from("Hello, World!").as_chat_message(&t).unwrap(), "Hello, World!");
+    assert_eq!(FormattedText::from("Hello, World!").as_message(&t).unwrap(), "Hello, World!");
 
     assert_eq!(
         FormattedText::from_string_with("Hello, World!".into(), TextFormatting::empty())
-            .as_chat_message(&t)
+            .as_message(&t)
             .unwrap(),
         "Hello, World!"
     );
@@ -242,7 +242,7 @@ fn chat_message() {
             "Hello, World!".into(),
             TextFormatting::empty().with_color(TextColor::Blue)
         )
-        .as_chat_message(&t)
+        .as_message(&t)
         .unwrap(),
         "Hello, World!"
     );
@@ -259,7 +259,7 @@ fn chat_message() {
                 children: Vec::new(),
             }],
         }
-        .as_chat_message(&t)
+        .as_message(&t)
         .unwrap(),
         "Hello, World!"
     );
@@ -276,7 +276,7 @@ fn chat_message() {
                 children: Vec::new(),
             }],
         }
-        .as_chat_message(&t)
+        .as_message(&t)
         .unwrap(),
         "Hello, World!"
     );
@@ -292,13 +292,13 @@ fn chat_message_ansi() {
     let t = TextTranslations::default();
 
     assert_eq!(
-        FormattedText::from_string("Hello, World!").as_chat_message_ansi(&t).unwrap().to_string(),
+        FormattedText::from_string("Hello, World!").as_message_ansi(&t).unwrap().to_string(),
         "Hello, World!"
     );
 
     assert_eq!(
         FormattedText::from_string_with("Hello, World!".into(), TextFormatting::empty())
-            .as_chat_message_ansi(&t)
+            .as_message_ansi(&t)
             .unwrap()
             .to_string(),
         "Hello, World!"
@@ -308,7 +308,7 @@ fn chat_message_ansi() {
         "Hello, World!".into(),
         TextFormatting::empty().with_color(TextColor::Blue),
     );
-    let message = text.as_chat_message_ansi(&t).unwrap().to_string();
+    let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "\u{1b}[38;2;85;85;255mHello, World!\u{1b}[0m");
 
@@ -316,7 +316,7 @@ fn chat_message_ansi() {
         "Hello, World!".into(),
         TextFormatting::empty().with_color(TextColor::Custom("#999999".into())),
     );
-    let message = text.as_chat_message_ansi(&t).unwrap().to_string();
+    let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "\u{1b}[38;2;153;153;153mHello, World!\u{1b}[0m");
 
@@ -331,7 +331,7 @@ fn chat_message_ansi() {
             children: Vec::new(),
         }],
     };
-    let message = text.as_chat_message_ansi(&t).unwrap().to_string();
+    let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "Hello, World!");
 
@@ -347,7 +347,7 @@ fn chat_message_ansi() {
         }],
     };
 
-    let message = text.as_chat_message_ansi(&t).unwrap().to_string();
+    let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1mWorld!\u{1b}[0m");
 
@@ -363,7 +363,7 @@ fn chat_message_ansi() {
         }],
     };
 
-    let message = text.as_chat_message_ansi(&t).unwrap().to_string();
+    let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1;4mWorld!\u{1b}[0m");
 
@@ -386,7 +386,7 @@ fn chat_message_ansi() {
         }],
     };
 
-    let message = text.as_chat_message_ansi(&t).unwrap().to_string();
+    let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(
         message,

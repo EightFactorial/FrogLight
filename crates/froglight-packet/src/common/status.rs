@@ -6,17 +6,18 @@ use alloc::vec::Vec;
 use bevy_platform::collections::HashMap;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_text::text::FormattedText;
 use serde::{Deserialize, Serialize, ser::SerializeSeq};
 use smol_str::SmolStr;
 use uuid::Uuid;
 
 /// A status response from a server
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Serialize, Deserialize))]
 pub struct ServerStatus {
     /// The server's description
-    pub description: SmolStr,
+    pub description: FormattedText,
     /// The server's icon
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub favicon: Option<SmolStr>,

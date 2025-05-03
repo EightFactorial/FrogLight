@@ -6,10 +6,11 @@ use froglight_network::{
     packet::{common::ConnectionIntent, v1_21_4::prelude::*},
     prelude::*,
 };
+use froglight_text::prelude::TextTranslations;
 use smol_str::SmolStr;
 
 /// The address of the server to request the status from.
-static SERVER_ADDRESS: SmolStr = SmolStr::new_static("hypixel.net");
+static SERVER_ADDRESS: SmolStr = SmolStr::new_static("mbs.playskyward.gg");
 
 fn main() -> Result<(), Box<dyn core::error::Error>> {
     // Initialize the `IoTaskPool`
@@ -21,6 +22,7 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
 async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
     // Create a resolver using Cloudflare's DNS servers
     let resolver = FroglightResolver::cloudflare();
+    let translations = TextTranslations::default();
 
     // Connect and send the handshake packet
     let mut conn = ClientConnection::<V1_21_4, _>::connect(&SERVER_ADDRESS, &resolver).await?;
@@ -41,13 +43,10 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
     match conn.read().await? {
         ClientboundStatusPackets::PingResult(..) => panic!("Got a ping response?"),
         ClientboundStatusPackets::QueryResponse(response) => {
-            println!("Connected to {peer} ->\n{response:#?}");
-
-            assert!(
-                response.description.contains("Hypixel"),
-                "Did not find \"Hypixel\" in the server description?"
-            );
-
+            match response.description.as_message_ansi(&translations) {
+                Ok(txt) => println!("Connected to \'{SERVER_ADDRESS}\' at \'{peer}\':\n{txt}"),
+                Err(err) => panic!("Failed to parse description: {err}"),
+            }
             Ok(())
         }
     }
