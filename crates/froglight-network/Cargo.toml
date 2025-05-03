@@ -16,67 +16,60 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-async-compression = { workspace = true, features = ["futures-io", "zlib"] }
-async-net = { workspace = true }
+async-trait = "0.1"
+bevy_platform = { workspace = true, features = ["alloc"] }
 derive_more = { workspace = true }
-froglight-common = { workspace = true, features = ["serde"] }
-froglight-entity = { workspace = true, features = ["io"] }
-froglight-io = { workspace = true, features = ["glam", "serde", "smallvec", "uuid"] }
-froglight-macros = { workspace = true, features = ["io", "network"] }
-froglight-text = { workspace = true, features = ["io", "serde"] }
-futures-lite = { workspace = true, features = ["std"] }
-glam = { workspace = true, features = ["std"] }
-hashbrown = { workspace = true, features = ["serde"] }
-serde = { workspace = true, features = ["derive", "std"] }
-serde_json = { workspace = true, features = ["std"] }
-smallvec = { workspace = true }
-smol_str = { workspace = true, features = ["std"] }
-uuid = { workspace = true, features = ["std"] }
+froglight-common = { workspace = true }
+froglight-macros = { workspace = true, features = ["network"] }
+froglight-packet = { workspace = true }
+futures-lite = { workspace = true, features = ["alloc"] }
+thiserror = { workspace = true }
 
 # Optional dependencies
+async-compression = { workspace = true, optional = true, features = ["futures-io", "zlib"] }
+async-net = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
-bevy_log = { workspace = true, optional = true }
-bevy_platform = { workspace = true, optional = true, features = ["alloc", "serialize"] }
-bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallvec", "smol_str", "uuid"] }
-bevy_tasks = { workspace = true, optional = true, features = ["async-io"] }
-froglight-brigadier = { workspace = true, optional = true, features = ["glam", "io", "uuid"] }
-froglight-inventory = { workspace = true, optional = true, features = ["io"] }
-froglight-nbt = { workspace = true, optional = true, features = ["io"] }
+bevy_reflect = { workspace = true, optional = true }
+bevy_tasks = { workspace = true, optional = true }
+froglight-io = { workspace = true, optional = true }
 froglight-resolver = { workspace = true, optional = true }
 
 [features]
-default = ["inventory", "nbt", "resolver"]
+default = ["inventory", "io", "resolver", "std"]
 
 # Enable `froglight-brigadier` support.
-brigadier = ["bevy", "dep:froglight-brigadier"]
+brigadier = ["bevy", "froglight-packet/brigadier"]
 # Enable `froglight-inventory` support.
-inventory = ["dep:froglight-inventory", "nbt"]
-# Enable `froglight-nbt` support.
-nbt = ["dep:froglight-nbt", "froglight-brigadier?/nbt"]
+inventory = ["froglight-packet/inventory"]
 # Enable `froglight-resolver` support.
-resolver = ["dep:froglight-resolver"]
+resolver = ["dep:froglight-resolver", "std"]
+
+# Enable `froglight-io` support.
+io = ["dep:froglight-io", "froglight-packet/io", "std"]
 
 # Enable `bevy` support.
-bevy = [
-  "dep:bevy_ecs",
-  "dep:bevy_log",
-  "dep:bevy_platform",
-  "dep:bevy_reflect",
-  "dep:bevy_tasks",
-  "froglight-common/bevy",
-  "froglight-inventory?/bevy",
-  "froglight-io/bevy_platform",
-  "froglight-nbt?/reflect",
-  "froglight-text/bevy",
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-resolver?/bevy"]
+
+# Enable support for the rust standard library.
+std = [
+  "bevy_ecs?/std",
+  "bevy_reflect?/std",
+  "bevy_tasks?/std",
+  "dep:async-compression",
+  "dep:async-net",
+  "froglight-packet/std",
+  "futures-lite/std",
 ]
+# Enable `no_std` support for `glam`.
+libm = ["froglight-packet/libm"]
 
 # Enable support for v1.21.4
-v1_21_4 = ["froglight-common/v1_21_4"]
+v1_21_4 = ["froglight-common/v1_21_4", "froglight-packet/v1_21_4"]
 # Enable support for v1.21.5
-v1_21_5 = ["froglight-common/v1_21_5"]
+v1_21_5 = ["froglight-common/v1_21_5", "froglight-packet/v1_21_5"]
 
 # --- Examples ---
 
-[[example]]
-name = "status"
-required-features = ["bevy", "resolver", "v1_21_4"]
+# [[example]]
+# name = "status"
+# required-features = ["bevy", "io", "resolver", "v1_21_4"]

@@ -1,355 +1,244 @@
-//! A connection with a [`Version`] and [`State`].
-//!
-//! This is a wrapper around a [`RawConnection`] that
-//! guarantees the correct packets are being sent and received.
+//! [`StateConnection`] and its components
 
-use std::{fmt::Debug, future::Future, hash::Hash, marker::PhantomData, net::SocketAddr};
+#[cfg(not(feature = "std"))]
+use alloc::boxed::Box;
+use core::{error::Error, marker::PhantomData};
 
-use froglight_common::version::Version;
-use froglight_io::{
-    prelude::{ReadError, WriteError},
-    version::{FrogReadVersion, FrogWriteVersion},
+use froglight_packet::{
+    packet::ValidState,
+    state::{Config, Handshake, Login, Play, State, Status},
 };
 
-use crate::{
-    connection::raw::{RawConnection, RawReadConnection, RawWriteConnection},
-    prelude::*,
-};
+use super::{RawConnection, raw::RawPacketVersion};
 
-/// A connection from a client to a server.
-pub type ClientConnection<V, S> = StateConnection<V, S, Client>;
-/// A connection from a server to a client.
-pub type ServerConnection<V, S> = StateConnection<V, S, Server>;
+/// A wrapper over a [`RawConnection`] that manages the state of the connection.
+pub struct StateConnection<S: State, V: ValidState<S>, D: Direction<S, V>> {
+    raw: Box<dyn RawConnection>,
+    _phantom: PhantomData<(V, S, D)>,
+}
+
+/// An error that can occur when reading or writing packets.
+#[derive(Debug, thiserror::Error)]
+pub enum ConnectionError {
+    /// An error that occurred while parsing a packet from bytes.
+    #[error("Failed to create raw packet from bytes: {0}")]
+    ReadRawPacket(Box<dyn Error>),
+    /// An error that occurred while reading from the connection.
+    #[error("Failed to read from the connection: {0}")]
+    ReadRawConnection(Box<dyn Error>),
+
+    /// An error that occurred while writing a packet as bytes.
+    #[error("Failed to write raw packet as bytes: {0}")]
+    WriteRawPacket(Box<dyn Error>),
+    /// An error that occurred while writing to the connection.
+    #[error("Failed to write to the connection: {0}")]
+    WriteRawConnection(Box<dyn Error>),
+}
 
 // -------------------------------------------------------------------------------------------------
 
-/// A connection type, either [`Client`] or a [`Server`].
-pub trait ConnectionType<V: Version, S>:
-    Debug + Default + Copy + Eq + Hash + Send + Sync + 'static
-{
-    /// The type of data sent on this connection.
-    type Send: FrogWriteVersion<V> + Send + Sync + 'static;
-    /// The type of data received on this connection.
-    type Recv: FrogReadVersion<V> + Send + Sync + 'static;
+/// The direction of the [`RawConnection`].
+pub trait Direction<S: State, V: ValidState<S>> {
+    /// The type of packet received by the connection.
+    type Recv: Send + Sync;
+    /// The type of packet sent by the connection.
+    type Send: Send + Sync;
 }
 
-/// A connection from a client to a server.
+/// A [`RawConnection`] from a [`Client`] to a [`Server`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Client;
-impl<V: ValidState<S>, S: State> ConnectionType<V, S> for Client {
-    /// Receive clientbound data.
-    type Recv = <V as ValidState<S>>::Clientbound;
-    /// Send serverbound data.
-    type Send = <V as ValidState<S>>::Serverbound;
+impl<S: State, V: ValidState<S>> Direction<S, V> for Client {
+    type Recv = V::Clientbound;
+    type Send = V::Serverbound;
 }
 
-/// A connection from a server to a client.
+/// A [`RawConnection`] from a [`Server`] to a [`Client`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Server;
-impl<V: ValidState<S>, S: State> ConnectionType<V, S> for Server {
-    /// Receive serverbound data.
-    type Recv = <V as ValidState<S>>::Serverbound;
-    /// Send clientbound data.
-    type Send = <V as ValidState<S>>::Clientbound;
+impl<S: State, V: ValidState<S>> Direction<S, V> for Server {
+    type Recv = V::Serverbound;
+    type Send = V::Clientbound;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// A connection with a [`Version`] and [`State`].
-///
-/// This is a wrapper around a [`RawConnection`] that
-/// guarantees the correct packets are being sent and received.
-#[derive(Debug)]
-pub struct StateConnection<V: ValidState<S>, S: State, T: ConnectionType<V, S>>(
-    RawConnection,
-    PhantomData<(V, S, T)>,
-);
+impl<S: State, V: ValidState<S>, D: Direction<S, V>> StateConnection<S, V, D> {
+    /// Read a raw type from the [`StateConnection`],
+    /// regardless of the actual state.
+    ///
+    /// You should be using [`StateConnection::read_packet`] to read the
+    /// correct packet type for the current state.
+    ///
+    /// # Warning
+    /// It is the responsibility of the caller to ensure that
+    /// the data received matches the expected packet type.
+    pub async fn read_raw<T: RawPacketVersion<V, M>, M: 'static>(
+        &mut self,
+    ) -> Result<T, ConnectionError> {
+        let bytes = self.raw.read_raw().await.map_err(ConnectionError::ReadRawConnection)?;
+        let (packet, remainder) =
+            T::read_packet(bytes).await.map_err(ConnectionError::ReadRawPacket)?;
 
-impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateConnection<V, S, T> {
-    /// Get the address of the connection.
-    #[inline]
-    #[must_use]
-    pub fn address(&self) -> &str { self.0.address() }
+        let packet_length = bytes.len() - remainder.len();
+        self.raw.consume_raw(packet_length).await;
 
-    /// Get the remote address the stream is connected to.
-    #[inline]
-    #[expect(clippy::missing_errors_doc)]
-    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
+        Ok(packet)
+    }
 
-    /// Get the compression level of the connection.
-    #[inline]
-    #[must_use]
-    pub fn compression(&self) -> Option<i32> { self.0.compression() }
-
-    /// Set the compression level of the connection.
-    #[inline]
-    pub fn set_compression(&self, level: Option<i32>) { self.0.set_compression(level) }
-
-    /// Read a packet from the connection.
+    /// Read a packet from the [`StateConnection`].
     ///
     /// # Errors
-    /// Returns an error if the packet could not be read.
+    /// Returns an error if the packet could not be parsed,
+    /// or data could not be read from the connection.
     #[inline]
-    pub fn read(&mut self) -> impl Future<Output = Result<T::Recv, ReadError>> + Send + Sync {
-        self.0.read_version()
+    pub async fn read_packet<M: 'static>(&mut self) -> Result<D::Recv, ConnectionError>
+    where D::Recv: RawPacketVersion<V, M> {
+        self.read_raw::<_, M>().await
     }
 
-    /// Write a packet to the connection.
+    /// Write a raw type into the [`StateConnection`],
+    /// regardless of the actual state.
+    ///
+    /// You should be using [`StateConnection::write_packet`] to write the
+    /// correct packet type for the current state.
+    ///
+    /// # Warning
+    /// It is the responsibility of the caller to ensure that
+    /// the connection is expecting the type of packet being written.
+    pub async fn write_raw<T: RawPacketVersion<V, M>, M: 'static>(
+        &mut self,
+        packet: &T,
+    ) -> Result<(), ConnectionError> {
+        let bytes = packet.write_packet().await.map_err(ConnectionError::WriteRawPacket)?;
+        self.raw.write_raw(&bytes).await.map_err(ConnectionError::WriteRawConnection)?;
+        Ok(())
+    }
+
+    /// Write a packet to the [`StateConnection`].
     ///
     /// # Errors
-    /// Returns an error if the packet could not be written.
+    /// Returns an error if the packet could not be written,
+    /// or data could not be written to the connection.
     #[inline]
-    pub async fn write(&mut self, packet: impl Into<T::Send>) -> Result<(), WriteError> {
-        self.0.write_version(&packet.into()).await
+    pub async fn write_packet<M: 'static>(
+        &mut self,
+        packet: impl Into<D::Send>,
+    ) -> Result<(), ConnectionError>
+    where
+        D::Send: RawPacketVersion<V, M>,
+    {
+        self.write_raw::<_, M>(&packet.into()).await
     }
 
-    /// Write a packet to the connection.
+    /// Write a packet to the [`StateConnection`].
     ///
     /// # Errors
-    /// Returns an error if the packet could not be written.
+    /// Returns an error if the packet could not be written,
+    /// or data could not be written to the connection.
     #[inline]
-    pub fn write_ref<'a>(
-        &'a mut self,
-        packet: &'a impl AsRef<T::Send>,
-    ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
-        self.0.write_version(packet.as_ref())
+    pub async fn write_packet_ref<M: 'static>(
+        &mut self,
+        packet: &D::Send,
+    ) -> Result<(), ConnectionError>
+    where
+        D::Send: RawPacketVersion<V, M>,
+    {
+        self.write_raw::<_, M>(packet).await
     }
 
-    /// Split the [`StateConnection`] into a
-    /// [`StateReadConnection`] and a [`StateWriteConnection`].
+    /// Manually set the [`State`] of the [`StateConnection`].
     ///
-    /// These can be recombined using [`StateConnection::from_split`].
-    #[must_use]
-    pub fn into_split(self) -> (StateReadConnection<V, S, T>, StateWriteConnection<V, S, T>) {
-        let (read, write) = self.0.into_split();
-        (StateReadConnection(read, PhantomData), StateWriteConnection(write, PhantomData))
-    }
-
-    /// Recombine a [`StateReadConnection`] and a [`StateWriteConnection`]
-    /// into a [`StateConnection`].
-    ///
-    /// Both parts must be from the same connection, otherwise this will panic.
-    ///
-    /// # Panics
-    /// Panics if the two connection halves are from different connections.
-    #[must_use]
-    pub fn from_split(
-        read: StateReadConnection<V, S, T>,
-        write: StateWriteConnection<V, S, T>,
-    ) -> Self {
-        Self(RawConnection::from_split(read.0, write.0), PhantomData)
-    }
-
-    /// Get a mutable reference to the inner [`RawConnection`].
+    /// # Warning
+    /// It is the responsibility of the caller to ensure the
+    /// connection is expecting the state to be changed.
     #[inline]
     #[must_use]
-    pub fn as_raw(&mut self) -> &mut RawConnection { &mut self.0 }
+    pub fn transform<S2: State>(self) -> StateConnection<S2, V, D>
+    where
+        V: ValidState<S2>,
+        D: Direction<S2, V>,
+    {
+        StateConnection { raw: self.raw, _phantom: PhantomData }
+    }
+}
 
+// -------------------------------------------------------------------------------------------------
+
+impl<V: ValidState<Handshake>, D: Direction<Handshake, V>> StateConnection<Handshake, V, D> {
     /// Create a new [`StateConnection`] from a [`RawConnection`].
-    #[inline]
-    #[must_use]
-    pub fn from_raw(raw: RawConnection) -> Self { Self(raw, PhantomData) }
-
-    /// Get the inner [`RawConnection`].
-    #[inline]
-    #[must_use]
-    pub fn into_raw(self) -> RawConnection { self.0 }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A read-only connection with a [`Version`] and [`State`].
-///
-/// This is a wrapper around a [`RawReadConnection`] that
-/// guarantees the correct packets are being received.
-#[derive(Debug)]
-pub struct StateReadConnection<V: ValidState<S>, S: State, T: ConnectionType<V, S>>(
-    RawReadConnection,
-    PhantomData<(V, S, T)>,
-);
-
-impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateReadConnection<V, S, T> {
-    /// Get the address of the connection.
-    #[inline]
-    #[must_use]
-    pub fn address(&self) -> &str { self.0.address() }
-
-    /// Get the remote address the stream is connected to.
-    #[inline]
-    #[expect(clippy::missing_errors_doc)]
-    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
-
-    /// Get the compression level of the connection.
-    #[inline]
-    #[must_use]
-    pub fn compression(&self) -> Option<i32> { self.0.compression() }
-
-    /// Set the compression level of the connection.
-    #[inline]
-    pub fn set_compression(&self, level: Option<i32>) { self.0.set_compression(level) }
-
-    /// Read a packet from the connection.
-    #[inline]
-    pub fn read(&mut self) -> impl Future<Output = Result<T::Recv, ReadError>> + Send + Sync {
-        self.0.read_version()
+    pub fn from_raw<T: RawConnection + 'static>(raw: T) -> Self {
+        StateConnection { raw: Box::new(raw), _phantom: PhantomData }
     }
 
-    /// Get a mutable reference to the inner [`RawReadConnection`].
-    #[inline]
-    #[must_use]
-    pub fn as_raw(&mut self) -> &mut RawReadConnection { &mut self.0 }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A write-only connection with a [`Version`] and [`State`].
-///
-/// This is a wrapper around a [`RawWriteConnection`] that
-/// guarantees the correct packets are being sent.
-#[derive(Debug)]
-pub struct StateWriteConnection<V: ValidState<S>, S: State, T: ConnectionType<V, S>>(
-    RawWriteConnection,
-    PhantomData<(V, S, T)>,
-);
-
-impl<V: ValidState<S>, S: State, T: ConnectionType<V, S>> StateWriteConnection<V, S, T> {
-    /// Get the address of the connection.
-    #[inline]
-    #[must_use]
-    pub fn address(&self) -> &str { self.0.address() }
-
-    /// Get the remote address the stream is connected to.
-    #[inline]
-    #[expect(clippy::missing_errors_doc)]
-    pub fn peer_addr(&self) -> Result<SocketAddr, std::io::Error> { self.0.peer_addr() }
-
-    /// Get the compression level of the connection.
-    #[inline]
-    #[must_use]
-    pub fn compression(&self) -> Option<i32> { self.0.compression() }
-
-    /// Set the compression level of the connection.
-    #[inline]
-    pub fn set_compression(&self, level: Option<i32>) { self.0.set_compression(level) }
-
-    /// Write a packet to the connection.
-    #[inline]
-    pub fn write<'a>(
-        &'a mut self,
-        packet: &'a T::Send,
-    ) -> impl Future<Output = Result<(), WriteError>> + Send + Sync + 'a {
-        self.0.write_version(packet)
-    }
-
-    /// Get a mutable reference to the inner [`RawWriteConnection`].
-    #[inline]
-    #[must_use]
-    pub fn as_raw(&mut self) -> &mut RawWriteConnection { &mut self.0 }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl<V: ValidState<Handshake>> StateConnection<V, Handshake, Client> {
-    /// Connect to a server by resolving the address
-    /// using the provided resolver.
+    /// Enter the [`Status`] state.
     ///
-    /// # Errors
-    /// Returns an error if the connection could not be established,
-    /// or if the stream could not set `nodelay` to `true`.
-    #[inline]
-    #[cfg(feature = "resolver")]
-    pub async fn connect(
-        address: impl AsRef<str>,
-        resolver: FroglightResolver,
-    ) -> Result<Self, std::io::Error> {
-        let socket = resolver.lookup_minecraft(address.as_ref()).await?;
-        Self::connect_to(address, socket).await
-    }
-
-    /// Connect to a server by resolving the address
-    /// using the default system resolver.
-    ///
-    /// # Errors
-    /// Returns an error if the connection could not be established,
-    /// or if the stream could not set `nodelay` to `true`.
-    #[inline]
-    pub async fn connect_system(address: impl AsRef<str>) -> Result<Self, std::io::Error> {
-        Ok(Self(RawConnection::connect(address).await?, PhantomData))
-    }
-
-    /// Connect to a server at the given socket address.
-    ///
-    /// # Errors
-    /// Returns an error if the connection could not be established,
-    /// or if the stream could not set `nodelay` to `true`.
-    #[inline]
-    pub async fn connect_to(
-        address: impl AsRef<str>,
-        socket: SocketAddr,
-    ) -> Result<Self, std::io::Error> {
-        Ok(Self(RawConnection::connect_to(address, socket).await?, PhantomData))
-    }
-}
-
-impl<V: ValidState<Handshake>, T: ConnectionType<V, Handshake>> StateConnection<V, Handshake, T> {
-    /// Set the state of the connection to [`Status`].
+    /// Use this when a connection is requesting the server's status.
     #[inline]
     #[must_use]
-    pub fn status(self) -> StateConnection<V, Status, T>
+    pub fn status(self) -> StateConnection<Status, V, D>
     where
         V: ValidState<Status>,
-        T: ConnectionType<V, Status>,
+        D: Direction<Status, V>,
     {
-        StateConnection(self.0, PhantomData)
+        self.transform()
     }
 
-    /// Set the state of the connection to [`Login`].
+    /// Enter the [`Login`] state.
+    ///
+    /// Use this when the client will join the server.
     #[inline]
     #[must_use]
-    pub fn login(self) -> StateConnection<V, Login, T>
+    pub fn login(self) -> StateConnection<Login, V, D>
     where
         V: ValidState<Login>,
-        T: ConnectionType<V, Login>,
+        D: Direction<Login, V>,
     {
-        StateConnection(self.0, PhantomData)
+        self.transform()
     }
 }
 
-impl<V: ValidState<Login>, T: ConnectionType<V, Login>> StateConnection<V, Login, T> {
-    /// Set the state of the connection to [`Config`].
+impl<V: ValidState<Login>, D: Direction<Login, V>> StateConnection<Login, V, D> {
+    /// Enter the [`Config`] state.
+    ///
+    /// Use this when the client is ready to be configured.
     #[inline]
     #[must_use]
-    pub fn config(self) -> StateConnection<V, Config, T>
+    pub fn config(self) -> StateConnection<Config, V, D>
     where
         V: ValidState<Config>,
-        T: ConnectionType<V, Config>,
+        D: Direction<Config, V>,
     {
-        StateConnection(self.0, PhantomData)
+        self.transform()
     }
 }
 
-impl<V: ValidState<Config>, T: ConnectionType<V, Config>> StateConnection<V, Config, T> {
-    /// Set the state of the connection to [`Play`].
+impl<V: ValidState<Config>, D: Direction<Config, V>> StateConnection<Config, V, D> {
+    /// Enter the [`Play`] state.
+    ///
+    /// Use this when the client has finished being configured.
     #[inline]
     #[must_use]
-    pub fn play(self) -> StateConnection<V, Play, T>
+    pub fn play(self) -> StateConnection<Play, V, D>
     where
         V: ValidState<Play>,
-        T: ConnectionType<V, Play>,
+        D: Direction<Play, V>,
     {
-        StateConnection(self.0, PhantomData)
+        self.transform()
     }
 }
 
-impl<V: ValidState<Play>, T: ConnectionType<V, Play>> StateConnection<V, Play, T> {
-    /// Set the state of the connection to [`Config`].
+impl<V: ValidState<Play>, D: Direction<Play, V>> StateConnection<Play, V, D> {
+    /// Enter the [`Config`] state.
+    ///
+    /// Use this when the client is being reconfigured.
     #[inline]
     #[must_use]
-    pub fn config(self) -> StateConnection<V, Config, T>
+    pub fn config(self) -> StateConnection<Config, V, D>
     where
         V: ValidState<Config>,
-        T: ConnectionType<V, Config>,
+        D: Direction<Config, V>,
     {
-        StateConnection(self.0, PhantomData)
+        self.transform()
     }
 }

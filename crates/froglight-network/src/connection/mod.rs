@@ -1,10 +1,7 @@
-//! [`Client`](ClientConnection), [`Server`](ServerConnection),
-//! and [`Raw`](RawConnection) connections.
+//! [`StateConnection`], [`RawConnection`], and [`RawPacket`](raw::RawPacket)
 
 pub mod raw;
 pub use raw::RawConnection;
 
 pub mod state;
-pub use state::{ClientConnection, ServerConnection};
-
-mod io;
+pub use state::StateConnection;

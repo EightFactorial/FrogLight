@@ -1,0 +1,86 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+name = "froglight-packet"
+readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy_platform = { workspace = true, features = ["alloc", "serialize"] }
+derive_more = { workspace = true }
+froglight-common = { workspace = true, features = ["serde"] }
+froglight-entity = { workspace = true, features = ["serde"] }
+froglight-macros = { workspace = true, features = ["io"] }
+froglight-nbt = { workspace = true, features = ["serde"] }
+froglight-text = { workspace = true, features = ["serde"] }
+glam = { workspace = true, features = ["serde"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["alloc"] }
+smallvec = { workspace = true, features = ["serde"] }
+smol_str = { workspace = true, features = ["serde"] }
+uuid = { workspace = true, features = ["serde"] }
+
+# Optional dependencies
+bevy_ecs = { workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallvec", "smol_str", "uuid"] }
+froglight-brigadier = { workspace = true, optional = true, features = ["glam", "io", "nbt", "serde", "uuid"] }
+froglight-inventory = { workspace = true, optional = true, features = ["io"] }
+froglight-io = { workspace = true, optional = true, features = ["glam", "serde", "smallvec", "uuid"] }
+
+[features]
+default = ["bevy", "brigadier", "inventory", "io", "std"]
+
+# Enable `froglight-brigadier` support.
+brigadier = ["bevy", "dep:froglight-brigadier"]
+# Enable `froglight-inventory` support.
+inventory = ["dep:froglight-inventory"]
+
+# Enable `froglight-io` support.
+io = [
+  "dep:froglight-io",
+  "froglight-brigadier?/io",
+  "froglight-entity/io",
+  "froglight-inventory/io",
+  "froglight-nbt/io",
+  "froglight-text/io",
+  "std",
+]
+
+# Enable `bevy` support.
+bevy = [
+  "dep:bevy_reflect",
+  "froglight-common/bevy",
+  "froglight-inventory?/bevy",
+  "froglight-io?/bevy_platform",
+  "froglight-nbt/reflect",
+  "froglight-text/bevy",
+]
+
+# Enable support for the rust standard library.
+std = [
+  "bevy_platform/std",
+  "bevy_reflect?/std",
+  "froglight-nbt/std",
+  "glam/std",
+  "serde/std",
+  "serde_json/std",
+  "smol_str/std",
+  "uuid/std",
+]
+# Enable `no_std` support for `glam`.
+libm = ["glam/libm"]
+
+# Enable support for v1.21.4
+v1_21_4 = ["froglight-common/v1_21_4"]
+# Enable support for v1.21.5
+v1_21_5 = ["froglight-common/v1_21_5"]

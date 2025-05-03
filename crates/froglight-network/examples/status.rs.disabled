@@ -3,7 +3,10 @@
 use bevy_log::tracing_subscriber::{EnvFilter, fmt};
 use bevy_tasks::{IoTaskPool, TaskPool, block_on};
 use froglight_common::version::Version;
-use froglight_network::{prelude::*, types::ConnectionIntent, version::v1_21_4::prelude::*};
+use froglight_network::{
+    packet::{common::ConnectionIntent, v1_21_4::prelude::*},
+    prelude::*,
+};
 use smol_str::SmolStr;
 
 /// The address of the server to request the status from.

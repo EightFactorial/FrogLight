@@ -1,9 +1,9 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use froglight_macros::FrogBuf;
 
 /// The intent a client has when connecting to a server.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, FrogBuf)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, Clone, PartialEq, Hash))]
 pub enum ConnectionIntent {
     /// The connection wants to get the status of the server.

@@ -1,11 +1,11 @@
 //! TODO
 
-#[cfg(feature = "bevy")]
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
 use bevy_platform::collections::HashMap;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-#[cfg(not(feature = "bevy"))]
-use hashbrown::HashMap;
 use serde::{Deserialize, Serialize, ser::SerializeSeq};
 use smol_str::SmolStr;
 use uuid::Uuid;
