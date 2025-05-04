@@ -412,7 +412,7 @@ impl<T: FrogVarWrite> FrogVarWrite for [T] {
 
 impl<T: FrogVarRead, const N: usize> FrogVarRead for [T; N] {
     fn frog_var_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        std::array::try_from_fn(|_| T::frog_var_read(buffer))
+        core::array::try_from_fn(|_| T::frog_var_read(buffer))
     }
 }
 impl<T: FrogVarWrite, const N: usize> FrogVarWrite for [T; N] {

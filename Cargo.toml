@@ -187,18 +187,18 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-froglight-internal = { workspace = true }
+froglight-internal = { workspace = true, features = ["nightly"] }
 
 [features]
-default = ["bevy", "brigadier", "nightly", "std"]
+default = ["bevy", "brigadier", "std"]
 
 # Enable the `froglight-brigadier` crate.
 brigadier = ["froglight-internal/brigadier"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
-# Enable various crates' nightly features.
-nightly = ["froglight-internal/nightly"]
+# # Enable various crates' nightly features.
+# nightly = ["froglight-internal/nightly"]
 
 # Enable support for rust's standard library.
 std = ["froglight-internal/std"]
