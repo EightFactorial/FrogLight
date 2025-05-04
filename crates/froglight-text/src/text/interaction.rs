@@ -55,6 +55,12 @@ impl TextInteraction {
     #[must_use]
     pub const fn empty() -> Self { Self::EMPTY }
 
+    /// Returns `true` if all fields are `None`.
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
+        self.insertion.is_none() && self.click.is_none() && self.hover.is_none()
+    }
+
     /// Update the [`InteractComponent`] with the given insertion text.
     #[inline]
     #[must_use]

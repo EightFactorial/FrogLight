@@ -52,60 +52,62 @@ struct Child<'a>(FormattedTextRef<'a>, &'a TextFormatting);
 impl Serialize for Child<'_> {
     fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
     where S: Serializer {
-        // If there is only plain text, serialize it as a string
-        if let FormattedContent::Text(text) = &self.0.content {
-            if self.0.children.is_empty()
-                && self.1 == &TextFormatting::EMPTY
-                && self.0.interact == TextInteraction::EMPTY
-            {
-                return ser.serialize_str(&text.text);
-            }
-        }
+        let mut map: S::SerializeMap;
 
-        let mut ser = ser.serialize_map(None)?;
+        // Prepare formatting arguments
+        let inherit = self.0.formatting.inherit(self.1);
+        let diff = inherit.difference(self.1);
 
         // Serialize the text content
         match &self.0.content {
             FormattedContent::Text(c) => {
-                ser.serialize_entry("type", "text")?;
-                c.serialize(FlatMapSerializer(&mut ser))?;
+                if diff.is_empty() && self.0.interact.is_empty() && self.0.children.is_empty() {
+                    return ser.serialize_str(&c.text);
+                } else {
+                    map = ser.serialize_map(None)?;
+                    map.serialize_entry("type", "text")?;
+                    c.serialize(FlatMapSerializer(&mut map))?;
+                }
             }
             FormattedContent::Translation(c) => {
-                ser.serialize_entry("type", "translatable")?;
-                c.serialize(FlatMapSerializer(&mut ser))?;
+                map = ser.serialize_map(None)?;
+                map.serialize_entry("type", "translatable")?;
+                c.serialize(FlatMapSerializer(&mut map))?;
             }
             FormattedContent::Score(c) => {
-                ser.serialize_entry("type", "score")?;
-                c.serialize(FlatMapSerializer(&mut ser))?;
+                map = ser.serialize_map(None)?;
+                map.serialize_entry("type", "score")?;
+                c.serialize(FlatMapSerializer(&mut map))?;
             }
             FormattedContent::Selector(c) => {
-                ser.serialize_entry("type", "selector")?;
-                c.serialize(FlatMapSerializer(&mut ser))?;
+                map = ser.serialize_map(None)?;
+                map.serialize_entry("type", "selector")?;
+                c.serialize(FlatMapSerializer(&mut map))?;
             }
             FormattedContent::Keybind(c) => {
-                ser.serialize_entry("type", "keybind")?;
-                c.serialize(FlatMapSerializer(&mut ser))?;
+                map = ser.serialize_map(None)?;
+                map.serialize_entry("type", "keybind")?;
+                c.serialize(FlatMapSerializer(&mut map))?;
             }
             FormattedContent::Nbt(c) => {
-                ser.serialize_entry("type", "nbt")?;
-                c.serialize(FlatMapSerializer(&mut ser))?;
+                map = ser.serialize_map(None)?;
+                map.serialize_entry("type", "nbt")?;
+                c.serialize(FlatMapSerializer(&mut map))?;
             }
         }
 
         // Serialize the text's children recursively
-        let inherit = self.0.formatting.inherit(self.1);
         if !self.0.children.is_empty() {
-            ser.serialize_entry("extra", &Children(&self.0.children, &inherit))?;
+            map.serialize_entry("extra", &Children(&self.0.children, &inherit))?;
         }
 
         // Serialize the differences from the parent text's formatting
-        let diff = inherit.difference(self.1);
-        diff.serialize(FlatMapSerializer(&mut ser))?;
+        diff.serialize(FlatMapSerializer(&mut map))?;
 
         // Serialize the text's interaction settings
-        self.0.interact.serialize(FlatMapSerializer(&mut ser))?;
+        self.0.interact.serialize(FlatMapSerializer(&mut map))?;
 
-        ser.end()
+        map.end()
     }
 }
 
@@ -272,7 +274,7 @@ fn formatted_text() {
     assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
-        r#"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"}]}"#,
+        r#"{"type":"text","text":"Hello, World!","extra":["Child"]}"#,
         "The text is missing it's children"
     );
 
@@ -310,7 +312,7 @@ fn formatted_text() {
     assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
-        r#"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"}],"color":"red"}"#,
+        r#"{"type":"text","text":"Hello, World!","extra":["Child"],"color":"red"}"#,
         "The child components are unnecessarily including the parent's formatting"
     );
 
@@ -329,7 +331,7 @@ fn formatted_text() {
     assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
-        r#"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"}],"color":"red"}"#,
+        r#"{"type":"text","text":"Hello, World!","extra":["Child"],"color":"red"}"#,
         "The child components are unnecessarily including the parent's formatting"
     );
 
@@ -358,7 +360,7 @@ fn formatted_text() {
     assert_eq!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
-        r##"{"type":"text","text":"Hello, World!","extra":[{"type":"text","text":"Child"},{"type":"text","text":"Child 2","color":"#111111","bold":true}]}"##,
+        r##"{"type":"text","text":"Hello, World!","extra":["Child",{"type":"text","text":"Child 2","color":"#111111","bold":true}]}"##,
         "The child components are unnecessarily including the parent's formatting"
     );
 }

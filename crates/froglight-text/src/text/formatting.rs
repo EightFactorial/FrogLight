@@ -102,6 +102,18 @@ impl TextFormatting {
     #[must_use]
     pub const fn empty() -> Self { Self::EMPTY }
 
+    /// Returns `true` if all fields are `None`.
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
+        self.font.is_none()
+            && self.color.is_none()
+            && self.bold.is_none()
+            && self.italic.is_none()
+            && self.underlined.is_none()
+            && self.strikethrough.is_none()
+            && self.obfuscated.is_none()
+    }
+
     /// Create a new [`TextFormatting`] with all uninitialized fields
     /// set to the default values.
     #[must_use]
