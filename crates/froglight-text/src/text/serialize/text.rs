@@ -63,11 +63,11 @@ impl Serialize for Child<'_> {
             FormattedContent::Text(c) => {
                 if diff.is_empty() && self.0.interact.is_empty() && self.0.children.is_empty() {
                     return ser.serialize_str(&c.text);
-                } else {
-                    map = ser.serialize_map(None)?;
-                    map.serialize_entry("type", "text")?;
-                    c.serialize(FlatMapSerializer(&mut map))?;
                 }
+
+                map = ser.serialize_map(None)?;
+                map.serialize_entry("type", "text")?;
+                c.serialize(FlatMapSerializer(&mut map))?;
             }
             FormattedContent::Translation(c) => {
                 map = ser.serialize_map(None)?;
@@ -139,8 +139,8 @@ impl<'de> Deserialize<'de> for FormattedText {
                 };
 
                 Ok(Self {
-                    content: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
-                    formatting: Deserialize::deserialize(ContentRefDeserializer::new(&content))?,
+                    content: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
+                    formatting: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
                     interact: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
                     children,
                 })

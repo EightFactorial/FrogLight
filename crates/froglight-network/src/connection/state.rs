@@ -72,6 +72,10 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     /// # Warning
     /// It is the responsibility of the caller to ensure that
     /// the data received matches the expected packet type.
+    ///
+    /// # Errors
+    /// Returns an error if the type could not be read,
+    /// or data could not be read from the connection.
     pub async fn read_raw<T: RawPacketVersion<V, M>, M: 'static>(
         &mut self,
     ) -> Result<T, ConnectionError> {
@@ -98,6 +102,11 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     /// # Warning
     /// It is the responsibility of the caller to ensure that
     /// the connection is expecting the type of packet being written.
+    ///
+    /// # Errors
+    /// Returns an error if the type could not be written,
+    /// or data could not be written to the connection.
+    #[inline]
     pub async fn write_raw<T: RawPacketVersion<V, M>, M: 'static>(
         &mut self,
         packet: &T,

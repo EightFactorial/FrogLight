@@ -51,13 +51,13 @@ pub trait RawPacket: Sized + Send + 'static {
     /// Read a packet from the given bytes.
     fn read_packet<'a, C: RawConnection + ?Sized>(
         conn: &'a mut C,
-        buf: &'a Vec<u8>,
+        buf: &'a mut Vec<u8>,
     ) -> impl Future<Output = Result<Self, ConnectionError>> + Send + 'a;
     /// Write the packet into the given buffer.
     fn write_packet<'a, C: RawConnection + ?Sized>(
         &'a self,
         conn: &'a mut C,
-        buf: &'a Vec<u8>,
+        buf: &'a mut Vec<u8>,
     ) -> impl Future<Output = Result<(), ConnectionError>> + Send + 'a;
 }
 

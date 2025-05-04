@@ -22,6 +22,10 @@ impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
     /// Connect to a server at the given address,
     /// resolved using the provided
     /// [`FroglightResolver`](crate::prelude::FroglightResolver).
+    ///
+    /// # Errors
+    /// Returns an error if the connection cannot be established,
+    /// or if `TCP_NODELAY` cannot be set.
     #[cfg(feature = "resolver")]
     pub async fn connect(
         addr: &str,
@@ -32,11 +36,19 @@ impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
 
     /// Connect to a server at the given address,
     /// resolved using the default system resolver.
+    ///
+    /// # Errors
+    /// Returns an error if the connection cannot be established,
+    /// or if `TCP_NODELAY` cannot be set.
     pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
         IoTransport::<TcpStream>::connect_system(addr).await.map(Self::from_raw)
     }
 
     /// Connect to a server at the given [`SocketAddr`].
+    ///
+    /// # Errors
+    /// Returns an error if the connection cannot be established,
+    /// or if `TCP_NODELAY` cannot be set.
     pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
         IoTransport::<TcpStream>::connect_to(socket).await.map(Self::from_raw)
     }
@@ -114,6 +126,7 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         self.peek_raw(len_buf.get_mut().as_mut_slice()).await?;
         let len = <u32 as FrogVarRead>::frog_var_read(&mut len_buf);
         let len = len.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
+        #[expect(clippy::cast_possible_truncation)]
         let len_size = len_buf.position() as usize;
 
         // Make sure the buffer can hold the packet, then read it
@@ -135,6 +148,7 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         }
 
         // Move the packet to the beginning of the buffer and set the size.
+        #[expect(clippy::cast_possible_truncation)]
         let position = cursor.position() as usize;
         buf.copy_within(position.., 0);
         buf.truncate(buf.len() - position);
@@ -204,6 +218,10 @@ impl IoTransport<TcpStream> {
     /// Create an [`IoTransport`] from an address resolved
     /// using the provided
     /// [`FroglightResolver`](crate::prelude::FroglightResolver).
+    ///
+    /// # Errors
+    /// Returns an error if the connection cannot be established,
+    /// or if `TCP_NODELAY` cannot be set.
     #[inline]
     #[cfg(feature = "resolver")]
     pub async fn connect(
@@ -215,6 +233,10 @@ impl IoTransport<TcpStream> {
 
     /// Create an [`IoTransport`] from an address resolved
     /// using the system's default resolver.
+    ///
+    /// # Errors
+    /// Returns an error if the connection cannot be established,
+    /// or if `TCP_NODELAY` cannot be set.
     pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
         let stream = TcpStream::connect(addr).await?;
         let socket = stream.peer_addr()?;
@@ -223,6 +245,10 @@ impl IoTransport<TcpStream> {
     }
 
     /// Create an [`IoTransport`] from a [`SocketAddr`].
+    ///
+    /// # Errors
+    /// Returns an error if the connection cannot be established,
+    /// or if `TCP_NODELAY` cannot be set.
     pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
         let stream = TcpStream::connect(socket).await?;
         stream.set_nodelay(true)?;

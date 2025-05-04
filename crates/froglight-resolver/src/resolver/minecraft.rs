@@ -24,9 +24,9 @@ impl FroglightResolver {
         let mut port = Self::DEFAULT_PORT;
 
         // Return early if given a socket or IP address
-        if let Ok(sock) = SocketAddr::from_str(&address) {
+        if let Ok(sock) = SocketAddr::from_str(address) {
             return Ok(sock);
-        } else if let Ok(addr) = IpAddr::from_str(&address) {
+        } else if let Ok(addr) = IpAddr::from_str(address) {
             return Ok(SocketAddr::new(addr, port));
         } else if let Some(addr) = IntoName::to_ip(&address) {
             return Ok(SocketAddr::new(addr, port));
@@ -35,7 +35,7 @@ impl FroglightResolver {
         // Split off a port if one is present
         if let Some((addr, pt)) = address.rsplit_once(':') {
             if pt.chars().all(|c| c.is_ascii_digit()) {
-                let _ = pt.parse::<u16>().map_or((), |p| port = p);
+                let () = pt.parse::<u16>().map_or((), |p| port = p);
                 address = addr;
             }
         }
@@ -48,7 +48,7 @@ impl FroglightResolver {
 
         // If a SRV record is found, use the first IP address given
         if let Ok(lookup) = self.lookup_srv(srv_name).await {
-            for record in lookup.into_iter() {
+            for record in lookup {
                 if let Some(ip) = self.lookup_ip(record.target().clone()).await?.iter().next() {
                     return Ok(SocketAddr::new(ip, port));
                 }
