@@ -23,6 +23,7 @@ froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["io"] }
 smol_str = { workspace = true }
 thiserror = { workspace = true }
+uuid = { workspace = true, features = ["std"] }
 
 # Optional dependencies
 bevy_platform = { workspace = true, optional = true, features = ["alloc"] }
@@ -31,10 +32,9 @@ hashbrown = { version = "0.15", optional = true, features = ["default"] }
 serde = { workspace = true, optional = true, features = ["std"] }
 serde_json = { workspace = true, optional = true, features = ["std"] }
 smallvec = { workspace = true, optional = true }
-uuid = { workspace = true, optional = true, features = ["std"] }
 
 [features]
-default = ["glam", "uuid"]
+default = ["glam"]
 
 # Enable support for `bevy_platform` types.
 bevy_platform = ["dep:bevy_platform"]
@@ -44,8 +44,6 @@ glam = ["dep:glam"]
 hashbrown = ["dep:hashbrown"]
 # Enable support for `smallvec` types.
 smallvec = ["dep:smallvec"]
-# Enable support for `uuid` types.
-uuid = ["dep:uuid"]
 
 # Enable support for serializing to/from JSON.
 serde = [
@@ -55,7 +53,7 @@ serde = [
   "hashbrown?/serde",
   "smallvec?/serde",
   "smol_str/serde",
-  "uuid?/serde",
+  "uuid/serde",
 ]
 
 # Enable nightly features.

@@ -12,6 +12,7 @@ pub use froglight_item as item;
 pub use froglight_nbt as nbt;
 #[cfg(feature = "std")]
 pub use froglight_network as network;
+pub use froglight_physics as physics;
 pub use froglight_registry as registry;
 #[cfg(feature = "std")]
 pub use froglight_resolver as resolver;
@@ -33,6 +34,7 @@ pub mod prelude {
     pub use froglight_nbt::prelude::*;
     #[cfg(feature = "std")]
     pub use froglight_network::prelude::*;
+    pub use froglight_physics::prelude::*;
     pub use froglight_registry::prelude::*;
     #[cfg(feature = "bevy")]
     pub use froglight_schedule::prelude::*;

@@ -35,7 +35,7 @@ bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallvec", "smol_str", "uuid"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["glam", "io", "nbt", "serde", "uuid"] }
 froglight-inventory = { workspace = true, optional = true, features = ["io"] }
-froglight-io = { workspace = true, optional = true, features = ["glam", "serde", "smallvec", "uuid"] }
+froglight-io = { workspace = true, optional = true, features = ["bevy_platform", "glam", "serde", "smallvec"] }
 
 [features]
 default = ["bevy", "brigadier", "inventory", "io", "std"]

@@ -8,7 +8,7 @@ use crate::common::ConnectionIntent;
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 pub struct HandshakePacket {
-    #[frog(var)]
+    #[cfg_attr(feature = "io", frog(var))]
     pub protocol: i32,
     pub address: SmolStr,
     pub port: u16,

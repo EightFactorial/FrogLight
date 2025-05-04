@@ -1,6 +1,6 @@
 //! [`ScheduleLabel`]s and [`SystemSet`]s
 
-use bevy_ecs::schedule::{ScheduleLabel, SystemSet};
+use bevy_ecs::schedule::ScheduleLabel;
 
 /// The [`Network::PreNetwork`] and [`Network::PostNetwork`] schedules.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, ScheduleLabel)]
@@ -29,9 +29,3 @@ pub enum Tick {
     /// [`Tick::Tick`].
     PostTick,
 }
-
-// -------------------------------------------------------------------------------------------------
-
-/// A placeholder for future [`SystemSet`]s.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, SystemSet)]
-pub enum Placeholder {}

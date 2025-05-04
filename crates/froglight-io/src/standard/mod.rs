@@ -8,6 +8,7 @@ use std::{
 mod froglight_common_impl;
 mod smol_str_impl;
 mod std_impl;
+mod uuid_impl;
 
 #[cfg(feature = "bevy_platform")]
 mod bevy_impl;
@@ -17,8 +18,6 @@ mod glam_impl;
 mod hashbrown_impl;
 #[cfg(feature = "smallvec")]
 mod smallvec_impl;
-#[cfg(feature = "uuid")]
-mod uuid_impl;
 
 /// A trait for reading data from a buffer.
 pub trait FrogRead: Sized {
