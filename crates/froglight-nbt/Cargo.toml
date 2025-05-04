@@ -45,8 +45,11 @@ reflect = ["dep:bevy_reflect"]
 # Enable `froglight-io` support.
 io = ["dep:froglight-io", "std"]
 
-# Enable support for `serde` serialization.
+# Enable `serde` serialization support.
 serde = ["dep:serde", "indexmap/serde", "smol_str/serde"]
+
+# Enable nightly features.
+nightly = ["froglight-io?/nightly", "simd_cesu8/nightly"]
 
 # Enable support for the rust standard library.
 std = ["bevy_platform/std", "bevy_reflect?/std", "indexmap/std"]

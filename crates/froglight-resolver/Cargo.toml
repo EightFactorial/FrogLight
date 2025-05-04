@@ -39,6 +39,9 @@ agent = ["dep:ureq"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect", "dep:bevy_tasks"]
 
+# Enable nightly features.
+nightly = []
+
 # --- Examples ---
 
 [[example]]

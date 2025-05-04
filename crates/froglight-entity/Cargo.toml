@@ -16,6 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+base64 = { workspace = true, features = ["alloc"] }
 bevy_platform = { workspace = true, features = ["alloc"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
@@ -27,7 +28,6 @@ thiserror = { workspace = true }
 uuid = { workspace = true, features = ["md5"] }
 
 # Optional dependencies
-base64 = { workspace = true, optional = true, features = ["std"] }
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 froglight-io = { workspace = true, optional = true }
@@ -39,7 +39,7 @@ ureq = { workspace = true, optional = true, features = ["json"] }
 default = ["online", "std"]
 
 # Enable accessing online APIs.
-online = ["dep:base64", "dep:ureq", "serde", "std"]
+online = ["dep:ureq", "serde", "std"]
 # Enable `froglight-io` support.
 io = ["dep:froglight-io", "std"]
 
@@ -57,5 +57,19 @@ serde = [
   "uuid/serde",
 ]
 
+# Enable nightly features.
+nightly = ["froglight-io?/nightly", "froglight-nbt/nightly", "parking_lot/nightly"]
+
 # Enable support for the rust standard library.
-std = []
+std = [
+  "base64/std",
+  "bevy_ecs?/std",
+  "bevy_platform/std",
+  "bevy_reflect?/std",
+  "froglight-nbt/std",
+  "md-5/std",
+  "serde?/std",
+  "serde_json?/std",
+  "smol_str/std",
+  "uuid/std",
+]

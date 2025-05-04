@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
+#![cfg_attr(feature = "nightly", feature(const_type_id))]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![feature(const_type_id)]
 
 #[cfg(not(feature = "std"))]
 extern crate alloc;

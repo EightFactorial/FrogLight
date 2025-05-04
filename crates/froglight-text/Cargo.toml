@@ -58,6 +58,9 @@ serde = [
   "uuid/serde",
 ]
 
+# Enable nightly features.
+nightly = ["froglight-io?/nightly", "froglight-nbt/nightly", "parking_lot/nightly"]
+
 # Enable support for the rust standard library.
 std = [
   "bevy_ecs?/std",

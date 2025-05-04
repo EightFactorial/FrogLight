@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
+#![cfg_attr(feature = "nightly", feature(array_try_from_fn))]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
-#![feature(array_try_from_fn)]
 
 pub mod standard;
 pub mod variable;

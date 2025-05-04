@@ -31,7 +31,7 @@ default = ["alloc"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect"]
-# Enable `serde` support.
+# Enable `serde` serialization support.
 serde = ["dep:serde", "smol_str/serde", "uuid/serde"]
 
 # Enable support for the rust allocator library.

@@ -190,7 +190,7 @@ workspace = true
 froglight-internal = { workspace = true }
 
 [features]
-default = ["bevy", "brigadier", "std"]
+default = ["bevy", "brigadier", "nightly", "std"]
 
 # Enable the `froglight-brigadier` crate.
 brigadier = ["froglight-internal/brigadier"]

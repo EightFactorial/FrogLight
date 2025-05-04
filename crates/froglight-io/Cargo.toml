@@ -57,3 +57,6 @@ serde = [
   "smol_str/serde",
   "uuid?/serde",
 ]
+
+# Enable nightly features.
+nightly = ["hashbrown?/nightly"]

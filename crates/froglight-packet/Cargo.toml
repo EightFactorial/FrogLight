@@ -67,6 +67,16 @@ bevy = [
   "froglight-text/bevy",
 ]
 
+# Enable nightly features.
+nightly = [
+  "froglight-brigadier?/nightly",
+  "froglight-entity/nightly",
+  "froglight-inventory?/nightly",
+  "froglight-io?/nightly",
+  "froglight-nbt/nightly",
+  "froglight-text/nightly",
+]
+
 # Enable support for the rust standard library.
 std = [
   "bevy_platform/std",

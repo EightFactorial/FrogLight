@@ -37,6 +37,9 @@ bevy = ["dep:bevy_ecs", "dep:bevy_utils", "froglight-common/bevy"]
 # Enable `bevy_reflect` support.
 reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect"]
 
+# Enable nightly features.
+nightly = ["parking_lot/nightly", "rangemap/nightly"]
+
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4"]
 # Enable support for v1.21.5

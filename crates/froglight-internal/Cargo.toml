@@ -55,17 +55,16 @@ bevy = [
 
 # Enable nightly features.
 nightly = [
-  # "froglight-block/nightly",
-  # "froglight-common/nightly",
-  # "froglight-entity/nightly",
-  # "froglight-inventory/nightly",
-  # "froglight-item/nightly",
-  # "froglight-nbt/nightly",
-  # "froglight-network?/nightly",
-  # "froglight-registry/nightly",
-  # "froglight-schedule?/nightly",
-  # "froglight-resolver?/nightly",
-  # "froglight-world/nightly",
+  "froglight-block/nightly",
+  "froglight-entity/nightly",
+  "froglight-inventory/nightly",
+  "froglight-item/nightly",
+  "froglight-nbt/nightly",
+  "froglight-network?/nightly",
+  "froglight-registry/nightly",
+  "froglight-resolver?/nightly",
+  "froglight-schedule?/nightly",
+  "froglight-world/nightly",
 ]
 
 # Enable support for rust's standard library.

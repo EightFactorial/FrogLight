@@ -46,18 +46,21 @@ default = ["glam", "nbt", "std", "uuid"]
 # Enable `froglight-io` support.
 io = ["dep:froglight-io", "std"]
 
-# Enable support for `glam` types.
+# Enable `glam` support.
 glam = ["bevy_reflect/glam", "dep:glam"]
 # Enable `no_std` support for `glam`.
 libm = ["glam?/libm"]
 
-# Enable support for `froglight-nbt` types.
+# Enable `froglight-nbt` support.
 nbt = ["dep:froglight-nbt"]
-# Enable support for `uuid` types.
+# Enable `uuid` support.
 uuid = ["bevy_reflect/uuid", "dep:uuid"]
 
-# Enable support for `serde` serialization.
+# Enable `serde` serialization support.
 serde = ["bevy_platform/serialize", "dep:serde", "glam?/serde", "petgraph/serde-1", "smol_str/serde", "uuid?/serde"]
+
+# Enable nightly features.
+nightly = ["froglight-io?/nightly", "froglight-nbt?/nightly", "parking_lot/nightly"]
 
 # Enable support for the rust standard library.
 std = [
