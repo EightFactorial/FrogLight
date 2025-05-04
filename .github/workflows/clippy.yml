@@ -53,7 +53,7 @@ jobs:
       # Run the clippy tool
       - name: Run Clippy
         run: >
-          cargo clippy --workspace --all-targets -- -D warnings
+          cargo clippy --workspace --features=v1_21_4,v1_21_5 -- -D warnings
           | clippy-sarif
           | tee clippy-results.sarif
           | sarif-fmt
@@ -66,4 +66,4 @@ jobs:
           wait-for-processing: true
       # Print the results
       - name: Report Results
-        run: cargo clippy --workspace --all-targets
+        run: cargo clippy --workspace --features=v1_21_4,v1_21_5

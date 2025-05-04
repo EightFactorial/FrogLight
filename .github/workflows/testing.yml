@@ -47,6 +47,8 @@ jobs:
       # Run nextest with the default features
       - name: Run Nextest
         run: cargo nextest run --workspace --features=v1_21_4,v1_21_5
+      - name: Run Nextest (no_std)
+        run: cargo nextest run --workspace --no-default-features --features=brigadier,libm,v1_21_4,v1_21_5
       # Run doctests with the default features
       - name: Run Doctests
         run: cargo test --doc --workspace --features=v1_21_4,v1_21_5
