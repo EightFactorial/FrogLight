@@ -209,8 +209,8 @@ pub trait AsyncPeekExt: AsyncReadExt {
 
 impl AsyncPeekExt for TcpStream {
     #[inline]
-    fn peek(&self, buf: &mut [u8]) -> impl Future<Output = std::io::Result<usize>> + Send {
-        self.peek(buf)
+    async fn peek(&self, buf: &mut [u8]) -> std::io::Result<usize> {
+        TcpStream::peek(self, buf).await
     }
 }
 

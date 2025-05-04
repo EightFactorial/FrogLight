@@ -52,13 +52,19 @@ impl<'a> FormattedTextRef<'a> {
     pub fn as_message(&self, t: &TextTranslations) -> Result<String, ChatMessageError> {
         // Get the message content
         let mut string = match &self.content {
-            FormattedContent::Text(text) => text.to_string(),
+            FormattedContent::Text(text) => {
+                // TODO: Handle legacy formatting codes
+                text.to_string()
+            }
             FormattedContent::Translation(translate) => {
                 // Retrieve the translated message or the fallback, if one exists
-                if let Some(translation) = t.get(translate.translate.as_ref()).map_or_else(
+                let translation = t.get(translate.translate.as_ref()).map_or_else(
                     || translate.fallback.as_ref().map(AsRef::as_ref),
                     |t| Some(t.as_str()),
-                ) {
+                );
+
+                if let Some(translation) = translation {
+                    // TODO: Handle legacy formatting codes
                     // Format and insert the message arguments
                     Self::format_message(translation, &translate.arguments, t)?
                 } else {
@@ -109,13 +115,19 @@ impl<'a> FormattedTextRef<'a> {
     ) -> Result<nu_ansi_term::AnsiString<'a>, ChatMessageError> {
         // Get the message content
         let mut string = match &self.content {
-            FormattedContent::Text(text) => text.to_string(),
+            FormattedContent::Text(text) => {
+                // TODO: Handle legacy formatting codes
+                text.to_string()
+            }
             FormattedContent::Translation(translate) => {
                 // Retrieve the translated message or the fallback, if one exists
-                if let Some(translation) = t.get(translate.translate.as_ref()).map_or_else(
+                let translation = t.get(translate.translate.as_ref()).map_or_else(
                     || translate.fallback.as_ref().map(AsRef::as_ref),
                     |t| Some(t.as_str()),
-                ) {
+                );
+
+                if let Some(translation) = translation {
+                    // TODO: Handle legacy formatting codes
                     // Format and insert the message arguments
                     Self::format_message_ansi(
                         translation,

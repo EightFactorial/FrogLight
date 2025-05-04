@@ -16,23 +16,23 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
+aes = { workspace = true }
 bevy_platform = { workspace = true, features = ["alloc"] }
+cfb8 = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-nbt = { workspace = true }
 parking_lot = { workspace = true }
+rsa = { workspace = true, features = ["sha2"] }
 smol_str = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-aes = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str"] }
-cfb8 = { workspace = true, optional = true, features = ["std"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }
-rsa = { workspace = true, optional = true, features = ["sha2", "std"] }
 serde = { workspace = true, optional = true, features = ["derive"] }
 serde_json = { workspace = true, optional = true }
 
@@ -66,9 +66,9 @@ std = [
   "bevy_ecs?/std",
   "bevy_platform/std",
   "bevy_reflect?/std",
-  "dep:cfb8",
-  "dep:rsa",
+  "cfb8/std",
   "froglight-nbt/std",
+  "rsa/std",
   "serde?/std",
   "serde_json?/std",
   "uuid/std",
