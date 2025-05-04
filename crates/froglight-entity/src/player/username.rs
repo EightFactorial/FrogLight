@@ -202,6 +202,9 @@ where SmolStr: Deref<Target = T>
 #[test]
 #[cfg(test)]
 fn username() {
+    #[cfg(not(feature = "std"))]
+    use alloc::string::ToString;
+
     let username = PlayerUsername::static_new("Mr_Sus_");
     assert_eq!(username.offline_uuid().to_string(), "fc6b8fd9-0dd1-399f-9924-3b08f51d4119");
 
