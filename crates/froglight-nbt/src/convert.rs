@@ -37,16 +37,29 @@ pub trait IntoCompound {
     fn into_compound(&self) -> Result<NbtCompound, ConvertError>;
 }
 
-impl<T: From<NbtCompound>> FromCompound for T {
+impl FromCompound for NbtCompound {
     #[inline]
-    fn from_compound(compound: &NbtCompound) -> Result<Self, ConvertError> {
-        Ok(T::from(compound.clone()))
-    }
+    fn from_compound(compound: &NbtCompound) -> Result<Self, ConvertError> { Ok(compound.clone()) }
+}
+impl IntoCompound for NbtCompound {
+    #[inline]
+    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { Ok(self.clone()) }
 }
 
-impl<T: Clone + Into<NbtCompound>> IntoCompound for T {
+impl<T: FromCompound> FromCompound for Option<T> {
     #[inline]
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { Ok(self.clone().into()) }
+    fn from_compound(compound: &NbtCompound) -> Result<Self, ConvertError> {
+        T::from_compound(compound).map(Some)
+    }
+}
+impl<T: IntoCompound> IntoCompound for Option<T> {
+    #[inline]
+    fn into_compound(&self) -> Result<NbtCompound, ConvertError> {
+        match self {
+            Some(value) => value.into_compound(),
+            None => Ok(NbtCompound::new()),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -167,11 +180,11 @@ pub trait InsertAsNbt: IntoTag {
 /// An error that can occur when converting between a type and NBT.
 #[derive(Debug, thiserror::Error)]
 pub enum ConvertError {
-    /// A field was missing from the NBT compound.
+    /// A field was missing from a NBT compound.
     #[error("Missing field for `{0}`: \"{1}\"")]
     MissingField(&'static str, &'static str),
     /// A field's tag did not match the expected tag.
-    #[error("Mismatched tag for `{0}`, expected \"{1}\"")]
+    #[error("Mismatched tag for `{0}`, expected {1}")]
     MismatchedTag(&'static str, &'static str),
     /// An error occurred while converting a field.
     #[error("Failed to create \"{0}\": {1}")]

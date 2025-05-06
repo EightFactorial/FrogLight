@@ -42,7 +42,7 @@ default = ["ansi", "std"]
 # Enable ANSI terminal support.
 ansi = ["dep:nu-ansi-term", "std"]
 # Enable `froglight-io` support.
-io = ["dep:froglight-io", "std"]
+io = ["dep:froglight-io", "froglight-nbt/io", "std"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-nbt/reflect"]

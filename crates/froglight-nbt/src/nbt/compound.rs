@@ -1,12 +1,13 @@
 #[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
+use core::iter::{Extend, IntoIterator, Iterator};
 
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{From, Into};
 
 use super::CompoundMap;
-use crate::{mutf8::Mutf8String, nbt::NbtTag};
+use crate::{convert::IntoCompound, mutf8::Mutf8String, nbt::NbtTag};
 
 /// A map of named NBT tags.
 #[repr(transparent)]
@@ -117,8 +118,12 @@ impl NbtCompound {
     ///
     /// Returns the previous value associated with the key, if any.
     #[inline]
-    pub fn insert(&mut self, key: impl Into<Mutf8String>, tag: NbtTag) -> Option<NbtTag> {
-        self.0.insert(key.into(), tag)
+    pub fn insert(
+        &mut self,
+        key: impl Into<Mutf8String>,
+        tag: impl Into<NbtTag>,
+    ) -> Option<NbtTag> {
+        self.0.insert(key.into(), tag.into())
     }
 
     /// Insert a new key-value pair into the [`NbtCompound`] at the given index,
@@ -172,44 +177,66 @@ impl NbtCompound {
     pub fn iter_mut(&mut self) -> indexmap::map::IterMut<Mutf8String, NbtTag> { self.0.iter_mut() }
 }
 
-impl core::iter::IntoIterator for NbtCompound {
+impl IntoIterator for NbtCompound {
     type IntoIter = indexmap::map::IntoIter<Mutf8String, NbtTag>;
     type Item = (Mutf8String, NbtTag);
 
+    #[inline]
     fn into_iter(self) -> Self::IntoIter { self.0.into_iter() }
 }
-impl<'a> core::iter::IntoIterator for &'a NbtCompound {
+impl<'a> IntoIterator for &'a NbtCompound {
     type IntoIter = indexmap::map::Iter<'a, Mutf8String, NbtTag>;
     type Item = (&'a Mutf8String, &'a NbtTag);
 
+    #[inline]
     fn into_iter(self) -> Self::IntoIter { self.iter() }
 }
-impl<'a> core::iter::IntoIterator for &'a mut NbtCompound {
+impl<'a> IntoIterator for &'a mut NbtCompound {
     type IntoIter = indexmap::map::IterMut<'a, Mutf8String, NbtTag>;
     type Item = (&'a Mutf8String, &'a mut NbtTag);
 
+    #[inline]
     fn into_iter(self) -> Self::IntoIter { self.iter_mut() }
 }
 
-impl FromIterator<(Mutf8String, NbtTag)> for NbtCompound {
-    fn from_iter<T: IntoIterator<Item = (Mutf8String, NbtTag)>>(iter: T) -> Self {
-        Self(CompoundMap::from_iter(iter))
+impl<A: Into<Mutf8String>, B: Into<NbtTag>> FromIterator<(A, B)> for NbtCompound {
+    fn from_iter<T: IntoIterator<Item = (A, B)>>(iter: T) -> Self {
+        Self(CompoundMap::from_iter(iter.into_iter().map(|(key, val)| (key.into(), val.into()))))
     }
 }
 impl From<Vec<(Mutf8String, NbtTag)>> for NbtCompound {
+    #[inline]
     fn from(pair: Vec<(Mutf8String, NbtTag)>) -> Self { Self::from_iter(pair) }
+}
+
+impl<A: Into<Mutf8String>, B: Into<NbtTag>> Extend<(A, B)> for NbtCompound {
+    fn extend<T: IntoIterator<Item = (A, B)>>(&mut self, iter: T) {
+        iter.into_iter().for_each(|(key, val)| {
+            self.insert(key, val.into());
+        });
+    }
+}
+impl<A: IntoCompound> Extend<A> for NbtCompound {
+    fn extend<T: IntoIterator<Item = A>>(&mut self, iter: T) {
+        iter.into_iter().for_each(|item| match item.into_compound() {
+            Ok(c) => self.extend(c),
+            Err(err) => {
+                panic!("Failed to extend NbtCompound with {}: {err}", core::any::type_name::<A>())
+            }
+        });
+    }
 }
 
 impl<'a> core::ops::Index<&'a str> for NbtCompound {
     type Output = NbtTag;
 
     fn index(&self, key: &'a str) -> &Self::Output {
-        self.get_tag(key).expect("Compound does not contain key")
+        self.get_tag(key).expect("NbtCompound does not contain key")
     }
 }
 impl<'a> core::ops::IndexMut<&'a str> for NbtCompound {
     fn index_mut(&mut self, key: &'a str) -> &mut Self::Output {
-        self.get_tag_mut(key).expect("Compound does not contain key")
+        self.get_tag_mut(key).expect("NbtCompound does not contain key")
     }
 }
 
@@ -217,11 +244,11 @@ impl core::ops::Index<usize> for NbtCompound {
     type Output = NbtTag;
 
     fn index(&self, index: usize) -> &Self::Output {
-        self.get_index(index).map(|(_, tag)| tag).expect("Compound does not contain index")
+        self.get_index(index).map(|(_, tag)| tag).expect("NbtCompound does not contain index")
     }
 }
 impl core::ops::IndexMut<usize> for NbtCompound {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
-        self.get_index_mut(index).map(|(_, tag)| tag).expect("Compound does not contain index")
+        self.get_index_mut(index).map(|(_, tag)| tag).expect("NbtCompound does not contain index")
     }
 }

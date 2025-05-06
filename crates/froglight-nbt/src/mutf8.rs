@@ -6,12 +6,13 @@ use alloc::{
     string::String,
     vec::Vec,
 };
-use core::borrow::Borrow;
+use core::{borrow::Borrow, convert::Infallible};
 #[cfg(feature = "std")]
 use std::borrow::Cow;
 
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
+use froglight_common::prelude::Identifier;
 use indexmap::Equivalent;
 
 /// A MUTF-8 string.
@@ -128,10 +129,33 @@ impl From<String> for Mutf8String {
 impl<'a> From<&'a str> for Mutf8String {
     fn from(value: &'a str) -> Self { Self::from_string(value) }
 }
+
 impl TryFrom<Mutf8String> for String {
     type Error = simd_cesu8::DecodingError;
 
     fn try_from(value: Mutf8String) -> Result<Self, Self::Error> { value.try_as_string() }
+}
+impl TryFrom<Mutf8String> for Cow<'static, str> {
+    type Error = simd_cesu8::DecodingError;
+
+    fn try_from(value: Mutf8String) -> Result<Self, Self::Error> {
+        Ok(Cow::Owned(value.try_as_string()?))
+    }
+}
+
+impl TryFrom<Mutf8String> for Identifier {
+    type Error = ();
+
+    fn try_from(value: Mutf8String) -> Result<Self, Self::Error> {
+        Identifier::try_new(value.to_str_lossy()).ok_or(())
+    }
+}
+impl TryFrom<Mutf8String> for Option<Identifier> {
+    type Error = Infallible;
+
+    fn try_from(value: Mutf8String) -> Result<Self, Self::Error> {
+        Ok(Identifier::try_new(value.to_str_lossy()))
+    }
 }
 
 impl From<Vec<u8>> for Mutf8String {
@@ -160,6 +184,8 @@ impl core::fmt::Debug for Mutf8String {
         f.debug_tuple("Mutf8String").field(&self.to_str_lossy()).finish()
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A MUTF-8 string slice.
 ///

@@ -56,6 +56,18 @@ impl FormattedText {
         Self::from_string_with(text.into(), TextFormatting::empty())
     }
 
+    /// Create a [`FormattedText`] from a [`FormattedContent`].
+    #[inline]
+    #[must_use]
+    pub const fn from_content(content: FormattedContent) -> Self {
+        FormattedText {
+            content,
+            formatting: TextFormatting::empty(),
+            interact: TextInteraction::empty(),
+            children: Vec::new(),
+        }
+    }
+
     /// Create a [`FormattedText`] from a static string.
     #[inline]
     #[must_use]
