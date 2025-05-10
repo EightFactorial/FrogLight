@@ -12,6 +12,8 @@ pub use array::{ByteArray, DoubleArray, FloatArray, IntArray, LongArray, ShortAr
 mod compound;
 pub use compound::NbtCompound;
 
+pub mod mappings;
+
 mod named;
 pub use named::{NamedNbt, UnnamedNbt};
 

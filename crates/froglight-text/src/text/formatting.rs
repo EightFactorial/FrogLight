@@ -7,18 +7,19 @@ use alloc::{format, string::String};
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
 use froglight_common::prelude::Identifier;
+use froglight_nbt::{nbt::mappings::ByteBoolOption, prelude::FrogNbt};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
 /// The formatting of a [`FormattedText`](super::FormattedText) component.
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Clone, Eq, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct TextFormatting {
     /// The font of the text.
-    // #[frog(default, tag = String, skip_if = Option::is_none)]
+    #[frog(default, tag = "string", skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub font: Option<Identifier>,
     /// The color of the text.
@@ -26,23 +27,23 @@ pub struct TextFormatting {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub color: Option<TextColor>,
     /// Whether the text is bold.
-    // #[frog(default, tag = Bool, skip_if = Option::is_none)]
+    #[frog(default, tag = "byte", with = ByteBoolOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub bold: Option<bool>,
     /// Whether the text is italic.
-    // #[frog(default, tag = Bool, skip_if = Option::is_none)]
+    #[frog(default, tag = "byte", with = ByteBoolOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub italic: Option<bool>,
     /// Whether the text is underlined.
-    // #[frog(default, tag = Bool, skip_if = Option::is_none)]
+    #[frog(default, tag = "byte", with = ByteBoolOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub underlined: Option<bool>,
     /// Whether the text is strikedthrough.
-    // #[frog(default, tag = Bool, skip_if = Option::is_none)]
+    #[frog(default, tag = "byte", with = ByteBoolOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub strikethrough: Option<bool>,
     /// Whether the text is obfuscated.
-    // #[frog(default, tag = Bool, skip_if = Option::is_none)]
+    #[frog(default, tag = "byte", with = ByteBoolOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub obfuscated: Option<bool>,
 }

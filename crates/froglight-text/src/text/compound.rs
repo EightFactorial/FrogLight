@@ -1,7 +1,11 @@
 //! [`FromCompound`] and [`IntoCompound`] implementations for [`FormattedText`]
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
-use froglight_nbt::{convert::ConvertError, nbt::NbtListTag, prelude::*};
+use froglight_nbt::{
+    convert::{ConvertError, FromCompound, IntoCompound},
+    nbt::NbtListTag,
+    prelude::*,
+};
 
 use super::{
     FormattedContent, FormattedText, TextInteraction,
@@ -254,13 +258,6 @@ impl IntoCompound for TextInteraction {
 }
 
 // -------------------------------------------------------------------------------------------------
-
-impl FromCompound for TextFormatting {
-    fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
-}
-impl IntoCompound for TextFormatting {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
-}
 
 impl FromCompound for TextColor {
     fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
