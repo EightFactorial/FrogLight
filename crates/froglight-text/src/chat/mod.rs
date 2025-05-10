@@ -18,13 +18,19 @@ pub trait SignableMessage: Version {
     type SignedMessage: Sized;
 
     /// Sign a chat message.
-    fn sign_message(
+    fn sign_message<M: MessageTimestamp>(
         message: Self::UnsignedMessage,
+        salt: u64,
+        timer: &M,
         ctx: &mut MessageSignatureCtx,
     ) -> Self::SignedMessage;
 
     /// Verify a signed chat message.
-    fn verify_message(message: &Self::SignedMessage, ctx: &MessageSignatureCtx) -> bool;
+    fn verify_message<M: MessageTimestamp>(
+        message: &Self::SignedMessage,
+        timer: &M,
+        ctx: &MessageSignatureCtx,
+    ) -> bool;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -36,13 +42,27 @@ pub trait SignableMessage: Version {
 pub struct MessageSignatureCtx {
     account: Uuid,
     session: Uuid,
-    salt: u64,
-
-    timestamp: Duration,
-    previous: Vec<(usize, [u8; 256])>,
+    previous: Vec<PreviousSignature>,
 
     #[cfg_attr(feature = "bevy", reflect(ignore))]
     private_key: RsaPrivateKey,
+}
+
+/// Signature information about a previous message.
+///
+/// Used to verify future messages sent by the same user.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+pub struct PreviousSignature {
+    /// The timestamp of the message
+    pub timestamp: Duration,
+    /// The hash of the message
+    pub hash: [u8; 256],
+    /// The length of the message
+    pub length: usize,
+    /// The salt used to sign the message
+    pub salt: u64,
 }
 
 impl MessageSignatureCtx {
@@ -56,57 +76,56 @@ impl MessageSignatureCtx {
     pub fn new<R: CryptoRngCore>(
         account: Uuid,
         session: Uuid,
-        salt: Option<u64>,
         rng: &mut R,
     ) -> Result<Self, rsa::Error> {
         let private_key = RsaPrivateKey::new(rng, Self::DEFAULT_KEY_SIZE)?;
-        Ok(Self::new_with(account, session, salt.unwrap_or_else(|| rng.next_u64()), private_key))
+        Ok(Self::new_with(account, session, private_key))
     }
 
     /// Create a new [`MessageSignatureCtx`] using the given salt and key.
     #[inline]
     #[must_use]
-    pub fn new_with(account: Uuid, session: Uuid, salt: u64, private_key: RsaPrivateKey) -> Self {
-        Self {
-            account,
-            session,
-            salt,
-            private_key,
-            previous: Vec::new(),
-            timestamp: Duration::ZERO,
-        }
+    pub fn new_with(account: Uuid, session: Uuid, private_key: RsaPrivateKey) -> Self {
+        Self { account, session, private_key, previous: Vec::new() }
     }
-
-    /// Get the number of messages previously signed by this
-    /// [`MessageSignatureCtx`].
-    #[inline]
-    #[must_use]
-    pub const fn message_index(&self) -> usize { self.previous.len() }
-
-    /// Get the lengths and signatures of all previous messages signed by this
-    /// [`MessageSignatureCtx`].
-    #[inline]
-    #[must_use]
-    pub const fn messages(&self) -> &[(usize, [u8; 256])] { self.previous.as_slice() }
-
-    /// Get the [`Duration`] from the unix epoch when the last message was
-    /// signed.
-    #[inline]
-    #[must_use]
-    pub const fn timestamp(&self) -> &Duration { &self.timestamp }
 
     /// Separate out the components of this [`MessageSignatureCtx`].
     #[inline]
     #[must_use]
-    pub fn into_inner(self) -> (Uuid, Uuid, u64, RsaPrivateKey) {
-        (self.account, self.session, self.salt, self.private_key)
+    pub fn into_inner(self) -> (Uuid, Uuid, RsaPrivateKey) {
+        (self.account, self.session, self.private_key)
     }
 
-    /// Sign a message using this [`MessageSignatureCtx`].
+    /// Get information about previously signed messages.
     #[inline]
     #[must_use]
-    pub fn sign<V: SignableMessage>(&mut self, message: V::UnsignedMessage) -> V::SignedMessage {
-        V::sign_message(message, self)
+    pub const fn history(&self) -> &[PreviousSignature] { self.previous.as_slice() }
+
+    /// Sign a message using this [`MessageSignatureCtx`].
+    ///
+    /// Uses the given [`CryptoRngCore`] implementation to
+    /// generate a random salt.
+    #[inline]
+    #[must_use]
+    pub fn sign<V: SignableMessage, M: MessageTimestamp, R: CryptoRngCore>(
+        &mut self,
+        message: V::UnsignedMessage,
+        timer: &M,
+        rng: &mut R,
+    ) -> V::SignedMessage {
+        self.sign_with_salt::<V, M>(message, timer, rng.next_u64())
+    }
+
+    /// Sign a message using this [`MessageSignatureCtx`] and the given salt.
+    #[inline]
+    #[must_use]
+    pub fn sign_with_salt<V: SignableMessage, M: MessageTimestamp>(
+        &mut self,
+        message: V::UnsignedMessage,
+        timer: &M,
+        salt: u64,
+    ) -> V::SignedMessage {
+        V::sign_message::<M>(message, salt, timer, self)
     }
 
     /// Verify a signed message using this [`MessageSignatureCtx`].
@@ -114,7 +133,31 @@ impl MessageSignatureCtx {
     /// Returns `true` if the message is valid and signed by this context.
     #[inline]
     #[must_use]
-    pub fn verify<V: SignableMessage>(&self, message: &V::SignedMessage) -> bool {
-        V::verify_message(message, self)
+    pub fn verify<V: SignableMessage, M: MessageTimestamp>(
+        &self,
+        message: &V::SignedMessage,
+        timer: &M,
+    ) -> bool {
+        V::verify_message::<M>(message, timer, self)
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A trait for types that can provide a timestamp.
+pub trait MessageTimestamp {
+    /// Get the [`Duration`] from the unix epoch.
+    fn timestamp(&self) -> Duration;
+}
+
+/// A [`MessageTimestamp`] implementation that uses the standard library.
+#[cfg(feature = "std")]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct StdTimestamp;
+
+#[cfg(feature = "std")]
+impl MessageTimestamp for StdTimestamp {
+    fn timestamp(&self) -> Duration {
+        std::time::UNIX_EPOCH.elapsed().expect("Time went backwards?")
     }
 }
