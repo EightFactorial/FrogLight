@@ -1,5 +1,7 @@
 //! Chat message signing.
 
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
 use core::time::Duration;
 
 #[cfg(feature = "bevy")]
