@@ -1,17 +1,13 @@
 //! [`FromCompound`] and [`IntoCompound`] implementations for [`FormattedText`]
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
-use froglight_nbt::{
-    convert::{ConvertError, FromCompound, IntoCompound},
-    nbt::NbtListTag,
-    prelude::*,
-};
+use froglight_nbt::{convert::NbtError, prelude::*};
 
 use super::{
     FormattedContent, FormattedText, TextInteraction,
     component::{
         KeybindComponent, ScoreComponent, SelectorComponent, TextComponent, TranslateComponent,
-        ValueComponent, ValueComponentSource, ValueSourceKind,
+        ValueComponent,
     },
     formatting::{TextColor, TextFormatting},
 };
@@ -19,13 +15,17 @@ use super::{
 #[cfg(feature = "io")]
 impl FrogRead for FormattedText {
     fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
-        NbtTag::frog_read(buffer).and_then(|tag| Self::from_tag(&tag).map_err(|_err| todo!()))
+        Self::from_tag(&NbtTag::frog_read(buffer)?)
+            .map_err(|err| panic!("Failed to convert NbtTag into FormattedText: {err}"))
     }
 }
 #[cfg(feature = "io")]
 impl FrogWrite for FormattedText {
     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
-        Self::into_tag(self).map_err(|_err| todo!()).and_then(|tag| tag.frog_write(buffer))
+        match Self::into_tag(self) {
+            Ok(tag) => tag.frog_write(buffer),
+            Err(err) => panic!("Failed to convert FormattedText into NbtTag: {err}"),
+        }
     }
 
     fn frog_len(&self) -> usize {
@@ -39,14 +39,11 @@ impl FrogWrite for FormattedText {
 // -------------------------------------------------------------------------------------------------
 
 impl FromTag for FormattedText {
-    fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
+    fn from_tag(tag: &NbtTag) -> Result<Self, NbtError> {
         match tag {
             NbtTag::String(s) => Self::from_mutf8_string(s),
             NbtTag::Compound(c) => Self::from_compound(c),
-            _ => Err(ConvertError::MismatchedTag(
-                core::any::type_name::<Self>(),
-                "String or Compound",
-            )),
+            _ => Err(NbtError::MismatchedTag(core::any::type_name::<Self>(), "String or Compound")),
         }
     }
 }
@@ -56,7 +53,7 @@ impl FormattedText {
     ///
     /// # Errors
     /// Returns an error if the compound is not a valid [`FormattedText`].
-    pub fn from_compound(c: &NbtCompound) -> Result<FormattedText, ConvertError> {
+    pub fn from_compound(c: &NbtCompound) -> Result<FormattedText, NbtError> {
         // Parse the content
         let content = FormattedContent::from_compound(c)?;
         let mut text = FormattedText::from_content(content);
@@ -75,13 +72,13 @@ impl FormattedText {
                     }
                 }
                 _ => {
-                    return Err(ConvertError::MismatchedTag(
+                    return Err(NbtError::MismatchedTag(
                         core::any::type_name::<Self>(),
                         "String or Compound",
                     ));
                 }
             },
-            Some(..) => Err(ConvertError::MismatchedTag(core::any::type_name::<Self>(), "extra"))?,
+            Some(..) => Err(NbtError::MismatchedTag(core::any::type_name::<Self>(), "extra"))?,
             None => {}
         }
 
@@ -102,7 +99,7 @@ impl FormattedText {
     ///
     /// # Errors (Never Occurs)
     /// Returns an error if the string is not a valid [`FormattedText`].
-    pub fn from_mutf8_string(string: &Mutf8String) -> Result<FormattedText, ConvertError> {
+    pub fn from_mutf8_string(string: &Mutf8String) -> Result<FormattedText, NbtError> {
         Ok(FormattedText::from_content(FormattedContent::Text(TextComponent {
             text: string.to_string_lossy().into(),
         })))
@@ -110,7 +107,7 @@ impl FormattedText {
 }
 
 impl IntoTag for FormattedText {
-    fn into_tag(&self) -> Result<NbtTag, ConvertError> {
+    fn into_tag(&self) -> Result<NbtTag, NbtError> {
         // Return a string tag if there is no formatting or children
         if let FormattedContent::Text(text) = &self.content {
             if self.formatting.is_empty() && self.interact.is_empty() && self.children.is_empty() {
@@ -170,7 +167,7 @@ impl IntoTag for FormattedText {
 // -------------------------------------------------------------------------------------------------
 
 impl FromCompound for FormattedContent {
-    fn from_compound(c: &NbtCompound) -> Result<Self, ConvertError> {
+    fn from_compound(c: &NbtCompound) -> Result<Self, NbtError> {
         let ttag = c.get_tag("type").and_then(|tag| tag.as_string());
         let ttag = ttag.map(|str| str.to_str_lossy());
         let ttag = ttag.as_ref();
@@ -189,12 +186,12 @@ impl FromCompound for FormattedContent {
         } else if ttag.is_some_and(|t| t == "nbt") || c.contains_key("nbt") {
             Ok(FormattedContent::Nbt(ValueComponent::from_compound(c)?))
         } else {
-            Err(ConvertError::MissingField(core::any::type_name::<Self>(), "type"))
+            Err(NbtError::MissingField(core::any::type_name::<Self>(), "type"))
         }
     }
 }
 impl IntoCompound for FormattedContent {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> {
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> {
         let mut compound = NbtCompound::new();
         match self {
             FormattedContent::Text(c) => {
@@ -228,40 +225,17 @@ impl IntoCompound for FormattedContent {
 }
 
 impl FromCompound for TranslateComponent {
-    fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
+    fn from_compound(_: &NbtCompound) -> Result<Self, NbtError> { todo!() }
 }
 impl IntoCompound for TranslateComponent {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
-}
-
-impl FromCompound for ValueComponentSource {
-    fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
-}
-impl IntoCompound for ValueComponentSource {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
-}
-
-impl FromCompound for ValueSourceKind {
-    fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
-}
-impl IntoCompound for ValueSourceKind {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl FromCompound for TextInteraction {
-    fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
-}
-impl IntoCompound for TextInteraction {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 impl FromCompound for TextColor {
-    fn from_compound(_: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
+    fn from_compound(_: &NbtCompound) -> Result<Self, NbtError> { todo!() }
 }
 impl IntoCompound for TextColor {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { todo!() }
 }

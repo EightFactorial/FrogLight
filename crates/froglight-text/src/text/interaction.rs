@@ -11,7 +11,7 @@ use std::borrow::Cow;
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
 use froglight_common::prelude::Identifier;
-use froglight_nbt::nbt::NbtCompound;
+use froglight_nbt::{nbt::mappings::WrapOption, prelude::*};
 #[cfg(feature = "serde")]
 use serde::{
     __private::{
@@ -25,21 +25,24 @@ use serde::{
 use uuid::Uuid;
 
 /// Actions to take when interacting with a [`FormattedText`].
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextInteraction {
     /// Text to insert when the component is interacted with.
+    #[frog(default, tag = "string", with = WrapOption,  skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub insertion: Option<Cow<'static, str>>,
     /// An action to perform when the component is clicked.
+    #[frog(default, skip_if = Option::is_none)]
     #[cfg_attr(
         feature = "serde",
         serde(default, rename = "clickEvent", skip_serializing_if = "Option::is_none")
     )]
     pub click: Option<TextClickInteract>,
     /// An action to perform when the component is hovered over.
+    #[frog(default, skip_if = Option::is_none)]
     #[cfg_attr(
         feature = "serde",
         serde(default, rename = "hoverEvent", skip_serializing_if = "Option::is_none")
@@ -89,7 +92,7 @@ impl TextInteraction {
 // -------------------------------------------------------------------------------------------------
 
 /// An interaction to perform when the [`FormattedText`] is clicked.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -97,6 +100,7 @@ pub struct TextClickInteract {
     /// The action type
     pub action: TextClickAction,
     /// The value to pass to the action
+    #[frog(tag = "string")]
     pub value: Cow<'static, str>,
 }
 
@@ -124,6 +128,13 @@ pub enum TextClickAction {
     /// Copy the text to the clipboard.
     #[cfg_attr(feature = "serde", serde(rename = "copy_to_clipboard"))]
     CopyToClipboard,
+}
+
+impl FromTag for TextClickAction {
+    fn from_tag(_tag: &NbtTag) -> Result<Self, NbtError> { todo!() }
+}
+impl IntoTag for TextClickAction {
+    fn into_tag(&self) -> Result<NbtTag, NbtError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -167,20 +178,29 @@ pub struct TextHoverItem {
 }
 
 /// An entity action to perform when the [`FormattedText`] is hovered over.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextHoverEntity {
     /// An optional name to display
+    #[frog(default, tag = "string",  with = WrapOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub name: Option<Cow<'static, str>>,
     /// The entity's type
+    #[frog(tag = "string")]
     #[cfg_attr(feature = "serde", serde(rename = "type"))]
     pub kind: Identifier,
     /// The entity's [`Uuid`]
     #[cfg_attr(feature = "serde", serde(rename = "id"))]
     pub uuid: Uuid,
+}
+
+impl FromCompound for TextHoverInteract {
+    fn from_compound(_compound: &NbtCompound) -> Result<Self, NbtError> { todo!() }
+}
+impl IntoCompound for TextHoverInteract {
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------

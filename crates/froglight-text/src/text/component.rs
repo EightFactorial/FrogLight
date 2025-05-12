@@ -9,7 +9,7 @@ use std::borrow::Cow;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
-use froglight_nbt::prelude::FrogNbt;
+use froglight_nbt::{nbt::mappings::ByteBool, prelude::*};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -116,15 +116,17 @@ pub struct ValueComponent {
 }
 
 /// A NBT value component source.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
 pub struct ValueComponentSource {
     /// The source of the data.
     pub source: ValueSourceKind,
     /// The path used to look up data from the source.
+    #[frog(tag = "string")]
     pub path: Cow<'static, str>,
 
     /// Whether to interpret the returned NBT values as [`FormattedText`]s.
+    #[frog(tag = "byte", with = ByteBool)]
     pub interpret: bool,
     // /// The separator to use when displaying multiple tags.
     // pub separator: FormattedText,
@@ -140,4 +142,11 @@ pub enum ValueSourceKind {
     Entity(Cow<'static, str>),
     /// The path to the command storage which contains the data.
     Storage(Cow<'static, str>),
+}
+
+impl FromTag for ValueSourceKind {
+    fn from_tag(_tag: &NbtTag) -> Result<Self, NbtError> { todo!() }
+}
+impl IntoTag for ValueSourceKind {
+    fn into_tag(&self) -> Result<NbtTag, NbtError> { todo!() }
 }

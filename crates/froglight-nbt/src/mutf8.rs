@@ -6,7 +6,7 @@ use alloc::{
     string::String,
     vec::Vec,
 };
-use core::{borrow::Borrow, convert::Infallible};
+use core::borrow::Borrow;
 #[cfg(feature = "std")]
 use std::borrow::Cow;
 
@@ -142,19 +142,11 @@ impl TryFrom<Mutf8String> for Cow<'static, str> {
         Ok(Cow::Owned(value.try_as_string()?))
     }
 }
-
 impl TryFrom<Mutf8String> for Identifier {
-    type Error = ();
+    type Error = simd_cesu8::DecodingError;
 
     fn try_from(value: Mutf8String) -> Result<Self, Self::Error> {
-        Identifier::try_new(value.to_str_lossy()).ok_or(())
-    }
-}
-impl TryFrom<Mutf8String> for Option<Identifier> {
-    type Error = Infallible;
-
-    fn try_from(value: Mutf8String) -> Result<Self, Self::Error> {
-        Ok(Identifier::try_new(value.to_str_lossy()))
+        Ok(Identifier::new(value.try_as_str()?))
     }
 }
 

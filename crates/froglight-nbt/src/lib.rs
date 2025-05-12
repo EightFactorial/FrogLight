@@ -14,6 +14,8 @@ pub mod snbt;
 
 #[cfg(test)]
 mod test;
+#[cfg(feature = "uuid")]
+mod uuid;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
@@ -21,9 +23,9 @@ pub mod prelude {
     pub use froglight_macros::FrogNbt;
 
     pub use crate::{
-        convert::{FromCompound, FromTag, IntoCompound, IntoTag},
+        convert::{FromCompound, FromTag, IntoCompound, IntoTag, NbtError},
         mutf8::{Mutf8Str, Mutf8String},
-        nbt::{NamedNbt, NbtCompound, NbtTag, UnnamedNbt},
+        nbt::{NamedNbt, NbtCompound, NbtListTag, NbtTag, UnnamedNbt},
         snbt::Snbt,
     };
 }

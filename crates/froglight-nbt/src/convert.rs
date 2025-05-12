@@ -11,7 +11,7 @@ pub trait FromCompound: Sized {
     ///
     /// # Errors
     /// Returns an error if the type fails to parse.
-    fn from_compound(compound: &NbtCompound) -> Result<Self, ConvertError>;
+    fn from_compound(compound: &NbtCompound) -> Result<Self, NbtError>;
 
     /// Parse the type from an [`UnnamedNbt`].
     ///
@@ -19,7 +19,7 @@ pub trait FromCompound: Sized {
     ///
     /// # Errors
     /// Returns an error if the type fails to parse.
-    fn from_nbt(nbt: &UnnamedNbt) -> Result<Option<Self>, ConvertError> {
+    fn from_nbt(nbt: &UnnamedNbt) -> Result<Option<Self>, NbtError> {
         match nbt.compound() {
             Some(compound) => Self::from_compound(compound).map(Some),
             None => Ok(None),
@@ -34,27 +34,27 @@ pub trait IntoCompound {
     /// # Errors
     /// Returns an error if the type fails to convert.
     #[expect(clippy::wrong_self_convention)]
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError>;
+    fn into_compound(&self) -> Result<NbtCompound, NbtError>;
 }
 
 impl FromCompound for NbtCompound {
     #[inline]
-    fn from_compound(compound: &NbtCompound) -> Result<Self, ConvertError> { Ok(compound.clone()) }
+    fn from_compound(compound: &NbtCompound) -> Result<Self, NbtError> { Ok(compound.clone()) }
 }
 impl IntoCompound for NbtCompound {
     #[inline]
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { Ok(self.clone()) }
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { Ok(self.clone()) }
 }
 
 impl<T: FromCompound> FromCompound for Option<T> {
     #[inline]
-    fn from_compound(compound: &NbtCompound) -> Result<Self, ConvertError> {
+    fn from_compound(compound: &NbtCompound) -> Result<Self, NbtError> {
         T::from_compound(compound).map(Some)
     }
 }
 impl<T: IntoCompound> IntoCompound for Option<T> {
     #[inline]
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> {
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> {
         match self {
             Some(value) => value.into_compound(),
             None => Ok(NbtCompound::new()),
@@ -70,7 +70,7 @@ pub trait FromTag: Sized {
     ///
     /// # Errors
     /// Returns an error if the type fails to parse.
-    fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError>;
+    fn from_tag(tag: &NbtTag) -> Result<Self, NbtError>;
 }
 
 /// A trait for converting types into [`NbtTag`]s.
@@ -80,23 +80,21 @@ pub trait IntoTag {
     /// # Errors
     /// Returns an error if the type fails to convert.
     #[expect(clippy::wrong_self_convention)]
-    fn into_tag(&self) -> Result<NbtTag, ConvertError>;
+    fn into_tag(&self) -> Result<NbtTag, NbtError>;
 }
 
 impl<T: FromCompound> FromTag for T {
-    fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
+    fn from_tag(tag: &NbtTag) -> Result<Self, NbtError> {
         match tag {
             NbtTag::Compound(compound) => T::from_compound(compound),
-            _ => Err(ConvertError::MismatchedTag(core::any::type_name::<T>(), "Compound")),
+            _ => Err(NbtError::MismatchedTag(core::any::type_name::<T>(), "Compound")),
         }
     }
 }
 
 impl<T: IntoCompound> IntoTag for T {
     #[inline]
-    fn into_tag(&self) -> Result<NbtTag, ConvertError> {
-        self.into_compound().map(NbtTag::Compound)
-    }
+    fn into_tag(&self) -> Result<NbtTag, NbtError> { self.into_compound().map(NbtTag::Compound) }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -107,17 +105,17 @@ macro_rules! impl_from_into_tag {
         $(
             impl FromTag for $inner {
                 #[allow(trivial_numeric_casts, clippy::cast_sign_loss)]
-                fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
+                fn from_tag(tag: &NbtTag) -> Result<Self, NbtError> {
                     match tag {
                         NbtTag::$ty(value) => Ok(*value as Self),
-                        _ => Err(ConvertError::MismatchedTag(core::any::type_name::<Self>(), stringify!($ty))),
+                        _ => Err(NbtError::MismatchedTag(core::any::type_name::<Self>(), stringify!($ty))),
                     }
                 }
             }
 
             impl IntoTag for $inner {
                 #[allow(trivial_numeric_casts, clippy::cast_possible_wrap)]
-                fn into_tag(&self) -> Result<NbtTag, ConvertError> {
+                fn into_tag(&self) -> Result<NbtTag, NbtError> {
                     Ok(NbtTag::$ty(*self as _))
                 }
             }
@@ -127,16 +125,16 @@ macro_rules! impl_from_into_tag {
     (@try_into $(($ty:ident, $inner:ty)),*) => {
         $(
             impl FromTag for $inner {
-                fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
+                fn from_tag(tag: &NbtTag) -> Result<Self, NbtError> {
                     match tag {
-                        NbtTag::$ty(value) => value.clone().try_into().map_err(|err| ConvertError::ConversionError(core::any::type_name::<Self>(), Box::new(err))),
-                        _ => Err(ConvertError::MismatchedTag(core::any::type_name::<Self>(), stringify!($ty))),
+                        NbtTag::$ty(value) => value.clone().try_into().map_err(|err| NbtError::ConversionError(core::any::type_name::<Self>(), Box::new(err))),
+                        _ => Err(NbtError::MismatchedTag(core::any::type_name::<Self>(), stringify!($ty))),
                     }
                 }
             }
 
             impl IntoTag for $inner {
-                fn into_tag(&self) -> Result<NbtTag, ConvertError> {
+                fn into_tag(&self) -> Result<NbtTag, NbtError> {
                     Ok(NbtTag::from(self.clone()))
                 }
             }
@@ -160,7 +158,7 @@ pub trait InsertAsNbt: IntoTag {
     ///
     /// # Errors
     /// Returns an error if the type fails to convert.
-    fn insert_into(&self, compound: &mut NbtCompound) -> Result<Option<NbtTag>, ConvertError> {
+    fn insert_into(&self, compound: &mut NbtCompound) -> Result<Option<NbtTag>, NbtError> {
         self.into_tag().map(|tag| compound.insert(Self::KEY, tag))
     }
 
@@ -170,7 +168,7 @@ pub trait InsertAsNbt: IntoTag {
     ///
     /// # Errors
     /// Returns an error if the type fails to convert.
-    fn insert_into_nbt(&self, nbt: &mut UnnamedNbt) -> Result<Option<NbtTag>, ConvertError> {
+    fn insert_into_nbt(&self, nbt: &mut UnnamedNbt) -> Result<Option<NbtTag>, NbtError> {
         self.into_tag().map(|tag| nbt.insert(Self::KEY, tag))
     }
 }
@@ -179,7 +177,7 @@ pub trait InsertAsNbt: IntoTag {
 
 /// An error that can occur when converting between a type and NBT.
 #[derive(Debug, thiserror::Error)]
-pub enum ConvertError {
+pub enum NbtError {
     /// A field was missing from a NBT compound.
     #[error("Missing field for `{0}`: \"{1}\"")]
     MissingField(&'static str, &'static str),

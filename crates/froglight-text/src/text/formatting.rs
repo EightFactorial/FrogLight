@@ -7,7 +7,11 @@ use alloc::{format, string::String};
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
 use froglight_common::prelude::Identifier;
-use froglight_nbt::{nbt::mappings::ByteBoolOption, prelude::FrogNbt};
+use froglight_nbt::{
+    convert::NbtError,
+    nbt::mappings::{ByteBoolOption, WrapOption},
+    prelude::*,
+};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
@@ -19,11 +23,11 @@ use smol_str::SmolStr;
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct TextFormatting {
     /// The font of the text.
-    #[frog(default, tag = "string", skip_if = Option::is_none)]
+    #[frog(default, tag = "string", with = WrapOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub font: Option<Identifier>,
     /// The color of the text.
-    // #[frog(default, tag = String, with = TextColor, skip_if = Option::is_none)]
+    #[frog(default, tag = "string", with = TextColor, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub color: Option<TextColor>,
     /// Whether the text is bold.
@@ -457,6 +461,33 @@ impl TextColor {
     #[inline]
     #[must_use]
     pub fn as_integer(&self) -> IntegerTextColor { IntegerTextColor::from_color(self) }
+
+    /// Read a [`TextColor`] from a [`Mutf8String`].
+    ///
+    /// Used when reading a color from a NBT string.
+    ///
+    /// # Note
+    /// This should *never* return `None`, as this case is handled when
+    /// the field is missing from the NBT Compound.
+    fn read_from_tag(str: &Mutf8String) -> Result<Option<Self>, NbtError> {
+        Self::from_hex_string(str.to_str_lossy().as_ref())
+            .map_or_else(|| todo!(), |color| Ok(Some(color)))
+    }
+
+    /// Write a [`TextColor`] to a [`Mutf8String`].
+    ///
+    /// Used when writing a color as a NBT string.
+    ///
+    /// # Note
+    /// This should *never* be called with `None`, as this case is handled when
+    /// the field is initially being written.
+    #[expect(dead_code)]
+    fn write_as_tag(color: &Option<Self>) -> Result<Mutf8String, NbtError> {
+        match color {
+            Some(color) => Ok(Mutf8String::from_string(color.as_named_str())),
+            None => panic!("Tried to write an empty Option<TextColor>!"),
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -497,9 +528,8 @@ impl IntegerTextColor {
     pub fn from_color(color: &TextColor) -> Self {
         if let Some(color) = color.as_hex_str().strip_prefix('#') {
             let color = u32::from_str_radix(color, 16);
-            Self::new(
-                color.unwrap_or_else(|_| unreachable!("TextColor contains invalid hexadecimal!")),
-            )
+            color
+                .map_or_else(|_| unreachable!("TextColor contains invalid hexadecimal!"), Self::new)
         } else {
             unreachable!("TextColor always starts with a '#'!")
         }
