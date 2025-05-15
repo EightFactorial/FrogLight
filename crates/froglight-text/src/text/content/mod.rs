@@ -20,7 +20,7 @@ pub use translate::TranslateComponent;
 
 /// The content of a [`FormattedText`].
 #[derive(Debug, Clone, PartialEq, derive_more::From)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, Clone, PartialEq))]
 pub enum TextContent {
     /// A plain-text component.
     Text(TextComponent),

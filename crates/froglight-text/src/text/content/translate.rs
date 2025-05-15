@@ -12,7 +12,7 @@ use crate::text::FormattedText;
 
 /// A translated text component.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TranslateComponent {

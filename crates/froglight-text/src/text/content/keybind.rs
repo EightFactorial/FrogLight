@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 /// A keybind component.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deref, DerefMut, From, Into, FrogNbt)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct KeybindComponent {

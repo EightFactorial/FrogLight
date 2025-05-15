@@ -19,7 +19,7 @@ pub use preset::PresetColor;
 
 /// A color used for text styling.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, From)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub enum TextColor {
     /// A color represented as a hexadecimal string.

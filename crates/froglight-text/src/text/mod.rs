@@ -24,7 +24,7 @@ mod serde;
 
 /// A formatted text message.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(no_field_bounds, Debug, Clone, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct FormattedText {
     /// The content of the message.
@@ -80,8 +80,8 @@ impl FormattedText {
     /// Set the children of the [`FormattedText`].
     #[inline]
     #[must_use]
-    pub fn with_children(mut self, children: impl Iterator<Item = Self>) -> Self {
-        self.children = children.collect();
+    pub fn with_children(mut self, children: impl IntoIterator<Item = Self>) -> Self {
+        self.children = children.into_iter().collect();
         self
     }
 
@@ -101,6 +101,8 @@ impl FormattedText {
 /// Used to apply custom properties to a [`FormattedText`]
 /// without modifying the original.
 #[derive(Debug, Clone, Copy, PartialEq, Deref)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize))]
 pub struct FormattedTextRef<'t, 'a> {
     /// A reference to the original [`FormattedText`].
     #[deref]

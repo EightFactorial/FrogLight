@@ -277,11 +277,11 @@ fn chat_message() {
     assert_eq!(
         FormattedText {
             content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
-            style: TextStyle::default().with_underlined(true),
+            style: TextStyle::default().with_underline(true),
             interaction: TextInteraction::default(),
             children: vec![FormattedText {
                 content: TextContent::Text(Cow::Borrowed("World!").into()),
-                style: TextStyle::default().with_underlined(false).with_italic(true),
+                style: TextStyle::default().with_underline(false).with_italic(true),
                 interaction: TextInteraction::default(),
                 children: Vec::new(),
             }],
@@ -344,11 +344,11 @@ fn chat_message_ansi() {
 
     let text = FormattedText {
         content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
-        style: TextStyle::default().with_underlined(true),
+        style: TextStyle::default().with_underline(true),
         interaction: TextInteraction::default(),
         children: vec![FormattedText {
             content: TextContent::Text(Cow::Borrowed("World!").into()),
-            style: TextStyle::default().with_underlined(false).with_bold(true),
+            style: TextStyle::default().with_underline(false).with_bold(true),
             interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
@@ -360,7 +360,7 @@ fn chat_message_ansi() {
 
     let text = FormattedText {
         content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
-        style: TextStyle::default().with_underlined(true),
+        style: TextStyle::default().with_underline(true),
         interaction: TextInteraction::default(),
         children: vec![FormattedText {
             content: TextContent::Text(Cow::Borrowed("World!").into()),
@@ -380,7 +380,7 @@ fn chat_message_ansi() {
         interaction: TextInteraction::default(),
         children: vec![FormattedText {
             content: TextContent::Text(Cow::Borrowed("World").into()),
-            style: TextStyle::default().with_underlined(true).with_strikethrough(false),
+            style: TextStyle::default().with_underline(true).with_strikethrough(false),
             interaction: TextInteraction::default(),
             children: vec![FormattedText {
                 content: TextContent::Text(Cow::Borrowed("!").into()),
@@ -390,6 +390,23 @@ fn chat_message_ansi() {
             }],
         }],
     };
+
+    let message = text.as_message_ansi(&t).unwrap().to_string();
+    println!("{message}");
+    assert_eq!(
+        message,
+        "\u{1b}[9mHello, \u{1b}[0m\u{1b}[4mWorld\u{1b}[0m\u{1b}[4;9;38;2;255;85;85m!\u{1b}[0m"
+    );
+
+    let text = FormattedText::new("Hello, ")
+        .with_style(TextStyle::default().with_strikethrough(true))
+        .with_children(vec![
+            FormattedText::new("World")
+                .with_style(TextStyle::default().with_underline(true).with_strikethrough(false))
+                .with_children(vec![FormattedText::new("!").with_style(
+                    TextStyle::default().with_color(PresetColor::Red).with_strikethrough(true),
+                )]),
+        ]);
 
     let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");

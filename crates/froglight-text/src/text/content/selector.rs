@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 /// An entity selector component.
 #[derive(Debug, Clone, PartialEq, FrogNbt)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct SelectorComponent {

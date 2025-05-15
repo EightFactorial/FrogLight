@@ -26,7 +26,7 @@ use uuid::Uuid;
 
 /// Actions to take when interacting with a [`FormattedText`].
 #[derive(Debug, Default, Clone, PartialEq, FrogNbt)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextInteraction {
@@ -93,7 +93,7 @@ impl TextInteraction {
 
 /// An interaction to perform when the [`FormattedText`] is clicked.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextClickInteract {
@@ -106,7 +106,7 @@ pub struct TextClickInteract {
 
 /// The action to perform when the [`FormattedText`] is clicked.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub enum TextClickAction {
@@ -141,7 +141,7 @@ impl IntoTag for TextClickAction {
 
 /// An interaction to perform when the [`FormattedText`] is hovered over.
 #[derive(Debug, Clone, PartialEq, Deref, DerefMut, From, Into)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextHoverInteract {
     /// The action type
@@ -150,7 +150,7 @@ pub struct TextHoverInteract {
 
 /// An action to perform when the [`FormattedText`] is hovered over.
 #[derive(Debug, Clone, PartialEq, From)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub enum TextHoverAction {
     /// Show a text message
     ShowText(Cow<'static, str>),
@@ -162,7 +162,7 @@ pub enum TextHoverAction {
 
 /// An item action to perform when the [`FormattedText`] is hovered over.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextHoverItem {
@@ -179,7 +179,7 @@ pub struct TextHoverItem {
 
 /// An entity action to perform when the [`FormattedText`] is hovered over.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextHoverEntity {
@@ -242,15 +242,14 @@ impl<'de> Deserialize<'de> for TextHoverInteract {
         fn text<'de, D: Deserializer<'de>>(
             content: &[(Content<'de>, Content<'de>)],
         ) -> Result<TextHoverInteract, D::Error> {
-            if let Some(text) =
-                content.iter().find_map(|(n, c)| (n.as_str() == Some("text")).then_some(c))
+            if let Some(text) = content
+                .iter()
+                .find_map(|(n, c)| (n.as_str() == Some("text")).then_some(c))
+                .and_then(|t| t.as_str())
             {
-                if let Some(text) = text.as_str() {
-                    let text = Cow::Owned(text.to_string());
-                    Ok(TextHoverInteract { action: TextHoverAction::ShowText(text) })
-                } else {
-                    Err(Error::custom("expected `text` to be a string"))
-                }
+                Ok(TextHoverInteract {
+                    action: TextHoverAction::ShowText(Cow::Owned(text.to_string())),
+                })
             } else {
                 Err(Error::custom("expected a `text` field"))
             }

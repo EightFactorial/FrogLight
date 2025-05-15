@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 /// A NBT value component.
 #[derive(Debug, Clone, PartialEq, Deref, DerefMut, From, Into, FrogNbt)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct ValueComponent {
@@ -23,7 +23,7 @@ pub struct ValueComponent {
 
 /// A NBT value component source.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub struct ValueComponentSource {
     /// The source of the data.
     pub source: ValueSourceKind,
@@ -38,7 +38,7 @@ pub struct ValueComponentSource {
 
 /// The type and location of the data source.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 pub enum ValueSourceKind {
     /// Coordinates to the block entity which contains the data.
     Block(Cow<'static, str>),

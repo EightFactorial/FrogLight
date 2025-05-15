@@ -15,7 +15,7 @@ pub use color::{IntegerColor, PresetColor, TextColor};
 
 /// The style of a [`FormattedText`](super::FormattedText) component.
 #[derive(Debug, Default, Clone, PartialEq, Eq, FrogNbt)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct TextStyle {
@@ -101,7 +101,7 @@ impl TextStyle {
         self
     }
 
-    /// Set the bold property of the [`TextStyle`].
+    /// Set whether the [`TextStyle`] is bold.
     #[inline]
     #[must_use]
     pub fn with_bold(mut self, bold: bool) -> Self {
@@ -109,7 +109,7 @@ impl TextStyle {
         self
     }
 
-    /// Set the italic property of the [`TextStyle`].
+    /// Set whether the [`TextStyle`] is italic.
     #[inline]
     #[must_use]
     pub fn with_italic(mut self, italic: bool) -> Self {
@@ -117,15 +117,15 @@ impl TextStyle {
         self
     }
 
-    /// Set the underlined property of the [`TextStyle`].
+    /// Set whether the [`TextStyle`] is underlined.
     #[inline]
     #[must_use]
-    pub fn with_underlined(mut self, underlined: bool) -> Self {
+    pub fn with_underline(mut self, underlined: bool) -> Self {
         self.underlined = Some(underlined);
         self
     }
 
-    /// Set the strikethrough property of the [`TextStyle`].
+    /// Set whether the [`TextStyle`] is strikedthrough.
     #[inline]
     #[must_use]
     pub fn with_strikethrough(mut self, strikethrough: bool) -> Self {
@@ -133,7 +133,7 @@ impl TextStyle {
         self
     }
 
-    /// Set the obfuscated property of the [`TextStyle`].
+    /// Set whether the [`TextStyle`] is obfuscated.
     #[inline]
     #[must_use]
     pub fn with_obfuscated(mut self, obfuscated: bool) -> Self {
