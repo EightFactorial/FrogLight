@@ -263,7 +263,19 @@ impl<T: FrogWrite> FrogWrite for [T] {
 
 impl<T: FrogRead, const N: usize> FrogRead for [T; N] {
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
-        core::array::try_from_fn(|_| T::frog_read(buffer))
+        #[cfg(feature = "nightly")]
+        {
+            core::array::try_from_fn(|_| T::frog_read(buffer))
+        }
+
+        #[cfg(not(feature = "nightly"))]
+        {
+            let mut vec = Vec::with_capacity(N);
+            for _ in 0..N {
+                vec.push(T::frog_read(buffer)?);
+            }
+            Ok(vec.try_into().unwrap_or_else(|_| unreachable!("Vec is always of size `N`")))
+        }
     }
 }
 impl<T: FrogWrite, const N: usize> FrogWrite for [T; N] {
