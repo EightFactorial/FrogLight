@@ -1,8 +1,5 @@
 //! [`TextStyle`] and [`TextColor`]
 
-#[cfg(not(feature = "std"))]
-use alloc::boxed::Box;
-
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use froglight_common::prelude::Identifier;

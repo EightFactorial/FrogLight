@@ -1,5 +1,7 @@
 #[cfg(not(feature = "std"))]
-use alloc::{borrow::Cow, string::String};
+use alloc::borrow::Cow;
+#[cfg(all(not(feature = "std"), feature = "serde"))]
+use alloc::string::String;
 use core::str::FromStr;
 #[cfg(feature = "std")]
 use std::borrow::Cow;

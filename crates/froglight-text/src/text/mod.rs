@@ -39,7 +39,18 @@ pub struct FormattedText {
 }
 
 impl FormattedText {
-    /// Create a new [`FormattedText`] from the given string.
+    /// Create a new [`FormattedText`] with the given text.
+    #[must_use]
+    pub const fn new(text: &'static str) -> Self {
+        Self {
+            content: TextContent::Text(TextComponent { text: Cow::Borrowed(text) }),
+            style: TextStyle::EMPTY,
+            interaction: TextInteraction::DEFAULT,
+            children: Vec::new(),
+        }
+    }
+
+    /// Create a new [`FormattedText`] from the given text.
     #[must_use]
     pub fn from_string(text: impl Into<Cow<'static, str>>) -> Self {
         Self {
@@ -53,8 +64,32 @@ impl FormattedText {
     /// Set the [`TextStyle`] of the [`FormattedText`].
     #[inline]
     #[must_use]
-    pub fn with_style(mut self, style: TextStyle) -> Self {
-        self.style = style;
+    pub fn with_style(mut self, style: impl Into<TextStyle>) -> Self {
+        self.style = style.into();
+        self
+    }
+
+    /// Set the [`TextInteraction`] of the [`FormattedText`].
+    #[inline]
+    #[must_use]
+    pub fn with_interaction(mut self, interaction: impl Into<TextInteraction>) -> Self {
+        self.interaction = interaction.into();
+        self
+    }
+
+    /// Set the children of the [`FormattedText`].
+    #[inline]
+    #[must_use]
+    pub fn with_children(mut self, children: impl Iterator<Item = Self>) -> Self {
+        self.children = children.collect();
+        self
+    }
+
+    /// Add a child to the [`FormattedText`].
+    #[inline]
+    #[must_use]
+    pub fn with_child(&mut self, child: Self) -> &mut Self {
+        self.children.push(child);
         self
     }
 }
