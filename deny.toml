@@ -90,6 +90,8 @@ name = "windows_aarch64_msvc"
 [[bans.skip]]
 name = "windows_i686_gnu"
 [[bans.skip]]
+name = "windows_i686_gnullvm"
+[[bans.skip]]
 name = "windows_i686_msvc"
 [[bans.skip]]
 name = "windows_x86_64_gnu"

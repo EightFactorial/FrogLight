@@ -7,7 +7,7 @@ use alloc::boxed::Box;
 use bevy_reflect::prelude::*;
 use froglight_common::prelude::Identifier;
 use froglight_nbt::{
-    nbt::mappings::{ByteBoolOption, TagOption},
+    nbt::mappings::{ByteBoolOption, TagOption, WrapOption},
     prelude::*,
 };
 #[cfg(feature = "serde")]
@@ -23,7 +23,7 @@ pub use color::{IntegerColor, PresetColor, TextColor};
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct TextStyle {
     /// The font of the text.
-    #[frog(default, tag = "string", skip_if = Option::is_none)]
+    #[frog(default, tag = "string", with = WrapOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub font: Option<Identifier>,
     /// The color of the text.

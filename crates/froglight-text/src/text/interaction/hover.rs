@@ -11,7 +11,7 @@ use std::borrow::Cow;
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
 use froglight_common::prelude::Identifier;
-use froglight_nbt::prelude::*;
+use froglight_nbt::{nbt::mappings::WrapOption, prelude::*};
 #[cfg(feature = "serde")]
 use serde::{
     __private::{
@@ -23,6 +23,121 @@ use serde::{
     ser::SerializeMap,
 };
 use uuid::Uuid;
+
+/// Actions to take when interacting with a [`FormattedText`].
+#[derive(Debug, Default, Clone, PartialEq, FrogNbt)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+pub struct TextInteraction {
+    /// Text to insert when the component is interacted with.
+    #[frog(default, tag = "string", with = WrapOption,  skip_if = Option::is_none)]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
+    pub insertion: Option<Cow<'static, str>>,
+    /// An action to perform when the component is clicked.
+    #[frog(default, skip_if = Option::is_none)]
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, rename = "clickEvent", skip_serializing_if = "Option::is_none")
+    )]
+    pub click: Option<TextClickInteract>,
+    /// An action to perform when the component is hovered over.
+    #[frog(default, skip_if = Option::is_none)]
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, rename = "hoverEvent", skip_serializing_if = "Option::is_none")
+    )]
+    pub hover: Option<TextHoverInteract>,
+}
+
+impl TextInteraction {
+    /// An empty [`InteractComponent`].
+    pub const EMPTY: Self = Self { insertion: None, click: None, hover: None };
+
+    /// Create a new empty [`InteractComponent`].
+    #[must_use]
+    pub const fn empty() -> Self { Self::EMPTY }
+
+    /// Returns `true` if all fields are `None`.
+    #[must_use]
+    pub const fn is_empty(&self) -> bool {
+        self.insertion.is_none() && self.click.is_none() && self.hover.is_none()
+    }
+
+    /// Update the [`InteractComponent`] with the given insertion text.
+    #[inline]
+    #[must_use]
+    pub fn with_insert(mut self, insert: impl Into<Cow<'static, str>>) -> Self {
+        self.insertion = Some(insert.into());
+        self
+    }
+
+    /// Update the [`InteractComponent`] with the given [`TextClickInteract`].
+    #[inline]
+    #[must_use]
+    pub fn with_click(mut self, click: impl Into<TextClickInteract>) -> Self {
+        self.click = Some(click.into());
+        self
+    }
+
+    /// Update the [`InteractComponent`] with the given [`TextHoverInteract`].
+    #[inline]
+    #[must_use]
+    pub fn with_hover(mut self, hover: impl Into<TextHoverInteract>) -> Self {
+        self.hover = Some(hover.into());
+        self
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// An interaction to perform when the [`FormattedText`] is clicked.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+pub struct TextClickInteract {
+    /// The action type
+    pub action: TextClickAction,
+    /// The value to pass to the action
+    #[frog(tag = "string")]
+    pub value: Cow<'static, str>,
+}
+
+/// The action to perform when the [`FormattedText`] is clicked.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+pub enum TextClickAction {
+    /// A URL to open in the browser.
+    #[cfg_attr(feature = "serde", serde(rename = "open_url"))]
+    OpenUrl,
+    /// A file to open on the computer.
+    #[cfg_attr(feature = "serde", serde(rename = "open_file"))]
+    OpenFile,
+    /// A chat command to send to the server.
+    #[cfg_attr(feature = "serde", serde(rename = "run_command"))]
+    RunCommand,
+    /// Fill in a field in the chat command.
+    #[cfg_attr(feature = "serde", serde(rename = "suggest_command"))]
+    SuggestCommand,
+    /// Change to a page in a written book.
+    #[cfg_attr(feature = "serde", serde(rename = "change_page"))]
+    ChangePage,
+    /// Copy the text to the clipboard.
+    #[cfg_attr(feature = "serde", serde(rename = "copy_to_clipboard"))]
+    CopyToClipboard,
+}
+
+impl FromTag for TextClickAction {
+    fn from_tag(_tag: &NbtTag) -> Result<Self, NbtError> { todo!() }
+}
+impl IntoTag for TextClickAction {
+    fn into_tag(&self) -> Result<NbtTag, NbtError> { todo!() }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 /// An interaction to perform when the [`FormattedText`] is hovered over.
 #[derive(Debug, Clone, PartialEq, Deref, DerefMut, From, Into)]
@@ -63,20 +178,29 @@ pub struct TextHoverItem {
 }
 
 /// An entity action to perform when the [`FormattedText`] is hovered over.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextHoverEntity {
     /// An optional name to display
+    #[frog(default, tag = "string",  with = WrapOption, skip_if = Option::is_none)]
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub name: Option<Cow<'static, str>>,
     /// The entity's type
+    #[frog(tag = "string")]
     #[cfg_attr(feature = "serde", serde(rename = "type"))]
     pub kind: Identifier,
     /// The entity's [`Uuid`]
     #[cfg_attr(feature = "serde", serde(rename = "id"))]
     pub uuid: Uuid,
+}
+
+impl FromCompound for TextHoverInteract {
+    fn from_compound(_compound: &NbtCompound) -> Result<Self, NbtError> { todo!() }
+}
+impl IntoCompound for TextHoverInteract {
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------

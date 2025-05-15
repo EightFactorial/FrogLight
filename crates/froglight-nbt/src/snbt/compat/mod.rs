@@ -14,7 +14,7 @@ use write::WriteCompat;
 
 use super::Snbt;
 use crate::{
-    convert::{ConvertError, FromCompound, IntoCompound},
+    convert::{NbtError, FromCompound, IntoCompound},
     nbt::NbtCompound,
 };
 
@@ -27,16 +27,16 @@ pub struct Compat;
 impl super::SnbtType for Compat {}
 
 impl FromCompound for Snbt<Compat> {
-    fn from_compound(nbt: &NbtCompound) -> Result<Self, ConvertError> {
+    fn from_compound(nbt: &NbtCompound) -> Result<Self, NbtError> {
         let mut content = String::new();
         NbtCompound::write_to_string(nbt, &mut content);
         Ok(Self::new_unchecked(content.into()))
     }
 }
 impl IntoCompound for Snbt<Compat> {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> {
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> {
         NbtCompound::read_from_string(self.as_str()).map_or_else(
-            |err| Err(ConvertError::ConversionError(core::any::type_name::<Self>(), Box::new(err))),
+            |err| Err(NbtError::ConversionError(core::any::type_name::<Self>(), Box::new(err))),
             |(val, _)| Ok(val),
         )
     }

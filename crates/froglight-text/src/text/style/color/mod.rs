@@ -7,7 +7,7 @@ use std::borrow::Cow;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::From;
-use froglight_nbt::{convert::ConvertError, prelude::*};
+use froglight_nbt::prelude::*;
 
 mod integer;
 pub use integer::IntegerColor;
@@ -103,11 +103,11 @@ impl FromStr for TextColor {
 // -------------------------------------------------------------------------------------------------
 
 impl FromTag for TextColor {
-    fn from_tag(_tag: &NbtTag) -> Result<Self, ConvertError> { todo!() }
+    fn from_tag(_tag: &NbtTag) -> Result<Self, NbtError> { todo!() }
 }
 
 impl IntoTag for TextColor {
-    fn into_tag(&self) -> Result<NbtTag, ConvertError> { todo!() }
+    fn into_tag(&self) -> Result<NbtTag, NbtError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------

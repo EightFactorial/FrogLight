@@ -6,7 +6,7 @@ use std::borrow::Cow;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, DerefMut, From, Into};
-use froglight_nbt::{convert::ConvertError, prelude::*};
+use froglight_nbt::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -51,11 +51,11 @@ pub enum ValueSourceKind {
 // -------------------------------------------------------------------------------------------------
 
 impl FromCompound for ValueComponentSource {
-    fn from_compound(_compound: &NbtCompound) -> Result<Self, ConvertError> { todo!() }
+    fn from_compound(_compound: &NbtCompound) -> Result<Self, NbtError> { todo!() }
 }
 
 impl IntoCompound for ValueComponentSource {
-    fn into_compound(&self) -> Result<NbtCompound, ConvertError> { todo!() }
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------

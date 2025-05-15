@@ -22,6 +22,9 @@ struct FieldAttrs {
     /// Use the default value if the field
     /// is missing when reading Nbt data.
     default: Flag,
+    /// Use the same component for the field
+    /// as the parent.
+    inline: Flag,
 
     /// The name of the NbtTag.
     ///
@@ -100,14 +103,14 @@ pub(crate) fn derive_frognbt(input: TokenStream) -> TokenStream {
     quote! {
         #[automatically_derived]
         impl #path::convert::FromCompound for #ident {
-            fn from_compound(nbt: &#path::nbt::NbtCompound) -> Result<Self, #path::convert::ConvertError> {
+            fn from_compound(nbt: &#path::nbt::NbtCompound) -> Result<Self, #path::convert::NbtError> {
                 Ok(#from_tokens)
             }
         }
         #[automatically_derived]
         #[allow(dead_code, unreachable_code)]
         impl #path::convert::IntoCompound for #ident {
-            fn into_compound(&self) -> Result<#path::nbt::NbtCompound, #path::convert::ConvertError> {
+            fn into_compound(&self) -> Result<#path::nbt::NbtCompound, #path::convert::NbtError> {
                 let mut nbt = #path::nbt::NbtCompound::new();
                 #into_tokens
                 Ok(nbt)
