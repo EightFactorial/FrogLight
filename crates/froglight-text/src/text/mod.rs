@@ -1,34 +1,26 @@
-//! Text parsing and formatting.
+//! A representation of text, including formatting
 
 #[cfg(not(feature = "std"))]
-use alloc::{
-    borrow::Cow,
-    string::{String, ToString},
-    vec::Vec,
-};
+use alloc::{borrow::Cow, vec::Vec};
 #[cfg(feature = "std")]
 use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::From;
+use derive_more::Deref;
 
-pub mod component;
-use component::{
-    KeybindComponent, ScoreComponent, SelectorComponent, TextComponent, TranslateComponent,
-    ValueComponent,
-};
-
-pub mod formatting;
-pub use formatting::{TextColor, TextFormatting};
+pub mod content;
+use content::{TextComponent, TextContent};
 
 pub mod interaction;
-pub use interaction::TextInteraction;
+use interaction::TextInteraction;
 
-mod compound;
+pub mod style;
+use style::TextStyle;
+
 mod message;
 #[cfg(feature = "serde")]
-mod serialize;
+mod serde;
 
 /// A formatted text message.
 #[derive(Debug, Clone, PartialEq)]
@@ -36,158 +28,84 @@ mod serialize;
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Deserialize, Serialize))]
 pub struct FormattedText {
     /// The content of the message.
-    pub content: FormattedContent,
-    /// The formatting of the message.
-    pub formatting: TextFormatting,
+    pub content: TextContent,
+    /// The style of the message.
+    pub style: TextStyle,
     /// The interactability of the message.
-    pub interact: TextInteraction,
+    pub interaction: TextInteraction,
 
-    /// Child message components.
-    ///
-    /// These are appended after the parent and inherit its formatting.
+    /// Children that inherit the parent's formatting.
     pub children: Vec<FormattedText>,
 }
 
 impl FormattedText {
-    /// Create a [`FormattedText`] from a string and formatting.
-    #[inline]
+    /// Create a new [`FormattedText`] from the given string.
     #[must_use]
-    pub fn from_string(text: impl Into<String>) -> Self {
-        Self::from_string_with(text.into(), TextFormatting::empty())
-    }
-
-    /// Create a [`FormattedText`] from a [`FormattedContent`].
-    #[inline]
-    #[must_use]
-    pub const fn from_content(content: FormattedContent) -> Self {
-        FormattedText {
-            content,
-            formatting: TextFormatting::empty(),
-            interact: TextInteraction::empty(),
+    pub fn from_string(text: impl Into<Cow<'static, str>>) -> Self {
+        Self {
+            content: TextContent::Text(TextComponent { text: text.into() }),
+            style: TextStyle::EMPTY,
+            interaction: TextInteraction::DEFAULT,
             children: Vec::new(),
         }
     }
 
-    /// Create a [`FormattedText`] from a static string.
+    /// Set the [`TextStyle`] of the [`FormattedText`].
     #[inline]
     #[must_use]
-    pub const fn from_static(text: &'static str) -> Self {
-        FormattedText {
-            formatting: TextFormatting::empty(),
-            content: FormattedContent::Text(TextComponent { text: Cow::Borrowed(text) }),
-            interact: TextInteraction::empty(),
-            children: Vec::new(),
-        }
-    }
-
-    /// Create a [`FormattedText`] from a [`String`] and [`TextFormatting`].
-    #[must_use]
-    pub const fn from_string_with(text: String, formatting: TextFormatting) -> Self {
-        FormattedText {
-            formatting,
-            content: FormattedContent::Text(TextComponent { text: Cow::Owned(text) }),
-            interact: TextInteraction::empty(),
-            children: Vec::new(),
-        }
-    }
-
-    /// Use the provided [`TextFormatting`] for this message.
-    #[inline]
-    #[must_use]
-    pub fn with_formatting(mut self, formatting: TextFormatting) -> Self {
-        self.formatting = formatting;
+    pub fn with_style(mut self, style: TextStyle) -> Self {
+        self.style = style;
         self
     }
-
-    /// Use the provided [`TextInteraction`] for this message.
-    #[inline]
-    #[must_use]
-    pub fn with_interaction(mut self, interaction: TextInteraction) -> Self {
-        self.interact = interaction;
-        self
-    }
-
-    /// Append a child message component to this message.
-    #[inline]
-    #[must_use]
-    pub fn with_child(mut self, child: FormattedText) -> Self {
-        self.children.push(child);
-        self
-    }
-}
-
-impl From<&str> for FormattedText {
-    #[inline]
-    fn from(value: &str) -> Self { Self::from_string(value.to_string()) }
-}
-impl From<String> for FormattedText {
-    #[inline]
-    fn from(value: String) -> Self { Self::from_string(value) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// The content of a [`FormattedText`].
-#[derive(Debug, Clone, PartialEq, From)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-pub enum FormattedContent {
-    /// A plain-text component.
-    Text(TextComponent),
-    /// A translation component.
-    Translation(TranslateComponent),
-    /// A score component.
-    Score(ScoreComponent),
-    /// A selector component.
-    Selector(SelectorComponent),
-    /// A keybind component.
-    Keybind(KeybindComponent),
-    /// An Nbt component.
-    Nbt(ValueComponent),
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A reference to a [`FormattedText`] message.
+/// A [`FormattedText`] with custom formatting and interactions.
 ///
-/// Used to avoid cloning the message while applying custom formatting.
-#[derive(Debug, Clone, PartialEq, derive_more::Deref)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize))]
-pub struct FormattedTextRef<'a> {
-    /// The original message.
+/// Used to apply custom properties to a [`FormattedText`]
+/// without modifying the original.
+#[derive(Debug, Clone, Copy, PartialEq, Deref)]
+pub struct FormattedTextRef<'t, 'a> {
+    /// A reference to the original [`FormattedText`].
     #[deref]
-    pub text: &'a FormattedText,
-    /// The formatting to apply to the message.
-    pub formatting: Cow<'a, TextFormatting>,
+    pub original: &'t FormattedText,
+
+    /// A custom style to apply to the text.
+    pub style: &'a TextStyle,
+    /// Custom interactions to apply to the text.
+    pub interaction: &'a TextInteraction,
 }
 
-impl<'a> FormattedTextRef<'a> {
-    /// Create a new [`FormattedTextRef`] from a [`FormattedText`],
-    /// keeping the original formatting.
+impl<'t, 'a> FormattedTextRef<'t, 'a> {
+    /// Create a new [`FormattedTextRef`] from a [`FormattedText`].
+    ///
+    /// Uses the original text's style and interaction by default.
     #[inline]
     #[must_use]
-    pub const fn new(text: &'a FormattedText) -> Self {
-        Self { text, formatting: Cow::Borrowed(&text.formatting) }
+    pub const fn new(text: &'t FormattedText) -> Self
+    where 't: 'a {
+        Self { original: text, style: &text.style, interaction: &text.interaction }
     }
 
-    /// Create a new [`FormattedTextRef`] from a [`FormattedText`]
-    /// and a custom [`TextFormatting`].
+    /// Update the [`TextStyle`] applied to the [`FormattedTextRef`].
     #[inline]
     #[must_use]
-    pub const fn new_with(text: &'a FormattedText, formatting: &'a TextFormatting) -> Self {
-        Self { text, formatting: Cow::Borrowed(formatting) }
+    pub const fn with_style(mut self, style: &'a TextStyle) -> Self {
+        self.style = style;
+        self
     }
 
-    /// Apply a new [`TextFormatting`] to a [`FormattedTextRef`].
+    /// Update the [`TextInteraction`] applied to the [`FormattedTextRef`].
     #[inline]
     #[must_use]
-    pub fn with(mut self, formatting: impl Into<Cow<'a, TextFormatting>>) -> Self {
-        self.formatting = formatting.into();
+    pub const fn with_interaction(mut self, interaction: &'a TextInteraction) -> Self {
+        self.interaction = interaction;
         self
     }
 }
 
-impl<'a> From<&'a FormattedText> for FormattedTextRef<'a> {
+impl<'t> From<&'t FormattedText> for FormattedTextRef<'t, 't> {
     #[inline]
-    fn from(text: &'a FormattedText) -> Self { Self::new(text) }
+    fn from(text: &'t FormattedText) -> Self { Self::new(text) }
 }

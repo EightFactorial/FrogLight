@@ -1,6 +1,6 @@
 //! [`FormattedText::as_message`] and the ansi equivalent if enabled.
 //!
-//! TODO: Handle legacy formatting codes
+//! TODO: Handle legacy style codes
 
 #[cfg(not(feature = "std"))]
 use alloc::{
@@ -13,7 +13,8 @@ use std::borrow::Cow;
 
 use crate::{
     prelude::*,
-    text::{FormattedContent, FormattedTextRef},
+    text::{FormattedTextRef, TextContent},
+    translate::TextTranslations,
 };
 
 impl FormattedText {
@@ -43,7 +44,7 @@ impl FormattedText {
 }
 
 #[allow(clippy::elidable_lifetime_names)]
-impl<'a> FormattedTextRef<'a> {
+impl<'a> FormattedTextRef<'a, '_> {
     /// Extract the message as a [`String`]
     ///
     /// # Errors
@@ -52,11 +53,11 @@ impl<'a> FormattedTextRef<'a> {
     pub fn as_message(&self, t: &TextTranslations) -> Result<String, ChatMessageError> {
         // Get the message content
         let mut string = match &self.content {
-            FormattedContent::Text(text) => {
-                // TODO: Handle legacy formatting codes
+            TextContent::Text(text) => {
+                // TODO: Handle legacy style codes
                 text.to_string()
             }
-            FormattedContent::Translation(translate) => {
+            TextContent::Translation(translate) => {
                 // Retrieve the translated message or the fallback, if one exists
                 let translation = t.get(translate.translate.as_ref()).map_or_else(
                     || translate.fallback.as_ref().map(AsRef::as_ref),
@@ -64,7 +65,7 @@ impl<'a> FormattedTextRef<'a> {
                 );
 
                 if let Some(translation) = translation {
-                    // TODO: Handle legacy formatting codes
+                    // TODO: Handle legacy style codes
                     // Format and insert the message arguments
                     Self::format_message(translation, &translate.arguments, t)?
                 } else {
@@ -115,11 +116,11 @@ impl<'a> FormattedTextRef<'a> {
     ) -> Result<nu_ansi_term::AnsiString<'a>, ChatMessageError> {
         // Get the message content
         let mut string = match &self.content {
-            FormattedContent::Text(text) => {
-                // TODO: Handle legacy formatting codes
+            TextContent::Text(text) => {
+                // TODO: Handle legacy style codes
                 text.to_string()
             }
-            FormattedContent::Translation(translate) => {
+            TextContent::Translation(translate) => {
                 // Retrieve the translated message or the fallback, if one exists
                 let translation = t.get(translate.translate.as_ref()).map_or_else(
                     || translate.fallback.as_ref().map(AsRef::as_ref),
@@ -127,14 +128,9 @@ impl<'a> FormattedTextRef<'a> {
                 );
 
                 if let Some(translation) = translation {
-                    // TODO: Handle legacy formatting codes
+                    // TODO: Handle legacy style codes
                     // Format and insert the message arguments
-                    Self::format_message_ansi(
-                        translation,
-                        &self.formatting,
-                        &translate.arguments,
-                        t,
-                    )?
+                    Self::format_message_ansi(translation, &self.style, &translate.arguments, t)?
                 } else {
                     return Err(ChatMessageError::UnknownTranslationKey(
                         translate.translate.clone(),
@@ -145,13 +141,13 @@ impl<'a> FormattedTextRef<'a> {
             _ => return Err(ChatMessageError::InvalidMessageContent),
         };
 
-        // Apply the message's formatting
-        string = nu_ansi_term::Style::from(&*self.formatting).paint(string).to_string();
+        // Apply the message's style
+        string = nu_ansi_term::Style::from(&*self.style).paint(string).to_string();
 
         // Append children messages
         for child in &self.children {
-            let formatting = child.formatting.inherit(&self.formatting);
-            let child = FormattedTextRef::new_with(child, &formatting);
+            let style = child.style.inherit(&self.style);
+            let child = FormattedTextRef::new(child).with_style(&style);
             string.push_str(&child.as_message_ansi(t)?.to_string());
         }
 
@@ -161,15 +157,15 @@ impl<'a> FormattedTextRef<'a> {
     #[cfg(feature = "ansi")]
     fn format_message_ansi(
         message: &str,
-        formatting: &TextFormatting,
+        style: &TextStyle,
         arguments: &[FormattedText],
         t: &TextTranslations,
     ) -> Result<String, ChatMessageError> {
         let mut formatted = message.to_string();
 
         for (index, argument) in arguments.iter().enumerate() {
-            let formatting = argument.formatting.inherit(formatting);
-            let argument = FormattedTextRef::new_with(argument, &formatting);
+            let style = argument.style.inherit(style);
+            let argument = FormattedTextRef::new(argument).with_style(&style);
             let resolved = argument.as_message_ansi(t)?.to_string();
 
             // Replace the next occurrence of `%s`
@@ -198,18 +194,18 @@ pub enum ChatMessageError {
 // -------------------------------------------------------------------------------------------------
 
 #[cfg(feature = "ansi")]
-impl From<TextFormatting> for nu_ansi_term::Style {
+impl From<TextStyle> for nu_ansi_term::Style {
     #[inline]
-    fn from(value: TextFormatting) -> Self { Self::from(&value) }
+    fn from(value: TextStyle) -> Self { Self::from(&value) }
 }
 
 #[cfg(feature = "ansi")]
-impl From<&TextFormatting> for nu_ansi_term::Style {
-    fn from(value: &TextFormatting) -> Self {
+impl From<&TextStyle> for nu_ansi_term::Style {
+    fn from(value: &TextStyle) -> Self {
         let mut style = nu_ansi_term::Style::new();
 
         if let Some(color) = &value.color {
-            let (r, g, b) = color.as_integer().into_rgb();
+            let (r, g, b) = color.as_rgb();
             style = style.fg(nu_ansi_term::Color::Rgb(r, g, b));
         }
 
@@ -234,40 +230,42 @@ impl From<&TextFormatting> for nu_ansi_term::Style {
 
 #[test]
 fn chat_message() {
+    #[cfg(not(feature = "std"))]
+    use alloc::{borrow::Cow, vec, vec::Vec};
+    #[cfg(feature = "std")]
     use std::borrow::Cow;
 
     use crate::{prelude::*, text::TextInteraction};
 
     let t = TextTranslations::default();
 
-    assert_eq!(FormattedText::from("Hello, World!").as_message(&t).unwrap(), "Hello, World!");
+    assert_eq!(
+        FormattedText::from_string("Hello, World!").as_message(&t).unwrap(),
+        "Hello, World!"
+    );
 
     assert_eq!(
-        FormattedText::from_string_with("Hello, World!".into(), TextFormatting::empty())
+        FormattedText::from_string("Hello, World!").as_message(&t).unwrap(),
+        "Hello, World!"
+    );
+
+    assert_eq!(
+        FormattedText::from_string("Hello, World!")
+            .with_style(TextStyle::default().with_color(PresetColor::Blue))
             .as_message(&t)
             .unwrap(),
         "Hello, World!"
     );
 
     assert_eq!(
-        FormattedText::from_string_with(
-            "Hello, World!".into(),
-            TextFormatting::empty().with_color(TextColor::Blue)
-        )
-        .as_message(&t)
-        .unwrap(),
-        "Hello, World!"
-    );
-
-    assert_eq!(
         FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-            formatting: TextFormatting::empty(),
-            interact: TextInteraction::default(),
+            content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
+            style: TextStyle::default(),
+            interaction: TextInteraction::default(),
             children: vec![FormattedText {
-                content: FormattedContent::Text(Cow::Borrowed("World!").into()),
-                formatting: TextFormatting::empty(),
-                interact: TextInteraction::default(),
+                content: TextContent::Text(Cow::Borrowed("World!").into()),
+                style: TextStyle::default(),
+                interaction: TextInteraction::default(),
                 children: Vec::new(),
             }],
         }
@@ -278,13 +276,13 @@ fn chat_message() {
 
     assert_eq!(
         FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-            formatting: TextFormatting::empty().with_underline(true),
-            interact: TextInteraction::default(),
+            content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
+            style: TextStyle::default().with_underlined(true),
+            interaction: TextInteraction::default(),
             children: vec![FormattedText {
-                content: FormattedContent::Text(Cow::Borrowed("World!").into()),
-                formatting: TextFormatting::empty().with_underline(false).with_italic(true),
-                interact: TextInteraction::default(),
+                content: TextContent::Text(Cow::Borrowed("World!").into()),
+                style: TextStyle::default().with_underlined(false).with_italic(true),
+                interaction: TextInteraction::default(),
                 children: Vec::new(),
             }],
         }
@@ -309,37 +307,34 @@ fn chat_message_ansi() {
     );
 
     assert_eq!(
-        FormattedText::from_string_with("Hello, World!".into(), TextFormatting::empty())
+        FormattedText::from_string("Hello, World!")
+            .with_style(TextStyle::default())
             .as_message_ansi(&t)
             .unwrap()
             .to_string(),
         "Hello, World!"
     );
 
-    let text = FormattedText::from_string_with(
-        "Hello, World!".into(),
-        TextFormatting::empty().with_color(TextColor::Blue),
-    );
+    let text = FormattedText::from_string("Hello, World!")
+        .with_style(TextStyle::default().with_color(PresetColor::Blue));
     let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "\u{1b}[38;2;85;85;255mHello, World!\u{1b}[0m");
 
-    let text = FormattedText::from_string_with(
-        "Hello, World!".into(),
-        TextFormatting::empty().with_color(TextColor::Custom("#999999".into())),
-    );
+    let text = FormattedText::from_string("Hello, World!")
+        .with_style(TextStyle::default().with_color(IntegerColor::new(0x999999)));
     let message = text.as_message_ansi(&t).unwrap().to_string();
     println!("{message}");
     assert_eq!(message, "\u{1b}[38;2;153;153;153mHello, World!\u{1b}[0m");
 
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-        formatting: TextFormatting::empty(),
-        interact: TextInteraction::default(),
+        content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
+        style: TextStyle::default(),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("World!").into()),
-            formatting: TextFormatting::empty(),
-            interact: TextInteraction::default(),
+            content: TextContent::Text(Cow::Borrowed("World!").into()),
+            style: TextStyle::default(),
+            interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
     };
@@ -348,13 +343,13 @@ fn chat_message_ansi() {
     assert_eq!(message, "Hello, World!");
 
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-        formatting: TextFormatting::empty().with_underline(true),
-        interact: TextInteraction::default(),
+        content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
+        style: TextStyle::default().with_underlined(true),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("World!").into()),
-            formatting: TextFormatting::empty().with_underline(false).with_bold(true),
-            interact: TextInteraction::default(),
+            content: TextContent::Text(Cow::Borrowed("World!").into()),
+            style: TextStyle::default().with_underlined(false).with_bold(true),
+            interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
     };
@@ -364,13 +359,13 @@ fn chat_message_ansi() {
     assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1mWorld!\u{1b}[0m");
 
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-        formatting: TextFormatting::empty().with_underline(true),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
+        style: TextStyle::default().with_underlined(true),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("World!").into()),
-            formatting: TextFormatting::empty().with_bold(true),
-            interact: TextInteraction::empty(),
+            content: TextContent::Text(Cow::Borrowed("World!").into()),
+            style: TextStyle::default().with_bold(true),
+            interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
     };
@@ -380,19 +375,17 @@ fn chat_message_ansi() {
     assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1;4mWorld!\u{1b}[0m");
 
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, ").into()),
-        formatting: TextFormatting::empty().with_strikethrough(true),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, ").into()),
+        style: TextStyle::default().with_strikethrough(true),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("World").into()),
-            formatting: TextFormatting::empty().with_underline(true).with_strikethrough(false),
-            interact: TextInteraction::empty(),
+            content: TextContent::Text(Cow::Borrowed("World").into()),
+            style: TextStyle::default().with_underlined(true).with_strikethrough(false),
+            interaction: TextInteraction::default(),
             children: vec![FormattedText {
-                content: FormattedContent::Text(Cow::Borrowed("!").into()),
-                formatting: TextFormatting::empty()
-                    .with_color(TextColor::Red)
-                    .with_strikethrough(true),
-                interact: TextInteraction::empty(),
+                content: TextContent::Text(Cow::Borrowed("!").into()),
+                style: TextStyle::default().with_color(PresetColor::Red).with_strikethrough(true),
+                interaction: TextInteraction::default(),
                 children: Vec::new(),
             }],
         }],

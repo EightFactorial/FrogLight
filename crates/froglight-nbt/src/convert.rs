@@ -73,6 +73,15 @@ pub trait FromTag: Sized {
     fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError>;
 }
 
+impl<T: FromCompound> FromTag for T {
+    fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
+        match tag {
+            NbtTag::Compound(compound) => T::from_compound(compound),
+            _ => Err(ConvertError::MismatchedTag(core::any::type_name::<T>(), "Compound")),
+        }
+    }
+}
+
 /// A trait for converting types into [`NbtTag`]s.
 pub trait IntoTag {
     /// Convert the type into an [`NbtTag`].
@@ -81,15 +90,6 @@ pub trait IntoTag {
     /// Returns an error if the type fails to convert.
     #[expect(clippy::wrong_self_convention)]
     fn into_tag(&self) -> Result<NbtTag, ConvertError>;
-}
-
-impl<T: FromCompound> FromTag for T {
-    fn from_tag(tag: &NbtTag) -> Result<Self, ConvertError> {
-        match tag {
-            NbtTag::Compound(compound) => T::from_compound(compound),
-            _ => Err(ConvertError::MismatchedTag(core::any::type_name::<T>(), "Compound")),
-        }
-    }
 }
 
 impl<T: IntoCompound> IntoTag for T {

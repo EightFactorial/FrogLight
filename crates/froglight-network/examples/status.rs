@@ -6,7 +6,7 @@ use froglight_network::{
     packet::{common::ConnectionIntent, v1_21_4::prelude::*},
     prelude::*,
 };
-use froglight_text::prelude::TextTranslations;
+use froglight_text::translate::TextTranslations;
 use smol_str::SmolStr;
 
 /// The address of the server to request the status from.

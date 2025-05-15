@@ -1,11 +1,11 @@
 //! [`FrogNbt`](crate::prelude::FrogNbt) `with`-macro functions for common
-//! scenerios
+//! scenarios
 
 #[cfg(not(feature = "std"))]
 use alloc::{boxed::Box, vec::Vec};
 
-use super::NbtCompound;
-use crate::convert::{ConvertError, FromCompound};
+use super::{NbtCompound, NbtTag};
+use crate::convert::{ConvertError, FromCompound, FromTag, IntoTag};
 
 /// A Nbt mapper that converts between `i8` and `bool`
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -69,6 +69,28 @@ impl WrapOption {
             |err| Err(ConvertError::ConversionError(core::any::type_name::<R>(), Box::new(err))),
             |val| Ok(Some(val)),
         )
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A Nbt mapper that converts between `NbtTag` and `Option<R>`.
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
+pub struct TagOption;
+
+impl TagOption {
+    /// Attempt to convert the type and wrap it inside of an `Option`.
+    pub fn from_tag<R: FromTag>(tag: &NbtTag) -> Result<Option<R>, ConvertError> {
+        R::from_tag(tag).map(Some)
+    }
+
+    /// Attempt to unwrap the type and convert it into a `NbtTag`.
+    #[expect(unreachable_code)]
+    pub fn into_tag<R: IntoTag>(val: &Option<R>) -> Result<NbtTag, ConvertError> {
+        match val {
+            Some(value) => value.into_tag(),
+            None => Err(ConvertError::ConversionError(core::any::type_name::<R>(), todo!())),
+        }
     }
 }
 

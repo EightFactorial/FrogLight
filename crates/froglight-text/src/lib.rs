@@ -14,7 +14,9 @@ pub mod prelude {
 
     pub use crate::{
         chat::MessageSignatureCtx,
-        text::{FormattedText, TextColor, TextFormatting},
-        translate::TextTranslations,
+        text::{
+            FormattedText,
+            style::{IntegerColor, PresetColor, TextColor, TextStyle},
+        },
     };
 }

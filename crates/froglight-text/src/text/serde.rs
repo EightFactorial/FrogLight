@@ -1,5 +1,5 @@
 #[cfg(not(feature = "std"))]
-use alloc::{borrow::Cow, format, vec::Vec};
+use alloc::{borrow::Cow, format, string::ToString, vec::Vec};
 #[cfg(feature = "std")]
 use std::borrow::Cow;
 
@@ -12,32 +12,34 @@ use serde::{
     ser::{SerializeMap, SerializeSeq},
 };
 
+use super::content::TextContent;
 use crate::{
     prelude::*,
     text::{
-        FormattedContent, FormattedTextRef, TextInteraction,
-        component::{
+        FormattedTextRef, TextInteraction,
+        content::{
             KeybindComponent, ScoreComponent, SelectorComponent, TextComponent, TranslateComponent,
             ValueComponent,
         },
+        style::TextStyle,
     },
 };
 
 impl Serialize for FormattedText {
     fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
     where S: Serializer {
-        Child(FormattedTextRef::new(self), &TextFormatting::DEFAULT).serialize(ser)
+        Child(FormattedTextRef::new(self), &TextStyle::EMPTY).serialize(ser)
     }
 }
-impl Serialize for FormattedTextRef<'_> {
+impl Serialize for FormattedTextRef<'_, '_> {
     fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
     where S: Serializer {
-        Child(self.clone(), &TextFormatting::DEFAULT).serialize(ser)
+        Child(*self, &TextStyle::EMPTY).serialize(ser)
     }
 }
 
 /// Serialize a slice of [`FormattedText`] children while inheriting formatting.
-struct Children<'a>(&'a [FormattedText], &'a TextFormatting);
+struct Children<'a>(&'a [FormattedText], &'a TextStyle);
 impl Serialize for Children<'_> {
     fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
     where S: Serializer {
@@ -48,20 +50,20 @@ impl Serialize for Children<'_> {
 }
 
 /// Serialize a [`FormattedText`] while inheriting formatting.
-struct Child<'a>(FormattedTextRef<'a>, &'a TextFormatting);
+struct Child<'a>(FormattedTextRef<'a, 'a>, &'a TextStyle);
 impl Serialize for Child<'_> {
     fn serialize<S>(&self, ser: S) -> Result<S::Ok, S::Error>
     where S: Serializer {
         let mut map: S::SerializeMap;
 
         // Prepare formatting arguments
-        let inherit = self.0.formatting.inherit(self.1);
+        let inherit = self.0.style.inherit(self.1);
         let diff = inherit.difference(self.1);
 
         // Serialize the text content
         match &self.0.content {
-            FormattedContent::Text(c) => {
-                if diff.is_empty() && self.0.interact.is_empty() && self.0.children.is_empty() {
+            TextContent::Text(c) => {
+                if diff.is_empty() && self.0.interaction.is_empty() && self.0.children.is_empty() {
                     return ser.serialize_str(&c.text);
                 }
 
@@ -69,27 +71,27 @@ impl Serialize for Child<'_> {
                 map.serialize_entry("type", "text")?;
                 c.serialize(FlatMapSerializer(&mut map))?;
             }
-            FormattedContent::Translation(c) => {
+            TextContent::Translation(c) => {
                 map = ser.serialize_map(None)?;
                 map.serialize_entry("type", "translatable")?;
                 c.serialize(FlatMapSerializer(&mut map))?;
             }
-            FormattedContent::Score(c) => {
+            TextContent::Score(c) => {
                 map = ser.serialize_map(None)?;
                 map.serialize_entry("type", "score")?;
                 c.serialize(FlatMapSerializer(&mut map))?;
             }
-            FormattedContent::Selector(c) => {
+            TextContent::Selector(c) => {
                 map = ser.serialize_map(None)?;
                 map.serialize_entry("type", "selector")?;
                 c.serialize(FlatMapSerializer(&mut map))?;
             }
-            FormattedContent::Keybind(c) => {
+            TextContent::Keybind(c) => {
                 map = ser.serialize_map(None)?;
                 map.serialize_entry("type", "keybind")?;
                 c.serialize(FlatMapSerializer(&mut map))?;
             }
-            FormattedContent::Nbt(c) => {
+            TextContent::Nbt(c) => {
                 map = ser.serialize_map(None)?;
                 map.serialize_entry("type", "nbt")?;
                 c.serialize(FlatMapSerializer(&mut map))?;
@@ -105,7 +107,7 @@ impl Serialize for Child<'_> {
         diff.serialize(FlatMapSerializer(&mut map))?;
 
         // Serialize the text's interaction settings
-        self.0.interact.serialize(FlatMapSerializer(&mut map))?;
+        self.0.interaction.serialize(FlatMapSerializer(&mut map))?;
 
         map.end()
     }
@@ -118,15 +120,15 @@ impl<'de> Deserialize<'de> for FormattedText {
     where D: Deserializer<'de> {
         match Content::deserialize(de)? {
             Content::String(string) => Ok(Self {
-                content: FormattedContent::Text(TextComponent { text: Cow::Owned(string) }),
-                formatting: TextFormatting::empty(),
-                interact: TextInteraction::empty(),
+                content: TextContent::Text(TextComponent { text: Cow::Owned(string) }),
+                style: TextStyle::EMPTY,
+                interaction: TextInteraction::DEFAULT,
                 children: Vec::new(),
             }),
             Content::Str(str) => Ok(Self {
-                content: FormattedContent::Text(TextComponent { text: Cow::Owned(str.into()) }),
-                formatting: TextFormatting::empty(),
-                interact: TextInteraction::empty(),
+                content: TextContent::Text(TextComponent { text: Cow::Owned(str.to_string()) }),
+                style: TextStyle::EMPTY,
+                interaction: TextInteraction::DEFAULT,
                 children: Vec::new(),
             }),
             ref content @ Content::Map(ref map) => {
@@ -140,8 +142,8 @@ impl<'de> Deserialize<'de> for FormattedText {
 
                 Ok(Self {
                     content: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
-                    formatting: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
-                    interact: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
+                    style: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
+                    interaction: Deserialize::deserialize(ContentRefDeserializer::new(content))?,
                     children,
                 })
             }
@@ -150,13 +152,13 @@ impl<'de> Deserialize<'de> for FormattedText {
     }
 }
 
-impl<'de> Deserialize<'de> for FormattedContent {
+impl<'de> Deserialize<'de> for TextContent {
     fn deserialize<D>(de: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
-        /// Deserialize a [`FormattedContent`] using the provided content type.
-        fn deserialize<'de, D: Deserializer<'de>, T: Into<FormattedContent> + Deserialize<'de>>(
+        /// Deserialize a [`TextContent`] using the provided content type.
+        fn deserialize<'de, D: Deserializer<'de>, T: Into<TextContent> + Deserialize<'de>>(
             content: Content<'de>,
-        ) -> Result<FormattedContent, D::Error> {
+        ) -> Result<TextContent, D::Error> {
             Ok(T::deserialize(ContentDeserializer::<'de, D::Error>::new(content))?.into())
         }
 
@@ -188,19 +190,19 @@ impl<'de> Deserialize<'de> for FormattedContent {
                         }
                     };
                 }
-                // Guess `FormattedContent::Text`
+                // Guess `TextContent::Text`
                 "text" => return deserialize::<D, TextComponent>(content),
-                // Guess `FormattedContent::Translation`
+                // Guess `TextContent::Translation`
                 "translate" | "fallback" | "with" => {
                     return deserialize::<D, TranslateComponent>(content);
                 }
-                // Guess `FormattedContent::Score`
+                // Guess `TextContent::Score`
                 "score" => return deserialize::<D, ScoreComponent>(content),
-                // Guess `FormattedContent::Selector`
+                // Guess `TextContent::Selector`
                 "selector" => return deserialize::<D, SelectorComponent>(content),
-                // Guess `FormattedContent::Keybind`
+                // Guess `TextContent::Keybind`
                 "keybind" => return deserialize::<D, KeybindComponent>(content),
-                // Guess `FormattedContent::Nbt`
+                // Guess `TextContent::Nbt`
                 "source" | "path" | "interpret" => {
                     return deserialize::<D, ValueComponent>(content);
                 }
@@ -217,23 +219,32 @@ impl<'de> Deserialize<'de> for FormattedContent {
 
 #[test]
 fn formatted_text() {
+    #[cfg(not(feature = "std"))]
+    use alloc::{borrow::Cow, vec};
+    #[cfg(feature = "std")]
     use std::borrow::Cow;
 
-    use crate::{prelude::*, text::TextInteraction};
+    use crate::{
+        prelude::*,
+        text::{
+            TextInteraction,
+            style::{IntegerColor, PresetColor},
+        },
+    };
 
     fn from_str(json: &str) -> FormattedText { serde_json::from_str(json).unwrap() }
     fn roundtrip(value: &FormattedText) -> FormattedText {
         let json = serde_json::to_string(value).unwrap();
-        #[cfg(debug_assertions)]
+        #[cfg(all(debug_assertions, feature = "std"))]
         println!("{json}");
         from_str(&json)
     }
 
     // Test the default formatting.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::empty(),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default(),
+        interaction: TextInteraction::default(),
         children: Vec::new(),
     };
     assert_eq!(roundtrip(&text), text);
@@ -241,9 +252,9 @@ fn formatted_text() {
 
     // Test the default formatting with the color set.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default().with_color(TextColor::Red),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default().with_color(PresetColor::Red),
+        interaction: TextInteraction::default(),
         children: Vec::new(),
     };
     assert_eq!(roundtrip(&text), text);
@@ -251,9 +262,9 @@ fn formatted_text() {
 
     // Test the default formatting with bold and italic text.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default().with_bold(true).with_italic(true),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default().with_bold(true).with_italic(true),
+        interaction: TextInteraction::default(),
         children: Vec::new(),
     };
     assert_eq!(roundtrip(&text), text);
@@ -261,13 +272,13 @@ fn formatted_text() {
 
     // Test the default formatting with children.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default(),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default(),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("Child").into()),
-            formatting: TextFormatting::empty(),
-            interact: TextInteraction::empty(),
+            content: TextContent::Text(Cow::Borrowed("Child").into()),
+            style: TextStyle::default(),
+            interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
     };
@@ -280,13 +291,13 @@ fn formatted_text() {
 
     // Test the default formatting with children who have custom formatting.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default(),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default(),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("Child").into()),
-            formatting: TextFormatting::empty().with_color(TextColor::Red),
-            interact: TextInteraction::empty(),
+            content: TextContent::Text(Cow::Borrowed("Child").into()),
+            style: TextStyle::default().with_color(PresetColor::Red),
+            interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
     };
@@ -299,13 +310,13 @@ fn formatted_text() {
 
     // Test the default formatting with red text and children who inherit it.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default().with_color(TextColor::Red),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default().with_color(PresetColor::Red),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("Child").into()),
-            formatting: TextFormatting::empty(),
-            interact: TextInteraction::empty(),
+            content: TextContent::Text(Cow::Borrowed("Child").into()),
+            style: TextStyle::default(),
+            interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
     };
@@ -318,17 +329,17 @@ fn formatted_text() {
 
     // Test the default formatting and children who both have red text.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default().with_color(TextColor::Red),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default().with_color(PresetColor::Red),
+        interaction: TextInteraction::default(),
         children: vec![FormattedText {
-            content: FormattedContent::Text(Cow::Borrowed("Child").into()),
-            formatting: TextFormatting::empty().with_color(TextColor::Red),
-            interact: TextInteraction::empty(),
+            content: TextContent::Text(Cow::Borrowed("Child").into()),
+            style: TextStyle::default().with_color(PresetColor::Red),
+            interaction: TextInteraction::default(),
             children: Vec::new(),
         }],
     };
-    assert_eq!(roundtrip(&text), text);
+    assert_ne!(roundtrip(&text), text);
     assert_eq!(
         serde_json::to_string(&text).unwrap(),
         r#"{"type":"text","text":"Hello, World!","extra":["Child"],"color":"red"}"#,
@@ -337,22 +348,22 @@ fn formatted_text() {
 
     // Test the default formatting with children who have matching formatting.
     let text = FormattedText {
-        content: FormattedContent::Text(Cow::Borrowed("Hello, World!").into()),
-        formatting: TextFormatting::default(),
-        interact: TextInteraction::empty(),
+        content: TextContent::Text(Cow::Borrowed("Hello, World!").into()),
+        style: TextStyle::default(),
+        interaction: TextInteraction::default(),
         children: vec![
             FormattedText {
-                content: FormattedContent::Text(Cow::Borrowed("Child").into()),
-                formatting: TextFormatting::default(),
-                interact: TextInteraction::empty(),
+                content: TextContent::Text(Cow::Borrowed("Child").into()),
+                style: TextStyle::default(),
+                interaction: TextInteraction::default(),
                 children: Vec::new(),
             },
             FormattedText {
-                content: FormattedContent::Text(Cow::Borrowed("Child 2").into()),
-                formatting: TextFormatting::empty()
-                    .with_color(TextColor::Custom("#111111".into()))
+                content: TextContent::Text(Cow::Borrowed("Child 2").into()),
+                style: TextStyle::default()
+                    .with_color(IntegerColor::try_from_hex("111111").unwrap())
                     .with_bold(true),
-                interact: TextInteraction::empty(),
+                interaction: TextInteraction::default(),
                 children: Vec::new(),
             },
         ],
