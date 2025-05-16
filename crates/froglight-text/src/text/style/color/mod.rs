@@ -128,7 +128,7 @@ impl<'de> serde::Deserialize<'de> for TextColor {
     where D: serde::Deserializer<'de> {
         let s = String::deserialize(de)?;
         Self::from_str(&s)
-            .map_err(|_| serde::de::Error::custom("valid preset or hexadecimal color"))
+            .map_err(|()| serde::de::Error::custom("valid preset or hexadecimal color"))
     }
 }
 

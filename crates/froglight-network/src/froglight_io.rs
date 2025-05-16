@@ -155,7 +155,7 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
 
         // Log the ID and length of the packet
         #[cfg(feature = "trace")]
-        if let Some(id) = buf.get(0) {
+        if let Some(id) = buf.first() {
             tracing::trace!("Reading Packet: {id} ({})", buf.len());
         }
 
@@ -166,7 +166,7 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
     async fn write_packet(&mut self, buf: &[u8]) -> Result<(), ConnectionError> {
         // Log the ID and length of the packet
         #[cfg(feature = "trace")]
-        if let Some(id) = buf.get(0) {
+        if let Some(id) = buf.first() {
             tracing::trace!("Writing Packet: {id} ({})", buf.len());
         }
 

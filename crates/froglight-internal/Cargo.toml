@@ -26,7 +26,7 @@ froglight-network = { workspace = true, optional = true, features = ["inventory"
 froglight-physics = { workspace = true }
 froglight-registry = { workspace = true }
 froglight-text = { workspace = true }
-froglight-world = { workspace = true, features = ["block"] }
+froglight-world = { workspace = true, features = ["block", "nbt"] }
 
 # Optional dependencies
 froglight-brigadier = { workspace = true, optional = true, features = ["glam", "nbt", "uuid"] }

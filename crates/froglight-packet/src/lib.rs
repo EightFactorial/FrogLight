@@ -16,7 +16,7 @@ pub mod prelude {
     //! Re-exports of commonly used types, traits, and macros.
 
     pub use crate::{
-        common::{ConnectionIntent, ServerStatus},
+        common::{Axis, BlockPos, ChunkPos, ConnectionIntent, Direction, ServerStatus},
         state::{Config, Handshake, Login, Play, Status},
     };
 }

@@ -201,7 +201,7 @@ impl<'a> IntoIterator for &'a mut NbtCompound {
 
 impl<A: Into<Mutf8String>, B: Into<NbtTag>> FromIterator<(A, B)> for NbtCompound {
     fn from_iter<T: IntoIterator<Item = (A, B)>>(iter: T) -> Self {
-        Self(CompoundMap::from_iter(iter.into_iter().map(|(key, val)| (key.into(), val.into()))))
+        Self(iter.into_iter().map(|(key, val)| (key.into(), val.into())).collect::<CompoundMap>())
     }
 }
 impl From<Vec<(Mutf8String, NbtTag)>> for NbtCompound {

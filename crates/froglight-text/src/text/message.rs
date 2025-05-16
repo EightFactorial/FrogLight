@@ -130,7 +130,7 @@ impl<'a> FormattedTextRef<'a, '_> {
                 if let Some(translation) = translation {
                     // TODO: Handle legacy style codes
                     // Format and insert the message arguments
-                    Self::format_message_ansi(translation, &self.style, &translate.arguments, t)?
+                    Self::format_message_ansi(translation, self.style, &translate.arguments, t)?
                 } else {
                     return Err(ChatMessageError::UnknownTranslationKey(
                         translate.translate.clone(),
@@ -142,11 +142,11 @@ impl<'a> FormattedTextRef<'a, '_> {
         };
 
         // Apply the message's style
-        string = nu_ansi_term::Style::from(&*self.style).paint(string).to_string();
+        string = nu_ansi_term::Style::from(self.style).paint(string).to_string();
 
         // Append children messages
         for child in &self.children {
-            let style = child.style.inherit(&self.style);
+            let style = child.style.inherit(self.style);
             let child = FormattedTextRef::new(child).with_style(&style);
             string.push_str(&child.as_message_ansi(t)?.to_string());
         }

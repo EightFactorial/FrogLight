@@ -37,13 +37,13 @@ impl<T: Serialize + DeserializeOwned> FrogJson for T {
     fn frog_from_json(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
         let content = String::frog_read(buffer)?;
         #[cfg(feature = "trace")]
-        tracing::trace!("Deserializing \"{}\" from JSON", Self::type_name());
+        tracing::trace!("Deserializing \"{}\" from JSON", <Self as TypeName>::type_name());
         serde_json::from_str(&content).map_err(ReadError::Json)
     }
 
     fn frog_to_json(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
         #[cfg(feature = "trace")]
-        tracing::trace!("Serializing \"{}\" as JSON", Self::type_name());
+        tracing::trace!("Serializing \"{}\" as JSON", <Self as TypeName>::type_name());
         let content = serde_json::to_string(self).map_err(WriteError::Json)?;
         content.frog_write(buffer)
     }
@@ -52,12 +52,13 @@ impl<T: Serialize + DeserializeOwned> FrogJson for T {
 // -------------------------------------------------------------------------------------------------
 
 /// A trait for retrieving the name of a type.
+#[allow(dead_code)]
 trait TypeName {
     /// The name of the type.
     ///
     /// If the `nightly` feature is enabled,
     /// the path to the type is stripped at compile time.
-    #[inline(always)]
+    #[inline]
     fn type_name() -> &'static str {
         #[cfg(feature = "nightly")]
         return Self::STRIPPED_TYPE_NAME;
@@ -67,6 +68,7 @@ trait TypeName {
 
     /// The name of the type without the path.
     #[cfg(feature = "nightly")]
+    #[expect(clippy::single_match)]
     const STRIPPED_TYPE_NAME: &'static str = {
         let mut index = 0;
         let mut last = 0;

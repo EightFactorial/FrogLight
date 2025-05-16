@@ -121,7 +121,7 @@ fn named_fields(fields: FieldsNamed, path: &Path) -> (TokenStream, TokenStream) 
                     todo!();
                 });
             }
-        };
+        }
     }
 
     (quote!( Self { #from } ), into)

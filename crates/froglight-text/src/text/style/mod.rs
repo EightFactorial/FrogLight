@@ -147,7 +147,7 @@ impl TextStyle {
     pub fn inherit(&self, other: &Self) -> Self {
         Self {
             font: self.font.clone().or_else(|| other.font.clone()),
-            color: self.color.clone().or_else(|| other.color.clone()),
+            color: self.color.or(other.color),
             bold: self.bold.or(other.bold),
             italic: self.italic.or(other.italic),
             underlined: self.underlined.or(other.underlined),
@@ -162,6 +162,7 @@ impl TextStyle {
     pub fn difference(&self, other: &Self) -> Self {
         /// Returns `Some(a)` if `a` and `b` are different,
         /// or `Some(val)` if only one is `Some`.
+        #[expect(clippy::ref_option)]
         fn opt_neq<'a, T: PartialEq>(a: &'a Option<T>, b: &'a Option<T>) -> Option<&'a T> {
             match (a, b) {
                 (Some(a), Some(b)) if a != b => Some(a),
@@ -172,7 +173,7 @@ impl TextStyle {
 
         Self {
             font: opt_neq(&self.font, &other.font).cloned(),
-            color: opt_neq(&self.color, &other.color).cloned(),
+            color: opt_neq(&self.color, &other.color).copied(),
             bold: opt_neq(&self.bold, &other.bold).copied(),
             italic: opt_neq(&self.italic, &other.italic).copied(),
             underlined: opt_neq(&self.underlined, &other.underlined).copied(),

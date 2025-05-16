@@ -166,6 +166,7 @@ impl PresetColor {
 
     /// Get the [`PresetColor`] as a hexadecimal number.
     #[must_use]
+    #[expect(clippy::unreadable_literal)]
     pub const fn as_hex(&self) -> u32 {
         match self {
             PresetColor::Black => 0x000000,

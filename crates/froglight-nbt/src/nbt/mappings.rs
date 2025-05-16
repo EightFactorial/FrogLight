@@ -13,6 +13,9 @@ pub struct ByteBool;
 
 impl ByteBool {
     /// Convert from `i8` to `bool`
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     #[expect(unreachable_code)]
     pub fn read_from_tag(tag: &i8) -> Result<bool, NbtError> {
         match *tag {
@@ -26,6 +29,7 @@ impl ByteBool {
     }
 
     /// Convert from `i8` to `bool`
+    #[expect(clippy::match_bool, clippy::missing_errors_doc)]
     pub fn write_as_tag(val: &bool) -> Result<i8, NbtError> {
         match *val {
             false => Ok(0i8),
@@ -40,11 +44,17 @@ pub struct ByteBoolOption;
 
 impl ByteBoolOption {
     /// Convert from `i8` to `Option<bool>`
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     pub fn read_from_tag(tag: &i8) -> Result<Option<bool>, NbtError> {
         ByteBool::read_from_tag(tag).map(Some)
     }
 
     /// Convert from `Option<bool>` to `i8`
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     #[expect(unreachable_code)]
     pub fn write_as_tag(val: &Option<bool>) -> Result<i8, NbtError> {
         val.as_ref().map_or_else(
@@ -67,6 +77,9 @@ pub struct WrapOption;
 
 impl WrapOption {
     /// Attempt to convert the type and wrap it inside of an Option.
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     pub fn read_from_tag<T: Clone + TryInto<R>, R>(tag: &T) -> Result<Option<R>, NbtError>
     where T::Error: core::error::Error + 'static {
         tag.clone().try_into().map_or_else(
@@ -76,6 +89,9 @@ impl WrapOption {
     }
 
     /// Attempt to unwrap the type and convert it.
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     #[expect(unreachable_code)]
     pub fn write_as_tag<T: Clone + TryInto<R>, R>(tag: &Option<T>) -> Result<R, NbtError>
     where T::Error: core::error::Error + 'static {
@@ -103,11 +119,17 @@ pub struct TagOption;
 
 impl TagOption {
     /// Attempt to convert the type and wrap it inside of an `Option`.
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     pub fn read_from_tag<R: FromTag>(tag: &NbtTag) -> Result<Option<R>, NbtError> {
         R::from_tag(tag).map(Some)
     }
 
     /// Attempt to unwrap the type and convert it into a `NbtTag`.
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     #[expect(unreachable_code)]
     pub fn write_as_tag<R: IntoTag>(val: &Option<R>) -> Result<NbtTag, NbtError> {
         match val {
@@ -125,6 +147,9 @@ pub struct ConvertVec;
 
 impl ConvertVec {
     /// Attempt to convert each element in the Vec.
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     pub fn read_from_tag<T: Clone + TryInto<R>, R>(tag: &[T]) -> Result<Vec<R>, NbtError>
     where T::Error: core::error::Error + 'static {
         let mut vec = Vec::with_capacity(tag.len());
@@ -145,6 +170,9 @@ pub struct CompoundVec;
 
 impl CompoundVec {
     /// Attempt to convert each element in the Vec.
+    ///
+    /// # Errors
+    /// Returns an error if the conversion fails.
     pub fn read_from_tag<R: FromCompound>(tag: &[NbtCompound]) -> Result<Vec<R>, NbtError> {
         let mut vec = Vec::with_capacity(tag.len());
         for compound in tag {

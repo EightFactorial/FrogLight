@@ -11,6 +11,7 @@ struct FrogPacketMacro {}
 
 // -------------------------------------------------------------------------------------------------
 
+#[allow(clippy::too_many_lines)]
 pub(crate) fn derive_frogpackets(input: TokenStream) -> TokenStream {
     let input: DeriveInput = syn::parse2(input).unwrap();
 
