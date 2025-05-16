@@ -8,7 +8,7 @@ use bevy_ecs::component::ComponentInfo;
 use bevy_log::{Level, LogPlugin};
 use froglight_common::entity::EntityId;
 
-use crate::{function::WorldRef, prelude::*};
+use crate::{function::WorldRef, plugin::BrigadierPlugin, prelude::*};
 
 #[test]
 fn execute() -> AppExit {
@@ -42,7 +42,7 @@ fn execute() -> AppExit {
 
             let world = world.value();
             let components = world.inspect_entity(entity).unwrap().map(ComponentInfo::name);
-            info!("Entity {entity}: {}", components.collect::<Vec<_>>().join(", "));
+            info!("Entity {entity}: [{}]", components.collect::<Vec<_>>().join(", "));
         });
     });
 
@@ -86,6 +86,8 @@ fn execute() -> AppExit {
         });
     });
 
+    // ---------------------------------------------------------------------------------------------
+
     // Add a system spawn an entity and run the commands
     app.add_systems(Update, |mut commands: Commands| {
         let bundle = (Name::new("TestEntity"), EntityId::from(0));
@@ -111,7 +113,7 @@ fn execute() -> AppExit {
         if timer.elapsed().is_zero() {
             timer.set_duration(Duration::from_millis(100));
         }
-        if timer.tick(time.elapsed()).just_finished() {
+        if timer.tick(time.delta()).just_finished() {
             panic!("Application did not exit after 100ms!");
         }
     });

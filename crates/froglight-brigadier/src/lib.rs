@@ -22,9 +22,8 @@ pub mod prelude {
 
     pub use crate::{
         argument::{ArgumentError, ArgumentParser, ReflectArgumentParser},
+        function::WorldRef,
         graph::{AppBrigadierGraph, BrigadierError, BrigadierGraph},
-        plugin::{
-            BrigadierBuilder, BrigadierCommand, BrigadierCommands, BrigadierEvent, BrigadierPlugin,
-        },
+        plugin::{BrigadierBuilder, BrigadierCommand, BrigadierCommands, BrigadierEvent},
     };
 }

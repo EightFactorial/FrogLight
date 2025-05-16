@@ -130,6 +130,7 @@ simd_cesu8 = { version = "1.0", default-features = false }
 smallvec = { version = "1.15", features = ["const_new"] }
 smol_str = { version = "0.2", default-features = false }
 thiserror = { version = "2.0", default-features = false }
+toml = "0.8"
 tracing = { version = "0.1", default-features = false }
 tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
 ureq = "3.0"

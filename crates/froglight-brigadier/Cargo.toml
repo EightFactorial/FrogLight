@@ -16,8 +16,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy = { workspace = true, features = ["bevy_log"] }
+bevy = { workspace = true, features = ["bevy_log", "reflect_functions"] }
 proptest = { workspace = true }
+toml = { workspace = true, features = ["parse"] }
 
 [dependencies]
 bevy_app = { workspace = true, features = ["reflect_functions"] }
@@ -76,3 +77,9 @@ std = [
   "serde?/std",
   "uuid?/std",
 ]
+
+# --- Examples ---
+
+[[example]]
+name = "admin"
+required-features = ["std"]
