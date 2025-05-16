@@ -7,7 +7,7 @@ use core::ops::{Deref, DerefMut};
 use std::borrow::Borrow;
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::prelude::*;
+use bevy_ecs::{component::HookContext, prelude::*, world::DeferredWorld};
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::Display;
@@ -24,7 +24,7 @@ use super::username::PlayerUsername;
 #[repr(transparent)]
 #[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
+#[cfg_attr(feature = "bevy", derive(Component), component(on_add = Self::on_add), reflect(Component))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PlayerUuid(Uuid);
@@ -37,6 +37,18 @@ impl PlayerUuid {
     /// Create a new [`PlayerUuid`] from a [`Uuid`].
     #[must_use]
     pub fn new(uuid: impl Into<Uuid>) -> Self { Self(uuid.into()) }
+
+    /// Insert the [`PlayerUuid`] as an [`EntityUuid`].
+    ///
+    /// Only occurs the first time a [`PlayerUuid`] is added to an [`Entity`],
+    /// any changes to the [`PlayerUuid`] will not affect the [`EntityUuid`].
+    #[cfg(feature = "bevy")]
+    fn on_add(mut world: DeferredWorld, ctx: HookContext) {
+        if let Some(uuid) = world.get::<Self>(ctx.entity) {
+            let uuid = froglight_common::entity::EntityUuid::from(uuid.0);
+            world.commands().entity(ctx.entity).insert(uuid);
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

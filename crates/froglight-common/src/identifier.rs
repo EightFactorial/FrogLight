@@ -130,6 +130,8 @@ impl Identifier {
     pub fn split(&self) -> (&str, &str) { self.0.split_once(':').unwrap() }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 impl core::fmt::Display for Identifier {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result { self.0.fmt(f) }
 }

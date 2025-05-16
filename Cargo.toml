@@ -199,8 +199,8 @@ brigadier = ["froglight-internal/brigadier"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
-# # Enable various crates' nightly features.
-# nightly = ["froglight-internal/nightly"]
+# Enable various crates' nightly features.
+nightly = ["froglight-internal/nightly"]
 
 # Enable support for rust's standard library.
 std = ["froglight-internal/std"]

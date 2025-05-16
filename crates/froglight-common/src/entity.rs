@@ -21,6 +21,8 @@ impl Borrow<u32> for EntityId {
     fn borrow(&self) -> &u32 { &self.0 }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// A universally unique identifier for an [`Entity`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, From, Into, AsRef, Deref)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
