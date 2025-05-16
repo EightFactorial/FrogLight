@@ -153,11 +153,23 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         buf.copy_within(position.., 0);
         buf.truncate(buf.len() - position);
 
+        // Log the ID and length of the packet
+        #[cfg(feature = "trace")]
+        if let Some(id) = buf.get(0) {
+            tracing::trace!("Reading Packet: {id} ({})", buf.len());
+        }
+
         Ok(())
     }
 
     // TODO: Compression + Encryption
     async fn write_packet(&mut self, buf: &[u8]) -> Result<(), ConnectionError> {
+        // Log the ID and length of the packet
+        #[cfg(feature = "trace")]
+        if let Some(id) = buf.get(0) {
+            tracing::trace!("Writing Packet: {id} ({})", buf.len());
+        }
+
         // Get the packet length and prefix length
         let packet_len = buf.len();
         let prefix_len = packet_len + packet_len.frog_var_len();

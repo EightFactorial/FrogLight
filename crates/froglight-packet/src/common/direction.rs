@@ -1,7 +1,17 @@
 //! TODO: Fix enum variant ordering
-#![expect(dead_code, unreachable_pub)]
+#![expect(missing_docs)]
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
+#[cfg(feature = "io")]
+use froglight_io::prelude::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[cfg_attr(feature = "io", derive(FrogBuf))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Serialize, Deserialize))]
 pub enum Direction {
     Up,
     Down,
@@ -13,7 +23,13 @@ pub enum Direction {
 
 impl Direction {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[cfg_attr(feature = "io", derive(FrogBuf))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Serialize, Deserialize))]
 pub enum VerticalDirection {
     Up,
     Down,
@@ -21,7 +37,13 @@ pub enum VerticalDirection {
 
 impl VerticalDirection {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[cfg_attr(feature = "io", derive(FrogBuf))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Serialize, Deserialize))]
 pub enum HorizontalDirection {
     North,
     South,
@@ -31,7 +53,12 @@ pub enum HorizontalDirection {
 
 impl HorizontalDirection {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Serialize, Deserialize))]
 pub enum Axis {
     X,
     Y,
@@ -40,7 +67,13 @@ pub enum Axis {
 
 impl Axis {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+#[cfg_attr(feature = "io", derive(FrogBuf))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Serialize, Deserialize))]
 pub enum SignedAxis {
     PosX,
     NegX,

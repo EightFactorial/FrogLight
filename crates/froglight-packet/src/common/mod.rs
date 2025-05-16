@@ -3,8 +3,8 @@
 mod chunk;
 // pub use chunk::*;
 
-mod direction;
-// pub use direction::*;
+pub mod direction;
+pub use direction::{Axis, Direction};
 
 mod gamemode;
 // pub use gamemode::*;

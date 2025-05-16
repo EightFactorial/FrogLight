@@ -32,15 +32,23 @@ default = []
 
 # Enable `froglight-block` macros.
 block = []
+
 # Enable `froglight-common` macros.
 common = []
+
 # Enable `froglight-io` macros.
 io = []
+# Enable tracing for `froglight-io` macros.
+io-trace = ["io"]
+
 # Enable `froglight-item` macros.
 item = []
+
 # Enable `froglight-nbt` macros.
 nbt = []
+
 # Enable `froglight-network` macros.
 network = []
+
 # Enable `froglight-registry` macros.
 registry = []

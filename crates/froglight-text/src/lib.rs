@@ -16,6 +16,8 @@ pub mod prelude {
         chat::MessageSignatureCtx,
         text::{
             FormattedText,
+            content::TextContent,
+            interaction::TextClickInteract,
             style::{IntegerColor, PresetColor, TextColor, TextStyle},
         },
     };

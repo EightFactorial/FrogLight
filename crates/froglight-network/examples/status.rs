@@ -8,11 +8,17 @@ use froglight_network::{
 };
 use froglight_text::translate::TextTranslations;
 use smol_str::SmolStr;
+use tracing_subscriber::{EnvFilter, fmt};
 
 /// The address of the server to request the status from.
 static SERVER_ADDRESS: SmolStr = SmolStr::new_static("mbs.playskyward.gg");
 
 fn main() -> Result<(), Box<dyn core::error::Error>> {
+    // Initialize the tracing subscriber
+    if let Ok(filter) = EnvFilter::try_from_default_env() {
+        let _ = fmt().with_env_filter(filter).try_init();
+    }
+
     // Initialize the `IoTaskPool`
     let _ = IoTaskPool::get_or_init(TaskPool::new);
 

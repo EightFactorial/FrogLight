@@ -32,6 +32,7 @@ hashbrown = { version = "0.15", optional = true, features = ["default"] }
 serde = { workspace = true, optional = true, features = ["std"] }
 serde_json = { workspace = true, optional = true, features = ["std"] }
 smallvec = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true, features = ["std"] }
 
 [features]
 default = ["glam"]
@@ -58,3 +59,5 @@ serde = [
 
 # Enable nightly features.
 nightly = ["hashbrown?/nightly"]
+# Enable trace logs.
+trace = ["dep:tracing", "froglight-macros/io-trace"]

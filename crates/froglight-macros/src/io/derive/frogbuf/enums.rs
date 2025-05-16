@@ -32,7 +32,7 @@ pub(super) fn derive_enum(
         };
     }
 
-    for Variant { ident, fields, discriminant: d, .. } in variants {
+    for Variant { ident: variant, fields, discriminant: d, .. } in variants {
         // Update the discriminant if one is provided
         if let Some((_, d)) = d {
             let integer: LitInt = syn::parse_quote!(#d);
@@ -46,18 +46,37 @@ pub(super) fn derive_enum(
             Fields::Unit => (quote!(), quote!(), quote!(), quote!()),
         };
 
+        // If `io-trace` is enabled, emit a trace message when reading the struct.
+        let read_trace = if cfg!(feature = "io-trace") {
+            let message = format!("Reading enum variant \"{ident}::{variant}\" ({discriminant})");
+            quote! { #path::tracing::trace!(target: "froglight_io::read", #message); }
+        } else {
+            TokenStream::new()
+        };
+        // If `io-trace` is enabled, emit a trace message when writing the struct.
+        let write_trace = if cfg!(feature = "io-trace") {
+            let message = format!("Writing enum variant \"{ident}::{variant}\" ({discriminant})");
+            quote! { #path::tracing::trace!(target: "froglight_io::write", #message); }
+        } else {
+            TokenStream::new()
+        };
+
         // Add outer syntax and handle variant discriminants
         read_tokens.extend(quote! {
-            #discriminant => { Ok(Self::#ident #read) },
+            #discriminant => {
+                #read_trace
+                Ok(Self::#variant #read)
+            },
         });
         write_tokens.extend(quote! {
-            Self::#ident #fields => {
+            Self::#variant #fields => {
+                #write_trace
                 written += #path::variable::FrogVarWrite::frog_var_write(&#discriminant, buffer)?;
                 #write
             }
         });
         length_tokens.extend(quote! {
-            Self::#ident #fields => {
+            Self::#variant #fields => {
                 length += #path::variable::FrogVarWrite::frog_var_len(&#discriminant);
                 #length
             }

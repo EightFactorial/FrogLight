@@ -36,6 +36,7 @@ bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallve
 froglight-brigadier = { workspace = true, optional = true, features = ["glam", "io", "nbt", "serde", "uuid"] }
 froglight-inventory = { workspace = true, optional = true, features = ["io"] }
 froglight-io = { workspace = true, optional = true, features = ["bevy_platform", "glam", "serde", "smallvec"] }
+tracing = { workspace = true, optional = true }
 
 [features]
 default = ["bevy", "brigadier", "inventory", "io", "std"]
@@ -76,6 +77,8 @@ nightly = [
   "froglight-nbt/nightly",
   "froglight-text/nightly",
 ]
+# Enable trace logs.
+trace = ["dep:tracing", "froglight-io?/trace"]
 
 # Enable support for the rust standard library.
 std = [
@@ -86,6 +89,7 @@ std = [
   "serde/std",
   "serde_json/std",
   "smol_str/std",
+  "tracing?/std",
   "uuid/std",
 ]
 # Enable `no_std` support for `glam`.

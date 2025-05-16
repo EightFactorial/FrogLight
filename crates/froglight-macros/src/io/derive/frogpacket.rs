@@ -28,6 +28,21 @@ pub(crate) fn derive_frogpackets(input: TokenStream) -> TokenStream {
     // `froglight::common`, `froglight-common`.
     let common = CrateManifest::froglight("froglight-common");
 
+    // If `io-trace` is enabled, emit a trace message when reading the struct.
+    let read_trace = if cfg!(feature = "io-trace") {
+        let message = format!("Reading packet from \"{ident}\"");
+        quote! { #path::tracing::trace!(target: "froglight_io::read", #message); }
+    } else {
+        TokenStream::new()
+    };
+    // If `io-trace` is enabled, emit a trace message when writing the struct.
+    let write_trace = if cfg!(feature = "io-trace") {
+        let message = format!("Writing packet from \"{ident}\"");
+        quote! { #path::tracing::trace!(target: "froglight_io::write", #message); }
+    } else {
+        TokenStream::new()
+    };
+
     let Data::Enum(DataEnum { variants, .. }) = data else {
         panic!("`FrogPackets` requires an enum of packets!")
     };
@@ -39,12 +54,18 @@ pub(crate) fn derive_frogpackets(input: TokenStream) -> TokenStream {
         return quote! {
             #[automatically_derived]
             impl<V: #common::version::Version> #path::version::FrogReadVersion<V> for #ident {
-                fn frog_read(_: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> { unreachable!(#message) }
+                fn frog_read(_: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
+                    #read_trace
+                    unreachable!(#message)
+                }
             }
 
             #[automatically_derived]
             impl<V: #common::version::Version> #path::version::FrogWriteVersion<V> for #ident {
-                fn frog_write(&self, _: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> { unreachable!(#message) }
+                fn frog_write(&self, _: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
+                    #write_trace
+                    unreachable!(#message)
+                }
                 fn frog_len(&self) -> usize { unreachable!(#message) }
             }
         };
@@ -77,11 +98,15 @@ pub(crate) fn derive_frogpackets(input: TokenStream) -> TokenStream {
         );
 
         read_tokens.extend(quote! {
-            #discriminant => Ok(Self::#ident(#path::version::FrogReadVersion::<V>::frog_read(buffer)?)),
+            #discriminant => {
+                #read_trace
+                Ok(Self::#ident(#path::version::FrogReadVersion::<V>::frog_read(buffer)?))
+            },
         });
 
         write_tokens.extend(quote! {
             Self::#ident(value) => {
+                #write_trace
                 written += <i32 as #path::variable::FrogVarWrite>::frog_var_write(&#discriminant, buffer)?;
                 written += #path::version::FrogWriteVersion::frog_write(value, buffer)?;
             },

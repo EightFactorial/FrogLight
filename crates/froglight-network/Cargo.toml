@@ -18,6 +18,7 @@ workspace = true
 [dev-dependencies]
 froglight-text = { workspace = true, features = ["ansi"] }
 smol_str = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
 
 [dependencies]
 async-trait = "0.1"
@@ -36,6 +37,7 @@ bevy_ecs = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 froglight-resolver = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
 
 [features]
 default = ["inventory", "io", "resolver", "std"]
@@ -61,12 +63,15 @@ std = [
   "dep:async-net",
   "froglight-packet/std",
   "futures-lite/std",
+  "tracing?/std",
 ]
 # Enable `no_std` support for `glam`.
 libm = ["froglight-packet/libm"]
 
 # Enable nightly features.
 nightly = ["froglight-io?/nightly", "froglight-packet/nightly", "froglight-resolver?/nightly"]
+# Enable trace logs.
+trace = ["dep:tracing", "froglight-io?/trace", "froglight-packet/trace"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4", "froglight-packet/v1_21_4"]

@@ -10,6 +10,21 @@ pub(super) fn derive_struct(
     DataStruct { fields, .. }: DataStruct,
     path: Path,
 ) -> TokenStream {
+    // If `io-trace` is enabled, emit a trace message when reading the struct.
+    let read_trace = if cfg!(feature = "io-trace") {
+        let message = format!("Reading struct \"{ident}\"");
+        quote! { #path::tracing::trace!(target: "froglight_io::read", #message); }
+    } else {
+        TokenStream::new()
+    };
+    // If `io-trace` is enabled, emit a trace message when writing the struct.
+    let write_trace = if cfg!(feature = "io-trace") {
+        let message = format!("Writing struct \"{ident}\"");
+        quote! { #path::tracing::trace!(target: "froglight_io::write", #message); }
+    } else {
+        TokenStream::new()
+    };
+
     let (read, write, length) = match &fields {
         Fields::Named(fields) => named_fields(fields, &path),
         Fields::Unnamed(fields) => unnamed_fields(fields, &path),
@@ -19,13 +34,19 @@ pub(super) fn derive_struct(
                 #[automatically_derived]
                 impl #path::standard::FrogRead for #ident {
                     #[inline]
-                    fn frog_read(_: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> { Ok(Self) }
+                    fn frog_read(_: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
+                        #read_trace
+                        Ok(Self)
+                    }
                 }
 
                 #[automatically_derived]
                 impl #path::standard::FrogWrite for #ident {
                     #[inline]
-                    fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> { Ok(0) }
+                    fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
+                        #write_trace
+                        Ok(0)
+                    }
                     #[inline]
                     fn frog_len(&self) -> usize { 0 }
                 }
@@ -37,6 +58,7 @@ pub(super) fn derive_struct(
         #[automatically_derived]
         impl #path::standard::FrogRead for #ident {
             fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
+                #read_trace
                 Ok(Self #read)
             }
         }
@@ -44,6 +66,7 @@ pub(super) fn derive_struct(
         #[automatically_derived]
         impl #path::standard::FrogWrite for #ident {
             fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
+                #write_trace
                 let mut written = 0;
                 #write
                 Ok(written)
