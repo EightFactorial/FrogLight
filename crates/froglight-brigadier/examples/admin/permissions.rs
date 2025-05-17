@@ -8,7 +8,7 @@ use uuid::Uuid;
 /// A [`Plugin`] that reads the [`PlayerPermissions`]
 /// from the disk and provides it as a [`Resource`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PermissionsPlugin(PathBuf);
+pub(crate) struct PermissionsPlugin(PathBuf);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Resource, Reflect, Deref, DerefMut)]
 #[reflect(Debug, Clone, PartialEq, Hash, Resource)]
@@ -17,7 +17,7 @@ struct FilePath(PathBuf);
 impl PermissionsPlugin {
     /// Create a new [`AdminPlugin`] that reads from the given path.
     #[must_use]
-    pub fn new(path: impl Into<PathBuf>) -> Self { Self(path.into()) }
+    pub(crate) fn new(path: impl Into<PathBuf>) -> Self { Self(path.into()) }
 }
 
 impl Plugin for PermissionsPlugin {
