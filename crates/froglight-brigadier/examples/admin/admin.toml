@@ -1,3 +1,11 @@
 [[player]]
+role = "Moderator"
+uuid = "16fe7587-31f5-4cd7-bdaa-d40dde387829"
+
+[[player]]
 role = "Admin"
-uuid = "00000000-0000-0000-0000-000000000000"
+uuid = "3415d071-2c51-4d37-b659-5df3687fbe7a"
+
+[[player]]
+role = "Owner"
+uuid = "36982e9b-5e6c-405c-a18d-1cfbf5e8e57e"
