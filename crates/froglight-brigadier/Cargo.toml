@@ -17,6 +17,7 @@ workspace = true
 
 [dev-dependencies]
 bevy = { workspace = true, features = ["bevy_log", "reflect_functions"] }
+froglight-entity = { workspace = true, features = ["bevy"] }
 proptest = { workspace = true }
 toml = { workspace = true, features = ["parse"] }
 
@@ -37,9 +38,9 @@ bevy_log = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 froglight-nbt = { workspace = true, optional = true, features = ["reflect"] }
 glam = { workspace = true, optional = true }
-serde = { workspace = true, optional = true }
+serde = { workspace = true, optional = true, features = ["derive"] }
 tracing = { workspace = true, optional = true }
-uuid = { workspace = true, optional = true }
+uuid = { workspace = true, optional = true, features = ["serde"] }
 
 [features]
 default = ["glam", "nbt", "std", "uuid"]
@@ -82,4 +83,4 @@ std = [
 
 [[example]]
 name = "admin"
-required-features = ["std"]
+required-features = ["serde", "std"]

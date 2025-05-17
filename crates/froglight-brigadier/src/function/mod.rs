@@ -14,7 +14,7 @@ mod traits;
 use traits::FunctionBuilder;
 
 mod world;
-pub use world::{Empty, Full, WorldRef};
+pub use world::{Empty, Full, WorldRef, WorldValueRef};
 
 use crate::{
     graph::{BrigadierEdge, BrigadierGraph},
