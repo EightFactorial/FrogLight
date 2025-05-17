@@ -37,7 +37,7 @@ jobs:
       - name: Toolchain
         uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # v1
         with:
-          toolchain: nightly-2024-11-11
+          toolchain: nightly
           components: clippy
       # Install clippy-sarif and sarif-fmt
       - name: Install Sarif

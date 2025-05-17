@@ -31,7 +31,7 @@ jobs:
       - name: Toolchain
         uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # v1
         with:
-          toolchain: nightly-2024-11-11
+          toolchain: nightly
       # Install the deny tool
       - name: Install Deny
         uses: taiki-e/install-action@a86da1a3cb51967612c80d6dc98c5cac03a73025 # v2
