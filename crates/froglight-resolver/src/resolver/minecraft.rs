@@ -33,11 +33,11 @@ impl FroglightResolver {
         }
 
         // Split off a port if one is present
-        if let Some((addr, pt)) = address.rsplit_once(':') {
-            if pt.chars().all(|c| c.is_ascii_digit()) {
-                let () = pt.parse::<u16>().map_or((), |p| port = p);
-                address = addr;
-            }
+        if let Some((addr, pt)) = address.rsplit_once(':')
+            && pt.chars().all(|c| c.is_ascii_digit())
+        {
+            let () = pt.parse::<u16>().map_or((), |p| port = p);
+            address = addr;
         }
 
         // Prepare the server address and SRV-prefixed address

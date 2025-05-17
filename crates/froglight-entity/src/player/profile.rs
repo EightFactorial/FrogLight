@@ -257,20 +257,20 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
         let mut textures = None;
 
         for property in response.properties {
-            if let Ok(data) = BASE64_URL_SAFE.decode(&property.value) {
-                if let Ok(value) = serde_json::from_slice(&data) {
-                    //
+            if let Ok(data) = BASE64_URL_SAFE.decode(&property.value)
+                && let Ok(value) = serde_json::from_slice(&data)
+            {
+                //
 
-                    // If the property is "textures", parse it into a PlayerProfileTextures.
-                    if property.name == "textures" {
-                        if let Ok(tex) = PlayerProfileTextures::try_from(&value) {
-                            textures = Some(tex);
-                        }
-                    }
-
-                    // Add the property to the properties map.
-                    properties.insert(property.name, value);
+                // If the property is "textures", parse it into a PlayerProfileTextures.
+                if property.name == "textures"
+                    && let Ok(tex) = PlayerProfileTextures::try_from(&value)
+                {
+                    textures = Some(tex);
                 }
+
+                // Add the property to the properties map.
+                properties.insert(property.name, value);
             }
         }
 

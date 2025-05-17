@@ -97,17 +97,17 @@ impl SubWorldSync for SubWorlds {
 
     /// Insert an [`Entity`]-[`Identifier`] relationship into the map.
     fn on_add(entity: Entity, world: &mut DeferredWorld) {
-        if let Some(identifier) = world.get::<SubWorld>(entity).map(SubWorld::identifier).cloned() {
-            if let Some(mut map) = world.get_resource_mut::<SubWorlds>() {
-                match map.entry(identifier) {
-                    Entry::Vacant(entry) => {
-                        entry.insert(entity);
-                    }
-                    #[allow(unused_variables, clippy::used_underscore_binding)]
-                    Entry::Occupied(_entry) => {
-                        #[cfg(feature = "trace")]
-                        bevy_log::error!("The SubWorld \"{}\" already exists!", _entry.key());
-                    }
+        if let Some(identifier) = world.get::<SubWorld>(entity).map(SubWorld::identifier).cloned()
+            && let Some(mut map) = world.get_resource_mut::<SubWorlds>()
+        {
+            match map.entry(identifier) {
+                Entry::Vacant(entry) => {
+                    entry.insert(entity);
+                }
+                #[allow(unused_variables, clippy::used_underscore_binding)]
+                Entry::Occupied(_entry) => {
+                    #[cfg(feature = "trace")]
+                    bevy_log::error!("The SubWorld \"{}\" already exists!", _entry.key());
                 }
             }
         }
