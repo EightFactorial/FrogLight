@@ -82,4 +82,4 @@ v1_21_5 = ["froglight-common/v1_21_5", "froglight-packet/v1_21_5"]
 
 [[example]]
 name = "status"
-required-features = ["bevy", "io", "resolver", "v1_21_4"]
+required-features = ["io", "resolver", "v1_21_4"]

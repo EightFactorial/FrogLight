@@ -1,17 +1,19 @@
 //! TODO
 
-use bevy_tasks::{IoTaskPool, TaskPool, block_on};
+#[cfg(feature = "bevy")]
+use bevy_tasks::{IoTaskPool, TaskPool};
 use froglight_common::version::Version;
 use froglight_network::{
     packet::{common::ConnectionIntent, v1_21_4::prelude::*},
     prelude::*,
 };
 use froglight_text::translate::TextTranslations;
+use futures_lite::future::block_on;
 use smol_str::SmolStr;
 use tracing_subscriber::{EnvFilter, fmt};
 
 /// The address of the server to request the status from.
-static SERVER_ADDRESS: SmolStr = SmolStr::new_static("mbs.playskyward.gg");
+static SERVER_ADDRESS: SmolStr = SmolStr::new_static("hypixel.net");
 
 fn main() -> Result<(), Box<dyn core::error::Error>> {
     // Initialize the tracing subscriber
@@ -20,6 +22,7 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
     }
 
     // Initialize the `IoTaskPool`
+    #[cfg(feature = "bevy")]
     let _ = IoTaskPool::get_or_init(TaskPool::new);
 
     block_on(main_async())

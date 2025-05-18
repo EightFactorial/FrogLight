@@ -19,7 +19,7 @@ workspace = true
 bevy = { workspace = true, features = ["bevy_log", "reflect_functions"] }
 froglight-entity = { workspace = true, features = ["bevy"] }
 proptest = { workspace = true }
-toml = { workspace = true, features = ["parse"] }
+toml_edit = { workspace = true, features = ["parse", "serde"] }
 
 [dependencies]
 bevy_app = { workspace = true, features = ["reflect_functions"] }

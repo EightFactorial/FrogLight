@@ -66,7 +66,7 @@ impl FromWorld for PlayerPermissions {
             };
 
             // Parse the contents as TOML
-            match toml::from_str::<PermissionsFile>(&contents) {
+            match toml_edit::de::from_str::<PermissionsFile>(&contents) {
                 Ok(file) => Self::from_file(&file),
                 Err(err) => panic!("Failed to parse file \"{}\": {err}", path.display()),
             }
