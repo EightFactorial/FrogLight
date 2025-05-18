@@ -121,7 +121,7 @@ hickory-resolver = { version = "0.25", default-features = false }
 indexmap = { version = "2.9", default-features = false }
 nu-ansi-term = { version = "0.46", default-features = false }
 parking_lot = { version = "0.12", default-features = false }
-proptest = "1.6"
+proptest = { version = "1.6", default-features = false }
 rangemap = { version = "1.5", features = ["const_fn"] }
 regex = { version = "1.11", default-features = false, features = ["perf", "unicode"] }
 serde = { version = "1.0", default-features = false, features = ["alloc"] }
