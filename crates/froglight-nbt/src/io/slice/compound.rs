@@ -73,16 +73,16 @@ impl<'a> NbtCompoundRef<'a> {
                             Err(err) => return Err(err),
                             Ok(tag_length) => {
                                 // Get the next tag and data.
-                                if let Some((_, data)) = data.split_at_checked(tag_length) {
-                                    if let Some((&next, data)) = data.split_first() {
-                                        // Add the tag, name, and tag data to the result
-                                        size += 1 + (2 + name_length) + tag_length;
+                                if let Some((_, data)) = data.split_at_checked(tag_length)
+                                    && let Some((&next, data)) = data.split_first()
+                                {
+                                    // Add the tag, name, and tag data to the result
+                                    size += 1 + (2 + name_length) + tag_length;
 
-                                        tag = next;
-                                        loop_data = data;
+                                    tag = next;
+                                    loop_data = data;
 
-                                        continue;
-                                    }
+                                    continue;
                                 }
                             }
                         }

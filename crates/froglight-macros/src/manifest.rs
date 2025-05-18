@@ -39,12 +39,11 @@ impl CrateManifest {
     #[must_use]
     pub fn find_package(&self, name: &str, series: &str) -> Option<syn::Path> {
         // If the package is the root package, return `crate`.
-        if let Some(package) = self.0.get("package") {
-            if let Some(package_name) = package.get("name") {
-                if package_name.as_str() == Some(name) {
-                    return Some(syn::parse_quote!(crate));
-                }
-            }
+        if let Some(package) = self.0.get("package")
+            && let Some(package_name) = package.get("name")
+            && package_name.as_str() == Some(name)
+        {
+            return Some(syn::parse_quote!(crate));
         }
 
         // Find the package in `dependencies` or `dev-dependencies`.

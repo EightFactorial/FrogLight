@@ -175,6 +175,7 @@ inherits = "release"
 [package]
 authors = { workspace = true }
 edition = { workspace = true }
+exclude = ["/.gitmodules", "/tools"]
 homepage = { workspace = true }
 license = { workspace = true }
 name = "froglight"

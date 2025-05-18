@@ -24,6 +24,7 @@ froglight-macros = { workspace = true, features = ["registry"] }
 froglight-nbt = { workspace = true }
 indexmap = { workspace = true }
 parking_lot = { workspace = true }
+smol_str = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true }
