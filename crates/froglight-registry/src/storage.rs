@@ -5,7 +5,10 @@ use core::{any::TypeId, hash::Hash, marker::PhantomData};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
-use bevy_platform::{hash::{FixedHasher, NoOpHash}, collections::HashMap};
+use bevy_platform::{
+    collections::HashMap,
+    hash::{FixedHasher, NoOpHash},
+};
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::Deref;
@@ -24,9 +27,11 @@ pub struct AppRegistryStorage<V: Version>(Arc<RwLock<RegistryStorage<V>>>);
 /// A storage container for [`RegistryValue`]s.
 #[derive(Default)]
 pub struct RegistryStorage<V: Version>(
-    HashMap<TypeId, IndexMap<Identifier, Box<dyn RegistryValue>, FixedHasher>, NoOpHash>,
+    HashMap<TypeId, RegistryStorageInner, NoOpHash>,
     PhantomData<V>,
 );
+
+type RegistryStorageInner = IndexMap<Identifier, Box<dyn RegistryValue>, FixedHasher>;
 
 impl<V: Version> RegistryStorage<V> {
     /// Create a new empty [`RegistryStorage`].
@@ -42,10 +47,7 @@ impl<V: Version> RegistryStorage<V> {
         &self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
     ) -> Option<&R::Value> {
-        self.0
-            .get(&TypeId::of::<R>())
-            .and_then(|map| map.get(ident))
-            .and_then(|v| <dyn RegistryValue as Downcast>::as_any(v.as_ref()).downcast_ref())
+        self.0.get(&TypeId::of::<R>()).and_then(|map| map.get(ident)).and_then(downcast_ref)
     }
 
     /// Get a [`RegistryValue`] by it's [`RegistryType`] and index
@@ -53,9 +55,10 @@ impl<V: Version> RegistryStorage<V> {
     /// Returns `None` if the value does not exist.
     #[must_use]
     pub fn get_index<R: RegistryType<V>>(&self, index: usize) -> Option<(&Identifier, &R::Value)> {
-        self.0.get(&TypeId::of::<R>()).and_then(|map| map.get_index(index)).and_then(|(i, v)| {
-            <dyn RegistryValue as Downcast>::as_any(v.as_ref()).downcast_ref().map(|v| (i, v))
-        })
+        self.0
+            .get(&TypeId::of::<R>())
+            .and_then(|map| map.get_index(index))
+            .and_then(|(i, v)| downcast_ref(v).map(|v| (i, v)))
     }
 
     /// Get a mutable [`RegistryValue`] by it's [`RegistryType`] and identifier.
@@ -66,10 +69,7 @@ impl<V: Version> RegistryStorage<V> {
         &mut self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
     ) -> Option<&mut R::Value> {
-        self.0
-            .get_mut(&TypeId::of::<R>())
-            .and_then(|map| map.get_mut(ident))
-            .and_then(|v| <dyn RegistryValue as Downcast>::as_any_mut(v.as_mut()).downcast_mut())
+        self.0.get_mut(&TypeId::of::<R>()).and_then(|map| map.get_mut(ident)).and_then(downcast_mut)
     }
 
     /// Get a mutable [`RegistryValue`] by it's [`RegistryType`] and index.
@@ -80,13 +80,10 @@ impl<V: Version> RegistryStorage<V> {
         &mut self,
         index: usize,
     ) -> Option<(&Identifier, &mut R::Value)> {
-        self.0.get_mut(&TypeId::of::<R>()).and_then(|map| map.get_index_mut(index)).and_then(
-            |(i, v)| {
-                <dyn RegistryValue as Downcast>::as_any_mut(v.as_mut())
-                    .downcast_mut()
-                    .map(|v| (i, v))
-            },
-        )
+        self.0
+            .get_mut(&TypeId::of::<R>())
+            .and_then(|map| map.get_index_mut(index))
+            .and_then(|(i, v)| downcast_mut(v).map(|v| (i, v)))
     }
 
     /// Returns `true` if the [`RegistryStorage`] contains
@@ -99,18 +96,18 @@ impl<V: Version> RegistryStorage<V> {
         self.0.get(&TypeId::of::<R>()).is_some_and(|map| map.contains_key(ident))
     }
 
-    /// Iterate over all [`RegistryType`]s in the [`RegistryStorage`]
-    /// in an arbitrary order.
-    pub fn keys(&self) -> impl Iterator<Item = &TypeId> { self.0.keys() }
+    /// Iterate over all [`RegistryType`]s in an arbitrary order.
+    #[inline]
+    #[must_use]
+    pub fn keys(&self) -> impl ExactSizeIterator<Item = &TypeId> { self.0.keys() }
 
     /// Get an iterator over all [`RegistryValue`]s of a specific
     /// [`RegistryType`].
     pub fn iter<R: RegistryType<V>>(&self) -> impl Iterator<Item = (&Identifier, &R::Value)> {
-        self.0.get(&TypeId::of::<R>()).into_iter().flat_map(|map| {
-            map.iter().filter_map(|(k, v)| {
-                <dyn RegistryValue as Downcast>::as_any(v.as_ref()).downcast_ref().map(|v| (k, v))
-            })
-        })
+        self.0
+            .get(&TypeId::of::<R>())
+            .into_iter()
+            .flat_map(|map| map.iter().filter_map(|(k, v)| downcast_ref(v).map(|v| (k, v))))
     }
 
     /// Get a mutable iterator over all [`RegistryValue`]s of a specific
@@ -118,9 +115,10 @@ impl<V: Version> RegistryStorage<V> {
     pub fn iter_mut<R: RegistryType<V>>(
         &mut self,
     ) -> impl Iterator<Item = (&Identifier, &mut R::Value)> {
-        self.0.entry(TypeId::of::<R>()).or_default().iter_mut().filter_map(|(k, v)| {
-            <dyn RegistryValue as Downcast>::as_any_mut(v.as_mut()).downcast_mut().map(|v| (k, v))
-        })
+        self.0
+            .get_mut(&TypeId::of::<R>())
+            .into_iter()
+            .flat_map(|map| map.iter_mut().filter_map(|(k, v)| downcast_mut(v).map(|v| (k, v))))
     }
 
     /// Insert a [`RegistryValue`] into the [`RegistryStorage`].
@@ -131,9 +129,11 @@ impl<V: Version> RegistryStorage<V> {
         ident: Identifier,
         value: R::Value,
     ) -> Option<R::Value> {
-        self.0.entry(TypeId::of::<R>()).or_default().insert(ident, Box::new(value)).and_then(|v| {
-            <dyn RegistryValue as Downcast>::into_any(v).downcast().map_or(None, |v| Some(*v))
-        })
+        self.0
+            .entry(TypeId::of::<R>())
+            .or_default()
+            .insert(ident, Box::new(value))
+            .and_then(downcast_unbox)
     }
 
     /// Insert a [`RegistryValue`] into the [`RegistryStorage`] at a specific
@@ -152,9 +152,7 @@ impl<V: Version> RegistryStorage<V> {
             .entry(TypeId::of::<R>())
             .or_default()
             .shift_insert(index, ident, Box::new(value))
-            .and_then(|v| {
-                <dyn RegistryValue as Downcast>::into_any(v).downcast().map_or(None, |v| Some(*v))
-            })
+            .and_then(downcast_unbox)
     }
 
     /// Insert the default values for a [`RegistryType`] into the
@@ -163,7 +161,15 @@ impl<V: Version> RegistryStorage<V> {
     /// # Note
     /// This will overwrite any existing values.
     pub fn insert_default<R: RegistryType<V>>(&mut self) {
-        self.extend::<R, _>(<R as RegistryType<V>>::defaults());
+        self.0.insert(
+            TypeId::of::<R>(),
+            <R as RegistryType<V>>::DEFAULTS
+                .iter()
+                .map::<(Identifier, Box<dyn RegistryValue>), _>(|(k, v)| {
+                    (k.clone(), Box::new(v.clone()))
+                })
+                .collect(),
+        );
     }
 
     /// Extend the [`RegistryStorage`] with a collection of [`RegistryValue`]s.
@@ -185,14 +191,14 @@ impl<V: Version> RegistryStorage<V> {
     /// Returns `None` if the value does not exist.
     ///
     /// See [`IndexMap::swap_remove`] for more information.
-    #[must_use]
     pub fn swap_remove<R: RegistryType<V>>(
         &mut self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
     ) -> Option<R::Value> {
-        self.0.get_mut(&TypeId::of::<R>()).and_then(|map| map.swap_remove(ident)).and_then(|v| {
-            <dyn RegistryValue as Downcast>::into_any(v).downcast().map_or(None, |v| Some(*v))
-        })
+        self.0
+            .get_mut(&TypeId::of::<R>())
+            .and_then(|map| map.swap_remove(ident))
+            .and_then(downcast_unbox)
     }
 
     /// Remove a [`RegistryValue`] from the [`RegistryStorage`].
@@ -204,14 +210,16 @@ impl<V: Version> RegistryStorage<V> {
         &mut self,
         ident: &(impl Equivalent<Identifier> + Hash + ?Sized),
     ) -> Option<R::Value> {
-        self.0.get_mut(&TypeId::of::<R>()).and_then(|map| map.shift_remove(ident)).and_then(|v| {
-            <dyn RegistryValue as Downcast>::into_any(v).downcast().map_or(None, |v| Some(*v))
-        })
+        self.0
+            .get_mut(&TypeId::of::<R>())
+            .and_then(|map| map.shift_remove(ident))
+            .and_then(downcast_unbox)
     }
 
     /// Remove all [`RegistryValue`]s of a specific [`RegistryType`].
     ///
     /// Keeps the allocated memory for future use.
+    #[inline]
     pub fn clear<R: RegistryType<V>>(&mut self) {
         self.0.get_mut(&TypeId::of::<R>()).map(IndexMap::clear);
     }
@@ -221,4 +229,19 @@ impl<V: Version> RegistryStorage<V> {
     /// Keeps the allocated memory for future use.
     #[inline]
     pub fn clear_all(&mut self) { self.0.clear(); }
+}
+
+/// A downcast function to convert a `&dyn RegistryValue` into a `&T`.
+fn downcast_ref<T: RegistryValue>(value: &Box<dyn RegistryValue>) -> Option<&T> {
+    <dyn RegistryValue as Downcast>::as_any(value.as_ref()).downcast_ref::<T>()
+}
+
+/// A downcast function to convert a `&mut dyn RegistryValue` into a `&mut T`.
+fn downcast_mut<T: RegistryValue>(value: &mut Box<dyn RegistryValue>) -> Option<&mut T> {
+    <dyn RegistryValue as Downcast>::as_any_mut(value.as_mut()).downcast_mut::<T>()
+}
+
+/// A downcast function to convert a `Box<dyn RegistryValue>` into a `Box<T>`.
+fn downcast_unbox<T: RegistryValue>(value: Box<dyn RegistryValue>) -> Option<T> {
+    <dyn RegistryValue as Downcast>::into_any(value).downcast::<T>().map_or(None, |v| Some(*v))
 }
