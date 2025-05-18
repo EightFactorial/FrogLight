@@ -18,7 +18,6 @@ use interaction::TextInteraction;
 pub mod style;
 use style::TextStyle;
 
-mod message;
 #[cfg(feature = "serde")]
 mod serde;
 
