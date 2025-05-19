@@ -92,6 +92,57 @@ impl PresetColor {
         }
     }
 
+    /// Get the [`PresetColor`] from a decimal number.
+    ///
+    /// Returns `None` if the number does not match any of the presets.
+    #[must_use]
+    #[expect(clippy::unreadable_literal)]
+    pub const fn try_from_decimal(color: u32) -> Option<Self> {
+        match color {
+            0x000000 => Some(Self::Black),
+            0x0000AA => Some(Self::DarkBlue),
+            0x00AA00 => Some(Self::DarkGreen),
+            0x00AAAA => Some(Self::DarkAqua),
+            0xAA0000 => Some(Self::DarkRed),
+            0xAA00AA => Some(Self::DarkPurple),
+            0xFFAA00 => Some(Self::Gold),
+            0xAAAAAA => Some(Self::Gray),
+            0x555555 => Some(Self::DarkGray),
+            0x5555FF => Some(Self::Blue),
+            0x55FF55 => Some(Self::Green),
+            0x55FFFF => Some(Self::Aqua),
+            0xFF5555 => Some(Self::Red),
+            0xFF55FF => Some(Self::LightPurple),
+            0xFFFF55 => Some(Self::Yellow),
+            0xFFFFFF => Some(Self::White),
+            _ => None,
+        }
+    }
+
+    /// Get the [`PresetColor`] as a decimal number.
+    #[must_use]
+    #[expect(clippy::unreadable_literal)]
+    pub const fn as_decimal(self) -> u32 {
+        match self {
+            Self::Black => 0x000000,
+            Self::DarkBlue => 0x0000AA,
+            Self::DarkGreen => 0x00AA00,
+            Self::DarkAqua => 0x00AAAA,
+            Self::DarkRed => 0xAA0000,
+            Self::DarkPurple => 0xAA00AA,
+            Self::Gold => 0xFFAA00,
+            Self::Gray => 0xAAAAAA,
+            Self::DarkGray => 0x555555,
+            Self::Blue => 0x5555FF,
+            Self::Green => 0x55FF55,
+            Self::Aqua => 0x55FFFF,
+            Self::Red => 0xFF5555,
+            Self::LightPurple => 0xFF55FF,
+            Self::Yellow => 0xFFFF55,
+            Self::White => 0xFFFFFF,
+        }
+    }
+
     /// Get the [`PresetColor`] from a hex string.
     ///
     /// # Errors

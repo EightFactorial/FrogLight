@@ -36,9 +36,30 @@ impl TextColor {
     #[must_use]
     pub const fn is_preset(&self) -> bool { matches!(self, Self::Preset(_)) }
 
+    /// Get the color as a [`PresetColor`].
+    ///
+    /// Returns `None` if the color is an [`IntegerColor`]
+    /// that cannot be represented as a [`PresetColor`].
+    #[must_use]
+    pub const fn try_as_preset(self) -> Option<PresetColor> {
+        match self {
+            Self::Integer(integer) => PresetColor::try_from_decimal(integer.as_decimal()),
+            Self::Preset(color) => Some(color),
+        }
+    }
+
     /// Returns `true` if the color is an [`IntegerColor`].
     #[must_use]
     pub const fn is_integer(&self) -> bool { matches!(self, Self::Integer(_)) }
+
+    /// Get the color as an [`IntegerColor`].
+    #[must_use]
+    pub const fn as_integer(self) -> IntegerColor {
+        match self {
+            Self::Integer(color) => color,
+            Self::Preset(color) => IntegerColor::new(color.as_decimal()),
+        }
+    }
 
     /// Returns the color as a name or hexadecimal string.
     #[must_use]
@@ -58,28 +79,19 @@ impl TextColor {
         }
     }
 
-    /// Returns the color as a hexadecimal number.
-    #[must_use]
-    pub fn as_integer(&self) -> u32 {
-        match self {
-            Self::Integer(color) => **color,
-            Self::Preset(color) => *IntegerColor::from_preset(color),
-        }
-    }
-
     /// Returns the color as an RGB tuple.
     #[must_use]
-    pub fn as_rgb(&self) -> (u8, u8, u8) {
-        let integer = self.as_integer();
-        let r = ((integer >> 16) & 0xFF) as u8;
-        let g = ((integer >> 8) & 0xFF) as u8;
-        let b = (integer & 0xFF) as u8;
+    pub const fn as_rgb(&self) -> (u8, u8, u8) {
+        let decimal = self.as_integer().as_decimal();
+        let r = ((decimal >> 16) & 0xFF) as u8;
+        let g = ((decimal >> 8) & 0xFF) as u8;
+        let b = (decimal & 0xFF) as u8;
         (r, g, b)
     }
 }
 
 impl FromStr for TextColor {
-    // TODO: Create a proper error type
+    /// TODO: Create a proper error type
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

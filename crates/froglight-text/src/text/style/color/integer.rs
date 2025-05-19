@@ -24,6 +24,11 @@ impl IntegerColor {
     #[must_use]
     pub const fn new(color: u32) -> Self { Self(color) }
 
+    /// Get the inner [`u32`] value of the [`IntegerColor`].
+    #[inline]
+    #[must_use]
+    pub const fn as_decimal(self) -> u32 { self.0 }
+
     /// Create an [`IntegerColor`] from a [`PresetColor`].
     #[inline]
     #[must_use]

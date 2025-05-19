@@ -232,6 +232,7 @@ impl<V: Version> RegistryStorage<V> {
 }
 
 /// A downcast function to convert a `&dyn RegistryValue` into a `&T`.
+#[expect(clippy::borrowed_box)]
 fn downcast_ref<T: RegistryValue>(value: &Box<dyn RegistryValue>) -> Option<&T> {
     <dyn RegistryValue as Downcast>::as_any(value.as_ref()).downcast_ref::<T>()
 }

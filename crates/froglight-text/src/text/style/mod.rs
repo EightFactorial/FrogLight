@@ -13,6 +13,8 @@ use serde::{Deserialize, Serialize};
 mod color;
 pub use color::{IntegerColor, PresetColor, TextColor};
 
+pub mod legacy;
+
 /// The style of a [`FormattedText`](super::FormattedText) component.
 #[derive(Debug, Default, Clone, PartialEq, Eq, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
