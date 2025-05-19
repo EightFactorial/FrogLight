@@ -86,7 +86,6 @@ impl FormattedText {
 
     /// Add a child to the [`FormattedText`].
     #[inline]
-    #[must_use]
     pub fn with_child(&mut self, child: Self) -> &mut Self {
         self.children.push(child);
         self
