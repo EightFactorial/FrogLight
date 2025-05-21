@@ -1,20 +1,21 @@
 //! [`PlayerProfile`] and [`PlayerProfileTextures`]
 
-#[cfg(all(feature = "serde", feature = "std"))]
 use core::time::Duration;
-#[cfg(feature = "std")]
-use std::time::SystemTime;
 
 #[cfg(feature = "online")]
 use base64::{Engine, prelude::BASE64_URL_SAFE};
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
 #[cfg(feature = "serde")]
-use bevy_platform::collections::HashMap;
+use bevy_platform::hash::FixedHasher;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+#[cfg(feature = "serde")]
+use indexmap::IndexMap;
 #[cfg(feature = "online")]
 use serde::Deserialize;
+#[cfg(feature = "serde")]
+use serde::{Serialize, de::DeserializeOwned};
 use smol_str::SmolStr;
 use uuid::Uuid;
 
@@ -30,10 +31,11 @@ pub struct PlayerProfile {
     pub username: PlayerUsername,
     /// The player's textures.
     pub textures: PlayerProfileTextures,
+
     /// The player's properties.
     #[cfg(feature = "serde")]
     #[cfg_attr(feature = "bevy", reflect(ignore))]
-    pub properties: HashMap<SmolStr, serde_json::Value>,
+    pub properties: IndexMap<SmolStr, serde_json::Value, FixedHasher>,
 }
 
 impl PlayerProfile {
@@ -50,20 +52,67 @@ impl PlayerProfile {
     /// Create a new [`PlayerProfile`] from a
     /// [`PlayerUsername`], [`PlayerUuid`], and [`PlayerProfileTextures`].
     #[must_use]
-    pub fn new_with_textures(
+    pub const fn new_with_textures(
         username: PlayerUsername,
         uuid: PlayerUuid,
         textures: PlayerProfileTextures,
     ) -> Self {
         #[cfg(feature = "serde")]
         {
-            Self { uuid, username, textures, properties: HashMap::new() }
+            Self { uuid, username, textures, properties: IndexMap::with_hasher(FixedHasher) }
         }
 
         #[cfg(not(feature = "serde"))]
         {
             Self { uuid, username, textures }
         }
+    }
+
+    /// Insert a profile property into the [`PlayerProfile`].
+    ///
+    /// Optionally returns the previous value of the property.
+    #[cfg(feature = "serde")]
+    pub fn insert_property<T: Serialize>(
+        &mut self,
+        name: impl smol_str::ToSmolStr,
+        proeprty: &T,
+    ) -> Result<Option<serde_json::Value>, serde_json::Error> {
+        T::serialize(&proeprty, serde_json::value::Serializer)
+            .map(|val| self.properties.insert(name.to_smolstr(), val))
+    }
+
+    /// Get a property from the [`PlayerProfile`].
+    #[must_use]
+    #[cfg(feature = "serde")]
+    pub fn get_property<T: DeserializeOwned>(
+        &self,
+        name: impl AsRef<str>,
+    ) -> Option<Result<T, serde_json::Error>> {
+        self.properties.get(name.as_ref()).map(|value| T::deserialize(value))
+    }
+
+    /// Take a property from the [`PlayerProfile`],
+    /// shifting all following properties down by one.
+    ///
+    /// Returns `None` if the property does not exist.
+    #[cfg(feature = "serde")]
+    pub fn shift_take_property<T: DeserializeOwned>(
+        &mut self,
+        name: impl AsRef<str>,
+    ) -> Option<Result<T, serde_json::Error>> {
+        self.properties.shift_remove(name.as_ref()).map(|value| T::deserialize(value))
+    }
+
+    /// Take a property from the [`PlayerProfile`],
+    /// swapping the property with the last one and removing it.
+    ///
+    /// Returns `None` if the property does not exist.
+    #[cfg(feature = "serde")]
+    pub fn swap_take_property<T: DeserializeOwned>(
+        &mut self,
+        name: impl AsRef<str>,
+    ) -> Option<Result<T, serde_json::Error>> {
+        self.properties.swap_remove(name.as_ref()).map(|value| T::deserialize(value))
     }
 
     /// Create a new offline [`PlayerProfile`] from a username.
@@ -102,9 +151,7 @@ impl PlayerProfile {
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
 pub struct PlayerProfileTextures {
     /// The timestamp the textures were retrieved.
-    #[cfg(feature = "std")]
-    #[cfg_attr(feature = "bevy", reflect(ignore))]
-    pub timestamp: SystemTime,
+    pub timestamp: Duration,
     /// Whether the player has a slim model.
     pub slim: bool,
     /// The URL of the player's skin.
@@ -119,16 +166,10 @@ impl Default for PlayerProfileTextures {
 }
 
 impl PlayerProfileTextures {
-    /// Create a new default [`PlayerProfileTextures`].
+    /// Create a new empty [`PlayerProfileTextures`].
     #[must_use]
-    pub fn new() -> Self {
-        Self {
-            #[cfg(feature = "std")]
-            timestamp: SystemTime::now(),
-            slim: false,
-            skin: None,
-            cape: None,
-        }
+    pub const fn new() -> Self {
+        Self { timestamp: Duration::ZERO, slim: false, skin: None, cape: None }
     }
 }
 
@@ -253,9 +294,12 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
     type Error = serde::de::value::Error;
 
     fn try_from(response: ProfileResponse) -> Result<Self, Self::Error> {
-        let mut properties = HashMap::new();
-        let mut textures = None;
+        let mut properties = IndexMap::with_capacity_and_hasher(
+            response.properties.len().saturating_sub(1),
+            FixedHasher,
+        );
 
+        let mut textures = None;
         for property in response.properties {
             if let Ok(data) = BASE64_URL_SAFE.decode(&property.value)
                 && let Ok(value) = serde_json::from_slice(&data)
@@ -288,7 +332,6 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
     type Error = serde::de::value::Error;
 
     fn try_from(value: &serde_json::Value) -> Result<Self, Self::Error> {
-        #[cfg(feature = "std")]
         let Some(timestamp) = value.get("timestamp").and_then(serde_json::Value::as_u64) else {
             return Err(serde::de::Error::custom("\"timestamp\" not found"));
         };
@@ -297,10 +340,7 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
         };
 
         Ok(Self {
-            #[cfg(feature = "std")]
-            timestamp: SystemTime::UNIX_EPOCH
-                .checked_add(Duration::from_millis(timestamp))
-                .expect("SystemTime overflow!"),
+            timestamp: Duration::from_millis(timestamp),
             slim: textures
                 .get("SKIN")
                 .and_then(|skin| skin.get("model"))
