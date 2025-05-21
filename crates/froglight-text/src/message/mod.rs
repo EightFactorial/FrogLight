@@ -45,7 +45,7 @@ impl<'a> FormattedTextRef<'a, '_> {
     pub fn as_message(&self, t: &TextTranslations) -> Result<String, ChatMessageError> {
         // Get the message content
         let mut string = match &self.content {
-            TextContent::Text(text) => Self::format_legacy(&text.text),
+            TextContent::Text(component) => component.text.to_string(),
             TextContent::Translation(translate) => Self::format_translation(translate, t)?,
             _ => return Err(ChatMessageError::InvalidMessageContent),
         };
@@ -56,26 +56,6 @@ impl<'a> FormattedTextRef<'a, '_> {
         }
 
         Ok(string)
-    }
-
-    /// Process plain-text messages, stripping out legacy formatting codes.
-    fn format_legacy(text: &str) -> String {
-        let mut result = String::with_capacity(text.len());
-
-        let prefixed = text.starts_with('§');
-        for (i, mut segment) in text.split_inclusive('§').enumerate() {
-            segment = segment.trim_end_matches('§');
-
-            if i == 0 && !prefixed {
-                // Append the first segment if it doesn't start with '§'
-                result.push_str(segment);
-            } else if let Some((_, segment)) = segment.split_at_checked(1) {
-                // Append the segment without the legacy formatting code
-                result.push_str(segment);
-            }
-        }
-
-        result
     }
 
     /// Process translated messages, resolving and appending arguments.

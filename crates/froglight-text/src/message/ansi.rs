@@ -1,10 +1,11 @@
+use nu_ansi_term::{AnsiString, Color, Style};
+
 use super::ChatMessageError;
 use crate::{
     prelude::*,
     text::{
         FormattedTextRef,
         content::{TextContent, TranslateComponent},
-        style::legacy::LegacyCode,
     },
     translate::TextTranslations,
 };
@@ -19,12 +20,11 @@ impl FormattedText {
     pub fn as_message_ansi<'a>(
         &'a self,
         t: &TextTranslations,
-    ) -> Result<nu_ansi_term::AnsiString<'a>, ChatMessageError> {
+    ) -> Result<AnsiString<'a>, ChatMessageError> {
         FormattedTextRef::new(self).as_message_ansi(t)
     }
 }
 
-#[allow(clippy::elidable_lifetime_names)]
 impl<'a> FormattedTextRef<'a, '_> {
     /// Extract the message as an [`AnsiString`](nu_ansi_term::AnsiString).
     ///
@@ -34,10 +34,10 @@ impl<'a> FormattedTextRef<'a, '_> {
     pub fn as_message_ansi(
         &self,
         t: &TextTranslations,
-    ) -> Result<nu_ansi_term::AnsiString<'a>, ChatMessageError> {
+    ) -> Result<AnsiString<'a>, ChatMessageError> {
         // Get the message content
         let mut string = match &self.content {
-            TextContent::Text(text) => Self::format_legacy_ansi(&text.text, self.style),
+            TextContent::Text(component) => component.text.to_string(),
             TextContent::Translation(translate) => {
                 Self::format_translation_ansi(translate, self.style, t)?
             }
@@ -46,7 +46,7 @@ impl<'a> FormattedTextRef<'a, '_> {
         };
 
         // Apply the message's style
-        string = nu_ansi_term::Style::from(self.style).paint(string).to_string();
+        string = Style::from(self.style).paint(string).to_string();
 
         // Append children messages
         for child in &self.children {
@@ -56,33 +56,6 @@ impl<'a> FormattedTextRef<'a, '_> {
         }
 
         Ok(string.into())
-    }
-
-    /// Process plain-text messages, applying legacy formatting codes.
-    fn format_legacy_ansi(message: &str, style: &TextStyle) -> String {
-        let mut result = String::with_capacity(message.len());
-        let mut legacy_style = style.clone();
-
-        let prefixed = message.starts_with('§');
-        for (i, mut segment) in message.split_inclusive('§').enumerate() {
-            segment = segment.trim_end_matches('§');
-
-            if i == 0 && !prefixed {
-                // Append the first segment if it doesn't start with '§'
-                result.push_str(segment);
-            } else if let Some((code, segment)) = segment.split_at_checked(1) {
-                // If there is a legacy code, apply it to the current style
-                if let Some(code) = code.chars().next().and_then(LegacyCode::try_from_char) {
-                    code.apply_to_style(&mut legacy_style);
-                }
-
-                // Append the segment with the current style
-                let diff = style.difference(&legacy_style);
-                result.push_str(&nu_ansi_term::Style::from(&diff).paint(segment).to_string());
-            }
-        }
-
-        result
     }
 
     /// Process translated messages, resolving and appending arguments.
@@ -134,18 +107,17 @@ impl<'a> FormattedTextRef<'a, '_> {
 
 // -------------------------------------------------------------------------------------------------
 
-impl From<TextStyle> for nu_ansi_term::Style {
+impl From<TextStyle> for Style {
     #[inline]
     fn from(value: TextStyle) -> Self { Self::from(&value) }
 }
-
-impl From<&TextStyle> for nu_ansi_term::Style {
+impl From<&TextStyle> for Style {
     fn from(value: &TextStyle) -> Self {
-        let mut style = nu_ansi_term::Style::new();
+        let mut style = Style::new();
 
         if let Some(color) = &value.color {
             let (r, g, b) = color.as_rgb();
-            style = style.fg(nu_ansi_term::Color::Rgb(r, g, b));
+            style = style.fg(Color::Rgb(r, g, b));
         }
 
         if value.bold.is_some_and(|b| b) {

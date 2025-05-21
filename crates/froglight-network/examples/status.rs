@@ -51,8 +51,8 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
     // Print the response
     match conn.read().await? {
         ClientboundStatusPackets::PingResult(..) => panic!("Got a ping response?"),
-        ClientboundStatusPackets::QueryResponse(response) => {
-            match response.description.as_message_ansi(&translations) {
+        ClientboundStatusPackets::QueryResponse(mut response) => {
+            match response.description.apply_legacy_formatting().as_message_ansi(&translations) {
                 Ok(txt) => println!("Connected to \'{SERVER_ADDRESS}\' at \'{peer}\':\n{txt}"),
                 Err(err) => panic!("Failed to parse description: {err}"),
             }

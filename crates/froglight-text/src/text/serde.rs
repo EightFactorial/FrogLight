@@ -1,7 +1,5 @@
 #[cfg(not(feature = "std"))]
-use alloc::{borrow::Cow, format, string::ToString, vec::Vec};
-#[cfg(feature = "std")]
-use std::borrow::Cow;
+use alloc::{format, string::ToString, vec::Vec};
 
 use serde::{
     __private::{
@@ -12,7 +10,7 @@ use serde::{
     ser::{SerializeMap, SerializeSeq},
 };
 
-use super::{content::TextContent, style::legacy::LegacyCode};
+use super::content::TextContent;
 use crate::{
     prelude::*,
     text::{
@@ -64,20 +62,12 @@ impl Serialize for Child<'_> {
         match &self.0.content {
             TextContent::Text(c) => {
                 if diff.is_empty() && self.0.interaction.is_empty() && self.0.children.is_empty() {
-                    if c.text.contains('§') {
-                        return self.serialize_legacy_text(ser, &c.text);
-                    } else {
-                        return ser.serialize_str(&c.text);
-                    }
+                    return ser.serialize_str(&c.text);
                 }
 
-                if c.contains('§') {
-                    return self.serialize_legacy_text(ser, c);
-                } else {
-                    map = ser.serialize_map(None)?;
-                    map.serialize_entry("type", "text")?;
-                    c.serialize(FlatMapSerializer(&mut map))?;
-                }
+                map = ser.serialize_map(None)?;
+                map.serialize_entry("type", "text")?;
+                c.serialize(FlatMapSerializer(&mut map))?;
             }
             TextContent::Translation(c) => {
                 map = ser.serialize_map(None)?;
@@ -121,67 +111,14 @@ impl Serialize for Child<'_> {
     }
 }
 
-impl Child<'_> {
-    /// Serialize legacy text content
-    fn serialize_legacy_text<S>(
-        &self,
-        ser: S,
-        text: &Cow<'static, str>,
-    ) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        // Prepare formatting arguments
-        let inherit = self.0.style.inherit(self.1);
-        let mut diff = inherit.difference(self.1);
-
-        let mut children = Vec::new();
-        let prefixed = text.starts_with('§');
-
-        for (i, mut segment) in text.split_inclusive('§').enumerate() {
-            segment = segment.trim_end_matches('§');
-
-            if i == 0 && !prefixed {
-            } else if let Some((code, segment)) = segment.split_at_checked(1) {
-                // If there is a legacy code, apply it to the current style
-                if let Some(code) = code.chars().next().and_then(LegacyCode::try_from_char) {
-                    code.apply_to_style(&mut diff);
-                }
-
-                if !segment.is_empty() {
-                    // Append the segment with the current style
-                    let child_diff = inherit.difference(&diff);
-                    children.push(
-                        FormattedText::from_string(segment.to_string()).with_style(child_diff),
-                    )
-                }
-            }
-        }
-
-        FormattedText::new("").with_style(diff).with_children(children).serialize(ser)
-    }
-}
-
 // -------------------------------------------------------------------------------------------------
 
 impl<'de> Deserialize<'de> for FormattedText {
     fn deserialize<D>(de: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
         match Content::deserialize(de)? {
-            Content::String(string) => {
-                if string.contains('§') {
-                    deserialize_legacy_text::<D>(&string)
-                } else {
-                    Ok(Self::from_string(string))
-                }
-            }
-            Content::Str(str) => {
-                if str.contains('§') {
-                    deserialize_legacy_text::<D>(str)
-                } else {
-                    Ok(Self::from_string(str.to_string()))
-                }
-            }
+            Content::String(string) => Ok(Self::from_string(string)),
+            Content::Str(str) => Ok(Self::from_string(str.to_string())),
             ref content @ Content::Map(ref map) => {
                 let children = match map
                     .iter()
@@ -264,37 +201,6 @@ impl<'de> Deserialize<'de> for TextContent {
 
         Err(de::Error::custom("no `type` flag and unable to guess type"))
     }
-}
-
-/// Deserialize legacy text content
-fn deserialize_legacy_text<'de, D>(text: &str) -> Result<FormattedText, D::Error>
-where D: Deserializer<'de> {
-    let mut result = FormattedText::new("");
-    let mut style = TextStyle::EMPTY;
-
-    let prefixed = text.starts_with('§');
-    for (i, mut segment) in text.split_inclusive('§').enumerate() {
-        segment = segment.trim_end_matches('§');
-
-        if i == 0 && !prefixed {
-            // Append the first segment if it doesn't start with '§'
-            result.with_child(FormattedText::from_string(segment.to_string()));
-        } else if let Some((code, segment)) = segment.split_at_checked(1) {
-            // If there is a legacy code, apply it to the current style
-            if let Some(code) = code.chars().next().and_then(LegacyCode::try_from_char) {
-                code.apply_to_style(&mut style);
-            }
-
-            // Append the segment with the current style
-            if !segment.is_empty() {
-                result.with_child(
-                    FormattedText::from_string(segment.to_string()).with_style(style.clone()),
-                );
-            }
-        }
-    }
-
-    Ok(result)
 }
 
 // -------------------------------------------------------------------------------------------------

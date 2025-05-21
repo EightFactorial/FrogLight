@@ -16,10 +16,10 @@ pub mod prelude {
     pub use crate::{
         chat::MessageSignatureCtx,
         text::{
-            FormattedText,
             content::TextContent,
-            interaction::TextClickInteract,
+            interaction::TextInteraction,
             style::{IntegerColor, PresetColor, TextColor, TextStyle},
+            FormattedText,
         },
     };
 }

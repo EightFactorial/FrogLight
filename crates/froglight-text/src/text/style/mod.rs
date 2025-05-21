@@ -13,7 +13,8 @@ use serde::{Deserialize, Serialize};
 mod color;
 pub use color::{IntegerColor, PresetColor, TextColor};
 
-pub mod legacy;
+mod legacy;
+pub use legacy::LegacyCode;
 
 /// The style of a [`FormattedText`](super::FormattedText) component.
 #[derive(Debug, Default, Clone, PartialEq, Eq, FrogNbt)]

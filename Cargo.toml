@@ -146,11 +146,13 @@ opt-level = 1
 opt-level = 3
 
 [profile.dev.package.froglight-block]
+debug = false
 incremental = true
 inherits = "dev"
 opt-level = 3
 
 [profile.dev.package.froglight-item]
+debug = false
 incremental = true
 inherits = "dev"
 opt-level = 3

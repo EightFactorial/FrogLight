@@ -25,6 +25,7 @@ fn execute() -> AppExit {
     });
 
     // Add a command with multiple arguments
+    #[cfg(feature = "glam")]
     app.add_command("test_2", |builder| {
         let builder = builder.arg::<UVec2, _>().arg::<String, _>().arg::<String, _>();
         builder.command(|entity, vec2, string_1, string_2, _| {
@@ -94,7 +95,10 @@ fn execute() -> AppExit {
         let mut entity = commands.spawn(bundle);
 
         entity.run_command("test");
+
+        #[cfg(feature = "glam")]
         entity.run_command("test_2 42 42 foo bar");
+
         entity.run_command("test_3 1000 literal 40320");
 
         entity.run_command("test_4 first");
