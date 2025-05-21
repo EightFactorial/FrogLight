@@ -71,17 +71,25 @@ impl PlayerProfile {
     /// Insert a profile property into the [`PlayerProfile`].
     ///
     /// Optionally returns the previous value of the property.
+    ///
+    /// # Errors
+    /// Returns an error if the property cannot be serialized.
     #[cfg(feature = "serde")]
     pub fn insert_property<T: Serialize>(
         &mut self,
         name: impl smol_str::ToSmolStr,
-        proeprty: &T,
+        property: &T,
     ) -> Result<Option<serde_json::Value>, serde_json::Error> {
-        T::serialize(&proeprty, serde_json::value::Serializer)
+        T::serialize(property, serde_json::value::Serializer)
             .map(|val| self.properties.insert(name.to_smolstr(), val))
     }
 
     /// Get a property from the [`PlayerProfile`].
+    ///
+    /// Returns `None` if the property does not exist.
+    ///
+    /// # Errors
+    /// Returns an error if the property cannot be deserialized.
     #[must_use]
     #[cfg(feature = "serde")]
     pub fn get_property<T: DeserializeOwned>(
@@ -95,6 +103,9 @@ impl PlayerProfile {
     /// shifting all following properties down by one.
     ///
     /// Returns `None` if the property does not exist.
+    ///
+    /// # Errors
+    /// Returns an error if the property cannot be deserialized.
     #[cfg(feature = "serde")]
     pub fn shift_take_property<T: DeserializeOwned>(
         &mut self,
@@ -107,6 +118,9 @@ impl PlayerProfile {
     /// swapping the property with the last one and removing it.
     ///
     /// Returns `None` if the property does not exist.
+    ///
+    /// # Errors
+    /// Returns an error if the property cannot be deserialized.
     #[cfg(feature = "serde")]
     pub fn swap_take_property<T: DeserializeOwned>(
         &mut self,

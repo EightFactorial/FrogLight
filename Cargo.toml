@@ -196,10 +196,12 @@ workspace = true
 froglight-internal = { workspace = true, features = ["nightly"] }
 
 [features]
-default = ["bevy", "brigadier", "std"]
+default = ["bevy", "brigadier", "crypto", "std"]
 
 # Enable the `froglight-brigadier` crate.
 brigadier = ["froglight-internal/brigadier"]
+# Enable support for encrypted connections.
+crypto = ["froglight-internal/crypto"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]

@@ -31,16 +31,11 @@ pub trait RawConnection: Send + 'static {
 
     /// Read data from the connection, filling the provided buffer.
     ///
-    /// This should not perform any processing and return the raw data.
+    /// This should perform minimal processing and return raw data.
     async fn read_raw(&mut self, buf: &mut [u8]) -> Result<(), ConnectionError>;
-    /// Peek data from the connection, returning the number of bytes read.
-    ///
-    /// This should not perform any processing and return the raw data.
-    async fn peek_raw(&mut self, buf: &mut [u8]) -> Result<usize, ConnectionError>;
-
     /// Write data to the connection.
     ///
-    /// This should not perform any processing and write the raw data.
+    /// This should perform minimal processing and write raw data.
     async fn write_raw(&mut self, buf: &[u8]) -> Result<(), ConnectionError>;
 }
 

@@ -16,14 +16,11 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-aes = { workspace = true }
 bevy_platform = { workspace = true, features = ["alloc"] }
-cfb8 = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-nbt = { workspace = true, features = ["uuid"] }
 parking_lot = { workspace = true }
-rsa = { workspace = true, features = ["sha2"] }
 smol_str = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true }
@@ -33,14 +30,17 @@ bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }
+rsa = { workspace = true, optional = true, features = ["sha2"] }
 serde = { workspace = true, optional = true, features = ["derive"] }
 serde_json = { workspace = true, optional = true }
 
 [features]
-default = ["ansi", "std"]
+default = ["ansi", "crypto", "std"]
 
 # Enable ANSI terminal support.
 ansi = ["dep:nu-ansi-term", "std"]
+# Enable chat message cryptography support.
+crypto = ["dep:rsa"]
 # Enable `froglight-io` support.
 io = ["dep:froglight-io", "froglight-nbt/io", "std"]
 
@@ -66,9 +66,8 @@ std = [
   "bevy_ecs?/std",
   "bevy_platform/std",
   "bevy_reflect?/std",
-  "cfb8/std",
   "froglight-nbt/std",
-  "rsa/std",
+  "rsa?/std",
   "serde?/std",
   "serde_json?/std",
   "uuid/std",

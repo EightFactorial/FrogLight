@@ -22,10 +22,10 @@ froglight-entity = { workspace = true }
 froglight-inventory = { workspace = true, features = ["world"] }
 froglight-item = { workspace = true, features = ["block"] }
 froglight-nbt = { workspace = true }
-froglight-network = { workspace = true, optional = true, features = ["inventory"] }
+froglight-network = { workspace = true, optional = true }
 froglight-physics = { workspace = true }
 froglight-registry = { workspace = true }
-froglight-text = { workspace = true }
+froglight-text = { workspace = true, features = ["crypto"] }
 froglight-world = { workspace = true, features = ["block", "nbt"] }
 
 # Optional dependencies
@@ -34,10 +34,12 @@ froglight-resolver = { workspace = true, optional = true, features = ["agent"] }
 froglight-schedule = { workspace = true, optional = true }
 
 [features]
-default = ["bevy", "brigadier", "std"]
+default = ["bevy", "brigadier", "crypto", "std"]
 
 # Enable the `froglight-brigadier` crate.
 brigadier = ["bevy", "dep:froglight-brigadier", "froglight-network/brigadier"]
+# Enable support for encrypted connections.
+crypto = ["froglight-network/crypto", "froglight-text/crypto"]
 
 # Enable `bevy` support.
 bevy = [

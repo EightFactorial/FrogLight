@@ -3,8 +3,15 @@
 use core::net::SocketAddr;
 use std::io::Cursor;
 
+#[cfg(feature = "crypto")]
+use aes::{
+    Aes128,
+    cipher::{BlockDecryptMut, BlockEncryptMut, inout::InOutBuf},
+};
 use async_net::TcpStream;
 use async_trait::async_trait;
+#[cfg(feature = "crypto")]
+use cfb8::{Decryptor, Encryptor};
 use froglight_common::version::Version;
 use froglight_io::{
     prelude::{FrogVarRead, FrogVarWrite},
@@ -95,19 +102,46 @@ pub struct IoTransport<S> {
     stream: S,
     peer: SocketAddr,
     compression: Option<i32>,
-    _compress_buf: Vec<u8>,
+    #[allow(dead_code)]
+    scratch: Vec<u8>,
+
+    #[cfg(feature = "crypto")]
+    cipher: Option<IoCipher>,
+}
+
+/// The cipher used for encrypting and decrypting packets.
+#[cfg(feature = "crypto")]
+pub struct IoCipher {
+    /// The cipher is used to encrypt packets.
+    pub encryptor: Encryptor<Aes128>,
+    /// The decryptor is used to decrypt packets.
+    pub decryptor: Decryptor<Aes128>,
 }
 
 impl<S> IoTransport<S> {
     /// Creates a new [`IoTransport`] instance.
     #[must_use]
     pub const fn wrap(stream: S, peer: SocketAddr) -> Self {
-        Self { stream, peer, compression: None, _compress_buf: Vec::new() }
+        #[cfg(feature = "crypto")]
+        {
+            Self { stream, peer, compression: None, scratch: Vec::new(), cipher: None }
+        }
+
+        #[cfg(not(feature = "crypto"))]
+        {
+            Self { stream, peer, compression: None, scratch: Vec::new() }
+        }
     }
+
+    /// Get a mutable reference to the inner [`IoCipher`].
+    #[inline]
+    #[must_use]
+    #[cfg(feature = "crypto")]
+    pub fn cipher_mut(&mut self) -> &mut Option<IoCipher> { &mut self.cipher }
 }
 
 #[async_trait]
-impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnection
+impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnection
     for IoTransport<S>
 {
     #[inline]
@@ -119,25 +153,30 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
     #[inline]
     async fn get_compression(&self) -> Option<i32> { self.compression }
 
-    // TODO: Decryption + Decompression
+    // TODO: Decompression
     async fn read_packet(&mut self, buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
-        // Get the size of the packet and the size of the packet size
+        // Read the length bytes of the packet
         let mut len_buf = Cursor::new([0u8; 5]);
-        self.peek_raw(len_buf.get_mut().as_mut_slice()).await?;
+        self.read_raw(len_buf.get_mut().as_mut_slice()).await?;
+
+        // Read the length of the packet and count the number of bytes
         let len = <u32 as FrogVarRead>::frog_var_read(&mut len_buf);
         let len = len.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
         #[expect(clippy::cast_possible_truncation)]
         let len_size = len_buf.position() as usize;
 
-        // Make sure the buffer can hold the packet, then read it
+        // Make sure the buffer can hold the packet
         buf.resize(buf.len().max(len + len_size), 0u8);
-        let pbuf = &mut buf[..len + len_size];
+        // Copy the non-length bytes into the buffer
+        buf[..5usize - len_size].copy_from_slice(&len_buf.get_ref()[len_size..5usize]);
+        // Read the rest of the packet into the buffer
+        let pbuf = &mut buf[len_size + 1..len];
         self.read_raw(pbuf).await?;
 
-        // Create a cursor and skip the packet size
+        // Create a cursor to read from
         let mut cursor = Cursor::new(pbuf);
-        cursor.set_position(len_size as u64);
 
+        // Check whether the packet is compressed
         if self.compression.is_some_and(|c| c >= 0) {
             let size = <u32 as FrogVarRead>::frog_var_read(&mut cursor);
             let size = size.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
@@ -147,7 +186,7 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             }
         }
 
-        // Move the packet to the beginning of the buffer and set the size.
+        // Move the packet to the beginning of the buffer and set the buffer size.
         #[expect(clippy::cast_possible_truncation)]
         let position = cursor.position() as usize;
         buf.copy_within(position.., 0);
@@ -162,7 +201,7 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         Ok(())
     }
 
-    // TODO: Compression + Encryption
+    // TODO: Compression
     async fn write_packet(&mut self, buf: &[u8]) -> Result<(), ConnectionError> {
         // Log the ID and length of the packet
         #[cfg(feature = "trace")]
@@ -195,36 +234,48 @@ impl<S: AsyncPeekExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         }
     }
 
+    // TODO: Test decryption
     async fn read_raw(&mut self, buf: &mut [u8]) -> Result<(), ConnectionError> {
         let result = self.stream.read_exact(buf).await;
-        result.map_err(|err| ConnectionError::ReadRawConnection(Box::new(err)))
+        result.map_err(|err| ConnectionError::ReadRawConnection(Box::new(err)))?;
+
+        #[cfg(feature = "crypto")]
+        if let Some(cipher) = &mut self.cipher {
+            // Decrypt the packet using the cipher
+            let inout = InOutBuf::from(buf);
+            let (inout, tail) = inout.into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            cipher.decryptor.decrypt_blocks_inout_mut(inout);
+        }
+
+        Ok(())
     }
 
-    async fn peek_raw(&mut self, buf: &mut [u8]) -> Result<usize, ConnectionError> {
-        let result = self.stream.peek(buf).await;
-        result.map_err(|err| ConnectionError::ReadRawConnection(Box::new(err)))
-    }
+    // TODO: Test encryption
+    #[allow(unused_mut)]
+    async fn write_raw(&mut self, mut buf: &[u8]) -> Result<(), ConnectionError> {
+        #[cfg(feature = "crypto")]
+        if let Some(cipher) = &mut self.cipher {
+            // Clear and resize the scratch buffer to fit the packet
+            self.scratch.clear();
+            self.scratch.resize(buf.len(), 0u8);
 
-    async fn write_raw(&mut self, buf: &[u8]) -> Result<(), ConnectionError> {
+            // Encrypt the packet using the cipher
+            let inout = InOutBuf::new(buf, self.scratch.as_mut_slice()).unwrap();
+            let (inout, tail) = inout.into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            cipher.encryptor.encrypt_blocks_inout_mut(inout);
+
+            // Use the scratch buffer as the input buffer
+            buf = self.scratch.as_slice();
+        }
+
         let result = self.stream.write_all(buf).await;
         result.map_err(|err| ConnectionError::WriteRawConnection(Box::new(err)))
     }
 }
 
 // -------------------------------------------------------------------------------------------------
-
-/// Extension trait for [`AsyncReadExt`]
-pub trait AsyncPeekExt: AsyncReadExt {
-    /// Peek at the next bytes in the stream without consuming them.
-    fn peek(&self, buf: &mut [u8]) -> impl Future<Output = std::io::Result<usize>> + Send;
-}
-
-impl AsyncPeekExt for TcpStream {
-    #[inline]
-    async fn peek(&self, buf: &mut [u8]) -> std::io::Result<usize> {
-        TcpStream::peek(self, buf).await
-    }
-}
 
 impl IoTransport<TcpStream> {
     /// Create an [`IoTransport`] from an address resolved

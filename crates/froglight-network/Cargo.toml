@@ -26,28 +26,30 @@ bevy_platform = { workspace = true, features = ["alloc"] }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["network"] }
-froglight-packet = { workspace = true }
+froglight-packet = { workspace = true, features = ["inventory"] }
 futures-lite = { workspace = true, features = ["alloc"] }
 thiserror = { workspace = true }
 
 # Optional dependencies
+aes = { workspace = true, optional = true }
 async-compression = { workspace = true, optional = true, features = ["futures-io", "zlib"] }
 async-net = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true }
+cfb8 = { workspace = true, optional = true }
 froglight-io = { workspace = true, optional = true }
 froglight-resolver = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 [features]
-default = ["inventory", "io", "resolver", "std"]
+default = ["crypto", "io", "resolver", "std"]
 
 # Enable `froglight-brigadier` support.
 brigadier = ["bevy", "froglight-packet/brigadier"]
-# Enable `froglight-inventory` support.
-inventory = ["froglight-packet/inventory"]
 # Enable `froglight-resolver` support.
 resolver = ["dep:froglight-resolver", "std"]
+# Enable support for encrypted connections.
+crypto = ["dep:aes", "dep:cfb8", "io"]
 
 # Enable `froglight-io` support.
 io = ["dep:froglight-io", "froglight-packet/io", "std"]
