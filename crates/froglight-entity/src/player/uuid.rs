@@ -8,7 +8,7 @@ use std::borrow::Borrow;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::HookContext, prelude::*, world::DeferredWorld};
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::Display;
 #[cfg(feature = "serde")]
@@ -23,10 +23,10 @@ use super::username::PlayerUsername;
 /// A player's [`Uuid`].
 #[repr(transparent)]
 #[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(feature = "bevy", derive(Component), component(on_add = Self::on_add), reflect(Component))]
+#[cfg_attr(feature = "bevy", derive(Component), component(on_add = Self::on_add))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq, Component))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PlayerUuid(Uuid);
 
 impl PlayerUuid {

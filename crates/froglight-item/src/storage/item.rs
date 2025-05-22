@@ -81,7 +81,6 @@ impl<V: Version> ItemStorage<V> {
     }
 
     /// Create a new [`ItemStorage`] with no registered item types.
-    #[inline]
     #[must_use]
     pub const fn new_empty() -> Self { Self(IndexMap::with_hasher(NoOpHash)) }
 

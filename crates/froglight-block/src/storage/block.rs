@@ -5,9 +5,10 @@ use core::{any::TypeId, ops::Range};
 use bevy_ecs::reflect::ReflectResource;
 #[cfg(feature = "bevy")]
 use bevy_ecs::resource::Resource;
-use bevy_platform::{hash::NoOpHash, collections::HashMap};
+use bevy_platform::{collections::HashMap, hash::NoOpHash};
 #[cfg(feature = "reflect")]
 use bevy_reflect::Reflect;
+use derive_more::Deref;
 use downcast_rs::Downcast;
 use froglight_common::{vanilla::Vanilla, version::Version};
 use parking_lot::RwLock;
@@ -23,7 +24,7 @@ use crate::{
 /// A thread-safe dynamic storage for block types.
 ///
 /// Allows for the registration and retrieval of block types at runtime.
-#[derive(Clone)]
+#[derive(Clone, Deref)]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 #[cfg_attr(feature = "reflect", derive(Reflect))]
 #[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Clone, Resource))]
@@ -34,11 +35,6 @@ where Vanilla: BlockResolver<V>
 {
     #[inline]
     fn default() -> Self { Self::new() }
-}
-impl<V: Version> core::ops::Deref for AppBlockStorage<V> {
-    type Target = Arc<RwLock<BlockStorage<V>>>;
-
-    fn deref(&self) -> &Self::Target { &self.0 }
 }
 
 impl<V: Version> AppBlockStorage<V> {
@@ -84,7 +80,6 @@ impl<V: Version> BlockStorage<V> {
     }
 
     /// Create a new [`BlockStorage`] with no registered block types.
-    #[inline]
     #[must_use]
     pub const fn new_empty() -> Self {
         Self { traits: RangeMap::new(), types: HashMap::with_hasher(NoOpHash) }
@@ -291,7 +286,7 @@ impl<V: Version> BlockStorage<V> {
 
 /// A wrapper around a [`&'static dyn BlockType`](BlockType)
 /// that implements [`PartialEq`] and [`Eq`].
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Deref)]
 #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Clone, PartialEq))]
 pub(crate) struct BlockWrapper<V: Version>(&'static dyn BlockType<V>);
 
@@ -308,9 +303,4 @@ impl<V: Version> PartialEq for BlockWrapper<V> {
         <dyn BlockType<V> as Downcast>::as_any(self.0).type_id()
             == <dyn BlockType<V> as Downcast>::as_any(other.0).type_id()
     }
-}
-impl<V: Version> core::ops::Deref for BlockWrapper<V> {
-    type Target = &'static dyn BlockType<V>;
-
-    fn deref(&self) -> &Self::Target { &self.0 }
 }

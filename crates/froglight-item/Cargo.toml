@@ -39,7 +39,7 @@ block = ["dep:froglight-block"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "froglight-block?/bevy", "froglight-common/bevy"]
 # Enable `bevy_reflect` support.
-reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-block?/reflect", "froglight-nbt/reflect"]
+reflect = ["bevy", "bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-block?/reflect", "froglight-nbt/reflect"]
 
 # Enable nightly features.
 nightly = ["froglight-block?/nightly", "froglight-nbt/nightly", "parking_lot/nightly"]

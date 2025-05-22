@@ -8,7 +8,7 @@ use std::borrow::Borrow;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::Display;
 use md5::{
@@ -25,10 +25,10 @@ use super::uuid::PlayerUuid;
 /// A player's username.
 #[repr(transparent)]
 #[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq))]
-#[cfg_attr(feature = "bevy", derive(Component), reflect(Component))]
+#[cfg_attr(feature = "bevy", derive(Component))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq, Component))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PlayerUsername(SmolStr);
 
 impl PlayerUsername {

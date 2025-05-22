@@ -17,6 +17,8 @@ pub trait StaticBlock: 'static {
     fn as_static() -> &'static Self;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// A block type.
 pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     /// Get the value of an attribute as a string.
@@ -124,6 +126,8 @@ pub trait BlockType<V: Version>: DowncastSync + MaybeReflect {
     fn is_air(&self) -> bool;
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// An extension of the [`BlockType`] trait.
 pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock {
     /// The attributes of the block.
@@ -138,6 +142,8 @@ pub trait BlockTypeExt<V: Version>: BlockType<V> + StaticBlock {
     /// Whether the block is air.
     const IS_AIR: bool;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 use sealed::MaybeReflect;
 mod sealed {

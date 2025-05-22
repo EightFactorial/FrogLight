@@ -1,9 +1,9 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
+    Ident, LitBool, LitInt, LitStr, Path, Token,
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
-    Ident, LitBool, LitInt, LitStr, Path, Token,
 };
 
 use crate::CrateManifest;
@@ -27,7 +27,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                     #[must_use]
                     fn get_attr_str(&self, state: u16, attr: &str) -> Option<&'static str> {
                         if <<#block as #block_path::block::BlockTypeExt<#version>>::Attributes as #block_path::storage::BlockAttributes>::COUNT > state as usize {
-                            #block_path::block::Block::<#block, #version>::new(state.into()).get_attr_str(attr)
+                            #block_path::block::Block::<#block, #version>::new(#block_path::storage::RelativeBlockState::new_unchecked(state)).get_attr_str(attr)
                         } else {
                             None
                         }
@@ -119,7 +119,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             let default: u16 = default.base10_parse().unwrap();
             block_tests.extend(quote! {{
                     let mut block = #block_path::block::Block::<#block, #version>::default();
-                    assert_eq!(block.state(), &#default.into(), "Block \"{}\" default state mismatch!", #ident);
+                    assert_eq!(u16::from(*block.state()), #default, "Block \"{}\" default state mismatch!", #ident);
                     assert_eq!(block, block, "Block \"{}\" equality failed!", #ident);
                     assert_eq!(block, block.into_version::<#version>(), "Block \"{}\" `into_version` failed!", #ident);
                     assert_eq!(block, #block_path::block::Block::from_attr(block.into_attr()), "Block \"{}\" attribute round-trip failed!", #ident);

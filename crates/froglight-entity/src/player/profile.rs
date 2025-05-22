@@ -8,7 +8,7 @@ use base64::{Engine, prelude::BASE64_URL_SAFE};
 use bevy_ecs::prelude::*;
 #[cfg(feature = "serde")]
 use bevy_platform::hash::FixedHasher;
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 #[cfg(feature = "serde")]
 use indexmap::IndexMap;
@@ -23,7 +23,8 @@ use super::{username::PlayerUsername, uuid::PlayerUuid};
 
 /// A player's profile.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect), reflect(Debug, PartialEq, Component))]
+#[cfg_attr(feature = "bevy", derive(Component))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq, Component))]
 pub struct PlayerProfile {
     /// The player's [`Uuid`].
     pub uuid: PlayerUuid,
@@ -34,7 +35,7 @@ pub struct PlayerProfile {
 
     /// The player's properties.
     #[cfg(feature = "serde")]
-    #[cfg_attr(feature = "bevy", reflect(ignore))]
+    #[cfg_attr(feature = "reflect", reflect(ignore))]
     pub properties: IndexMap<SmolStr, serde_json::Value, FixedHasher>,
 }
 
@@ -162,7 +163,7 @@ impl PlayerProfile {
 
 /// The textures of a player.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Default, PartialEq))]
 pub struct PlayerProfileTextures {
     /// The timestamp the textures were retrieved.
     pub timestamp: Duration,

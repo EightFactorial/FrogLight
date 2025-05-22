@@ -24,19 +24,30 @@ glam = { workspace = true }
 smol_str = { workspace = true }
 
 # Optional dependencies
+bevy_app = { workspace = true, optional = true }
 bevy_ecs = { workspace = true, optional = true }
+bevy_math = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
+bevy_transform = { workspace = true, optional = true }
 
 [features]
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-entity/bevy"]
+bevy = [
+  "dep:bevy_app",
+  "dep:bevy_ecs",
+  "dep:bevy_math",
+  "dep:bevy_reflect",
+  "dep:bevy_transform",
+  "froglight-common/bevy",
+  "froglight-entity/bevy",
+]
 
 # Enable nightly features.
 nightly = ["froglight-entity/nightly"]
 
 # Enable support for the rust standard library.
-std = ["bevy_ecs?/std", "bevy_platform/std", "bevy_reflect?/std", "froglight-entity/std"]
+std = ["bevy_ecs?/std", "bevy_math?/std", "bevy_platform/std", "bevy_reflect?/std", "froglight-entity/std"]
 # Enable `no_std` support for `glam`.
-libm = ["glam/libm"]
+libm = ["bevy_math?/libm", "froglight-entity/libm", "glam/libm"]

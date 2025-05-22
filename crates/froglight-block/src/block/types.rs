@@ -142,7 +142,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(self.state.into()) }
+    pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(usize::from(self.state)) }
 
     /// Get the value of an [`Attribute`] as a string.
     ///
@@ -353,7 +353,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 }
 
 impl<B: BlockTypeExt<V>, V: Version> Default for Block<B, V> {
-    fn default() -> Self { Self::new(RelativeBlockState::from(B::DEFAULT)) }
+    fn default() -> Self { Self::new(RelativeBlockState::new_unchecked(B::DEFAULT)) }
 }
 
 impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
