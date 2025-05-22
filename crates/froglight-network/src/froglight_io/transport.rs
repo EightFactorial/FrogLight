@@ -1,5 +1,3 @@
-//! TODO
-
 use core::net::SocketAddr;
 use std::io::Cursor;
 
@@ -8,96 +6,17 @@ use aes::{
     Aes128,
     cipher::{BlockDecryptMut, BlockEncryptMut, inout::InOutBuf},
 };
-use async_net::TcpStream;
 use async_trait::async_trait;
 #[cfg(feature = "crypto")]
 use cfb8::{Decryptor, Encryptor};
-use froglight_common::version::Version;
-use froglight_io::{
-    prelude::{FrogVarRead, FrogVarWrite},
-    version::{FrogReadVersion, FrogWriteVersion},
-};
-use froglight_packet::state::{Handshake, ValidState};
+use froglight_io::prelude::{FrogVarRead, FrogVarWrite};
 use futures_lite::{AsyncReadExt, AsyncWriteExt};
 
-use crate::{
-    connection::{RawConnection, raw::RawPacketVersion, state::ConnectionError},
-    prelude::ClientConnection,
-};
-
-impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
-    /// Connect to a server at the given address,
-    /// resolved using the provided
-    /// [`FroglightResolver`](crate::prelude::FroglightResolver).
-    ///
-    /// # Errors
-    /// Returns an error if the connection cannot be established,
-    /// or if `TCP_NODELAY` cannot be set.
-    #[cfg(feature = "resolver")]
-    pub async fn connect(
-        addr: &str,
-        resolver: &crate::prelude::FroglightResolver,
-    ) -> Result<Self, std::io::Error> {
-        IoTransport::<TcpStream>::connect(addr, resolver).await.map(Self::from_raw)
-    }
-
-    /// Connect to a server at the given address,
-    /// resolved using the default system resolver.
-    ///
-    /// # Errors
-    /// Returns an error if the connection cannot be established,
-    /// or if `TCP_NODELAY` cannot be set.
-    pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
-        IoTransport::<TcpStream>::connect_system(addr).await.map(Self::from_raw)
-    }
-
-    /// Connect to a server at the given [`SocketAddr`].
-    ///
-    /// # Errors
-    /// Returns an error if the connection cannot be established,
-    /// or if `TCP_NODELAY` cannot be set.
-    pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
-        IoTransport::<TcpStream>::connect_to(socket).await.map(Self::from_raw)
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A marker struct for [`RawPacketVersion`].
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct IoPacket;
-
-impl<V: Version, T: FrogReadVersion<V> + FrogWriteVersion<V> + Send + Sync + 'static>
-    RawPacketVersion<V, IoPacket> for T
-{
-    async fn read_packet<'a, C: RawConnection + ?Sized>(
-        conn: &'a mut C,
-        buf: &'a mut Vec<u8>,
-    ) -> Result<Self, ConnectionError> {
-        buf.clear();
-
-        conn.read_packet(buf).await?;
-        let mut cursor = Cursor::new(buf.as_mut_slice());
-        let result = T::frog_read(&mut cursor);
-        result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))
-    }
-
-    async fn write_packet<'a, C: RawConnection + ?Sized>(
-        &'a self,
-        conn: &'a mut C,
-        buf: &'a mut Vec<u8>,
-    ) -> Result<(), ConnectionError> {
-        buf.clear();
-
-        let result = self.frog_write(buf);
-        result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
-        conn.write_packet(buf).await
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
+use crate::connection::{RawConnection, state::ConnectionError};
 
 /// The default [`RawConnection`] implementation.
+///
+/// Wraps any [`AsyncReadExt`] and [`AsyncWriteExt`] stream.
 pub struct IoTransport<S> {
     stream: S,
     peer: SocketAddr,
@@ -272,49 +191,5 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
 
         let result = self.stream.write_all(buf).await;
         result.map_err(|err| ConnectionError::WriteRawConnection(Box::new(err)))
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-impl IoTransport<TcpStream> {
-    /// Create an [`IoTransport`] from an address resolved
-    /// using the provided
-    /// [`FroglightResolver`](crate::prelude::FroglightResolver).
-    ///
-    /// # Errors
-    /// Returns an error if the connection cannot be established,
-    /// or if `TCP_NODELAY` cannot be set.
-    #[inline]
-    #[cfg(feature = "resolver")]
-    pub async fn connect(
-        addr: &str,
-        resolver: &crate::prelude::FroglightResolver,
-    ) -> Result<Self, std::io::Error> {
-        Self::connect_to(resolver.lookup_minecraft(addr).await?).await
-    }
-
-    /// Create an [`IoTransport`] from an address resolved
-    /// using the system's default resolver.
-    ///
-    /// # Errors
-    /// Returns an error if the connection cannot be established,
-    /// or if `TCP_NODELAY` cannot be set.
-    pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
-        let stream = TcpStream::connect(addr).await?;
-        let socket = stream.peer_addr()?;
-        stream.set_nodelay(true)?;
-        Ok(Self::wrap(stream, socket))
-    }
-
-    /// Create an [`IoTransport`] from a [`SocketAddr`].
-    ///
-    /// # Errors
-    /// Returns an error if the connection cannot be established,
-    /// or if `TCP_NODELAY` cannot be set.
-    pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
-        let stream = TcpStream::connect(socket).await?;
-        stream.set_nodelay(true)?;
-        Ok(Self::wrap(stream, socket))
     }
 }
