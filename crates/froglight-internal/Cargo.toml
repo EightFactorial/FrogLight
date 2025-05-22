@@ -102,6 +102,7 @@ libm = [
 # Enable support for v1.21.4
 v1_21_4 = [
   "froglight-block/v1_21_4",
+  "froglight-entity/v1_21_4",
   "froglight-inventory/v1_21_4",
   "froglight-item/v1_21_4",
   "froglight-network/v1_21_4",
@@ -111,6 +112,7 @@ v1_21_4 = [
 # Enable support for v1.21.5
 v1_21_5 = [
   "froglight-block/v1_21_5",
+  "froglight-entity/v1_21_5",
   "froglight-inventory/v1_21_5",
   "froglight-item/v1_21_5",
   "froglight-network/v1_21_5",
