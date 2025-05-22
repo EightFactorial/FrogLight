@@ -46,6 +46,7 @@ impl From<u32> for RelativeBlockState {
 
     #[inline]
     #[cfg(not(debug_assertions))]
+    #[expect(clippy::cast_possible_truncation)]
     fn from(state: u32) -> Self { Self(state as u16) }
 }
 impl From<RelativeBlockState> for u32 {
@@ -61,6 +62,7 @@ impl From<usize> for RelativeBlockState {
 
     #[inline]
     #[cfg(not(debug_assertions))]
+    #[expect(clippy::cast_possible_truncation)]
     fn from(state: usize) -> Self { Self(state as u16) }
 }
 impl From<RelativeBlockState> for usize {

@@ -145,7 +145,7 @@ pub trait EntityType<V: Version>: DowncastSync + MaybeReflect {
 // -------------------------------------------------------------------------------------------------
 
 /// An extension of the [`EntityType`] trait.
-pub trait EntityTypeExt<V: Version>: EntityType<V> + StaticEntityType {
+pub trait EntityTypeExt<V: Version>: EntityType<V> + StaticEntityType + MaybeComponent {
     /// The type of [`Bundle`] to insert into an [`Entity`].
     #[cfg(feature = "bevy")]
     type BundleType: Bundle;
@@ -169,8 +169,10 @@ pub trait EntityTypeExt<V: Version>: EntityType<V> + StaticEntityType {
 
 // -------------------------------------------------------------------------------------------------
 
-use sealed::MaybeReflect;
+use sealed::{MaybeComponent, MaybeReflect};
 mod sealed {
+    #[cfg(feature = "bevy")]
+    use bevy_ecs::component::Component;
     #[cfg(feature = "reflect")]
     use bevy_reflect::Reflect;
 
@@ -183,4 +185,14 @@ mod sealed {
     pub trait MaybeReflect {}
     #[cfg(not(feature = "reflect"))]
     impl<T> MaybeReflect for T {}
+
+    #[cfg(feature = "bevy")]
+    pub trait MaybeComponent: Component {}
+    #[cfg(feature = "bevy")]
+    impl<T: Component> MaybeComponent for T {}
+
+    #[cfg(not(feature = "bevy"))]
+    pub trait MaybeComponent {}
+    #[cfg(not(feature = "bevy"))]
+    impl<T> MaybeComponent for T {}
 }
