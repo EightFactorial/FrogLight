@@ -24,7 +24,7 @@ futures-lite = { workspace = true, features = ["std"] }
 hickory-resolver = { workspace = true, features = ["system-config"] }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true, features = ["std"] }
+bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect", "std"] }
 bevy_log = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true, features = ["std"] }
 bevy_tasks = { workspace = true, optional = true, features = ["std"] }

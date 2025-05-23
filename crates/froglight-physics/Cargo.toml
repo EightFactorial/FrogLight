@@ -24,11 +24,11 @@ glam = { workspace = true }
 smol_str = { workspace = true }
 
 # Optional dependencies
-bevy_app = { workspace = true, optional = true }
-bevy_ecs = { workspace = true, optional = true }
-bevy_math = { workspace = true, optional = true }
+bevy_app = { workspace = true, optional = true, features = ["bevy_reflect"] }
+bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
+bevy_math = { workspace = true, optional = true, features = ["bevy_reflect"] }
 bevy_reflect = { workspace = true, optional = true }
-bevy_transform = { workspace = true, optional = true }
+bevy_transform = { workspace = true, optional = true, features = ["bevy_reflect"] }
 
 [features]
 default = ["std"]
@@ -41,6 +41,7 @@ bevy = [
   "dep:bevy_reflect",
   "dep:bevy_transform",
   "froglight-common/bevy",
+  "froglight-common/reflect",
   "froglight-entity/bevy",
 ]
 

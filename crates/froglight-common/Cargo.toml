@@ -22,7 +22,7 @@ smol_str = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
+bevy_ecs = { workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 serde = { workspace = true, optional = true, features = ["derive"] }
 
@@ -30,7 +30,10 @@ serde = { workspace = true, optional = true, features = ["derive"] }
 default = ["alloc"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect"]
+bevy = ["dep:bevy_ecs"]
+# Enable `bevy_reflect` support.
+reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect"]
+
 # Enable `serde` serialization support.
 serde = ["dep:serde", "smol_str/serde", "uuid/serde"]
 

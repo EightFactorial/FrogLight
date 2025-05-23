@@ -25,8 +25,8 @@ use crate::{
 /// Allows for the registration and retrieval of item types at runtime.
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Resource))]
-#[cfg_attr(feature = "reflect", derive(Reflect))]
-#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Clone, Resource))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
+#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Resource))]
 pub struct AppItemStorage<V: Version>(Arc<RwLock<ItemStorage<V>>>);
 
 impl<V: Version> Default for AppItemStorage<V>
@@ -166,7 +166,7 @@ impl<V: Version> ItemStorage<V> {
 /// A wrapper around a [`&'static dyn ItemType`](ItemType)
 /// that implements [`PartialEq`] and [`Eq`].
 #[derive(Clone, Copy)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Clone, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone, PartialEq))]
 pub(crate) struct ItemWrapper<V: Version>(&'static dyn ItemType<V>);
 
 impl<V: Version> ItemWrapper<V> {

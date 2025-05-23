@@ -40,7 +40,7 @@ mod test;
 
 /// A chunk of the world.
 #[derive(Clone)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect), reflect(Component))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect), reflect(Clone, Component))]
 pub struct Chunk {
     storage: ChunkStorage,
     #[cfg(feature = "nbt")]

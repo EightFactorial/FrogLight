@@ -26,7 +26,7 @@ thiserror = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
 bevy_reflect = { workspace = true, optional = true, features = ["smol_str"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }

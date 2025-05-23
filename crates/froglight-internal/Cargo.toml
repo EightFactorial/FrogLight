@@ -46,6 +46,7 @@ bevy = [
   "dep:froglight-schedule",
   "froglight-block/bevy",
   "froglight-common/bevy",
+  "froglight-common/reflect",
   "froglight-entity/bevy",
   "froglight-inventory/bevy",
   "froglight-item/bevy",

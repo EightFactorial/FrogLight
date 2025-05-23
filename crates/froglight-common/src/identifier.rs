@@ -3,20 +3,20 @@
 
 use core::borrow::Borrow;
 
-#[cfg(feature = "bevy")]
+#[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use smol_str::SmolStr;
 
 /// A namespaced identifier.
 #[derive(Debug, Clone, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, PartialEq, Hash))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq, Hash))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
+#[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct Identifier(SmolStr);
 
 impl Identifier {
-    #[allow(dead_code)]
-    const DEFAULT_NAMESPACE: &'static str = "minecraft";
+    /// The default namespace for identifiers.
+    pub const DEFAULT_NAMESPACE: &'static str = "minecraft";
 
     /// Create a new [`Identifier`].
     ///
@@ -45,33 +45,6 @@ impl Identifier {
     #[inline]
     #[must_use]
     pub unsafe fn new_unchecked(content: SmolStr) -> Self { Self(content) }
-
-    /// Try to create a new [`Identifier`].
-    ///
-    /// Returns `None` if the string is not a valid identifier.
-    #[cfg(feature = "alloc")]
-    pub fn try_new(content: impl AsRef<str>) -> Option<Self> {
-        let content = content.as_ref().trim();
-
-        // Check if the string is empty or contains non-ASCII characters
-        if content.is_empty() || !content.is_ascii() {
-            return None;
-        }
-        // Check if the string starts or ends with a non-alphanumeric character
-        if !content.as_bytes()[0].is_ascii_alphanumeric()
-            || !content.as_bytes()[content.len() - 1].is_ascii_alphanumeric()
-        {
-            return None;
-        }
-
-        match content.chars().filter(|c| c == &':').count() {
-            // Append the default namespace
-            0 => Some(Self(SmolStr::new(alloc::format!("{}:{content}", Self::DEFAULT_NAMESPACE)))),
-            // Use the provided namespace
-            1 => Some(Self(SmolStr::new(content))),
-            _ => None,
-        }
-    }
 
     /// Create a new [`Identifier`] from a static string.
     ///
@@ -108,6 +81,33 @@ impl Identifier {
         }
 
         Self(SmolStr::new_static(content))
+    }
+
+    /// Try to create a new [`Identifier`].
+    ///
+    /// Returns `None` if the string is not a valid identifier.
+    #[cfg(feature = "alloc")]
+    pub fn try_new(content: impl AsRef<str>) -> Option<Self> {
+        let content = content.as_ref().trim();
+
+        // Check if the string is empty or contains non-ASCII characters
+        if content.is_empty() || !content.is_ascii() {
+            return None;
+        }
+        // Check if the string starts or ends with a non-alphanumeric character
+        if !content.as_bytes()[0].is_ascii_alphanumeric()
+            || !content.as_bytes()[content.len() - 1].is_ascii_alphanumeric()
+        {
+            return None;
+        }
+
+        match content.chars().filter(|c| c == &':').count() {
+            // Append the default namespace
+            0 => Some(Self(SmolStr::new(alloc::format!("{}:{content}", Self::DEFAULT_NAMESPACE)))),
+            // Use the provided namespace
+            1 => Some(Self(SmolStr::new(content))),
+            _ => None,
+        }
     }
 
     /// Get the namespace of the [`Identifier`].

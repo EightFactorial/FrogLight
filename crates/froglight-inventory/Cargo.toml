@@ -45,7 +45,7 @@ world = ["dep:froglight-world"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "froglight-common/bevy", "froglight-item/bevy"]
 # Enable `bevy_reflect` support.
-reflect = ["dep:bevy_reflect", "froglight-item/reflect"]
+reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-common/reflect", "froglight-item/reflect"]
 
 # Enable nightly features.
 nightly = [

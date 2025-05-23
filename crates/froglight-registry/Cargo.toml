@@ -34,7 +34,9 @@ bevy_reflect = { workspace = true, optional = true }
 default = []
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-nbt/reflect"]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy"]
+# Enable `bevy_reflect` support.
+reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-common/reflect", "froglight-nbt/reflect"]
 
 # Enable nightly features.
 nightly = ["froglight-nbt/nightly", "parking_lot/nightly"]

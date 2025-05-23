@@ -28,12 +28,12 @@ parking_lot = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
-bevy_app = { workspace = true, optional = true }
-bevy_ecs = { workspace = true, optional = true }
+bevy_app = { workspace = true, optional = true, features = ["bevy_reflect"] }
+bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
 bevy_reflect = { workspace = true, optional = true, features = ["glam"] }
 downcast-rs = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
-froglight-io = { workspace = true, optional = true }
+froglight-io = { workspace = true, optional = true, features = ["glam"] }
 froglight-nbt = { workspace = true, optional = true }
 
 [features]

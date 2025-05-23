@@ -32,7 +32,7 @@ smol_str = { workspace = true, features = ["serde"] }
 uuid = { workspace = true, features = ["serde"] }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true }
+bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
 bevy_reflect = { workspace = true, optional = true, features = ["glam", "smallvec", "smol_str", "uuid"] }
 froglight-brigadier = { workspace = true, optional = true, features = ["glam", "nbt", "serde", "uuid"] }
 froglight-inventory = { workspace = true, optional = true, features = ["world"] }
@@ -62,8 +62,10 @@ io = [
 
 # Enable `bevy` support.
 bevy = [
+  "dep:bevy_ecs",
   "dep:bevy_reflect",
   "froglight-common/bevy",
+  "froglight-common/reflect",
   "froglight-inventory?/bevy",
   "froglight-io?/bevy_platform",
   "froglight-nbt/reflect",

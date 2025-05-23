@@ -26,8 +26,8 @@ use crate::{
 /// Allows for the registration and retrieval of block types at runtime.
 #[derive(Clone, Deref)]
 #[cfg_attr(feature = "bevy", derive(Resource))]
-#[cfg_attr(feature = "reflect", derive(Reflect))]
-#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Clone, Resource))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
+#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Resource))]
 pub struct AppBlockStorage<V: Version>(Arc<RwLock<BlockStorage<V>>>);
 
 impl<V: Version> Default for AppBlockStorage<V>
@@ -287,7 +287,7 @@ impl<V: Version> BlockStorage<V> {
 /// A wrapper around a [`&'static dyn BlockType`](BlockType)
 /// that implements [`PartialEq`] and [`Eq`].
 #[derive(Clone, Copy, Deref)]
-#[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Clone, PartialEq))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone, PartialEq))]
 pub(crate) struct BlockWrapper<V: Version>(&'static dyn BlockType<V>);
 
 impl<V: Version> BlockWrapper<V> {
