@@ -5,7 +5,7 @@ use froglight_common::prelude::Identifier;
 /// A trait for synchronizing a main [`World`] with a
 /// [`SubWorld`](super::SubWorld).
 pub trait SubWorldSync {
-    /// Initialize a [`SubWorld`] using the main [`World`].
+    /// Initialize a [`SubWorld`](super::SubWorld) using the main [`World`].
     fn initialize(ident: &Identifier, world: &mut World, sub: &mut World);
 
     /// A function to run when adding a [`SubWorld`](super::SubWorld) to an

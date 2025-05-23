@@ -1,4 +1,4 @@
-//! Player usernames and uuids.
+//! [`PlayerUsername`]
 
 #[cfg(not(feature = "std"))]
 use alloc::{borrow::Borrow, format};

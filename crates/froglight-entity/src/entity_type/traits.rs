@@ -131,7 +131,8 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// Whether the entity type is immune to fire.
     fn fire_immunity(&self) -> bool;
 
-    /// Insert a [`Bundle`] of entity data into the given [`Entity`].
+    /// Insert a [`Bundle`] of entity data into the given
+    /// [`Entity`](bevy_ecs::entity::Entity).
     #[cfg(feature = "bevy")]
     fn insert_bundle(&self, entity: &mut EntityWorldMut);
 }
@@ -142,10 +143,11 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
 pub trait EntityTypeExt<V: Version>:
     EntityTypeTrait<V> + StaticEntityType + MaybeComponent
 {
-    /// The type of [`Bundle`] to insert into an [`Entity`].
+    /// The type of [`Bundle`] to insert into an
+    /// [`Entity`](bevy_ecs::entity::Entity).
     #[cfg(feature = "bevy")]
     type BundleType: Bundle;
-    /// The [`Bundle`] to insert into an [`Entity`].
+    /// The [`Bundle`] to insert into an [`Entity`](bevy_ecs::entity::Entity).
     #[cfg(feature = "bevy")]
     const BUNDLE: Self::BundleType;
 

@@ -82,7 +82,7 @@ impl<V: Version> EntityTypeStorage<V> {
         Self { traits: IndexMap::with_hasher(NoOpHash), _phantom: PhantomData }
     }
 
-    /// Get the [`EntityType`] for the given [`GlobalEntityTypeId`].
+    /// Get the [`EntityTypeTrait`] for the given [`GlobalEntityTypeId`].
     ///
     /// Handy for storing many entity types and bulk operations.
     ///

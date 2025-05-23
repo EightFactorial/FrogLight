@@ -66,7 +66,7 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     /// Read a raw type from the [`Connection`],
     /// regardless of the actual state.
     ///
-    /// You should be using [`StateConnection::read_packet`] to read the
+    /// You should be using [`Connection::read`] to read the
     /// correct packet type for the current state.
     ///
     /// # Warning
@@ -96,7 +96,7 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     /// Write a raw type into the [`Connection`],
     /// regardless of the actual state.
     ///
-    /// You should be using [`StateConnection::write_packet`] to write the
+    /// You should be using [`Connection::write`] to write the
     /// correct packet type for the current state.
     ///
     /// # Warning

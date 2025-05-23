@@ -9,9 +9,10 @@ pub trait EntityTypeResolver<V: Version> {
     /// The possible entity types that can be resolved.
     type EntityEnum: Sized;
 
-    /// Register all known [`EntityType`]s with the given [`EntityTypeStorage`].
+    /// Register all known [`EntityTypeTrait`]s
+    /// with the given [`EntityTypeStorage`].
     fn register(storage: &mut EntityTypeStorage<V>);
 
-    /// Resolve the entity type for the given [`EntityType`].
+    /// Resolve the entity type for the given [`EntityTypeTrait`].
     fn resolve(block: &dyn EntityTypeTrait<V>) -> Option<Self::EntityEnum>;
 }

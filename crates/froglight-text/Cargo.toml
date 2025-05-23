@@ -27,7 +27,7 @@ uuid = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
-bevy_reflect = { workspace = true, optional = true, features = ["smol_str"] }
+bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
 froglight-io = { workspace = true, optional = true }
 nu-ansi-term = { workspace = true, optional = true }
 rsa = { workspace = true, optional = true, features = ["sha2"] }
@@ -45,7 +45,13 @@ crypto = ["dep:rsa"]
 io = ["dep:froglight-io", "froglight-nbt/io", "std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-nbt/reflect"]
+bevy = [
+  "dep:bevy_ecs",
+  "dep:bevy_reflect",
+  "froglight-common/bevy",
+  "froglight-common/reflect",
+  "froglight-nbt/reflect",
+]
 # Enable `serde` serialization support.
 serde = [
   "bevy_platform/serialize",

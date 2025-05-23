@@ -131,7 +131,8 @@ impl NbtCompound {
     ///
     /// Returns the previous value associated with the key, if any.
     ///
-    /// See [`IndexMap::shift_insert`] for more information.
+    /// See [`IndexMap::shift_insert`](indexmap::IndexMap::shift_insert) for
+    /// more information.
     #[inline]
     pub fn shift_insert(
         &mut self,
@@ -147,7 +148,8 @@ impl NbtCompound {
     ///
     /// Returns the removed value, if any.
     ///
-    /// See [`IndexMap::shift_remove`] for more information.
+    /// See [`IndexMap::shift_remove`](indexmap::IndexMap::shift_remove) for
+    /// more information.
     #[inline]
     pub fn shift_remove<Q: ?Sized + AsRef<str>>(&mut self, key: &Q) -> Option<NbtTag> {
         self.0.shift_remove(key.as_ref().as_bytes())
@@ -158,7 +160,8 @@ impl NbtCompound {
     ///
     /// Returns the removed value, if any.
     ///
-    /// See [`IndexMap::swap_remove`] for more information.
+    /// See [`IndexMap::swap_remove`](indexmap::IndexMap::swap_remove) for more
+    /// information.
     #[inline]
     pub fn swap_remove<Q: ?Sized + AsRef<str>>(&mut self, key: &Q) -> Option<NbtTag> {
         self.0.swap_remove(key.as_ref().as_bytes())

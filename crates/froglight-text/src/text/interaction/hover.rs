@@ -24,7 +24,8 @@ use serde::{
 };
 use uuid::Uuid;
 
-/// Actions to take when interacting with a [`FormattedText`].
+/// Actions to take when interacting with a
+/// [`FormattedText`](crate::text::FormattedText).
 #[derive(Debug, Default, Clone, PartialEq, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -51,10 +52,10 @@ pub struct TextInteraction {
 }
 
 impl TextInteraction {
-    /// An empty [`InteractComponent`].
+    /// An empty [`TextInteraction`].
     pub const EMPTY: Self = Self { insertion: None, click: None, hover: None };
 
-    /// Create a new empty [`InteractComponent`].
+    /// Create a new empty [`TextInteraction`].
     #[must_use]
     pub const fn empty() -> Self { Self::EMPTY }
 
@@ -64,7 +65,7 @@ impl TextInteraction {
         self.insertion.is_none() && self.click.is_none() && self.hover.is_none()
     }
 
-    /// Update the [`InteractComponent`] with the given insertion text.
+    /// Update the [`TextInteraction`] with the given insertion text.
     #[inline]
     #[must_use]
     pub fn with_insert(mut self, insert: impl Into<Cow<'static, str>>) -> Self {
@@ -72,7 +73,7 @@ impl TextInteraction {
         self
     }
 
-    /// Update the [`InteractComponent`] with the given [`TextClickInteract`].
+    /// Update the [`TextInteraction`] with the given [`TextClickInteract`].
     #[inline]
     #[must_use]
     pub fn with_click(mut self, click: impl Into<TextClickInteract>) -> Self {
@@ -80,7 +81,7 @@ impl TextInteraction {
         self
     }
 
-    /// Update the [`InteractComponent`] with the given [`TextHoverInteract`].
+    /// Update the [`TextInteraction`] with the given [`TextHoverInteract`].
     #[inline]
     #[must_use]
     pub fn with_hover(mut self, hover: impl Into<TextHoverInteract>) -> Self {
@@ -91,7 +92,8 @@ impl TextInteraction {
 
 // -------------------------------------------------------------------------------------------------
 
-/// An interaction to perform when the [`FormattedText`] is clicked.
+/// An interaction to perform when the
+/// [`FormattedText`](crate::text::FormattedText) is clicked.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -104,7 +106,8 @@ pub struct TextClickInteract {
     pub value: Cow<'static, str>,
 }
 
-/// The action to perform when the [`FormattedText`] is clicked.
+/// The action to perform when the [`FormattedText`](crate::text::FormattedText)
+/// is clicked.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -139,7 +142,8 @@ impl IntoTag for TextClickAction {
 
 // -------------------------------------------------------------------------------------------------
 
-/// An interaction to perform when the [`FormattedText`] is hovered over.
+/// An interaction to perform when the
+/// [`FormattedText`](crate::text::FormattedText) is hovered over.
 #[derive(Debug, Clone, PartialEq, Deref, DerefMut, From, Into)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -148,7 +152,8 @@ pub struct TextHoverInteract {
     pub action: TextHoverAction,
 }
 
-/// An action to perform when the [`FormattedText`] is hovered over.
+/// An action to perform when the [`FormattedText`](crate::text::FormattedText)
+/// is hovered over.
 #[derive(Debug, Clone, PartialEq, From)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub enum TextHoverAction {
@@ -160,7 +165,8 @@ pub enum TextHoverAction {
     ShowEntity(TextHoverEntity),
 }
 
-/// An item action to perform when the [`FormattedText`] is hovered over.
+/// An item action to perform when the
+/// [`FormattedText`](crate::text::FormattedText) is hovered over.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -177,7 +183,8 @@ pub struct TextHoverItem {
     pub components: Option<NbtCompound>,
 }
 
-/// An entity action to perform when the [`FormattedText`] is hovered over.
+/// An entity action to perform when the
+/// [`FormattedText`](crate::text::FormattedText) is hovered over.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, FrogNbt)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

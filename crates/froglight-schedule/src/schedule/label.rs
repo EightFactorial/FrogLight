@@ -1,4 +1,4 @@
-//! [`ScheduleLabel`]s and [`SystemSet`]s
+//! [`ScheduleLabel`]s and [`SystemSet`](bevy_ecs::schedule::SystemSet)s
 
 use bevy_ecs::schedule::ScheduleLabel;
 

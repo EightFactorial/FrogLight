@@ -18,7 +18,7 @@ pub use text::TextComponent;
 mod translate;
 pub use translate::TranslateComponent;
 
-/// The content of a [`FormattedText`].
+/// The content of a [`FormattedText`](crate::text::FormattedText).
 #[derive(Debug, Clone, PartialEq, derive_more::From)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect), reflect(Debug, Clone, PartialEq))]
 pub enum TextContent {

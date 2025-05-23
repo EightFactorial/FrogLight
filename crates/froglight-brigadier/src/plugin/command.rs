@@ -9,7 +9,7 @@ use derive_more::{Deref, From};
 
 use super::BrigadierEvent;
 
-/// An Brigadier command executed by an [`Entity`].
+/// An Brigadier command executed by an [`Entity`](bevy_ecs::entity::Entity).
 ///
 /// Internally sends a [`BrigadierEvent`] to be handled later.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, From, Deref)]
@@ -36,7 +36,7 @@ impl EntityCommand for BrigadierCommand {
 
 /// A trait for running Brigadier commands.
 pub trait BrigadierCommands {
-    /// Run a [`BrigadierCommand`] as an [`Entity`].
+    /// Run a [`BrigadierCommand`] as an [`Entity`](bevy_ecs::entity::Entity).
     fn run_command(&mut self, command: impl Into<String>) -> &mut Self;
 }
 

@@ -1,4 +1,4 @@
-//! [`InteractComponent`]
+//! [`TextInteraction`]
 
 #[cfg(not(feature = "std"))]
 use alloc::borrow::Cow;
@@ -16,7 +16,8 @@ pub use click::TextClickInteract;
 pub mod hover;
 pub use hover::TextHoverInteract;
 
-/// Actions to take when interacting with a [`FormattedText`].
+/// Actions to take when interacting with a
+/// [`FormattedText`](crate::text::FormattedText).
 #[derive(Debug, Default, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -49,7 +50,7 @@ impl TextInteraction {
         self.insertion.is_none() && self.click.is_none() && self.hover.is_none()
     }
 
-    /// Update the [`InteractComponent`] with the given insertion text.
+    /// Update the [`TextInteraction`] with the given insertion text.
     #[inline]
     #[must_use]
     pub fn with_insert(mut self, insert: impl Into<Cow<'static, str>>) -> Self {
@@ -57,7 +58,7 @@ impl TextInteraction {
         self
     }
 
-    /// Update the [`InteractComponent`] with the given [`TextClickInteract`].
+    /// Update the [`TextInteraction`] with the given [`TextClickInteract`].
     #[inline]
     #[must_use]
     pub fn with_click(mut self, click: impl Into<TextClickInteract>) -> Self {
@@ -65,7 +66,7 @@ impl TextInteraction {
         self
     }
 
-    /// Update the [`InteractComponent`] with the given [`TextHoverInteract`].
+    /// Update the [`TextInteraction`] with the given [`TextHoverInteract`].
     #[inline]
     #[must_use]
     pub fn with_hover(mut self, hover: impl Into<TextHoverInteract>) -> Self {

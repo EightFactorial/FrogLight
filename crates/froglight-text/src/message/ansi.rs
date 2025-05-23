@@ -11,7 +11,7 @@ use crate::{
 };
 
 impl FormattedText {
-    /// Extract the message as an [`AnsiString`](nu_ansi_term::AnsiString).
+    /// Extract the message as an [`AnsiString`].
     ///
     /// # Errors
     /// Returns an error if the [`FormattedText`] is not a message,
@@ -26,7 +26,7 @@ impl FormattedText {
 }
 
 impl<'a> FormattedTextRef<'a, '_> {
-    /// Extract the message as an [`AnsiString`](nu_ansi_term::AnsiString).
+    /// Extract the message as an [`AnsiString`].
     ///
     /// # Errors
     /// Returns an error if the [`FormattedText`] is not a message,

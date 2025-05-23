@@ -1,4 +1,4 @@
-//! [`PlayerUUID`]
+//! [`PlayerUuid`]
 
 #[cfg(not(feature = "std"))]
 use alloc::borrow::Borrow;

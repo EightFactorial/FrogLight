@@ -10,7 +10,8 @@ use bevy_reflect::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-/// An interaction to perform when the [`FormattedText`] is clicked.
+/// An interaction to perform when the
+/// [`FormattedText`](crate::text::FormattedText) is clicked.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -22,7 +23,8 @@ pub struct TextClickInteract {
     pub value: Cow<'static, str>,
 }
 
-/// The action to perform when the [`FormattedText`] is clicked.
+/// The action to perform when the [`FormattedText`](crate::text::FormattedText)
+/// is clicked.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
