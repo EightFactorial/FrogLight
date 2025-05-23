@@ -14,7 +14,7 @@ use froglight_common::{vanilla::Vanilla, version::Version};
 use indexmap::IndexMap;
 use parking_lot::RwLock;
 
-use super::{EntityTypeTrait, EntityTypeExt, EntityTypeResolver};
+use super::{EntityTypeExt, EntityTypeResolver, EntityTypeTrait};
 
 /// A thread-safe dynamic storage for entity types.
 ///
@@ -90,8 +90,8 @@ impl<V: Version> EntityTypeStorage<V> {
     ///
     /// # Example
     ///
-    /// ```rust,ignore
-    /// use froglight_entity::prelude::*;
+    /// ```rust
+    /// use froglight_entity::{entity_type::GlobalEntityTypeId, prelude::*};
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -102,15 +102,18 @@ impl<V: Version> EntityTypeStorage<V> {
     ///
     ///     // Get the trait with the global id of `0`.
     ///     let entity = storage.get_trait(GlobalEntityTypeId::new_unchecked(0)).unwrap();
-    ///     assert_eq!(entity.identifier(), "minecraft:cat");
+    ///     assert_eq!(entity.identifier(), "minecraft:acacia_boat");
     ///
     ///     // Get the trait with the global id of `1`.
     ///     let entity = storage.get_trait(GlobalEntityTypeId::new_unchecked(1)).unwrap();
-    ///     assert_eq!(entity.identifier(), "minecraft:bat");
+    ///     assert_eq!(entity.identifier(), "minecraft:acacia_chest_boat");
     /// }
     /// ```
     #[must_use]
-    pub fn get_trait(&self, entity_type: GlobalEntityTypeId) -> Option<&'static dyn EntityTypeTrait<V>> {
+    pub fn get_trait(
+        &self,
+        entity_type: GlobalEntityTypeId,
+    ) -> Option<&'static dyn EntityTypeTrait<V>> {
         self.traits.get_index(usize::from(entity_type)).map(|(_, entity)| *entity)
     }
 
@@ -121,32 +124,32 @@ impl<V: Version> EntityTypeStorage<V> {
     ///
     /// # Example
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use froglight_common::vanilla::Vanilla;
-    /// use froglight_entity::prelude::*;
+    /// use froglight_entity::{entity_type::GlobalEntityTypeId, prelude::*};
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
     ///     use froglight_common::version::V1_21_4;
-    ///     use froglight_entity::entity_type::generated::v1_21_4::VersionEntities;
+    ///     use froglight_entity::entity_type::generated::v1_21_4::VersionEntityType;
     ///
     ///     // Create a new entity type storage.
     ///     let storage = EntityTypeStorage::<V1_21_4>::new();
     ///
     ///     // Get the entity type with the global id of `0`.
     ///     let entity = storage.get_typed::<Vanilla>(GlobalEntityTypeId::new_unchecked(0));
-    ///     if let Some(VersionEntities::Cat(cat)) = entity {
-    ///         assert_eq!(car.identifier(), "minecraft:cat");
-    ///     } else {
-    ///         panic!("EntityType was not `Cat`!");
+    ///     if let Some(VersionEntityType::AcaciaBoat(boat)) = &entity {
+    ///         assert_eq!(EntityTypeTrait::<V1_21_4>::identifier(boat), "minecraft:acacia_boat");
+    ///     } else if entity.is_some() {
+    ///         panic!("EntityType was not `AcaciaBoat`, but {:?}!", entity.unwrap());
     ///     }
     ///
-    ///     // Get the entity type with the global id of `1`.
-    ///     let entity = storage.get_typed::<Vanilla>(GlobalEntityTypeId::new_unchecked(1));
-    ///     if let Some(VersionEntities::Bat(bat)) = entity {
-    ///         assert_eq!(bat.identifier(), "minecraft:bat");
-    ///     } else {
-    ///         panic!("EntityType was not `Bat`!");
+    ///     // Get the entity type with the global id of `5`.
+    ///     let entity = storage.get_typed::<Vanilla>(GlobalEntityTypeId::new_unchecked(5));
+    ///     if let Some(VersionEntityType::ArmorStand(armorstand)) = &entity {
+    ///         assert_eq!(EntityTypeTrait::<V1_21_4>::identifier(armorstand), "minecraft:armor_stand");
+    ///     } else if entity.is_some() {
+    ///         panic!("EntityType was not `ArmorStand`, but {:?}!", entity.unwrap());
     ///     }
     /// }
     /// ```
@@ -165,7 +168,7 @@ impl<V: Version> EntityTypeStorage<V> {
     ///
     /// # Example
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use froglight_entity::prelude::*;
     ///
     /// #[cfg(feature = "v1_21_4")]
@@ -177,11 +180,11 @@ impl<V: Version> EntityTypeStorage<V> {
     ///
     ///     // Get the `GlobalEntityTypeId` of `Cat`.
     ///     let global_id = storage.get_global(entity::Cat).unwrap();
-    ///     assert_eq!(*global_id, 0u32);
+    ///     assert_eq!(*global_id, 20u32);
     ///
     ///     // Get the `GlobalEntityTypeId` of `Bat`.
     ///     let global_id = storage.get_global(entity::Bat).unwrap();
-    ///     assert_eq!(*global_id, 1u32);
+    ///     assert_eq!(*global_id, 10u32);
     /// }
     /// ```
     #[must_use]
@@ -201,8 +204,8 @@ impl<V: Version> EntityTypeStorage<V> {
     ///
     /// # Example
     ///
-    /// ```rust,ignore
-    /// use froglight_entity::prelude::*;
+    /// ```rust
+    /// use froglight_entity::{entity_type::GlobalEntityTypeId, prelude::*};
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -212,7 +215,7 @@ impl<V: Version> EntityTypeStorage<V> {
     ///     let storage = EntityTypeStorage::<V1_21_4>::new();
     ///
     ///     // Since `Cat` is already registered, we can get its global id.
-    ///     assert_eq!(storage.get_global(entity::Cat), Some(GlobalEntityTypeId::new_unchecked(0)));
+    ///     assert_eq!(storage.get_global(entity::Cat), Some(GlobalEntityTypeId::new_unchecked(20)));
     ///
     ///     // Create a new empty entity type storage.
     ///     let mut storage = EntityTypeStorage::<V1_21_4>::new_empty();

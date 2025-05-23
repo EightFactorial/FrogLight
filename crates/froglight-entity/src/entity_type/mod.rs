@@ -3,10 +3,10 @@
 pub mod generated;
 
 mod storage;
-pub use storage::{AppEntityTypeStorage, EntityTypeStorage};
+pub use storage::{AppEntityTypeStorage, EntityTypeStorage, GlobalEntityTypeId};
 
 mod traits;
-pub use traits::{EntityTypeTrait, EntityTypeExt, StaticEntityType};
+pub use traits::{EntityTypeExt, EntityTypeTrait, StaticEntityType};
 
 mod resolver;
 pub use resolver::EntityTypeResolver;

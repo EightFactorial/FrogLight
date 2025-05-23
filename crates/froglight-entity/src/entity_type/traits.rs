@@ -10,7 +10,7 @@ pub trait StaticEntityType: 'static {
     ///
     /// Useful when working internally with generic entity types.
     ///
-    /// ```rust,ignore
+    /// ```rust
     /// use froglight_entity::entity_type::{StaticEntityType, generated::Cat};
     ///
     /// assert_eq!(Cat::as_static(), &Cat);
@@ -24,17 +24,18 @@ pub trait StaticEntityType: 'static {
 pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// The identifier of the entity type.
     ///
-    /// ```rust,ignore
-    /// use froglight_entity::entity_type::{
-    ///     EntityTypeTrait, EntityTypeExt, StaticEntityType, generated::Cat,
-    /// };
+    /// ```rust
+    /// use froglight_entity::prelude::{entity::Cat, *};
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static identifier through the `EntityType` trait.
-    ///     assert_eq!(<Cat as EntityTypeTrait<V1_21_4>>::identifier(Cat::as_static()), "minecraft:cat");
+    ///     assert_eq!(
+    ///         <Cat as EntityTypeTrait<V1_21_4>>::identifier(Cat::as_static()),
+    ///         "minecraft:cat"
+    ///     );
     ///
     ///     // Accessing the constant identifier through the `EntityTypeExt` trait.
     ///     assert_eq!(<Cat as EntityTypeExt<V1_21_4>>::IDENTIFIER, "minecraft:cat");
@@ -45,7 +46,10 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_5;
     ///
     ///     // Accessing the static identifier through the `EntityType` trait.
-    ///     assert_eq!(<Cat as EntityTypeTrait<V1_21_5>>::identifier(Cat::as_static()), "minecraft:cat");
+    ///     assert_eq!(
+    ///         <Cat as EntityTypeTrait<V1_21_5>>::identifier(Cat::as_static()),
+    ///         "minecraft:cat"
+    ///     );
     ///
     ///     // Accessing the constant identifier through the `EntityTypeExt` trait.
     ///     assert_eq!(<Cat as EntityTypeExt<V1_21_5>>::IDENTIFIER, "minecraft:cat");
@@ -55,10 +59,8 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
 
     /// The spawn group of the entity type.
     ///
-    /// ```rust,ignore
-    /// use froglight_entity::entity_type::{
-    ///     EntityTypeTrait, EntityTypeExt, StaticEntityType, generated::Cat,
-    /// };
+    /// ```rust
+    /// use froglight_entity::prelude::{entity::Cat, *};
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -92,11 +94,9 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
 
     /// The dimensions of the entity type.
     ///
-    /// ```rust,ignore
-    /// use froglight_entity::entity_type::{
-    ///     EntityTypeTrait, EntityTypeExt, StaticEntityType, generated::Cat,
-    /// };
-    /// use glam:Vec3;
+    /// ```rust
+    /// use froglight_entity::prelude::{entity::Cat, *};
+    /// use glam::Vec3;
     ///
     /// #[cfg(feature = "v1_21_4")]
     /// {
@@ -109,10 +109,7 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     );
     ///
     ///     // Accessing the constant identifier through the `EntityTypeExt` trait.
-    ///     assert_eq!(
-    ///         <Cat as EntityTypeExt<V1_21_4>>::DIMENSIONS,
-    ///          Vec3::new(0.6, 0.7, 0.35)
-    ///     );
+    ///     assert_eq!(<Cat as EntityTypeExt<V1_21_4>>::DIMENSIONS, Vec3::new(0.6, 0.7, 0.35));
     /// }
     ///
     /// #[cfg(feature = "v1_21_5")]
@@ -126,10 +123,7 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     );
     ///
     ///     // Accessing the constant identifier through the `EntityTypeExt` trait.
-    ///     assert_eq!(
-    ///         <Cat as EntityTypeExt<V1_21_5>>::DIMENSIONS,
-    ///         Vec3::new(0.6, 0.7, 0.35)
-    ///     );
+    ///     assert_eq!(<Cat as EntityTypeExt<V1_21_5>>::DIMENSIONS, Vec3::new(0.6, 0.7, 0.35));
     /// }
     /// ```
     fn dimensions(&self) -> Vec3;

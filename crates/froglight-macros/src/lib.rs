@@ -93,6 +93,13 @@ pub fn entity_types(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     entity::entity_types(input.into()).into()
 }
 
+/// Derive the appropriate traits on entity types.
+#[proc_macro]
+#[cfg(feature = "entity")]
+pub fn entity_type_properties(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::entity_type_properties(input.into()).into()
+}
+
 /// Derive `froglight_entity::entity_type::StaticEntityType` for a struct.
 ///
 /// # Example

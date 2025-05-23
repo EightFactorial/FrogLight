@@ -24,6 +24,7 @@ froglight-common = { workspace = true }
 froglight-macros = { workspace = true, features = ["entity"] }
 froglight-nbt = { workspace = true }
 glam = { workspace = true }
+hashify = { workspace = true }
 indexmap = { workspace = true }
 md-5 = { workspace = true }
 parking_lot = { workspace = true }
@@ -66,11 +67,7 @@ serde = [
 ]
 
 # Enable nightly features.
-nightly = [
-  "froglight-io?/nightly",
-  "froglight-nbt/nightly",
-  "parking_lot/nightly",
-]
+nightly = ["froglight-io?/nightly", "froglight-nbt/nightly", "parking_lot/nightly"]
 
 # Enable support for the rust standard library.
 std = [
