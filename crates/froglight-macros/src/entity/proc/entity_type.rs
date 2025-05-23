@@ -20,12 +20,19 @@ pub(crate) fn entity_types(input: TokenStream) -> TokenStream {
 
     let mut enum_tokens = TokenStream::new();
     let mut hook_tokens = TokenStream::new();
+    let mut impl_tokens = TokenStream::new();
 
     for entity in entities {
         let ident = &entity.ident;
         enum_tokens.extend(quote!(#ident,));
         hook_tokens.extend(quote! {
             Self::#ident => { if !entity_ref.contains::<#ident>() { commands.insert(#ident); } },
+        });
+        impl_tokens.extend(quote! {
+            impl From<#ident> for EntityType {
+                #[inline]
+                fn from(_: #ident) -> Self { Self::#ident }
+            }
         });
 
         struct_tokens.extend(MacroInput::as_tokens(&entity, &path));
