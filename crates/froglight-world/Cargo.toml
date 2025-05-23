@@ -55,6 +55,7 @@ bevy = [
   "dep:downcast-rs",
   "froglight-block?/bevy",
   "froglight-common/bevy",
+  "froglight-common/reflect",
   "froglight-nbt?/reflect",
 ]
 

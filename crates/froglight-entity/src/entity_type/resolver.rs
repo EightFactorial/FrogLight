@@ -2,7 +2,7 @@
 
 use froglight_common::version::Version;
 
-use super::{storage::EntityTypeStorage, traits::EntityType};
+use super::{storage::EntityTypeStorage, traits::EntityTypeTrait};
 
 /// A trait for resolving entity types from global entity type IDs.
 pub trait EntityTypeResolver<V: Version> {
@@ -13,5 +13,5 @@ pub trait EntityTypeResolver<V: Version> {
     fn register(storage: &mut EntityTypeStorage<V>);
 
     /// Resolve the entity type for the given [`EntityType`].
-    fn resolve(block: &dyn EntityType<V>) -> Option<Self::EntityEnum>;
+    fn resolve(block: &dyn EntityTypeTrait<V>) -> Option<Self::EntityEnum>;
 }

@@ -12,9 +12,12 @@ pub mod player;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    pub use froglight_macros::StaticEntityType;
+
     pub use crate::{
         entity_type::{
-            AppEntityTypeStorage, EntityType, EntityTypeExt, EntityTypeStorage, generated::entity,
+            AppEntityTypeStorage, EntityTypeTrait, EntityTypeExt, EntityTypeStorage, StaticEntityType,
+            generated::{entity, entity::EntityType},
         },
         player::{profile::PlayerProfile, username::PlayerUsername, uuid::PlayerUuid},
     };

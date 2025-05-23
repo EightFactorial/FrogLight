@@ -65,13 +65,12 @@ mod common;
 /// use froglight_macros::Version;
 ///
 /// #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, Version)]
-/// #[version(protocol = 769, resource = 46, feature = "v1_21_4")]
+/// #[version(protocol = 769, resource = 46)]
 /// pub struct V1_21_4;
 ///
 /// // |
 /// // V
 ///
-/// #[cfg(feature = "v1_21_4")]
 /// impl froglight_common::version::Version for V1_21_4 {
 ///     const PROTOCOL_ID: u32 = 769;
 ///     const RESOURCE_VERSION: u32 = 46;
@@ -80,6 +79,40 @@ mod common;
 #[proc_macro_derive(Version, attributes(version))]
 pub fn derive_version(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     common::derive_version(input.into()).into()
+}
+
+// ------------------- `froglight-entity` -------------------
+
+#[cfg(feature = "entity")]
+mod entity;
+
+/// Derive the appropriate traits on entity types.
+#[proc_macro]
+#[cfg(feature = "entity")]
+pub fn entity_types(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::entity_types(input.into()).into()
+}
+
+/// Derive `froglight_entity::entity_type::StaticEntityType` for a struct.
+///
+/// # Example
+/// ```rust,ignore
+/// use froglight_macros::StaticEntityType;
+///
+/// #[derive(StaticEntityType)]
+/// struct MyItem;
+///
+/// // |
+/// // V
+///
+/// impl froglight_entity::entity_type::StaticEntityType for MyItem {
+///    fn as_static() -> &'static Self { &Self }
+/// }
+/// ```
+#[cfg(feature = "entity")]
+#[proc_macro_derive(StaticEntityType)]
+pub fn derive_static_entity_type(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::derive_static_entity_type(input.into()).into()
 }
 
 // ------------------- `froglight-io` -------------------

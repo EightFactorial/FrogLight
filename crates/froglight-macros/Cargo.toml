@@ -36,6 +36,9 @@ block = []
 # Enable `froglight-common` macros.
 common = []
 
+# Enable `froglight-entity` macros.
+entity = []
+
 # Enable `froglight-io` macros.
 io = []
 # Enable tracing for `froglight-io` macros.

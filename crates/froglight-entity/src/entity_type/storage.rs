@@ -14,7 +14,7 @@ use froglight_common::{vanilla::Vanilla, version::Version};
 use indexmap::IndexMap;
 use parking_lot::RwLock;
 
-use super::{EntityType, EntityTypeExt, EntityTypeResolver};
+use super::{EntityTypeTrait, EntityTypeExt, EntityTypeResolver};
 
 /// A thread-safe dynamic storage for entity types.
 ///
@@ -55,7 +55,7 @@ impl<V: Version> AppEntityTypeStorage<V> {
 ///
 /// Allows for the registration and retrieval of entity types at runtime.
 pub struct EntityTypeStorage<V: Version> {
-    traits: IndexMap<TypeId, &'static dyn EntityType<V>, NoOpHash>,
+    traits: IndexMap<TypeId, &'static dyn EntityTypeTrait<V>, NoOpHash>,
     _phantom: PhantomData<V>,
 }
 
@@ -110,7 +110,7 @@ impl<V: Version> EntityTypeStorage<V> {
     /// }
     /// ```
     #[must_use]
-    pub fn get_trait(&self, entity_type: GlobalEntityTypeId) -> Option<&'static dyn EntityType<V>> {
+    pub fn get_trait(&self, entity_type: GlobalEntityTypeId) -> Option<&'static dyn EntityTypeTrait<V>> {
         self.traits.get_index(usize::from(entity_type)).map(|(_, entity)| *entity)
     }
 
@@ -185,7 +185,7 @@ impl<V: Version> EntityTypeStorage<V> {
     /// }
     /// ```
     #[must_use]
-    pub fn get_global(&self, entity_type: impl EntityType<V>) -> Option<GlobalEntityTypeId> {
+    pub fn get_global(&self, entity_type: impl EntityTypeTrait<V>) -> Option<GlobalEntityTypeId> {
         self.traits.get_index_of(&entity_type.type_id()).map(GlobalEntityTypeId::from)
     }
 
