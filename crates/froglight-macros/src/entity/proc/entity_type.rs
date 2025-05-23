@@ -44,7 +44,9 @@ pub(crate) fn entity_types(input: TokenStream) -> TokenStream {
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
         #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component), component(on_add = Self::on_add))]
         #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
         #[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Component))]
+        #[cfg_attr(all(feature = "serde", feature = "reflect"), reflect(Serialize, Deserialize))]
         pub enum EntityType {
             #enum_tokens
         }
@@ -95,7 +97,9 @@ impl MacroInput {
             #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, #path::prelude::StaticEntityType)]
             #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component), require(#path::prelude::EntityType::#ident))]
             #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Default, Clone, PartialEq, Hash))]
+            #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Component))]
+            #[cfg_attr(all(feature = "serde", feature = "reflect"), reflect(Serialize, Deserialize))]
             #vis #struct_token #ident #semi_token
         }
     }
