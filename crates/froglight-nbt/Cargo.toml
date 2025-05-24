@@ -17,15 +17,15 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-flate2 = { workspace = true, features = ["rust_backend"] }
+flate2 = { features = ["rust_backend"], workspace = true }
 proptest = { workspace = true }
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tracing-subscriber = { features = ["env-filter"], workspace = true }
 
 [dependencies]
-bevy_platform = { workspace = true, features = ["alloc"] }
+bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
-froglight-macros = { workspace = true, features = ["nbt"] }
+froglight-macros = { features = ["nbt"], workspace = true }
 indexmap = { workspace = true }
 regex = { workspace = true }
 simd_cesu8 = { workspace = true }
@@ -33,11 +33,11 @@ smol_str = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
-bevy_reflect = { workspace = true, optional = true, features = ["smol_str"] }
-froglight-io = { workspace = true, optional = true }
-serde = { workspace = true, optional = true, features = ["derive"] }
-tracing = { workspace = true, optional = true }
-uuid = { workspace = true, optional = true }
+bevy_reflect = { features = ["smol_str"], optional = true, workspace = true }
+froglight-io = { optional = true, workspace = true }
+serde = { features = ["derive"], optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+uuid = { optional = true, workspace = true }
 
 [features]
 default = ["std", "uuid"]

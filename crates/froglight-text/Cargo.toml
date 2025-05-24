@@ -16,23 +16,23 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy_platform = { workspace = true, features = ["alloc"] }
+bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
-froglight-nbt = { workspace = true, features = ["uuid"] }
+froglight-nbt = { features = ["uuid"], workspace = true }
 parking_lot = { workspace = true }
 smol_str = { workspace = true }
 thiserror = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
-bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
-froglight-io = { workspace = true, optional = true }
-nu-ansi-term = { workspace = true, optional = true }
-rsa = { workspace = true, optional = true, features = ["sha2"] }
-serde = { workspace = true, optional = true, features = ["derive"] }
-serde_json = { workspace = true, optional = true }
+bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_reflect = { features = ["smol_str", "uuid"], optional = true, workspace = true }
+froglight-io = { optional = true, workspace = true }
+nu-ansi-term = { optional = true, workspace = true }
+rsa = { features = ["sha2"], optional = true, workspace = true }
+serde = { features = ["derive"], optional = true, workspace = true }
+serde_json = { optional = true, workspace = true }
 
 [features]
 default = ["ansi", "crypto", "std"]

@@ -16,30 +16,30 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-froglight-text = { workspace = true, features = ["ansi"] }
+froglight-text = { features = ["ansi"], workspace = true }
 smol_str = { workspace = true }
-tracing-subscriber = { workspace = true, features = ["env-filter"] }
+tracing-subscriber = { features = ["env-filter"], workspace = true }
 
 [dependencies]
 async-trait = "0.1"
-bevy_platform = { workspace = true, features = ["alloc"] }
+bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
-froglight-macros = { workspace = true, features = ["network"] }
-froglight-packet = { workspace = true, features = ["inventory"] }
-futures-lite = { workspace = true, features = ["alloc"] }
+froglight-macros = { features = ["network"], workspace = true }
+froglight-packet = { features = ["inventory"], workspace = true }
+futures-lite = { features = ["alloc"], workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
-aes = { workspace = true, optional = true }
-async-compression = { workspace = true, optional = true, features = ["futures-io", "zlib"] }
-async-net = { workspace = true, optional = true }
-bevy_ecs = { workspace = true, optional = true }
-bevy_tasks = { workspace = true, optional = true }
-cfb8 = { workspace = true, optional = true }
-froglight-io = { workspace = true, optional = true }
-froglight-resolver = { workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
+aes = { optional = true, workspace = true }
+async-compression = { features = ["futures-io", "zlib"], optional = true, workspace = true }
+async-net = { optional = true, workspace = true }
+bevy_ecs = { optional = true, workspace = true }
+bevy_tasks = { optional = true, workspace = true }
+cfb8 = { optional = true, workspace = true }
+froglight-io = { optional = true, workspace = true }
+froglight-resolver = { optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
 
 [features]
 default = ["crypto", "io", "resolver", "std"]

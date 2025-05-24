@@ -19,19 +19,19 @@ workspace = true
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-entity = { workspace = true }
-froglight-inventory = { workspace = true, features = ["world"] }
-froglight-item = { workspace = true, features = ["block"] }
+froglight-inventory = { features = ["world"], workspace = true }
+froglight-item = { features = ["block"], workspace = true }
 froglight-nbt = { workspace = true }
-froglight-network = { workspace = true, optional = true }
+froglight-network = { optional = true, workspace = true }
 froglight-physics = { workspace = true }
 froglight-registry = { workspace = true }
-froglight-text = { workspace = true, features = ["crypto"] }
-froglight-world = { workspace = true, features = ["block", "nbt"] }
+froglight-text = { features = ["crypto"], workspace = true }
+froglight-world = { features = ["block", "nbt"], workspace = true }
 
 # Optional dependencies
-froglight-brigadier = { workspace = true, optional = true, features = ["glam", "nbt", "uuid"] }
-froglight-resolver = { workspace = true, optional = true, features = ["agent"] }
-froglight-schedule = { workspace = true, optional = true }
+froglight-brigadier = { features = ["glam", "nbt", "uuid"], optional = true, workspace = true }
+froglight-resolver = { features = ["agent"], optional = true, workspace = true }
+froglight-schedule = { optional = true, workspace = true }
 
 [features]
 default = ["bevy", "brigadier", "crypto", "std"]

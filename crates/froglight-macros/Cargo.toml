@@ -23,9 +23,9 @@ convert_case = "0.7"
 darling = "0.20"
 parking_lot = { workspace = true }
 proc-macro2 = "1.0"
-quote = { version = "1.0", features = ["proc-macro"] }
-syn = { version = "2.0", features = ["full", "printing", "proc-macro"] }
-toml_edit = { version = "0.22", default-features = false, features = ["parse"] }
+quote = { features = ["proc-macro"], version = "1.0" }
+syn = { features = ["full", "printing", "proc-macro"], version = "2.0" }
+toml_edit = { default-features = false, features = ["parse"], version = "0.22" }
 
 [features]
 default = []

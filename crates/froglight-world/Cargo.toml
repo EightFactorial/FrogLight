@@ -19,8 +19,8 @@ workspace = true
 proptest = { workspace = true }
 
 [dependencies]
-bevy_platform = { workspace = true, features = ["alloc"] }
-bitvec = { version = "1.0", default-features = false, features = ["alloc"] }
+bevy_platform = { features = ["alloc"], workspace = true }
+bitvec = { default-features = false, features = ["alloc"], version = "1.0" }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 glam = { workspace = true }
@@ -28,13 +28,13 @@ parking_lot = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
-bevy_app = { workspace = true, optional = true, features = ["bevy_reflect"] }
-bevy_ecs = { workspace = true, optional = true, features = ["bevy_reflect"] }
-bevy_reflect = { workspace = true, optional = true, features = ["glam"] }
-downcast-rs = { workspace = true, optional = true }
-froglight-block = { workspace = true, optional = true }
-froglight-io = { workspace = true, optional = true, features = ["glam"] }
-froglight-nbt = { workspace = true, optional = true }
+bevy_app = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_reflect = { features = ["glam"], optional = true, workspace = true }
+downcast-rs = { optional = true, workspace = true }
+froglight-block = { optional = true, workspace = true }
+froglight-io = { features = ["glam"], optional = true, workspace = true }
+froglight-nbt = { optional = true, workspace = true }
 
 [features]
 default = ["nbt", "std"]

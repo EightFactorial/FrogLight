@@ -16,19 +16,19 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy_platform = { workspace = true, features = ["alloc"] }
+bevy_platform = { features = ["alloc"], workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
-froglight-macros = { workspace = true, features = ["item"] }
+froglight-macros = { features = ["item"], workspace = true }
 froglight-nbt = { workspace = true }
 hashify = { workspace = true }
 indexmap = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
-froglight-block = { workspace = true, optional = true }
+bevy_ecs = { optional = true, workspace = true }
+bevy_reflect = { optional = true, workspace = true }
+froglight-block = { optional = true, workspace = true }
 
 [features]
 default = []

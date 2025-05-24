@@ -17,14 +17,14 @@ workspace = true
 
 [dependencies]
 derive_more = { workspace = true }
-froglight-macros = { workspace = true, features = ["common"] }
+froglight-macros = { features = ["common"], workspace = true }
 smol_str = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
-serde = { workspace = true, optional = true, features = ["derive"] }
+bevy_ecs = { optional = true, workspace = true }
+bevy_reflect = { features = ["smol_str", "uuid"], optional = true, workspace = true }
+serde = { features = ["derive"], optional = true, workspace = true }
 
 [features]
 default = ["alloc"]

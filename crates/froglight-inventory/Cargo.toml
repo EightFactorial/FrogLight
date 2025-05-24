@@ -19,7 +19,7 @@ workspace = true
 paste = "1.0"
 
 [dependencies]
-bevy_platform = { workspace = true, features = ["alloc"] }
+bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-item = { workspace = true }
@@ -28,11 +28,11 @@ indexmap = { workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
-crc32fast = { workspace = true, optional = true }
-froglight-io = { workspace = true, optional = true }
-froglight-world = { workspace = true, optional = true, features = ["nbt"] }
+bevy_ecs = { optional = true, workspace = true }
+bevy_reflect = { optional = true, workspace = true }
+crc32fast = { optional = true, workspace = true }
+froglight-io = { optional = true, workspace = true }
+froglight-world = { features = ["nbt"], optional = true, workspace = true }
 
 [features]
 default = ["std"]

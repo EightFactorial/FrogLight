@@ -60,81 +60,81 @@ unnecessary_cast = "warn"
 
 [workspace.dependencies]
 # Bevy
-bevy = { version = "0.16", default-features = false, features = ["async_executor", "multi_threaded"] }
-bevy_app = { version = "0.16", default-features = false }
-bevy_derive = { version = "0.16", default-features = false }
-bevy_diagnostic = { version = "0.16", default-features = false }
-bevy_ecs = { version = "0.16", default-features = false }
-bevy_log = { version = "0.16", default-features = false }
-bevy_math = { version = "0.16", default-features = false }
-bevy_platform = { version = "0.16", default-features = false }
-bevy_reflect = { version = "0.16", default-features = false }
-bevy_state = { version = "0.16", default-features = false }
-bevy_tasks = { version = "0.16", default-features = false }
-bevy_time = { version = "0.16", default-features = false }
-bevy_transform = { version = "0.16", default-features = false }
-bevy_utils = { version = "0.16", default-features = false }
-bevy_winit = { version = "0.16", default-features = false }
+bevy = { default-features = false, features = ["async_executor", "multi_threaded"], version = "0.16" }
+bevy_app = { default-features = false, version = "0.16" }
+bevy_derive = { default-features = false, version = "0.16" }
+bevy_diagnostic = { default-features = false, version = "0.16" }
+bevy_ecs = { default-features = false, version = "0.16" }
+bevy_log = { default-features = false, version = "0.16" }
+bevy_math = { default-features = false, version = "0.16" }
+bevy_platform = { default-features = false, version = "0.16" }
+bevy_reflect = { default-features = false, version = "0.16" }
+bevy_state = { default-features = false, version = "0.16" }
+bevy_tasks = { default-features = false, version = "0.16" }
+bevy_time = { default-features = false, version = "0.16" }
+bevy_transform = { default-features = false, version = "0.16" }
+bevy_utils = { default-features = false, version = "0.16" }
+bevy_winit = { default-features = false, version = "0.16" }
 
 # FrogLight
-froglight-block = { version = "0.1", path = "crates/froglight-block", default-features = false }
-froglight-brigadier = { version = "0.1", path = "crates/froglight-brigadier", default-features = false }
-froglight-common = { version = "0.1", path = "crates/froglight-common", features = ["alloc"] }
-froglight-entity = { version = "0.1", path = "crates/froglight-entity", default-features = false }
-froglight-internal = { version = "0.1", path = "crates/froglight-internal", default-features = false }
-froglight-inventory = { version = "0.1", path = "crates/froglight-inventory", default-features = false }
-froglight-io = { version = "0.1", path = "crates/froglight-io", default-features = false }
-froglight-item = { version = "0.1", path = "crates/froglight-item", default-features = false }
-froglight-macros = { version = "0.1", path = "crates/froglight-macros", default-features = false }
-froglight-nbt = { version = "0.1", path = "crates/froglight-nbt", default-features = false }
-froglight-network = { version = "0.1", path = "crates/froglight-network", default-features = false }
-froglight-packet = { version = "0.1", path = "crates/froglight-packet", default-features = false }
-froglight-physics = { version = "0.1", path = "crates/froglight-physics", default-features = false }
-froglight-registry = { version = "0.1", path = "crates/froglight-registry", default-features = false }
-froglight-resolver = { version = "0.1", path = "crates/froglight-resolver", default-features = false }
-froglight-schedule = { version = "0.1", path = "crates/froglight-schedule", default-features = false }
-froglight-text = { version = "0.1", path = "crates/froglight-text", default-features = false }
-froglight-world = { version = "0.1", path = "crates/froglight-world", default-features = false }
+froglight-block = { default-features = false, path = "crates/froglight-block", version = "0.1" }
+froglight-brigadier = { default-features = false, path = "crates/froglight-brigadier", version = "0.1" }
+froglight-common = { features = ["alloc"], path = "crates/froglight-common", version = "0.1" }
+froglight-entity = { default-features = false, path = "crates/froglight-entity", version = "0.1" }
+froglight-internal = { default-features = false, path = "crates/froglight-internal", version = "0.1" }
+froglight-inventory = { default-features = false, path = "crates/froglight-inventory", version = "0.1" }
+froglight-io = { default-features = false, path = "crates/froglight-io", version = "0.1" }
+froglight-item = { default-features = false, path = "crates/froglight-item", version = "0.1" }
+froglight-macros = { default-features = false, path = "crates/froglight-macros", version = "0.1" }
+froglight-nbt = { default-features = false, path = "crates/froglight-nbt", version = "0.1" }
+froglight-network = { default-features = false, path = "crates/froglight-network", version = "0.1" }
+froglight-packet = { default-features = false, path = "crates/froglight-packet", version = "0.1" }
+froglight-physics = { default-features = false, path = "crates/froglight-physics", version = "0.1" }
+froglight-registry = { default-features = false, path = "crates/froglight-registry", version = "0.1" }
+froglight-resolver = { default-features = false, path = "crates/froglight-resolver", version = "0.1" }
+froglight-schedule = { default-features = false, path = "crates/froglight-schedule", version = "0.1" }
+froglight-text = { default-features = false, path = "crates/froglight-text", version = "0.1" }
+froglight-world = { default-features = false, path = "crates/froglight-world", version = "0.1" }
 
 # Hashing / Cryptography
-aes = { version = "0.8.4", default-features = false, features = ["zeroize"] }
-base64 = { version = "0.22.1", default-features = false, features = ["alloc"] }
-cfb8 = { version = "0.8.1", default-features = false, features = ["alloc", "zeroize"] }
-crc32fast = { version = "1.4.2", default-features = false }
-md-5 = { version = "0.10.6", default-features = false }
-rsa = { version = "0.9.8", default-features = false }
-sha2 = { version = "0.10.9", default-features = false }
+aes = { default-features = false, features = ["zeroize"], version = "0.8.4" }
+base64 = { default-features = false, features = ["alloc"], version = "0.22.1" }
+cfb8 = { default-features = false, features = ["alloc", "zeroize"], version = "0.8.1" }
+crc32fast = { default-features = false, version = "1.4.2" }
+md-5 = { default-features = false, version = "0.10.6" }
+rsa = { default-features = false, version = "0.9.8" }
+sha2 = { default-features = false, version = "0.10.9" }
 
 # Other
-async-channel = { version = "2.3", default-features = false }
-async-compression = { version = "0.4", default-features = false }
+async-channel = { default-features = false, version = "2.3" }
+async-compression = { default-features = false, version = "0.4" }
 async-io = "2.4"
 async-net = "2.0"
 blocking = "1.6"
-derive_more = { version = "2.0", default-features = false, features = ["full"] }
-downcast-rs = { version = "2.0", default-features = false, features = ["sync"] }
-flate2 = { version = "1.1", default-features = false }
-futures-lite = { version = "2.6", default-features = false, features = ["alloc"] }
-glam = { version = "0.29", default-features = false }
-hashify = { version = "0.2.6", default-features = false }
-hickory-resolver = { version = "0.25", default-features = false }
-indexmap = { version = "2.9", default-features = false }
-nu-ansi-term = { version = "0.46", default-features = false }
-parking_lot = { version = "0.12", default-features = false }
-proptest = { version = "1.6", default-features = false }
-rangemap = { version = "1.5", features = ["const_fn"] }
-regex = { version = "1.11", default-features = false, features = ["perf", "unicode"] }
-serde = { version = "1.0", default-features = false, features = ["alloc"] }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-simd_cesu8 = { version = "1.0", default-features = false }
-smallvec = { version = "1.15", features = ["const_new"] }
-smol_str = { version = "0.2", default-features = false }
-thiserror = { version = "2.0", default-features = false }
+derive_more = { default-features = false, features = ["full"], version = "2.0" }
+downcast-rs = { default-features = false, features = ["sync"], version = "2.0" }
+flate2 = { default-features = false, version = "1.1" }
+futures-lite = { default-features = false, features = ["alloc"], version = "2.6" }
+glam = { default-features = false, version = "0.29" }
+hashify = { default-features = false, version = "0.2.6" }
+hickory-resolver = { default-features = false, version = "0.25" }
+indexmap = { default-features = false, version = "2.9" }
+nu-ansi-term = { default-features = false, version = "0.46" }
+parking_lot = { default-features = false, version = "0.12" }
+proptest = { default-features = false, version = "1.6" }
+rangemap = { features = ["const_fn"], version = "1.5" }
+regex = { default-features = false, features = ["perf", "unicode"], version = "1.11" }
+serde = { default-features = false, features = ["alloc"], version = "1.0" }
+serde_json = { default-features = false, features = ["alloc"], version = "1.0" }
+simd_cesu8 = { default-features = false, version = "1.0" }
+smallvec = { features = ["const_new"], version = "1.15" }
+smol_str = { default-features = false, version = "0.2" }
+thiserror = { default-features = false, version = "2.0" }
 toml_edit = "0.22"
-tracing = { version = "0.1", default-features = false }
-tracing-subscriber = { version = "0.3", features = ["tracing-log"] }
+tracing = { default-features = false, version = "0.1" }
+tracing-subscriber = { features = ["tracing-log"], version = "0.3" }
 ureq = "3.0"
-uuid = { version = "1.16", default-features = false }
+uuid = { default-features = false, version = "1.17" }
 
 # --- Build Settings ---
 
@@ -193,7 +193,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-froglight-internal = { workspace = true, features = ["nightly"] }
+froglight-internal = { features = ["nightly"], workspace = true }
 
 [features]
 default = ["bevy", "brigadier", "crypto", "std"]

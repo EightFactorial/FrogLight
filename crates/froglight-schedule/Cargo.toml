@@ -16,22 +16,22 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy = { workspace = true, features = ["bevy_log"] }
-froglight-common = { workspace = true, features = ["bevy"] }
+bevy = { features = ["bevy_log"], workspace = true }
+froglight-common = { features = ["bevy"], workspace = true }
 
 [dependencies]
-bevy_app = { workspace = true, features = ["bevy_reflect"] }
-bevy_ecs = { workspace = true, features = ["bevy_reflect"] }
-bevy_platform = { workspace = true, features = ["alloc"] }
+bevy_app = { features = ["bevy_reflect"], workspace = true }
+bevy_ecs = { features = ["bevy_reflect"], workspace = true }
+bevy_platform = { features = ["alloc"], workspace = true }
 bevy_reflect = { workspace = true }
 derive_more = { workspace = true }
-froglight-common = { workspace = true, features = ["bevy"] }
+froglight-common = { features = ["bevy"], workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
-bevy_log = { workspace = true, optional = true, features = ["trace"] }
-bevy_tasks = { workspace = true, optional = true }
-bevy_time = { workspace = true, optional = true, features = ["bevy_reflect"] }
+bevy_log = { features = ["trace"], optional = true, workspace = true }
+bevy_tasks = { optional = true, workspace = true }
+bevy_time = { features = ["bevy_reflect"], optional = true, workspace = true }
 
 [features]
 default = ["std"]
