@@ -65,9 +65,13 @@ pub(crate) fn entity_type_properties(input: TokenStream) -> TokenStream {
                 #[automatically_derived]
                 impl #entity_path::entity_type::EntityTypeExt<#version> for #entity {
                     #[cfg(feature = "bevy")]
-                    type BundleType = (Self);
+                    type BundleType = (Self, #entity_path::entity_type::EntityCollider, #entity_path::entity_type::EntityEyeHeight);
                     #[cfg(feature = "bevy")]
-                    const BUNDLE: Self::BundleType = (Self);
+                    const BUNDLE: Self::BundleType = (
+                        Self,
+                        #entity_path::entity_type::EntityCollider::new(#entity_path::entity_type::Aabb3d { min: glam::Vec3A::ZERO, max: glam::Vec3A::new(#dim_x, #dim_y, #dim_x) }),
+                        #entity_path::entity_type::EntityEyeHeight::new(#dim_z),
+                    );
 
                     const IDENTIFIER: &'static str = #ident;
                     const SPAWN_GROUP: &'static str = #group;

@@ -16,8 +16,8 @@ pub mod prelude {
 
     pub use crate::{
         entity_type::{
-            AppEntityTypeStorage, EntityTypeExt, EntityTypeStorage, EntityTypeTrait,
-            StaticEntityType,
+            AppEntityTypeStorage, EntityCollider, EntityEyeHeight, EntityTypeExt,
+            EntityTypeStorage, EntityTypeTrait, StaticEntityType,
             generated::{self as entity, EntityType},
         },
         player::{profile::PlayerProfile, username::PlayerUsername, uuid::PlayerUuid},

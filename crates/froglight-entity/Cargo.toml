@@ -16,12 +16,12 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-base64 = { workspace = true, features = ["alloc"] }
-bevy_platform = { workspace = true, features = ["alloc"] }
+base64 = { features = ["alloc"], workspace = true }
+bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
-froglight-macros = { workspace = true, features = ["entity"] }
+froglight-macros = { features = ["entity"], workspace = true }
 froglight-nbt = { workspace = true }
 glam = { workspace = true }
 hashify = { workspace = true }
@@ -30,15 +30,16 @@ md-5 = { workspace = true }
 parking_lot = { workspace = true }
 smol_str = { workspace = true }
 thiserror = { workspace = true }
-uuid = { workspace = true, features = ["md5"] }
+uuid = { features = ["md5"], workspace = true }
 
 # Optional dependencies
-bevy_ecs = { workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true, features = ["smol_str", "uuid"] }
-froglight-io = { workspace = true, optional = true }
-serde = { workspace = true, optional = true, features = ["derive"] }
-serde_json = { workspace = true, optional = true }
-ureq = { workspace = true, optional = true, features = ["json"] }
+bevy_ecs = { optional = true, workspace = true }
+bevy_math = { optional = true, workspace = true }
+bevy_reflect = { features = ["glam", "smol_str", "uuid"], optional = true, workspace = true }
+froglight-io = { optional = true, workspace = true }
+serde = { features = ["derive"], optional = true, workspace = true }
+serde_json = { optional = true, workspace = true }
+ureq = { features = ["json"], optional = true, workspace = true }
 
 [features]
 default = ["online", "std"]
@@ -49,9 +50,9 @@ online = ["dep:ureq", "serde", "std"]
 io = ["dep:froglight-io", "std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "froglight-common/bevy", "froglight-nbt/reflect"]
+bevy = ["dep:bevy_ecs", "dep:bevy_math", "froglight-common/bevy", "froglight-nbt/reflect"]
 # Enable `bevy_reflect` support.
-reflect = ["bevy", "bevy_ecs?/bevy_reflect", "dep:bevy_reflect"]
+reflect = ["bevy", "bevy_ecs?/bevy_reflect", "bevy_math?/bevy_reflect", "dep:bevy_reflect", "froglight-common/reflect"]
 
 # Enable `serde` serialization support.
 serde = [
@@ -84,7 +85,7 @@ std = [
   "uuid/std",
 ]
 # Enable `no_std` support for `glam`.
-libm = ["glam/libm"]
+libm = ["bevy_math?/libm", "glam/libm"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4"]
