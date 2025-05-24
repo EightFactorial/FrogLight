@@ -50,7 +50,7 @@ froglight_macros::entity_type_properties! {
     ElderGuardian => { properties: { ident: "minecraft:elder_guardian", group: "minecraft:monster", dimensions: [1.9975f32, 1.9975f32, 0.99875f32], fire_immune: false } },
     Enderman => { properties: { ident: "minecraft:enderman", group: "minecraft:monster", dimensions: [0.6f32, 2.9f32, 2.55f32], fire_immune: false } },
     Endermite => { properties: { ident: "minecraft:endermite", group: "minecraft:monster", dimensions: [0.4f32, 0.3f32, 0.13f32], fire_immune: false } },
-    Head => { properties: { ident: "minecraft:head", group: "minecraft:monster", dimensions: [16f32, 8f32, 6.8f32], fire_immune: true } },
+    EnderDragon => { properties: { ident: "minecraft:ender_dragon", group: "minecraft:monster", dimensions: [16f32, 8f32, 6.8f32], fire_immune: true } },
     EnderPearl => { properties: { ident: "minecraft:ender_pearl", group: "minecraft:misc", dimensions: [0.25f32, 0.25f32, 0.2125f32], fire_immune: false } },
     EndCrystal => { properties: { ident: "minecraft:end_crystal", group: "minecraft:misc", dimensions: [2f32, 2f32, 1.7f32], fire_immune: true } },
     Evoker => { properties: { ident: "minecraft:evoker", group: "minecraft:monster", dimensions: [0.6f32, 1.95f32, 1.6575f32], fire_immune: false } },
