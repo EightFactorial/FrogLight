@@ -1,14 +1,14 @@
 //! TODO
 
-use core::{
-    borrow::{Borrow, BorrowMut},
-    f32::consts::{FRAC_PI_2, PI},
-};
+use core::f32::consts::{FRAC_PI_2, PI};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use derive_more::{AsMut, AsRef};
+#[cfg(feature = "io")]
+use froglight_io::prelude::*;
 use glam::{Vec2, Vec3};
 
 use crate::table::{EPSILON, cos, sin};
@@ -17,7 +17,7 @@ use crate::table::{EPSILON, cos, sin};
 ///
 /// Stored as a [`Vec2`] where `x` is the pitch and `y` is the yaw.
 #[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, AsRef, AsMut)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
 pub struct LookDirection(Vec2);
@@ -37,11 +37,55 @@ impl LookDirection {
     pub const WEST: Self = Self(Vec2::new(0.0, FRAC_PI_2));
 
     /// Create a [`EntityLookDirection`] from pitch and yaw angles.
+    ///
+    /// # Examples
+    /// ```
+    /// use froglight_physics::prelude::LookDirection;
+    /// use glam::Vec3;
+    ///
+    /// // Looking straight south, positive along the z-axis.
+    /// let direction = LookDirection::new(0.0, 0.0);
+    /// assert_eq!(direction.pitch(), 0.0);
+    /// assert_eq!(direction.pitch_degrees(), 0.0);
+    /// assert_eq!(direction.yaw(), 0.0);
+    /// assert_eq!(direction.yaw_degrees(), 0.0);
+    /// assert_eq!(direction.look_vector(), Vec3::new(0.0, 0.0, 1.0));
+    ///
+    /// // Looking down, oriented along the negative z-axis.
+    /// let direction = LookDirection::new_degrees(90.0, 180.0);
+    /// assert_eq!(direction.pitch(), core::f32::consts::FRAC_PI_2);
+    /// assert_eq!(direction.pitch_degrees(), 90.0);
+    /// assert_eq!(direction.yaw(), core::f32::consts::PI);
+    /// assert_eq!(direction.yaw_degrees(), 180.0);
+    /// assert_eq!(direction.look_vector(), Vec3::new(0.0, -1.0, 0.0));
+    /// ```
     #[inline]
     #[must_use]
     pub const fn new(pitch: f32, yaw: f32) -> Self { Self(Vec2::new(pitch, yaw)) }
 
     /// Create a [`EntityLookDirection`] from pitch and yaw angles in degrees.
+    ///
+    /// # Examples
+    /// ```
+    /// use froglight_physics::prelude::LookDirection;
+    /// use glam::Vec3;
+    ///
+    /// // Looking straight south, positive along the z-axis.
+    /// let direction = LookDirection::new(0.0, 0.0);
+    /// assert_eq!(direction.pitch(), 0.0);
+    /// assert_eq!(direction.pitch_degrees(), 0.0);
+    /// assert_eq!(direction.yaw(), 0.0);
+    /// assert_eq!(direction.yaw_degrees(), 0.0);
+    /// assert_eq!(direction.look_vector(), Vec3::new(0.0, 0.0, 1.0));
+    ///
+    /// // Looking down, oriented along the negative z-axis.
+    /// let direction = LookDirection::new_degrees(90.0, 180.0);
+    /// assert_eq!(direction.pitch(), core::f32::consts::FRAC_PI_2);
+    /// assert_eq!(direction.pitch_degrees(), 90.0);
+    /// assert_eq!(direction.yaw(), core::f32::consts::PI);
+    /// assert_eq!(direction.yaw_degrees(), 180.0);
+    /// assert_eq!(direction.look_vector(), Vec3::new(0.0, -1.0, 0.0));
+    /// ```
     #[inline]
     #[must_use]
     pub const fn new_degrees(pitch: f32, yaw: f32) -> Self {
@@ -122,7 +166,6 @@ impl LookDirection {
     /// assert_eq!(LookDirection::EAST.look_vector(), Vec3::new(1.0, 0.0, 0.0));
     /// ```
     #[must_use]
-    #[expect(clippy::obfuscated_if_else)]
     pub fn look_vector(&self) -> Vec3 {
         let (pitch, yaw) = self.0.into();
         let (pitch_sin, pitch_cos) = (sin(pitch), cos(pitch));
@@ -130,9 +173,9 @@ impl LookDirection {
 
         let (x, y, z) = (pitch_cos * yaw_sin, -pitch_sin, pitch_cos * yaw_cos);
         Vec3::new(
-            x.abs().lt(&EPSILON).then_some(0.0).unwrap_or(x),
-            y.abs().lt(&EPSILON).then_some(0.0).unwrap_or(y),
-            z.abs().lt(&EPSILON).then_some(0.0).unwrap_or(z),
+            if x.abs() < EPSILON { 0.0 } else { x },
+            if y.abs() < EPSILON { 0.0 } else { y },
+            if z.abs() < EPSILON { 0.0 } else { z },
         )
         .normalize_or_zero()
     }
@@ -143,20 +186,24 @@ impl<T: Into<Vec2>> From<T> for LookDirection {
     fn from(value: T) -> Self { Self(value.into()) }
 }
 
-impl Borrow<Vec2> for LookDirection {
-    #[inline]
-    fn borrow(&self) -> &Vec2 { &self.0 }
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(feature = "io")]
+impl FrogRead for LookDirection {
+    fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
+        let [yaw, pitch] = <[f32; 2]>::frog_read(buffer)?;
+        Ok(Self::new(pitch, yaw))
+    }
 }
-impl BorrowMut<Vec2> for LookDirection {
-    #[inline]
-    fn borrow_mut(&mut self) -> &mut Vec2 { &mut self.0 }
+#[cfg(feature = "io")]
+impl FrogWrite for LookDirection {
+    fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
+        Ok(self.yaw().frog_write(buffer)? + self.pitch().frog_write(buffer)?)
+    }
+
+    fn frog_len(&self) -> usize { self.yaw().frog_len() + self.pitch().frog_len() }
 }
 
-impl AsRef<Vec2> for LookDirection {
-    #[inline]
-    fn as_ref(&self) -> &Vec2 { &self.0 }
-}
-impl AsMut<Vec2> for LookDirection {
-    #[inline]
-    fn as_mut(&mut self) -> &mut Vec2 { &mut self.0 }
-}
+// -------------------------------------------------------------------------------------------------
+//
+// TODO: Tests

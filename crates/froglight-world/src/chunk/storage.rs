@@ -1,6 +1,7 @@
 #[cfg(not(feature = "std"))]
 use alloc::{boxed::Box, vec::Vec};
 
+#[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use derive_more::{From, Into};
 

@@ -22,6 +22,7 @@ froglight-common = { features = ["serde"], workspace = true }
 froglight-entity = { features = ["serde"], workspace = true }
 froglight-macros = { workspace = true }
 froglight-nbt = { features = ["serde"], workspace = true }
+froglight-physics = { workspace = true }
 froglight-text = { features = ["serde"], workspace = true }
 froglight-world = { features = ["nbt"], workspace = true }
 glam = { features = ["serde"], workspace = true }
@@ -55,6 +56,7 @@ io = [
   "froglight-inventory?/io",
   "froglight-macros/io",
   "froglight-nbt/io",
+  "froglight-physics/io",
   "froglight-text/io",
   "froglight-world/io",
   "std",
@@ -69,6 +71,7 @@ bevy = [
   "froglight-inventory?/bevy",
   "froglight-io?/bevy_platform",
   "froglight-nbt/reflect",
+  "froglight-physics/bevy",
   "froglight-text/bevy",
   "froglight-world/bevy",
 ]
@@ -80,6 +83,7 @@ nightly = [
   "froglight-inventory?/nightly",
   "froglight-io?/nightly",
   "froglight-nbt/nightly",
+  "froglight-physics/nightly",
   "froglight-text/nightly",
   "froglight-world/nightly",
 ]
@@ -92,6 +96,7 @@ std = [
   "bevy_reflect?/std",
   "froglight-inventory?/std",
   "froglight-nbt/std",
+  "froglight-physics/std",
   "froglight-text/std",
   "froglight-world/std",
   "glam/std",
@@ -102,7 +107,7 @@ std = [
   "uuid/std",
 ]
 # Enable `no_std` support for `glam`.
-libm = ["froglight-world/libm", "glam/libm"]
+libm = ["froglight-physics/libm", "froglight-world/libm", "glam/libm"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4", "froglight-inventory?/v1_21_4", "froglight-world/v1_21_4"]

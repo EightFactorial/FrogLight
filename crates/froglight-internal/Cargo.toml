@@ -23,7 +23,7 @@ froglight-inventory = { features = ["world"], workspace = true }
 froglight-item = { features = ["block"], workspace = true }
 froglight-nbt = { workspace = true }
 froglight-network = { optional = true, workspace = true }
-froglight-physics = { workspace = true }
+froglight-physics = { features = ["world"], workspace = true }
 froglight-registry = { workspace = true }
 froglight-text = { features = ["crypto"], workspace = true }
 froglight-world = { features = ["block", "nbt"], workspace = true }

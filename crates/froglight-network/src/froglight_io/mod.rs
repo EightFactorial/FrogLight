@@ -11,7 +11,9 @@ mod adapter;
 pub use adapter::IoAdapter;
 
 mod transport;
-pub use transport::{IoCipher, IoTransport};
+#[cfg(feature = "crypto")]
+pub use transport::IoCipher;
+pub use transport::IoTransport;
 
 impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
     /// Connect to a server at the given address,
