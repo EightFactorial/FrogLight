@@ -119,6 +119,7 @@ glam = { default-features = false, version = "0.29" }
 hashify = { default-features = false, version = "0.2.6" }
 hickory-resolver = { default-features = false, version = "0.25" }
 indexmap = { default-features = false, version = "2.9" }
+libm = { version = "0.2" }
 nu-ansi-term = { default-features = false, version = "0.46" }
 parking_lot = { default-features = false, version = "0.12" }
 proptest = { default-features = false, version = "1.6" }

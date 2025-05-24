@@ -30,6 +30,7 @@ pub(crate) fn entity_type_properties(input: TokenStream) -> TokenStream {
                     _ => unreachable!(),
                 }
             }
+            #[expect(clippy::manual_let_else)]
             let (dim_x, dim_y, dim_z) = match (dim_x, dim_y, dim_z) {
                 (Some(dim_x), Some(dim_y), Some(dim_z)) => (dim_x, dim_y, dim_z),
                 _ => panic!("Invalid dimensions array length!"),

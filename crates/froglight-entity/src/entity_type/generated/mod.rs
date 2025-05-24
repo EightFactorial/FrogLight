@@ -1,5 +1,5 @@
 //! TODO
-#![allow(clippy::all)]
+#![allow(clippy::all, clippy::unreadable_literal)]
 #![cfg_attr(rustfmt, rustfmt::skip)]
 
 mod entity;
