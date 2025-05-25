@@ -16,6 +16,10 @@ pub mod prelude {
     pub use froglight_macros::StaticEntityType;
 
     pub use crate::{
+        entity_data::{
+            AppearsOnFire, CustomName, CustomNameVisible, EntityBreath, HasGravity, IsGlowing,
+            IsInvulnerable, IsSilent, OnFire, PortalCooldown, TicksFrozen,
+        },
         entity_type::{
             AppEntityTypeStorage, EntityCollider, EntityEyeHeight, EntityGravity, EntityTypeExt,
             EntityTypeStorage, EntityTypeTrait, StaticEntityType,

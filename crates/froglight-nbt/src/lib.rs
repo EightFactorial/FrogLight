@@ -12,10 +12,9 @@ pub mod mutf8;
 pub mod nbt;
 pub mod snbt;
 
+mod impls;
 #[cfg(test)]
 mod test;
-#[cfg(feature = "uuid")]
-mod uuid;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.

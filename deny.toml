@@ -52,6 +52,9 @@ version = "=1.0.0"
 name = "getrandom"
 version = "=0.2.16"
 [[bans.skip]]
+name = "itertools"
+version = "=0.13.0"
+[[bans.skip]]
 name = "rand"
 version = "=0.8.5"
 [[bans.skip]]

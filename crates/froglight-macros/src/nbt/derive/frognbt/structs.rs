@@ -130,32 +130,29 @@ fn named_fields(fields: FieldsNamed, path: &Path) -> (TokenStream, TokenStream) 
 // -------------------------------------------------------------------------------------------------
 
 #[allow(unused_mut, unused_variables, unreachable_code)]
-fn unnamed_fields(fields: FieldsUnnamed, _path: &Path) -> (TokenStream, TokenStream) {
+fn unnamed_fields(fields: FieldsUnnamed, path: &Path) -> (TokenStream, TokenStream) {
     let mut from = TokenStream::new();
     let mut into = TokenStream::new();
 
-    for field in fields.unnamed {
+    for (_i, field) in fields.unnamed.into_iter().enumerate() {
         let FieldAttrs { default, inline, tag_name, tag_type, list_type, with_fn, skip_fn } =
             FieldAttrs::from_field(&field).unwrap();
 
         // Handle when fields are marked `#[frog(inline)]`
         if inline.is_present() {
             from.extend(quote! {
-                todo!();
+                #path::convert::FromCompound::from_compound(nbt)?,
             });
             into.extend(quote! {
                 todo!();
             });
+            continue;
         }
 
         let Field { ty, ident, .. } = field;
 
-        // Get the name of the field
-        let field: Ident = todo!();
-        let field_str = field.to_string();
-
         // Get the name of the tag
-        let tag_name = tag_name.unwrap_or_else(|| field.clone());
+        let tag_name = tag_name.expect("Unnamed fields require a \"name\" attribute!").to_string();
     }
 
     into.extend(quote!(todo!();));

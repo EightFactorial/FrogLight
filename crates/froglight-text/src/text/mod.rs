@@ -19,6 +19,7 @@ pub mod style;
 use style::TextStyle;
 
 mod legacy;
+mod nbt;
 #[cfg(feature = "serde")]
 mod serde;
 
