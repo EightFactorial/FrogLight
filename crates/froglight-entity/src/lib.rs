@@ -16,7 +16,7 @@ pub mod prelude {
 
     pub use crate::{
         entity_type::{
-            AppEntityTypeStorage, EntityCollider, EntityEyeHeight, EntityTypeExt,
+            AppEntityTypeStorage, EntityCollider, EntityEyeHeight, EntityGravity, EntityTypeExt,
             EntityTypeStorage, EntityTypeTrait, StaticEntityType,
             generated::{self as entity, EntityType},
         },

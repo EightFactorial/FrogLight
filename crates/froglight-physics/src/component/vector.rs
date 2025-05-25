@@ -1,11 +1,41 @@
 //! TODO
 
 #[cfg(feature = "bevy")]
-use bevy_ecs::prelude::*;
+use bevy_ecs::{prelude::*, query::QueryData};
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use derive_more::{AsMut, AsRef, Deref, DerefMut};
 use glam::Vec3;
+
+/// A [`Query`] that contains the
+/// position, velocity, and acceleration of an entity.
+#[cfg(feature = "bevy")]
+#[derive(Debug, PartialEq, QueryData)]
+#[query_data(mutable)]
+pub struct CurrentVectors {
+    /// The current position of the entity.
+    pub position: &'static mut CurrentPosition,
+    /// The current velocity of the entity.
+    pub velocity: &'static mut CurrentVelocity,
+    /// The current acceleration of the entity.
+    pub acceleration: &'static mut CurrentAcceleration,
+}
+
+/// A [`Query`] that contains the previous
+/// position, velocity, and acceleration of an entity.
+#[cfg(feature = "bevy")]
+#[derive(Debug, PartialEq, QueryData)]
+#[query_data(mutable)]
+pub struct PreviousVectors {
+    /// The previous position of the entity.
+    pub position: &'static mut PreviousPosition,
+    /// The previous velocity of the entity.
+    pub velocity: &'static mut PreviousVelocity,
+    /// The previous acceleration of the entity.
+    pub acceleration: &'static mut PreviousAcceleration,
+}
+
+// -------------------------------------------------------------------------------------------------
 
 /// An entity's current position.
 #[repr(transparent)]

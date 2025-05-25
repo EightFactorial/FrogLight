@@ -2,8 +2,8 @@
 
 pub mod generated;
 
-mod collider;
-pub use collider::{Aabb3d, EntityCollider, EntityEyeHeight};
+mod properties;
+pub use properties::{Aabb3d, EntityCollider, EntityEyeHeight, EntityGravity};
 
 mod storage;
 pub use storage::{AppEntityTypeStorage, EntityTypeStorage, GlobalEntityTypeId};

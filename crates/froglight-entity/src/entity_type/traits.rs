@@ -131,6 +131,9 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// Whether the entity type is immune to fire.
     fn fire_immunity(&self) -> bool;
 
+    /// The amount of gravity applied to the entity type.
+    fn gravity(&self) -> f32 { 0.0 }
+
     /// Insert a [`Bundle`] of entity data into the given
     /// [`Entity`](bevy_ecs::entity::Entity).
     #[cfg(feature = "bevy")]
@@ -163,6 +166,8 @@ pub trait EntityTypeExt<V: Version>:
     const DIMENSIONS: Vec3;
     /// Whether the entity type is immune to fire.
     const FIRE_IMMUNITY: bool;
+    /// The amount of gravity applied to the entity type.
+    const GRAVITY: f32 = 0.0;
 }
 
 // -------------------------------------------------------------------------------------------------

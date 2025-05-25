@@ -103,3 +103,20 @@ impl EntityEyeHeight {
         Self(eye_height)
     }
 }
+
+// -------------------------------------------------------------------------------------------------
+
+/// The force of gravity applied to an entity.
+#[repr(transparent)]
+#[derive(Debug, Clone, Copy, PartialEq, Deref, DerefMut, From, Into)]
+#[cfg_attr(feature = "bevy", derive(Component))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Component))]
+pub struct EntityGravity(f32);
+
+impl EntityGravity {
+    /// Create a new [`EntityGravity`].
+    #[inline]
+    #[must_use]
+    pub const fn new(gravity: f32) -> Self { Self(gravity) }
+}
