@@ -24,7 +24,7 @@ use super::username::PlayerUsername;
 #[repr(transparent)]
 #[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(Component), component(on_add = Self::on_add))]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq, Component))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
 #[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PlayerUuid(Uuid);

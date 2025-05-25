@@ -10,8 +10,9 @@ pub mod prelude {
 
     pub use crate::component::{
         direction::LookDirection,
-        modifier::EntityPhysicsModifiers,
         state::{EntityGroundState, PlayerPhysicsState},
-        vector::{CurrentAcceleration, CurrentPosition, CurrentVelocity},
+        vector::{
+            EntityAcceleration, EntityPosition, EntityVectors, EntityVectorsMut, EntityVelocity,
+        },
     };
 }

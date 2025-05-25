@@ -24,7 +24,7 @@ use super::{username::PlayerUsername, uuid::PlayerUuid};
 /// A player's profile.
 #[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Component))]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, PartialEq, Component))]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Component))]
 pub struct PlayerProfile {
     /// The player's [`Uuid`].
     pub uuid: PlayerUuid,

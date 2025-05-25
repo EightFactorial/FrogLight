@@ -9,6 +9,8 @@ use bevy_reflect::prelude::*;
 use derive_more::{AsMut, AsRef};
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
+#[cfg(feature = "io")]
+use glam::Vec2Swizzles;
 use glam::{Vec2, Vec3};
 
 use crate::table::{EPSILON, cos, sin};
@@ -190,18 +192,20 @@ impl<T: Into<Vec2>> From<T> for LookDirection {
 
 #[cfg(feature = "io")]
 impl FrogRead for LookDirection {
+    #[inline]
     fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
-        let [yaw, pitch] = <[f32; 2]>::frog_read(buffer)?;
-        Ok(Self::new(pitch, yaw))
+        Vec2::frog_read(buffer).map(|vec| Self(vec.yx()))
     }
 }
 #[cfg(feature = "io")]
 impl FrogWrite for LookDirection {
+    #[inline]
     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
-        Ok(self.yaw().frog_write(buffer)? + self.pitch().frog_write(buffer)?)
+        Vec2::frog_write(&self.0.yx(), buffer)
     }
 
-    fn frog_len(&self) -> usize { self.yaw().frog_len() + self.pitch().frog_len() }
+    #[inline]
+    fn frog_len(&self) -> usize { self.pitch().frog_len() + self.yaw().frog_len() }
 }
 
 // -------------------------------------------------------------------------------------------------

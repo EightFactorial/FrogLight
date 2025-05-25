@@ -4,192 +4,169 @@
 use bevy_ecs::{prelude::*, query::QueryData};
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::{AsMut, AsRef, Deref, DerefMut};
-use glam::Vec3;
+use glam::Vec3A;
 
-/// A [`Query`] that contains the
+/// A [`Query`] that retrieves the current and previous
+/// position, velocity, and acceleration of an entity.
+#[cfg(feature = "bevy")]
+#[derive(Debug, PartialEq, QueryData)]
+pub struct EntityVectors {
+    /// The current and previous position of the entity.
+    pub position: &'static EntityPosition,
+    /// The current and previous velocity of the entity.
+    pub velocity: &'static EntityVelocity,
+    /// The current and previous acceleration of the entity.
+    pub acceleration: &'static EntityAcceleration,
+}
+
+/// A mutable [`Query`] that retrieves the current and previous
 /// position, velocity, and acceleration of an entity.
 #[cfg(feature = "bevy")]
 #[derive(Debug, PartialEq, QueryData)]
 #[query_data(mutable)]
-pub struct CurrentVectors {
-    /// The current position of the entity.
-    pub position: &'static mut CurrentPosition,
-    /// The current velocity of the entity.
-    pub velocity: &'static mut CurrentVelocity,
-    /// The current acceleration of the entity.
-    pub acceleration: &'static mut CurrentAcceleration,
-}
-
-/// A [`Query`] that contains the previous
-/// position, velocity, and acceleration of an entity.
-#[cfg(feature = "bevy")]
-#[derive(Debug, PartialEq, QueryData)]
-#[query_data(mutable)]
-pub struct PreviousVectors {
-    /// The previous position of the entity.
-    pub position: &'static mut PreviousPosition,
-    /// The previous velocity of the entity.
-    pub velocity: &'static mut PreviousVelocity,
-    /// The previous acceleration of the entity.
-    pub acceleration: &'static mut PreviousAcceleration,
+pub struct EntityVectorsMut {
+    /// The current and previous position of the entity.
+    pub position: &'static mut EntityPosition,
+    /// The current and previous velocity of the entity.
+    pub velocity: &'static mut EntityVelocity,
+    /// The current and previous acceleration of the entity.
+    pub acceleration: &'static mut EntityAcceleration,
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// An entity's current position.
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, AsRef, AsMut, Deref, DerefMut)]
+/// An entity's current and previous position.
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", require(CurrentVelocity, CurrentAcceleration, PreviousPosition))]
+#[cfg_attr(feature = "bevy", require(EntityVelocity, EntityAcceleration))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-pub struct CurrentPosition(Vec3);
+pub struct EntityPosition(Vec3A, Vec3A);
 
-impl CurrentPosition {
-    /// Create a [`CurrentPosition`] from a [`Vec3`].
+impl EntityPosition {
+    /// Create an [`EntityPosition`] from a [`Vec3A`]
     #[inline]
     #[must_use]
-    pub const fn new(velocity: Vec3) -> Self { Self(velocity) }
+    pub const fn new(velocity: Vec3A) -> Self { Self(velocity, Vec3A::ZERO) }
 
-    /// Convert the [`CurrentPosition`] into its inner [`Vec3`].
+    /// Get a reference to the entity's current position
     #[inline]
     #[must_use]
-    pub const fn into_inner(self) -> Vec3 { self.0 }
+    pub const fn current(&self) -> &Vec3A { &self.0 }
+
+    /// Get a mutable reference to the entity's current position
+    #[inline]
+    #[must_use]
+    pub const fn current_mut(&mut self) -> &mut Vec3A { &mut self.0 }
+
+    /// Get a reference to the entity's previous position
+    #[inline]
+    #[must_use]
+    pub const fn previous(&self) -> &Vec3A { &self.1 }
+
+    /// Get a mutable reference to the entity's previous position
+    #[inline]
+    #[must_use]
+    pub const fn previous_mut(&mut self) -> &mut Vec3A { &mut self.1 }
+
+    /// Convert the [`EntityPosition`] into its inner [`Vec3A`]s
+    #[inline]
+    #[must_use]
+    pub const fn into_inner(self) -> (Vec3A, Vec3A) { (self.0, self.1) }
 }
 
-impl<T: Into<Vec3>> From<T> for CurrentPosition {
+impl<T: Into<Vec3A>> From<T> for EntityPosition {
     #[inline]
-    fn from(value: T) -> Self { Self(value.into()) }
+    fn from(value: T) -> Self { Self::new(value.into()) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// An entity's position during the previous tick.
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, AsRef, AsMut, Deref, DerefMut)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect), require(CurrentPosition))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-pub struct PreviousPosition(Vec3);
-
-impl PreviousPosition {
-    /// Create a [`PreviousPosition`] from a [`Vec3`].
-    #[inline]
-    #[must_use]
-    pub const fn new(velocity: Vec3) -> Self { Self(velocity) }
-
-    /// Convert the [`PreviousPosition`] into its inner [`Vec3`].
-    #[inline]
-    #[must_use]
-    pub const fn into_inner(self) -> Vec3 { self.0 }
-}
-
-impl<T: Into<Vec3>> From<T> for PreviousPosition {
-    #[inline]
-    fn from(value: T) -> Self { Self(value.into()) }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// An entity's current velocity.
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, AsRef, AsMut, Deref, DerefMut)]
+/// An entity's current and previous velocity.
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", require(CurrentPosition, CurrentAcceleration, PreviousVelocity))]
+#[cfg_attr(feature = "bevy", require(EntityPosition, EntityAcceleration))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-pub struct CurrentVelocity(Vec3);
+pub struct EntityVelocity(Vec3A, Vec3A);
 
-impl CurrentVelocity {
-    /// Create a [`CurrentVelocity`] from a [`Vec3`].
+impl EntityVelocity {
+    /// Create a [`EntityVelocity`] from a [`Vec3A`]
     #[inline]
     #[must_use]
-    pub const fn new(velocity: Vec3) -> Self { Self(velocity) }
+    pub const fn new(velocity: Vec3A) -> Self { Self(velocity, Vec3A::ZERO) }
 
-    /// Convert the [`CurrentVelocity`] into its inner [`Vec3`].
+    /// Get a reference to the entity's current velocity
     #[inline]
     #[must_use]
-    pub const fn into_inner(self) -> Vec3 { self.0 }
+    pub const fn current(&self) -> &Vec3A { &self.0 }
+
+    /// Get a mutable reference to the entity's current velocity
+    #[inline]
+    #[must_use]
+    pub const fn current_mut(&mut self) -> &mut Vec3A { &mut self.0 }
+
+    /// Get a reference to the entity's previous velocity
+    #[inline]
+    #[must_use]
+    pub const fn previous(&self) -> &Vec3A { &self.1 }
+
+    /// Get a mutable reference to the entity's previous velocity
+    #[inline]
+    #[must_use]
+    pub const fn previous_mut(&mut self) -> &mut Vec3A { &mut self.1 }
+
+    /// Convert the [`EntityVelocity`] into its inner [`Vec3A`]s
+    #[inline]
+    #[must_use]
+    pub const fn into_inner(self) -> (Vec3A, Vec3A) { (self.0, self.1) }
 }
 
-impl<T: Into<Vec3>> From<T> for CurrentVelocity {
+impl<T: Into<Vec3A>> From<T> for EntityVelocity {
     #[inline]
-    fn from(value: T) -> Self { Self(value.into()) }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// An entity's velocity during the previous tick.
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, AsRef, AsMut, Deref, DerefMut)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect), require(CurrentVelocity))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-pub struct PreviousVelocity(Vec3);
-
-impl PreviousVelocity {
-    /// Create a [`PreviousVelocity`] from a [`Vec3`].
-    #[inline]
-    #[must_use]
-    pub const fn new(velocity: Vec3) -> Self { Self(velocity) }
-
-    /// Convert the [`PreviousVelocity`] into its inner [`Vec3`].
-    #[inline]
-    #[must_use]
-    pub const fn into_inner(self) -> Vec3 { self.0 }
-}
-
-impl<T: Into<Vec3>> From<T> for PreviousVelocity {
-    #[inline]
-    fn from(value: T) -> Self { Self(value.into()) }
+    fn from(value: T) -> Self { Self::new(value.into()) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// An entity's current acceleration.
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, AsRef, AsMut, Deref, DerefMut)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", require(CurrentPosition, CurrentVelocity, PreviousAcceleration))]
+#[cfg_attr(feature = "bevy", require(EntityPosition, EntityVelocity))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-pub struct CurrentAcceleration(Vec3);
+pub struct EntityAcceleration(Vec3A, Vec3A);
 
-impl CurrentAcceleration {
-    /// Create a [`CurrentAcceleration`] from a [`Vec3`].
+impl EntityAcceleration {
+    /// Create a [`EntityAcceleration`] from a [`Vec3A`]
     #[inline]
     #[must_use]
-    pub const fn new(acceleration: Vec3) -> Self { Self(acceleration) }
+    pub const fn new(acceleration: Vec3A) -> Self { Self(acceleration, Vec3A::ZERO) }
 
-    /// Convert the [`CurrentAcceleration`] into its inner [`Vec3`].
+    /// Get a reference to the entity's current acceleration
     #[inline]
     #[must_use]
-    pub const fn into_inner(self) -> Vec3 { self.0 }
+    pub const fn current(&self) -> &Vec3A { &self.0 }
+
+    /// Get a mutable reference to the entity's current acceleration
+    #[inline]
+    #[must_use]
+    pub const fn current_mut(&mut self) -> &mut Vec3A { &mut self.0 }
+
+    /// Get a reference to the entity's previous acceleration
+    #[inline]
+    #[must_use]
+    pub const fn previous(&self) -> &Vec3A { &self.1 }
+
+    /// Get a mutable reference to the entity's previous acceleration
+    #[inline]
+    #[must_use]
+    pub const fn previous_mut(&mut self) -> &mut Vec3A { &mut self.1 }
+
+    /// Convert the [`EntityAcceleration`] into its inner [`Vec3A`]s
+    #[inline]
+    #[must_use]
+    pub const fn into_inner(self) -> (Vec3A, Vec3A) { (self.0, self.1) }
 }
 
-impl<T: Into<Vec3>> From<T> for CurrentAcceleration {
+impl<T: Into<Vec3A>> From<T> for EntityAcceleration {
     #[inline]
-    fn from(value: T) -> Self { Self(value.into()) }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// An entity's current acceleration.
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, AsRef, AsMut, Deref, DerefMut)]
-#[cfg_attr(feature = "bevy", derive(Component, Reflect), require(CurrentAcceleration))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq, Component))]
-pub struct PreviousAcceleration(Vec3);
-
-impl PreviousAcceleration {
-    /// Create a [`PreviousAcceleration`] from a [`Vec3`].
-    #[inline]
-    #[must_use]
-    pub const fn new(acceleration: Vec3) -> Self { Self(acceleration) }
-
-    /// Convert the [`PreviousAcceleration`] into its inner [`Vec3`].
-    #[inline]
-    #[must_use]
-    pub const fn into_inner(self) -> Vec3 { self.0 }
-}
-
-impl<T: Into<Vec3>> From<T> for PreviousAcceleration {
-    #[inline]
-    fn from(value: T) -> Self { Self(value.into()) }
+    fn from(value: T) -> Self { Self::new(value.into()) }
 }

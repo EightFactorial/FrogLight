@@ -6,6 +6,7 @@
 #[cfg(not(feature = "std"))]
 extern crate alloc;
 
+pub mod entity_data;
 pub mod entity_type;
 pub mod player;
 

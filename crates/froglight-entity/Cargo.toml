@@ -22,7 +22,8 @@ derive_more = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { features = ["entity"], workspace = true }
-froglight-nbt = { workspace = true }
+froglight-nbt = { workspace = true, features = ["uuid"] }
+froglight-text = { workspace = true }
 glam = { workspace = true }
 hashify = { workspace = true }
 indexmap = { workspace = true }
@@ -50,9 +51,16 @@ online = ["dep:ureq", "serde", "std"]
 io = ["dep:froglight-io", "std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_math", "froglight-common/bevy", "froglight-nbt/reflect"]
+bevy = ["dep:bevy_ecs", "dep:bevy_math", "froglight-common/bevy"]
 # Enable `bevy_reflect` support.
-reflect = ["bevy", "bevy_ecs?/bevy_reflect", "bevy_math?/bevy_reflect", "dep:bevy_reflect", "froglight-common/reflect"]
+reflect = [
+  "bevy_ecs?/bevy_reflect",
+  "bevy_math?/bevy_reflect",
+  "dep:bevy_reflect",
+  "froglight-common/reflect",
+  "froglight-nbt/reflect",
+  "froglight-text/bevy",
+]
 
 # Enable `serde` serialization support.
 serde = [
@@ -62,13 +70,14 @@ serde = [
   "froglight-common/serde",
   "froglight-io?/serde",
   "froglight-nbt/serde",
+  "froglight-text/serde",
   "glam/serde",
   "smol_str/serde",
   "uuid/serde",
 ]
 
 # Enable nightly features.
-nightly = ["froglight-io?/nightly", "froglight-nbt/nightly", "parking_lot/nightly"]
+nightly = ["froglight-io?/nightly", "froglight-nbt/nightly", "froglight-text/nightly", "parking_lot/nightly"]
 
 # Enable support for the rust standard library.
 std = [
@@ -77,6 +86,7 @@ std = [
   "bevy_platform/std",
   "bevy_reflect?/std",
   "froglight-nbt/std",
+  "froglight-text/std",
   "glam/std",
   "md-5/std",
   "serde?/std",
