@@ -181,7 +181,7 @@ impl<'de> Deserialize<'de> for TextContent {
                 // Guess `TextContent::Text`
                 "text" => return deserialize::<D, TextComponent>(content),
                 // Guess `TextContent::Translation`
-                "translate" | "fallback" | "with" => {
+                "translate" => {
                     return deserialize::<D, TranslateComponent>(content);
                 }
                 // Guess `TextContent::Score`
@@ -191,7 +191,7 @@ impl<'de> Deserialize<'de> for TextContent {
                 // Guess `TextContent::Keybind`
                 "keybind" => return deserialize::<D, KeybindComponent>(content),
                 // Guess `TextContent::Nbt`
-                "source" | "path" | "interpret" => {
+                "nbt" => {
                     return deserialize::<D, ValueComponent>(content);
                 }
                 // Ambiguous or unknown fields, unable to make any guesses

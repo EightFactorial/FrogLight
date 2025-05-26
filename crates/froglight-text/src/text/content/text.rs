@@ -20,3 +20,7 @@ pub struct TextComponent {
     #[frog(tag = "string")]
     pub text: Cow<'static, str>,
 }
+
+// -------------------------------------------------------------------------------------------------
+//
+// TODO: Tests

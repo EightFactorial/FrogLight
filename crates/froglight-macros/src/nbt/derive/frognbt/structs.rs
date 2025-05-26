@@ -41,7 +41,7 @@ fn named_fields(fields: FieldsNamed, path: &Path) -> (TokenStream, TokenStream) 
         let field = ident.expect("Fields without names require a \"name\" attribute!");
         let field_str = field.to_string();
         // Get the name of the tag
-        let tag_name = tag_name.unwrap_or_else(|| field.clone()).to_string();
+        let tag_name = tag_name.map_or_else(|| field.to_string(), |tag| tag.value());
 
         // Prepare tag handlers based on the input flags
         let (from_handler, into_handler) = match (tag_type, with_fn) {
@@ -152,7 +152,7 @@ fn unnamed_fields(fields: FieldsUnnamed, path: &Path) -> (TokenStream, TokenStre
         let Field { ty, ident, .. } = field;
 
         // Get the name of the tag
-        let tag_name = tag_name.expect("Unnamed fields require a \"name\" attribute!").to_string();
+        let tag_name = tag_name.expect("Unnamed fields require a \"name\" attribute!").value();
     }
 
     into.extend(quote!(todo!();));

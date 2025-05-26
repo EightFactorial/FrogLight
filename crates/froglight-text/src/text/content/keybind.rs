@@ -20,3 +20,7 @@ pub struct KeybindComponent {
     #[frog(tag = "string")]
     pub keybind: Cow<'static, str>,
 }
+
+// -------------------------------------------------------------------------------------------------
+//
+// TODO: Tests

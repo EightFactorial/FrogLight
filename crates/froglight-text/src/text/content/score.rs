@@ -33,3 +33,7 @@ pub struct ScoreObjectiveComponent {
     #[frog(tag = "string")]
     pub objective: Cow<'static, str>,
 }
+
+// -------------------------------------------------------------------------------------------------
+//
+// TODO: Tests

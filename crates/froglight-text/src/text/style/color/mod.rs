@@ -116,12 +116,12 @@ impl FromStr for TextColor {
 
 // -------------------------------------------------------------------------------------------------
 
-impl FromTag for TextColor {
-    fn from_tag(_tag: &NbtTag) -> Result<Self, NbtError> { todo!() }
+impl FromCompound for TextColor {
+    fn from_compound(_: &NbtCompound) -> Result<Self, NbtError> { todo!() }
 }
 
-impl IntoTag for TextColor {
-    fn into_tag(&self) -> Result<NbtTag, NbtError> { todo!() }
+impl IntoCompound for TextColor {
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { todo!() }
 }
 
 // -------------------------------------------------------------------------------------------------

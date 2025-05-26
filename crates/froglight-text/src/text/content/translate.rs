@@ -5,6 +5,7 @@ use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_nbt::prelude::*;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -29,3 +30,17 @@ pub struct TranslateComponent {
     )]
     pub arguments: Vec<FormattedText>,
 }
+
+// -------------------------------------------------------------------------------------------------
+
+impl FromCompound for TranslateComponent {
+    fn from_compound(_: &NbtCompound) -> Result<Self, NbtError> { todo!() }
+}
+
+impl IntoCompound for TranslateComponent {
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { todo!() }
+}
+
+// -------------------------------------------------------------------------------------------------
+//
+// TODO: Tests

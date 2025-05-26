@@ -46,6 +46,17 @@ impl IntoCompound for NbtCompound {
     fn into_compound(&self) -> Result<NbtCompound, NbtError> { Ok(self.clone()) }
 }
 
+impl<T: FromCompound> FromCompound for Box<T> {
+    #[inline]
+    fn from_compound(compound: &NbtCompound) -> Result<Self, NbtError> {
+        T::from_compound(compound).map(Box::new)
+    }
+}
+impl<T: IntoCompound> IntoCompound for Box<T> {
+    #[inline]
+    fn into_compound(&self) -> Result<NbtCompound, NbtError> { self.as_ref().into_compound() }
+}
+
 impl<T: FromCompound> FromCompound for Option<T> {
     #[inline]
     fn from_compound(compound: &NbtCompound) -> Result<Self, NbtError> {
@@ -184,6 +195,9 @@ pub enum NbtError {
     /// A field's tag did not match the expected tag.
     #[error("Mismatched tag for `{0}`, expected {1}")]
     MismatchedTag(&'static str, &'static str),
+    /// An unknown enum variant was encountered while parsing.
+    #[error("Unknown variant for `{0}`: \"{1}\"")]
+    UnknownVariant(&'static str, String),
     /// An error occurred while converting a field.
     #[error("Failed to create \"{0}\": {1}")]
     ConversionError(&'static str, Box<dyn core::error::Error>),

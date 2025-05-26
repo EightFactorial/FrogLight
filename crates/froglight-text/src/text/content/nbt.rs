@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 pub struct ValueComponent {
     /// The source of the data.
     #[frog(default, skip_if = Option::is_none)]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Option::is_none"))]
     pub source: Option<ValueComponentSource>,
 }
 

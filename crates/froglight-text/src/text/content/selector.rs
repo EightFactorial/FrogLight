@@ -19,6 +19,10 @@ pub struct SelectorComponent {
     #[frog(tag = "string")]
     pub selector: Cow<'static, str>,
     // /// The separator used when multiple selections are present.
-    // #[frog(default = default_separator, tag = Compound)]
-    // pub separator: FormattedText,
+    // #[frog(tag = "compound")]
+    // pub separator: Box<FormattedText>,
 }
+
+// -------------------------------------------------------------------------------------------------
+//
+// TODO: Tests

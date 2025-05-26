@@ -1,7 +1,7 @@
 use darling::{FromDeriveInput, FromField, FromMeta, util::Flag};
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, Ident, Path};
+use syn::{Data, DeriveInput, LitStr, Path};
 
 use crate::manifest::CrateManifest;
 
@@ -31,7 +31,7 @@ struct FieldAttrs {
     /// Defaults to the field name,
     /// required for fields without names.
     #[darling(default, rename = "name")]
-    tag_name: Option<Ident>,
+    tag_name: Option<LitStr>,
 
     /// Convert the type to/from a tag's inner
     /// type instead of a tag directly.
