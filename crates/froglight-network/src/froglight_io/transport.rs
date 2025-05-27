@@ -73,6 +73,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
     async fn get_compression(&self) -> Option<i32> { self.compression }
 
     // TODO: Decompression
+    // Optimization: Replace the `[u8; 5]` with a mut slice from the buffer.
     async fn read_packet(&mut self, buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
         // Read the length bytes of the packet
         let mut len_buf = Cursor::new([0u8; 5]);
@@ -88,8 +89,9 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         buf.resize(buf.len().max(len + len_size), 0u8);
         // Copy the non-length bytes into the buffer
         buf[..5usize - len_size].copy_from_slice(&len_buf.get_ref()[len_size..5usize]);
+
         // Read the rest of the packet into the buffer
-        let pbuf = &mut buf[len_size + 1..len];
+        let pbuf = &mut buf[5usize - len_size..len];
         self.read_raw(pbuf).await?;
 
         // Create a cursor to read from
@@ -105,11 +107,11 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             }
         }
 
-        // Move the packet to the beginning of the buffer and set the buffer size.
+        // Move the packet to the beginning of the buffer and set the buffer size
         #[expect(clippy::cast_possible_truncation)]
         let position = cursor.position() as usize;
         buf.copy_within(position.., 0);
-        buf.truncate(buf.len() - position);
+        buf.truncate(buf.len() - len_size - position);
 
         // Log the ID and length of the packet
         #[cfg(feature = "trace")]

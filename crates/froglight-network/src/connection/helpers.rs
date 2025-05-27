@@ -9,28 +9,34 @@ use crate::prelude::*;
 
 impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
     /// Send a [`HandshakePacket`] to the server to initiate a connection.
+    ///
+    /// # Errors
+    /// Returns an error if the client is unable to send the packet.
     #[inline]
-    pub fn handshake<M: 'static>(
+    pub async fn handshake<M: 'static>(
         &mut self,
         address: impl ToSmolStr,
         port: u16,
         intent: ConnectionIntent,
-    ) -> impl Future<Output = Result<(), ConnectionError>>
+    ) -> Result<(), ConnectionError>
     where
         V::Serverbound: RawPacketVersion<V, M>,
         HandshakePacket: Into<V::Serverbound>,
     {
-        self.write::<M>(HandshakePacket::new::<V>(address, port, intent))
+        self.write::<M>(HandshakePacket::new::<V>(address, port, intent)).await
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 impl<V: ValidState<Status>> ClientConnection<V, Status> {
     /// Send a [`QueryRequestPacket`] to the server
     /// and wait for a [`ServerStatus`] response.
     ///
     /// # Errors
-    /// If the client is unable to send the request or read the response,
-    /// or the server sends an invalid response.
+    /// Returns an error if the client is unable to send the request,
+    /// read the response, or the server sends an invalid response.
+    #[inline]
     pub async fn query_status<M: 'static>(&mut self) -> Result<ServerStatus, ConnectionError>
     where
         V::Serverbound: RawPacketVersion<V, M>,
@@ -41,7 +47,9 @@ impl<V: ValidState<Status>> ClientConnection<V, Status> {
         self.write::<M>(QueryRequestPacket).await?;
         match self.read::<M>().await?.try_into() {
             Ok(QueryResponsePacket { status }) => Ok(status),
-            Err(err) => todo!("Handle invalid response: {err:?}"),
+            Err(err) => {
+                Err(ConnectionError::ReadRawPacket(Box::new(UnexpectedPacketError::from(err))))
+            }
         }
     }
 
@@ -49,8 +57,9 @@ impl<V: ValidState<Status>> ClientConnection<V, Status> {
     /// and wait for a [`PingResultPacket`] response.
     ///
     /// # Errors
-    /// If the client is unable to send the request or read the response,
-    /// or the server sends an invalid response.
+    /// Returns an error if the client is unable to send the request,
+    /// read the response, or the server sends an invalid response.
+    #[inline]
     pub async fn query_ping<M: 'static>(&mut self, ping: u64) -> Result<u64, ConnectionError>
     where
         V::Serverbound: RawPacketVersion<V, M>,
@@ -61,7 +70,17 @@ impl<V: ValidState<Status>> ClientConnection<V, Status> {
         self.write::<M>(QueryPingPacket { ping }).await?;
         match self.read::<M>().await?.try_into() {
             Ok(PingResultPacket { pong }) => Ok(pong),
-            Err(err) => todo!("Handle invalid response: {err:?}"),
+            Err(err) => {
+                Err(ConnectionError::ReadRawPacket(Box::new(UnexpectedPacketError::from(err))))
+            }
         }
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, thiserror::Error, derive_more::From)]
+#[error("Expected a different packet type, received: {received:?}")]
+struct UnexpectedPacketError<T> {
+    pub received: T,
 }

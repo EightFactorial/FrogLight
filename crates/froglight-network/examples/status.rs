@@ -39,13 +39,37 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
     let peer = conn.peer_addr().await?;
     conn.handshake(&SERVER_ADDRESS, peer.port(), ConnectionIntent::Status).await?;
 
-    // Enter the status state and request the server's status
-    let mut status = conn.status().query_status().await?;
+    // Enter the status state
+    let mut conn = conn.status();
 
-    // Apply any legacy formatting codes and print the server's description
+    // Request the server's status, apply any legacy formatting codes,
+    // and print the server's description
+    let mut status = conn.query_status().await?;
     match status.description.apply_legacy_formatting().as_message_ansi(&translations) {
         Ok(txt) => println!("Connected to \'{SERVER_ADDRESS}\' at \'{peer}\':\n{txt}"),
         Err(err) => panic!("Failed to parse description: {err}"),
+    }
+
+    #[cfg(feature = "std")]
+    {
+        use std::time::{SystemTime, UNIX_EPOCH};
+
+        // Get current time and the number of milliseconds since the UNIX epoch
+        let now = SystemTime::now();
+        let millis = now.duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
+
+        // Send a ping request to the server and wait for the response
+        let response = conn.query_ping(millis).await?;
+
+        #[cfg(feature = "trace")]
+        if millis != response {
+            // Warn if the ping response does not match the expected value
+            tracing::warn!("Ping mismatch: expected '{millis}', got '{response}'?");
+        }
+
+        // Print how long the ping took
+        let duration = now.elapsed().unwrap();
+        println!("Ping: {}ms", duration.as_millis());
     }
 
     Ok(())
