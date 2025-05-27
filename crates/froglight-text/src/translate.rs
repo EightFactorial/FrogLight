@@ -16,3 +16,9 @@ use smol_str::SmolStr;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct TextTranslations(HashMap<SmolStr, SmolStr>);
+
+impl TextTranslations {
+    /// Create a new, empty [`TextTranslations`] instance.
+    #[must_use]
+    pub const fn new() -> Self { Self(HashMap::new()) }
+}

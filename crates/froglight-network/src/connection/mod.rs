@@ -7,6 +7,8 @@ pub mod state;
 pub use state::Connection;
 use state::{Client, Server};
 
+mod helpers;
+
 /// A [`Connection`] from a [`Client`] to a [`Server`]
 pub type ClientConnection<V, S> = Connection<V, S, Client>;
 /// A [`Connection`] from a [`Server`] to a [`Client`]

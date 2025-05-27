@@ -134,7 +134,7 @@ fn unnamed_fields(fields: FieldsUnnamed, path: &Path) -> (TokenStream, TokenStre
     let mut from = TokenStream::new();
     let mut into = TokenStream::new();
 
-    for (_i, field) in fields.unnamed.into_iter().enumerate() {
+    for field in fields.unnamed {
         let FieldAttrs { default, inline, tag_name, tag_type, list_type, with_fn, skip_fn } =
             FieldAttrs::from_field(&field).unwrap();
 

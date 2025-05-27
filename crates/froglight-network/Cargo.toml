@@ -28,6 +28,7 @@ froglight-common = { workspace = true }
 froglight-macros = { features = ["network"], workspace = true }
 froglight-packet = { features = ["inventory"], workspace = true }
 futures-lite = { features = ["alloc"], workspace = true }
+smol_str = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
@@ -73,7 +74,7 @@ libm = ["froglight-packet/libm"]
 # Enable nightly features.
 nightly = ["froglight-io?/nightly", "froglight-packet/nightly", "froglight-resolver?/nightly"]
 # Enable trace logs.
-trace = ["dep:tracing", "froglight-io?/trace", "froglight-packet/trace"]
+trace = ["dep:tracing", "froglight-io?/trace", "froglight-packet/trace", "froglight-resolver?/trace"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4", "froglight-packet/v1_21_4"]

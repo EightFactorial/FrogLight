@@ -1,0 +1,67 @@
+#[cfg(not(feature = "std"))]
+use alloc::boxed::Box;
+
+use froglight_packet::{state::ValidState, v1_21_4::prelude::*};
+use smol_str::ToSmolStr;
+
+use super::{raw::RawPacketVersion, state::ConnectionError};
+use crate::prelude::*;
+
+impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
+    /// Send a [`HandshakePacket`] to the server to initiate a connection.
+    #[inline]
+    pub fn handshake<M: 'static>(
+        &mut self,
+        address: impl ToSmolStr,
+        port: u16,
+        intent: ConnectionIntent,
+    ) -> impl Future<Output = Result<(), ConnectionError>>
+    where
+        V::Serverbound: RawPacketVersion<V, M>,
+        HandshakePacket: Into<V::Serverbound>,
+    {
+        self.write::<M>(HandshakePacket::new::<V>(address, port, intent))
+    }
+}
+
+impl<V: ValidState<Status>> ClientConnection<V, Status> {
+    /// Send a [`QueryRequestPacket`] to the server
+    /// and wait for a [`ServerStatus`] response.
+    ///
+    /// # Errors
+    /// If the client is unable to send the request or read the response,
+    /// or the server sends an invalid response.
+    pub async fn query_status<M: 'static>(&mut self) -> Result<ServerStatus, ConnectionError>
+    where
+        V::Serverbound: RawPacketVersion<V, M>,
+        QueryRequestPacket: Into<V::Serverbound>,
+        V::Clientbound: RawPacketVersion<V, M> + TryInto<QueryResponsePacket>,
+        <V::Clientbound as TryInto<QueryResponsePacket>>::Error: core::fmt::Debug,
+    {
+        self.write::<M>(QueryRequestPacket).await?;
+        match self.read::<M>().await?.try_into() {
+            Ok(QueryResponsePacket { status }) => Ok(status),
+            Err(err) => todo!("Handle invalid response: {err:?}"),
+        }
+    }
+
+    /// Send a [`QueryPingPacket`] to the server
+    /// and wait for a [`PingResultPacket`] response.
+    ///
+    /// # Errors
+    /// If the client is unable to send the request or read the response,
+    /// or the server sends an invalid response.
+    pub async fn query_ping<M: 'static>(&mut self, ping: u64) -> Result<u64, ConnectionError>
+    where
+        V::Serverbound: RawPacketVersion<V, M>,
+        QueryPingPacket: Into<V::Serverbound>,
+        V::Clientbound: RawPacketVersion<V, M> + TryInto<PingResultPacket>,
+        <V::Clientbound as TryInto<PingResultPacket>>::Error: core::fmt::Debug,
+    {
+        self.write::<M>(QueryPingPacket { ping }).await?;
+        match self.read::<M>().await?.try_into() {
+            Ok(PingResultPacket { pong }) => Ok(pong),
+            Err(err) => todo!("Handle invalid response: {err:?}"),
+        }
+    }
+}

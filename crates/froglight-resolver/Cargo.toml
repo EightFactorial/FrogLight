@@ -25,9 +25,9 @@ hickory-resolver = { features = ["system-config"], workspace = true }
 
 # Optional dependencies
 bevy_ecs = { features = ["bevy_reflect", "std"], optional = true, workspace = true }
-bevy_log = { optional = true, workspace = true }
 bevy_reflect = { features = ["std"], optional = true, workspace = true }
 bevy_tasks = { features = ["std"], optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
 ureq = { optional = true, workspace = true }
 
 [features]
@@ -37,10 +37,12 @@ default = ["agent"]
 agent = ["dep:ureq"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_log", "dep:bevy_reflect", "dep:bevy_tasks"]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks"]
 
 # Enable nightly features.
 nightly = []
+# Enable trace logs.
+trace = ["dep:tracing"]
 
 # --- Examples ---
 
