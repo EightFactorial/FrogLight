@@ -21,7 +21,6 @@ pub struct IoTransport<S> {
     stream: S,
     peer: SocketAddr,
     compression: Option<i32>,
-    #[allow(dead_code)]
     scratch: Vec<u8>,
 
     #[cfg(feature = "crypto")]

@@ -244,6 +244,7 @@ pub struct PortalCooldown(u32);
 
 impl FromTag for PortalCooldown {
     #[inline]
+    #[expect(clippy::cast_sign_loss)]
     fn from_tag(tag: &NbtTag) -> Result<Self, NbtError> {
         match tag {
             NbtTag::Int(int) => Ok(Self(*int as u32)),
@@ -253,6 +254,7 @@ impl FromTag for PortalCooldown {
 }
 impl IntoTag for PortalCooldown {
     #[inline]
+    #[expect(clippy::cast_possible_wrap)]
     fn into_tag(&self) -> Result<NbtTag, NbtError> { Ok(NbtTag::Int(self.0 as i32)) }
 }
 
@@ -295,6 +297,7 @@ pub struct TicksFrozen(u32);
 
 impl FromTag for TicksFrozen {
     #[inline]
+    #[expect(clippy::cast_sign_loss)]
     fn from_tag(tag: &NbtTag) -> Result<Self, NbtError> {
         match tag {
             NbtTag::Int(int) => Ok(Self(*int as u32)),
@@ -304,5 +307,6 @@ impl FromTag for TicksFrozen {
 }
 impl IntoTag for TicksFrozen {
     #[inline]
+    #[expect(clippy::cast_possible_wrap)]
     fn into_tag(&self) -> Result<NbtTag, NbtError> { Ok(NbtTag::Int(self.0 as i32)) }
 }

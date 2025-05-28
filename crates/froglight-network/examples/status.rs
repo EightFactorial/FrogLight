@@ -34,9 +34,9 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
 
     // Create a new client connection to the server
     let mut conn = ClientConnection::<V1_21_4, _>::connect(&SERVER_ADDRESS, &resolver).await?;
-
-    // Get the peer's address and send a handshake packet to the server
     let peer = conn.peer_addr().await?;
+
+    // Send a handshake packet to the server
     conn.handshake(&SERVER_ADDRESS, peer.port(), ConnectionIntent::Status).await?;
 
     // Enter the status state
@@ -52,11 +52,11 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
 
     #[cfg(feature = "std")]
     {
-        use std::time::{SystemTime, UNIX_EPOCH};
+        use std::time::UNIX_EPOCH;
 
-        // Get current time and the number of milliseconds since the UNIX epoch
-        let now = SystemTime::now();
-        let millis = now.duration_since(UNIX_EPOCH).unwrap().as_millis() as u64;
+        // Get the current time in milliseconds
+        let now = UNIX_EPOCH.elapsed().unwrap();
+        let millis = now.as_millis() as u64;
 
         // Send a ping request to the server and wait for the response
         let response = conn.query_ping(millis).await?;
@@ -68,7 +68,7 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
         }
 
         // Print how long the ping took
-        let duration = now.elapsed().unwrap();
+        let duration = UNIX_EPOCH.elapsed().unwrap() - now;
         println!("Ping: {}ms", duration.as_millis());
     }
 

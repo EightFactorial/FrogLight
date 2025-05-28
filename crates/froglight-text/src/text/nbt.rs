@@ -94,7 +94,10 @@ impl FormattedText {
                 }
             }
             Some(..) => {
-                Err(NbtError::MismatchedTag(type_name::<Self>(), "List of Strings or Compounds"))?
+                return Err(NbtError::MismatchedTag(
+                    type_name::<Self>(),
+                    "List of Strings or Compounds",
+                ));
             }
             None => {}
         }

@@ -30,6 +30,7 @@ impl FromTag for Uuid {
         match tag {
             NbtTag::ByteArray(array) | NbtTag::List(NbtListTag::Byte(array)) => {
                 if array.len() == 16 {
+                    #[expect(clippy::cast_sign_loss)]
                     let bytes = core::array::from_fn::<u8, 16, _>(|i| array[i] as u8);
                     Ok(Uuid::from_bytes(bytes))
                 } else {
@@ -42,8 +43,8 @@ impl FromTag for Uuid {
             }
             NbtTag::IntArray(array) | NbtTag::List(NbtListTag::Int(array)) => {
                 if array.len() == 4 {
-                    let ints = core::array::from_fn::<[u8; 4], 4, _>(|i| array[i].to_le_bytes());
-                    Ok(Uuid::from_slice_le(ints.as_flattened()).unwrap())
+                    let bytes = core::array::from_fn::<[u8; 4], 4, _>(|i| array[i].to_le_bytes());
+                    Ok(Uuid::from_slice_le(bytes.as_flattened()).unwrap())
                 } else {
                     #[expect(unreachable_code)]
                     Err(NbtError::ConversionError(
