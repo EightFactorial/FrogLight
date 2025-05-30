@@ -1,35 +1,27 @@
 #[cfg(not(feature = "std"))]
 use alloc::sync::Arc;
-use core::{any::TypeId, marker::PhantomData};
+use core::any::TypeId;
 #[cfg(feature = "std")]
 use std::sync::Arc;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
-use bevy_platform::hash::NoOpHash;
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
-use derive_more::{Deref, Into};
 use froglight_common::{vanilla::Vanilla, version::Version};
-use indexmap::IndexMap;
-use parking_lot::RwLock;
+use froglight_utils::storage::prelude::*;
 
 use super::{EntityTypeExt, EntityTypeResolver, EntityTypeTrait};
 
-/// A thread-safe dynamic storage for entity types.
+/// A dynamic storage for entity types.
 ///
 /// Allows for the registration and retrieval of entity types at runtime.
-#[derive(Clone, Deref)]
-#[cfg_attr(feature = "bevy", derive(Resource))]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone, Resource))]
-pub struct AppEntityTypeStorage<V: Version>(Arc<RwLock<EntityTypeStorage<V>>>);
-
-impl<V: Version> Default for AppEntityTypeStorage<V>
-where Vanilla: EntityTypeResolver<V>
-{
-    #[inline]
-    fn default() -> Self { Self::new() }
-}
+#[repr(transparent)]
+#[derive(Clone, AppStorage)]
+#[storage(index(ident = "GlobalEntityTypeId", inner = "u16"), bevy = "bevy", reflect = "reflect")]
+pub struct EntityTypeStorage<V: Version>(
+    IndexedLocalStorage<dyn EntityTypeTrait<V>, GlobalEntityTypeId>,
+);
 
 impl<V: Version> AppEntityTypeStorage<V> {
     /// Create a new [`AppEntityTypeStorage`] with the [`Vanilla`] types
@@ -40,29 +32,6 @@ impl<V: Version> AppEntityTypeStorage<V> {
     where Vanilla: EntityTypeResolver<V> {
         Self::from_storage(EntityTypeStorage::new())
     }
-
-    /// Create a new [`AppEntityTypeStorage`] from a [`EntityTypeStorage`].
-    #[inline]
-    #[must_use]
-    pub fn from_storage(storage: EntityTypeStorage<V>) -> Self {
-        Self(Arc::new(RwLock::new(storage)))
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A dynamic storage for entity types.
-///
-/// Allows for the registration and retrieval of entity types at runtime.
-pub struct EntityTypeStorage<V: Version> {
-    traits: IndexMap<TypeId, &'static dyn EntityTypeTrait<V>, NoOpHash>,
-    _phantom: PhantomData<V>,
-}
-
-impl<V: Version> Default for EntityTypeStorage<V>
-where Vanilla: EntityTypeResolver<V>
-{
-    fn default() -> Self { Self::new() }
 }
 
 impl<V: Version> EntityTypeStorage<V> {
@@ -78,9 +47,7 @@ impl<V: Version> EntityTypeStorage<V> {
 
     /// Create a new [`EntityTypeStorage`] with no registered entity types.
     #[must_use]
-    pub const fn new_empty() -> Self {
-        Self { traits: IndexMap::with_hasher(NoOpHash), _phantom: PhantomData }
-    }
+    pub const fn new_empty() -> Self { Self(IndexedLocalStorage::new()) }
 
     /// Get the [`EntityTypeTrait`] for the given [`GlobalEntityTypeId`].
     ///
@@ -114,7 +81,7 @@ impl<V: Version> EntityTypeStorage<V> {
         &self,
         entity_type: GlobalEntityTypeId,
     ) -> Option<&'static dyn EntityTypeTrait<V>> {
-        self.traits.get_index(usize::from(entity_type)).map(|(_, entity)| *entity)
+        self.0.get_index(entity_type).map(|val| val.inner())
     }
 
     /// Get an entity type for the given entity type id.
@@ -179,17 +146,26 @@ impl<V: Version> EntityTypeStorage<V> {
     ///     let storage = EntityTypeStorage::<V1_21_4>::new();
     ///
     ///     // Get the `GlobalEntityTypeId` of `Cat`.
-    ///     let global_id = storage.get_global(entity::Cat).unwrap();
-    ///     assert_eq!(*global_id, 20u32);
+    ///     let global_id = storage.get_global_id::<entity::Cat>().unwrap();
+    ///     assert_eq!(*global_id, 20);
     ///
     ///     // Get the `GlobalEntityTypeId` of `Bat`.
-    ///     let global_id = storage.get_global(entity::Bat).unwrap();
-    ///     assert_eq!(*global_id, 10u32);
+    ///     let global_id = storage.get_global_id::<entity::Bat>().unwrap();
+    ///     assert_eq!(*global_id, 10);
     /// }
     /// ```
+    #[inline]
     #[must_use]
-    pub fn get_global(&self, entity_type: impl EntityTypeTrait<V>) -> Option<GlobalEntityTypeId> {
-        self.traits.get_index_of(&entity_type.type_id()).map(GlobalEntityTypeId::from)
+    pub fn get_global_id<E: EntityTypeTrait<V>>(&self) -> Option<GlobalEntityTypeId> {
+        self.get_global_type_id(&TypeId::of::<E>())
+    }
+
+    /// Get the [`GlobalEntityTypeId`] for the given entity type.
+    ///
+    /// Returns `None` if the entity type was not registered.
+    #[must_use]
+    pub fn get_global_type_id(&self, type_id: &TypeId) -> Option<GlobalEntityTypeId> {
+        self.0.get_index_of(type_id)
     }
 
     /// Register an entity type with the storage.
@@ -215,55 +191,58 @@ impl<V: Version> EntityTypeStorage<V> {
     ///     let storage = EntityTypeStorage::<V1_21_4>::new();
     ///
     ///     // Since `Cat` is already registered, we can get its global id.
-    ///     assert_eq!(storage.get_global(entity::Cat), Some(GlobalEntityTypeId::new_unchecked(20)));
+    ///     assert_eq!(
+    ///         storage.get_global_id::<entity::Cat>(),
+    ///         Some(GlobalEntityTypeId::new_unchecked(20))
+    ///     );
     ///
     ///     // Create a new empty entity type storage.
     ///     let mut storage = EntityTypeStorage::<V1_21_4>::new_empty();
     ///
     ///     // Since `Cat` is not registered, it does not have a global id.
-    ///     assert_eq!(storage.get_global(entity::Cat), None);
+    ///     assert_eq!(storage.get_global_id::<entity::Cat>(), None);
     ///
     ///     // Register the `Cat` entity type, now we can get its global id.
     ///     storage.register::<entity::Cat>();
-    ///     assert_eq!(storage.get_global(entity::Cat), Some(GlobalEntityTypeId::new_unchecked(0)));
+    ///     assert_eq!(
+    ///         storage.get_global_id::<entity::Cat>(),
+    ///         Some(GlobalEntityTypeId::new_unchecked(0))
+    ///     );
     /// }
     /// ```
     pub fn register<E: EntityTypeExt<V>>(&mut self) {
-        self.traits.insert(TypeId::of::<E>(), E::as_static());
+        self.0.store(TypeId::of::<E>(), E::as_static());
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// A raw entity type id that represents a type of entity.
-#[repr(transparent)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Into, Deref)]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
-pub struct GlobalEntityTypeId(u32);
-
-impl GlobalEntityTypeId {
-    /// Create a new [`GlobalEntityTypeId`] with the given id.
-    ///
-    /// # Warning
-    /// There is no guarantee that the given id is valid or represents the
-    /// same entity type between versions.
-    /// Ids may even change between program runs!
-    #[inline]
-    #[must_use]
-    pub const fn new_unchecked(entity_type: u32) -> Self { Self(entity_type) }
+impl<V: Version> Default for AppEntityTypeStorage<V>
+where Vanilla: EntityTypeResolver<V>
+{
+    fn default() -> Self { Self::new() }
 }
+
+impl<V: Version> Default for EntityTypeStorage<V>
+where Vanilla: EntityTypeResolver<V>
+{
+    fn default() -> Self { Self::new() }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 impl From<usize> for GlobalEntityTypeId {
     #[cfg(debug_assertions)]
     fn from(id: usize) -> Self {
-        Self(u32::try_from(id).expect("GlobalEntityTypeId is too large!"))
+        Self(u16::try_from(id).expect("GlobalEntityTypeId is too large!"))
     }
 
     #[inline]
     #[cfg(not(debug_assertions))]
     #[expect(clippy::cast_possible_truncation)]
-    fn from(id: usize) -> Self { Self(id as u32) }
+    fn from(id: usize) -> Self { Self(id as u16) }
 }
+
 impl From<GlobalEntityTypeId> for usize {
     #[cfg(debug_assertions)]
     fn from(id: GlobalEntityTypeId) -> Self {

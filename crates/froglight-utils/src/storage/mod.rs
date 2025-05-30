@@ -13,7 +13,15 @@ pub use local::IndexedLocalStorage;
 #[cfg(feature = "reflect")]
 mod reflect;
 #[cfg(feature = "reflect")]
-pub use reflect::AppStorageReflect;
+pub use reflect::ReflectAppStorage;
 
 mod wrapper;
 pub use wrapper::StorageWrapper;
+
+pub mod prelude {
+    //! Re-exports of common types, traits, and macros.
+
+    #[cfg(feature = "reflect")]
+    pub use super::ReflectAppStorage;
+    pub use super::{AppStorage, IndexedLocalStorage, StorageWrapper};
+}

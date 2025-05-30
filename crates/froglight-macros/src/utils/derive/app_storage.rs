@@ -1,18 +1,24 @@
-use darling::{FromDeriveInput, FromMeta, util::Flag};
+use darling::{FromDeriveInput, FromMeta, usage::GenericsExt, util::Flag};
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::{DeriveInput, Ident, LitStr, TypePath};
-
-use crate::CrateManifest;
 
 pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
     let input: DeriveInput = syn::parse2(input).unwrap();
 
     let AppStorageMacro { index, manual, reflect, bevy } =
         AppStorageMacro::from_derive_input(&input).unwrap();
-    let DeriveInput { vis, ident, .. } = input;
 
-    let _utils = CrateManifest::froglight("froglight-utils");
+    let DeriveInput { vis, ident, generics, .. } = input;
+
+    let mut generic_params =
+        generics.declared_type_params().into_iter().fold(TokenStream::new(), |mut acc, param| {
+            acc.extend(quote! { #param, });
+            acc
+        });
+    if !generic_params.is_empty() {
+        generic_params = quote! { <#generic_params> };
+    }
 
     let mut index_tokens = TokenStream::new();
     if let Some(index) = index {
@@ -20,8 +26,13 @@ pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
 
         // Generate the index struct
         index_tokens.extend(quote! {
+            /// An index for accessing items in type storage.
+            ///
+            /// # Warning
+            /// There is no guarantee that the given index is valid or represents the
+            /// same index between versions. Indices may even change between program runs!
             #[repr(transparent)]
-            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into)]
+            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into, derive_more::Deref)]
             #vis struct #index;
         });
 
@@ -63,15 +74,17 @@ pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
     }
 
     quote! {
+        /// A thread-safe, run-time modifiable storage for values
+        /// accessible by either a [`TypeId`] or an index.
         #[derive(Clone, derive_more::Deref, derive_more::From, derive_more::Into)]
         #[repr(transparent)]
         #attr_tokens
-        #vis struct #app_ident(Arc<::parking_lot::RwLock<#ident>>);
+        #vis struct #app_ident #generics (Arc<::parking_lot::RwLock<#ident #generic_params >>);
 
-        impl #app_ident {
+        impl #generics #app_ident #generic_params {
             /// Create a new `AppStorage` with the given storage.
             #[must_use]
-            pub fn from_storage(storage: #ident) -> Self {
+            pub fn from_storage(storage: #ident #generic_params) -> Self {
                 Self(Arc::new(::parking_lot::RwLock::new(storage)))
             }
         }

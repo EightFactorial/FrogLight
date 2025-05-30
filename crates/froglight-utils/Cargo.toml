@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy_platform = { features = ["alloc"], workspace = true }
+bevy_platform = { workspace = true }
 derive_more = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-macros = { features = ["utils"], workspace = true }
@@ -36,4 +36,4 @@ reflect = ["dep:bevy_reflect"]
 nightly = []
 
 # Enable support for the rust standard library.
-std = ["bevy_platform/std", "bevy_reflect?/std"]
+std = ["bevy_reflect?/std"]

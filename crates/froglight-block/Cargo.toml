@@ -21,6 +21,7 @@ derive_more = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { features = ["block"], workspace = true }
+froglight-utils = { workspace = true }
 hashify = { workspace = true }
 parking_lot = { workspace = true }
 rangemap = { workspace = true }
@@ -36,10 +37,10 @@ default = []
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_utils", "froglight-common/bevy"]
 # Enable `bevy_reflect` support.
-reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-common/bevy"]
+reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-common/bevy", "froglight-utils/reflect"]
 
 # Enable nightly features.
-nightly = ["parking_lot/nightly", "rangemap/nightly"]
+nightly = ["froglight-utils/nightly", "parking_lot/nightly", "rangemap/nightly"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4"]

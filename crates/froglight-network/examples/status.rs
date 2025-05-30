@@ -59,6 +59,7 @@ async fn main_async() -> Result<(), Box<dyn core::error::Error>> {
         let millis = now.as_millis() as u64;
 
         // Send a ping request to the server and wait for the response
+        #[allow(unused_variables)]
         let response = conn.query_ping(millis).await?;
 
         #[cfg(feature = "trace")]
