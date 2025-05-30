@@ -1,7 +1,6 @@
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{Deref, From, Into};
-use downcast_rs::DowncastSync;
 use parking_lot::RwLock;
 
 use super::IndexedLocalStorage;
@@ -11,14 +10,11 @@ use super::IndexedLocalStorage;
 #[repr(transparent)]
 #[derive(Debug, Deref, From, Into)]
 #[cfg_attr(feature = "reflect", derive(Reflect))]
-pub struct IndexedGlobalStorage<
-    V: DowncastSync + ?Sized + 'static,
-    I: From<usize> + Into<usize> + 'static,
->(&'static RwLock<IndexedLocalStorage<V, I>>);
+pub struct IndexedGlobalStorage<V: ?Sized + 'static, I: From<usize> + Into<usize> + 'static>(
+    &'static RwLock<IndexedLocalStorage<V, I>>,
+);
 
-impl<V: DowncastSync + ?Sized + 'static, I: From<usize> + Into<usize> + 'static>
-    IndexedGlobalStorage<V, I>
-{
+impl<V: ?Sized + 'static, I: From<usize> + Into<usize> + 'static> IndexedGlobalStorage<V, I> {
     /// Create a new [`IndexedGlobalStorage`].
     #[must_use]
     pub const fn new(storage: &'static RwLock<IndexedLocalStorage<V, I>>) -> Self { Self(storage) }
@@ -31,15 +27,10 @@ impl<V: DowncastSync + ?Sized + 'static, I: From<usize> + Into<usize> + 'static>
 // -------------------------------------------------------------------------------------------------
 // Manual implementations for `IndexedGlobalStorage` to avoid trait bounds
 
-impl<V: DowncastSync + ?Sized + 'static, I: From<usize> + Into<usize>> Clone
-    for IndexedGlobalStorage<V, I>
-{
+impl<V: ?Sized + 'static, I: From<usize> + Into<usize>> Clone for IndexedGlobalStorage<V, I> {
     fn clone(&self) -> Self { *self }
 }
-impl<V: DowncastSync + ?Sized + 'static, I: From<usize> + Into<usize>> Copy
-    for IndexedGlobalStorage<V, I>
-{
-}
+impl<V: ?Sized + 'static, I: From<usize> + Into<usize>> Copy for IndexedGlobalStorage<V, I> {}
 
 // -------------------------------------------------------------------------------------------------
 

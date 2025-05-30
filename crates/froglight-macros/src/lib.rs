@@ -277,3 +277,15 @@ pub fn derive_frognbt(input: proc_macro::TokenStream) -> proc_macro::TokenStream
 
 #[cfg(feature = "network")]
 mod network;
+
+// ------------------- `froglight-utils` -------------------
+
+#[cfg(feature = "utils")]
+mod utils;
+
+/// Create an `AppStorage` struct.
+#[cfg(feature = "utils")]
+#[proc_macro_derive(AppStorage, attributes(storage))]
+pub fn derive_appstorage(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    utils::derive_app_storage(input.into()).into()
+}

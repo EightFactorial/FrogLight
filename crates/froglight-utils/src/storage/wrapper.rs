@@ -1,5 +1,7 @@
 //! TODO
 
+use core::fmt::Debug;
+
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::Deref;
@@ -7,11 +9,11 @@ use downcast_rs::Downcast;
 
 /// A wrapper around a static value that implements
 /// [`PartialEq`] and [`Eq`] based on its [`TypeId`].
-#[derive(Debug, Deref)]
+#[derive(Deref)]
 #[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone, PartialEq))]
-pub struct StorageWrapper<V: Downcast + ?Sized + 'static>(&'static V);
+pub struct StorageWrapper<V: ?Sized + 'static>(&'static V);
 
-impl<V: Downcast + ?Sized + 'static> StorageWrapper<V> {
+impl<V: ?Sized + 'static> StorageWrapper<V> {
     /// Create a new [`StorageWrapper`] from the given value.
     #[inline]
     #[must_use]
@@ -26,14 +28,16 @@ impl<V: Downcast + ?Sized + 'static> StorageWrapper<V> {
 // -------------------------------------------------------------------------------------------------
 // Manual implementations for `StorageWrapper` to avoid trait bounds
 
-impl<V: Downcast + ?Sized + 'static> Clone for StorageWrapper<V> {
+impl<V: Debug + ?Sized + 'static> Debug for StorageWrapper<V> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result { self.inner().fmt(f) }
+}
+
+impl<V: ?Sized + 'static> Clone for StorageWrapper<V> {
     fn clone(&self) -> Self { *self }
 }
-impl<V: Downcast + ?Sized + 'static> Copy for StorageWrapper<V> {}
+impl<V: ?Sized + 'static> Copy for StorageWrapper<V> {}
 
-impl<V: Downcast + ?Sized + 'static> Eq for StorageWrapper<V> {}
-impl<V: Downcast + ?Sized + 'static> PartialEq for StorageWrapper<V> {
-    fn eq(&self, other: &Self) -> bool {
-        <V as Downcast>::as_any(self.0).type_id() == <V as Downcast>::as_any(other.0).type_id()
-    }
+impl<V: ?Sized + 'static> Eq for StorageWrapper<V> {}
+impl<V: ?Sized + 'static> PartialEq for StorageWrapper<V> {
+    fn eq(&self, other: &Self) -> bool { self.0.as_any().type_id() == other.0.as_any().type_id() }
 }

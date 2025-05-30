@@ -1,7 +1,6 @@
 //! TODO
 
-// TODO: Write the `AppStorage` macro
-// pub use froglight_macros::AppStorage;
+pub use froglight_macros::AppStorage;
 
 pub use crate::global_storage;
 

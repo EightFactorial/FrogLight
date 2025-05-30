@@ -1,4 +1,5 @@
 //! TODO
+#![allow(missing_docs)]
 
 use core::any::TypeId;
 
@@ -42,6 +43,8 @@ fn main() {
     assert_eq!(AnyStorage::fetch::<&str>(), Some(&SECOND_STR));
     assert_ne!(AnyStorage::fetch::<&str>(), Some(&THIRD_STR));
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// A global storage that can store one of any type of static value.
 #[derive(Debug, Default, Clone, Copy)]

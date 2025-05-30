@@ -5,13 +5,6 @@ use syn::{DeriveInput, LitInt};
 
 use crate::CrateManifest;
 
-#[derive(FromDeriveInput)]
-#[darling(attributes(version))]
-struct VersionMacro {
-    protocol: LitInt,
-    resource: LitInt,
-}
-
 pub(crate) fn derive_version(input: TokenStream) -> TokenStream {
     let input: DeriveInput = syn::parse2(input).unwrap();
 
@@ -26,4 +19,13 @@ pub(crate) fn derive_version(input: TokenStream) -> TokenStream {
             const RESOURCE_VERSION: u32 = #resource;
         }
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[derive(FromDeriveInput)]
+#[darling(attributes(version))]
+struct VersionMacro {
+    protocol: LitInt,
+    resource: LitInt,
 }
