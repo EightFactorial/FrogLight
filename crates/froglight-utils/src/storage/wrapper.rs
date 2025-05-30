@@ -1,6 +1,6 @@
 //! TODO
 
-use core::fmt::Debug;
+use core::{any::Any, fmt::Debug};
 
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
@@ -23,6 +23,14 @@ impl<V: ?Sized + 'static> StorageWrapper<V> {
     #[inline]
     #[must_use]
     pub const fn inner(&self) -> &'static V { self.0 }
+
+    /// Get the inner value as a reference to `dyn Any`.
+    #[inline]
+    #[must_use]
+    pub fn as_any(&self) -> &dyn Any
+    where V: Downcast {
+        <V as Downcast>::as_any(self.0)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

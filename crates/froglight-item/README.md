@@ -31,7 +31,7 @@ fn main() {
 
     // Untyped items can hold any item internally with any NBT data.
     let untyped_item: UntypedItem<V1_21_4> = storage.get_untyped(GlobalItemId::new_unchecked(0), None).unwrap();
-    assert_eq!(storage.get_global(&untyped_item), Some(GlobalItemId::new_unchecked(0)));
+    assert_eq!(storage.get_global_untyped_id(&untyped_item), Some(GlobalItemId::new_unchecked(0)));
 
     // Untyped items have limited functionality, but can be resolved into typed items.
     assert_eq!(untyped_item.identifier(), "minecraft:air");
@@ -39,11 +39,11 @@ fn main() {
 
     let item_id = GlobalItemId::new_unchecked(1);
     assert_eq!(storage.get_typed::<Vanilla>(item_id, None), Some(Ok(Item::<item::Stone, V1_21_4>::default().into())));
-    assert_eq!(storage.get_global_type::<item::Stone>(), Some(item_id));
+    assert_eq!(storage.get_global_id::<item::Stone>(), Some(item_id));
 
     let item_id = GlobalItemId::new_unchecked(1146);
     assert_eq!(storage.get_typed::<Vanilla>(item_id, None), Some(Ok(Item::<item::BakedPotato, V1_21_4>::default().into())));
-    assert_eq!(storage.get_global_type::<item::BakedPotato>(), Some(item_id));
+    assert_eq!(storage.get_global_id::<item::BakedPotato>(), Some(item_id));
 
 }
 ```

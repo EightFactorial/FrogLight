@@ -5,9 +5,10 @@ use bevy_reflect::prelude::*;
 use downcast_rs::Downcast;
 use froglight_common::{prelude::Identifier, version::Version};
 use froglight_nbt::nbt::UnnamedNbt;
+use froglight_utils::storage::StorageWrapper;
 
 use super::{ItemRarity, ItemType, ItemTypeExt};
-use crate::{resolve::ItemResolver, storage::ItemWrapper};
+use crate::resolve::ItemResolver;
 
 /// An item with optional data.
 #[cfg_attr(feature = "reflect", derive(Reflect))]
@@ -217,22 +218,22 @@ impl<I: ItemTypeExt<V>, V: Version> TryFrom<UntypedItem<V>> for Item<I, V> {
 pub struct UntypedItem<V: Version> {
     data: UnnamedNbt,
     #[cfg_attr(feature = "reflect", reflect(ignore))]
-    wrapper: ItemWrapper<V>,
+    wrapper: StorageWrapper<dyn ItemType<V>>,
 }
 
 impl<V: Version> UntypedItem<V> {
     /// Create a new [`UntypedItem`] from the given
-    /// [`UnnamedNbt`] and [`ItemWrapper`].
+    /// [`UnnamedNbt`] and [`StorageWrapper`].
     #[inline]
     #[must_use]
-    pub(crate) const fn new(data: UnnamedNbt, wrapper: ItemWrapper<V>) -> Self {
+    pub(crate) const fn new(data: UnnamedNbt, wrapper: StorageWrapper<dyn ItemType<V>>) -> Self {
         Self { data, wrapper }
     }
 
-    /// Get the internal [`ItemWrapper`] of the [`UntypedItem`].
+    /// Get the internal [`StorageWrapper`] of the [`UntypedItem`].
     #[inline]
     #[must_use]
-    pub(crate) const fn wrapper(&self) -> &ItemWrapper<V> { &self.wrapper }
+    pub(crate) const fn wrapper(&self) -> &StorageWrapper<dyn ItemType<V>> { &self.wrapper }
 
     /// Get the default data of the [`UntypedItem`].
     ///
@@ -378,7 +379,7 @@ impl<V: Version> UntypedItem<V> {
 impl<I: ItemTypeExt<V>, V: Version> From<Item<I, V>> for UntypedItem<V> {
     #[inline]
     fn from(item: Item<I, V>) -> Self {
-        UntypedItem::new(item.data, ItemWrapper::new(I::as_static()))
+        UntypedItem::new(item.data, StorageWrapper::new(I::as_static()))
     }
 }
 

@@ -53,7 +53,7 @@ pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
         }
     }
 
-    let app_ident = Ident::new(&format!("App{}", ident.to_string()), ident.span());
+    let app_ident = Ident::new(&format!("App{ident}"), ident.span());
 
     let mut attr_tokens = TokenStream::new();
 

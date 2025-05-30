@@ -97,7 +97,7 @@ impl<'a, V: Version> RawInventorySlotRef<'a, V> {
         match &slot.0 {
             Some((count, item)) => {
                 // Get the global item ID from the item.
-                let global = storage.get_global(item)?;
+                let global = storage.get_global_untyped_id(item)?;
                 // Get ids of any missing default components.
                 let removed = Cow::Owned(Self::missing_defaults(item));
 
@@ -194,7 +194,7 @@ impl<V: Version> FrogReadVersion<V> for RawInventorySlot<V> {
             count => {
                 #[expect(clippy::cast_possible_truncation)]
                 let count = NonZeroU8::new(count as u8).unwrap();
-                let global = GlobalItemId::new_unchecked(u32::frog_var_read(buffer)?);
+                let global = GlobalItemId::new_unchecked_u32(u32::frog_var_read(buffer)?);
 
                 let add_len = u32::frog_var_read(buffer)? as usize;
                 let rem_len = u32::frog_var_read(buffer)? as usize;

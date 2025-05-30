@@ -244,12 +244,5 @@ impl From<usize> for GlobalEntityTypeId {
 }
 
 impl From<GlobalEntityTypeId> for usize {
-    #[cfg(debug_assertions)]
-    fn from(id: GlobalEntityTypeId) -> Self {
-        usize::try_from(id.0).expect("GlobalEntityTypeId is too large!")
-    }
-
-    #[inline]
-    #[cfg(not(debug_assertions))]
-    fn from(id: GlobalEntityTypeId) -> Self { id.0 as usize }
+    fn from(id: GlobalEntityTypeId) -> Self { usize::from(id.0) }
 }

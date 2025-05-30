@@ -86,7 +86,7 @@ pub(crate) fn item_properties(input: TokenStream) -> TokenStream {
 
             // Create resolver tests
             resolver_tests.extend(quote! {{
-                let item = storage.get_untyped(GlobalItemId::new_unchecked(global), None).expect("No item found for expected GlobalItemId!");
+                let item = storage.get_untyped(GlobalItemId::new_unchecked_u32(global), None).expect("No item found for expected GlobalItemId!");
                 assert_eq!(item.identifier().as_str(), #ident, "Item \"{}\" identifier mismatch!", #ident);
                 assert_eq!(item.clone().resolve::<Vanilla>(), item.clone().downcast().map(VersionItems::#item), "Failed to resolve \"{}\"!", #ident);
                 global += 1;
