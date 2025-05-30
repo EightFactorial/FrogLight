@@ -166,7 +166,7 @@ impl From<usize> for GlobalItemId {
     #[inline]
     #[cfg(not(debug_assertions))]
     #[expect(clippy::cast_possible_truncation)]
-    fn from(id: usize) -> Self { Self(id as u16) }
+    fn from(id: usize) -> Self { Self(id as u32) }
 }
 
 impl From<GlobalItemId> for usize {
