@@ -1,0 +1,39 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+name = "froglight-utils"
+readme = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+[dependencies]
+bevy_platform = { features = ["alloc"], workspace = true }
+derive_more = { workspace = true }
+downcast-rs = { workspace = true }
+froglight-macros = { features = ["utils"], workspace = true }
+indexmap = { workspace = true }
+parking_lot = { workspace = true }
+
+# Optional dependencies
+bevy_reflect = { optional = true, workspace = true }
+
+[features]
+default = ["std"]
+
+# Enable `bevy_reflect` support.
+reflect = ["dep:bevy_reflect"]
+
+# Enable nightly features.
+nightly = []
+
+# Enable support for the rust standard library.
+std = ["bevy_platform/std", "bevy_reflect?/std"]

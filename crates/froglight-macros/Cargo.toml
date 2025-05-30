@@ -55,3 +55,6 @@ network = []
 
 # Enable `froglight-registry` macros.
 registry = []
+
+# Enable `froglight-utils` macros.
+utils = []

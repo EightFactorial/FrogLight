@@ -1,10 +1,7 @@
 //! TODO
 
-use alloc::{borrow::Cow, string::String};
-
 use downcast_rs::DowncastSync;
 use froglight_common::{prelude::Identifier, version::Version};
-use smol_str::SmolStr;
 
 /// A registry type.
 pub trait RegistryType<V: Version>: MaybeReflect + 'static {
@@ -21,31 +18,7 @@ pub trait RegistryType<V: Version>: MaybeReflect + 'static {
 /// A value stored in a [`RegistryStorage`](crate::storage::RegistryStorage).
 pub trait RegistryValue: DowncastSync + MaybeReflect {}
 
-impl RegistryValue for () {}
-impl RegistryValue for bool {}
-
-impl RegistryValue for i8 {}
-impl RegistryValue for i16 {}
-impl RegistryValue for i32 {}
-impl RegistryValue for i64 {}
-impl RegistryValue for i128 {}
-impl RegistryValue for isize {}
-
-impl RegistryValue for u8 {}
-impl RegistryValue for u16 {}
-impl RegistryValue for u32 {}
-impl RegistryValue for u64 {}
-impl RegistryValue for u128 {}
-impl RegistryValue for usize {}
-
-impl RegistryValue for f32 {}
-impl RegistryValue for f64 {}
-
-impl RegistryValue for &'static str {}
-impl RegistryValue for Cow<'static, str> {}
-impl RegistryValue for String {}
-impl RegistryValue for SmolStr {}
-impl RegistryValue for Identifier {}
+impl<T: DowncastSync + MaybeReflect> RegistryValue for T {}
 
 // -------------------------------------------------------------------------------------------------
 

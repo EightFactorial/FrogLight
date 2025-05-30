@@ -19,6 +19,7 @@ members = [
   "crates/froglight-resolver",
   "crates/froglight-schedule",
   "crates/froglight-text",
+  "crates/froglight-utils",
   "crates/froglight-world",
 ]
 resolver = "2"
@@ -94,6 +95,7 @@ froglight-registry = { default-features = false, path = "crates/froglight-regist
 froglight-resolver = { default-features = false, path = "crates/froglight-resolver", version = "0.1" }
 froglight-schedule = { default-features = false, path = "crates/froglight-schedule", version = "0.1" }
 froglight-text = { default-features = false, path = "crates/froglight-text", version = "0.1" }
+froglight-utils = { default-features = false, path = "crates/froglight-utils", version = "0.1" }
 froglight-world = { default-features = false, path = "crates/froglight-world", version = "0.1" }
 
 # Hashing / Cryptography
@@ -146,17 +148,22 @@ opt-level = 1
 [profile.dev.build-override]
 opt-level = 3
 
-[profile.dev.package.froglight-block]
+[profile.dev-opt]
 debug = false
 incremental = true
 inherits = "dev"
 opt-level = 3
 
+[profile.dev.package.froglight-block]
+inherits = "dev-opt"
+[profile.dev.package.froglight-entity]
+inherits = "dev-opt"
 [profile.dev.package.froglight-item]
-debug = false
-incremental = true
-inherits = "dev"
-opt-level = 3
+inherits = "dev-opt"
+[profile.dev.package.froglight-network]
+inherits = "dev-opt"
+[profile.dev.package.froglight-registry]
+inherits = "dev-opt"
 
 # Release Builds
 [profile.release]
@@ -165,13 +172,20 @@ opt-level = 3
 [profile.release.build-override]
 opt-level = 3
 
-[profile.release.package.froglight-block]
+[profile.release-opt]
 incremental = true
 inherits = "release"
 
+[profile.release.package.froglight-block]
+inherits = "release-opt"
+[profile.release.package.froglight-entity]
+inherits = "release-opt"
 [profile.release.package.froglight-item]
-incremental = true
-inherits = "release"
+inherits = "release-opt"
+[profile.release.package.froglight-network]
+inherits = "release-opt"
+[profile.release.package.froglight-registry]
+inherits = "release-opt"
 
 # --- FrogLight Crate ---
 

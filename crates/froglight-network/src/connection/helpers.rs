@@ -1,7 +1,13 @@
 #[cfg(not(feature = "std"))]
 use alloc::boxed::Box;
 
-use froglight_packet::{state::ValidState, v1_21_4::prelude::*};
+use froglight_packet::{
+    state::ValidState,
+    v1_21_4::{
+        handshake::HandshakePacket,
+        status::{PingResultPacket, QueryPingPacket, QueryRequestPacket, QueryResponsePacket},
+    },
+};
 use smol_str::ToSmolStr;
 
 use super::{raw::RawPacketVersion, state::ConnectionError};
