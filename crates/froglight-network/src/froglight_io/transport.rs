@@ -72,29 +72,30 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
     async fn get_compression(&self) -> Option<i32> { self.compression }
 
     // TODO: Decompression
-    // Optimization: Replace the `[u8; 5]` with a mut slice from the buffer.
-    async fn read_packet(&mut self, buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
+    async fn read_packet(&mut self, vec: &mut Vec<u8>) -> Result<(), ConnectionError> {
+        // Make sure the buffer is large enough to hold the packet length
+        if vec.len() < 5 {
+            vec.resize(5, 0u8);
+        }
+
         // Read the length bytes of the packet
-        let mut len_buf = Cursor::new([0u8; 5]);
-        self.read_raw(len_buf.get_mut().as_mut_slice()).await?;
+        let (len_buf, _) = vec.split_first_chunk_mut::<5>().unwrap();
+        self.read_raw(len_buf.as_mut_slice()).await?;
 
         // Read the length of the packet and count the number of bytes
-        let len = <u32 as FrogVarRead>::frog_var_read(&mut len_buf);
+        let mut len_cursor = Cursor::new(len_buf);
+        let len = <u32 as FrogVarRead>::frog_var_read(&mut len_cursor);
         let len = len.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
         #[expect(clippy::cast_possible_truncation)]
-        let len_size = len_buf.position() as usize;
+        let len_size = len_cursor.position() as usize;
 
-        // Make sure the buffer can hold the packet
-        buf.resize(buf.len().max(len + len_size), 0u8);
-        // Copy the non-length bytes into the buffer
-        buf[..5usize - len_size].copy_from_slice(&len_buf.get_ref()[len_size..5usize]);
-
-        // Read the rest of the packet into the buffer
-        let pbuf = &mut buf[5usize - len_size..len];
+        // Resize the buffer to hold the packet data
+        vec.resize(len + len_size, 0u8);
+        // Create a slice positioned to read the rest of the packet
+        let pbuf = &mut vec[5usize..];
         self.read_raw(pbuf).await?;
-
-        // Create a cursor to read from
-        let mut cursor = Cursor::new(pbuf);
+        // Create a cursor to read packet bytes from the buffer
+        let mut cursor = Cursor::new(&vec[len_size..]);
 
         // Check whether the packet is compressed
         if self.compression.is_some_and(|c| c >= 0) {
@@ -109,13 +110,13 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         // Move the packet to the beginning of the buffer and set the buffer size
         #[expect(clippy::cast_possible_truncation)]
         let position = cursor.position() as usize;
-        buf.copy_within(position.., 0);
-        buf.truncate(buf.len() - len_size - position);
+        vec.copy_within(len_size + position.., 0);
+        vec.truncate(len);
 
         // Log the ID and length of the packet
         #[cfg(feature = "trace")]
-        if let Some(id) = buf.first() {
-            tracing::trace!("Reading Packet: {id} ({})", buf.len());
+        if let Some(id) = vec.first() {
+            tracing::trace!("Reading Packet: {id} ({})", vec.len());
         }
 
         Ok(())
