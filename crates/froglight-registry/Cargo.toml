@@ -25,11 +25,11 @@ froglight-nbt = { workspace = true }
 froglight-utils = { workspace = true }
 indexmap = { workspace = true }
 parking_lot = { workspace = true }
-smol_str = { workspace = true }
 
 # Optional dependencies
 bevy_ecs = { optional = true, workspace = true }
 bevy_reflect = { optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
 
 [features]
 default = []
@@ -47,6 +47,8 @@ reflect = [
 
 # Enable nightly features.
 nightly = ["froglight-nbt/nightly", "froglight-utils/nightly", "parking_lot/nightly"]
+# Enable trace logs.
+trace = ["dep:tracing"]
 
 # Enable support for v1.21.4
 v1_21_4 = ["froglight-common/v1_21_4"]

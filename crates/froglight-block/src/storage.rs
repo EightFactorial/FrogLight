@@ -25,8 +25,9 @@ use crate::{
 /// Allows for the registration and retrieval of block types at runtime.
 #[derive(Clone, AppStorage)]
 #[storage(index(ident = "GlobalBlockId", inner = "u32"), bevy = "bevy", reflect = "reflect")]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
 pub struct BlockStorage<V: Version> {
-    traits: RangeMap<u32, StorageWrapper<dyn BlockType<V>>>,
+    statics: RangeMap<u32, StorageWrapper<dyn BlockType<V>>>,
     storage: HashMap<TypeId, u32, NoOpHash>,
 }
 
@@ -53,7 +54,7 @@ impl<V: Version> BlockStorage<V> {
     /// Create a new [`BlockStorage`] with no registered block types.
     #[must_use]
     pub const fn new_empty() -> Self {
-        Self { traits: RangeMap::new(), storage: HashMap::with_hasher(NoOpHash) }
+        Self { statics: RangeMap::new(), storage: HashMap::with_hasher(NoOpHash) }
     }
 
     /// Get the [`BlockType`] for the given [`GlobalBlockId`].
@@ -85,7 +86,7 @@ impl<V: Version> BlockStorage<V> {
     /// ```
     #[must_use]
     pub fn get_trait(&self, block: GlobalBlockId) -> Option<&'static dyn BlockType<V>> {
-        self.traits.get(&block).map(|val| val.inner())
+        self.statics.get(&block).map(|val| val.inner())
     }
 
     /// Get the [`UntypedBlock`] for the given [`GlobalBlockId`].
@@ -124,7 +125,7 @@ impl<V: Version> BlockStorage<V> {
     /// ```
     #[must_use]
     pub fn get_untyped(&self, block: GlobalBlockId) -> Option<UntypedBlock<V>> {
-        self.traits.get_key_value(&block).map(|(range, wrapper)| {
+        self.statics.get_key_value(&block).map(|(range, wrapper)| {
             UntypedBlock::new(RelativeBlockState::from(u32::from(block) - range.start), *wrapper)
         })
     }
@@ -244,13 +245,13 @@ impl<V: Version> BlockStorage<V> {
     #[expect(clippy::missing_panics_doc)]
     pub fn register<B: BlockTypeExt<V>>(&mut self) {
         let count = u32::try_from(B::Attributes::COUNT).expect("BlockType has too many states!");
-        let range = self.traits.last_range_value().map_or_else(
+        let range = self.statics.last_range_value().map_or_else(
             || Range { start: 0, end: count },
             |(r, _)| Range { start: r.end, end: r.end + count },
         );
 
         self.storage.insert(TypeId::of::<B>(), range.start);
-        self.traits.insert(range, StorageWrapper::new(B::as_static()));
+        self.statics.insert(range, StorageWrapper::new(B::as_static()));
     }
 }
 

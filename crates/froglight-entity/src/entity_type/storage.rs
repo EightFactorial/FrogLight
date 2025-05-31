@@ -19,6 +19,7 @@ use super::{EntityTypeExt, EntityTypeResolver, EntityTypeTrait};
 #[repr(transparent)]
 #[derive(Clone, AppStorage)]
 #[storage(index(ident = "GlobalEntityTypeId", inner = "u16"), bevy = "bevy", reflect = "reflect")]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
 pub struct EntityTypeStorage<V: Version>(
     IndexedLocalStorage<dyn EntityTypeTrait<V>, GlobalEntityTypeId>,
 );

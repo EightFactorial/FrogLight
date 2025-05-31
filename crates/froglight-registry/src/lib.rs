@@ -3,14 +3,12 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![no_std]
 
-extern crate alloc;
-
-pub mod generated;
-pub mod storage;
-pub mod traits;
+pub mod registry;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::storage::{AppRegistryStorage, RegistryStorage};
+    pub use crate::registry::{
+        AppRegistryStorage, GlobalRegistryId, RegistryStorage, RegistryTrait,
+    };
 }

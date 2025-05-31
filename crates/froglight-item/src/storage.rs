@@ -22,6 +22,7 @@ use crate::{
 #[repr(transparent)]
 #[derive(Clone, AppStorage)]
 #[storage(index(ident = "GlobalItemId", inner = "u32"), bevy = "bevy", reflect = "reflect")]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
 pub struct ItemStorage<V: Version>(IndexedLocalStorage<dyn ItemType<V>, GlobalItemId>);
 
 impl<V: Version> AppItemStorage<V> {

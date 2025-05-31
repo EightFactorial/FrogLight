@@ -29,13 +29,12 @@ rangemap = { workspace = true }
 # Optional dependencies
 bevy_ecs = { optional = true, workspace = true }
 bevy_reflect = { optional = true, workspace = true }
-bevy_utils = { optional = true, workspace = true }
 
 [features]
 default = []
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_utils", "froglight-common/bevy"]
+bevy = ["dep:bevy_ecs", "froglight-common/bevy"]
 # Enable `bevy_reflect` support.
 reflect = ["bevy_ecs?/bevy_reflect", "dep:bevy_reflect", "froglight-common/bevy", "froglight-utils/reflect"]
 
