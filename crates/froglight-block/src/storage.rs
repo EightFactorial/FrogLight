@@ -86,7 +86,7 @@ impl<V: Version> BlockStorage<V> {
     /// ```
     #[must_use]
     pub fn get_trait(&self, block: GlobalBlockId) -> Option<&'static dyn BlockType<V>> {
-        self.statics.get(&block).map(|val| val.inner())
+        self.statics.get(&block).map(StorageWrapper::inner)
     }
 
     /// Get the [`UntypedBlock`] for the given [`GlobalBlockId`].

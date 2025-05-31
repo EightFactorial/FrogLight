@@ -8,11 +8,12 @@ use froglight_common::prelude::*;
 use crate::prelude::*;
 
 impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
+    #[allow(clippy::too_many_lines)]
     fn register(storage: &mut RegistryStorage<froglight_common::version::V1_21_4>) {
         storage.register_with_default(
             Identifier::const_new("minecraft:game_event"),
             Some(Identifier::const_new("minecraft:step")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:block_activate"),
                 Identifier::const_new("minecraft:block_attach"),
                 Identifier::const_new("minecraft:block_change"),
@@ -73,12 +74,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:resonate_13"),
                 Identifier::const_new("minecraft:resonate_14"),
                 Identifier::const_new("minecraft:resonate_15"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:sound_event"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:entity.allay.ambient_with_item"),
                 Identifier::const_new("minecraft:entity.allay.ambient_without_item"),
                 Identifier::const_new("minecraft:entity.allay.death"),
@@ -1730,23 +1731,23 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:event.mob_effect.bad_omen"),
                 Identifier::const_new("minecraft:event.mob_effect.trial_omen"),
                 Identifier::const_new("minecraft:event.mob_effect.raid_omen"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:fluid"),
             Some(Identifier::const_new("minecraft:empty")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:empty"),
                 Identifier::const_new("minecraft:flowing_water"),
                 Identifier::const_new("minecraft:water"),
                 Identifier::const_new("minecraft:flowing_lava"),
                 Identifier::const_new("minecraft:lava"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:mob_effect"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:speed"),
                 Identifier::const_new("minecraft:slowness"),
                 Identifier::const_new("minecraft:haste"),
@@ -1786,12 +1787,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:weaving"),
                 Identifier::const_new("minecraft:oozing"),
                 Identifier::const_new("minecraft:infested"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:block"),
             Some(Identifier::const_new("minecraft:air")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:air"),
                 Identifier::const_new("minecraft:stone"),
                 Identifier::const_new("minecraft:granite"),
@@ -2887,12 +2888,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:closed_eyeblossom"),
                 Identifier::const_new("minecraft:potted_open_eyeblossom"),
                 Identifier::const_new("minecraft:potted_closed_eyeblossom"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:entity_type"),
             Some(Identifier::const_new("minecraft:pig")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:acacia_boat"),
                 Identifier::const_new("minecraft:acacia_chest_boat"),
                 Identifier::const_new("minecraft:allay"),
@@ -3042,12 +3043,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:zombified_piglin"),
                 Identifier::const_new("minecraft:player"),
                 Identifier::const_new("minecraft:fishing_bobber"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:item"),
             Some(Identifier::const_new("minecraft:air")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:air"),
                 Identifier::const_new("minecraft:stone"),
                 Identifier::const_new("minecraft:granite"),
@@ -4433,12 +4434,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:ominous_trial_key"),
                 Identifier::const_new("minecraft:vault"),
                 Identifier::const_new("minecraft:ominous_bottle"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:potion"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:water"),
                 Identifier::const_new("minecraft:mundane"),
                 Identifier::const_new("minecraft:thick"),
@@ -4485,12 +4486,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:weaving"),
                 Identifier::const_new("minecraft:oozing"),
                 Identifier::const_new("minecraft:infested"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:particle_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:angry_villager"),
                 Identifier::const_new("minecraft:block"),
                 Identifier::const_new("minecraft:block_marker"),
@@ -4603,12 +4604,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:raid_omen"),
                 Identifier::const_new("minecraft:trial_omen"),
                 Identifier::const_new("minecraft:block_crumble"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:block_entity_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:furnace"),
                 Identifier::const_new("minecraft:chest"),
                 Identifier::const_new("minecraft:trapped_chest"),
@@ -4654,12 +4655,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:crafter"),
                 Identifier::const_new("minecraft:trial_spawner"),
                 Identifier::const_new("minecraft:vault"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:custom_stat"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:leave_game"),
                 Identifier::const_new("minecraft:play_time"),
                 Identifier::const_new("minecraft:total_world_time"),
@@ -4735,12 +4736,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:interact_with_grindstone"),
                 Identifier::const_new("minecraft:target_hit"),
                 Identifier::const_new("minecraft:interact_with_smithing_table"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:chunk_status"),
             Some(Identifier::const_new("minecraft:empty")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:empty"),
                 Identifier::const_new("minecraft:structure_starts"),
                 Identifier::const_new("minecraft:structure_references"),
@@ -4753,43 +4754,43 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:light"),
                 Identifier::const_new("minecraft:spawn"),
                 Identifier::const_new("minecraft:full"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:rule_test"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:always_true"),
                 Identifier::const_new("minecraft:block_match"),
                 Identifier::const_new("minecraft:blockstate_match"),
                 Identifier::const_new("minecraft:tag_match"),
                 Identifier::const_new("minecraft:random_block_match"),
                 Identifier::const_new("minecraft:random_blockstate_match"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:rule_block_entity_modifier"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:clear"),
                 Identifier::const_new("minecraft:passthrough"),
                 Identifier::const_new("minecraft:append_static"),
                 Identifier::const_new("minecraft:append_loot"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:pos_rule_test"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:always_true"),
                 Identifier::const_new("minecraft:linear_pos"),
                 Identifier::const_new("minecraft:axis_aligned_linear_pos"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:menu"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:generic_9x1"),
                 Identifier::const_new("minecraft:generic_9x2"),
                 Identifier::const_new("minecraft:generic_9x3"),
@@ -4815,12 +4816,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:smoker"),
                 Identifier::const_new("minecraft:cartography_table"),
                 Identifier::const_new("minecraft:stonecutter"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:recipe_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:crafting"),
                 Identifier::const_new("minecraft:smelting"),
                 Identifier::const_new("minecraft:blasting"),
@@ -4828,12 +4829,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:campfire_cooking"),
                 Identifier::const_new("minecraft:stonecutting"),
                 Identifier::const_new("minecraft:smithing"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:recipe_serializer"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:crafting_shaped"),
                 Identifier::const_new("minecraft:crafting_shapeless"),
                 Identifier::const_new("minecraft:crafting_special_armordye"),
@@ -4856,12 +4857,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:smithing_transform"),
                 Identifier::const_new("minecraft:smithing_trim"),
                 Identifier::const_new("minecraft:crafting_decorated_pot"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:attribute"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:armor"),
                 Identifier::const_new("minecraft:armor_toughness"),
                 Identifier::const_new("minecraft:attack_damage"),
@@ -4894,20 +4895,20 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:sweeping_damage_ratio"),
                 Identifier::const_new("minecraft:tempt_range"),
                 Identifier::const_new("minecraft:water_movement_efficiency"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:position_source_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:block"),
                 Identifier::const_new("minecraft:entity"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:command_argument_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("brigadier:bool"),
                 Identifier::const_new("brigadier:float"),
                 Identifier::const_new("brigadier:double"),
@@ -4962,12 +4963,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:loot_predicate"),
                 Identifier::const_new("minecraft:loot_modifier"),
                 Identifier::const_new("minecraft:uuid"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:stat_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:mined"),
                 Identifier::const_new("minecraft:crafted"),
                 Identifier::const_new("minecraft:used"),
@@ -4977,12 +4978,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:killed"),
                 Identifier::const_new("minecraft:killed_by"),
                 Identifier::const_new("minecraft:custom"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:villager_type"),
             Some(Identifier::const_new("minecraft:plains")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:desert"),
                 Identifier::const_new("minecraft:jungle"),
                 Identifier::const_new("minecraft:plains"),
@@ -4990,12 +4991,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:snow"),
                 Identifier::const_new("minecraft:swamp"),
                 Identifier::const_new("minecraft:taiga"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:villager_profession"),
             Some(Identifier::const_new("minecraft:none")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:none"),
                 Identifier::const_new("minecraft:armorer"),
                 Identifier::const_new("minecraft:butcher"),
@@ -5011,12 +5012,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:shepherd"),
                 Identifier::const_new("minecraft:toolsmith"),
                 Identifier::const_new("minecraft:weaponsmith"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:point_of_interest_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:armorer"),
                 Identifier::const_new("minecraft:butcher"),
                 Identifier::const_new("minecraft:cartographer"),
@@ -5037,12 +5038,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:nether_portal"),
                 Identifier::const_new("minecraft:lodestone"),
                 Identifier::const_new("minecraft:lightning_rod"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:memory_module_type"),
             Some(Identifier::const_new("minecraft:dummy")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:dummy"),
                 Identifier::const_new("minecraft:home"),
                 Identifier::const_new("minecraft:job_site"),
@@ -5149,12 +5150,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:breeze_jump_inhaling"),
                 Identifier::const_new("minecraft:breeze_jump_target"),
                 Identifier::const_new("minecraft:breeze_leaving_water"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:sensor_type"),
             Some(Identifier::const_new("minecraft:dummy")),
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:dummy"),
                 Identifier::const_new("minecraft:nearest_items"),
                 Identifier::const_new("minecraft:nearest_living_entities"),
@@ -5181,22 +5182,22 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:warden_entity_sensor"),
                 Identifier::const_new("minecraft:sniffer_temptations"),
                 Identifier::const_new("minecraft:breeze_attack_entity_sensor"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:schedule"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:empty"),
                 Identifier::const_new("minecraft:simple"),
                 Identifier::const_new("minecraft:villager_baby"),
                 Identifier::const_new("minecraft:villager_default"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:activity"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:core"),
                 Identifier::const_new("minecraft:idle"),
                 Identifier::const_new("minecraft:work"),
@@ -5223,12 +5224,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:roar"),
                 Identifier::const_new("minecraft:emerge"),
                 Identifier::const_new("minecraft:dig"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:loot_pool_entry_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:empty"),
                 Identifier::const_new("minecraft:item"),
                 Identifier::const_new("minecraft:loot_table"),
@@ -5237,12 +5238,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:alternatives"),
                 Identifier::const_new("minecraft:sequence"),
                 Identifier::const_new("minecraft:group"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:loot_function_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:set_count"),
                 Identifier::const_new("minecraft:set_item"),
                 Identifier::const_new("minecraft:enchant_with_levels"),
@@ -5283,12 +5284,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:toggle_tooltips"),
                 Identifier::const_new("minecraft:set_ominous_bottle_amplifier"),
                 Identifier::const_new("minecraft:set_custom_model_data"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:loot_condition_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:inverted"),
                 Identifier::const_new("minecraft:any_of"),
                 Identifier::const_new("minecraft:all_of"),
@@ -5308,74 +5309,74 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:time_check"),
                 Identifier::const_new("minecraft:value_check"),
                 Identifier::const_new("minecraft:enchantment_active_check"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:loot_number_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:constant"),
                 Identifier::const_new("minecraft:uniform"),
                 Identifier::const_new("minecraft:binomial"),
                 Identifier::const_new("minecraft:score"),
                 Identifier::const_new("minecraft:storage"),
                 Identifier::const_new("minecraft:enchantment_level"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:loot_nbt_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:storage"),
                 Identifier::const_new("minecraft:context"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:loot_score_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:fixed"),
                 Identifier::const_new("minecraft:context"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:float_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:constant"),
                 Identifier::const_new("minecraft:uniform"),
                 Identifier::const_new("minecraft:clamped_normal"),
                 Identifier::const_new("minecraft:trapezoid"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:int_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:constant"),
                 Identifier::const_new("minecraft:uniform"),
                 Identifier::const_new("minecraft:biased_to_bottom"),
                 Identifier::const_new("minecraft:clamped"),
                 Identifier::const_new("minecraft:weighted_list"),
                 Identifier::const_new("minecraft:clamped_normal"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:height_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:constant"),
                 Identifier::const_new("minecraft:uniform"),
                 Identifier::const_new("minecraft:biased_to_bottom"),
                 Identifier::const_new("minecraft:very_biased_to_bottom"),
                 Identifier::const_new("minecraft:trapezoid"),
                 Identifier::const_new("minecraft:weighted_list"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:block_predicate_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:matching_blocks"),
                 Identifier::const_new("minecraft:matching_block_tag"),
                 Identifier::const_new("minecraft:matching_fluids"),
@@ -5389,21 +5390,21 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:not"),
                 Identifier::const_new("minecraft:true"),
                 Identifier::const_new("minecraft:unobstructed"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/carver"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:cave"),
                 Identifier::const_new("minecraft:nether_cave"),
                 Identifier::const_new("minecraft:canyon"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/feature"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:no_op"),
                 Identifier::const_new("minecraft:tree"),
                 Identifier::const_new("minecraft:flower"),
@@ -5466,20 +5467,20 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:large_dripstone"),
                 Identifier::const_new("minecraft:pointed_dripstone"),
                 Identifier::const_new("minecraft:sculk_patch"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/structure_placement"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:random_spread"),
                 Identifier::const_new("minecraft:concentric_rings"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/structure_piece"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:mscorridor"),
                 Identifier::const_new("minecraft:mscrossing"),
                 Identifier::const_new("minecraft:msroom"),
@@ -5536,12 +5537,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:shipwreck"),
                 Identifier::const_new("minecraft:nefos"),
                 Identifier::const_new("minecraft:jigsaw"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/structure_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:buried_treasure"),
                 Identifier::const_new("minecraft:desert_pyramid"),
                 Identifier::const_new("minecraft:end_city"),
@@ -5558,12 +5559,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:stronghold"),
                 Identifier::const_new("minecraft:swamp_hut"),
                 Identifier::const_new("minecraft:woodland_mansion"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/placement_modifier_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:block_predicate_filter"),
                 Identifier::const_new("minecraft:rarity_filter"),
                 Identifier::const_new("minecraft:surface_relative_threshold_filter"),
@@ -5579,12 +5580,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:in_square"),
                 Identifier::const_new("minecraft:random_offset"),
                 Identifier::const_new("minecraft:fixed_placement"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/block_state_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:simple_state_provider"),
                 Identifier::const_new("minecraft:weighted_state_provider"),
                 Identifier::const_new("minecraft:noise_threshold_provider"),
@@ -5592,12 +5593,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:dual_noise_provider"),
                 Identifier::const_new("minecraft:rotated_block_provider"),
                 Identifier::const_new("minecraft:randomized_int_state_provider"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/foliage_placer_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:blob_foliage_placer"),
                 Identifier::const_new("minecraft:spruce_foliage_placer"),
                 Identifier::const_new("minecraft:pine_foliage_placer"),
@@ -5609,12 +5610,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:dark_oak_foliage_placer"),
                 Identifier::const_new("minecraft:random_spread_foliage_placer"),
                 Identifier::const_new("minecraft:cherry_foliage_placer"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/trunk_placer_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:straight_trunk_placer"),
                 Identifier::const_new("minecraft:forking_trunk_placer"),
                 Identifier::const_new("minecraft:giant_trunk_placer"),
@@ -5624,19 +5625,19 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:bending_trunk_placer"),
                 Identifier::const_new("minecraft:upwards_branching_trunk_placer"),
                 Identifier::const_new("minecraft:cherry_trunk_placer"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/root_placer_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:mangrove_root_placer"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/tree_decorator_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:trunk_vine"),
                 Identifier::const_new("minecraft:leave_vine"),
                 Identifier::const_new("minecraft:pale_moss"),
@@ -5645,39 +5646,39 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:beehive"),
                 Identifier::const_new("minecraft:alter_ground"),
                 Identifier::const_new("minecraft:attached_to_leaves"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/feature_size_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:two_layers_feature_size"),
                 Identifier::const_new("minecraft:three_layers_feature_size"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/biome_source"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:fixed"),
                 Identifier::const_new("minecraft:multi_noise"),
                 Identifier::const_new("minecraft:checkerboard"),
                 Identifier::const_new("minecraft:the_end"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/chunk_generator"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:noise"),
                 Identifier::const_new("minecraft:flat"),
                 Identifier::const_new("minecraft:debug"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/material_condition"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:biome"),
                 Identifier::const_new("minecraft:noise_threshold"),
                 Identifier::const_new("minecraft:vertical_gradient"),
@@ -5689,22 +5690,22 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:hole"),
                 Identifier::const_new("minecraft:above_preliminary_surface"),
                 Identifier::const_new("minecraft:stone_depth"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/material_rule"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:bandlands"),
                 Identifier::const_new("minecraft:block"),
                 Identifier::const_new("minecraft:sequence"),
                 Identifier::const_new("minecraft:condition"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/density_function_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:blend_alpha"),
                 Identifier::const_new("minecraft:blend_offset"),
                 Identifier::const_new("minecraft:beardifier"),
@@ -5737,12 +5738,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:spline"),
                 Identifier::const_new("minecraft:constant"),
                 Identifier::const_new("minecraft:y_clamped_gradient"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:block_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:block"),
                 Identifier::const_new("minecraft:air"),
                 Identifier::const_new("minecraft:amethyst"),
@@ -5988,12 +5989,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:wither_skull"),
                 Identifier::const_new("minecraft:wither_wall_skull"),
                 Identifier::const_new("minecraft:wool_carpet"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/structure_processor"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:block_ignore"),
                 Identifier::const_new("minecraft:block_rot"),
                 Identifier::const_new("minecraft:gravity"),
@@ -6005,32 +6006,32 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:lava_submerged_block"),
                 Identifier::const_new("minecraft:protected_blocks"),
                 Identifier::const_new("minecraft:capped"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/structure_pool_element"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:single_pool_element"),
                 Identifier::const_new("minecraft:list_pool_element"),
                 Identifier::const_new("minecraft:feature_pool_element"),
                 Identifier::const_new("minecraft:empty_pool_element"),
                 Identifier::const_new("minecraft:legacy_single_pool_element"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:worldgen/pool_alias_binding"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:random"),
                 Identifier::const_new("minecraft:random_group"),
                 Identifier::const_new("minecraft:direct"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:cat_variant"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:tabby"),
                 Identifier::const_new("minecraft:black"),
                 Identifier::const_new("minecraft:red"),
@@ -6042,21 +6043,21 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:white"),
                 Identifier::const_new("minecraft:jellie"),
                 Identifier::const_new("minecraft:all_black"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:frog_variant"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:temperate"),
                 Identifier::const_new("minecraft:warm"),
                 Identifier::const_new("minecraft:cold"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:decorated_pot_pattern"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:angler"),
                 Identifier::const_new("minecraft:archer"),
                 Identifier::const_new("minecraft:arms_up"),
@@ -6081,12 +6082,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:skull"),
                 Identifier::const_new("minecraft:snort"),
                 Identifier::const_new("minecraft:blank"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:creative_mode_tab"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:building_blocks"),
                 Identifier::const_new("minecraft:colored_blocks"),
                 Identifier::const_new("minecraft:natural_blocks"),
@@ -6101,12 +6102,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:spawn_eggs"),
                 Identifier::const_new("minecraft:op_blocks"),
                 Identifier::const_new("minecraft:inventory"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:trigger_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:impossible"),
                 Identifier::const_new("minecraft:player_killed_entity"),
                 Identifier::const_new("minecraft:entity_killed_player"),
@@ -6163,21 +6164,21 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:recipe_crafted"),
                 Identifier::const_new("minecraft:crafter_recipe_crafted"),
                 Identifier::const_new("minecraft:fall_after_explosion"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:number_format_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:blank"),
                 Identifier::const_new("minecraft:styled"),
                 Identifier::const_new("minecraft:fixed"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:data_component_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:custom_data"),
                 Identifier::const_new("minecraft:max_stack_size"),
                 Identifier::const_new("minecraft:max_damage"),
@@ -6245,12 +6246,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:bees"),
                 Identifier::const_new("minecraft:lock"),
                 Identifier::const_new("minecraft:container_loot"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:entity_sub_predicate_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:lightning"),
                 Identifier::const_new("minecraft:fishing_hook"),
                 Identifier::const_new("minecraft:player"),
@@ -6271,12 +6272,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:cat"),
                 Identifier::const_new("minecraft:frog"),
                 Identifier::const_new("minecraft:wolf"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:item_sub_predicate_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:damage"),
                 Identifier::const_new("minecraft:enchantments"),
                 Identifier::const_new("minecraft:stored_enchantments"),
@@ -6291,12 +6292,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:attribute_modifiers"),
                 Identifier::const_new("minecraft:trim"),
                 Identifier::const_new("minecraft:jukebox_playable"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:map_decoration_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:player"),
                 Identifier::const_new("minecraft:frame"),
                 Identifier::const_new("minecraft:red_marker"),
@@ -6332,12 +6333,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:jungle_temple"),
                 Identifier::const_new("minecraft:swamp_hut"),
                 Identifier::const_new("minecraft:trial_chambers"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:enchantment_effect_component_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:damage_protection"),
                 Identifier::const_new("minecraft:damage_immunity"),
                 Identifier::const_new("minecraft:damage"),
@@ -6368,23 +6369,23 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:prevent_equipment_drop"),
                 Identifier::const_new("minecraft:prevent_armor_change"),
                 Identifier::const_new("minecraft:trident_spin_attack_strength"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:enchantment_level_based_value_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:clamped"),
                 Identifier::const_new("minecraft:fraction"),
                 Identifier::const_new("minecraft:levels_squared"),
                 Identifier::const_new("minecraft:linear"),
                 Identifier::const_new("minecraft:lookup"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:enchantment_entity_effect_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:all_of"),
                 Identifier::const_new("minecraft:apply_mob_effect"),
                 Identifier::const_new("minecraft:change_item_damage"),
@@ -6398,12 +6399,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:set_block_properties"),
                 Identifier::const_new("minecraft:spawn_particles"),
                 Identifier::const_new("minecraft:summon_entity"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:enchantment_location_based_effect_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:all_of"),
                 Identifier::const_new("minecraft:apply_mob_effect"),
                 Identifier::const_new("minecraft:attribute"),
@@ -6418,54 +6419,54 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:set_block_properties"),
                 Identifier::const_new("minecraft:spawn_particles"),
                 Identifier::const_new("minecraft:summon_entity"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:enchantment_value_effect_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:add"),
                 Identifier::const_new("minecraft:all_of"),
                 Identifier::const_new("minecraft:multiply"),
                 Identifier::const_new("minecraft:remove_binomial"),
                 Identifier::const_new("minecraft:set"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:enchantment_provider_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:by_cost"),
                 Identifier::const_new("minecraft:by_cost_with_difficulty"),
                 Identifier::const_new("minecraft:single"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:consume_effect_type"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:apply_effects"),
                 Identifier::const_new("minecraft:remove_effects"),
                 Identifier::const_new("minecraft:clear_all_effects"),
                 Identifier::const_new("minecraft:teleport_randomly"),
                 Identifier::const_new("minecraft:play_sound"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:recipe_display"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:crafting_shapeless"),
                 Identifier::const_new("minecraft:crafting_shaped"),
                 Identifier::const_new("minecraft:furnace"),
                 Identifier::const_new("minecraft:stonecutter"),
                 Identifier::const_new("minecraft:smithing"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:slot_display"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:empty"),
                 Identifier::const_new("minecraft:any_fuel"),
                 Identifier::const_new("minecraft:item"),
@@ -6474,12 +6475,12 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:smithing_trim"),
                 Identifier::const_new("minecraft:with_remainder"),
                 Identifier::const_new("minecraft:composite"),
-            ]
+            ].into_boxed_slice()
         );
         storage.register_with_default(
             Identifier::const_new("minecraft:recipe_book_category"),
             None,
-            [
+            alloc::vec![
                 Identifier::const_new("minecraft:crafting_building_blocks"),
                 Identifier::const_new("minecraft:crafting_redstone"),
                 Identifier::const_new("minecraft:crafting_equipment"),
@@ -6493,7 +6494,7 @@ impl RegistryTrait<froglight_common::version::V1_21_4> for Vanilla {
                 Identifier::const_new("minecraft:stonecutter"),
                 Identifier::const_new("minecraft:smithing"),
                 Identifier::const_new("minecraft:campfire"),
-            ]
+            ].into_boxed_slice()
         );
 
     }

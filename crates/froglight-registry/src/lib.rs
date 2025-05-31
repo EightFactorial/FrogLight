@@ -3,6 +3,8 @@
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![no_std]
 
+extern crate alloc;
+
 pub mod registry;
 
 pub mod prelude {

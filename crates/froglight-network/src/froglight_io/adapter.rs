@@ -24,6 +24,7 @@ impl<V: Version, T: FrogReadVersion<V> + FrogWriteVersion<V> + Send + Sync + 'st
         let result = T::frog_read(&mut cursor);
 
         #[cfg(feature = "trace")]
+        #[expect(clippy::cast_possible_truncation)]
         if cursor.position() != cursor.get_ref().len() as u64 {
             tracing::warn!(
                 "Packet only read {} of {} bytes",
@@ -33,7 +34,7 @@ impl<V: Version, T: FrogReadVersion<V> + FrogWriteVersion<V> + Send + Sync + 'st
             tracing::trace!(
                 "Remaining packet bytes: {:?}",
                 &cursor.get_ref()[cursor.position() as usize..]
-            )
+            );
         }
 
         result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))

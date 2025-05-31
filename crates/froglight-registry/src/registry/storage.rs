@@ -161,7 +161,7 @@ impl<V: Version> RegistryStorage<V> {
         registry: &Q,
         value: &Q,
     ) -> bool {
-        self.get_registry(registry).map_or(false, |val| val.contains(value))
+        self.get_registry(registry).is_some_and(|val| val.contains(value))
     }
 
     /// Register a new registry with the given name and values.
@@ -219,7 +219,7 @@ impl<V: Version> RegistryValueStorage<V> {
     ) -> Self {
         Self {
             default,
-            values: IndexSet::from_iter(values.into_iter().map(|v| v.into())),
+            values: values.into_iter().map(Into::into).collect(),
             _phantom: PhantomData,
         }
     }
@@ -240,7 +240,7 @@ impl<V: Version> RegistryValueStorage<V> {
     /// or the default value if it exists.
     #[must_use]
     pub fn get_value_or_default(&self, index: GlobalRegistryId) -> Option<&Identifier> {
-        self.get_value(index).or_else(|| self.default.as_ref())
+        self.get_value(index).or(self.default.as_ref())
     }
 
     /// Get the [`GlobalRegistryId`] for the given registry value.
@@ -255,6 +255,7 @@ impl<V: Version> RegistryValueStorage<V> {
     /// Get the [`GlobalRegistryId`] for the given registry value,
     /// or the default value if it exists.
     #[must_use]
+    #[allow(clippy::collapsible_if)]
     pub fn get_global_id_or_default<Q: ?Sized + Hash + Equivalent<Identifier>>(
         &self,
         value: &Q,

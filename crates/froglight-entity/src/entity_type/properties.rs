@@ -42,8 +42,10 @@ pub struct Aabb3d {
 }
 
 #[cfg(not(feature = "bevy"))]
+#[expect(clippy::inline_always)]
 impl Aabb3d {
     /// Constructs an AABB from its center and half-size.
+    #[must_use]
     #[inline(always)]
     pub fn new(center: impl Into<glam::Vec3A>, half_size: impl Into<glam::Vec3A>) -> Self {
         let (center, half_size) = (center.into(), half_size.into());
@@ -53,10 +55,12 @@ impl Aabb3d {
     }
 
     /// Returns the center of the bounding volume.
+    #[must_use]
     #[inline(always)]
     pub fn center(&self) -> glam::Vec3A { (self.min + self.max) / 2. }
 
     /// Returns the half size of the bounding volume.
+    #[must_use]
     #[inline(always)]
     pub fn half_size(&self) -> glam::Vec3A { (self.max - self.min) / 2. }
 
@@ -66,6 +70,7 @@ impl Aabb3d {
     ///
     /// For 2D shapes this would simply be the area of the shape.
     /// For 3D shapes this would usually be half the area of the shape.
+    #[must_use]
     #[inline(always)]
     pub fn visible_area(&self) -> f32 {
         let b = self.max - self.min;
@@ -73,12 +78,14 @@ impl Aabb3d {
     }
 
     /// Checks if this bounding volume contains another one.
+    #[must_use]
     #[inline(always)]
     pub fn contains(&self, other: &Self) -> bool {
         other.min.cmpge(self.min).all() && other.max.cmple(self.max).all()
     }
 
     /// Check if a volume intersects with this bounding volume.
+    #[must_use]
     #[inline(always)]
     pub fn intersects(&self, other: &Self) -> bool {
         self.min.cmple(other.max).all() && self.max.cmpge(other.min).all()

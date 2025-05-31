@@ -48,6 +48,6 @@ impl<T: ?Sized + 'static> Copy for StorageWrapper<T> {}
 impl<T: Downcast + ?Sized + 'static> Eq for StorageWrapper<T> {}
 impl<T: Downcast + ?Sized + 'static> PartialEq for StorageWrapper<T> {
     fn eq(&self, other: &Self) -> bool {
-        <T as Downcast>::as_any(&self.0).type_id() == <T as Downcast>::as_any(&other.0).type_id()
+        <T as Downcast>::as_any(self.0).type_id() == <T as Downcast>::as_any(other.0).type_id()
     }
 }
