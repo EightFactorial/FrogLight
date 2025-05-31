@@ -10,6 +10,7 @@ pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
         AppStorageMacro::from_derive_input(&input).unwrap();
 
     let DeriveInput { vis, ident, generics, .. } = input;
+    let app_ident = Ident::new(&format!("App{ident}"), ident.span());
 
     let mut generic_params =
         generics.declared_type_params().into_iter().fold(TokenStream::new(), |mut acc, param| {
@@ -24,6 +25,15 @@ pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
     if let Some(index) = index {
         let index_ident = &index.ident;
 
+        let mut attr_tokens = TokenStream::new();
+
+        // Add the `Reflect` derive if a flag for the feature is given.
+        if let Some(reflect) = &reflect {
+            attr_tokens.extend(quote! {
+                #[cfg_attr(feature = #reflect, derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+            });
+        }
+
         // Generate the index struct
         index_tokens.extend(quote! {
             /// An index for accessing items in type storage.
@@ -33,6 +43,7 @@ pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
             /// same index between versions. Indices may even change between program runs!
             #[repr(transparent)]
             #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, derive_more::From, derive_more::Into, derive_more::Deref)]
+            #attr_tokens
             #vis struct #index;
         });
 
@@ -53,21 +64,23 @@ pub(crate) fn derive_app_storage(input: TokenStream) -> TokenStream {
         }
     }
 
-    let app_ident = Ident::new(&format!("App{ident}"), ident.span());
-
     let mut attr_tokens = TokenStream::new();
 
-    if let Some(bevy) = &bevy {
-        attr_tokens.extend(quote! {
-            #[cfg_attr(feature = #bevy, derive(Resource))]
-        });
-    }
+    // Add the `Reflect` derive if a flag for the feature is given.
     if let Some(reflect) = &reflect {
         attr_tokens.extend(quote! {
             #[cfg_attr(feature = #reflect, derive(Reflect), reflect(Clone, AppStorage))]
         });
     }
-    if let (Some(reflect), Some(bevy)) = (reflect, bevy) {
+    // Add the `Resource` derive if a flag for the feature is given.
+    if let Some(bevy) = &bevy {
+        attr_tokens.extend(quote! {
+            #[cfg_attr(feature = #bevy, derive(Resource))]
+        });
+    }
+    // Reflect the `Resource` trait if flags for both
+    // the `reflect` and `bevy` features are given.
+    if let (Some(reflect), Some(bevy)) = (&reflect, &bevy) {
         attr_tokens.extend(quote! {
             #[cfg_attr(all(feature = #bevy, feature = #reflect), reflect(Resource))]
         });
