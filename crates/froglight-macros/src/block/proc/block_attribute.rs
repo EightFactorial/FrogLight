@@ -118,7 +118,7 @@ impl BlockAttribute {
             #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Clone, PartialEq, Hash))]
             #vis #token #ident { #variants }
             #[automatically_derived]
-            impl #path::storage::Attribute for #ident {
+            impl #path::attribute::Attribute for #ident {
                 const STATES: &'static [#ident] = &[#state_tokens];
                 const VALUES: &'static [&'static str] = &[#strings];
             }
@@ -166,7 +166,7 @@ impl BlockAttribute {
             #[cfg(test)]
             mod test {
                 use super::*;
-                use #path::storage::{BlockAttributes, Attribute};
+                use #path::attribute::{BlockAttributes, Attribute};
 
                 #[test]
                 fn attributes() {

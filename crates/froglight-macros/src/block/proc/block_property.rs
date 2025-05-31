@@ -26,8 +26,8 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
                 impl #block_path::block::BlockType<#version> for #block {
                     #[must_use]
                     fn get_attr_str(&self, state: u16, attr: &str) -> Option<&'static str> {
-                        if <<#block as #block_path::block::BlockTypeExt<#version>>::Attributes as #block_path::storage::BlockAttributes>::COUNT > state as usize {
-                            #block_path::block::Block::<#block, #version>::new(#block_path::storage::RelativeBlockState::new_unchecked(state)).get_attr_str(attr)
+                        if <<#block as #block_path::block::BlockTypeExt<#version>>::Attributes as #block_path::attribute::BlockAttributes>::COUNT > state as usize {
+                            #block_path::block::Block::<#block, #version>::new(#block_path::storage::RelativeBlockState::from(state)).get_attr_str(attr)
                         } else {
                             None
                         }
@@ -97,8 +97,8 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
 
             // Create resolver tests
             resolver_tests.extend(quote! {{
-                let block = storage.get_untyped(GlobalBlockId::new_unchecked(global)).expect("No block found for expected GlobalBlockId!");
-                assert_eq!(block.identifier().as_str(), #ident, "Block \"{}\" identifier mismatch!", #ident);
+                let block = storage.get_untyped(GlobalBlockId::new_unchecked_u32(global)).expect("No block found for expected GlobalBlockId!");
+                assert_eq!(block.identifier().as_str(), #ident, "Block \"{}\" identifier mismatch! \"{block:?}\"", #ident);
                 assert_eq!(block.resolve::<Vanilla>(), block.downcast().map(|block| VersionBlocks::#block(block)), "Failed to resolve \"{}\"!", #ident);
                 #[expect(clippy::cast_possible_truncation)]
                 { global += <#block as #block_path::block::BlockTypeExt<#version>>::Attributes::COUNT as u32; }
@@ -161,7 +161,7 @@ pub(crate) fn block_properties(input: TokenStream) -> TokenStream {
             #[cfg(test)]
             mod test {
                 use super::*;
-                use #block_path::{prelude::*, storage::BlockAttributes};
+                use #block_path::{prelude::*, attribute::BlockAttributes};
                 use #common_path::vanilla::Vanilla;
 
                 #[test]

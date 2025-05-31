@@ -5,6 +5,7 @@
 
 extern crate alloc;
 
+pub mod attribute;
 pub mod block;
 pub mod generated;
 pub mod resolve;

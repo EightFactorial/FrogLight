@@ -3,7 +3,7 @@ use alloc::boxed::Box;
 use froglight_common::version::Version;
 
 use super::{Block, BlockTypeExt};
-use crate::storage::BlockAttributes;
+use crate::attribute::BlockAttributes;
 
 /// A trait for converting blocks between versions.
 pub trait BlockConvert<V1: Version, V2: Version>:

@@ -1,3 +1,5 @@
+//! [`Attribute`] and [`BlockAttributes`] implementations
+
 use core::any::TypeId;
 
 /// A block attribute.

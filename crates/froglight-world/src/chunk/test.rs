@@ -206,11 +206,11 @@ fn chunk_resolve() {
         for z in min.z()..=max.z() {
             for x in min.x()..=max.x() {
                 let pos = BlockPos::new(x, y, z);
-                let pos_id = SectionBlockPos::from_block(pos).into_index() as u32;
+                let pos_id = SectionBlockPos::from_block(pos).into_index();
 
                 let block = storage.get_untyped(GlobalBlockId::new_unchecked(pos_id)).unwrap();
                 assert_eq!(chunk.set_block(pos, block, &storage), Some(0));
-                assert_eq!(chunk.get_raw_block(pos), Some(pos_id));
+                assert_eq!(chunk.get_raw_block(pos), Some(pos_id as u32));
             }
         }
     }
@@ -220,10 +220,10 @@ fn chunk_resolve() {
         for z in min.z()..=max.z() {
             for x in min.x()..=max.x() {
                 let pos = BlockPos::new(x, y, z);
-                let pos_id = SectionBlockPos::from_block(pos).into_index() as u32;
+                let pos_id = SectionBlockPos::from_block(pos).into_index();
 
                 let block = chunk.get_block_untyped::<V1_21_4>(pos, &storage).unwrap();
-                assert_eq!(pos_id, u32::from(storage.get_global(block).unwrap()));
+                assert_eq!(pos_id as u32, u32::from(storage.get_global(block).unwrap()));
             }
         }
     }

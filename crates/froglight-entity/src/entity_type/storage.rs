@@ -26,7 +26,6 @@ pub struct EntityTypeStorage<V: Version>(
 impl<V: Version> AppEntityTypeStorage<V> {
     /// Create a new [`AppEntityTypeStorage`] with the [`Vanilla`] types
     /// registered.
-    #[inline]
     #[must_use]
     pub fn new() -> Self
     where Vanilla: EntityTypeResolver<V> {

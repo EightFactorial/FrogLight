@@ -26,7 +26,6 @@ pub struct ItemStorage<V: Version>(IndexedLocalStorage<dyn ItemType<V>, GlobalIt
 
 impl<V: Version> AppItemStorage<V> {
     /// Create a new [`AppItemStorage`] with the [`Vanilla`] types registered.
-    #[inline]
     #[must_use]
     pub fn new() -> Self
     where Vanilla: ItemResolver<V> {

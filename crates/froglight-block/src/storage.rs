@@ -1,71 +1,42 @@
+//! [`BlockStorage`] and [`AppBlockStorage`]
+
 use alloc::sync::Arc;
 use core::{any::TypeId, ops::Range};
 
-#[cfg(all(feature = "bevy", feature = "reflect"))]
-use bevy_ecs::reflect::ReflectResource;
 #[cfg(feature = "bevy")]
-use bevy_ecs::resource::Resource;
+use bevy_ecs::prelude::*;
 use bevy_platform::{collections::HashMap, hash::NoOpHash};
 #[cfg(feature = "reflect")]
-use bevy_reflect::Reflect;
-use derive_more::Deref;
+use bevy_reflect::prelude::*;
+use derive_more::{Deref, From, Into};
 use downcast_rs::Downcast;
 use froglight_common::{vanilla::Vanilla, version::Version};
-use parking_lot::RwLock;
+use froglight_utils::storage::prelude::*;
 use rangemap::RangeMap;
 
-use super::{GlobalBlockId, RelativeBlockState};
 use crate::{
+    attribute::BlockAttributes,
     block::{BlockType, BlockTypeExt, UntypedBlock},
     resolve::BlockResolver,
-    storage::BlockAttributes,
 };
 
-/// A thread-safe dynamic storage for block types.
+/// A dynamic storage for block types.
 ///
 /// Allows for the registration and retrieval of block types at runtime.
-#[derive(Clone, Deref)]
-#[cfg_attr(feature = "bevy", derive(Resource))]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
-#[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Resource))]
-pub struct AppBlockStorage<V: Version>(Arc<RwLock<BlockStorage<V>>>);
-
-impl<V: Version> Default for AppBlockStorage<V>
-where Vanilla: BlockResolver<V>
-{
-    #[inline]
-    fn default() -> Self { Self::new() }
+#[derive(Clone, AppStorage)]
+#[storage(index(ident = "GlobalBlockId", inner = "u32"), bevy = "bevy", reflect = "reflect")]
+pub struct BlockStorage<V: Version> {
+    traits: RangeMap<u32, StorageWrapper<dyn BlockType<V>>>,
+    storage: HashMap<TypeId, u32, NoOpHash>,
 }
 
 impl<V: Version> AppBlockStorage<V> {
     /// Create a new [`AppBlockStorage`] with the [`Vanilla`] types registered.
-    #[inline]
     #[must_use]
     pub fn new() -> Self
     where Vanilla: BlockResolver<V> {
         Self::from_storage(BlockStorage::new())
     }
-
-    /// Create a new [`AppBlockStorage`] from a [`BlockStorage`].
-    #[inline]
-    #[must_use]
-    pub fn from_storage(storage: BlockStorage<V>) -> Self { Self(Arc::new(RwLock::new(storage))) }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A dynamic storage for block types.
-///
-/// Allows for the registration and retrieval of block types at runtime.
-pub struct BlockStorage<V: Version> {
-    traits: RangeMap<u32, BlockWrapper<V>>,
-    types: HashMap<TypeId, u32, NoOpHash>,
-}
-
-impl<V: Version> Default for BlockStorage<V>
-where Vanilla: BlockResolver<V>
-{
-    fn default() -> Self { Self::new() }
 }
 
 impl<V: Version> BlockStorage<V> {
@@ -82,7 +53,7 @@ impl<V: Version> BlockStorage<V> {
     /// Create a new [`BlockStorage`] with no registered block types.
     #[must_use]
     pub const fn new_empty() -> Self {
-        Self { traits: RangeMap::new(), types: HashMap::with_hasher(NoOpHash) }
+        Self { traits: RangeMap::new(), storage: HashMap::with_hasher(NoOpHash) }
     }
 
     /// Get the [`BlockType`] for the given [`GlobalBlockId`].
@@ -114,7 +85,7 @@ impl<V: Version> BlockStorage<V> {
     /// ```
     #[must_use]
     pub fn get_trait(&self, block: GlobalBlockId) -> Option<&'static dyn BlockType<V>> {
-        self.traits.get(&block).map(|wrapper| **wrapper)
+        self.traits.get(&block).map(|val| val.inner())
     }
 
     /// Get the [`UntypedBlock`] for the given [`GlobalBlockId`].
@@ -154,7 +125,7 @@ impl<V: Version> BlockStorage<V> {
     #[must_use]
     pub fn get_untyped(&self, block: GlobalBlockId) -> Option<UntypedBlock<V>> {
         self.traits.get_key_value(&block).map(|(range, wrapper)| {
-            UntypedBlock::new(RelativeBlockState::from(*block - range.start), *wrapper)
+            UntypedBlock::new(RelativeBlockState::from(u32::from(block) - range.start), *wrapper)
         })
     }
 
@@ -228,9 +199,9 @@ impl<V: Version> BlockStorage<V> {
     #[must_use]
     pub fn get_global(&self, block: impl Into<UntypedBlock<V>>) -> Option<GlobalBlockId> {
         let block: UntypedBlock<V> = block.into();
-        self.types
-            .get(&<dyn BlockType<V> as Downcast>::as_any(**block.wrapper()).type_id())
-            .map(|start| GlobalBlockId::new_unchecked(*start + u32::from(**block.state())))
+        self.storage
+            .get(&<dyn BlockType<V> as Downcast>::as_any(block.wrapper().inner()).type_id())
+            .map(|&start| GlobalBlockId::new_unchecked_u32(start + u32::from(*block.state())))
     }
 
     /// Register a block type with the storage.
@@ -277,30 +248,98 @@ impl<V: Version> BlockStorage<V> {
             || Range { start: 0, end: count },
             |(r, _)| Range { start: r.end, end: r.end + count },
         );
-        self.types.insert(TypeId::of::<B>(), range.start);
-        self.traits.insert(range, BlockWrapper::new(B::as_static()));
+
+        self.storage.insert(TypeId::of::<B>(), range.start);
+        self.traits.insert(range, StorageWrapper::new(B::as_static()));
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// A wrapper around a [`&'static dyn BlockType`](BlockType)
-/// that implements [`PartialEq`] and [`Eq`].
-#[derive(Clone, Copy, Deref)]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone, PartialEq))]
-pub(crate) struct BlockWrapper<V: Version>(&'static dyn BlockType<V>);
-
-impl<V: Version> BlockWrapper<V> {
-    /// Create a new [`BlockWrapper`] from the given block type.
+impl<V: Version> Default for AppBlockStorage<V>
+where Vanilla: BlockResolver<V>
+{
     #[inline]
-    #[must_use]
-    pub(crate) const fn new(block: &'static dyn BlockType<V>) -> Self { Self(block) }
+    fn default() -> Self { Self::new() }
 }
 
-impl<V: Version> Eq for BlockWrapper<V> {}
-impl<V: Version> PartialEq for BlockWrapper<V> {
-    fn eq(&self, other: &Self) -> bool {
-        <dyn BlockType<V> as Downcast>::as_any(self.0).type_id()
-            == <dyn BlockType<V> as Downcast>::as_any(other.0).type_id()
+impl<V: Version> Default for BlockStorage<V>
+where Vanilla: BlockResolver<V>
+{
+    fn default() -> Self { Self::new() }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A block's global state id, relative to the block's first state id.
+///
+/// # Warning
+/// There is no guarantee that the given index is valid or represents the
+/// same index between versions. Indices may even change between program
+/// runs!
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deref, From, Into)]
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+pub(crate) struct RelativeBlockState(u16);
+
+impl From<u32> for RelativeBlockState {
+    #[cfg(debug_assertions)]
+    fn from(id: u32) -> Self { Self(u16::try_from(id).expect("RelativeBlockState is too large!")) }
+
+    #[inline]
+    #[cfg(not(debug_assertions))]
+    #[expect(clippy::cast_possible_truncation)]
+    fn from(id: u32) -> Self { Self(id as u16) }
+}
+impl From<RelativeBlockState> for u32 {
+    fn from(id: RelativeBlockState) -> Self { u32::from(id.0) }
+}
+
+impl From<usize> for RelativeBlockState {
+    #[cfg(debug_assertions)]
+    fn from(id: usize) -> Self {
+        Self(u16::try_from(id).expect("RelativeBlockState is too large!"))
     }
+
+    #[inline]
+    #[cfg(not(debug_assertions))]
+    #[expect(clippy::cast_possible_truncation)]
+    fn from(id: usize) -> Self { Self(id as u16) }
+}
+impl From<RelativeBlockState> for usize {
+    fn from(id: RelativeBlockState) -> Self { usize::from(id.0) }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl GlobalBlockId {
+    /// Create a new index with the given value.
+    ///
+    /// # Warning
+    /// There is no guarantee that the given index is valid or represents the
+    /// same index between versions. Indices may even change between program
+    /// runs!
+    #[inline]
+    #[must_use]
+    pub const fn new_unchecked_u32(index: u32) -> Self { Self(index) }
+}
+
+impl From<usize> for GlobalBlockId {
+    #[cfg(debug_assertions)]
+    fn from(id: usize) -> Self { Self(u32::try_from(id).expect("GlobalBlockId is too large!")) }
+
+    #[inline]
+    #[cfg(not(debug_assertions))]
+    #[expect(clippy::cast_possible_truncation)]
+    fn from(id: usize) -> Self { Self(id as u32) }
+}
+
+impl From<GlobalBlockId> for usize {
+    #[cfg(debug_assertions)]
+    fn from(id: GlobalBlockId) -> Self {
+        usize::try_from(id.0).expect("GlobalBlockId is too large!")
+    }
+
+    #[inline]
+    #[cfg(not(debug_assertions))]
+    fn from(id: GlobalBlockId) -> Self { id.0 as usize }
 }

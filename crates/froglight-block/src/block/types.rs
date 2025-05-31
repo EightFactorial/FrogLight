@@ -6,11 +6,13 @@ use core::marker::PhantomData;
 use bevy_reflect::prelude::*;
 use downcast_rs::Downcast;
 use froglight_common::{identifier::Identifier, version::Version};
+use froglight_utils::storage::StorageWrapper;
 
 use super::{BlockType, BlockTypeExt};
 use crate::{
+    attribute::{Attribute, BlockAttributes},
     resolve::BlockResolver,
-    storage::{Attribute, BlockAttributes, BlockWrapper, RelativeBlockState},
+    storage::RelativeBlockState,
 };
 
 /// A block with a state.
@@ -142,7 +144,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     /// ```
     #[inline]
     #[must_use]
-    pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(usize::from(self.state)) }
+    pub fn into_attr(self) -> B::Attributes { B::Attributes::from_index(self.state.into()) }
 
     /// Get the value of an [`Attribute`] as a string.
     ///
@@ -353,7 +355,7 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
 }
 
 impl<B: BlockTypeExt<V>, V: Version> Default for Block<B, V> {
-    fn default() -> Self { Self::new(RelativeBlockState::new_unchecked(B::DEFAULT)) }
+    fn default() -> Self { Self::new(RelativeBlockState::from(B::DEFAULT)) }
 }
 
 impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
@@ -372,7 +374,7 @@ impl<B: BlockTypeExt<V>, V: Version> TryFrom<UntypedBlock<V>> for Block<B, V> {
 pub struct UntypedBlock<V: Version> {
     state: RelativeBlockState,
     #[cfg_attr(feature = "reflect", reflect(ignore))]
-    wrapper: BlockWrapper<V>,
+    wrapper: StorageWrapper<dyn BlockType<V>>,
 }
 
 impl<V: Version> UntypedBlock<V> {
@@ -380,7 +382,10 @@ impl<V: Version> UntypedBlock<V> {
     /// [`Block`] and [`BlockWrapper`].
     #[inline]
     #[must_use]
-    pub(crate) const fn new(state: RelativeBlockState, wrapper: BlockWrapper<V>) -> Self {
+    pub(crate) const fn new(
+        state: RelativeBlockState,
+        wrapper: StorageWrapper<dyn BlockType<V>>,
+    ) -> Self {
         Self { state, wrapper }
     }
 
@@ -392,7 +397,7 @@ impl<V: Version> UntypedBlock<V> {
     /// Get the internal [`BlockWrapper`] of the [`UntypedBlock`].
     #[inline]
     #[must_use]
-    pub(crate) const fn wrapper(&self) -> &BlockWrapper<V> { &self.wrapper }
+    pub(crate) const fn wrapper(&self) -> &StorageWrapper<dyn BlockType<V>> { &self.wrapper }
 
     /// Resolve the [`UntypedBlock`] into a typed [`Block`].
     ///
@@ -435,7 +440,7 @@ impl<V: Version> UntypedBlock<V> {
     /// ```
     #[must_use]
     pub fn is<B: BlockTypeExt<V>>(&self) -> bool {
-        <dyn BlockType<V> as Downcast>::as_any(*self.wrapper).type_id()
+        <dyn BlockType<V> as Downcast>::as_any(self.wrapper.inner()).type_id()
             == <dyn BlockType<V> as Downcast>::as_any(B::as_static()).type_id()
     }
 
@@ -532,7 +537,7 @@ impl<V: Version> UntypedBlock<V> {
 impl<B: BlockTypeExt<V>, V: Version> From<Block<B, V>> for UntypedBlock<V> {
     #[inline]
     fn from(block: Block<B, V>) -> Self {
-        UntypedBlock::new(block.state, BlockWrapper::new(B::as_static()))
+        UntypedBlock::new(block.state, StorageWrapper::new(B::as_static()))
     }
 }
 

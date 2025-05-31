@@ -10,42 +10,44 @@ use downcast_rs::Downcast;
 /// A wrapper around a static value that implements
 /// [`PartialEq`] and [`Eq`] based on its [`TypeId`].
 #[derive(Deref)]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone, PartialEq))]
-pub struct StorageWrapper<V: ?Sized + 'static>(&'static V);
+#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
+pub struct StorageWrapper<T: ?Sized + 'static>(&'static T);
 
-impl<V: ?Sized + 'static> StorageWrapper<V> {
+impl<T: ?Sized + 'static> StorageWrapper<T> {
     /// Create a new [`StorageWrapper`] from the given value.
     #[inline]
     #[must_use]
-    pub const fn new(value: &'static V) -> Self { Self(value) }
+    pub const fn new(value: &'static T) -> Self { Self(value) }
 
     /// Get a reference to the inner static value.
     #[inline]
     #[must_use]
-    pub const fn inner(&self) -> &'static V { self.0 }
+    pub const fn inner(&self) -> &'static T { self.0 }
 
     /// Get the inner value as a reference to `dyn Any`.
     #[inline]
     #[must_use]
     pub fn as_any(&self) -> &dyn Any
-    where V: Downcast {
-        <V as Downcast>::as_any(self.0)
+    where T: Downcast {
+        <T as Downcast>::as_any(self.0)
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 // Manual implementations for `StorageWrapper` to avoid trait bounds
 
-impl<V: Debug + ?Sized + 'static> Debug for StorageWrapper<V> {
+impl<T: Debug + ?Sized + 'static> Debug for StorageWrapper<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result { self.inner().fmt(f) }
 }
 
-impl<V: ?Sized + 'static> Clone for StorageWrapper<V> {
+impl<T: ?Sized + 'static> Clone for StorageWrapper<T> {
     fn clone(&self) -> Self { *self }
 }
-impl<V: ?Sized + 'static> Copy for StorageWrapper<V> {}
+impl<T: ?Sized + 'static> Copy for StorageWrapper<T> {}
 
-impl<V: ?Sized + 'static> Eq for StorageWrapper<V> {}
-impl<V: ?Sized + 'static> PartialEq for StorageWrapper<V> {
-    fn eq(&self, other: &Self) -> bool { self.0.as_any().type_id() == other.0.as_any().type_id() }
+impl<T: Downcast + ?Sized + 'static> Eq for StorageWrapper<T> {}
+impl<T: Downcast + ?Sized + 'static> PartialEq for StorageWrapper<T> {
+    fn eq(&self, other: &Self) -> bool {
+        <T as Downcast>::as_any(&self.0).type_id() == <T as Downcast>::as_any(&other.0).type_id()
+    }
 }

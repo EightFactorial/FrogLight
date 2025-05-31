@@ -112,7 +112,8 @@ impl Chunk {
         pos: BlockPos,
         storage: &BlockStorage<V>,
     ) -> Option<&'static dyn BlockType<V>> {
-        self.get_raw_block(pos).and_then(|id| storage.get_trait(GlobalBlockId::new_unchecked(id)))
+        self.get_raw_block(pos)
+            .and_then(|id| storage.get_trait(GlobalBlockId::new_unchecked_u32(id)))
     }
 
     /// Get the [`UntypedBlock`] at the given [`BlockPos`].
@@ -124,7 +125,8 @@ impl Chunk {
         pos: BlockPos,
         storage: &BlockStorage<V>,
     ) -> Option<UntypedBlock<V>> {
-        self.get_raw_block(pos).and_then(|id| storage.get_untyped(GlobalBlockId::new_unchecked(id)))
+        self.get_raw_block(pos)
+            .and_then(|id| storage.get_untyped(GlobalBlockId::new_unchecked_u32(id)))
     }
 
     /// Get the [`Block`] at the given [`BlockPos`].
@@ -137,7 +139,7 @@ impl Chunk {
         storage: &BlockStorage<V>,
     ) -> Option<R::BlockEnum> {
         self.get_raw_block(pos)
-            .and_then(|id| storage.get_typed::<R>(GlobalBlockId::new_unchecked(id)))
+            .and_then(|id| storage.get_typed::<R>(GlobalBlockId::new_unchecked_u32(id)))
     }
 
     /// Set a [`Block`] at the given [`BlockPos`].
@@ -151,7 +153,7 @@ impl Chunk {
         storage: &BlockStorage<V>,
     ) -> Option<u32> {
         self.set_raw_block(pos, storage.get_global(block)?.into(), |id: u32| {
-            storage.get_trait(GlobalBlockId::new_unchecked(id)).is_some_and(BlockType::is_air)
+            storage.get_trait(GlobalBlockId::new_unchecked_u32(id)).is_some_and(BlockType::is_air)
         })
     }
 }

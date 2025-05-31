@@ -3,6 +3,7 @@ use core::{any::TypeId, fmt::Debug, marker::PhantomData};
 use bevy_platform::hash::NoOpHash;
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
+use downcast_rs::Downcast;
 use indexmap::IndexMap;
 
 use super::StorageWrapper;
@@ -73,7 +74,12 @@ impl<V: ?Sized + 'static, I: From<usize> + Into<usize>> Clone for IndexedLocalSt
     fn clone(&self) -> Self { Self(self.0.clone(), PhantomData) }
 }
 
-impl<V: ?Sized + 'static, I: From<usize> + Into<usize>> PartialEq for IndexedLocalStorage<V, I> {
+impl<V: Downcast + ?Sized + 'static, I: From<usize> + Into<usize>> PartialEq
+    for IndexedLocalStorage<V, I>
+{
     fn eq(&self, other: &Self) -> bool { IndexMap::eq(&self.0, &other.0) }
 }
-impl<V: ?Sized + 'static, I: From<usize> + Into<usize>> Eq for IndexedLocalStorage<V, I> {}
+impl<V: Downcast + ?Sized + 'static, I: From<usize> + Into<usize>> Eq
+    for IndexedLocalStorage<V, I>
+{
+}
