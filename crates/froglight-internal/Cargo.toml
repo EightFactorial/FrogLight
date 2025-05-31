@@ -26,6 +26,7 @@ froglight-network = { optional = true, workspace = true }
 froglight-physics = { features = ["world"], workspace = true }
 froglight-registry = { workspace = true }
 froglight-text = { features = ["crypto"], workspace = true }
+froglight-utils = { workspace = true }
 froglight-world = { features = ["block", "nbt"], workspace = true }
 
 # Optional dependencies
@@ -55,6 +56,7 @@ bevy = [
   "froglight-physics/bevy",
   "froglight-registry/bevy",
   "froglight-resolver?/bevy",
+  "froglight-utils/reflect",
   "froglight-world/bevy",
 ]
 
@@ -70,6 +72,7 @@ nightly = [
   "froglight-registry/nightly",
   "froglight-resolver?/nightly",
   "froglight-schedule?/nightly",
+  "froglight-utils/nightly",
   "froglight-world/nightly",
 ]
 
@@ -89,6 +92,7 @@ std = [
   "froglight-schedule?/std",
   "froglight-text/ansi",
   "froglight-text/std",
+  "froglight-utils/std",
   "froglight-world/std",
 ]
 # Enable `no_std` support for `glam`.
