@@ -38,7 +38,7 @@ impl LookDirection {
     /// Looking straight west, negative along the x-axis.
     pub const WEST: Self = Self(Vec2::new(0.0, FRAC_PI_2));
 
-    /// Create a [`EntityLookDirection`] from pitch and yaw angles.
+    /// Create a [`LookDirection`] from pitch and yaw angles.
     ///
     /// # Examples
     /// ```
@@ -65,7 +65,7 @@ impl LookDirection {
     #[must_use]
     pub const fn new(pitch: f32, yaw: f32) -> Self { Self(Vec2::new(pitch, yaw)) }
 
-    /// Create a [`EntityLookDirection`] from pitch and yaw angles in degrees.
+    /// Create a [`LookDirection`] from pitch and yaw angles in degrees.
     ///
     /// # Examples
     /// ```

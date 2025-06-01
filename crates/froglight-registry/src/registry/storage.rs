@@ -52,6 +52,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     #[must_use]
     pub fn get_registry<Q: ?Sized + Hash + Equivalent<Identifier>>(
@@ -69,6 +70,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     #[must_use]
     pub fn get_registry_mut<Q: ?Sized + Hash + Equivalent<Identifier>>(
@@ -86,6 +88,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     #[must_use]
     pub fn get_registry_index(&self, index: GlobalRegistryId) -> Option<&RegistryValueStorage<V>> {
@@ -100,6 +103,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     #[must_use]
     pub fn get_registry_index_mut(
@@ -116,6 +120,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     #[must_use]
     pub fn get_registry_global_id<Q: ?Sized + Hash + Equivalent<Identifier>>(
@@ -133,6 +138,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     #[must_use]
     pub fn get_value_global_id<Q: ?Sized + Hash + Equivalent<Identifier>>(
@@ -169,6 +175,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     pub fn register(
         &mut self,
@@ -183,6 +190,7 @@ impl<V: Version> RegistryStorage<V> {
     /// # Example
     ///
     /// ```rust
+    /// let _placeholder = ();
     /// ```
     pub fn register_with_default(
         &mut self,

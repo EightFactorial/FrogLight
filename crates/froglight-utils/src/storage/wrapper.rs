@@ -8,7 +8,7 @@ use derive_more::Deref;
 use downcast_rs::Downcast;
 
 /// A wrapper around a static value that implements
-/// [`PartialEq`] and [`Eq`] based on its [`TypeId`].
+/// [`PartialEq`] and [`Eq`] based on its [`TypeId`](core::any::TypeId).
 #[derive(Deref)]
 #[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
 pub struct StorageWrapper<T: ?Sized + 'static>(&'static T);

@@ -11,6 +11,6 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::registry::{
-        AppRegistryStorage, GlobalRegistryId, RegistryStorage, RegistryTrait,
+        AppRegistryStorage, GlobalRegistryId, RegistryStorage, RegistryTrait, RegistryValueStorage,
     };
 }

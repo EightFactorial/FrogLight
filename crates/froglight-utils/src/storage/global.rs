@@ -6,7 +6,8 @@ use parking_lot::RwLock;
 use super::IndexedLocalStorage;
 
 /// A globally accessible, run-time modifiable storage
-/// for static values accessible by either a [`TypeId`] or an index.
+/// for static values accessible by either a [`TypeId`](core::any::TypeId)
+/// or an index.
 #[repr(transparent)]
 #[derive(Debug, Deref, From, Into)]
 #[cfg_attr(feature = "reflect", derive(Reflect))]
