@@ -4,6 +4,8 @@ use downcast_rs::DowncastSync;
 use froglight_common::{identifier::Identifier, version::Version};
 use glam::Vec3;
 
+use crate::maybe::{MaybeComponent, MaybeReflect};
+
 /// A static entity type
 pub trait StaticEntityType: 'static {
     /// Get a static reference to the entity type.
@@ -168,34 +170,4 @@ pub trait EntityTypeExt<V: Version>:
     const FIRE_IMMUNITY: bool;
     /// The amount of gravity applied to the entity type.
     const GRAVITY: f32 = 0.0;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-use sealed::{MaybeComponent, MaybeReflect};
-mod sealed {
-    #[cfg(feature = "bevy")]
-    use bevy_ecs::component::Component;
-    #[cfg(feature = "reflect")]
-    use bevy_reflect::Reflect;
-
-    #[cfg(feature = "reflect")]
-    pub trait MaybeReflect: Reflect {}
-    #[cfg(feature = "reflect")]
-    impl<T: Reflect> MaybeReflect for T {}
-
-    #[cfg(not(feature = "reflect"))]
-    pub trait MaybeReflect {}
-    #[cfg(not(feature = "reflect"))]
-    impl<T> MaybeReflect for T {}
-
-    #[cfg(feature = "bevy")]
-    pub trait MaybeComponent: Component {}
-    #[cfg(feature = "bevy")]
-    impl<T: Component> MaybeComponent for T {}
-
-    #[cfg(not(feature = "bevy"))]
-    pub trait MaybeComponent {}
-    #[cfg(not(feature = "bevy"))]
-    impl<T> MaybeComponent for T {}
 }

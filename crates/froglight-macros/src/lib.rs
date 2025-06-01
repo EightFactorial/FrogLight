@@ -122,6 +122,42 @@ pub fn derive_static_entity_type(input: proc_macro::TokenStream) -> proc_macro::
     entity::derive_static_entity_type(input.into()).into()
 }
 
+/// Derive the appropriate traits on entity types.
+#[proc_macro]
+#[cfg(feature = "entity")]
+pub fn status_effects(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::status_effects(input.into()).into()
+}
+
+/// Derive the appropriate traits on entity types.
+#[proc_macro]
+#[cfg(feature = "entity")]
+pub fn status_effect_properties(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::status_effect_properties(input.into()).into()
+}
+
+/// Derive `froglight_entity::status_effect::StaticStatusEffect` for a struct.
+///
+/// # Example
+/// ```rust,ignore
+/// use froglight_macros::StaticStatusEffect;
+///
+/// #[derive(StaticStatusEffect)]
+/// struct MyItem;
+///
+/// // |
+/// // V
+///
+/// impl froglight_entity::status_effect::StaticStatusEffect for MyItem {
+///    fn as_static() -> &'static Self { &Self }
+/// }
+/// ```
+#[cfg(feature = "entity")]
+#[proc_macro_derive(StaticStatusEffect)]
+pub fn derive_static_status_effect(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    entity::derive_static_status_effect(input.into()).into()
+}
+
 // ------------------- `froglight-io` -------------------
 
 #[cfg(feature = "io")]
