@@ -18,7 +18,7 @@ pub mod prelude {
 
     pub use crate::{
         block::{Block, BlockConvert, BlockType, BlockTypeExt, StaticBlock, UntypedBlock},
-        generated::{attribute, block},
+        generated::{attribute as block_attr, block},
         storage::{AppBlockStorage, BlockStorage, GlobalBlockId},
     };
 }

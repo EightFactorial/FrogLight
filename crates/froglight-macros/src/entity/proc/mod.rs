@@ -1,3 +1,9 @@
+mod attribute;
+pub(crate) use attribute::entity_attributes;
+
+mod attribute_property;
+pub(crate) use attribute_property::entity_attribute_properties;
+
 mod entity_property;
 pub(crate) use entity_property::entity_type_properties;
 

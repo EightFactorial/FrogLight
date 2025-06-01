@@ -4,13 +4,13 @@ use syn::DeriveInput;
 
 use crate::CrateManifest;
 
-pub(crate) fn derive_static_entity_type(input: TokenStream) -> TokenStream {
+pub(crate) fn derive_static_entity_attribute(input: TokenStream) -> TokenStream {
     let DeriveInput { ident, .. } = syn::parse2(input).unwrap();
     let entity = CrateManifest::froglight("froglight-entity");
 
     quote! {
         #[automatically_derived]
-        impl #entity::entity_type::StaticEntityType for #ident {
+        impl #entity::entity_attribute::StaticEntityAttribute for #ident {
             #[inline] #[must_use] fn as_static() -> &'static Self { &Self }
         }
     }
