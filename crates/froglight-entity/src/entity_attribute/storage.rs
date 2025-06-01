@@ -110,21 +110,21 @@ impl<V: Version> EntityAttributeStorage<V> {
     ///
     ///     // Get the attribute with the global id of `21`.
     ///     let attrib = storage.get_typed::<Vanilla>(GlobalEntityAttributeId::new_unchecked(21));
-    ///     if let Some(VersionEntityAttribute::MovementSpeedAttribute(speed)) = &attrib {
+    ///     if let Some(VersionEntityAttribute::MovementSpeed(speed)) = &attrib {
     ///         assert_eq!(
     ///             EntityAttributeTrait::<V1_21_4>::identifier(speed),
     ///             "minecraft:movement_speed"
     ///         );
     ///     } else if attrib.is_some() {
-    ///         panic!("EntityAttribute was not `MovementSpeed`, but {:?}!", attrib.unwrap());
+    ///         panic!("Entity was not `MovementSpeed`, but {:?}!", attrib.unwrap());
     ///     }
     ///
     ///     // Get the attribute with the global id of `24`.
     ///     let attrib = storage.get_typed::<Vanilla>(GlobalEntityAttributeId::new_unchecked(24));
-    ///     if let Some(VersionEntityAttribute::ScaleAttribute(scale)) = &attrib {
+    ///     if let Some(VersionEntityAttribute::Scale(scale)) = &attrib {
     ///         assert_eq!(EntityAttributeTrait::<V1_21_4>::identifier(scale), "minecraft:scale");
     ///     } else if attrib.is_some() {
-    ///         panic!("EntityAttribute was not `Scale`, but {:?}!", attrib.unwrap());
+    ///         panic!("Entity was not `Scale`, but {:?}!", attrib.unwrap());
     ///     }
     /// }
     /// ```
@@ -154,11 +154,11 @@ impl<V: Version> EntityAttributeStorage<V> {
     ///     let storage = EntityAttributeStorage::<V1_21_4>::new();
     ///
     ///     // Get the `GlobalEntityAttributeId` of `MaxHealthAttribute`.
-    ///     let global_id = storage.get_global_id::<entity_attr::MaxHealthAttribute>().unwrap();
+    ///     let global_id = storage.get_global_id::<entity_attr::MaxHealth>().unwrap();
     ///     assert_eq!(*global_id, 18);
     ///
     ///     // Get the `GlobalEntityAttributeId` of `MaxAbsorptionAttribute`.
-    ///     let global_id = storage.get_global_id::<entity_attr::MaxAbsorptionAttribute>().unwrap();
+    ///     let global_id = storage.get_global_id::<entity_attr::MaxAbsorption>().unwrap();
     ///     assert_eq!(*global_id, 17);
     /// }
     /// ```
@@ -200,7 +200,7 @@ impl<V: Version> EntityAttributeStorage<V> {
     ///
     ///     // Since `AttackDamage` is already registered, we can get its global id.
     ///     assert_eq!(
-    ///         storage.get_global_id::<entity_attr::AttackDamageAttribute>(),
+    ///         storage.get_global_id::<entity_attr::AttackDamage>(),
     ///         Some(GlobalEntityAttributeId::new_unchecked(2))
     ///     );
     ///
@@ -208,12 +208,12 @@ impl<V: Version> EntityAttributeStorage<V> {
     ///     let mut storage = EntityAttributeStorage::<V1_21_4>::new_empty();
     ///
     ///     // Since `AttackDamage` is not registered, it does not have a global id.
-    ///     assert_eq!(storage.get_global_id::<entity_attr::AttackDamageAttribute>(), None);
+    ///     assert_eq!(storage.get_global_id::<entity_attr::AttackDamage>(), None);
     ///
     ///     // Register the `AttackDamage` attribute, now we can get its global id.
-    ///     storage.register::<entity_attr::AttackDamageAttribute>();
+    ///     storage.register::<entity_attr::AttackDamage>();
     ///     assert_eq!(
-    ///         storage.get_global_id::<entity_attr::AttackDamageAttribute>(),
+    ///         storage.get_global_id::<entity_attr::AttackDamage>(),
     ///         Some(GlobalEntityAttributeId::new_unchecked(0))
     ///     );
     /// }
