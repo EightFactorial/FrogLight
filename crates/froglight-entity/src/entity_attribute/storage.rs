@@ -1,5 +1,5 @@
 #[cfg(not(feature = "std"))]
-use alloc::sync::Arc;
+use alloc::{boxed::Box, sync::Arc};
 use core::any::TypeId;
 #[cfg(feature = "std")]
 use std::sync::Arc;
