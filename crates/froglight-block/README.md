@@ -56,24 +56,24 @@ fn main() {
 
     // Typed blocks can have their attributes accessed and modified
     let mut normal_grass = Block::<block::GrassBlock, V1_21_4>::default();
-    assert_eq!(normal_grass.into_attr(), attribute::SnowyBool::False);
+    assert_eq!(normal_grass.into_attr(), block_attr::SnowyBool::False);
 
     // Attributes can be set using strict types
-    normal_grass.scoped_attr(|_snowy| attribute::SnowyBool::True); // Short-hand for `into_attr` and `from_attr`
-    assert_eq!(normal_grass.get_attr::<attribute::SnowyBool>(), Some(attribute::SnowyBool::True));
+    normal_grass.scoped_attr(|_snowy| block_attr::SnowyBool::True); // Short-hand for `into_attr` and `from_attr`
+    assert_eq!(normal_grass.get_attr::<block_attr::SnowyBool>(), Some(block_attr::SnowyBool::True));
     assert_eq!(normal_grass.get_attr_str("snowy"), Some("true"));
 
     // Or by using strings
     assert_eq!(normal_grass.set_attr_str("snowy", "false"), Some("true")); // Returns the previous value
     assert_eq!(normal_grass.get_attr_str("snowy"), Some("false"));
-    assert_eq!(normal_grass.get_attr::<attribute::SnowyBool>(), Some(attribute::SnowyBool::False));
+    assert_eq!(normal_grass.get_attr::<block_attr::SnowyBool>(), Some(block_attr::SnowyBool::False));
 
     // Blocks without attributes will return a unit
     assert_eq!(Block::<block::Stone, V1_21_4>::default().into_attr(), ());
 
     // Block with multiple attributes will return a tuple
     let attributes = Block::<block::OakLeaves, V1_21_4>::default().into_attr();
-    assert_eq!(attributes, (attribute::DistanceInt1To7::_7, attribute::PersistentBool::False, attribute::WaterloggedBool::False));
+    assert_eq!(attributes, (block_attr::DistanceInt1To7::_7, block_attr::PersistentBool::False, block_attr::WaterloggedBool::False));
 
     // Block Versions
 

@@ -52,9 +52,9 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     ///
     ///     let block = Block::<block::GrassBlock, V1_21_4>::default();
     ///     // Grass does have the `SnowyBool` attribute
-    ///     assert_eq!(block.get_attr::<attribute::SnowyBool>(), Some(attribute::SnowyBool::False));
+    ///     assert_eq!(block.get_attr::<block_attr::SnowyBool>(), Some(block_attr::SnowyBool::False));
     ///     // Grass does not have the `WaterloggedBool` attribute
-    ///     assert_eq!(block.get_attr::<attribute::WaterloggedBool>(), None);
+    ///     assert_eq!(block.get_attr::<block_attr::WaterloggedBool>(), None);
     /// }
     /// ```
     #[inline]
@@ -79,11 +79,11 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     ///
     ///     let mut block = Block::<block::GrassBlock, V1_21_4>::default();
     ///     // Get the default attribute
-    ///     assert_eq!(block.into_attr(), attribute::SnowyBool::False);
+    ///     assert_eq!(block.into_attr(), block_attr::SnowyBool::False);
     ///     // Set the attribute to `true`
-    ///     block.scoped_attr(|_snowy| attribute::SnowyBool::True);
+    ///     block.scoped_attr(|_snowy| block_attr::SnowyBool::True);
     ///     // Verify the attribute was set
-    ///     assert_eq!(block.into_attr(), attribute::SnowyBool::True);
+    ///     assert_eq!(block.into_attr(), block_attr::SnowyBool::True);
     /// }
     /// ```
     #[inline]
@@ -106,8 +106,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     ///     let block = Block::<block::GrassBlock, V1_21_4>::default();
     ///
     ///     // Get the attributes of the block
-    ///     let snowy: attribute::SnowyBool = block.into_attr();
-    ///     assert_eq!(snowy, attribute::SnowyBool::False);
+    ///     let snowy: block_attr::SnowyBool = block.into_attr();
+    ///     assert_eq!(snowy, block_attr::SnowyBool::False);
     ///
     ///     // Create a new block from the same attributes
     ///     let new_block = Block::from_attr(snowy);
@@ -134,8 +134,8 @@ impl<B: BlockTypeExt<V>, V: Version> Block<B, V> {
     ///     let block = Block::<block::GrassBlock, V1_21_4>::default();
     ///
     ///     // Get the attributes of the block
-    ///     let snowy: attribute::SnowyBool = block.into_attr();
-    ///     assert_eq!(snowy, attribute::SnowyBool::False);
+    ///     let snowy: block_attr::SnowyBool = block.into_attr();
+    ///     assert_eq!(snowy, block_attr::SnowyBool::False);
     ///
     ///     // Create a new block from the same attributes
     ///     let new_block = Block::from_attr(snowy);
