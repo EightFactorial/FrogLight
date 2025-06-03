@@ -6,10 +6,12 @@ use std::sync::Arc;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
+use bevy_platform::hash::NoOpHash;
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use froglight_common::prelude::*;
 use froglight_utils::storage::prelude::*;
+use indexmap::IndexMap;
 
 use super::{EntityAttributeExt, EntityAttributeResolver, EntityAttributeTrait};
 
@@ -17,15 +19,15 @@ use super::{EntityAttributeExt, EntityAttributeResolver, EntityAttributeTrait};
 ///
 /// Allows for the registration and retrieval of attributes at runtime.
 #[repr(transparent)]
-#[derive(Clone, AppStorage)]
+#[derive(AppStorage)]
 #[storage(
     index(ident = "GlobalEntityAttributeId", inner = "u8"),
     bevy = "bevy",
     reflect = "reflect"
 )]
-#[cfg_attr(feature = "reflect", derive(Reflect), reflect(Clone))]
+#[cfg_attr(feature = "reflect", derive(Reflect))]
 pub struct EntityAttributeStorage<V: Version>(
-    IndexedLocalStorage<dyn EntityAttributeTrait<V>, GlobalEntityAttributeId>,
+    IndexMap<TypeId, Box<dyn EntityAttributeTrait<V>>, NoOpHash>,
 );
 
 impl<V: Version> AppEntityAttributeStorage<V> {
@@ -51,7 +53,7 @@ impl<V: Version> EntityAttributeStorage<V> {
 
     /// Create a new [`EntityAttributeStorage`] with no registered attributes.
     #[must_use]
-    pub const fn new_empty() -> Self { Self(IndexedLocalStorage::new()) }
+    pub const fn new_empty() -> Self { Self(IndexMap::with_hasher(NoOpHash)) }
 
     /// Get the [`EntityAttributeTrait`] for the given
     /// [`GlobalEntityAttributeId`].
@@ -85,8 +87,8 @@ impl<V: Version> EntityAttributeStorage<V> {
     pub fn get_trait(
         &self,
         attrib_id: GlobalEntityAttributeId,
-    ) -> Option<&'static dyn EntityAttributeTrait<V>> {
-        self.0.get_index(attrib_id).map(|val| val.inner())
+    ) -> Option<&dyn EntityAttributeTrait<V>> {
+        self.0.get_index(attrib_id.into()).map(|(_, val)| val.as_ref())
     }
 
     /// Get a entity attribute for the given attribute id.
@@ -173,7 +175,7 @@ impl<V: Version> EntityAttributeStorage<V> {
     /// Returns `None` if the attribute was not registered.
     #[must_use]
     pub fn get_global_type_id(&self, type_id: &TypeId) -> Option<GlobalEntityAttributeId> {
-        self.0.get_index_of(type_id)
+        self.0.get_index_of(type_id).map(GlobalEntityAttributeId::from)
     }
 
     /// Register an entity attribute with the storage.
@@ -218,8 +220,8 @@ impl<V: Version> EntityAttributeStorage<V> {
     ///     );
     /// }
     /// ```
-    pub fn register<E: EntityAttributeExt<V>>(&mut self) {
-        self.0.store(TypeId::of::<E>(), E::as_static());
+    pub fn register<E: EntityAttributeExt<V> + From<f64>>(&mut self) {
+        self.0.insert(TypeId::of::<E>(), Box::new(E::from(E::DEFAULT)));
     }
 }
 

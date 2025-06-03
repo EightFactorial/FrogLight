@@ -5,22 +5,6 @@ use froglight_common::{identifier::Identifier, version::Version};
 
 use crate::maybe::{MaybeComponent, MaybeReflect};
 
-/// A static entity attribute
-pub trait StaticEntityAttribute: 'static {
-    /// Get a static reference to the entity attribute.
-    ///
-    /// Useful when working internally with generic attributes.
-    ///
-    /// ```rust
-    /// use froglight_entity::entity_attribute::{StaticEntityAttribute, generated::AttackSpeed};
-    ///
-    /// assert_eq!(AttackSpeed::as_static(), &AttackSpeed);
-    /// ```
-    fn as_static() -> &'static Self;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 /// An entity attribute.
 pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// The identifier of the entity attribute.
@@ -33,8 +17,9 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static identifier through `EntityAttributeTrait`.
+    ///     let attr = JumpStrength(<JumpStrength as EntityAttributeExt<V1_21_4>>::DEFAULT);
     ///     assert_eq!(
-    ///         <JumpStrength as EntityAttributeTrait<V1_21_4>>::identifier(JumpStrength::as_static()),
+    ///         <JumpStrength as EntityAttributeTrait<V1_21_4>>::identifier(&attr),
     ///         "minecraft:jump_strength"
     ///     );
     ///
@@ -50,8 +35,9 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_5;
     ///
     ///     // Accessing the static identifier through `EntityAttributeTrait`.
+    ///     let attr = JumpStrength(<JumpStrength as EntityAttributeExt<V1_21_5>>::DEFAULT);
     ///     assert_eq!(
-    ///         <JumpStrength as EntityAttributeTrait<V1_21_5>>::identifier(JumpStrength::as_static()),
+    ///         <JumpStrength as EntityAttributeTrait<V1_21_5>>::identifier(&attr),
     ///         "minecraft:jump_strength"
     ///     );
     ///
@@ -64,6 +50,31 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// ```
     fn identifier(&self) -> &'static Identifier;
 
+    /// The value of the entity attribute.
+    ///
+    /// ```rust
+    /// use froglight_entity::prelude::{entity_attr::Gravity, *};
+    ///
+    /// #[cfg(feature = "v1_21_4")]
+    /// {
+    ///     use froglight_common::version::V1_21_4;
+    ///
+    ///     // Accessing the value through `EntityAttributeTrait`.
+    ///     let attr = Gravity(<Gravity as EntityAttributeExt<V1_21_4>>::DEFAULT);
+    ///     assert_eq!(<Gravity as EntityAttributeTrait<V1_21_4>>::value(&attr), 0.08);
+    /// }
+    ///
+    /// #[cfg(feature = "v1_21_5")]
+    /// {
+    ///     use froglight_common::version::V1_21_5;
+    ///
+    ///     // Accessing the value through `EntityAttributeTrait`.
+    ///     let attr = Gravity(<Gravity as EntityAttributeExt<V1_21_5>>::DEFAULT);
+    ///     assert_eq!(<Gravity as EntityAttributeTrait<V1_21_5>>::value(&attr), 0.08);
+    /// }
+    /// ```
+    fn value(&self) -> f64;
+
     /// The identifier of the entity attribute.
     ///
     /// ```rust
@@ -74,8 +85,9 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static key through `EntityAttributeTrait`.
+    ///     let attr = Luck(<Luck as EntityAttributeExt<V1_21_4>>::DEFAULT);
     ///     assert_eq!(
-    ///         <Luck as EntityAttributeTrait<V1_21_4>>::translation_key(Luck::as_static()),
+    ///         <Luck as EntityAttributeTrait<V1_21_4>>::translation_key(&attr),
     ///         "minecraft.attribute.name.luck"
     ///     );
     ///
@@ -91,8 +103,9 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_5;
     ///
     ///     // Accessing the static key through the `EntityType` trait.
+    ///     let attr = Luck(<Luck as EntityAttributeExt<V1_21_5>>::DEFAULT);
     ///     assert_eq!(
-    ///         <Luck as EntityAttributeTrait<V1_21_5>>::translation_key(Luck::as_static()),
+    ///         <Luck as EntityAttributeTrait<V1_21_5>>::translation_key(&attr),
     ///         "minecraft.attribute.name.luck"
     ///     );
     ///
@@ -114,12 +127,6 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// {
     ///     use froglight_common::version::V1_21_4;
     ///
-    ///     // Accessing the static default through `EntityAttributeTrait`.
-    ///     assert_eq!(
-    ///         <Gravity as EntityAttributeTrait<V1_21_4>>::default_value(Gravity::as_static()),
-    ///         0.08
-    ///     );
-    ///
     ///     // Accessing the constant default through the `EntityAttributeExt` trait.
     ///     assert_eq!(<Gravity as EntityAttributeExt<V1_21_4>>::DEFAULT, 0.08);
     /// }
@@ -127,12 +134,6 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// #[cfg(feature = "v1_21_5")]
     /// {
     ///     use froglight_common::version::V1_21_5;
-    ///
-    ///     // Accessing the static default through `EntityAttributeTrait`.
-    ///     assert_eq!(
-    ///         <Gravity as EntityAttributeTrait<V1_21_5>>::default_value(Gravity::as_static()),
-    ///         0.08
-    ///     );
     ///
     ///     // Accessing the constant default through the `EntityAttributeExt` trait.
     ///     assert_eq!(<Gravity as EntityAttributeExt<V1_21_5>>::DEFAULT, 0.08);
@@ -150,10 +151,8 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_4;
     ///
     ///     // Accessing the static range through `EntityAttributeTrait`.
-    ///     assert_eq!(
-    ///         <Armor as EntityAttributeTrait<V1_21_4>>::valid_range(Armor::as_static()),
-    ///         0.0..=30.0
-    ///     );
+    ///     let attr = Armor(<Armor as EntityAttributeExt<V1_21_4>>::DEFAULT);
+    ///     assert_eq!(<Armor as EntityAttributeTrait<V1_21_4>>::valid_range(&attr), 0.0..=30.0);
     ///
     ///     // Accessing the constant range through the `EntityAttributeExt` trait.
     ///     assert_eq!(<Armor as EntityAttributeExt<V1_21_4>>::RANGE, 0.0..=30.0);
@@ -164,10 +163,8 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
     ///     use froglight_common::version::V1_21_5;
     ///
     ///     // Accessing the static range through `EntityAttributeTrait`.
-    ///     assert_eq!(
-    ///         <Armor as EntityAttributeTrait<V1_21_5>>::valid_range(Armor::as_static()),
-    ///         0.0..=30.0
-    ///     );
+    ///     let attr = Armor(<Armor as EntityAttributeExt<V1_21_5>>::DEFAULT);
+    ///     assert_eq!(<Armor as EntityAttributeTrait<V1_21_5>>::valid_range(&attr), 0.0..=30.0);
     ///
     ///     // Accessing the constant range through the `EntityAttributeExt` trait.
     ///     assert_eq!(<Armor as EntityAttributeExt<V1_21_5>>::RANGE, 0.0..=30.0);
@@ -179,9 +176,7 @@ pub trait EntityAttributeTrait<V: Version>: DowncastSync + MaybeReflect {
 // -------------------------------------------------------------------------------------------------
 
 /// An extension of the [`EntityAttributeTrait`] trait.
-pub trait EntityAttributeExt<V: Version>:
-    EntityAttributeTrait<V> + StaticEntityAttribute + MaybeComponent
-{
+pub trait EntityAttributeExt<V: Version>: EntityAttributeTrait<V> + MaybeComponent {
     /// The [`Identifier`] of the entity attribute.
     const IDENTIFIER: &'static str;
     /// The translation key for the entity attribute.

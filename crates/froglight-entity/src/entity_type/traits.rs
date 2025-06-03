@@ -4,7 +4,10 @@ use downcast_rs::DowncastSync;
 use froglight_common::{identifier::Identifier, version::Version};
 use glam::Vec3;
 
-use crate::maybe::{MaybeComponent, MaybeReflect};
+use crate::{
+    entity_attribute::EntityAttributeSet,
+    maybe::{MaybeComponent, MaybeReflect},
+};
 
 /// A static entity type
 pub trait StaticEntityType: 'static {
@@ -133,13 +136,14 @@ pub trait EntityTypeTrait<V: Version>: DowncastSync + MaybeReflect {
     /// Whether the entity type is immune to fire.
     fn fire_immunity(&self) -> bool;
 
-    /// The amount of gravity applied to the entity type.
-    fn gravity(&self) -> f32 { 0.0 }
-
-    /// Insert a [`Bundle`] of entity data into the given
+    /// Insert the [`EntityTypeTrait::default_attributes`] and
+    /// [`EntityTypeExt::BUNDLE`] and into an
     /// [`Entity`](bevy_ecs::entity::Entity).
     #[cfg(feature = "bevy")]
     fn insert_bundle(&self, entity: &mut EntityWorldMut);
+
+    /// The default attributes of the entity type.
+    fn default_attributes(&self) -> EntityAttributeSet;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -156,6 +160,11 @@ pub trait EntityTypeExt<V: Version>:
     #[cfg(feature = "bevy")]
     const BUNDLE: Self::BundleType;
 
+    /// The default attributes of the entity type.
+    #[inline]
+    #[must_use]
+    fn default_attributes() -> EntityAttributeSet { Self::as_static().default_attributes() }
+
     /// The identifier of the entity type.
     const IDENTIFIER: &'static str;
     /// The spawn group of the entity type.
@@ -168,6 +177,4 @@ pub trait EntityTypeExt<V: Version>:
     const DIMENSIONS: Vec3;
     /// Whether the entity type is immune to fire.
     const FIRE_IMMUNITY: bool;
-    /// The amount of gravity applied to the entity type.
-    const GRAVITY: f32 = 0.0;
 }

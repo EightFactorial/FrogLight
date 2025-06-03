@@ -51,6 +51,8 @@ pub(crate) fn entity_types(input: TokenStream) -> TokenStream {
             #enum_tokens
         }
 
+        #impl_tokens
+
         #[cfg(feature = "bevy")]
         impl EntityType {
             fn on_add(mut world: bevy_ecs::world::DeferredWorld, ctx: bevy_ecs::component::HookContext) {

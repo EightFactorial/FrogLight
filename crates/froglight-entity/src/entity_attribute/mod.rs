@@ -12,4 +12,4 @@ mod storage;
 pub use storage::{AppEntityAttributeStorage, EntityAttributeStorage, GlobalEntityAttributeId};
 
 mod traits;
-pub use traits::{EntityAttributeExt, EntityAttributeTrait, StaticEntityAttribute};
+pub use traits::{EntityAttributeExt, EntityAttributeTrait};

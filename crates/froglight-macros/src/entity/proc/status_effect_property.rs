@@ -140,11 +140,10 @@ pub(crate) fn status_effect_properties(input: TokenStream) -> TokenStream {
                     #vanilla_register
                 }
                 fn resolve(status_effect: &dyn #entity_path::status_effect::StatusEffectTrait<#version>) -> Option<VersionStatusEffect> {
-                    hashify::map!(
+                    hashify::tiny_map!(
                         status_effect.identifier().as_bytes(),
-                        VersionStatusEffect,
                         #vanilla_resolve
-                    ).copied()
+                    )
                 }
             }
 

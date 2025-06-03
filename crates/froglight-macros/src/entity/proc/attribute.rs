@@ -5,11 +5,8 @@ use syn::{
     parse::{Parse, ParseStream},
 };
 
-use crate::CrateManifest;
-
 pub(crate) fn entity_attributes(input: TokenStream) -> TokenStream {
-    let MacroInput { path, entities } = syn::parse2(input).unwrap();
-    let path = path.unwrap_or_else(|| CrateManifest::froglight("froglight-entity"));
+    let MacroInput { entities, .. } = syn::parse2(input).unwrap();
 
     let mut struct_tokens = quote! {
         #[cfg(feature = "bevy")]
@@ -35,7 +32,7 @@ pub(crate) fn entity_attributes(input: TokenStream) -> TokenStream {
             }
         });
 
-        struct_tokens.extend(MacroInput::as_tokens(&entity, &path));
+        struct_tokens.extend(MacroInput::as_tokens(&entity));
     }
 
     quote! {
@@ -49,6 +46,8 @@ pub(crate) fn entity_attributes(input: TokenStream) -> TokenStream {
             #enum_tokens
         }
 
+        #impl_tokens
+
         #[cfg(feature = "bevy")]
         impl EntityAttribute {
             pub fn apply_to(self, entity: &mut bevy_ecs::world::EntityWorldMut) {
@@ -61,6 +60,7 @@ pub(crate) fn entity_attributes(input: TokenStream) -> TokenStream {
 }
 
 struct MacroInput {
+    #[expect(dead_code)]
     path: Option<Path>,
     entities: Vec<ItemStruct>,
 }
@@ -81,18 +81,16 @@ impl Parse for MacroInput {
     }
 }
 impl MacroInput {
-    fn as_tokens(
-        ItemStruct { vis, struct_token, ident, semi_token, .. }: &ItemStruct,
-        path: &Path,
-    ) -> TokenStream {
+    fn as_tokens(item: &ItemStruct) -> TokenStream {
         quote! {
-            #[derive(Debug, Clone, Copy, PartialEq, #path::prelude::StaticEntityAttribute)]
+            #[repr(transparent)]
+            #[derive(Debug, Clone, Copy, PartialEq, derive_more::Deref, derive_more::DerefMut, derive_more::From, derive_more::Into)]
             #[cfg_attr(feature = "bevy", derive(Component))]
             #[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq))]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
             #[cfg_attr(all(feature = "bevy", feature = "reflect"), reflect(Component))]
             #[cfg_attr(all(feature = "serde", feature = "reflect"), reflect(Serialize, Deserialize))]
-            #vis #struct_token #ident #semi_token
+            #item
         }
     }
 }

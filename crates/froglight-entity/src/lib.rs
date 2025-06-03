@@ -17,12 +17,12 @@ pub(crate) mod maybe;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use froglight_macros::{StaticEntityAttribute, StaticEntityType, StaticStatusEffect};
+    pub use froglight_macros::{StaticEntityType, StaticStatusEffect};
 
     pub use crate::{
         entity_attribute::{
             AppEntityAttributeStorage, EntityAttributeExt, EntityAttributeStorage,
-            EntityAttributeTrait, StaticEntityAttribute,
+            EntityAttributeTrait,
             generated::{self as entity_attr, EntityAttribute},
         },
         entity_data::{

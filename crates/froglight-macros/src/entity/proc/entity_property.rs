@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
-    ExprArray, Ident, LitBool, LitStr, Path, Token,
+    ExprArray, Ident, Lit, LitBool, LitStr, Path, Token,
     parse::{Parse, ParseStream},
 };
 
@@ -9,17 +9,18 @@ use crate::CrateManifest;
 
 #[allow(clippy::obfuscated_if_else, clippy::too_many_lines)]
 pub(crate) fn entity_type_properties(input: TokenStream) -> TokenStream {
-    let MacroInput { path, version, entities: blocks } = syn::parse2(input).unwrap();
+    let MacroInput { path, version, entities } = syn::parse2(input).unwrap();
     let entity_path = path.unwrap_or_else(|| CrateManifest::froglight("froglight-entity"));
     let common_path = CrateManifest::froglight("froglight-common");
 
     // Generate the block implementations
-    let mut output = blocks.iter().fold(
+    let mut output = entities.iter().fold(
         TokenStream::new(),
         |mut tokens,
          EntityInput {
              entity,
              properties: PropertyInput { ident, group, dimensions, fire_immune },
+             attributes: AttributeInput { attributes }
          }| {
             let (mut dim_x, mut dim_y, mut dim_z) = (None, None, None);
             for (i, dim) in dimensions.elems.iter().take(3).enumerate() {
@@ -35,6 +36,23 @@ pub(crate) fn entity_type_properties(input: TokenStream) -> TokenStream {
                 (Some(dim_x), Some(dim_y), Some(dim_z)) => (dim_x, dim_y, dim_z),
                 _ => panic!("Invalid dimensions array length!"),
             };
+
+            let mut attribute_tokens = TokenStream::new();
+            for (attr, val) in attributes {
+                match val {
+                    Lit::Str(..) => {
+                        attribute_tokens.extend(quote! {
+                            attributes.insert::<#attr, #version>(#attr(<#attr as #entity_path::entity_attribute::EntityAttributeExt<#version>>::DEFAULT));
+                        });
+                    },
+                    other => {
+                        attribute_tokens.extend(quote! {
+                            attributes.insert::<#attr, #version>(#attr(#other));
+                        });
+                    }
+                }
+            }
+
 
             tokens.extend(quote! {
                 #[automatically_derived]
@@ -57,10 +75,16 @@ pub(crate) fn entity_type_properties(input: TokenStream) -> TokenStream {
                     #[inline]
                     fn fire_immunity(&self) -> bool { <Self as #entity_path::entity_type::EntityTypeExt<#version>>::FIRE_IMMUNITY }
 
-                    #[inline]
                     #[cfg(feature = "bevy")]
                     fn insert_bundle(&self, entity: &mut bevy_ecs::world::EntityWorldMut) {
                         entity.insert(<Self as #entity_path::entity_type::EntityTypeExt<#version>>::BUNDLE);
+                        <Self as #entity_path::entity_type::EntityTypeTrait<#version>>::default_attributes(self).apply_to(entity);
+                    }
+
+                    fn default_attributes(&self) -> #entity_path::entity_attribute::EntityAttributeSet {
+                        let mut attributes = #entity_path::entity_attribute::EntityAttributeSet::new();
+                        #attribute_tokens
+                        attributes
                     }
                 }
                 #[automatically_derived]
@@ -100,7 +124,8 @@ pub(crate) fn entity_type_properties(input: TokenStream) -> TokenStream {
         for EntityInput {
             entity,
             properties: PropertyInput { ident, .. },
-        } in blocks
+            attributes: _
+        } in entities
         {
 
             // Build the `VersionEntityType` enum
@@ -176,11 +201,10 @@ pub(crate) fn entity_type_properties(input: TokenStream) -> TokenStream {
                     #vanilla_register
                 }
                 fn resolve(entity_type: &dyn #entity_path::entity_type::EntityTypeTrait<#version>) -> Option<VersionEntityType> {
-                    hashify::map!(
+                    hashify::tiny_map!(
                         entity_type.identifier().as_bytes(),
-                        VersionEntityType,
                         #vanilla_resolve
-                    ).copied()
+                    )
                 }
             }
 
@@ -269,6 +293,7 @@ impl Parse for MacroInput {
 struct EntityInput {
     entity: Ident,
     properties: PropertyInput,
+    attributes: AttributeInput,
 }
 impl Parse for EntityInput {
     fn parse(input: ParseStream) -> syn::Result<Self> {
@@ -279,17 +304,24 @@ impl Parse for EntityInput {
         syn::braced!(content in input);
 
         let mut properties = None;
+        let mut attributes = AttributeInput::default();
 
         while !content.is_empty() {
             let key: Ident = content.parse()?;
             content.parse::<Token![:]>()?;
 
-            let braced;
-            syn::braced!(braced in content);
-
             match key.to_string().as_str() {
                 "properties" => {
+                    let braced;
+                    syn::braced!(braced in content);
+
                     properties = Some(braced.parse()?);
+                }
+                "attributes" => {
+                    let bracketed;
+                    syn::bracketed!(bracketed in content);
+
+                    attributes = bracketed.parse()?;
                 }
                 unk => {
                     return Err(syn::Error::new(key.span(), format!("unknown entity key '{unk}'")));
@@ -299,9 +331,6 @@ impl Parse for EntityInput {
             if content.peek(Token![,]) {
                 content.parse::<Token![,]>()?;
             }
-            if properties.is_some() {
-                break;
-            }
         }
 
         Ok(Self {
@@ -309,6 +338,7 @@ impl Parse for EntityInput {
             properties: properties.ok_or_else(|| {
                 syn::Error::new(content.span(), "missing entity key 'properties'")
             })?,
+            attributes,
         })
     }
 }
@@ -376,5 +406,36 @@ impl Parse for PropertyInput {
                 syn::Error::new(input.span(), "missing property key 'fire_immune'")
             })?,
         })
+    }
+}
+
+/// Example:
+///
+/// ```text
+/// attributes: [ ExampleAttribute(1f64), AnotherAttribute(2f64) ]
+/// ```
+#[derive(Default)]
+struct AttributeInput {
+    attributes: Vec<(Path, Lit)>,
+}
+impl Parse for AttributeInput {
+    fn parse(input: ParseStream) -> syn::Result<Self> {
+        let mut attributes = Vec::new();
+
+        while !input.is_empty() {
+            let path: Path = input.parse()?;
+
+            let paren;
+            syn::parenthesized!(paren in input);
+
+            let literal: Lit = paren.parse()?;
+            attributes.push((path, literal));
+
+            if input.peek(Token![,]) {
+                input.parse::<Token![,]>()?;
+            }
+        }
+
+        Ok(Self { attributes })
     }
 }

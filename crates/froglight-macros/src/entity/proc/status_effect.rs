@@ -37,6 +37,8 @@ pub(crate) fn status_effects(input: TokenStream) -> TokenStream {
     quote! {
         #struct_tokens
 
+        #impl_tokens
+
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
         #[cfg_attr(feature = "reflect", derive(bevy_reflect::Reflect), reflect(Debug, Clone, PartialEq, Hash))]
         #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

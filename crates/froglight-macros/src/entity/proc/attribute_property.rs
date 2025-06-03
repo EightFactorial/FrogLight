@@ -31,6 +31,9 @@ pub(crate) fn entity_attribute_properties(input: TokenStream) -> TokenStream {
                     }
 
                     #[inline]
+                    fn value(&self) -> f64 { self.0 }
+
+                    #[inline]
                     fn translation_key(&self) -> &'static str {
                         static TRANSLATION_KEY: &str = <#attribute as #entity_path::entity_attribute::EntityAttributeExt<#version>>::TRANSLATION_KEY;
                         TRANSLATION_KEY
@@ -91,7 +94,7 @@ pub(crate) fn entity_attribute_properties(input: TokenStream) -> TokenStream {
             // Register the entity types with the resolver
             vanilla_register.extend(quote! { storage.register::<#attribute>(); });
             vanilla_resolve.extend(quote! {
-                #ident => VersionEntityAttribute::#attribute(#attribute),
+                #ident => { return Some(VersionEntityAttribute::#attribute(#attribute(value))) },
             });
 
             // // Create resolver tests
@@ -149,11 +152,13 @@ pub(crate) fn entity_attribute_properties(input: TokenStream) -> TokenStream {
                     #vanilla_register
                 }
                 fn resolve(attribute: &dyn #entity_path::entity_attribute::EntityAttributeTrait<#version>) -> Option<VersionEntityAttribute> {
-                    hashify::map!(
+                    let value = attribute.value();
+                    hashify::fnc_map!(
                         attribute.identifier().as_bytes(),
-                        VersionEntityAttribute,
                         #vanilla_resolve
-                    ).copied()
+                        _ => { return None }
+                    );
+                    unreachable!("All possible cases handled by `hashify::fnc_map` macro")
                 }
             }
 
