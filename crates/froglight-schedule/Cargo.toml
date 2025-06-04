@@ -16,7 +16,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dev-dependencies]
-bevy = { features = ["bevy_log"], workspace = true }
+bevy = { features = ["bevy_log", "trace_tracy"], workspace = true }
 froglight-common = { features = ["bevy"], workspace = true }
 
 [dependencies]
@@ -25,13 +25,13 @@ bevy_ecs = { features = ["bevy_reflect"], workspace = true }
 bevy_platform = { features = ["alloc"], workspace = true }
 bevy_reflect = { workspace = true }
 derive_more = { workspace = true }
-froglight-common = { features = ["bevy"], workspace = true }
+froglight-common = { features = ["bevy", "reflect"], workspace = true }
 parking_lot = { workspace = true }
 
 # Optional dependencies
-bevy_log = { features = ["trace"], optional = true, workspace = true }
 bevy_tasks = { optional = true, workspace = true }
 bevy_time = { features = ["bevy_reflect"], optional = true, workspace = true }
+tracing = { workspace = true, optional = true }
 
 [features]
 default = ["std"]
@@ -48,7 +48,7 @@ nightly = ["parking_lot/nightly"]
 std = ["bevy_app/std", "bevy_ecs/std", "bevy_platform/std", "bevy_reflect/std", "bevy_tasks?/std", "bevy_time?/std"]
 
 # Enable tracing
-trace = ["bevy/trace_tracy", "dep:bevy_log", "std"]
+trace = ["dep:tracing"]
 
 [[example]]
 name = "subapp"

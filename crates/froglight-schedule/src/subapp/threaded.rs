@@ -4,8 +4,6 @@ use alloc::vec::Vec;
 
 use bevy_app::{AppLabel, InternedAppLabel, PluginsState, prelude::*};
 use bevy_ecs::{intern::Interned, prelude::*};
-#[cfg(feature = "trace")]
-use bevy_log::info_span;
 use bevy_tasks::{Scope, prelude::*};
 use derive_more::{Deref, DerefMut};
 
@@ -68,17 +66,18 @@ impl ThreadedSubApps {
         scope: &Scope<'a, '_, ()>,
     ) {
         #[cfg(feature = "trace")]
-        let _span = info_span!("threaded update").entered();
+        let _span = tracing::info_span!("threaded update").entered();
 
         // Sync and spawn tasks for all multi-threaded SubApps.
         for (sub_app, _label) in sub_apps {
             #[cfg(feature = "trace")]
-            let _span = info_span!("threaded extract", name = ?_label).entered();
+            let _span = tracing::info_span!("threaded extract", name = ?_label).entered();
 
             sub_app.extract(app.world_mut());
             scope.spawn(async {
                 #[cfg(feature = "trace")]
-                let _span = info_span!("threaded subapp", name = ?_label.clone()).entered();
+                let _span =
+                    tracing::info_span!("threaded subapp", name = ?_label.clone()).entered();
 
                 sub_app.update();
             });
