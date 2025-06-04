@@ -1,7 +1,7 @@
 //! TODO
 
 #[cfg(not(feature = "std"))]
-use alloc::{borrow::Cow, string::ToString};
+use alloc::{borrow::Cow, boxed::Box, string::ToString};
 #[cfg(feature = "std")]
 use std::borrow::Cow;
 

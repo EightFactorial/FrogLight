@@ -1,7 +1,7 @@
 //! TODO: Check byte ordering and create an error type for length mismatches.
 
 #[cfg(not(feature = "std"))]
-use alloc::borrow::Cow;
+use alloc::{borrow::Cow, boxed::Box};
 use core::{any::type_name, str::FromStr};
 #[cfg(feature = "std")]
 use std::borrow::Cow;

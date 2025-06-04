@@ -69,11 +69,11 @@ fn log_components(entity: &mut EntityWorldMut) {
     let entity_id = entity.id();
     let iter: Vec<_> = entity.archetype().components().collect();
     entity.world_scope(|world| {
+        let reg = world.resource::<AppTypeRegistry>().read();
         info!(
             "Entity ({entity_id}): {}\n",
             iter.into_iter()
                 .map(|c_id| {
-                    let reg = world.resource::<AppTypeRegistry>().read();
                     let c_inf = world.components().get_info(c_id).unwrap();
                     let c_ty = c_inf.type_id().unwrap();
                     if let Some(c_ref) = reg.get(c_ty) {

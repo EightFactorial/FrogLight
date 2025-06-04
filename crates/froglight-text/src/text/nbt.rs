@@ -1,5 +1,5 @@
 #[cfg(not(feature = "std"))]
-use alloc::string::String;
+use alloc::{boxed::Box, string::String, vec::Vec};
 use core::any::type_name;
 
 use froglight_nbt::prelude::*;
