@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+bevy = { features = ["bevy_log"], workspace = true }
+
 [dependencies]
 base64 = { features = ["alloc"], workspace = true }
 bevy_platform = { features = ["alloc"], workspace = true }
@@ -110,3 +113,9 @@ libm = ["bevy_math?/libm", "glam/libm"]
 v1_21_4 = ["froglight-common/v1_21_4"]
 # Enable support for v1.21.5
 v1_21_5 = ["froglight-common/v1_21_5"]
+
+# --- Examples ---
+
+[[example]]
+name = "bevy"
+required-features = ["bevy", "reflect", "v1_21_4"]

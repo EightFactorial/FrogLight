@@ -21,13 +21,18 @@ pub(crate) fn entity_types(input: TokenStream) -> TokenStream {
     let mut enum_tokens = TokenStream::new();
     let mut hook_tokens = TokenStream::new();
     let mut impl_tokens = TokenStream::new();
+    let mut register_tokens = TokenStream::new();
 
     for entity in entities {
         let ident = &entity.ident;
+
+        struct_tokens.extend(MacroInput::as_tokens(&entity, &path));
+
         enum_tokens.extend(quote!(#ident,));
         hook_tokens.extend(quote! {
             Self::#ident => { if !entity_ref.contains::<#ident>() { commands.insert(#ident); } },
         });
+
         impl_tokens.extend(quote! {
             impl From<#ident> for EntityType {
                 #[inline]
@@ -35,7 +40,9 @@ pub(crate) fn entity_types(input: TokenStream) -> TokenStream {
             }
         });
 
-        struct_tokens.extend(MacroInput::as_tokens(&entity, &path));
+        register_tokens.extend(quote! {
+            registry.register::<#ident>();
+        });
     }
 
     quote! {
@@ -53,8 +60,9 @@ pub(crate) fn entity_types(input: TokenStream) -> TokenStream {
 
         #impl_tokens
 
-        #[cfg(feature = "bevy")]
+        #[cfg(any(feature = "bevy", feature = "reflect"))]
         impl EntityType {
+            #[cfg(feature = "bevy")]
             fn on_add(mut world: bevy_ecs::world::DeferredWorld, ctx: bevy_ecs::component::HookContext) {
                 let (entities, mut commands) = world.entities_and_commands();
                 let mut commands = commands.entity(ctx.entity);
@@ -65,6 +73,13 @@ pub(crate) fn entity_types(input: TokenStream) -> TokenStream {
                             #hook_tokens
                         }
                 }
+            }
+
+            #[cfg(feature = "reflect")]
+            pub fn register(registry: &mut bevy_reflect::TypeRegistry) -> &mut bevy_reflect::TypeRegistry {
+                registry.register::<Self>();
+                #register_tokens
+                registry
             }
         }
     }

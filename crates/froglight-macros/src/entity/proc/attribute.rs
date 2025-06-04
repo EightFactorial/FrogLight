@@ -18,13 +18,17 @@ pub(crate) fn entity_attributes(input: TokenStream) -> TokenStream {
     let mut enum_tokens = TokenStream::new();
     let mut fn_tokens = TokenStream::new();
     let mut impl_tokens = TokenStream::new();
+    let mut register_tokens = TokenStream::new();
 
     for entity in entities {
         let ident = &entity.ident;
+        struct_tokens.extend(MacroInput::as_tokens(&entity));
+
         enum_tokens.extend(quote!(#ident(#ident),));
         fn_tokens.extend(quote! {
             Self::#ident(item) => { entity.insert(item); },
         });
+
         impl_tokens.extend(quote! {
             impl From<#ident> for EntityAttribute {
                 #[inline]
@@ -32,7 +36,9 @@ pub(crate) fn entity_attributes(input: TokenStream) -> TokenStream {
             }
         });
 
-        struct_tokens.extend(MacroInput::as_tokens(&entity));
+        register_tokens.extend(quote! {
+            registry.register::<#ident>();
+        });
     }
 
     quote! {
@@ -48,12 +54,20 @@ pub(crate) fn entity_attributes(input: TokenStream) -> TokenStream {
 
         #impl_tokens
 
-        #[cfg(feature = "bevy")]
+        #[cfg(any(feature = "bevy", feature = "reflect"))]
         impl EntityAttribute {
+            #[cfg(feature = "bevy")]
             pub fn apply_to(self, entity: &mut bevy_ecs::world::EntityWorldMut) {
                 match self {
                     #fn_tokens
                 }
+            }
+
+            #[cfg(feature = "reflect")]
+            pub fn register(registry: &mut bevy_reflect::TypeRegistry) -> &mut bevy_reflect::TypeRegistry {
+                registry.register::<Self>();
+                #register_tokens
+                registry
             }
         }
     }
