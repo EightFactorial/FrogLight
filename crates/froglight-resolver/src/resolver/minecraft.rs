@@ -29,7 +29,7 @@ impl FroglightResolver {
         // Return early if given a socket or IP address
         if let Ok(sock) = SocketAddr::from_str(address) {
             #[cfg(feature = "trace")]
-            tracing::trace!("Using given SocketAddress: \"{sock}\"");
+            tracing::trace!("Using given socket address: \"{sock}\"");
             return Ok(sock);
         } else if let Ok(addr) = IpAddr::from_str(address) {
             #[cfg(feature = "trace")]

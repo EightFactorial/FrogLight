@@ -2,6 +2,10 @@
 
 use std::{future::Future, sync::Arc};
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::prelude::*;
+#[cfg(feature = "bevy")]
+use bevy_reflect::prelude::*;
 use hickory_resolver::{
     IntoName, ResolveError,
     config::{ResolverConfig, ResolverOpts},
@@ -17,7 +21,8 @@ use super::{FroglightInnerResolver, ResolverConnectionProvider};
 ///
 /// This resolver is cheaply cloneable and can be shared between threads.
 #[derive(Debug, Clone)]
-#[cfg_attr(feature = "bevy", derive(bevy_ecs::resource::Resource))]
+#[cfg_attr(feature = "bevy", derive(Resource, Reflect))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, Resource))]
 pub struct FroglightResolver {
     resolver: Arc<FroglightInnerResolver>,
 }

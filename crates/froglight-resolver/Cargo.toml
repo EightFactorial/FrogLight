@@ -15,6 +15,9 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+tracing-subscriber = { features = ["env-filter"], workspace = true }
+
 [dependencies]
 async-io = { workspace = true }
 async-net = { workspace = true }
@@ -24,6 +27,7 @@ futures-lite = { features = ["std"], workspace = true }
 hickory-resolver = { features = ["system-config"], workspace = true }
 
 # Optional dependencies
+bevy_app = { features = ["bevy_reflect", "std"], optional = true, workspace = true }
 bevy_ecs = { features = ["bevy_reflect", "std"], optional = true, workspace = true }
 bevy_reflect = { features = ["std"], optional = true, workspace = true }
 bevy_tasks = { features = ["std"], optional = true, workspace = true }
@@ -37,7 +41,7 @@ default = ["agent"]
 agent = ["dep:ureq"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks"]
 
 # Enable nightly features.
 nightly = []
@@ -49,4 +53,4 @@ trace = ["dep:tracing"]
 [[example]]
 name = "address"
 path = "examples/address.rs"
-required-features = ["bevy"]
+required-features = ["bevy", "trace"]

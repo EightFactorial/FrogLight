@@ -27,7 +27,8 @@ use crate::resolver::FroglightResolver;
 ///
 /// Uses [`FroglightResolver`] for DNS resolution if enabled.
 #[derive(Debug, Clone, Deref)]
-#[cfg_attr(feature = "bevy", derive(Resource, Reflect), reflect(opaque, Debug, Resource))]
+#[cfg_attr(feature = "bevy", derive(Resource, Reflect))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, Resource))]
 pub struct FroglightAgent(Arc<Agent>);
 
 impl FroglightAgent {

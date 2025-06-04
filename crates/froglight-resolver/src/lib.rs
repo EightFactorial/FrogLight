@@ -3,6 +3,8 @@
 
 #[cfg(feature = "agent")]
 pub mod agent;
+#[cfg(feature = "bevy")]
+pub mod plugin;
 pub mod resolver;
 
 pub mod prelude {
@@ -10,6 +12,8 @@ pub mod prelude {
 
     #[cfg(feature = "agent")]
     pub use crate::agent::FroglightAgent;
+    #[cfg(feature = "bevy")]
+    pub use crate::plugin::ResolverPlugin;
     pub use crate::resolver::{
         FroglightResolver,
         hickory::{ResolverConfig, ResolverOpts},
