@@ -41,12 +41,11 @@ subapp = ["dep:bevy_time"]
 # Enable the multi-threaded SubApp executor
 multi_threaded = ["dep:bevy_tasks", "subapp"]
 
-# Enable nightly features.
-nightly = ["parking_lot/nightly"]
-
 # Enable support for the rust standard library.
 std = ["bevy_app/std", "bevy_ecs/std", "bevy_platform/std", "bevy_reflect/std", "bevy_tasks?/std", "bevy_time?/std"]
 
+# Enable nightly features.
+nightly = ["parking_lot/nightly"]
 # Enable tracing
 trace = ["dep:tracing"]
 

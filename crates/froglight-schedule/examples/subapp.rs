@@ -32,14 +32,14 @@ fn main() -> AppExit {
 
         #[cfg(not(feature = "multi_threaded"))]
         sub.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
-            if **tick > 115_000 {
+            if **tick > 75_000 {
                 info!("Tick! ({})", **tick);
             }
         });
 
         #[cfg(feature = "multi_threaded")]
         sub.add_systems(Tick::Tick, |tick: Res<CurrentTick>| {
-            if **tick > 130_000 {
+            if **tick > 105_000 {
                 info!("Tick! ({})", **tick);
             }
         });
