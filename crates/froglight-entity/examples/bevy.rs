@@ -35,6 +35,7 @@ fn main() -> AppExit {
     app.run()
 }
 
+#[cfg_attr(rustfmt, rustfmt::skip)]
 fn spawn_entities(world: &mut World) {
     let entity_types = world.resource::<AppEntityTypeStorage<V1_21_4>>().clone();
     let entity_types = entity_types.read();
@@ -61,7 +62,14 @@ fn spawn_entities(world: &mut World) {
     EntityTypeTrait::<V1_21_4>::insert_bundle(&entity::Warden, &mut entity);
     log_components(&mut entity);
 
-    // Spawn:
+    // !! This does not compile !!
+    // In 1.21.4, all potion entities were simply called `Potion`.
+    // Only in 1.21.5 were they split into `SplashPotion` and `LingeringPotion`.
+    //
+    // Spawn: Splash Potion
+    // let mut entity = world.spawn_empty();
+    // EntityTypeTrait::<V1_21_4>::insert_bundle(&entity::SplashPotion, &mut entity);
+    // log_components(&mut entity);
 }
 
 /// Log the components of an [`Entity`].
@@ -75,10 +83,9 @@ fn log_components(entity: &mut EntityWorldMut) {
             iter.into_iter()
                 .map(|c_id| {
                     let c_inf = world.components().get_info(c_id).unwrap();
-                    let c_ty = c_inf.type_id().unwrap();
-                    if let Some(c_ref) = reg.get(c_ty) {
-                        let c_fn = c_ref.data::<ReflectComponent>().unwrap();
-                        format!("{:?}", c_fn.reflect(world.entity(entity_id)).unwrap())
+                    if let Some(c_reg) = reg.get(c_inf.type_id().unwrap()) {
+                        let c_fns = c_reg.data::<ReflectComponent>().unwrap();
+                        format!("{:?}", c_fns.reflect(world.entity(entity_id)).unwrap())
                     } else {
                         format!("{}(Unknown)", c_inf.name().split("::").last().unwrap())
                     }
