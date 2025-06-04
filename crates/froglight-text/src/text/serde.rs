@@ -1,4 +1,3 @@
-#[cfg(not(feature = "std"))]
 use alloc::{format, string::ToString, vec::Vec};
 
 use serde::{

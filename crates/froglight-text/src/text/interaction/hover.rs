@@ -1,11 +1,8 @@
 //! TODO
 
-#[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, boxed::Box};
-#[cfg(all(not(feature = "std"), feature = "serde"))]
+#[cfg(feature = "serde")]
 use alloc::{format, string::ToString};
-#[cfg(feature = "std")]
-use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;

@@ -1,8 +1,7 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
-#[cfg(not(feature = "std"))]
 extern crate alloc;
 
 pub mod message;
@@ -18,9 +17,9 @@ pub mod prelude {
     #[cfg(feature = "crypto")]
     pub use crate::chat::MessageSignatureCtx;
     pub use crate::text::{
+        FormattedText,
         content::TextContent,
         interaction::TextInteraction,
         style::{IntegerColor, PresetColor, TextColor, TextStyle},
-        FormattedText,
     };
 }

@@ -1,3 +1,8 @@
+use alloc::{
+    format,
+    string::{String, ToString},
+};
+
 use nu_ansi_term::{AnsiString, Color, Style};
 
 use super::ChatMessageError;

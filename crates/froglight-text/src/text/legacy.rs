@@ -1,7 +1,4 @@
-#[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, string::ToString, vec::Vec};
-#[cfg(feature = "std")]
-use std::borrow::Cow;
 
 use crate::{prelude::*, text::style::LegacyCode};
 

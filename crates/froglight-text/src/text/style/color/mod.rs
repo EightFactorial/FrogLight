@@ -1,10 +1,7 @@
-#[cfg(not(feature = "std"))]
 use alloc::borrow::Cow;
-#[cfg(all(not(feature = "std"), feature = "serde"))]
+#[cfg(feature = "serde")]
 use alloc::string::String;
 use core::str::FromStr;
-#[cfg(feature = "std")]
-use std::borrow::Cow;
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;

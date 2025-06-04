@@ -28,7 +28,6 @@ uuid = { workspace = true }
 # Optional dependencies
 bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
 bevy_reflect = { features = ["smol_str", "uuid"], optional = true, workspace = true }
-froglight-io = { optional = true, workspace = true }
 nu-ansi-term = { optional = true, workspace = true }
 rsa = { features = ["sha2"], optional = true, workspace = true }
 serde = { features = ["derive"], optional = true, workspace = true }
@@ -41,8 +40,6 @@ default = ["ansi", "crypto", "std"]
 ansi = ["dep:nu-ansi-term", "std"]
 # Enable chat message cryptography support.
 crypto = ["dep:rsa"]
-# Enable `froglight-io` support.
-io = ["dep:froglight-io", "froglight-nbt/io", "std"]
 
 # Enable `bevy` support.
 bevy = [
@@ -58,14 +55,13 @@ serde = [
   "dep:serde",
   "dep:serde_json",
   "froglight-common/serde",
-  "froglight-io?/serde",
   "froglight-nbt/serde",
   "smol_str/serde",
   "uuid/serde",
 ]
 
 # Enable nightly features.
-nightly = ["froglight-io?/nightly", "froglight-nbt/nightly", "parking_lot/nightly"]
+nightly = ["froglight-nbt/nightly", "parking_lot/nightly"]
 
 # Enable support for the rust standard library.
 std = [

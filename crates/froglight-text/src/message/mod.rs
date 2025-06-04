@@ -1,13 +1,10 @@
 //! TODO
 
-#[cfg(not(feature = "std"))]
 use alloc::{
     borrow::Cow,
     format,
     string::{String, ToString},
 };
-#[cfg(feature = "std")]
-use std::borrow::Cow;
 
 use crate::{
     prelude::*,

@@ -1,6 +1,5 @@
 //! Chat message signing.
 
-#[cfg(not(feature = "std"))]
 use alloc::vec::Vec;
 use core::time::Duration;
 
@@ -150,16 +149,4 @@ impl MessageSignatureCtx {
 pub trait MessageTimestamp {
     /// Get the [`Duration`] from the unix epoch.
     fn timestamp(&self) -> Duration;
-}
-
-/// A [`MessageTimestamp`] implementation that uses the standard library.
-#[cfg(feature = "std")]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct StdTimestamp;
-
-#[cfg(feature = "std")]
-impl MessageTimestamp for StdTimestamp {
-    fn timestamp(&self) -> Duration {
-        std::time::UNIX_EPOCH.elapsed().expect("Time went backwards?")
-    }
 }
