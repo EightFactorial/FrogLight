@@ -206,24 +206,13 @@ impl<'de> Deserialize<'de> for TextContent {
 
 #[test]
 fn formatted_text() {
-    #[cfg(not(feature = "std"))]
     use alloc::{borrow::Cow, vec};
-    #[cfg(feature = "std")]
-    use std::borrow::Cow;
 
-    use crate::{
-        prelude::*,
-        text::{
-            TextInteraction,
-            style::{IntegerColor, PresetColor},
-        },
-    };
+    use crate::prelude::*;
 
     fn from_str(json: &str) -> FormattedText { serde_json::from_str(json).unwrap() }
     fn roundtrip(value: &FormattedText) -> FormattedText {
         let json = serde_json::to_string(value).unwrap();
-        #[cfg(all(debug_assertions, feature = "std"))]
-        println!("{json}");
         from_str(&json)
     }
 

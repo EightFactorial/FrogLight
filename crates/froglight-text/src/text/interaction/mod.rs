@@ -92,8 +92,6 @@ fn serde() {
     fn from_str(json: &str) -> TextInteraction { serde_json::from_str(json).unwrap() }
     fn roundtrip(value: &TextInteraction) -> TextInteraction {
         let json = serde_json::to_string(value).unwrap();
-        #[cfg(all(debug_assertions, feature = "std"))]
-        println!("{json}");
         from_str(&json)
     }
 

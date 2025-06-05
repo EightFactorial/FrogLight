@@ -1,7 +1,4 @@
-#[cfg(not(feature = "std"))]
-use alloc::{borrow::Cow, vec, vec::Vec};
-#[cfg(feature = "std")]
-use std::borrow::Cow;
+use alloc::{borrow::Cow, string::ToString, vec, vec::Vec};
 
 use crate::{
     prelude::*,
@@ -88,13 +85,11 @@ fn chat_message_ansi() {
     let text = FormattedText::from_string("Hello, World!")
         .with_style(TextStyle::default().with_color(PresetColor::Blue));
     let message = text.as_message_ansi(&t).unwrap().to_string();
-    println!("{message}");
     assert_eq!(message, "\u{1b}[38;2;85;85;255mHello, World!\u{1b}[0m");
 
     let text = FormattedText::from_string("Hello, World!")
         .with_style(TextStyle::default().with_color(IntegerColor::new(0x999999)));
     let message = text.as_message_ansi(&t).unwrap().to_string();
-    println!("{message}");
     assert_eq!(message, "\u{1b}[38;2;153;153;153mHello, World!\u{1b}[0m");
 
     let text = FormattedText {
@@ -109,7 +104,6 @@ fn chat_message_ansi() {
         }],
     };
     let message = text.as_message_ansi(&t).unwrap().to_string();
-    println!("{message}");
     assert_eq!(message, "Hello, World!");
 
     let text = FormattedText {
@@ -125,7 +119,6 @@ fn chat_message_ansi() {
     };
 
     let message = text.as_message_ansi(&t).unwrap().to_string();
-    println!("{message}");
     assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1mWorld!\u{1b}[0m");
 
     let text = FormattedText {
@@ -141,7 +134,6 @@ fn chat_message_ansi() {
     };
 
     let message = text.as_message_ansi(&t).unwrap().to_string();
-    println!("{message}");
     assert_eq!(message, "\u{1b}[4mHello, \u{1b}[0m\u{1b}[1;4mWorld!\u{1b}[0m");
 
     let text = FormattedText {
@@ -162,7 +154,6 @@ fn chat_message_ansi() {
     };
 
     let message = text.as_message_ansi(&t).unwrap().to_string();
-    println!("{message}");
     assert_eq!(
         message,
         "\u{1b}[9mHello, \u{1b}[0m\u{1b}[4mWorld\u{1b}[0m\u{1b}[4;9;38;2;255;85;85m!\u{1b}[0m"
@@ -179,7 +170,6 @@ fn chat_message_ansi() {
         ]);
 
     let message = text.as_message_ansi(&t).unwrap().to_string();
-    println!("{message}");
     assert_eq!(
         message,
         "\u{1b}[9mHello, \u{1b}[0m\u{1b}[4mWorld\u{1b}[0m\u{1b}[4;9;38;2;255;85;85m!\u{1b}[0m"
