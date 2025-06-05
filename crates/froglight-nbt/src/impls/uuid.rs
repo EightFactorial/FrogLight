@@ -2,7 +2,7 @@
 
 #[cfg(not(feature = "std"))]
 use alloc::{borrow::Cow, boxed::Box};
-use core::{any::type_name, str::FromStr};
+use core::any::type_name;
 #[cfg(feature = "std")]
 use std::borrow::Cow;
 
@@ -57,8 +57,10 @@ impl FromTag for Uuid {
                 let string = string.try_as_str().map_err(|err| {
                     NbtError::ConversionError(type_name::<Cow<'_, str>>(), Box::new(err))
                 })?;
-                Uuid::from_str(&string)
-                    .map_err(|err| NbtError::ConversionError(type_name::<Self>(), Box::new(err)))
+                Uuid::parse_str(&string).map_err(|_err| {
+                    #[expect(unreachable_code)]
+                    NbtError::ConversionError(type_name::<Self>(), todo!("Create an error type"))
+                })
             }
             _ => Err(NbtError::MismatchedTag(
                 type_name::<Self>(),
