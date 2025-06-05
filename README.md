@@ -9,7 +9,9 @@
 
 ## About
 
-FrogLight is a set of libraries for creating Minecraft clients. Each crate is designed to be used independently, but plugins are provided for the [Bevy](https://github.com/bevyengine/bevy/) engine.
+FrogLight is a set of libraries for writing both Minecraft servers and clients.
+
+Each crate is designed to be used independently, but plugin for integrating into the [Bevy](https://github.com/bevyengine/bevy/) engine are provided.
 
 It is currently in an **early alpha state**. Some things do not work yet!
 
@@ -30,16 +32,16 @@ FrogLight can added as a dependency in your `cargo.toml` file:
 
 ```toml
 [dependencies]
-bevy = "0.15"
+bevy = "0.16"
 froglight = { git = "https://github.com/EightFactorial/FrogLight.git" }
 # etc...
 ```
 
-See the [examples](examples) directory for how to use the library.
+~~See the [examples](examples) directory for how to use the library.~~
 
 ## Client
 
-See [FrogLight Client](https://github.com/EightFactorial/FrogLight/) for more information.
+~~See [FrogLight Client](https://github.com/EightFactorial/FrogLight/) for more information.~~
 
 ## Helpful Resources
 
@@ -47,7 +49,7 @@ For more information, see the following links:
   * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
   * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
   * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
-  * [FrogLight Examples](examples)
+  * ~~[FrogLight Examples](examples)~~
 
 For documentation, see:
   * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
