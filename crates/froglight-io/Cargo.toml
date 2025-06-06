@@ -58,6 +58,6 @@ serde = [
 ]
 
 # Enable nightly features.
-nightly = ["hashbrown?/nightly"]
+nightly = ["hashbrown?/nightly", "smallvec?/specialization"]
 # Enable trace logs.
 trace = ["dep:tracing", "froglight-macros/io-trace"]

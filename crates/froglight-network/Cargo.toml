@@ -50,7 +50,7 @@ brigadier = ["bevy", "froglight-packet/brigadier"]
 # Enable `froglight-resolver` support.
 resolver = ["dep:froglight-resolver", "std"]
 # Enable support for encrypted connections.
-crypto = ["dep:aes", "dep:cfb8", "io"]
+crypto = ["dep:aes", "dep:cfb8"]
 
 # Enable `froglight-io` support.
 io = ["dep:froglight-io", "froglight-packet/io", "std"]

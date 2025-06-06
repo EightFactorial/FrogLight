@@ -4,10 +4,13 @@ pub mod raw;
 pub use raw::RawConnection;
 
 pub mod state;
-pub use state::Connection;
 use state::{Client, Server};
+pub use state::{Connection, ConnectionError};
 
-mod helpers;
+#[cfg(feature = "crypto")]
+mod crypto;
+#[cfg(feature = "crypto")]
+pub use crypto::ConnectionCrypto;
 
 /// A [`Connection`] from a [`Client`] to a [`Server`]
 pub type ClientConnection<V, S> = Connection<V, S, Client>;

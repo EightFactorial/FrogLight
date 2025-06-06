@@ -10,8 +10,7 @@ use froglight_packet::{
 };
 use smol_str::ToSmolStr;
 
-use super::{raw::RawPacketVersion, state::ConnectionError};
-use crate::prelude::*;
+use crate::{connection::raw::RawPacketVersion, prelude::*};
 
 impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
     /// Send a [`HandshakePacket`] to the server to initiate a connection.

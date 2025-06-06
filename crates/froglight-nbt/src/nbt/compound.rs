@@ -97,7 +97,7 @@ impl NbtCompound {
     pub fn entry(
         &mut self,
         key: impl Into<Mutf8String>,
-    ) -> indexmap::map::Entry<Mutf8String, NbtTag> {
+    ) -> indexmap::map::Entry<'_, Mutf8String, NbtTag> {
         self.0.entry(key.into())
     }
 
@@ -110,7 +110,7 @@ impl NbtCompound {
     pub fn entry_index(
         &mut self,
         index: usize,
-    ) -> Option<indexmap::map::IndexedEntry<Mutf8String, NbtTag>> {
+    ) -> Option<indexmap::map::IndexedEntry<'_, Mutf8String, NbtTag>> {
         self.0.get_index_entry(index)
     }
 
@@ -171,13 +171,15 @@ impl NbtCompound {
     /// in their order
     #[inline]
     #[must_use]
-    pub fn iter(&self) -> indexmap::map::Iter<Mutf8String, NbtTag> { self.0.iter() }
+    pub fn iter(&self) -> indexmap::map::Iter<'_, Mutf8String, NbtTag> { self.0.iter() }
 
     /// Return an iterator over the key-value pairs of the map,
     /// in their order
     #[inline]
     #[must_use]
-    pub fn iter_mut(&mut self) -> indexmap::map::IterMut<Mutf8String, NbtTag> { self.0.iter_mut() }
+    pub fn iter_mut(&mut self) -> indexmap::map::IterMut<'_, Mutf8String, NbtTag> {
+        self.0.iter_mut()
+    }
 }
 
 impl IntoIterator for NbtCompound {

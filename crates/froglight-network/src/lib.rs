@@ -13,6 +13,8 @@ pub mod connection;
 #[cfg(feature = "io")]
 pub mod froglight_io;
 
+mod helpers;
+
 pub mod prelude {
     //! Re-exports of commonly used types, traits, and macros.
 
@@ -22,5 +24,5 @@ pub mod prelude {
     #[cfg(feature = "resolver")]
     pub use froglight_resolver::prelude::*;
 
-    pub use crate::connection::{ClientConnection, Connection, ServerConnection};
+    pub use crate::connection::{ClientConnection, Connection, ConnectionError, ServerConnection};
 }

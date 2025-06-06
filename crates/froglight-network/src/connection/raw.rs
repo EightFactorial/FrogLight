@@ -8,6 +8,8 @@ use async_trait::async_trait;
 use froglight_common::version::Version;
 
 use super::state::ConnectionError;
+#[cfg(feature = "crypto")]
+use crate::connection::ConnectionCrypto;
 
 /// A dyn-compatible connection, either to a server or client.
 #[async_trait]
@@ -15,10 +17,17 @@ pub trait RawConnection: Send + 'static {
     /// Get the peer address of the connection.
     async fn peer_addr(&self) -> Result<SocketAddr, ConnectionError>;
 
-    /// Set the compression threshold for the connection.
-    async fn set_compression(&mut self, threshold: Option<i32>);
     /// Get the compression threshold for the connection.
     async fn get_compression(&self) -> Option<i32>;
+    /// Set the compression threshold for the connection.
+    async fn set_compression(&mut self, threshold: Option<i32>);
+
+    /// Get a reference to the [`ConnectionCrypto`] for the connection.
+    #[cfg(feature = "crypto")]
+    async fn get_crypto(&self) -> Option<&ConnectionCrypto>;
+    /// Get a mutable reference to the [`ConnectionCrypto`] for the connection.
+    #[cfg(feature = "crypto")]
+    async fn get_crypto_mut(&mut self) -> Option<&mut ConnectionCrypto>;
 
     /// Read a packet from the connection, returning the number of bytes read.
     ///

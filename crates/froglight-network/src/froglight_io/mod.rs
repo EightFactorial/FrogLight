@@ -11,8 +11,6 @@ mod adapter;
 pub use adapter::IoAdapter;
 
 mod transport;
-#[cfg(feature = "crypto")]
-pub use transport::IoCipher;
 pub use transport::IoTransport;
 
 impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
@@ -29,6 +27,8 @@ impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
         addr: &str,
         resolver: &crate::prelude::FroglightResolver,
     ) -> Result<Self, std::io::Error> {
+        #[cfg(feature = "trace")]
+        tracing::debug!("Connecting to \"{addr}\"");
         IoTransport::<TcpStream>::connect(addr, resolver).await.map(Self::from_raw)
     }
 
@@ -40,7 +40,16 @@ impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
     /// or if `TCP_NODELAY` cannot be set.
     #[inline]
     pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
-        IoTransport::<TcpStream>::connect_system(addr).await.map(Self::from_raw)
+        #[cfg(feature = "trace")]
+        tracing::debug!("Connecting to \"{addr}\"");
+
+        let stream = TcpStream::connect(addr).await?;
+        let peer = stream.peer_addr()?;
+
+        #[cfg(feature = "trace")]
+        tracing::trace!("Connecting to \"{peer}\"");
+
+        Ok(Self::from_raw(IoTransport::<TcpStream>::wrap(stream, peer)))
     }
 
     /// Connect to a server at the given [`SocketAddr`].
@@ -73,27 +82,18 @@ impl IoTransport<TcpStream> {
         Self::connect_to(resolver.lookup_minecraft(addr).await?).await
     }
 
-    /// Create an [`IoTransport`] from an address resolved
-    /// using the system's default resolver.
-    ///
-    /// # Errors
-    /// Returns an error if the connection cannot be established,
-    /// or if `TCP_NODELAY` cannot be set.
-    pub async fn connect_system(addr: &str) -> Result<Self, std::io::Error> {
-        let stream = TcpStream::connect(addr).await?;
-        let socket = stream.peer_addr()?;
-        stream.set_nodelay(true)?;
-        Ok(Self::wrap(stream, socket))
-    }
-
     /// Create an [`IoTransport`] from a [`SocketAddr`].
     ///
     /// # Errors
     /// Returns an error if the connection cannot be established,
     /// or if `TCP_NODELAY` cannot be set.
     pub async fn connect_to(socket: SocketAddr) -> Result<Self, std::io::Error> {
+        #[cfg(feature = "trace")]
+        tracing::trace!("Connecting to \"{socket}\"");
+
         let stream = TcpStream::connect(socket).await?;
         stream.set_nodelay(true)?;
+
         Ok(Self::wrap(stream, socket))
     }
 }

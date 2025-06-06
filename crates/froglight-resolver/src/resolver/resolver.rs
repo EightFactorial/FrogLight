@@ -99,7 +99,7 @@ impl bevy_ecs::world::FromWorld for FroglightResolver {
     fn from_world(_: &mut bevy_ecs::world::World) -> Self {
         Self::system_config().unwrap_or_else(|err| {
             #[cfg(feature = "trace")]
-            tracing::error!("Failed to load system resolver, defaulting to Cloudflare: {err}");
+            tracing::error!(target: "froglight_resolver", "Failed to load system resolver, defaulting to Cloudflare: {err}");
             Self::new(ResolverConfig::cloudflare(), ResolverOpts::default())
         })
     }
