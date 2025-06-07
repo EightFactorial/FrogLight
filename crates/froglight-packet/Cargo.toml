@@ -24,6 +24,7 @@ froglight-macros = { workspace = true }
 froglight-nbt = { features = ["serde"], workspace = true }
 froglight-physics = { workspace = true }
 froglight-text = { features = ["serde"], workspace = true }
+froglight-utils = { workspace = true }
 froglight-world = { features = ["nbt"], workspace = true }
 glam = { features = ["serde"], workspace = true }
 serde = { features = ["derive"], workspace = true }
@@ -57,6 +58,7 @@ io = [
   "froglight-macros/io",
   "froglight-nbt/io",
   "froglight-physics/io",
+  "froglight-utils/io",
   "froglight-world/io",
   "std",
 ]
@@ -72,6 +74,7 @@ bevy = [
   "froglight-nbt/reflect",
   "froglight-physics/bevy",
   "froglight-text/bevy",
+  "froglight-utils/reflect",
   "froglight-world/bevy",
 ]
 
@@ -84,6 +87,7 @@ nightly = [
   "froglight-nbt/nightly",
   "froglight-physics/nightly",
   "froglight-text/nightly",
+  "froglight-utils/nightly",
   "froglight-world/nightly",
 ]
 # Enable trace logs.
@@ -97,6 +101,7 @@ std = [
   "froglight-nbt/std",
   "froglight-physics/std",
   "froglight-text/std",
+  "froglight-utils/std",
   "froglight-world/std",
   "glam/std",
   "serde/std",

@@ -3,14 +3,17 @@
 pub mod axis;
 pub use axis::Axis;
 
+mod bitset;
+pub use bitset::{BitSet, FixedBitSet};
+
 mod chunk;
-// pub use chunk::*;
+pub use chunk::*;
 
 pub mod direction;
 pub use direction::Direction;
 
 mod gamemode;
-// pub use gamemode::*;
+pub use gamemode::GameMode;
 
 mod hand;
 // pub use hand::*;

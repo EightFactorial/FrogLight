@@ -19,10 +19,11 @@ workspace = true
 proptest = { workspace = true }
 
 [dependencies]
-bevy_platform = { features = ["alloc"], workspace = true }
-bitvec = { default-features = false, features = ["alloc"], version = "1.0" }
+bevy_platform = { workspace = true }
+bitvec = { workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
+froglight-utils = { workspace = true }
 glam = { workspace = true }
 parking_lot = { workspace = true }
 thiserror = { workspace = true }
@@ -45,7 +46,7 @@ block = ["dep:froglight-block"]
 nbt = ["dep:froglight-nbt"]
 
 # Enable `froglight-io` support
-io = ["dep:froglight-io", "froglight-nbt/io", "nbt"]
+io = ["dep:froglight-io", "froglight-nbt/io", "froglight-utils/io", "nbt"]
 
 # Enable `bevy` support.
 bevy = [
@@ -57,13 +58,20 @@ bevy = [
   "froglight-common/bevy",
   "froglight-common/reflect",
   "froglight-nbt?/reflect",
+  "froglight-utils/reflect",
 ]
 
 # Enable nightly features.
-nightly = ["froglight-block?/nightly", "froglight-io?/nightly", "froglight-nbt?/nightly", "parking_lot/nightly"]
+nightly = [
+  "froglight-block?/nightly",
+  "froglight-io?/nightly",
+  "froglight-nbt?/nightly",
+  "froglight-utils/nightly",
+  "parking_lot/nightly",
+]
 
 # Enable support for the rust standard library.
-std = ["bevy_platform/std", "bevy_reflect?/std", "bitvec/std", "glam/std"]
+std = ["bevy_platform/std", "bevy_reflect?/std", "bitvec/std", "froglight-utils/std", "glam/std"]
 # Enable `no_std` support for `glam`.
 libm = ["glam/libm"]
 

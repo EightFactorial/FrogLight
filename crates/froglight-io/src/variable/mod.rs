@@ -4,7 +4,7 @@ use std::io::{Read, Write};
 
 use crate::standard::{ReadError, WriteError};
 
-mod froglight_common_impl;
+mod froglight_impl;
 mod std_impl;
 
 #[cfg(feature = "bevy_platform")]

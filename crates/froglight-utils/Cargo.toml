@@ -16,7 +16,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 workspace = true
 
 [dependencies]
-bevy_platform = { workspace = true }
+bevy_platform = { features = ["alloc"], workspace = true }
+bitvec = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 downcast-rs = { workspace = true }
 froglight-macros = { features = ["utils"], workspace = true }
@@ -25,12 +26,20 @@ parking_lot = { workspace = true }
 
 # Optional dependencies
 bevy_reflect = { optional = true, workspace = true }
+froglight-io = { optional = true, workspace = true }
+serde = { features = ["derive"], optional = true, workspace = true }
 
 [features]
 default = ["std"]
 
+# Enable `froglight-io` support.
+io = ["dep:froglight-io"]
+
 # Enable `bevy_reflect` support.
 reflect = ["dep:bevy_reflect"]
+
+# Enable `serde` support.
+serde = ["bevy_platform/serialize", "bitvec/serde", "dep:serde", "indexmap/serde"]
 
 # Enable nightly features.
 nightly = []

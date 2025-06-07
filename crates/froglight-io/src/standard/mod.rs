@@ -5,7 +5,7 @@ use std::{
     io::{Read, Write},
 };
 
-mod froglight_common_impl;
+mod froglight_impl;
 mod smol_str_impl;
 mod std_impl;
 mod uuid_impl;
