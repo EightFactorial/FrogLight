@@ -1,6 +1,7 @@
 use core::net::SocketAddr;
 use std::io::Cursor;
 
+use async_compression::futures::write::{ZlibDecoder, ZlibEncoder};
 use async_trait::async_trait;
 use froglight_io::prelude::{FrogVarRead, FrogVarWrite};
 use futures_lite::{AsyncReadExt, AsyncWriteExt};
@@ -59,7 +60,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
     #[cfg(feature = "crypto")]
     async fn get_crypto_mut(&mut self) -> Option<&mut ConnectionCrypto> { self.crypto.as_mut() }
 
-    // TODO: Decompression
+    // TODO: Test decompression
     async fn read_packet(&mut self, buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
         // Make sure the buffer is large enough to hold the packet length
         if buf.len() < 5 {
@@ -91,7 +92,25 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             let size = size.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
 
             if size != 0 {
-                todo!("Packet Decompression")
+                // Create a ZlibDecoder to decompress the packet
+                let mut decoder =
+                    ZlibDecoder::new(futures_lite::io::Cursor::new(&mut self.scratch));
+
+                // Uncompress the data into the scratch buffer
+                let result = decoder.write_all(buf).await;
+                result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))?;
+
+                // Replace the buffer with the decompressed data
+                buf.resize(size, 0u8);
+                buf.copy_from_slice(&self.scratch[..size]);
+
+                // Log the ID and length of the packet
+                #[cfg(feature = "trace")]
+                if let Some(id) = buf.first() {
+                    tracing::trace!(target: "froglight_network::froglight_io", "Reading Packet ID {id} ({size})");
+                }
+
+                return Ok(());
             }
         }
 
@@ -110,7 +129,8 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         Ok(())
     }
 
-    // TODO: Compression
+    // TODO: Test compression
+    #[expect(clippy::cast_possible_truncation)]
     async fn write_packet(&mut self, buf: &[u8]) -> Result<(), ConnectionError> {
         // Log the ID and length of the packet
         #[cfg(feature = "trace")]
@@ -120,26 +140,44 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
 
         // Get the packet length and prefix length
         let packet_len = buf.len();
-        let prefix_len = packet_len + packet_len.frog_var_len();
+        let prefixed_len = packet_len + packet_len.frog_var_len();
+        let mut prefixed = Vec::<u8>::with_capacity(prefixed_len);
 
-        if self.compression.is_some_and(|c| c <= prefix_len.try_into().unwrap_or_default()) {
-            todo!("Packet Compression")
+        if self.compression.is_some_and(|c| c <= prefixed_len.try_into().unwrap_or_default()) {
+            // Write the total packet length
+            let prefixed_prefixed_len = prefixed_len + prefixed_len.frog_var_len();
+            let result =
+                FrogVarWrite::frog_var_write(&(prefixed_prefixed_len as u32), &mut prefixed);
+            result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
+
+            // Write the uncompressed packet length
+            let result = FrogVarWrite::frog_var_write(&(packet_len as u32), &mut prefixed);
+            result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
+
+            // Create a ZlibEncoder to compress the packet
+            let mut encoder = ZlibEncoder::new(prefixed);
+            // Compress the packet data with the ZlibEncoder
+            let result = encoder.write_all(buf).await;
+            result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
+
+            // Write the final packet to the stream
+            self.write_raw(&encoder.into_inner()).await
         } else {
-            let mut prefix_buf = Vec::<u8>::with_capacity(8);
-
             if self.compression.is_some() {
-                // Write the packet length and a `0` byte
-                let result = FrogVarWrite::frog_var_write(&(packet_len + 1), &mut prefix_buf);
+                // Write the total packet length and a `0` byte to indicate no compression
+                let result = FrogVarWrite::frog_var_write(&(packet_len as u32 + 1), &mut prefixed);
                 result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
-                prefix_buf.push(0);
+                prefixed.push(0);
             } else {
-                // Write the packet length
-                let result = FrogVarWrite::frog_var_write(&packet_len, &mut prefix_buf);
+                // Write the total packet length without any compression marker
+                let result = FrogVarWrite::frog_var_write(&(packet_len as u32), &mut prefixed);
                 result.map_err(|err| ConnectionError::WriteRawPacket(Box::new(err)))?;
             }
 
-            self.write_raw(&prefix_buf).await?;
-            self.write_raw(buf).await
+            // Append the rest of the packet data
+            prefixed.extend_from_slice(buf);
+            // Write the final packet to the stream
+            self.write_raw(&prefixed).await
         }
     }
 
@@ -150,6 +188,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
 
         #[cfg(feature = "crypto")]
         if let Some(crypto) = &mut self.crypto {
+            // Decrypt the buffer in place
             crypto.decrypt_inplace(buf);
         }
 
@@ -164,7 +203,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             // Clear and resize the scratch buffer to fit the packet
             self.scratch.clear();
             self.scratch.resize(buf.len(), 0u8);
-            // Encrypt the packet using the crypto
+            // Encrypt the packet and write into the scratch buffer
             crypto.encrypt_into(buf, &mut self.scratch);
             // Use the scratch buffer as the input buffer
             buf = self.scratch.as_slice();

@@ -35,8 +35,8 @@ impl ResolverPlugin {
 impl Plugin for ResolverPlugin {
     fn build(&self, app: &mut App) {
         // Use the provided resolver or create a new one.
-        let resolver = self.0.as_ref().cloned();
-        let resolver = resolver.unwrap_or_else(|| FroglightResolver::from_world(app.world_mut()));
+        let resolver =
+            self.0.clone().unwrap_or_else(|| FroglightResolver::from_world(app.world_mut()));
 
         // Insert an agent resource if the feature is enabled.
         #[cfg(feature = "agent")]
