@@ -24,7 +24,7 @@ async-net = { workspace = true }
 blocking = { workspace = true }
 derive_more = { workspace = true }
 futures-lite = { features = ["std"], workspace = true }
-hickory-resolver = { features = ["system-config"], workspace = true }
+hickory-resolver = { workspace = true }
 
 # Optional dependencies
 bevy_app = { features = ["bevy_reflect", "std"], optional = true, workspace = true }
@@ -35,10 +35,12 @@ tracing = { optional = true, workspace = true }
 ureq = { optional = true, workspace = true }
 
 [features]
-default = ["agent"]
+default = ["agent", "system-config"]
 
 # Enable `ureq` support.
 agent = ["dep:ureq"]
+# Enable reading the system's DNS configuration.
+system-config = ["hickory-resolver/system-config"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks"]

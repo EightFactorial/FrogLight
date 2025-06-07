@@ -6,13 +6,14 @@ use std::{fmt::Debug, future::Future, sync::Arc};
 use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+#[cfg(feature = "system-config")]
+use hickory_resolver::system_conf::read_system_conf;
 use hickory_resolver::{
     IntoName, ResolveError,
     config::{ResolverConfig, ResolverOpts},
     lookup::{SrvLookup, TxtLookup},
     lookup_ip::LookupIp,
     proto::runtime::Executor,
-    system_conf::read_system_conf,
 };
 
 use super::{FroglightInnerResolver, ResolverConnectionProvider};
@@ -43,6 +44,7 @@ impl FroglightResolver {
     ///
     /// # Errors
     /// Returns an error if the system configuration could not be read.
+    #[cfg(feature = "system-config")]
     pub fn system_config() -> Result<Self, std::io::Error> {
         let (config, options) = read_system_conf()?;
         Ok(Self::new(config, options))
@@ -54,8 +56,8 @@ impl FroglightResolver {
 
     /// Create a new [`FroglightResolver`] from the system configuration,
     /// falling back to using Cloudflare's DNS servers if it cannot be read.
-    #[inline]
     #[must_use]
+    #[cfg(feature = "system-config")]
     pub fn system_or_cloudflare() -> Self {
         Self::system_config().unwrap_or_else(|_| Self::cloudflare())
     }
@@ -102,13 +104,17 @@ impl FroglightResolver {
 #[cfg(feature = "bevy")]
 #[allow(unused_variables)]
 impl bevy_ecs::world::FromWorld for FroglightResolver {
+    #[cfg(feature = "system-config")]
     fn from_world(_: &mut bevy_ecs::world::World) -> Self {
         Self::system_config().unwrap_or_else(|err| {
             #[cfg(feature = "trace")]
             tracing::error!(target: "froglight_resolver", "Failed to load system resolver, defaulting to Cloudflare: {err}");
-            Self::new(ResolverConfig::cloudflare(), ResolverOpts::default())
+            Self::cloudflare()
         })
     }
+
+    #[cfg(not(feature = "system-config"))]
+    fn from_world(_: &mut bevy_ecs::world::World) -> Self { Self::cloudflare() }
 }
 
 // -------------------------------------------------------------------------------------------------

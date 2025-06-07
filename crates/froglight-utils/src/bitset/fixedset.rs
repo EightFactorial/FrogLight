@@ -1,4 +1,4 @@
-use core::{fmt::Debug, marker::PhantomData};
+use core::{convert::Infallible, fmt::Debug, marker::PhantomData};
 
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
@@ -34,12 +34,32 @@ where [(); N.div_ceil(8)]: Sized
 
     /// Create a new [`FixedBitSet`] from the given array.
     #[must_use]
-    pub fn from_bools(data: [bool; N]) -> Self {
+    pub fn from_bools(data: [bool; N]) -> Self { Self::from_fn(|i| data[i]) }
+
+    /// Create a new `[bool; N]` from the bits in this [`FixedBitSet`].
+    #[must_use]
+    pub fn into_bools(self) -> [bool; N] { core::array::from_fn(|i| self[i]) }
+
+    /// Create a new [`FixedBitSet`] from the given closure.
+    ///
+    /// See [`core::array::from_fn`] for more details.
+    #[must_use]
+    pub fn from_fn<F>(mut f: F) -> Self
+    where F: FnMut(usize) -> bool {
+        Self::try_from_fn::<_, Infallible>(|i| Ok(f(i))).unwrap_or_else(|_| unreachable!())
+    }
+
+    /// Attempt to create a new [`FixedBitSet`] from the given closure.
+    ///
+    /// See [`core::array::try_from_fn`] for more details.
+    #[must_use]
+    pub fn try_from_fn<F, Err>(mut f: F) -> Result<Self, Err>
+    where F: FnMut(usize) -> Result<bool, Err> {
         let mut array = Self::new();
-        data.into_iter().enumerate().for_each(|(i, b)| {
-            BitSlice::set(&mut array, i, b);
-        });
-        array
+        for i in 0..N {
+            BitSlice::set(&mut array, i, f(i)?);
+        }
+        Ok(array)
     }
 }
 

@@ -13,7 +13,7 @@ pub mod direction;
 pub use direction::Direction;
 
 mod gamemode;
-pub use gamemode::GameMode;
+pub use gamemode::{GameMode, PreviousGameMode};
 
 mod hand;
 // pub use hand::*;

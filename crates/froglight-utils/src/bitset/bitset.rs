@@ -25,7 +25,7 @@ impl BitSet {
 
     /// Create a new [`BitSet`] from the given [`Vec`].
     #[must_use]
-    pub fn from_data(data: Vec<u64>) -> Self { Self(BitVec::from_vec(data)) }
+    pub fn from_vec(vec: Vec<u64>) -> Self { Self(BitVec::from_vec(vec)) }
 
     /// Create a new [`BitSet`] from the given slice.
     #[must_use]
@@ -38,7 +38,7 @@ impl BitSet {
 impl FrogRead for BitSet {
     #[inline]
     fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
-        <Vec<u64>>::frog_read(buffer).map(Self::from_data)
+        <Vec<u64>>::frog_read(buffer).map(Self::from_vec)
     }
 }
 
@@ -46,9 +46,9 @@ impl FrogRead for BitSet {
 impl FrogWrite for BitSet {
     #[inline]
     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
-        self.as_raw_slice().frog_write(buffer)
+        <[u64]>::frog_write(self.as_raw_slice(), buffer)
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { self.as_raw_slice().frog_len() }
+    fn frog_len(&self) -> usize { <[u64]>::frog_len(self.as_raw_slice()) }
 }

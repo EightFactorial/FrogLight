@@ -10,6 +10,8 @@ use super::BlockPos;
 use crate::chunk::Section;
 
 /// A relative position in a [`Chunk`](crate::chunk::Chunk).
+///
+/// Wraps around if the values are larger than a chunk.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, PartialEq, Hash))]
