@@ -1,6 +1,6 @@
 //! TODO
 
-use std::{future::Future, sync::Arc};
+use std::{fmt::Debug, future::Future, sync::Arc};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
@@ -63,10 +63,12 @@ impl FroglightResolver {
     /// Lookup an IP address for a given hostname.
     ///
     /// See [`hickory_resolver::AsyncResolver::lookup_ip`] for more information.
-    pub fn lookup_ip<'a, N: IntoName + 'a>(
+    pub fn lookup_ip<'a, N: IntoName + Debug + 'a>(
         &'a self,
         host: N,
     ) -> impl Future<Output = Result<LookupIp, ResolveError>> + 'a {
+        #[cfg(feature = "trace")]
+        tracing::trace!(target: "froglight_resolver", "Looking up IP for: {host:?}");
         self.resolver.lookup_ip(host)
     }
 
@@ -74,10 +76,12 @@ impl FroglightResolver {
     ///
     /// See [`hickory_resolver::AsyncResolver::srv_lookup`] for more
     /// information.
-    pub fn lookup_srv<'a, N: IntoName + 'a>(
+    pub fn lookup_srv<'a, N: IntoName + Debug + 'a>(
         &'a self,
         host: N,
     ) -> impl Future<Output = Result<SrvLookup, ResolveError>> + 'a {
+        #[cfg(feature = "trace")]
+        tracing::trace!(target: "froglight_resolver", "Looking up SRV for: {host:?}");
         self.resolver.srv_lookup::<N>(host)
     }
 
@@ -85,10 +89,12 @@ impl FroglightResolver {
     ///
     /// See [`hickory_resolver::AsyncResolver::txt_lookup`] for more
     /// information.
-    pub fn lookup_txt<'a, N: IntoName + 'a>(
+    pub fn lookup_txt<'a, N: IntoName + Debug + 'a>(
         &'a self,
         host: N,
     ) -> impl Future<Output = Result<TxtLookup, ResolveError>> + 'a {
+        #[cfg(feature = "trace")]
+        tracing::trace!(target: "froglight_resolver", "Looking up TXT for: {host:?}");
         self.resolver.txt_lookup::<N>(host)
     }
 }
@@ -106,6 +112,5 @@ impl bevy_ecs::world::FromWorld for FroglightResolver {
 }
 
 // -------------------------------------------------------------------------------------------------
-
-#[test]
-fn resolve_lookup() {}
+//
+// TODO: Tests

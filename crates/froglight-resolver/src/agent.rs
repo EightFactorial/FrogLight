@@ -1,9 +1,6 @@
 //! A [`ureq::Agent`], backed by a [`FroglightResolver`]
 
-use std::{
-    net::{IpAddr, Ipv4Addr, SocketAddr},
-    sync::Arc,
-};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
@@ -17,7 +14,7 @@ use ureq::{
     http::{Uri, uri::Scheme},
     unversioned::{
         resolver::{ResolvedSocketAddrs, Resolver},
-        transport::{DefaultConnector, NextTimeout},
+        transport::{Connector, DefaultConnector, NextTimeout},
     },
 };
 
@@ -29,22 +26,23 @@ use crate::resolver::FroglightResolver;
 #[derive(Debug, Clone, Deref)]
 #[cfg_attr(feature = "bevy", derive(Resource, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, Resource))]
-pub struct FroglightAgent(Arc<Agent>);
+pub struct FroglightAgent(Agent);
 
 impl FroglightAgent {
     /// Create a new [`FroglightAgent`] using the given [`FroglightResolver`].
     #[must_use]
     pub fn new(resolver: &FroglightResolver) -> Self {
-        let resolver = resolver.clone();
-        Self(Arc::new(Agent::with_parts(Config::default(), DefaultConnector::new(), resolver)))
+        Self::from_parts(resolver.clone(), Config::default(), DefaultConnector::new())
     }
 
-    /// Create a new [`FroglightAgent`] using the system's settings,
-    /// falling back to using Cloudflare's DNS servers if it cannot be read.
+    /// Create a new [`FroglightAgent`] using the given parts.
     #[must_use]
-    pub fn system_config_or_cloudflare() -> Self {
-        let resolver = FroglightResolver::system_or_cloudflare();
-        Self(Arc::new(Agent::with_parts(Config::default(), DefaultConnector::new(), resolver)))
+    pub fn from_parts(
+        resolver: FroglightResolver,
+        config: Config,
+        connector: impl Connector,
+    ) -> Self {
+        Self(Agent::with_parts(config, connector, resolver))
     }
 }
 
@@ -99,17 +97,19 @@ impl Resolver for FroglightResolver {
 fn agent() {
     use std::io::ErrorKind;
 
-    let agent = {
-        use hickory_resolver::config::{ResolverConfig, ResolverOpts};
+    use tracing_subscriber::{EnvFilter, fmt};
 
-        #[cfg(feature = "bevy")]
-        bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+    // Initialize the tracing subscriber
+    if let Ok(filter) = EnvFilter::try_from_default_env() {
+        let _ = fmt().with_env_filter(filter).try_init();
+    }
 
-        FroglightAgent::new(&FroglightResolver::new(
-            ResolverConfig::cloudflare(),
-            ResolverOpts::default(),
-        ))
-    };
+    // Initialize the `IoTaskPool` if the `bevy` feature is enabled
+    #[cfg(feature = "bevy")]
+    bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+
+    // Create a FroglightAgent using Cloudflare's DNS
+    let agent = FroglightAgent::new(&FroglightResolver::cloudflare());
 
     // Attempt to connect to ip addresses
     match agent.get("http://127.0.0.1").call() {

@@ -24,20 +24,20 @@ impl FroglightResolver {
         let mut port = Self::DEFAULT_PORT;
 
         #[cfg(feature = "trace")]
-        tracing::trace!(target: "froglight_resolver", "Resolving server address for \"{address}\"");
+        tracing::trace!(target: "froglight_resolver::mc", "Resolving server address for \"{address}\"");
 
         // Return early if given a socket or IP address
         if let Ok(sock) = SocketAddr::from_str(address) {
             #[cfg(feature = "trace")]
-            tracing::trace!(target: "froglight_resolver", "Using given socket address: \"{sock}\"");
+            tracing::trace!(target: "froglight_resolver::mc", "Using given socket address: \"{sock}\"");
             return Ok(sock);
         } else if let Ok(addr) = IpAddr::from_str(address) {
             #[cfg(feature = "trace")]
-            tracing::trace!(target: "froglight_resolver", "Using given IP address: \"{addr}:{port}\"");
+            tracing::trace!(target: "froglight_resolver::mc", "Using given IP address: \"{addr}:{port}\"");
             return Ok(SocketAddr::new(addr, port));
         } else if let Some(addr) = IntoName::to_ip(&address) {
             #[cfg(feature = "trace")]
-            tracing::trace!(target: "froglight_resolver", "Using given IP address: \"{addr}:{port}\"");
+            tracing::trace!(target: "froglight_resolver::mc", "Using given IP address: \"{addr}:{port}\"");
             return Ok(SocketAddr::new(addr, port));
         }
 
@@ -59,10 +59,10 @@ impl FroglightResolver {
         if let Ok(lookup) = self.lookup_srv(srv_name).await {
             for record in lookup {
                 #[cfg(feature = "trace")]
-                tracing::trace!(target: "froglight_resolver", "Trying SRV record: \"{}\"", record.target());
+                tracing::trace!(target: "froglight_resolver::mc", "Trying SRV record: \"{}\"", record.target());
                 if let Some(ip) = self.lookup_ip(record.target().clone()).await?.iter().next() {
                     #[cfg(feature = "trace")]
-                    tracing::trace!(target: "froglight_resolver", "Found IP through SRV: \"{ip}:{port}\"");
+                    tracing::trace!(target: "froglight_resolver::mc", "Found IP through SRV: \"{ip}:{port}\"");
                     return Ok(SocketAddr::new(ip, port));
                 }
             }
@@ -71,12 +71,12 @@ impl FroglightResolver {
         // Otherwise, use the address found using A/AAAA records
         if let Some(ip) = self.lookup_ip(name).await?.iter().next() {
             #[cfg(feature = "trace")]
-            tracing::trace!(target: "froglight_resolver", "Found IP through A/AAAA: \"{ip}:{port}\"");
+            tracing::trace!(target: "froglight_resolver::mc", "Found IP through A/AAAA: \"{ip}:{port}\"");
             return Ok(SocketAddr::new(ip, port));
         }
 
         #[cfg(feature = "trace")]
-        tracing::warn!(target: "froglight_resolver", "Could not resolve \"{address}\" into an IP address");
+        tracing::warn!(target: "froglight_resolver::mc", "Could not resolve \"{address}\" into an IP address");
 
         Err(ResolveError::from("could not resolve address into an IP address"))
     }
@@ -89,6 +89,12 @@ fn resolve_minecraft() {
     use std::net::{Ipv4Addr, Ipv6Addr};
 
     use futures_lite::future::block_on;
+    use tracing_subscriber::{EnvFilter, fmt};
+
+    // Initialize the tracing subscriber
+    if let Ok(filter) = EnvFilter::try_from_default_env() {
+        let _ = fmt().with_env_filter(filter).try_init();
+    }
 
     #[cfg(feature = "bevy")]
     let _ = bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
