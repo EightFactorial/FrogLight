@@ -60,7 +60,7 @@ where [(); N.div_ceil(8)]: Sized
     where F: FnMut(usize) -> Result<bool, Err> {
         let mut array = Self::new();
         for i in 0..N {
-            BitSlice::set(&mut array, i, f(i)?);
+            BitSlice::set(&mut array.0, i, f(i)?);
         }
         Ok(array)
     }

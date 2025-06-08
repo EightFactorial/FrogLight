@@ -12,7 +12,7 @@ use bevy_platform::sync::LazyLock;
 
 /// The smallest value that can be considered "zero"
 /// when comparing angles using [`sin`] and [`cos`].
-pub const EPSILON: f32 = 1.0E-7;
+pub const TABLE_EPSILON: f32 = 1.0E-4;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
 pub fn sin(x: f32) -> f32 {
     let x = x * 10430.378;
     let x = x as i32 as usize & 65535;
-    debug_assert!(x < 65535, "x must be in the range [0, 65535), got: {x}");
+    debug_assert!(x <= 65535, "x must be in the range [0, 65535], got: {x}");
 
     SIN[x]
 }
@@ -73,7 +73,7 @@ pub fn sin(x: f32) -> f32 {
 pub fn cos(x: f32) -> f32 {
     let x = x * 10430.378 + 16384.0;
     let x = x as i32 as usize & 65535;
-    debug_assert!(x < 65535, "x must be in the range [0, 65535), got: {x}");
+    debug_assert!(x <= 65535, "x must be in the range [0, 65535], got: {x}");
 
     SIN[x]
 }
@@ -83,7 +83,10 @@ pub fn cos(x: f32) -> f32 {
 pub fn sin_cos(x: f32) -> (f32, f32) {
     let (x, y) = (x * 10430.378, x * 10430.378 + 16384.0);
     let (x, y) = ((x as i32 as usize & 65535), (y as i32 as usize & 65535));
-    debug_assert!(x < 65535 && y < 65535, "x and y must be in the range [0, 65535), got: {x}, {y}");
+    debug_assert!(
+        x <= 65535 && y <= 65535,
+        "x and y must be in the range [0, 65535], got: {x}, {y}"
+    );
 
     (SIN[x], SIN[y])
 }
@@ -94,7 +97,9 @@ pub fn sin_cos(x: f32) -> (f32, f32) {
 fn test() {
     use core::f32::consts::{FRAC_PI_2, FRAC_PI_4, FRAC_PI_8};
     fn assert(input: f32, expected: f32) {
-        assert!(sin(input) - expected < EPSILON, "sin({input}) != {expected}");
+        let sin = sin(input);
+        let diff = (sin - expected).abs();
+        assert!(diff < TABLE_EPSILON, "{sin} != {expected} (input: {input}, diff: {diff})");
     }
 
     // 0, 90, 180, 270, 360 degrees
@@ -119,4 +124,20 @@ fn test() {
     assert(11.0 * FRAC_PI_8, -0.9238795); // sin(247.5 degrees)
     assert(13.0 * FRAC_PI_8, -0.9238795); // sin(292.5 degrees)
     assert(15.0 * FRAC_PI_8, -0.38268343); // sin(337.5 degrees)
+}
+
+#[cfg(test)]
+proptest::proptest! {
+    #[test]
+    fn arbitrary(data in -720.0f32..720.0f32) {
+        // Note: Input is in radians, not degrees.
+        let (std_sin, std_cos) = data.sin_cos();
+        let (tbl_sin, tbl_cos) = sin_cos(data);
+
+        let diff = (std_sin - tbl_sin).abs();
+        assert!(diff < TABLE_EPSILON, "{tbl_sin} != {std_sin} (diff: {diff})");
+
+        let diff = (std_cos - tbl_cos).abs();
+        assert!(diff < TABLE_EPSILON, "{tbl_cos} != {std_cos} (diff: {diff})");
+    }
 }

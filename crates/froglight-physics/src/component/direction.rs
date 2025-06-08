@@ -1,6 +1,9 @@
 //! TODO
 
-use core::f32::consts::{FRAC_PI_2, PI};
+use core::f32::{
+    EPSILON,
+    consts::{FRAC_PI_2, PI},
+};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
@@ -13,7 +16,7 @@ use froglight_io::prelude::*;
 use glam::Vec2Swizzles;
 use glam::{Vec2, Vec3};
 
-use crate::table::{EPSILON, cos, sin};
+use crate::table::{cos, sin};
 
 /// The direction an entity is looking in.
 ///

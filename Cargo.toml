@@ -126,7 +126,7 @@ indexmap = { default-features = false, version = "2.9" }
 libm = { version = "0.2" }
 nu-ansi-term = { default-features = false, version = "0.46" }
 parking_lot = { default-features = false, version = "0.12" }
-proptest = { default-features = false, version = "1.6" }
+proptest = { default-features = false, version = "1.7" }
 rangemap = { features = ["const_fn"], version = "1.5" }
 regex = { default-features = false, features = ["perf", "unicode"], version = "1.11" }
 serde = { default-features = false, features = ["alloc"], version = "1.0" }

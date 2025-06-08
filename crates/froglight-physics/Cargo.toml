@@ -15,12 +15,14 @@ rustdoc-args = ["--cfg", "docsrs"]
 [lints]
 workspace = true
 
+[dev-dependencies]
+proptest = { features = ["std"], workspace = true }
+
 [dependencies]
 bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-entity = { workspace = true }
-froglight-registry = { workspace = true }
 glam = { workspace = true }
 
 # Optional dependencies
@@ -51,11 +53,10 @@ bevy = [
   "froglight-common/bevy",
   "froglight-common/reflect",
   "froglight-entity/bevy",
-  "froglight-registry/bevy",
 ]
 
 # Enable nightly features.
-nightly = ["froglight-entity/nightly", "froglight-registry/nightly"]
+nightly = ["froglight-entity/nightly", "froglight-io?/nightly", "froglight-world?/nightly"]
 
 # Enable support for the rust standard library.
 std = ["bevy_ecs?/std", "bevy_math?/std", "bevy_platform/std", "bevy_reflect?/std", "froglight-entity/std", "glam/std"]

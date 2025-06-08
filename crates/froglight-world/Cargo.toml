@@ -29,7 +29,6 @@ parking_lot = { workspace = true }
 thiserror = { workspace = true }
 
 # Optional dependencies
-bevy_app = { features = ["bevy_reflect"], optional = true, workspace = true }
 bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
 bevy_reflect = { features = ["glam"], optional = true, workspace = true }
 downcast-rs = { optional = true, workspace = true }
@@ -50,7 +49,6 @@ io = ["dep:froglight-io", "froglight-nbt/io", "froglight-utils/io", "nbt"]
 
 # Enable `bevy` support.
 bevy = [
-  "dep:bevy_app",
   "dep:bevy_ecs",
   "dep:bevy_reflect",
   "dep:downcast-rs",
