@@ -11,7 +11,9 @@ mod adapter;
 pub use adapter::IoAdapter;
 
 mod transport;
-pub use transport::IoTransport;
+pub use transport::{IoTransport, SplitIoTransport};
+
+mod transport_fns;
 
 impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
     /// Connect to a server at the given address,

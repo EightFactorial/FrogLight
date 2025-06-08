@@ -21,6 +21,7 @@ smol_str = { workspace = true }
 tracing-subscriber = { features = ["env-filter"], workspace = true }
 
 [dependencies]
+async-lock = { workspace = true }
 async-trait = "0.1"
 bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
@@ -60,6 +61,7 @@ bevy = ["dep:bevy_ecs", "dep:bevy_tasks", "froglight-resolver?/bevy"]
 
 # Enable support for the rust standard library.
 std = [
+  "async-lock/std",
   "bevy_ecs?/std",
   "bevy_tasks?/std",
   "dep:async-compression",

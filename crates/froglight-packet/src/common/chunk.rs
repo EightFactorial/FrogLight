@@ -1,1 +1,1 @@
-pub use froglight_world::chunk::{Chunk, PackedEntity, SectionPalette};
+pub use froglight_world::chunk::{PackedEntity, SectionPalette};

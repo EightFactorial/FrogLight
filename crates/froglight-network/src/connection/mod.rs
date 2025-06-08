@@ -3,6 +3,9 @@
 pub mod raw;
 pub use raw::RawConnection;
 
+pub mod split;
+pub use split::{ReadConnection, WriteConnection};
+
 pub mod state;
 use state::{Client, Server};
 pub use state::{Connection, ConnectionError};

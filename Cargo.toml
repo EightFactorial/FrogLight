@@ -111,6 +111,7 @@ sha2 = { default-features = false, version = "0.10.9" }
 async-channel = { default-features = false, version = "2.3" }
 async-compression = { default-features = false, version = "0.4" }
 async-io = "2.4"
+async-lock = { default-features = false, version = "3.4" }
 async-net = "2.0"
 bitvec = { default-features = false, features = ["alloc"], version = "1.0" }
 blocking = "1.6"

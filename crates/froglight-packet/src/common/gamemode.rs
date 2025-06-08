@@ -92,9 +92,14 @@ impl GameMode {
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
 #[serde(transparent)]
-pub struct PreviousGameMode(Option<GameMode>);
+pub struct PreviousGameMode(pub Option<GameMode>);
 
 impl PreviousGameMode {
+    /// Create a new [`PreviousGameMode`] with the given [`GameMode`].
+    #[inline]
+    #[must_use]
+    pub const fn new(mode: Option<GameMode>) -> Self { PreviousGameMode(mode) }
+
     /// Get the [`PreviousGameMode`] from its ID.
     #[must_use]
     pub const fn from_id(id: i8) -> Option<Self> {

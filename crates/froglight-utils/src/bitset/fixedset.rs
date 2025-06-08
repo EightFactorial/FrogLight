@@ -52,7 +52,10 @@ where [(); N.div_ceil(8)]: Sized
     /// Attempt to create a new [`FixedBitSet`] from the given closure.
     ///
     /// See [`core::array::try_from_fn`] for more details.
-    #[must_use]
+    ///
+    /// # Errors
+    /// If the closure ever returns an error,
+    /// this function will return that error.
     pub fn try_from_fn<F, Err>(mut f: F) -> Result<Self, Err>
     where F: FnMut(usize) -> Result<bool, Err> {
         let mut array = Self::new();

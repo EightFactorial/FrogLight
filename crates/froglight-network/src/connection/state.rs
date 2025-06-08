@@ -6,12 +6,13 @@ use core::{error::Error, marker::PhantomData, net::SocketAddr};
 
 use froglight_packet::state::{Config, Handshake, Login, Play, State, Status, ValidState};
 
-use super::{RawConnection, raw::RawPacketVersion};
+use super::raw::RawPacketVersion;
+use crate::connection::{ReadConnection, WriteConnection, split::SplittableConnection};
 
 /// A [`RawConnection`] that manages the state of the connection.
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
 pub struct Connection<V: ValidState<S>, S: State, D: Direction<V, S>> {
-    raw: Box<dyn RawConnection>,
+    raw: Box<dyn SplittableConnection>,
     scratch: Vec<u8>,
     _phantom: PhantomData<(V, S, D)>,
 }
@@ -63,6 +64,18 @@ impl<V: ValidState<S>, S: State> Direction<V, S> for Server {
 // -------------------------------------------------------------------------------------------------
 
 impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
+    /// Create a new [`Connection`] from a [`RawConnection`].
+    #[must_use]
+    pub fn from_raw<T: SplittableConnection + 'static>(raw: T) -> Self {
+        Self::from_raw_box(Box::new(raw))
+    }
+
+    /// Create a new [`Connection`] from a boxed [`RawConnection`].
+    #[must_use]
+    pub const fn from_raw_box(raw: Box<dyn SplittableConnection>) -> Self {
+        Connection { raw, scratch: Vec::new(), _phantom: PhantomData }
+    }
+
     /// Read a raw type from the [`Connection`],
     /// regardless of the actual state.
     ///
@@ -164,16 +177,33 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     {
         Connection { raw: self.raw, scratch: self.scratch, _phantom: PhantomData }
     }
+
+    /// Split the [`Connection`] into a pair of
+    /// [`ReadConnection`] and [`WriteConnection`]s.
+    #[must_use]
+    pub async fn into_split(mut self) -> (ReadConnection<V, S, D>, WriteConnection<V, S, D>) {
+        let (read, write) = self.raw.split().await;
+        (ReadConnection::from_raw_box(read), WriteConnection::from_raw_box(write))
+    }
+
+    /// Combine a pair of [`ReadConnection`] and [`WriteConnection`]
+    /// into a single [`Connection`].
+    #[must_use]
+    pub async fn from_split(
+        mut read: ReadConnection<V, S, D>,
+        mut write: WriteConnection<V, S, D>,
+    ) -> Self {
+        Connection {
+            raw: read.raw.recombine(write.raw.as_mut()).await,
+            scratch: Vec::new(),
+            _phantom: PhantomData,
+        }
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 impl<V: ValidState<Handshake>, D: Direction<V, Handshake>> Connection<V, Handshake, D> {
-    /// Create a new [`Connection`] from a [`RawConnection`].
-    pub fn from_raw<T: RawConnection + 'static>(raw: T) -> Self {
-        Connection { raw: Box::new(raw), scratch: Vec::new(), _phantom: PhantomData }
-    }
-
     /// Enter the [`Status`] state.
     ///
     /// Use this when a connection is requesting the server's status.

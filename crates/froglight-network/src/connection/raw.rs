@@ -22,12 +22,9 @@ pub trait RawConnection: Send + 'static {
     /// Set the compression threshold for the connection.
     async fn set_compression(&mut self, threshold: Option<i32>);
 
-    /// Get a reference to the [`ConnectionCrypto`] for the connection.
+    /// Set the [`ConnectionCrypto`] used by the connection.
     #[cfg(feature = "crypto")]
-    async fn get_crypto(&self) -> Option<&ConnectionCrypto>;
-    /// Get a mutable reference to the [`ConnectionCrypto`] for the connection.
-    #[cfg(feature = "crypto")]
-    async fn get_crypto_mut(&mut self) -> Option<&mut ConnectionCrypto>;
+    async fn set_crypto(&mut self, crypto: Option<ConnectionCrypto>);
 
     /// Read a packet from the connection, returning the number of bytes read.
     ///
