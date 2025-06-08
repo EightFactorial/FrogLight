@@ -12,7 +12,7 @@ use smol_str::SmolStr;
 use tracing_subscriber::{EnvFilter, fmt};
 
 /// The address of the server to request the status from.
-static SERVER_ADDRESS: SmolStr = SmolStr::new_static("hypixel.net");
+static SERVER_ADDRESS: SmolStr = SmolStr::new_static("fmc.wynncraft.com");
 
 fn main() -> Result<(), Box<dyn core::error::Error>> {
     // Initialize the tracing subscriber

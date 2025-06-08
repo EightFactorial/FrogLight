@@ -91,7 +91,7 @@ impl GameMode {
 )]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
-#[serde(transparent)]
+#[serde(transparent, default)]
 pub struct PreviousGameMode(pub Option<GameMode>);
 
 impl PreviousGameMode {

@@ -74,6 +74,10 @@ pub enum ReadError {
     #[cfg(feature = "serde")]
     #[error("Failed to parse from JSON: {0}")]
     Json(#[from] serde_json::Error),
+
+    /// An error that occurred while reading a value.
+    #[error("Failed to read value: {0}")]
+    Other(#[from] Box<dyn core::error::Error>),
 }
 
 /// Errors that can occur when writing to a buffer.
@@ -87,4 +91,8 @@ pub enum WriteError {
     #[cfg(feature = "serde")]
     #[error("Failed to parse into JSON: {0}")]
     Json(#[from] serde_json::Error),
+
+    /// An error that occurred while writing a value.
+    #[error("Failed to write value: {0}")]
+    Other(#[from] Box<dyn core::error::Error>),
 }

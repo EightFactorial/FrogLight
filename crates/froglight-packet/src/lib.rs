@@ -7,6 +7,7 @@
 extern crate alloc;
 
 pub mod common;
+pub mod multicast;
 pub mod state;
 
 pub mod v1_21_4;
