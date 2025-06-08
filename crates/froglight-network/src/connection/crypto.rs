@@ -2,29 +2,49 @@ use aes::{
     Aes128,
     cipher::{BlockDecryptMut, BlockEncryptMut, inout::InOutBuf},
 };
+use async_lock::RwLock;
 use cfb8::{Decryptor, Encryptor};
 
 /// The cipher used for encrypting and decrypting packets.
-pub struct ConnectionCrypto {
-    /// The encryptor is used to encrypt packets.
-    pub encryptor: Encryptor<Aes128>,
-    /// The decryptor is used to decrypt packets.
-    pub decryptor: Decryptor<Aes128>,
+#[derive(Default)]
+#[expect(clippy::large_enum_variant)]
+pub enum ConnectionCrypto {
+    /// No encryption is used for the connection.
+    #[default]
+    None,
+    /// The connection has encryption enabled.
+    Some {
+        /// The encryptor is used to encrypt packets.
+        encryptor: RwLock<Encryptor<Aes128>>,
+        /// The decryptor is used to decrypt packets.
+        decryptor: RwLock<Decryptor<Aes128>>,
+    },
 }
 
 impl ConnectionCrypto {
+    /// Returns `true` if the connection has encryption enabled.
+    #[inline]
+    #[must_use]
+    pub const fn is_some(&self) -> bool { matches!(self, ConnectionCrypto::Some { .. }) }
+
     /// Encrypt a slice of bytes in-place.
-    pub fn encrypt_inplace(&mut self, buf: &mut [u8]) {
-        let (head, tail) = InOutBuf::from(buf).into_chunks();
-        debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-        self.encryptor.encrypt_blocks_inout_mut(head);
+    pub async fn encrypt_inplace(&self, buf: &mut [u8]) {
+        if let ConnectionCrypto::Some { encryptor, .. } = self {
+            let mut encryptor = encryptor.write().await;
+            let (head, tail) = InOutBuf::from(buf).into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            encryptor.encrypt_blocks_inout_mut(head);
+        }
     }
 
     /// Decrypt a slice of bytes in-place.
-    pub fn decrypt_inplace(&mut self, buf: &mut [u8]) {
-        let (head, tail) = InOutBuf::from(buf).into_chunks();
-        debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-        self.decryptor.decrypt_blocks_inout_mut(head);
+    pub async fn decrypt_inplace(&self, buf: &mut [u8]) {
+        if let ConnectionCrypto::Some { decryptor, .. } = self {
+            let mut decryptor = decryptor.write().await;
+            let (head, tail) = InOutBuf::from(buf).into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            decryptor.decrypt_blocks_inout_mut(head);
+        }
     }
 
     /// Encrypts a slice of bytes into another slice.
@@ -32,10 +52,13 @@ impl ConnectionCrypto {
     /// # Panics
     /// This will panic if the input and output slices
     /// are not of the same length.
-    pub fn encrypt_into(&mut self, input: &[u8], output: &mut [u8]) {
-        let (head, tail) = InOutBuf::new(input, output).unwrap().into_chunks();
-        debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-        self.encryptor.encrypt_blocks_inout_mut(head);
+    pub async fn encrypt_into(&self, input: &[u8], output: &mut [u8]) {
+        if let ConnectionCrypto::Some { encryptor, .. } = self {
+            let mut encryptor = encryptor.write().await;
+            let (head, tail) = InOutBuf::new(input, output).unwrap().into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            encryptor.encrypt_blocks_inout_mut(head);
+        }
     }
 
     /// Decrypts a slice of bytes into another slice.
@@ -43,9 +66,12 @@ impl ConnectionCrypto {
     /// # Panics
     /// This will panic if the input and output slices
     /// are not of the same length.
-    pub fn decrypt_into(&mut self, input: &[u8], output: &mut [u8]) {
-        let (head, tail) = InOutBuf::new(input, output).unwrap().into_chunks();
-        debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-        self.decryptor.decrypt_blocks_inout_mut(head);
+    pub async fn decrypt_into(&self, input: &[u8], output: &mut [u8]) {
+        if let ConnectionCrypto::Some { decryptor, .. } = self {
+            let mut decryptor = decryptor.write().await;
+            let (head, tail) = InOutBuf::new(input, output).unwrap().into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            decryptor.decrypt_blocks_inout_mut(head);
+        }
     }
 }

@@ -14,7 +14,7 @@ pub(super) async fn read_packet_outer(
     stream: &mut (impl AsyncReadExt + Unpin),
     scratch: &mut Vec<u8>,
     compression: Option<i32>,
-    #[cfg(feature = "crypto")] mut crypto: Option<&mut ConnectionCrypto>,
+    #[cfg(feature = "crypto")] crypto: &ConnectionCrypto,
 ) -> Result<(), ConnectionError> {
     // Make sure the buffer is large enough to hold the packet length
     if buf.len() < 5 {
@@ -27,7 +27,7 @@ pub(super) async fn read_packet_outer(
         len_buf.as_mut_slice(),
         stream,
         #[cfg(feature = "crypto")]
-        &mut crypto,
+        crypto,
     )
     .await?;
 
@@ -46,7 +46,7 @@ pub(super) async fn read_packet_outer(
         pbuf,
         stream,
         #[cfg(feature = "crypto")]
-        &mut crypto,
+        crypto,
     )
     .await?;
 
@@ -103,7 +103,7 @@ pub(super) async fn write_packet_outer(
     stream: &mut (impl AsyncWriteExt + Unpin),
     scratch: &mut Vec<u8>,
     compression: Option<i32>,
-    #[cfg(feature = "crypto")] crypto: Option<&mut ConnectionCrypto>,
+    #[cfg(feature = "crypto")] crypto: &ConnectionCrypto,
 ) -> Result<(), ConnectionError> {
     // Log the ID and length of the packet
     #[cfg(feature = "trace")]
@@ -177,15 +177,14 @@ pub(super) async fn write_packet_outer(
 pub(super) async fn read_raw_outer(
     buf: &mut [u8],
     stream: &mut (impl AsyncReadExt + Unpin),
-    #[cfg(feature = "crypto")] crypto: &mut Option<&mut ConnectionCrypto>,
+    #[cfg(feature = "crypto")] crypto: &ConnectionCrypto,
 ) -> Result<(), ConnectionError> {
     let result = stream.read_exact(buf).await;
     result.map_err(|err| ConnectionError::ReadRawConnection(Box::new(err)))?;
 
     #[cfg(feature = "crypto")]
-    if let Some(crypto) = crypto {
-        // Decrypt the buffer in place
-        crypto.decrypt_inplace(buf);
+    if crypto.is_some() {
+        crypto.decrypt_inplace(buf).await;
     }
 
     Ok(())
@@ -199,15 +198,15 @@ pub(super) async fn write_raw_outer(
     mut buf: &[u8],
     stream: &mut (impl AsyncWriteExt + Unpin),
     scratch: &mut Vec<u8>,
-    #[cfg(feature = "crypto")] crypto: Option<&mut ConnectionCrypto>,
+    #[cfg(feature = "crypto")] crypto: &ConnectionCrypto,
 ) -> Result<(), ConnectionError> {
     #[cfg(feature = "crypto")]
-    if let Some(crypto) = crypto {
+    if crypto.is_some() {
         // Clear and resize the scratch buffer to fit the packet
         scratch.clear();
         scratch.resize(buf.len(), 0u8);
         // Encrypt the packet and write into the scratch buffer
-        crypto.encrypt_into(buf, scratch);
+        crypto.encrypt_into(buf, scratch).await;
         // Use the scratch buffer as the input buffer
         buf = scratch.as_slice();
     }

@@ -188,16 +188,13 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
 
     /// Combine a pair of [`ReadConnection`] and [`WriteConnection`]
     /// into a single [`Connection`].
+    #[inline]
     #[must_use]
     pub async fn from_split(
-        mut read: ReadConnection<V, S, D>,
-        mut write: WriteConnection<V, S, D>,
+        read: ReadConnection<V, S, D>,
+        write: WriteConnection<V, S, D>,
     ) -> Self {
-        Connection {
-            raw: read.raw.recombine(write.raw.as_mut()).await,
-            scratch: Vec::new(),
-            _phantom: PhantomData,
-        }
+        read.recombine(write).await
     }
 }
 

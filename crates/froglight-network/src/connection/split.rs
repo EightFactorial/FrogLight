@@ -26,7 +26,7 @@ pub trait CombinableConnection: RawConnection {
     /// Recombine two connections into one.
     async fn recombine(
         &mut self,
-        other: &mut dyn CombinableConnection,
+        other: Box<dyn CombinableConnection>,
     ) -> Box<dyn SplittableConnection>;
 }
 
@@ -94,9 +94,10 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> ReadConnection<V, S, D> {
 
     /// Recombine a [`ReadConnection`] with a [`WriteConnection`]
     /// to form a full [`Connection`].
+    #[inline]
     #[must_use]
-    pub async fn recombine(mut self, mut write: WriteConnection<V, S, D>) -> Connection<V, S, D> {
-        Connection::from_raw_box(self.raw.recombine(write.raw.as_mut()).await)
+    pub async fn recombine(mut self, write: WriteConnection<V, S, D>) -> Connection<V, S, D> {
+        Connection::from_raw_box(self.raw.recombine(write.raw).await)
     }
 }
 
@@ -182,8 +183,9 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> WriteConnection<V, S, D> {
 
     /// Recombine a [`ReadConnection`] with a [`WriteConnection`]
     /// to form a full [`Connection`].
+    #[inline]
     #[must_use]
-    pub async fn recombine(mut self, mut read: ReadConnection<V, S, D>) -> Connection<V, S, D> {
-        Connection::from_raw_box(read.raw.recombine(self.raw.as_mut()).await)
+    pub async fn recombine(self, read: ReadConnection<V, S, D>) -> Connection<V, S, D> {
+        read.recombine(self).await
     }
 }

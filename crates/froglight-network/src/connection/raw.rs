@@ -5,6 +5,8 @@ use alloc::{boxed::Box, vec::Vec};
 use core::net::SocketAddr;
 
 use async_trait::async_trait;
+#[cfg(feature = "crypto")]
+use bevy_platform::sync::Arc;
 use froglight_common::version::Version;
 
 use super::state::ConnectionError;
@@ -24,7 +26,7 @@ pub trait RawConnection: Send + 'static {
 
     /// Set the [`ConnectionCrypto`] used by the connection.
     #[cfg(feature = "crypto")]
-    async fn set_crypto(&mut self, crypto: Option<ConnectionCrypto>);
+    async fn set_crypto(&mut self, crypto: Arc<ConnectionCrypto>);
 
     /// Read a packet from the connection, returning the number of bytes read.
     ///

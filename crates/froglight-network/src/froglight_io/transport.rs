@@ -1,8 +1,8 @@
 use core::net::SocketAddr;
-use std::sync::Arc;
 
 use async_lock::RwLock;
 use async_trait::async_trait;
+use bevy_platform::sync::Arc;
 use futures_lite::{AsyncReadExt, AsyncWriteExt};
 
 #[cfg(feature = "crypto")]
@@ -27,17 +27,23 @@ pub struct IoTransport<S> {
     scratch: Vec<u8>,
 
     #[cfg(feature = "crypto")]
-    crypto: Option<ConnectionCrypto>,
+    crypto: Arc<ConnectionCrypto>,
     compression: Option<i32>,
 }
 
 impl<S> IoTransport<S> {
     /// Creates a new [`IoTransport`] instance.
     #[must_use]
-    pub const fn wrap(stream: S, peer: SocketAddr) -> Self {
+    pub fn wrap(stream: S, peer: SocketAddr) -> Self {
         #[cfg(feature = "crypto")]
         {
-            Self { stream, peer, scratch: Vec::new(), crypto: None, compression: None }
+            Self {
+                stream,
+                peer,
+                scratch: Vec::new(),
+                crypto: Arc::new(ConnectionCrypto::None),
+                compression: None,
+            }
         }
 
         #[cfg(not(feature = "crypto"))]
@@ -62,7 +68,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
 
     #[inline]
     #[cfg(feature = "crypto")]
-    async fn set_crypto(&mut self, crypto: Option<ConnectionCrypto>) { self.crypto = crypto; }
+    async fn set_crypto(&mut self, crypto: Arc<ConnectionCrypto>) { self.crypto = crypto; }
 
     #[inline]
     async fn read_packet(&mut self, buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
@@ -72,7 +78,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             &mut self.scratch,
             self.compression,
             #[cfg(feature = "crypto")]
-            self.crypto.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -85,7 +91,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             &mut self.scratch,
             self.compression,
             #[cfg(feature = "crypto")]
-            self.crypto.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -96,7 +102,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             buf,
             &mut self.stream,
             #[cfg(feature = "crypto")]
-            &mut self.crypto.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -108,7 +114,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             &mut self.stream,
             &mut self.scratch,
             #[cfg(feature = "crypto")]
-            self.crypto.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -120,7 +126,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Clone + Send + Sync + Unpin + 'static> Sp
 {
     async fn split(&mut self) -> (Box<dyn CombinableConnection>, Box<dyn CombinableConnection>) {
         #[cfg(feature = "crypto")]
-        let crypto = Arc::new(RwLock::new(core::mem::take(&mut self.crypto)));
+        let crypto = Arc::clone(&self.crypto);
         let compression = Arc::new(RwLock::new(self.compression));
         let Self { stream, peer, .. } = self;
 
@@ -157,7 +163,7 @@ pub struct SplitIoTransport<S> {
     pub(super) scratch: Vec<u8>,
 
     #[cfg(feature = "crypto")]
-    pub(super) crypto: Arc<RwLock<Option<ConnectionCrypto>>>,
+    pub(super) crypto: Arc<ConnectionCrypto>,
     pub(super) compression: Arc<RwLock<Option<i32>>>,
 }
 
@@ -177,9 +183,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
     }
 
     #[cfg(feature = "crypto")]
-    async fn set_crypto(&mut self, crypto: Option<ConnectionCrypto>) {
-        *self.crypto.write().await = crypto;
-    }
+    async fn set_crypto(&mut self, crypto: Arc<ConnectionCrypto>) { self.crypto = crypto; }
 
     #[inline]
     async fn read_packet(&mut self, buf: &mut Vec<u8>) -> Result<(), ConnectionError> {
@@ -189,7 +193,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             &mut self.scratch,
             *self.compression.read().await,
             #[cfg(feature = "crypto")]
-            self.crypto.write().await.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -202,7 +206,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             &mut self.scratch,
             *self.compression.read().await,
             #[cfg(feature = "crypto")]
-            self.crypto.write().await.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -213,7 +217,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             buf,
             &mut self.stream,
             #[cfg(feature = "crypto")]
-            &mut self.crypto.write().await.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -225,7 +229,7 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
             &mut self.stream,
             &mut self.scratch,
             #[cfg(feature = "crypto")]
-            self.crypto.write().await.as_mut(),
+            &self.crypto,
         )
         .await
     }
@@ -238,12 +242,12 @@ impl<S: AsyncReadExt + AsyncWriteExt + Clone + Send + Sync + Unpin + 'static> Co
     #[allow(unused_mut)]
     async fn recombine(
         &mut self,
-        _: &mut dyn CombinableConnection,
+        _: Box<dyn CombinableConnection>,
     ) -> Box<dyn SplittableConnection> {
         let mut transport = IoTransport::wrap(self.stream.clone(), self.peer);
 
         #[cfg(feature = "crypto")]
-        transport.set_crypto(core::mem::take(&mut *self.crypto.write().await)).await;
+        transport.set_crypto(Arc::clone(&self.crypto)).await;
 
         Box::new(transport)
     }
