@@ -24,5 +24,8 @@ pub use intent::ConnectionIntent;
 pub mod position;
 pub use position::{BlockPos, ChunkPos};
 
+mod registry;
+pub use registry::{InlineRegistryId, RegistrySet};
+
 pub mod status;
 pub use status::ServerStatus;
