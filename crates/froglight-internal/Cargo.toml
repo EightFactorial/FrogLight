@@ -23,6 +23,7 @@ froglight-inventory = { features = ["world"], workspace = true }
 froglight-item = { features = ["block"], workspace = true }
 froglight-nbt = { workspace = true }
 froglight-network = { optional = true, workspace = true }
+froglight-packet = { features = ["inventory", "registry"], workspace = true }
 froglight-physics = { features = ["world"], workspace = true }
 froglight-registry = { workspace = true }
 froglight-text = { features = ["crypto"], workspace = true }
@@ -53,6 +54,7 @@ bevy = [
   "froglight-item/bevy",
   "froglight-nbt/reflect",
   "froglight-network/bevy",
+  "froglight-packet/bevy",
   "froglight-physics/bevy",
   "froglight-registry/bevy",
   "froglight-resolver?/bevy",
@@ -68,6 +70,7 @@ nightly = [
   "froglight-item/nightly",
   "froglight-nbt/nightly",
   "froglight-network?/nightly",
+  "froglight-packet/nightly",
   "froglight-physics/nightly",
   "froglight-registry/nightly",
   "froglight-resolver?/nightly",
@@ -88,6 +91,7 @@ std = [
   "froglight-network/io",
   "froglight-network/resolver",
   "froglight-network/std",
+  "froglight-packet/std",
   "froglight-physics/std",
   "froglight-schedule?/std",
   "froglight-text/ansi",
@@ -100,6 +104,7 @@ libm = [
   "froglight-brigadier?/libm",
   "froglight-entity/libm",
   "froglight-network/libm",
+  "froglight-packet/libm",
   "froglight-physics/libm",
   "froglight-world/libm",
 ]
@@ -111,6 +116,7 @@ v1_21_4 = [
   "froglight-inventory/v1_21_4",
   "froglight-item/v1_21_4",
   "froglight-network/v1_21_4",
+  "froglight-packet/v1_21_4",
   "froglight-registry/v1_21_4",
   "froglight-world/v1_21_4",
 ]
@@ -121,6 +127,7 @@ v1_21_5 = [
   "froglight-inventory/v1_21_5",
   "froglight-item/v1_21_5",
   "froglight-network/v1_21_5",
+  "froglight-packet/v1_21_5",
   "froglight-registry/v1_21_5",
   "froglight-world/v1_21_5",
 ]

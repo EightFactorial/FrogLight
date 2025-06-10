@@ -25,7 +25,7 @@ pub mod position;
 pub use position::{BlockPos, ChunkPos};
 
 mod registry;
-pub use registry::{InlineRegistryId, RegistrySet};
+pub use registry::{RegistryItemOrId, RegistryNameOrSet};
 
 pub mod status;
 pub use status::ServerStatus;

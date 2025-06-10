@@ -1,10 +1,5 @@
 //! Precomputed sine and cosine tables.
-#![allow(
-    clippy::cast_precision_loss,
-    clippy::cast_possible_truncation,
-    clippy::cast_sign_loss,
-    unused_imports
-)]
+#![allow(clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_sign_loss)]
 
 use core::f64::consts::PI;
 

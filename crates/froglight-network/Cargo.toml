@@ -27,7 +27,7 @@ bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { features = ["network"], workspace = true }
-froglight-packet = { features = ["inventory"], workspace = true }
+froglight-packet = { workspace = true }
 futures-lite = { features = ["alloc"], workspace = true }
 smol_str = { workspace = true }
 thiserror = { workspace = true }

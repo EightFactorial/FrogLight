@@ -4,6 +4,8 @@
 #![cfg_attr(feature = "nightly", feature(array_chunks, portable_simd))]
 
 pub mod component;
+
+pub mod math;
 pub mod table;
 
 pub mod prelude {

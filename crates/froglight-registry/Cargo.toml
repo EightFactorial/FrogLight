@@ -35,7 +35,7 @@ tracing = { optional = true, workspace = true }
 default = []
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy"]
+bevy = ["dep:bevy_ecs", "froglight-common/bevy"]
 # Enable `bevy_reflect` support.
 reflect = [
   "bevy_ecs?/bevy_reflect",
