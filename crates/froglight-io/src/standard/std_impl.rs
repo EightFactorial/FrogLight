@@ -86,6 +86,32 @@ impl FrogWrite for usize {
     fn frog_len(&self) -> usize { std::mem::size_of::<u32>() }
 }
 
+impl FrogRead for isize {
+    #[allow(clippy::unnecessary_lazy_evaluations)]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        i32::frog_read(buffer).map(|value| {
+            isize::try_from(value).unwrap_or_else(|_| {
+                #[cfg(feature = "trace")]
+                tracing::error!(target: "froglight_io::read", "Failed to convert `i32` to `isize`, using isize::MAX");
+                isize::MAX
+            })
+        })
+    }
+}
+impl FrogWrite for isize {
+    #[allow(clippy::unnecessary_lazy_evaluations)]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        i32::try_from(*self).unwrap_or_else(|_| {
+            #[cfg(feature = "trace")]
+            tracing::error!(target: "froglight_io::write", "Failed to convert `isize` to `i32`, using i32::MAX");
+            i32::MAX
+        }).frog_write(buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { std::mem::size_of::<i32>() }
+}
+
 #[cfg(test)]
 proptest::proptest! {
     #![proptest_config(ProptestConfig::with_cases(32))]
