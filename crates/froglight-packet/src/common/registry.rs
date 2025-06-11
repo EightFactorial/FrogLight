@@ -40,6 +40,7 @@ impl RegistryNameOrSet {
     /// retrieved from the [`RegistryStorage`] using the [`Identifier`].
     #[must_use]
     #[cfg(feature = "registry")]
+    #[expect(clippy::cast_possible_truncation)]
     pub fn values<'a, V: Version>(
         &'a self,
         registries: &RegistryStorage<V>,
@@ -48,7 +49,7 @@ impl RegistryNameOrSet {
             RegistryNameOrSet::Identifier(ident) => registries
                 .get_registry(ident)
                 .map(|v| Cow::Owned((0..v.values().len() as u32).collect())),
-            RegistryNameOrSet::Set(items) => Some(Cow::Borrowed(&items)),
+            RegistryNameOrSet::Set(items) => Some(Cow::Borrowed(items)),
         }
     }
 }

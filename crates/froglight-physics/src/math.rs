@@ -1,4 +1,5 @@
 //! Math functions that match Java's standard library.
+#![allow(clippy::unreadable_literal)]
 
 /// Convert degrees to radians.
 ///

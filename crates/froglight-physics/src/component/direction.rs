@@ -1,9 +1,6 @@
 //! TODO
 
-use core::f32::{
-    EPSILON,
-    consts::{FRAC_PI_2, PI},
-};
+use core::f32::consts::{FRAC_PI_2, PI};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::prelude::*;
@@ -178,9 +175,9 @@ impl LookDirection {
 
         let (x, y, z) = (pitch_cos * yaw_sin, -pitch_sin, pitch_cos * yaw_cos);
         Vec3::new(
-            if x.abs() < EPSILON { 0.0 } else { x },
-            if y.abs() < EPSILON { 0.0 } else { y },
-            if z.abs() < EPSILON { 0.0 } else { z },
+            if x.abs() < f32::EPSILON { 0.0 } else { x },
+            if y.abs() < f32::EPSILON { 0.0 } else { y },
+            if z.abs() < f32::EPSILON { 0.0 } else { z },
         )
         .normalize_or_zero()
     }

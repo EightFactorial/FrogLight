@@ -14,7 +14,7 @@ use write::WriteCompat;
 
 use super::Snbt;
 use crate::{
-    convert::{NbtError, FromCompound, IntoCompound},
+    convert::{FromCompound, IntoCompound, NbtError},
     nbt::NbtCompound,
 };
 

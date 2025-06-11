@@ -38,7 +38,7 @@ macro_rules! impl_integer {
     };
 }
 
-impl_integer!(u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, usize, isize, f32, f64);
+impl_integer!(u8, i8, u16, i16, u32, i32, u64, i64, u128, i128, f32, f64);
 
 impl FrogRead for bool {
     #[inline]
@@ -58,6 +58,32 @@ impl FrogWrite for bool {
 
     #[inline]
     fn frog_len(&self) -> usize { std::mem::size_of::<bool>() }
+}
+
+impl FrogRead for usize {
+    #[allow(clippy::unnecessary_lazy_evaluations)]
+    fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
+        u32::frog_read(buffer).map(|value| {
+            usize::try_from(value).unwrap_or_else(|_| {
+                #[cfg(feature = "trace")]
+                tracing::error!(target: "froglight_io::read", "Failed to convert `u32` to `usize`, using usize::MAX");
+                usize::MAX
+            })
+        })
+    }
+}
+impl FrogWrite for usize {
+    #[allow(clippy::unnecessary_lazy_evaluations)]
+    fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
+        u32::try_from(*self).unwrap_or_else(|_| {
+            #[cfg(feature = "trace")]
+            tracing::error!(target: "froglight_io::write", "Failed to convert `usize` to `u32`, using u32::MAX");
+            u32::MAX
+        }).frog_write(buffer)
+    }
+
+    #[inline]
+    fn frog_len(&self) -> usize { std::mem::size_of::<u32>() }
 }
 
 #[cfg(test)]
