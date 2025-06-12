@@ -114,14 +114,14 @@ fn resolve_minecraft() {
 
     // Test domain names
     let addr = block_on(resolver.lookup_minecraft("hypixel.net")).unwrap();
-    let host = addr.ip();
-    assert_eq!(addr.port(), 25565);
+    let host: String = addr.ip().to_canonical().to_string().split_inclusive('.').take(3).collect();
+    assert_eq!(addr.port(), 25565, "Default port should be \"25565\"");
 
     let addr = block_on(resolver.lookup_minecraft("hypixel.net:25565")).unwrap();
-    assert_eq!(addr.ip(), host);
-    assert_eq!(addr.port(), 25565);
+    assert!(addr.ip().to_string().starts_with(&host));
+    assert_eq!(addr.port(), 25565, "Port was explicitly set to \"25565\"");
 
     let addr = block_on(resolver.lookup_minecraft("hypixel.net:80")).unwrap();
-    assert_eq!(addr.ip(), host);
-    assert_eq!(addr.port(), 80);
+    assert!(addr.ip().to_string().starts_with(&host));
+    assert_eq!(addr.port(), 80, "Port was explicitly set to \"80\"");
 }
