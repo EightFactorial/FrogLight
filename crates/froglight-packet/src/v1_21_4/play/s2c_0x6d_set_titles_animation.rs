@@ -5,7 +5,11 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct TitleFadeS2CPacket {}
+pub struct TitleFadeS2CPacket {
+    pub fade_in_ticks: u32,
+    pub stay_ticks: u32,
+    pub fade_out_ticks: u32,
+}

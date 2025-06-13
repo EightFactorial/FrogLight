@@ -6,6 +6,12 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct LightUpdateS2CPacket {}
+pub struct LightUpdateS2CPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub chunk_x: u32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub chunk_z: u32,
+    pub unknown: (),
+}

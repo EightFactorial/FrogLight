@@ -6,6 +6,10 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct EntityPassengersSetS2CPacket {}
+pub struct EntityPassengersSetS2CPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub entity_id: u32,
+    pub passenger_ids: Vec<u32>,
+}

@@ -5,7 +5,12 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct HealthUpdateS2CPacket {}
+pub struct HealthUpdateS2CPacket {
+    pub health: f32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub food: u32,
+    pub saturation: f32,
+}

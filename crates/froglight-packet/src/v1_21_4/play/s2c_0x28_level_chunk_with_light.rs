@@ -6,6 +6,10 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct ChunkDataS2CPacket {}
+pub struct ChunkDataS2CPacket {
+    pub chunk_x: u32,
+    pub chunk_z: u32,
+    pub unknown: (),
+}

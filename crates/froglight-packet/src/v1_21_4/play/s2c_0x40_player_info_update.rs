@@ -6,6 +6,9 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct PlayerListS2CPacket {}
+pub struct PlayerListS2CPacket {
+    pub actions: Vec<()>,
+    pub entries: Vec<()>,
+}

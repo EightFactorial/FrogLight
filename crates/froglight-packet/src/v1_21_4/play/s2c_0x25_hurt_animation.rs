@@ -5,7 +5,11 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct DamageTiltS2CPacket {}
+pub struct DamageTiltS2CPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub id: u32,
+    pub yaw: f32,
+}

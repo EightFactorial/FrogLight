@@ -4,8 +4,11 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_common::prelude::Identifier;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct CookieRequestS2CPacket {}
+pub struct CookieRequestS2CPacket {
+    pub key: Identifier,
+}

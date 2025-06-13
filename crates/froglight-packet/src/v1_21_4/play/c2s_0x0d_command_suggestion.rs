@@ -6,6 +6,10 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct RequestCommandCompletionsC2SPacket {}
+pub struct RequestCommandCompletionsC2SPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub completion_id: u32,
+    pub partial_command: String,
+}

@@ -4,8 +4,13 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_nbt::prelude::NbtTag;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct NbtQueryResponseS2CPacket {}
+pub struct NbtQueryResponseS2CPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub transaction_id: u32,
+    pub nbt: NbtTag,
+}

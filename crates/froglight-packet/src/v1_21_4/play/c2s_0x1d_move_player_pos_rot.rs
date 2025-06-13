@@ -5,7 +5,14 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct PlayerFullC2SPacket {}
+pub struct PlayerFullC2SPacket {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+    pub yaw: f32,
+    pub pitch: f32,
+    pub horizontal_collision: i8,
+}

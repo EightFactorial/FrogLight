@@ -5,7 +5,15 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct PlaySoundS2CPacket {}
+pub struct PlaySoundS2CPacket {
+    pub category: (),
+    pub fixed_x: u32,
+    pub fixed_y: u32,
+    pub fixed_z: u32,
+    pub volume: f32,
+    pub pitch: f32,
+    pub seed: u64,
+}

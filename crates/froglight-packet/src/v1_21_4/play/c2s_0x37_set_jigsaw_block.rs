@@ -4,8 +4,20 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_common::prelude::Identifier;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct UpdateJigsawC2SPacket {}
+pub struct UpdateJigsawC2SPacket {
+    pub pos: (),
+    pub name: Identifier,
+    pub target: Identifier,
+    pub pool: Identifier,
+    pub final_state: String,
+    pub joint_type: String,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub selection_priority: u32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub placement_priority: u32,
+}

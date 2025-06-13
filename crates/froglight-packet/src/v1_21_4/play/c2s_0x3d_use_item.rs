@@ -5,7 +5,13 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct PlayerInteractItemC2SPacket {}
+pub struct PlayerInteractItemC2SPacket {
+    pub hand: (),
+    #[cfg_attr(feature = "io", frog(var))]
+    pub sequence: u32,
+    pub yaw: f32,
+    pub pitch: f32,
+}

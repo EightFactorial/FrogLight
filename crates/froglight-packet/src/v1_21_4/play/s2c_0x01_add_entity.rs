@@ -5,7 +5,22 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct EntitySpawnS2CPacket {}
+pub struct EntitySpawnS2CPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub entity_id: u32,
+    pub uuid: (),
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+    pub pitch: i8,
+    pub yaw: i8,
+    pub head_yaw: i8,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub entity_data: u32,
+    pub velocity_x: u16,
+    pub velocity_y: u16,
+    pub velocity_z: u16,
+}

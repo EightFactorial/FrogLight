@@ -6,6 +6,11 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct UpdateCommandBlockC2SPacket {}
+pub struct UpdateCommandBlockC2SPacket {
+    pub pos: (),
+    pub command: String,
+    pub ty: (),
+    pub always_active: i8,
+}

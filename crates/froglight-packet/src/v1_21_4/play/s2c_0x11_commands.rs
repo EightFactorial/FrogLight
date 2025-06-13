@@ -6,6 +6,10 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct CommandTreeS2CPacket {}
+pub struct CommandTreeS2CPacket {
+    pub unknown: Vec<()>,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub root_size: u32,
+}

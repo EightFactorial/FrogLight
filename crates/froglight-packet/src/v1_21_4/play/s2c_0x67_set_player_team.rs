@@ -6,6 +6,10 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct TeamS2CPacket {}
+pub struct TeamS2CPacket {
+    pub team_name: String,
+    pub packet_type: i8,
+    pub unknown: Vec<String>,
+}

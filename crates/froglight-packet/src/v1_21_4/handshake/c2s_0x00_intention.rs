@@ -6,6 +6,13 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct HandshakeC2SPacket {}
+pub struct HandshakeC2SPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub protocol_version: u32,
+    pub address: String,
+    pub port: u16,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub intended_state: u32,
+}

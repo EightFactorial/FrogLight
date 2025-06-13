@@ -15,6 +15,18 @@ use proptest::prelude::*;
 use super::{FrogRead, FrogWrite, ReadError, WriteError};
 use crate::variable::{FrogVarRead, FrogVarWrite};
 
+impl FrogRead for () {
+    #[inline]
+    fn frog_read(_: &mut impl Read) -> Result<Self, ReadError> { Ok(()) }
+}
+impl FrogWrite for () {
+    #[inline]
+    fn frog_write(&self, _: &mut impl Write) -> Result<usize, WriteError> { Ok(0) }
+
+    #[inline]
+    fn frog_len(&self) -> usize { 0 }
+}
+
 macro_rules! impl_integer {
     ($($ty:ty),*) => {
         $(

@@ -5,7 +5,16 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct SetTradeOffersS2CPacket {}
+pub struct SetTradeOffersS2CPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub sync_id: u32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub level_progress: u32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub experience: u32,
+    pub leveled: bool,
+    pub refreshable: bool,
+}

@@ -5,7 +5,18 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct ParticleS2CPacket {}
+pub struct ParticleS2CPacket {
+    pub force_spawn: bool,
+    pub important: bool,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+    pub offset_x: f32,
+    pub offset_y: f32,
+    pub offset_z: f32,
+    pub speed: f32,
+    pub count: u32,
+}

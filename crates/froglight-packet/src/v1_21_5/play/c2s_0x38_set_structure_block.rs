@@ -5,7 +5,21 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct UpdateStructureBlockC2SPacket {}
+pub struct UpdateStructureBlockC2SPacket {
+    pub pos: (),
+    pub action: (),
+    pub mode: (),
+    pub template_name: String,
+    pub offset: i8,
+    pub size: i8,
+    pub mirror: (),
+    pub rotation: (),
+    pub metadata: String,
+    pub integrity: f32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub seed: u64,
+    pub strict: i8,
+}

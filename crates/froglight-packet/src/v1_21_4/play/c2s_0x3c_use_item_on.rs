@@ -5,7 +5,12 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct PlayerInteractBlockC2SPacket {}
+pub struct PlayerInteractBlockC2SPacket {
+    pub hand: (),
+    pub block_hit_result: (),
+    #[cfg_attr(feature = "io", frog(var))]
+    pub sequence: u32,
+}

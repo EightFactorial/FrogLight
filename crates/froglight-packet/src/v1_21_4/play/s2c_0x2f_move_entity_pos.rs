@@ -5,7 +5,14 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct EntityMoveRelativeS2CPacket {}
+pub struct EntityMoveRelativeS2CPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub id: u32,
+    pub delta_x: u16,
+    pub delta_y: u16,
+    pub delta_z: u16,
+    pub on_ground: bool,
+}

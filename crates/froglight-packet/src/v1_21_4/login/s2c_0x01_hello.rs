@@ -6,6 +6,11 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct LoginHelloS2CPacket {}
+pub struct LoginHelloS2CPacket {
+    pub server_id: String,
+    pub public_key: Vec<i8>,
+    pub nonce: Vec<i8>,
+    pub needs_authentication: bool,
+}

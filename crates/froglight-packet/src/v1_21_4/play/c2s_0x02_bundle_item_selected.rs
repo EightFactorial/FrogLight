@@ -5,7 +5,12 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct BundleItemSelectedC2SPacket {}
+pub struct BundleItemSelectedC2SPacket {
+    #[cfg_attr(feature = "io", frog(var))]
+    pub slot_id: u32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub selected_item_index: u32,
+}

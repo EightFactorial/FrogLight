@@ -5,7 +5,16 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Copy, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct LookAtS2CPacket {}
+pub struct LookAtS2CPacket {
+    pub self_anchor: (),
+    pub target_x: f64,
+    pub target_y: f64,
+    pub target_z: f64,
+    pub look_at_entity: bool,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub entity_id: u32,
+    pub target_anchor: (),
+}

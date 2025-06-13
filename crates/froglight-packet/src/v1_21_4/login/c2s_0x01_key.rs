@@ -6,6 +6,9 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct LoginKeyC2SPacket {}
+pub struct LoginKeyC2SPacket {
+    pub encrypted_secret_key: Vec<i8>,
+    pub nonce: Vec<i8>,
+}

@@ -6,6 +6,12 @@
 use bevy_reflect::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct ChatMessageC2SPacket {}
+pub struct ChatMessageC2SPacket {
+    pub chat_message: String,
+    pub timestamp: u64,
+    pub salt: u64,
+    pub data: Vec<i8>,
+    pub unknown: (),
+}

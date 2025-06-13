@@ -4,8 +4,23 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_common::prelude::Identifier;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct GameJoinS2CPacket {}
+pub struct GameJoinS2CPacket {
+    pub player_entity_id: u32,
+    pub hardcore: bool,
+    pub unknown: Vec<Identifier>,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub max_players: u32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub view_distance: u32,
+    #[cfg_attr(feature = "io", frog(var))]
+    pub simulation_distance: u32,
+    pub reduced_debug_info: bool,
+    pub show_death_screen: bool,
+    pub do_limited_crafting: bool,
+    pub enforces_secure_chat: bool,
+}
