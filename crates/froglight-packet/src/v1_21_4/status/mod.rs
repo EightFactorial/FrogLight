@@ -5,21 +5,22 @@
 use bevy_reflect::prelude::*;
 use derive_more::{From, TryInto, TryUnwrap};
 
-pub use super::play::{PingResultPacket, QueryPingPacket};
+pub use crate::v1_21_4::play::{QueryPingC2SPacket, PingResultS2CPacket};
 
-mod query_request;
-pub use query_request::QueryRequestPacket;
+pub(super) mod c2s_0x00_status_request;
+pub use c2s_0x00_status_request::QueryRequestC2SPacket;
 
-mod query_response;
-pub use query_response::QueryResponsePacket;
+pub(super) mod s2c_0x00_status_response;
+pub use s2c_0x00_status_response::QueryResponseS2CPacket;
+
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundStatusPackets {
-    QueryResponse(QueryResponsePacket) = 0x0,
-    PingResult(PingResultPacket) = 0x1,
+    QueryRequest(QueryRequestC2SPacket) = 0x00,
+    QueryPing(QueryPingC2SPacket) = 0x01,
 }
 
 #[repr(u8)]
@@ -27,6 +28,6 @@ pub enum ClientboundStatusPackets {
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundStatusPackets {
-    QueryRequest(QueryRequestPacket) = 0x0,
-    QueryPing(QueryPingPacket) = 0x1,
+    QueryResponse(QueryResponseS2CPacket) = 0x00,
+    PingResult(PingResultS2CPacket) = 0x01,
 }

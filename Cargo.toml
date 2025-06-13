@@ -146,7 +146,6 @@ uuid = { default-features = false, version = "1.17" }
 # Dev Builds
 [profile.dev]
 opt-level = 1
-
 [profile.dev.build-override]
 opt-level = 3
 
@@ -170,7 +169,6 @@ inherits = "dev-opt"
 # Release Builds
 [profile.release]
 opt-level = 3
-
 [profile.release.build-override]
 opt-level = 3
 
