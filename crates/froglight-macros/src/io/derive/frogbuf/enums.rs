@@ -1,18 +1,31 @@
-use darling::FromField;
+use darling::{FromField, util::Flag};
 use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{DataEnum, Fields, FieldsNamed, FieldsUnnamed, Ident, LitInt, Path, Variant};
 
 use super::FrogBufField;
+use crate::CrateManifest;
 
 pub(super) fn derive_enum(
     ident: Ident,
     DataEnum { variants, .. }: DataEnum,
+    version: Flag,
     path: Path,
 ) -> TokenStream {
     let (mut read_tokens, mut write_tokens, mut length_tokens) =
         (TokenStream::new(), TokenStream::new(), TokenStream::new());
     let mut discriminant = 0i32;
+
+    let common = CrateManifest::froglight("froglight-common");
+    let (read_trait, write_trait, generics) = if version.is_present() {
+        (
+            quote!(#path::version::FrogReadVersion<V>),
+            quote!(#path::version::FrogWriteVersion<V>),
+            quote!(<V: #common::version::Version>),
+        )
+    } else {
+        (quote!(#path::standard::FrogRead), quote!(#path::standard::FrogWrite), quote!())
+    };
 
     // Return an unreachable error if the enum has no variants
     if variants.is_empty() {
@@ -20,12 +33,12 @@ pub(super) fn derive_enum(
             format!("Enum \"{ident}\" has no variants, this code should never be reached!");
         return quote! {
             #[automatically_derived]
-            impl #path::standard::FrogRead for #ident {
+            impl #generics #read_trait for #ident {
                 fn frog_read(_: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> { unreachable!(#message) }
             }
 
             #[automatically_derived]
-            impl #path::standard::FrogWrite for #ident {
+            impl #generics #write_trait for #ident {
                 fn frog_write(&self, _: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> { unreachable!(#message) }
                 fn frog_len(&self) -> usize { unreachable!(#message) }
             }
@@ -41,8 +54,8 @@ pub(super) fn derive_enum(
 
         // Generate the read and write tokens for the variant
         let (fields, read, write, length) = match &fields {
-            Fields::Named(fields) => named_fields(fields, &path),
-            Fields::Unnamed(fields) => unnamed_fields(fields, &path),
+            Fields::Named(fields) => named_fields(fields, &version, &path),
+            Fields::Unnamed(fields) => unnamed_fields(fields, &version, &path),
             Fields::Unit => (quote!(), quote!(), quote!(), quote!()),
         };
 
@@ -87,7 +100,7 @@ pub(super) fn derive_enum(
 
     quote! {
         #[automatically_derived]
-        impl #path::standard::FrogRead for #ident {
+        impl #generics #read_trait for #ident {
             fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
                 match #path::variable::FrogVarRead::frog_var_read(buffer)? {
                     #read_tokens
@@ -97,7 +110,7 @@ pub(super) fn derive_enum(
         }
 
         #[automatically_derived]
-        impl #path::standard::FrogWrite for #ident {
+        impl #generics #write_trait for #ident {
             fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
                 let mut written = 0;
                 match self {
@@ -123,6 +136,7 @@ pub(super) fn derive_enum(
 /// for an enum with named fields.
 fn named_fields(
     fields: &FieldsNamed,
+    version: &Flag,
     path: &Path,
 ) -> (TokenStream, TokenStream, TokenStream, TokenStream) {
     let (mut fields_out, mut read, mut write, mut length) =
@@ -156,6 +170,17 @@ fn named_fields(
             length.extend(quote! {
                 length += #ident.frog_var_length();
             });
+        } else if version.is_present() {
+            read.extend(quote! {
+                #ident: #path::version::FrogReadVersion::<V>::frog_read(buffer)?,
+            });
+
+            write.extend(quote! {
+                written += #path::version::FrogWriteVersion::<V>::frog_write(&self.#ident, buffer)?;
+            });
+            length.extend(quote! {
+                length += #path::version::FrogWriteVersion::<V>::frog_length(&self.#ident);
+            });
         } else {
             read.extend(quote! {
                  #ident: #path::standard::FrogRead::frog_read(buffer)?,
@@ -184,6 +209,7 @@ const FIELDS: &[&str; 36] = &[
 /// for an enum with unnamed fields.
 fn unnamed_fields(
     fields: &FieldsUnnamed,
+    version: &Flag,
     path: &Path,
 ) -> (TokenStream, TokenStream, TokenStream, TokenStream) {
     let (mut fields_out, mut read, mut write, mut length) =
@@ -216,6 +242,17 @@ fn unnamed_fields(
             });
             length.extend(quote! {
                 length += #path::variable::FrogVarWrite::frog_var_len(#ident);
+            });
+        } else if version.is_present() {
+            read.extend(quote! {
+                #path::version::FrogReadVersion::<V>::frog_read(buffer)?,
+            });
+
+            write.extend(quote! {
+                written += #path::version::FrogWriteVersion::<V>::frog_write(#ident, buffer)?;
+            });
+            length.extend(quote! {
+                length += #path::version::FrogWriteVersion::<V>::frog_len(#ident);
             });
         } else {
             read.extend(quote! {

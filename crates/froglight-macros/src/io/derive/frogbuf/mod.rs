@@ -10,7 +10,9 @@ mod structs;
 
 #[derive(FromDeriveInput)]
 #[darling(attributes(frog))]
-struct FrogBufMacro {}
+struct FrogBufMacro {
+    version: Flag,
+}
 
 #[derive(FromField)]
 #[darling(attributes(frog))]
@@ -24,7 +26,7 @@ struct FrogBufField {
 pub(crate) fn derive_frogbuf(input: TokenStream) -> TokenStream {
     let input: DeriveInput = syn::parse2(input).unwrap();
 
-    let FrogBufMacro {} = FrogBufMacro::from_derive_input(&input).unwrap();
+    let FrogBufMacro { version } = FrogBufMacro::from_derive_input(&input).unwrap();
     let DeriveInput { ident, data, .. } = input;
 
     // Attempt to find the following crates in order:
@@ -36,8 +38,8 @@ pub(crate) fn derive_frogbuf(input: TokenStream) -> TokenStream {
 
     // Derive the `FrogRead` and `FrogWrite` traits.
     match data {
-        Data::Struct(data) => structs::derive_struct(ident, data, path),
-        Data::Enum(data) => enums::derive_enum(ident, data, path),
+        Data::Struct(data) => structs::derive_struct(ident, data, version, path),
+        Data::Enum(data) => enums::derive_enum(ident, data, version, path),
         Data::Union(..) => panic!("`FrogBuf` cannot be derived for unions!"),
     }
 }

@@ -1,13 +1,15 @@
-use darling::FromField;
+use darling::{FromField, util::Flag};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{DataStruct, Fields, FieldsNamed, FieldsUnnamed, Ident, Index, Path};
 
 use super::FrogBufField;
+use crate::CrateManifest;
 
 pub(super) fn derive_struct(
     ident: Ident,
     DataStruct { fields, .. }: DataStruct,
+    version: Flag,
     path: Path,
 ) -> TokenStream {
     // If `io-trace` is enabled, emit a trace message when reading the struct.
@@ -25,14 +27,25 @@ pub(super) fn derive_struct(
         TokenStream::new()
     };
 
+    let common = CrateManifest::froglight("froglight-common");
+    let (read_trait, write_trait, generics) = if version.is_present() {
+        (
+            quote!(#path::version::FrogReadVersion<V>),
+            quote!(#path::version::FrogWriteVersion<V>),
+            quote!(<V: #common::version::Version>),
+        )
+    } else {
+        (quote!(#path::standard::FrogRead), quote!(#path::standard::FrogWrite), quote!())
+    };
+
     let (read, write, length) = match &fields {
-        Fields::Named(fields) => named_fields(fields, &path),
-        Fields::Unnamed(fields) => unnamed_fields(fields, &path),
+        Fields::Named(fields) => named_fields(fields, &version, &path),
+        Fields::Unnamed(fields) => unnamed_fields(fields, &version, &path),
         // Return a specialized implementation for unit structs
         Fields::Unit => {
             return quote! {
                 #[automatically_derived]
-                impl #path::standard::FrogRead for #ident {
+                impl #generics #read_trait for #ident {
                     #[inline]
                     fn frog_read(_: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
                         #read_trace
@@ -41,7 +54,7 @@ pub(super) fn derive_struct(
                 }
 
                 #[automatically_derived]
-                impl #path::standard::FrogWrite for #ident {
+                impl #generics #write_trait for #ident {
                     #[inline]
                     fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
                         #write_trace
@@ -56,7 +69,7 @@ pub(super) fn derive_struct(
 
     quote! {
         #[automatically_derived]
-        impl #path::standard::FrogRead for #ident {
+        impl #generics #read_trait for #ident {
             fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, #path::standard::ReadError> {
                 #read_trace
                 Ok(Self #read)
@@ -64,7 +77,7 @@ pub(super) fn derive_struct(
         }
 
         #[automatically_derived]
-        impl #path::standard::FrogWrite for #ident {
+        impl #generics #write_trait for #ident {
             fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, #path::standard::WriteError> {
                 #write_trace
                 let mut written = 0;
@@ -85,7 +98,11 @@ pub(super) fn derive_struct(
 
 /// Generate the `read`, `write`, and `length` functions
 /// for a struct with named fields.
-fn named_fields(fields: &FieldsNamed, path: &Path) -> (TokenStream, TokenStream, TokenStream) {
+fn named_fields(
+    fields: &FieldsNamed,
+    version: &Flag,
+    path: &Path,
+) -> (TokenStream, TokenStream, TokenStream) {
     let (mut read, mut write, mut length) =
         (TokenStream::new(), TokenStream::new(), TokenStream::new());
 
@@ -115,6 +132,17 @@ fn named_fields(fields: &FieldsNamed, path: &Path) -> (TokenStream, TokenStream,
             length.extend(quote! {
                 length += #path::variable::FrogVarWrite::frog_var_len(&self.#ident);
             });
+        } else if version.is_present() {
+            read.extend(quote! {
+                #ident: #path::version::FrogReadVersion::<V>::frog_read(buffer)?,
+            });
+
+            write.extend(quote! {
+                written += #path::version::FrogWriteVersion::<V>::frog_write(&self.#ident, buffer)?;
+            });
+            length.extend(quote! {
+                length += #path::version::FrogWriteVersion::<V>::frog_len(&self.#ident);
+            });
         } else {
             read.extend(quote! {
                 #ident: #path::standard::FrogRead::frog_read(buffer)?,
@@ -136,7 +164,11 @@ fn named_fields(fields: &FieldsNamed, path: &Path) -> (TokenStream, TokenStream,
 
 /// Generate the `read`, `write`, and `length` functions
 /// for a struct with unnamed fields.
-fn unnamed_fields(fields: &FieldsUnnamed, path: &Path) -> (TokenStream, TokenStream, TokenStream) {
+fn unnamed_fields(
+    fields: &FieldsUnnamed,
+    version: &Flag,
+    path: &Path,
+) -> (TokenStream, TokenStream, TokenStream) {
     let (mut read, mut write, mut length) =
         (TokenStream::new(), TokenStream::new(), TokenStream::new());
 
@@ -165,6 +197,17 @@ fn unnamed_fields(fields: &FieldsUnnamed, path: &Path) -> (TokenStream, TokenStr
             });
             length.extend(quote! {
                 length += #path::variable::FrogVarWrite::frog_var_len(&self.#index);
+            });
+        } else if version.is_present() {
+            read.extend(quote! {
+                 #path::version::FrogReadVersion::<V>::frog_read(buffer)?,
+            });
+
+            write.extend(quote! {
+                written += #path::version::FrogWriteVersion::<V>::frog_write(&self.#index, buffer)?;
+            });
+            length.extend(quote! {
+                length += #path::version::FrogWriteVersion::<V>::frog_len(&self.#index);
             });
         } else {
             read.extend(quote! {
