@@ -52,7 +52,7 @@ default = ["online", "std"]
 # Enable accessing online APIs.
 online = ["dep:ureq", "serde", "std"]
 # Enable `froglight-io` support.
-io = ["dep:froglight-io", "std"]
+io = ["dep:froglight-io", "online", "serde", "std"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_ecs", "dep:bevy_math", "froglight-common/bevy"]

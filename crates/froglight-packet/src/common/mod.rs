@@ -24,6 +24,9 @@ pub use intent::ConnectionIntent;
 pub mod position;
 pub use position::{BlockPos, ChunkPos};
 
+pub mod profile;
+pub use profile::PlayerProfile;
+
 mod registry;
 pub use registry::{RegistryItemOrId, RegistryNameOrSet};
 

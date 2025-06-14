@@ -22,9 +22,10 @@ use super::username::PlayerUsername;
 
 /// A player's [`Uuid`].
 #[repr(transparent)]
-#[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Display, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(Component), component(on_add = Self::on_add))]
 #[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Component))]
+#[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
 #[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PlayerUuid(Uuid);
@@ -49,6 +50,11 @@ impl PlayerUuid {
             world.commands().entity(ctx.entity).insert(uuid);
         }
     }
+
+    /// Get the inner [`Uuid`] of the [`PlayerUuid`].
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> Uuid { self.0 }
 }
 
 // -------------------------------------------------------------------------------------------------

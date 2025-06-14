@@ -27,6 +27,7 @@ use super::uuid::PlayerUuid;
 #[derive(Debug, Display, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(Component))]
 #[cfg_attr(feature = "reflect", derive(Reflect), reflect(Debug, Clone, PartialEq, Component))]
+#[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
 #[cfg_attr(all(feature = "reflect", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct PlayerUsername(SmolStr);
@@ -43,6 +44,11 @@ impl PlayerUsername {
     /// Create a new [`PlayerUsername`] from a string.
     #[must_use]
     pub fn new(s: impl Into<SmolStr>) -> Self { Self(s.into()) }
+
+    /// Get the inner [`SmolStr`] of this [`PlayerUsername`].
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> SmolStr { self.0 }
 
     /// Get the offline [`Uuid`] of the player with this [`PlayerUsername`].
     ///

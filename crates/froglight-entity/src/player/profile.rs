@@ -193,6 +193,7 @@ impl PlayerProfileTextures {
 /// The response from the Mojang API when querying a player's profile.
 #[cfg(feature = "online")]
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 #[cfg_attr(feature = "serde", derive(Deserialize))]
 pub struct ProfileResponse {
     /// The username of the player.
@@ -206,14 +207,14 @@ pub struct ProfileResponse {
 }
 
 /// A property of a player's profile.
-#[cfg(feature = "online")]
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "serde", derive(Deserialize))]
+#[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
+#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
 pub struct ProfileResponseProperty {
     /// The name of the property.
     pub name: SmolStr,
     /// The value of the property.
-    pub value: String,
+    pub value: SmolStr,
 }
 
 #[cfg(feature = "online")]
@@ -306,7 +307,7 @@ impl PlayerProfile {
 
 #[cfg(feature = "online")]
 impl TryFrom<ProfileResponse> for PlayerProfile {
-    type Error = serde::de::value::Error;
+    type Error = serde_json::Error;
 
     fn try_from(response: ProfileResponse) -> Result<Self, Self::Error> {
         let mut properties = IndexMap::with_capacity_and_hasher(
@@ -316,7 +317,7 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
 
         let mut textures = None;
         for property in response.properties {
-            if let Ok(data) = BASE64_URL_SAFE.decode(&property.value)
+            if let Ok(data) = BASE64_URL_SAFE.decode(property.value.as_bytes())
                 && let Ok(value) = serde_json::from_slice(&data)
             {
                 //
@@ -342,9 +343,31 @@ impl TryFrom<ProfileResponse> for PlayerProfile {
     }
 }
 
+#[cfg(feature = "online")]
+impl TryFrom<&PlayerProfile> for ProfileResponse {
+    type Error = serde_json::Error;
+
+    fn try_from(value: &PlayerProfile) -> Result<Self, Self::Error> {
+        let mut properties = Vec::with_capacity(value.properties.len().saturating_add(1));
+
+        properties.push(ProfileResponseProperty {
+            name: SmolStr::new_static("textures"),
+            value: serde_json::to_string(&serde_json::Value::from(&value.textures))?.into(),
+        });
+        for (name, property) in &value.properties {
+            properties.push(ProfileResponseProperty {
+                name: name.clone(),
+                value: serde_json::to_string(&property)?.into(),
+            });
+        }
+
+        Ok(Self { username: value.username.clone(), uuid: value.uuid, properties })
+    }
+}
+
 #[cfg(feature = "serde")]
 impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
-    type Error = serde::de::value::Error;
+    type Error = serde_json::Error;
 
     fn try_from(value: &serde_json::Value) -> Result<Self, Self::Error> {
         let Some(timestamp) = value.get("timestamp").and_then(serde_json::Value::as_u64) else {
@@ -372,6 +395,40 @@ impl TryFrom<&serde_json::Value> for PlayerProfileTextures {
                 .and_then(serde_json::Value::as_str)
                 .map(SmolStr::from),
         })
+    }
+}
+
+#[cfg(feature = "serde")]
+impl From<&PlayerProfileTextures> for serde_json::Value {
+    fn from(value: &PlayerProfileTextures) -> Self {
+        let mut map = serde_json::Map::new();
+
+        #[expect(clippy::cast_possible_truncation)]
+        map.insert("timestamp".into(), (value.timestamp.as_millis() as u64).into());
+
+        let mut textures = serde_json::Map::new();
+
+        if let Some(skin) = &value.skin {
+            let mut map = serde_json::Map::new();
+
+            if value.slim {
+                map.insert("model".into(), "slim".into());
+            }
+            map.insert("url".into(), skin.to_string().into());
+
+            textures.insert("SKIN".into(), serde_json::Value::Object(map));
+        }
+        if let Some(cape) = &value.cape {
+            let mut map = serde_json::Map::new();
+
+            map.insert("url".into(), cape.to_string().into());
+
+            textures.insert("CAPE".into(), serde_json::Value::Object(map));
+        }
+
+        map.insert("textures".into(), serde_json::Value::Object(textures));
+
+        serde_json::Value::Object(map)
     }
 }
 

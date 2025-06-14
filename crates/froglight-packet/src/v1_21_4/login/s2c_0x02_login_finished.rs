@@ -4,8 +4,13 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use derive_more::{Deref, DerefMut, From, Into};
+use froglight_entity::prelude::PlayerProfile;
 
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, Clone, PartialEq, Hash))]
+#[repr(transparent)]
+#[derive(Debug, Clone, PartialEq, Eq, Deref, DerefMut, From, Into)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-pub struct LoginSuccessS2CPacket;
+pub struct LoginSuccessS2CPacket {
+    pub profile: PlayerProfile,
+}

@@ -4,6 +4,9 @@ pub mod profile;
 pub mod username;
 pub mod uuid;
 
+#[cfg(feature = "io")]
+mod io;
+
 /// Retry a request up to N times if it fails.
 ///
 /// # Warning
