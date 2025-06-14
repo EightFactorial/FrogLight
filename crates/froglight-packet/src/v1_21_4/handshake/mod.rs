@@ -12,15 +12,15 @@ use derive_more::{From, TryInto, TryUnwrap};
 mod c2s_0x00_intention;
 pub use c2s_0x00_intention::HandshakeC2SPacket;
 
+#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
+pub enum ClientboundHandshakePackets {}
+
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
-pub enum ClientboundHandshakePackets {
+pub enum ServerboundHandshakePackets {
     Handshake(HandshakeC2SPacket) = 0x00,
 }
-
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
-#[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
-pub enum ServerboundHandshakePackets {}

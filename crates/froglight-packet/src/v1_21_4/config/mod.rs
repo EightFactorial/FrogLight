@@ -43,21 +43,6 @@ pub use s2c_0x0e_select_known_packs::SelectKnownPacksS2CPacket;
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundConfigPackets {
-    ClientOptions(ClientOptionsC2SPacket) = 0x00,
-    CookieResponse(CookieResponseC2SPacket) = 0x01,
-    CustomPayload(CustomPayloadC2SPacket) = 0x02,
-    Ready(ReadyC2SPacket) = 0x03,
-    KeepAlive(KeepAliveC2SPacket) = 0x04,
-    CommonPong(CommonPongC2SPacket) = 0x05,
-    ResourcePackStatus(ResourcePackStatusC2SPacket) = 0x06,
-    SelectKnownPacks(SelectKnownPacksC2SPacket) = 0x07,
-}
-
-#[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
-#[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
-pub enum ServerboundConfigPackets {
     CookieRequest(CookieRequestS2CPacket) = 0x00,
     CustomPayload(CustomPayloadS2CPacket) = 0x01,
     Disconnect(DisconnectS2CPacket) = 0x02,
@@ -75,4 +60,19 @@ pub enum ServerboundConfigPackets {
     SelectKnownPacks(SelectKnownPacksS2CPacket) = 0x0e,
     CustomReportDetails(CustomReportDetailsS2CPacket) = 0x0f,
     ServerLinks(ServerLinksS2CPacket) = 0x10,
+}
+
+#[repr(u8)]
+#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
+pub enum ServerboundConfigPackets {
+    ClientOptions(ClientOptionsC2SPacket) = 0x00,
+    CookieResponse(CookieResponseC2SPacket) = 0x01,
+    CustomPayload(CustomPayloadC2SPacket) = 0x02,
+    Ready(ReadyC2SPacket) = 0x03,
+    KeepAlive(KeepAliveC2SPacket) = 0x04,
+    CommonPong(CommonPongC2SPacket) = 0x05,
+    ResourcePackStatus(ResourcePackStatusC2SPacket) = 0x06,
+    SelectKnownPacks(SelectKnownPacksC2SPacket) = 0x07,
 }

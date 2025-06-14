@@ -85,6 +85,6 @@ v1_21_5 = ["froglight-common/v1_21_5", "froglight-packet/v1_21_5"]
 
 # --- Examples ---
 
-# [[example]]
-# name = "status"
-# required-features = ["io", "resolver", "v1_21_4"]
+[[example]]
+name = "status"
+required-features = ["io", "resolver", "v1_21_4"]

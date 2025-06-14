@@ -43,11 +43,12 @@ pub use s2c_0x04_custom_query::LoginQueryRequestS2CPacket;
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundLoginPackets {
-    LoginHello(LoginHelloC2SPacket) = 0x00,
-    LoginKey(LoginKeyC2SPacket) = 0x01,
-    LoginQueryResponse(LoginQueryResponseC2SPacket) = 0x02,
-    EnterConfiguration(EnterConfigurationC2SPacket) = 0x03,
-    CookieResponse(CookieResponseC2SPacket) = 0x04,
+    LoginDisconnect(LoginDisconnectS2CPacket) = 0x00,
+    LoginHello(LoginHelloS2CPacket) = 0x01,
+    LoginSuccess(LoginSuccessS2CPacket) = 0x02,
+    LoginCompression(LoginCompressionS2CPacket) = 0x03,
+    LoginQueryRequest(LoginQueryRequestS2CPacket) = 0x04,
+    CookieRequest(CookieRequestS2CPacket) = 0x05,
 }
 
 #[repr(u8)]
@@ -55,10 +56,9 @@ pub enum ClientboundLoginPackets {
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundLoginPackets {
-    LoginDisconnect(LoginDisconnectS2CPacket) = 0x00,
-    LoginHello(LoginHelloS2CPacket) = 0x01,
-    LoginSuccess(LoginSuccessS2CPacket) = 0x02,
-    LoginCompression(LoginCompressionS2CPacket) = 0x03,
-    LoginQueryRequest(LoginQueryRequestS2CPacket) = 0x04,
-    CookieRequest(CookieRequestS2CPacket) = 0x05,
+    LoginHello(LoginHelloC2SPacket) = 0x00,
+    LoginKey(LoginKeyC2SPacket) = 0x01,
+    LoginQueryResponse(LoginQueryResponseC2SPacket) = 0x02,
+    EnterConfiguration(EnterConfigurationC2SPacket) = 0x03,
+    CookieResponse(CookieResponseC2SPacket) = 0x04,
 }

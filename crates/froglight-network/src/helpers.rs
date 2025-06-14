@@ -4,8 +4,10 @@ use alloc::boxed::Box;
 use froglight_packet::{
     state::ValidState,
     v1_21_4::{
-        handshake::HandshakePacket,
-        status::{PingResultPacket, QueryPingPacket, QueryRequestPacket, QueryResponsePacket},
+        handshake::HandshakeC2SPacket,
+        status::{
+            PingResultS2CPacket, QueryPingC2SPacket, QueryRequestC2SPacket, QueryResponseS2CPacket,
+        },
     },
 };
 use smol_str::ToSmolStr;
@@ -13,7 +15,7 @@ use smol_str::ToSmolStr;
 use crate::{connection::raw::RawPacketVersion, prelude::*};
 
 impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
-    /// Send a [`HandshakePacket`] to the server to initiate a connection.
+    /// Send a [`HandshakeC2SPacket`] to the server to initiate a connection.
     ///
     /// # Errors
     /// Returns an error if the client is unable to send the packet.
@@ -26,16 +28,16 @@ impl<V: ValidState<Handshake>> ClientConnection<V, Handshake> {
     ) -> Result<(), ConnectionError>
     where
         V::Serverbound: RawPacketVersion<V, M>,
-        HandshakePacket: Into<V::Serverbound>,
+        HandshakeC2SPacket: Into<V::Serverbound>,
     {
-        self.write::<M>(HandshakePacket::new::<V>(address, port, intent)).await
+        self.write::<M>(HandshakeC2SPacket::new::<V>(address, port, intent)).await
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 impl<V: ValidState<Status>> ClientConnection<V, Status> {
-    /// Send a [`QueryRequestPacket`] to the server
+    /// Send a [`QueryRequestC2SPacket`] to the server
     /// and wait for a [`ServerStatus`] response.
     ///
     /// # Errors
@@ -45,36 +47,36 @@ impl<V: ValidState<Status>> ClientConnection<V, Status> {
     pub async fn query_status<M: 'static>(&mut self) -> Result<ServerStatus, ConnectionError>
     where
         V::Serverbound: RawPacketVersion<V, M>,
-        QueryRequestPacket: Into<V::Serverbound>,
-        V::Clientbound: RawPacketVersion<V, M> + TryInto<QueryResponsePacket>,
-        <V::Clientbound as TryInto<QueryResponsePacket>>::Error: core::fmt::Debug,
+        QueryRequestC2SPacket: Into<V::Serverbound>,
+        V::Clientbound: RawPacketVersion<V, M> + TryInto<QueryResponseS2CPacket>,
+        <V::Clientbound as TryInto<QueryResponseS2CPacket>>::Error: core::fmt::Debug,
     {
-        self.write::<M>(QueryRequestPacket).await?;
+        self.write::<M>(QueryRequestC2SPacket).await?;
         match self.read::<M>().await?.try_into() {
-            Ok(QueryResponsePacket { status }) => Ok(status),
+            Ok(QueryResponseS2CPacket { metadata }) => Ok(metadata),
             Err(err) => {
                 Err(ConnectionError::ReadRawPacket(Box::new(UnexpectedPacketError::from(err))))
             }
         }
     }
 
-    /// Send a [`QueryPingPacket`] to the server
-    /// and wait for a [`PingResultPacket`] response.
+    /// Send a [`QueryPingC2SPacket`] to the server
+    /// and wait for a [`PingResultS2CPacket`] response.
     ///
     /// # Errors
     /// Returns an error if the client is unable to send the request,
     /// read the response, or the server sends an invalid response.
     #[inline]
-    pub async fn query_ping<M: 'static>(&mut self, ping: u64) -> Result<u64, ConnectionError>
+    pub async fn query_ping<M: 'static>(&mut self, timestamp: u64) -> Result<u64, ConnectionError>
     where
         V::Serverbound: RawPacketVersion<V, M>,
-        QueryPingPacket: Into<V::Serverbound>,
-        V::Clientbound: RawPacketVersion<V, M> + TryInto<PingResultPacket>,
-        <V::Clientbound as TryInto<PingResultPacket>>::Error: core::fmt::Debug,
+        QueryPingC2SPacket: Into<V::Serverbound>,
+        V::Clientbound: RawPacketVersion<V, M> + TryInto<PingResultS2CPacket>,
+        <V::Clientbound as TryInto<PingResultS2CPacket>>::Error: core::fmt::Debug,
     {
-        self.write::<M>(QueryPingPacket { ping }).await?;
+        self.write::<M>(QueryPingC2SPacket { timestamp }).await?;
         match self.read::<M>().await?.try_into() {
-            Ok(PingResultPacket { pong }) => Ok(pong),
+            Ok(PingResultS2CPacket { timestamp }) => Ok(timestamp),
             Err(err) => {
                 Err(ConnectionError::ReadRawPacket(Box::new(UnexpectedPacketError::from(err))))
             }

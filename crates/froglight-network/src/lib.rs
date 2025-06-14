@@ -13,7 +13,7 @@ pub mod connection;
 #[cfg(feature = "io")]
 pub mod froglight_io;
 
-// mod helpers;
+mod helpers;
 
 pub mod prelude {
     //! Re-exports of commonly used types, traits, and macros.
