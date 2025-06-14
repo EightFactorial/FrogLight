@@ -30,6 +30,12 @@ pub use profile::PlayerProfile;
 mod registry;
 pub use registry::{RegistryItemOrId, RegistryNameOrSet};
 
+mod resource_pack;
+pub use resource_pack::{KnownResourcePack, ResourcePackStatus};
+
+pub mod server_link;
+pub use server_link::ServerLink;
+
 pub mod settings;
 pub use settings::ClientSettings;
 
