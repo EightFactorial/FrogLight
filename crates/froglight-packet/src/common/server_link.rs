@@ -2,14 +2,14 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_nbt::io::NbtWrapper;
+use froglight_text::text::FormattedText;
 use smol_str::SmolStr;
 
-use crate::common::UnsizedBuffer;
-
 /// A link sent by the server to the client.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub struct ServerLink {
     /// The text of the label.
     pub label: ServerLinkLabel,
@@ -20,12 +20,12 @@ pub struct ServerLink {
 // -------------------------------------------------------------------------------------------------
 
 /// The label of a server link.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 pub enum ServerLinkLabel {
     /// A custom label
-    Text(UnsizedBuffer<[u8; 16]>),
+    Text(NbtWrapper<FormattedText>),
     /// A preset label
     Preset(ServerLinkPreset),
 }

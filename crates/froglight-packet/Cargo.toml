@@ -115,6 +115,7 @@ std = [
   "glam/std",
   "serde/std",
   "serde_json/std",
+  "smallvec/write",
   "smol_str/std",
   "tracing?/std",
   "uuid/std",

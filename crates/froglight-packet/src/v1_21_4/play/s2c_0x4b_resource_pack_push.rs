@@ -4,10 +4,10 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use froglight_nbt::io::NbtWrapper;
+use froglight_text::text::FormattedText;
 use smol_str::SmolStr;
 use uuid::Uuid;
-
-use crate::common::UnsizedBuffer;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
@@ -17,5 +17,5 @@ pub struct ResourcePackSendS2CPacket {
     pub url: SmolStr,
     pub hash: SmolStr,
     pub required: bool,
-    pub prompt: UnsizedBuffer<[u8; 16]>,
+    pub prompt: Option<NbtWrapper<FormattedText>>,
 }
