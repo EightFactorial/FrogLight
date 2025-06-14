@@ -52,8 +52,8 @@ pub enum ClientboundLoginPackets {
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, From, TryInto, TryUnwrap)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundLoginPackets {
     LoginHello(LoginHelloC2SPacket) = 0x00,

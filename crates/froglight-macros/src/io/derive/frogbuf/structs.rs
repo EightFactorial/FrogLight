@@ -1,15 +1,15 @@
-use darling::{FromField, util::Flag};
+use darling::FromField;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{DataStruct, Fields, FieldsNamed, FieldsUnnamed, Ident, Index, Path};
 
 use super::FrogBufField;
-use crate::CrateManifest;
+use crate::{CrateManifest, io::derive::frogbuf::FrogBufMacro};
 
 pub(super) fn derive_struct(
     ident: Ident,
     DataStruct { fields, .. }: DataStruct,
-    version: Flag,
+    flags: FrogBufMacro,
     path: Path,
 ) -> TokenStream {
     // If `io-trace` is enabled, emit a trace message when reading the struct.
@@ -28,7 +28,7 @@ pub(super) fn derive_struct(
     };
 
     let common = CrateManifest::froglight("froglight-common");
-    let (read_trait, write_trait, generics) = if version.is_present() {
+    let (read_trait, write_trait, generics) = if flags.version.is_present() {
         (
             quote!(#path::version::FrogReadVersion<V>),
             quote!(#path::version::FrogWriteVersion<V>),
@@ -39,8 +39,8 @@ pub(super) fn derive_struct(
     };
 
     let (read, write, length) = match &fields {
-        Fields::Named(fields) => named_fields(fields, &version, &path),
-        Fields::Unnamed(fields) => unnamed_fields(fields, &version, &path),
+        Fields::Named(fields) => named_fields(fields, &flags, &path),
+        Fields::Unnamed(fields) => unnamed_fields(fields, &flags, &path),
         // Return a specialized implementation for unit structs
         Fields::Unit => {
             return quote! {
@@ -100,7 +100,7 @@ pub(super) fn derive_struct(
 /// for a struct with named fields.
 fn named_fields(
     fields: &FieldsNamed,
-    version: &Flag,
+    flags: &FrogBufMacro,
     path: &Path,
 ) -> (TokenStream, TokenStream, TokenStream) {
     let (mut read, mut write, mut length) =
@@ -132,7 +132,7 @@ fn named_fields(
             length.extend(quote! {
                 length += #path::variable::FrogVarWrite::frog_var_len(&self.#ident);
             });
-        } else if version.is_present() {
+        } else if flags.version.is_present() {
             read.extend(quote! {
                 #ident: #path::version::FrogReadVersion::<V>::frog_read(buffer)?,
             });
@@ -166,7 +166,7 @@ fn named_fields(
 /// for a struct with unnamed fields.
 fn unnamed_fields(
     fields: &FieldsUnnamed,
-    version: &Flag,
+    flags: &FrogBufMacro,
     path: &Path,
 ) -> (TokenStream, TokenStream, TokenStream) {
     let (mut read, mut write, mut length) =
@@ -198,7 +198,7 @@ fn unnamed_fields(
             length.extend(quote! {
                 length += #path::variable::FrogVarWrite::frog_var_len(&self.#index);
             });
-        } else if version.is_present() {
+        } else if flags.version.is_present() {
             read.extend(quote! {
                  #path::version::FrogReadVersion::<V>::frog_read(buffer)?,
             });

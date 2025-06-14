@@ -16,7 +16,7 @@ mod gamemode;
 pub use gamemode::{GameMode, PreviousGameMode};
 
 mod hand;
-// pub use hand::*;
+pub use hand::PlayerHand;
 
 mod intent;
 pub use intent::ConnectionIntent;
@@ -26,6 +26,9 @@ pub use position::{BlockPos, ChunkPos};
 
 mod registry;
 pub use registry::{RegistryItemOrId, RegistryNameOrSet};
+
+pub mod settings;
+pub use settings::ClientSettings;
 
 pub mod status;
 pub use status::ServerStatus;
