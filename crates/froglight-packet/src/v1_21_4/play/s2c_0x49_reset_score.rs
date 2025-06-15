@@ -4,11 +4,12 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 pub struct ScoreboardScoreResetS2CPacket {
-    pub score_holder_name: String,
-    pub unknown: Option<String>,
+    pub score_holder_name: SmolStr,
+    pub unknown: Option<SmolStr>,
 }

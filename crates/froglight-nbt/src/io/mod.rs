@@ -6,7 +6,5 @@ mod froglight;
 pub mod slice;
 pub use slice::{NamedNbtRef, NbtRefIterator, NbtStreamError, UnnamedNbtRef};
 
-#[cfg(feature = "io")]
 mod wrapper;
-#[cfg(feature = "io")]
 pub use wrapper::{NbtCompoundWrapper, NbtWrapper};

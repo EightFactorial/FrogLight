@@ -7,18 +7,18 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::{From, TryInto, TryUnwrap};
+use derive_more::{From, TryUnwrap};
 
 mod c2s_0x00_intention;
 pub use c2s_0x00_intention::HandshakeC2SPacket;
 
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundHandshakePackets {}
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundHandshakePackets {

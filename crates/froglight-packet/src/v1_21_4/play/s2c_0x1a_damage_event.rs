@@ -4,6 +4,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
@@ -11,5 +12,5 @@ use bevy_reflect::prelude::*;
 pub struct EntityDamageS2CPacket {
     #[cfg_attr(feature = "io", frog(var))]
     pub entity_id: u32,
-    pub unknown: Option<String>,
+    pub unknown: Option<SmolStr>,
 }

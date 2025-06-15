@@ -7,7 +7,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::{From, TryInto, TryUnwrap};
+use derive_more::{From, TryUnwrap};
 
 pub use crate::v1_21_4::play::{
     AcknowledgeChunksC2SPacket, AcknowledgeReconfigurationC2SPacket, AdvancementTabC2SPacket,
@@ -105,7 +105,7 @@ mod s2c_0x7b_update_advancements;
 pub use s2c_0x7b_update_advancements::AdvancementUpdateS2CPacket;
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundPlayPackets {
@@ -176,7 +176,7 @@ pub enum ClientboundPlayPackets {
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundPlayPackets {

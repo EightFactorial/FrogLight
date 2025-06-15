@@ -4,6 +4,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
@@ -11,5 +12,5 @@ use bevy_reflect::prelude::*;
 pub struct RequestCommandCompletionsC2SPacket {
     #[cfg_attr(feature = "io", frog(var))]
     pub completion_id: u32,
-    pub partial_command: String,
+    pub partial_command: SmolStr,
 }

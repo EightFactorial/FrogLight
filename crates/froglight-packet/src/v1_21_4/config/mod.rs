@@ -7,7 +7,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::{From, TryInto, TryUnwrap};
+use derive_more::{From, TryUnwrap};
 
 pub use crate::v1_21_4::play::{
     ClientOptionsC2SPacket, CommonPingS2CPacket, CommonPongC2SPacket, CookieRequestS2CPacket,
@@ -39,7 +39,7 @@ mod s2c_0x0e_select_known_packs;
 pub use s2c_0x0e_select_known_packs::SelectKnownPacksS2CPacket;
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundConfigPackets {
@@ -63,7 +63,7 @@ pub enum ClientboundConfigPackets {
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundConfigPackets {

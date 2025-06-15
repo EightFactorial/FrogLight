@@ -1,14 +1,13 @@
+#[cfg(feature = "io")]
 use std::io::{Read, Write};
 
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
 use derive_more::{AsMut, AsRef, Deref, DerefMut};
+#[cfg(feature = "io")]
 use froglight_io::prelude::*;
 
-use crate::{
-    convert::{FromCompound, FromTag, IntoCompound, IntoTag},
-    nbt::{NbtCompound, NbtTag},
-};
+use crate::prelude::*;
 
 /// A wrapper around any type that implements [`FromTag`] and [`IntoTag`].
 ///
@@ -43,6 +42,7 @@ impl<T: FromTag + IntoTag + MaybeReflect> NbtWrapper<T> {
 
 // -------------------------------------------------------------------------------------------------
 
+#[cfg(feature = "io")]
 impl<T: FromTag + IntoTag + MaybeReflect> FrogRead for NbtWrapper<T> {
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         T::from_tag(&NbtTag::frog_read(buffer)?)
@@ -50,6 +50,7 @@ impl<T: FromTag + IntoTag + MaybeReflect> FrogRead for NbtWrapper<T> {
     }
 }
 
+#[cfg(feature = "io")]
 impl<T: FromTag + IntoTag + MaybeReflect> FrogWrite for NbtWrapper<T> {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         T::into_tag(self).map_err(|err| -> WriteError { todo!("{err}") })?.frog_write(buffer)
@@ -94,6 +95,7 @@ impl<T: FromCompound + IntoCompound> NbtCompoundWrapper<T> {
 
 // -------------------------------------------------------------------------------------------------
 
+#[cfg(feature = "io")]
 impl<T: FromCompound + IntoCompound> FrogRead for NbtCompoundWrapper<T> {
     fn frog_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         T::from_compound(&NbtCompound::frog_read(buffer)?)
@@ -101,6 +103,7 @@ impl<T: FromCompound + IntoCompound> FrogRead for NbtCompoundWrapper<T> {
     }
 }
 
+#[cfg(feature = "io")]
 impl<T: FromCompound + IntoCompound> FrogWrite for NbtCompoundWrapper<T> {
     fn frog_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         T::into_compound(self).map_err(|err| -> WriteError { todo!("{err}") })?.frog_write(buffer)

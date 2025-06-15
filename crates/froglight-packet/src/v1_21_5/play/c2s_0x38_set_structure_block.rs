@@ -4,6 +4,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
@@ -12,12 +13,12 @@ pub struct UpdateStructureBlockC2SPacket {
     pub pos: (),
     pub action: (),
     pub mode: (),
-    pub template_name: String,
+    pub template_name: SmolStr,
     pub offset: i8,
     pub size: i8,
     pub mirror: (),
     pub rotation: (),
-    pub metadata: String,
+    pub metadata: SmolStr,
     pub integrity: f32,
     #[cfg_attr(feature = "io", frog(var))]
     pub seed: u64,

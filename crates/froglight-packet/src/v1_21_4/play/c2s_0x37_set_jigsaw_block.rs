@@ -5,6 +5,7 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use froglight_common::prelude::Identifier;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
@@ -14,8 +15,8 @@ pub struct UpdateJigsawC2SPacket {
     pub name: Identifier,
     pub target: Identifier,
     pub pool: Identifier,
-    pub final_state: String,
-    pub joint_type: String,
+    pub final_state: SmolStr,
+    pub joint_type: SmolStr,
     #[cfg_attr(feature = "io", frog(var))]
     pub selection_priority: u32,
     #[cfg_attr(feature = "io", frog(var))]

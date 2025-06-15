@@ -4,13 +4,14 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 pub struct UpdateCommandBlockC2SPacket {
     pub pos: (),
-    pub command: String,
+    pub command: SmolStr,
     pub ty: (),
     pub always_active: i8,
 }

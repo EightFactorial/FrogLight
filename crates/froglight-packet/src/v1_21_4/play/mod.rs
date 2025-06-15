@@ -7,7 +7,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::{From, TryInto, TryUnwrap};
+use derive_more::{From, TryUnwrap};
 
 mod c2s_0x00_accept_teleportation;
 pub use c2s_0x00_accept_teleportation::TeleportConfirmC2SPacket;
@@ -589,7 +589,7 @@ mod s2c_0x82_server_links;
 pub use s2c_0x82_server_links::ServerLinksS2CPacket;
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundPlayPackets {
@@ -727,7 +727,7 @@ pub enum ClientboundPlayPackets {
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundPlayPackets {

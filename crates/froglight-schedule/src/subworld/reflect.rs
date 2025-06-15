@@ -29,7 +29,7 @@ pub trait SubWorldSync {
 
 /// A [`TypeData`](bevy_reflect::TypeData)-compatible
 /// container for a [`SubWorldSync`] implementation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy)]
 #[expect(clippy::struct_field_names)]
 pub struct ReflectSubWorldSync {
     init_fn: fn(&Identifier, &mut World, &mut World),

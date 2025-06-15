@@ -4,6 +4,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
@@ -11,5 +12,5 @@ use bevy_reflect::prelude::*;
 pub struct UpdateSignC2SPacket {
     pub pos: (),
     pub front: bool,
-    pub text: String,
+    pub text: SmolStr,
 }

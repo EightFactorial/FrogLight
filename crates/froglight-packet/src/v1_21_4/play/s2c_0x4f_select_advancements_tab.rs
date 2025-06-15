@@ -4,10 +4,11 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
+use smol_str::SmolStr;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 pub struct SelectAdvancementTabS2CPacket {
-    pub unknown: Option<String>,
+    pub unknown: Option<SmolStr>,
 }

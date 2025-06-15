@@ -7,7 +7,7 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use derive_more::{From, TryInto, TryUnwrap};
+use derive_more::{From, TryUnwrap};
 
 pub use crate::v1_21_4::config::{CookieRequestS2CPacket, CookieResponseC2SPacket};
 
@@ -39,7 +39,7 @@ mod s2c_0x04_custom_query;
 pub use s2c_0x04_custom_query::LoginQueryRequestS2CPacket;
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, From, TryInto, TryUnwrap)]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ClientboundLoginPackets {
@@ -52,8 +52,8 @@ pub enum ClientboundLoginPackets {
 }
 
 #[repr(u8)]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, From, TryInto, TryUnwrap)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
+#[derive(Debug, Clone, PartialEq, From, TryUnwrap)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogPackets))]
 pub enum ServerboundLoginPackets {
     LoginHello(LoginHelloC2SPacket) = 0x00,

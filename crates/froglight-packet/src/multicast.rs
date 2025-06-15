@@ -1,13 +1,10 @@
 //! [`LanBroadcast`]
 
-#[cfg(not(feature = "std"))]
-use alloc::boxed::Box;
-
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 #[cfg(feature = "io")]
 use froglight_io::prelude::*;
-use smol_str::{SmolStr, ToSmolStr};
+use smol_str::SmolStr;
 
 /// A LAN broadcast message that advertises a server on the local network.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -55,7 +52,7 @@ impl FrogRead for LanBroadcast {
         };
 
         Ok(LanBroadcast {
-            motd: motd.to_smolstr(),
+            motd: SmolStr::new(motd),
             port: port.parse::<u16>().map_err(|err| ReadError::Other(Box::new(err)))?,
         })
     }
