@@ -10,6 +10,8 @@ use bevy_ecs::prelude::*;
 use bevy_platform::hash::FixedHasher;
 #[cfg(feature = "reflect")]
 use bevy_reflect::prelude::*;
+#[cfg(feature = "io")]
+use froglight_io::prelude::*;
 #[cfg(feature = "serde")]
 use indexmap::IndexMap;
 #[cfg(feature = "online")]
@@ -157,6 +159,21 @@ impl PlayerProfile {
             None => Self::profile_of_player(username, &ureq::Agent::new_with_defaults()),
         }
     }
+}
+
+#[cfg(feature = "io")]
+impl FrogRead for PlayerProfile {
+    fn frog_read(buffer: &mut impl std::io::Read) -> Result<Self, ReadError> {
+        Self::try_from(ProfileResponse::frog_read(buffer)?).map_err(ReadError::Json)
+    }
+}
+#[cfg(feature = "io")]
+impl FrogWrite for PlayerProfile {
+    fn frog_write(&self, buffer: &mut impl std::io::Write) -> Result<usize, WriteError> {
+        ProfileResponse::try_from(self).map_err(WriteError::Json)?.frog_write(buffer)
+    }
+
+    fn frog_len(&self) -> usize { ProfileResponse::try_from(self).unwrap().frog_len() }
 }
 
 // -------------------------------------------------------------------------------------------------

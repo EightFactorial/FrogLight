@@ -12,6 +12,9 @@ pub use boss_bar::BossBarAction;
 mod chunk;
 pub use chunk::*;
 
+mod client_status;
+pub use client_status::ClientStatusAction;
+
 mod difficulty;
 pub use difficulty::Difficulty;
 
@@ -26,6 +29,12 @@ pub use hand::PlayerHand;
 
 mod intent;
 pub use intent::ConnectionIntent;
+
+pub mod interaction;
+pub use interaction::PlayerInteraction;
+
+mod message;
+pub use message::{MessageSignature, SeenMessagesUpdate, SignedCommandArgument};
 
 pub mod position;
 pub use position::{BlockPos, ChunkPos};
