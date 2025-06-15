@@ -12,26 +12,26 @@ use proptest::prelude::*;
 use super::{FrogVarRead, FrogVarWrite, ReadError, WriteError};
 use crate::standard::{FrogRead, FrogWrite};
 
-impl<K: FrogVarRead + Eq + Hash, V: FrogRead, S: BuildHasher + Default> FrogVarRead
+impl<K: FrogRead + Eq + Hash, V: FrogVarRead, S: BuildHasher + Default> FrogVarRead
     for HashMap<K, V, S>
 {
     fn frog_var_read(buffer: &mut impl Read) -> Result<Self, ReadError> {
         (0..usize::frog_var_read(buffer)?)
-            .map(|_| Ok((K::frog_var_read(buffer)?, V::frog_read(buffer)?)))
+            .map(|_| Ok((K::frog_read(buffer)?, V::frog_var_read(buffer)?)))
             .collect()
     }
 }
-impl<K: FrogVarWrite, V: FrogWrite, S> FrogVarWrite for HashMap<K, V, S> {
+impl<K: FrogWrite, V: FrogVarWrite, S> FrogVarWrite for HashMap<K, V, S> {
     fn frog_var_write(&self, buffer: &mut impl Write) -> Result<usize, WriteError> {
         self.iter().try_fold(self.len().frog_var_write(buffer)?, |acc, (key, value)| {
-            key.frog_var_write(buffer)
-                .and_then(|len| value.frog_write(buffer).map(|len2| acc + len + len2))
+            key.frog_write(buffer)
+                .and_then(|len| value.frog_var_write(buffer).map(|len2| acc + len + len2))
         })
     }
 
     fn frog_var_len(&self) -> usize {
         self.iter().fold(self.len().frog_var_len(), |acc, (key, value)| {
-            acc + key.frog_var_len() + value.frog_len()
+            acc + key.frog_len() + value.frog_var_len()
         })
     }
 }

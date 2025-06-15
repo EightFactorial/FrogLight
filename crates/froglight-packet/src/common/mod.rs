@@ -6,8 +6,14 @@ pub use axis::Axis;
 mod bitset;
 pub use bitset::{BitSet, FixedBitSet};
 
+pub mod boss_bar;
+pub use boss_bar::BossBarAction;
+
 mod chunk;
 pub use chunk::*;
+
+mod difficulty;
+pub use difficulty::Difficulty;
 
 pub mod direction;
 pub use direction::Direction;
@@ -38,6 +44,9 @@ pub use server_link::ServerLink;
 
 pub mod settings;
 pub use settings::ClientSettings;
+
+mod statistic;
+pub use statistic::PlayerStatisticType;
 
 pub mod status;
 pub use status::ServerStatus;
