@@ -8,7 +8,7 @@ use bevy_ecs::prelude::*;
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
 use froglight_common::version::Version;
-use rsa::{RsaPrivateKey, rand_core::CryptoRngCore};
+use rsa::{RsaPrivateKey, rand_core::CryptoRng};
 use uuid::Uuid;
 
 /// A trait for [`Version`]s that can sign chat messages.
@@ -74,12 +74,12 @@ impl MessageSignatureCtx {
     ///
     /// # Errors
     /// Returns an error if the RSA key generation fails.
-    pub fn new<R: CryptoRngCore>(
+    pub fn new<R: CryptoRng>(
         account: Uuid,
         session: Uuid,
         rng: &mut R,
     ) -> Result<Self, rsa::Error> {
-        let private_key = RsaPrivateKey::new(rng, Self::DEFAULT_KEY_SIZE)?;
+        let private_key = RsaPrivateKey::new::<R>(rng, Self::DEFAULT_KEY_SIZE)?;
         Ok(Self::new_with(account, session, private_key))
     }
 
@@ -104,11 +104,11 @@ impl MessageSignatureCtx {
 
     /// Sign a message using this [`MessageSignatureCtx`].
     ///
-    /// Uses the given [`CryptoRngCore`] implementation to
+    /// Uses the given [`CryptoRng`] implementation to
     /// generate a random salt.
     #[inline]
     #[must_use]
-    pub fn sign<V: SignableMessage, M: MessageTimestamp, R: CryptoRngCore>(
+    pub fn sign<V: SignableMessage, M: MessageTimestamp, R: CryptoRng>(
         &mut self,
         message: V::UnsignedMessage,
         timer: &M,

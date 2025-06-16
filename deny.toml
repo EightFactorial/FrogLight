@@ -55,15 +55,6 @@ version = "=0.2.16"
 name = "itertools"
 version = "=0.13.0"
 [[bans.skip]]
-name = "rand"
-version = "=0.8.5"
-[[bans.skip]]
-name = "rand_chacha"
-version = "=0.3.1"
-[[bans.skip]]
-name = "rand_core"
-version = "=0.6.4"
-[[bans.skip]]
 name = "regex-automata"
 version = "=0.1.10"
 [[bans.skip]]

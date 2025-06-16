@@ -1,6 +1,6 @@
 use aes::{
     Aes128,
-    cipher::{BlockDecryptMut, BlockEncryptMut, inout::InOutBuf},
+    cipher::{BlockModeDecrypt, BlockModeEncrypt, inout::InOutBuf},
 };
 use async_lock::RwLock;
 use cfb8::{Decryptor, Encryptor};
@@ -33,7 +33,7 @@ impl ConnectionCrypto {
             let mut encryptor = encryptor.write().await;
             let (head, tail) = InOutBuf::from(buf).into_chunks();
             debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-            encryptor.encrypt_blocks_inout_mut(head);
+            encryptor.encrypt_blocks_inout(head);
         }
     }
 
@@ -43,7 +43,7 @@ impl ConnectionCrypto {
             let mut decryptor = decryptor.write().await;
             let (head, tail) = InOutBuf::from(buf).into_chunks();
             debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-            decryptor.decrypt_blocks_inout_mut(head);
+            decryptor.decrypt_blocks_inout(head);
         }
     }
 
@@ -57,7 +57,7 @@ impl ConnectionCrypto {
             let mut encryptor = encryptor.write().await;
             let (head, tail) = InOutBuf::new(input, output).unwrap().into_chunks();
             debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-            encryptor.encrypt_blocks_inout_mut(head);
+            encryptor.encrypt_blocks_inout(head);
         }
     }
 
@@ -71,7 +71,7 @@ impl ConnectionCrypto {
             let mut decryptor = decryptor.write().await;
             let (head, tail) = InOutBuf::new(input, output).unwrap().into_chunks();
             debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-            decryptor.decrypt_blocks_inout_mut(head);
+            decryptor.decrypt_blocks_inout(head);
         }
     }
 }

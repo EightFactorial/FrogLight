@@ -100,7 +100,6 @@ std = [
   "froglight-text/std",
   "froglight-utils/std",
   "glam/std",
-  "md-5/std",
   "serde?/std",
   "serde_json?/std",
   "smol_str/std",

@@ -99,13 +99,13 @@ froglight-utils = { default-features = false, path = "crates/froglight-utils", v
 froglight-world = { default-features = false, path = "crates/froglight-world", version = "0.1" }
 
 # Hashing / Cryptography
-aes = { default-features = false, features = ["zeroize"], version = "0.8.4" }
+aes = { default-features = false, features = ["zeroize"], version = "0.9.0-rc.0" }
 base64 = { default-features = false, features = ["alloc"], version = "0.22.1" }
-cfb8 = { default-features = false, features = ["alloc", "zeroize"], version = "0.8.1" }
+cfb8 = { default-features = false, features = ["alloc", "zeroize"], version = "0.9.0-rc.0" }
 crc32fast = { default-features = false, version = "1.4.2" }
-md-5 = { default-features = false, version = "0.10.6" }
-rsa = { default-features = false, version = "0.9.8" }
-sha2 = { default-features = false, version = "0.10.9" }
+md-5 = { default-features = false, features = ["alloc", "zeroize"], version = "0.11.0-rc.0" }
+rsa = { default-features = false, features = [], version = "0.10.0-rc.0" }
+sha2 = { default-features = false, features = ["alloc", "zeroize"], version = "0.11.0-rc.0" }
 
 # Other
 async-channel = { default-features = false, version = "2.3" }
