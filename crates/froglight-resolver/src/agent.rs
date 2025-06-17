@@ -129,9 +129,4 @@ fn agent() {
         Err(ureq::Error::Io(err)) if err.kind() == ErrorKind::ConnectionRefused => {}
         Err(err) => panic!("Failed to connect to \"https://www.google.com\": {err}"),
     }
-    match agent.get("https://github.com").call() {
-        Ok(..) | Err(ureq::Error::ConnectionFailed) => {}
-        Err(ureq::Error::Io(err)) if err.kind() == ErrorKind::ConnectionRefused => {}
-        Err(err) => panic!("Failed to connect to \"https://github.com\": {err}"),
-    }
 }

@@ -44,3 +44,5 @@ alloc = []
 v1_21_4 = []
 # Enable support for v1.21.5
 v1_21_5 = []
+# Enable support for v1.21.6
+v1_21_6 = []

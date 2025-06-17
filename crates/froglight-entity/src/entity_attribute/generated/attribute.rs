@@ -13,6 +13,7 @@ froglight_macros::entity_attributes! {
     pub struct BlockBreakSpeed(pub f64);
     pub struct BlockInteractionRange(pub f64);
     pub struct BurningTime(pub f64);
+    pub struct CameraDistance(pub f64);
     pub struct EntityInteractionRange(pub f64);
     pub struct ExplosionKnockbackResistance(pub f64);
     pub struct FallDamageMultiplier(pub f64);
@@ -37,4 +38,6 @@ froglight_macros::entity_attributes! {
     pub struct SweepingDamageRatio(pub f64);
     pub struct TemptRange(pub f64);
     pub struct WaterMovementEfficiency(pub f64);
+    pub struct WaypointReceiveRange(pub f64);
+    pub struct WaypointTransmitRange(pub f64);
 }

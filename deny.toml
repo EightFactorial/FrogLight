@@ -69,9 +69,6 @@ version = "=1.0.69"
 [[bans.skip]]
 name = "wasi"
 version = "=0.11.1"
-[[bans.skip]]
-name = "webpki-roots"
-version = "=0.26.11"
 
 [[bans.skip]]
 name = "windows-sys"

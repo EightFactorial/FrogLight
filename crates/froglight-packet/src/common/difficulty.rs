@@ -57,7 +57,9 @@ impl FrogRead for Difficulty {
     fn frog_read(buffer: &mut impl std::io::Read) -> core::result::Result<Self, ReadError> {
         match u8::frog_read(buffer)? {
             val @ 0..3 => Ok(Difficulty::from_u8(val).unwrap_or_else(|| unreachable!())),
-            invalid => Err(ReadError::InvalidEnum(core::any::type_name::<Self>(), invalid as i32)),
+            invalid => {
+                Err(ReadError::InvalidEnum(core::any::type_name::<Self>(), i32::from(invalid)))
+            }
         }
     }
 }

@@ -64,3 +64,5 @@ std = ["bevy_platform/std", "bevy_reflect?/std", "froglight-nbt/std", "froglight
 v1_21_4 = ["froglight-common/v1_21_4", "froglight-item/v1_21_4", "froglight-world?/v1_21_4"]
 # Enable support for v1.21.5
 v1_21_5 = ["froglight-common/v1_21_5", "froglight-item/v1_21_5", "froglight-world?/v1_21_5"]
+# Enable support for v1.21.6
+v1_21_6 = ["froglight-common/v1_21_6", "froglight-item/v1_21_6", "froglight-world?/v1_21_6"]

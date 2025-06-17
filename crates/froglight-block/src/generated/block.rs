@@ -378,6 +378,7 @@ froglight_macros::blocks! {
     pub struct DragonEgg;
     pub struct DragonHead;
     pub struct DragonWallHead;
+    pub struct DriedGhast;
     pub struct DriedKelpBlock;
     pub struct DripstoneBlock;
     pub struct Dropper;

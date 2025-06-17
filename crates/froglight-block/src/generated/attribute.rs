@@ -59,6 +59,7 @@ froglight_macros::block_attributes! {
     pub enum HatchInt0To2 { _0, _1, _2 } { "0", "1", "2" },
     pub enum HingeEnum { Left, Right } { "left", "right" },
     pub enum HoneyLevelInt0To5 { _0, _1, _2, _3, _4, _5 } { "0", "1", "2", "3", "4", "5" },
+    pub enum HydrationInt0To3 { _0, _1, _2, _3 } { "0", "1", "2", "3" },
     pub enum InWallBool { True, False } { "true", "false" },
     pub enum InstrumentEnum { Harp, Basedrum, Snare, Hat, Bass, Flute, Bell, Guitar, Chime, Xylophone, IronXylophone, CowBell, Didgeridoo, Bit, Banjo, Pling, Zombie, Skeleton, Creeper, Dragon, WitherSkeleton, Piglin, CustomHead } { "harp", "basedrum", "snare", "hat", "bass", "flute", "bell", "guitar", "chime", "xylophone", "iron_xylophone", "cow_bell", "didgeridoo", "bit", "banjo", "pling", "zombie", "skeleton", "creeper", "dragon", "wither_skeleton", "piglin", "custom_head" },
     pub enum InvertedBool { True, False } { "true", "false" },

@@ -106,6 +106,7 @@ pub enum ChatVisibilityMode {
 /// The layers of the player model that can be toggled on or off.
 ///
 /// TODO: Add "bitset" flag to `FrogBuf` to read/write as a `BitSet<N>`.
+#[expect(clippy::struct_excessive_bools)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Serialize, Deserialize))]

@@ -178,6 +178,7 @@ froglight_macros::items! {
     pub struct BlackDye;
     #[block]
     pub struct BlackGlazedTerracotta;
+    pub struct BlackHarness;
     #[block]
     pub struct BlackShulkerBox;
     #[block]
@@ -253,6 +254,7 @@ froglight_macros::items! {
     pub struct BlueEgg;
     #[block]
     pub struct BlueGlazedTerracotta;
+    pub struct BlueHarness;
     #[block]
     pub struct BlueIce;
     #[block]
@@ -319,6 +321,7 @@ froglight_macros::items! {
     pub struct BrownEgg;
     #[block]
     pub struct BrownGlazedTerracotta;
+    pub struct BrownHarness;
     #[block]
     pub struct BrownMushroom;
     #[block]
@@ -601,6 +604,7 @@ froglight_macros::items! {
     pub struct CyanDye;
     #[block]
     pub struct CyanGlazedTerracotta;
+    pub struct CyanHarness;
     #[block]
     pub struct CyanShulkerBox;
     #[block]
@@ -762,6 +766,8 @@ froglight_macros::items! {
     #[block]
     pub struct DragonHead;
     pub struct DragonsBreath;
+    #[block]
+    pub struct DriedGhast;
     pub struct DriedKelp;
     #[block]
     pub struct DriedKelpBlock;
@@ -933,6 +939,7 @@ froglight_macros::items! {
     pub struct GrayDye;
     #[block]
     pub struct GrayGlazedTerracotta;
+    pub struct GrayHarness;
     #[block]
     pub struct GrayShulkerBox;
     #[block]
@@ -959,6 +966,7 @@ froglight_macros::items! {
     pub struct GreenDye;
     #[block]
     pub struct GreenGlazedTerracotta;
+    pub struct GreenHarness;
     #[block]
     pub struct GreenShulkerBox;
     #[block]
@@ -977,6 +985,7 @@ froglight_macros::items! {
     pub struct GusterPotterySherd;
     #[block]
     pub struct HangingRoots;
+    pub struct HappyGhastSpawnEgg;
     #[block]
     pub struct HayBale;
     pub struct HeartOfTheSea;
@@ -1129,6 +1138,7 @@ froglight_macros::items! {
     pub struct LightBlueDye;
     #[block]
     pub struct LightBlueGlazedTerracotta;
+    pub struct LightBlueHarness;
     #[block]
     pub struct LightBlueShulkerBox;
     #[block]
@@ -1155,6 +1165,7 @@ froglight_macros::items! {
     pub struct LightGrayDye;
     #[block]
     pub struct LightGrayGlazedTerracotta;
+    pub struct LightGrayHarness;
     #[block]
     pub struct LightGrayShulkerBox;
     #[block]
@@ -1191,6 +1202,7 @@ froglight_macros::items! {
     pub struct LimeDye;
     #[block]
     pub struct LimeGlazedTerracotta;
+    pub struct LimeHarness;
     #[block]
     pub struct LimeShulkerBox;
     #[block]
@@ -1224,6 +1236,7 @@ froglight_macros::items! {
     pub struct MagentaDye;
     #[block]
     pub struct MagentaGlazedTerracotta;
+    pub struct MagentaHarness;
     #[block]
     pub struct MagentaShulkerBox;
     #[block]
@@ -1337,6 +1350,7 @@ froglight_macros::items! {
     pub struct MusicDiscRelic;
     pub struct MusicDiscStal;
     pub struct MusicDiscStrad;
+    pub struct MusicDiscTears;
     pub struct MusicDiscWait;
     pub struct MusicDiscWard;
     #[block]
@@ -1441,6 +1455,7 @@ froglight_macros::items! {
     pub struct OrangeDye;
     #[block]
     pub struct OrangeGlazedTerracotta;
+    pub struct OrangeHarness;
     #[block]
     pub struct OrangeShulkerBox;
     #[block]
@@ -1550,6 +1565,7 @@ froglight_macros::items! {
     pub struct PinkDye;
     #[block]
     pub struct PinkGlazedTerracotta;
+    pub struct PinkHarness;
     #[block]
     pub struct PinkPetals;
     #[block]
@@ -1678,6 +1694,7 @@ froglight_macros::items! {
     pub struct PurpleDye;
     #[block]
     pub struct PurpleGlazedTerracotta;
+    pub struct PurpleHarness;
     #[block]
     pub struct PurpleShulkerBox;
     #[block]
@@ -1739,6 +1756,7 @@ froglight_macros::items! {
     pub struct RedDye;
     #[block]
     pub struct RedGlazedTerracotta;
+    pub struct RedHarness;
     #[block]
     pub struct RedMushroom;
     #[block]
@@ -2282,6 +2300,7 @@ froglight_macros::items! {
     pub struct WhiteDye;
     #[block]
     pub struct WhiteGlazedTerracotta;
+    pub struct WhiteHarness;
     #[block]
     pub struct WhiteShulkerBox;
     #[block]
@@ -2329,6 +2348,7 @@ froglight_macros::items! {
     pub struct YellowDye;
     #[block]
     pub struct YellowGlazedTerracotta;
+    pub struct YellowHarness;
     #[block]
     pub struct YellowShulkerBox;
     #[block]

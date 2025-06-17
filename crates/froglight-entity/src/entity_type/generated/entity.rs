@@ -67,6 +67,7 @@ froglight_macros::entity_types! {
     pub struct GlowSquid;
     pub struct Goat;
     pub struct Guardian;
+    pub struct HappyGhast;
     pub struct Hoglin;
     pub struct HopperMinecart;
     pub struct Horse;

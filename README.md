@@ -23,8 +23,10 @@ It is currently in an **early alpha state**. Some things do not work yet!
 ## Version Support
 
 FrogLight has support for:
+
 - v1.21.4
 - v1.21.5
+- v1.21.6
 
 ## Usage
 
@@ -46,21 +48,23 @@ froglight = { git = "https://github.com/EightFactorial/FrogLight.git" }
 ## Helpful Resources
 
 For more information, see the following links:
-  * [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
-  * [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
-  * [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
-  * ~~[FrogLight Examples](examples)~~
+
+- [Bevy Quick Start Guide](https://bevyengine.org/learn/quick-start/getting-started/setup/)
+- [Bevy Cheat Book](https://bevy-cheatbook.github.io/)
+- [Bevy Examples](https://github.com/bevyengine/bevy/tree/latest/examples)
+- ~~[FrogLight Examples](examples)~~
 
 For documentation, see:
-  * [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
-  * ~~[FrogLight Docs](https://github.com/EightFactorial/FrogLight/)~~
+
+- [Bevy Docs](https://docs.rs/bevy/latest/bevy/)
+- ~~[FrogLight Docs](https://github.com/EightFactorial/FrogLight/)~~
 
 ## License
 
 Licensed under either of
 
-* Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
-* MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
 

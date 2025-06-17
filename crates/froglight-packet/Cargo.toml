@@ -137,3 +137,10 @@ v1_21_5 = [
   "froglight-registry?/v1_21_5",
   "froglight-world/v1_21_5",
 ]
+# Enable support for v1.21.6
+v1_21_6 = [
+  "froglight-common/v1_21_6",
+  "froglight-inventory?/v1_21_6",
+  "froglight-registry?/v1_21_6",
+  "froglight-world/v1_21_6",
+]

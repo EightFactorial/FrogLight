@@ -68,7 +68,7 @@ impl<V: Version, T: FrogWriteVersion<V>> FrogWriteVersion<V> for UnsizedVec<T> {
     }
 
     #[inline]
-    fn frog_len(&self) -> usize { self.0.iter().map(|item| item.frog_len()).sum() }
+    fn frog_len(&self) -> usize { self.0.iter().map(T::frog_len).sum() }
 }
 
 // -------------------------------------------------------------------------------------------------
