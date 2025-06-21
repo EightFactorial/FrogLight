@@ -18,7 +18,9 @@ workspace = true
 [dev-dependencies]
 froglight-text = { features = ["ansi"], workspace = true }
 smol_str = { workspace = true }
+tracing = { workspace = true }
 tracing-subscriber = { features = ["env-filter"], workspace = true }
+uuid = { workspace = true }
 
 [dependencies]
 async-lock = { workspace = true }
@@ -89,4 +91,8 @@ v1_21_6 = ["froglight-common/v1_21_6", "froglight-packet/v1_21_6"]
 
 [[example]]
 name = "status"
+required-features = ["io", "resolver", "v1_21_4"]
+
+[[example]]
+name = "login"
 required-features = ["io", "resolver", "v1_21_4"]

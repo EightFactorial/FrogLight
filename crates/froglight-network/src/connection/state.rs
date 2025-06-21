@@ -7,7 +7,9 @@ use core::{error::Error, marker::PhantomData, net::SocketAddr};
 use froglight_packet::state::{Config, Handshake, Login, Play, State, Status, ValidState};
 
 use super::raw::RawPacketVersion;
-use crate::connection::{ReadConnection, WriteConnection, split::SplittableConnection};
+use crate::connection::{
+    RawConnection, ReadConnection, WriteConnection, split::SplittableConnection,
+};
 
 /// A [`RawConnection`] that manages the state of the connection.
 #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component))]
@@ -75,6 +77,16 @@ impl<V: ValidState<S>, S: State, D: Direction<V, S>> Connection<V, S, D> {
     pub const fn from_raw_box(raw: Box<dyn SplittableConnection>) -> Self {
         Connection { raw, scratch: Vec::new(), _phantom: PhantomData }
     }
+
+    /// Get a reference to the inner [`RawConnection`].
+    #[inline]
+    #[must_use]
+    pub const fn as_raw(&self) -> &dyn RawConnection { &*self.raw }
+
+    /// Get a mutable reference to the inner [`RawConnection`].
+    #[inline]
+    #[must_use]
+    pub const fn as_raw_mut(&mut self) -> &mut dyn RawConnection { &mut *self.raw }
 
     /// Read a raw type from the [`Connection`],
     /// regardless of the actual state.

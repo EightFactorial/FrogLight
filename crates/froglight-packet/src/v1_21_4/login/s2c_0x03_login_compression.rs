@@ -12,5 +12,5 @@ use derive_more::{Deref, DerefMut, From, Into};
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 pub struct LoginCompressionS2CPacket {
     #[cfg_attr(feature = "io", frog(var))]
-    pub compression_threshold: u32,
+    pub compression_threshold: i32,
 }

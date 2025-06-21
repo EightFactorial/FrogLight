@@ -99,7 +99,7 @@ nightly = [
   "froglight-world/nightly",
 ]
 # Enable trace logs.
-trace = ["dep:tracing", "froglight-io?/trace", "froglight-registry?/trace"]
+trace = ["dep:tracing", "froglight-io?/trace", "froglight-nbt/trace", "froglight-registry?/trace"]
 
 # Enable support for the rust standard library.
 std = [

@@ -4,13 +4,12 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::prelude::*;
-use smol_str::SmolStr;
-use uuid::Uuid;
+use froglight_entity::prelude::{PlayerUsername, PlayerUuid};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 pub struct LoginHelloC2SPacket {
-    pub name: SmolStr,
-    pub profile_id: Uuid,
+    pub name: PlayerUsername,
+    pub uuid: PlayerUuid,
 }

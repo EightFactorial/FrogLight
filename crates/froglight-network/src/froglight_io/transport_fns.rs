@@ -16,13 +16,15 @@ pub(super) async fn read_packet_outer(
     compression: Option<i32>,
     #[cfg(feature = "crypto")] crypto: &ConnectionCrypto,
 ) -> Result<(), ConnectionError> {
+    const MIN_PACKET_SIZE: usize = 3;
+
     // Make sure the buffer is large enough to hold the packet length
-    if buf.len() < 5 {
-        buf.resize(5, 0u8);
+    if buf.len() < MIN_PACKET_SIZE {
+        buf.resize(MIN_PACKET_SIZE, 0u8);
     }
 
     // Read the length bytes of the packet
-    let (len_buf, _) = buf.split_first_chunk_mut::<5>().unwrap();
+    let (len_buf, _) = buf.split_first_chunk_mut::<MIN_PACKET_SIZE>().unwrap();
     read_raw_outer(
         len_buf.as_mut_slice(),
         stream,
@@ -38,37 +40,47 @@ pub(super) async fn read_packet_outer(
     #[expect(clippy::cast_possible_truncation)]
     let len_size = len_cursor.position() as usize;
 
-    // Resize the buffer to hold the packet data
-    buf.resize(len + len_size, 0u8);
-    // Create a slice positioned to read the rest of the packet
-    let pbuf = &mut buf[5usize..];
-    read_raw_outer(
-        pbuf,
-        stream,
-        #[cfg(feature = "crypto")]
-        crypto,
-    )
-    .await?;
+    // If the packet is larger than the initial buffer,
+    // grow the buffer and read the rest of the packet.
+    if len + len_size > MIN_PACKET_SIZE {
+        buf.resize(len + len_size, 0u8);
+        read_raw_outer(
+            &mut buf[MIN_PACKET_SIZE..],
+            stream,
+            #[cfg(feature = "crypto")]
+            crypto,
+        )
+        .await?;
+    }
 
     // Create a cursor to read packet bytes from the buffer
     let mut cursor = Cursor::new(&buf[len_size..]);
 
     // Check whether the packet is compressed
-    if compression.is_some_and(|c| c >= 0) {
+    if let Some(threshold) = compression
+        && !threshold.is_negative()
+    {
         let size = <u32 as FrogVarRead>::frog_var_read(&mut cursor);
         let size = size.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))? as usize;
 
-        if size != 0 {
+        #[expect(clippy::cast_sign_loss)]
+        if size >= threshold as usize {
             // Create a ZlibDecoder to decompress the packet
             let mut decoder = ZlibDecoder::new(futures_lite::io::Cursor::new(scratch));
 
-            // Uncompress the data into the scratch buffer
-            let result = decoder.write_all(buf).await;
+            // Write the compressed data into the decoder
+            #[expect(clippy::cast_possible_truncation)]
+            let remaining = &buf[len_size + cursor.position() as usize..];
+            let result = decoder.write_all(remaining).await;
+            result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))?;
+            // Flush the decoder to ensure all data is processed
+            let result = decoder.flush().await;
             result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))?;
 
-            // Replace the buffer with the decompressed data
-            buf.resize(size, 0u8);
-            buf.copy_from_slice(&decoder.into_inner().into_inner()[..size]);
+            // Copy the decompressed data back into the buffer
+            let result = decoder.into_inner().into_inner();
+            buf.resize(result.len(), 0u8);
+            buf.copy_from_slice(result);
 
             // Log the ID and length of the packet
             #[cfg(feature = "trace")]

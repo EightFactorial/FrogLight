@@ -213,12 +213,12 @@ impl PlayerProfileTextures {
 #[cfg_attr(feature = "io", derive(froglight_macros::FrogBuf))]
 #[cfg_attr(feature = "serde", derive(Deserialize))]
 pub struct ProfileResponse {
-    /// The username of the player.
-    #[serde(rename = "name")]
-    pub username: PlayerUsername,
     /// The [`Uuid`] of the player.
     #[serde(rename = "id")]
     pub uuid: PlayerUuid,
+    /// The username of the player.
+    #[serde(rename = "name")]
+    pub username: PlayerUsername,
     /// The properties of the player.
     pub properties: Vec<ProfileResponseProperty>,
 }
