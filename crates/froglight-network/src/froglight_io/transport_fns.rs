@@ -16,15 +16,15 @@ pub(super) async fn read_packet_outer(
     compression: Option<i32>,
     #[cfg(feature = "crypto")] crypto: &ConnectionCrypto,
 ) -> Result<(), ConnectionError> {
-    const MIN_PACKET_SIZE: usize = 3;
+    const MIN_PRELUDE_SIZE: usize = 3;
 
     // Make sure the buffer is large enough to hold the packet length
-    if buf.len() < MIN_PACKET_SIZE {
-        buf.resize(MIN_PACKET_SIZE, 0u8);
+    if buf.len() < MIN_PRELUDE_SIZE {
+        buf.resize(MIN_PRELUDE_SIZE, 0u8);
     }
 
     // Read the length bytes of the packet
-    let (len_buf, _) = buf.split_first_chunk_mut::<MIN_PACKET_SIZE>().unwrap();
+    let (len_buf, _) = buf.split_first_chunk_mut::<MIN_PRELUDE_SIZE>().unwrap();
     read_raw_outer(
         len_buf.as_mut_slice(),
         stream,
@@ -42,10 +42,10 @@ pub(super) async fn read_packet_outer(
 
     // If the packet is larger than the initial buffer,
     // grow the buffer and read the rest of the packet.
-    if len + len_size > MIN_PACKET_SIZE {
+    if len + len_size > MIN_PRELUDE_SIZE {
         buf.resize(len + len_size, 0u8);
         read_raw_outer(
-            &mut buf[MIN_PACKET_SIZE..],
+            &mut buf[MIN_PRELUDE_SIZE..],
             stream,
             #[cfg(feature = "crypto")]
             crypto,
@@ -66,7 +66,7 @@ pub(super) async fn read_packet_outer(
         #[expect(clippy::cast_sign_loss)]
         if size >= threshold as usize {
             // Create a ZlibDecoder to decompress the packet
-            let mut decoder = ZlibDecoder::new(futures_lite::io::Cursor::new(scratch));
+            let mut decoder = ZlibDecoder::new(scratch);
 
             // Write the compressed data into the decoder
             #[expect(clippy::cast_possible_truncation)]
@@ -78,7 +78,7 @@ pub(super) async fn read_packet_outer(
             result.map_err(|err| ConnectionError::ReadRawPacket(Box::new(err)))?;
 
             // Copy the decompressed data back into the buffer
-            let result = decoder.into_inner().into_inner();
+            let result = decoder.into_inner();
             buf.resize(result.len(), 0u8);
             buf.copy_from_slice(result);
 
@@ -86,6 +86,12 @@ pub(super) async fn read_packet_outer(
             #[cfg(feature = "trace")]
             if let Some(id) = buf.first() {
                 tracing::trace!(target: "froglight_network::froglight_io", "Reading Packet ID {id} ({size})");
+            }
+
+            // Warn if the size does not match the expected length
+            #[cfg(feature = "trace")]
+            if buf.len() != size {
+                tracing::warn!(target: "froglight_network::froglight_io", "Decompressed packet size mismatch: expected {size}, got {}", buf.len());
             }
 
             return Ok(());

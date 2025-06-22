@@ -7,6 +7,7 @@ use core::net::SocketAddr;
 use async_trait::async_trait;
 #[cfg(feature = "crypto")]
 use bevy_platform::sync::Arc;
+use downcast_rs::DowncastSend;
 use froglight_common::version::Version;
 
 use super::state::ConnectionError;
@@ -15,7 +16,7 @@ use crate::connection::ConnectionCrypto;
 
 /// A dyn-compatible connection, either to a server or client.
 #[async_trait]
-pub trait RawConnection: Send + 'static {
+pub trait RawConnection: DowncastSend + 'static {
     /// Get the peer address of the connection.
     async fn peer_addr(&self) -> Result<SocketAddr, ConnectionError>;
 
@@ -24,6 +25,9 @@ pub trait RawConnection: Send + 'static {
     /// Set the compression threshold for the connection.
     async fn set_compression(&mut self, threshold: Option<i32>);
 
+    /// Get the [`ConnectionCrypto`] used by the connection.
+    #[cfg(feature = "crypto")]
+    async fn get_crypto(&self) -> Arc<ConnectionCrypto>;
     /// Set the [`ConnectionCrypto`] used by the connection.
     #[cfg(feature = "crypto")]
     async fn set_crypto(&mut self, crypto: Arc<ConnectionCrypto>);

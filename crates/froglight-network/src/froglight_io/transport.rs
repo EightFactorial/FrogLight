@@ -68,6 +68,10 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
 
     #[inline]
     #[cfg(feature = "crypto")]
+    async fn get_crypto(&self) -> Arc<ConnectionCrypto> { Arc::clone(&self.crypto) }
+
+    #[inline]
+    #[cfg(feature = "crypto")]
     async fn set_crypto(&mut self, crypto: Arc<ConnectionCrypto>) { self.crypto = crypto; }
 
     #[inline]
@@ -182,6 +186,11 @@ impl<S: AsyncReadExt + AsyncWriteExt + Send + Sync + Unpin + 'static> RawConnect
         *self.compression.write().await = threshold;
     }
 
+    #[inline]
+    #[cfg(feature = "crypto")]
+    async fn get_crypto(&self) -> Arc<ConnectionCrypto> { Arc::clone(&self.crypto) }
+
+    #[inline]
     #[cfg(feature = "crypto")]
     async fn set_crypto(&mut self, crypto: Arc<ConnectionCrypto>) { self.crypto = crypto; }
 

@@ -129,7 +129,7 @@ impl<V: ValidState<Login>> ClientConnection<V, Login> {
         V::Serverbound: RawPacketVersion<V, M>,
         LoginHelloC2SPacket: Into<V::Serverbound>,
     {
-        self.login(profile.username.clone(), profile.uuid).await
+        self.login::<M>(profile.username.clone(), profile.uuid).await
     }
 
     /// Handle the login process by reading packets from the server
@@ -190,5 +190,3 @@ impl<V: ValidState<Config>> ClientConnection<V, Config> {
         }
     }
 }
-
-// -------------------------------------------------------------------------------------------------

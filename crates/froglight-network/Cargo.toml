@@ -27,6 +27,7 @@ async-lock = { workspace = true }
 async-trait = "0.1"
 bevy_platform = { features = ["alloc"], workspace = true }
 derive_more = { workspace = true }
+downcast-rs = { workspace = true }
 froglight-common = { workspace = true }
 froglight-macros = { features = ["network"], workspace = true }
 froglight-packet = { workspace = true }
