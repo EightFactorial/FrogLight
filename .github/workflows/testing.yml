@@ -46,9 +46,9 @@ jobs:
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2
       # Run nextest with the default features
       - name: Run Nextest
-        run: cargo nextest run --workspace --features=v1_21_4,v1_21_5
+        run: cargo nextest run --workspace --features=v1_21_4,v1_21_5,v1_21_6
       - name: Run Nextest (no_std)
-        run: cargo nextest run --workspace --no-default-features --features=brigadier,libm,v1_21_4,v1_21_5
+        run: cargo nextest run --workspace --no-default-features --features=brigadier,libm,v1_21_4,v1_21_5,v1_21_6
       # Run doctests with the default features
       - name: Run Doctests
-        run: cargo test --doc --workspace --features=v1_21_4,v1_21_5
+        run: cargo test --doc --workspace --features=v1_21_4,v1_21_5,v1_21_6
