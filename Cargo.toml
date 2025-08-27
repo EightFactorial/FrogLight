@@ -1,0 +1,331 @@
+
+# --- Package Settings  ---
+
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dependencies]
+froglight_internal = { workspace = true }
+
+[features]
+default = ["bevy", "std"]
+
+# Use `async-lock` for global locking.
+async = ["froglight_internal/async"]
+
+# Provide a DNS resolver using `hickory-resolver`.
+resolver = ["froglight_internal/resolver", "std"]
+# Enable `hickory-resolver` to read the system configuration.
+resolver-sys = ["froglight_internal/resolver-sys", "resolver", "std"]
+
+# Enable `bevy` support.
+bevy = ["froglight_internal/bevy"]
+# Enable `libm` for `no_std` support.
+libm = ["froglight_internal/libm"]
+# Enable `tracing` support.
+tracing = ["froglight_internal/tracing"]
+
+# Enable support for the standard library
+std = ["froglight_internal/std"]
+# Enable features using the nightly toolchain
+nightly = ["froglight_internal/nightly"]
+
+# --- Build Settings ---
+
+# Dev Builds
+[profile.dev]
+debug = true
+opt-level = 1
+[profile.dev.build-override]
+opt-level = 3
+
+[profile.dev-opt]
+incremental = true
+inherits = "dev"
+opt-level = 3
+
+[profile.dev.package.froglight_block]
+inherits = "dev-opt"
+[profile.dev.package.froglight_entity]
+inherits = "dev-opt"
+[profile.dev.package.froglight_item]
+inherits = "dev-opt"
+[profile.dev.package.froglight_network]
+inherits = "dev-opt"
+[profile.dev.package.froglight_registry]
+inherits = "dev-opt"
+[profile.dev.package.froglight_world]
+inherits = "dev-opt"
+
+# [profile.dev.package.bevy]
+# inherits = "dev-opt"
+[profile.dev.package.bevy_ecs]
+inherits = "dev-opt"
+# [profile.dev.package.bevy_math]
+# inherits = "dev-opt"
+[profile.dev.package.bevy_platform]
+inherits = "dev-opt"
+[profile.dev.package.bevy_reflect]
+inherits = "dev-opt"
+# [profile.dev.package.bevy_transform]
+# inherits = "dev-opt"
+
+# Release Builds
+[profile.release]
+debug = false
+lto = true
+opt-level = 3
+[profile.release.build-override]
+opt-level = 3
+
+[profile.release-opt]
+incremental = true
+inherits = "release"
+
+[profile.release.package.froglight_block]
+inherits = "release-opt"
+[profile.release.package.froglight_entity]
+inherits = "release-opt"
+[profile.release.package.froglight_item]
+inherits = "release-opt"
+[profile.release.package.froglight_network]
+inherits = "release-opt"
+[profile.release.package.froglight_registry]
+inherits = "release-opt"
+[profile.release.package.froglight_world]
+inherits = "release-opt"
+
+# --- Workspace Dependencies ---
+
+[workspace.dependencies]
+# Workspace Crates
+froglight = { default-features = false, path = "/", version = "0.1" }
+froglight_api = { default-features = false, path = "crates/froglight_api", version = "0.1" }
+froglight_block = { default-features = false, path = "crates/froglight_block", version = "0.1" }
+froglight_common = { default-features = false, path = "crates/froglight_common", version = "0.1" }
+froglight_entity = { default-features = false, path = "crates/froglight_entity", version = "0.1" }
+froglight_internal = { default-features = false, path = "crates/froglight_internal", version = "0.1" }
+froglight_item = { default-features = false, path = "crates/froglight_item", version = "0.1" }
+froglight_network = { default-features = false, path = "crates/froglight_network", version = "0.1" }
+froglight_packet = { default-features = false, path = "crates/froglight_packet", version = "0.1" }
+froglight_registry = { default-features = false, path = "crates/froglight_registry", version = "0.1" }
+froglight_world = { default-features = false, path = "crates/froglight_world", version = "0.1" }
+
+# Bevy Dependencies
+bevy = { default-features = false, version = "0.17" }
+bevy_a11y = { default-features = false, version = "0.17" }
+bevy_animation = { default-features = false, version = "0.17" }
+bevy_app = { default-features = false, version = "0.17" }
+bevy_asset = { default-features = false, version = "0.17" }
+bevy_audio = { default-features = false, version = "0.17" }
+bevy_color = { default-features = false, version = "0.17" }
+bevy_core_pipeline = { default-features = false, version = "0.17" }
+bevy_derive = { default-features = false, version = "0.17" }
+bevy_dev_tools = { default-features = false, version = "0.17" }
+bevy_diagnostic = { default-features = false, version = "0.17" }
+bevy_ecs = { default-features = false, version = "0.17" }
+bevy_gilrs = { default-features = false, version = "0.17" }
+bevy_gizmos = { default-features = false, version = "0.17" }
+bevy_gltf = { default-features = false, version = "0.17" }
+bevy_image = { default-features = false, version = "0.17" }
+bevy_input = { default-features = false, version = "0.17" }
+bevy_input_focus = { default-features = false, version = "0.17" }
+bevy_log = { default-features = false, version = "0.17" }
+bevy_math = { default-features = false, version = "0.17" }
+bevy_pbr = { default-features = false, version = "0.17" }
+bevy_picking = { default-features = false, version = "0.17" }
+bevy_platform = { default-features = false, version = "0.17" }
+bevy_ptr = { default-features = false, version = "0.17" }
+bevy_reflect = { default-features = false, version = "0.17" }
+bevy_remote = { default-features = false, version = "0.17" }
+bevy_render = { default-features = false, version = "0.17" }
+bevy_scene = { default-features = false, version = "0.17" }
+bevy_sprite = { default-features = false, version = "0.17" }
+bevy_state = { default-features = false, version = "0.17" }
+bevy_tasks = { default-features = false, version = "0.17" }
+bevy_text = { default-features = false, version = "0.17" }
+bevy_time = { default-features = false, version = "0.17" }
+bevy_transform = { default-features = false, version = "0.17" }
+bevy_ui = { default-features = false, version = "0.17" }
+bevy_utils = { default-features = false, version = "0.17" }
+bevy_window = { default-features = false, version = "0.17" }
+bevy_winit = { default-features = false, version = "0.17" }
+
+# Facet Dependencies
+facet = { default-features = false, version = "0.28" }
+facet-brigadier = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.1" }
+facet-core = { default-features = false, version = "0.28" }
+facet-deserialize = { default-features = false, version = "0.28" }
+facet-json = { default-features = false, version = "0.28" }
+facet-macros = { default-features = false, version = "0.28" }
+facet-minecraft = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.1" }
+facet-minehash = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.1" }
+facet-minetext = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.1" }
+facet-nbt = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.1" }
+facet-reflect = { default-features = false, version = "0.28" }
+facet-serialize = { default-features = false, version = "0.28" }
+facet-snbt = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.1" }
+
+# Hashing & Cryptography Dependencies
+aes = { default-features = false, version = "0.9.0-rc.1" }
+base64 = { default-features = false, version = "0.22.1" }
+cfb8 = { default-features = false, version = "0.9.0-rc.1" }
+crc32c = { default-features = false, version = "0.6.8" }
+foldhash = { default-features = false, version = "0.2" }
+md-5 = { default-features = false, version = "0.11.0-rc.2" }
+rsa = { default-features = false, version = "0.10.0-rc.9" }
+sha1 = { default-features = false, version = "0.11.0-rc.2" }
+sha2 = { default-features = false, version = "0.11.0-rc.2" }
+
+# Other Dependencies
+ariadne = { default-features = false, version = "0.5" }
+async-channel = { default-features = false, version = "2.5" }
+async-compat = { default-features = false, version = "0.2" }
+async-compression = { default-features = false, version = "0.4" }
+async-io = { default-features = false, version = "2.6" }
+async-lock = { default-features = false, version = "3.4" }
+async-net = { default-features = false, version = "2.0" }
+async-trait = { default-features = false, version = "0.1" }
+atomicow = { default-features = false, version = "1.1" }
+bitvec = { default-features = false, version = "1.0" }
+blocking = { default-features = false, version = "1.6" }
+curl = { default-features = false, version = "0.4" }
+downcast-rs = { default-features = false, version = "2.0" }
+futures-lite = { default-features = false, version = "2.6" }
+glam = { default-features = false, version = "0.30" }
+hashify = { default-features = false, version = "0.2" }
+hickory-resolver = { default-features = false, version = "0.25" }
+indexmap = { default-features = false, version = "2.11" }
+inventory = { default-features = false, version = "0.3" }
+libm = { default-features = false, version = "0.2" }
+once_cell = { default-features = false, version = "1.21" }
+owo-colors = { default-features = false, version = "4.2" }
+parking_lot = { default-features = false, version = "0.12" }
+proc-macro2 = { default-features = false, version = "1.0" }
+quote = { default-features = false, version = "1.0" }
+rangemap = { default-features = false, version = "1.6" }
+serde = { default-features = false, version = "1.0" }
+serde_json = { default-features = false, version = "1.0" }
+socket2 = { default-features = false, version = "0.6" }
+syn = { default-features = false, version = "2.0" }
+tokio = { default-features = false, version = "1.47" }
+tracing = { default-features = false, version = "0.1" }
+ureq = { default-features = false, version = "3.1" }
+uuid = { default-features = false, version = "1.18" }
+variadics_please = { default-features = false, version = "1.1" }
+
+# Debug Dependencies
+criterion = { version = "0.7" }
+divan = "0.1"
+tracing-subscriber = { features = ["tracing-log"], version = "0.3" }
+
+# --- Workspace Settings ---
+
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.package]
+authors = ["EightFactorial"]
+edition = "2024"
+homepage = "https://github.com/EightFactorial/FrogLight"
+include = ["Cargo.toml", "README.md", "src/**/*.rs"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/EightFactorial/FrogLight"
+rust-version = "1.91.0"
+version = "0.1.0"
+
+[workspace.lints.rust]
+missing_docs = "warn"
+trivial_casts = "warn"
+trivial_numeric_casts = "warn"
+unreachable_pub = "warn"
+unused_import_braces = "warn"
+unused_lifetimes = "warn"
+
+[workspace.lints.rustdoc]
+bare_urls = "deny"
+broken_intra_doc_links = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_html_tags = "deny"
+invalid_rust_codeblocks = "deny"
+private_intra_doc_links = "deny"
+
+[workspace.lints.clippy]
+allow_attributes_without_reason = "deny"
+cast_possible_truncation = "warn"
+cast_possible_wrap = "warn"
+clone_on_ref_ptr = "warn"
+doc_markdown = "allow"
+module_name_repetitions = "allow"
+needless_pass_by_value = "allow"
+pedantic = { level = "warn", priority = -1 }
+std_instead_of_alloc = "deny"
+std_instead_of_core = "deny"
+unnecessary_cast = "warn"
+
+# --- Git Cliff ---
+
+[workspace.metadata.git-cliff.changelog]
+body = """
+{% if version %}\
+    ## [{{ version | trim_start_matches(pat="v") }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+    ## [unreleased]
+{% endif %}\
+{% for group, commits in commits | group_by(attribute="group") %}
+    ### {{ group | striptags | trim | upper_first }}
+    {% for commit in commits %}
+        - {% if commit.scope %}*({{ commit.scope }})* {% endif %}\
+            {% if commit.breaking %}[**breaking**] {% endif %}\
+            {{ commit.message | upper_first }}\
+    {% endfor %}
+{% endfor %}
+"""
+postprocessors = []
+render_always = true
+trim = true
+
+[workspace.metadata.git-cliff.git]
+commit_parsers = [
+  { body = ".*security", group = "<!-- 8 -->🛡️ Security" },
+  { group = "<!-- 0 -->🚀 Features", message = "^feat" },
+  { group = "<!-- 1 -->🐛 Bug Fixes", message = "^fix" },
+  { group = "<!-- 2 -->🚜 Refactor", message = "^refactor" },
+  { group = "<!-- 3 -->📚 Documentation", message = "^doc" },
+  { group = "<!-- 4 -->⚡ Performance", message = "^perf" },
+  { group = "<!-- 5 -->🎨 Styling", message = "^style" },
+  { group = "<!-- 6 -->🧪 Testing", message = "^test" },
+  { group = "<!-- 7 -->◀️ Revert", message = "^revert" },
+  { message = "^chore|^ci", skip = true },
+]
+commit_preprocessors = []
+conventional_commits = true
+filter_commits = false
+filter_unconventional = true
+link_parsers = []
+protect_breaking_commits = false
+recurse_submodules = false
+require_conventional = false
+sort_commits = "oldest"
+split_commits = false
+topo_order = false
+topo_order_commits = true
+use_branch_tags = false

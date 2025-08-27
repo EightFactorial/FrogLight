@@ -1,0 +1,49 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_registry"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dependencies]
+foldhash = { workspace = true }
+froglight_common = { workspace = true }
+indexmap = { workspace = true }
+once_cell = { features = ["alloc", "critical-section", "parking_lot"], workspace = true }
+parking_lot = { workspace = true }
+variadics_please = { features = ["alloc"], workspace = true }
+
+# Optional dependencies
+async-lock = { optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+
+[features]
+default = ["bevy", "std"]
+
+# Use `async-lock` for registry information.
+async = ["dep:async-lock", "std"]
+
+# Enable `bevy` support.
+bevy = ["froglight_common/bevy"]
+# Enable `tracing` support.
+tracing = ["dep:tracing", "froglight_common/tracing", "tracing?/std"]
+
+# Enable support for the standard library
+std = ["async-lock?/std", "foldhash/std", "froglight_common/std", "indexmap/std"]
+# Enable features using the nightly toolchain
+nightly = ["parking_lot/nightly"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.

@@ -1,0 +1,138 @@
+[advisories]
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+ignore = ["RUSTSEC-2023-0071", "RUSTSEC-2025-0057"]
+version = 2
+
+[licenses]
+allow = ["Apache-2.0", "BSD-3-Clause", "MIT", "Unicode-3.0", "Zlib"]
+
+[bans]
+external-default-features = "allow"
+highlight = "all"
+multiple-versions = "warn"
+skip-tree = []
+wildcards = "deny"
+workspace-default-features = "deny"
+
+[bans.build]
+enable-builtin-globs = true
+executables = "deny"
+include-archives = true
+include-dependencies = true
+include-workspace = true
+interpreted = "warn"
+
+[bans.workspace-dependencies]
+duplicates = "deny"
+include-path-dependencies = false
+unused = "allow"
+
+[sources]
+allow-registry = ["https://github.com/EightFactorial/facet-minecraft", "https://github.com/rust-lang/crates.io-index"]
+unknown-git = "deny"
+unknown-registry = "deny"
+
+# --- Feature Exceptions ---
+
+# Allow `froglight` crates to have default features...
+[[bans.features]]
+allow = ["async", "default", "nightly", "resolver", "resolver-sys"]
+crate = "froglight"
+[[bans.features]]
+allow = ["default", "nightly", "resolver", "ureq"]
+crate = "froglight_api"
+[[bans.features]]
+allow = ["async", "default", "nightly"]
+crate = "froglight_block"
+[[bans.features]]
+allow = ["bevy", "default", "serde"]
+crate = "froglight_common"
+[[bans.features]]
+allow = ["async", "default", "nightly"]
+crate = "froglight_entity"
+[[bans.features]]
+allow = ["async", "default", "nightly", "resolver", "resolver-sys"]
+crate = "froglight_internal"
+[[bans.features]]
+allow = ["async", "block", "default", "nightly"]
+crate = "froglight_item"
+[[bans.features]]
+allow = ["async", "default", "nightly", "resolver", "resolver-sys", "ureq"]
+crate = "froglight_network"
+[[bans.features]]
+allow = ["bevy", "default", "froglight", "nightly"]
+crate = "froglight_packet"
+[[bans.features]]
+allow = ["async", "default", "nightly"]
+crate = "froglight_registry"
+[[bans.features]]
+allow = ["block", "default", "nightly"]
+crate = "froglight_world"
+
+# --- Executable Exceptions ---
+
+# Allow scripts in `autocfg`.
+[[bans.build.bypass]]
+allow-globs = ["tests/wrap_ignored"]
+name = "autocfg"
+
+# Allow executables in `owo-colors`.
+[[bans.build.bypass]]
+allow = [{ path = "scripts/cargo-release-publish.sh" }]
+name = "owo-colors"
+
+# Allow scripts in `smallvec`.
+[[bans.build.bypass]]
+allow = [{ path = "scripts/run_miri.sh" }]
+name = "smallvec"
+
+# Allow scripts in `shadow_counted`.
+[[bans.build.bypass]]
+allow = [{ path = ".cehgit" }]
+allow-globs = [".cehgit.d/*"]
+name = "shadow_counted"
+
+# Allow executables and scripts in `wasi`/`wasm` crates.
+[[bans.build.bypass]]
+allow = [{ path = "ci/regenerate.sh" }, { path = "ci/vendor-wit.sh" }]
+crate = "wasi"
+[[bans.build.bypass]]
+allow = [{ path = "src/worker.js" }]
+name = "wasm-bindgen-macro"
+[[bans.build.bypass]]
+allow-globs = ["src/rt/libwit*.a"]
+name = "wit-bindgen"
+
+# Allow scripts in the `redox` crates.
+[[bans.build.bypass]]
+allow-globs = ["src/scheme/generate.sh"]
+name = "redox_syscall"
+
+# Allow executables in the `windows` crates.
+[[bans.build.bypass]]
+allow-globs = ["lib/libwindows.*.a"]
+name = "windows_aarch64_gnullvm"
+[[bans.build.bypass]]
+allow-globs = ["lib/windows.*.lib"]
+name = "windows_aarch64_msvc"
+[[bans.build.bypass]]
+allow-globs = ["lib/libwindows.*.a"]
+name = "windows_i686_gnu"
+[[bans.build.bypass]]
+allow-globs = ["lib/libwindows.*.a"]
+name = "windows_i686_gnullvm"
+[[bans.build.bypass]]
+allow-globs = ["lib/windows.*.lib"]
+name = "windows_i686_msvc"
+[[bans.build.bypass]]
+allow-globs = ["lib/libwindows.*.a"]
+name = "windows_x86_64_gnu"
+[[bans.build.bypass]]
+allow-globs = ["lib/libwindows.*.a"]
+name = "windows_x86_64_gnullvm"
+[[bans.build.bypass]]
+allow-globs = ["lib/windows.*.lib"]
+name = "windows_x86_64_msvc"
+
+# --- Duplicate Exceptions ---

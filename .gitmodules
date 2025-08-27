@@ -1,0 +1,6 @@
+[submodule "submodule/facet-minecraft"]
+	path = submodule/facet-minecraft
+	url = https://github.com/EightFactorial/facet-minecraft
+[submodule "submodule/froglight-tools"]
+	path = submodule/froglight-tools
+	url = https://github.com/EightFactorial/FrogLight-Tools

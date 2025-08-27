@@ -1,0 +1,52 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_item"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dependencies]
+froglight_common = { default-features = false, workspace = true }
+once_cell = { features = ["alloc", "critical-section", "parking_lot"], workspace = true }
+parking_lot = { workspace = true }
+variadics_please = { features = ["alloc"], workspace = true }
+
+# Optional dependencies
+async-lock = { optional = true, workspace = true }
+froglight_block = { default-features = false, optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+
+[features]
+default = ["bevy", "std"]
+
+# Use `async-lock` for item and block information.
+async = ["dep:async-lock", "froglight_block?/async", "std"]
+
+# Enable `bevy` support.
+bevy = ["froglight_block?/bevy", "froglight_common/bevy"]
+# Enable `froglight_block` support.
+block = ["dep:froglight_block"]
+# Enable `libm` for `no_std` support.
+libm = ["froglight_block?/libm"]
+# Enable `tracing` support.
+tracing = ["dep:tracing", "froglight_block?/tracing", "froglight_common/tracing"]
+
+# Enable support for the standard library
+std = ["async-lock?/std", "froglight_block?/std", "froglight_common/std", "tracing?/std"]
+# Enable features using the nightly toolchain
+nightly = ["froglight_block?/nightly", "parking_lot/nightly"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.

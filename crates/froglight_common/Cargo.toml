@@ -1,0 +1,45 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_common"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[lints]
+workspace = true
+
+[[test]]
+name = "digest"
+path = "tests/digest.rs"
+
+[dependencies]
+atomicow = { workspace = true }
+sha1 = { features = ["alloc"], workspace = true }
+uuid = { workspace = true }
+
+# Optional dependencies
+bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_reflect = { features = ["uuid"], optional = true, workspace = true }
+serde = { features = ["alloc", "derive"], optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+
+[features]
+default = ["std"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "serde"]
+# Enable `serde` support.
+serde = ["dep:serde", "uuid/serde"]
+# Enable `tracing` support.
+tracing = ["dep:tracing"]
+
+# Enable support for the standard library
+std = ["atomicow/std", "bevy_ecs?/std", "bevy_reflect?/std", "serde?/std", "tracing?/std", "uuid/std"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.

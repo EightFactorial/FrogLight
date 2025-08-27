@@ -1,0 +1,77 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_api"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tracing-subscriber = { features = ["ansi", "env-filter", "std"], workspace = true }
+
+[dependencies]
+async-trait = { workspace = true }
+base64 = { features = ["alloc"], workspace = true }
+foldhash = { workspace = true }
+froglight_common = { workspace = true }
+futures-lite = { workspace = true }
+indexmap = { features = ["serde"], workspace = true }
+parking_lot = { workspace = true }
+rsa = { features = ["encoding"], workspace = true }
+serde = { features = ["alloc", "derive"], workspace = true }
+serde_json = { features = ["alloc"], workspace = true }
+uuid = { features = ["serde"], workspace = true }
+
+# Optional dependencies
+bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_reflect = { features = ["uuid"], optional = true, workspace = true }
+froglight_network = { features = ["resolver"], optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+ureq = { features = ["rustls"], optional = true, workspace = true }
+
+[features]
+default = ["bevy", "std"]
+
+# Use `ureq` for HTTP requests.
+ureq = ["dep:ureq", "froglight_network?/ureq", "std"]
+# Use `froglight_network` for DNS resolution.
+resolver = ["dep:froglight_network", "std"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect"]
+# Enable `tracing` support.
+tracing = ["dep:tracing", "froglight_network?/tracing"]
+
+# Enable support for the standard library
+std = [
+  "base64/std",
+  "bevy_ecs?/std",
+  "bevy_reflect?/std",
+  "foldhash/std",
+  "froglight_common/std",
+  "futures-lite/std",
+  "indexmap/std",
+  "rsa/std",
+  "serde/std",
+  "serde_json/std",
+  "tracing?/std",
+  "uuid/std",
+]
+# Enable features using the nightly toolchain
+nightly = ["parking_lot/nightly"]
+
+[[test]]
+name = "unauthenticated"
+path = "tests/unauthenticated.rs"
+required-features = ["resolver", "ureq"]

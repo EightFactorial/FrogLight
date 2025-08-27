@@ -1,0 +1,27 @@
+# Enable unstable features
+unstable_features = true
+
+# Files
+format_generated_files = false
+newline_style = "Unix"
+
+# Formatting
+use_small_heuristics = "Max"
+
+# Imports
+group_imports = "StdExternalCrate"
+imports_granularity = "Crate"
+
+# Comments
+error_on_unformatted = true
+format_code_in_doc_comments = true
+normalize_comments = true
+normalize_doc_attributes = true
+wrap_comments = true
+
+# Functions
+condense_wildcard_suffixes = true
+fn_single_line = true
+
+# Implementations
+reorder_impl_items = true

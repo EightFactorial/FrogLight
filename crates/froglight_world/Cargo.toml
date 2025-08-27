@@ -1,0 +1,53 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_world"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dependencies]
+bitvec = { features = ["alloc"], workspace = true }
+froglight_common = { workspace = true }
+glam = { workspace = true }
+
+# Optional dependencies
+async-lock = { optional = true, workspace = true }
+bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_reflect = { features = ["glam"], optional = true, workspace = true }
+froglight_block = { optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+
+[features]
+default = ["bevy", "std"]
+
+# Use `async-lock` to create a `SharedChunk`.
+async = ["dep:async-lock", "std"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight_block?/bevy", "froglight_common/bevy"]
+# Enable `froglight_block` support.
+block = ["dep:froglight_block"]
+# Enable `libm` for `no_std` support.
+libm = ["froglight_block?/libm", "glam/libm"]
+# Enable `tracing` support.
+tracing = ["dep:tracing", "froglight_block?/tracing", "froglight_common/tracing"]
+
+# Enable support for the standard library
+std = ["async-lock?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "froglight_common/std", "glam/std", "tracing?/std"]
+# Enable features using the nightly toolchain
+nightly = ["froglight_block?/nightly"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.

@@ -1,0 +1,90 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_internal"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dependencies]
+froglight_api = { workspace = true }
+froglight_block = { workspace = true }
+froglight_common = { workspace = true }
+froglight_entity = { workspace = true }
+froglight_item = { features = ["block"], workspace = true }
+froglight_network = { workspace = true }
+froglight_packet = { features = ["froglight"], workspace = true }
+froglight_registry = { workspace = true }
+froglight_world = { features = ["block"], workspace = true }
+
+[features]
+default = ["bevy", "std"]
+
+# Use `async-lock` for global locking.
+async = ["froglight_block/async", "froglight_entity/async", "froglight_item/async", "froglight_registry/async", "froglight_world/async", "std"]
+
+# Provide a DNS resolver using `hickory-resolver`.
+resolver = [
+  "froglight_api/resolver",
+  "froglight_api/ureq",
+  "froglight_network/resolver",
+  "froglight_network/ureq",
+  "std",
+]
+# Enable `hickory-resolver` to read the system configuration.
+resolver-sys = ["froglight_network/resolver-sys", "resolver", "std"]
+
+# Enable `bevy` support.
+bevy = [
+  "froglight_api/bevy",
+  "froglight_block/bevy",
+  "froglight_common/bevy",
+  "froglight_entity/bevy",
+  "froglight_item/bevy",
+  "froglight_network/bevy",
+  "froglight_packet/bevy",
+  "froglight_registry/bevy",
+  "froglight_world/bevy",
+]
+# Enable `libm` for `no_std` support.
+libm = ["froglight_block/libm", "froglight_entity/libm", "froglight_item/libm", "froglight_world/libm"]
+# Enable `tracing` support.
+tracing = ["froglight_api/tracing", "froglight_network/tracing", "froglight_packet/tracing", "froglight_world/tracing"]
+
+# Enable support for the standard library
+std = [
+  "froglight_api/std",
+  "froglight_block/std",
+  "froglight_common/std",
+  "froglight_entity/std",
+  "froglight_item/std",
+  "froglight_network/std",
+  "froglight_packet/std",
+  "froglight_registry/std",
+  "froglight_world/std",
+]
+# Enable features using the nightly toolchain
+nightly = [
+  "froglight_api/nightly",
+  "froglight_block/nightly",
+  "froglight_entity/nightly",
+  "froglight_item/nightly",
+  "froglight_network/nightly",
+  "froglight_packet/nightly",
+  "froglight_registry/nightly",
+  "froglight_world/nightly",
+]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.

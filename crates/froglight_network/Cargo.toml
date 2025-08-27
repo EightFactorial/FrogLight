@@ -1,0 +1,84 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_network"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tracing-subscriber = { features = ["ansi", "env-filter", "std"], workspace = true }
+
+[dependencies]
+downcast-rs = { features = ["sync"], workspace = true }
+futures-lite = { workspace = true }
+
+# Optional dependencies
+async-compat = { optional = true, workspace = true }
+async-io = { optional = true, workspace = true }
+async-net = { optional = true, workspace = true }
+tokio = { features = ["net"], optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+
+# Resolver dependencies
+async-trait = { optional = true, workspace = true }
+bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_reflect = { optional = true, workspace = true }
+bevy_tasks = { optional = true, workspace = true }
+blocking = { optional = true, workspace = true }
+hickory-resolver = { optional = true, workspace = true }
+socket2 = { optional = true, workspace = true }
+ureq = { optional = true, workspace = true }
+
+[features]
+default = ["bevy", "std"]
+
+# Use `async-net` for asynchronous networking.
+async = ["dep:async-net", "std"]
+# Use `tokio` for asynchronous networking.
+tokio = ["dep:async-compat", "dep:tokio", "std"]
+
+# Provide a DNS resolver using `hickory-resolver`.
+resolver = [
+  "bevy_tasks?/async-io",
+  "dep:async-io",
+  "dep:async-net",
+  "dep:async-trait",
+  "dep:blocking",
+  "dep:hickory-resolver",
+  "dep:socket2",
+  "std",
+]
+# Enable provided resolver to read the system configuration.
+resolver-sys = ["hickory-resolver?/system-config", "resolver", "std"]
+# Enable `ureq` support for the provided resolver.
+ureq = ["dep:ureq", "resolver", "std"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks"]
+# Enable `tracing` support.
+tracing = ["dep:tracing"]
+
+# Enable support for the standard library
+std = ["bevy_ecs?/std", "bevy_reflect?/std", "downcast-rs/std", "futures-lite/std", "tracing?/std"]
+# Enable features using the nightly toolchain
+nightly = []
+
+[[test]]
+name = "resolver"
+path = "tests/resolver.rs"
+required-features = ["resolver", "ureq"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.

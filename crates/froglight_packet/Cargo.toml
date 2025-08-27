@@ -1,0 +1,134 @@
+[package]
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight_packet"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--generate-link-to-definition", "-Zunstable-options"]
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tracing-subscriber = { features = ["ansi", "env-filter", "std"], workspace = true }
+
+[dependencies]
+uuid = { workspace = true }
+
+# Optional dependencies
+aes = { optional = true, workspace = true }
+async-compression = { features = ["futures-io", "zlib"], optional = true, workspace = true }
+async-lock = { optional = true, workspace = true }
+bevy_ecs = { features = ["bevy_reflect"], optional = true, workspace = true }
+bevy_reflect = { features = ["uuid"], optional = true, workspace = true }
+cfb8 = { features = ["alloc"], optional = true, workspace = true }
+futures-lite = { features = ["alloc"], optional = true, workspace = true }
+tracing = { optional = true, workspace = true }
+
+# Facet dependencies
+facet-core = { features = ["alloc", "uuid"], optional = true, workspace = true }
+facet-macros = { optional = true, workspace = true }
+facet-minecraft = { features = ["custom", "full", "parking_lot", "uuid"], optional = true, workspace = true }
+
+# Froglight dependencies
+froglight_block = { optional = true, workspace = true }
+froglight_common = { optional = true, workspace = true }
+froglight_entity = { optional = true, workspace = true }
+froglight_item = { features = ["block"], optional = true, workspace = true }
+froglight_network = { features = ["async"], optional = true, workspace = true }
+froglight_registry = { optional = true, workspace = true }
+froglight_world = { features = ["block"], optional = true, workspace = true }
+
+[features]
+default = ["network", "std"]
+
+# Provide typed network connections.
+network = [
+  "dep:aes",
+  "dep:async-compression",
+  "dep:async-lock",
+  "dep:cfb8",
+  "dep:facet-minecraft",
+  "dep:froglight_common",
+  "dep:froglight_network",
+  "dep:futures-lite",
+  "facet",
+  "std",
+]
+# Enable `facet` support.
+facet = ["dep:facet-core", "dep:facet-macros"]
+
+# Enable `froglight` support.
+froglight = [
+  "dep:froglight_block",
+  "dep:froglight_common",
+  "dep:froglight_entity",
+  "dep:froglight_item",
+  "dep:froglight_registry",
+  "dep:froglight_world",
+  "network",
+]
+# Enable `bevy` support.
+bevy = [
+  "dep:bevy_ecs",
+  "dep:bevy_reflect",
+  "froglight_block?/bevy",
+  "froglight_common?/bevy",
+  "froglight_entity?/bevy",
+  "froglight_item?/bevy",
+  "froglight_network?/bevy",
+  "froglight_registry?/bevy",
+  "froglight_world?/bevy",
+]
+# Enable `tracing` support.
+tracing = [
+  "dep:tracing",
+  "facet-minecraft?/rich-diagnostics",
+  "froglight_block?/tracing",
+  "froglight_common?/tracing",
+  "froglight_entity?/tracing",
+  "froglight_item?/tracing",
+  "froglight_network?/tracing",
+  "froglight_registry?/tracing",
+  "froglight_world?/tracing",
+]
+
+# Enable support for the standard library
+std = [
+  "async-lock?/std",
+  "bevy_ecs?/std",
+  "bevy_reflect?/std",
+  "facet-core/std",
+  "facet-minecraft?/std",
+  "froglight_block?/std",
+  "froglight_common?/std",
+  "froglight_entity?/std",
+  "froglight_item?/std",
+  "froglight_network?/std",
+  "froglight_registry?/std",
+  "froglight_world?/std",
+  "futures-lite?/std",
+  "tracing?/std",
+  "uuid/std",
+]
+# Enable features using the nightly toolchain
+nightly = [
+  "facet-minecraft?/nightly",
+  "froglight_block?/nightly",
+  "froglight_entity?/nightly",
+  "froglight_item?/nightly",
+  "froglight_network?/nightly",
+  "froglight_registry?/nightly",
+  "froglight_world?/nightly",
+]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.
