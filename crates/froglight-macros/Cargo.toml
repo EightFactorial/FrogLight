@@ -20,7 +20,7 @@ workspace = true
 
 [dependencies]
 convert_case = "0.7"
-darling = "0.20"
+darling = "0.23"
 parking_lot = { workspace = true }
 proc-macro2 = "1.0"
 quote = { features = ["proc-macro"], version = "1.0" }
