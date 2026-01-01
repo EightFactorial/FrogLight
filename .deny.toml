@@ -1,0 +1,81 @@
+[advisories]
+db-path = "~/.cargo/advisory-db"
+db-urls = ["https://github.com/rustsec/advisory-db"]
+ignore = []
+version = 2
+
+[licenses]
+allow = ["Apache-2.0", "MIT", "Unicode-3.0"]
+
+[bans]
+external-default-features = "allow"
+highlight = "all"
+multiple-versions = "warn"
+wildcards = "deny"
+
+[bans.build]
+enable-builtin-globs = true
+executables = "deny"
+include-archives = true
+include-dependencies = true
+include-workspace = true
+interpreted = "warn"
+
+[bans.workspace-dependencies]
+duplicates = "deny"
+include-path-dependencies = false
+unused = "allow"
+
+[sources]
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+unknown-git = "deny"
+unknown-registry = "deny"
+
+# --- Duplicate Exceptions ---
+
+[[bans.skip-tree]]
+crate = "windows-sys"
+reason = "Updates are too frequent for many crates, leaving multiple versions unavoidable."
+
+# --- Executable Exceptions ---
+
+[[bans.build.bypass]]
+name = "autocfg"
+allow-globs = ["tests/*"]
+
+[[bans.build.bypass]]
+name = "windows_aarch64_gnullvm"
+allow-globs = ["lib/libwindows.*.a"]
+[[bans.build.bypass]]
+name = "windows_aarch64_msvc"
+allow-globs = ["lib/windows.*.lib"]
+[[bans.build.bypass]]
+name = "windows_i686_gnu"
+allow-globs = ["lib/libwindows.*.a"]
+[[bans.build.bypass]]
+name = "windows_i686_gnullvm"
+allow-globs = ["lib/libwindows.*.a"]
+[[bans.build.bypass]]
+name = "windows_i686_msvc"
+allow-globs = ["lib/windows.*.lib"]
+[[bans.build.bypass]]
+name = "windows_x86_64_gnu"
+allow-globs = ["lib/libwindows.*.a"]
+[[bans.build.bypass]]
+name = "windows_x86_64_gnullvm"
+allow-globs = ["lib/libwindows.*.a"]
+[[bans.build.bypass]]
+name = "windows_x86_64_msvc"
+allow-globs = ["lib/windows.*.lib"]
+
+[[bans.build.bypass]]
+name = "wit-bindgen"
+allow-globs = ["src/rt/libwit_bindgen_*.a"]
+
+[[bans.build.bypass]]
+name = "zerocopy"
+allow-globs = ["ci/*", "githooks/*"]
+allow = [
+  { path = "cargo.sh", checksum = "8cc26650d78a7377953546bffb612017e748aa0c36c14365cda810d3d1f6ebc8" },
+  { path = "win-cargo.bat", checksum = "dbde5af501630f6d14a0681d27f30ef2ffaeb1753d14be2f7cb1a7f285458c07" }
+]

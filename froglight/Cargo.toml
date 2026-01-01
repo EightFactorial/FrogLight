@@ -1,0 +1,42 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+froglight-block = { workspace = true }
+
+# Optional dependencies
+
+# --- Features ---
+
+[features]
+default = ["std"]
+
+# Enable `bevy` support.
+bevy = []
+# Enable `tracing` support.
+tracing = []
+
+# Enable `libm` for `no_std` support.
+libm = ["froglight-block/libm"]
+
+# Enable support for the standard library
+std = ["froglight-block/std"]
+# Enable optimizations using the nightly toolchain
+nightly = ["froglight-block/nightly"]

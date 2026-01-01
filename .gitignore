@@ -1,0 +1,15 @@
+# Editor & Build Settings
+/.cargo
+/.vscode
+/.zed
+
+# Build Files
+/debug
+/target
+/Cargo.lock
+
+# Compiler Error Reports
+/rustc-ice-**.txt
+
+# MacOs
+.DS_Store

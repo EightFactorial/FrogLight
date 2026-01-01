@@ -1,0 +1,53 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-block"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+glam = { workspace = true }
+variadics_please = { workspace = true }
+
+# Optional dependencies
+async-lock = { workspace = true, optional = true }
+critical-section = { workspace = true, optional = true }
+parking_lot = { workspace = true, optional = true }
+
+# --- Features ---
+
+[features]
+default = ["alloc", "std"]
+
+# Add async locking support
+async = ["dep:async-lock"]
+# Enable support for atomics
+atomic = []
+
+# Enable `libm` for `no_std` support.
+libm = ["glam/libm"]
+# Enable `parking_lot` for `no_std` support.
+parking_lot = ["dep:parking_lot"]
+
+# Enable support for a global allocator
+alloc = []
+# Enable support for the standard library
+std = ["alloc", "async-lock?/std", "glam/std"]
+# Enable optimizations using the nightly toolchain
+nightly = ["parking_lot?/nightly"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.
