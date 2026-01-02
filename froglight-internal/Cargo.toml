@@ -3,7 +3,7 @@ edition = { workspace = true }
 homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
-name = "froglight"
+name = "froglight-internal"
 readme = { workspace = true }
 repository = { workspace = true }
 rust-version = { workspace = true }
@@ -19,7 +19,10 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-internal = { workspace = true }
+froglight-block = { workspace = true }
+froglight-common = { workspace = true }
+
+# Optional dependencies
 
 # --- Features ---
 
@@ -27,16 +30,16 @@ froglight-internal = { workspace = true }
 default = ["bevy", "std"]
 
 # Enable `bevy` support.
-bevy = []
+bevy = ["froglight-common/bevy"]
 # Enable `tracing` support.
 tracing = []
 
 # Enable `libm` for `no_std` support.
-libm = ["froglight-internal/libm"]
+libm = ["froglight-block/libm"]
 # Enable `parking_lot` for `no_std` support.
-parking_lot = ["froglight-internal/parking_lot"]
+parking_lot = ["froglight-block/parking_lot"]
 
 # Enable support for the standard library
-std = ["froglight-internal/std"]
+std = ["froglight-block/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-internal/nightly"]
+nightly = ["froglight-block/nightly", "froglight-common/nightly"]

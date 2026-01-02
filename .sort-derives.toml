@@ -1,5 +1,5 @@
 # Define the custom order of derive attributes.
-order = ["Debug", "Default", "Clone", "Copy" , "PartialEq", "Eq", "PartialOrd", "Ord", "Hash", "...", "Serialize", "Deserialize", "Facet"]
+order = ["Debug", "Default", "Clone", "Copy" , "PartialEq", "Eq", "PartialOrd", "Ord", "Hash", "...", "Component", "Serialize", "Deserialize", "Reflect", "Facet"]
 
 # Preserve the original order for unspecified derive attributes
 preserve = true

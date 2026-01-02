@@ -1,6 +1,6 @@
 ALL_FEATURES := "all-features"
 DEF_FEATURES := "features=bevy,std"
-NO_FEATURES := "features=libm --no-default-features"
+NO_FEATURES := "features=libm,parking_lot --no-default-features"
 
 # Generate the changelog
 changelog path="CHANGELOG.md":

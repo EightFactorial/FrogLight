@@ -3,6 +3,8 @@ use core::{
     fmt::{Debug, Display, Formatter},
 };
 
+use froglight_common::identifier::Identifier;
+
 use crate::{
     atomic::MaybeAtomicU32,
     block::{BlockAttr, BlockAttrs, BlockType, GlobalId, StateId},
@@ -12,7 +14,7 @@ use crate::{
 /// Metadata about a block type.
 pub struct BlockMetadata {
     /// The string identifier of the block.
-    identifier: &'static str,
+    identifier: Identifier,
     /// The lowest [`GlobalId`] assigned to this block.
     base_global: MaybeAtomicU32,
     /// The maximum [`StateId`] for this block.
@@ -37,7 +39,7 @@ impl BlockMetadata {
     /// [`BlockStorage`](crate::storage::BlockStorage) it will be used in.
     #[must_use]
     pub const unsafe fn new<B: BlockType<V>, V: BlockVersion>(
-        identifier: &'static str,
+        identifier: Identifier,
         base_state: MaybeAtomicU32,
     ) -> Self {
         BlockMetadata {
@@ -67,7 +69,7 @@ impl BlockMetadata {
     /// Get the string identifier of this block.
     #[inline]
     #[must_use]
-    pub const fn identifier(&self) -> &'static str { self.identifier }
+    pub const fn identifier(&self) -> &Identifier { &self.identifier }
 
     /// Get the base [`GlobalId`] of this block.
     ///

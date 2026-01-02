@@ -4,6 +4,8 @@ use core::{
     fmt::{Debug, Display, Formatter},
 };
 
+use froglight_common::identifier::Identifier;
+
 use crate::{
     block::{BlockAttr, BlockAttrs, BlockMetadata, GlobalId, StateId},
     version::BlockVersion,
@@ -43,7 +45,7 @@ impl Block {
 
     /// Get the string identifier of this block.
     #[must_use]
-    pub const fn identifier(&self) -> &'static str { self.reference.identifier() }
+    pub const fn identifier(&self) -> &Identifier { self.reference.identifier() }
 
     /// Get the [`GlobalId`] of this block.
     ///
@@ -144,7 +146,7 @@ impl Debug for Block {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
         let global = u32::from(self.state.into_inner()) + self.reference.base_id().into_inner();
         f.debug_tuple("Block")
-            .field(&self.reference.identifier())
+            .field(self.reference.identifier())
             .field(&global)
             .finish_non_exhaustive()
     }

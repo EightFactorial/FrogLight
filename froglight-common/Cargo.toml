@@ -1,0 +1,47 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-common"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
+uuid = { workspace = true }
+
+# Optional dependencies
+bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
+serde = { features = ["derive"], workspace = true, optional = true }
+facet = { features = ["uuid"], workspace = true, optional = true }
+
+# --- Features ---
+
+[features]
+default = ["alloc", "std"]
+
+# Enable `bevy` support.
+bevy = ["alloc", "dep:bevy_ecs", "dep:bevy_reflect", "serde"]
+# Enable `facet` support.
+facet = ["dep:facet"]
+# Enable `serde` support.
+serde = ["dep:serde", "uuid/serde"]
+
+# Enable support for a global allocator
+alloc = []
+# Enable support for the standard library
+std = ["alloc", "bevy_ecs?/std", "bevy_reflect?/std", "uuid/std"]
+# Enable optimizations using the nightly toolchain
+nightly = []

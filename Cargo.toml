@@ -7,9 +7,9 @@ froglight = { path = "froglight" }
 # froglight-api = { path = "froglight-api" }
 froglight-block = { path = "froglight-block" }
 # froglight-brigadier = { path = "froglight-brigadier" }
-# froglight-common = { path = "froglight-common" }
+froglight-common = { path = "froglight-common" }
 # froglight-entity = { path = "froglight-entity" }
-# froglight-internal = { path = "froglight-internal" }
+froglight-internal = { path = "froglight-internal" }
 # froglight-inventory = { path = "froglight-inventory" }
 # froglight-item = { path = "froglight-item" }
 # froglight-network = { path = "froglight-network" }
@@ -45,10 +45,11 @@ async-lock = { default-features = false, version = "3.4" }
 async-net = { default-features = false, version = "2.0" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
-glam = { default-features = false, version = "0.24" }
+glam = { default-features = false, version = "0.30" }
 indexmap = { default-features = false, version = "2.12" }
 libm = { default-features = false, version = "0.2" }
 parking_lot = { default-features = false, version = "0.12" }
+serde = { default-features = false, version = "1.0" }
 tracing = { default-features = false, version = "0.1" }
 uuid = { default-features = false, version = "1.0" }
 variadics_please = { default-features = false, version = "1.0" }
@@ -70,9 +71,9 @@ members = [
   # "froglight-api",
   "froglight-block",
   # "froglight-brigadier",
-  # "froglight-common",
+  "froglight-common",
   # "froglight-entity",
-  # "froglight-internal",
+  "froglight-internal",
   # "froglight-inventory",
   # "froglight-item",
   # "froglight-network",
