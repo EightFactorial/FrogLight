@@ -1,1 +1,0 @@
-//! @generated block attributes

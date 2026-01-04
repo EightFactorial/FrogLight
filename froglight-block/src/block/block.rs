@@ -19,15 +19,35 @@ pub struct Block {
 }
 
 impl Block {
+    /// Create a new [`Block`] from the given attributes.
+    #[must_use]
+    #[expect(
+        clippy::missing_panics_doc,
+        reason = "This should never panic unless something is catastrophically wrong"
+    )]
+    pub fn new<B: BlockType<V>, V: BlockVersion>(attributes: B::Attributes) -> Block {
+        let state = attributes.to_set_index().try_into().ok().map(StateId::new);
+        state.and_then(Self::new_state::<B, V>).expect("Invalid Attribute StateId!")
+    }
+
+    /// Create a new [`Block`] with the default state.
+    #[must_use]
+    #[expect(
+        clippy::missing_panics_doc,
+        reason = "This should never panic unless something is catastrophically wrong"
+    )]
+    pub fn new_default<B: BlockType<V>, V: BlockVersion>() -> Block {
+        Self::new_state::<B, V>(B::METADATA.state_default()).expect("Invalid Default StateId!")
+    }
+
     /// Try to create a new [`Block`] from the given [`StateId`].
     ///
     /// Returns `None` if the [`StateId`] is invalid for the block type.
     #[must_use]
-    pub fn try_new<B: BlockType<V>, V: BlockVersion>(state: StateId) -> Option<Block> {
-        let meta = B::metadata();
-        if state.into_inner() <= meta.state_max().into_inner() {
-            // SAFETY: The state is guaranteed to be valid for this metadata.
-            Some(unsafe { Block::new_unchecked(state, meta) })
+    pub fn new_state<B: BlockType<V>, V: BlockVersion>(state: StateId) -> Option<Block> {
+        let metadata = B::METADATA;
+        if state.into_inner() < metadata.state_count() {
+            Some(Self { state, reference: metadata })
         } else {
             None
         }
@@ -45,7 +65,7 @@ impl Block {
 
     /// Get the string identifier of this block.
     #[must_use]
-    pub const fn identifier(&self) -> &Identifier { self.reference.identifier() }
+    pub const fn identifier(&self) -> &Identifier<'static> { self.reference.identifier() }
 
     /// Get the [`GlobalId`] of this block.
     ///
@@ -107,9 +127,7 @@ impl Block {
     /// Returns `true` if this block is of type `T`.
     #[inline]
     #[must_use]
-    pub fn is_block<B: BlockType<V>, V: BlockVersion>(&self) -> bool {
-        self.reference.is_block::<B, V>()
-    }
+    pub fn is_block<B: 'static>(&self) -> bool { self.reference.is_block::<B>() }
 
     /// Returns `true` if this block is of version `V`.
     #[inline]
@@ -138,16 +156,15 @@ impl PartialOrd for Block {
 
 impl Display for Block {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", u32::from(self.state.into_inner()) + self.reference.base_id().into_inner())
+        write!(f, "{}", self.global_id().into_inner())
     }
 }
 
 impl Debug for Block {
     fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        let global = u32::from(self.state.into_inner()) + self.reference.base_id().into_inner();
         f.debug_tuple("Block")
             .field(self.reference.identifier())
-            .field(&global)
+            .field(&self.global_id().into_inner())
             .finish_non_exhaustive()
     }
 }
@@ -158,9 +175,9 @@ impl Debug for Block {
 pub trait BlockType<V: BlockVersion>: 'static {
     /// The attribute set for this block type.
     type Attributes: BlockAttrs;
-    /// The names and types of the attributes for this block type.
-    const ATTR_DATA: &'static [(&'static str, TypeId)];
 
-    /// Get the [`BlockMetadata`] of this block type.
-    fn metadata() -> &'static BlockMetadata;
+    /// The names and types of the attributes for this block type.
+    const ATTRDATA: &'static [(&'static str, TypeId)];
+    /// The [`BlockMetadata`] for this block type.
+    const METADATA: &'static BlockMetadata;
 }

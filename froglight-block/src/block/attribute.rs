@@ -64,8 +64,8 @@ pub trait BlockAttrs: Sized + 'static {
 // -------------------------------------------------------------------------------------------------
 
 impl BlockAttrs for () {
-    const SIZE: usize = 0;
-    const TOTAL: u16 = 0;
+    const SIZE: usize = 1;
+    const TOTAL: u16 = 1;
 
     fn to_set_index(&self) -> usize { 0 }
 
@@ -137,16 +137,22 @@ impl<T0: BlockAttrs> BlockAttrs for (T0,) {
     const SIZE: usize = 1;
     const TOTAL: u16 = T0::TOTAL;
 
+    #[inline]
     fn to_set_index(&self) -> usize { self.0.to_set_index() }
 
+    #[inline]
     fn from_set_index(index: usize) -> Option<Self> { T0::from_set_index(index).map(|t0| (t0,)) }
 
+    #[inline]
     fn get_attr<A: BlockAttr>(&self) -> Option<A> { self.0.get_attr() }
 
+    #[inline]
     fn set_attr<A: BlockAttr>(&mut self, attr: A) -> Option<A> { self.0.set_attr::<A>(attr) }
 
+    #[inline]
     fn get_attr_str(&self, index: usize) -> Option<&'static str> { self.0.get_attr_str(index) }
 
+    #[inline]
     fn set_attr_str(&mut self, index: usize, value: &'static str) -> Option<&'static str> {
         self.0.set_attr_str(index, value)
     }

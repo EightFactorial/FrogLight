@@ -10,8 +10,8 @@ macro_rules! generate {
     (@version) => {};
 }
 
-pub mod attributes;
-pub mod blocks;
+pub mod attribute;
+pub mod block;
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.

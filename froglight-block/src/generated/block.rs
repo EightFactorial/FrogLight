@@ -1,0 +1,3 @@
+//! Block types
+//!
+//! @generated

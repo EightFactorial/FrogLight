@@ -6,7 +6,7 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
-pub mod atomic;
+pub(crate) mod atomic;
 pub mod block;
 pub mod generated;
 pub mod storage;
@@ -17,7 +17,7 @@ pub mod prelude {
 
     pub use crate::{
         block::{Block, GlobalId, StateId},
-        generated::{attributes, blocks},
+        generated::{attribute as block_attr, block},
         version::BlockVersion,
     };
 }

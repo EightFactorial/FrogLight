@@ -39,7 +39,7 @@ async = ["dep:async-lock"]
 atomic = []
 
 # Enable `libm` for `no_std` support.
-libm = ["glam/libm"]
+libm = ["glam/nostd-libm"]
 # Enable `parking_lot` for `no_std` support.
 parking_lot = ["dep:parking_lot"]
 

@@ -3,13 +3,13 @@
 
 [workspace.dependencies]
 # Workspace Crates
-froglight = { path = "froglight" }
+froglight = { path = "froglight", version = "0.0.1" }
 # froglight-api = { path = "froglight-api" }
-froglight-block = { path = "froglight-block" }
+froglight-block = { path = "froglight-block", version = "0.0.1" }
 # froglight-brigadier = { path = "froglight-brigadier" }
-froglight-common = { path = "froglight-common" }
+froglight-common = { path = "froglight-common", version = "0.0.1" }
 # froglight-entity = { path = "froglight-entity" }
-froglight-internal = { path = "froglight-internal" }
+froglight-internal = { path = "froglight-internal", version = "0.0.1" }
 # froglight-inventory = { path = "froglight-inventory" }
 # froglight-item = { path = "froglight-item" }
 # froglight-network = { path = "froglight-network" }
@@ -52,7 +52,7 @@ parking_lot = { default-features = false, version = "0.12" }
 serde = { default-features = false, version = "1.0" }
 tracing = { default-features = false, version = "0.1" }
 uuid = { default-features = false, version = "1.0" }
-variadics_please = { default-features = false, version = "1.0" }
+variadics_please = { default-features = false, version = "1.1" }
 zerocopy = { default-features = false, version = "0.8" }
 
 # Debug Dependencies

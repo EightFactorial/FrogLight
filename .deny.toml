@@ -5,7 +5,7 @@ ignore = []
 version = 2
 
 [licenses]
-allow = ["Apache-2.0", "MIT", "Unicode-3.0"]
+allow = ["Apache-2.0", "MIT", "Unicode-3.0", "Zlib"]
 
 [bans]
 external-default-features = "allow"
@@ -33,49 +33,50 @@ unknown-registry = "deny"
 
 # --- Duplicate Exceptions ---
 
-[[bans.skip-tree]]
-crate = "windows-sys"
-reason = "Updates are too frequent for many crates, leaving multiple versions unavoidable."
+# [[bans.skip-tree]]
+# crate = "windows-sys"
+# reason = "Updates are too frequent for many crates, leaving multiple versions unavoidable."
 
 # --- Executable Exceptions ---
 
 [[bans.build.bypass]]
-name = "autocfg"
-allow-globs = ["tests/*"]
+name = "unicode-segmentation"
+allow = [
+  { path = "scripts/unicode.py", checksum = "31dd92fd09c5c7e73f1423aae38efd49dee51e7859ee1fbfd3374bb90d4cd8ab" },
+  { path = "scripts/unicode_gen_breaktests.py", checksum = "5b3f4caeade8517eb6b9cab6aa0948a7ee7672e845b22e5254254cbfc54d7141" },
+]
 
 [[bans.build.bypass]]
-name = "windows_aarch64_gnullvm"
-allow-globs = ["lib/libwindows.*.a"]
-[[bans.build.bypass]]
-name = "windows_aarch64_msvc"
-allow-globs = ["lib/windows.*.lib"]
-[[bans.build.bypass]]
-name = "windows_i686_gnu"
-allow-globs = ["lib/libwindows.*.a"]
-[[bans.build.bypass]]
-name = "windows_i686_gnullvm"
-allow-globs = ["lib/libwindows.*.a"]
-[[bans.build.bypass]]
-name = "windows_i686_msvc"
-allow-globs = ["lib/windows.*.lib"]
-[[bans.build.bypass]]
-name = "windows_x86_64_gnu"
-allow-globs = ["lib/libwindows.*.a"]
-[[bans.build.bypass]]
-name = "windows_x86_64_gnullvm"
-allow-globs = ["lib/libwindows.*.a"]
-[[bans.build.bypass]]
-name = "windows_x86_64_msvc"
-allow-globs = ["lib/windows.*.lib"]
+name = "wasm-bindgen-macro"
+allow = [
+  { path = "src/worker.js", checksum = "cb5c33dd41cfad622abce5464a3ceae478904ea16ddc3c6c769ee33e0c086692" },
+]
+
+# [[bans.build.bypass]]
+# name = "windows_aarch64_gnullvm"
+# allow-globs = ["lib/libwindows.*.a"]
+# [[bans.build.bypass]]
+# name = "windows_aarch64_msvc"
+# allow-globs = ["lib/windows.*.lib"]
+# [[bans.build.bypass]]
+# name = "windows_i686_gnu"
+# allow-globs = ["lib/libwindows.*.a"]
+# [[bans.build.bypass]]
+# name = "windows_i686_gnullvm"
+# allow-globs = ["lib/libwindows.*.a"]
+# [[bans.build.bypass]]
+# name = "windows_i686_msvc"
+# allow-globs = ["lib/windows.*.lib"]
+# [[bans.build.bypass]]
+# name = "windows_x86_64_gnu"
+# allow-globs = ["lib/libwindows.*.a"]
+# [[bans.build.bypass]]
+# name = "windows_x86_64_gnullvm"
+# allow-globs = ["lib/libwindows.*.a"]
+# [[bans.build.bypass]]
+# name = "windows_x86_64_msvc"
+# allow-globs = ["lib/windows.*.lib"]
 
 [[bans.build.bypass]]
 name = "wit-bindgen"
 allow-globs = ["src/rt/libwit_bindgen_*.a"]
-
-[[bans.build.bypass]]
-name = "zerocopy"
-allow-globs = ["ci/*", "githooks/*"]
-allow = [
-  { path = "cargo.sh", checksum = "8cc26650d78a7377953546bffb612017e748aa0c36c14365cda810d3d1f6ebc8" },
-  { path = "win-cargo.bat", checksum = "dbde5af501630f6d14a0681d27f30ef2ffaeb1753d14be2f7cb1a7f285458c07" }
-]
