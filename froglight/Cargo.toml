@@ -27,9 +27,9 @@ froglight-internal = { workspace = true }
 default = ["bevy", "std"]
 
 # Enable `bevy` support.
-bevy = []
+bevy = ["froglight-internal/bevy"]
 # Enable `tracing` support.
-tracing = []
+tracing = ["froglight-internal/tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-internal/libm"]
