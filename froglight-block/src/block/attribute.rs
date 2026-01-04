@@ -77,11 +77,9 @@ impl BlockAttrs for () {
 
     fn set_attr<A: BlockAttr>(&mut self, _: A) -> Option<A> { self.get_attr::<A>() }
 
-    fn get_attr_str(&self, index: usize) -> Option<&'static str> { (index == 0).then_some("") }
+    fn get_attr_str(&self, _: usize) -> Option<&'static str> { None }
 
-    fn set_attr_str(&mut self, index: usize, _: &'static str) -> Option<&'static str> {
-        self.get_attr_str(index)
-    }
+    fn set_attr_str(&mut self, _: usize, _: &'static str) -> Option<&'static str> { None }
 }
 
 impl<T0: BlockAttr> BlockAttrs for T0 {

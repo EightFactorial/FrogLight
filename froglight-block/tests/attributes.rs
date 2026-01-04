@@ -160,25 +160,41 @@ fn dirt() {
 
 #[test]
 fn grass() {
-    let grassy = Block::new::<Grass, TestVersion>(Snowy(false));
+    let mut grassy = Block::new::<Grass, TestVersion>(Snowy(false));
     assert_eq!(Block::new_state::<Grass, TestVersion>(StateId::new(1)), Some(grassy));
     assert_eq!(Block::new_default::<Grass, TestVersion>(), grassy);
     assert_eq!(grassy.global_id(), 4u32);
     assert_eq!(grassy.state_id(), 1u16);
 
     assert_eq!(grassy.get_attribute::<Snowy>(), Some(Snowy(false)));
+    assert_eq!(grassy.set_attribute::<Snowy>(Snowy(true)), Some(Snowy(false)));
+    assert_eq!(grassy.get_attribute::<Snowy>(), Some(Snowy(true)));
+    assert_eq!(grassy.set_attribute::<Snowy>(Snowy(false)), Some(Snowy(true)));
+
     assert_eq!(grassy.get_attribute_str("snowy"), Some("false"));
+    assert_eq!(grassy.set_attribute_str("snowy", "true"), Some("false"));
+    assert_eq!(grassy.get_attribute_str("snowy"), Some("true"));
+    assert_eq!(grassy.set_attribute_str("snowy", "false"), Some("true"));
+
     let mut attr_iter = grassy.get_attributes();
     assert_eq!(attr_iter.next(), Some(("snowy", "false")));
     assert_eq!(attr_iter.next(), None);
 
-    let snowy = Block::new::<Grass, TestVersion>(Snowy(true));
+    let mut snowy = Block::new::<Grass, TestVersion>(Snowy(true));
     assert_eq!(Block::new_state::<Grass, TestVersion>(StateId::new(0)), Some(snowy));
     assert_eq!(snowy.global_id(), 3u32);
     assert_eq!(snowy.state_id(), 0u16);
 
     assert_eq!(snowy.get_attribute::<Snowy>(), Some(Snowy(true)));
+    assert_eq!(snowy.set_attribute::<Snowy>(Snowy(false)), Some(Snowy(true)));
+    assert_eq!(snowy.get_attribute::<Snowy>(), Some(Snowy(false)));
+    assert_eq!(snowy.set_attribute::<Snowy>(Snowy(true)), Some(Snowy(false)));
+
     assert_eq!(snowy.get_attribute_str("snowy"), Some("true"));
+    assert_eq!(snowy.set_attribute_str("snowy", "false"), Some("true"));
+    assert_eq!(snowy.get_attribute_str("snowy"), Some("false"));
+    assert_eq!(snowy.set_attribute_str("snowy", "true"), Some("false"));
+
     let mut attr_iter = snowy.get_attributes();
     assert_eq!(attr_iter.next(), Some(("snowy", "true")));
     assert_eq!(attr_iter.next(), None);
