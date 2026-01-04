@@ -40,6 +40,10 @@ impl BlockMetadata {
     ///
     /// The caller must ensure that the `base_id` value is correct for the
     /// [`BlockStorage`](crate::storage::BlockStorage) it will be used in.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the `default_state` is out of range for the block type.
     #[must_use]
     pub const unsafe fn new<B: BlockType<V>, V: BlockVersion>(
         identifier: Identifier<'static>,
