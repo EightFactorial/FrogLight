@@ -98,7 +98,17 @@ impl Identifier<'_> {
     /// cloning.
     #[must_use]
     pub const fn reborrow(&self) -> Identifier<'_> {
-        Identifier { inner: Cow::Borrowed(self.as_str()) }
+        #[cfg(feature = "alloc")]
+        {
+            match &self.inner {
+                Cow::Borrowed(s) => Identifier { inner: Cow::Borrowed(s) },
+                Cow::Owned(s) => Identifier { inner: Cow::Borrowed(s.as_str()) },
+            }
+        }
+        #[cfg(not(feature = "alloc"))]
+        {
+            Identifier { inner: self.inner }
+        }
     }
 
     /// Get the content of this [`Identifier`] as a string slice.

@@ -3,20 +3,20 @@
 
 [workspace.dependencies]
 # Workspace Crates
-froglight = { path = "froglight", version = "0.0.1" }
-# froglight-api = { path = "froglight-api" }
-froglight-block = { path = "froglight-block", version = "0.0.1" }
-# froglight-brigadier = { path = "froglight-brigadier" }
-froglight-common = { path = "froglight-common", version = "0.0.1" }
-# froglight-entity = { path = "froglight-entity" }
-froglight-internal = { path = "froglight-internal", version = "0.0.1" }
-# froglight-inventory = { path = "froglight-inventory" }
-# froglight-item = { path = "froglight-item" }
-# froglight-network = { path = "froglight-network" }
-# froglight-packet = { path = "froglight-packet" }
-# froglight-physics = { path = "froglight-physics" }
-froglight-registry = { path = "froglight-registry", version = "0.0.1" }
-# froglight-world = { path = "froglight-world" }
+froglight = { default-features = false, path = "froglight", version = "0.0.1" }
+# froglight-api = { default-features = false, path = "froglight-api" }
+froglight-block = { default-features = false, path = "froglight-block", version = "0.0.1" }
+# froglight-brigadier = { default-features = false, path = "froglight-brigadier" }
+froglight-common = { default-features = false, path = "froglight-common", version = "0.0.1" }
+# froglight-entity = { default-features = false, path = "froglight-entity" }
+froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
+# froglight-inventory = { default-features = false, path = "froglight-inventory" }
+# froglight-item = { default-features = false,  path = "froglight-item" }
+# froglight-network = { default-features = false, path = "froglight-network" }
+# froglight-packet = { default-features = false, path = "froglight-packet" }
+# froglight-physics = { default-features = false, path = "froglight-physics" }
+froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
+# froglight-world = { default-features = false, path = "froglight-world" }
 
 # Bevy Dependencies
 bevy = { default-features = false, version = "0.18.0-rc.2" }

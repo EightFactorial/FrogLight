@@ -19,10 +19,10 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 uuid = { workspace = true }
 
 # Optional dependencies
+bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
 facet = { features = ["uuid"], workspace = true, optional = true }

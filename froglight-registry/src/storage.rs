@@ -286,15 +286,29 @@ impl RegistryStorage {
 
     /// Get an [`Identifier`] by its registry index.
     #[must_use]
-    pub fn name_from_index(&self, index: usize) -> Option<&Identifier<'static>> {
-        self.as_slice().get(index)
+    pub const fn get_name(&self, index: usize) -> Option<&Identifier<'static>> {
+        if index < self.len() { Some(&self.as_slice()[index]) } else { None }
     }
 
     /// Get the index of an [`Identifier`] by its name.
     #[must_use]
-    pub fn index_from_name<T: AsRef<str> + ?Sized>(&self, name: &T) -> Option<usize> {
+    pub fn get_index<T: AsRef<str> + ?Sized>(&self, name: &T) -> Option<usize> {
         let name = name.as_ref();
         self.as_slice().iter().position(|id| id.as_str() == name)
+    }
+
+    /// Get the index of an [`Identifier`] by its name.
+    #[must_use]
+    pub fn get_index_const(&self, name: &str) -> Option<usize> {
+        let slice = self.as_slice();
+        let mut index = 0;
+        while index < slice.len() {
+            if slice[index].as_str() == name {
+                return Some(index);
+            }
+            index += 1;
+        }
+        None
     }
 
     /// Get a reference to the underlying slice of identifiers.
@@ -329,6 +343,11 @@ impl RegistryStorage {
             }
         }
     }
+}
+
+impl AsRef<[Identifier<'static>]> for RegistryStorage {
+    #[inline]
+    fn as_ref(&self) -> &[Identifier<'static>] { self.as_slice() }
 }
 
 // -------------------------------------------------------------------------------------------------

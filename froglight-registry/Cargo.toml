@@ -43,7 +43,7 @@ alloc = ["froglight-common/alloc", "dep:indexmap", "dep:foldhash"]
 # Enable support for the standard library
 std = ["alloc", "async-lock?/std", "froglight-common/std", "indexmap?/std", "foldhash?/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-common/nightly", "parking_lot?/nightly"]
+nightly = ["foldhash?/nightly", "froglight-common/nightly", "parking_lot?/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
