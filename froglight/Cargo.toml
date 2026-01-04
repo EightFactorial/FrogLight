@@ -24,7 +24,7 @@ froglight-internal = { workspace = true }
 # --- Features ---
 
 [features]
-default = ["bevy", "std"]
+default = ["std"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
