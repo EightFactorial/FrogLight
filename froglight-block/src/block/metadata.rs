@@ -40,15 +40,14 @@ impl BlockMetadata {
     ///
     /// The caller must ensure that the `base_id` value is correct for the
     /// [`BlockStorage`](crate::storage::BlockStorage) it will be used in.
-    ///
-    /// The caller must also ensure that the `default_state` value is a valid
-    /// state for the block type.
     #[must_use]
     pub const unsafe fn new<B: BlockType<V>, V: BlockVersion>(
         identifier: Identifier<'static>,
         base_id: u32,
         default_state: u16,
     ) -> Self {
+        assert!(default_state < B::Attributes::TOTAL, "Default StateId is out of range!");
+
         BlockMetadata {
             identifier,
             base_id: MaybeAtomicU32::new(base_id),

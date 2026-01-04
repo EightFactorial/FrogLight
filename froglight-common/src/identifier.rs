@@ -82,6 +82,15 @@ impl Identifier<'_> {
         Identifier { inner: Cow::Owned(self.inner.into_owned()) }
     }
 
+    /// Reborrow this [`Identifier`] with a shorter lifetime.
+    ///
+    /// Useful for converting a reference into an owned identifier without
+    /// cloning.
+    #[must_use]
+    pub const fn reborrow(&self) -> Identifier<'_> {
+        Identifier { inner: Cow::Borrowed(self.as_str()) }
+    }
+
     /// Get the content of this [`Identifier`] as a string slice.
     #[must_use]
     pub const fn as_str(&self) -> &str {
