@@ -3,7 +3,7 @@ edition = { workspace = true }
 homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
-name = "froglight-block"
+name = "froglight-registry"
 readme = { workspace = true }
 repository = { workspace = true }
 rust-version = { workspace = true }
@@ -20,11 +20,11 @@ workspace = true
 
 [dependencies]
 froglight-common = { workspace = true }
-glam = { workspace = true }
-variadics_please = { workspace = true }
 
 # Optional dependencies
 async-lock = { workspace = true, optional = true }
+foldhash = { workspace = true, optional = true }
+indexmap = { workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
 
 # --- Features ---
@@ -34,18 +34,14 @@ default = ["alloc", "std"]
 
 # Add async locking support
 async = ["dep:async-lock"]
-# Enable support for atomics
-atomic = []
 
-# Enable `libm` for `no_std` support.
-libm = ["glam/nostd-libm"]
 # Enable `parking_lot` for `no_std` support.
 parking_lot = ["dep:parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["froglight-common/alloc"]
+alloc = ["froglight-common/alloc", "dep:indexmap", "dep:foldhash"]
 # Enable support for the standard library
-std = ["alloc", "async-lock?/std", "froglight-common/std", "glam/std"]
+std = ["alloc", "async-lock?/std", "froglight-common/std", "indexmap?/std", "foldhash?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-common/nightly", "parking_lot?/nightly"]
 

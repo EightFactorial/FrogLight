@@ -10,7 +10,7 @@ impl GlobalId {
     #[must_use]
     pub const fn new(id: u32) -> Self { GlobalId(id) }
 
-    /// Return the inner [`u32`] value.
+    /// Get the inner [`u32`] value.
     #[inline]
     #[must_use]
     pub const fn into_inner(self) -> u32 { self.0 }
@@ -37,7 +37,7 @@ impl StateId {
     #[must_use]
     pub const fn new(id: u16) -> Self { StateId(id) }
 
-    /// Return the inner [`u16`] value.
+    /// Get the inner [`u16`] value.
     #[inline]
     #[must_use]
     pub const fn into_inner(self) -> u16 { self.0 }

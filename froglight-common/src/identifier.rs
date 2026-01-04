@@ -7,6 +7,7 @@
 #[cfg(feature = "alloc")]
 use alloc::borrow::Cow;
 use core::{
+    borrow::Borrow,
     cmp::Ordering,
     error::Error,
     fmt::{self, Debug, Display},
@@ -56,7 +57,16 @@ impl Identifier<'_> {
     ///
     /// This will panic if the string is not a valid identifier.
     #[must_use]
-    pub const fn new_static(_s: &'static str) -> Identifier<'static> { todo!() }
+    pub const fn new_static(s: &'static str) -> Identifier<'static> {
+        #[cfg(feature = "alloc")]
+        {
+            Identifier { inner: Cow::Borrowed(s) }
+        }
+        #[cfg(not(feature = "alloc"))]
+        {
+            Identifier { inner: s }
+        }
+    }
 
     /// Try to create a new [`Identifier`] from a string slice.
     ///
@@ -143,6 +153,9 @@ impl Identifier<'_> {
 impl AsRef<str> for Identifier<'_> {
     fn as_ref(&self) -> &str { self.as_str() }
 }
+impl Borrow<str> for Identifier<'_> {
+    fn borrow(&self) -> &str { self.as_str() }
+}
 impl Deref for Identifier<'_> {
     type Target = str;
 
@@ -163,6 +176,14 @@ impl Eq for Identifier<'_> {}
 impl PartialEq for Identifier<'_> {
     #[inline]
     fn eq(&self, other: &Self) -> bool { self.as_str() == other.as_str() }
+}
+impl PartialEq<str> for Identifier<'_> {
+    #[inline]
+    fn eq(&self, other: &str) -> bool { self.as_str() == other }
+}
+impl PartialEq<Identifier<'_>> for str {
+    #[inline]
+    fn eq(&self, other: &Identifier<'_>) -> bool { self == other.as_str() }
 }
 
 impl Ord for Identifier<'_> {

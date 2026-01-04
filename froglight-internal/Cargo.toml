@@ -21,6 +21,7 @@ workspace = true
 [dependencies]
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
+froglight-registry = { workspace = true }
 
 # Optional dependencies
 
@@ -37,9 +38,9 @@ tracing = []
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block/libm"]
 # Enable `parking_lot` for `no_std` support.
-parking_lot = ["froglight-block/parking_lot"]
+parking_lot = ["froglight-block/parking_lot", "froglight-registry/parking_lot"]
 
 # Enable support for the standard library
-std = ["froglight-block/std", "froglight-common/std"]
+std = ["froglight-block/std", "froglight-common/std", "froglight-registry/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-block/nightly", "froglight-common/nightly"]
+nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-registry/nightly"]

@@ -15,7 +15,7 @@ froglight-internal = { path = "froglight-internal", version = "0.0.1" }
 # froglight-network = { path = "froglight-network" }
 # froglight-packet = { path = "froglight-packet" }
 # froglight-physics = { path = "froglight-physics" }
-# froglight-registry = { path = "froglight-registry" }
+froglight-registry = { path = "froglight-registry", version = "0.0.1" }
 # froglight-world = { path = "froglight-world" }
 
 # Bevy Dependencies
@@ -79,7 +79,7 @@ members = [
   # "froglight-network",
   # "froglight-packet",
   # "froglight-physics",
-  # "froglight-registry",
+  "froglight-registry",
   # "froglight-world",
 ]
 resolver = "2"

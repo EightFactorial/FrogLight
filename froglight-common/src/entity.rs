@@ -23,6 +23,18 @@ use uuid::Uuid;
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct EntityId(pub i32);
 
+impl EntityId {
+    /// Create a new [`EntityId`].
+    #[inline]
+    #[must_use]
+    pub const fn new(id: i32) -> Self { EntityId(id) }
+
+    /// Get the inner [`i32`] value.
+    #[inline]
+    #[must_use]
+    pub const fn into_inner(self) -> i32 { self.0 }
+}
+
 impl From<i32> for EntityId {
     fn from(value: i32) -> Self { EntityId(value) }
 }
@@ -43,6 +55,18 @@ impl From<EntityId> for i32 {
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct EntityUuid(pub Uuid);
+
+impl EntityUuid {
+    /// Create a new [`EntityUuid`].
+    #[inline]
+    #[must_use]
+    pub const fn new(uuid: Uuid) -> Self { EntityUuid(uuid) }
+
+    /// Get the inner [`Uuid`] value.
+    #[inline]
+    #[must_use]
+    pub const fn into_inner(self) -> Uuid { self.0 }
+}
 
 impl From<Uuid> for EntityUuid {
     fn from(value: Uuid) -> Self { EntityUuid(value) }

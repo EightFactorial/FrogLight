@@ -3,12 +3,12 @@
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 #[cfg(all(not(feature = "async"), feature = "std", not(feature = "parking_lot")))]
-pub(super) use std::sync::RwLock;
+use std::sync::RwLock;
 
 #[cfg(feature = "async")]
-pub(super) use async_lock::RwLock;
+use async_lock::RwLock;
 #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-pub(super) use parking_lot::RwLock;
+use parking_lot::RwLock;
 
 use crate::block::{Block, BlockMetadata, GlobalId, StateId};
 
@@ -192,7 +192,7 @@ impl BlockStorage {
 /// based on enabled features.
 #[macro_export]
 #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-macro_rules! implement_storage {
+macro_rules! implement_block_storage {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@global $version => $($tt)*);
     };
@@ -204,13 +204,13 @@ macro_rules! implement_storage {
 /// based on enabled features.
 #[macro_export]
 #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-macro_rules! implement_storage {
+macro_rules! implement_block_storage {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@local {}, $version => $($tt)*);
     };
 }
 
-/// A hidden internal macro for the [`implement_storage`] macro.
+/// A hidden internal macro for the [`implement_block_storage`] macro.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __implement_storage_inner {
