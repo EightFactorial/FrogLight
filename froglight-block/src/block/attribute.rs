@@ -58,7 +58,7 @@ pub trait BlockAttrs: Sized + 'static {
     /// Get the name of an attribute by its index in the set.
     fn get_attr_str(&self, index: usize) -> Option<&'static str>;
     /// Set the value of an attribute by its index in the set.
-    fn set_attr_str(&mut self, index: usize, value: &'static str) -> Option<&'static str>;
+    fn set_attr_str(&mut self, index: usize, value: &str) -> Option<&'static str>;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ impl BlockAttrs for () {
 
     fn get_attr_str(&self, _: usize) -> Option<&'static str> { None }
 
-    fn set_attr_str(&mut self, _: usize, _: &'static str) -> Option<&'static str> { None }
+    fn set_attr_str(&mut self, _: usize, _: &str) -> Option<&'static str> { None }
 }
 
 impl<T0: BlockAttr> BlockAttrs for T0 {
@@ -118,7 +118,7 @@ impl<T0: BlockAttr> BlockAttrs for T0 {
         (index == 0).then(|| self.to_name())
     }
 
-    fn set_attr_str(&mut self, index: usize, name: &'static str) -> Option<&'static str> {
+    fn set_attr_str(&mut self, index: usize, name: &str) -> Option<&'static str> {
         if index == 0
             && let Some(new) = Self::from_name(name)
         {
@@ -151,7 +151,7 @@ impl<T0: BlockAttrs> BlockAttrs for (T0,) {
     fn get_attr_str(&self, index: usize) -> Option<&'static str> { self.0.get_attr_str(index) }
 
     #[inline]
-    fn set_attr_str(&mut self, index: usize, value: &'static str) -> Option<&'static str> {
+    fn set_attr_str(&mut self, index: usize, value: &str) -> Option<&'static str> {
         self.0.set_attr_str(index, value)
     }
 }
@@ -235,7 +235,7 @@ macro_rules! implement {
                 None
             }
 
-            fn set_attr_str(&mut self, mut index: usize, value: &'static str) -> Option<&'static str> {
+            fn set_attr_str(&mut self, mut index: usize, value: &str) -> Option<&'static str> {
                 let ($($T),*) = self;
                 $(
                     if index == 0 {

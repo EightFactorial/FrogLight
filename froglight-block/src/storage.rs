@@ -186,31 +186,35 @@ impl BlockStorage {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A macro helper for implementing [`BlockVersion`] for a given [`Version`].
+/// A macro helper for implementing
+/// [`BlockVersion`](crate::version::BlockVersion) for a given
+/// [`Version`](froglight_common::version::Version).
 ///
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
 #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-macro_rules! implement_block_storage {
+macro_rules! implement_blocks {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@global $version => $($tt)*);
     };
 }
 
-/// A macro helper for implementing [`BlockVersion`] for a given [`Version`].
+/// A macro helper for implementing
+/// [`BlockVersion`](crate::version::BlockVersion) for a given
+/// [`Version`](froglight_common::version::Version).
 ///
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
 #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-macro_rules! implement_block_storage {
+macro_rules! implement_blocks {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@local {}, $version => $($tt)*);
     };
 }
 
-/// A hidden internal macro for the [`implement_block_storage`] macro.
+/// A hidden internal macro for the [`implement_blocks`] macro.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __implement_storage_inner {

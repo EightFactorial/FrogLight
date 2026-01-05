@@ -8,11 +8,11 @@ use crate::storage::RegistrySetStorage;
 
 /// A [`Version`]'s associated registry data.
 pub trait RegistryVersion: Version {
-    /// The [`GlobalRegistryStorage`] for this [`Version`].
+    /// The [`GlobalRegistrySetStorage`] for this [`Version`].
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
     const REGISTRIES: &'static GlobalRegistrySetStorage;
 
-    /// Get the [`GlobalRegistryStorage`] for this [`Version`].
+    /// Get the [`GlobalRegistrySetStorage`] for this [`Version`].
     #[inline]
     #[must_use]
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]

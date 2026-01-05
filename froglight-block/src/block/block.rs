@@ -118,7 +118,7 @@ impl Block {
     /// Set the value of an attribute as a string for this block.
     ///
     /// Returns the old value of the attribute if it was set successfully.
-    pub fn set_attribute_str(&mut self, name: &str, value: &'static str) -> Option<&'static str> {
+    pub fn set_attribute_str(&mut self, name: &str, value: &str) -> Option<&'static str> {
         let (new_state, old_value) = self.reference.set_attribute_str(self.state, name, value)?;
         self.state = new_state;
         Some(old_value)

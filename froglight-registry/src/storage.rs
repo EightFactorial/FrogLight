@@ -352,35 +352,38 @@ impl AsRef<[Identifier<'static>]> for RegistryStorage {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A macro helper for implementing [`RegistryVersion`] for a given [`Version`].
+/// A macro helper for implementing
+/// [`RegistryVersion`](crate::version::RegistryVersion) for a given
+/// [`Version`](froglight_common::version::Version).
 ///
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
 #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-macro_rules! implement_registry_storage {
+macro_rules! implement_registry {
     ($version:ty => { $($tt:tt)* })  => {
         $crate::__implement_storage_inner!(@global $version => { $($tt)* });
     };
 }
 
-/// A macro helper for implementing [`RegistryVersion`] for a given [`Version`].
+/// A macro helper for implementing [`RegistryVersion`] for a given
+/// [`Version`](froglight_common::version::Version).
 ///
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
 #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-macro_rules! implement_registry_storage {
+macro_rules! implement_registry {
     ($version:ty => { $($tt:tt)* }) => {
         $crate::__implement_storage_inner!(@local {}, $version => { $($tt)* });
     };
 }
 
-/// A hidden internal macro for the [`implement_registry_storage`] macro.
+/// A hidden internal macro for the [`implement_registry`] macro.
 ///
 /// Parses the following syntax:
 /// ```rust,ignore
-/// implement_registry_storage! {
+/// implement_registry! {
 ///     TestVersion => {
 ///         "test:example_a" => [
 ///             "test:example_a_a",
@@ -412,6 +415,7 @@ macro_rules! __implement_storage_inner {
         );
     };
     (@local {$($constant:tt)*}, $version:ty => { $($tt:tt)* } ) => {
+        #[doc(hidden)]
         mod __registry_storage_impl {
             #[allow(unused_imports, reason = "Macro generated code")]
             use super::*;

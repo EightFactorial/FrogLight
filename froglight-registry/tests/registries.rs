@@ -2,7 +2,7 @@
 #![no_std]
 
 use froglight_common::prelude::*;
-use froglight_registry::{implement_registry_storage, prelude::*};
+use froglight_registry::{implement_registry, prelude::*};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 struct TestVersion;
@@ -12,7 +12,7 @@ impl Version for TestVersion {
     const RESOURCE_VERSION: u32 = u32::MIN;
 }
 
-implement_registry_storage! {
+implement_registry! {
     TestVersion => {
         "test:example_a" => [
             "test:example_a_a",

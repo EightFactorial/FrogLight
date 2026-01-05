@@ -5,7 +5,7 @@ use core::any::TypeId;
 
 use froglight_block::{
     block::{BlockAttr, BlockMetadata, BlockType},
-    implement_block_storage,
+    implement_blocks,
     prelude::*,
     storage::BlockStorage,
 };
@@ -87,7 +87,7 @@ impl BlockAttr for Snowy {
     const STATES: &'static [(&'static str, Self)] = &[("true", Self(true)), ("false", Self(false))];
 }
 
-implement_block_storage! {
+implement_blocks! {
     TestVersion => unsafe {
         BlockStorage::new_static(&[
             Air::METADATA,

@@ -25,7 +25,7 @@ pub struct BlockMetadata {
 
     attr_data: &'static [(&'static str, TypeId)],
     get_attr_fn: fn(state: usize, attr: &str) -> Option<&'static str>,
-    set_attr_fn: fn(state: usize, attr: &str, value: &'static str) -> Option<(usize, &'static str)>,
+    set_attr_fn: fn(state: usize, attr: &str, value: &str) -> Option<(usize, &'static str)>,
 
     /// The [`TypeId`] of the block type.
     block_ty: TypeId,
@@ -34,7 +34,7 @@ pub struct BlockMetadata {
 }
 
 impl BlockMetadata {
-    /// Create a new [`BlockData`].
+    /// Create a new [`BlockMetadata`].
     ///
     /// # Safety
     ///
@@ -191,7 +191,7 @@ impl BlockMetadata {
         &self,
         state: StateId,
         name: &str,
-        value: &'static str,
+        value: &str,
     ) -> Option<(StateId, &'static str)> {
         let (state, value) = (self.set_attr_fn)(usize::from(state.into_inner()), name, value)?;
         let state = StateId::new(u16::try_from(state).expect("Invalid StateId, overflowed!"));
