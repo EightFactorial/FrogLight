@@ -3,7 +3,7 @@ use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::{SECTION_HEIGHT, SECTION_LENGTH, SECTION_WIDTH};
+use crate::{SECTION_HEIGHT, SECTION_LENGTH, SECTION_WIDTH, component::ChunkBlockPos};
 
 /// A block's position within a section.
 #[repr(transparent)]
@@ -46,4 +46,10 @@ impl SectionBlockPos {
     /// Get the z coordinate of this [`SectionBlockPos`].
     #[must_use]
     pub const fn z(&self) -> u8 { ((self.0 >> 4) & 0xF) as u8 }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl From<ChunkBlockPos> for SectionBlockPos {
+    fn from(value: ChunkBlockPos) -> Self { value.as_section_blockpos() }
 }

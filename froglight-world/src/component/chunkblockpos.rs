@@ -4,7 +4,9 @@ use glam::U8Vec2;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::{CHUNK_LENGTH, CHUNK_WIDTH, prelude::BlockPos};
+use crate::{
+    CHUNK_LENGTH, CHUNK_WIDTH, SECTION_HEIGHT, component::SectionBlockPos, prelude::BlockPos,
+};
 
 /// A block's position within a chunk.
 ///
@@ -39,8 +41,19 @@ impl ChunkBlockPos {
     #[must_use]
     pub const fn z(&self) -> u8 { self.0.y }
 
+    /// Get the index of the section that contains this block.
+    #[must_use]
+    pub const fn as_section_index(&self) -> usize { self.y() as usize / SECTION_HEIGHT as usize }
+
+    /// Get the [`SectionBlockPos`] of this block.
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation, reason = "Height will never be that large")]
+    pub const fn as_section_blockpos(&self) -> SectionBlockPos {
+        SectionBlockPos::new_xyz(self.x(), (self.y() % SECTION_HEIGHT as u16) as u8, self.z())
+    }
+
     /// Try to create a new [`ChunkBlockPos`] from the given [`BlockPos`] and
-    /// chunk offset.
+    /// vertical chunk offset.
     ///
     /// Returns `None` if the resulting absolute Y coordinate is negative
     /// or exceeds `u16::MAX`.

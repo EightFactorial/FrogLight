@@ -22,11 +22,12 @@ workspace = true
 bitvec = { workspace = true }
 froglight-common = { workspace = true }
 glam = { workspace = true }
+smallvec = { features = ["const_new"], workspace = true }
 
 # Optional dependencies
 async-lock = { workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
-bevy_reflect = { features = ["glam"], workspace = true, optional = true }
+bevy_reflect = { features = ["glam", "smallvec"], workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
@@ -42,9 +43,9 @@ bevy = ["alloc", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "s
 # Enable `froglight-block` support.
 froglight-block = ["dep:froglight-block"]
 # Enable `serde` support.
-serde = ["dep:serde"]
+serde = ["dep:serde", "smallvec/serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing"]
+tracing = ["dep:tracing", "froglight-block?/tracing"]
 
 # Add async locking support
 async = ["dep:async-lock", "froglight-block?/async"]
@@ -58,4 +59,4 @@ alloc = ["bitvec/alloc", "froglight-block?/alloc", "froglight-common/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bitvec/std", "async-lock?/std", "froglight-block?/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-block?/nightly", "froglight-common/nightly", "parking_lot?/nightly"]
+nightly = ["froglight-block?/nightly", "froglight-common/nightly", "parking_lot?/nightly", "smallvec/specialization"]

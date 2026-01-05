@@ -1,11 +1,19 @@
 //! TODO
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::{component::Component, reflect::ReflectComponent};
+#[cfg(feature = "bevy")]
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+
 use crate::{component::ChunkBlockPos, prelude::*};
 
 #[cfg(feature = "froglight-block")]
 mod block;
 
-/// A region of blocks in the world.
+/// A region of blocks in a world.
+#[derive(Default, Clone)]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
 pub struct Chunk;
 
 impl Chunk {
