@@ -16,7 +16,7 @@ froglight-internal = { default-features = false, path = "froglight-internal", ve
 # froglight-packet = { default-features = false, path = "froglight-packet" }
 # froglight-physics = { default-features = false, path = "froglight-physics" }
 froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
-# froglight-world = { default-features = false, path = "froglight-world" }
+froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
 bevy = { default-features = false, version = "0.18.0-rc.2" }
@@ -43,6 +43,7 @@ sha2 = { default-features = false, version = "0.11.0-rc.3" }
 # Other Dependencies
 async-lock = { default-features = false, version = "3.4" }
 async-net = { default-features = false, version = "2.0" }
+bitvec = { default-features = false, version = "1.0" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
 glam = { default-features = false, version = "0.30" }
@@ -80,7 +81,7 @@ members = [
   # "froglight-packet",
   # "froglight-physics",
   "froglight-registry",
-  # "froglight-world",
+  "froglight-world",
 ]
 resolver = "2"
 

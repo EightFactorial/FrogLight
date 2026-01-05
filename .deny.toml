@@ -39,19 +39,6 @@ unknown-registry = "deny"
 
 # --- Executable Exceptions ---
 
-[[bans.build.bypass]]
-name = "unicode-segmentation"
-allow = [
-  { path = "scripts/unicode.py", checksum = "31dd92fd09c5c7e73f1423aae38efd49dee51e7859ee1fbfd3374bb90d4cd8ab" },
-  { path = "scripts/unicode_gen_breaktests.py", checksum = "5b3f4caeade8517eb6b9cab6aa0948a7ee7672e845b22e5254254cbfc54d7141" },
-]
-
-[[bans.build.bypass]]
-name = "wasm-bindgen-macro"
-allow = [
-  { path = "src/worker.js", checksum = "cb5c33dd41cfad622abce5464a3ceae478904ea16ddc3c6c769ee33e0c086692" },
-]
-
 # [[bans.build.bypass]]
 # name = "windows_aarch64_gnullvm"
 # allow-globs = ["lib/libwindows.*.a"]
@@ -76,7 +63,3 @@ allow = [
 # [[bans.build.bypass]]
 # name = "windows_x86_64_msvc"
 # allow-globs = ["lib/windows.*.lib"]
-
-[[bans.build.bypass]]
-name = "wit-bindgen"
-allow-globs = ["src/rt/libwit_bindgen_*.a"]

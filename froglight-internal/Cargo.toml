@@ -22,6 +22,7 @@ workspace = true
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-registry = { workspace = true }
+froglight-world = { features = ["froglight-block"], workspace = true }
 
 # Optional dependencies
 
@@ -31,16 +32,16 @@ froglight-registry = { workspace = true }
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["froglight-common/bevy"]
+bevy = ["froglight-common/bevy", "froglight-world/bevy"]
 # Enable `tracing` support.
 tracing = []
 
 # Enable `libm` for `no_std` support.
-libm = ["froglight-block/libm"]
+libm = ["froglight-block/libm", "froglight-world/libm"]
 # Enable `parking_lot` for `no_std` support.
-parking_lot = ["froglight-block/parking_lot", "froglight-registry/parking_lot"]
+parking_lot = ["froglight-block/parking_lot", "froglight-registry/parking_lot", "froglight-world/parking_lot"]
 
 # Enable support for the standard library
-std = ["froglight-block/std", "froglight-common/std", "froglight-registry/std"]
+std = ["froglight-block/std", "froglight-common/std", "froglight-registry/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-registry/nightly"]
+nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-registry/nightly", "froglight-world/nightly"]

@@ -32,11 +32,11 @@ parking_lot = { workspace = true, optional = true }
 [features]
 default = ["alloc", "std"]
 
-# Add async locking support
-async = ["dep:async-lock"]
 # Enable support for atomics
 atomic = []
 
+# Add async locking support
+async = ["dep:async-lock"]
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
 # Enable `parking_lot` for `no_std` support.

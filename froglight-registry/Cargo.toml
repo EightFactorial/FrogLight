@@ -34,7 +34,6 @@ default = ["alloc", "std"]
 
 # Add async locking support
 async = ["dep:async-lock"]
-
 # Enable `parking_lot` for `no_std` support.
 parking_lot = ["dep:parking_lot"]
 
