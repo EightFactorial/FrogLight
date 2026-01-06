@@ -4,11 +4,30 @@ use bitvec::slice::BitSlice;
 use froglight_world::{
     SECTION_VOLUME,
     borrowed::{
-        BorrowedSection,
+        BorrowedChunk, BorrowedSection,
         section::{BorrowedPalette, BorrowedSectionData},
     },
-    component::SectionBlockPos,
+    component::{ChunkBlockPos, SectionBlockPos},
+    prelude::BlockPos,
 };
+
+#[test]
+fn chunk() {
+    // An empty chunk with no blocks.
+    let chunk = BorrowedChunk::new_empty_large();
+    let offset = chunk.height_offset();
+
+    for y in chunk.height_range() {
+        for z in 0..16 {
+            for x in 0..16 {
+                let position = BlockPos::new_xyz(x, y, z);
+                let chunk_position = ChunkBlockPos::try_from_blockpos(position, offset).unwrap();
+                assert_eq!(chunk.get_raw_block(position), Some(0));
+                assert_eq!(chunk.get_raw_block_pos(chunk_position), Some(0));
+            }
+        }
+    }
+}
 
 #[test]
 fn empty() {

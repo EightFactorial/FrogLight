@@ -59,7 +59,7 @@ impl ChunkBlockPos {
     /// or exceeds `u16::MAX`.
     #[must_use]
     pub fn try_from_blockpos(position: BlockPos, chunk_offset: i32) -> Option<Self> {
-        let absolute_y = position.y().wrapping_add(chunk_offset);
+        let absolute_y = position.y().wrapping_sub(chunk_offset);
         if absolute_y.is_negative() {
             #[cfg(feature = "tracing")]
             tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, absolute Y is negative?");

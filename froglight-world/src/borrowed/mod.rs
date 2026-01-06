@@ -56,9 +56,30 @@ impl<'a> BorrowedChunk<'a> {
     pub fn new_empty_normal() -> Self { Self { storage: BorrowedChunkStorage::empty_normal() } }
 
     /// Get the height of this [`Chunk`].
+    ///
+    /// ## Note
+    ///
+    /// This is the height in world/coordinate space,
+    /// and takes into account the chunk's vertical offset.
     #[must_use]
     #[expect(clippy::cast_possible_truncation, reason = "Chunks will never be that tall")]
-    pub fn height(&self) -> u32 { self.storage.len() as u32 * 16 }
+    #[expect(clippy::cast_possible_wrap, reason = "Chunks will never be that tall")]
+    pub fn height(&self) -> i32 {
+        (self.storage.len() as i32 * 16).saturating_add(self.height_offset())
+    }
+
+    /// Get the height range of this [`Chunk`].
+    ///
+    /// ## Note
+    ///
+    /// This is the range in world/coordinate space,
+    /// and takes into account the chunk's vertical offset.
+    #[must_use]
+    pub fn height_range(&self) -> core::ops::Range<i32> { self.height_offset()..self.height() }
+
+    /// Get the total height of this [`Chunk`], ignoring it's vertical offset.
+    #[must_use]
+    pub fn height_total(&self) -> usize { self.storage.len() * 16 }
 
     /// Get the height offset of this [`Chunk`].
     #[must_use]
