@@ -3,7 +3,9 @@ use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-use crate::{SECTION_HEIGHT, SECTION_LENGTH, SECTION_WIDTH, component::ChunkBlockPos};
+use crate::{
+    SECTION_HEIGHT, SECTION_LENGTH, SECTION_VOLUME, SECTION_WIDTH, component::ChunkBlockPos,
+};
 
 /// A block's position within a section.
 #[repr(transparent)]
@@ -19,7 +21,7 @@ impl SectionBlockPos {
     /// Create a new [`SectionBlockPos`] from the given coordinates.
     #[inline]
     #[must_use]
-    pub const fn new_index(index: u16) -> Self { Self(index) }
+    pub const fn new_index(index: u16) -> Self { Self(index.rem_euclid(SECTION_VOLUME)) }
 
     /// Create a new [`SectionBlockPos`] from the given x, y, and z coordinates.
     #[must_use]

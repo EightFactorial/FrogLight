@@ -8,6 +8,7 @@ pub mod borrowed;
 #[cfg(feature = "alloc")]
 pub mod chunk;
 pub mod component;
+pub mod section;
 
 /// The length of a chunk.
 pub const CHUNK_LENGTH: u8 = 16;
@@ -20,6 +21,9 @@ pub const SECTION_LENGTH: u8 = CHUNK_LENGTH;
 pub const SECTION_WIDTH: u8 = CHUNK_WIDTH;
 /// The height of a section.
 pub const SECTION_HEIGHT: u8 = 16;
+/// The volume of a section.
+pub const SECTION_VOLUME: u16 =
+    SECTION_LENGTH as u16 * SECTION_WIDTH as u16 * SECTION_HEIGHT as u16;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
