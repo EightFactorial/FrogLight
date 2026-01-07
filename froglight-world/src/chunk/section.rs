@@ -61,8 +61,12 @@ impl Section {
 
     /// Create an iterator over all raw block ids in this section.
     #[inline]
-    #[must_use]
     pub fn iter_raw_blocks(&self) -> impl Iterator<Item = u32> + '_ { self.blocks.iter() }
+
+    /// Returns `true` if the given block id is contained within this section.
+    #[inline]
+    #[must_use]
+    pub fn contains_raw_block(&self, id: u32) -> bool { self.blocks.contains(id) }
 
     /// Get the biome id at the given position within the section.
     #[inline]
@@ -71,8 +75,12 @@ impl Section {
 
     /// Create an iterator over all raw biome ids in this section.
     #[inline]
-    #[must_use]
     pub fn iter_raw_biomes(&self) -> impl Iterator<Item = u32> + '_ { self.biomes.iter() }
+
+    /// Returns `true` if the given biome id is contained within this section.
+    #[inline]
+    #[must_use]
+    pub fn contains_raw_biome(&self, id: u32) -> bool { self.biomes.contains(id) }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -160,10 +168,27 @@ impl<T: SectionType> SectionData<T> {
     }
 
     /// Create an iterator over all values in this section.
-    #[must_use]
+    #[expect(clippy::missing_panics_doc, reason = "The index cannot ever go out of bounds")]
     pub fn iter(&self) -> impl Iterator<Item = u32> + '_ {
         (0..usize::from(T::VOLUME))
             .map(move |i| self.get_index(i).expect("Volume should always be within bounds"))
+    }
+
+    /// Returns `true` if the given id is contained within this section.
+    #[must_use]
+    pub fn contains(&self, id: u32) -> bool {
+        match &self.palette {
+            SectionPalette::Single(value) => *value == id,
+            SectionPalette::Vector(items) => {
+                if items.contains(&id) {
+                    // Cannot return `true` directly as the palette may contain unused values.
+                    self.iter().any(|value| value == id)
+                } else {
+                    false
+                }
+            }
+            SectionPalette::Global => self.iter().any(|value| value == id),
+        }
     }
 }
 

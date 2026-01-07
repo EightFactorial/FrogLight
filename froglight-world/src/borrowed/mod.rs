@@ -118,9 +118,20 @@ impl<'a> BorrowedChunk<'a> {
     }
 
     /// Iterate over all raw block ids in this chunk.
-    #[must_use]
+    ///
+    /// # Note
+    ///
+    /// If you are searching for whether a block exists in the chunk, use
+    /// [`BorrowedChunk::contains_raw_block`] instead as it has much better
+    /// performance.
     pub fn iter_raw_blocks(&self) -> impl Iterator<Item = u32> + '_ {
-        self.storage.as_slice().iter().flat_map(|section| section.iter_raw_blocks())
+        self.storage.as_slice().iter().flat_map(BorrowedSection::iter_raw_blocks)
+    }
+
+    /// Returns `true` if the chunk contains the given raw block id.
+    #[must_use]
+    pub fn contains_raw_block(&self, block_id: u32) -> bool {
+        self.storage.as_slice().iter().any(|section| section.contains_raw_block(block_id))
     }
 
     /// Get the biome id at the given position within the chunk.
@@ -151,8 +162,19 @@ impl<'a> BorrowedChunk<'a> {
     }
 
     /// Iterate over all raw biome ids in this chunk.
-    #[must_use]
+    ///
+    /// # Note
+    ///
+    /// If you are searching for whether a biome exists in the chunk, use
+    /// [`BorrowedChunk::contains_raw_biome`] instead as it has much better
+    /// performance.
     pub fn iter_raw_biomes(&self) -> impl Iterator<Item = u32> + '_ {
-        self.storage.as_slice().iter().flat_map(|section| section.iter_raw_biomes())
+        self.storage.as_slice().iter().flat_map(BorrowedSection::iter_raw_biomes)
+    }
+
+    /// Returns `true` if the chunk contains the given raw biome id.
+    #[must_use]
+    pub fn contains_raw_biome(&self, biome_id: u32) -> bool {
+        self.storage.as_slice().iter().any(|section| section.contains_raw_biome(biome_id))
     }
 }
