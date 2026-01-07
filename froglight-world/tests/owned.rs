@@ -1,20 +1,23 @@
 //! TODO
 #![no_std]
 
-use bitvec::slice::BitSlice;
+#[cfg(feature = "alloc")]
+use bitvec::vec::BitVec;
+#[cfg(feature = "alloc")]
 use froglight_world::{
-    borrowed::{
-        BorrowedChunk, BorrowedSection,
-        section::{BorrowedPalette, BorrowedSectionData},
+    chunk::{
+        Section,
+        section::{SectionData, SectionPalette},
     },
     component::{ChunkBlockPos, SectionBlockPos},
-    prelude::BlockPos,
+    prelude::{BlockPos, Chunk},
 };
 
 #[test]
+#[cfg(feature = "alloc")]
 fn chunk() {
     // An empty chunk with no blocks.
-    let chunk = BorrowedChunk::new_empty_large();
+    let chunk = Chunk::new_empty_large();
     let offset = chunk.height_offset();
 
     for y in chunk.height_range() {
@@ -30,13 +33,14 @@ fn chunk() {
 }
 
 #[test]
+#[cfg(feature = "alloc")]
 fn empty() {
     // An empty section with no blocks.
     let section = unsafe {
-        BorrowedSection::new_unchecked(
+        Section::new_unchecked(
             0,
-            BorrowedSectionData::new_unchecked(0, BorrowedPalette::Single(0), BitSlice::empty()),
-            BorrowedSectionData::new_unchecked(0, BorrowedPalette::Single(0), BitSlice::empty()),
+            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::EMPTY),
+            SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::EMPTY),
         )
     };
 

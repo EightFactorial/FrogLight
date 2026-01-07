@@ -1,42 +1,102 @@
 //! TODO
 
+use core::ops::Range;
+
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
-use crate::{borrowed::storage::BorrowedChunkStorage, component::ChunkBlockPos, prelude::*};
+use crate::{component::ChunkBlockPos, prelude::*};
 
 #[cfg(feature = "froglight-block")]
 mod block;
 
+pub mod section;
+pub use section::Section;
+
 mod shared;
 pub use shared::SharedChunk;
+
+pub mod storage;
+use storage::ChunkStorage;
 
 /// A region of blocks in a world.
 #[derive(Default, Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
 pub struct Chunk {
-    storage: BorrowedChunkStorage<'static>, // TODO: TEMPORARY
+    storage: ChunkStorage,
 }
 
 impl Chunk {
-    /// Get the height of this [`Chunk`].
+    /// Create a new [`Chunk`] from the given storage.
     #[must_use]
-    pub const fn height(&self) -> u32 { todo!() }
+    pub const fn new(storage: ChunkStorage) -> Self { Self { storage } }
+
+    // /// Create a new [`Chunk`] from the given sections and offset.
+    // #[must_use]
+    // pub fn new_from(sections: Vec<Section>, offset: i32) -> Self {
+    //     Self { storage: ChunkStorage::new_from_vec(sections, offset) }
+    // }
+
+    /// Create a new empty large [`BorrowedChunk`].
+    ///
+    /// This is equivalent to an overworld chunk,
+    /// or 24 sections (384 blocks) tall with an offset of -64.
+    #[must_use]
+    pub fn new_empty_large() -> Self { Self { storage: ChunkStorage::empty_large() } }
+
+    /// Create a new empty normal [`BorrowedChunk`].
+    ///
+    /// This is equivalent to a nether or end chunk,
+    /// or 16 sections (256 blocks) tall with an offset of 0.
+    #[must_use]
+    pub fn new_empty_normal() -> Self { Self { storage: ChunkStorage::empty_normal() } }
+
+    /// Get the height of this [`Chunk`].
+    ///
+    /// ## Note
+    ///
+    /// This is the height in world/coordinate space,
+    /// and takes into account the chunk's vertical offset.
+    #[must_use]
+    #[expect(clippy::cast_possible_truncation, reason = "Chunks will never be that tall")]
+    #[expect(clippy::cast_possible_wrap, reason = "Chunks will never be that tall")]
+    pub fn height(&self) -> i32 {
+        (self.storage.len() as i32 * 16).saturating_add(self.height_offset())
+    }
+
+    /// Get the height range of this [`Chunk`].
+    ///
+    /// ## Note
+    ///
+    /// This is the range in world/coordinate space and follows the chunk's
+    /// vertical offset.
+    #[must_use]
+    pub fn height_range(&self) -> Range<i32> { self.height_offset()..self.height() }
+
+    /// Get the total height of this [`Chunk`], ignoring it's vertical offset.
+    ///
+    /// ## Note
+    ///
+    /// In other words, `y = 0` is always the bottom of the chunk.
+    ///
+    /// In most cases, you probably want [`Chunk::height`] instead.
+    #[must_use]
+    pub fn height_total(&self) -> usize { self.storage.len() * 16 }
 
     /// Get the height offset of this [`Chunk`].
     #[must_use]
-    pub const fn height_offset(&self) -> i32 { todo!() }
+    pub const fn height_offset(&self) -> i32 { self.storage.offset() }
 
     /// Get a reference to the sections in this [`Chunk`].
     #[must_use]
-    pub const fn sections(&self) -> &[()] { todo!() }
+    pub fn sections(&self) -> &[Section] { todo!() }
 
     /// Get a mutable reference to the sections in this [`Chunk`].
     #[must_use]
-    pub const fn sections_mut(&mut self) -> &mut [()] { todo!() }
+    pub fn sections_mut(&self) -> &mut [Section] { todo!() }
 
     /// Get the block id at the given position within the chunk.
     ///

@@ -4,6 +4,7 @@
 
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
+use core::ops::Range;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
@@ -75,7 +76,7 @@ impl<'a> BorrowedChunk<'a> {
     /// This is the range in world/coordinate space,
     /// and takes into account the chunk's vertical offset.
     #[must_use]
-    pub fn height_range(&self) -> core::ops::Range<i32> { self.height_offset()..self.height() }
+    pub fn height_range(&self) -> Range<i32> { self.height_offset()..self.height() }
 
     /// Get the total height of this [`Chunk`], ignoring it's vertical offset.
     #[must_use]

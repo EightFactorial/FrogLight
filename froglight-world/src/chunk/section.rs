@@ -2,7 +2,8 @@
 
 use core::{marker::PhantomData, ops::Range};
 
-use bitvec::{field::BitField, order::Msb0, slice::BitSlice};
+use bitvec::{field::BitField, order::Msb0, slice::BitSlice, vec::BitVec};
+use smallvec::SmallVec;
 
 use crate::{
     SECTION_HEIGHT, SECTION_WIDTH,
@@ -10,15 +11,15 @@ use crate::{
     section::{BiomeSection, BlockSection, SectionType},
 };
 
-/// A borrowed piece of a chunk.
+/// A piece of a chunk.
 #[derive(Default, Clone)]
-pub struct BorrowedSection<'a> {
+pub struct Section {
     non_air: u32,
-    blocks: BorrowedSectionData<'a, BlockSection>,
-    biomes: BorrowedSectionData<'a, BiomeSection>,
+    blocks: SectionData<BlockSection>,
+    biomes: SectionData<BiomeSection>,
 }
 
-impl<'a> BorrowedSection<'a> {
+impl Section {
     /// Create a new [`BorrowedSection`] without performing any validation.
     ///
     /// # Safety
@@ -27,8 +28,8 @@ impl<'a> BorrowedSection<'a> {
     #[must_use]
     pub const unsafe fn new_unchecked(
         non_air: u32,
-        blocks: BorrowedSectionData<'a, BlockSection>,
-        biomes: BorrowedSectionData<'a, BiomeSection>,
+        blocks: SectionData<BlockSection>,
+        biomes: SectionData<BiomeSection>,
     ) -> Self {
         Self { non_air, blocks, biomes }
     }
@@ -37,13 +38,21 @@ impl<'a> BorrowedSection<'a> {
     #[must_use]
     pub const fn block_count(&self) -> u32 { self.non_air }
 
-    /// Get the [`BorrowedSectionData`] for blocks.
+    /// Get the [`SectionData`] for blocks.
     #[must_use]
-    pub const fn block_data(&self) -> &BorrowedSectionData<'a, BlockSection> { &self.blocks }
+    pub const fn block_data(&self) -> &SectionData<BlockSection> { &self.blocks }
 
-    /// Get the [`BorrowedSectionData`] for biomes.
+    /// Get the [`SectionData`] for blocks mutably.
     #[must_use]
-    pub const fn biome_data(&self) -> &BorrowedSectionData<'a, BiomeSection> { &self.biomes }
+    pub const fn block_data_mut(&mut self) -> &mut SectionData<BlockSection> { &mut self.blocks }
+
+    /// Get the [`SectionData`] for biomes.
+    #[must_use]
+    pub const fn biome_data(&self) -> &SectionData<BiomeSection> { &self.biomes }
+
+    /// Get the [`SectionData`] for biomes mutably.
+    #[must_use]
+    pub const fn biome_data_mut(&mut self) -> &mut SectionData<BiomeSection> { &mut self.biomes }
 
     /// Get the block id at the given position within the section.
     #[inline]
@@ -60,14 +69,14 @@ impl<'a> BorrowedSection<'a> {
 
 /// A bit-packed bundle of chunk data.
 #[derive(Default, Clone)]
-pub struct BorrowedSectionData<'a, T: SectionType> {
+pub struct SectionData<T: SectionType> {
     bits: usize,
-    palette: BorrowedPalette<'a>,
-    data: &'a BitSlice<u64, Msb0>,
+    palette: SectionPalette,
+    data: BitVec<u64, Msb0>,
     _phantom: PhantomData<T>,
 }
 
-impl<'a, T: SectionType> BorrowedSectionData<'a, T> {
+impl<T: SectionType> SectionData<T> {
     /// Create a new [`BorrowedSectionData`] without performing any validation.
     ///
     /// # Safety
@@ -76,8 +85,8 @@ impl<'a, T: SectionType> BorrowedSectionData<'a, T> {
     #[must_use]
     pub const unsafe fn new_unchecked(
         bits: usize,
-        palette: BorrowedPalette<'a>,
-        data: &'a BitSlice<u64, Msb0>,
+        palette: SectionPalette,
+        data: BitVec<u64, Msb0>,
     ) -> Self {
         Self { bits, palette, data, _phantom: PhantomData }
     }
@@ -88,11 +97,11 @@ impl<'a, T: SectionType> BorrowedSectionData<'a, T> {
 
     /// Get the palette used by this data.
     #[must_use]
-    pub const fn palette(&self) -> &BorrowedPalette<'a> { &self.palette }
+    pub const fn palette(&self) -> &SectionPalette { &self.palette }
 
     /// Get the raw bit data.
     #[must_use]
-    pub const fn data(&self) -> &'a BitSlice<u64, Msb0> { self.data }
+    pub fn data(&self) -> &BitSlice<u64, Msb0> { self.data.as_bitslice() }
 
     /// Get the value at the given position within the section.
     #[must_use]
@@ -118,15 +127,15 @@ impl<'a, T: SectionType> BorrowedSectionData<'a, T> {
             return None;
         }
 
-        if let BorrowedPalette::Single(value) = self.palette {
+        if let SectionPalette::Single(value) = self.palette {
             return Some(value);
         }
 
         let index = self.get_slice(index)?.load::<usize>();
-        match self.palette {
-            BorrowedPalette::Single(_) => unreachable!(),
-            BorrowedPalette::Vector(items) => items.get(index).copied(),
-            BorrowedPalette::Global => index.try_into().ok(),
+        match &self.palette {
+            SectionPalette::Single(_) => unreachable!(),
+            SectionPalette::Vector(items) => items.get(index).copied(),
+            SectionPalette::Global => index.try_into().ok(),
         }
     }
 
@@ -144,16 +153,16 @@ impl<'a, T: SectionType> BorrowedSectionData<'a, T> {
 // -------------------------------------------------------------------------------------------------
 
 /// A borrowed palette of values.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BorrowedPalette<'a> {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum SectionPalette {
     /// A single value.
     Single(u32),
     /// A list of values that can be indexed into.
-    Vector(&'a [u32]),
+    Vector(SmallVec<[u32; 8]>),
     /// Values should be used directly.
     Global,
 }
 
-impl Default for BorrowedPalette<'_> {
+impl Default for SectionPalette {
     fn default() -> Self { Self::Single(0u32) }
 }
