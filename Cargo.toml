@@ -26,7 +26,7 @@ bevy_math = { default-features = false, version = "0.18.0-rc.2" }
 bevy_reflect = { default-features = false, version = "0.18.0-rc.2" }
 
 # Facet Dependencies
-facet = { default-features = false, version = "0.41" }
+facet = { default-features = false, version = "0.42" }
 facet-minecraft = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.0.1" }
 
 # Hashing & Cryptography Dependencies
@@ -41,6 +41,7 @@ sha1 = { default-features = false, version = "0.11.0-rc.3" }
 sha2 = { default-features = false, version = "0.11.0-rc.3" }
 
 # Other Dependencies
+arc-swap = { default-features = false, version = "1.8" }
 async-lock = { default-features = false, version = "3.4" }
 async-net = { default-features = false, version = "2.0" }
 bitvec = { default-features = false, version = "1.0" }
@@ -51,11 +52,11 @@ indexmap = { default-features = false, version = "2.12" }
 libm = { default-features = false, version = "0.2" }
 parking_lot = { default-features = false, version = "0.12" }
 serde = { default-features = false, version = "1.0" }
+smallvec = { default-features = false, version = "1.15" }
 tracing = { default-features = false, version = "0.1" }
 uuid = { default-features = false, version = "1.0" }
 variadics_please = { default-features = false, version = "1.1" }
 zerocopy = { default-features = false, version = "0.8" }
-smallvec = { default-features = false, version = "1.15" }
 
 # Debug Dependencies
 divan = { version = "0.1" }

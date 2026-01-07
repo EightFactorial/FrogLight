@@ -25,6 +25,7 @@ glam = { workspace = true }
 smallvec = { features = ["const_new"], workspace = true }
 
 # Optional dependencies
+arc-swap = { workspace = true, optional = true }
 async-lock = { workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["glam", "smallvec"], workspace = true, optional = true }
@@ -55,7 +56,7 @@ libm = ["glam/nostd-libm"]
 parking_lot = ["dep:parking_lot", "froglight-block?/parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["bitvec/alloc", "froglight-block?/alloc", "froglight-common/alloc"]
+alloc = ["bitvec/alloc", "dep:arc-swap", "froglight-block?/alloc", "froglight-common/alloc"]
 # Enable support for the standard library
 std = ["alloc", "bitvec/std", "async-lock?/std", "froglight-block?/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain

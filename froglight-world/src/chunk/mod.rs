@@ -10,6 +10,9 @@ use crate::{borrowed::storage::BorrowedChunkStorage, component::ChunkBlockPos, p
 #[cfg(feature = "froglight-block")]
 mod block;
 
+mod shared;
+pub use shared::SharedChunk;
+
 /// A region of blocks in a world.
 #[derive(Default, Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
