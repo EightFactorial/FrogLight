@@ -5,7 +5,6 @@ use core::fmt::Debug;
 use crate::SECTION_VOLUME;
 
 /// A type of [`Section`] storage.
-#[expect(private_bounds, reason = "There are only two section types")]
 pub trait SectionType: Debug + Default + Clone + Send + Sync + Sealed + 'static {
     /// The volume of this type of section.
     #[expect(clippy::cast_possible_truncation, reason = "Sections will never be that large")]
@@ -18,8 +17,6 @@ pub trait SectionType: Debug + Default + Clone + Send + Sync + Sealed + 'static 
     fn palette_for(bits: usize) -> SectionPaletteType;
 }
 
-trait Sealed {}
-
 /// A type of section palette.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SectionPaletteType {
@@ -29,6 +26,11 @@ pub enum SectionPaletteType {
     Vector,
     /// Values should be used directly.
     Global,
+}
+
+use sealed::Sealed;
+mod sealed {
+    pub trait Sealed {}
 }
 
 // -------------------------------------------------------------------------------------------------
