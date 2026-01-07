@@ -48,13 +48,13 @@ bitvec = { default-features = false, version = "1.0" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
 glam = { default-features = false, version = "0.30" }
-indexmap = { default-features = false, version = "2.12" }
+indexmap = { default-features = false, version = "2.13" }
 libm = { default-features = false, version = "0.2" }
 parking_lot = { default-features = false, version = "0.12" }
 serde = { default-features = false, version = "1.0" }
 smallvec = { default-features = false, version = "1.15" }
 tracing = { default-features = false, version = "0.1" }
-uuid = { default-features = false, version = "1.0" }
+uuid = { default-features = false, version = "1.19" }
 variadics_please = { default-features = false, version = "1.1" }
 zerocopy = { default-features = false, version = "0.8" }
 

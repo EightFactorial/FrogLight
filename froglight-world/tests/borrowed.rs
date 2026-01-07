@@ -24,8 +24,18 @@ fn chunk() {
                 let chunk_position = ChunkBlockPos::try_from_blockpos(position, offset).unwrap();
                 assert_eq!(chunk.get_raw_block(position), Some(0));
                 assert_eq!(chunk.get_raw_block_pos(chunk_position), Some(0));
+                assert_eq!(chunk.get_raw_biome(position), Some(0));
+                assert_eq!(chunk.get_raw_biome_pos(chunk_position), Some(0));
             }
         }
+    }
+
+    for id in chunk.iter_raw_blocks() {
+        assert_eq!(id, 0);
+    }
+
+    for id in chunk.iter_raw_biomes() {
+        assert_eq!(id, 0);
     }
 }
 
@@ -54,5 +64,13 @@ fn empty() {
         let pos = SectionBlockPos::new_index(index);
         assert_eq!(section.get_raw_biome(pos), 0);
         assert_eq!(section.biome_data().get_index(usize::from(index)), Some(0));
+    }
+
+    for id in section.iter_raw_blocks() {
+        assert_eq!(id, 0);
+    }
+
+    for id in section.iter_raw_biomes() {
+        assert_eq!(id, 0);
     }
 }

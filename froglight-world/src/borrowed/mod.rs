@@ -117,6 +117,12 @@ impl<'a> BorrowedChunk<'a> {
         }
     }
 
+    /// Iterate over all raw block ids in this chunk.
+    #[must_use]
+    pub fn iter_raw_blocks(&self) -> impl Iterator<Item = u32> + '_ {
+        self.storage.as_slice().iter().flat_map(|section| section.iter_raw_blocks())
+    }
+
     /// Get the biome id at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds.
@@ -142,5 +148,11 @@ impl<'a> BorrowedChunk<'a> {
             tracing::warn!(target: "froglight_world", "Failed to access `BorrowedChunk`, position was invalid?");
             None
         }
+    }
+
+    /// Iterate over all raw biome ids in this chunk.
+    #[must_use]
+    pub fn iter_raw_biomes(&self) -> impl Iterator<Item = u32> + '_ {
+        self.storage.as_slice().iter().flat_map(|section| section.iter_raw_biomes())
     }
 }

@@ -50,10 +50,20 @@ impl<'a> BorrowedSection<'a> {
     #[must_use]
     pub fn get_raw_block(&self, position: SectionBlockPos) -> u32 { self.blocks.get(position) }
 
+    /// Create an iterator over all raw block ids in this section.
+    #[inline]
+    #[must_use]
+    pub fn iter_raw_blocks(&self) -> impl Iterator<Item = u32> + '_ { self.blocks.iter() }
+
     /// Get the biome id at the given position within the section.
     #[inline]
     #[must_use]
     pub fn get_raw_biome(&self, position: SectionBlockPos) -> u32 { self.biomes.get(position) }
+
+    /// Create an iterator over all raw biome ids in this section.
+    #[inline]
+    #[must_use]
+    pub fn iter_raw_biomes(&self) -> impl Iterator<Item = u32> + '_ { self.biomes.iter() }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -138,6 +148,13 @@ impl<'a, T: SectionType> BorrowedSectionData<'a, T> {
     pub fn get_slice(&self, index: usize) -> Option<&BitSlice<u64, Msb0>> {
         let start = index * self.bits;
         self.data.get(Range { start, end: start + self.bits })
+    }
+
+    /// Create an iterator over all values in this section.
+    #[must_use]
+    pub fn iter(&self) -> impl Iterator<Item = u32> + '_ {
+        (0..usize::from(T::VOLUME))
+            .map(move |i| self.get_index(i).expect("Volume should always be within bounds"))
     }
 }
 
