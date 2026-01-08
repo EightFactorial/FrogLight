@@ -124,6 +124,11 @@ impl Block {
         Some(old_value)
     }
 
+    /// Returns `true` if this block is air.
+    #[inline]
+    #[must_use]
+    pub fn is_air(&self) -> bool { self.reference.is_air(self.state) }
+
     /// Returns `true` if this block is of type `T`.
     #[inline]
     #[must_use]
@@ -133,6 +138,16 @@ impl Block {
     #[inline]
     #[must_use]
     pub fn is_version<V: 'static>(&self) -> bool { self.reference.is_version::<V>() }
+
+    /// Get the [`TypeId`] of the block type.
+    #[inline]
+    #[must_use]
+    pub const fn block_ty(&self) -> TypeId { self.reference.block_ty() }
+
+    /// Get the [`TypeId`] of the version type.
+    #[inline]
+    #[must_use]
+    pub const fn version_ty(&self) -> TypeId { self.reference.version_ty() }
 }
 
 impl Eq for Block {}

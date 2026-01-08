@@ -33,7 +33,6 @@ fn chunk() {
     for id in chunk.iter_raw_blocks() {
         assert_eq!(id, 0);
     }
-
     for id in chunk.iter_raw_biomes() {
         assert_eq!(id, 0);
     }
@@ -59,7 +58,6 @@ fn empty() {
         assert_eq!(section.get_raw_block(pos), 0);
         assert_eq!(section.block_data().get_index(usize::from(index)), Some(0));
     }
-
     for index in 0..(16 * 16 * 16) / (4 * 4 * 4) {
         let pos = SectionBlockPos::new_index(index);
         assert_eq!(section.get_raw_biome(pos), 0);
@@ -69,7 +67,6 @@ fn empty() {
     for id in section.iter_raw_blocks() {
         assert_eq!(id, 0);
     }
-
     for id in section.iter_raw_biomes() {
         assert_eq!(id, 0);
     }

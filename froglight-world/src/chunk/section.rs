@@ -59,6 +59,26 @@ impl Section {
     #[must_use]
     pub fn get_raw_block(&self, position: SectionBlockPos) -> u32 { self.blocks.get(position) }
 
+    /// Set the block id at the given position within the section,
+    /// returning the previous id.
+    ///
+    /// The provided closure must return `true` if the block being set is air.
+    #[must_use]
+    pub fn set_raw_block(
+        &mut self,
+        position: SectionBlockPos,
+        block_id: u32,
+        mut is_air: impl FnMut(u32) -> bool,
+    ) -> u32 {
+        let previous = self.blocks.set(position, block_id);
+        match (is_air(previous), is_air(block_id)) {
+            (false, true) => self.non_air += 1,
+            (true, false) => self.non_air -= 1,
+            _ => {}
+        }
+        previous
+    }
+
     /// Create an iterator over all raw block ids in this section.
     #[inline]
     pub fn iter_raw_blocks(&self) -> impl Iterator<Item = u32> + '_ { self.blocks.iter() }
@@ -72,6 +92,14 @@ impl Section {
     #[inline]
     #[must_use]
     pub fn get_raw_biome(&self, position: SectionBlockPos) -> u32 { self.biomes.get(position) }
+
+    /// Set the biome id at the given position within the section,
+    /// returning the previous id.
+    #[inline]
+    #[must_use]
+    pub fn set_raw_biome(&mut self, position: SectionBlockPos, id: u32) -> u32 {
+        self.biomes.set(position, id)
+    }
 
     /// Create an iterator over all raw biome ids in this section.
     #[inline]
@@ -136,6 +164,23 @@ impl<T: SectionType> SectionData<T> {
         .expect("SectionBlockPos should always be within bounds")
     }
 
+    /// Set the value at the given position within the section,
+    /// returning the previous value.
+    #[must_use]
+    #[expect(clippy::missing_panics_doc, reason = "The index cannot ever go out of bounds")]
+    pub fn set(&self, position: SectionBlockPos, id: u32) -> u32 {
+        let width = usize::from(SECTION_WIDTH) / T::QUANTIZATION;
+        let height = usize::from(SECTION_HEIGHT) / T::QUANTIZATION;
+
+        self.set_index(
+            (usize::from(position.x()) / T::QUANTIZATION)
+                + (usize::from(position.z()) / T::QUANTIZATION * width)
+                + (usize::from(position.y()) / T::QUANTIZATION * width * height),
+            id,
+        )
+        .expect("SectionBlockPos should always be within bounds")
+    }
+
     /// Get the value at the given index within the section.
     ///
     /// Returns `None` if the index is out of bounds.
@@ -157,6 +202,19 @@ impl<T: SectionType> SectionData<T> {
         }
     }
 
+    /// Set the value at the given index within the section,
+    /// returning the previous value.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    #[must_use]
+    pub fn set_index(&self, index: usize, _id: u32) -> Option<u32> {
+        if index > usize::from(T::VOLUME) {
+            return None;
+        }
+
+        todo!()
+    }
+
     /// Get a reference to the entry at the given index.
     ///
     /// Returns `None` if the index is out of bounds.
@@ -165,6 +223,21 @@ impl<T: SectionType> SectionData<T> {
     pub fn get_slice(&self, index: usize) -> Option<&BitSlice<u64, Msb0>> {
         let start = index * self.bits;
         self.data.get(Range { start, end: start + self.bits })
+    }
+
+    /// Get a mutable reference to the entry at the given index.
+    ///
+    /// Returns `None` if the index is out of bounds.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the data is a valid entry in the section's
+    /// palette.
+    #[inline]
+    #[must_use]
+    pub unsafe fn get_slice_mut(&mut self, index: usize) -> Option<&mut BitSlice<u64, Msb0>> {
+        let start = index * self.bits;
+        self.data.get_mut(Range { start, end: start + self.bits })
     }
 
     /// Create an iterator over all values in this section.

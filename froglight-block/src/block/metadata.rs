@@ -198,6 +198,10 @@ impl BlockMetadata {
         if state.into_inner() < self.state_count { Some((state, value)) } else { None } // Validate in-range
     }
 
+    /// Returns `true` if this block is air.
+    #[must_use]
+    pub fn is_air(&self, _state: StateId) -> bool { todo!() }
+
     /// Returns `true` if this block is of type `B`.
     #[must_use]
     pub fn is_block<B: 'static>(&self) -> bool { self.block_ty == TypeId::of::<B>() }

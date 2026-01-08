@@ -97,7 +97,7 @@ impl Chunk {
 
     /// Get a mutable reference to the sections in this [`Chunk`].
     #[must_use]
-    pub const fn sections_mut(&mut self) -> &mut [Section] { self.storage.as_mut_slice() }
+    pub const fn sections_mut(&mut self) -> &mut [Section] { self.storage.as_slice_mut() }
 
     /// Get the block id at the given position within the chunk.
     ///
@@ -119,6 +119,43 @@ impl Chunk {
 
         if let Some(section) = self.storage.as_slice().get(index) {
             Some(section.get_raw_block(position.as_section_blockpos()))
+        } else {
+            #[cfg(feature = "tracing")]
+            tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
+            None
+        }
+    }
+
+    /// Set the block id at the given position within the chunk,
+    /// returning the previous id.
+    ///
+    /// Returns `None` if the position is out of bounds.
+    pub fn set_raw_block<P: Into<BlockPos>>(
+        &mut self,
+        position: P,
+        block_id: u32,
+        is_air: impl Fn(u32) -> bool,
+    ) -> Option<u32> {
+        ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
+            .and_then(|pos| self.set_raw_block_pos::<ChunkBlockPos>(pos, block_id, is_air))
+    }
+
+    /// Set the block id at the given position within the chunk,
+    /// returning the previous id.
+    ///
+    /// Returns `None` if the position is out of bounds.
+    #[allow(clippy::manual_map, reason = "Nuh-uh")]
+    pub fn set_raw_block_pos<P: Into<ChunkBlockPos>>(
+        &mut self,
+        position: P,
+        block_id: u32,
+        is_air: impl Fn(u32) -> bool,
+    ) -> Option<u32> {
+        let position = position.into();
+        let index = position.as_section_index();
+
+        if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
+            Some(section.set_raw_block(position.as_section_blockpos(), block_id, is_air))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
@@ -163,6 +200,37 @@ impl Chunk {
 
         if let Some(section) = self.storage.as_slice().get(index) {
             Some(section.get_raw_biome(position.as_section_blockpos()))
+        } else {
+            #[cfg(feature = "tracing")]
+            tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
+            None
+        }
+    }
+
+    /// Set the biome id at the given position within the chunk,
+    /// returning the previous id.
+    ///
+    /// Returns `None` if the position is out of bounds.
+    pub fn set_raw_biome<P: Into<BlockPos>>(&mut self, position: P, biome_id: u32) -> Option<u32> {
+        ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
+            .and_then(|pos| self.set_raw_biome_pos::<ChunkBlockPos>(pos, biome_id))
+    }
+
+    /// Set the biome id at the given position within the chunk,
+    /// returning the previous id.
+    ///
+    /// Returns `None` if the position is out of bounds.
+    #[allow(clippy::manual_map, reason = "Nuh-uh")]
+    pub fn set_raw_biome_pos<P: Into<ChunkBlockPos>>(
+        &mut self,
+        position: P,
+        biome_id: u32,
+    ) -> Option<u32> {
+        let position = position.into();
+        let index = position.as_section_index();
+
+        if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
+            Some(section.set_raw_biome(position.as_section_blockpos(), biome_id))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");

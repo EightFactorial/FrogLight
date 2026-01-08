@@ -100,7 +100,7 @@ impl ChunkStorage {
 
     /// Get the list of [`Section`]s as a mutable slice.
     #[must_use]
-    pub const fn as_mut_slice(&mut self) -> &mut [Section] {
+    pub const fn as_slice_mut(&mut self) -> &mut [Section] {
         match self {
             ChunkStorage::Large(storage) => storage.0.as_mut_slice(),
             ChunkStorage::Normal(storage) => storage.0.as_mut_slice(),
