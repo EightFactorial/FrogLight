@@ -20,7 +20,7 @@ pub struct Section {
 }
 
 impl Section {
-    /// Create a new [`BorrowedSection`] without performing any validation.
+    /// Create a new [`Section`] without performing any validation.
     ///
     /// # Safety
     ///
@@ -95,7 +95,7 @@ pub struct SectionData<T: SectionType> {
 }
 
 impl<T: SectionType> SectionData<T> {
-    /// Create a new [`BorrowedSectionData`] without performing any validation.
+    /// Create a new [`SectionData`] without performing any validation.
     ///
     /// # Safety
     ///

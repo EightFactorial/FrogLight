@@ -33,7 +33,7 @@ froglight-world = { features = ["froglight-block"], workspace = true }
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["froglight-common/bevy", "froglight-world/bevy"]
+bevy = ["froglight-common/bevy", "froglight-math/bevy", "froglight-world/bevy"]
 # Enable `tracing` support.
 tracing = ["froglight-block/tracing", "froglight-world/tracing"]
 

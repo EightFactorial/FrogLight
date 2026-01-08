@@ -7,6 +7,10 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+#[cfg(feature = "bevy")]
+pub use bevy_math;
+pub use glam;
+
 pub mod functions;
 #[cfg(any(feature = "once_cell", feature = "std"))]
 pub mod table;

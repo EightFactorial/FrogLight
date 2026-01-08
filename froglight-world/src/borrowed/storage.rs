@@ -155,7 +155,7 @@ impl Default for BorrowedChunkStorage<'_> {
 ///
 /// ---
 ///
-/// Storing [`Section`]s in a fixed-size array has two main benefits:
+/// Storing [`BorrowedSection`]s in a fixed-size array has two main benefits:
 ///
 /// 1. It guarantees that the number of sections is always correct.
 /// 2. It prevents unnecessary bounds checks when accessing the array.
@@ -165,7 +165,8 @@ pub struct BorrowedArrayStorage<'a, const SECTIONS: usize, const OFFSET: i32>(
 );
 
 impl<'a, const SECTIONS: usize, const OFFSET: i32> BorrowedArrayStorage<'a, SECTIONS, OFFSET> {
-    /// Create a new [`ArrayChunkStorage`] from the given [`Section`]s.
+    /// Create a new [`BorrowedArrayStorage`] from the given
+    /// [`BorrowedSection`]s.
     #[must_use]
     pub const fn new(sections: [BorrowedSection<'a>; SECTIONS]) -> Self { Self(sections) }
 
@@ -201,15 +202,15 @@ pub struct BorrowedVecStorage<'a>(SmallVec<[BorrowedSection<'a>; 16]>, i32);
 
 #[cfg(feature = "alloc")]
 impl<'a> BorrowedVecStorage<'a> {
-    /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
-    /// offset.
+    /// Create a new [`BorrowedVecStorage`] from the given [`BorrowedSection`]s
+    /// and offset.
     #[must_use]
     pub fn new(sections: SmallVec<[BorrowedSection<'a>; 16]>, offset: i32) -> Self {
         Self(sections, offset)
     }
 
-    /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
-    /// offset.
+    /// Create a new [`BorrowedVecStorage`] from the given [`BorrowedSection`]s
+    /// and offset.
     #[must_use]
     pub fn new_from_vec(sections: Vec<BorrowedSection<'a>>, offset: i32) -> Self {
         Self(SmallVec::from_vec(sections), offset)

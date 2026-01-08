@@ -40,14 +40,14 @@ impl Chunk {
     //     Self { storage: ChunkStorage::new_from_vec(sections, offset) }
     // }
 
-    /// Create a new empty large [`BorrowedChunk`].
+    /// Create a new empty large [`Chunk`].
     ///
     /// This is equivalent to an overworld chunk,
     /// or 24 sections (384 blocks) tall with an offset of -64.
     #[must_use]
     pub fn new_empty_large() -> Self { Self { storage: ChunkStorage::empty_large() } }
 
-    /// Create a new empty normal [`BorrowedChunk`].
+    /// Create a new empty normal [`Chunk`].
     ///
     /// This is equivalent to a nether or end chunk,
     /// or 16 sections (256 blocks) tall with an offset of 0.
@@ -120,7 +120,7 @@ impl Chunk {
             Some(section.get_raw_block(position.as_section_blockpos()))
         } else {
             #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to access `BorrowedChunk`, position was invalid?");
+            tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
             None
         }
     }
@@ -164,7 +164,7 @@ impl Chunk {
             Some(section.get_raw_biome(position.as_section_blockpos()))
         } else {
             #[cfg(feature = "tracing")]
-            tracing::warn!(target: "froglight_world", "Failed to access `BorrowedChunk`, position was invalid?");
+            tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
             None
         }
     }

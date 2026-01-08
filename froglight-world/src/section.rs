@@ -4,7 +4,7 @@ use core::fmt::Debug;
 
 use crate::SECTION_VOLUME;
 
-/// A type of [`Section`] storage.
+/// A type of section storage.
 pub trait SectionType: Debug + Default + Clone + Send + Sync + Sealed + 'static {
     /// The volume of this type of section.
     #[expect(clippy::cast_possible_truncation, reason = "Sections will never be that large")]
@@ -13,7 +13,7 @@ pub trait SectionType: Debug + Default + Clone + Send + Sync + Sealed + 'static 
     /// The quantization factor of this type of section.
     const QUANTIZATION: usize;
 
-    /// Get a [`SectionPalette`] for this number of bits.
+    /// Get a [`SectionPaletteType`] for this number of bits.
     fn palette_for(bits: usize) -> SectionPaletteType;
 }
 
