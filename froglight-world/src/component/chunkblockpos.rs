@@ -55,11 +55,16 @@ impl ChunkBlockPos {
     /// Try to create a new [`ChunkBlockPos`] from the given [`BlockPos`] and
     /// vertical chunk offset.
     ///
-    /// Returns `None` if the resulting absolute Y coordinate is negative
-    /// or exceeds `u16::MAX`.
+    /// Returns `None` if the resulting Y coordinate is negative or exceeds
+    /// `u16::MAX`.
     #[must_use]
     pub fn try_from_blockpos(position: BlockPos, chunk_offset: i32) -> Option<Self> {
-        let absolute_y = position.y().wrapping_sub(chunk_offset);
+        let Some(absolute_y) = position.y().checked_sub(chunk_offset) else {
+            #[cfg(feature = "tracing")]
+            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, absolute Y underflowed?");
+            return None;
+        };
+
         if absolute_y.is_negative() {
             #[cfg(feature = "tracing")]
             tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, absolute Y is negative?");
@@ -80,6 +85,33 @@ impl ChunkBlockPos {
                     position.z().rem_euclid(i32::from(CHUNK_WIDTH)) as u8,
                 ),
                 absolute_y as u16,
+            ))
+        }
+    }
+
+    /// Try to create a new [`ChunkBlockPos`] from the given
+    /// [`SectionBlockPos`] and section index.
+    ///
+    /// Returns `None` if the resulting Y coordinate exceeds `u16::MAX`.
+    #[must_use]
+    pub fn try_from_sectionpos(position: SectionBlockPos, section_index: usize) -> Option<Self> {
+        let Some(total_height) =
+            (position.y() as usize).checked_add(section_index * SECTION_HEIGHT as usize)
+        else {
+            #[cfg(feature = "tracing")]
+            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, total Y overflowed?");
+            return None;
+        };
+
+        if total_height > usize::from(u16::MAX) {
+            #[cfg(feature = "tracing")]
+            tracing::trace!(target: "froglight_world", "Failed to create `ChunkBlockPos`, total Y exceeds u16 max?");
+            None
+        } else {
+            #[expect(clippy::cast_possible_truncation, reason = "Verified within bounds above")]
+            Some(Self(
+                U8Vec2::new(position.x(), position.z()),
+                u16::from(position.y()) + total_height as u16,
             ))
         }
     }

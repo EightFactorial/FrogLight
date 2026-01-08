@@ -54,7 +54,7 @@ impl ChunkStorage {
 
     /// Create a new [`ChunkStorage::Variable`].
     #[must_use]
-    pub fn new_variable(sections: Vec<Section>, offset: i32) -> Self {
+    pub const fn new_variable(sections: Vec<Section>, offset: i32) -> Self {
         Self::Variable(VecChunkStorage::new(sections, offset))
     }
 
@@ -64,36 +64,33 @@ impl ChunkStorage {
         match self {
             ChunkStorage::Large(storage) => storage.offset(),
             ChunkStorage::Normal(storage) => storage.offset(),
-
             ChunkStorage::Variable(storage) => storage.offset(),
         }
     }
 
     /// Get the number of sections in the [`ChunkStorage`].
     #[must_use]
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         match self {
             ChunkStorage::Large(storage) => storage.len(),
             ChunkStorage::Normal(storage) => storage.len(),
-
             ChunkStorage::Variable(storage) => storage.len(),
         }
     }
 
     /// Returns `true` if the [`ChunkStorage`] contains no sections.
     #[must_use]
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         match self {
             ChunkStorage::Large(storage) => storage.is_empty(),
             ChunkStorage::Normal(storage) => storage.is_empty(),
-
             ChunkStorage::Variable(storage) => storage.is_empty(),
         }
     }
 
     /// Get the list of [`Section`]s as a slice.
     #[must_use]
-    pub fn as_slice(&self) -> &[Section] {
+    pub const fn as_slice(&self) -> &[Section] {
         match self {
             ChunkStorage::Large(storage) => storage.0.as_slice(),
             ChunkStorage::Normal(storage) => storage.0.as_slice(),
@@ -103,7 +100,7 @@ impl ChunkStorage {
 
     /// Get the list of [`Section`]s as a mutable slice.
     #[must_use]
-    pub fn as_mut_slice(&mut self) -> &mut [Section] {
+    pub const fn as_mut_slice(&mut self) -> &mut [Section] {
         match self {
             ChunkStorage::Large(storage) => storage.0.as_mut_slice(),
             ChunkStorage::Normal(storage) => storage.0.as_mut_slice(),
@@ -142,7 +139,7 @@ impl ChunkStorage {
             (16, 0) => {
                 // SAFETY: We have already checked that the length is 16.
                 let array: [Section; 16] = unsafe { sections.try_into().unwrap_unchecked() };
-                ChunkStorage::Large(ArrayChunkStorage::new_from(Box::new(array)))
+                ChunkStorage::Normal(ArrayChunkStorage::new_from(Box::new(array)))
             }
             _ => ChunkStorage::Variable(VecChunkStorage::new(sections, offset)),
         }

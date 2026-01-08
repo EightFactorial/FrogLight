@@ -1,3 +1,5 @@
+use core::ops::{Add, Div, Mul, Sub};
+
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
@@ -39,3 +41,67 @@ impl ChunkPos {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+impl Add<ChunkPos> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn add(self, rhs: ChunkPos) -> Self::Output { ChunkPos::new(self.0 + rhs.0) }
+}
+impl Add<[i32; 2]> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn add(self, rhs: [i32; 2]) -> Self::Output { ChunkPos::new(self.0 + IVec2::from(rhs)) }
+}
+
+impl Sub<ChunkPos> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn sub(self, rhs: ChunkPos) -> Self::Output { ChunkPos::new(self.0 - rhs.0) }
+}
+impl Sub<[i32; 2]> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn sub(self, rhs: [i32; 2]) -> Self::Output { ChunkPos::new(self.0 - IVec2::from(rhs)) }
+}
+
+impl Mul<ChunkPos> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn mul(self, rhs: ChunkPos) -> Self::Output { ChunkPos::new(self.0 * rhs.0) }
+}
+impl Mul<[i32; 2]> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn mul(self, rhs: [i32; 2]) -> Self::Output { ChunkPos::new(self.0 * IVec2::from(rhs)) }
+}
+impl Mul<i32> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn mul(self, rhs: i32) -> Self::Output { ChunkPos::new(self.0 * rhs) }
+}
+
+impl Div<ChunkPos> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn div(self, rhs: ChunkPos) -> Self::Output { ChunkPos::new(self.0 / rhs.0) }
+}
+impl Div<[i32; 2]> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn div(self, rhs: [i32; 2]) -> Self::Output { ChunkPos::new(self.0 / IVec2::from(rhs)) }
+}
+impl Div<i32> for ChunkPos {
+    type Output = ChunkPos;
+
+    #[inline]
+    fn div(self, rhs: i32) -> Self::Output { ChunkPos::new(self.0 / rhs) }
+}

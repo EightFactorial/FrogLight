@@ -64,7 +64,7 @@ impl Chunk {
     #[must_use]
     #[expect(clippy::cast_possible_truncation, reason = "Chunks will never be that tall")]
     #[expect(clippy::cast_possible_wrap, reason = "Chunks will never be that tall")]
-    pub fn height(&self) -> i32 {
+    pub const fn height(&self) -> i32 {
         (self.storage.len() as i32 * 16).saturating_add(self.height_offset())
     }
 
@@ -75,7 +75,7 @@ impl Chunk {
     /// This is the range in world/coordinate space and follows the chunk's
     /// vertical offset.
     #[must_use]
-    pub fn height_range(&self) -> Range<i32> { self.height_offset()..self.height() }
+    pub const fn height_range(&self) -> Range<i32> { self.height_offset()..self.height() }
 
     /// Get the total height of this [`Chunk`], ignoring it's vertical offset.
     ///
@@ -85,7 +85,7 @@ impl Chunk {
     ///
     /// In most cases, you probably want [`Chunk::height`] instead.
     #[must_use]
-    pub fn height_total(&self) -> usize { self.storage.len() * 16 }
+    pub const fn height_total(&self) -> usize { self.storage.len() * 16 }
 
     /// Get the height offset of this [`Chunk`].
     #[must_use]
@@ -93,11 +93,11 @@ impl Chunk {
 
     /// Get a reference to the sections in this [`Chunk`].
     #[must_use]
-    pub fn sections(&self) -> &[Section] { todo!() }
+    pub const fn sections(&self) -> &[Section] { self.storage.as_slice() }
 
     /// Get a mutable reference to the sections in this [`Chunk`].
     #[must_use]
-    pub fn sections_mut(&self) -> &mut [Section] { todo!() }
+    pub const fn sections_mut(&mut self) -> &mut [Section] { self.storage.as_mut_slice() }
 
     /// Get the block id at the given position within the chunk.
     ///

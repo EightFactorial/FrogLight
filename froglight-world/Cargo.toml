@@ -22,7 +22,7 @@ workspace = true
 bitvec = { workspace = true }
 froglight-common = { workspace = true }
 glam = { workspace = true }
-smallvec = { features = ["const_new"], workspace = true }
+smallvec = { features = ["const_generics", "const_new", "union"], workspace = true }
 
 # Optional dependencies
 arc-swap = { workspace = true, optional = true }
