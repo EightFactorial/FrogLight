@@ -18,6 +18,9 @@ workspace = true
 
 # --- Dependencies ---
 
+[dev-dependencies]
+divan = { workspace = true }
+
 [dependencies]
 bitvec = { workspace = true }
 froglight-common = { workspace = true }
@@ -33,6 +36,13 @@ froglight-block = { workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
+
+# --- Tests/Benchmarks ---
+
+[[bench]]
+name = "contains"
+required-features = ["std"]
+harness = false
 
 # --- Features ---
 

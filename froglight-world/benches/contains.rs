@@ -1,0 +1,492 @@
+//! Quick and dirty benchmarks for using `Chunk::contains_raw_block` vs
+//! iterating over all blocks.
+
+#[cfg(feature = "froglight-block")]
+use std::any::TypeId;
+
+use bitvec::slice::BitSlice;
+use divan::prelude::*;
+#[cfg(feature = "froglight-block")]
+use froglight_block::{
+    block::{BlockMetadata, BlockType, StateId},
+    storage::BlockStorage,
+};
+#[cfg(feature = "froglight-block")]
+use froglight_common::version::Version;
+use froglight_world::borrowed::{
+    BorrowedChunk, BorrowedSection,
+    section::{BorrowedPalette, BorrowedSectionData},
+    storage::{BorrowedArrayStorage, BorrowedChunkStorage},
+};
+
+fn main() { divan::main() }
+
+#[divan::bench]
+fn contains_single_best(b: Bencher) {
+    // An empty section with no blocks.
+    let single = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(single.contains_raw_block(0));
+    });
+}
+
+#[divan::bench]
+fn contains_single_worst(b: Bencher) {
+    // An empty section with no blocks.
+    let single = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(single.contains_raw_block(1));
+    });
+}
+
+#[divan::bench]
+fn contains_single_best_iter(b: Bencher) {
+    // An empty section with no blocks.
+    let single = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(single.iter_raw_blocks().any(|id| id == 0));
+    });
+}
+
+#[divan::bench]
+fn contains_single_worst_iter(b: Bencher) {
+    // An empty section with no blocks.
+    let single = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(single.iter_raw_blocks().any(|id| id == 1));
+    });
+}
+
+#[divan::bench]
+fn contains_vector_best(b: Bencher) {
+    // An empty section with no blocks.
+    let single = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Vector(&[0, 1]),
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(single.contains_raw_block(0));
+    });
+}
+
+#[divan::bench]
+fn contains_vector_best_iter(b: Bencher) {
+    // An empty section with no blocks.
+    let vector = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Vector(&[0, 1]),
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(vector.iter_raw_blocks().any(|id| id == 0));
+    });
+}
+
+#[divan::bench]
+fn contains_vector_pass(b: Bencher) {
+    // An empty section with no blocks.
+    let vector = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Vector(&[0]),
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(vector.contains_raw_block(1));
+    });
+}
+
+#[divan::bench]
+fn contains_vector_worst_iter(b: Bencher) {
+    // An empty section with no blocks.
+    let vector = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Vector(&[0, 1]),
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(vector.iter_raw_blocks().any(|id| id == 2));
+    });
+}
+
+#[divan::bench]
+fn contains_vector_worst(b: Bencher) {
+    // An empty section with no blocks.
+    let vector = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Vector(&[0, 1]),
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(vector.contains_raw_block(1));
+    });
+}
+
+#[divan::bench]
+fn contains_global_best(b: Bencher) {
+    // An empty section with no blocks.
+    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Global,
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(global.contains_raw_block(0));
+    });
+}
+
+#[divan::bench]
+fn contains_global_worst(b: Bencher) {
+    // An empty section with no blocks.
+    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Global,
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(global.contains_raw_block(1));
+    });
+}
+
+#[divan::bench]
+fn contains_global_best_iter(b: Bencher) {
+    // An empty section with no blocks.
+    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Global,
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(global.iter_raw_blocks().any(|id| id == 0));
+    });
+}
+
+#[divan::bench]
+fn contains_global_worst_iter(b: Bencher) {
+    // An empty section with no blocks.
+    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Global,
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(global.iter_raw_blocks().any(|id| id == 1));
+    });
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg(feature = "froglight-block")]
+struct TestVersion;
+
+#[cfg(feature = "froglight-block")]
+impl Version for TestVersion {
+    const PROTOCOL_ID: u32 = u32::MIN;
+    const RESOURCE_VERSION: u32 = u32::MIN;
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg(feature = "froglight-block")]
+struct Air;
+
+#[cfg(feature = "froglight-block")]
+impl BlockType<TestVersion> for Air {
+    type Attributes = ();
+
+    const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
+    const METADATA: &'static BlockMetadata = {
+        static STATIC: BlockMetadata = unsafe {
+            use froglight_block::block::BlockBehavior;
+            use froglight_common::prelude::Identifier;
+
+            BlockMetadata::new::<Air, TestVersion>(
+                Identifier::new_unchecked("test:air"),
+                0,
+                0,
+                BlockBehavior::new::<Air, TestVersion>(),
+            )
+        };
+        &STATIC
+    };
+
+    fn is_air(_: StateId) -> bool { true }
+
+    fn is_solid(_: StateId) -> bool { false }
+
+    fn is_transparent(_: StateId) -> bool { true }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg(feature = "froglight-block")]
+struct Stone;
+
+#[cfg(feature = "froglight-block")]
+impl BlockType<TestVersion> for Stone {
+    type Attributes = ();
+
+    const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
+    const METADATA: &'static BlockMetadata = {
+        static STATIC: BlockMetadata = unsafe {
+            use froglight_block::block::BlockBehavior;
+            use froglight_common::prelude::Identifier;
+
+            BlockMetadata::new::<Stone, TestVersion>(
+                Identifier::new_unchecked("test:stone"),
+                1,
+                0,
+                BlockBehavior::new::<Stone, TestVersion>(),
+            )
+        };
+        &STATIC
+    };
+}
+
+#[cfg(feature = "froglight-block")]
+froglight_block::implement_blocks! {
+    TestVersion => unsafe {
+        BlockStorage::new_static(&[
+            Air::METADATA,
+            Stone::METADATA,
+        ])
+    }
+}
+
+#[divan::bench]
+#[cfg(feature = "froglight-block")]
+fn contains_global_block_best(b: Bencher) {
+    // An empty section with no blocks.
+    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Global,
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(global.contains_block_type::<Air, TestVersion>());
+    });
+}
+
+#[divan::bench]
+#[cfg(feature = "froglight-block")]
+fn contains_global_block_worst(b: Bencher) {
+    // An empty section with no blocks.
+    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+        core::array::from_fn(|_| unsafe {
+            BorrowedSection::new_unchecked(
+                0,
+                BorrowedSectionData::new_unchecked(
+                    1,
+                    BorrowedPalette::Global,
+                    BitSlice::from_slice(&[0; 4096]),
+                ),
+                BorrowedSectionData::new_unchecked(
+                    0,
+                    BorrowedPalette::Single(0),
+                    BitSlice::empty(),
+                ),
+            )
+        }),
+    )));
+
+    b.bench(|| {
+        black_box(global.contains_block_type::<Stone, TestVersion>());
+    });
+}
