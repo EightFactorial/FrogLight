@@ -39,4 +39,4 @@ parking_lot = ["froglight-internal/parking_lot"]
 # Enable support for the standard library
 std = ["froglight-internal/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-internal/nightly"]
+nightly = ["froglight-internal/nightly", "std"]

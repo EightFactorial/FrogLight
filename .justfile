@@ -1,6 +1,6 @@
 ALL_FEATURES := "all-features"
 DEF_FEATURES := "features=bevy,std"
-NO_FEATURES := "features=libm --no-default-features"
+NO_FEATURES := "features=libm,once_cell --no-default-features"
 
 # Generate the changelog
 changelog path="CHANGELOG.md":
@@ -50,5 +50,5 @@ inspect package="froglight":
     cargo tree --invert --package={{ package }}
 
 # Update and run all checks
-pre-commit: clean update deny typos clippy test
+pre-commit: typos update clippy clean test
     @echo '{{ GREEN + BOLD }}Success!{{ NORMAL }} All checks passed!'

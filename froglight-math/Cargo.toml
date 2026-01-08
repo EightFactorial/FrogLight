@@ -1,0 +1,50 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-math"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dev-dependencies]
+proptest = { workspace = true }
+
+[dependencies]
+glam = { workspace = true }
+
+# Optional dependencies
+bevy_math = { features = ["alloc", "bevy_reflect"], workspace = true, optional = true }
+libm = { workspace = true, optional = true }
+once_cell = { features = ["critical-section"], workspace = true, optional = true }
+
+# --- Features ---
+
+[features]
+default = ["alloc", "std"]
+
+# Enable `bevy` support.
+bevy = ["alloc", "dep:bevy_math"]
+
+# Enable `libm` for `no_std` support.
+libm = ["bevy_math?/nostd-libm", "dep:libm", "glam/nostd-libm"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["dep:once_cell"]
+
+# Enable support for a global allocator
+alloc = ["bevy_math?/alloc", "once_cell?/alloc"]
+# Enable support for the standard library
+std = ["alloc", "bevy_math?/std", "glam/std", "once_cell?/std"]
+# Enable optimizations using the nightly toolchain
+nightly = ["std"]

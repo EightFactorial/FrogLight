@@ -12,6 +12,7 @@ froglight-common = { default-features = false, path = "froglight-common", versio
 froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
 # froglight-inventory = { default-features = false, path = "froglight-inventory" }
 # froglight-item = { default-features = false,  path = "froglight-item" }
+froglight-math = { default-features = false, path = "froglight-math" }
 # froglight-network = { default-features = false, path = "froglight-network" }
 # froglight-packet = { default-features = false, path = "froglight-packet" }
 # froglight-physics = { default-features = false, path = "froglight-physics" }
@@ -50,6 +51,7 @@ futures-lite = { default-features = false, version = "2.0" }
 glam = { default-features = false, version = "0.30" }
 indexmap = { default-features = false, version = "2.13" }
 libm = { default-features = false, version = "0.2" }
+once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
 serde = { default-features = false, version = "1.0" }
 smallvec = { default-features = false, version = "1.15" }
@@ -79,6 +81,7 @@ members = [
   "froglight-internal",
   # "froglight-inventory",
   # "froglight-item",
+  "froglight-math",
   # "froglight-network",
   # "froglight-packet",
   # "froglight-physics",
