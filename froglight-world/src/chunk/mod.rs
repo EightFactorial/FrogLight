@@ -1,5 +1,6 @@
 //! TODO
 
+use alloc::vec::Vec;
 use core::ops::Range;
 
 #[cfg(feature = "bevy")]
@@ -34,11 +35,11 @@ impl Chunk {
     #[must_use]
     pub const fn new(storage: ChunkStorage) -> Self { Self { storage } }
 
-    // /// Create a new [`Chunk`] from the given sections and offset.
-    // #[must_use]
-    // pub fn new_from(sections: Vec<Section>, offset: i32) -> Self {
-    //     Self { storage: ChunkStorage::new_from_vec(sections, offset) }
-    // }
+    /// Create a new [`Chunk`] from the given sections and offset.
+    #[must_use]
+    pub fn new_from(sections: Vec<Section>, offset: i32) -> Self {
+        Self { storage: ChunkStorage::new_from_vec(sections, offset) }
+    }
 
     /// Create a new empty large [`Chunk`].
     ///

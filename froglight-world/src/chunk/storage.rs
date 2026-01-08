@@ -118,15 +118,31 @@ impl ChunkStorage {
     #[must_use]
     pub fn new_from_vec(sections: Vec<Section>, offset: i32) -> ChunkStorage {
         match (sections.len(), offset) {
+            #[cfg(feature = "nightly")]
+            (24, -64) => {
+                // SAFETY: We have already checked that the length is 24.
+                let array: Box<[Section; 24]> =
+                    unsafe { sections.into_boxed_slice().into_array().unwrap_unchecked() };
+                ChunkStorage::Large(ArrayChunkStorage::new_from(array))
+            }
+            #[cfg(feature = "nightly")]
+            (16, 0) => {
+                // SAFETY: We have already checked that the length is 16.
+                let array: Box<[Section; 16]> =
+                    unsafe { sections.into_boxed_slice().into_array().unwrap_unchecked() };
+                ChunkStorage::Normal(ArrayChunkStorage::new_from(array))
+            }
+            #[cfg(not(feature = "nightly"))]
             (24, -64) => {
                 // SAFETY: We have already checked that the length is 24.
                 let array: [Section; 24] = unsafe { sections.try_into().unwrap_unchecked() };
-                ChunkStorage::Large(ArrayChunkStorage::new(array))
+                ChunkStorage::Large(ArrayChunkStorage::new_from(Box::new(array)))
             }
+            #[cfg(not(feature = "nightly"))]
             (16, 0) => {
                 // SAFETY: We have already checked that the length is 16.
                 let array: [Section; 16] = unsafe { sections.try_into().unwrap_unchecked() };
-                ChunkStorage::Normal(ArrayChunkStorage::new(array))
+                ChunkStorage::Large(ArrayChunkStorage::new_from(Box::new(array)))
             }
             _ => ChunkStorage::Variable(VecChunkStorage::new(sections, offset)),
         }
@@ -198,7 +214,7 @@ impl VecChunkStorage {
     /// Create a new [`VecChunkStorage`] from the given [`Section`]s and
     /// offset.
     #[must_use]
-    pub fn new(sections: Vec<Section>, offset: i32) -> Self { Self(sections, offset) }
+    pub const fn new(sections: Vec<Section>, offset: i32) -> Self { Self(sections, offset) }
 
     /// Get the vertical offset of the storage.
     #[must_use]
@@ -206,11 +222,11 @@ impl VecChunkStorage {
 
     /// Get the number of sections in the storage.
     #[must_use]
-    pub fn len(&self) -> usize { self.0.len() }
+    pub const fn len(&self) -> usize { self.0.len() }
 
     /// Returns `true` if the storage contains no sections.
     #[must_use]
-    pub fn is_empty(&self) -> bool { self.0.is_empty() }
+    pub const fn is_empty(&self) -> bool { self.0.is_empty() }
 }
 
 impl Deref for VecChunkStorage {

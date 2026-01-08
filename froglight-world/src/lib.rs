@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "nightly", feature(alloc_slice_into_array))]
 #![doc = include_str!("../README.md")]
 #![no_std]
 
