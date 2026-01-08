@@ -7,7 +7,7 @@ use core::f64::consts::PI;
 #[cfg(feature = "std")]
 use std::sync::LazyLock;
 
-#[cfg(all(feature = "once_cell", not(feature = "std")))]
+#[cfg(not(feature = "std"))]
 use once_cell::sync::Lazy as LazyLock;
 
 /// The smallest value that can be considered "zero"
@@ -19,8 +19,16 @@ pub const EPSILON: f32 = 1.0E-4;
 /// A precomputed sine table for angles in the range `[0, 2π)`.
 ///
 /// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
-#[cfg(not(all(feature = "std", feature = "nightly")))]
+#[cfg(not(feature = "nightly"))]
 pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
+    /// The sine function from the standard library.
+    #[cfg(feature = "std")]
+    const SINFN: fn(f64) -> f64 = f64::sin;
+
+    /// The sine function from the `libm` crate.
+    #[cfg(not(feature = "std"))]
+    const SINFN: fn(f64) -> f64 = libm::sin;
+
     // Normally we'd use `core::array::from_fn`,
     // but it seems to be causing a stack overflow in some cases.
     let mut array = [0.0f64; 65536];
@@ -37,24 +45,6 @@ pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
     output
 });
 
-/// The sine function from the standard library.
-#[cfg(all(not(all(feature = "std", feature = "nightly")), feature = "std"))]
-const SINFN: fn(f64) -> f64 = f64::sin;
-
-/// The sine function from the `libm` crate.
-#[cfg(all(not(all(feature = "std", feature = "nightly")), not(feature = "std"), feature = "libm"))]
-const SINFN: fn(f64) -> f64 = libm::sin;
-
-/// Fail to compile if neither the `std` nor `libm` features are enabled.
-#[cfg(all(
-    not(all(feature = "std", feature = "nightly")),
-    not(feature = "std"),
-    not(feature = "libm")
-))]
-const SINFN: fn(f64) -> f64 = compile_error!(
-    "Either the `std` or `libm` feature must be enabled to use the precomputed sine table."
-);
-
 // -------------------------------------------------------------------------------------------------
 
 /// A precomputed sine table for angles in the range `[0, 2π)`.
@@ -62,7 +52,7 @@ const SINFN: fn(f64) -> f64 = compile_error!(
 /// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
 ///
 /// Uses SIMD intrinsics for better performance (generates roughly 64x faster).
-#[cfg(all(feature = "std", feature = "nightly"))]
+#[cfg(feature = "nightly")]
 pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
     const BATCH: usize = 64;
 

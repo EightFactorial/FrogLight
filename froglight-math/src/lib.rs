@@ -12,13 +12,13 @@ pub use bevy_math;
 pub use glam;
 
 pub mod functions;
-#[cfg(any(feature = "once_cell", feature = "std"))]
+#[cfg(any(all(feature = "libm", feature = "once_cell"), feature = "std"))]
 pub mod table;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::functions::*;
-    #[cfg(any(feature = "once_cell", feature = "std"))]
+    #[cfg(any(all(feature = "libm", feature = "once_cell"), feature = "std"))]
     pub use crate::table::{cos, sin, sin_cos};
 }
