@@ -7,7 +7,7 @@ use froglight_common::identifier::Identifier;
 
 use crate::{
     atomic::{MaybeAtomicU16, MaybeAtomicU32},
-    block::{BlockAttr, BlockAttrs, BlockType, GlobalId, StateId},
+    block::{BlockAttr, BlockAttrs, BlockBehavior, BlockType, GlobalId, StateId},
     version::BlockVersion,
 };
 
@@ -17,6 +17,8 @@ pub struct BlockMetadata {
     identifier: Identifier<'static>,
     /// The lowest [`GlobalId`] assigned to this block.
     base_id: MaybeAtomicU32,
+    /// The behavior of this block.
+    behavior: BlockBehavior,
 
     /// The number of states for this block.
     state_count: u16,
@@ -49,12 +51,14 @@ impl BlockMetadata {
         identifier: Identifier<'static>,
         base_id: u32,
         default_state: u16,
+        behavior: BlockBehavior,
     ) -> Self {
         assert!(default_state < B::Attributes::TOTAL, "Default StateId is out of range!");
 
         BlockMetadata {
             identifier,
             base_id: MaybeAtomicU32::new(base_id),
+            behavior,
 
             state_count: B::Attributes::TOTAL,
             state_default: MaybeAtomicU16::new(default_state),
@@ -82,6 +86,11 @@ impl BlockMetadata {
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
+
+    /// Get the behavior of this block.
+    #[inline]
+    #[must_use]
+    pub const fn behavior(&self) -> &BlockBehavior { &self.behavior }
 
     /// Get the base [`GlobalId`] of this block.
     ///
@@ -197,10 +206,6 @@ impl BlockMetadata {
         let state = StateId::new(u16::try_from(state).expect("Invalid StateId, overflowed!"));
         if state.into_inner() < self.state_count { Some((state, value)) } else { None } // Validate in-range
     }
-
-    /// Returns `true` if this block is air.
-    #[must_use]
-    pub fn is_air(&self, _state: StateId) -> bool { todo!() }
 
     /// Returns `true` if this block is of type `B`.
     #[must_use]

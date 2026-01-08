@@ -4,7 +4,7 @@
 use core::any::TypeId;
 
 use froglight_block::{
-    block::{BlockAttr, BlockMetadata, BlockType},
+    block::{BlockAttr, BlockBehavior, BlockMetadata, BlockType},
     implement_blocks,
     prelude::*,
     storage::BlockStorage,
@@ -30,10 +30,21 @@ impl BlockType<TestVersion> for Air {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Air, TestVersion>(Identifier::new_unchecked("test:air"), 0, 0)
+            BlockMetadata::new::<Air, TestVersion>(
+                Identifier::new_unchecked("test:air"),
+                0,
+                0,
+                BlockBehavior::new::<Air, TestVersion>(),
+            )
         };
         &STATIC
     };
+
+    fn is_air(_: StateId) -> bool { true }
+
+    fn is_solid(_: StateId) -> bool { false }
+
+    fn is_transparent(_: StateId) -> bool { true }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -45,7 +56,12 @@ impl BlockType<TestVersion> for Stone {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Stone, TestVersion>(Identifier::new_unchecked("test:stone"), 1, 0)
+            BlockMetadata::new::<Stone, TestVersion>(
+                Identifier::new_unchecked("test:stone"),
+                1,
+                0,
+                BlockBehavior::new::<Stone, TestVersion>(),
+            )
         };
         &STATIC
     };
@@ -60,7 +76,12 @@ impl BlockType<TestVersion> for Dirt {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Dirt, TestVersion>(Identifier::new_unchecked("test:stone"), 2, 0)
+            BlockMetadata::new::<Dirt, TestVersion>(
+                Identifier::new_unchecked("test:stone"),
+                2,
+                0,
+                BlockBehavior::new::<Dirt, TestVersion>(),
+            )
         };
         &STATIC
     };
@@ -77,7 +98,12 @@ impl BlockType<TestVersion> for Grass {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[("snowy", TypeId::of::<Snowy>())];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            BlockMetadata::new::<Grass, TestVersion>(Identifier::new_unchecked("test:grass"), 3, 1)
+            BlockMetadata::new::<Grass, TestVersion>(
+                Identifier::new_unchecked("test:grass"),
+                3,
+                1,
+                BlockBehavior::new::<Grass, TestVersion>(),
+            )
         };
         &STATIC
     };
@@ -107,6 +133,10 @@ fn air() {
     assert_eq!(air.global_id(), 0u32);
     assert_eq!(air.state_id(), 0u16);
 
+    assert!(air.is_air());
+    assert!(!air.is_solid());
+    assert!(air.is_transparent());
+
     let mut attr_iter = air.get_attributes();
     assert_eq!(attr_iter.next(), None);
 
@@ -126,6 +156,10 @@ fn stone() {
     assert_eq!(stone.global_id(), 1u32);
     assert_eq!(stone.state_id(), 0u16);
 
+    assert!(!stone.is_air());
+    assert!(stone.is_solid());
+    assert!(!stone.is_transparent());
+
     let mut attr_iter = stone.get_attributes();
     assert_eq!(attr_iter.next(), None);
 
@@ -144,6 +178,10 @@ fn dirt() {
     let dirt = Block::new_default::<Dirt, TestVersion>();
     assert_eq!(dirt.global_id(), 2u32);
     assert_eq!(dirt.state_id(), 0u16);
+
+    assert!(!dirt.is_air());
+    assert!(dirt.is_solid());
+    assert!(!dirt.is_transparent());
 
     let mut attr_iter = dirt.get_attributes();
     assert_eq!(attr_iter.next(), None);
@@ -166,6 +204,10 @@ fn grass() {
     assert_eq!(grassy.global_id(), 4u32);
     assert_eq!(grassy.state_id(), 1u16);
 
+    assert!(!grassy.is_air());
+    assert!(grassy.is_solid());
+    assert!(!grassy.is_transparent());
+
     assert_eq!(grassy.get_attribute::<Snowy>(), Some(Snowy(false)));
     assert_eq!(grassy.set_attribute::<Snowy>(Snowy(true)), Some(Snowy(false)));
     assert_eq!(grassy.get_attribute::<Snowy>(), Some(Snowy(true)));
@@ -184,6 +226,10 @@ fn grass() {
     assert_eq!(Block::new_state::<Grass, TestVersion>(StateId::new(0)), Some(snowy));
     assert_eq!(snowy.global_id(), 3u32);
     assert_eq!(snowy.state_id(), 0u16);
+
+    assert!(!snowy.is_air());
+    assert!(snowy.is_solid());
+    assert!(!snowy.is_transparent());
 
     assert_eq!(snowy.get_attribute::<Snowy>(), Some(Snowy(true)));
     assert_eq!(snowy.set_attribute::<Snowy>(Snowy(false)), Some(Snowy(true)));

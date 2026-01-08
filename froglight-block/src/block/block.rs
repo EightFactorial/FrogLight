@@ -124,11 +124,6 @@ impl Block {
         Some(old_value)
     }
 
-    /// Returns `true` if this block is air.
-    #[inline]
-    #[must_use]
-    pub fn is_air(&self) -> bool { self.reference.is_air(self.state) }
-
     /// Returns `true` if this block is of type `T`.
     #[inline]
     #[must_use]
@@ -148,6 +143,18 @@ impl Block {
     #[inline]
     #[must_use]
     pub const fn version_ty(&self) -> TypeId { self.reference.version_ty() }
+
+    /// Returns `true` if this block is air.
+    #[must_use]
+    pub fn is_air(&self) -> bool { self.reference.behavior().is_air(self.state) }
+
+    /// Returns `true` if this block is solid.
+    #[must_use]
+    pub fn is_solid(&self) -> bool { self.reference.behavior().is_solid(self.state) }
+
+    /// Returns `true` if this block is transparent.
+    #[must_use]
+    pub fn is_transparent(&self) -> bool { self.reference.behavior().is_transparent(self.state) }
 }
 
 impl Eq for Block {}
@@ -195,4 +202,32 @@ pub trait BlockType<V: BlockVersion>: 'static {
     const ATTRDATA: &'static [(&'static str, TypeId)];
     /// The [`BlockMetadata`] for this block type.
     const METADATA: &'static BlockMetadata;
+
+    /// Returns `true` if the given block is air.
+    #[must_use]
+    fn is_air(_: StateId) -> bool { false }
+
+    /// Returns `true` if the given block is solid.
+    #[must_use]
+    fn is_solid(_: StateId) -> bool { true }
+
+    /// Returns `true` if the given block is liquid.
+    #[must_use]
+    fn is_liquid(_: StateId) -> bool { false }
+
+    /// Returns `true` if the given block has collision.
+    #[must_use]
+    fn has_collision(_: StateId) -> bool { true }
+
+    /// Returns `true` if the given block is transparent.
+    #[must_use]
+    fn is_transparent(_: StateId) -> bool { false }
+
+    /// Returns `true` if the given block has occlusion.
+    #[must_use]
+    fn has_occlusion(_: StateId) -> bool { true }
+
+    /// Returns the block's light emission level.
+    #[must_use]
+    fn light_emission(_: StateId) -> u8 { 0u8 }
 }

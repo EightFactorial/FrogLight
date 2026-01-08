@@ -3,6 +3,9 @@
 mod attribute;
 pub use attribute::{BlockAttr, BlockAttrs};
 
+mod behavior;
+pub use behavior::BlockBehavior;
+
 mod block;
 pub use block::{Block, BlockType};
 
