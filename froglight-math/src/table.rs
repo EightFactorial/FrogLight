@@ -10,12 +10,6 @@ use std::sync::LazyLock;
 #[cfg(not(feature = "std"))]
 use once_cell::sync::Lazy as LazyLock;
 
-/// The smallest value that can be considered "zero"
-/// when comparing angles using [`sin`] and [`cos`].
-pub const EPSILON: f32 = 1.0E-4;
-
-// -------------------------------------------------------------------------------------------------
-
 /// A precomputed sine table for angles in the range `[0, 2π)`.
 ///
 /// Used by the [`sin`], [`cos`], and [`sin_cos`] functions.
@@ -44,8 +38,6 @@ pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
     });
     output
 });
-
-// -------------------------------------------------------------------------------------------------
 
 /// A precomputed sine table for angles in the range `[0, 2π)`.
 ///
@@ -83,6 +75,10 @@ pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
 
 // -------------------------------------------------------------------------------------------------
 
+/// The smallest value that can be considered "zero"
+/// when comparing angles using [`sin`] and [`cos`].
+pub const EPSILON: f32 = 1.0E-4;
+
 /// Calculate the sine of an angle using the [`SIN`] table.
 #[must_use]
 pub fn sin(rad: f32) -> f32 {
@@ -112,8 +108,6 @@ pub fn sin_cos(rad: f32) -> (f32, f32) {
 
     (SIN[x], SIN[y])
 }
-
-// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
