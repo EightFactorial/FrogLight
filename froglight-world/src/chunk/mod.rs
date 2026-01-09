@@ -10,6 +10,8 @@ use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 
 use crate::{component::ChunkBlockPos, prelude::*};
 
+#[cfg(feature = "froglight-biome")]
+mod biome;
 #[cfg(feature = "froglight-block")]
 mod block;
 

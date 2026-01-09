@@ -5,6 +5,7 @@
 # Workspace Crates
 froglight = { default-features = false, path = "froglight", version = "0.0.1" }
 # froglight-api = { default-features = false, path = "froglight-api" }
+froglight-biome = { default-features = false, path = "froglight-biome", version = "0.0.1" }
 froglight-block = { default-features = false, path = "froglight-block", version = "0.0.1" }
 # froglight-brigadier = { default-features = false, path = "froglight-brigadier" }
 froglight-common = { default-features = false, path = "froglight-common", version = "0.0.1" }
@@ -74,6 +75,7 @@ default-members = ["froglight"]
 members = [
   "froglight",
   # "froglight-api",
+  "froglight-biome",
   "froglight-block",
   # "froglight-brigadier",
   "froglight-common",

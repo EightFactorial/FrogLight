@@ -32,6 +32,7 @@ arc-swap = { workspace = true, optional = true }
 async-lock = { workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["glam", "smallvec"], workspace = true, optional = true }
+froglight-biome = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
@@ -51,23 +52,25 @@ default = ["alloc", "std"]
 
 # Enable `bevy` support.
 bevy = ["alloc", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "serde"]
+# Enable `froglight-biome` support.
+froglight-biome = ["dep:froglight-biome"]
 # Enable `froglight-block` support.
 froglight-block = ["dep:froglight-block"]
 # Enable `serde` support.
 serde = ["dep:serde", "smallvec/serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-block?/tracing"]
+tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing"]
 
 # Add async locking support
-async = ["dep:async-lock", "froglight-block?/async"]
+async = ["dep:async-lock", "froglight-biome?/async", "froglight-block?/async"]
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
 # Enable `parking_lot` for `no_std` support.
-parking_lot = ["dep:parking_lot", "froglight-block?/parking_lot"]
+parking_lot = ["dep:parking_lot", "froglight-biome?/parking_lot", "froglight-block?/parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["bitvec/alloc", "dep:arc-swap", "froglight-block?/alloc", "froglight-common/alloc"]
+alloc = ["bitvec/alloc", "dep:arc-swap", "froglight-biome?/alloc", "froglight-block?/alloc", "froglight-common/alloc"]
 # Enable support for the standard library
-std = ["alloc", "bitvec/std", "async-lock?/std", "froglight-block?/std", "froglight-common/std"]
+std = ["alloc", "bitvec/std", "async-lock?/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-block?/nightly", "froglight-common/nightly", "parking_lot?/nightly", "smallvec/specialization"]
+nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "parking_lot?/nightly", "smallvec/specialization"]

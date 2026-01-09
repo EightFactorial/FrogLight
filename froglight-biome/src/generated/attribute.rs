@@ -1,0 +1,3 @@
+//! Biome attributes
+//!
+//! @generated
