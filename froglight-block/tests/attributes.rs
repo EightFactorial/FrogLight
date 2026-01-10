@@ -3,8 +3,10 @@
 
 use core::any::TypeId;
 
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+use froglight_block::block::GlobalId;
 use froglight_block::{
-    block::{BlockAttr, BlockBehavior, BlockMetadata, BlockType},
+    block::{BlockAttr, BlockBehavior, BlockMetadata, BlockType, StateId},
     implement_blocks,
     prelude::*,
     storage::BlockStorage,

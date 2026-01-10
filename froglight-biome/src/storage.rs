@@ -10,9 +10,7 @@ use async_lock::RwLock;
 #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
 use parking_lot::RwLock;
 
-type Block = ();
-type BlockMetadata = ();
-type GlobalId = ();
+use crate::biome::{Biome, BiomeMetadata, GlobalId};
 
 /// A thread-safe container for a [`BiomeStorage`].
 #[repr(transparent)]
@@ -95,7 +93,7 @@ impl GlobalBiomeStorage {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A container for block data storage.
+/// A container for Biome data storage.
 #[repr(transparent)]
 #[derive(Debug, Clone)]
 pub struct BiomeStorage {
@@ -107,9 +105,9 @@ pub struct BiomeStorage {
 enum StorageInner {
     /// Dynamic storage allocated at runtime.
     #[cfg(feature = "alloc")]
-    Runtime(Vec<&'static BlockMetadata>),
+    Runtime(Vec<&'static BiomeMetadata>),
     /// Static storage allocated at compile time.
-    Static(&'static [&'static BlockMetadata]),
+    Static(&'static [&'static BiomeMetadata]),
 }
 
 impl BiomeStorage {
@@ -120,7 +118,7 @@ impl BiomeStorage {
     /// The caller must ensure that the provided slice is valid, with one entry
     /// per [`GlobalId`] in ascending order.
     #[must_use]
-    pub const unsafe fn new_static(slice: &'static [&'static BlockMetadata]) -> Self {
+    pub const unsafe fn new_static(slice: &'static [&'static BiomeMetadata]) -> Self {
         Self { inner: StorageInner::Static(slice) }
     }
 
@@ -132,37 +130,25 @@ impl BiomeStorage {
     /// per [`GlobalId`] in ascending order.
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub const unsafe fn new_runtime(vec: Vec<&'static BlockMetadata>) -> Self {
+    pub const unsafe fn new_runtime(vec: Vec<&'static BiomeMetadata>) -> Self {
         Self { inner: StorageInner::Runtime(vec) }
     }
 
-    /// Get the [`Block`] for a given [`GlobalId`].
+    /// Get the [`Biome`] for a given [`GlobalId`].
     #[must_use]
-    pub fn get_block(&self, _id: GlobalId) -> Option<Block> {
-        // let metadata = self.get_metadata(id)?;
-        // let state =
-        // id.into_inner().saturating_sub(metadata.base_id().into_inner());
-        // let state = StateId::new(u16::try_from(state).ok()?);
-
-        // if state.into_inner() < metadata.state_count() {
-        //     // SAFETY: We just checked if the state is valid for this
-        // metadata.     Some(unsafe { Block::new_unchecked(state,
-        // metadata) }) } else {
-        //     None
-        // }
-        todo!()
+    pub fn get_biome(&self, id: GlobalId) -> Option<Biome> {
+        self.get_metadata(id).map(Biome::new_from)
     }
 
-    /// Get the [`BlockMetadata`] for a given [`GlobalId`].
+    /// Get the [`BiomeMetadata`] for a given [`GlobalId`].
     #[must_use]
-    pub fn get_metadata(&self, _id: GlobalId) -> Option<&'static BlockMetadata> {
-        // self.to_ref().get(id.into_inner() as usize).copied()
-        todo!()
+    pub fn get_metadata(&self, id: GlobalId) -> Option<&'static BiomeMetadata> {
+        self.to_ref().get(id.into_inner() as usize).copied()
     }
 
     /// Get an immutable reference to underlying storage.
     #[must_use]
-    pub const fn to_ref(&self) -> &[&'static BlockMetadata] {
+    pub const fn to_ref(&self) -> &[&'static BiomeMetadata] {
         match self.inner {
             #[cfg(feature = "alloc")]
             StorageInner::Runtime(ref vec) => vec.as_slice(),
@@ -175,7 +161,7 @@ impl BiomeStorage {
     /// If the storage is static, it will be converted into a dynamic storage.
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub fn to_mut(&mut self) -> &mut Vec<&'static BlockMetadata> {
+    pub fn to_mut(&mut self) -> &mut Vec<&'static BiomeMetadata> {
         match self.inner {
             StorageInner::Runtime(ref mut vec) => vec,
             StorageInner::Static(slice) => {
@@ -192,7 +178,7 @@ impl BiomeStorage {
 // -------------------------------------------------------------------------------------------------
 
 /// A macro helper for implementing
-/// [`BlockVersion`](crate::version::BlockVersion) for a given
+/// [`BiomeVersion`](crate::version::BiomeVersion) for a given
 /// [`Version`](froglight_common::version::Version).
 ///
 /// This macro has will determine whether to generate a global storage constant
@@ -206,7 +192,7 @@ macro_rules! implement_biomes {
 }
 
 /// A macro helper for implementing
-/// [`BlockVersion`](crate::version::BlockVersion) for a given
+/// [`BiomeVersion`](crate::version::BiomeVersion) for a given
 /// [`Version`](froglight_common::version::Version).
 ///
 /// This macro has will determine whether to generate a global storage constant

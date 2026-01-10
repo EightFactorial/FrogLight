@@ -2,7 +2,9 @@
 
 use core::any::TypeId;
 
-use froglight_block::{block::BlockType, prelude::*, storage::BlockStorage};
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+use froglight_block::block::BlockType;
+use froglight_block::{block::GlobalId, prelude::*, storage::BlockStorage};
 
 use super::section::SectionPalette;
 use crate::{component::ChunkBlockPos, prelude::*};

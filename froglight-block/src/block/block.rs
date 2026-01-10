@@ -1,7 +1,7 @@
 use core::{
     any::TypeId,
     cmp::Ordering,
-    fmt::{Debug, Display, Formatter},
+    fmt::{self, Debug, Display},
 };
 
 use froglight_common::identifier::Identifier;
@@ -66,6 +66,11 @@ impl Block {
     /// Get the string identifier of this block.
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { self.reference.identifier() }
+
+    /// Get the [`BlockMetadata`] of this block.
+    #[inline]
+    #[must_use]
+    pub const fn metadata(&self) -> &'static BlockMetadata { self.reference }
 
     /// Get the [`GlobalId`] of this block.
     ///
@@ -177,13 +182,11 @@ impl PartialOrd for Block {
 }
 
 impl Display for Block {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.global_id().into_inner())
-    }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { Display::fmt(self.identifier(), f) }
 }
 
 impl Debug for Block {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_tuple("Block")
             .field(self.reference.identifier())
             .field(&self.global_id().into_inner())

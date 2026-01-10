@@ -16,7 +16,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     pub use crate::{
-        block::{Block, GlobalId, StateId},
+        block::Block,
         generated::{attribute as block_attr, block},
         version::BlockVersion,
     };

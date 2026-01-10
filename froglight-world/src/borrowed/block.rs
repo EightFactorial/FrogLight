@@ -4,7 +4,7 @@ use core::any::TypeId;
 
 #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
 use froglight_block::block::BlockType;
-use froglight_block::{prelude::*, storage::BlockStorage};
+use froglight_block::{block::GlobalId, prelude::*, storage::BlockStorage};
 
 use crate::{
     borrowed::{BorrowedChunk, section::BorrowedPalette},
