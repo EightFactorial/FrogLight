@@ -12,76 +12,28 @@ use froglight_common::prelude::Identifier;
 use parking_lot::RwLock;
 
 /// A collection of all biome feature generators.
+#[repr(transparent)]
 #[derive(Debug)]
-#[expect(missing_docs, reason = "TODO: Needs documentation")]
 pub struct BiomeFeatures {
-    pub raw_generation: BiomeFeatureSet,
-    pub lakes: BiomeFeatureSet,
-    pub local_modifications: BiomeFeatureSet,
-    pub underground_structures: BiomeFeatureSet,
-    pub surface_structures: BiomeFeatureSet,
-    pub strongholds: BiomeFeatureSet,
-    pub underground_ores: BiomeFeatureSet,
-    pub underground_decoration: BiomeFeatureSet,
-    pub fluid_springs: BiomeFeatureSet,
-    pub vegetal_decoration: BiomeFeatureSet,
-    pub top_layer_modification: BiomeFeatureSet,
+    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    storage: RwLock<BiomeFeatureSets>,
+    #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+    storage: BiomeFeatureSets,
 }
 
 impl BiomeFeatures {
-    /// Create an empty [`BiomeFeatures`] instance.
-    #[must_use]
-    pub const fn empty() -> Self { Self::from_arrays([&[]; 11]) }
-
-    /// Create a new [`BiomeFeatures`] from the provided set of feature arrays.
-    ///
-    /// # Panics
-    ///
-    /// Panics if any of the provided arrays contain duplicate entries.
-    #[must_use]
-    pub const fn from_arrays(features: [&'static [Identifier<'static>]; 11]) -> Self {
-        Self {
-            raw_generation: BiomeFeatureSet::new_static(features[0]),
-            lakes: BiomeFeatureSet::new_static(features[1]),
-            local_modifications: BiomeFeatureSet::new_static(features[2]),
-            underground_structures: BiomeFeatureSet::new_static(features[3]),
-            surface_structures: BiomeFeatureSet::new_static(features[4]),
-            strongholds: BiomeFeatureSet::new_static(features[5]),
-            underground_ores: BiomeFeatureSet::new_static(features[6]),
-            underground_decoration: BiomeFeatureSet::new_static(features[7]),
-            fluid_springs: BiomeFeatureSet::new_static(features[8]),
-            vegetal_decoration: BiomeFeatureSet::new_static(features[9]),
-            top_layer_modification: BiomeFeatureSet::new_static(features[10]),
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// A container for a set of biome feature types.
-#[repr(transparent)]
-#[derive(Debug)]
-pub struct BiomeFeatureSet {
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-    storage: RwLock<FeatureSetStorage>,
-    #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-    storage: FeatureSetStorage,
-}
-
-impl BiomeFeatureSet {
     /// Create a new static [`BiomeFeatureSet`].
     ///
     /// # Panics
     ///
     /// Panics if the provided slice contains duplicate entries.
     #[must_use]
-    pub const fn new_static(slice: &'static [Identifier<'static>]) -> Self {
-        assert_no_duplicates(slice);
+    pub const fn new_static(features: [&'static [Identifier<'static>]; 11]) -> Self {
         Self {
             #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-            storage: RwLock::new(FeatureSetStorage { inner: FeatureSetInner::Static(slice) }),
+            storage: RwLock::new(BiomeFeatureSets::from_arrays(features)),
             #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-            storage: FeatureSetStorage { inner: FeatureSetInner::Static(slice) },
+            storage: BiomeFeatureSets::from_arrays(features),
         }
     }
 
@@ -92,13 +44,12 @@ impl BiomeFeatureSet {
     /// Panics if the provided vector contains duplicate entries.
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub const fn new_runtime(vec: Vec<Identifier<'static>>) -> Self {
-        assert_no_duplicates(vec.as_slice());
+    pub fn new_runtime(vec: [Vec<Identifier<'static>>; 11]) -> Self {
         Self {
             #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-            storage: RwLock::new(FeatureSetStorage { inner: FeatureSetInner::Runtime(vec) }),
+            storage: RwLock::new(BiomeFeatureSets::from_vectors(vec)),
             #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-            storage: FeatureSetStorage { inner: FeatureSetInner::Runtime(vec) },
+            storage: BiomeFeatureSets::from_vectors(vec),
         }
     }
 
@@ -106,21 +57,19 @@ impl BiomeFeatureSet {
     #[inline]
     #[must_use]
     #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-    pub const fn read(&self) -> &FeatureSetStorage { &self.storage }
+    pub const fn read(&self) -> &BiomeFeatureSets { &self.storage }
 
     /// Acquire a read lock, blocking the current thread.
     #[inline]
     #[cfg(all(feature = "async", feature = "std"))]
-    pub fn read(&self) -> async_lock::RwLockReadGuard<'_, FeatureSetStorage> {
+    pub fn read(&self) -> async_lock::RwLockReadGuard<'_, BiomeFeatureSets> {
         self.storage.read_blocking()
     }
 
     /// Acquire a read lock, blocking the current thread.
     #[inline]
     #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, FeatureSetStorage> {
-        self.storage.read()
-    }
+    pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, BiomeFeatureSets> { self.storage.read() }
 
     /// Acquire a read lock, blocking the current thread.
     ///
@@ -129,14 +78,14 @@ impl BiomeFeatureSet {
     /// Panics if the [`RwLock`] was poisoned.
     #[inline]
     #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn read(&self) -> std::sync::RwLockReadGuard<'_, FeatureSetStorage> {
+    pub fn read(&self) -> std::sync::RwLockReadGuard<'_, BiomeFeatureSets> {
         self.storage.read().expect("RwLock was poisoned!")
     }
 
     /// Acquire a read lock asynchronously.
     #[inline]
     #[cfg(feature = "async")]
-    pub async fn read_async(&self) -> async_lock::RwLockReadGuard<'_, FeatureSetStorage> {
+    pub async fn read_async(&self) -> async_lock::RwLockReadGuard<'_, BiomeFeatureSets> {
         self.storage.read().await
     }
 
@@ -144,19 +93,19 @@ impl BiomeFeatureSet {
     #[inline]
     #[must_use]
     #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
-    pub const fn write(&mut self) -> &mut FeatureSetStorage { &mut self.storage }
+    pub const fn write(&mut self) -> &mut BiomeFeatureSets { &mut self.storage }
 
     /// Acquire a write lock, blocking the current thread.
     #[inline]
     #[cfg(all(feature = "async", feature = "std"))]
-    pub fn write(&self) -> async_lock::RwLockWriteGuard<'_, FeatureSetStorage> {
+    pub fn write(&self) -> async_lock::RwLockWriteGuard<'_, BiomeFeatureSets> {
         self.storage.write_blocking()
     }
 
     /// Acquire a write lock, blocking the current thread.
     #[inline]
     #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn write(&self) -> parking_lot::RwLockWriteGuard<'_, FeatureSetStorage> {
+    pub fn write(&self) -> parking_lot::RwLockWriteGuard<'_, BiomeFeatureSets> {
         self.storage.write()
     }
 
@@ -167,28 +116,89 @@ impl BiomeFeatureSet {
     /// Panics if the [`RwLock`] was poisoned.
     #[inline]
     #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn write(&self) -> std::sync::RwLockWriteGuard<'_, FeatureSetStorage> {
+    pub fn write(&self) -> std::sync::RwLockWriteGuard<'_, BiomeFeatureSets> {
         self.storage.write().expect("RwLock was poisoned!")
     }
 
     /// Acquire a write lock asynchronously.
     #[inline]
     #[cfg(feature = "async")]
-    pub async fn write_async(&self) -> async_lock::RwLockWriteGuard<'_, FeatureSetStorage> {
+    pub async fn write_async(&self) -> async_lock::RwLockWriteGuard<'_, BiomeFeatureSets> {
         self.storage.write().await
     }
 }
 
-/// Asserts that the given slice contains no duplicate entries.
-const fn assert_no_duplicates(slice: &[Identifier<'static>]) {
-    let mut i = 0;
-    while i < slice.len() {
-        let mut j = i + 1;
-        while j < slice.len() {
-            assert!(!slice[i].const_eq(&slice[j]), "`FeatureSet` contains duplicate entries!");
-            j += 1;
+// -------------------------------------------------------------------------------------------------
+
+/// A collection of all biome feature generator sets.
+#[derive(Debug)]
+#[expect(missing_docs, reason = "TODO: Needs documentation")]
+pub struct BiomeFeatureSets {
+    pub raw_generation: FeatureSetStorage,
+    pub lakes: FeatureSetStorage,
+    pub local_modifications: FeatureSetStorage,
+    pub underground_structures: FeatureSetStorage,
+    pub surface_structures: FeatureSetStorage,
+    pub strongholds: FeatureSetStorage,
+    pub underground_ores: FeatureSetStorage,
+    pub underground_decoration: FeatureSetStorage,
+    pub fluid_springs: FeatureSetStorage,
+    pub vegetal_decoration: FeatureSetStorage,
+    pub top_layer_modification: FeatureSetStorage,
+}
+
+impl BiomeFeatureSets {
+    /// Create an empty [`BiomeFeatures`] instance.
+    #[must_use]
+    pub const fn empty() -> Self { Self::from_arrays([&[]; 11]) }
+
+    /// Create a new [`BiomeFeatures`] from the provided set of feature arrays.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any of the provided arrays contain duplicate entries.
+    #[must_use]
+    #[expect(clippy::many_single_char_names, reason = "Array deconstruction")]
+    pub const fn from_arrays(features: [&'static [Identifier<'static>]; 11]) -> Self {
+        let [a, b, c, d, e, f, g, h, i, j, k] = features;
+        Self {
+            raw_generation: FeatureSetStorage::new_static(a),
+            lakes: FeatureSetStorage::new_static(b),
+            local_modifications: FeatureSetStorage::new_static(c),
+            underground_structures: FeatureSetStorage::new_static(d),
+            surface_structures: FeatureSetStorage::new_static(e),
+            strongholds: FeatureSetStorage::new_static(f),
+            underground_ores: FeatureSetStorage::new_static(g),
+            underground_decoration: FeatureSetStorage::new_static(h),
+            fluid_springs: FeatureSetStorage::new_static(i),
+            vegetal_decoration: FeatureSetStorage::new_static(j),
+            top_layer_modification: FeatureSetStorage::new_static(k),
         }
-        i += 1;
+    }
+
+    /// Create a new [`BiomeFeatures`] from the provided set of feature vectors.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any of the provided vectors contain duplicate entries.
+    #[must_use]
+    #[cfg(feature = "alloc")]
+    #[expect(clippy::many_single_char_names, reason = "Array deconstruction")]
+    pub fn from_vectors(features: [Vec<Identifier<'static>>; 11]) -> Self {
+        let [a, b, c, d, e, f, g, h, i, j, k] = features;
+        Self {
+            raw_generation: FeatureSetStorage::new_runtime(a),
+            lakes: FeatureSetStorage::new_runtime(b),
+            local_modifications: FeatureSetStorage::new_runtime(c),
+            underground_structures: FeatureSetStorage::new_runtime(d),
+            surface_structures: FeatureSetStorage::new_runtime(e),
+            strongholds: FeatureSetStorage::new_runtime(f),
+            underground_ores: FeatureSetStorage::new_runtime(g),
+            underground_decoration: FeatureSetStorage::new_runtime(h),
+            fluid_springs: FeatureSetStorage::new_runtime(i),
+            vegetal_decoration: FeatureSetStorage::new_runtime(j),
+            top_layer_modification: FeatureSetStorage::new_runtime(k),
+        }
     }
 }
 
@@ -211,6 +221,29 @@ enum FeatureSetInner {
 }
 
 impl FeatureSetStorage {
+    /// Create a new static [`BiomeFeatureSet`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided slice contains duplicate entries.
+    #[must_use]
+    pub const fn new_static(slice: &'static [Identifier<'static>]) -> Self {
+        assert_no_duplicates(slice);
+        Self { inner: FeatureSetInner::Static(slice) }
+    }
+
+    /// Create a new runtime-allocated [`BiomeFeatureSet`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if the provided vector contains duplicate entries.
+    #[must_use]
+    #[cfg(feature = "alloc")]
+    pub const fn new_runtime(vec: Vec<Identifier<'static>>) -> Self {
+        assert_no_duplicates(vec.as_slice());
+        Self { inner: FeatureSetInner::Runtime(vec) }
+    }
+
     /// Returns `true` if the set contains the specified feature type.
     #[must_use]
     pub fn contains<F: FeatureType>(&self) -> bool { self.to_ref().contains(&F::IDENTIFIER) }
@@ -310,6 +343,19 @@ impl FeatureSetStorage {
                 }
             }
         }
+    }
+}
+
+/// Asserts that the given slice contains no duplicate entries.
+const fn assert_no_duplicates(slice: &[Identifier<'static>]) {
+    let mut i = 0;
+    while i < slice.len() {
+        let mut j = i + 1;
+        while j < slice.len() {
+            assert!(!slice[i].const_eq(&slice[j]), "`FeatureSet` contains duplicate entries!");
+            j += 1;
+        }
+        i += 1;
     }
 }
 

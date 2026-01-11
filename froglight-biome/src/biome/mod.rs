@@ -6,7 +6,7 @@ mod biome;
 pub use biome::{Biome, BiomeType};
 
 mod feature;
-pub use feature::{BiomeFeatures, BiomeFeatureSet, FeatureSetStorage, FeatureType};
+pub use feature::{BiomeFeatureSets, BiomeFeatures, FeatureSetStorage, FeatureType};
 
 mod metadata;
 pub use metadata::BiomeMetadata;
