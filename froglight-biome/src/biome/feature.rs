@@ -29,6 +29,10 @@ pub struct BiomeFeatures {
 }
 
 impl BiomeFeatures {
+    /// Create an empty [`BiomeFeatures`] instance.
+    #[must_use]
+    pub const fn empty() -> Self { Self::from_arrays([&[]; 11]) }
+
     /// Create a new [`BiomeFeatures`] from the provided set of feature arrays.
     ///
     /// # Panics
@@ -65,7 +69,7 @@ pub struct BiomeFeatureSet {
 }
 
 impl BiomeFeatureSet {
-    /// Create a new static [`FeatureSet`].
+    /// Create a new static [`BiomeFeatureSet`].
     ///
     /// # Panics
     ///
@@ -81,7 +85,7 @@ impl BiomeFeatureSet {
         }
     }
 
-    /// Create a new runtime-allocated [`FeatureSetInner`].
+    /// Create a new runtime-allocated [`BiomeFeatureSet`].
     ///
     /// # Panics
     ///
@@ -190,7 +194,7 @@ const fn assert_no_duplicates(slice: &[Identifier<'static>]) {
 
 // -------------------------------------------------------------------------------------------------
 
-/// The underlying storage for a [`FeatureSet`].
+/// The underlying storage for a [`BiomeFeatureSet`].
 #[repr(transparent)]
 #[derive(Debug, Clone)]
 pub struct FeatureSetStorage {

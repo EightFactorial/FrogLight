@@ -1,17 +1,24 @@
 //! Quick and dirty benchmarks for using `Chunk::contains_raw_block` vs
 //! iterating over all blocks.
+#![allow(clippy::large_stack_arrays, reason = "Ignored")]
 
 #[cfg(feature = "froglight-block")]
-use std::any::TypeId;
+use core::any::TypeId;
 
 use bitvec::slice::BitSlice;
 use divan::prelude::*;
+#[cfg(feature = "froglight-biome")]
+use froglight_biome::{
+    biome::{BiomeMetadata, BiomeType},
+    implement_biomes,
+    storage::BiomeStorage,
+};
 #[cfg(feature = "froglight-block")]
 use froglight_block::{
     block::{BlockMetadata, BlockType, StateId},
     storage::BlockStorage,
 };
-#[cfg(feature = "froglight-block")]
+#[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 use froglight_common::version::Version;
 use froglight_world::borrowed::{
     BorrowedChunk, BorrowedSection,
@@ -22,7 +29,7 @@ use froglight_world::borrowed::{
 fn main() { divan::main() }
 
 macro_rules! create {
-    ($($tt:tt)*) => {{
+    (@blocks $($tt:tt)*) => {{
         black_box(BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
             core::array::from_fn(|_| unsafe {
                 BorrowedSection::new_unchecked(
@@ -37,12 +44,28 @@ macro_rules! create {
             }),
         ))))
     }};
+    (@biomes $($tt:tt)*) => {{
+        black_box(BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
+            core::array::from_fn(|_| unsafe {
+                BorrowedSection::new_unchecked(
+                    0,
+                    BorrowedSectionData::new_unchecked(
+                        0,
+                        BorrowedPalette::Single(0),
+                        BitSlice::empty(),
+                    ),
+                    $($tt)*,
+                )
+            }),
+        ))))
+    }};
 }
 
 #[divan::bench]
 fn contains_single_best(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             0,
             BorrowedPalette::Single(0),
@@ -59,6 +82,7 @@ fn contains_single_best(b: Bencher) {
 fn contains_single_worst(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             0,
             BorrowedPalette::Single(0),
@@ -75,6 +99,7 @@ fn contains_single_worst(b: Bencher) {
 fn contains_single_best_iter(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             0,
             BorrowedPalette::Single(0),
@@ -91,6 +116,7 @@ fn contains_single_best_iter(b: Bencher) {
 fn contains_single_worst_iter(b: Bencher) {
     // An empty section with no blocks.
     let single = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             0,
             BorrowedPalette::Single(0),
@@ -107,6 +133,7 @@ fn contains_single_worst_iter(b: Bencher) {
 fn contains_vector_best(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Vector(&[0, 1]),
@@ -123,6 +150,7 @@ fn contains_vector_best(b: Bencher) {
 fn contains_vector_best_iter(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Vector(&[0, 1]),
@@ -139,6 +167,7 @@ fn contains_vector_best_iter(b: Bencher) {
 fn contains_vector_pass(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Vector(&[0]),
@@ -155,6 +184,7 @@ fn contains_vector_pass(b: Bencher) {
 fn contains_vector_worst_iter(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Vector(&[0, 1]),
@@ -171,6 +201,7 @@ fn contains_vector_worst_iter(b: Bencher) {
 fn contains_vector_worst(b: Bencher) {
     // An empty section with no blocks.
     let vector = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Vector(&[0, 1]),
@@ -187,6 +218,7 @@ fn contains_vector_worst(b: Bencher) {
 fn contains_global_best(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Global,
@@ -203,6 +235,7 @@ fn contains_global_best(b: Bencher) {
 fn contains_global_worst(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Global,
@@ -219,6 +252,7 @@ fn contains_global_worst(b: Bencher) {
 fn contains_global_best_iter(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Global,
@@ -235,6 +269,7 @@ fn contains_global_best_iter(b: Bencher) {
 fn contains_global_worst_iter(b: Bencher) {
     // An empty section with no blocks.
     let global = create! {
+        @blocks
         BorrowedSectionData::new_unchecked(
             1,
             BorrowedPalette::Global,
@@ -250,14 +285,118 @@ fn contains_global_worst_iter(b: Bencher) {
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg(feature = "froglight-block")]
+#[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 struct TestVersion;
 
-#[cfg(feature = "froglight-block")]
+#[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 impl Version for TestVersion {
     const PROTOCOL_ID: u32 = u32::MIN;
     const RESOURCE_VERSION: u32 = u32::MIN;
 }
+
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg(feature = "froglight-biome")]
+struct Plains;
+
+#[cfg(feature = "froglight-biome")]
+impl BiomeType<TestVersion> for Plains {
+    const METADATA: &'static BiomeMetadata = {
+        static STATIC: BiomeMetadata = unsafe {
+            use froglight_biome::biome::BiomeFeatures;
+            use froglight_common::prelude::Identifier;
+
+            BiomeMetadata::new::<Plains, TestVersion>(
+                Identifier::new_static("test:plains"),
+                0,
+                BiomeFeatures::empty(),
+                0,
+                0,
+                0,
+                true,
+                0.0,
+                0.0,
+            )
+        };
+        &STATIC
+    };
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg(feature = "froglight-biome")]
+struct Forest;
+
+#[cfg(feature = "froglight-biome")]
+impl BiomeType<TestVersion> for Forest {
+    const METADATA: &'static BiomeMetadata = {
+        static STATIC: BiomeMetadata = unsafe {
+            use froglight_biome::biome::BiomeFeatures;
+            use froglight_common::prelude::Identifier;
+
+            BiomeMetadata::new::<Forest, TestVersion>(
+                Identifier::new_static("test:forest"),
+                1,
+                BiomeFeatures::empty(),
+                0,
+                0,
+                0,
+                true,
+                0.0,
+                0.0,
+            )
+        };
+        &STATIC
+    };
+}
+
+#[cfg(feature = "froglight-biome")]
+implement_biomes! {
+    TestVersion => unsafe {
+        BiomeStorage::new_static(&[
+            Plains::METADATA,
+            Forest::METADATA,
+        ])
+    }
+}
+
+#[divan::bench]
+#[cfg(feature = "froglight-biome")]
+fn contains_global_biome_best(b: Bencher) {
+    // An empty section with no biomes.
+    let global = create! {
+        @biomes
+        BorrowedSectionData::new_unchecked(
+            1,
+            BorrowedPalette::Global,
+            BitSlice::from_slice(&[0; 4096]),
+        )
+    };
+
+    b.bench(|| {
+        black_box(global.contains_biome_type::<Plains, TestVersion>());
+    });
+}
+
+#[divan::bench]
+#[cfg(feature = "froglight-biome")]
+fn contains_global_biome_worst(b: Bencher) {
+    // An empty section with no biomes.
+    let global = create! {
+        @biomes
+        BorrowedSectionData::new_unchecked(
+            1,
+            BorrowedPalette::Global,
+            BitSlice::from_slice(&[0; 4096]),
+        )
+    };
+
+    b.bench(|| {
+        black_box(global.contains_biome_type::<Forest, TestVersion>());
+    });
+}
+
+// -------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg(feature = "froglight-block")]
@@ -329,23 +468,14 @@ froglight_block::implement_blocks! {
 #[cfg(feature = "froglight-block")]
 fn contains_global_block_best(b: Bencher) {
     // An empty section with no blocks.
-    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
-        core::array::from_fn(|_| unsafe {
-            BorrowedSection::new_unchecked(
-                0,
-                BorrowedSectionData::new_unchecked(
-                    1,
-                    BorrowedPalette::Global,
-                    BitSlice::from_slice(&[0; 4096]),
-                ),
-                BorrowedSectionData::new_unchecked(
-                    0,
-                    BorrowedPalette::Single(0),
-                    BitSlice::empty(),
-                ),
-            )
-        }),
-    )));
+    let global = create! {
+        @blocks
+        BorrowedSectionData::new_unchecked(
+            1,
+            BorrowedPalette::Global,
+            BitSlice::from_slice(&[0; 4096]),
+        )
+    };
 
     b.bench(|| {
         black_box(global.contains_block_type::<Air, TestVersion>());
@@ -356,23 +486,14 @@ fn contains_global_block_best(b: Bencher) {
 #[cfg(feature = "froglight-block")]
 fn contains_global_block_worst(b: Bencher) {
     // An empty section with no blocks.
-    let global = BorrowedChunk::new(BorrowedChunkStorage::Large(BorrowedArrayStorage::new(
-        core::array::from_fn(|_| unsafe {
-            BorrowedSection::new_unchecked(
-                0,
-                BorrowedSectionData::new_unchecked(
-                    1,
-                    BorrowedPalette::Global,
-                    BitSlice::from_slice(&[0; 4096]),
-                ),
-                BorrowedSectionData::new_unchecked(
-                    0,
-                    BorrowedPalette::Single(0),
-                    BitSlice::empty(),
-                ),
-            )
-        }),
-    )));
+    let global = create! {
+        @blocks
+        BorrowedSectionData::new_unchecked(
+            1,
+            BorrowedPalette::Global,
+            BitSlice::from_slice(&[0; 4096]),
+        )
+    };
 
     b.bench(|| {
         black_box(global.contains_block_type::<Stone, TestVersion>());

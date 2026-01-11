@@ -89,7 +89,7 @@ impl Biome {
     /// Get the [`TypeId`] of the biome type.
     #[inline]
     #[must_use]
-    pub const fn block_ty(&self) -> TypeId { self.reference.block_ty() }
+    pub const fn biome_ty(&self) -> TypeId { self.reference.biome_ty() }
 
     /// Get the [`TypeId`] of the version type.
     #[inline]

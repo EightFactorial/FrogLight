@@ -8,21 +8,21 @@ use crate::storage::GlobalBiomeStorage;
 
 /// A [`Version`]'s associated biome data.
 pub trait BiomeVersion: Version {
-    /// The [`GlobalBlockStorage`] for this [`Version`].
+    /// The [`GlobalBiomeStorage`] for this [`Version`].
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
     const BIOMES: &'static GlobalBiomeStorage;
 
-    /// Get the [`GlobalBlockStorage`] for this [`Version`].
+    /// Get the [`GlobalBiomeStorage`] for this [`Version`].
     #[inline]
     #[must_use]
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
     fn biomes() -> &'static GlobalBiomeStorage { Self::BIOMES }
 
-    /// Create a new [`BlockStorage`] for this [`Version`].
+    /// Create a new [`BiomeStorage`] for this [`Version`].
     ///
     /// # Warning
     ///
-    /// This will create a new [`BlockStorage`] each time it is called!
+    /// This will create a new [`BiomeStorage`] each time it is called!
     ///
     /// Unless you are in a `no_std` environment, you should probably be using
     /// [`BiomeVersion::biomes`] or the associated constant.

@@ -158,7 +158,7 @@ impl BiomeMetadata {
     /// Get the [`TypeId`] of the biome type.
     #[inline]
     #[must_use]
-    pub const fn block_ty(&self) -> TypeId { self.biome_ty }
+    pub const fn biome_ty(&self) -> TypeId { self.biome_ty }
 
     /// Get the [`TypeId`] of the version type.
     #[inline]
