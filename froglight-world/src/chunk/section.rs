@@ -14,7 +14,7 @@ use crate::{
 /// A piece of a chunk.
 #[derive(Default, Clone)]
 pub struct Section {
-    non_air: u32,
+    block_count: u32,
     blocks: SectionData<BlockSection>,
     biomes: SectionData<BiomeSection>,
 }
@@ -27,16 +27,16 @@ impl Section {
     /// The caller must ensure that the provided data is valid.
     #[must_use]
     pub const unsafe fn new_unchecked(
-        non_air: u32,
+        block_count: u32,
         blocks: SectionData<BlockSection>,
         biomes: SectionData<BiomeSection>,
     ) -> Self {
-        Self { non_air, blocks, biomes }
+        Self { block_count, blocks, biomes }
     }
 
     /// Get the number of non-air blocks in this section.
     #[must_use]
-    pub const fn block_count(&self) -> u32 { self.non_air }
+    pub const fn block_count(&self) -> u32 { self.block_count }
 
     /// Get the [`SectionData`] for blocks.
     #[must_use]
@@ -62,7 +62,8 @@ impl Section {
     /// Set the block id at the given position within the section,
     /// returning the previous id.
     ///
-    /// The provided closure must return `true` if the block being set is air.
+    /// The provided closure must return `true` if the block id corresponds with
+    /// some form of air.
     #[must_use]
     pub fn set_raw_block(
         &mut self,
@@ -72,8 +73,10 @@ impl Section {
     ) -> u32 {
         let previous = self.blocks.set(position, block_id);
         match (is_air(previous), is_air(block_id)) {
-            (false, true) => self.non_air += 1,
-            (true, false) => self.non_air -= 1,
+            // Non-air to air, decrement block counter.
+            (false, true) => self.block_count -= 1,
+            // Air to non-air, increment block counter.
+            (true, false) => self.block_count += 1,
             _ => {}
         }
         previous
