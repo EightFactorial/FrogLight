@@ -60,6 +60,11 @@ impl BlockPos {
 
 // -------------------------------------------------------------------------------------------------
 
+impl<T: Into<IVec3>> From<T> for BlockPos {
+    #[inline]
+    fn from(value: T) -> Self { BlockPos::new(value.into()) }
+}
+
 impl Add<BlockPos> for BlockPos {
     type Output = BlockPos;
 
