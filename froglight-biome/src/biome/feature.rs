@@ -22,6 +22,10 @@ pub struct BiomeFeatures {
 }
 
 impl BiomeFeatures {
+    /// Create an empty [`BiomeFeatureSet`] instance.
+    #[must_use]
+    pub const fn empty() -> Self { Self::new_static([&[]; 11]) }
+
     /// Create a new static [`BiomeFeatureSet`].
     ///
     /// # Panics
@@ -148,10 +152,6 @@ pub struct BiomeFeatureSets {
 }
 
 impl BiomeFeatureSets {
-    /// Create an empty [`BiomeFeatures`] instance.
-    #[must_use]
-    pub const fn empty() -> Self { Self::from_arrays([&[]; 11]) }
-
     /// Create a new [`BiomeFeatures`] from the provided set of feature arrays.
     ///
     /// # Panics
