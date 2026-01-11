@@ -1,3 +1,5 @@
+use core::ops::{Add, Sub};
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
 use froglight_common::prelude::Identifier;
@@ -17,4 +19,22 @@ pub struct DimensionPos {
     pub dimension: Identifier<'static>,
     /// The block's position within the world.
     pub position: BlockPos,
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<T: Into<BlockPos>> Add<T> for DimensionPos {
+    type Output = DimensionPos;
+
+    fn add(self, rhs: T) -> Self::Output {
+        DimensionPos { dimension: self.dimension, position: self.position + rhs.into() }
+    }
+}
+
+impl<T: Into<BlockPos>> Sub<T> for DimensionPos {
+    type Output = DimensionPos;
+
+    fn sub(self, rhs: T) -> Self::Output {
+        DimensionPos { dimension: self.dimension, position: self.position - rhs.into() }
+    }
 }

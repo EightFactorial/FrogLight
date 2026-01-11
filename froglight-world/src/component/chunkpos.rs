@@ -29,6 +29,11 @@ impl ChunkPos {
     #[must_use]
     pub const fn new_xz(x: i32, z: i32) -> Self { Self(IVec2::new(x, z)) }
 
+    /// Create a new [`ChunkPos`] all elements set to `v`.
+    #[inline]
+    #[must_use]
+    pub const fn splat(v: i32) -> Self { Self(IVec2::splat(v)) }
+
     /// Get the x coordinate of this [`ChunkPos`].
     #[inline]
     #[must_use]
@@ -41,6 +46,11 @@ impl ChunkPos {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+impl<T: Into<IVec2>> From<T> for ChunkPos {
+    #[inline]
+    fn from(value: T) -> Self { ChunkPos::new(value.into()) }
+}
 
 impl Add<ChunkPos> for ChunkPos {
     type Output = ChunkPos;

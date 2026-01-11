@@ -31,6 +31,11 @@ impl BlockPos {
     #[must_use]
     pub const fn new_xyz(x: i32, y: i32, z: i32) -> Self { Self(IVec3::new(x, y, z)) }
 
+    /// Create a new [`BlockPos`] with all coordinates set to `v`.
+    #[inline]
+    #[must_use]
+    pub const fn splat(v: i32) -> Self { Self(IVec3::splat(v)) }
+
     /// Get the x coordinate of this [`BlockPos`].
     #[inline]
     #[must_use]
