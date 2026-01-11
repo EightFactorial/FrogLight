@@ -127,6 +127,29 @@ impl Identifier<'_> {
         }
     }
 
+    /// A `const` method for comparing two identifiers for equality.
+    ///
+    /// Likely much slower than the standard [`PartialEq`]/[`Eq`]
+    /// implementations, but usable in `const` contexts.
+    #[must_use]
+    pub const fn const_eq(&self, other: &Identifier<'_>) -> bool {
+        let s1 = self.as_str().as_bytes();
+        let s2 = other.as_str().as_bytes();
+        // Short-circuit if lengths differ
+        if s1.len() != s2.len() {
+            return false;
+        }
+        // Compare byte by byte
+        let mut i = 0;
+        while i < s1.len() {
+            if s1[i] != s2[i] {
+                return false;
+            }
+            i += 1;
+        }
+        true
+    }
+
     /// Create a new [`Identifier`] without checking its validity.
     ///
     /// # Safety
