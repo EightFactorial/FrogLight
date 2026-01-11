@@ -15,9 +15,6 @@ pub struct BiomeMetadata {
     /// The [`GlobalId`] assigned to this biome.
     global_id: MaybeAtomicU32,
 
-    /// The features of this biome.
-    features: BiomeFeatures,
-
     /// The foliage color of this biome.
     color_foliage: MaybeAtomicU32,
     /// The grass color of this biome.
@@ -30,6 +27,9 @@ pub struct BiomeMetadata {
     temperature: MaybeAtomicF32,
     /// The downfall of this biome.
     downfall: MaybeAtomicF32,
+
+    /// The features of this biome.
+    features: BiomeFeatures,
 
     /// The [`TypeId`] of the biome type.
     biome_ty: TypeId,
@@ -49,19 +49,17 @@ impl BiomeMetadata {
     pub const unsafe fn new<B: BiomeType<V>, V: BiomeVersion>(
         identifier: Identifier<'static>,
         global_id: u32,
-        features: BiomeFeatures,
         foliage_color: u32,
         grass_color: u32,
         water_color: u32,
         precipitation: bool,
         temperature: f32,
         downfall: f32,
+        features: BiomeFeatures,
     ) -> Self {
         Self {
             identifier,
             global_id: MaybeAtomicU32::new(global_id),
-
-            features,
 
             color_foliage: MaybeAtomicU32::new(foliage_color),
             color_grass: MaybeAtomicU32::new(grass_color),
@@ -69,6 +67,8 @@ impl BiomeMetadata {
             precipitation: MaybeAtomicBool::new(precipitation),
             temperature: MaybeAtomicF32::new(temperature),
             downfall: MaybeAtomicF32::new(downfall),
+
+            features,
 
             biome_ty: TypeId::of::<B>(),
             version_ty: TypeId::of::<V>(),
@@ -92,10 +92,6 @@ impl BiomeMetadata {
     /// [`BiomeStorage`](crate::storage::BiomeStorage) it is used in.
     #[cfg(feature = "atomic")]
     pub unsafe fn set_global_id(&self, id: GlobalId) { self.global_id.set_atomic(id.into_inner()); }
-
-    /// Get the features of this biome.
-    #[must_use]
-    pub fn features(&self) -> &BiomeFeatures { &self.features }
 
     /// Get the foliage color of this biome.
     #[must_use]
@@ -146,6 +142,10 @@ impl BiomeMetadata {
     /// Set the downfall of this biome.
     #[cfg(feature = "atomic")]
     pub fn set_downfall(&self, downfall: f32) { self.downfall.set_atomic(downfall); }
+
+    /// Get the features of this biome.
+    #[must_use]
+    pub const fn features(&self) -> &BiomeFeatures { &self.features }
 
     /// Returns `true` if this biome is of type `B`.
     #[must_use]

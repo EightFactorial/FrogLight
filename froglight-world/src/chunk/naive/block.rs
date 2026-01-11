@@ -6,10 +6,13 @@ use core::any::TypeId;
 use froglight_block::block::BlockType;
 use froglight_block::{block::GlobalId, prelude::*, storage::BlockStorage};
 
-use super::section::SectionPalette;
-use crate::{component::ChunkBlockPos, prelude::*};
+use crate::{
+    chunk::{NaiveChunk, section::SectionPalette},
+    component::ChunkBlockPos,
+    prelude::*,
+};
 
-impl Chunk {
+impl NaiveChunk {
     /// Get the [`Block`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds,
@@ -79,7 +82,7 @@ impl Chunk {
         self.set_block_using::<P>(position, block, &V::blocks().read())
     }
 
-    /// Get the [`Block`] at the given position within the chunk and return the
+    /// Set the [`Block`] at the given position within the chunk and return the
     /// previous one, resolving it using the provided [`BlockStorage`].
     ///
     /// Returns `None` if the position is out of bounds,
@@ -109,7 +112,7 @@ impl Chunk {
         self.set_block_pos_using::<P>(position, block, &V::blocks().read())
     }
 
-    /// Get the [`Block`] at the given position within the chunk and return the
+    /// Set the [`Block`] at the given position within the chunk and return the
     /// previous one, resolving it using the provided [`BlockStorage`].
     ///
     /// Returns `None` if the position is out of bounds,

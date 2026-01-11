@@ -310,13 +310,13 @@ impl BiomeType<TestVersion> for Plains {
             BiomeMetadata::new::<Plains, TestVersion>(
                 Identifier::new_static("test:plains"),
                 0,
-                BiomeFeatures::empty(),
                 0,
                 0,
                 0,
                 true,
                 0.0,
                 0.0,
+                BiomeFeatures::empty(),
             )
         };
         &STATIC
@@ -337,13 +337,13 @@ impl BiomeType<TestVersion> for Forest {
             BiomeMetadata::new::<Forest, TestVersion>(
                 Identifier::new_static("test:forest"),
                 1,
-                BiomeFeatures::empty(),
                 0,
                 0,
                 0,
                 true,
                 0.0,
                 0.0,
+                BiomeFeatures::empty(),
             )
         };
         &STATIC

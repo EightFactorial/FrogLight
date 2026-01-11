@@ -12,7 +12,6 @@ use crate::chunk::Chunk;
 ///
 /// See [`ArcSwap`](arc_swap::ArcSwapAny) for more information.
 #[repr(transparent)]
-#[derive(Default)]
 #[cfg_attr(feature = "bevy", derive(Component))]
 pub struct SharedChunk {
     chunk: ArcSwap<Chunk>,

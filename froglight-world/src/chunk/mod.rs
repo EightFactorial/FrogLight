@@ -1,46 +1,78 @@
 //! TODO
 
-use alloc::vec::Vec;
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
 use core::ops::Range;
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
-use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+use bevy_reflect::Reflect;
 
-use crate::{component::ChunkBlockPos, prelude::*};
-
-#[cfg(feature = "froglight-biome")]
-mod biome;
-#[cfg(feature = "froglight-block")]
-mod block;
+mod naive;
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+use froglight_biome::storage::GlobalBiomeStorage;
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+use froglight_biome::{biome::Biome, version::BiomeVersion};
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+use froglight_block::storage::GlobalBlockStorage;
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+use froglight_block::{block::Block, version::BlockVersion};
+pub use naive::NaiveChunk;
 
 pub mod section;
 pub use section::Section;
 
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
 mod shared;
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
 pub use shared::SharedChunk;
 
 pub mod storage;
 use storage::ChunkStorage;
 
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+use crate::component::ChunkBlockPos;
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+use crate::prelude::BlockPos;
+
 /// A region of blocks in a world.
-#[derive(Default, Clone)]
+#[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Clone, Component))]
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
 pub struct Chunk {
+    biomes: &'static GlobalBiomeStorage,
+    blocks: &'static GlobalBlockStorage,
     storage: ChunkStorage,
 }
 
+#[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
 impl Chunk {
-    /// Create a new [`Chunk`] from the given storage.
+    /// Create a new [`Chunk`] using blocks and biomes from the given
+    /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    pub const fn new(storage: ChunkStorage) -> Self { Self { storage } }
+    pub const fn new<V: BiomeVersion + BlockVersion>(storage: ChunkStorage) -> Self {
+        Self::new_from(storage, V::BIOMES, V::BLOCKS)
+    }
 
-    /// Create a new [`Chunk`] from the given sections and offset.
+    /// Create a new [`Chunk`] using the given block and biome storages.
     #[must_use]
-    pub fn new_from(sections: Vec<Section>, offset: i32) -> Self {
-        Self { storage: ChunkStorage::new_from_vec(sections, offset) }
+    pub const fn new_from(
+        storage: ChunkStorage,
+        biomes: &'static GlobalBiomeStorage,
+        blocks: &'static GlobalBlockStorage,
+    ) -> Self {
+        Self { biomes, blocks, storage }
     }
 
     /// Create a new empty large [`Chunk`].
@@ -48,14 +80,28 @@ impl Chunk {
     /// This is equivalent to an overworld chunk,
     /// or 24 sections (384 blocks) tall with an offset of -64.
     #[must_use]
-    pub fn new_empty_large() -> Self { Self { storage: ChunkStorage::empty_large() } }
+    pub fn new_empty_large<V: BiomeVersion + BlockVersion>() -> Self {
+        Self::new::<V>(ChunkStorage::empty_large())
+    }
 
     /// Create a new empty normal [`Chunk`].
     ///
     /// This is equivalent to a nether or end chunk,
     /// or 16 sections (256 blocks) tall with an offset of 0.
     #[must_use]
-    pub fn new_empty_normal() -> Self { Self { storage: ChunkStorage::empty_normal() } }
+    pub fn new_empty_normal<V: BiomeVersion + BlockVersion>() -> Self {
+        Self::new::<V>(ChunkStorage::empty_normal())
+    }
+
+    /// Get the [`GlobalBlockStorage`] used by this chunk.
+    #[inline]
+    #[must_use]
+    pub const fn biomes(&self) -> &'static GlobalBiomeStorage { self.biomes }
+
+    /// Get the [`GlobalBlockStorage`] used by this chunk.
+    #[inline]
+    #[must_use]
+    pub const fn blocks(&self) -> &'static GlobalBlockStorage { self.blocks }
 
     /// Get the height of this [`Chunk`].
     ///
@@ -101,26 +147,30 @@ impl Chunk {
     #[must_use]
     pub const fn sections_mut(&mut self) -> &mut [Section] { self.storage.as_slice_mut() }
 
-    /// Get the block id at the given position within the chunk.
+    /// Get the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds.
+    /// Returns `None` if the position is out of bounds,
+    /// or if the block is not recognized.
     #[must_use]
-    pub fn get_raw_block<P: Into<BlockPos>>(&self, position: P) -> Option<u32> {
+    pub fn get_block<P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
         ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
-            .and_then(|pos| self.get_raw_block_pos::<ChunkBlockPos>(pos))
+            .and_then(|pos| self.get_block_pos::<ChunkBlockPos>(pos))
     }
 
-    /// Get the block id at the given position within the chunk.
+    /// Get the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds.
+    /// Returns `None` if the position is out of bounds,
+    /// or if the block is not recognized.
     #[must_use]
-    #[allow(clippy::manual_map, reason = "Nuh-uh")]
-    pub fn get_raw_block_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<u32> {
+    pub fn get_block_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Block> {
         let position = position.into();
         let index = position.as_section_index();
 
         if let Some(section) = self.storage.as_slice().get(index) {
-            Some(section.get_raw_block(position.as_section_blockpos()))
+            use froglight_block::block::GlobalId;
+
+            let raw = section.get_raw_block(position.as_section_blockpos());
+            self.blocks.read().get_block(GlobalId::new(raw))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
@@ -128,36 +178,41 @@ impl Chunk {
         }
     }
 
-    /// Set the block id at the given position within the chunk,
-    /// returning the previous id.
+    /// Set the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds.
-    pub fn set_raw_block<P: Into<BlockPos>>(
-        &mut self,
-        position: P,
-        block_id: u32,
-        is_air: impl Fn(u32) -> bool,
-    ) -> Option<u32> {
+    /// Returns `None` if the position is out of bounds,
+    /// or if the block is not recognized.
+    #[must_use]
+    pub fn set_block<P: Into<BlockPos>>(&mut self, position: P, block: Block) -> Option<Block> {
         ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
-            .and_then(|pos| self.set_raw_block_pos::<ChunkBlockPos>(pos, block_id, is_air))
+            .and_then(|pos| self.set_block_pos::<ChunkBlockPos>(pos, block))
     }
 
-    /// Set the block id at the given position within the chunk,
-    /// returning the previous id.
+    /// Set the [`Block`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds.
-    #[allow(clippy::manual_map, reason = "Nuh-uh")]
-    pub fn set_raw_block_pos<P: Into<ChunkBlockPos>>(
+    /// Returns `None` if the position is out of bounds,
+    /// or if the block is not recognized.
+    pub fn set_block_pos<P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
-        block_id: u32,
-        is_air: impl Fn(u32) -> bool,
-    ) -> Option<u32> {
+        block: Block,
+    ) -> Option<Block> {
         let position = position.into();
         let index = position.as_section_index();
 
         if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
-            Some(section.set_raw_block(position.as_section_blockpos(), block_id, is_air))
+            use froglight_block::block::GlobalId;
+
+            let storage = self.blocks.read();
+            let is_air =
+                |id| storage.get_block(GlobalId::new(id)).is_some_and(|block| block.is_air());
+
+            let raw = section.set_raw_block(
+                position.as_section_blockpos(),
+                block.global_id().into_inner(),
+                is_air,
+            );
+            storage.get_block(GlobalId::new(raw))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
@@ -165,43 +220,30 @@ impl Chunk {
         }
     }
 
-    /// Iterate over all raw block ids in this chunk.
+    /// Get the [`Biome`] at the given position within the chunk.
     ///
-    /// # Note
-    ///
-    /// If you are searching for whether a block exists in the chunk, use
-    /// [`Chunk::contains_raw_block`] instead as it has much better
-    /// performance.
-    pub fn iter_raw_blocks(&self) -> impl Iterator<Item = u32> + '_ {
-        self.storage.as_slice().iter().flat_map(Section::iter_raw_blocks)
-    }
-
-    /// Returns `true` if the chunk contains the given raw block id.
+    /// Returns `None` if the position is out of bounds,
+    /// or if the biome is not recognized.
     #[must_use]
-    pub fn contains_raw_block(&self, block_id: u32) -> bool {
-        self.storage.as_slice().iter().any(|section| section.contains_raw_block(block_id))
-    }
-
-    /// Get the biome id at the given position within the chunk.
-    ///
-    /// Returns `None` if the position is out of bounds.
-    #[must_use]
-    pub fn get_raw_biome<P: Into<BlockPos>>(&self, position: P) -> Option<u32> {
+    pub fn get_biome<P: Into<BlockPos>>(&self, position: P) -> Option<Biome> {
         ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
-            .and_then(|pos| self.get_raw_biome_pos::<ChunkBlockPos>(pos))
+            .and_then(|pos| self.get_biome_pos::<ChunkBlockPos>(pos))
     }
 
-    /// Get the biome id at the given position within the chunk.
+    /// Get the [`Biome`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds.
+    /// Returns `None` if the position is out of bounds,
+    /// or if the biome is not recognized.
     #[must_use]
-    #[allow(clippy::manual_map, reason = "Nuh-uh")]
-    pub fn get_raw_biome_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<u32> {
+    pub fn get_biome_pos<P: Into<ChunkBlockPos>>(&self, position: P) -> Option<Biome> {
         let position = position.into();
         let index = position.as_section_index();
 
         if let Some(section) = self.storage.as_slice().get(index) {
-            Some(section.get_raw_biome(position.as_section_blockpos()))
+            use froglight_biome::biome::GlobalId;
+
+            let raw = section.get_raw_biome(position.as_section_blockpos());
+            self.biomes.read().get_biome(GlobalId::new(raw))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
@@ -209,51 +251,38 @@ impl Chunk {
         }
     }
 
-    /// Set the biome id at the given position within the chunk,
-    /// returning the previous id.
+    /// Set the [`Biome`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds.
-    pub fn set_raw_biome<P: Into<BlockPos>>(&mut self, position: P, biome_id: u32) -> Option<u32> {
+    /// Returns `None` if the position is out of bounds,
+    /// or if the biome is not recognized.
+    #[must_use]
+    pub fn set_biome<P: Into<BlockPos>>(&mut self, position: P, biome: Biome) -> Option<Biome> {
         ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
-            .and_then(|pos| self.set_raw_biome_pos::<ChunkBlockPos>(pos, biome_id))
+            .and_then(|pos| self.set_biome_pos::<ChunkBlockPos>(pos, biome))
     }
 
-    /// Set the biome id at the given position within the chunk,
-    /// returning the previous id.
+    /// Set the [`Biome`] at the given position within the chunk.
     ///
-    /// Returns `None` if the position is out of bounds.
-    #[allow(clippy::manual_map, reason = "Nuh-uh")]
-    pub fn set_raw_biome_pos<P: Into<ChunkBlockPos>>(
+    /// Returns `None` if the position is out of bounds,
+    /// or if the biome is not recognized.
+    pub fn set_biome_pos<P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
-        biome_id: u32,
-    ) -> Option<u32> {
+        biome: Biome,
+    ) -> Option<Biome> {
         let position = position.into();
         let index = position.as_section_index();
 
         if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
-            Some(section.set_raw_biome(position.as_section_blockpos(), biome_id))
+            use froglight_biome::biome::GlobalId;
+
+            let raw = section
+                .set_raw_biome(position.as_section_blockpos(), biome.global_id().into_inner());
+            self.biomes.read().get_biome(GlobalId::new(raw))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
             None
         }
-    }
-
-    /// Iterate over all raw biome ids in this chunk.
-    ///
-    /// # Note
-    ///
-    /// If you are searching for whether a biome exists in the chunk, use
-    /// [`Chunk::contains_raw_biome`] instead as it has much better
-    /// performance.
-    pub fn iter_raw_biomes(&self) -> impl Iterator<Item = u32> + '_ {
-        self.storage.as_slice().iter().flat_map(Section::iter_raw_biomes)
-    }
-
-    /// Returns `true` if the chunk contains the given raw biome id.
-    #[must_use]
-    pub fn contains_raw_biome(&self, biome_id: u32) -> bool {
-        self.storage.as_slice().iter().any(|section| section.contains_raw_biome(biome_id))
     }
 }

@@ -29,6 +29,9 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     #[cfg(feature = "alloc")]
+    pub use crate::chunk::NaiveChunk;
+    #[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
+    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
     pub use crate::chunk::{Chunk, SharedChunk};
     pub use crate::component::{BlockPos, ChunkPos};
 }

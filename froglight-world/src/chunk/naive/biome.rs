@@ -8,10 +8,13 @@ use froglight_biome::{
     storage::BiomeStorage,
 };
 
-use super::section::SectionPalette;
-use crate::{component::ChunkBlockPos, prelude::*};
+use crate::{
+    chunk::{NaiveChunk, section::SectionPalette},
+    component::ChunkBlockPos,
+    prelude::*,
+};
 
-impl Chunk {
+impl NaiveChunk {
     /// Get the [`Biome`] at the given position within the chunk.
     ///
     /// Returns `None` if the position is out of bounds,

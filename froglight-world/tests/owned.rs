@@ -10,14 +10,14 @@ use froglight_world::{
         section::{SectionData, SectionPalette},
     },
     component::{ChunkBlockPos, SectionBlockPos},
-    prelude::{BlockPos, Chunk},
+    prelude::{BlockPos, NaiveChunk},
 };
 
 #[test]
 #[cfg(feature = "alloc")]
 fn chunk() {
     // An empty chunk with no blocks.
-    let chunk = Chunk::new_empty_large();
+    let chunk = NaiveChunk::new_empty_large();
     let offset = chunk.height_offset();
 
     for y in chunk.height_range() {
