@@ -5,6 +5,8 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+#[cfg(feature = "bevy")]
+pub mod bevy;
 pub mod borrowed;
 #[cfg(feature = "alloc")]
 pub mod chunk;
@@ -28,6 +30,8 @@ const SECTION_VOLUME: u16 = SECTION_LENGTH as u16 * SECTION_WIDTH as u16 * SECTI
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "bevy")]
+    pub use crate::bevy::{relationship::*, world::WorldInstance};
     #[cfg(feature = "alloc")]
     pub use crate::chunk::NaiveChunk;
     #[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]

@@ -50,6 +50,7 @@ bitvec = { default-features = false, version = "1.0" }
 critical-section = { default-features = false, version = "1.2" }
 futures-lite = { default-features = false, version = "2.0" }
 glam = { default-features = false, version = "0.30" }
+hashbrown = { default-features = false, version = "0.16" }
 indexmap = { default-features = false, version = "2.13" }
 libm = { default-features = false, version = "0.2" }
 once_cell = { default-features = false, version = "1.21" }
