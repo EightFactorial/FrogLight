@@ -1,3 +1,5 @@
+use crate::block::Block;
+
 /// A unique identifier for a block state,
 /// relative to all other blocks and states.
 #[repr(transparent)]
@@ -19,6 +21,10 @@ impl GlobalId {
 impl<T: Into<u32>> From<T> for GlobalId {
     fn from(value: T) -> Self { GlobalId(value.into()) }
 }
+impl From<Block> for GlobalId {
+    fn from(block: Block) -> Self { block.global_id() }
+}
+
 impl<T: PartialEq<u32>> PartialEq<T> for GlobalId {
     fn eq(&self, other: &T) -> bool { other.eq(&self.0) }
 }
@@ -46,6 +52,10 @@ impl StateId {
 impl<T: Into<u16>> From<T> for StateId {
     fn from(value: T) -> Self { StateId(value.into()) }
 }
+impl From<Block> for StateId {
+    fn from(block: Block) -> Self { block.state_id() }
+}
+
 impl<T: PartialEq<u16>> PartialEq<T> for StateId {
     fn eq(&self, other: &T) -> bool { other.eq(&self.0) }
 }

@@ -6,7 +6,7 @@ use core::any::TypeId;
 #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
 use froglight_block::block::GlobalId;
 use froglight_block::{
-    block::{BlockAttr, BlockBehavior, BlockMetadata, BlockType, StateId},
+    block::{BlockAttribute, BlockBehavior, BlockMetadata, BlockType, StateId},
     implement_blocks,
     prelude::*,
     storage::BlockStorage,
@@ -111,7 +111,7 @@ impl BlockType<TestVersion> for Grass {
     };
 }
 
-impl BlockAttr for Snowy {
+impl BlockAttribute for Snowy {
     const STATES: &'static [(&'static str, Self)] = &[("true", Self(true)), ("false", Self(false))];
 }
 

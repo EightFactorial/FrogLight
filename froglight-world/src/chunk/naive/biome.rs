@@ -2,11 +2,9 @@
 
 use core::any::TypeId;
 
-use froglight_biome::{
-    biome::{BiomeType, GlobalId},
-    prelude::*,
-    storage::BiomeStorage,
-};
+#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+use froglight_biome::biome::BiomeType;
+use froglight_biome::{biome::GlobalId, prelude::*, storage::BiomeStorage};
 
 use crate::{
     chunk::{NaiveChunk, section::SectionPalette},

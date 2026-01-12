@@ -36,7 +36,7 @@ aes = { default-features = false, version = "0.9.0-rc.2" }
 base64 = { default-features = false, version = "0.22.1" }
 cfb8 = { default-features = false, version = "0.9.0-rc.1" }
 crc32c = { default-features = false, version = "0.6.8" }
-foldhash = { default-features = false, version = "0.2" }
+foldhash = { default-features = false, version = "0.2.0" }
 md-5 = { default-features = false, version = "0.11.0-rc.3" }
 rsa = { default-features = false, version = "0.10.0-rc.10" }
 sha1 = { default-features = false, version = "0.11.0-rc.3" }

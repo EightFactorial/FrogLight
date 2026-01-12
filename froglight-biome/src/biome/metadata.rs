@@ -4,7 +4,7 @@ use froglight_common::prelude::Identifier;
 
 use crate::{
     atomic::{MaybeAtomicBool, MaybeAtomicF32, MaybeAtomicU32},
-    biome::{BiomeFeatures, BiomeType, GlobalId},
+    biome::{BiomeAttributeSet, BiomeFeatureSet, BiomeType, GlobalId},
     version::BiomeVersion,
 };
 
@@ -28,8 +28,10 @@ pub struct BiomeMetadata {
     /// The downfall of this biome.
     downfall: MaybeAtomicF32,
 
+    /// The attributes of this biome.
+    attributes: BiomeAttributeSet,
     /// The features of this biome.
-    features: BiomeFeatures,
+    features: BiomeFeatureSet,
 
     /// The [`TypeId`] of the biome type.
     biome_ty: TypeId,
@@ -55,7 +57,8 @@ impl BiomeMetadata {
         precipitation: bool,
         temperature: f32,
         downfall: f32,
-        features: BiomeFeatures,
+        attributes: BiomeAttributeSet,
+        features: BiomeFeatureSet,
     ) -> Self {
         Self {
             identifier,
@@ -68,6 +71,7 @@ impl BiomeMetadata {
             temperature: MaybeAtomicF32::new(temperature),
             downfall: MaybeAtomicF32::new(downfall),
 
+            attributes,
             features,
 
             biome_ty: TypeId::of::<B>(),
@@ -143,9 +147,13 @@ impl BiomeMetadata {
     #[cfg(feature = "atomic")]
     pub fn set_downfall(&self, downfall: f32) { self.downfall.set_atomic(downfall); }
 
+    /// Get the attributes of this biome.
+    #[must_use]
+    pub const fn attributes(&self) -> &BiomeAttributeSet { &self.attributes }
+
     /// Get the features of this biome.
     #[must_use]
-    pub const fn features(&self) -> &BiomeFeatures { &self.features }
+    pub const fn features(&self) -> &BiomeFeatureSet { &self.features }
 
     /// Returns `true` if this biome is of type `B`.
     #[must_use]

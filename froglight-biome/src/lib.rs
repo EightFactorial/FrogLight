@@ -15,5 +15,9 @@ pub mod version;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{biome::Biome, generated::biome, version::BiomeVersion};
+    pub use crate::{
+        biome::{AttributeType, Biome, FeatureType},
+        generated::biome,
+        version::BiomeVersion,
+    };
 }

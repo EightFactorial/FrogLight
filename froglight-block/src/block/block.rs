@@ -7,7 +7,7 @@ use core::{
 use froglight_common::identifier::Identifier;
 
 use crate::{
-    block::{BlockAttr, BlockAttrs, BlockMetadata, GlobalId, StateId},
+    block::{BlockAttribute, BlockAttributes, BlockMetadata, GlobalId, StateId},
     version::BlockVersion,
 };
 
@@ -94,7 +94,7 @@ impl Block {
     ///
     /// Returns `None` if no attribute of type `A` exists.
     #[must_use]
-    pub fn get_attribute<A: BlockAttr>(&self) -> Option<A> {
+    pub fn get_attribute<A: BlockAttribute>(&self) -> Option<A> {
         self.reference.get_attribute::<A>(self.state)
     }
 
@@ -114,7 +114,7 @@ impl Block {
     /// Set the value of an attribute for this block.
     ///
     /// Returns the old value of the attribute if it was set successfully.
-    pub fn set_attribute<A: BlockAttr>(&mut self, value: A) -> Option<A> {
+    pub fn set_attribute<A: BlockAttribute>(&mut self, value: A) -> Option<A> {
         let (new_state, old_value) = self.reference.set_attribute::<A>(self.state, value)?;
         self.state = new_state;
         Some(old_value)
@@ -199,7 +199,7 @@ impl Debug for Block {
 /// A trait implemented by all block types.
 pub trait BlockType<V: BlockVersion>: 'static {
     /// The attribute set for this block type.
-    type Attributes: BlockAttrs;
+    type Attributes: BlockAttributes;
 
     /// The names and types of the attributes for this block type.
     const ATTRDATA: &'static [(&'static str, TypeId)];

@@ -1,7 +1,7 @@
 //! TODO
 
 mod attribute;
-pub use attribute::{BlockAttr, BlockAttrs};
+pub use attribute::{BlockAttribute, BlockAttributes};
 
 mod behavior;
 pub use behavior::BlockBehavior;

@@ -304,7 +304,7 @@ struct Plains;
 impl BiomeType<TestVersion> for Plains {
     const METADATA: &'static BiomeMetadata = {
         static STATIC: BiomeMetadata = unsafe {
-            use froglight_biome::biome::BiomeFeatures;
+            use froglight_biome::biome::{BiomeAttributeSet, BiomeFeatureSet};
             use froglight_common::prelude::Identifier;
 
             BiomeMetadata::new::<Plains, TestVersion>(
@@ -316,7 +316,8 @@ impl BiomeType<TestVersion> for Plains {
                 true,
                 0.0,
                 0.0,
-                BiomeFeatures::empty(),
+                BiomeAttributeSet::empty(),
+                BiomeFeatureSet::empty(),
             )
         };
         &STATIC
@@ -331,7 +332,7 @@ struct Forest;
 impl BiomeType<TestVersion> for Forest {
     const METADATA: &'static BiomeMetadata = {
         static STATIC: BiomeMetadata = unsafe {
-            use froglight_biome::biome::BiomeFeatures;
+            use froglight_biome::biome::{BiomeAttributeSet, BiomeFeatureSet};
             use froglight_common::prelude::Identifier;
 
             BiomeMetadata::new::<Forest, TestVersion>(
@@ -343,7 +344,8 @@ impl BiomeType<TestVersion> for Forest {
                 true,
                 0.0,
                 0.0,
-                BiomeFeatures::empty(),
+                BiomeAttributeSet::empty(),
+                BiomeFeatureSet::empty(),
             )
         };
         &STATIC

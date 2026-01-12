@@ -1,7 +1,7 @@
 use core::any::TypeId;
 
 /// A block attribute.
-pub trait BlockAttr: Copy + Eq + Sized + 'static {
+pub trait BlockAttribute: Copy + Eq + Sized + 'static {
     /// The possible states for this attribute, in order.
     const STATES: &'static [(&'static str, Self)];
 
@@ -39,7 +39,7 @@ pub trait BlockAttr: Copy + Eq + Sized + 'static {
 }
 
 /// A set of block attributes.
-pub trait BlockAttrs: Sized + 'static {
+pub trait BlockAttributes: Sized + 'static {
     /// The number of attributes in this set.
     const SIZE: usize;
     /// The total number of possible states.
@@ -51,9 +51,9 @@ pub trait BlockAttrs: Sized + 'static {
     fn from_set_index(index: usize) -> Option<Self>;
 
     /// Get the value of a specific attribute.
-    fn get_attr<A: BlockAttr>(&self) -> Option<A>;
+    fn get_attr<A: BlockAttribute>(&self) -> Option<A>;
     /// Set the value of a specific attribute.
-    fn set_attr<A: BlockAttr>(&mut self, attr: A) -> Option<A>;
+    fn set_attr<A: BlockAttribute>(&mut self, attr: A) -> Option<A>;
 
     /// Get the name of an attribute by its index in the set.
     fn get_attr_str(&self, index: usize) -> Option<&'static str>;
@@ -63,7 +63,7 @@ pub trait BlockAttrs: Sized + 'static {
 
 // -------------------------------------------------------------------------------------------------
 
-impl BlockAttrs for () {
+impl BlockAttributes for () {
     const SIZE: usize = 1;
     const TOTAL: u16 = 1;
 
@@ -71,18 +71,18 @@ impl BlockAttrs for () {
 
     fn from_set_index(index: usize) -> Option<Self> { (index == 0).then_some(()) }
 
-    fn get_attr<A: BlockAttr>(&self) -> Option<A> {
+    fn get_attr<A: BlockAttribute>(&self) -> Option<A> {
         if TypeId::of::<A>() == TypeId::of::<()>() { A::from_index(0) } else { None }
     }
 
-    fn set_attr<A: BlockAttr>(&mut self, _: A) -> Option<A> { self.get_attr::<A>() }
+    fn set_attr<A: BlockAttribute>(&mut self, _: A) -> Option<A> { self.get_attr::<A>() }
 
     fn get_attr_str(&self, _: usize) -> Option<&'static str> { None }
 
     fn set_attr_str(&mut self, _: usize, _: &str) -> Option<&'static str> { None }
 }
 
-impl<T0: BlockAttr> BlockAttrs for T0 {
+impl<T0: BlockAttribute> BlockAttributes for T0 {
     const SIZE: usize = 1;
     #[allow(
         clippy::cast_possible_truncation,
@@ -94,7 +94,7 @@ impl<T0: BlockAttr> BlockAttrs for T0 {
 
     fn from_set_index(index: usize) -> Option<Self> { Self::from_index(index) }
 
-    fn get_attr<A: BlockAttr>(&self) -> Option<A> {
+    fn get_attr<A: BlockAttribute>(&self) -> Option<A> {
         if TypeId::of::<Self>() == TypeId::of::<A>() {
             A::from_index(self.to_index())
         } else {
@@ -102,7 +102,7 @@ impl<T0: BlockAttr> BlockAttrs for T0 {
         }
     }
 
-    fn set_attr<A: BlockAttr>(&mut self, attr: A) -> Option<A> {
+    fn set_attr<A: BlockAttribute>(&mut self, attr: A) -> Option<A> {
         if TypeId::of::<Self>() == TypeId::of::<A>()
             && let Some(new) = Self::from_index(attr.to_index())
             && let Some(old) = A::from_index(self.to_index())
@@ -131,7 +131,7 @@ impl<T0: BlockAttr> BlockAttrs for T0 {
     }
 }
 
-impl<T0: BlockAttrs> BlockAttrs for (T0,) {
+impl<T0: BlockAttributes> BlockAttributes for (T0,) {
     const SIZE: usize = 1;
     const TOTAL: u16 = T0::TOTAL;
 
@@ -142,10 +142,10 @@ impl<T0: BlockAttrs> BlockAttrs for (T0,) {
     fn from_set_index(index: usize) -> Option<Self> { T0::from_set_index(index).map(|t0| (t0,)) }
 
     #[inline]
-    fn get_attr<A: BlockAttr>(&self) -> Option<A> { self.0.get_attr() }
+    fn get_attr<A: BlockAttribute>(&self) -> Option<A> { self.0.get_attr() }
 
     #[inline]
-    fn set_attr<A: BlockAttr>(&mut self, attr: A) -> Option<A> { self.0.set_attr::<A>(attr) }
+    fn set_attr<A: BlockAttribute>(&mut self, attr: A) -> Option<A> { self.0.set_attr::<A>(attr) }
 
     #[inline]
     fn get_attr_str(&self, index: usize) -> Option<&'static str> { self.0.get_attr_str(index) }
@@ -168,7 +168,7 @@ macro_rules! implement {
 
     ($($T:ident),*) => {
         #[allow(non_snake_case, unused_assignments, reason = "Macro expansion")]
-        impl<$($T: BlockAttr),*> BlockAttrs for ($($T,)*) {
+        impl<$($T: BlockAttribute),*> BlockAttributes for ($($T,)*) {
             const SIZE: usize = 0 + implement!(@count $($T),*) ;
             #[allow(clippy::cast_possible_truncation, reason = "There should never be enough states to overflow a u16")]
             const TOTAL: u16 = 1 $( * $T::STATES.len() as u16 )* ;
@@ -202,7 +202,7 @@ macro_rules! implement {
                 }
             }
 
-            fn get_attr<A: BlockAttr>(&self) -> Option<A> {
+            fn get_attr<A: BlockAttribute>(&self) -> Option<A> {
                 let ($($T),*) = self;
                 $(
                     if TypeId::of::<A>() == TypeId::of::<$T>() {
@@ -211,7 +211,7 @@ macro_rules! implement {
                 )*
                 None
             }
-            fn set_attr<A: BlockAttr>(&mut self, attr: A) -> Option<A> {
+            fn set_attr<A: BlockAttribute>(&mut self, attr: A) -> Option<A> {
                 let ($($T),*) = self;
                 $(
                     if TypeId::of::<A>() == TypeId::of::<$T>() {

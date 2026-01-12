@@ -1,3 +1,5 @@
+use crate::biome::Biome;
+
 /// A unique identifier for a biome,
 /// relative to all other biomes.
 #[repr(transparent)]
@@ -19,6 +21,10 @@ impl GlobalId {
 impl<T: Into<u32>> From<T> for GlobalId {
     fn from(value: T) -> Self { GlobalId(value.into()) }
 }
+impl From<Biome> for GlobalId {
+    fn from(value: Biome) -> Self { value.global_id() }
+}
+
 impl<T: PartialEq<u32>> PartialEq<T> for GlobalId {
     fn eq(&self, other: &T) -> bool { other.eq(&self.0) }
 }

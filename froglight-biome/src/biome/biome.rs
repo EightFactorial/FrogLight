@@ -79,7 +79,7 @@ impl Biome {
     /// Returns `true` if this biome is of type `B`.
     #[inline]
     #[must_use]
-    pub fn is_block<B: 'static>(&self) -> bool { self.reference.is_biome::<B>() }
+    pub fn is_biome<B: 'static>(&self) -> bool { self.reference.is_biome::<B>() }
 
     /// Returns `true` if this biome is of version `V`.
     #[inline]

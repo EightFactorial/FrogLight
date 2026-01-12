@@ -7,7 +7,7 @@ use froglight_common::identifier::Identifier;
 
 use crate::{
     atomic::{MaybeAtomicU16, MaybeAtomicU32},
-    block::{BlockAttr, BlockAttrs, BlockBehavior, BlockType, GlobalId, StateId},
+    block::{BlockAttribute, BlockAttributes, BlockBehavior, BlockType, GlobalId, StateId},
     version::BlockVersion,
 };
 
@@ -141,7 +141,7 @@ impl BlockMetadata {
 
     /// Get the value of an attribute for a given state.
     #[must_use]
-    pub fn get_attribute<A: BlockAttr>(&self, state: StateId) -> Option<A> {
+    pub fn get_attribute<A: BlockAttribute>(&self, state: StateId) -> Option<A> {
         self.attr_data.iter().find_map(|(name, ty)| {
             if *ty == TypeId::of::<A>() {
                 self.get_attribute_str(state, name).and_then(A::from_name)
@@ -171,7 +171,7 @@ impl BlockMetadata {
     ///
     /// Returns the new [`StateId`] and the old value if successful.
     #[must_use]
-    pub fn set_attribute<A: BlockAttr>(
+    pub fn set_attribute<A: BlockAttribute>(
         &self,
         state: StateId,
         attribute: A,
