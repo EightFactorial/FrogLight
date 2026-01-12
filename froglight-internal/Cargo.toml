@@ -27,6 +27,7 @@ froglight-math = { workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 
 # Optional dependencies
+bevy_app = { workspace = true, optional = true }
 
 # --- Features ---
 
@@ -34,7 +35,7 @@ froglight-world = { features = ["froglight-biome", "froglight-block"], workspace
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["froglight-common/bevy", "froglight-math/bevy", "froglight-world/bevy"]
+bevy = ["dep:bevy_app", "froglight-common/bevy", "froglight-math/bevy", "froglight-world/bevy"]
 # Enable `tracing` support.
 tracing = ["froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-world/tracing"]
 

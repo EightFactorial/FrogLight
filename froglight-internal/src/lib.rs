@@ -9,11 +9,9 @@ pub use froglight_registry as registry;
 pub use froglight_world as world;
 
 #[cfg(feature = "bevy")]
-pub mod plugins {
-    //! Re-exports of all provided bevy plugins.
-
-    pub use crate::{common::bevy::CommonPlugin, world::bevy::WorldPlugin};
-}
+mod bevy;
+#[cfg(feature = "bevy")]
+pub use bevy::*;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
