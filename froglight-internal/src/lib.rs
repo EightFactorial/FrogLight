@@ -8,6 +8,13 @@ pub use froglight_math as math;
 pub use froglight_registry as registry;
 pub use froglight_world as world;
 
+#[cfg(feature = "bevy")]
+pub mod plugins {
+    //! Re-exports of all provided bevy plugins.
+
+    pub use crate::{common::bevy::CommonPlugin, world::bevy::WorldPlugin};
+}
+
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 

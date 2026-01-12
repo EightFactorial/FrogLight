@@ -10,10 +10,10 @@ use bevy_reflect::Reflect;
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]
 #[reflect(Debug, Clone, PartialEq, Hash, Component)]
-pub struct ChunkOfInstance(Entity);
+pub struct EntityOfInstance(Entity);
 
-impl ChunkOfInstance {
-    /// Creates a new [`ChunkOfInstance`].
+impl EntityOfInstance {
+    /// Creates a new [`EntityOfInstance`].
     #[inline]
     #[must_use]
     pub const fn new(entity: Entity) -> Self { Self(entity) }
@@ -26,15 +26,15 @@ impl ChunkOfInstance {
 
 // -------------------------------------------------------------------------------------------------
 
-impl Deref for ChunkOfInstance {
+impl Deref for EntityOfInstance {
     type Target = Entity;
 
     fn deref(&self) -> &Self::Target { &self.0 }
 }
 
-impl From<Entity> for ChunkOfInstance {
+impl From<Entity> for EntityOfInstance {
     fn from(entity: Entity) -> Self { Self::new(entity) }
 }
-impl From<ChunkOfInstance> for Entity {
-    fn from(entity: ChunkOfInstance) -> Self { entity.0 }
+impl From<EntityOfInstance> for Entity {
+    fn from(entity: EntityOfInstance) -> Self { entity.0 }
 }

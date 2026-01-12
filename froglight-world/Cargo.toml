@@ -61,7 +61,7 @@ froglight-block = ["dep:froglight-block"]
 # Enable `serde` support.
 serde = ["dep:serde", "smallvec/serde"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing"]
+tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing", "froglight-common/tracing"]
 
 # Add async locking support
 async = ["dep:async-lock", "froglight-biome?/async", "froglight-block?/async"]
