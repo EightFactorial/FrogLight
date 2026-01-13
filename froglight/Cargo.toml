@@ -35,6 +35,8 @@ tracing = ["froglight-internal/tracing"]
 libm = ["froglight-internal/libm"]
 # Enable `parking_lot` for `no_std` support.
 parking_lot = ["froglight-internal/parking_lot"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["froglight-internal/once_cell"]
 
 # Enable support for the standard library
 std = ["froglight-internal/std"]

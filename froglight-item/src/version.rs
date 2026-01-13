@@ -10,13 +10,13 @@ use crate::storage::ItemStorage;
 pub trait ItemVersion: Version {
     /// The [`GlobalItemStorage`] for this [`Version`].
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-    const BLOCKS: &'static GlobalItemStorage;
+    const ITEMS: &'static GlobalItemStorage;
 
     /// Get the [`GlobalItemStorage`] for this [`Version`].
     #[inline]
     #[must_use]
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-    fn items() -> &'static GlobalItemStorage { Self::BLOCKS }
+    fn items() -> &'static GlobalItemStorage { Self::ITEMS }
 
     /// Create a new [`ItemStorage`] for this [`Version`].
     ///

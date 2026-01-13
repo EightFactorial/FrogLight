@@ -22,7 +22,7 @@ impl Item {
     /// Create a new [`Item`] of the given type.
     #[inline]
     #[must_use]
-    pub fn new<B: ItemType<V>, V: ItemVersion>() -> Self { Self::new_from(B::METADATA) }
+    pub fn new<I: ItemType<V>, V: ItemVersion>() -> Self { Self::new_from(I::METADATA) }
 
     /// Create a new [`Item`] from the given metadata.
     ///
@@ -88,7 +88,7 @@ impl Item {
     /// Returns `true` if this item is of type `B`.
     #[inline]
     #[must_use]
-    pub fn is_item<B: 'static>(&self) -> bool { self.reference.is_item::<B>() }
+    pub fn is_item<I: 'static>(&self) -> bool { self.reference.is_item::<I>() }
 
     /// Returns `true` if this item is of version `V`.
     #[inline]

@@ -11,7 +11,7 @@ froglight-block = { default-features = false, path = "froglight-block", version 
 froglight-common = { default-features = false, path = "froglight-common", version = "0.0.1" }
 # froglight-entity = { default-features = false, path = "froglight-entity" }
 froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
-# froglight-inventory = { default-features = false, path = "froglight-inventory" }
+froglight-inventory = { default-features = false, path = "froglight-inventory", version = "0.0.1" }
 froglight-item = { default-features = false,  path = "froglight-item", version = "0.0.1" }
 froglight-math = { default-features = false, path = "froglight-math" }
 # froglight-network = { default-features = false, path = "froglight-network" }
@@ -82,7 +82,7 @@ members = [
   "froglight-common",
   # "froglight-entity",
   "froglight-internal",
-  # "froglight-inventory",
+  "froglight-inventory",
   "froglight-item",
   "froglight-math",
   # "froglight-network",

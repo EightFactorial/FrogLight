@@ -7,7 +7,8 @@ use froglight_common::prelude::Identifier;
 
 use crate::{
     atomic::MaybeAtomicU32,
-    item::{GlobalId, ComponentData},
+    item::{ComponentData, GlobalId, ItemType},
+    version::ItemVersion,
 };
 
 /// Metadata about an item type.
@@ -27,6 +28,27 @@ pub struct ItemMetadata {
 }
 
 impl ItemMetadata {
+    /// Create a new [`ItemMetadata`].
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the `global_id` value is correct for the
+    /// [`ItemStorage`](crate::storage::ItemStorage) it will be used in.
+    #[must_use]
+    pub const unsafe fn new<I: ItemType<V>, V: ItemVersion>(
+        identifier: Identifier<'static>,
+        global_id: u32,
+        default_data: ComponentData,
+    ) -> Self {
+        Self {
+            identifier,
+            global_id: MaybeAtomicU32::new(global_id),
+            default_data,
+            item_ty: TypeId::of::<I>(),
+            version_ty: TypeId::of::<V>(),
+        }
+    }
+
     /// Get the string identifier of this item.
     #[inline]
     #[must_use]
@@ -52,7 +74,7 @@ impl ItemMetadata {
 
     /// Returns `true` if this item is of type `B`.
     #[must_use]
-    pub fn is_item<B: 'static>(&self) -> bool { self.item_ty == TypeId::of::<B>() }
+    pub fn is_item<I: 'static>(&self) -> bool { self.item_ty == TypeId::of::<I>() }
 
     /// Returns `true` if this item is of version `V`.
     #[must_use]

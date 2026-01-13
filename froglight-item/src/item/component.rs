@@ -27,15 +27,14 @@ impl ComponentData {
     ///
     /// Returns an error if the component could not be read.
     pub fn get<C: ComponentType<V>, V: ItemVersion>(&self) -> Result<Option<C>, C::Error> {
-        let component = self.raw; // .get_compound(C::IDENTIFIER)?;
+        let component = self.raw; // .get(C::IDENTIFIER)?;
         C::from_nbt_data(&component).map(Some)
     }
 
     /// Set the component of the given type in this data.
     #[inline]
-    pub fn set<C: ComponentType<V>, V: ItemVersion>(&mut self, component: &C) {
-        let nbt_data = component.to_nbt_data();
-        self.raw = nbt_data; // .set_compound(C::IDENTIFIER, nbt_data);
+    pub fn set<C: ComponentType<V>, V: ItemVersion>(&mut self, _component: &C) {
+        // self.nbt.insert(C::IDENTIFIER, component.to_nbt_data());
     }
 
     /// Get a reference to the raw NBT data.

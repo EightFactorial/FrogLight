@@ -1,0 +1,46 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-inventory"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+froglight-common = { workspace = true, features = ["alloc"] }
+froglight-item = { workspace = true, features = ["alloc"] }
+indexmap = { workspace = true }
+foldhash = { workspace = true }
+
+# Optional dependencies
+bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
+bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+once_cell = { features = ["critical-section"], workspace = true, optional = true }
+
+# --- Features ---
+
+[features]
+default = ["std"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect"]
+# Enable `once_cell` for `no_std` support.
+once_cell = ["dep:once_cell"]
+
+# Enable support for the standard library
+std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "froglight-common/std", "froglight-item/std", "indexmap/std"]
+# Enable optimizations using the nightly toolchain
+nightly = ["froglight-common/nightly", "froglight-item/nightly", "std"]
