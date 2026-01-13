@@ -1,3 +1,5 @@
+#![allow(unit_bindings, clippy::let_unit_value, reason = "Placeholder")]
+
 use froglight_common::prelude::Identifier;
 
 use crate::version::ItemVersion;
@@ -24,7 +26,6 @@ impl ComponentData {
     /// # Errors
     ///
     /// Returns an error if the component could not be read.
-    #[must_use]
     pub fn get<C: ComponentType<V>, V: ItemVersion>(&self) -> Result<Option<C>, C::Error> {
         let component = self.raw; // .get_compound(C::IDENTIFIER)?;
         C::from_nbt_data(&component).map(Some)
