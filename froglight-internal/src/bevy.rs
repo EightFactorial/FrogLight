@@ -3,7 +3,7 @@ use bevy_app::{PluginGroup, PluginGroupBuilder};
 pub mod plugins {
     //! Re-exports of all provided bevy [`Plugin`](bevy_app::Plugin)s.
 
-    pub use crate::{FroglightPlugins, common::bevy::CommonPlugin, world::bevy::WorldPlugin};
+    pub use crate::{bevy::FroglightPlugins, common::bevy::CommonPlugin, world::bevy::WorldPlugin};
 }
 
 /// A [`PluginGroup`] that includes all of froglight's bevy

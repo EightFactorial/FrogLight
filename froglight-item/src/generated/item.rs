@@ -1,0 +1,3 @@
+//! Item types
+//!
+//! @generated

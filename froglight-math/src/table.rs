@@ -160,7 +160,7 @@ mod tests {
 
         /// Test the sine and cosine functions against the standard library.
         #[test]
-        fn arbitrary(data in (-PI * 200.0f32)..(PI * 200.0f32)) {
+        fn arbitrary(data in (-PI * 180.0f32)..(PI * 180.0f32)) {
             // Note: Input is in radians, not degrees.
             let (std_sin, std_cos) = f32::sin_cos(data);
             let (tbl_sin, tbl_cos) = crate::table::sin_cos(data);

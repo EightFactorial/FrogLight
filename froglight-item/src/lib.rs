@@ -7,17 +7,14 @@ extern crate alloc;
 extern crate std;
 
 pub(crate) mod atomic;
-pub mod biome;
 pub mod generated;
+pub mod item;
 pub mod storage;
 pub mod version;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{
-        biome::{AttributeType, Biome, BiomeType, FeatureType},
-        generated::biome,
-        version::BiomeVersion,
-    };
+    pub use crate::{generated::item, version::ItemVersion};
+    // pub use crate::item::{Item, ItemType};
 }

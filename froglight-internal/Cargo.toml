@@ -23,6 +23,7 @@ froglight-biome = { workspace = true }
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-registry = { workspace = true }
+froglight-item = { features = ["froglight-block"], workspace = true }
 froglight-math = { workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 
@@ -37,14 +38,14 @@ default = ["std"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "froglight-common/bevy", "froglight-math/bevy", "froglight-world/bevy"]
 # Enable `tracing` support.
-tracing = ["froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-world/tracing"]
+tracing = ["froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-item/tracing", "froglight-world/tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block/libm", "froglight-math/libm", "froglight-world/libm"]
 # Enable `parking_lot` for `no_std` support.
-parking_lot = ["froglight-biome/parking_lot", "froglight-block/parking_lot", "froglight-registry/parking_lot", "froglight-world/parking_lot"]
+parking_lot = ["froglight-biome/parking_lot", "froglight-block/parking_lot", "froglight-item/parking_lot", "froglight-registry/parking_lot", "froglight-world/parking_lot"]
 
 # Enable support for the standard library
-std = ["froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-math/std", "froglight-registry/std", "froglight-world/std"]
+std = ["froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-item/std", "froglight-math/std", "froglight-registry/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-math/nightly", "froglight-registry/nightly", "froglight-world/nightly", "std"]
+nightly = ["froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-item/nightly", "froglight-math/nightly", "froglight-registry/nightly", "froglight-world/nightly", "std"]
