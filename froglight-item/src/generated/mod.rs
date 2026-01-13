@@ -5,10 +5,12 @@
 
 #[expect(unused, reason = "WIP")]
 macro_rules! generate {
+    (@components) => {};
     (@items) => {};
     (@version) => {};
 }
 
+pub mod component;
 pub mod item;
 
 // -------------------------------------------------------------------------------------------------

@@ -15,6 +15,9 @@ pub mod version;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{generated::item, version::ItemVersion};
-    // pub use crate::item::{Item, ItemType};
+    pub use crate::{
+        generated::{component as item_component, item},
+        item::{Item, ItemType},
+        version::ItemVersion,
+    };
 }

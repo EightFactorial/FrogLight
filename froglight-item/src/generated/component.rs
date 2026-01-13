@@ -1,0 +1,3 @@
+//! Item component types
+//!
+//! @generated

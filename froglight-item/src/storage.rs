@@ -10,9 +10,7 @@ use async_lock::RwLock;
 #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
 use parking_lot::RwLock;
 
-// use crate::item::{Item, ItemMetadata, GlobalId};
-
-type ItemMetadata = ();
+use crate::item::{GlobalId, Item, ItemMetadata};
 
 /// A thread-safe container for a [`ItemStorage`].
 #[repr(transparent)]
@@ -136,27 +134,17 @@ impl ItemStorage {
         Self { inner: StorageInner::Runtime(vec) }
     }
 
-    // /// Get the [`Item`] for a given [`GlobalId`].
-    // #[must_use]
-    // pub fn get_item(&self, id: GlobalId) -> Option<Item> {
-    //     let metadata = self.get_metadata(id)?;
-    //     let state =
-    // id.into_inner().saturating_sub(metadata.base_id().into_inner());
-    //     let state = StateId::new(u16::try_from(state).ok()?);
-    //
-    //     if state.into_inner() < metadata.state_count() {
-    //         // SAFETY: We just checked if the state is valid for this metadata.
-    //         Some(unsafe { Item::new_unchecked(state, metadata) })
-    //     } else {
-    //         None
-    //     }
-    // }
+    /// Get the [`Item`] for a given [`GlobalId`].
+    #[must_use]
+    pub fn get_item(&self, id: GlobalId) -> Option<Item> {
+        self.get_metadata(id).map(Item::new_from)
+    }
 
-    // /// Get the [`ItemMetadata`] for a given [`GlobalId`].
-    // #[must_use]
-    // pub fn get_metadata(&self, id: GlobalId) -> Option<&'static ItemMetadata> {
-    //     self.to_ref().get(id.into_inner() as usize).copied()
-    // }
+    /// Get the [`ItemMetadata`] for a given [`GlobalId`].
+    #[must_use]
+    pub fn get_metadata(&self, id: GlobalId) -> Option<&'static ItemMetadata> {
+        self.to_ref().get(id.into_inner() as usize).copied()
+    }
 
     /// Get an immutable reference to underlying storage.
     #[must_use]
