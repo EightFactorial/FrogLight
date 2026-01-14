@@ -63,8 +63,14 @@ impl InventoryPlugins {
     /// Panics if the inventory plugins have already been initialized.
     pub fn initialize(mut plugins: IndexMap<TypeId, ReflectInventory, RandomState>) {
         plugins.sort_unstable_by_key(|_, r| r.identifier().reborrow().into_owned());
-        INSTANCE.set(plugins).unwrap_or_else(|err| {
-            panic!("InventoryPlugins have already been initialized:\n  Current: {:?}\n->\n  Attempted: {err:?}", Self::get_map());
+
+        #[cfg(feature = "tracing")]
+        for plugin in plugins.values() {
+            tracing::debug!(target: "froglight_inventory", "Initializing the \"{}\" InventoryPlugin", plugin.identifier());
+        }
+
+        INSTANCE.set(plugins).unwrap_or_else(|input| {
+            panic!("InventoryPlugins have already been initialized:\n  Current: {:?}\n->\n  Attempted: {input:?}", Self::get_map());
         });
     }
 }
@@ -94,11 +100,6 @@ pub trait InventoryPluginType: 'static {
     /// Get a specific item slot in the [`Inventory`].
     fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<usize, Option<Item>>;
 
-    /// Get all item slots in the [`Inventory`].
-    fn get_slot_all(
-        inventory: &Inventory,
-    ) -> InventoryResult<(), IndexMap<usize, Item, RandomState>>;
-
     /// Set a specific item slot in the [`Inventory`].
     fn set_slot(
         inventory: &mut Inventory,
@@ -119,10 +120,18 @@ pub trait InventoryPluginType: 'static {
     ) -> InventoryResult<Identifier<'static>, ()>;
 
     /// Query whether a menu is enabled in the [`Inventory`].
-    fn query_menu(
+    fn query_menu_status(
         inventory: &Inventory,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, bool>;
+
+    /// Get all item slots of a menu in the [`Inventory`].
+    ///
+    /// Returns an empty map if the menu is disabled.
+    fn query_menu_slots(
+        inventory: &Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>>;
 }
 
 /// The result of an [`InventoryPluginType`] operation.

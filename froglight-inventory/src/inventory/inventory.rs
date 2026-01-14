@@ -37,20 +37,6 @@ impl Inventory {
         None
     }
 
-    /// Get all [`Item`]s in the [`Inventory`].
-    #[must_use]
-    pub fn get_slot_all(&self) -> IndexMap<usize, Item, RandomState> {
-        let mut result = IndexMap::with_hasher(RandomState::default());
-        for plugin in InventoryPlugins::get_map().values() {
-            match plugin.get_slot_all(self) {
-                InventoryResult::Passthrough(()) => {}
-                InventoryResult::Complete(part) => result.extend(part),
-            }
-        }
-        result.sort_unstable_keys();
-        result
-    }
-
     /// Set the [`Item`] in the specified slot.
     ///
     /// Returns `true` if the item was set successfully, `false` otherwise.
@@ -98,9 +84,26 @@ impl Inventory {
     /// Returns `Some(true)` if the menu is enabled, `Some(false)` if disabled,
     /// or `None` if the menu does not exist.
     #[must_use]
-    pub fn query_menu(&self, mut menu: Identifier<'static>) -> Option<bool> {
+    pub fn query_menu_status(&self, mut menu: Identifier<'static>) -> Option<bool> {
         for plugin in InventoryPlugins::get_map().values() {
-            match plugin.query_menu(self, menu) {
+            match plugin.query_menu_status(self, menu) {
+                InventoryResult::Passthrough(pass) => menu = pass,
+                InventoryResult::Complete(result) => return Some(result),
+            }
+        }
+        None
+    }
+
+    /// Query the slots of a menu within the [`Inventory`].
+    ///
+    /// Returns `None` if the menu does not exist.
+    #[must_use]
+    pub fn query_menu_slots(
+        &self,
+        mut menu: Identifier<'static>,
+    ) -> Option<IndexMap<usize, Item, RandomState>> {
+        for plugin in InventoryPlugins::get_map().values() {
+            match plugin.query_menu_slots(self, menu) {
                 InventoryResult::Passthrough(pass) => menu = pass,
                 InventoryResult::Complete(result) => return Some(result),
             }
@@ -123,7 +126,6 @@ impl Inventory {
     /// Set plugin data of type `T`.
     ///
     /// Returns any previous data of type `T` if it existed.
-    #[must_use]
     pub fn set_plugin_data<T: Send + Sync + 'static>(&mut self, data: T) -> Option<T> {
         let previous = self.plugin_data.swap_remove(&TypeId::of::<T>());
         self.plugin_data.insert(TypeId::of::<T>(), Box::new(data));

@@ -13,13 +13,18 @@ pub struct ReflectInventory {
     identifier: Identifier<'static>,
     initialize: fn(&mut Inventory),
     get_slot: fn(&Inventory, usize) -> InventoryResult<usize, Option<Item>>,
-    get_slot_all: fn(&Inventory) -> InventoryResult<(), IndexMap<usize, Item, RandomState>>,
     set_slot: fn(&mut Inventory, Option<Item>, usize) -> InventoryResult<(Option<Item>, usize), ()>,
     enable_menu:
         fn(&mut Inventory, Identifier<'static>) -> InventoryResult<Identifier<'static>, ()>,
     disable_menu:
         fn(&mut Inventory, Identifier<'static>) -> InventoryResult<Identifier<'static>, ()>,
-    query_menu: fn(&Inventory, Identifier<'static>) -> InventoryResult<Identifier<'static>, bool>,
+    query_menu_status:
+        fn(&Inventory, Identifier<'static>) -> InventoryResult<Identifier<'static>, bool>,
+    query_menu_slots:
+        fn(
+            &Inventory,
+            Identifier<'static>,
+        ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>>,
 }
 
 impl ReflectInventory {
@@ -30,11 +35,11 @@ impl ReflectInventory {
             identifier: P::IDENTIFIER,
             initialize: P::initialize,
             get_slot: P::get_slot,
-            get_slot_all: P::get_slot_all,
             set_slot: P::set_slot,
             enable_menu: P::enable_menu,
             disable_menu: P::disable_menu,
-            query_menu: P::query_menu,
+            query_menu_status: P::query_menu_status,
+            query_menu_slots: P::query_menu_slots,
         }
     }
 
@@ -56,16 +61,6 @@ impl ReflectInventory {
         slot: usize,
     ) -> InventoryResult<usize, Option<Item>> {
         (self.get_slot)(inventory, slot)
-    }
-
-    /// Get all item slots in the [`Inventory`].
-    #[inline]
-    #[must_use]
-    pub fn get_slot_all(
-        &self,
-        inventory: &Inventory,
-    ) -> InventoryResult<(), IndexMap<usize, Item, RandomState>> {
-        (self.get_slot_all)(inventory)
     }
 
     /// Set a specific item slot in the [`Inventory`].
@@ -102,11 +97,24 @@ impl ReflectInventory {
     /// Query the status of a menu in the [`Inventory`].
     #[inline]
     #[must_use]
-    pub fn query_menu(
+    pub fn query_menu_status(
         &self,
         inventory: &Inventory,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, bool> {
-        (self.query_menu)(inventory, menu)
+        (self.query_menu_status)(inventory, menu)
+    }
+
+    /// Query the slots of a menu in the [`Inventory`].
+    ///
+    /// Returns an empty map if the menu is disabled.
+    #[inline]
+    #[must_use]
+    pub fn query_menu_slots(
+        &self,
+        inventory: &Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>> {
+        (self.query_menu_slots)(inventory, menu)
     }
 }

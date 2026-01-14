@@ -39,7 +39,7 @@ default = ["std"]
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-math/bevy", "froglight-world/bevy"]
 # Enable `tracing` support.
-tracing = ["froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-item/tracing", "froglight-world/tracing"]
+tracing = ["froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-world/tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block/libm", "froglight-math/libm", "froglight-world/libm"]

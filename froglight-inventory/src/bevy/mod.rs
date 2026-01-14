@@ -5,16 +5,22 @@ use bevy_ecs::reflect::AppTypeRegistry;
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 
-use crate::inventory::{InventoryPlugins, ReflectInventory};
+use crate::{
+    inventory::{InventoryPlugins, ReflectInventory},
+    plugin::player_inventory::PlayerInventoryPlugin,
+};
 
 mod reflect;
 
-/// A [`Plugin`] that adds ...
+/// A [`Plugin`] that initializes the [`InventoryPlugins`] registry.
+///
+/// Automatically gathers all types with [`ReflectInventory`] data
+/// and initializes [`InventoryPlugins`] during startup.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct InventoryPlugin;
 
 impl Plugin for InventoryPlugin {
-    fn build(&self, _app: &mut App) {}
+    fn build(&self, app: &mut App) { app.register_type::<PlayerInventoryPlugin>(); }
 
     fn finish(&self, app: &mut App) {
         let registry = app.world().resource::<AppTypeRegistry>();
@@ -26,6 +32,9 @@ impl Plugin for InventoryPlugin {
                 plugins.insert(ty.type_id(), reflect.clone());
             }
         }
+
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_inventory", "Discovered {} plugins from the `TypeRegistry`", plugins.len());
 
         InventoryPlugins::initialize(plugins);
     }

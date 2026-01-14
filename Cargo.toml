@@ -13,7 +13,7 @@ froglight-common = { default-features = false, path = "froglight-common", versio
 froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
 froglight-inventory = { default-features = false, path = "froglight-inventory", version = "0.0.1" }
 froglight-item = { default-features = false,  path = "froglight-item", version = "0.0.1" }
-froglight-math = { default-features = false, path = "froglight-math" }
+froglight-math = { default-features = false, path = "froglight-math", version = "0.0.1" }
 # froglight-network = { default-features = false, path = "froglight-network" }
 # froglight-packet = { default-features = false, path = "froglight-packet" }
 # froglight-physics = { default-features = false, path = "froglight-physics" }

@@ -8,6 +8,7 @@ extern crate std;
 #[cfg(feature = "bevy")]
 pub mod bevy;
 pub mod inventory;
+pub mod plugin;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
