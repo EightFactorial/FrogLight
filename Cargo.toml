@@ -61,7 +61,7 @@ unnecessary_cast = "warn"
 
 [workspace.dependencies]
 # Bevy
-bevy = { default-features = false, features = ["async_executor", "multi_threaded"], version = "0.16" }
+bevy = { default-features = false, features = ["async_executor", "multi_threaded"], version = "0.18" }
 bevy_app = { default-features = false, version = "0.16" }
 bevy_derive = { default-features = false, version = "0.16" }
 bevy_diagnostic = { default-features = false, version = "0.16" }
