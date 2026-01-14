@@ -12,6 +12,5 @@ pub mod inventory;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    /// TODO: Remove
-    pub struct InventoryPlaceholder;
+    pub use crate::inventory::Inventory;
 }

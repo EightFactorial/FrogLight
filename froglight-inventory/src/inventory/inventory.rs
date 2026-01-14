@@ -1,7 +1,10 @@
 use alloc::boxed::Box;
 use core::any::{Any, TypeId};
 
+#[cfg(feature = "bevy")]
+use bevy_ecs::component::Component;
 use foldhash::fast::RandomState;
+use froglight_common::prelude::Identifier;
 use froglight_item::item::Item;
 use indexmap::IndexMap;
 
@@ -10,8 +13,9 @@ use crate::inventory::InventoryPlugins;
 
 /// TODO
 #[derive(Debug)]
+#[cfg_attr(feature = "bevy", derive(Component))]
 pub struct Inventory {
-    plugin_data: IndexMap<TypeId, Box<dyn Any>, RandomState>,
+    plugin_data: IndexMap<TypeId, Box<dyn Any + Send + Sync>, RandomState>,
 }
 
 impl Inventory {
@@ -23,11 +27,11 @@ impl Inventory {
     ///
     /// Returns `None` if the slot is empty or does not exist.
     #[must_use]
-    pub fn get_slot(&self, slot: usize) -> Option<Item> {
+    pub fn get_slot(&self, mut slot: usize) -> Option<Item> {
         for plugin in InventoryPlugins::get_map().values() {
             match plugin.get_slot(self, slot) {
+                InventoryResult::Passthrough(pass) => slot = pass,
                 InventoryResult::Complete(result) => return result,
-                InventoryResult::Passthrough => {}
             }
         }
         None
@@ -39,8 +43,8 @@ impl Inventory {
         let mut result = IndexMap::with_hasher(RandomState::default());
         for plugin in InventoryPlugins::get_map().values() {
             match plugin.get_slot_all(self) {
+                InventoryResult::Passthrough(()) => {}
                 InventoryResult::Complete(part) => result.extend(part),
-                InventoryResult::Passthrough => {}
             }
         }
         result.sort_unstable_keys();
@@ -50,14 +54,58 @@ impl Inventory {
     /// Set the [`Item`] in the specified slot.
     ///
     /// Returns `true` if the item was set successfully, `false` otherwise.
-    pub fn set_slot(&mut self, item: Option<Item>, slot: usize) -> bool {
+    pub fn set_slot(&mut self, mut item: Option<Item>, mut slot: usize) -> bool {
         for plugin in InventoryPlugins::get_map().values() {
-            match plugin.set_slot(self, item.clone(), slot) {
+            match plugin.set_slot(self, item, slot) {
+                InventoryResult::Passthrough((pass_item, pass_slot)) => {
+                    item = pass_item;
+                    slot = pass_slot;
+                }
                 InventoryResult::Complete(()) => return true,
-                InventoryResult::Passthrough => {}
             }
         }
         false
+    }
+
+    /// Enable a menu within the [`Inventory`].
+    ///
+    /// Returns `true` if the menu was enabled successfully, `false` otherwise.
+    pub fn enable_menu(&mut self, mut menu: Identifier<'static>) -> bool {
+        for plugin in InventoryPlugins::get_map().values() {
+            match plugin.enable_menu(self, menu) {
+                InventoryResult::Passthrough(pass) => menu = pass,
+                InventoryResult::Complete(()) => return true,
+            }
+        }
+        false
+    }
+
+    /// Disable a menu within the [`Inventory`].
+    ///
+    /// Returns `true` if the menu was disabled successfully, `false` otherwise.
+    pub fn disable_menu(&mut self, mut menu: Identifier<'static>) -> bool {
+        for plugin in InventoryPlugins::get_map().values() {
+            match plugin.disable_menu(self, menu) {
+                InventoryResult::Passthrough(pass) => menu = pass,
+                InventoryResult::Complete(()) => return true,
+            }
+        }
+        false
+    }
+
+    /// Query the status of a menu within the [`Inventory`].
+    ///
+    /// Returns `Some(true)` if the menu is enabled, `Some(false)` if disabled,
+    /// or `None` if the menu does not exist.
+    #[must_use]
+    pub fn query_menu(&self, mut menu: Identifier<'static>) -> Option<bool> {
+        for plugin in InventoryPlugins::get_map().values() {
+            match plugin.query_menu(self, menu) {
+                InventoryResult::Passthrough(pass) => menu = pass,
+                InventoryResult::Complete(result) => return Some(result),
+            }
+        }
+        None
     }
 
     /// Get a reference to plugin data of type `T` if it exists.
@@ -76,7 +124,7 @@ impl Inventory {
     ///
     /// Returns any previous data of type `T` if it existed.
     #[must_use]
-    pub fn set_plugin_data<T: 'static>(&mut self, data: T) -> Option<T> {
+    pub fn set_plugin_data<T: Send + Sync + 'static>(&mut self, data: T) -> Option<T> {
         let previous = self.plugin_data.swap_remove(&TypeId::of::<T>());
         self.plugin_data.insert(TypeId::of::<T>(), Box::new(data));
         previous.and_then(|b| b.downcast::<T>().ok()).map(|b| *b)

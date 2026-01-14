@@ -92,19 +92,44 @@ pub trait InventoryPluginType: 'static {
     fn initialize(inventory: &mut Inventory);
 
     /// Get a specific item slot in the [`Inventory`].
-    fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<Option<Item>>;
+    fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<usize, Option<Item>>;
 
     /// Get all item slots in the [`Inventory`].
-    fn get_slot_all(inventory: &Inventory) -> InventoryResult<IndexMap<usize, Item, RandomState>>;
+    fn get_slot_all(
+        inventory: &Inventory,
+    ) -> InventoryResult<(), IndexMap<usize, Item, RandomState>>;
 
     /// Set a specific item slot in the [`Inventory`].
-    fn set_slot(inventory: &mut Inventory, item: Option<Item>, slot: usize) -> InventoryResult<()>;
+    fn set_slot(
+        inventory: &mut Inventory,
+        item: Option<Item>,
+        slot: usize,
+    ) -> InventoryResult<(Option<Item>, usize), ()>;
+
+    /// Enable a menu in the [`Inventory`].
+    fn enable_menu(
+        inventory: &mut Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, ()>;
+
+    /// Disable a menu in the [`Inventory`].
+    fn disable_menu(
+        inventory: &mut Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, ()>;
+
+    /// Query whether a menu is enabled in the [`Inventory`].
+    fn query_menu(
+        inventory: &Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, bool>;
 }
 
+/// The result of an [`InventoryPluginType`] operation.
 #[derive(Debug, Clone)]
-pub enum InventoryResult<T> {
-    /// A query that completed successfully.
-    Complete(T),
+pub enum InventoryResult<T, U> {
     /// A query that should be passed to the next plugin.
-    Passthrough,
+    Passthrough(T),
+    /// A query that completed successfully.
+    Complete(U),
 }
