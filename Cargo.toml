@@ -21,11 +21,11 @@ froglight-registry = { default-features = false, path = "froglight-registry", ve
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 
 # Bevy Dependencies
-bevy = { default-features = false, version = "0.18.0-rc.2" }
-bevy_app = { default-features = false, version = "0.18.0-rc.2" }
-bevy_ecs = { default-features = false, version = "0.18.0-rc.2" }
-bevy_math = { default-features = false, version = "0.18.0-rc.2" }
-bevy_reflect = { default-features = false, version = "0.18.0-rc.2" }
+bevy = { default-features = false, version = "0.18" }
+bevy_app = { default-features = false, version = "0.18" }
+bevy_ecs = { default-features = false, version = "0.18" }
+bevy_math = { default-features = false, version = "0.18" }
+bevy_reflect = { default-features = false, version = "0.18" }
 
 # Facet Dependencies
 facet = { default-features = false, version = "0.42" }
