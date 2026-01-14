@@ -7,17 +7,18 @@ use std::sync::OnceLock;
 
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
+use froglight_item::item::Item;
 use indexmap::IndexMap;
 #[cfg(all(feature = "once_cell", not(feature = "std")))]
 use once_cell::sync::OnceCell as OnceLock;
 
 use crate::inventory::{Inventory, ReflectInventory};
 
-static INSTANCE: OnceLock<IndexMap<TypeId, ReflectInventory, RandomState>> = OnceLock::new();
-
 /// A global registry of inventory plugins.
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct InventoryPlugins;
+
+static INSTANCE: OnceLock<IndexMap<TypeId, ReflectInventory, RandomState>> = OnceLock::new();
 
 impl InventoryPlugins {
     /// Get access to a specific inventory plugin by its type.
@@ -51,9 +52,20 @@ impl InventoryPlugins {
     /// # Panics
     ///
     /// Panics if the inventory plugins have already been initialized.
-    pub fn initialize(plugins: IndexMap<TypeId, ReflectInventory, RandomState>) {
-        // TODO: Sort plugins, using internal priority system?
-        INSTANCE.set(plugins).expect("InventoryPlugins have already been initialized!");
+    pub fn initialize_iter(plugins: impl Iterator<Item = (TypeId, ReflectInventory)>) {
+        Self::initialize(plugins.collect());
+    }
+
+    /// Initialize the inventory plugins registry with the given plugins.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the inventory plugins have already been initialized.
+    pub fn initialize(mut plugins: IndexMap<TypeId, ReflectInventory, RandomState>) {
+        plugins.sort_unstable_by_key(|_, r| r.identifier().reborrow().into_owned());
+        INSTANCE.set(plugins).unwrap_or_else(|err| {
+            panic!("InventoryPlugins have already been initialized:\n  Current: {:?}\n->\n  Attempted: {err:?}", Self::get_map());
+        });
     }
 }
 
@@ -76,37 +88,23 @@ pub trait InventoryPluginType: 'static {
     /// The identifier of this inventory plugin.
     const IDENTIFIER: Identifier<'static>;
 
-    /// Initialize the given [`Inventory`] with this plugin's data.
+    /// Initialize this plugin within the given [`Inventory`].
     fn initialize(inventory: &mut Inventory);
 
-    /// Handle a [`PluginEvent`].
-    fn event_handle(event: PluginEvent, inventory: &mut Inventory) -> PluginResult;
+    /// Get a specific item slot in the [`Inventory`].
+    fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<Option<Item>>;
+
+    /// Get all item slots in the [`Inventory`].
+    fn get_slot_all(inventory: &Inventory) -> InventoryResult<IndexMap<usize, Item, RandomState>>;
+
+    /// Set a specific item slot in the [`Inventory`].
+    fn set_slot(inventory: &mut Inventory, item: Option<Item>, slot: usize) -> InventoryResult<()>;
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PluginEvent {
-    /// A request to pick an item from the given slot.
-    PickItem { slot: usize },
-    /// A request to place an item into the given slot.
-    PlaceItem { slot: usize },
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PluginResult {
-    /// Pass the event to the next plugin.
-    Pass(PluginEvent),
-    /// Return a response and stop processing the event.
-    Complete(PluginResponse),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PluginResponse {
-    /// The event was accepted.
-    Accepted,
-    /// The event was rejected.
-    Rejected,
-    /// The event could not be processed.
-    ///
-    /// Considered equivalent to [`PluginResponse::Rejected`].
-    None,
+#[derive(Debug, Clone)]
+pub enum InventoryResult<T> {
+    /// A query that completed successfully.
+    Complete(T),
+    /// A query that should be passed to the next plugin.
+    Passthrough,
 }
