@@ -95,7 +95,12 @@ pub trait InventoryPluginType: 'static {
     const IDENTIFIER: Identifier<'static>;
 
     /// Initialize this plugin within the given [`Inventory`].
-    fn initialize(inventory: &mut Inventory);
+    ///
+    /// ## Note
+    ///
+    /// This method will be called once when an inventory is created,
+    /// regardless of whether the plugin is enabled or not.
+    fn initialize(_inventory: &mut Inventory) {}
 
     /// Get a specific item slot in the [`Inventory`].
     fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<usize, Option<Item>>;

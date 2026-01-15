@@ -5,6 +5,8 @@ use bevy_ecs::reflect::AppTypeRegistry;
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 
+#[cfg(feature = "froglight-entity")]
+use crate::plugin::entity_equipment::EntityEquipmentPlugin;
 use crate::{
     inventory::{InventoryPlugins, ReflectInventory},
     plugin::player_inventory::PlayerInventoryPlugin,
@@ -20,7 +22,11 @@ mod reflect;
 pub struct InventoryPlugin;
 
 impl Plugin for InventoryPlugin {
-    fn build(&self, app: &mut App) { app.register_type::<PlayerInventoryPlugin>(); }
+    fn build(&self, app: &mut App) {
+        app.register_type::<PlayerInventoryPlugin>();
+        #[cfg(feature = "froglight-entity")]
+        app.register_type::<EntityEquipmentPlugin>();
+    }
 
     fn finish(&self, app: &mut App) {
         let registry = app.world().resource::<AppTypeRegistry>();

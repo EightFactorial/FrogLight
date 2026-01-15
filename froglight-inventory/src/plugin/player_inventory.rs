@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::vec::Vec;
+use alloc::{vec, vec::Vec};
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
@@ -101,11 +101,9 @@ impl PlayerInventoryData {
 
 impl InventoryPluginType for PlayerInventoryPlugin {
     const IDENTIFIER: Identifier<'static> =
-        Identifier::new_static("minecraft:inventory/player_inventory");
+        Identifier::new_static("froglight:inventory/player_inventory");
 
-    fn initialize(inventory: &mut Inventory) {
-        inventory.set_plugin_data::<PlayerInventoryData>(PlayerInventoryData::default());
-    }
+    fn initialize(_: &mut Inventory) {}
 
     fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<usize, Option<Item>> {
         if let Some(data) = inventory.plugin_data_ref::<PlayerInventoryData>()
@@ -142,15 +140,17 @@ impl InventoryPluginType for PlayerInventoryPlugin {
         inventory: &mut Inventory,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()> {
-        if menu == Self::IDENTIFIER
-            && let Some(plugin) = inventory.plugin_data_mut::<PlayerInventoryData>()
-        {
-            // Initialize the inventory slots if they are empty.
-            if plugin.storage.is_empty() {
-                plugin.storage.resize(PlayerInventoryData::STORAGE_SIZE, None);
+        if menu == Self::IDENTIFIER {
+            if let Some(plugin) = inventory.plugin_data_mut::<PlayerInventoryData>() {
+                // Enable the plugin if it already exists
+                plugin.enabled = true;
+            } else {
+                // Initialize the plugin with empty storage
+                inventory.set_plugin_data(PlayerInventoryData {
+                    enabled: true,
+                    storage: vec![None; 30],
+                });
             }
-
-            plugin.enabled = true;
             InventoryResult::Complete(())
         } else {
             InventoryResult::Passthrough(menu)

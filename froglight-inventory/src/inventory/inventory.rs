@@ -11,7 +11,9 @@ use indexmap::IndexMap;
 use super::plugin::InventoryResult;
 use crate::inventory::InventoryPlugins;
 
-/// TODO
+/// An inventory that can hold items.
+///
+/// Uses internal plugins to manage slots and menus.
 #[derive(Debug)]
 #[cfg_attr(feature = "bevy", derive(Component))]
 pub struct Inventory {
