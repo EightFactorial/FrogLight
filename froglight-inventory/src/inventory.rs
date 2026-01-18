@@ -126,6 +126,14 @@ impl<G: PluginGroup> Inventory<G> {
         self.plugin_data.insert(TypeId::of::<T>(), Box::new(data));
         previous.and_then(|b| b.into_any().downcast::<T>().ok()).map(|b| *b)
     }
+
+    /// Get a reference to this [`Inventory`].
+    #[must_use]
+    pub fn as_ref(&self) -> InventoryRef<'_, '_> { InventoryRef::new(self) }
+
+    /// Get a mutable reference to this [`Inventory`].
+    #[must_use]
+    pub fn as_mut(&mut self) -> InventoryMut<'_, '_> { InventoryMut::new(self) }
 }
 
 #[cfg(feature = "bevy")]
@@ -178,20 +186,21 @@ pub struct InventoryMut<'inv, 'iter> {
     plugin_data: &'inv mut IndexMap<TypeId, Box<dyn MaybeReflect>, RandomState>,
 }
 
-/// An enum representing either a reference to or an owned [`Iterator`]
-/// function.
+/// An enum representing either a reference to or an owned function.
 enum IterFn<'inv, 'iter> {
+    /// A reference to a function that creates iterators.
     Ref(&'inv (dyn Fn() -> Box<dyn Iterator<Item = &'iter ReflectInventory> + 'iter> + 'inv)),
+    /// An owned function that creates iterators.
     Owned(Box<dyn Fn() -> Box<dyn Iterator<Item = &'iter ReflectInventory> + 'iter> + 'inv>),
 }
 
 impl<'iter> IterFn<'_, 'iter> {
     /// Reborrow the [`IterFn`] for a shorter lifetime.
     #[must_use]
-    const fn reborrow<'c>(&'c self) -> IterFn<'c, 'iter> {
-        match self {
+    const fn reborrow<'a>(&'a self) -> IterFn<'a, 'iter> {
+        match *self {
             IterFn::Ref(r) => IterFn::Ref(r),
-            IterFn::Owned(o) => IterFn::Ref(o),
+            IterFn::Owned(ref o) => IterFn::Ref(o),
         }
     }
 }
@@ -214,9 +223,8 @@ impl<'inv, 'iter> InventoryRef<'inv, 'iter> {
     /// Create a new [`InventoryRef`] that is valid within the context of the
     /// given function.
     ///
-    /// A very, very slight optimization over [`InventoryRef::new`] when you
-    /// only need to use the reference for a short period of time.
-    #[must_use]
+    /// A slight optimization over [`InventoryRef::new`] when you
+    /// don't need to return the reference.
     pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryRef<'_, 'inv>) -> R, R>(
         inventory: &'inv Inventory<G>,
         f: F,
@@ -311,9 +319,8 @@ impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
     /// Create a new [`InventoryMut`] that is valid within the context of the
     /// given function.
     ///
-    /// A very, very slight optimization over [`InventoryMut::new`] when you
-    /// only need to use the mutable reference for a short period of time.
-    #[must_use]
+    /// A slight optimization over [`InventoryMut::new`] when you
+    /// don't need to return the mutable reference.
     pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryMut<'_, 'inv>) -> R, R>(
         inventory: &'inv mut Inventory<G>,
         f: F,
