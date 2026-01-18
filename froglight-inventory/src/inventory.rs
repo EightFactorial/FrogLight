@@ -217,7 +217,7 @@ impl<'inv, 'iter> InventoryRef<'inv, 'iter> {
     /// A very, very slight optimization over [`InventoryRef::new`] when you
     /// only need to use the reference for a short period of time.
     #[must_use]
-    pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryRef) -> R, R>(
+    pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryRef<'_, 'inv>) -> R, R>(
         inventory: &'inv Inventory<G>,
         f: F,
     ) -> R {
@@ -314,7 +314,7 @@ impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
     /// A very, very slight optimization over [`InventoryMut::new`] when you
     /// only need to use the mutable reference for a short period of time.
     #[must_use]
-    pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryMut) -> R, R>(
+    pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryMut<'_, 'inv>) -> R, R>(
         inventory: &'inv mut Inventory<G>,
         f: F,
     ) -> R {
