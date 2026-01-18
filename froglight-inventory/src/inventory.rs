@@ -44,7 +44,9 @@ impl<G: PluginGroup> Inventory<G> {
         {
             let plugin_group = &inventory.plugin_group;
             let mut inv_mut = InventoryMut {
-                plugin_group: Box::new(|| Box::new(inventory.plugin_group.iter_plugins())),
+                plugin_group: IterFn::Owned(Box::new(|| {
+                    Box::new(inventory.plugin_group.iter_plugins())
+                })),
                 plugin_data: &mut inventory.plugin_data,
             };
             plugin_group.iter_plugins().for_each(|plugin| plugin.initialize(&mut inv_mut));
@@ -163,38 +165,58 @@ impl<G: PluginGroup + Default> Default for Inventory<G> {
 // -------------------------------------------------------------------------------------------------
 
 /// A reference to an [`Inventory`].
-pub struct InventoryRef<'a> {
-    plugin_group: Box<dyn Fn() -> Box<dyn Iterator<Item = &'a ReflectInventory> + 'a> + 'a>,
-    plugin_data: &'a IndexMap<TypeId, Box<dyn MaybeReflect>, RandomState>,
+pub struct InventoryRef<'inv, 'iter> {
+    plugin_group: IterFn<'inv, 'iter>,
+    plugin_data: &'inv IndexMap<TypeId, Box<dyn MaybeReflect>, RandomState>,
 }
 
 /// A mutable reference to an [`Inventory`].
-pub struct InventoryMut<'a> {
-    plugin_group: Box<dyn Fn() -> Box<dyn Iterator<Item = &'a ReflectInventory> + 'a> + 'a>,
-    plugin_data: &'a mut IndexMap<TypeId, Box<dyn MaybeReflect>, RandomState>,
+pub struct InventoryMut<'inv, 'iter> {
+    plugin_group: IterFn<'inv, 'iter>,
+    plugin_data: &'inv mut IndexMap<TypeId, Box<dyn MaybeReflect>, RandomState>,
 }
 
-impl<'a> InventoryRef<'a> {
+/// An enum representing either a reference to or an owned [`Iterator`]
+/// function.
+enum IterFn<'inv, 'iter> {
+    Ref(&'inv (dyn Fn() -> Box<dyn Iterator<Item = &'iter ReflectInventory> + 'iter> + 'inv)),
+    Owned(Box<dyn Fn() -> Box<dyn Iterator<Item = &'iter ReflectInventory> + 'iter> + 'inv>),
+}
+
+impl<'iter> IterFn<'_, 'iter> {
+    /// Reborrow the [`IterFn`] for a shorter lifetime.
+    #[must_use]
+    const fn reborrow<'c>(&'c self) -> IterFn<'c, 'iter> {
+        match self {
+            IterFn::Ref(r) => IterFn::Ref(r),
+            IterFn::Owned(o) => IterFn::Ref(o),
+        }
+    }
+}
+
+impl<'inv, 'iter> InventoryRef<'inv, 'iter> {
     /// Create a new [`InventoryRef`] from the given [`Inventory`].
     #[must_use]
-    pub fn new<G: PluginGroup>(inventory: &'a Inventory<G>) -> Self {
+    pub fn new<G: PluginGroup>(inventory: &'inv Inventory<G>) -> Self
+    where
+        'inv: 'iter,
+    {
         Self {
-            plugin_group: Box::new(|| Box::new(inventory.plugin_group.iter_plugins())),
+            plugin_group: IterFn::Owned(Box::new(|| {
+                Box::new(inventory.plugin_group.iter_plugins())
+            })),
             plugin_data: &inventory.plugin_data,
         }
     }
 
     /// Reborrow the [`InventoryRef`] for a shorter lifetime.
     #[must_use]
-    pub fn reborrow<'b: 'a>(&'b self) -> InventoryRef<'b> {
-        InventoryRef {
-            plugin_group: Box::new(|| (self.plugin_group)()),
-            plugin_data: self.plugin_data,
-        }
+    pub const fn reborrow<'c>(&'c self) -> InventoryRef<'c, 'iter> {
+        InventoryRef { plugin_group: self.plugin_group.reborrow(), plugin_data: self.plugin_data }
     }
 
     /// Get an iterator over the plugins used by this [`Inventory`].
-    pub fn plugins(&self) -> impl Iterator<Item = &'a ReflectInventory> { (self.plugin_group)() }
+    pub fn plugins(&self) -> impl Iterator<Item = &'iter ReflectInventory> { (self.plugin_group)() }
 
     /// Get the [`Item`] in the specified slot.
     ///
@@ -249,42 +271,41 @@ impl<'a> InventoryRef<'a> {
     }
 }
 
-impl<'a> InventoryMut<'a> {
+impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
     /// Create a new [`InventoryMut`] from the given [`Inventory`].
     #[must_use]
-    pub fn new<G: PluginGroup>(inventory: &'a mut Inventory<G>) -> Self {
+    pub fn new<G: PluginGroup>(inventory: &'inv mut Inventory<G>) -> Self
+    where
+        'inv: 'iter,
+    {
         Self {
-            plugin_group: Box::new(|| Box::new(inventory.plugin_group.iter_plugins())),
+            plugin_group: IterFn::Owned(Box::new(|| {
+                Box::new(inventory.plugin_group.iter_plugins())
+            })),
             plugin_data: &mut inventory.plugin_data,
         }
     }
 
     /// Reborrow the [`InventoryMut`] for a shorter lifetime.
     #[must_use]
-    pub fn reborrow<'b: 'a>(&'b mut self) -> InventoryMut<'b> {
-        InventoryMut {
-            plugin_group: Box::new(|| (self.plugin_group)()),
-            plugin_data: self.plugin_data,
-        }
+    pub const fn reborrow<'c>(&'c mut self) -> InventoryMut<'c, 'iter> {
+        InventoryMut { plugin_group: self.plugin_group.reborrow(), plugin_data: self.plugin_data }
     }
 
     /// Reborrow the [`InventoryMut`] as an [`InventoryRef`].
     #[must_use]
-    pub fn reborrow_ref<'b: 'a>(&'b self) -> InventoryRef<'b> {
-        InventoryRef {
-            plugin_group: Box::new(|| (self.plugin_group)()),
-            plugin_data: self.plugin_data,
-        }
+    pub const fn reborrow_ref<'c>(&'c self) -> InventoryRef<'c, 'iter> {
+        InventoryRef { plugin_group: self.plugin_group.reborrow(), plugin_data: self.plugin_data }
     }
 
     /// Get an iterator over the plugins used by this [`Inventory`].
-    pub fn plugins(&self) -> impl Iterator<Item = &'a ReflectInventory> { (self.plugin_group)() }
+    pub fn plugins(&self) -> impl Iterator<Item = &'iter ReflectInventory> { (self.plugin_group)() }
 
     /// Get the [`Item`] in the specified slot.
     ///
     /// Returns `None` if the slot is empty or does not exist.
     #[must_use]
-    pub fn get_slot(&'a self, slot: usize) -> Option<Item> { self.reborrow_ref().get_slot(slot) }
+    pub fn get_slot(&self, slot: usize) -> Option<Item> { self.reborrow_ref().get_slot(slot) }
 
     /// Set the [`Item`] in the specified slot.
     ///
@@ -333,7 +354,7 @@ impl<'a> InventoryMut<'a> {
     /// Returns `Some(true)` if the menu is enabled, `Some(false)` if disabled,
     /// or `None` if the menu does not exist.
     #[must_use]
-    pub fn query_menu_status(&'a self, menu: Identifier<'static>) -> Option<bool> {
+    pub fn query_menu_status(&self, menu: Identifier<'static>) -> Option<bool> {
         self.reborrow_ref().query_menu_status(menu)
     }
 
@@ -342,7 +363,7 @@ impl<'a> InventoryMut<'a> {
     /// Returns `None` if the menu does not exist.
     #[must_use]
     pub fn query_menu_slots(
-        &'a self,
+        &self,
         menu: Identifier<'static>,
     ) -> Option<IndexMap<usize, Item, RandomState>> {
         self.reborrow_ref().query_menu_slots(menu)
@@ -369,6 +390,17 @@ impl<'a> InventoryMut<'a> {
         let previous = self.plugin_data.swap_remove(&TypeId::of::<T>());
         self.plugin_data.insert(TypeId::of::<T>(), Box::new(data));
         previous.and_then(|b| b.into_any().downcast::<T>().ok()).map(|b| *b)
+    }
+}
+
+impl<'inv, 'iter> core::ops::Deref for IterFn<'inv, 'iter> {
+    type Target = dyn Fn() -> Box<dyn Iterator<Item = &'iter ReflectInventory> + 'iter> + 'inv;
+
+    fn deref(&self) -> &Self::Target {
+        match self {
+            IterFn::Ref(r) => r,
+            IterFn::Owned(o) => o,
+        }
     }
 }
 
