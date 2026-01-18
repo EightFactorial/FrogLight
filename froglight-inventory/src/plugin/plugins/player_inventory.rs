@@ -12,7 +12,7 @@ use indexmap::IndexMap;
 #[cfg(feature = "bevy")]
 use crate::plugin::ReflectInventory;
 use crate::{
-    inventory::{Inventory, InventoryResult},
+    inventory::{InventoryMut, InventoryRef, InventoryResult},
     plugin::PluginType,
 };
 
@@ -105,9 +105,9 @@ impl PluginType for PlayerInventoryPlugin {
     const IDENTIFIER: Identifier<'static> =
         Identifier::new_static("froglight:inventory/player_inventory");
 
-    fn initialize(_: &mut Inventory) {}
+    fn initialize(_: &mut InventoryMut) {}
 
-    fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<usize, Option<Item>> {
+    fn get_slot(inventory: &InventoryRef, slot: usize) -> InventoryResult<usize, Option<Item>> {
         if let Some(data) = inventory.plugin_data_ref::<PlayerInventoryData>()
             && data.is_enabled()
             && let Some(slot) = data.get_slot_index(slot)
@@ -121,7 +121,7 @@ impl PluginType for PlayerInventoryPlugin {
     }
 
     fn set_slot(
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         item: Option<Item>,
         slot: usize,
     ) -> InventoryResult<(Option<Item>, usize), ()> {
@@ -139,7 +139,7 @@ impl PluginType for PlayerInventoryPlugin {
     }
 
     fn enable_menu(
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()> {
         if menu == Self::IDENTIFIER {
@@ -160,7 +160,7 @@ impl PluginType for PlayerInventoryPlugin {
     }
 
     fn disable_menu(
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()> {
         if menu == Self::IDENTIFIER
@@ -174,7 +174,7 @@ impl PluginType for PlayerInventoryPlugin {
     }
 
     fn query_menu_status(
-        inventory: &Inventory,
+        inventory: &InventoryRef,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, bool> {
         if menu == Self::IDENTIFIER
@@ -187,7 +187,7 @@ impl PluginType for PlayerInventoryPlugin {
     }
 
     fn query_menu_slots(
-        inventory: &Inventory,
+        inventory: &InventoryRef,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>> {
         if menu == Self::IDENTIFIER

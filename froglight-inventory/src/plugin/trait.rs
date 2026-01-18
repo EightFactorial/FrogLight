@@ -3,7 +3,7 @@ use froglight_common::prelude::Identifier;
 use froglight_item::item::Item;
 use indexmap::IndexMap;
 
-use crate::inventory::{Inventory, InventoryResult};
+use crate::inventory::{InventoryMut, InventoryRef, InventoryResult};
 
 /// A trait implemented by inventory plugins.
 pub trait PluginType: 'static {
@@ -16,33 +16,33 @@ pub trait PluginType: 'static {
     ///
     /// This method will be called once when an inventory is created,
     /// regardless of whether the plugin is enabled or not.
-    fn initialize(_inventory: &mut Inventory) {}
+    fn initialize(_: &mut InventoryMut) {}
 
     /// Get a specific item slot in the [`Inventory`].
-    fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<usize, Option<Item>>;
+    fn get_slot(inventory: &InventoryRef, slot: usize) -> InventoryResult<usize, Option<Item>>;
 
     /// Set a specific item slot in the [`Inventory`].
     fn set_slot(
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         item: Option<Item>,
         slot: usize,
     ) -> InventoryResult<(Option<Item>, usize), ()>;
 
     /// Enable a menu in the [`Inventory`].
     fn enable_menu(
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()>;
 
     /// Disable a menu in the [`Inventory`].
     fn disable_menu(
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()>;
 
     /// Query whether a menu is enabled in the [`Inventory`].
     fn query_menu_status(
-        inventory: &Inventory,
+        inventory: &InventoryRef,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, bool>;
 
@@ -50,7 +50,7 @@ pub trait PluginType: 'static {
     ///
     /// Returns an empty map if the menu is disabled.
     fn query_menu_slots(
-        inventory: &Inventory,
+        inventory: &InventoryRef,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>>;
 }
@@ -62,18 +62,19 @@ pub trait PluginType: 'static {
 #[expect(clippy::type_complexity, reason = "Function definitions")]
 pub struct ReflectInventory {
     identifier: Identifier<'static>,
-    initialize: fn(&mut Inventory),
-    get_slot: fn(&Inventory, usize) -> InventoryResult<usize, Option<Item>>,
-    set_slot: fn(&mut Inventory, Option<Item>, usize) -> InventoryResult<(Option<Item>, usize), ()>,
+    initialize: fn(&mut InventoryMut),
+    get_slot: fn(&InventoryRef, usize) -> InventoryResult<usize, Option<Item>>,
+    set_slot:
+        fn(&mut InventoryMut, Option<Item>, usize) -> InventoryResult<(Option<Item>, usize), ()>,
     enable_menu:
-        fn(&mut Inventory, Identifier<'static>) -> InventoryResult<Identifier<'static>, ()>,
+        fn(&mut InventoryMut, Identifier<'static>) -> InventoryResult<Identifier<'static>, ()>,
     disable_menu:
-        fn(&mut Inventory, Identifier<'static>) -> InventoryResult<Identifier<'static>, ()>,
+        fn(&mut InventoryMut, Identifier<'static>) -> InventoryResult<Identifier<'static>, ()>,
     query_menu_status:
-        fn(&Inventory, Identifier<'static>) -> InventoryResult<Identifier<'static>, bool>,
+        fn(&InventoryRef, Identifier<'static>) -> InventoryResult<Identifier<'static>, bool>,
     query_menu_slots:
         fn(
-            &Inventory,
+            &InventoryRef,
             Identifier<'static>,
         ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>>,
 }
@@ -101,14 +102,14 @@ impl ReflectInventory {
 
     /// Initialize the given [`Inventory`] with this plugin's data.
     #[inline]
-    pub fn initialize(&self, inventory: &mut Inventory) { (self.initialize)(inventory); }
+    pub fn initialize(&self, inventory: &mut InventoryMut) { (self.initialize)(inventory); }
 
     /// Get a specific item slot in the [`Inventory`].
     #[inline]
     #[must_use]
     pub fn get_slot(
         &self,
-        inventory: &Inventory,
+        inventory: &InventoryRef,
         slot: usize,
     ) -> InventoryResult<usize, Option<Item>> {
         (self.get_slot)(inventory, slot)
@@ -118,7 +119,7 @@ impl ReflectInventory {
     #[inline]
     pub fn set_slot(
         &self,
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         item: Option<Item>,
         slot: usize,
     ) -> InventoryResult<(Option<Item>, usize), ()> {
@@ -129,7 +130,7 @@ impl ReflectInventory {
     #[inline]
     pub fn enable_menu(
         &self,
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()> {
         (self.enable_menu)(inventory, menu)
@@ -139,7 +140,7 @@ impl ReflectInventory {
     #[inline]
     pub fn disable_menu(
         &self,
-        inventory: &mut Inventory,
+        inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()> {
         (self.disable_menu)(inventory, menu)
@@ -150,7 +151,7 @@ impl ReflectInventory {
     #[must_use]
     pub fn query_menu_status(
         &self,
-        inventory: &Inventory,
+        inventory: &InventoryRef,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, bool> {
         (self.query_menu_status)(inventory, menu)
@@ -163,7 +164,7 @@ impl ReflectInventory {
     #[must_use]
     pub fn query_menu_slots(
         &self,
-        inventory: &Inventory,
+        inventory: &InventoryRef,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>> {
         (self.query_menu_slots)(inventory, menu)
