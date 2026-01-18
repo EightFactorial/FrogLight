@@ -3,17 +3,17 @@
 use alloc::{vec, vec::Vec};
 
 #[cfg(feature = "bevy")]
-use bevy_reflect::Reflect;
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
 use froglight_item::prelude::Item;
 use indexmap::IndexMap;
 
 #[cfg(feature = "bevy")]
-use crate::inventory::ReflectInventory;
+use crate::plugin::ReflectInventory;
 use crate::{
-    inventory::{InventoryPluginType, InventoryResult},
-    prelude::Inventory,
+    inventory::{Inventory, InventoryResult},
+    plugin::PluginType,
 };
 
 /// An [`InventoryPluginType`] that handles the player's inventory.
@@ -23,8 +23,10 @@ pub struct PlayerInventoryPlugin;
 
 /// Data stored by the [`PlayerInventoryPlugin`].
 #[derive(Debug, Default, Clone)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, Clone))]
 pub struct PlayerInventoryData {
     enabled: bool,
+    #[cfg_attr(feature = "bevy", reflect(ignore))]
     storage: Vec<Option<Item>>,
 }
 
@@ -99,7 +101,7 @@ impl PlayerInventoryData {
 
 // -------------------------------------------------------------------------------------------------
 
-impl InventoryPluginType for PlayerInventoryPlugin {
+impl PluginType for PlayerInventoryPlugin {
     const IDENTIFIER: Identifier<'static> =
         Identifier::new_static("froglight:inventory/player_inventory");
 

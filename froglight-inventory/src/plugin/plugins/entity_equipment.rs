@@ -1,17 +1,17 @@
 //! TODO
 
 #[cfg(feature = "bevy")]
-use bevy_reflect::Reflect;
+use bevy_reflect::{Reflect, std_traits::ReflectDefault};
 use foldhash::fast::RandomState;
 use froglight_common::prelude::Identifier;
 use froglight_item::prelude::Item;
 use indexmap::IndexMap;
 
 #[cfg(feature = "bevy")]
-use crate::inventory::ReflectInventory;
+use crate::plugin::ReflectInventory;
 use crate::{
-    inventory::{InventoryPluginType, InventoryResult},
-    prelude::Inventory,
+    inventory::{Inventory, InventoryResult},
+    plugin::PluginType,
 };
 
 /// An [`InventoryPluginType`] that handles an entity's equipment slots.
@@ -21,6 +21,7 @@ pub struct EntityEquipmentPlugin;
 
 /// Data stored by the [`EntityEquipmentPlugin`].
 #[derive(Debug, Default, Clone)]
+#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Default, Clone))]
 pub struct EntityEquipmentData {
     enabled: bool,
 }
@@ -34,7 +35,7 @@ impl EntityEquipmentData {
 
 // -------------------------------------------------------------------------------------------------
 
-impl InventoryPluginType for EntityEquipmentPlugin {
+impl PluginType for EntityEquipmentPlugin {
     const IDENTIFIER: Identifier<'static> =
         Identifier::new_static("froglight:inventory/entity_equipment");
 

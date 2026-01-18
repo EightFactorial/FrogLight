@@ -1,9 +1,9 @@
-//! [Plugins](crate::inventory::InventoryPluginType) used by different inventory
-//! types.
-//!
-//! Must be registered by
-//! [`InventoryPlugins`](crate::inventory::InventoryPlugins) to enable.
+//! TODO
 
-#[cfg(feature = "froglight-entity")]
-pub mod entity_equipment;
-pub mod player_inventory;
+mod groups;
+pub use groups::*;
+
+pub mod plugins;
+
+mod r#trait;
+pub use r#trait::{PluginType, ReflectInventory};

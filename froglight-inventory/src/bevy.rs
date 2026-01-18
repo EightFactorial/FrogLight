@@ -2,17 +2,15 @@
 
 use bevy_app::{App, Plugin};
 use bevy_ecs::reflect::AppTypeRegistry;
+use bevy_reflect::FromType;
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 
 #[cfg(feature = "froglight-entity")]
-use crate::plugin::entity_equipment::EntityEquipmentPlugin;
-use crate::{
-    inventory::{InventoryPlugins, ReflectInventory},
-    plugin::player_inventory::PlayerInventoryPlugin,
+use crate::plugin::plugins::entity_equipment::EntityEquipmentPlugin;
+use crate::plugin::{
+    GlobalPlugins, PluginType, ReflectInventory, plugins::player_inventory::PlayerInventoryPlugin,
 };
-
-mod reflect;
 
 /// A [`Plugin`] that initializes the [`InventoryPlugins`] registry.
 ///
@@ -42,6 +40,12 @@ impl Plugin for InventoryPlugin {
         #[cfg(feature = "tracing")]
         tracing::debug!(target: "froglight_inventory", "Discovered {} plugins from the `TypeRegistry`", plugins.len());
 
-        InventoryPlugins::initialize(plugins);
+        GlobalPlugins::initialize(plugins);
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+impl<T: PluginType> FromType<T> for ReflectInventory {
+    fn from_type() -> Self { ReflectInventory::from_plugin::<T>() }
 }

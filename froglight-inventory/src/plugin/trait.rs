@@ -3,10 +3,61 @@ use froglight_common::prelude::Identifier;
 use froglight_item::item::Item;
 use indexmap::IndexMap;
 
-use crate::inventory::{Inventory, InventoryPluginType, plugin::InventoryResult};
+use crate::inventory::{Inventory, InventoryResult};
 
-/// A collection of function pointers for interacting with an
-/// [`Inventory`](crate::inventory::Inventory).
+/// A trait implemented by inventory plugins.
+pub trait PluginType: 'static {
+    /// The identifier of this inventory plugin.
+    const IDENTIFIER: Identifier<'static>;
+
+    /// Initialize this plugin within the given [`Inventory`].
+    ///
+    /// ## Note
+    ///
+    /// This method will be called once when an inventory is created,
+    /// regardless of whether the plugin is enabled or not.
+    fn initialize(_inventory: &mut Inventory) {}
+
+    /// Get a specific item slot in the [`Inventory`].
+    fn get_slot(inventory: &Inventory, slot: usize) -> InventoryResult<usize, Option<Item>>;
+
+    /// Set a specific item slot in the [`Inventory`].
+    fn set_slot(
+        inventory: &mut Inventory,
+        item: Option<Item>,
+        slot: usize,
+    ) -> InventoryResult<(Option<Item>, usize), ()>;
+
+    /// Enable a menu in the [`Inventory`].
+    fn enable_menu(
+        inventory: &mut Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, ()>;
+
+    /// Disable a menu in the [`Inventory`].
+    fn disable_menu(
+        inventory: &mut Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, ()>;
+
+    /// Query whether a menu is enabled in the [`Inventory`].
+    fn query_menu_status(
+        inventory: &Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, bool>;
+
+    /// Get all item slots of a menu in the [`Inventory`].
+    ///
+    /// Returns an empty map if the menu is disabled.
+    fn query_menu_slots(
+        inventory: &Inventory,
+        menu: Identifier<'static>,
+    ) -> InventoryResult<Identifier<'static>, IndexMap<usize, Item, RandomState>>;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// A collection of function pointers from a [`PluginType`].
 #[derive(Debug, Clone)]
 #[expect(clippy::type_complexity, reason = "Function definitions")]
 pub struct ReflectInventory {
@@ -28,9 +79,9 @@ pub struct ReflectInventory {
 }
 
 impl ReflectInventory {
-    /// Creates a new [`ReflectInventory`] from the given plugin type.
+    /// Create a new [`ReflectInventory`] from the given [`PluginType`].
     #[must_use]
-    pub fn from_plugin<P: InventoryPluginType>() -> Self {
+    pub fn from_plugin<P: PluginType>() -> Self {
         Self {
             identifier: P::IDENTIFIER,
             initialize: P::initialize,
