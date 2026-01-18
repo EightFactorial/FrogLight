@@ -38,48 +38,50 @@ impl<G: PluginGroup> Inventory<G> {
     /// Create a new [`Inventory`] from the given [`PluginGroup`].
     #[must_use]
     pub fn new_from(plugin_group: G) -> Self {
-        let mut inventory =
-            Self { plugin_group, plugin_data: IndexMap::with_hasher(RandomState::default()) };
+        let mut plugin_data = IndexMap::with_hasher(RandomState::default());
 
         {
-            let plugin_group = &inventory.plugin_group;
-            let mut inv_mut = InventoryMut {
-                plugin_group: IterFn::Owned(Box::new(|| {
-                    Box::new(inventory.plugin_group.iter_plugins())
-                })),
-                plugin_data: &mut inventory.plugin_data,
+            let dyn_iter_fn = || -> Box<dyn Iterator<Item = &ReflectInventory>> {
+                Box::new(plugin_group.iter_plugins())
             };
-            plugin_group.iter_plugins().for_each(|plugin| plugin.initialize(&mut inv_mut));
+            let mut inventory = InventoryMut {
+                plugin_group: IterFn::Ref(&dyn_iter_fn),
+                plugin_data: &mut plugin_data,
+            };
+
+            plugin_group.iter_plugins().for_each(|plugin| plugin.initialize(&mut inventory));
         }
 
-        inventory
+        Self { plugin_group, plugin_data }
     }
 
     /// Get the [`Item`] in the specified slot.
     ///
     /// Returns `None` if the slot is empty or does not exist.
     #[must_use]
-    pub fn get_slot(&self, slot: usize) -> Option<Item> { InventoryRef::new(self).get_slot(slot) }
+    pub fn get_slot(&self, slot: usize) -> Option<Item> {
+        InventoryRef::new_for_context(self, |inv| inv.get_slot(slot))
+    }
 
     /// Set the [`Item`] in the specified slot.
     ///
     /// Returns `true` if the item was set successfully, `false` otherwise.
     pub fn set_slot(&mut self, item: Option<Item>, slot: usize) -> bool {
-        InventoryMut::new(self).set_slot(item, slot)
+        InventoryMut::new_for_context(self, |mut inv| inv.set_slot(item, slot))
     }
 
     /// Enable a menu within the [`Inventory`].
     ///
     /// Returns `true` if the menu was enabled successfully, `false` otherwise.
     pub fn enable_menu(&mut self, menu: Identifier<'static>) -> bool {
-        InventoryMut::new(self).enable_menu(menu)
+        InventoryMut::new_for_context(self, |mut inv| inv.enable_menu(menu))
     }
 
     /// Disable a menu within the [`Inventory`].
     ///
     /// Returns `true` if the menu was disabled successfully, `false` otherwise.
     pub fn disable_menu(&mut self, menu: Identifier<'static>) -> bool {
-        InventoryMut::new(self).disable_menu(menu)
+        InventoryMut::new_for_context(self, |mut inv| inv.disable_menu(menu))
     }
 
     /// Query the status of a menu within the [`Inventory`].
@@ -88,7 +90,7 @@ impl<G: PluginGroup> Inventory<G> {
     /// or `None` if the menu does not exist.
     #[must_use]
     pub fn query_menu_status(&self, menu: Identifier<'static>) -> Option<bool> {
-        InventoryRef::new(self).query_menu_status(menu)
+        InventoryRef::new_for_context(self, |inv| inv.query_menu_status(menu))
     }
 
     /// Query the slots of a menu within the [`Inventory`].
@@ -99,7 +101,7 @@ impl<G: PluginGroup> Inventory<G> {
         &self,
         menu: Identifier<'static>,
     ) -> Option<IndexMap<usize, Item, RandomState>> {
-        InventoryRef::new(self).query_menu_slots(menu)
+        InventoryRef::new_for_context(self, |inv| inv.query_menu_slots(menu))
     }
 
     /// Get a reference to plugin data of type `T` if it exists.
@@ -209,6 +211,26 @@ impl<'inv, 'iter> InventoryRef<'inv, 'iter> {
         }
     }
 
+    /// Create a new [`InventoryRef`] that is valid within the context of the
+    /// given function.
+    ///
+    /// A very, very slight optimization over [`InventoryRef::new`] when you
+    /// only need to use the reference for a short period of time.
+    #[must_use]
+    pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryRef) -> R, R>(
+        inventory: &'inv Inventory<G>,
+        f: F,
+    ) -> R {
+        let dyn_iter_fn = || -> Box<dyn Iterator<Item = &ReflectInventory>> {
+            Box::new(inventory.plugin_group.iter_plugins())
+        };
+        let inventory = InventoryRef {
+            plugin_group: IterFn::Ref(&dyn_iter_fn),
+            plugin_data: &inventory.plugin_data,
+        };
+        f(inventory)
+    }
+
     /// Reborrow the [`InventoryRef`] for a shorter lifetime.
     #[must_use]
     pub const fn reborrow<'c>(&'c self) -> InventoryRef<'c, 'iter> {
@@ -284,6 +306,26 @@ impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
             })),
             plugin_data: &mut inventory.plugin_data,
         }
+    }
+
+    /// Create a new [`InventoryMut`] that is valid within the context of the
+    /// given function.
+    ///
+    /// A very, very slight optimization over [`InventoryMut::new`] when you
+    /// only need to use the mutable reference for a short period of time.
+    #[must_use]
+    pub fn new_for_context<G: PluginGroup, F: FnOnce(InventoryMut) -> R, R>(
+        inventory: &'inv mut Inventory<G>,
+        f: F,
+    ) -> R {
+        let dyn_iter_fn = || -> Box<dyn Iterator<Item = &ReflectInventory>> {
+            Box::new(inventory.plugin_group.iter_plugins())
+        };
+        let inventory = InventoryMut {
+            plugin_group: IterFn::Ref(&dyn_iter_fn),
+            plugin_data: &mut inventory.plugin_data,
+        };
+        f(inventory)
     }
 
     /// Reborrow the [`InventoryMut`] for a shorter lifetime.
