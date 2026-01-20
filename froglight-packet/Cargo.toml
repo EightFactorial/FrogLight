@@ -47,7 +47,7 @@ serde = ["dep:serde", "indexmap/serde", "uuid/serde"]
 # Enable support for the standard library
 std = ["facet?/std", "facet-minecraft?/std", "foldhash/std", "indexmap/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["foldhash/nightly"]
+nightly = ["facet-minecraft?/nightly", "foldhash/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

@@ -49,7 +49,7 @@ tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing",
 # Enable support for the standard library
 std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "dep:async-net", "dep:facet", "facet-minecraft/futures-lite", "facet-minecraft/streaming", "froglight-block/std", "froglight-common/std", "froglight-inventory/std", "froglight-item/std", "froglight-packet/std", "froglight-registry/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-block/nightly", "froglight-common/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-packet/nightly", "froglight-registry/nightly", "froglight-world/nightly"]
+nightly = ["facet-minecraft/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-packet/nightly", "froglight-registry/nightly", "froglight-world/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
