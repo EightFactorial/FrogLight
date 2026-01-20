@@ -163,6 +163,7 @@ impl Add<BlockShape<'_>> for BlockShape<'_> {
 
 // -------------------------------------------------------------------------------------------------
 
+/// An axis-aligned bounding box (AABB) for a block.
 #[derive(Debug, Clone, Copy)]
 pub struct BlockAabb {
     min: DVec3,

@@ -13,7 +13,7 @@ mod metadata;
 pub use metadata::BlockMetadata;
 
 mod shape;
-pub use shape::BlockShape;
+pub use shape::{BlockAabb, BlockShape};
 
 mod state;
 pub use state::{GlobalId, StateId};
