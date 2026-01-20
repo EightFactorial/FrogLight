@@ -6,6 +6,9 @@ pub use froglight_block as block;
 pub use froglight_common as common;
 pub use froglight_inventory as inventory;
 pub use froglight_math as math;
+#[cfg(feature = "network")]
+pub use froglight_network as network;
+pub use froglight_packet as packet;
 pub use froglight_registry as registry;
 pub use froglight_world as world;
 
@@ -17,8 +20,10 @@ pub use bevy::*;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "network")]
+    pub use crate::network::prelude::*;
     pub use crate::{
         biome::prelude::*, block::prelude::*, common::prelude::*, inventory::prelude::*,
-        math::prelude::*, registry::prelude::*, world::prelude::*,
+        math::prelude::*, packet::prelude::*, registry::prelude::*, world::prelude::*,
     };
 }

@@ -24,12 +24,14 @@ froglight-internal = { workspace = true }
 # --- Features ---
 
 [features]
-default = ["std"]
+default = ["network", "std"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
 # Enable `tracing` support.
 tracing = ["froglight-internal/tracing"]
+# Enable networking support.
+network = ["froglight-internal/network", "std"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-internal/libm"]
@@ -42,3 +44,6 @@ once_cell = ["froglight-internal/once_cell"]
 std = ["froglight-internal/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-internal/nightly", "std"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.

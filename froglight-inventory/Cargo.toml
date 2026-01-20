@@ -19,10 +19,10 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+foldhash = { workspace = true }
 froglight-common = { workspace = true, features = ["alloc"] }
 froglight-item = { workspace = true, features = ["alloc"] }
 indexmap = { workspace = true }
-foldhash = { workspace = true }
 
 # Optional dependencies
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
@@ -44,6 +44,6 @@ once_cell = ["dep:once_cell"]
 tracing = ["dep:tracing"]
 
 # Enable support for the standard library
-std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "froglight-common/std", "froglight-item/std", "indexmap/std"]
+std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "foldhash/std", "froglight-common/std", "froglight-item/std", "indexmap/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-common/nightly", "froglight-item/nightly", "std"]
+nightly = ["foldhash/nightly", "froglight-common/nightly", "froglight-item/nightly", "std"]

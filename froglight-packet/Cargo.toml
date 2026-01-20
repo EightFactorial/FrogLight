@@ -3,7 +3,7 @@ edition = { workspace = true }
 homepage = { workspace = true }
 include = { workspace = true }
 license = { workspace = true }
-name = "froglight-common"
+name = "froglight-packet"
 readme = { workspace = true }
 repository = { workspace = true }
 rust-version = { workspace = true }
@@ -19,6 +19,8 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+foldhash = { workspace = true }
+indexmap = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
@@ -26,30 +28,26 @@ bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 facet = { features = ["uuid"], workspace = true, optional = true }
-hashbrown = { features = ["alloc", "core", "default-hasher"], workspace = true, optional = true }
+facet-minecraft = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
 # --- Features ---
 
 [features]
-default = ["alloc", "std"]
+default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:hashbrown", "serde"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "serde"]
 # Enable `facet` support.
-facet = ["dep:facet"]
+facet = ["dep:facet", "dep:facet-minecraft"]
 # Enable `serde` support.
-serde = ["dep:serde", "uuid/serde"]
-# Enable `tracing` support.
-tracing = ["dep:tracing"]
+serde = ["dep:serde", "indexmap/serde", "uuid/serde"]
 
-# Enable support for a global allocator
-alloc = []
 # Enable support for the standard library
-std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "uuid/std"]
+std = ["facet?/std", "facet-minecraft?/std", "foldhash/std", "indexmap/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = []
+nightly = ["foldhash/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

@@ -1,5 +1,5 @@
 ALL_FEATURES := "all-features"
-DEF_FEATURES := "features=bevy,std"
+DEF_FEATURES := "features=bevy,network,std"
 NO_FEATURES := "features=libm,once_cell --no-default-features"
 
 # Generate the changelog
