@@ -19,35 +19,39 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-facet-minecraft = { workspace = true }
-froglight-block = { workspace = true }
-froglight-common = { workspace = true }
-froglight-inventory = { workspace = true }
-froglight-item = { workspace = true }
-froglight-packet = { features = ["facet"], workspace = true }
-froglight-registry = { workspace = true }
-froglight-world = { workspace = true }
+facet = { features = ["std"], workspace = true }
+facet-minecraft = { features = ["std"], workspace = true }
+froglight-block = { features = ["async", "std"], workspace = true }
+froglight-common = { features = ["facet", "std"], workspace = true }
+froglight-inventory = { features = ["std"], workspace = true }
+froglight-item = { features = ["async", "froglight-block", "std"], workspace = true }
+froglight-packet = { features = ["facet", "std"], workspace = true }
+froglight-registry = { features = ["async", "std"], workspace = true }
+froglight-world = { features = ["async", "froglight-biome", "froglight-block", "std"], workspace = true }
 
 # Optional dependencies
-async-net = { workspace = true, optional = true }
-bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
-bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
-facet = { features = ["std"], workspace = true, optional = true }
+bevy_app = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
+bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
+bevy_reflect = { features = ["std"], workspace = true, optional = true }
+futures-lite = { features = ["std"], workspace = true, optional = true }
+tokio = { features = ["io-util"], workspace = true, optional = true }
+tracing = { features = ["std"], workspace = true, optional = true }
 
 # --- Features ---
 
 [features]
-default = ["std"]
+default = []
+
+# Enable `futures-lite` support.
+futures-lite = ["dep:futures-lite", "facet-minecraft/futures-lite"]
+# Enable `tokio` support.
+tokio = ["dep:tokio", "facet-minecraft/tokio"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-world/bevy"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-packet/tracing", "froglight-world/tracing"]
+tracing = ["dep:tracing", "facet-minecraft/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-packet/tracing", "froglight-world/tracing"]
 
-# Enable support for the standard library
-std = ["bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "dep:async-net", "dep:facet", "facet-minecraft/futures-lite", "facet-minecraft/streaming", "froglight-block/std", "froglight-common/std", "froglight-inventory/std", "froglight-item/std", "froglight-packet/std", "froglight-registry/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["facet-minecraft/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-packet/nightly", "froglight-registry/nightly", "froglight-world/nightly"]
 

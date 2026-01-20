@@ -64,7 +64,7 @@ serde = ["dep:serde", "smallvec/serde"]
 tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing", "froglight-common/tracing"]
 
 # Add async locking support
-async = ["dep:async-lock", "froglight-biome?/async", "froglight-block?/async"]
+async = ["dep:async-lock", "froglight-biome?/async", "froglight-block?/async", "std"]
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
 # Enable `parking_lot` for `no_std` support.

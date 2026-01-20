@@ -31,7 +31,7 @@ froglight-world = { features = ["froglight-biome", "froglight-block"], workspace
 
 # Optional dependencies
 bevy_app = { workspace = true, optional = true }
-froglight-network = { workspace = true, optional = true }
+froglight-network = { features = ["futures-lite"], workspace = true, optional = true }
 
 # --- Features ---
 
@@ -53,7 +53,7 @@ once_cell = ["froglight-inventory/once_cell", "froglight-math/once_cell"]
 parking_lot = ["froglight-biome/parking_lot", "froglight-block/parking_lot", "froglight-item/parking_lot", "froglight-registry/parking_lot", "froglight-world/parking_lot"]
 
 # Enable support for the standard library
-std = ["froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-inventory/std", "froglight-item/std", "froglight-math/std", "froglight-network?/std", "froglight-packet/std", "froglight-registry/std", "froglight-world/std"]
+std = ["froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-inventory/std", "froglight-item/std", "froglight-math/std", "froglight-packet/std", "froglight-registry/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-math/nightly", "froglight-network?/nightly", "froglight-packet/nightly", "froglight-registry/nightly", "froglight-world/nightly", "std"]
 
