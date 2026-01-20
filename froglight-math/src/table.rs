@@ -77,7 +77,7 @@ pub static SIN: LazyLock<[f32; 65536]> = LazyLock::new(|| {
 
 /// The smallest value that can be considered "zero"
 /// when comparing angles using [`sin`] and [`cos`].
-pub const EPSILON: f32 = 1.0E-4;
+pub const EPSILON: f32 = 1.0E-7;
 
 /// Calculate the sine of an angle using the [`SIN`] table.
 #[must_use]
@@ -117,7 +117,10 @@ mod tests {
     #[cfg(feature = "std")]
     use proptest::prelude::*;
 
-    use super::{EPSILON, sin};
+    use super::sin;
+
+    /// The acceptable error margin for table and non-table calculations.
+    const EPSILON: f32 = 1.0e-4;
 
     /// Tests for the sine and cosine functions for common angles.
     #[test]

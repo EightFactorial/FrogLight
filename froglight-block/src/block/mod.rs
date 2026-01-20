@@ -12,5 +12,8 @@ pub use block::{Block, BlockType};
 mod metadata;
 pub use metadata::BlockMetadata;
 
+mod shape;
+pub use shape::BlockShape;
+
 mod state;
 pub use state::{GlobalId, StateId};

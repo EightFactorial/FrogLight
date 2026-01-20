@@ -7,7 +7,7 @@ use core::{
 use froglight_common::identifier::Identifier;
 
 use crate::{
-    block::{BlockAttribute, BlockAttributes, BlockMetadata, GlobalId, StateId},
+    block::{BlockAttribute, BlockAttributes, BlockMetadata, BlockShape, GlobalId, StateId},
     version::BlockVersion,
 };
 
@@ -160,6 +160,12 @@ impl Block {
     /// Returns `true` if this block is transparent.
     #[must_use]
     pub fn is_transparent(&self) -> bool { self.reference.behavior().is_transparent(self.state) }
+
+    /// Returns the shape of this block.
+    #[must_use]
+    pub fn shape(&self) -> &'static BlockShape<'static> {
+        self.reference.behavior().shape_of(self.state)
+    }
 }
 
 impl Eq for Block {}
@@ -233,4 +239,8 @@ pub trait BlockType<V: BlockVersion>: 'static {
     /// Returns the block's light emission level.
     #[must_use]
     fn light_emission(_: StateId) -> u8 { 0u8 }
+
+    /// Returns the shape of the given block state.
+    #[must_use]
+    fn shape_of(_: StateId) -> &'static BlockShape<'static> { &BlockShape::FULL }
 }

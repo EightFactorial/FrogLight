@@ -1,14 +1,17 @@
+#![expect(clippy::too_many_arguments, reason = "Only when manually constructing a BlockBehavior")]
+#![expect(missing_docs, reason = "The functions themselves have documentation")]
+
 use crate::{
-    block::{BlockType, StateId},
+    block::{BlockShape, BlockType, StateId},
     version::BlockVersion,
 };
 
 type BoolFn = fn(StateId) -> bool;
 type U8Fn = fn(StateId) -> u8;
+type ShapeFn = fn(StateId) -> &'static BlockShape<'static>;
 
 /// A collection of functions that define a block's behavior.
 #[derive(Clone, Copy)]
-#[expect(missing_docs, reason = "The functions have documentation")]
 pub struct BlockBehavior {
     pub is_air: BoolFn,
     pub is_solid: BoolFn,
@@ -17,6 +20,7 @@ pub struct BlockBehavior {
     pub is_transparent: BoolFn,
     pub has_occlusion: BoolFn,
     pub light_emission: U8Fn,
+    pub shape_of: ShapeFn,
 }
 
 impl BlockBehavior {
@@ -31,6 +35,7 @@ impl BlockBehavior {
             B::is_transparent,
             B::has_occlusion,
             B::light_emission,
+            B::shape_of,
         )
     }
 
@@ -44,6 +49,7 @@ impl BlockBehavior {
         is_transparent: BoolFn,
         has_occlusion: BoolFn,
         light_emission: U8Fn,
+        shape_of: ShapeFn,
     ) -> Self {
         Self {
             is_air,
@@ -53,6 +59,7 @@ impl BlockBehavior {
             is_transparent,
             has_occlusion,
             light_emission,
+            shape_of,
         }
     }
 
@@ -90,4 +97,11 @@ impl BlockBehavior {
     #[inline]
     #[must_use]
     pub fn light_emission(&self, state: StateId) -> u8 { (self.light_emission)(state) }
+
+    /// Returns the shape of the block.
+    #[inline]
+    #[must_use]
+    pub fn shape_of(&self, state: StateId) -> &'static BlockShape<'static> {
+        (self.shape_of)(state)
+    }
 }
