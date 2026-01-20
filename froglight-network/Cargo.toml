@@ -19,10 +19,13 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+async-channel = { features = ["std"], workspace = true }
 facet = { features = ["std"], workspace = true }
+facet-format = { workspace = true }
 facet-minecraft = { features = ["std"], workspace = true }
 froglight-block = { features = ["async", "std"], workspace = true }
 froglight-common = { features = ["facet", "std"], workspace = true }
+# froglight-entity = { features = ["async", "std"], workspace = true }
 froglight-inventory = { features = ["std"], workspace = true }
 froglight-item = { features = ["async", "froglight-block", "std"], workspace = true }
 froglight-packet = { features = ["facet", "std"], workspace = true }

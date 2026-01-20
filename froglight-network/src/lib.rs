@@ -2,10 +2,12 @@
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
+pub mod connection;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    /// TODO: Remove
-    pub struct NetworkPlaceholder;
+    #[cfg(feature = "bevy")]
+    pub use crate::connection::event::EventConnection;
+    pub use crate::connection::event::{ClientboundEvent, ServerboundEvent};
 }
