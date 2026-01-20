@@ -28,7 +28,6 @@ foldhash = { workspace = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { workspace = true, optional = true }
-# froglight-entity = { workspace = true, optional = true }
 once_cell = { features = ["critical-section"], workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 
@@ -39,8 +38,6 @@ default = ["std"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect"]
-# Enable `froglight-entity` support.
-froglight-entity = []
 # Enable `once_cell` for `no_std` support.
 once_cell = ["dep:once_cell"]
 # Enable `tracing` support.

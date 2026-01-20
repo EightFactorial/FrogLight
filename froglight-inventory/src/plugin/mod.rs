@@ -1,7 +1,7 @@
 //! TODO
 
 mod groups;
-pub use groups::*;
+pub use groups::GlobalPlugins;
 
 pub mod plugins;
 

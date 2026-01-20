@@ -38,22 +38,19 @@ impl<G: PluginGroup> Inventory<G> {
     /// Create a new [`Inventory`] from the given [`PluginGroup`].
     #[must_use]
     pub fn new_from(plugin_group: G) -> Self {
-        let mut plugin_data = IndexMap::with_hasher(RandomState::default());
-
-        {
-            let dyn_iter_fn = || -> Box<dyn Iterator<Item = &ReflectInventory>> {
-                Box::new(plugin_group.iter_plugins())
-            };
-            let mut inventory = InventoryMut {
-                plugin_group: IterFn::Ref(&dyn_iter_fn),
-                plugin_data: &mut plugin_data,
-            };
-
-            plugin_group.iter_plugins().for_each(|plugin| plugin.initialize(&mut inventory));
-        }
-
-        Self { plugin_group, plugin_data }
+        let mut inventory =
+            Self { plugin_group, plugin_data: IndexMap::with_hasher(RandomState::default()) };
+        inventory.as_mut_for(|mut inv| inv.plugins().for_each(|p| p.initialize(&mut inv)));
+        inventory
     }
+
+    /// Get a reference to this [`Inventory`]'s [`PluginGroup`].
+    #[must_use]
+    pub const fn plugins(&self) -> &G { &self.plugin_group }
+
+    /// Get a mutable reference to this [`Inventory`]'s [`PluginGroup`].
+    #[must_use]
+    pub const fn plugins_mut(&mut self) -> &mut G { &mut self.plugin_group }
 
     /// Get the [`Item`] in the specified slot.
     ///
@@ -131,9 +128,27 @@ impl<G: PluginGroup> Inventory<G> {
     #[must_use]
     pub fn as_ref(&self) -> InventoryRef<'_, '_> { InventoryRef::new(self) }
 
+    /// Get a reference to this [`Inventory`] within the context of the given
+    /// function.
+    ///
+    /// A slight optimization over [`Inventory::as_ref`] when you
+    /// don't need to return the reference.
+    pub fn as_ref_for<F: FnOnce(InventoryRef<'_, '_>) -> R, R>(&self, f: F) -> R {
+        InventoryRef::new_for_context(self, f)
+    }
+
     /// Get a mutable reference to this [`Inventory`].
     #[must_use]
     pub fn as_mut(&mut self) -> InventoryMut<'_, '_> { InventoryMut::new(self) }
+
+    /// Get a mutable reference to this [`Inventory`] within the context of the
+    /// given function.
+    ///
+    /// A slight optimization over [`Inventory::as_mut`] when you
+    /// don't need to return the mutable reference.
+    pub fn as_mut_for<F: FnOnce(InventoryMut<'_, '_>) -> R, R>(&mut self, f: F) -> R {
+        InventoryMut::new_for_context(self, f)
+    }
 }
 
 #[cfg(feature = "bevy")]
@@ -232,11 +247,10 @@ impl<'inv, 'iter> InventoryRef<'inv, 'iter> {
         let dyn_iter_fn = || -> Box<dyn Iterator<Item = &ReflectInventory>> {
             Box::new(inventory.plugin_group.iter_plugins())
         };
-        let inventory = InventoryRef {
+        f(InventoryRef {
             plugin_group: IterFn::Ref(&dyn_iter_fn),
             plugin_data: &inventory.plugin_data,
-        };
-        f(inventory)
+        })
     }
 
     /// Reborrow the [`InventoryRef`] for a shorter lifetime.
@@ -246,7 +260,9 @@ impl<'inv, 'iter> InventoryRef<'inv, 'iter> {
     }
 
     /// Get an iterator over the plugins used by this [`Inventory`].
-    pub fn plugins(&self) -> impl Iterator<Item = &'iter ReflectInventory> { (self.plugin_group)() }
+    pub fn plugins(&self) -> impl Iterator<Item = &'iter ReflectInventory> + use<'iter> {
+        (self.plugin_group)()
+    }
 
     /// Get the [`Item`] in the specified slot.
     ///
@@ -328,11 +344,10 @@ impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
         let dyn_iter_fn = || -> Box<dyn Iterator<Item = &ReflectInventory>> {
             Box::new(inventory.plugin_group.iter_plugins())
         };
-        let inventory = InventoryMut {
+        f(InventoryMut {
             plugin_group: IterFn::Ref(&dyn_iter_fn),
             plugin_data: &mut inventory.plugin_data,
-        };
-        f(inventory)
+        })
     }
 
     /// Reborrow the [`InventoryMut`] for a shorter lifetime.
@@ -348,7 +363,9 @@ impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
     }
 
     /// Get an iterator over the plugins used by this [`Inventory`].
-    pub fn plugins(&self) -> impl Iterator<Item = &'iter ReflectInventory> { (self.plugin_group)() }
+    pub fn plugins(&self) -> impl Iterator<Item = &'iter ReflectInventory> + use<'iter> {
+        (self.plugin_group)()
+    }
 
     /// Get the [`Item`] in the specified slot.
     ///
