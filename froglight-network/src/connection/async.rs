@@ -5,47 +5,64 @@ use core::marker::PhantomData;
 use facet::Facet;
 use facet_format::{DeserializeError as FDError, SerializeError as FSError};
 use facet_minecraft::{deserialize::DeserializeError, serialize::SerializeError};
-use froglight_common::version::Version;
+use froglight_packet::version::{PacketState, PacketVersion};
 #[cfg(feature = "futures-lite")]
 use futures_lite::{AsyncRead as FAsyncRead, AsyncWrite as FAsyncWrite};
 #[cfg(feature = "tokio")]
 use tokio::io::{AsyncRead as TAsyncRead, AsyncWrite as TAsyncWrite};
 
+use crate::connection::event::ConnectionChannel;
+
 /// A [`Version`]'ed connection that uses a specific [`Runtime`].
-#[repr(transparent)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct AsyncConnection<R: Runtime<C>, C, V: Version> {
+#[derive(Clone)]
+#[expect(dead_code, reason = "WIP")]
+pub struct AsyncConnection<R: Runtime<C>, C, V: PacketVersion, S: PacketState<V>> {
     connection: C,
-    // channel: ConnectionChannel<V::Serverbound, V::Clientbound>,
+    channel: ConnectionChannel<S::Serverbound, S::Clientbound>,
     _phantom: PhantomData<(R, V)>,
 }
 
-impl<R: Runtime<C>, C, V: Version> AsyncConnection<R, C, V> {
+impl<R: Runtime<C>, C, V: PacketVersion, S: PacketState<V>> AsyncConnection<R, C, V, S> {
     /// Create a new [`Connection`].
     #[must_use]
-    pub const fn new(connection: C) -> Self { Self { connection, _phantom: PhantomData } }
+    pub const fn new(
+        connection: C,
+        channel: ConnectionChannel<S::Serverbound, S::Clientbound>,
+    ) -> Self {
+        Self { connection, channel, _phantom: PhantomData }
+    }
 }
 
 #[cfg(feature = "futures-lite")]
-impl<C, V: Version> AsyncConnection<FuturesLite, C, V>
+impl<C, V: PacketVersion, S: PacketState<V>> AsyncConnection<FuturesLite, C, V, S>
 where
     FuturesLite: Runtime<C>,
 {
     /// Create a new [`Connection`] using the [`futures_lite`] runtime.
     #[inline]
     #[must_use]
-    pub const fn new_async(connection: C) -> Self { Self::new(connection) }
+    pub const fn new_async(
+        connection: C,
+        channel: ConnectionChannel<S::Serverbound, S::Clientbound>,
+    ) -> Self {
+        Self::new(connection, channel)
+    }
 }
 
 #[cfg(feature = "tokio")]
-impl<C, V: Version> AsyncConnection<Tokio, C, V>
+impl<C, V: PacketVersion, S: PacketState<V>> AsyncConnection<Tokio, C, V, S>
 where
     Tokio: Runtime<C>,
 {
     /// Create a new [`Connection`] using the [`tokio`] runtime.
     #[inline]
     #[must_use]
-    pub const fn new_tokio(connection: C) -> Self { Self::new(connection) }
+    pub const fn new_tokio(
+        connection: C,
+        channel: ConnectionChannel<S::Serverbound, S::Clientbound>,
+    ) -> Self {
+        Self::new(connection, channel)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

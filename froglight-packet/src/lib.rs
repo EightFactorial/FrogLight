@@ -5,9 +5,13 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+pub mod version;
+
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    /// TODO: Remove
-    pub struct PacketPlaceholder;
+    pub use crate::version::{
+        Clientbound, Config, Handshake, Login, PacketDirection, PacketState, PacketVersion, Play,
+        Serverbound, Status,
+    };
 }
