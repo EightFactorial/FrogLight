@@ -11,7 +11,7 @@ use froglight_packet::version::{Clientbound, PacketVersion, Serverbound, Version
 use crate::{
     bevy::ClientConnection,
     connection::{AsyncConnection, Channel, ConnectionError, Runtime},
-    event::{ClientboundEvent, ServerboundEvent},
+    event::{ClientboundEventEnum, ServerboundEventEnum},
 };
 
 /// A trait for defining a [`Version`](froglight_common::version::Version)'s
@@ -53,7 +53,7 @@ pub trait NetworkVersion: PacketVersion {
     ///
     /// Returns a [`ConnectionError`] if the conversion fails.
     fn event_to_packet(
-        event: ServerboundEvent,
+        event: ServerboundEventEnum,
         entity: EntityRef<'_>,
     ) -> Result<VersionPacket<Self, Serverbound>, ConnectionError>;
 
@@ -66,7 +66,7 @@ pub trait NetworkVersion: PacketVersion {
     fn packet_to_event(
         packet: VersionPacket<Self, Clientbound>,
         entity: EntityRef<'_>,
-    ) -> Result<ClientboundEvent, ConnectionError>;
+    ) -> Result<ClientboundEventEnum, ConnectionError>;
 
     /// An asynchronous packet handler that sends and receives packets over
     /// the given [`ConnectionChannel`].

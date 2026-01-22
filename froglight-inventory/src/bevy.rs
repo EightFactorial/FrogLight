@@ -8,7 +8,8 @@ use crate::plugin::{
     GlobalPlugins, PluginType, ReflectInventory, plugins::player_inventory::PlayerInventoryPlugin,
 };
 
-/// A [`Plugin`] that initializes the [`InventoryPlugins`] registry.
+/// A [`Plugin`] that initializes the [`GlobalPlugins`]
+/// [`PluginGroup`](crate::inventory::PluginGroup).
 ///
 /// Automatically gathers all types with [`ReflectInventory`] data
 /// and initializes [`InventoryPlugins`] during startup.

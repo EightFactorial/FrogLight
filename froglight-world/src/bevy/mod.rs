@@ -14,7 +14,7 @@ use world::WorldInstanceChunks;
 
 use crate::prelude::ChunkPos;
 
-/// A [`Plugin`] that adds chunk-world instance relationships.
+/// A [`Plugin`] that adds [`ChunkPos`]-[`WorldInstance`] relationships.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct WorldPlugin;
 

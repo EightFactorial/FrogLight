@@ -6,7 +6,7 @@ use bevy_tasks::Task;
 use crate::{
     bevy::NetworkVersion,
     connection::{ConnectionError, Runtime},
-    event::{ClientboundEvent, ServerboundEvent},
+    event::{ClientboundEventEnum, ServerboundEventEnum},
 };
 
 /// The client-side end of a network connection.
@@ -20,9 +20,10 @@ pub struct ClientConnection {
     task: Task<Result<(), Box<dyn Error + Send + Sync>>>,
 }
 
-type SenderFn =
-    dyn for<'a> Fn(ServerboundEvent, EntityRef<'a>) -> Result<(), ConnectionError> + Send + Sync;
-type ReceiverFn = dyn for<'a> Fn(EntityRef<'a>) -> Result<Option<ClientboundEvent>, ConnectionError>
+type SenderFn = dyn for<'a> Fn(ServerboundEventEnum, EntityRef<'a>) -> Result<(), ConnectionError>
+    + Send
+    + Sync;
+type ReceiverFn = dyn for<'a> Fn(EntityRef<'a>) -> Result<Option<ClientboundEventEnum>, ConnectionError>
     + Send
     + Sync;
 
@@ -57,7 +58,7 @@ impl ClientConnection {
     #[inline]
     pub fn send(
         &self,
-        event: ServerboundEvent,
+        event: ServerboundEventEnum,
         entity: EntityRef<'_>,
     ) -> Result<(), ConnectionError> {
         (self.sender)(event, entity)
@@ -74,7 +75,7 @@ impl ClientConnection {
     pub fn receive(
         &mut self,
         entity: EntityRef<'_>,
-    ) -> Result<Option<ClientboundEvent>, ConnectionError> {
+    ) -> Result<Option<ClientboundEventEnum>, ConnectionError> {
         (self.receiver)(entity)
     }
 

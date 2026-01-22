@@ -5,7 +5,7 @@ use bevy_reflect::Reflect;
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
-pub enum ClientboundEvent {
+pub enum ClientboundEventEnum {
     Play(ClientboundPlayEvent),
     Config(ClientboundConfigEvent),
     Login(ClientboundLoginEvent),
@@ -14,37 +14,37 @@ pub enum ClientboundEvent {
 
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
-pub enum ServerboundEvent {
+pub enum ServerboundEventEnum {
     Play(ServerboundPlayEvent),
     Config(ServerboundConfigEvent),
     Login(ServerboundLoginEvent),
     Status(ServerboundStatusEvent),
 }
 
-impl From<ClientboundPlayEvent> for ClientboundEvent {
-    fn from(value: ClientboundPlayEvent) -> Self { ClientboundEvent::Play(value) }
+impl From<ClientboundPlayEvent> for ClientboundEventEnum {
+    fn from(value: ClientboundPlayEvent) -> Self { ClientboundEventEnum::Play(value) }
 }
-impl From<ClientboundConfigEvent> for ClientboundEvent {
-    fn from(value: ClientboundConfigEvent) -> Self { ClientboundEvent::Config(value) }
+impl From<ClientboundConfigEvent> for ClientboundEventEnum {
+    fn from(value: ClientboundConfigEvent) -> Self { ClientboundEventEnum::Config(value) }
 }
-impl From<ClientboundLoginEvent> for ClientboundEvent {
-    fn from(value: ClientboundLoginEvent) -> Self { ClientboundEvent::Login(value) }
+impl From<ClientboundLoginEvent> for ClientboundEventEnum {
+    fn from(value: ClientboundLoginEvent) -> Self { ClientboundEventEnum::Login(value) }
 }
-impl From<ClientboundStatusEvent> for ClientboundEvent {
-    fn from(value: ClientboundStatusEvent) -> Self { ClientboundEvent::Status(value) }
+impl From<ClientboundStatusEvent> for ClientboundEventEnum {
+    fn from(value: ClientboundStatusEvent) -> Self { ClientboundEventEnum::Status(value) }
 }
 
-impl From<ServerboundPlayEvent> for ServerboundEvent {
-    fn from(value: ServerboundPlayEvent) -> Self { ServerboundEvent::Play(value) }
+impl From<ServerboundPlayEvent> for ServerboundEventEnum {
+    fn from(value: ServerboundPlayEvent) -> Self { ServerboundEventEnum::Play(value) }
 }
-impl From<ServerboundConfigEvent> for ServerboundEvent {
-    fn from(value: ServerboundConfigEvent) -> Self { ServerboundEvent::Config(value) }
+impl From<ServerboundConfigEvent> for ServerboundEventEnum {
+    fn from(value: ServerboundConfigEvent) -> Self { ServerboundEventEnum::Config(value) }
 }
-impl From<ServerboundLoginEvent> for ServerboundEvent {
-    fn from(value: ServerboundLoginEvent) -> Self { ServerboundEvent::Login(value) }
+impl From<ServerboundLoginEvent> for ServerboundEventEnum {
+    fn from(value: ServerboundLoginEvent) -> Self { ServerboundEventEnum::Login(value) }
 }
-impl From<ServerboundStatusEvent> for ServerboundEvent {
-    fn from(value: ServerboundStatusEvent) -> Self { ServerboundEvent::Status(value) }
+impl From<ServerboundStatusEvent> for ServerboundEventEnum {
+    fn from(value: ServerboundStatusEvent) -> Self { ServerboundEventEnum::Status(value) }
 }
 
 // -------------------------------------------------------------------------------------------------

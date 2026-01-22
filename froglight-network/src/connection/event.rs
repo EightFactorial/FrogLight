@@ -2,7 +2,7 @@
 
 use core::fmt::{self, Debug, Display};
 
-use crate::event::{ClientboundEvent, ServerboundEvent};
+use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
 
 /// A connection that can send and receive event using a coroutine.
 pub struct EventConnection<T> {
@@ -11,9 +11,10 @@ pub struct EventConnection<T> {
 }
 
 type SenderFn<T> =
-    dyn for<'a> Fn(ServerboundEvent, &'a mut T) -> Result<(), ConnectionError> + Send + Sync;
-type ReceiverFn<T> =
-    dyn for<'a> Fn(&'a mut T) -> Result<Option<ClientboundEvent>, ConnectionError> + Send + Sync;
+    dyn for<'a> Fn(ServerboundEventEnum, &'a mut T) -> Result<(), ConnectionError> + Send + Sync;
+type ReceiverFn<T> = dyn for<'a> Fn(&'a mut T) -> Result<Option<ClientboundEventEnum>, ConnectionError>
+    + Send
+    + Sync;
 
 /// An error that can occur while using a [`EventConnection`].
 #[derive(Debug)]
@@ -32,11 +33,11 @@ impl<T> EventConnection<T> {
     #[must_use]
     pub fn new<F1, F2>(sender: F1, receiver: F2) -> Self
     where
-        F1: for<'a> Fn(ServerboundEvent, &'a mut T) -> Result<(), ConnectionError>
+        F1: for<'a> Fn(ServerboundEventEnum, &'a mut T) -> Result<(), ConnectionError>
             + Send
             + Sync
             + 'static,
-        F2: for<'a> Fn(&'a mut T) -> Result<Option<ClientboundEvent>, ConnectionError>
+        F2: for<'a> Fn(&'a mut T) -> Result<Option<ClientboundEventEnum>, ConnectionError>
             + Send
             + Sync
             + 'static,
@@ -58,7 +59,7 @@ impl<T> EventConnection<T> {
     ///
     /// Returns a [`ConnectionError`] if the event cannot be sent.
     #[inline]
-    pub fn send(&self, event: ServerboundEvent, data: &mut T) -> Result<(), ConnectionError> {
+    pub fn send(&self, event: ServerboundEventEnum, data: &mut T) -> Result<(), ConnectionError> {
         (self.sender)(event, data)
     }
 
@@ -69,7 +70,10 @@ impl<T> EventConnection<T> {
     /// # Errors
     ///
     /// Returns a [`ConnectionError`] if an event cannot be received.
-    pub fn receive(&mut self, data: &mut T) -> Result<Option<ClientboundEvent>, ConnectionError> {
+    pub fn receive(
+        &mut self,
+        data: &mut T,
+    ) -> Result<Option<ClientboundEventEnum>, ConnectionError> {
         (self.receiver)(data)
     }
 }

@@ -9,6 +9,6 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     #[cfg(feature = "bevy")]
-    pub use crate::bevy::ClientConnection;
-    pub use crate::event::{ClientboundEvent, ServerboundEvent};
+    pub use crate::bevy::{ClientConnection, ClientboundEvent, ServerboundMessage};
+    pub use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
 }
