@@ -15,7 +15,7 @@ clippy:
 
 # Clean up all build artifacts
 clean:
-    cargo clean
+    cargo clean --workspace
 
 # Build the project
 build mode="release":

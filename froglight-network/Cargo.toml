@@ -48,7 +48,7 @@ tracing = { features = ["std"], workspace = true, optional = true }
 default = ["futures-lite"]
 
 # Enable `futures-lite` support.
-futures-lite = ["dep:futures-lite", "facet-minecraft/futures-lite"]
+futures-lite = ["bevy_tasks?/futures-lite", "dep:futures-lite", "facet-minecraft/futures-lite"]
 # Enable `tokio` support.
 tokio = ["dep:async-compat", "dep:tokio", "facet-minecraft/tokio"]
 
