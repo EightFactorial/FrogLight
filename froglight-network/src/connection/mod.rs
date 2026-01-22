@@ -1,4 +1,10 @@
 //! TODO
 
-pub mod r#async;
-pub mod event;
+mod r#async;
+pub use r#async::*;
+
+mod channel;
+pub use channel::ConnectionChannel;
+
+mod event;
+pub use event::{ConnectionError, EventConnection};

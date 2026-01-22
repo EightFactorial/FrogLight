@@ -10,8 +10,5 @@ pub mod version;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::version::{
-        Clientbound, Config, Handshake, Login, PacketDirection, PacketState, PacketVersion, Play,
-        Serverbound, Status,
-    };
+    pub use crate::version::{PacketVersion, VersionPacket, VersionPacketDirectional};
 }

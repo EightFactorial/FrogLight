@@ -1,11 +1,9 @@
 //! TODO
 
-use bevy_app::{App, Plugin};
+mod connection;
+pub use connection::ClientConnection;
 
-/// A [`Plugin`] that adds networking features and systems.
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct NetworkPlugin;
+mod network;
+pub use network::NetworkVersion;
 
-impl Plugin for NetworkPlugin {
-    fn build(&self, _app: &mut App) {}
-}
+mod version;
