@@ -11,9 +11,9 @@ pub struct EventConnection<T> {
 }
 
 type SenderFn<T> =
-    dyn for<'a> FnMut(ServerboundEvent, &'a mut T) -> Result<(), ConnectionError> + Send + Sync;
+    dyn for<'a> Fn(ServerboundEvent, &'a mut T) -> Result<(), ConnectionError> + Send + Sync;
 type ReceiverFn<T> =
-    dyn for<'a> FnMut(&'a mut T) -> Result<Option<ClientboundEvent>, ConnectionError> + Send + Sync;
+    dyn for<'a> Fn(&'a mut T) -> Result<Option<ClientboundEvent>, ConnectionError> + Send + Sync;
 
 /// An error that can occur while using a [`EventConnection`].
 #[derive(Debug)]
@@ -30,11 +30,11 @@ impl<T> EventConnection<T> {
     #[must_use]
     pub fn new<F1, F2>(sender: F1, receiver: F2) -> Self
     where
-        F1: for<'a> FnMut(ServerboundEvent, &'a mut T) -> Result<(), ConnectionError>
+        F1: for<'a> Fn(ServerboundEvent, &'a mut T) -> Result<(), ConnectionError>
             + Send
             + Sync
             + 'static,
-        F2: for<'a> FnMut(&'a mut T) -> Result<Option<ClientboundEvent>, ConnectionError>
+        F2: for<'a> Fn(&'a mut T) -> Result<Option<ClientboundEvent>, ConnectionError>
             + Send
             + Sync
             + 'static,
@@ -50,23 +50,24 @@ impl<T> EventConnection<T> {
         Self { sender, receiver }
     }
 
-    /// Send a [`ServerboundEvent`] through the connection.
+    /// Send a [`ServerboundEvent`] to the server.
     ///
     /// # Errors
     ///
-    /// Returns an error if the event cannot be sent.
+    /// Returns a [`ConnectionError`] if the event cannot be sent.
     #[inline]
-    pub fn send(&mut self, event: ServerboundEvent, data: &mut T) -> Result<(), ConnectionError> {
+    pub fn send(&self, event: ServerboundEvent, data: &mut T) -> Result<(), ConnectionError> {
         (self.sender)(event, data)
     }
 
-    /// Receive a [`ClientboundEvent`] from the connection.
+    /// Receive a [`ClientboundEvent`] from the server.
+    ///
+    /// Returns `None` if there are no events to receive.
     ///
     /// # Errors
     ///
-    /// Returns an error if an event cannot be received.
-    #[inline]
-    pub fn recv(&mut self, data: &mut T) -> Result<Option<ClientboundEvent>, ConnectionError> {
+    /// Returns a [`ConnectionError`] if an event cannot be received.
+    pub fn receive(&mut self, data: &mut T) -> Result<Option<ClientboundEvent>, ConnectionError> {
         (self.receiver)(data)
     }
 }

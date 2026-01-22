@@ -1,7 +1,7 @@
 //! TODO
 
-mod connection;
-pub use connection::ClientConnection;
+mod client;
+pub use client::ClientConnection;
 
 mod version;
 pub use version::NetworkVersion;

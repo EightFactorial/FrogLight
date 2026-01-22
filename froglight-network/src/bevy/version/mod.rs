@@ -5,7 +5,7 @@
 use core::error::Error;
 
 use async_channel::{TryRecvError, TrySendError};
-use bevy_ecs::world::DeferredWorld;
+use bevy_ecs::world::EntityRef;
 use bevy_tasks::IoTaskPool;
 use froglight_packet::version::{Clientbound, PacketVersion, Serverbound, VersionPacket};
 
@@ -13,7 +13,7 @@ use froglight_packet::version::{Clientbound, PacketVersion, Serverbound, Version
 use crate::connection::FuturesLite;
 use crate::{
     bevy::ClientConnection,
-    connection::{AsyncConnection, ConnectionChannel, ConnectionError, EventConnection, Runtime},
+    connection::{AsyncConnection, ConnectionChannel, ConnectionError, Runtime},
     event::{ClientboundEvent, ServerboundEvent},
 };
 
@@ -22,31 +22,36 @@ use crate::{
 pub trait NetworkVersion: PacketVersion {
     /// Create a new [`ClientConnection`] for this
     /// [`Version`](froglight_common::version::Version).
+    ///
+    /// ## Note
+    ///
+    /// This method is only available when the `futures-lite` feature is
+    /// enabled, as it relies on the [`FuturesLite`] [`Runtime`].
     #[must_use]
     #[cfg(feature = "futures-lite")]
     fn wrap_connection<C>(connection: C) -> ClientConnection
     where
         FuturesLite: Runtime<C>,
     {
-        let (channel_a, channel_b) = ConnectionChannel::<
-            VersionPacket<Self, Clientbound>,
-            VersionPacket<Self, Serverbound>,
-        >::new_pair(None);
-
+        let (channel_a, channel_b) = ConnectionChannel::new_pair(None);
         let (receiver, sender) = channel_a.into_split();
-        ClientConnection::new_from(
-            EventConnection::new(
-                move |event, world| match sender.try_send(Self::event_to_packet(event, world)?) {
+
+        ClientConnection::new_from_parts(
+            // Receive events from the ECS and send them as packets.
+            Box::new(move |event, world| {
+                match sender.try_send(Self::event_to_packet(event, world)?) {
                     Ok(()) => Ok(()),
                     Err(TrySendError::Closed(_)) => todo!(),
                     Err(TrySendError::Full(_)) => unreachable!("ConnectionChannel is unbounded!"),
-                },
-                move |world| match receiver.try_recv() {
-                    Ok(packet) => Self::packet_to_event(packet, world).map(Some),
-                    Err(TryRecvError::Empty) => Ok(None),
-                    Err(TryRecvError::Closed) => todo!(),
-                },
-            ),
+                }
+            }),
+            // Receive packets and convert them into events for the ECS.
+            Box::new(move |world| match receiver.try_recv() {
+                Ok(packet) => Self::packet_to_event(packet, world).map(Some),
+                Err(TryRecvError::Empty) => Ok(None),
+                Err(TryRecvError::Closed) => todo!(),
+            }),
+            // Spawn the packet handler task to communicate with the server.
             IoTaskPool::get().spawn(Self::packet_handler(
                 AsyncConnection::<FuturesLite, C, Self>::new(connection, channel_b),
             )),
@@ -61,7 +66,7 @@ pub trait NetworkVersion: PacketVersion {
     /// Returns a [`ConnectionError`] if the conversion fails.
     fn event_to_packet(
         event: ServerboundEvent,
-        world: &mut DeferredWorld,
+        world: EntityRef<'_>,
     ) -> Result<VersionPacket<Self, Serverbound>, ConnectionError>;
 
     /// Convert a [`VersionPacket<Self, Clientbound>`] into a
@@ -72,7 +77,7 @@ pub trait NetworkVersion: PacketVersion {
     /// Returns a [`ConnectionError`] if the conversion fails.
     fn packet_to_event(
         packet: VersionPacket<Self, Clientbound>,
-        world: &mut DeferredWorld,
+        world: EntityRef<'_>,
     ) -> Result<ClientboundEvent, ConnectionError>;
 
     /// An asynchronous packet handler that sends and receives packets over

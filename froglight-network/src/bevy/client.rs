@@ -1,13 +1,13 @@
 use core::error::Error;
 
-use bevy_ecs::{component::Component, world::DeferredWorld};
+use bevy_ecs::{component::Component, world::EntityRef};
 use bevy_tasks::Task;
 
 #[cfg(feature = "futures-lite")]
 use crate::connection::FuturesLite;
 use crate::{
     bevy::NetworkVersion,
-    connection::{ConnectionError, EventConnection, Runtime},
+    connection::{ConnectionError, Runtime},
     event::{ClientboundEvent, ServerboundEvent},
 };
 
@@ -17,13 +17,24 @@ use crate::{
 /// [`ClientboundEvent`]s from the server.
 #[derive(Component)]
 pub struct ClientConnection {
-    connection: EventConnection<DeferredWorld<'static>>,
+    sender: Box<SenderFn>,
+    receiver: Box<ReceiverFn>,
     task: Task<Result<(), Box<dyn Error + Send + Sync>>>,
 }
 
+type SenderFn =
+    dyn for<'a> Fn(ServerboundEvent, EntityRef<'a>) -> Result<(), ConnectionError> + Send + Sync;
+type ReceiverFn = dyn for<'a> Fn(EntityRef<'a>) -> Result<Option<ClientboundEvent>, ConnectionError>
+    + Send
+    + Sync;
+
 impl ClientConnection {
-    /// Create a new [`ClientConnection`] using the given [`Runtime`] and
-    /// connection.
+    /// Create a new [`ClientConnection`] using the given connection.
+    ///
+    /// ## Note
+    ///
+    /// This method is only available when the `futures-lite` feature is
+    /// enabled, as it relies on the [`FuturesLite`] [`Runtime`].
     #[inline]
     #[must_use]
     #[cfg(feature = "futures-lite")]
@@ -39,12 +50,14 @@ impl ClientConnection {
     ///
     /// This is typically used internally by
     /// [`NetworkVersion::wrap_connection`].
+    #[inline]
     #[must_use]
-    pub const fn new_from(
-        connection: EventConnection<DeferredWorld<'static>>,
+    pub const fn new_from_parts(
+        sender: Box<SenderFn>,
+        receiver: Box<ReceiverFn>,
         task: Task<Result<(), Box<dyn Error + Send + Sync>>>,
     ) -> Self {
-        Self { connection, task }
+        Self { sender, receiver, task }
     }
 
     /// Send a [`ServerboundEvent`] to the server.
@@ -54,11 +67,11 @@ impl ClientConnection {
     /// Returns a [`ConnectionError`] if the event cannot be sent.
     #[inline]
     pub fn send(
-        &mut self,
+        &self,
         event: ServerboundEvent,
-        world: &mut DeferredWorld<'static>,
+        entity: EntityRef<'_>,
     ) -> Result<(), ConnectionError> {
-        self.connection.send(event, world)
+        (self.sender)(event, entity)
     }
 
     /// Receive a [`ClientboundEvent`] from the server.
@@ -68,24 +81,27 @@ impl ClientConnection {
     /// # Errors
     ///
     /// Returns a [`ConnectionError`] if an event cannot be received.
-    pub fn recv(
+    #[inline]
+    pub fn receive(
         &mut self,
-        world: &mut DeferredWorld<'static>,
+        entity: EntityRef<'_>,
     ) -> Result<Option<ClientboundEvent>, ConnectionError> {
-        self.connection.recv(world)
+        (self.receiver)(entity)
     }
 
     /// Poll the connection [`Task`] for completion.
     ///
     /// Returns `None` if the task is still running.
     ///
+    /// # Warning
+    ///
     /// If the task has been completed, this component should be
-    /// removed from the ECS to avoid polling it again.
+    /// removed from the ECS to avoid polling it again!
     ///
     /// # Errors
     ///
     /// Returns an error if the task has encountered an error.
-    pub fn poll(&mut self) -> Option<Result<(), Box<dyn Error + Send + Sync>>> {
+    pub fn poll_task(&mut self) -> Option<Result<(), Box<dyn Error + Send + Sync>>> {
         futures_lite::future::block_on(futures_lite::future::poll_once(&mut self.task))
     }
 }
