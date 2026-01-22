@@ -56,9 +56,9 @@ impl ClientConnection {
     pub fn send(
         &mut self,
         event: ServerboundEvent,
-        mut world: DeferredWorld<'static>,
+        world: &mut DeferredWorld<'static>,
     ) -> Result<(), ConnectionError> {
-        self.connection.send(event, &mut world)
+        self.connection.send(event, world)
     }
 
     /// Receive a [`ClientboundEvent`] from the server.
@@ -70,9 +70,9 @@ impl ClientConnection {
     /// Returns a [`ConnectionError`] if an event cannot be received.
     pub fn recv(
         &mut self,
-        mut world: DeferredWorld<'static>,
+        world: &mut DeferredWorld<'static>,
     ) -> Result<Option<ClientboundEvent>, ConnectionError> {
-        self.connection.recv(&mut world)
+        self.connection.recv(world)
     }
 
     /// Poll the connection [`Task`] for completion.
