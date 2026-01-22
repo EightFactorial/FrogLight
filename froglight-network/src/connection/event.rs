@@ -21,6 +21,8 @@ type ReceiverFn<T> =
 pub enum ConnectionError {
     /// The connection has been closed.
     Closed,
+    /// The connection channel is full.
+    Full,
 }
 
 impl<T> EventConnection<T> {

@@ -11,7 +11,7 @@ use futures_lite::{AsyncRead as FAsyncRead, AsyncWrite as FAsyncWrite};
 #[cfg(feature = "tokio")]
 use tokio::io::{AsyncRead as TAsyncRead, AsyncWrite as TAsyncWrite};
 
-use crate::connection::channel::ConnectionChannel;
+use crate::connection::channel::Channel as InnerChannel;
 
 /// A [`Version`]'ed connection that uses a specific [`Runtime`].
 #[derive(Clone)]
@@ -21,7 +21,7 @@ pub struct AsyncConnection<R: Runtime<C>, C, V: PacketVersion> {
     _phantom: PhantomData<(R, V)>,
 }
 
-type Channel<V> = ConnectionChannel<VersionPacket<V, Serverbound>, VersionPacket<V, Clientbound>>;
+type Channel<V> = InnerChannel<VersionPacket<V, Serverbound>, VersionPacket<V, Clientbound>>;
 
 impl<R: Runtime<C>, C, V: PacketVersion> AsyncConnection<R, C, V> {
     /// Create a new [`AsyncConnection`].
