@@ -3,8 +3,6 @@ use core::error::Error;
 use bevy_ecs::{component::Component, world::EntityRef};
 use bevy_tasks::Task;
 
-#[cfg(feature = "futures-lite")]
-use crate::connection::FuturesLite;
 use crate::{
     bevy::NetworkVersion,
     connection::{ConnectionError, Runtime},
@@ -30,19 +28,10 @@ type ReceiverFn = dyn for<'a> Fn(EntityRef<'a>) -> Result<Option<ClientboundEven
 
 impl ClientConnection {
     /// Create a new [`ClientConnection`] using the given connection.
-    ///
-    /// ## Note
-    ///
-    /// This method is only available when the `futures-lite` feature is
-    /// enabled, as it relies on the [`FuturesLite`] [`Runtime`].
     #[inline]
     #[must_use]
-    #[cfg(feature = "futures-lite")]
-    pub fn new<V: NetworkVersion, C>(connection: C) -> Self
-    where
-        FuturesLite: Runtime<C>,
-    {
-        V::wrap_connection::<C>(connection)
+    pub fn new<V: NetworkVersion, R: Runtime<C>, C>(connection: C) -> Self {
+        V::wrap_connection::<R, C>(connection)
     }
 
     /// Create a new [`ClientConnection`] from the given

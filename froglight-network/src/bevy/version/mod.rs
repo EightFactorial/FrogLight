@@ -6,11 +6,8 @@ use core::error::Error;
 
 use async_channel::{TryRecvError, TrySendError};
 use bevy_ecs::world::EntityRef;
-use bevy_tasks::IoTaskPool;
 use froglight_packet::version::{Clientbound, PacketVersion, Serverbound, VersionPacket};
 
-#[cfg(feature = "futures-lite")]
-use crate::connection::FuturesLite;
 use crate::{
     bevy::ClientConnection,
     connection::{AsyncConnection, Channel, ConnectionError, Runtime},
@@ -22,17 +19,8 @@ use crate::{
 pub trait NetworkVersion: PacketVersion {
     /// Create a new [`ClientConnection`] for this
     /// [`Version`](froglight_common::version::Version).
-    ///
-    /// ## Note
-    ///
-    /// This method is only available when the `futures-lite` feature is
-    /// enabled, as it relies on the [`FuturesLite`] [`Runtime`].
     #[must_use]
-    #[cfg(feature = "futures-lite")]
-    fn wrap_connection<C>(connection: C) -> ClientConnection
-    where
-        FuturesLite: Runtime<C>,
-    {
+    fn wrap_connection<R: Runtime<C>, C>(connection: C) -> ClientConnection {
         let (channel_a, channel_b) = Channel::new_pair(Some(64));
         let (receiver, sender) = channel_a.into_split();
 
@@ -52,9 +40,9 @@ pub trait NetworkVersion: PacketVersion {
                 Err(TryRecvError::Closed) => Err(ConnectionError::Closed),
             }),
             // Spawn the packet handler task to communicate with the server.
-            IoTaskPool::get().spawn(Self::packet_handler(
-                AsyncConnection::<FuturesLite, C, Self>::new(connection, channel_b),
-            )),
+            R::spawn_task(Self::packet_handler(AsyncConnection::<R, C, Self>::new(
+                connection, channel_b,
+            ))),
         )
     }
 

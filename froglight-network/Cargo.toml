@@ -33,6 +33,7 @@ froglight-registry = { features = ["async", "std"], workspace = true }
 froglight-world = { features = ["async", "froglight-biome", "froglight-block", "std"], workspace = true }
 
 # Optional dependencies
+async-compat = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_reflect = { features = ["std"], workspace = true, optional = true }
@@ -49,7 +50,7 @@ default = ["futures-lite"]
 # Enable `futures-lite` support.
 futures-lite = ["dep:futures-lite", "facet-minecraft/futures-lite"]
 # Enable `tokio` support.
-tokio = ["dep:tokio", "facet-minecraft/tokio"]
+tokio = ["dep:async-compat", "dep:tokio", "facet-minecraft/tokio"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-world/bevy"]

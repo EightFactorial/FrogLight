@@ -47,6 +47,7 @@ sha2 = { default-features = false, version = "0.11.0-rc.3" }
 # Other Dependencies
 arc-swap = { default-features = false, version = "1.8" }
 async-channel = { default-features = false, version = "2.5" }
+async-compat = { default-features = false, version = "0.2" }
 async-lock = { default-features = false, version = "3.4" }
 async-net = { default-features = false, version = "2.0" }
 bitvec = { default-features = false, version = "1.0" }

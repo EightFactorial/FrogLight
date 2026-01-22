@@ -2,6 +2,8 @@
 
 use core::marker::PhantomData;
 
+#[cfg(feature = "bevy")]
+use bevy_tasks::{IoTaskPool, Task};
 use facet::Facet;
 use facet_format::{DeserializeError as FDError, SerializeError as FSError};
 use facet_minecraft::{deserialize::DeserializeError, serialize::SerializeError};
@@ -120,6 +122,10 @@ pub trait Runtime<C> {
         writer: &mut C,
         value: &T,
     ) -> impl Future<Output = Result<(), FSError<SerializeError>>>;
+
+    /// Spawn a task on the [`IoTaskPool`].
+    #[cfg(feature = "bevy")]
+    fn spawn_task<Fut: Future<Output = Ret> + 'static, Ret: 'static>(future: Fut) -> Task<Ret>;
 }
 
 /// Marker type for the [`futures_lite`] runtime.
@@ -143,6 +149,12 @@ impl<C: FAsyncRead + FAsyncWrite + Unpin> Runtime<C> for FuturesLite {
     ) -> impl Future<Output = Result<(), FSError<SerializeError>>> {
         facet_minecraft::to_async_writer::<T, C>(value, writer)
     }
+
+    #[inline]
+    #[cfg(feature = "bevy")]
+    fn spawn_task<Fut: Future<Output = Ret> + 'static, Ret: 'static>(future: Fut) -> Task<Ret> {
+        IoTaskPool::get().spawn(future)
+    }
 }
 
 /// Marker type for the [`tokio`] runtime.
@@ -165,5 +177,11 @@ impl<C: TAsyncRead + TAsyncWrite + Unpin> Runtime<C> for Tokio {
         value: &T,
     ) -> impl Future<Output = Result<(), FSError<SerializeError>>> {
         facet_minecraft::to_tokio_writer::<T, C>(value, writer)
+    }
+
+    #[inline]
+    #[cfg(feature = "bevy")]
+    fn spawn_task<Fut: Future<Output = Ret> + 'static, Ret: 'static>(future: Fut) -> Task<Ret> {
+        IoTaskPool::get().spawn(async_compat::Compat::new(future))
     }
 }
