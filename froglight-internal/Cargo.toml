@@ -31,6 +31,7 @@ froglight-world = { features = ["froglight-biome", "froglight-block"], workspace
 
 # Optional dependencies
 bevy_app = { workspace = true, optional = true }
+froglight-api = { features = ["ureq"], workspace = true, optional = true }
 froglight-network = { features = ["futures-lite"], workspace = true, optional = true }
 
 # --- Features ---
@@ -39,11 +40,11 @@ froglight-network = { features = ["futures-lite"], workspace = true, optional = 
 default = ["network", "std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-math/bevy", "froglight-network?/bevy", "froglight-packet/bevy", "froglight-world/bevy"]
+bevy = ["dep:bevy_app", "froglight-api?/bevy", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-math/bevy", "froglight-network?/bevy", "froglight-packet/bevy", "froglight-world/bevy"]
 # Enable `tracing` support.
 tracing = ["froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-world/tracing"]
 # Enable networking support.
-network = ["dep:froglight-network", "std"]
+network = ["dep:froglight-api", "dep:froglight-network", "std"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block/libm", "froglight-math/libm", "froglight-world/libm"]

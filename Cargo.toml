@@ -4,7 +4,7 @@
 [workspace.dependencies]
 # Workspace Crates
 froglight = { default-features = false, path = "froglight", version = "0.0.1" }
-# froglight-api = { default-features = false, path = "froglight-api" }
+froglight-api = { default-features = false, path = "froglight-api", version = "0.0.1" }
 froglight-biome = { default-features = false, path = "froglight-biome", version = "0.0.1" }
 froglight-block = { default-features = false, path = "froglight-block", version = "0.0.1" }
 # froglight-brigadier = { default-features = false, path = "froglight-brigadier" }
@@ -59,10 +59,12 @@ indexmap = { default-features = false, version = "2.13" }
 libm = { default-features = false, version = "0.2" }
 once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
+reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }
 smallvec = { default-features = false, version = "1.15" }
 tokio = { default-features = false, version = "1.0" }
 tracing = { default-features = false, version = "0.1" }
+ureq = { default-features = false, version = "3.1" }
 uuid = { default-features = false, version = "1.19" }
 variadics_please = { default-features = false, version = "1.1" }
 zerocopy = { default-features = false, version = "0.8" }
@@ -80,7 +82,7 @@ tracing-subscriber = { features = ["tracing-log"], version = "0.3" }
 default-members = ["froglight"]
 members = [
   "froglight",
-  # "froglight-api",
+  "froglight-api",
   "froglight-biome",
   "froglight-block",
   # "froglight-brigadier",

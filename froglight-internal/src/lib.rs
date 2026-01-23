@@ -1,6 +1,8 @@
 #![doc = include_str!("../README.md")]
 #![no_std]
 
+#[cfg(feature = "network")]
+pub use froglight_api as api;
 pub use froglight_biome as biome;
 pub use froglight_block as block;
 pub use froglight_common as common;
@@ -21,7 +23,7 @@ pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
     #[cfg(feature = "network")]
-    pub use crate::network::prelude::*;
+    pub use crate::{api::prelude::*, network::prelude::*};
     pub use crate::{
         biome::prelude::*, block::prelude::*, common::prelude::*, inventory::prelude::*,
         math::prelude::*, packet::prelude::*, registry::prelude::*, world::prelude::*,
