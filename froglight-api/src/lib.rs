@@ -10,5 +10,5 @@ pub mod resolver;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{agent::Agent, resolver::Resolver};
+    pub use crate::{agent::HttpAgent, resolver::DnsResolver};
 }

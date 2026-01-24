@@ -23,13 +23,15 @@ mod reqwest;
 pub use ::reqwest::blocking::Client as ReqwestAgent;
 
 /// An agent which can perform network operations.
+///
+/// Supports multiple underlying implementations via the [`NetworkAgent`] trait.
 #[repr(transparent)]
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Resource, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Clone, Resource))]
-pub struct Agent(Arc<dyn NetworkAgent>);
+pub struct HttpAgent(Arc<dyn NetworkAgent>);
 
-impl Agent {
+impl HttpAgent {
     /// Creates a new [`Agent`] from a [`NetworkAgent`].
     #[inline]
     #[must_use]
@@ -46,12 +48,12 @@ impl Agent {
     pub const fn as_arc(&self) -> &Arc<dyn NetworkAgent> { &self.0 }
 }
 
-impl AsRef<dyn NetworkAgent> for Agent {
+impl AsRef<dyn NetworkAgent> for HttpAgent {
     #[inline]
     fn as_ref(&self) -> &dyn NetworkAgent { &*self.0 }
 }
 
-impl Deref for Agent {
+impl Deref for HttpAgent {
     type Target = dyn NetworkAgent;
 
     #[inline]
