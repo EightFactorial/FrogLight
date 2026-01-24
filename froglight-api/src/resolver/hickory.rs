@@ -116,6 +116,9 @@ impl RuntimeProvider for DnsProvider {
         timeout: Option<Duration>,
     ) -> Pin<Box<dyn Send + Future<Output = io::Result<Self::Tcp>>>> {
         Box::pin(async move {
+            #[cfg(feature = "tracing")]
+            tracing::trace!(target: "froglight_api::resolver", "Creating TCP socket from {bind_addr:?} to {server_addr}");
+
             let socket =
                 Socket::new(Domain::for_address(server_addr), Type::STREAM, Some(Protocol::TCP))?;
 
@@ -140,6 +143,9 @@ impl RuntimeProvider for DnsProvider {
         server_addr: SocketAddr,
     ) -> Pin<Box<dyn Send + Future<Output = io::Result<Self::Udp>>>> {
         Box::pin(async move {
+            #[cfg(feature = "tracing")]
+            tracing::trace!(target: "froglight_api::resolver", "Creating UDP socket from {local_addr} to {server_addr}");
+
             let socket =
                 Socket::new(Domain::for_address(local_addr), Type::DGRAM, Some(Protocol::UDP))?;
 

@@ -4,7 +4,6 @@ use std::{
     error::Error,
     fmt::Debug,
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
-    ops::Deref,
     sync::Arc,
 };
 
@@ -37,7 +36,7 @@ pub use hickory::Resolver;
 #[repr(transparent)]
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Resource, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(opaque, Clone, Default, Resource))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, Default, Resource))]
 pub struct DnsResolver(Arc<dyn NetworkResolver>);
 
 impl DnsResolver {
@@ -63,23 +62,82 @@ impl DnsResolver {
     pub fn spawn_task_using<F: AsyncFnOnce(Self) + 'static>(&self, f: F) {
         bevy_tasks::IoTaskPool::get().spawn(f(self.clone())).detach();
     }
-}
 
-impl AsRef<dyn NetworkResolver> for DnsResolver {
-    #[inline]
-    fn as_ref(&self) -> &dyn NetworkResolver { &*self.0 }
-}
+    /// Resolves the given name to an iterator of [`IpAddr`]s.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    pub async fn lookup_ip(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = IpAddr> + Send>, Box<dyn Error + Send + Sync>> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_api::resolver", "Resolving IP for \"{name}\"");
+        self.0.lookup_ip(name).await
+    }
 
-impl Deref for DnsResolver {
-    type Target = dyn NetworkResolver;
+    /// Resolves the given name to an iterator of [`Ipv4Addr`]s.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    pub async fn lookup_ipv4(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = Ipv4Addr> + Send>, Box<dyn Error + Send + Sync>> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_api::resolver", "Resolving IPv4 for \"{name}\"");
+        self.0.lookup_ipv4(name).await
+    }
 
-    #[inline]
-    fn deref(&self) -> &Self::Target { &*self.0 }
+    /// Resolves the given name to an iterator of [`Ipv6Addr`]s.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    pub async fn lookup_ipv6(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = Ipv6Addr> + Send>, Box<dyn Error + Send + Sync>> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_api::resolver", "Resolving IPv6 for \"{name}\"");
+        self.0.lookup_ipv6(name).await
+    }
+
+    /// Resolves the given name to an iterator of nameserver [`String`]s.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    pub async fn lookup_ns(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = String> + Send>, Box<dyn Error + Send + Sync>> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_api::resolver", "Resolving NS for \"{name}\"");
+        self.0.lookup_ns(name).await
+    }
+
+    /// Resolves the given name to an iterator of SRV records as
+    /// `(target, port)` tuples.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    pub async fn lookup_srv(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = (String, u16)> + Send>, Box<dyn Error + Send + Sync>> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_api::resolver", "Resolving SRV for \"{name}\"");
+        self.0.lookup_srv(name).await
+    }
 }
 
 impl Debug for DnsResolver {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("DnsResolver").finish()
+        f.debug_tuple("DnsResolver").field(&"Arc<dyn NetworkResolver>").finish()
     }
 }
 
@@ -214,7 +272,14 @@ impl UreqResolver for DnsResolver {
     ) -> Result<ResolvedSocketAddrs, ureq::Error> {
         use std::net::SocketAddr;
 
-        async_io::block_on(NetworkResolver::lookup_ip(&*self.0, &uri.to_string())).map_or_else(
+        let host = uri.host().ok_or_else(|| {
+            ureq::Error::Other(Box::new(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "URI is missing a host",
+            )))
+        })?;
+
+        async_io::block_on(self.lookup_ip(host)).map_or_else(
             |err| Err(ureq::Error::Other(err)),
             |ips| {
                 let port = uri.port_u16().unwrap_or_else(|| match uri.scheme() {
@@ -223,8 +288,11 @@ impl UreqResolver for DnsResolver {
                 });
 
                 let mut results = self.empty();
-                ips.zip(results.iter_mut())
-                    .for_each(|(ip, slot)| *slot = SocketAddr::new(ip, port));
+                ips.into_iter()
+                    .for_each(|ip| results.push(SocketAddr::new(ip, port)));
+                #[cfg(feature = "tracing")]
+                tracing::trace!(target: "froglight_api::resolver::ureq", "Resolved \"{host}\" to {:?}", results.as_ref());
+
                 Ok(results)
             },
         )
@@ -244,6 +312,13 @@ impl UreqResolver for Resolver {
         use async_io::block_on;
         use ureq::config::IpFamily;
 
+        let host = uri.host().ok_or_else(|| {
+            ureq::Error::Other(Box::new(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                "URI is missing a host",
+            )))
+        })?;
+
         let mut results = self.empty();
         let port = uri.port_u16().unwrap_or_else(|| match uri.scheme() {
             Some(https) if https.as_str() == "https" => 443,
@@ -251,28 +326,28 @@ impl UreqResolver for Resolver {
         });
 
         match config.ip_family() {
-            IpFamily::Any => match block_on(self.as_resolver().lookup_ip(uri.to_string())) {
-                Ok(lookup) => lookup
-                    .into_iter()
-                    .zip(results.iter_mut())
-                    .for_each(|(ip, slot)| *slot = SocketAddr::new(ip, port)),
+            IpFamily::Any => match block_on(self.as_resolver().lookup_ip(host)) {
+                Ok(lookup) => {
+                    lookup.into_iter().for_each(|ip| results.push(SocketAddr::new(ip, port)));
+                }
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
             IpFamily::Ipv4Only => match block_on(self.as_resolver().ipv4_lookup(uri.to_string())) {
                 Ok(lookup) => lookup
                     .into_iter()
-                    .zip(results.iter_mut())
-                    .for_each(|(a, slot)| *slot = SocketAddr::new(IpAddr::V4(a.0), port)),
+                    .for_each(|a| results.push(SocketAddr::new(IpAddr::V4(a.0), port))),
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
             IpFamily::Ipv6Only => match block_on(self.as_resolver().ipv6_lookup(uri.to_string())) {
                 Ok(lookup) => lookup
                     .into_iter()
-                    .zip(results.iter_mut())
-                    .for_each(|(aaaa, slot)| *slot = SocketAddr::new(IpAddr::V6(aaaa.0), port)),
+                    .for_each(|aaaa| results.push(SocketAddr::new(IpAddr::V6(aaaa.0), port))),
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
         }
+
+        #[cfg(feature = "tracing")]
+        tracing::trace!(target: "froglight_api::resolver::ureq", "Resolved \"{host}\" to {:?}", results.as_ref());
 
         Ok(results)
     }
@@ -285,10 +360,16 @@ impl ReqwestResolve for Resolver {
 
         let resolver = self.clone();
         Box::pin(async move {
+            #[cfg(feature = "tracing")]
+            tracing::trace!(target: "froglight_api::resolver::reqwest", "Resolving IP for \"{}\"", name.as_str());
+
             resolver.as_resolver().lookup_ip(name.as_str().to_string()).await.map_or_else(
                 |err| -> Result<_, Box<dyn Error + Send + Sync>> { Err(Box::new(err)) },
                 |val| -> Result<Box<dyn Iterator<Item = SocketAddr> + Send>, _> {
-                    Ok(Box::new(val.into_iter().map(|ip| SocketAddr::new(ip, 80))))
+                    #[cfg(feature = "tracing")]
+                    tracing::trace!(target: "froglight_api::resolver::reqwest", "Resolved \"{}\" to IPs {:?}", name.as_str(), val.as_lookup().records());
+
+                    Ok(Box::new(val.into_iter().map(move |ip| SocketAddr::new(ip, 0))))
                 },
             )
         })
@@ -302,9 +383,12 @@ impl ReqwestResolve for DnsResolver {
 
         let resolver = self.clone();
         Box::pin(async move {
-            NetworkResolver::lookup_ip(&*resolver.0, name.as_str()).await.map(
+            #[cfg(feature = "tracing")]
+            tracing::trace!(target: "froglight_api::resolver::reqwest", "Resolving IP for \"{}\"", name.as_str());
+
+            resolver.lookup_ip(name.as_str()).await.map(
                 |val| -> Box<dyn Iterator<Item = SocketAddr> + Send> {
-                    Box::new(val.into_iter().map(|ip| SocketAddr::new(ip, 80)))
+                    Box::new(val.into_iter().map(move |ip| SocketAddr::new(ip, 0)))
                 },
             )
         })
