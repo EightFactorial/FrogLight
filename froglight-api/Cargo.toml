@@ -21,7 +21,7 @@ workspace = true
 [dependencies]
 async-io = { workspace = true, optional = true }
 async-net = { workspace = true, optional = true }
-async-trait = { workspace = true, optional = true }
+async-trait = { workspace = true }
 bevy_app = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_reflect = { features = ["std"], workspace = true, optional = true }
@@ -43,12 +43,12 @@ default = ["resolver", "ureq"]
 # Enable `reqwest` support.
 reqwest = ["dep:reqwest"]
 # Enable `ureq` support.
-ureq = ["dep:ureq"]
+ureq = ["dep:async-io", "dep:ureq"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks"]
 # Enable `hickory-resolver` support.
-resolver = ["dep:async-io", "dep:async-net", "dep:async-trait", "dep:blocking", "dep:futures-lite", "dep:hickory-resolver", "dep:socket2"]
+resolver = ["dep:async-io", "dep:async-net", "dep:blocking", "dep:futures-lite", "dep:hickory-resolver", "dep:socket2"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 

@@ -1,7 +1,14 @@
 //! TODO
 
-use std::{fmt::Debug, net::IpAddr, ops::Deref, sync::Arc};
+use std::{
+    error::Error,
+    fmt::Debug,
+    net::{IpAddr, Ipv4Addr, Ipv6Addr},
+    ops::Deref,
+    sync::Arc,
+};
 
+use async_trait::async_trait;
 #[cfg(feature = "bevy")]
 use bevy_ecs::{reflect::ReflectResource, resource::Resource};
 #[cfg(feature = "bevy")]
@@ -48,6 +55,14 @@ impl DnsResolver {
     #[inline]
     #[must_use]
     pub const fn as_arc(&self) -> &Arc<dyn NetworkResolver> { &self.0 }
+
+    /// Spawns a task on bevy's [`IoTaskPool`](bevy_tasks::IoTaskPool) to
+    /// run the given async function with this resolver.
+    #[inline]
+    #[cfg(feature = "bevy")]
+    pub fn spawn_task_using<F: AsyncFnOnce(Self) + 'static>(&self, f: F) {
+        bevy_tasks::IoTaskPool::get().spawn(f(self.clone())).detach();
+    }
 }
 
 impl AsRef<dyn NetworkResolver> for DnsResolver {
@@ -77,27 +92,111 @@ impl Default for DnsResolver {
 // -------------------------------------------------------------------------------------------------
 
 /// A trait for types that can act as network agents.
+#[async_trait]
 pub trait NetworkResolver: Send + Sync + 'static {
-    /// Resolves the given host to an iterator of [`IpAddr`]s.
+    /// Resolves the given name to an iterator of [`IpAddr`]s.
     ///
     /// # Errors
     ///
     /// Returns an error if name resolution fails.
-    fn resolve(
+    async fn lookup_ip(
         &self,
-        host: &str,
-    ) -> Result<Box<dyn Iterator<Item = IpAddr> + Send>, Box<dyn std::error::Error + Send + Sync>>;
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = IpAddr> + Send>, Box<dyn Error + Send + Sync>>;
+
+    /// Resolves the given name to an iterator of [`Ipv4Addr`]s.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    async fn lookup_ipv4(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = Ipv4Addr> + Send>, Box<dyn Error + Send + Sync>>;
+
+    /// Resolves the given name to an iterator of [`Ipv6Addr`]s.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    async fn lookup_ipv6(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = Ipv6Addr> + Send>, Box<dyn Error + Send + Sync>>;
+
+    /// Resolves the given name to an iterator of nameserver [`String`]s.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    async fn lookup_ns(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = String> + Send>, Box<dyn Error + Send + Sync>>;
+
+    /// Resolves the given name to an iterator of SRV records as `(target,
+    /// port)` tuples.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if name resolution fails.
+    async fn lookup_srv(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = (String, u16)> + Send>, Box<dyn Error + Send + Sync>>;
 }
 
+#[async_trait]
 #[cfg(feature = "resolver")]
 impl NetworkResolver for Resolver {
-    fn resolve(
+    async fn lookup_ip(
         &self,
-        host: &str,
-    ) -> Result<Box<dyn Iterator<Item = IpAddr> + Send>, Box<dyn std::error::Error + Send + Sync>>
-    {
-        match async_io::block_on(self.as_resolver().lookup_ip(host.to_string())) {
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = IpAddr> + Send>, Box<dyn Error + Send + Sync>> {
+        match self.as_resolver().lookup_ip(name).await {
             Ok(lookup) => Ok(Box::new(lookup.into_iter())),
+            Err(err) => Err(Box::new(err)),
+        }
+    }
+
+    async fn lookup_ipv4(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = Ipv4Addr> + Send>, Box<dyn Error + Send + Sync>> {
+        match self.as_resolver().ipv4_lookup(name).await {
+            Ok(lookup) => Ok(Box::new(lookup.into_iter().map(|a| a.0))),
+            Err(err) => Err(Box::new(err)),
+        }
+    }
+
+    async fn lookup_ipv6(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = Ipv6Addr> + Send>, Box<dyn Error + Send + Sync>> {
+        match self.as_resolver().ipv6_lookup(name).await {
+            Ok(lookup) => Ok(Box::new(lookup.into_iter().map(|aaaa| aaaa.0))),
+            Err(err) => Err(Box::new(err)),
+        }
+    }
+
+    async fn lookup_ns(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = String> + Send>, Box<dyn Error + Send + Sync>> {
+        match self.as_resolver().ns_lookup(name).await {
+            Ok(lookup) => Ok(Box::new(lookup.into_iter().map(|ns| ns.to_utf8()))),
+            Err(err) => Err(Box::new(err)),
+        }
+    }
+
+    async fn lookup_srv(
+        &self,
+        name: &str,
+    ) -> Result<Box<dyn Iterator<Item = (String, u16)> + Send>, Box<dyn Error + Send + Sync>> {
+        match self.as_resolver().srv_lookup(name).await {
+            Ok(lookup) => {
+                Ok(Box::new(lookup.into_iter().map(|srv| (srv.target().to_utf8(), srv.port()))))
+            }
             Err(err) => Err(Box::new(err)),
         }
     }
@@ -115,10 +214,14 @@ impl UreqResolver for DnsResolver {
     ) -> Result<ResolvedSocketAddrs, ureq::Error> {
         use std::net::SocketAddr;
 
-        NetworkResolver::resolve(&*self.0, &uri.to_string()).map_or_else(
+        async_io::block_on(NetworkResolver::lookup_ip(&*self.0, &uri.to_string())).map_or_else(
             |err| Err(ureq::Error::Other(err)),
             |ips| {
-                let port = uri.port().map_or(80, |p| p.as_u16());
+                let port = uri.port_u16().unwrap_or_else(|| match uri.scheme() {
+                    Some(https) if https.as_str() == "https" => 443,
+                    None | Some(_) => 80,
+                });
+
                 let mut results = self.empty();
                 ips.zip(results.iter_mut())
                     .for_each(|(ip, slot)| *slot = SocketAddr::new(ip, port));
@@ -142,7 +245,10 @@ impl UreqResolver for Resolver {
         use ureq::config::IpFamily;
 
         let mut results = self.empty();
-        let port = uri.port().map_or(80, |p| p.as_u16());
+        let port = uri.port_u16().unwrap_or_else(|| match uri.scheme() {
+            Some(https) if https.as_str() == "https" => 443,
+            None | Some(_) => 80,
+        });
 
         match config.ip_family() {
             IpFamily::Any => match block_on(self.as_resolver().lookup_ip(uri.to_string())) {
@@ -196,7 +302,7 @@ impl ReqwestResolve for DnsResolver {
 
         let resolver = self.clone();
         Box::pin(async move {
-            NetworkResolver::resolve(&*resolver.0, name.as_str()).map(
+            NetworkResolver::lookup_ip(&*resolver.0, name.as_str()).await.map(
                 |val| -> Box<dyn Iterator<Item = SocketAddr> + Send> {
                     Box::new(val.into_iter().map(|ip| SocketAddr::new(ip, 80)))
                 },
