@@ -2,6 +2,7 @@
 #![allow(clippy::std_instead_of_alloc, reason = "Requires the standard library")]
 #![allow(clippy::std_instead_of_core, reason = "Requires the standard library")]
 
+pub mod api;
 #[cfg(feature = "bevy")]
 pub mod bevy;
 pub mod client;

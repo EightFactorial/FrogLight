@@ -23,8 +23,11 @@ async-compat = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [dependencies]
-async-io = { workspace = true, optional = true }
 async-trait = { workspace = true }
+uuid = { features = ["std"], workspace = true }
+
+# Optional dependencies
+async-io = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_reflect = { features = ["std"], workspace = true, optional = true }

@@ -2,7 +2,7 @@
 
 use bevy_app::{App, Plugin};
 
-use crate::{client::HttpClient, resolver::DnsResolver};
+use crate::{api::ClientApi, client::HttpClient, resolver::DnsResolver};
 
 /// A [`Plugin`] that adds DNS and HTTP capabilities.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
@@ -10,7 +10,9 @@ pub struct ApiPlugin;
 
 impl Plugin for ApiPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<HttpClient>().register_type::<DnsResolver>();
+        app.register_type::<ClientApi>()
+            .register_type::<HttpClient>()
+            .register_type::<DnsResolver>();
 
         #[cfg(feature = "resolver")]
         app.init_resource::<DnsResolver>();

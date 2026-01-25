@@ -31,8 +31,15 @@ mod ureq;
 #[repr(transparent)]
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Resource, Reflect))]
-#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, Default, Resource))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, Resource))]
+#[cfg_attr(all(feature = "bevy", feature = "resolver"), reflect(Default))]
 pub struct DnsResolver(Arc<dyn NetworkResolver>);
+
+#[cfg(feature = "resolver")]
+impl Default for DnsResolver {
+    #[inline]
+    fn default() -> Self { Self::new(hickory::Resolver::default()) }
+}
 
 impl DnsResolver {
     /// Creates a new [`Resolver`] from a [`NetworkResolver`].
@@ -137,12 +144,6 @@ impl Debug for DnsResolver {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_tuple("DnsResolver").field(&"Arc<dyn NetworkResolver>").finish()
     }
-}
-
-#[cfg(feature = "resolver")]
-impl Default for DnsResolver {
-    #[inline]
-    fn default() -> Self { Self::new(hickory::Resolver::default()) }
 }
 
 // -------------------------------------------------------------------------------------------------
