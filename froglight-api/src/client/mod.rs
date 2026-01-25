@@ -145,6 +145,7 @@ pub enum HttpError {
     Other(Box<dyn Error + Send + Sync>),
 }
 
+impl Error for HttpError {}
 impl Display for HttpError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

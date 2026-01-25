@@ -3,6 +3,8 @@
 use std::{
     error::Error,
     fmt::{self, Debug, Display},
+    str::Utf8Error,
+    string::FromUtf8Error,
     sync::Arc,
 };
 
@@ -129,16 +131,38 @@ pub trait NetworkApi: Send + Sync + 'static {
 pub enum ApiError {
     /// An HTTP error occurred.
     Http(HttpError),
+    /// A UTF-8 error occurred.
+    Utf8(Utf8Error),
+    /// A JSON error occurred.
+    Serde(serde_json::Error),
+
     /// An unspecified error occurred.
     Other(Box<dyn Error + Send + Sync>),
 }
 
+impl Error for ApiError {}
 impl Display for ApiError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ApiError::Http(err) => write!(f, "failed to make request, {err}"),
+            ApiError::Utf8(err) => write!(f, "failed to parse response as utf-8, {err}"),
+            ApiError::Serde(err) => write!(f, "failed to parse response as json, {err}"),
             ApiError::Other(err) => Display::fmt(err, f),
         }
     }
 }
-impl Error for ApiError {}
+
+impl From<HttpError> for ApiError {
+    fn from(value: HttpError) -> Self { ApiError::Http(value) }
+}
+
+impl From<Utf8Error> for ApiError {
+    fn from(value: Utf8Error) -> Self { ApiError::Utf8(value) }
+}
+impl From<FromUtf8Error> for ApiError {
+    fn from(value: FromUtf8Error) -> Self { ApiError::Utf8(value.utf8_error()) }
+}
+
+impl From<serde_json::Error> for ApiError {
+    fn from(value: serde_json::Error) -> Self { ApiError::Serde(value) }
+}

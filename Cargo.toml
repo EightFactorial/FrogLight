@@ -65,6 +65,7 @@ once_cell = { default-features = false, version = "1.21" }
 parking_lot = { default-features = false, version = "0.12" }
 reqwest = { default-features = false, version = "0.13" }
 serde = { default-features = false, version = "1.0" }
+serde_json = { default-features = false, version = "1.0" }
 smallvec = { default-features = false, version = "1.15" }
 socket2 = { default-features = false, version = "0.6" }
 tokio = { default-features = false, version = "1.0" }
