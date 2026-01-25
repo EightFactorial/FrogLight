@@ -3,17 +3,16 @@
 use std::{
     fmt::{self, Debug, Display},
     io,
-    net::SocketAddr,
+    net::{SocketAddr, TcpStream, UdpSocket},
     ops::{Deref, DerefMut},
     pin::Pin,
     task::{Context, Poll},
     time::Duration,
 };
 
-use async_io::Timer;
-use async_net::{TcpStream, UdpSocket};
+use async_io::{Async, Timer};
 use async_trait::async_trait;
-use futures_lite::{AsyncRead, AsyncWrite, future::or, pin};
+use futures_lite::{AsyncRead, AsyncWrite, future::or, ready};
 pub use hickory_resolver::{
     Resolver as HickoryResolver,
     config::{ResolverConfig as HickoryConfig, ResolverOpts as HickoryOpts},
@@ -182,7 +181,7 @@ impl RuntimeProvider for DnsExecutor {
                 socket.connect(&SockAddr::from(server_addr))?;
             }
 
-            Ok(TcpStreamWrap(TcpStream::try_from(std::net::TcpStream::from(socket))?))
+            Ok(TcpStreamWrap { stream: Async::new(TcpStream::from(socket))? })
         })
     }
 
@@ -201,20 +200,26 @@ impl RuntimeProvider for DnsExecutor {
             socket.set_nonblocking(true)?;
             socket.bind(&SockAddr::from(local_addr))?;
 
-            Ok(UdpSocketWrap(UdpSocket::try_from(std::net::UdpSocket::from(socket))?))
+            Ok(UdpSocketWrap { socket: Async::new(UdpSocket::from(socket))? })
         })
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// A wrapper around [`TcpStream`] to implement [`DnsTcpStream`].
+/// A wrapper around [`Async<TcpStream>`] to implement [`DnsTcpStream`].
 #[repr(transparent)]
-pub struct TcpStreamWrap(pub TcpStream);
+pub struct TcpStreamWrap {
+    /// The inner [`Async<TcpStream>`].
+    pub stream: Async<TcpStream>,
+}
 
-/// A wrapper around [`UdpSocket`] to implement [`DnsUdpSocket`].
+/// A wrapper around [`Async<UdpSocket>`] to implement [`DnsUdpSocket`].
 #[repr(transparent)]
-pub struct UdpSocketWrap(pub UdpSocket);
+pub struct UdpSocketWrap {
+    /// The inner [`Async<UdpSocket>`].
+    pub socket: Async<UdpSocket>,
+}
 
 impl DnsTcpStream for TcpStreamWrap {
     type Time = DnsTimer;
@@ -227,7 +232,7 @@ impl AsyncRead for TcpStreamWrap {
         cx: &mut Context<'_>,
         buf: &mut [u8],
     ) -> Poll<io::Result<usize>> {
-        <TcpStream as AsyncRead>::poll_read(Pin::new(&mut self.get_mut().0), cx, buf)
+        Pin::new(&mut self.get_mut().stream).poll_read(cx, buf)
     }
 
     #[inline]
@@ -236,7 +241,7 @@ impl AsyncRead for TcpStreamWrap {
         cx: &mut Context<'_>,
         bufs: &mut [io::IoSliceMut<'_>],
     ) -> Poll<io::Result<usize>> {
-        <TcpStream as AsyncRead>::poll_read_vectored(Pin::new(&mut self.get_mut().0), cx, bufs)
+        Pin::new(&mut self.get_mut().stream).poll_read_vectored(cx, bufs)
     }
 }
 
@@ -247,7 +252,7 @@ impl AsyncWrite for TcpStreamWrap {
         cx: &mut Context<'_>,
         buf: &[u8],
     ) -> Poll<io::Result<usize>> {
-        <TcpStream as AsyncWrite>::poll_write(Pin::new(&mut self.get_mut().0), cx, buf)
+        Pin::new(&mut self.get_mut().stream).poll_write(cx, buf)
     }
 
     #[inline]
@@ -256,23 +261,20 @@ impl AsyncWrite for TcpStreamWrap {
         cx: &mut Context<'_>,
         bufs: &[io::IoSlice<'_>],
     ) -> Poll<io::Result<usize>> {
-        <TcpStream as AsyncWrite>::poll_write_vectored(Pin::new(&mut self.get_mut().0), cx, bufs)
+        Pin::new(&mut self.get_mut().stream).poll_write_vectored(cx, bufs)
     }
 
     #[inline]
     fn poll_flush(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
-        <TcpStream as AsyncWrite>::poll_flush(Pin::new(&mut self.get_mut().0), cx)
+        Pin::new(&mut self.get_mut().stream).poll_flush(cx)
     }
 
     #[inline]
     fn poll_close(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<io::Result<()>> {
-        <TcpStream as AsyncWrite>::poll_close(Pin::new(&mut self.get_mut().0), cx)
+        Pin::new(&mut self.get_mut().stream).poll_close(cx)
     }
 }
 
-// TODO: Figure out how this is supposed to work?
-// `pin!(fut)` and `fut.poll(cx)` doesn't wake the task,
-// and this is essentially a busy-loop.
 #[async_trait]
 impl DnsUdpSocket for UdpSocketWrap {
     type Time = DnsTimer;
@@ -282,16 +284,8 @@ impl DnsUdpSocket for UdpSocketWrap {
         cx: &mut Context<'_>,
         buf: &mut [u8],
     ) -> Poll<io::Result<(usize, SocketAddr)>> {
-        let fut = UdpSocket::recv_from(&self.0, buf);
-        pin!(fut);
-
-        match fut.poll(cx) {
-            Poll::Pending => {
-                cx.waker().wake_by_ref();
-                Poll::Pending
-            }
-            Poll::Ready(res) => Poll::Ready(res),
-        }
+        ready!(self.socket.poll_readable(cx))?;
+        Poll::Ready(self.socket.get_ref().recv_from(buf))
     }
 
     fn poll_send_to(
@@ -300,16 +294,8 @@ impl DnsUdpSocket for UdpSocketWrap {
         buf: &[u8],
         target: SocketAddr,
     ) -> Poll<io::Result<usize>> {
-        let fut = UdpSocket::send_to(&self.0, buf, target);
-        pin!(fut);
-
-        match fut.poll(cx) {
-            Poll::Pending => {
-                cx.waker().wake_by_ref();
-                Poll::Pending
-            }
-            Poll::Ready(res) => Poll::Ready(res),
-        }
+        ready!(self.socket.poll_writable(cx))?;
+        Poll::Ready(self.socket.get_ref().send_to(buf, target))
     }
 }
 
