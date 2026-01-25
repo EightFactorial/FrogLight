@@ -13,7 +13,7 @@ use std::{
 use async_io::Timer;
 use async_net::{TcpStream, UdpSocket};
 use async_trait::async_trait;
-use futures_lite::{AsyncRead, AsyncWrite, future::or, pin};
+use futures_lite::{AsyncRead, AsyncWrite, future::or};
 pub use hickory_resolver::{
     Resolver as HickoryResolver,
     config::{ResolverConfig as HickoryConfig, ResolverOpts as HickoryOpts},
@@ -270,31 +270,27 @@ impl AsyncWrite for TcpStreamWrap {
     }
 }
 
+// TODO: Figure out how this is supposed to work?
+// `pin!(fut)` and `fut.poll(cx)` doesn't wake the task...
 #[async_trait]
 impl DnsUdpSocket for UdpSocketWrap {
     type Time = DnsTimer;
 
     fn poll_recv_from(
         &self,
-        cx: &mut Context<'_>,
+        _: &mut Context<'_>,
         buf: &mut [u8],
     ) -> Poll<io::Result<(usize, SocketAddr)>> {
-        let fut = UdpSocket::recv_from(&self.0, buf);
-        pin!(fut);
-
-        fut.poll(cx)
+        Poll::Ready(async_io::block_on(UdpSocket::recv_from(&self.0, buf)))
     }
 
     fn poll_send_to(
         &self,
-        cx: &mut Context<'_>,
+        _: &mut Context<'_>,
         buf: &[u8],
         target: SocketAddr,
     ) -> Poll<io::Result<usize>> {
-        let fut = UdpSocket::send_to(&self.0, buf, target);
-        pin!(fut);
-
-        fut.poll(cx)
+        Poll::Ready(async_io::block_on(UdpSocket::send_to(&self.0, buf, target)))
     }
 }
 

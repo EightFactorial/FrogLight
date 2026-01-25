@@ -29,6 +29,9 @@ impl Resolver for DnsResolver {
             )))
         })?;
 
+        #[cfg(feature = "tracing")]
+        tracing::trace!(target: "froglight_api::resolver::ureq", "Resolving IP for \"{host}\"");
+
         block_on(self.lookup_ip(host)).map_or_else(
             |err| Err(ureq::Error::Other(err)),
             |ips| {
@@ -37,7 +40,7 @@ impl Resolver for DnsResolver {
                     Some(http) if http.as_str() == "http" => 80,
                     None | Some(_) => {
                         #[cfg(feature = "tracing")]
-                        tracing::warn!(target: "froglight_api::resolver::ureq", "Cannot get URI port, defaulting to port 80");
+                        tracing::warn!(target: "froglight_api::resolver::ureq", "Cannot get port for \"{}\", defaulting to port 80", uri.to_string());
                         80
                     }
                 });
@@ -74,13 +77,16 @@ impl Resolver for crate::resolver::hickory::Resolver {
             )))
         })?;
 
+        #[cfg(feature = "tracing")]
+        tracing::trace!(target: "froglight_api::resolver::ureq", "Resolving IP for \"{host}\"");
+
         let mut results = self.empty();
         let port = uri.port_u16().unwrap_or_else(|| match uri.scheme() {
             Some(https) if https.as_str() == "https" => 443,
             Some(http) if http.as_str() == "http" => 80,
             None | Some(_) => {
                 #[cfg(feature = "tracing")]
-                tracing::warn!(target: "froglight_api::resolver::ureq", "Cannot get URI port, defaulting to port 80");
+                tracing::warn!(target: "froglight_api::resolver::ureq", "Cannot get port for \"{}\", defaulting to port 80", uri.to_string());
                 80
             }
         });
