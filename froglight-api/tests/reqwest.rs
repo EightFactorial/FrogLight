@@ -7,7 +7,9 @@ use reqwest::Client;
 
 fn client() -> HttpClient {
     #[cfg(feature = "bevy")]
-    bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+    bevy_tasks::IoTaskPool::get_or_init(|| {
+        bevy_tasks::TaskPoolBuilder::new().num_threads(2).build()
+    });
 
     HttpClient::new(Client::builder().dns_resolver(DnsResolver::default()).build().unwrap())
 }

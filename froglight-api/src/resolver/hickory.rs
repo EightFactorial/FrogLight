@@ -22,7 +22,7 @@ use hickory_resolver::{
     name_server::GenericConnector,
     proto::{
         ProtoError,
-        runtime::{RuntimeProvider, Spawn, Time},
+        runtime::{Executor, RuntimeProvider, Spawn, Time},
         tcp::DnsTcpStream,
         udp::DnsUdpSocket,
     },
@@ -32,56 +32,60 @@ use socket2::{Domain, Protocol, SockAddr, Socket, Type};
 /// A [`NetworkResolver`](crate::resolver::NetworkResolver) implementation using
 /// [`hickory_resolver`].
 #[derive(Clone)]
-pub struct Resolver(HickoryResolver<GenericConnector<DnsProvider>>);
+pub struct Resolver(HickoryResolver<GenericConnector<DnsExecutor>>);
+
+impl Default for Resolver {
+    fn default() -> Self { Self::new_cloudflare() }
+}
 
 impl Resolver {
-    /// Creates a new [`DnsResolver`] using the default configuration.
+    /// Creates a new [`Resolver`] using the default configuration.
     ///
     /// Uses Cloudflare's public DNS servers, see [`HickoryConfig::cloudflare`]
     /// for more details.
     ///
-    /// See [`DnsResolver::new_from`] to create a resolver with a custom
+    /// See [`Resolver::new_from`] to create a resolver with a custom
     /// configuration.
     #[must_use]
     pub fn new_cloudflare() -> Self { Self::new_with_config(HickoryConfig::cloudflare(), None) }
 
-    /// Creates a new [`DnsResolver`].
+    /// Creates a new [`Resolver`].
     ///
     /// Uses Google's public DNS servers, see [`HickoryConfig::google`]
     /// for more details.
     ///
-    /// See [`DnsResolver::new_with_config`] to create a resolver with a custom
+    /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
     #[must_use]
     pub fn new_google() -> Self { Self::new_with_config(HickoryConfig::google(), None) }
 
-    /// Creates a new [`DnsResolver`].
+    /// Creates a new [`Resolver`].
     ///
     /// Uses Quad9's public DNS servers, see [`HickoryConfig::quad9`]
     /// for more details.
     ///
-    /// See [`DnsResolver::new_with_config`] to create a resolver with a custom
+    /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
     #[must_use]
     pub fn new_quad9() -> Self { Self::new_with_config(HickoryConfig::quad9(), None) }
 
-    /// Creates a new [`DnsResolver`] from a [`HickoryConfig`] and optional
+    /// Creates a new [`Resolver`] from a [`HickoryConfig`] and optional
     /// [`HickoryOpts`].
     #[must_use]
     pub fn new_with_config(config: HickoryConfig, opts: Option<HickoryOpts>) -> Self {
         let mut builder =
-            HickoryResolver::builder_with_config(config, GenericConnector::new(DnsProvider));
+            HickoryResolver::builder_with_config(config, GenericConnector::new(DnsExecutor));
         if let Some(opts) = opts {
             builder = builder.with_options(opts);
         }
         Self::new_from_resolver(builder.build())
     }
 
-    /// Creates a new [`DnsResolver`] from a [`Resolver`].
+    /// Creates a new [`Resolver`] from a [`Resolver`].
     #[inline]
     #[must_use]
     pub const fn new_from_resolver(
-        resolver: HickoryResolver<GenericConnector<DnsProvider>>,
+        resolver: HickoryResolver<GenericConnector<DnsExecutor>>,
     ) -> Self {
         Self(resolver)
     }
@@ -89,24 +93,24 @@ impl Resolver {
     /// Returns a reference to the inner [`Resolver`].
     #[inline]
     #[must_use]
-    pub const fn as_resolver(&self) -> &HickoryResolver<GenericConnector<DnsProvider>> { &self.0 }
+    pub const fn as_resolver(&self) -> &HickoryResolver<GenericConnector<DnsExecutor>> { &self.0 }
 
     /// Returns a mutable reference to the inner [`Resolver`].
     #[inline]
     #[must_use]
-    pub const fn as_resolver_mut(&mut self) -> &mut HickoryResolver<GenericConnector<DnsProvider>> {
+    pub const fn as_resolver_mut(&mut self) -> &mut HickoryResolver<GenericConnector<DnsExecutor>> {
         &mut self.0
     }
 }
 
 impl Debug for Resolver {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("DnsResolver").finish_non_exhaustive()
+        f.debug_struct("Resolver").finish_non_exhaustive()
     }
 }
 
 impl Deref for Resolver {
-    type Target = HickoryResolver<GenericConnector<DnsProvider>>;
+    type Target = HickoryResolver<GenericConnector<DnsExecutor>>;
 
     #[inline]
     fn deref(&self) -> &Self::Target { &self.0 }
@@ -116,36 +120,34 @@ impl DerefMut for Resolver {
     fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }
 
-impl Default for Resolver {
-    fn default() -> Self { Self::new_cloudflare() }
-}
-
 // -------------------------------------------------------------------------------------------------
 
-/// A [`Spawn`] and [`RuntimeProvider`] for DNS operations.
+/// An [`Executor`], [`Spawn`], and [`RuntimeProvider`] for DNS operations.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct DnsProvider;
+pub struct DnsExecutor;
 
-impl Spawn for DnsProvider {
-    #[cfg(not(feature = "bevy"))]
+impl Executor for DnsExecutor {
+    #[inline]
+    fn new() -> Self { Self }
+
+    #[inline]
+    fn block_on<F: Future>(&mut self, future: F) -> F::Output { async_io::block_on(future) }
+}
+
+impl Spawn for DnsExecutor {
     fn spawn_bg<F>(&mut self, future: F)
     where
         F: Future<Output = Result<(), ProtoError>> + Send + 'static,
     {
-        blocking::unblock(|| async_io::block_on(future)).detach();
-    }
-
-    #[cfg(feature = "bevy")]
-    fn spawn_bg<F>(&mut self, future: F)
-    where
-        F: Future<Output = Result<(), ProtoError>> + Send + 'static,
-    {
+        #[cfg(feature = "bevy")]
         bevy_tasks::IoTaskPool::get().spawn(future).detach();
+        #[cfg(not(feature = "bevy"))]
+        blocking::unblock(|| async_io::block_on(future)).detach();
     }
 }
 
-impl RuntimeProvider for DnsProvider {
-    type Handle = DnsProvider;
+impl RuntimeProvider for DnsExecutor {
+    type Handle = DnsExecutor;
     type Tcp = TcpStreamWrap;
     type Timer = DnsTimer;
     type Udp = UdpSocketWrap;
@@ -187,11 +189,11 @@ impl RuntimeProvider for DnsProvider {
     fn bind_udp(
         &self,
         local_addr: SocketAddr,
-        server_addr: SocketAddr,
+        _: SocketAddr,
     ) -> Pin<Box<dyn Send + Future<Output = io::Result<Self::Udp>>>> {
         Box::pin(async move {
             #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_api::resolver", "Creating UDP socket ({local_addr} -> {server_addr})");
+            tracing::trace!(target: "froglight_api::resolver", "Creating UDP socket ({local_addr})");
 
             let socket =
                 Socket::new(Domain::for_address(local_addr), Type::DGRAM, Some(Protocol::UDP))?;
@@ -199,7 +201,6 @@ impl RuntimeProvider for DnsProvider {
             socket.set_nonblocking(true)?;
             socket.bind(&SockAddr::from(local_addr))?;
 
-            socket.connect(&SockAddr::from(server_addr))?;
             Ok(UdpSocketWrap(UdpSocket::try_from(std::net::UdpSocket::from(socket))?))
         })
     }
@@ -313,7 +314,7 @@ impl Time for DnsTimer {
     async fn delay_for(duration: Duration) { Timer::after(duration).await; }
 
     #[inline]
-    async fn timeout<F: 'static + Future + Send>(
+    async fn timeout<F: Future + Send + 'static>(
         duration: Duration,
         future: F,
     ) -> Result<F::Output, io::Error> {

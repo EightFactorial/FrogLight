@@ -185,7 +185,9 @@ impl<C: TAsyncRead + TAsyncWrite + Unpin> Runtime<C> for Tokio {
 
     #[inline]
     #[cfg(feature = "bevy")]
-    fn spawn_task<Fut: Future<Output = Ret> + 'static, Ret: 'static>(future: Fut) -> Task<Ret> {
+    fn spawn_task<Fut: Future<Output = Ret> + Send + 'static, Ret: Send + 'static>(
+        future: Fut,
+    ) -> Task<Ret> {
         IoTaskPool::get().spawn(async_compat::Compat::new(future))
     }
 }

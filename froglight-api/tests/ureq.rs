@@ -6,7 +6,9 @@ use ureq::{Agent, config::Config, unversioned::transport::DefaultConnector};
 
 fn client() -> HttpClient {
     #[cfg(feature = "bevy")]
-    bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
+    bevy_tasks::IoTaskPool::get_or_init(|| {
+        bevy_tasks::TaskPoolBuilder::new().num_threads(2).build()
+    });
 
     HttpClient::new(Agent::with_parts(
         Config::default(),
