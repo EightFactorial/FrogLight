@@ -72,7 +72,7 @@ pub trait NetworkVersion: PacketVersion {
     /// the given [`ConnectionChannel`].
     fn packet_handler<R: Runtime<C>, C>(
         connection: AsyncConnection<R, C, Self>,
-    ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + 'static;
+    ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -125,7 +125,9 @@ pub trait Runtime<C> {
 
     /// Spawn a task on the [`IoTaskPool`].
     #[cfg(feature = "bevy")]
-    fn spawn_task<Fut: Future<Output = Ret> + 'static, Ret: 'static>(future: Fut) -> Task<Ret>;
+    fn spawn_task<Fut: Future<Output = Ret> + Send + 'static, Ret: Send + 'static>(
+        future: Fut,
+    ) -> Task<Ret>;
 }
 
 /// Marker type for the [`futures_lite`] runtime.
@@ -152,7 +154,9 @@ impl<C: FAsyncRead + FAsyncWrite + Unpin> Runtime<C> for FuturesLite {
 
     #[inline]
     #[cfg(feature = "bevy")]
-    fn spawn_task<Fut: Future<Output = Ret> + 'static, Ret: 'static>(future: Fut) -> Task<Ret> {
+    fn spawn_task<Fut: Future<Output = Ret> + Send + 'static, Ret: Send + 'static>(
+        future: Fut,
+    ) -> Task<Ret> {
         IoTaskPool::get().spawn(future)
     }
 }

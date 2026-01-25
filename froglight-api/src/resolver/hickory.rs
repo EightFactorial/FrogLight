@@ -4,6 +4,7 @@ use std::{
     fmt::{self, Debug, Display},
     io,
     net::SocketAddr,
+    ops::{Deref, DerefMut},
     pin::Pin,
     task::{Context, Poll},
     time::Duration,
@@ -13,7 +14,10 @@ use async_io::Timer;
 use async_net::{TcpStream, UdpSocket};
 use async_trait::async_trait;
 use futures_lite::{AsyncRead, AsyncWrite, future::or, pin};
-pub use hickory_resolver::{Resolver as HickoryResolver, config::ResolverConfig};
+pub use hickory_resolver::{
+    Resolver as HickoryResolver,
+    config::{ResolverConfig as HickoryConfig, ResolverOpts as HickoryOpts},
+};
 use hickory_resolver::{
     name_server::GenericConnector,
     proto::{
@@ -25,24 +29,60 @@ use hickory_resolver::{
 };
 use socket2::{Domain, Protocol, SockAddr, Socket, Type};
 
-/// A DNS resolver implementation using [`hickory_resolver`].
+/// A [`NetworkResolver`](crate::resolver::NetworkResolver) implementation using
+/// [`hickory_resolver`].
 #[derive(Clone)]
 pub struct Resolver(HickoryResolver<GenericConnector<DnsProvider>>);
 
 impl Resolver {
-    /// Creates a new [`DnsResolver`].
+    /// Creates a new [`DnsResolver`] using the default configuration.
     ///
-    /// Uses the default configuration and Cloudflare's public DNS servers.
+    /// Uses Cloudflare's public DNS servers, see [`HickoryConfig::cloudflare`]
+    /// for more details.
     ///
     /// See [`DnsResolver::new_from`] to create a resolver with a custom
     /// configuration.
     #[must_use]
-    pub fn new() -> Self { Self::default() }
+    pub fn new_cloudflare() -> Self { Self::new_with_config(HickoryConfig::cloudflare(), None) }
+
+    /// Creates a new [`DnsResolver`].
+    ///
+    /// Uses Google's public DNS servers, see [`HickoryConfig::google`]
+    /// for more details.
+    ///
+    /// See [`DnsResolver::new_with_config`] to create a resolver with a custom
+    /// configuration.
+    #[must_use]
+    pub fn new_google() -> Self { Self::new_with_config(HickoryConfig::google(), None) }
+
+    /// Creates a new [`DnsResolver`].
+    ///
+    /// Uses Quad9's public DNS servers, see [`HickoryConfig::quad9`]
+    /// for more details.
+    ///
+    /// See [`DnsResolver::new_with_config`] to create a resolver with a custom
+    /// configuration.
+    #[must_use]
+    pub fn new_quad9() -> Self { Self::new_with_config(HickoryConfig::quad9(), None) }
+
+    /// Creates a new [`DnsResolver`] from a [`HickoryConfig`] and optional
+    /// [`HickoryOpts`].
+    #[must_use]
+    pub fn new_with_config(config: HickoryConfig, opts: Option<HickoryOpts>) -> Self {
+        let mut builder =
+            HickoryResolver::builder_with_config(config, GenericConnector::new(DnsProvider));
+        if let Some(opts) = opts {
+            builder = builder.with_options(opts);
+        }
+        Self::new_from_resolver(builder.build())
+    }
 
     /// Creates a new [`DnsResolver`] from a [`Resolver`].
     #[inline]
     #[must_use]
-    pub const fn new_from(resolver: HickoryResolver<GenericConnector<DnsProvider>>) -> Self {
+    pub const fn new_from_resolver(
+        resolver: HickoryResolver<GenericConnector<DnsProvider>>,
+    ) -> Self {
         Self(resolver)
     }
 
@@ -65,16 +105,19 @@ impl Debug for Resolver {
     }
 }
 
+impl Deref for Resolver {
+    type Target = HickoryResolver<GenericConnector<DnsProvider>>;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl DerefMut for Resolver {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
 impl Default for Resolver {
-    fn default() -> Self {
-        Self::new_from(
-            HickoryResolver::builder_with_config(
-                ResolverConfig::cloudflare(),
-                GenericConnector::new(DnsProvider),
-            )
-            .build(),
-        )
-    }
+    fn default() -> Self { Self::new_cloudflare() }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -103,9 +146,9 @@ impl Spawn for DnsProvider {
 
 impl RuntimeProvider for DnsProvider {
     type Handle = DnsProvider;
-    type Tcp = TcpWrap;
+    type Tcp = TcpStreamWrap;
     type Timer = DnsTimer;
-    type Udp = UdpWrap;
+    type Udp = UdpSocketWrap;
 
     fn create_handle(&self) -> Self::Handle { Self }
 
@@ -117,7 +160,11 @@ impl RuntimeProvider for DnsProvider {
     ) -> Pin<Box<dyn Send + Future<Output = io::Result<Self::Tcp>>>> {
         Box::pin(async move {
             #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_api::resolver", "Creating TCP socket from {bind_addr:?} to {server_addr}");
+            if let Some(bind_addr) = bind_addr.as_ref() {
+                tracing::trace!(target: "froglight_api::resolver", "Creating TCP socket ({bind_addr} -> {server_addr})");
+            } else {
+                tracing::trace!(target: "froglight_api::resolver", "Creating TCP socket (None -> {server_addr})");
+            }
 
             let socket =
                 Socket::new(Domain::for_address(server_addr), Type::STREAM, Some(Protocol::TCP))?;
@@ -133,7 +180,7 @@ impl RuntimeProvider for DnsProvider {
                 socket.connect(&SockAddr::from(server_addr))?;
             }
 
-            Ok(TcpWrap(TcpStream::try_from(std::net::TcpStream::from(socket))?))
+            Ok(TcpStreamWrap(TcpStream::try_from(std::net::TcpStream::from(socket))?))
         })
     }
 
@@ -144,7 +191,7 @@ impl RuntimeProvider for DnsProvider {
     ) -> Pin<Box<dyn Send + Future<Output = io::Result<Self::Udp>>>> {
         Box::pin(async move {
             #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_api::resolver", "Creating UDP socket from {local_addr} to {server_addr}");
+            tracing::trace!(target: "froglight_api::resolver", "Creating UDP socket ({local_addr} -> {server_addr})");
 
             let socket =
                 Socket::new(Domain::for_address(local_addr), Type::DGRAM, Some(Protocol::UDP))?;
@@ -153,7 +200,7 @@ impl RuntimeProvider for DnsProvider {
             socket.bind(&SockAddr::from(local_addr))?;
 
             socket.connect(&SockAddr::from(server_addr))?;
-            Ok(UdpWrap(UdpSocket::try_from(std::net::UdpSocket::from(socket))?))
+            Ok(UdpSocketWrap(UdpSocket::try_from(std::net::UdpSocket::from(socket))?))
         })
     }
 }
@@ -162,17 +209,17 @@ impl RuntimeProvider for DnsProvider {
 
 /// A wrapper around [`TcpStream`] to implement [`DnsTcpStream`].
 #[repr(transparent)]
-pub struct TcpWrap(pub TcpStream);
+pub struct TcpStreamWrap(pub TcpStream);
 
 /// A wrapper around [`UdpSocket`] to implement [`DnsUdpSocket`].
 #[repr(transparent)]
-pub struct UdpWrap(pub UdpSocket);
+pub struct UdpSocketWrap(pub UdpSocket);
 
-impl DnsTcpStream for TcpWrap {
+impl DnsTcpStream for TcpStreamWrap {
     type Time = DnsTimer;
 }
 
-impl AsyncRead for TcpWrap {
+impl AsyncRead for TcpStreamWrap {
     #[inline]
     fn poll_read(
         self: Pin<&mut Self>,
@@ -181,9 +228,18 @@ impl AsyncRead for TcpWrap {
     ) -> Poll<io::Result<usize>> {
         <TcpStream as AsyncRead>::poll_read(Pin::new(&mut self.get_mut().0), cx, buf)
     }
+
+    #[inline]
+    fn poll_read_vectored(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        bufs: &mut [io::IoSliceMut<'_>],
+    ) -> Poll<io::Result<usize>> {
+        <TcpStream as AsyncRead>::poll_read_vectored(Pin::new(&mut self.get_mut().0), cx, bufs)
+    }
 }
 
-impl AsyncWrite for TcpWrap {
+impl AsyncWrite for TcpStreamWrap {
     #[inline]
     fn poll_write(
         self: Pin<&mut Self>,
@@ -191,6 +247,15 @@ impl AsyncWrite for TcpWrap {
         buf: &[u8],
     ) -> Poll<io::Result<usize>> {
         <TcpStream as AsyncWrite>::poll_write(Pin::new(&mut self.get_mut().0), cx, buf)
+    }
+
+    #[inline]
+    fn poll_write_vectored(
+        self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        bufs: &[io::IoSlice<'_>],
+    ) -> Poll<io::Result<usize>> {
+        <TcpStream as AsyncWrite>::poll_write_vectored(Pin::new(&mut self.get_mut().0), cx, bufs)
     }
 
     #[inline]
@@ -205,7 +270,7 @@ impl AsyncWrite for TcpWrap {
 }
 
 #[async_trait]
-impl DnsUdpSocket for UdpWrap {
+impl DnsUdpSocket for UdpSocketWrap {
     type Time = DnsTimer;
 
     fn poll_recv_from(
@@ -244,14 +309,16 @@ pub struct TimeoutError;
 
 #[async_trait]
 impl Time for DnsTimer {
+    #[inline]
     async fn delay_for(duration: Duration) { Timer::after(duration).await; }
 
+    #[inline]
     async fn timeout<F: 'static + Future + Send>(
         duration: Duration,
         future: F,
     ) -> Result<F::Output, io::Error> {
         or(async { Ok(future.await) }, async {
-            Self::delay_for(duration).await;
+            Timer::after(duration).await;
             Err(io::Error::new(io::ErrorKind::TimedOut, TimeoutError))
         })
         .await

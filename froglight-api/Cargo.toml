@@ -29,12 +29,12 @@ async-trait = { workspace = true }
 bevy_app = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_reflect = { features = ["std"], workspace = true, optional = true }
-bevy_tasks = { features = ["futures-lite"], workspace = true, optional = true }
+bevy_tasks = { features = ["async-io", "futures-lite"], workspace = true, optional = true }
 blocking = { workspace = true, optional = true }
-futures-lite = { features = ["std"], workspace = true, optional = true }
+futures-lite = { features = ["futures-io", "std"], workspace = true, optional = true }
 hickory-resolver = { workspace = true, optional = true }
 reqwest = { features = ["cookies", "gzip", "rustls"], workspace = true, optional = true }
-serde = { features = ["derive"], workspace = true }
+serde = { features = ["derive", "std"], workspace = true }
 socket2 = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 ureq = { features = ["cookies", "gzip", "rustls"], workspace = true, optional = true }
@@ -68,6 +68,3 @@ tracing = ["dep:tracing"]
 
 # Enable optimizations using the nightly toolchain
 nightly = []
-
-# -------------------------------------------------------------------------------------------------
-# Note: The following features are automatically @generated.
