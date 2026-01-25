@@ -299,7 +299,7 @@ impl UreqResolver for DnsResolver {
                 });
 
                 let mut results = self.empty();
-                ips.into_iter()
+                ips.into_iter().take(16)
                     .for_each(|ip| results.push(SocketAddr::new(ip, port)));
                 #[cfg(feature = "tracing")]
                 tracing::trace!(target: "froglight_api::resolver::ureq", "Resolved \"{host}\" to {:?}", results.as_ref());
@@ -344,19 +344,24 @@ impl UreqResolver for Resolver {
         match config.ip_family() {
             IpFamily::Any => match block_on(self.as_resolver().lookup_ip(host)) {
                 Ok(lookup) => {
-                    lookup.into_iter().for_each(|ip| results.push(SocketAddr::new(ip, port)));
+                    lookup
+                        .into_iter()
+                        .take(16)
+                        .for_each(|ip| results.push(SocketAddr::new(ip, port)));
                 }
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
             IpFamily::Ipv4Only => match block_on(self.as_resolver().ipv4_lookup(uri.to_string())) {
                 Ok(lookup) => lookup
                     .into_iter()
+                    .take(16)
                     .for_each(|a| results.push(SocketAddr::new(IpAddr::V4(a.0), port))),
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
             IpFamily::Ipv6Only => match block_on(self.as_resolver().ipv6_lookup(uri.to_string())) {
                 Ok(lookup) => lookup
                     .into_iter()
+                    .take(16)
                     .for_each(|aaaa| results.push(SocketAddr::new(IpAddr::V6(aaaa.0), port))),
                 Err(err) => Err(ureq::Error::Other(Box::new(err)))?,
             },
