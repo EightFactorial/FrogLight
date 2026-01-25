@@ -7,13 +7,10 @@ use reqwest::Client;
 
 fn client() -> HttpClient {
     #[cfg(feature = "bevy")]
-    bevy_tasks::IoTaskPool::get_or_init(|| bevy_tasks::TaskPool::new());
+    bevy_tasks::IoTaskPool::get_or_init(bevy_tasks::TaskPool::new);
 
     HttpClient::new(Client::builder().dns_resolver(DnsResolver::default()).build().unwrap())
 }
-
-#[cfg(not(feature = "tracing"))]
-fn trace() {}
 
 #[cfg(feature = "tracing")]
 fn trace() -> tracing::subscriber::DefaultGuard {
@@ -27,6 +24,7 @@ fn trace() -> tracing::subscriber::DefaultGuard {
 
 #[test]
 fn google_com() {
+    #[cfg(feature = "tracing")]
     let _guard = trace();
     let client = client();
     block_on(Compat::new(client.get("https://google.com", GetOptions {}))).unwrap();
@@ -34,6 +32,7 @@ fn google_com() {
 
 #[test]
 fn minecraft_net() {
+    #[cfg(feature = "tracing")]
     let _guard = trace();
     let client = client();
     block_on(Compat::new(client.get("https://minecraft.net", GetOptions {}))).unwrap();

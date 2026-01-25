@@ -26,6 +26,10 @@ pub use ::reqwest::Client as ReqwestAgent;
 ///
 /// Supports multiple underlying implementations via the [`NetworkClient`]
 /// trait.
+///
+/// ## Note
+///
+/// This type is thread-safe and can be cloned cheaply.
 #[repr(transparent)]
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Resource, Reflect))]

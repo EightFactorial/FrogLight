@@ -33,6 +33,10 @@ pub use hickory::Resolver;
 ///
 /// Supports multiple underlying implementations via the [`NetworkResolver`]
 /// trait.
+///
+/// ## Note
+///
+/// This type is thread-safe and can be cloned cheaply.
 #[repr(transparent)]
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Resource, Reflect))]
@@ -272,6 +276,8 @@ impl UreqResolver for DnsResolver {
     ) -> Result<ResolvedSocketAddrs, ureq::Error> {
         use std::net::SocketAddr;
 
+        use async_io::block_on;
+
         let host = uri.host().ok_or_else(|| {
             ureq::Error::Other(Box::new(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
@@ -279,12 +285,17 @@ impl UreqResolver for DnsResolver {
             )))
         })?;
 
-        async_io::block_on(self.lookup_ip(host)).map_or_else(
+        block_on(self.lookup_ip(host)).map_or_else(
             |err| Err(ureq::Error::Other(err)),
             |ips| {
                 let port = uri.port_u16().unwrap_or_else(|| match uri.scheme() {
                     Some(https) if https.as_str() == "https" => 443,
-                    None | Some(_) => 80,
+                    Some(http) if http.as_str() == "http" => 80,
+                    None | Some(_) => {
+                        #[cfg(feature = "tracing")]
+                        tracing::warn!(target: "froglight_api::resolver::ureq", "Cannot get URI port, defaulting to port 80");
+                        80
+                    }
                 });
 
                 let mut results = self.empty();
@@ -322,7 +333,12 @@ impl UreqResolver for Resolver {
         let mut results = self.empty();
         let port = uri.port_u16().unwrap_or_else(|| match uri.scheme() {
             Some(https) if https.as_str() == "https" => 443,
-            None | Some(_) => 80,
+            Some(http) if http.as_str() == "http" => 80,
+            None | Some(_) => {
+                #[cfg(feature = "tracing")]
+                tracing::warn!(target: "froglight_api::resolver::ureq", "Cannot get URI port, defaulting to port 80");
+                80
+            }
         });
 
         match config.ip_family() {
