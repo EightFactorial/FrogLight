@@ -1,25 +1,24 @@
-use bevy_ecs::{entity::Entity, event::EntityEvent, message::Message, reflect::ReflectEvent};
+use bevy_ecs::{entity::Entity, message::Message};
 use bevy_reflect::Reflect;
 
 use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
 
-/// An [`Event`] sent from the server to the client.
+/// A [`Message`] sent from the server to the client.
 ///
-/// Triggered on an [`Entity`] by it's
+/// Received by the [`Entity`]'s
 /// [`ClientConnection`](crate::bevy::ClientConnection)
-/// [`Component`](bevy_ecs::component::Component).
-#[derive(Debug, Clone, PartialEq, EntityEvent, Reflect)]
-#[reflect(Debug, Clone, PartialEq, Event)]
-pub struct ClientboundEvent {
+/// in the order they are sent.
+#[derive(Debug, Clone, PartialEq, Message, Reflect)]
+#[reflect(Debug, Clone, PartialEq)]
+pub struct ClientboundMessage {
     /// The entity associated with the event.
     pub entity: Entity,
     /// The event data.
     pub event: ClientboundEventEnum,
 }
 
-impl ClientboundEvent {
+impl ClientboundMessage {
     /// Create a new [`ClientboundEvent`] from an [`Entity`] and an event.
-    #[inline]
     #[must_use]
     pub fn new<T: Into<ClientboundEventEnum>>(entity: Entity, event: T) -> Self {
         Self { entity, event: event.into() }
@@ -44,6 +43,7 @@ pub struct ServerboundMessage {
 
 impl ServerboundMessage {
     /// Create a new [`ServerboundMessage`] from an [`Entity`] and an event.
+    #[must_use]
     pub fn new<T: Into<ServerboundEventEnum>>(entity: Entity, event: T) -> Self {
         Self { entity, event: event.into() }
     }
