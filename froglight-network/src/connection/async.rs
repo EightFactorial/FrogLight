@@ -4,21 +4,18 @@ use core::marker::PhantomData;
 
 #[cfg(feature = "bevy")]
 use bevy_tasks::{IoTaskPool, Task};
-use facet::Facet;
-use facet_format::{DeserializeError as FDError, SerializeError as FSError};
-use facet_minecraft::{deserialize::DeserializeError, serialize::SerializeError};
 use froglight_packet::version::{Clientbound, PacketVersion, Serverbound, VersionPacket};
 #[cfg(feature = "futures-lite")]
 use futures_lite::{AsyncRead as FAsyncRead, AsyncWrite as FAsyncWrite};
 #[cfg(feature = "tokio")]
 use tokio::io::{AsyncRead as TAsyncRead, AsyncWrite as TAsyncWrite};
 
-use crate::connection::channel::Channel as InnerChannel;
+use crate::connection::{Encrypted, channel::Channel as InnerChannel};
 
 /// A [`Version`]'ed connection that uses a specific [`Runtime`].
 #[derive(Clone)]
 pub struct AsyncConnection<R: Runtime<C>, C, V: PacketVersion> {
-    connection: C,
+    connection: Encrypted<R, C>,
     channel: Channel<V>,
     _phantom: PhantomData<(R, V)>,
 }
@@ -30,6 +27,13 @@ impl<R: Runtime<C>, C, V: PacketVersion> AsyncConnection<R, C, V> {
     #[inline]
     #[must_use]
     pub const fn new(connection: C, channel: Channel<V>) -> Self {
+        Self::new_encrypted(Encrypted::new(connection), channel)
+    }
+
+    /// Create a new [`AsyncConnection`] from an already encrypted connection.
+    #[inline]
+    #[must_use]
+    pub const fn new_encrypted(connection: Encrypted<R, C>, channel: Channel<V>) -> Self {
         Self { connection, channel, _phantom: PhantomData }
     }
 
@@ -38,7 +42,7 @@ impl<R: Runtime<C>, C, V: PacketVersion> AsyncConnection<R, C, V> {
     #[must_use]
     pub fn with_runtime<R2: Runtime<C>>(self) -> AsyncConnection<R2, C, V> {
         AsyncConnection {
-            connection: self.connection,
+            connection: self.connection.with_runtime(),
             channel: self.channel,
             _phantom: PhantomData,
         }
@@ -47,39 +51,22 @@ impl<R: Runtime<C>, C, V: PacketVersion> AsyncConnection<R, C, V> {
     /// Get a reference to the underlying connection.
     #[inline]
     #[must_use]
-    pub const fn connection(&self) -> &C { &self.connection }
+    pub const fn connection(&self) -> &Encrypted<R, C> { &self.connection }
 
     /// Get a mutable reference to the underlying connection.
     #[inline]
     #[must_use]
-    pub const fn connection_mut(&mut self) -> &mut C { &mut self.connection }
+    pub const fn connection_mut(&mut self) -> &mut Encrypted<R, C> { &mut self.connection }
 
     /// Get a reference to the connection's channel.
     #[inline]
     #[must_use]
     pub const fn channel(&self) -> &Channel<V> { &self.channel }
 
-    /// Read a type from the connection.
-    #[inline]
-    pub fn read_type<T: Facet<'static>>(
-        &mut self,
-    ) -> impl core::future::Future<Output = Result<T, FDError<DeserializeError>>> + '_ {
-        R::read_type(&mut self.connection)
-    }
-
-    /// Write a type to the connection.
-    #[inline]
-    pub fn write_type<'a, T: Facet<'static>>(
-        &'a mut self,
-        value: &'a T,
-    ) -> impl core::future::Future<Output = Result<(), FSError<SerializeError>>> + 'a {
-        R::write_type(&mut self.connection, value)
-    }
-
     /// Separate the [`AsyncConnection`] into its parts.
     #[inline]
     #[must_use]
-    pub fn into_parts(self) -> (C, Channel<V>) { (self.connection, self.channel) }
+    pub fn into_parts(self) -> (Encrypted<R, C>, Channel<V>) { (self.connection, self.channel) }
 }
 
 #[cfg(feature = "futures-lite")]
@@ -112,16 +99,11 @@ where
 
 /// A marker trait for different async runtimes' connection implementations.
 pub trait Runtime<C> {
-    /// Read a type from the given reader.
-    fn read_type<T: Facet<'static>>(
-        reader: &mut C,
-    ) -> impl Future<Output = Result<T, FDError<DeserializeError>>>;
-
-    /// Write a type to the given writer.
-    fn write_type<T: Facet<'static>>(
-        writer: &mut C,
-        value: &T,
-    ) -> impl Future<Output = Result<(), FSError<SerializeError>>>;
+    /// Reads the exact number of bytes required to fill `buf`.
+    fn read_exact<'a>(
+        conn: &'a mut C,
+        buf: &'a mut [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a;
 
     /// Spawn a task on the [`IoTaskPool`].
     #[cfg(feature = "bevy")]
@@ -138,18 +120,11 @@ pub struct FuturesLite;
 #[cfg(feature = "futures-lite")]
 impl<C: FAsyncRead + FAsyncWrite + Unpin> Runtime<C> for FuturesLite {
     #[inline]
-    fn read_type<T: Facet<'static>>(
-        reader: &mut C,
-    ) -> impl Future<Output = Result<T, FDError<DeserializeError>>> {
-        facet_minecraft::from_async_reader::<T, C>(reader)
-    }
-
-    #[inline]
-    fn write_type<T: Facet<'static>>(
-        writer: &mut C,
-        value: &T,
-    ) -> impl Future<Output = Result<(), FSError<SerializeError>>> {
-        facet_minecraft::to_async_writer::<T, C>(value, writer)
+    fn read_exact<'a>(
+        conn: &'a mut C,
+        buf: &'a mut [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+        futures_lite::AsyncReadExt::read_exact(conn, buf)
     }
 
     #[inline]
@@ -169,18 +144,12 @@ pub struct Tokio;
 #[cfg(feature = "tokio")]
 impl<C: TAsyncRead + TAsyncWrite + Unpin> Runtime<C> for Tokio {
     #[inline]
-    fn read_type<T: Facet<'static>>(
-        reader: &mut C,
-    ) -> impl Future<Output = Result<T, FDError<DeserializeError>>> {
-        facet_minecraft::from_tokio_reader::<T, C>(reader)
-    }
-
-    #[inline]
-    fn write_type<T: Facet<'static>>(
-        writer: &mut C,
-        value: &T,
-    ) -> impl Future<Output = Result<(), FSError<SerializeError>>> {
-        facet_minecraft::to_tokio_writer::<T, C>(value, writer)
+    #[allow(clippy::manual_async_fn, reason = "Control")]
+    fn read_exact<'a>(
+        conn: &'a mut C,
+        buf: &'a mut [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+        async { tokio::io::AsyncReadExt::read_exact(conn, buf).await.map(|_| ()) }
     }
 
     #[inline]
