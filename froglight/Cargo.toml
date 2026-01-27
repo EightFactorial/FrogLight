@@ -28,10 +28,10 @@ default = ["network", "std"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
-# Enable `tracing` support.
-tracing = ["froglight-internal/tracing"]
 # Enable networking support.
 network = ["froglight-internal/network", "std"]
+# Enable `tracing` support.
+tracing = ["froglight-internal/tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-internal/libm"]

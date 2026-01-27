@@ -31,7 +31,6 @@ bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 facet = { features = ["uuid"], workspace = true, optional = true }
 facet-minecraft = { workspace = true, optional = true }
 serde = { features = ["derive"], workspace = true, optional = true }
-tracing = { workspace = true, optional = true }
 
 # --- Features ---
 
