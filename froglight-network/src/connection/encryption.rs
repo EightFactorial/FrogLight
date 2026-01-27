@@ -2,10 +2,15 @@ use core::{
     marker::PhantomData,
     sync::atomic::{AtomicBool, AtomicI32},
 };
-use std::sync::Arc;
+use std::sync::{Arc, atomic::Ordering};
 
-use aes::{Aes128, cipher::KeyIvInit};
+use aes::{
+    Aes128,
+    cipher::{BlockModeDecrypt, BlockModeEncrypt, InOutBuf, KeyIvInit},
+};
+use async_compression::futures::bufread::{ZlibDecoder, ZlibEncoder};
 use cfb8::{Decryptor, Encryptor};
+use futures_lite::AsyncReadExt;
 
 use crate::connection::{Runtime, RuntimeRead, RuntimeWrite};
 
@@ -90,6 +95,7 @@ impl<R: Runtime<C>, C> Encrypted<R, C> {
         (
             DecryptorMut {
                 connection: read,
+                scratch: Vec::new(),
                 compression: Arc::clone(&compression),
                 enabled: Arc::clone(&enabled),
                 decryptor: self.decryptor,
@@ -97,6 +103,7 @@ impl<R: Runtime<C>, C> Encrypted<R, C> {
             },
             EncryptorMut {
                 connection: write,
+                scratch: Vec::new(),
                 compression,
                 enabled,
                 encryptor: self.encryptor,
@@ -111,6 +118,7 @@ impl<R: Runtime<C>, C> Encrypted<R, C> {
 /// A reference to an [`Encryptor`] that uses a specific [`Runtime`].
 pub struct EncryptorMut<R: RuntimeWrite<C>, C> {
     connection: C,
+    scratch: Vec<u8>,
     compression: Arc<AtomicI32>,
     enabled: Arc<AtomicBool>,
     encryptor: Encryptor<Aes128>,
@@ -120,6 +128,7 @@ pub struct EncryptorMut<R: RuntimeWrite<C>, C> {
 /// A reference to a [`Decryptor`] that uses a specific [`Runtime`].
 pub struct DecryptorMut<R: RuntimeRead<C>, C> {
     connection: C,
+    scratch: Vec<u8>,
     compression: Arc<AtomicI32>,
     enabled: Arc<AtomicBool>,
     decryptor: Decryptor<Aes128>,
@@ -137,12 +146,12 @@ impl<R: RuntimeWrite<C>, C> EncryptorMut<R, C> {
     #[must_use]
     pub fn enabled(&self) -> &AtomicBool { &self.enabled }
 
-    /// Get a reference to the underlying connection.
+    /// Get a reference to the underlying raw connection.
     #[inline]
     #[must_use]
     pub const fn as_raw(&self) -> &C { &self.connection }
 
-    /// Get a mutable reference to the underlying connection.
+    /// Get a mutable reference to the underlying raw connection.
     #[inline]
     #[must_use]
     pub const fn as_raw_mut(&mut self) -> &mut C { &mut self.connection }
@@ -151,6 +160,37 @@ impl<R: RuntimeWrite<C>, C> EncryptorMut<R, C> {
     #[inline]
     #[must_use]
     pub const fn encryptor(&mut self) -> &mut Encryptor<Aes128> { &mut self.encryptor }
+
+    /// Writes all bytes from `buf` to the underlying connection.
+    ///
+    /// If encryption is enabled, the data will be encrypted in-place.
+    pub async fn write_all(&mut self, buf: &mut [u8]) -> std::io::Result<()> {
+        if self.enabled.load(Ordering::Relaxed) {
+            let (head, tail) = InOutBuf::from(&mut *buf).into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            self.encryptor.encrypt_blocks_inout(head);
+        }
+        R::write_all(&mut self.connection, buf).await
+    }
+
+    /// Compresses `buf` if its length is greater than the compression
+    /// threshold.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if compression fails.
+    #[expect(clippy::cast_sign_loss, reason = "Checked if positive before casting")]
+    pub async fn compress<'a>(&'a mut self, buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
+        let threshold = self.compression().load(Ordering::Relaxed);
+        if threshold.is_positive() && threshold as usize <= buf.len() {
+            self.scratch.clear();
+            let mut compresser = ZlibEncoder::new(buf);
+            let len = compresser.read_to_end(&mut self.scratch).await?;
+            Ok(&self.scratch[..len])
+        } else {
+            Ok(buf)
+        }
+    }
 }
 
 impl<R: RuntimeRead<C>, C> DecryptorMut<R, C> {
@@ -164,12 +204,12 @@ impl<R: RuntimeRead<C>, C> DecryptorMut<R, C> {
     #[must_use]
     pub fn enabled(&self) -> &AtomicBool { &self.enabled }
 
-    /// Get a reference to the underlying connection.
+    /// Get a reference to the underlying raw connection.
     #[inline]
     #[must_use]
     pub const fn as_raw(&self) -> &C { &self.connection }
 
-    /// Get a mutable reference to the underlying connection.
+    /// Get a mutable reference to the underlying raw connection.
     #[inline]
     #[must_use]
     pub const fn as_raw_mut(&mut self) -> &mut C { &mut self.connection }
@@ -178,4 +218,36 @@ impl<R: RuntimeRead<C>, C> DecryptorMut<R, C> {
     #[inline]
     #[must_use]
     pub const fn decryptor(&mut self) -> &mut Decryptor<Aes128> { &mut self.decryptor }
+
+    /// Reads the exact number of bytes required to fill `buf`.
+    ///
+    /// If encryption is enabled, the data will be decrypted in-place.
+    pub async fn read_exact(&mut self, buf: &mut [u8]) -> std::io::Result<()> {
+        R::read_exact(&mut self.connection, buf).await?;
+        if self.enabled.load(Ordering::Relaxed) {
+            let (head, tail) = InOutBuf::from(buf).into_chunks();
+            debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
+            self.decryptor.decrypt_blocks_inout(head);
+        }
+        Ok(())
+    }
+
+    /// Decompresses `buf` if its length is greater than the compression
+    /// threshold.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if decompression fails.
+    #[expect(clippy::cast_sign_loss, reason = "Checked if positive before casting")]
+    pub async fn decompress<'a>(&'a mut self, buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
+        let threshold = self.compression().load(Ordering::Relaxed);
+        if threshold.is_positive() && threshold as usize <= buf.len() {
+            self.scratch.clear();
+            let mut decompresser = ZlibDecoder::new(buf);
+            let len = decompresser.read_to_end(&mut self.scratch).await?;
+            Ok(&self.scratch[..len])
+        } else {
+            Ok(buf)
+        }
+    }
 }

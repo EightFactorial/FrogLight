@@ -50,11 +50,13 @@ pub trait NetworkVersion: PacketVersion {
     }
 
     /// A connection handler that sends/receives packets from/to the server.
+    #[expect(clippy::option_map_unit_fn, reason = "Readability")]
     fn connection_handler<R: Runtime<C>, C>(
         connection: AsyncConnection<R, C, Self>,
     ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static {
         let (conn, channel) = connection.into_parts();
         let (_read, _write) = conn.into_split();
+        let (_read_buf, _write_buf) = (Vec::<u8>::new(), Vec::<u8>::new());
         let state = Mutex::new(PacketStateEnum::Handshake);
 
         async move {
@@ -68,34 +70,24 @@ pub trait NetworkVersion: PacketVersion {
 
                 match (packet, *state) {
                     (VersionPacket::Handshake(packet), PacketStateEnum::Handshake) => {
-                        if let Some(transition) = Self::Handshake::transition_state_to(&packet) {
-                            *state = transition;
-                        }
-                        todo!("Send the handshake packet to the server")
+                        Self::Handshake::transition_state_to(&packet).map(|s| *state = s);
+                        todo!("Send packet to the server")
                     }
                     (VersionPacket::Status(packet), PacketStateEnum::Status) => {
-                        if let Some(transition) = Self::Status::transition_state_to(&packet) {
-                            *state = transition;
-                        }
-                        todo!("Send the status packet to the server")
+                        Self::Status::transition_state_to(&packet).map(|s| *state = s);
+                        todo!("Send packet to the server")
                     }
                     (VersionPacket::Login(packet), PacketStateEnum::Login) => {
-                        if let Some(transition) = Self::Login::transition_state_to(&packet) {
-                            *state = transition;
-                        }
-                        todo!("Send the login packet to the server")
+                        Self::Login::transition_state_to(&packet).map(|s| *state = s);
+                        todo!("Send packet to the server")
                     }
                     (VersionPacket::Config(packet), PacketStateEnum::Config) => {
-                        if let Some(transition) = Self::Config::transition_state_to(&packet) {
-                            *state = transition;
-                        }
-                        todo!("Send the config packet to the server")
+                        Self::Config::transition_state_to(&packet).map(|s| *state = s);
+                        todo!("Send packet to the server")
                     }
                     (VersionPacket::Play(packet), PacketStateEnum::Play) => {
-                        if let Some(transition) = Self::Play::transition_state_to(&packet) {
-                            *state = transition;
-                        }
-                        todo!("Send the play packet to the server")
+                        Self::Play::transition_state_to(&packet).map(|s| *state = s);
+                        todo!("Send packet to the server")
                     }
                     #[cfg(feature = "tracing")]
                     (packet, state) => {
@@ -123,24 +115,23 @@ pub trait NetworkVersion: PacketVersion {
                 loop {
                     match *state.lock().await {
                         PacketStateEnum::Handshake => {
-                            let packet: <Self::Handshake as PacketState<Self>>::Clientbound =
-                                todo!();
+                            let packet = todo!();
                             channel.send_async(VersionPacket::Handshake(packet)).await?;
                         }
                         PacketStateEnum::Status => {
-                            let packet: <Self::Status as PacketState<Self>>::Clientbound = todo!();
+                            let packet = todo!();
                             channel.send_async(VersionPacket::Status(packet)).await?;
                         }
                         PacketStateEnum::Login => {
-                            let packet: <Self::Login as PacketState<Self>>::Clientbound = todo!();
+                            let packet = todo!();
                             channel.send_async(VersionPacket::Login(packet)).await?;
                         }
                         PacketStateEnum::Config => {
-                            let packet: <Self::Config as PacketState<Self>>::Clientbound = todo!();
+                            let packet = todo!();
                             channel.send_async(VersionPacket::Config(packet)).await?;
                         }
                         PacketStateEnum::Play => {
-                            let packet: <Self::Play as PacketState<Self>>::Clientbound = todo!();
+                            let packet = todo!();
                             channel.send_async(VersionPacket::Play(packet)).await?;
                         }
                     }
