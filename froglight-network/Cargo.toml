@@ -21,7 +21,6 @@ workspace = true
 [dependencies]
 aes = { workspace = true }
 async-channel = { features = ["std"], workspace = true }
-async-compression = { features = ["futures-io", "zlib"], workspace = true }
 async-lock = { features = ["std"], workspace = true }
 cfb8 = { features = ["alloc"], workspace = true }
 facet = { features = ["std"], workspace = true }
@@ -38,6 +37,7 @@ froglight-world = { features = ["async", "froglight-biome", "froglight-block", "
 
 # Optional dependencies
 async-compat = { workspace = true, optional = true }
+async-compression = { features = ["futures-io", "zlib"], workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = true }
 bevy_reflect = { features = ["std"], workspace = true, optional = true }
@@ -52,9 +52,9 @@ tracing = { features = ["std"], workspace = true, optional = true }
 default = ["futures-lite"]
 
 # Enable `futures-lite` support.
-futures-lite = ["bevy_tasks?/futures-lite", "dep:futures-lite", "facet-minecraft/futures-lite"]
+futures-lite = ["bevy_tasks?/futures-lite", "dep:async-compression", "dep:futures-lite", "facet-minecraft/futures-lite"]
 # Enable `tokio` support.
-tokio = ["dep:async-compat", "dep:tokio", "facet-minecraft/tokio"]
+tokio = ["dep:async-compat", "dep:tokio", "facet-minecraft/tokio", "futures-lite"]
 
 # Enable `bevy` support.
 bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-world/bevy"]

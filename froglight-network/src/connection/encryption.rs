@@ -8,9 +8,11 @@ use aes::{
     Aes128,
     cipher::{BlockModeDecrypt, BlockModeEncrypt, InOutBuf, KeyIvInit},
 };
+#[cfg(feature = "futures-lite")]
 use async_compression::futures::bufread::{ZlibDecoder, ZlibEncoder};
 use cfb8::{Decryptor, Encryptor};
-use futures_lite::AsyncReadExt;
+#[cfg(feature = "futures-lite")]
+use futures_lite::{AsyncReadExt, io::Cursor};
 
 use crate::connection::{Runtime, RuntimeRead, RuntimeWrite};
 
@@ -95,6 +97,7 @@ impl<R: Runtime<C>, C> Encrypted<R, C> {
         (
             DecryptorMut {
                 connection: read,
+                #[cfg(feature = "futures-lite")]
                 scratch: Vec::new(),
                 compression: Arc::clone(&compression),
                 enabled: Arc::clone(&enabled),
@@ -103,6 +106,7 @@ impl<R: Runtime<C>, C> Encrypted<R, C> {
             },
             EncryptorMut {
                 connection: write,
+                #[cfg(feature = "futures-lite")]
                 scratch: Vec::new(),
                 compression,
                 enabled,
@@ -118,6 +122,7 @@ impl<R: Runtime<C>, C> Encrypted<R, C> {
 /// A reference to an [`Encryptor`] that uses a specific [`Runtime`].
 pub struct EncryptorMut<R: RuntimeWrite<C>, C> {
     connection: C,
+    #[cfg(feature = "futures-lite")]
     scratch: Vec<u8>,
     compression: Arc<AtomicI32>,
     enabled: Arc<AtomicBool>,
@@ -128,6 +133,7 @@ pub struct EncryptorMut<R: RuntimeWrite<C>, C> {
 /// A reference to a [`Decryptor`] that uses a specific [`Runtime`].
 pub struct DecryptorMut<R: RuntimeRead<C>, C> {
     connection: C,
+    #[cfg(feature = "futures-lite")]
     scratch: Vec<u8>,
     compression: Arc<AtomicI32>,
     enabled: Arc<AtomicBool>,
@@ -179,13 +185,14 @@ impl<R: RuntimeWrite<C>, C> EncryptorMut<R, C> {
     /// # Errors
     ///
     /// Returns an error if compression fails.
+    #[cfg(feature = "futures-lite")]
     #[expect(clippy::cast_sign_loss, reason = "Checked if positive before casting")]
     pub async fn compress<'a>(&'a mut self, buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
         if threshold.is_positive() && threshold as usize <= buf.len() {
             self.scratch.clear();
-            let mut compresser = ZlibEncoder::new(buf);
-            let len = compresser.read_to_end(&mut self.scratch).await?;
+            let mut compressor = ZlibEncoder::new(Cursor::new(buf));
+            let len = compressor.read_to_end(&mut self.scratch).await?;
             Ok(&self.scratch[..len])
         } else {
             Ok(buf)
@@ -238,13 +245,14 @@ impl<R: RuntimeRead<C>, C> DecryptorMut<R, C> {
     /// # Errors
     ///
     /// Returns an error if decompression fails.
+    #[cfg(feature = "futures-lite")]
     #[expect(clippy::cast_sign_loss, reason = "Checked if positive before casting")]
     pub async fn decompress<'a>(&'a mut self, buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
         if threshold.is_positive() && threshold as usize <= buf.len() {
             self.scratch.clear();
-            let mut decompresser = ZlibDecoder::new(buf);
-            let len = decompresser.read_to_end(&mut self.scratch).await?;
+            let mut decompressor = ZlibDecoder::new(Cursor::new(buf));
+            let len = decompressor.read_to_end(&mut self.scratch).await?;
             Ok(&self.scratch[..len])
         } else {
             Ok(buf)

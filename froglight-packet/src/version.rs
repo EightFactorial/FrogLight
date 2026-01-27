@@ -2,6 +2,8 @@
 
 use core::fmt::{Debug, Display};
 
+#[cfg(feature = "facet")]
+use facet::Facet;
 use froglight_common::version::Version;
 
 /// A [`Version`]'s associated packet types.
@@ -50,9 +52,18 @@ where
 /// Provides associated packet types for the connection's state.
 pub trait PacketState<V: PacketVersion> {
     /// The packet sent from the server to the client.
+    #[cfg(not(feature = "facet"))]
     type Clientbound: Debug + Clone + Send + Sync;
+    /// The packet sent from the server to the client.
+    #[cfg(feature = "facet")]
+    type Clientbound: Debug + Clone + Send + Sync + Facet<'static> + 'static;
+
     /// The packet sent from the client to the server.
+    #[cfg(not(feature = "facet"))]
     type Serverbound: Debug + Clone + Send + Sync;
+    /// The packet sent from the client to the server.
+    #[cfg(feature = "facet")]
+    type Serverbound: Debug + Clone + Send + Sync + Facet<'static> + 'static;
 
     /// Check if the given clientbound packet is a transition packet,
     /// meaning it will cause the connection to change states.
@@ -119,9 +130,18 @@ where
     Serverbound: PacketDirection<V, S>,
 {
     /// The packet received.
-    type Recv: Debug + Clone + Send + Sync;
+    #[cfg(not(feature = "facet"))]
+    type Recv: Debug + Clone + Send + Sync + 'static;
+    /// The packet received.
+    #[cfg(feature = "facet")]
+    type Recv: Debug + Clone + Send + Sync + Facet<'static> + 'static;
+
     /// The packet sent.
-    type Send: Debug + Clone + Send + Sync;
+    #[cfg(not(feature = "facet"))]
+    type Send: Debug + Clone + Send + Sync + 'static;
+    /// The packet sent.
+    #[cfg(feature = "facet")]
+    type Send: Debug + Clone + Send + Sync + Facet<'static> + 'static;
 }
 
 /// A connection from a server to a client.
