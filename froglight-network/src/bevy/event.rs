@@ -5,8 +5,7 @@ use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
 
 /// A [`Message`] sent from the server to the client.
 ///
-/// Received by the [`Entity`]'s
-/// [`ClientConnection`](crate::bevy::ClientConnection)
+/// Received by [`ClientConnection`](crate::bevy::ClientConnection)s
 /// in the order they are sent.
 #[derive(Debug, Clone, PartialEq, Message, Reflect)]
 #[reflect(Debug, Clone, PartialEq)]
@@ -29,8 +28,7 @@ impl ClientboundMessage {
 
 /// A [`Message`] sent from the client to the server.
 ///
-/// Sent by the [`Entity`]'s
-/// [`ClientConnection`](crate::bevy::ClientConnection)
+/// Sent by [`ClientConnection`](crate::bevy::ClientConnection)s
 /// in the order they are received.
 #[derive(Debug, Clone, PartialEq, Message, Reflect)]
 #[reflect(Debug, Clone, PartialEq)]

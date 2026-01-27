@@ -5,8 +5,12 @@
 use core::error::Error;
 
 use async_channel::{TryRecvError, TrySendError};
+use async_lock::Mutex;
 use bevy_ecs::world::EntityRef;
-use froglight_packet::version::{Clientbound, PacketVersion, Serverbound, VersionPacket};
+use froglight_packet::version::{
+    Clientbound, PacketState, PacketStateEnum, PacketVersion, Serverbound, VersionPacket,
+};
+use futures_lite::future::or;
 
 use crate::{
     bevy::ClientConnection,
@@ -23,6 +27,7 @@ pub trait NetworkVersion: PacketVersion {
     fn wrap_connection<R: Runtime<C>, C>(connection: C) -> ClientConnection {
         let (channel_a, channel_b) = Channel::new_pair(Some(64));
         let (receiver, sender) = channel_a.into_split();
+        let connection = AsyncConnection::<R, C, Self>::new(connection, channel_b);
 
         ClientConnection::new_from_parts(
             // Receive events from the ECS and send them as packets.
@@ -39,11 +44,117 @@ pub trait NetworkVersion: PacketVersion {
                 Err(TryRecvError::Empty) => Ok(None),
                 Err(TryRecvError::Closed) => Err(ConnectionError::Closed),
             }),
-            // Spawn the packet handler task to communicate with the server.
-            R::spawn_task(Self::packet_handler(AsyncConnection::<R, C, Self>::new(
-                connection, channel_b,
-            ))),
+            // Spawn the connection handler task to communicate with the server.
+            R::spawn_task(Self::connection_handler(connection)),
         )
+    }
+
+    /// A connection handler that sends/receives packets from/to the server.
+    fn connection_handler<R: Runtime<C>, C>(
+        connection: AsyncConnection<R, C, Self>,
+    ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static {
+        let (conn, channel) = connection.into_parts();
+        let (_read, _write) = conn.into_split();
+        let state = Mutex::new(PacketStateEnum::Handshake);
+
+        async move {
+            // Receive a packet from the client and send it to the server.
+            // Note: Exits after every packet.
+            let client_to_server = async || {
+                let packet: VersionPacket<Self, Serverbound> = channel.recv_async().await?;
+                // Note: Holding this lock after receiving the packet to prevent
+                // `server_to_client` from reading it while we potentially update it.
+                let mut state = state.lock().await;
+
+                match (packet, *state) {
+                    (VersionPacket::Handshake(packet), PacketStateEnum::Handshake) => {
+                        if let Some(transition) = Self::Handshake::transition_state_to(&packet) {
+                            *state = transition;
+                        }
+                        todo!("Send the handshake packet to the server")
+                    }
+                    (VersionPacket::Status(packet), PacketStateEnum::Status) => {
+                        if let Some(transition) = Self::Status::transition_state_to(&packet) {
+                            *state = transition;
+                        }
+                        todo!("Send the status packet to the server")
+                    }
+                    (VersionPacket::Login(packet), PacketStateEnum::Login) => {
+                        if let Some(transition) = Self::Login::transition_state_to(&packet) {
+                            *state = transition;
+                        }
+                        todo!("Send the login packet to the server")
+                    }
+                    (VersionPacket::Config(packet), PacketStateEnum::Config) => {
+                        if let Some(transition) = Self::Config::transition_state_to(&packet) {
+                            *state = transition;
+                        }
+                        todo!("Send the config packet to the server")
+                    }
+                    (VersionPacket::Play(packet), PacketStateEnum::Play) => {
+                        if let Some(transition) = Self::Play::transition_state_to(&packet) {
+                            *state = transition;
+                        }
+                        todo!("Send the play packet to the server")
+                    }
+                    #[cfg(feature = "tracing")]
+                    (packet, state) => {
+                        if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
+                            tracing::error!(
+                                "Received mismatched server packet for state \"{state}\": {packet:?}"
+                            );
+                        } else {
+                            tracing::warn!(
+                                "Received mismatched server packet for state \"{state}\""
+                            );
+                        }
+                    }
+                    #[cfg(not(feature = "tracing"))]
+                    _ => {}
+                }
+
+                Result::<(), Box<dyn Error + Send + Sync>>::Ok(())
+            };
+
+            // Receive a packet from the server and send it to the client.
+            // Note: Loops indefinitely.
+            #[expect(unreachable_code, unused_variables, reason = "WIP")]
+            let server_to_client = async || {
+                loop {
+                    match *state.lock().await {
+                        PacketStateEnum::Handshake => {
+                            let packet: <Self::Handshake as PacketState<Self>>::Clientbound =
+                                todo!();
+                            channel.send_async(VersionPacket::Handshake(packet)).await?;
+                        }
+                        PacketStateEnum::Status => {
+                            let packet: <Self::Status as PacketState<Self>>::Clientbound = todo!();
+                            channel.send_async(VersionPacket::Status(packet)).await?;
+                        }
+                        PacketStateEnum::Login => {
+                            let packet: <Self::Login as PacketState<Self>>::Clientbound = todo!();
+                            channel.send_async(VersionPacket::Login(packet)).await?;
+                        }
+                        PacketStateEnum::Config => {
+                            let packet: <Self::Config as PacketState<Self>>::Clientbound = todo!();
+                            channel.send_async(VersionPacket::Config(packet)).await?;
+                        }
+                        PacketStateEnum::Play => {
+                            let packet: <Self::Play as PacketState<Self>>::Clientbound = todo!();
+                            channel.send_async(VersionPacket::Play(packet)).await?;
+                        }
+                    }
+                }
+            };
+
+            // Continuously handle packets from both directions.
+            //
+            // Note: When `client_to_server` finishes it will restart `server_to_client`
+            // to update the connection state, ensuring the state is always updated.
+            loop {
+                or((client_to_server)(), (server_to_client)()).await?;
+            }
+        }
     }
 
     /// Convert a [`ServerboundEvent`] into a
@@ -67,12 +178,6 @@ pub trait NetworkVersion: PacketVersion {
         packet: VersionPacket<Self, Clientbound>,
         entity: EntityRef<'_>,
     ) -> Result<ClientboundEventEnum, ConnectionError>;
-
-    /// An asynchronous packet handler that sends and receives packets over
-    /// the given [`ConnectionChannel`].
-    fn packet_handler<R: Runtime<C>, C>(
-        connection: AsyncConnection<R, C, Self>,
-    ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static;
 }
 
 // -------------------------------------------------------------------------------------------------

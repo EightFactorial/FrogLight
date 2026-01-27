@@ -1,6 +1,6 @@
 //! TODO
 
-use core::fmt::Debug;
+use core::fmt::{Debug, Display};
 
 use froglight_common::version::Version;
 
@@ -53,6 +53,12 @@ pub trait PacketState<V: PacketVersion> {
     type Clientbound: Debug + Clone + Send + Sync;
     /// The packet sent from the client to the server.
     type Serverbound: Debug + Clone + Send + Sync;
+
+    /// Check if the given clientbound packet is a transition packet,
+    /// meaning it will cause the connection to change states.
+    ///
+    /// Returns `None` if the packet does not cause a state transition.
+    fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum>;
 }
 
 /// A connection in the `Handshake` state.
@@ -74,6 +80,33 @@ pub struct Config;
 /// A connection in the `Play` state.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Play;
+
+/// An enum containing all connection states.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PacketStateEnum {
+    /// The [`Handshake`] state.
+    Handshake,
+    /// The [`Status`] state.
+    Status,
+    /// The [`Login`] state.
+    Login,
+    /// The [`Config`] state.
+    Config,
+    /// The [`Play`] state.
+    Play,
+}
+
+impl Display for PacketStateEnum {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            PacketStateEnum::Handshake => write!(f, "Handshake"),
+            PacketStateEnum::Status => write!(f, "Status"),
+            PacketStateEnum::Login => write!(f, "Login"),
+            PacketStateEnum::Config => write!(f, "Config"),
+            PacketStateEnum::Play => write!(f, "Play"),
+        }
+    }
+}
 
 // -------------------------------------------------------------------------------------------------
 

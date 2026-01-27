@@ -1,6 +1,6 @@
 //! TODO
 
-use async_channel::{Receiver, Sender, TryRecvError, TrySendError};
+use async_channel::{Receiver, Recv, Send, Sender, TryRecvError, TrySendError};
 
 /// A channel that (sends)[`Receiver`] and (receives)[`Sender`] values.
 #[derive(Debug, Clone)]
@@ -55,6 +55,14 @@ impl<T, U> Channel<T, U> {
     #[inline]
     pub fn recv(&self) -> Result<T, TryRecvError> { self.receiver.try_recv() }
 
+    /// Receives a value from the connection, waiting if one is not available.
+    ///
+    /// # Examples
+    ///
+    /// Returns an error if the connection is empty and closed.
+    #[inline]
+    pub fn recv_async(&self) -> Recv<'_, T> { self.receiver.recv() }
+
     /// Attempt to send a value to the connection.
     ///
     /// # Errors
@@ -63,4 +71,13 @@ impl<T, U> Channel<T, U> {
     /// or if the connection has been closed.
     #[inline]
     pub fn send(&self, value: U) -> Result<(), TrySendError<U>> { self.sender.try_send(value) }
+
+    /// Sends a value to the connection, waiting if necessary for space to
+    /// become available.
+    ///
+    /// # Examples
+    ///
+    /// Returns an error if the connection is closed.
+    #[inline]
+    pub fn send_async(&self, value: U) -> Send<'_, U> { self.sender.send(value) }
 }

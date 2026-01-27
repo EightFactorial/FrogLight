@@ -19,7 +19,11 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
+aes = { workspace = true }
 async-channel = { features = ["std"], workspace = true }
+async-compression = { features = ["futures-io", "zlib"], workspace = true }
+async-lock = { features = ["std"], workspace = true }
+cfb8 = { features = ["alloc"], workspace = true }
 facet = { features = ["std"], workspace = true }
 facet-format = { workspace = true }
 facet-minecraft = { features = ["std"], workspace = true }
@@ -39,7 +43,7 @@ bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = tr
 bevy_reflect = { features = ["std"], workspace = true, optional = true }
 bevy_tasks = { workspace = true, optional = true }
 futures-lite = { features = ["std"], workspace = true, optional = true }
-tokio = { features = ["io-util"], workspace = true, optional = true }
+tokio = { features = ["io-util", "net"], workspace = true, optional = true }
 tracing = { features = ["std"], workspace = true, optional = true }
 
 # --- Features ---

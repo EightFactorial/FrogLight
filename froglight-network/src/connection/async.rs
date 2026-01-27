@@ -1,6 +1,6 @@
 //! TODO
 
-use core::marker::PhantomData;
+use std::marker::PhantomData;
 
 #[cfg(feature = "bevy")]
 use bevy_tasks::{IoTaskPool, Task};
@@ -13,7 +13,6 @@ use tokio::io::{AsyncRead as TAsyncRead, AsyncWrite as TAsyncWrite};
 use crate::connection::{Encrypted, channel::Channel as InnerChannel};
 
 /// A [`Version`]'ed connection that uses a specific [`Runtime`].
-#[derive(Clone)]
 pub struct AsyncConnection<R: Runtime<C>, C, V: PacketVersion> {
     connection: Encrypted<R, C>,
     channel: Channel<V>,
@@ -26,7 +25,7 @@ impl<R: Runtime<C>, C, V: PacketVersion> AsyncConnection<R, C, V> {
     /// Create a new [`AsyncConnection`].
     #[inline]
     #[must_use]
-    pub const fn new(connection: C, channel: Channel<V>) -> Self {
+    pub fn new(connection: C, channel: Channel<V>) -> Self {
         Self::new_encrypted(Encrypted::new(connection), channel)
     }
 
@@ -77,9 +76,7 @@ where
     /// Create a new [`AsyncConnection`] using the [`futures_lite`] runtime.
     #[inline]
     #[must_use]
-    pub const fn new_async(connection: C, channel: Channel<V>) -> Self {
-        Self::new(connection, channel)
-    }
+    pub fn new_async(connection: C, channel: Channel<V>) -> Self { Self::new(connection, channel) }
 }
 
 #[cfg(feature = "tokio")]
@@ -90,20 +87,24 @@ where
     /// Create a new [`AsyncConnection`] using the [`tokio`] runtime.
     #[inline]
     #[must_use]
-    pub const fn new_tokio(connection: C, channel: Channel<V>) -> Self {
-        Self::new(connection, channel)
-    }
+    pub fn new_tokio(connection: C, channel: Channel<V>) -> Self { Self::new(connection, channel) }
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// A marker trait for different async runtimes' connection implementations.
-pub trait Runtime<C> {
-    /// Reads the exact number of bytes required to fill `buf`.
-    fn read_exact<'a>(
-        conn: &'a mut C,
-        buf: &'a mut [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a;
+/// A trait for runtime-specific read and write operations.
+///
+/// Also provides methods for splitting connections and spawning tasks.
+pub trait Runtime<C>:
+    RuntimeRead<C> + RuntimeWrite<C> + RuntimeRead<Self::Read> + RuntimeWrite<Self::Write> + Sized
+{
+    /// The read half of the connection.
+    type Read: Send + 'static;
+    /// The write half of the connection.
+    type Write: Send + 'static;
+
+    /// Split the connection into a read and write half.
+    fn into_split(conn: C) -> (Self::Read, Self::Write);
 
     /// Spawn a task on the [`IoTaskPool`].
     #[cfg(feature = "bevy")]
@@ -112,20 +113,37 @@ pub trait Runtime<C> {
     ) -> Task<Ret>;
 }
 
+/// A trait for reading from a connection in a specific runtime.
+pub trait RuntimeRead<C> {
+    /// Reads the exact number of bytes required to fill `buf`.
+    fn read_exact<'a>(
+        conn: &'a mut C,
+        buf: &'a mut [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a;
+}
+
+/// A trait for writing to a connection in a specific runtime.
+pub trait RuntimeWrite<C> {
+    /// Writes an entire buffer into the byte stream.
+    fn write_all<'a>(
+        conn: &'a mut C,
+        buf: &'a [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a;
+}
+
+// ------------------------------------
+
 /// Marker type for the [`futures_lite`] runtime.
 #[cfg(feature = "futures-lite")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct FuturesLite;
 
 #[cfg(feature = "futures-lite")]
-impl<C: FAsyncRead + FAsyncWrite + Unpin> Runtime<C> for FuturesLite {
-    #[inline]
-    fn read_exact<'a>(
-        conn: &'a mut C,
-        buf: &'a mut [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a {
-        futures_lite::AsyncReadExt::read_exact(conn, buf)
-    }
+impl<C: FAsyncRead + FAsyncWrite + Clone + Send + Unpin + 'static> Runtime<C> for FuturesLite {
+    type Read = C;
+    type Write = C;
+
+    fn into_split(conn: C) -> (Self::Read, Self::Write) { (conn.clone(), conn) }
 
     #[inline]
     #[cfg(feature = "bevy")]
@@ -136,21 +154,41 @@ impl<C: FAsyncRead + FAsyncWrite + Unpin> Runtime<C> for FuturesLite {
     }
 }
 
+#[cfg(feature = "futures-lite")]
+impl<C: FAsyncRead + Unpin> RuntimeRead<C> for FuturesLite {
+    #[inline]
+    fn read_exact<'a>(
+        conn: &'a mut C,
+        buf: &'a mut [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+        futures_lite::AsyncReadExt::read_exact(conn, buf)
+    }
+}
+
+#[cfg(feature = "futures-lite")]
+impl<C: FAsyncWrite + Unpin> RuntimeWrite<C> for FuturesLite {
+    #[inline]
+    fn write_all<'a>(
+        conn: &'a mut C,
+        buf: &'a [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+        futures_lite::AsyncWriteExt::write_all(conn, buf)
+    }
+}
+
+// ------------------------------------
+
 /// Marker type for the [`tokio`] runtime.
 #[cfg(feature = "tokio")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Tokio;
 
 #[cfg(feature = "tokio")]
-impl<C: TAsyncRead + TAsyncWrite + Unpin> Runtime<C> for Tokio {
-    #[inline]
-    #[allow(clippy::manual_async_fn, reason = "Control")]
-    fn read_exact<'a>(
-        conn: &'a mut C,
-        buf: &'a mut [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a {
-        async { tokio::io::AsyncReadExt::read_exact(conn, buf).await.map(|_| ()) }
-    }
+impl<C: TAsyncRead + TAsyncWrite + Clone + Send + Unpin + 'static> Runtime<C> for Tokio {
+    type Read = C;
+    type Write = C;
+
+    fn into_split(conn: C) -> (Self::Read, Self::Write) { (conn.clone(), conn) }
 
     #[inline]
     #[cfg(feature = "bevy")]
@@ -159,4 +197,125 @@ impl<C: TAsyncRead + TAsyncWrite + Unpin> Runtime<C> for Tokio {
     ) -> Task<Ret> {
         IoTaskPool::get().spawn(async_compat::Compat::new(future))
     }
+}
+
+#[cfg(feature = "tokio")]
+impl<C: TAsyncRead + Unpin> RuntimeRead<C> for Tokio {
+    #[inline]
+    #[allow(clippy::manual_async_fn, reason = "Control")]
+    fn read_exact<'a>(
+        conn: &'a mut C,
+        buf: &'a mut [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+        async { tokio::io::AsyncReadExt::read_exact(conn, buf).await.map(|_| ()) }
+    }
+}
+
+#[cfg(feature = "tokio")]
+impl<C: TAsyncWrite + Unpin> RuntimeWrite<C> for Tokio {
+    #[inline]
+    fn write_all<'a>(
+        conn: &'a mut C,
+        buf: &'a [u8],
+    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+        tokio::io::AsyncWriteExt::write_all(conn, buf)
+    }
+}
+
+/// A wrapper around [`TcpStream`](tokio::net::TcpStream) where
+/// [`Tokio`] implements [`Runtime`].
+#[cfg(feature = "tokio")]
+#[repr(transparent)]
+pub struct TokioTcpStream(pub tokio::net::TcpStream);
+
+#[cfg(feature = "tokio")]
+impl Runtime<TokioTcpStream> for Tokio {
+    type Read = tokio::net::tcp::OwnedReadHalf;
+    type Write = tokio::net::tcp::OwnedWriteHalf;
+
+    fn into_split(conn: TokioTcpStream) -> (Self::Read, Self::Write) { conn.0.into_split() }
+
+    #[inline]
+    #[cfg(feature = "bevy")]
+    fn spawn_task<Fut: Future<Output = Ret> + Send + 'static, Ret: Send + 'static>(
+        future: Fut,
+    ) -> Task<Ret> {
+        IoTaskPool::get().spawn(async_compat::Compat::new(future))
+    }
+}
+
+#[cfg(feature = "tokio")]
+impl TAsyncRead for TokioTcpStream {
+    #[inline]
+    fn poll_read(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        TAsyncRead::poll_read(std::pin::Pin::new(&mut self.get_mut().0), cx, buf)
+    }
+}
+
+#[cfg(feature = "tokio")]
+impl TAsyncWrite for TokioTcpStream {
+    #[inline]
+    fn poll_write(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &[u8],
+    ) -> std::task::Poll<std::io::Result<usize>> {
+        TAsyncWrite::poll_write(std::pin::Pin::new(&mut self.get_mut().0), cx, buf)
+    }
+
+    #[inline]
+    fn poll_write_vectored(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        bufs: &[std::io::IoSlice<'_>],
+    ) -> std::task::Poll<std::io::Result<usize>> {
+        TAsyncWrite::poll_write_vectored(std::pin::Pin::new(&mut self.get_mut().0), cx, bufs)
+    }
+
+    #[inline]
+    fn is_write_vectored(&self) -> bool { TAsyncWrite::is_write_vectored(&self.0) }
+
+    #[inline]
+    fn poll_flush(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        TAsyncWrite::poll_flush(std::pin::Pin::new(&mut self.get_mut().0), cx)
+    }
+
+    #[inline]
+    fn poll_shutdown(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        TAsyncWrite::poll_shutdown(std::pin::Pin::new(&mut self.get_mut().0), cx)
+    }
+}
+
+#[cfg(feature = "tokio")]
+impl From<tokio::net::TcpStream> for TokioTcpStream {
+    #[inline]
+    fn from(stream: tokio::net::TcpStream) -> Self { Self(stream) }
+}
+#[cfg(feature = "tokio")]
+impl From<TokioTcpStream> for tokio::net::TcpStream {
+    #[inline]
+    fn from(stream: TokioTcpStream) -> Self { stream.0 }
+}
+
+#[cfg(feature = "tokio")]
+impl std::ops::Deref for TokioTcpStream {
+    type Target = tokio::net::TcpStream;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+#[cfg(feature = "tokio")]
+impl core::ops::DerefMut for TokioTcpStream {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
 }

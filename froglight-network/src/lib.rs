@@ -1,4 +1,6 @@
 #![doc = include_str!("../README.md")]
+#![allow(clippy::std_instead_of_alloc, reason = "Requires the standard library")]
+#![allow(clippy::std_instead_of_core, reason = "Requires the standard library")]
 
 #[cfg(feature = "bevy")]
 pub mod bevy;
