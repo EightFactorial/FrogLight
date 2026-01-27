@@ -96,7 +96,13 @@ where
 ///
 /// Also provides methods for splitting connections and spawning tasks.
 pub trait Runtime<C>:
-    RuntimeRead<C> + RuntimeWrite<C> + RuntimeRead<Self::Read> + RuntimeWrite<Self::Write> + Sized
+    RuntimeRead<C>
+    + RuntimeWrite<C>
+    + RuntimeRead<Self::Read>
+    + RuntimeWrite<Self::Write>
+    + Sized
+    + Send
+    + 'static
 {
     /// The read half of the connection.
     type Read: Send + 'static;
@@ -114,7 +120,7 @@ pub trait Runtime<C>:
 }
 
 /// A trait for reading from a connection in a specific runtime.
-pub trait RuntimeRead<C> {
+pub trait RuntimeRead<C>: Sized + Send + 'static {
     /// Reads the exact number of bytes required to fill `buf`.
     fn read_exact<'a>(
         conn: &'a mut C,
@@ -123,7 +129,7 @@ pub trait RuntimeRead<C> {
 }
 
 /// A trait for writing to a connection in a specific runtime.
-pub trait RuntimeWrite<C> {
+pub trait RuntimeWrite<C>: Sized + Send + 'static {
     /// Writes an entire buffer into the byte stream.
     fn write_all<'a>(
         conn: &'a mut C,

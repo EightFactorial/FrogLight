@@ -7,7 +7,7 @@ mod channel;
 pub use channel::Channel;
 
 mod encryption;
-pub use encryption::Encrypted;
+pub use encryption::{DecryptorMut, Encrypted, EncryptorMut};
 
 mod event;
 pub use event::{ConnectionError, EventConnection};

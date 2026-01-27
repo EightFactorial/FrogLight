@@ -3,10 +3,13 @@
 //! Feel free to edit anything *except* the modules at the end of this file!
 
 use core::error::Error;
+use std::sync::atomic::Ordering;
 
+use aes::cipher::KeyIvInit;
 use async_channel::{TryRecvError, TrySendError};
 use async_lock::Mutex;
 use bevy_ecs::world::EntityRef;
+use cfb8::{Decryptor, Encryptor};
 use froglight_packet::version::{
     Clientbound, PacketState, PacketStateEnum, PacketVersion, Serverbound, VersionPacket,
 };
@@ -50,89 +53,135 @@ pub trait NetworkVersion: PacketVersion {
     }
 
     /// A connection handler that sends/receives packets from/to the server.
-    #[expect(clippy::option_map_unit_fn, reason = "Readability")]
+    #[expect(clippy::too_many_lines, reason = "Contains multiple async functions and packet logic")]
     fn connection_handler<R: Runtime<C>, C>(
         connection: AsyncConnection<R, C, Self>,
     ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static {
         let (conn, channel) = connection.into_parts();
-        let (_read, _write) = conn.into_split();
+        let (mut read, mut write) = conn.into_split();
         let (_read_buf, _write_buf) = (Vec::<u8>::new(), Vec::<u8>::new());
+
         let state = Mutex::new(PacketStateEnum::Handshake);
 
         async move {
             // Receive a packet from the client and send it to the server.
-            // Note: Exits after every packet.
+            // Note: Exits if `state` is changed to cancel the `server_to_client` future.
+            #[expect(unreachable_code, unused_mut, unused_variables, reason = "WIP")]
             let client_to_server = async || {
-                let packet: VersionPacket<Self, Serverbound> = channel.recv_async().await?;
-                // Note: Holding this lock after receiving the packet to prevent
-                // `server_to_client` from reading it while we potentially update it.
-                let mut state = state.lock().await;
+                loop {
+                    let packet: VersionPacket<Self, Serverbound> = channel.recv_async().await?;
 
-                match (packet, *state) {
-                    (VersionPacket::Handshake(packet), PacketStateEnum::Handshake) => {
-                        Self::Handshake::transition_state_to(&packet).map(|s| *state = s);
-                        todo!("Send packet to the server")
-                    }
-                    (VersionPacket::Status(packet), PacketStateEnum::Status) => {
-                        Self::Status::transition_state_to(&packet).map(|s| *state = s);
-                        todo!("Send packet to the server")
-                    }
-                    (VersionPacket::Login(packet), PacketStateEnum::Login) => {
-                        Self::Login::transition_state_to(&packet).map(|s| *state = s);
-                        todo!("Send packet to the server")
-                    }
-                    (VersionPacket::Config(packet), PacketStateEnum::Config) => {
-                        Self::Config::transition_state_to(&packet).map(|s| *state = s);
-                        todo!("Send packet to the server")
-                    }
-                    (VersionPacket::Play(packet), PacketStateEnum::Play) => {
-                        Self::Play::transition_state_to(&packet).map(|s| *state = s);
-                        todo!("Send packet to the server")
-                    }
-                    #[cfg(feature = "tracing")]
-                    (packet, state) => {
-                        if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
-                            tracing::error!(
-                                "Received mismatched server packet for state \"{state}\": {packet:?}"
-                            );
-                        } else {
-                            tracing::warn!(
-                                "Received mismatched server packet for state \"{state}\""
-                            );
+                    // Note: Holding this lock after receiving the packet to prevent
+                    // `server_to_client` from reading it while we potentially update it.
+                    let mut state = state.lock().await;
+
+                    match (packet, *state) {
+                        (VersionPacket::Handshake(packet), PacketStateEnum::Handshake) => {
+                            let transition = Self::Handshake::transition_state_to(&packet);
+                            todo!("Send packet to the server");
+                            if let Some(transition) = transition {
+                                *state = transition;
+                                return Ok(None);
+                            }
                         }
+                        (VersionPacket::Status(packet), PacketStateEnum::Status) => {
+                            let transition = Self::Status::transition_state_to(&packet);
+                            todo!("Send packet to the server");
+                            if let Some(transition) = transition {
+                                *state = transition;
+                                return Ok(None);
+                            }
+                        }
+                        (VersionPacket::Login(packet), PacketStateEnum::Login) => {
+                            let transition = Self::Login::transition_state_to(&packet);
+                            todo!("Send packet to the server");
+                            if let Some(transition) = transition {
+                                *state = transition;
+                                return Ok(None);
+                            }
+                        }
+                        (VersionPacket::Config(packet), PacketStateEnum::Config) => {
+                            let transition = Self::Config::transition_state_to(&packet);
+                            todo!("Send packet to the server");
+                            if let Some(transition) = transition {
+                                *state = transition;
+                                return Ok(None);
+                            }
+                        }
+                        (VersionPacket::Play(packet), PacketStateEnum::Play) => {
+                            let transition = Self::Play::transition_state_to(&packet);
+                            todo!("Send packet to the server");
+                            if let Some(transition) = transition {
+                                *state = transition;
+                                return Ok(None);
+                            }
+                        }
+                        #[cfg(feature = "tracing")]
+                        (packet, state) => {
+                            if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG)
+                            {
+                                tracing::error!(
+                                    target: "froglight_network",
+                                    "Received mismatched server packet for state \"{state}\": {packet:?}"
+                                );
+                            } else {
+                                tracing::warn!(
+                                    target: "froglight_network",
+                                    "Received mismatched server packet for state \"{state}\""
+                                );
+                            }
+                        }
+                        #[cfg(not(feature = "tracing"))]
+                        _ => {}
                     }
-                    #[cfg(not(feature = "tracing"))]
-                    _ => {}
                 }
-
-                Result::<(), Box<dyn Error + Send + Sync>>::Ok(())
             };
 
             // Receive a packet from the server and send it to the client.
-            // Note: Loops indefinitely.
+            // Note: Loops indefinitely unless a `ConnectionUpdate` is returned.
             #[expect(unreachable_code, unused_variables, reason = "WIP")]
             let server_to_client = async || {
                 loop {
                     match *state.lock().await {
                         PacketStateEnum::Handshake => {
-                            let packet = todo!();
-                            channel.send_async(VersionPacket::Handshake(packet)).await?;
+                            let packet = VersionPacket::Handshake(todo!());
+                            let update = Self::update_connection_details(&packet);
+                            channel.send_async(packet).await?;
+                            if update.is_some() {
+                                return Ok(update);
+                            }
                         }
                         PacketStateEnum::Status => {
-                            let packet = todo!();
-                            channel.send_async(VersionPacket::Status(packet)).await?;
+                            let packet = VersionPacket::Status(todo!());
+                            let update = Self::update_connection_details(&packet);
+                            channel.send_async(packet).await?;
+                            if update.is_some() {
+                                return Ok(update);
+                            }
                         }
                         PacketStateEnum::Login => {
-                            let packet = todo!();
-                            channel.send_async(VersionPacket::Login(packet)).await?;
+                            let packet = VersionPacket::Login(todo!());
+                            let update = Self::update_connection_details(&packet);
+                            channel.send_async(packet).await?;
+                            if update.is_some() {
+                                return Ok(update);
+                            }
                         }
                         PacketStateEnum::Config => {
-                            let packet = todo!();
-                            channel.send_async(VersionPacket::Config(packet)).await?;
+                            let packet = VersionPacket::Config(todo!());
+                            let update = Self::update_connection_details(&packet);
+                            channel.send_async(packet).await?;
+                            if update.is_some() {
+                                return Ok(update);
+                            }
                         }
                         PacketStateEnum::Play => {
-                            let packet = todo!();
-                            channel.send_async(VersionPacket::Play(packet)).await?;
+                            let packet = VersionPacket::Play(todo!());
+                            let update = Self::update_connection_details(&packet);
+                            channel.send_async(packet).await?;
+                            if update.is_some() {
+                                return Ok(update);
+                            }
                         }
                     }
                 }
@@ -140,13 +189,33 @@ pub trait NetworkVersion: PacketVersion {
 
             // Continuously handle packets from both directions.
             //
-            // Note: When `client_to_server` finishes it will restart `server_to_client`
-            // to update the connection state, ensuring the state is always updated.
+            // If a `ConnectionUpdate` is received, update the connection's settings
+            // and continue.
             loop {
-                or((client_to_server)(), (server_to_client)()).await?;
+                if let Some(update) = or::<
+                    Result<Option<ConnectionUpdate>, Box<dyn Error + Send + Sync>>,
+                    _,
+                    _,
+                >((client_to_server)(), (server_to_client)())
+                .await?
+                {
+                    if let Some(threshold) = update.compression_threshold {
+                        read.compression().store(threshold, Ordering::Relaxed);
+                        write.compression().store(threshold, Ordering::Relaxed);
+                    }
+                    if let Some(_key) = update.encrypion_key {
+                        *read.decryptor() = Decryptor::new(&[0; _].into(), &[0; _].into());
+                        *write.encryptor() = Encryptor::new(&[0; _].into(), &[0; _].into());
+                    }
+                }
             }
         }
     }
+
+    /// Update connection details based on a received packet.
+    fn update_connection_details(
+        packet: &VersionPacket<Self, Clientbound>,
+    ) -> Option<ConnectionUpdate>;
 
     /// Convert a [`ServerboundEvent`] into a
     /// [`VersionPacket<Self, Serverbound>`].
@@ -169,6 +238,11 @@ pub trait NetworkVersion: PacketVersion {
         packet: VersionPacket<Self, Clientbound>,
         entity: EntityRef<'_>,
     ) -> Result<ClientboundEventEnum, ConnectionError>;
+}
+
+pub struct ConnectionUpdate {
+    pub compression_threshold: Option<i32>,
+    pub encrypion_key: Option<()>,
 }
 
 // -------------------------------------------------------------------------------------------------

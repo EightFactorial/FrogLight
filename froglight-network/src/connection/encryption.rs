@@ -170,6 +170,10 @@ impl<R: RuntimeWrite<C>, C> EncryptorMut<R, C> {
     /// Writes all bytes from `buf` to the underlying connection.
     ///
     /// If encryption is enabled, the data will be encrypted in-place.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if writing to the underlying connection fails.
     pub async fn write_all(&mut self, buf: &mut [u8]) -> std::io::Result<()> {
         if self.enabled.load(Ordering::Relaxed) {
             let (head, tail) = InOutBuf::from(&mut *buf).into_chunks();
@@ -229,6 +233,10 @@ impl<R: RuntimeRead<C>, C> DecryptorMut<R, C> {
     /// Reads the exact number of bytes required to fill `buf`.
     ///
     /// If encryption is enabled, the data will be decrypted in-place.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if reading from the underlying connection fails.
     pub async fn read_exact(&mut self, buf: &mut [u8]) -> std::io::Result<()> {
         R::read_exact(&mut self.connection, buf).await?;
         if self.enabled.load(Ordering::Relaxed) {
