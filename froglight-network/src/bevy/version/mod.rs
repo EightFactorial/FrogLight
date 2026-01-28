@@ -276,6 +276,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
 
     let decompressed = reader.decompress(buffer).await?;
     match facet_minecraft::from_slice::<T>(decompressed) {
+        #[allow(unused_variables, reason = "Used in tracing only")]
         Ok((val, rem)) => {
             #[cfg(feature = "tracing")]
             if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {

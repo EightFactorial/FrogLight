@@ -28,7 +28,7 @@ impl ClientboundMessage {
     #[must_use]
     pub const fn source(&self) -> Entity { self.source }
 
-    /// Get a refernce to the event data of the message.
+    /// Get a reference to the event data of the message.
     #[inline]
     #[must_use]
     pub const fn event(&self) -> &ClientboundEventEnum { &self.event }
@@ -66,7 +66,7 @@ impl ServerboundMessage {
     #[must_use]
     pub const fn target(&self) -> Entity { self.target }
 
-    /// Get a refernce to the event data of the message.
+    /// Get a reference to the event data of the message.
     #[inline]
     #[must_use]
     pub const fn event(&self) -> &ServerboundEventEnum { &self.event }

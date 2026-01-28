@@ -294,6 +294,7 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
     }
 }
 
+#[cfg(feature = "futures-lite")]
 fn read_prefixed_slice(buf: &[u8]) -> Option<&[u8]> {
     let mut byte: u8;
     let mut number = 0usize;
@@ -310,4 +311,5 @@ fn read_prefixed_slice(buf: &[u8]) -> Option<&[u8]> {
     buf.get(index..index + number)
 }
 
+#[cfg(feature = "futures-lite")]
 fn write_slice_prefix(_prefix: usize, _buf: &mut Vec<u8>) -> usize { todo!() }
