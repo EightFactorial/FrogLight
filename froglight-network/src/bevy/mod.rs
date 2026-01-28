@@ -7,7 +7,7 @@ pub use client::ClientConnection;
 mod event;
 pub use event::{ClientboundMessage, ServerboundMessage};
 
-mod version;
+pub mod version;
 pub use version::NetworkVersion;
 
 /// A [`Plugin`] that adds [`ClientboundMessage`] and [`ServerboundMessage`]
