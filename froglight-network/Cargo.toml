@@ -57,7 +57,7 @@ futures-lite = ["bevy_tasks?/futures-lite", "dep:async-compression", "dep:future
 tokio = ["dep:async-compat", "dep:tokio", "facet-minecraft/tokio", "futures-lite"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-world/bevy"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-world/bevy", "futures-lite"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "facet-minecraft/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-world/tracing"]
 

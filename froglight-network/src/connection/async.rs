@@ -13,7 +13,7 @@ use tokio::io::{AsyncRead as TAsyncRead, AsyncWrite as TAsyncWrite};
 use crate::connection::{Encrypted, channel::Channel as InnerChannel};
 
 /// A [`Version`]'ed connection that uses a specific [`Runtime`].
-pub struct AsyncConnection<R: Runtime<C>, C, V: PacketVersion> {
+pub struct AsyncConnection<R: Runtime<C>, C: Send, V: PacketVersion> {
     connection: Encrypted<R, C>,
     channel: Channel<V>,
     _phantom: PhantomData<(R, V)>,
@@ -21,7 +21,7 @@ pub struct AsyncConnection<R: Runtime<C>, C, V: PacketVersion> {
 
 type Channel<V> = InnerChannel<VersionPacket<V, Serverbound>, VersionPacket<V, Clientbound>>;
 
-impl<R: Runtime<C>, C, V: PacketVersion> AsyncConnection<R, C, V> {
+impl<R: Runtime<C>, C: Send, V: PacketVersion> AsyncConnection<R, C, V> {
     /// Create a new [`AsyncConnection`].
     #[inline]
     #[must_use]
@@ -69,7 +69,7 @@ impl<R: Runtime<C>, C, V: PacketVersion> AsyncConnection<R, C, V> {
 }
 
 #[cfg(feature = "futures-lite")]
-impl<C, V: PacketVersion> AsyncConnection<FuturesLite, C, V>
+impl<C: Send, V: PacketVersion> AsyncConnection<FuturesLite, C, V>
 where
     FuturesLite: Runtime<C>,
 {
@@ -80,7 +80,7 @@ where
 }
 
 #[cfg(feature = "tokio")]
-impl<C, V: PacketVersion> AsyncConnection<Tokio, C, V>
+impl<C: Send, V: PacketVersion> AsyncConnection<Tokio, C, V>
 where
     Tokio: Runtime<C>,
 {
@@ -125,7 +125,7 @@ pub trait RuntimeRead<C>: Sized + Send + 'static {
     fn read_exact<'a>(
         conn: &'a mut C,
         buf: &'a mut [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a;
+    ) -> impl Future<Output = std::io::Result<()>> + Send + 'a;
 }
 
 /// A trait for writing to a connection in a specific runtime.
@@ -134,7 +134,7 @@ pub trait RuntimeWrite<C>: Sized + Send + 'static {
     fn write_all<'a>(
         conn: &'a mut C,
         buf: &'a [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a;
+    ) -> impl Future<Output = std::io::Result<()>> + Send + 'a;
 }
 
 // ------------------------------------
@@ -145,7 +145,7 @@ pub trait RuntimeWrite<C>: Sized + Send + 'static {
 pub struct FuturesLite;
 
 #[cfg(feature = "futures-lite")]
-impl<C: FAsyncRead + FAsyncWrite + Clone + Send + Unpin + 'static> Runtime<C> for FuturesLite {
+impl<C: FAsyncRead + FAsyncWrite + Clone + Unpin + Send + 'static> Runtime<C> for FuturesLite {
     type Read = C;
     type Write = C;
 
@@ -161,23 +161,23 @@ impl<C: FAsyncRead + FAsyncWrite + Clone + Send + Unpin + 'static> Runtime<C> fo
 }
 
 #[cfg(feature = "futures-lite")]
-impl<C: FAsyncRead + Unpin> RuntimeRead<C> for FuturesLite {
+impl<C: FAsyncRead + Unpin + Send> RuntimeRead<C> for FuturesLite {
     #[inline]
     fn read_exact<'a>(
         conn: &'a mut C,
         buf: &'a mut [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+    ) -> impl Future<Output = std::io::Result<()>> + Send + 'a {
         futures_lite::AsyncReadExt::read_exact(conn, buf)
     }
 }
 
 #[cfg(feature = "futures-lite")]
-impl<C: FAsyncWrite + Unpin> RuntimeWrite<C> for FuturesLite {
+impl<C: FAsyncWrite + Unpin + Send> RuntimeWrite<C> for FuturesLite {
     #[inline]
     fn write_all<'a>(
         conn: &'a mut C,
         buf: &'a [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+    ) -> impl Future<Output = std::io::Result<()>> + Send + 'a {
         futures_lite::AsyncWriteExt::write_all(conn, buf)
     }
 }
@@ -206,24 +206,24 @@ impl<C: TAsyncRead + TAsyncWrite + Clone + Send + Unpin + 'static> Runtime<C> fo
 }
 
 #[cfg(feature = "tokio")]
-impl<C: TAsyncRead + Unpin> RuntimeRead<C> for Tokio {
+impl<C: TAsyncRead + Send + Unpin> RuntimeRead<C> for Tokio {
     #[inline]
     #[allow(clippy::manual_async_fn, reason = "Control")]
     fn read_exact<'a>(
         conn: &'a mut C,
         buf: &'a mut [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+    ) -> impl Future<Output = std::io::Result<()>> + Send + 'a {
         async { tokio::io::AsyncReadExt::read_exact(conn, buf).await.map(|_| ()) }
     }
 }
 
 #[cfg(feature = "tokio")]
-impl<C: TAsyncWrite + Unpin> RuntimeWrite<C> for Tokio {
+impl<C: TAsyncWrite + Send + Unpin> RuntimeWrite<C> for Tokio {
     #[inline]
     fn write_all<'a>(
         conn: &'a mut C,
         buf: &'a [u8],
-    ) -> impl Future<Output = std::io::Result<()>> + 'a {
+    ) -> impl Future<Output = std::io::Result<()>> + Send + 'a {
         tokio::io::AsyncWriteExt::write_all(conn, buf)
     }
 }

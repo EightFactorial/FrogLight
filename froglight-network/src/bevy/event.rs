@@ -11,7 +11,7 @@ use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
 #[reflect(Debug, Clone, PartialEq)]
 pub struct ClientboundMessage {
     /// The entity associated with the event.
-    pub entity: Entity,
+    pub source: Entity,
     /// The event data.
     pub event: ClientboundEventEnum,
 }
@@ -19,9 +19,24 @@ pub struct ClientboundMessage {
 impl ClientboundMessage {
     /// Create a new [`ClientboundEvent`] from an [`Entity`] and an event.
     #[must_use]
-    pub fn new<T: Into<ClientboundEventEnum>>(entity: Entity, event: T) -> Self {
-        Self { entity, event: event.into() }
+    pub fn new<T: Into<ClientboundEventEnum>>(source: Entity, event: T) -> Self {
+        Self { source, event: event.into() }
     }
+
+    /// Get the source [`Entity`] of the message.
+    #[inline]
+    #[must_use]
+    pub const fn source(&self) -> Entity { self.source }
+
+    /// Get a refernce to the event data of the message.
+    #[inline]
+    #[must_use]
+    pub const fn event(&self) -> &ClientboundEventEnum { &self.event }
+
+    /// Get a mutable reference to the event data of the message.
+    #[inline]
+    #[must_use]
+    pub const fn event_mut(&mut self) -> &mut ClientboundEventEnum { &mut self.event }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -34,7 +49,7 @@ impl ClientboundMessage {
 #[reflect(Debug, Clone, PartialEq)]
 pub struct ServerboundMessage {
     /// The entity associated with the message.
-    pub entity: Entity,
+    pub target: Entity,
     /// The event data.
     pub event: ServerboundEventEnum,
 }
@@ -42,7 +57,22 @@ pub struct ServerboundMessage {
 impl ServerboundMessage {
     /// Create a new [`ServerboundMessage`] from an [`Entity`] and an event.
     #[must_use]
-    pub fn new<T: Into<ServerboundEventEnum>>(entity: Entity, event: T) -> Self {
-        Self { entity, event: event.into() }
+    pub fn new<T: Into<ServerboundEventEnum>>(target: Entity, event: T) -> Self {
+        Self { target, event: event.into() }
     }
+
+    /// Get the target [`Entity`] of the message.
+    #[inline]
+    #[must_use]
+    pub const fn target(&self) -> Entity { self.target }
+
+    /// Get a refernce to the event data of the message.
+    #[inline]
+    #[must_use]
+    pub const fn event(&self) -> &ServerboundEventEnum { &self.event }
+
+    /// Get a mutable reference to the event data of the message.
+    #[inline]
+    #[must_use]
+    pub const fn event_mut(&mut self) -> &mut ServerboundEventEnum { &mut self.event }
 }

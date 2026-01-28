@@ -17,7 +17,7 @@ use futures_lite::{AsyncReadExt, io::Cursor};
 use crate::connection::{Runtime, RuntimeRead, RuntimeWrite};
 
 /// An encrypted connection that uses a specific [`Runtime`].
-pub struct Encrypted<R: Runtime<C>, C> {
+pub struct Encrypted<R: Runtime<C>, C: Send> {
     connection: C,
     compression: AtomicI32,
     enabled: AtomicBool,
@@ -26,7 +26,7 @@ pub struct Encrypted<R: Runtime<C>, C> {
     _phantom: PhantomData<R>,
 }
 
-impl<R: Runtime<C>, C> Encrypted<R, C> {
+impl<R: Runtime<C>, C: Send> Encrypted<R, C> {
     /// Create a new [`Encrypted`] connection.
     ///
     /// Has encryption disabled by default.
@@ -120,7 +120,7 @@ impl<R: Runtime<C>, C> Encrypted<R, C> {
 // -------------------------------------------------------------------------------------------------
 
 /// A reference to an [`Encryptor`] that uses a specific [`Runtime`].
-pub struct EncryptorMut<R: RuntimeWrite<C>, C> {
+pub struct EncryptorMut<R: RuntimeWrite<C>, C: Send> {
     connection: C,
     #[cfg(feature = "futures-lite")]
     scratch: Vec<u8>,
@@ -131,7 +131,7 @@ pub struct EncryptorMut<R: RuntimeWrite<C>, C> {
 }
 
 /// A reference to a [`Decryptor`] that uses a specific [`Runtime`].
-pub struct DecryptorMut<R: RuntimeRead<C>, C> {
+pub struct DecryptorMut<R: RuntimeRead<C>, C: Send> {
     connection: C,
     #[cfg(feature = "futures-lite")]
     scratch: Vec<u8>,
@@ -141,7 +141,7 @@ pub struct DecryptorMut<R: RuntimeRead<C>, C> {
     _phantom: PhantomData<R>,
 }
 
-impl<R: RuntimeWrite<C>, C> EncryptorMut<R, C> {
+impl<R: RuntimeWrite<C>, C: Send> EncryptorMut<R, C> {
     /// Get a reference to the compression threshold.
     #[inline]
     #[must_use]
@@ -183,28 +183,42 @@ impl<R: RuntimeWrite<C>, C> EncryptorMut<R, C> {
         R::write_all(&mut self.connection, buf).await
     }
 
-    /// Compresses `buf` if its length is greater than the compression
-    /// threshold.
+    /// Compresses `buf` if compression is enabled and the length of `buf`
+    /// is greater than the compression threshold.
+    ///
+    /// Also adds a length prefix if compression is enabled.
     ///
     /// # Errors
     ///
     /// Returns an error if compression fails.
     #[cfg(feature = "futures-lite")]
-    #[expect(clippy::cast_sign_loss, reason = "Checked if positive before casting")]
     pub async fn compress<'a>(&'a mut self, buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
-        if threshold.is_positive() && threshold as usize <= buf.len() {
+        if threshold.is_positive() {
             self.scratch.clear();
-            let mut compressor = ZlibEncoder::new(Cursor::new(buf));
-            let len = compressor.read_to_end(&mut self.scratch).await?;
-            Ok(&self.scratch[..len])
+
+            let prefix = if threshold <= buf.len().try_into().unwrap_or(i32::MAX) {
+                // Compress the buffer and write it to the scratch space
+                let mut compressor = ZlibEncoder::new(Cursor::new(buf));
+                compressor.read_to_end(&mut self.scratch).await?
+            } else {
+                // No compression, copy the buffer to the scratch space
+                self.scratch.extend_from_slice(buf);
+                0
+            };
+
+            // Write the length prefix and rotate it to the front
+            let len = write_slice_prefix(prefix, &mut self.scratch);
+            self.scratch.rotate_right(len);
+
+            Ok(self.scratch.as_slice())
         } else {
             Ok(buf)
         }
     }
 }
 
-impl<R: RuntimeRead<C>, C> DecryptorMut<R, C> {
+impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
     /// Get a reference to the compression threshold.
     #[inline]
     #[must_use]
@@ -247,23 +261,53 @@ impl<R: RuntimeRead<C>, C> DecryptorMut<R, C> {
         Ok(())
     }
 
-    /// Decompresses `buf` if its length is greater than the compression
-    /// threshold.
+    /// Decompresses `buf` if decompression is enabled and the length of `buf`
+    /// is greater than the compression threshold.
+    ///
+    /// Also removes the length prefix if compression is enabled.
     ///
     /// # Errors
     ///
-    /// Returns an error if decompression fails.
+    /// Returns an error there is no length prefix, or if decompression fails.
     #[cfg(feature = "futures-lite")]
-    #[expect(clippy::cast_sign_loss, reason = "Checked if positive before casting")]
-    pub async fn decompress<'a>(&'a mut self, buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
+    pub async fn decompress<'a>(&'a mut self, mut buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
-        if threshold.is_positive() && threshold as usize <= buf.len() {
-            self.scratch.clear();
-            let mut decompressor = ZlibDecoder::new(Cursor::new(buf));
-            let len = decompressor.read_to_end(&mut self.scratch).await?;
-            Ok(&self.scratch[..len])
-        } else {
-            Ok(buf)
+        if threshold.is_positive() {
+            // Remove the length prefix from the buffer
+            buf = read_prefixed_slice(buf).ok_or_else(|| {
+                std::io::Error::new(
+                    std::io::ErrorKind::InvalidData,
+                    "Failed to read prefixed slice for decompression",
+                )
+            })?;
+
+            // Decompress if the buffer length exceeds the threshold
+            if threshold <= buf.len().try_into().unwrap_or(i32::MAX) {
+                self.scratch.clear();
+                let mut decompressor = ZlibDecoder::new(Cursor::new(buf));
+                decompressor.read_to_end(&mut self.scratch).await?;
+                return Ok(self.scratch.as_slice());
+            }
         }
+
+        Ok(buf)
     }
 }
+
+fn read_prefixed_slice(buf: &[u8]) -> Option<&[u8]> {
+    let mut byte: u8;
+    let mut number = 0usize;
+    let mut index = 0;
+    while index < 5 {
+        byte = *buf.get(index)?;
+        number |= usize::from(byte & 0b0111_1111) << (7 * index);
+        if byte & 0b1000_0000 != 0 {
+            index += 1;
+        } else {
+            break;
+        }
+    }
+    buf.get(index..index + number)
+}
+
+fn write_slice_prefix(_prefix: usize, _buf: &mut Vec<u8>) -> usize { todo!() }

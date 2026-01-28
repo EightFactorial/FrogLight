@@ -31,7 +31,7 @@ impl ClientConnection {
     /// Create a new [`ClientConnection`] using the given connection.
     #[inline]
     #[must_use]
-    pub fn new<V: NetworkVersion, R: Runtime<C>, C>(connection: C) -> Self {
+    pub fn new<V: NetworkVersion, R: Runtime<C>, C: Send>(connection: C) -> Self {
         V::wrap_connection::<R, C>(connection)
     }
 

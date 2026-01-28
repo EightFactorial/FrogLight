@@ -31,7 +31,7 @@ pub trait NetworkVersion: PacketVersion {
     /// Create a new [`ClientConnection`] for this
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    fn wrap_connection<R: Runtime<C>, C>(connection: C) -> ClientConnection {
+    fn wrap_connection<R: Runtime<C>, C: Send>(connection: C) -> ClientConnection {
         let (channel_a, channel_b) = Channel::new_pair(Some(64));
         let (receiver, sender) = channel_a.into_split();
         let connection = AsyncConnection::<R, C, Self>::new(connection, channel_b);
@@ -58,7 +58,7 @@ pub trait NetworkVersion: PacketVersion {
 
     /// A connection handler that sends/receives packets from/to the server.
     #[allow(clippy::too_many_lines, reason = "Contains multiple async functions and packet logic")]
-    fn connection_handler<R: Runtime<C>, C>(
+    fn connection_handler<R: Runtime<C>, C: Send>(
         connection: AsyncConnection<R, C, Self>,
     ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static {
         let (connection, channel) = connection.into_parts();
@@ -266,11 +266,52 @@ pub struct ConnectionUpdate {
 /// # Errors
 ///
 /// Returns an error if reading the packet fails.
-pub async fn read_packet<R: RuntimeRead<C>, C, T: Facet<'static>>(
-    _reader: &mut DecryptorMut<R, C>,
-    _buffer: &mut Vec<u8>,
+pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
+    reader: &mut DecryptorMut<R, C>,
+    buffer: &mut Vec<u8>,
 ) -> Result<T, Box<dyn Error + Send + Sync>> {
-    todo!()
+    let packet_length = read_varint_bytewise(reader).await? as usize;
+    buffer.resize(packet_length, 0);
+    reader.read_exact(buffer.as_mut_slice()).await?;
+
+    let decompressed = reader.decompress(buffer).await?;
+    match facet_minecraft::from_slice::<T>(decompressed) {
+        Ok((val, rem)) => {
+            #[cfg(feature = "tracing")]
+            if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
+                tracing::error!(
+                    target: "froglight_network",
+                    "Bytes remaining after reading packet `{}`: {} --v\n    {rem:?}", T::SHAPE.type_name(), rem.len()
+                );
+            } else {
+                tracing::warn!(
+                    target: "froglight_network",
+                    "Bytes remaining after reading packet `{}`: {}", T::SHAPE.type_name(), rem.len()
+                );
+            }
+
+            Ok(val)
+        }
+        Err(err) => Err(Box::new(err)),
+    }
+}
+
+/// Read a VarInt per-byte from the connection.
+///
+/// Prevents reading more bytes than necessary.
+async fn read_varint_bytewise<R: RuntimeRead<C>, C: Send>(
+    reader: &mut DecryptorMut<R, C>,
+) -> Result<u32, Box<dyn Error + Send + Sync>> {
+    let mut byte = [0];
+    let mut number = 0;
+    for i in 0..5 {
+        reader.read_exact(byte.as_mut_slice()).await?;
+        number |= u32::from(byte[0] & 0b0111_1111) << (7 * i);
+        if byte[0] & 0b1000_0000 == 0 {
+            break;
+        }
+    }
+    Ok(number)
 }
 
 /// Write a packet of type `T` to the connection.
@@ -278,7 +319,8 @@ pub async fn read_packet<R: RuntimeRead<C>, C, T: Facet<'static>>(
 /// # Errors
 ///
 /// Returns an error if writing the packet fails.
-pub async fn write_packet<R: RuntimeWrite<C>, C, T: Facet<'static>>(
+#[expect(clippy::unused_async, reason = "WIP")]
+pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     _packet: &T,
     _writer: &mut EncryptorMut<R, C>,
     _buffer: &mut Vec<u8>,
