@@ -53,3 +53,5 @@ nightly = []
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
+
+v26_1 = []

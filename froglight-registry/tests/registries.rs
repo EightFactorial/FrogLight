@@ -8,6 +8,7 @@ use froglight_registry::{implement_registry, prelude::*};
 struct TestVersion;
 
 impl Version for TestVersion {
+    const DATA_VERSION: u32 = u32::MIN;
     const PROTOCOL_ID: u32 = u32::MIN;
     const RESOURCE_VERSION: u32 = u32::MIN;
 }

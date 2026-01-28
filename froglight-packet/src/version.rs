@@ -20,31 +20,6 @@ pub trait PacketVersion: Version {
     type Play: PacketState<Self> + Debug + Copy + Send + Sync + 'static;
 }
 
-impl<V: Version> PacketVersion for V
-where
-    Handshake: PacketState<V>,
-    Status: PacketState<V>,
-    Login: PacketState<V>,
-    Config: PacketState<V>,
-    Play: PacketState<V>,
-    Clientbound: PacketDirection<V, Handshake>
-        + PacketDirection<V, Status>
-        + PacketDirection<V, Login>
-        + PacketDirection<V, Config>
-        + PacketDirection<V, Play>,
-    Serverbound: PacketDirection<V, Handshake>
-        + PacketDirection<V, Status>
-        + PacketDirection<V, Login>
-        + PacketDirection<V, Config>
-        + PacketDirection<V, Play>,
-{
-    type Config = Config;
-    type Handshake = Handshake;
-    type Login = Login;
-    type Play = Play;
-    type Status = Status;
-}
-
 // -------------------------------------------------------------------------------------------------
 
 /// The state of a connection.
