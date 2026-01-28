@@ -5,6 +5,9 @@
 /// Equivalent to [`Infallible`](core::convert::Infallible),
 /// but implements both [`Reflect`](bevy_reflect::Reflect) and
 /// [`Facet`](facet::Facet).
+///
+/// Will be removed if/when [`Reflect`](bevy_reflect::Reflect) is implemented
+/// for [`Infallible`](core::convert::Infallible).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]

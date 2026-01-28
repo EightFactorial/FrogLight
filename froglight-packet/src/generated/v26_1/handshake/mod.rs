@@ -1,22 +1,25 @@
 //! @generated [`Handshake`](crate::version::Handshake) packets for v26.1.x
 
+pub mod c2s_0x00_intention;
+pub use c2s_0x00_intention::HandshakeC2SPacket;
 // -------------------------------------------------------------------------------------------------
-
 use froglight_common::version::V26_1;
 
-use crate::{core::impossible::Impossible, version::*};
+use crate::{
+    core::{impossible::Impossible, intent::ConnectionIntent},
+    version::*,
+};
 
 impl PacketState<V26_1> for Handshake {
     type Clientbound = ClientboundPackets;
     type Serverbound = ServerboundPackets;
 
-    // TODO: Placeholder until `ServerboundPackets::Handshake` is implemented
     fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum> {
-        let ServerboundPackets::Handshake(val) = packet;
-        match val {
-            1 => Some(PacketStateEnum::Status),
-            2 => Some(PacketStateEnum::Login),
-            _ => None,
+        let ServerboundPackets::Handshake(HandshakeC2SPacket { intent, .. }) = packet;
+        match intent {
+            ConnectionIntent::Status => Some(PacketStateEnum::Status),
+            ConnectionIntent::Login => Some(PacketStateEnum::Login),
+            ConnectionIntent::Transfer => None,
         }
     }
 }
@@ -27,7 +30,7 @@ impl PacketState<V26_1> for Handshake {
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub enum ClientboundPackets {
-    Impossible(Impossible) = 0x00,
+    None(Impossible) = 0x00,
 }
 
 #[repr(u8)]
@@ -36,5 +39,5 @@ pub enum ClientboundPackets {
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub enum ServerboundPackets {
-    Handshake(u32) = 0x00,
+    Handshake(HandshakeC2SPacket) = 0x00,
 }
