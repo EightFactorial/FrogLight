@@ -6,7 +6,7 @@ pub use r#async::*;
 mod channel;
 pub use channel::Channel;
 
-mod encryption;
+pub(crate) mod encryption;
 pub use encryption::{DecryptorMut, Encrypted, EncryptorMut};
 
 mod event;

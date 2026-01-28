@@ -192,7 +192,7 @@ impl<R: RuntimeWrite<C>, C: Send> EncryptorMut<R, C> {
     ///
     /// Returns an error if compression fails.
     #[cfg(feature = "futures-lite")]
-    pub async fn compress<'a>(&'a mut self, buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
+    pub async fn compress<'a>(&'a mut self, buf: &'a mut [u8]) -> std::io::Result<&'a mut [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
         if threshold.is_positive() {
             self.scratch.clear();
@@ -211,7 +211,7 @@ impl<R: RuntimeWrite<C>, C: Send> EncryptorMut<R, C> {
             let len = write_slice_prefix(prefix, &mut self.scratch);
             self.scratch.rotate_right(len);
 
-            Ok(self.scratch.as_slice())
+            Ok(self.scratch.as_mut_slice())
         } else {
             Ok(buf)
         }
@@ -294,6 +294,8 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
     }
 }
 
+/// Reads a length-prefixed slice from the given buffer.
+#[must_use]
 #[cfg(feature = "futures-lite")]
 fn read_prefixed_slice(buf: &[u8]) -> Option<&[u8]> {
     let mut byte: u8;
@@ -311,5 +313,22 @@ fn read_prefixed_slice(buf: &[u8]) -> Option<&[u8]> {
     buf.get(index..index + number)
 }
 
+/// Writes a length prefix into the given buffer.
+#[must_use]
 #[cfg(feature = "futures-lite")]
-fn write_slice_prefix(_prefix: usize, _buf: &mut Vec<u8>) -> usize { todo!() }
+#[allow(clippy::cast_possible_truncation, reason = "Bitwise operations")]
+pub(crate) fn write_slice_prefix(mut prefix: usize, buf: &mut Vec<u8>) -> usize {
+    let mut count: usize = 0;
+    let mut byte = [0];
+    while (prefix != 0 || count == 0) && count < 5 {
+        byte[0] = (prefix & 0b0111_1111) as u8;
+        prefix = (prefix >> 7) & (usize::MAX >> 6);
+        if prefix != 0 {
+            byte[0] |= 0b1000_0000;
+        }
+
+        count += 1;
+        buf.push(byte[0]);
+    }
+    count
+}

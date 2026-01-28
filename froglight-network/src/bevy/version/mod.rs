@@ -20,7 +20,7 @@ use crate::{
     bevy::ClientConnection,
     connection::{
         AsyncConnection, Channel, ConnectionError, DecryptorMut, EncryptorMut, Runtime,
-        RuntimeRead, RuntimeWrite,
+        RuntimeRead, RuntimeWrite, encryption::write_slice_prefix,
     },
     event::{ClientboundEventEnum, ServerboundEventEnum},
 };
@@ -63,7 +63,8 @@ pub trait NetworkVersion: PacketVersion {
     ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static {
         let (connection, channel) = connection.into_parts();
         let (mut reader, mut writer) = connection.into_split();
-        let (mut read_buf, mut write_buf) = (Vec::<u8>::new(), Vec::<u8>::new());
+        let (mut read_buf, mut write_buf_a, mut write_buf_b) =
+            (Vec::<u8>::new(), Vec::<u8>::new(), Vec::<u8>::new());
 
         async move {
             let state = Mutex::new(PacketStateEnum::Handshake);
@@ -71,7 +72,9 @@ pub trait NetworkVersion: PacketVersion {
             // Receive a packet from the client and send it to the server.
             // Note: Exits if `state` is changed to cancel the `server_to_client` future.
             let client_to_server =
-                async |writer: &mut EncryptorMut<R, R::Write>, writer_buf: &mut Vec<u8>| {
+                async |writer: &mut EncryptorMut<R, R::Write>,
+                       writer_buf_a: &mut Vec<u8>,
+                       writer_buf_b: &mut Vec<u8>| {
                     loop {
                         let packet: VersionPacket<Self, Serverbound> = channel.recv_async().await?;
 
@@ -82,7 +85,7 @@ pub trait NetworkVersion: PacketVersion {
                         match (packet, *state) {
                             (VersionPacket::Handshake(packet), PacketStateEnum::Handshake) => {
                                 let transition = Self::Handshake::transition_state_to(&packet);
-                                write_packet(&packet, writer, writer_buf).await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     *state = transition;
                                     return Ok(None);
@@ -90,7 +93,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Status(packet), PacketStateEnum::Status) => {
                                 let transition = Self::Status::transition_state_to(&packet);
-                                write_packet(&packet, writer, writer_buf).await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     *state = transition;
                                     return Ok(None);
@@ -98,7 +101,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Login(packet), PacketStateEnum::Login) => {
                                 let transition = Self::Login::transition_state_to(&packet);
-                                write_packet(&packet, writer, writer_buf).await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     *state = transition;
                                     return Ok(None);
@@ -106,7 +109,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Config(packet), PacketStateEnum::Config) => {
                                 let transition = Self::Config::transition_state_to(&packet);
-                                write_packet(&packet, writer, writer_buf).await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     *state = transition;
                                     return Ok(None);
@@ -114,7 +117,7 @@ pub trait NetworkVersion: PacketVersion {
                             }
                             (VersionPacket::Play(packet), PacketStateEnum::Play) => {
                                 let transition = Self::Play::transition_state_to(&packet);
-                                write_packet(&packet, writer, writer_buf).await?;
+                                write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
                                     *state = transition;
                                     return Ok(None);
@@ -204,7 +207,7 @@ pub trait NetworkVersion: PacketVersion {
             loop {
                 if let Some(update) =
                     or::<Result<Option<ConnectionUpdate>, Box<dyn Error + Send + Sync>>, _, _>(
-                        (client_to_server)(&mut writer, &mut write_buf),
+                        (client_to_server)(&mut writer, &mut write_buf_a, &mut write_buf_b),
                         (server_to_client)(&mut reader, &mut read_buf),
                     )
                     .await?
@@ -270,11 +273,16 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     reader: &mut DecryptorMut<R, C>,
     buffer: &mut Vec<u8>,
 ) -> Result<T, Box<dyn Error + Send + Sync>> {
+    // Read the packet length prefix.
     let packet_length = read_varint_bytewise(reader).await? as usize;
+    // Read the packet data.
     buffer.resize(packet_length, 0);
     reader.read_exact(buffer.as_mut_slice()).await?;
 
+    // Decompress the packet.
     let decompressed = reader.decompress(buffer).await?;
+
+    // Deserialize the packet.
     match facet_minecraft::from_slice::<T>(decompressed) {
         #[allow(unused_variables, reason = "Used in tracing only")]
         Ok((val, rem)) => {
@@ -297,9 +305,35 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     }
 }
 
-/// Read a VarInt per-byte from the connection.
+/// Write a packet of type `T` to the connection.
 ///
-/// Prevents reading more bytes than necessary.
+/// # Errors
+///
+/// Returns an error if writing the packet fails.
+pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
+    packet: &T,
+    writer: &mut EncryptorMut<R, C>,
+    buffer_a: &mut Vec<u8>,
+    buffer_b: &mut Vec<u8>,
+) -> Result<(), Box<dyn Error + Send + Sync>> {
+    buffer_a.clear();
+    buffer_b.clear();
+
+    // Serialize the packet.
+    facet_minecraft::to_buffer(packet, buffer_a)?;
+    // Compress the packet.
+    let compressed = writer.compress(buffer_a).await?;
+    buffer_b.extend_from_slice(compressed);
+
+    // Add the length prefix.
+    let len = write_slice_prefix(buffer_b.len(), buffer_b);
+    buffer_b.rotate_right(len);
+
+    // Write packet data.
+    writer.write_all(buffer_b.as_mut_slice()).await.map_err(Into::into)
+}
+
+/// Read a VarInt per-byte from the connection.
 async fn read_varint_bytewise<R: RuntimeRead<C>, C: Send>(
     reader: &mut DecryptorMut<R, C>,
 ) -> Result<u32, Box<dyn Error + Send + Sync>> {
@@ -313,20 +347,6 @@ async fn read_varint_bytewise<R: RuntimeRead<C>, C: Send>(
         }
     }
     Ok(number)
-}
-
-/// Write a packet of type `T` to the connection.
-///
-/// # Errors
-///
-/// Returns an error if writing the packet fails.
-#[expect(clippy::unused_async, reason = "WIP")]
-pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
-    _packet: &T,
-    _writer: &mut EncryptorMut<R, C>,
-    _buffer: &mut Vec<u8>,
-) -> Result<(), Box<dyn Error + Send + Sync>> {
-    todo!()
 }
 
 // -------------------------------------------------------------------------------------------------
