@@ -8,3 +8,6 @@ pub use jardata::JarData;
 
 mod jarfile;
 pub use jarfile::JarFile;
+
+mod versiondata;
+pub use versiondata::VersionData;

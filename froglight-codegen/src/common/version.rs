@@ -3,14 +3,17 @@ use std::{
     collections::HashMap,
 };
 
+use facet::Facet;
+
 /// A version identifier.
 #[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Facet)]
+#[facet(transparent)]
 pub struct Version(String);
 
 impl Version {
     /// Create a new [`Version`].
-    pub fn new<S: ToString>(version: &S) -> Self { Version(ToString::to_string(version)) }
+    pub fn new<S: ToString + ?Sized>(version: &S) -> Self { Version(ToString::to_string(version)) }
 
     /// Get the version as a string slice.
     #[inline]
@@ -36,12 +39,12 @@ impl Version {
 /// A container for version-specific data.
 #[repr(transparent)]
 #[derive(Default)]
-pub struct VersionData(HashMap<TypeId, Box<dyn Any + Send + Sync + 'static>>);
+pub struct VersionStorage(HashMap<TypeId, Box<dyn Any + Send + Sync + 'static>>);
 
-impl VersionData {
+impl VersionStorage {
     /// Create a new empty [`VersionData`].
     #[must_use]
-    pub fn new() -> Self { VersionData(HashMap::new()) }
+    pub fn new() -> Self { VersionStorage(HashMap::new()) }
 
     /// Check if a value of type `T` exists.
     #[inline]

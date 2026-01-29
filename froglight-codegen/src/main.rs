@@ -5,9 +5,21 @@
 #![allow(dead_code, unused_imports, reason = "WIP")]
 
 use miette::Result;
+use tracing_subscriber::EnvFilter;
+
+use crate::source::{JarData, JarFile, Manifest};
 
 mod common;
+use common::Version;
+
 mod source;
 
 #[tokio::main]
-async fn main() -> Result<()> { Ok(()) }
+async fn main() -> Result<()> {
+    tracing_subscriber::fmt().with_env_filter(EnvFilter::from_default_env()).init();
+
+    let version = Version::new("1.21.11");
+    JarData::get_for(&version, |_jar| async { Ok(()) }).await?;
+
+    Ok(())
+}

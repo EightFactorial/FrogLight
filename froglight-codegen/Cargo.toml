@@ -17,9 +17,12 @@ workspace = true
 [dependencies]
 async_zip = { features = ["full", "tokio"], version = "0.0.18" }
 cafebabe = { features = ["threadsafe"], version = "0.9" }
+chrono = { features = ["clock", "std"], version = "0.4"}
 dashmap = { version = "6.1" }
 facet = { features = ["chrono", "helpful-derive", "std"], workspace = true }
 facet-json = { features = ["std", "tokio"], workspace = true }
 miette = { features = ["fancy"], version = "7.6" }
 reqwest = { features = ["rustls"], workspace = true }
 tokio = { features = ["full"], workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { features = ["env-filter"], workspace = true }
