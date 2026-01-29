@@ -1,13 +1,7 @@
 //! Generated packet definitions
 //!
-//! Do not edit anything other than the packet fields,
-//! as everything else is automatically @generated.
+//! Do not edit anything other than packet fields and marked modules,
+//! as everything else is automatically @generated and will be overwritten.
 #![allow(clippy::wildcard_imports, missing_docs, reason = "Generated code")]
-
-#[expect(unused, reason = "WIP")]
-macro_rules! generate {
-    (@state) => {};
-    (@version) => {};
-}
 
 pub mod v26_1;

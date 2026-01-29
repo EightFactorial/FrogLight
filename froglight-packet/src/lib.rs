@@ -13,6 +13,5 @@ pub mod version;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    #[allow(unused_imports, unreachable_pub, reason = "Prelude")]
-    pub use crate::generated::*;
+    pub use crate::generated as packet;
 }

@@ -14,7 +14,7 @@ use crate::common::handshake::HandshakeContent;
 pub struct HandshakeC2SPacket(pub HandshakeContent);
 
 impl HandshakeC2SPacket {
-    /// Create a new [HandshakeC2SPacket].
+    /// Create a new [`HandshakeC2SPacket`].
     #[inline]
     #[must_use]
     pub const fn new(content: HandshakeContent) -> Self { Self(content) }
