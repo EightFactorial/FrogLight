@@ -9,4 +9,5 @@ use miette::Result;
 mod common;
 mod source;
 
-fn main() -> Result<()> { Ok(()) }
+#[tokio::main]
+async fn main() -> Result<()> { Ok(()) }
