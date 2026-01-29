@@ -1,0 +1,25 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-codegen"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+async_zip = { features = ["full", "tokio"], version = "0.0.18" }
+cafebabe = { features = ["threadsafe"], version = "0.9" }
+dashmap = { version = "6.1" }
+facet = { features = ["std", "helpful-derive", "jiff02"], workspace = true }
+facet-json = { features = ["std", "tokio"], workspace = true }
+miette = { features = ["fancy"], version = "7.6" }
+reqwest = { features = ["cookies", "rustls"], workspace = true }
+tokio = { features = ["full"], workspace = true }

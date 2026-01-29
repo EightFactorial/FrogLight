@@ -31,6 +31,7 @@ bevy_tasks = { default-features = false, version = "0.18" }
 # Facet Dependencies
 facet = { default-features = false, version = "0.43" }
 facet-format = { default-features = false, version = "0.43" }
+facet-json = { default-features = false, version = "0.43" }
 facet-minecraft = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.0.1" }
 
 # Hashing & Cryptography Dependencies
@@ -93,6 +94,7 @@ members = [
   "froglight-biome",
   "froglight-block",
   # "froglight-brigadier",
+  "froglight-codegen",
   "froglight-common",
   # "froglight-entity",
   "froglight-internal",
