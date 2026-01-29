@@ -5,6 +5,7 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+pub mod common;
 pub mod core;
 pub mod generated;
 pub mod version;
@@ -12,8 +13,6 @@ pub mod version;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{
-        generated as packet,
-        version::{PacketVersion, VersionPacket, VersionPacketDirectional},
-    };
+    #[allow(unused_imports, unreachable_pub, reason = "Prelude")]
+    pub use crate::generated::*;
 }

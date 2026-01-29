@@ -1,4 +1,4 @@
 //! TODO
 
-pub mod impossible;
-pub mod intent;
+mod impossible;
+pub use impossible::Impossible;

@@ -10,5 +10,4 @@ macro_rules! generate {
     (@version) => {};
 }
 
-#[cfg(feature = "v26_1")]
 pub mod v26_1;

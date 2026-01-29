@@ -2,9 +2,11 @@
 
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
+use froglight_packet::common::handshake::HandshakeContent;
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundEventEnum {
     Play(ClientboundPlayEvent),
     Config(ClientboundConfigEvent),
@@ -13,12 +15,14 @@ pub enum ClientboundEventEnum {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundEventEnum {
     Play(ServerboundPlayEvent),
     Config(ServerboundConfigEvent),
     Login(ServerboundLoginEvent),
     Status(ServerboundStatusEvent),
+    Handshake(ServerboundHandshakeEvent),
 }
 
 impl From<ClientboundPlayEvent> for ClientboundEventEnum {
@@ -46,17 +50,22 @@ impl From<ServerboundLoginEvent> for ServerboundEventEnum {
 impl From<ServerboundStatusEvent> for ServerboundEventEnum {
     fn from(value: ServerboundStatusEvent) -> Self { ServerboundEventEnum::Status(value) }
 }
+impl From<ServerboundHandshakeEvent> for ServerboundEventEnum {
+    fn from(value: ServerboundHandshakeEvent) -> Self { ServerboundEventEnum::Handshake(value) }
+}
 
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundPlayEvent {
     Placeholder,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundPlayEvent {
     Placeholder,
 }
@@ -64,13 +73,15 @@ pub enum ServerboundPlayEvent {
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundConfigEvent {
     Placeholder,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundConfigEvent {
     Placeholder,
 }
@@ -78,13 +89,15 @@ pub enum ServerboundConfigEvent {
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundLoginEvent {
     Placeholder,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundLoginEvent {
     Placeholder,
 }
@@ -92,14 +105,25 @@ pub enum ServerboundLoginEvent {
 // -------------------------------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundStatusEvent {
     Placeholder,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Clone, PartialEq))]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundStatusEvent {
     RequestStatus,
     RequestPing,
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Reflect))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
+pub enum ServerboundHandshakeEvent {
+    Handshake(HandshakeContent),
 }
