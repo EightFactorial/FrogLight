@@ -16,7 +16,7 @@ pub struct JarFile {
 
 impl JarFile {
     /// Get the [`JarFile`] for the given [`Version`], fetching it if necessary.
-    pub async fn get_for<F: FnOnce(&Self) -> Fut, Fut: Future<Output = Result<V>>, V>(
+    pub async fn get_for<F: AsyncFnOnce(&Self) -> Result<V>, V>(
         version: &Version,
         f: F,
     ) -> Result<V> {
@@ -58,17 +58,14 @@ impl JarFile {
         } else {
             tracing::debug!("Downloading `JarFile` for \"{}\"", version.as_str());
 
-            let content = VersionData::get_for(version, |data| {
-                let url = data.downloads.client.url.clone();
-                async move {
-                    let response = match REQWEST.get(url).send().await {
-                        Ok(response) => response,
-                        Err(_err) => todo!(),
-                    };
-                    match response.bytes().await {
-                        Ok(bytes) => Ok(bytes.to_vec()),
-                        Err(_err) => todo!(),
-                    }
+            let content = VersionData::get_for(version, async |data| {
+                let response = match REQWEST.get(&data.downloads.client.url).send().await {
+                    Ok(response) => response,
+                    Err(_err) => todo!(),
+                };
+                match response.bytes().await {
+                    Ok(bytes) => Ok(bytes.to_vec()),
+                    Err(_err) => todo!(),
                 }
             })
             .await?;

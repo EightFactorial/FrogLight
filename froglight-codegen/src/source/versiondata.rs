@@ -31,11 +31,7 @@ pub struct DownloadInfo {
 impl VersionData {
     /// Get the [`VersionData`] for the given [`Version`], fetching it if
     /// necessary.
-    pub async fn get_for<
-        F: FnOnce(&Self) -> Fut,
-        Fut: Future<Output = Result<V>> + 'static,
-        V: 'static,
-    >(
+    pub async fn get_for<F: AsyncFnOnce(&Self) -> Result<V>, V: 'static>(
         version: &Version,
         f: F,
     ) -> Result<V> {
