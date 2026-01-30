@@ -12,7 +12,8 @@ use crate::source::{JarData, JarFile, Manifest};
 
 mod common;
 mod config;
-mod module;
+mod generator;
+mod helper;
 mod source;
 
 #[tokio::main]
@@ -23,7 +24,7 @@ async fn main() -> Result<()> {
     // Load the configuration and spawn a task for each version.
     let config = config::load().await?;
     for version in config.versions {
-        tasks.spawn(module::generate(version));
+        tasks.spawn(generator::generate(version));
     }
 
     // Wait for all tasks to complete, returning the first error encountered.
