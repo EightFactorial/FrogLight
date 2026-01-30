@@ -1,7 +1,6 @@
-use std::{cmp::Ordering, path::PathBuf, pin::Pin};
+use std::{cmp::Ordering, path::PathBuf};
 
 use miette::Result;
-use tokio::pin;
 
 #[derive(Debug, Clone)]
 pub struct ModuleBuilder {

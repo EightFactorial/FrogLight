@@ -2,13 +2,11 @@
 #![allow(clippy::alloc_instead_of_core, clippy::std_instead_of_core, reason = "Requires `std`")]
 #![allow(unreachable_pub, reason = "Binary")]
 #![allow(clippy::unnecessary_wraps, clippy::unused_async, reason = "WIP")]
-#![allow(dead_code, unused_imports, reason = "WIP")]
+#![allow(dead_code, reason = "WIP")]
 
 use miette::{Result, bail};
-use tokio::task::{JoinError, JoinSet};
+use tokio::task::JoinSet;
 use tracing_subscriber::EnvFilter;
-
-use crate::source::{JarData, JarFile, Manifest};
 
 mod common;
 mod config;
@@ -24,12 +22,12 @@ async fn main() -> Result<()> {
     // Load the configuration
     let config = config::load().await?;
 
-    // Update `Cargo.toml` feature sets
-    tasks.spawn(generator::cargo_toml::FeatureSets::generate(config));
+    // Generate `Cargo.toml` feature sets
+    tasks.spawn(generator::cargo_toml::generate(config));
     // Generate `Version` structs
-    tasks.spawn(generator::version_type::VersionType::generate(config));
+    tasks.spawn(generator::version_type::generate(config));
 
-    // Generate version-specific code (blocks, items, etc.)
+    // Generate `Version`-specific code (blocks, items, etc.)
     for version in &config.versions {
         tasks.spawn(generator::generate(version, config));
     }

@@ -3,10 +3,11 @@ use std::{
     sync::LazyLock,
 };
 
-use dashmap::DashMap;
+use papaya::HashMap;
 use reqwest::Client;
 
 mod version;
+use tokio::sync::RwLock;
 pub use version::{Version, VersionStorage};
 
 /// The root directory of the workspace.
@@ -21,6 +22,6 @@ pub static WORKSPACE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
 pub static CACHE_DIR: LazyLock<PathBuf> = LazyLock::new(|| WORKSPACE_DIR.join("target/codegen/"));
 
 /// A thread-safe map storing version-specific data.
-pub static DATA: LazyLock<DashMap<Version, VersionStorage>> = LazyLock::new(DashMap::new);
+pub static DATA: LazyLock<HashMap<Version, RwLock<VersionStorage>>> = LazyLock::new(HashMap::new);
 /// A shared HTTP client for making requests.
 pub static REQWEST: LazyLock<Client> = LazyLock::new(Client::new);

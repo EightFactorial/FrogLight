@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
 use cafebabe::ClassFile;
-use dashmap::Entry;
 use miette::Result;
 
 use crate::{
-    common::{DATA, Version, VersionStorage},
+    common::{Version, VersionStorage},
     source::JarFile,
 };
 
@@ -17,36 +16,22 @@ impl JarData {
     /// Get the [`JarData`] for the given [`Version`], fetching it if necessary.
     pub async fn get_for<F: AsyncFnOnce(&Self) -> Result<V>, V>(
         version: &Version,
+        storage: &mut VersionStorage,
         f: F,
     ) -> Result<V> {
-        let mut version_data = {
-            if !DATA.contains_key(version) {
-                DATA.insert(version.clone(), VersionStorage::default());
-            }
-            DATA.get(version).unwrap()
-        };
+        if !storage.contains::<Self>() {
+            tracing::info!("Fetching `JarData` for \"{}\"", version.as_str());
+            let data = Self::fetch(version, &mut *storage).await?;
+            storage.insert(data);
+        }
 
-        let jar_data = {
-            if !version_data.contains::<Self>() {
-                drop(version_data);
-
-                // Note: Since `fetch` locks `DATA`, it can't be locked here.
-                tracing::info!("Fetching `JarData` for \"{}\"", version.as_str());
-                let jardata = Self::fetch(version).await?;
-                DATA.get_mut(version).unwrap().insert(jardata);
-
-                version_data = DATA.get(version).unwrap();
-            }
-            version_data.get::<Self>().unwrap()
-        };
-
-        f(jar_data).await
+        f(storage.get::<Self>().unwrap()).await
     }
 
     /// Fetch the [`JarData`] for the given [`Version`].
     #[expect(clippy::case_sensitive_file_extension_comparisons, reason = "It is case sensitive")]
-    pub async fn fetch(version: &Version) -> Result<Self> {
-        JarFile::get_for(version, async |file| {
+    pub async fn fetch(version: &Version, storage: &mut VersionStorage) -> Result<Self> {
+        JarFile::get_for(version, storage, async |file| {
             let mut reader = file.reader.clone();
             let mut classes = HashMap::new();
 

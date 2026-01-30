@@ -1,14 +1,8 @@
-use std::{
-    path::{Path, PathBuf},
-    sync::OnceLock,
-};
-
-use chrono::{DateTime, Utc};
 use facet::Facet;
 use miette::Result;
 
 use crate::{
-    common::{CACHE_DIR, DATA, REQWEST, Version, VersionStorage},
+    common::{CACHE_DIR, REQWEST, Version, VersionStorage},
     source::Manifest,
 };
 
@@ -33,32 +27,15 @@ impl VersionData {
     /// necessary.
     pub async fn get_for<F: AsyncFnOnce(&Self) -> Result<V>, V: 'static>(
         version: &Version,
+        storage: &mut VersionStorage,
         f: F,
     ) -> Result<V> {
-        let mut version_data = {
-            if !DATA.contains_key(version) {
-                DATA.insert(version.clone(), VersionStorage::default());
-            }
-            DATA.get(version).unwrap()
-        };
+        if !storage.contains::<Self>() {
+            tracing::info!("Fetching `VersionData` for \"{}\"", version.as_str());
+            storage.insert(Self::fetch(version).await?);
+        }
 
-        let version_json = {
-            if !version_data.contains::<Self>() {
-                drop(version_data);
-
-                let mut data_mut = DATA.get_mut(version).unwrap();
-                if !data_mut.contains::<Self>() {
-                    tracing::info!("Fetching `VersionData` for \"{}\"", version.as_str());
-                    data_mut.insert(Self::fetch(version).await?);
-                }
-                drop(data_mut);
-
-                version_data = DATA.get(version).unwrap();
-            }
-            version_data.get::<Self>().unwrap()
-        };
-
-        f(version_json).await
+        f(storage.get::<Self>().unwrap()).await
     }
 
     /// Fetch the [`VersionData`] for the given [`Version`].

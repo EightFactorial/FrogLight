@@ -1,9 +1,10 @@
 //! The [`Version`] trait and generated versions.
+#![allow(clippy::unreadable_literal, reason = "Generated code")]
+#![allow(unused_imports, unreachable_pub, reason = "Triggered if no features are enabled")]
 
 use core::{fmt::Debug, hash::Hash};
 
 mod generated;
-#[allow(unused_imports, unreachable_pub, reason = "Triggered if no versions are enabled")]
 pub use generated::*;
 
 /// A version.

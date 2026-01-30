@@ -23,7 +23,7 @@ pub async fn load() -> Result<&'static ConfigBundle> {
     };
     match facet_toml::from_str::<ConfigBundle>(&content) {
         Ok(config) => {
-            tracing::debug!("`ConfigBundle`: {config:?}");
+            tracing::trace!("{config:?}");
             Ok(Box::leak(Box::new(config)))
         }
         Err(err) => bail!("Failed to parse \"codegen.toml\", {err}"),

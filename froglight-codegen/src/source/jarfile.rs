@@ -1,12 +1,11 @@
-use std::{io::Cursor, path::Path};
+use std::io::Cursor;
 
 use async_zip::tokio::read::seek::ZipFileReader;
 use miette::Result;
-use reqwest::Response;
 
 use crate::{
-    common::{CACHE_DIR, DATA, REQWEST, Version, VersionStorage},
-    source::{Manifest, VersionData},
+    common::{CACHE_DIR, REQWEST, Version, VersionStorage},
+    source::VersionData,
 };
 
 pub struct JarFile {
@@ -18,37 +17,20 @@ impl JarFile {
     /// Get the [`JarFile`] for the given [`Version`], fetching it if necessary.
     pub async fn get_for<F: AsyncFnOnce(&Self) -> Result<V>, V>(
         version: &Version,
+        storage: &mut VersionStorage,
         f: F,
     ) -> Result<V> {
-        let mut version_data = {
-            if !DATA.contains_key(version) {
-                DATA.insert(version.clone(), VersionStorage::default());
-            }
-            DATA.get(version).unwrap()
-        };
+        if !storage.contains::<Self>() {
+            tracing::info!("Fetching `JarFile` for \"{}\"", version.as_str());
+            let data = Self::fetch(version, storage).await?;
+            storage.insert(data);
+        }
 
-        let jar_file = {
-            if !version_data.contains::<Self>() {
-                drop(version_data);
-
-                // Note: Since `fetch` doesn't lock `DATA`, it's fine to keep it locked here.
-                let mut data_mut = DATA.get_mut(version).unwrap();
-                if !data_mut.contains::<Self>() {
-                    tracing::info!("Fetching `JarFile` for \"{}\"", version.as_str());
-                    data_mut.insert(Self::fetch(version).await?);
-                }
-                drop(data_mut);
-
-                version_data = DATA.get(version).unwrap();
-            }
-            version_data.get::<Self>().unwrap()
-        };
-
-        f(jar_file).await
+        f(storage.get::<Self>().unwrap()).await
     }
 
     /// Fetch the [`JarFile`] for the given [`Version`].
-    pub async fn fetch(version: &Version) -> Result<Self> {
+    pub async fn fetch(version: &Version, storage: &mut VersionStorage) -> Result<Self> {
         let mut path = CACHE_DIR.clone();
         let jar = format!("{}.jar", version.as_str());
         path.push(version.as_feature());
@@ -64,7 +46,7 @@ impl JarFile {
         } else {
             tracing::debug!("Downloading `JarFile` for \"{}\"", version.as_str());
 
-            let content = VersionData::get_for(version, async |data| {
+            let content = VersionData::get_for(version, storage, async |data| {
                 let response = match REQWEST.get(&data.downloads.client.url).send().await {
                     Ok(response) => response,
                     Err(_err) => todo!(),

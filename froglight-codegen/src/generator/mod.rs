@@ -1,6 +1,8 @@
 use miette::Result;
+use tokio::sync::RwLock;
 
 use crate::{
+    common::DATA,
     config::{ConfigBundle, VersionPair},
     source::JarData,
 };
@@ -12,5 +14,9 @@ pub async fn generate(
     VersionPair { base: _base, real }: &VersionPair,
     _config: &ConfigBundle,
 ) -> Result<()> {
-    JarData::get_for(real, async |_data| Ok(())).await
+    let pinned = DATA.pin_owned();
+    let storage_lock = pinned.get_or_insert_with(real.clone(), RwLock::default);
+
+    let mut storage = storage_lock.write().await;
+    JarData::get_for(real, &mut storage, async |_data| Ok(())).await
 }
