@@ -47,3 +47,5 @@ nightly = ["froglight-internal/nightly", "std"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
+
+v26_1 = ["froglight-internal/v26_1"]

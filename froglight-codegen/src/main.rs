@@ -23,9 +23,12 @@ async fn main() -> Result<()> {
 
     // Load the configuration and spawn a task for each version.
     let config = config::load().await?;
-    for version in config.versions {
-        tasks.spawn(generator::generate(version));
+    for version in &config.versions {
+        tasks.spawn(generator::generate(version, config));
     }
+
+    // Update crate's `Cargo.toml` files
+    tasks.spawn(helper::CargoHelper::generate(config));
 
     // Wait for all tasks to complete, returning the first error encountered.
     while let Some(result) = tasks.join_next().await {

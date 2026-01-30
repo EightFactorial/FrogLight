@@ -60,3 +60,5 @@ nightly = ["froglight-api?/nightly", "froglight-biome/nightly", "froglight-block
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
+
+v26_1 = ["froglight-biome/v26_1", "froglight-block/v26_1", "froglight-item/v26_1", "froglight-network?/v26_1", "froglight-packet/v26_1", "froglight-registry/v26_1"]

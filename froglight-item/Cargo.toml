@@ -52,3 +52,5 @@ nightly = ["froglight-block?/nightly", "froglight-common/nightly", "parking_lot?
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
+
+v26_1 = []

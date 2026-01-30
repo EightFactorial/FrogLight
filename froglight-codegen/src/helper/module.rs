@@ -8,7 +8,9 @@ pub struct ModuleBuilder {
     name: String,
     parent: PathBuf,
     docs: String,
+    precontent: String,
     imports: Vec<ModuleImport>,
+    content: String,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -22,13 +24,41 @@ impl ModuleBuilder {
     /// Create a new [`ModuleBuilder`].
     #[must_use]
     pub fn new<S: ToString + ?Sized>(name: &S, path: PathBuf) -> Self {
-        Self { name: name.to_string(), parent: path, docs: String::new(), imports: Vec::new() }
+        Self {
+            name: name.to_string(),
+            parent: path,
+            docs: String::new(),
+            precontent: String::new(),
+            imports: Vec::new(),
+            content: String::new(),
+        }
     }
 
     /// Add documentation to the module.
     pub fn with_docs<S: AsRef<str> + ?Sized>(&mut self, docs: &S) -> &mut Self {
-        self.docs.push('\n');
+        if !self.docs.is_empty() {
+            self.docs.push('\n');
+        }
         self.docs.push_str(docs.as_ref());
+        self
+    }
+
+    /// Add content to the beginning of the module.
+    pub fn with_precontent<S: AsRef<str> + ?Sized>(&mut self, content: &S) -> &mut Self {
+        if !self.precontent.is_empty() {
+            self.precontent.push('\n');
+        }
+        self.precontent.push_str(content.as_ref());
+        self
+    }
+
+    /// Add content to the module.
+    pub fn with_content<S: AsRef<str> + ?Sized>(&mut self, content: &S) -> &mut Self {
+        if !self.content.is_empty() {
+            self.content.push('\n');
+            self.content.push_str("// -------------------------------------------------------------------------------------------------\n");
+        }
+        self.content.push_str(content.as_ref());
         self
     }
 
@@ -76,14 +106,21 @@ impl ModuleBuilder {
             path.set_extension("rs");
         }
 
-        // Write documentation to the output buffer
+        // Write module documentation to the output buffer
         if !self.docs.is_empty() {
             for line in self.docs.lines() {
-                output.push_str("/// ");
+                output.push_str("//! ");
                 output.push_str(line);
                 output.push('\n');
             }
             output.push('\n');
+        }
+
+        // Write precontent to the output buffer
+        if !self.precontent.is_empty() {
+            output.push_str(&self.precontent);
+            output.push_str("\n// -------------------------------------------------------------------------------------------------");
+            output.push_str("\n// # Note: The following content is automatically @generated, do not edit this manually!\n\n");
         }
 
         // Write imports to the output buffer
@@ -119,21 +156,27 @@ impl ModuleBuilder {
             }
         }
 
+        // Write content to the output buffer
+        if !self.content.is_empty() {
+            output.push_str(&self.content);
+            output.push('\n');
+        }
+
         // Ensure the parent directory exists
         if let Some(parent) = path.parent()
             && !parent.exists()
             && let Err(err) = tokio::fs::create_dir_all(parent).await
         {
             return Err(miette::miette!(
-                "Failed to create submodule directory \"{}\", {err}",
+                "Failed to create module directory \"{}\", {err}",
                 parent.display(),
             ));
         }
 
         // Write the module content to the file
-        match tokio::fs::write(path, output).await {
+        match tokio::fs::write(&path, output).await {
             Ok(()) => Ok(()),
-            Err(_err) => todo!(),
+            Err(err) => miette::bail!("Failed to write to module \"{}\", {err}", path.display()),
         }
     }
 }

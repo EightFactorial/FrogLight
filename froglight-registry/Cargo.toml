@@ -50,3 +50,5 @@ nightly = ["foldhash?/nightly", "froglight-common/nightly", "parking_lot?/nightl
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
+
+v26_1 = []
