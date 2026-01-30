@@ -1,6 +1,7 @@
 //! Version types
-//!
-//! @generated
+//! 
+//! This file is automatically @generated, do not edit it manually.
+
 
 /// Minecraft 26.1
 ///
@@ -13,7 +14,8 @@ pub struct V26_1;
 
 #[cfg(feature = "v26_1")]
 impl super::Version for V26_1 {
-    const DATA_VERSION: u32 = 4671;
-    const PROTOCOL_ID: u32 = 775;
-    const RESOURCE_VERSION: u32 = 75;
+    const DATA_VERSION: u32 = 4770;
+    const PROTOCOL_ID: u32 = 1073742115;
+    const RESOURCE_VERSION: u32 = 79;
 }
+

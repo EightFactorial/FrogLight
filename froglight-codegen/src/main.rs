@@ -21,14 +21,18 @@ async fn main() -> Result<()> {
     tracing_subscriber::fmt().with_env_filter(EnvFilter::from_default_env()).init();
     let mut tasks = JoinSet::<Result<()>>::new();
 
-    // Load the configuration and spawn a task for each version.
+    // Load the configuration
     let config = config::load().await?;
+
+    // Update crates' `Cargo.toml` files
+    tasks.spawn(helper::CargoHelper::generate(config));
+    // Generate `Version` structs
+    tasks.spawn(helper::TypeHelper::generate(config));
+
+    // Generate version-specific code (blocks, items, etc.)
     for version in &config.versions {
         tasks.spawn(generator::generate(version, config));
     }
-
-    // Update crate's `Cargo.toml` files
-    tasks.spawn(helper::CargoHelper::generate(config));
 
     // Wait for all tasks to complete, returning the first error encountered.
     while let Some(result) = tasks.join_next().await {
