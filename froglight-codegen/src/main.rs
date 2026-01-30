@@ -24,10 +24,10 @@ async fn main() -> Result<()> {
     // Load the configuration
     let config = config::load().await?;
 
-    // Update crates' `Cargo.toml` files
-    tasks.spawn(helper::CargoHelper::generate(config));
+    // Update `Cargo.toml` feature sets
+    tasks.spawn(generator::cargo_toml::FeatureSets::generate(config));
     // Generate `Version` structs
-    tasks.spawn(helper::TypeHelper::generate(config));
+    tasks.spawn(generator::version_type::VersionType::generate(config));
 
     // Generate version-specific code (blocks, items, etc.)
     for version in &config.versions {

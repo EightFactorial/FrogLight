@@ -30,9 +30,15 @@ impl JarFile {
         let jar_file = {
             if !version_data.contains::<Self>() {
                 drop(version_data);
-                tracing::info!("Fetching `JarFile` for \"{}\"", version.as_str());
-                let jarfile = Self::fetch(version).await?;
-                DATA.get_mut(version).unwrap().insert(jarfile);
+
+                // Note: Since `fetch` doesn't lock `DATA`, it's fine to keep it locked here.
+                let mut data_mut = DATA.get_mut(version).unwrap();
+                if !data_mut.contains::<Self>() {
+                    tracing::info!("Fetching `JarFile` for \"{}\"", version.as_str());
+                    data_mut.insert(Self::fetch(version).await?);
+                }
+                drop(data_mut);
+
                 version_data = DATA.get(version).unwrap();
             }
             version_data.get::<Self>().unwrap()

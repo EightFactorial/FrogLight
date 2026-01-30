@@ -11,7 +11,8 @@ use crate::{
     source::JarFile,
 };
 
-pub struct TypeHelper;
+/// Generates structs that implement `Version`.
+pub struct VersionType;
 
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 struct VersionInfo {
@@ -27,16 +28,16 @@ struct VersionPackInfo {
     resource_major: u32,
 }
 
-impl TypeHelper {
+impl VersionType {
+    /// Generate `Version` structs.
     pub async fn generate(config: &ConfigBundle) -> Result<()> {
-        let path = WORKSPACE_DIR.join("froglight-common/src/version");
-        let mut module = ModuleBuilder::new("generated", path);
-
         let mut content = String::new();
         for version in &config.versions {
+            // Get the JAR file for the version
             JarFile::get_for(&version.real, async |file| {
                 let mut reader = file.reader.clone();
 
+                // Get the "version.json" file index
                 let Some(entry) =
                     reader.file().entries().iter().position(|entry| {
                         entry.filename().as_str().is_ok_and(|n| n == "version.json")
@@ -48,6 +49,7 @@ impl TypeHelper {
                     );
                 };
 
+                // Read and parse the "version.json" file
                 let mut buffer = Vec::new();
                 let mut reader = reader.reader_with_entry(entry).await.unwrap();
                 reader.read_to_end_checked(&mut buffer).await.unwrap();
@@ -58,37 +60,31 @@ impl TypeHelper {
                     );
                 };
 
+                // Generate the version struct and trait implementation
+                let version_raw = version.base.as_str();
                 let version_feature = version.base.as_feature();
                 let version_name = version_feature.to_ascii_uppercase();
 
                 write!(
                     content,
                     r#"
-/// Minecraft {}
+/// Minecraft {version_raw}
 ///
-/// See the [Minecraft Wiki](https://minecraft.wiki/w/Java_Edition_{}) for more details.
-#[cfg(feature = "{}")]
+/// See the [Minecraft Wiki](https://minecraft.wiki/w/Java_Edition_{version_raw}) for more details.
+#[cfg(feature = "{version_feature}")]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
-pub struct {};
+pub struct {version_name};
 
-#[cfg(feature = "{}")]
-impl super::Version for {} {{
+#[cfg(feature = "{version_feature}")]
+impl super::Version for {version_name} {{
     const DATA_VERSION: u32 = {};
     const PROTOCOL_ID: u32 = {};
     const RESOURCE_VERSION: u32 = {};
 }}
 "#,
-                    version.base.as_str(),
-                    version.base.as_str(),
-                    version_feature,
-                    version_name,
-                    version_feature,
-                    version_name,
-                    info.world_version,
-                    info.protocol_version,
-                    info.pack_version.resource_major,
+                    info.world_version, info.protocol_version, info.pack_version.resource_major,
                 )
                 .unwrap();
 
@@ -97,12 +93,13 @@ impl super::Version for {} {{
             .await?;
         }
 
-        module
-            .with_docs(
-                "Version types\n\nThis file is automatically @generated, do not edit it manually.",
-            )
-            .with_content(&content);
-
+        // Create and build the module
+        let path = WORKSPACE_DIR.join("froglight-common/src/version");
+        let mut module = ModuleBuilder::new("generated", path);
+        module.with_docs(
+            "Version types\n\nThis file is automatically @generated, do not edit it manually.",
+        );
+        module.with_content(&content);
         module.build().await
     }
 }

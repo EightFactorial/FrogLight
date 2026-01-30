@@ -45,9 +45,14 @@ impl VersionData {
         let version_json = {
             if !version_data.contains::<Self>() {
                 drop(version_data);
-                tracing::info!("Fetching `VersionData` for \"{}\"", version.as_str());
-                let jardata = Self::fetch(version).await?;
-                DATA.get_mut(version).unwrap().insert(jardata);
+
+                let mut data_mut = DATA.get_mut(version).unwrap();
+                if !data_mut.contains::<Self>() {
+                    tracing::info!("Fetching `VersionData` for \"{}\"", version.as_str());
+                    data_mut.insert(Self::fetch(version).await?);
+                }
+                drop(data_mut);
+
                 version_data = DATA.get(version).unwrap();
             }
             version_data.get::<Self>().unwrap()

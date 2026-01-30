@@ -29,9 +29,12 @@ impl JarData {
         let jar_data = {
             if !version_data.contains::<Self>() {
                 drop(version_data);
+
+                // Note: Since `fetch` locks `DATA`, it can't be locked here.
                 tracing::info!("Fetching `JarData` for \"{}\"", version.as_str());
                 let jardata = Self::fetch(version).await?;
                 DATA.get_mut(version).unwrap().insert(jardata);
+
                 version_data = DATA.get(version).unwrap();
             }
             version_data.get::<Self>().unwrap()

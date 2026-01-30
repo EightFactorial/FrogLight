@@ -5,9 +5,10 @@ use tokio::fs::{File, OpenOptions};
 
 use crate::{common::WORKSPACE_DIR, config::ConfigBundle};
 
-pub struct CargoHelper;
+/// Updates `Cargo.toml` files with version-specific feature sets.
+pub struct FeatureSets;
 
-impl CargoHelper {
+impl FeatureSets {
     /// The list of crates to manage and features to enable.
     const CRATES: &'static [(&'static str, &[&'static str])] = &[
         ("froglight", &["froglight-internal/"]),
@@ -34,7 +35,7 @@ impl CargoHelper {
         ("froglight-registry", &[]),
     ];
 
-    /// Generate `Cargo.toml` file feature sets for enabled versions.
+    /// Generate `Cargo.toml` file feature sets.
     pub async fn generate(config: &ConfigBundle) -> Result<()> {
         for (crate_name, features) in Self::CRATES {
             let path = WORKSPACE_DIR.join(crate_name).join("Cargo.toml");
