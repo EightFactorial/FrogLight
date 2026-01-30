@@ -10,7 +10,7 @@ mod version;
 pub use version::{Version, VersionStorage};
 
 /// The root directory of the workspace.
-pub const WORKSPACE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
+pub static WORKSPACE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     let mut dir = Path::new(env!("CARGO_MANIFEST_DIR"));
     while !dir.ends_with("FrogLight") {
         dir = dir.parent().expect("Failed to find workspace root directory");
@@ -18,7 +18,7 @@ pub const WORKSPACE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
     dir.to_path_buf()
 });
 /// The cache directory for code generation.
-pub const CACHE_DIR: LazyLock<PathBuf> = LazyLock::new(|| WORKSPACE_DIR.join("target/codegen/"));
+pub static CACHE_DIR: LazyLock<PathBuf> = LazyLock::new(|| WORKSPACE_DIR.join("target/codegen/"));
 
 /// A thread-safe map storing version-specific data.
 pub static DATA: LazyLock<DashMap<Version, VersionStorage>> = LazyLock::new(DashMap::new);

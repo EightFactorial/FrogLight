@@ -4,22 +4,36 @@
 #![allow(clippy::unnecessary_wraps, clippy::unused_async, reason = "WIP")]
 #![allow(dead_code, unused_imports, reason = "WIP")]
 
-use miette::Result;
+use miette::{Result, bail};
+use tokio::task::{JoinError, JoinSet};
 use tracing_subscriber::EnvFilter;
 
 use crate::source::{JarData, JarFile, Manifest};
 
 mod common;
-use common::Version;
-
+mod config;
+mod module;
 mod source;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     tracing_subscriber::fmt().with_env_filter(EnvFilter::from_default_env()).init();
+    let mut tasks = JoinSet::<Result<()>>::new();
 
-    let version = Version::new("1.21.11");
-    JarData::get_for(&version, |_jar| async { Ok(()) }).await?;
+    // Load the configuration and spawn a task for each version.
+    let config = config::load().await?;
+    for version in config.versions {
+        tasks.spawn(module::generate(version));
+    }
+
+    // Wait for all tasks to complete, returning the first error encountered.
+    while let Some(result) = tasks.join_next().await {
+        match result {
+            Ok(Ok(())) => {}
+            Ok(Err(err)) => return Err(err),
+            Err(err) => bail!("Failed to join task, {err}"),
+        }
+    }
 
     Ok(())
 }

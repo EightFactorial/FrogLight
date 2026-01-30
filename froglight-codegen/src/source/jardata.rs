@@ -41,6 +41,7 @@ impl JarData {
     }
 
     /// Fetch the [`JarData`] for the given [`Version`].
+    #[expect(clippy::case_sensitive_file_extension_comparisons, reason = "It is case sensitive")]
     pub async fn fetch(version: &Version) -> Result<Self> {
         JarFile::get_for(version, |file| {
             let mut reader = file.reader.clone();

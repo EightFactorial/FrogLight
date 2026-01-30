@@ -75,10 +75,9 @@ impl Manifest {
             // Ensure parent directory exists
             if let Some(parent) = path.parent()
                 && !parent.exists()
+                && let Err(_err) = tokio::fs::create_dir_all(parent).await
             {
-                if let Err(_err) = tokio::fs::create_dir_all(parent).await {
-                    todo!()
-                }
+                todo!()
             }
 
             // Write to cache

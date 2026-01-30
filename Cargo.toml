@@ -33,6 +33,7 @@ facet = { default-features = false, version = "0.43" }
 facet-format = { default-features = false, version = "0.43" }
 facet-json = { default-features = false, version = "0.43" }
 facet-minecraft = { default-features = false, git = "https://github.com/EightFactorial/facet-minecraft", version = "0.0.1" }
+facet-toml = { default-features = false, version = "0.43" }
 
 # Hashing & Cryptography Dependencies
 aes = { default-features = false, version = "0.9.0-rc.2" }

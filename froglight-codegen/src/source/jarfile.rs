@@ -75,12 +75,11 @@ impl JarFile {
 
             // Ensure parent directory exists
             tracing::debug!("Caching `JarFile` for \"{}\" at {:?}", version.as_str(), path);
-            if let Some(parent) = path.parent() {
-                if !parent.exists() {
-                    if let Err(_err) = tokio::fs::create_dir_all(parent).await {
-                        todo!()
-                    }
-                }
+            if let Some(parent) = path.parent()
+                && !parent.exists()
+                && let Err(_err) = tokio::fs::create_dir_all(parent).await
+            {
+                todo!()
             }
 
             // Write to cache

@@ -77,10 +77,7 @@ impl VersionData {
             }
         } else {
             let manifest = Manifest::get().await;
-            let manifest = match manifest.version(version) {
-                Some(manifest) => manifest,
-                None => todo!(),
-            };
+            let Some(manifest) = manifest.version(version) else { todo!() };
 
             tracing::debug!("Downloading `VersionData` from \"{}\"", &manifest.url);
 
@@ -98,10 +95,9 @@ impl VersionData {
             // Ensure parent directory exists
             if let Some(parent) = path.parent()
                 && !parent.exists()
+                && let Err(_err) = tokio::fs::create_dir_all(parent).await
             {
-                if let Err(_err) = tokio::fs::create_dir_all(parent).await {
-                    todo!()
-                }
+                todo!()
             }
 
             // Write to cache
