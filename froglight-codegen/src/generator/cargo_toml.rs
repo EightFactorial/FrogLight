@@ -6,7 +6,7 @@ use crate::{common::WORKSPACE_DIR, config::ConfigBundle};
 
 /// The list of crates to manage and features to enable.
 ///
-/// Formatted as ("crate name", &["feature/", "set/"]).
+/// Formatted as `("crate name", &["feature/", "set/"])`.
 const CRATES: &[(&str, &[&str])] = &[
     ("froglight", &["froglight-internal/"]),
     ("froglight-biome", &[]),

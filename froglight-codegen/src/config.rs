@@ -11,7 +11,9 @@ pub struct ConfigBundle {
 
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 pub struct VersionPair {
+    /// The name to refer to this version as.
     pub base: Version,
+    /// The real version data is sourced from.
     pub real: Version,
 }
 
