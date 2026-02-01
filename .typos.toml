@@ -1,1 +1,9 @@
-
+[files]
+extend-exclude = [
+  "froglight-biome/src/generated/**/*.rs",
+  "froglight-block/src/generated/**/*.rs",
+  "froglight-codegen/src/helper/emulate.rs",
+  "froglight-item/src/generated/**/*.rs",
+  "froglight-item/src/generated/**/*.rs",
+  "froglight-registry/src/generated/*/*/*.rs",
+]

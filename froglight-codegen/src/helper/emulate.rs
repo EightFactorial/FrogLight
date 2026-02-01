@@ -70,12 +70,11 @@ impl BytecodeEmulator {
         Ok(emulator)
     }
 
-    #[expect(clippy::unused_self, reason = "WIP")]
     #[expect(clippy::match_same_arms, clippy::too_many_lines, reason = "Readability")]
     fn emulate<'a>(
         &mut self,
         _jar: &JarData,
-        class: &'a ClassFile<'static>,
+        _class: &'a ClassFile<'static>,
         ops: impl Iterator<Item = &'a Opcode<'static>>,
     ) -> Result<()> {
         for op in ops.take(2) {
@@ -183,11 +182,7 @@ impl BytecodeEmulator {
                 Opcode::Imul => {}
                 Opcode::Ineg => {}
                 Opcode::Instanceof(_) => {}
-                Opcode::Invokedynamic(invoke) => {
-                    if let Some(method) = class.get_dynamic(invoke) {
-                    } else {
-                    }
-                }
+                Opcode::Invokedynamic(_) => {}
                 Opcode::Invokeinterface(..) => {}
                 Opcode::Invokespecial(_) => {}
                 Opcode::Invokestatic(_) => {}
@@ -309,13 +304,6 @@ fn iter_bytecode<'a, 'b>(code: &'a CodeData<'b>) -> impl Iterator<Item = &'a Opc
 
 // -------------------------------------------------------------------------------------------------
 
-pub trait ClassFileExt<'a> {
-    fn get_dynamic(&self, invoke: &InvokeDynamic<'a>) -> Option<()>;
-}
+pub trait ClassFileExt<'a> {}
 
-impl<'a> ClassFileExt<'a> for ClassFile<'a> {
-    fn get_dynamic(&self, invoke: &InvokeDynamic<'a>) -> Option<()> {
-        println!("{self:#?}");
-        None
-    }
-}
+impl<'a> ClassFileExt<'a> for ClassFile<'a> {}

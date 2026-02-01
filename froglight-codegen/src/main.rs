@@ -1,8 +1,6 @@
 #![doc = include_str!("../README.md")]
-#![allow(clippy::alloc_instead_of_core, clippy::std_instead_of_core, reason = "Requires `std`")]
-#![allow(unreachable_pub, reason = "Binary")]
-#![allow(clippy::unnecessary_wraps, clippy::unused_async, reason = "WIP")]
-#![allow(dead_code, reason = "WIP")]
+#![allow(clippy::std_instead_of_alloc, clippy::std_instead_of_core, reason = "Requires `std`")]
+#![allow(dead_code, unreachable_pub, reason = "Binary")]
 
 use miette::{Result, bail};
 use tokio::task::JoinSet;
