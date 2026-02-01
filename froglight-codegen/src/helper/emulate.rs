@@ -1,24 +1,53 @@
-use std::marker::PhantomData;
+use std::borrow::Cow;
 
 use cafebabe::{
+    ClassFile,
     attributes::{AttributeData, AttributeInfo, CodeData},
     bytecode::Opcode,
+    constant_pool::{ConstantPoolItem, InvokeDynamic, MemberRef},
 };
+use indexmap::IndexMap;
 use miette::Result;
 
 use crate::source::JarData;
 
-pub struct BytecodeEmulator<'a> {
-    _phantom: PhantomData<&'a ()>,
+#[derive(Debug, Default, Clone)]
+pub struct BytecodeEmulator {
+    pub stack: Vec<StackItem>,
+
+    pub statics: IndexMap<String, StackItem>,
 }
 
-impl<'a> BytecodeEmulator<'a> {
+#[derive(Debug, Clone)]
+pub enum StackItem {
+    Boolean(bool),
+    Byte(u8),
+    Char(char),
+    Short(i16),
+    Int(i32),
+    Long(i64),
+    Float(f32),
+    Double(f64),
+    Object(EmuObject),
+    Array(Vec<StackItem>),
+}
+
+#[derive(Debug, Clone)]
+pub struct EmuObject {
+    pub class: String,
+    pub fields: IndexMap<String, StackItem>,
+}
+
+impl BytecodeEmulator {
     /// Run the bytecode emulator starting from the specified class and method.
-    pub fn run(jar: &'a JarData, class: &str, method: &str) -> Result<Self> {
-        let mut emulator = BytecodeEmulator { _phantom: PhantomData };
+    pub fn run(jar: &JarData, class: &str, method: &str) -> Result<Self> {
+        let mut emulator = BytecodeEmulator::default();
 
         // Find the method info and ensure it takes no parameters
-        let Some(method_info) = jar.get_class_method(class, method) else {
+        let class_file = jar.get_class(class).ok_or_else(|| {
+            miette::miette!("Could not find class `{class}` for entrypoint `{class}.{method}`")
+        })?;
+        let Some(method_info) = class_file.methods.iter().find(|m| m.name == method) else {
             miette::bail!("Could not find entrypoint `{class}.{method}`");
         };
         if !method_info.descriptor.parameters.is_empty() {
@@ -34,17 +63,22 @@ impl<'a> BytecodeEmulator<'a> {
         tracing::debug!("Emulating `{class}.{method}`...");
 
         // Run the emulator
-        emulator.emulate(jar, iter_bytecode(code))?;
+        emulator.emulate(jar, class_file, iter_bytecode(code))?;
+
+        tracing::trace!("Emulation complete. Output:\n{emulator:#?}");
 
         Ok(emulator)
     }
 
     #[expect(clippy::unused_self, reason = "WIP")]
     #[expect(clippy::match_same_arms, clippy::too_many_lines, reason = "Readability")]
-    fn emulate(&mut self, _jar: &JarData, ops: impl Iterator<Item = &'a Opcode<'a>>) -> Result<()> {
-        for op in ops {
-            tracing::trace!("Opcode: {op:?}");
-
+    fn emulate<'a>(
+        &mut self,
+        _jar: &JarData,
+        class: &'a ClassFile<'static>,
+        ops: impl Iterator<Item = &'a Opcode<'static>>,
+    ) -> Result<()> {
+        for op in ops.take(2) {
             match op {
                 Opcode::Aaload => {}
                 Opcode::Aastore => {}
@@ -149,7 +183,11 @@ impl<'a> BytecodeEmulator<'a> {
                 Opcode::Imul => {}
                 Opcode::Ineg => {}
                 Opcode::Instanceof(_) => {}
-                Opcode::Invokedynamic(_) => {}
+                Opcode::Invokedynamic(invoke) => {
+                    if let Some(method) = class.get_dynamic(invoke) {
+                    } else {
+                    }
+                }
                 Opcode::Invokeinterface(..) => {}
                 Opcode::Invokespecial(_) => {}
                 Opcode::Invokestatic(_) => {}
@@ -200,7 +238,56 @@ impl<'a> BytecodeEmulator<'a> {
                 Opcode::Pop => {}
                 Opcode::Pop2 => {}
                 Opcode::Putfield(_) => {}
-                Opcode::Putstatic(_) => {}
+                Opcode::Putstatic(MemberRef { class_name, name_and_type }) => {
+                    let key = format!("{class_name}.{}", name_and_type.name);
+                    match name_and_type.descriptor.as_ref() {
+                        // Boolean
+                        "Z" => {
+                            self.statics.insert(key, StackItem::Byte(0));
+                        }
+                        // Byte
+                        "B" => {
+                            self.statics.insert(key, StackItem::Byte(0));
+                        }
+                        // Char
+                        "C" => {
+                            self.statics.insert(key, StackItem::Char('\0'));
+                        }
+                        // Short
+                        "S" => {
+                            self.statics.insert(key, StackItem::Short(0));
+                        }
+                        // Int
+                        "I" => {
+                            self.statics.insert(key, StackItem::Int(0));
+                        }
+                        // Long
+                        "J" => {
+                            self.statics.insert(key, StackItem::Long(0));
+                        }
+                        // Float
+                        "F" => {
+                            self.statics.insert(key, StackItem::Float(0.0));
+                        }
+                        // Double
+                        "D" => {
+                            self.statics.insert(key, StackItem::Double(0.0));
+                        }
+                        // Object
+                        desc if desc.starts_with('L') && desc.ends_with(';') => {
+                            let class_name = &desc[1..desc.len() - 1];
+                            self.statics.insert(
+                                key,
+                                StackItem::Object(EmuObject {
+                                    class: class_name.to_string(),
+                                    fields: IndexMap::new(),
+                                }),
+                            );
+                        }
+                        // Other
+                        unk => miette::bail!("Unhandled static field descriptor: {unk}"),
+                    }
+                }
                 Opcode::Ret(_) => {}
                 Opcode::Return => {}
                 Opcode::Saload => {}
@@ -216,6 +303,19 @@ impl<'a> BytecodeEmulator<'a> {
 }
 
 /// Iterate over the opcodes in the given [`CodeData`].
-fn iter_bytecode<'a>(code: &'a CodeData<'a>) -> impl Iterator<Item = &'a Opcode<'a>> {
+fn iter_bytecode<'a, 'b>(code: &'a CodeData<'b>) -> impl Iterator<Item = &'a Opcode<'b>> {
     code.bytecode.as_ref().unwrap().opcodes.iter().map(|(_, op)| op)
+}
+
+// -------------------------------------------------------------------------------------------------
+
+pub trait ClassFileExt<'a> {
+    fn get_dynamic(&self, invoke: &InvokeDynamic<'a>) -> Option<()>;
+}
+
+impl<'a> ClassFileExt<'a> for ClassFile<'a> {
+    fn get_dynamic(&self, invoke: &InvokeDynamic<'a>) -> Option<()> {
+        println!("{self:#?}");
+        None
+    }
 }

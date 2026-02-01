@@ -36,7 +36,7 @@ facet-minecraft = { default-features = false, git = "https://github.com/EightFac
 facet-toml = { default-features = false, version = "0.43" }
 
 # Hashing & Cryptography Dependencies
-aes = { default-features = false, version = "0.9.0-rc.2" }
+aes = { default-features = false, version = "0.9.0-rc.3" }
 base64 = { default-features = false, version = "0.22.1" }
 cfb8 = { default-features = false, version = "0.9.0-rc.1" }
 crc32c = { default-features = false, version = "0.6.8" }

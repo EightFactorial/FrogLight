@@ -1,5 +1,5 @@
 use facet::Facet;
-use miette::{Result, bail};
+use tokio::sync::OnceCell;
 
 use crate::common::{Version, WORKSPACE_DIR};
 
@@ -17,17 +17,27 @@ pub struct VersionPair {
     pub real: Version,
 }
 
-pub async fn load() -> Result<&'static ConfigBundle> {
-    let path = WORKSPACE_DIR.join("codegen.toml");
-    let content = match tokio::fs::read_to_string(&path).await {
-        Ok(content) => content,
-        Err(err) => bail!("Failed to open \"{}\", {err}", path.display()),
-    };
-    match facet_toml::from_str::<ConfigBundle>(&content) {
-        Ok(config) => {
-            tracing::trace!("{config:?}");
-            Ok(Box::leak(Box::new(config)))
-        }
-        Err(err) => bail!("Failed to parse \"codegen.toml\", {err}"),
+impl ConfigBundle {
+    pub async fn load() -> &'static Self {
+        static CONFIG: OnceCell<ConfigBundle> = OnceCell::const_new();
+
+        CONFIG
+            .get_or_init(|| async {
+                let path = WORKSPACE_DIR.join("codegen.toml");
+                let content = match tokio::fs::read_to_string(&path).await {
+                    Ok(content) => content,
+                    Err(err) => panic!("Failed to open \"{}\", {err}", path.display()),
+                };
+                match facet_toml::from_str::<ConfigBundle>(&content) {
+                    Ok(config) => {
+                        tracing::trace!("{config:?}");
+                        config
+                    }
+                    Err(err) => {
+                        panic!("Failed to parse \"{}\", {err}", path.display());
+                    }
+                }
+            })
+            .await
     }
 }

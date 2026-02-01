@@ -7,7 +7,7 @@ use miette::Result;
 
 use crate::{
     common::{Version, VersionStorage},
-    config::VersionPair,
+    config::{ConfigBundle, VersionPair},
     source::JarData,
 };
 
@@ -90,6 +90,10 @@ impl BiomeData {
 
 // -------------------------------------------------------------------------------------------------
 
-pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+pub async fn generate(
+    version: &VersionPair,
+    storage: &mut VersionStorage,
+    _config: &ConfigBundle,
+) -> Result<()> {
     BiomeData::get_for(&version.real, storage, async |_data| Ok(())).await
 }

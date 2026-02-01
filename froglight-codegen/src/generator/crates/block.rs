@@ -3,7 +3,7 @@ use miette::Result;
 
 use crate::{
     common::{Version, VersionStorage},
-    config::VersionPair,
+    config::{ConfigBundle, VersionPair},
     helper::BytecodeEmulator,
     source::JarData,
 };
@@ -56,6 +56,10 @@ impl BlockData {
 
 // -------------------------------------------------------------------------------------------------
 
-pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+pub async fn generate(
+    version: &VersionPair,
+    storage: &mut VersionStorage,
+    _config: &ConfigBundle,
+) -> Result<()> {
     BlockData::get_for(&version.real, storage, async |_data| Ok(())).await
 }

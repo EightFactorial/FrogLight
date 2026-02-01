@@ -8,6 +8,8 @@ use miette::{Result, bail};
 use tokio::task::JoinSet;
 use tracing_subscriber::EnvFilter;
 
+use crate::config::ConfigBundle;
+
 mod common;
 mod config;
 mod generator;
@@ -20,7 +22,7 @@ async fn main() -> Result<()> {
     let mut tasks = JoinSet::<Result<()>>::new();
 
     // Load the configuration
-    let config = config::load().await?;
+    let config = ConfigBundle::load().await;
 
     // Generate `Cargo.toml` feature sets
     tasks.spawn(generator::cargo_toml::generate(config));
