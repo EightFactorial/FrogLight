@@ -10,7 +10,14 @@ pub mod cargo_toml;
 pub mod crates;
 pub mod version_type;
 
-pub async fn generate(version: &VersionPair, config: &ConfigBundle) -> Result<()> {
+pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
+    crates::biome::generate_global(config).await?;
+    crates::block::generate_global(config).await?;
+
+    Ok(())
+}
+
+pub async fn generate_specific(version: &VersionPair, config: &ConfigBundle) -> Result<()> {
     let pinned = DATA.pin_owned();
     let storage_lock = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
     let mut storage = storage_lock.write().await;

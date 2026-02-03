@@ -27,9 +27,11 @@ async fn main() -> Result<()> {
     // Generate `Version` structs
     tasks.spawn(generator::version_type::generate(config));
 
-    // Generate `Version`-specific code (blocks, items, etc.)
+    // Generate global code (block types, item types, etc.)
+    tasks.spawn(generator::generate_global(config));
+    // Generate `Version`-specific code (block definitions, item definitions, etc.)
     for version in &config.versions {
-        tasks.spawn(generator::generate(version, config));
+        tasks.spawn(generator::generate_specific(version, config));
     }
 
     // Wait for all tasks to complete, returning the first error encountered.

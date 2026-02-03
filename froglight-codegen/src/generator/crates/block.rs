@@ -1,13 +1,18 @@
-use indexmap::IndexMap;
+use std::fmt::Write;
+
+use convert_case::{Case, Casing};
+use indexmap::{IndexMap, IndexSet};
 use miette::Result;
+use tokio::sync::{OnceCell, RwLock};
 
 use crate::{
-    common::{Version, VersionStorage},
+    common::{DATA, Version, VersionStorage, WORKSPACE_DIR},
     config::{ConfigBundle, VersionPair},
-    helper::BytecodeEmulator,
+    helper::{BytecodeEmulator, ModuleBuilder, VersionHelper},
     source::JarData,
 };
 
+#[derive(Debug, Clone)]
 pub struct BlockData {
     pub blocks: IndexMap<String, String>,
     pub block_families: IndexMap<String, Vec<String>>,
@@ -56,6 +61,61 @@ impl BlockData {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Generate global block data.
+pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
+    static ONCE: OnceCell<Result<()>> = OnceCell::const_new();
+    let result = ONCE
+        .get_or_init(|| async {
+            // Collect the `BlockData` for all versions.
+            let global_blocks = VersionHelper::for_all(config, async |version| {
+                let pinned = DATA.pin_owned();
+                let storage = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
+                let mut storage = storage.write().await;
+                BlockData::get_for(&version.real, &mut storage, async |data| Ok(data.clone())).await
+            })
+            .await?;
+
+            // Deduplicate and sort the block types
+            let mut blocks = IndexSet::new();
+            for versioned in global_blocks {
+                for (name, _id) in versioned.blocks {
+                    blocks.insert(name.to_case(Case::Pascal));
+                }
+            }
+            blocks.sort_unstable();
+
+            // Start building the module
+            let path = WORKSPACE_DIR.join("froglight-block/src/generated");
+            let mut module = ModuleBuilder::new("block", path);
+
+            // Generate the content
+            let mut content = String::new();
+            content.push_str("generate! {\n    @blocks\n");
+            for identifier in blocks {
+                writeln!(content, "    {identifier},").unwrap();
+            }
+            content.push('}');
+
+            // Finalize and build the module
+            module
+                .with_docs(
+                    "Block types for all [`Version`](froglight_common::version::Version)s.
+
+@generated",
+                )
+                .with_content(&content);
+
+            module.build().await
+        })
+        .await;
+
+    match result {
+        Ok(()) => Ok(()),
+        Err(err) => miette::bail!("Failed to generate global block data: {err}"),
+    }
+}
+
+/// Generate `Version`-specific block data.
 pub async fn generate(
     version: &VersionPair,
     storage: &mut VersionStorage,

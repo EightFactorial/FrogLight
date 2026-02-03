@@ -1,16 +1,22 @@
+use std::fmt::Write;
+
 use cafebabe::{
     bytecode::Opcode,
     constant_pool::{LiteralConstant, Loadable, MemberRef},
 };
-use indexmap::IndexMap;
+use convert_case::{Case, Casing};
+use indexmap::{IndexMap, IndexSet};
 use miette::Result;
+use tokio::sync::{OnceCell, RwLock};
 
 use crate::{
-    common::{Version, VersionStorage},
+    common::{DATA, Version, VersionStorage, WORKSPACE_DIR},
     config::{ConfigBundle, VersionPair},
+    helper::{ModuleBuilder, VersionHelper},
     source::JarData,
 };
 
+#[derive(Debug, Clone)]
 pub struct BiomeData {
     pub biomes: IndexMap<String, String>,
 }
@@ -90,6 +96,61 @@ impl BiomeData {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Generate global biome data.
+pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
+    static ONCE: OnceCell<Result<()>> = OnceCell::const_new();
+    let result = ONCE
+        .get_or_init(|| async move {
+            // Collect the `BiomeData` for all versions.
+            let global_biomes = VersionHelper::for_all(config, async |version| {
+                let pinned = DATA.pin_owned();
+                let storage = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
+                let mut storage = storage.write().await;
+                BiomeData::get_for(&version.real, &mut storage, async |data| Ok(data.clone())).await
+            })
+            .await?;
+
+            // Deduplicate and sort the biome types
+            let mut biomes = IndexSet::new();
+            for versioned in global_biomes {
+                for (name, _id) in versioned.biomes {
+                    biomes.insert(name.to_case(Case::Pascal));
+                }
+            }
+            biomes.sort_unstable();
+
+            // Start building the module
+            let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
+            let mut module = ModuleBuilder::new("biome", path);
+
+            // Generate the content
+            let mut content = String::new();
+            content.push_str("generate! {\n    @biomes\n");
+            for identifier in biomes {
+                writeln!(content, "    {identifier},").unwrap();
+            }
+            content.push('}');
+
+            // Finalize and build the module
+            module
+                .with_docs(
+                    "Biome types for all [`Version`](froglight_common::version::Version)s.
+
+@generated",
+                )
+                .with_content(&content);
+
+            module.build().await
+        })
+        .await;
+
+    match result {
+        Ok(()) => Ok(()),
+        Err(err) => miette::bail!("Failed to generate global biome data: {err}"),
+    }
+}
+
+/// Generate `Version`-specific biome data.
 pub async fn generate(
     version: &VersionPair,
     storage: &mut VersionStorage,
