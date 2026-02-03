@@ -17,7 +17,10 @@ pub mod prelude {
 
     pub use crate::{
         block::{Block, BlockAttribute, BlockType},
-        generated::{attribute as block_attribute, block},
+        generated::{
+            attribute as block_attribute,
+            block::{self, AnyBlock},
+        },
         version::BlockVersion,
     };
 }

@@ -12,7 +12,8 @@ use tokio::io::{AsyncRead as TAsyncRead, AsyncWrite as TAsyncWrite};
 
 use crate::connection::{Encrypted, channel::Channel as InnerChannel};
 
-/// A [`Version`]'ed connection that uses a specific [`Runtime`].
+/// A [`Version`](froglight_common::version::Version)'ed connection that uses a
+/// specific [`Runtime`].
 pub struct AsyncConnection<R: Runtime<C>, C: Send, V: PacketVersion> {
     connection: Encrypted<R, C>,
     channel: Channel<V>,

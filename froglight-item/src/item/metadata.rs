@@ -18,7 +18,7 @@ pub struct ItemMetadata {
     /// The [`GlobalId`] assigned to this item.
     global_id: MaybeAtomicU32,
 
-    /// The default [`ItemData`] for this item.
+    /// The default [`ComponentData`] for this item.
     default_data: ComponentData,
 
     /// The [`TypeId`] of the item type.
@@ -67,7 +67,7 @@ impl ItemMetadata {
     #[cfg(feature = "atomic")]
     pub unsafe fn set_global_id(&self, id: GlobalId) { self.global_id.set_atomic(id.into_inner()); }
 
-    /// Get the default [`ItemData`] for this item.
+    /// Get the default [`ComponentData`] for this item.
     #[inline]
     #[must_use]
     pub const fn default_data(&self) -> &ComponentData { &self.default_data }

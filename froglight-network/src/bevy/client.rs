@@ -11,8 +11,8 @@ use crate::{
 
 /// The client-side end of a network connection.
 ///
-/// Sends [`ServerboundEvent`]s to the server and receives
-/// [`ClientboundEvent`]s from the server.
+/// Sends [`ServerboundEventEnum`]s to the server and receives
+/// [`ClientboundEventEnum`]s from the server.
 #[derive(Component)]
 pub struct ClientConnection {
     sender: Box<SenderFn>,
@@ -36,7 +36,7 @@ impl ClientConnection {
     }
 
     /// Create a new [`ClientConnection`] from the given
-    /// [`EventConnection`] and [`Task`].
+    /// sender and receiver functions and [`Task`].
     ///
     /// This is typically used internally by
     /// [`NetworkVersion::wrap_connection`].
@@ -50,7 +50,7 @@ impl ClientConnection {
         Self { sender, receiver, task }
     }
 
-    /// Send a [`ServerboundEvent`] to the server.
+    /// Send a [`ServerboundEventEnum`] to the server.
     ///
     /// # Errors
     ///
@@ -64,7 +64,7 @@ impl ClientConnection {
         (self.sender)(event, entity)
     }
 
-    /// Receive a [`ClientboundEvent`] from the server.
+    /// Receive a [`ClientboundEventEnum`] from the server.
     ///
     /// Returns `None` if there are no events to receive.
     ///

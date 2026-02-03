@@ -12,7 +12,7 @@ use crate::plugin::{
 /// [`PluginGroup`](crate::inventory::PluginGroup).
 ///
 /// Automatically gathers all types with [`ReflectInventory`] data
-/// and initializes [`InventoryPlugins`] during startup.
+/// and initializes [`GlobalPlugins`] during startup.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct InventoryPlugin;
 

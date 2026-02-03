@@ -60,12 +60,12 @@ impl Item {
         self.item_data_mut().set::<C, V>(component);
     }
 
-    /// Get a reference to the [`ItemData`] of this item.
+    /// Get a reference to the [`ComponentData`] of this item.
     #[inline]
     #[must_use]
     pub const fn item_data(&self) -> &ComponentData { &self.data }
 
-    /// Get a mutable reference to the [`ItemData`] of this item.
+    /// Get a mutable reference to the [`ComponentData`] of this item.
     #[inline]
     #[must_use]
     pub const fn item_data_mut(&mut self) -> &mut ComponentData { &mut self.data }

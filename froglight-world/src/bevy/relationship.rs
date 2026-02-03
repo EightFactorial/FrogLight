@@ -5,7 +5,7 @@ use core::ops::Deref;
 use bevy_ecs::{component::Component, entity::Entity, reflect::ReflectComponent};
 use bevy_reflect::Reflect;
 
-/// An [`Entity`](Entity) that is a child of a
+/// An [`Entity`] that is a child of a
 /// [`WorldInstance`](crate::bevy::WorldInstance).
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Component, Reflect)]

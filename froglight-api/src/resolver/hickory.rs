@@ -43,7 +43,7 @@ impl Resolver {
     /// Uses Cloudflare's public DNS servers, see [`HickoryConfig::cloudflare`]
     /// for more details.
     ///
-    /// See [`Resolver::new_from`] to create a resolver with a custom
+    /// See [`Resolver::new_with_config`] to create a resolver with a custom
     /// configuration.
     #[must_use]
     pub fn new_cloudflare() -> Self { Self::new_with_config(HickoryConfig::cloudflare(), None) }
@@ -301,7 +301,7 @@ impl DnsUdpSocket for UdpSocketWrap {
 
 // -------------------------------------------------------------------------------------------------
 
-/// An implementation of [`Time`] using [`async-io::Timer`].
+/// An implementation of [`Time`] using [`async_io::Timer`].
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DnsTimer;
 

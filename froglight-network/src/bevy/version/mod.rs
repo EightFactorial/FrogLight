@@ -1,4 +1,4 @@
-//! Generated [`NetworkVersion`](super::NetworkVersion) implementations.
+//! Generated [`NetworkVersion`] implementations.
 //!
 //! Feel free to edit anything *except* the modules at the end of this file!
 
@@ -232,7 +232,7 @@ pub trait NetworkVersion: PacketVersion {
         packet: &VersionPacket<Self, Clientbound>,
     ) -> Option<ConnectionUpdate>;
 
-    /// Convert a [`ServerboundEvent`] into a
+    /// Convert a [`ServerboundEventEnum`] into a
     /// [`VersionPacket<Self, Serverbound>`].
     ///
     /// # Errors
@@ -244,7 +244,7 @@ pub trait NetworkVersion: PacketVersion {
     ) -> Result<VersionPacket<Self, Serverbound>, ConnectionError>;
 
     /// Convert a [`VersionPacket<Self, Clientbound>`] into a
-    /// [`ClientboundEvent`].
+    /// [`ClientboundEventEnum`].
     ///
     /// # Errors
     ///

@@ -14,12 +14,13 @@ use froglight_common::prelude::Identifier;
 use froglight_item::item::Item;
 use indexmap::IndexMap;
 
-use crate::plugin::{GlobalPlugins, ReflectInventory};
+use crate::plugin::{GlobalPlugins, PluginType, ReflectInventory};
 
 /// An inventory that can hold items.
 ///
 /// Uses internal plugins to manage slots and menus.
-#[cfg_attr(feature = "bevy", derive(Component, Reflect), reflect(opaque, Clone, Component))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
+#[cfg_attr(feature = "bevy", reflect(where G: Clone), reflect(opaque, Clone, Component))]
 pub struct Inventory<G: PluginGroup = GlobalPlugins> {
     plugin_group: G,
     plugin_data: IndexMap<TypeId, Box<dyn MaybeReflect>, RandomState>,
@@ -70,15 +71,15 @@ impl<G: PluginGroup> Inventory<G> {
     /// Enable a menu within the [`Inventory`].
     ///
     /// Returns `true` if the menu was enabled successfully, `false` otherwise.
-    pub fn enable_menu(&mut self, menu: Identifier<'static>) -> bool {
-        InventoryMut::new_for_context(self, |mut inv| inv.enable_menu(menu))
+    pub fn enable_menu<P: PluginType>(&mut self) -> bool {
+        InventoryMut::new_for_context(self, |mut inv| inv.enable_menu::<P>())
     }
 
     /// Disable a menu within the [`Inventory`].
     ///
     /// Returns `true` if the menu was disabled successfully, `false` otherwise.
-    pub fn disable_menu(&mut self, menu: Identifier<'static>) -> bool {
-        InventoryMut::new_for_context(self, |mut inv| inv.disable_menu(menu))
+    pub fn disable_menu<P: PluginType>(&mut self) -> bool {
+        InventoryMut::new_for_context(self, |mut inv| inv.disable_menu::<P>())
     }
 
     /// Query the status of a menu within the [`Inventory`].
@@ -392,7 +393,13 @@ impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
     /// Enable a menu within the [`Inventory`].
     ///
     /// Returns `true` if the menu was enabled successfully, `false` otherwise.
-    pub fn enable_menu(&mut self, mut menu: Identifier<'static>) -> bool {
+    #[inline]
+    pub fn enable_menu<P: PluginType>(&mut self) -> bool { self.enable_menu_ident(P::IDENTIFIER) }
+
+    /// Enable a menu within the [`Inventory`].
+    ///
+    /// Returns `true` if the menu was enabled successfully, `false` otherwise.
+    pub fn enable_menu_ident(&mut self, mut menu: Identifier<'static>) -> bool {
         for plugin in (self.plugin_group)() {
             match plugin.enable_menu(self, menu) {
                 InventoryResult::Passthrough(pass) => menu = pass,
@@ -405,7 +412,13 @@ impl<'inv, 'iter> InventoryMut<'inv, 'iter> {
     /// Disable a menu within the [`Inventory`].
     ///
     /// Returns `true` if the menu was disabled successfully, `false` otherwise.
-    pub fn disable_menu(&mut self, mut menu: Identifier<'static>) -> bool {
+    #[inline]
+    pub fn disable_menu<P: PluginType>(&mut self) -> bool { self.disable_menu_ident(P::IDENTIFIER) }
+
+    /// Disable a menu within the [`Inventory`].
+    ///
+    /// Returns `true` if the menu was disabled successfully, `false` otherwise.
+    pub fn disable_menu_ident(&mut self, mut menu: Identifier<'static>) -> bool {
         for plugin in (self.plugin_group)() {
             match plugin.disable_menu(self, menu) {
                 InventoryResult::Passthrough(pass) => menu = pass,
@@ -473,7 +486,7 @@ impl<'inv, 'iter> core::ops::Deref for IterFn<'inv, 'iter> {
 // -------------------------------------------------------------------------------------------------
 
 /// A group of inventory plugins.
-pub trait PluginGroup: MaybeReflect + Clone + Send + Sync {
+pub trait PluginGroup: MaybeReflect + Send + Sync {
     /// Create an iterator over the plugins in this group.
     fn iter_plugins(&self) -> impl Iterator<Item = &ReflectInventory>;
 }
@@ -489,13 +502,11 @@ pub enum InventoryResult<T, U> {
 
 // -------------------------------------------------------------------------------------------------
 
-/// A trait for types that may implement Bevy's
-/// [`Reflect`](bevy_reflect::Reflect) trait.
+/// A trait for types that may implement Bevy's [`Reflect`] trait.
 #[cfg(feature = "bevy")]
 pub use bevy_reflect::Reflect as MaybeReflect;
 
-/// A trait for types that may implement Bevy's
-/// [`Reflect`](bevy_reflect::Reflect) trait.
+/// A trait for types that may implement Bevy's `Reflect` trait.
 #[cfg(not(feature = "bevy"))]
 pub trait MaybeReflect: Any {
     /// Convert a [`Box<Self>`] into a [`Box<dyn Any>`].

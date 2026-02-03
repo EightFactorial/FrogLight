@@ -42,12 +42,12 @@ impl Default for DnsResolver {
 }
 
 impl DnsResolver {
-    /// Creates a new [`Resolver`] from a [`NetworkResolver`].
+    /// Creates a new [`DnsResolver`] from a [`NetworkResolver`].
     #[inline]
     #[must_use]
     pub fn new<T: NetworkResolver>(agent: T) -> Self { Self::new_arc(Arc::new(agent)) }
 
-    /// Creates a new [`Resolver`] from an [`Arc<dyn NetworkResolver>`].
+    /// Creates a new [`DnsResolver`] from an [`Arc<dyn NetworkResolver>`].
     #[inline]
     #[must_use]
     pub const fn new_arc(agent: Arc<dyn NetworkResolver>) -> Self { Self(agent) }

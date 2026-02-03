@@ -4,7 +4,8 @@ use froglight_common::prelude::Identifier;
 
 use crate::version::ItemVersion;
 
-type Nbt = ();
+/// Placeholder type for NBT data.
+pub type Nbt = ();
 
 /// Data about an [`Item`](crate::item::Item).
 #[repr(transparent)]
@@ -64,6 +65,6 @@ pub trait ComponentType<V: ItemVersion>: Sized {
     /// Returns an error if the conversion fails.
     fn from_nbt_data(data: &Nbt) -> Result<Self, Self::Error>;
 
-    /// Convert this type into [`BiomeAttributeData`].
+    /// Convert this type into [`Nbt`].
     fn to_nbt_data(&self) -> Nbt;
 }

@@ -5,7 +5,7 @@ use miette::Result;
 #[derive(Debug, Clone)]
 pub struct ModuleBuilder {
     name: String,
-    parent: PathBuf,
+    folder: PathBuf,
     docs: String,
     precontent: String,
     imports: Vec<ModuleImport>,
@@ -22,10 +22,10 @@ pub struct SubModuleSettings {
 impl ModuleBuilder {
     /// Create a new [`ModuleBuilder`].
     #[must_use]
-    pub fn new<S: ToString + ?Sized>(name: &S, path: PathBuf) -> Self {
+    pub fn new<S: ToString + ?Sized>(name: &S, folder: PathBuf) -> Self {
         Self {
             name: name.to_string(),
-            parent: path,
+            folder,
             docs: String::new(),
             precontent: String::new(),
             imports: Vec::new(),
@@ -71,7 +71,7 @@ impl ModuleBuilder {
         f: F,
     ) -> Result<&mut Self> {
         // Create a ModuleBuilder for the submodule
-        let path = self.parent.join(&self.name);
+        let path = self.folder.join(&self.name);
         let mut submodule = ModuleBuilder::new(name, path);
 
         // Run the submodule configuration function and build it.
@@ -98,7 +98,7 @@ impl ModuleBuilder {
         self.imports.sort();
 
         // Determine the file path for the module
-        let mut path = self.parent.join(&self.name);
+        let mut path = self.folder.join(&self.name);
         if let Some(ModuleImport::Mod { .. }) = self.imports.last() {
             path = path.join("mod.rs");
         } else {

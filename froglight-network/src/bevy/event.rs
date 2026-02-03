@@ -17,7 +17,7 @@ pub struct ClientboundMessage {
 }
 
 impl ClientboundMessage {
-    /// Create a new [`ClientboundEvent`] from an [`Entity`] and an event.
+    /// Create a new [`ClientboundMessage`] from an [`Entity`] and an event.
     #[must_use]
     pub fn new<T: Into<ClientboundEventEnum>>(source: Entity, event: T) -> Self {
         Self { source, event: event.into() }

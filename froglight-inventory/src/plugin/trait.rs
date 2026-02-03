@@ -10,7 +10,8 @@ pub trait PluginType: 'static {
     /// The identifier of this inventory plugin.
     const IDENTIFIER: Identifier<'static>;
 
-    /// Initialize this plugin within the given [`Inventory`].
+    /// Initialize this plugin within the given
+    /// [`Inventory`](crate::inventory::Inventory).
     ///
     /// ## Note
     ///
@@ -18,35 +19,39 @@ pub trait PluginType: 'static {
     /// regardless of whether the plugin is enabled or not.
     fn initialize(_: &mut InventoryMut) {}
 
-    /// Get a specific item slot in the [`Inventory`].
+    /// Get a specific item slot in the
+    /// [`Inventory`](crate::inventory::Inventory).
     fn get_slot(inventory: &InventoryRef, slot: usize) -> InventoryResult<usize, Option<Item>>;
 
-    /// Set a specific item slot in the [`Inventory`].
+    /// Set a specific item slot in the
+    /// [`Inventory`](crate::inventory::Inventory).
     fn set_slot(
         inventory: &mut InventoryMut,
         item: Option<Item>,
         slot: usize,
     ) -> InventoryResult<(Option<Item>, usize), ()>;
 
-    /// Enable a menu in the [`Inventory`].
+    /// Enable a menu in the [`Inventory`](crate::inventory::Inventory).
     fn enable_menu(
         inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()>;
 
-    /// Disable a menu in the [`Inventory`].
+    /// Disable a menu in the [`Inventory`](crate::inventory::Inventory).
     fn disable_menu(
         inventory: &mut InventoryMut,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, ()>;
 
-    /// Query whether a menu is enabled in the [`Inventory`].
+    /// Query whether a menu is enabled in the
+    /// [`Inventory`](crate::inventory::Inventory).
     fn query_menu_status(
         inventory: &InventoryRef,
         menu: Identifier<'static>,
     ) -> InventoryResult<Identifier<'static>, bool>;
 
-    /// Get all item slots of a menu in the [`Inventory`].
+    /// Get all item slots of a menu in the
+    /// [`Inventory`](crate::inventory::Inventory).
     ///
     /// Returns an empty map if the menu is disabled.
     fn query_menu_slots(
@@ -100,11 +105,13 @@ impl ReflectInventory {
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { &self.identifier }
 
-    /// Initialize the given [`Inventory`] with this plugin's data.
+    /// Initialize the given [`Inventory`](crate::inventory::Inventory) with
+    /// this plugin's data.
     #[inline]
     pub fn initialize(&self, inventory: &mut InventoryMut) { (self.initialize)(inventory); }
 
-    /// Get a specific item slot in the [`Inventory`].
+    /// Get a specific item slot in the
+    /// [`Inventory`](crate::inventory::Inventory).
     #[inline]
     #[must_use]
     pub fn get_slot(
@@ -115,7 +122,8 @@ impl ReflectInventory {
         (self.get_slot)(inventory, slot)
     }
 
-    /// Set a specific item slot in the [`Inventory`].
+    /// Set a specific item slot in the
+    /// [`Inventory`](crate::inventory::Inventory).
     #[inline]
     pub fn set_slot(
         &self,
@@ -126,7 +134,7 @@ impl ReflectInventory {
         (self.set_slot)(inventory, item, slot)
     }
 
-    /// Enable a menu in the [`Inventory`].
+    /// Enable a menu in the [`Inventory`](crate::inventory::Inventory).
     #[inline]
     pub fn enable_menu(
         &self,
@@ -136,7 +144,7 @@ impl ReflectInventory {
         (self.enable_menu)(inventory, menu)
     }
 
-    /// Disable a menu in the [`Inventory`].
+    /// Disable a menu in the [`Inventory`](crate::inventory::Inventory).
     #[inline]
     pub fn disable_menu(
         &self,
@@ -146,7 +154,8 @@ impl ReflectInventory {
         (self.disable_menu)(inventory, menu)
     }
 
-    /// Query the status of a menu in the [`Inventory`].
+    /// Query the status of a menu in the
+    /// [`Inventory`](crate::inventory::Inventory).
     #[inline]
     #[must_use]
     pub fn query_menu_status(
@@ -157,7 +166,8 @@ impl ReflectInventory {
         (self.query_menu_status)(inventory, menu)
     }
 
-    /// Query the slots of a menu in the [`Inventory`].
+    /// Query the slots of a menu in the
+    /// [`Inventory`](crate::inventory::Inventory).
     ///
     /// Returns an empty map if the menu is disabled.
     #[inline]

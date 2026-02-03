@@ -53,7 +53,7 @@ impl<T> EventConnection<T> {
         Self { sender, receiver }
     }
 
-    /// Send a [`ServerboundEvent`] to the server.
+    /// Send a [`ServerboundEventEnum`] to the server.
     ///
     /// # Errors
     ///
@@ -63,7 +63,7 @@ impl<T> EventConnection<T> {
         (self.sender)(event, data)
     }
 
-    /// Receive a [`ClientboundEvent`] from the server.
+    /// Receive a [`ClientboundEventEnum`] from the server.
     ///
     /// Returns `None` if there are no events to receive.
     ///

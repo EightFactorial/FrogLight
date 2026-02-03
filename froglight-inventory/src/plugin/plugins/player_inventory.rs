@@ -16,7 +16,7 @@ use crate::{
     plugin::PluginType,
 };
 
-/// An [`InventoryPluginType`] that handles the player's inventory.
+/// An [`PluginType`] that handles the player's inventory.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(Debug, Inventory))]
 pub struct PlayerInventoryPlugin;

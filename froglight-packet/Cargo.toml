@@ -52,4 +52,4 @@ nightly = ["facet-minecraft?/nightly", "froglight-common/nightly", "foldhash/nig
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
 
-v26_1 = []
+v26_1 = ["froglight-common/v26_1"]

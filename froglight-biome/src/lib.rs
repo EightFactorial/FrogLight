@@ -17,7 +17,11 @@ pub mod prelude {
 
     pub use crate::{
         biome::{AttributeType, Biome, BiomeType, FeatureType},
-        generated::{attribute as biome_attribute, biome, feature as biome_feature},
+        generated::{
+            attribute as biome_attribute,
+            biome::{self, AnyBiome},
+            feature as biome_feature,
+        },
         version::BiomeVersion,
     };
 }

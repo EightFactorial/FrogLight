@@ -1,7 +1,7 @@
 //! TODO
 
 mod component;
-pub use component::{ComponentType, ComponentData};
+pub use component::{ComponentData, ComponentType, Nbt};
 
 mod item;
 pub use item::{Item, ItemType};
