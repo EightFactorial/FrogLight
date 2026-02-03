@@ -25,7 +25,7 @@ build mode="release":
 
 # Check all project dependencies
 deny:
-    cargo deny check all
+    cargo deny --workspace --exclude=froglight-codegen --features=bevy check all
 
 # Run all workspace tests
 test:

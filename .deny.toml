@@ -5,7 +5,16 @@ ignore = []
 version = 2
 
 [licenses]
-allow = ["Apache-2.0", "MIT", "Unicode-3.0", "Zlib"]
+allow = [
+  "0BSD",
+  "Apache-2.0",
+  "BSD-3-Clause",
+  "CDLA-Permissive-2.0",
+  "ISC",
+  "MIT",
+  "Unicode-3.0",
+  "Zlib"
+]
 
 [bans]
 external-default-features = "allow"
