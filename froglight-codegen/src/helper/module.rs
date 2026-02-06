@@ -33,6 +33,44 @@ impl ModuleBuilder {
         }
     }
 
+    /// Create a new [`ModuleBuilder`], copying content from an existing module.
+    ///
+    /// ## Warning
+    ///
+    /// This will only copy content up to the `@generated` marker,
+    /// meaning any content after that will be lost.
+    pub async fn new_after_marker(path: PathBuf) -> Result<Self> {
+        let Some(filename) = path.file_name().and_then(|name| name.to_str()) else {
+            miette::bail!("Invalid module file \"{}\"", path.display());
+        };
+        let Some(folder) = path.parent() else {
+            miette::bail!("Invalid module file \"{}\"", path.display());
+        };
+
+        let Ok(contents) = tokio::fs::read_to_string(&path).await else {
+            miette::bail!("Failed to read module file \"{}\"", path.display());
+        };
+
+        // Find the last occurrence of the @generated marker, plus a few lines.
+        let Some(mut marker) = contents.lines().rev().position(|l| l.contains("@generated")) else {
+            miette::bail!("No `@generated` marker found in module file \"{}\"", path.display());
+        };
+        marker = contents.lines().count().saturating_sub(marker);
+
+        // Create a new `ModuleBuilder` with content up to the marker.
+        let mut builder = Self::new(filename, folder.to_path_buf());
+        for line in contents.lines().take(marker) {
+            if line.starts_with("//!") {
+                builder.docs.push_str(line.trim_start_matches("//!").trim());
+                builder.docs.push('\n');
+            } else {
+                builder.content.push_str(line);
+                builder.content.push('\n');
+            }
+        }
+        Ok(builder)
+    }
+
     /// Add documentation to the module.
     pub fn with_docs<S: AsRef<str> + ?Sized>(&mut self, docs: &S) -> &mut Self {
         if !self.docs.is_empty() {
@@ -109,7 +147,7 @@ impl ModuleBuilder {
         if !self.docs.is_empty() {
             for line in self.docs.lines() {
                 output.push_str("//! ");
-                output.push_str(line);
+                output.push_str(line.trim());
                 output.push('\n');
             }
             output.push('\n');
