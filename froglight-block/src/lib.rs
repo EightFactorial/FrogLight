@@ -19,7 +19,7 @@ pub mod prelude {
         block::{Block, BlockAttribute, BlockType},
         generated::{
             attribute as block_attribute,
-            block::{self, AnyBlock},
+            block::{self, VanillaBlock},
         },
         version::BlockVersion,
     };

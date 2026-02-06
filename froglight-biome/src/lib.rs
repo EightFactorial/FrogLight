@@ -19,7 +19,7 @@ pub mod prelude {
         biome::{AttributeType, Biome, BiomeType, FeatureType},
         generated::{
             attribute as biome_attribute,
-            biome::{self, AnyBiome},
+            biome::{self, VanillaBiome},
             feature as biome_feature,
         },
         version::BiomeVersion,

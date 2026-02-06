@@ -7,12 +7,11 @@
 macro_rules! generate {
     (@components) => {};
 
-    (@items $($tt:tt)*) => {};
-
     (@items @all $($ident:ident),*) => {
-        /// An enum containing all possible item types.
+        /// An enum containing all vanilla item types.
+        #[non_exhaustive]
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-        pub enum AnyItem {
+        pub enum VanillaItem {
             $(
                 #[doc = concat!("The [`", stringify!($ident), "`] item type.")]
                 $ident,
@@ -20,22 +19,69 @@ macro_rules! generate {
         }
 
         $(
-            impl From<$ident> for AnyItem {
+            #[automatically_derived]
+            impl From<$ident> for VanillaItem {
+                #[inline]
                 fn from(_: $ident) -> Self {
-                    AnyItem::$ident
+                    VanillaItem::$ident
                 }
             }
-            impl TryFrom<AnyItem> for $ident {
-                type Error = ();
 
-                fn try_from(value: AnyItem) -> Result<Self, Self::Error> {
-                    match value {
-                        AnyItem::$ident => Ok($ident),
-                        _ => Err(()),
-                    }
+            #[automatically_derived]
+            impl PartialEq<VanillaItem> for $ident {
+                #[inline]
+                fn eq(&self, other: &VanillaItem) -> bool {
+                    matches!(other, VanillaItem::$ident)
+                }
+            }
+            #[automatically_derived]
+            impl PartialEq<$ident> for VanillaItem {
+                #[inline]
+                fn eq(&self, _: &$ident) -> bool {
+                    matches!(self, VanillaItem::$ident)
+                }
+            }
+
+            #[automatically_derived]
+            impl PartialEq<crate::item::Item> for $ident {
+                #[inline]
+                fn eq(&self, other: &crate::item::Item) -> bool {
+                    other.is_item::<$ident>()
+                }
+            }
+            #[automatically_derived]
+            impl PartialEq<$ident> for crate::item::Item {
+                #[inline]
+                fn eq(&self, _: &$ident) -> bool {
+                    matches!(self, crate::item::Item::$ident)
                 }
             }
         )*
+
+        #[automatically_derived]
+        impl PartialEq<crate::item::Item> for VanillaItem {
+            #[allow(unreachable_patterns, reason = "Nonexhaustive")]
+            fn eq(&self, other: &crate::item::Item) -> bool {
+                match self {
+                    $(
+                        VanillaItem::$ident => other.is_item::<$ident>(),
+                    )*
+                    _ => unreachable!("All variants of `VanillaItem` should be covered in the match arms."),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl PartialEq<VanillaItem> for crate::item::Item {
+            #[allow(unreachable_patterns, reason = "Nonexhaustive")]
+            fn eq(&self, other: &VanillaItem) -> bool {
+                match other {
+                    $(
+                        VanillaItem::$ident => self.is_item::<$ident>(),
+                    )*
+                    _ => unreachable!("All variants of `VanillaItem` should be covered in the match arms."),
+                }
+            }
+        }
     };
     (@items @single $ident:ident) => {
         #[doc = concat!("The [`", stringify!($ident), "`] item type.")]
@@ -49,6 +95,12 @@ macro_rules! generate {
         #[doc = concat!("The [`", stringify!($ident), "`] item type.")]
         #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
         pub struct $ident;
+    };
+    (@items $($(@$attr:tt)? $ident:ident),*) => {
+        $(
+            generate!(@items @single $(@$attr)? $ident);
+        )*
+        generate!(@items @all $($ident),*);
     };
 
     (@version) => {};

@@ -13,9 +13,10 @@ macro_rules! generate {
             pub struct $ident;
         )*
 
-        /// An enum containing all possible biome types.
+        /// An enum containing all vanilla biome types.
+        #[non_exhaustive]
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-        pub enum AnyBiome {
+        pub enum VanillaBiome {
             $(
                 #[doc = concat!("The [`", stringify!($ident), "`] biome type.")]
                 $ident,
@@ -23,22 +24,69 @@ macro_rules! generate {
         }
 
         $(
-            impl From<$ident> for AnyBiome {
+            #[automatically_derived]
+            impl From<$ident> for VanillaBiome {
+                #[inline]
                 fn from(_: $ident) -> Self {
-                    AnyBiome::$ident
+                    VanillaBiome::$ident
                 }
             }
-            impl TryFrom<AnyBiome> for $ident {
-                type Error = ();
 
-                fn try_from(value: AnyBiome) -> Result<Self, Self::Error> {
-                    match value {
-                        AnyBiome::$ident => Ok($ident),
-                        _ => Err(()),
-                    }
+            #[automatically_derived]
+            impl PartialEq<VanillaBiome> for $ident {
+                #[inline]
+                fn eq(&self, other: &VanillaBiome) -> bool {
+                    matches!(other, VanillaBiome::$ident)
+                }
+            }
+            #[automatically_derived]
+            impl PartialEq<$ident> for VanillaBiome {
+                #[inline]
+                fn eq(&self, _: &$ident) -> bool {
+                    matches!(self, VanillaBiome::$ident)
+                }
+            }
+
+            #[automatically_derived]
+            impl PartialEq<crate::biome::Biome> for $ident {
+                #[inline]
+                fn eq(&self, other: &crate::biome::Biome) -> bool {
+                    other.is_biome::<$ident>()
+                }
+            }
+            #[automatically_derived]
+            impl PartialEq<$ident> for crate::biome::Biome {
+                #[inline]
+                fn eq(&self, _: &$ident) -> bool {
+                    self.is_biome::<$ident>()
                 }
             }
         )*
+
+        #[automatically_derived]
+        impl PartialEq<crate::biome::Biome> for VanillaBiome {
+            #[allow(unreachable_patterns, reason = "Nonexhaustive")]
+            fn eq(&self, other: &crate::biome::Biome) -> bool {
+                match self {
+                    $(
+                        VanillaBiome::$ident => other.is_biome::<$ident>(),
+                    )*
+                    _ => unreachable!("All variants of `VanillaBiome` should be covered in the match arms."),
+                }
+            }
+        }
+        #[automatically_derived]
+        impl PartialEq<VanillaBiome> for crate::biome::Biome {
+            #[allow(unreachable_patterns, reason = "Nonexhaustive")]
+            fn eq(&self, other: &VanillaBiome) -> bool {
+                match other {
+                    $(
+                        VanillaBiome::$ident => self.is_biome::<$ident>(),
+                    )*
+                    _ => unreachable!("All variants of `VanillaBiome` should be covered in the match arms."),
+                }
+            }
+        }
     };
 
     (@feature) => {};
