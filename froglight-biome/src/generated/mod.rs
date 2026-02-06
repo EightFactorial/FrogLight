@@ -77,14 +77,9 @@ macro_rules! generate {
         }
         #[automatically_derived]
         impl PartialEq<VanillaBiome> for crate::biome::Biome {
-            #[allow(unreachable_patterns, reason = "Nonexhaustive")]
+            #[inline]
             fn eq(&self, other: &VanillaBiome) -> bool {
-                match other {
-                    $(
-                        VanillaBiome::$ident => self.is_biome::<$ident>(),
-                    )*
-                    _ => unreachable!("All variants of `VanillaBiome` should be covered in the match arms."),
-                }
+                PartialEq::<crate::biome::Biome>::eq(other, self)
             }
         }
     };

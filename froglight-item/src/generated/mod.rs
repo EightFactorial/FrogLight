@@ -89,14 +89,9 @@ macro_rules! generate {
         }
         #[automatically_derived]
         impl PartialEq<VanillaItem> for crate::item::Item {
-            #[allow(unreachable_patterns, reason = "Nonexhaustive")]
+            #[inline]
             fn eq(&self, other: &VanillaItem) -> bool {
-                match other {
-                    $(
-                        VanillaItem::$ident => self.is_item::<$ident>(),
-                    )*
-                    _ => unreachable!("All variants of `VanillaItem` should be covered in the match arms."),
-                }
+                PartialEq::<crate::item::Item>::eq(other, self)
             }
         }
     };
