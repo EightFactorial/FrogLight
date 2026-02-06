@@ -23,6 +23,7 @@ aes = { workspace = true }
 async-channel = { features = ["std"], workspace = true }
 async-lock = { features = ["std"], workspace = true }
 cfb8 = { features = ["alloc"], workspace = true }
+cipher = { workspace = true }
 facet = { features = ["std"], workspace = true }
 facet-format = { workspace = true }
 facet-minecraft = { features = ["std"], workspace = true }
