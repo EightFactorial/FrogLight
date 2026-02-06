@@ -7,7 +7,24 @@
 macro_rules! generate {
     (@components) => {};
 
-    (@items @all $($ident:ident),*) => {
+    (@items @single $ident:ident) => {
+        #[doc = concat!("The [`", stringify!($ident), "`] item type.")]
+        #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+        pub struct $ident;
+    };
+    (@items @single @block $ident:ident) => {
+        #[cfg(feature = "froglight-block")]
+        pub use froglight_block::generated::block::$ident;
+        #[cfg(not(feature = "froglight-block"))]
+        #[doc = concat!("The [`", stringify!($ident), "`] item type.")]
+        #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+        pub struct $ident;
+    };
+    (@items $($(@$attr:tt)? $ident:ident),* $(,)?) => {
+        $(
+            generate!(@items @single $(@$attr)? $ident);
+        )*
+
         /// An enum containing all vanilla item types.
         #[non_exhaustive]
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -82,25 +99,6 @@ macro_rules! generate {
                 }
             }
         }
-    };
-    (@items @single $ident:ident) => {
-        #[doc = concat!("The [`", stringify!($ident), "`] item type.")]
-        #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-        pub struct $ident;
-    };
-    (@items @single @block $ident:ident) => {
-        #[cfg(feature = "froglight-block")]
-        pub use froglight_block::generated::block::$ident;
-        #[cfg(not(feature = "froglight-block"))]
-        #[doc = concat!("The [`", stringify!($ident), "`] item type.")]
-        #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-        pub struct $ident;
-    };
-    (@items $($(@$attr:tt)? $ident:ident),*) => {
-        $(
-            generate!(@items @single $(@$attr)? $ident);
-        )*
-        generate!(@items @all $($ident),*);
     };
 
     (@version) => {};
