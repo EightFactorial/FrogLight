@@ -69,7 +69,8 @@ pub async fn generate(config: &ConfigBundle) -> Result<()> {
 
             write!(
                 content,
-                r#"/// Minecraft {version_raw}
+                r#"
+/// Minecraft {version_raw}
 ///
 /// See the [Minecraft Wiki](https://minecraft.wiki/w/Java_Edition_{version_raw}) for more details.
 #[cfg(feature = "{version_feature}")]
@@ -83,8 +84,7 @@ impl super::Version for {version_name} {{
     const DATA_VERSION: u32 = {};
     const PROTOCOL_ID: u32 = {};
     const RESOURCE_VERSION: u32 = {};
-}}
-"#,
+}}"#,
                 info.world_version, info.protocol_version, info.pack_version.resource_major,
             )
             .unwrap();

@@ -13,7 +13,10 @@ impl Plugin for ApiPlugin {
         app.register_type::<ClientApi>()
             .register_type::<HttpClient>()
             .register_type::<DnsResolver>();
+    }
 
+    #[allow(unused_variables, reason = "Used if features are enabled")]
+    fn finish(&self, app: &mut App) {
         #[cfg(feature = "resolver")]
         app.init_resource::<DnsResolver>();
 
@@ -21,9 +24,9 @@ impl Plugin for ApiPlugin {
         if !app.world().contains_resource::<HttpClient>()
             && let Some(resolver) = app.world().get_resource::<DnsResolver>().cloned()
         {
-            use ureq::{config::Config, unversioned::transport::DefaultConnector};
+            use ureq::{Agent, config::Config, unversioned::transport::DefaultConnector};
 
-            app.world_mut().insert_resource(HttpClient::new(ureq::Agent::with_parts(
+            app.world_mut().insert_resource(HttpClient::new(Agent::with_parts(
                 Config::default(),
                 DefaultConnector::default(),
                 resolver,

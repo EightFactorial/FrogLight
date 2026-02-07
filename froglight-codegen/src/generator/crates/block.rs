@@ -90,7 +90,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 
             // Generate the content
             let mut content = String::new();
-            content.push_str("generate! {\n    @blocks\n");
+            content.push_str("\ngenerate! {\n    @blocks\n");
             for identifier in blocks {
                 writeln!(content, "    {identifier},").unwrap();
             }
@@ -116,10 +116,6 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 }
 
 /// Generate `Version`-specific block data.
-pub async fn generate(
-    version: &VersionPair,
-    storage: &mut VersionStorage,
-    _config: &ConfigBundle,
-) -> Result<()> {
+pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
     BlockData::get_for(&version.real, storage, async |_data| Ok(())).await
 }

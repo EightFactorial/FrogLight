@@ -1,5 +1,5 @@
 //! Generated biome types, attributes, and features.
-//!
+//! 
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
@@ -85,7 +85,37 @@ macro_rules! generate {
     };
 
     (@feature) => {};
-    (@version) => {};
+
+    (@version $version:ident, $($ident:ident => {
+        ident: $string:literal,
+        global: $global:literal,
+        prop: { foliage: $foliage:literal, grass: $grass:literal, water: $water:literal, precip: $precip:literal, temp: $temp:literal, downfall: $downfall:literal },
+        attr: $attr:expr,
+        feat: $feat:expr
+    }),*) => {
+        $(
+            impl crate::biome::BiomeType<$version> for $ident {
+                const METADATA: &'static crate::biome::BiomeMetadata = {
+                    static METADATA: crate::biome::BiomeMetadata = unsafe { crate::biome::BiomeMetadata::new::<$ident, $version>(
+                        froglight_common::identifier::Identifier::new_static($string),
+                        $global,
+                        $foliage, $grass, $water, $precip, $temp, $downfall,
+                        $attr,
+                        $feat,
+                    ) };
+                    &METADATA
+                };
+            }
+        )*
+
+        crate::implement_biomes!($version => unsafe {
+            crate::storage::BiomeStorage::new_static(&[
+                $(
+                    <$ident as crate::biome::BiomeType<$version>>::METADATA,
+                )*
+            ])
+        });
+    };
 }
 
 pub mod attribute;
@@ -94,3 +124,7 @@ pub mod feature;
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.
+
+#[cfg(feature = "v26_1")]
+mod v26_1;
+

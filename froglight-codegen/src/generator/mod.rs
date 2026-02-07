@@ -17,13 +17,13 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     Ok(())
 }
 
-pub async fn generate_specific(version: &VersionPair, config: &ConfigBundle) -> Result<()> {
+pub async fn generate_specific(version: &VersionPair, _config: &ConfigBundle) -> Result<()> {
     let pinned = DATA.pin_owned();
     let storage_lock = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
     let mut storage = storage_lock.write().await;
 
-    crates::biome::generate(version, &mut storage, config).await?;
-    crates::block::generate(version, &mut storage, config).await?;
+    crates::biome::generate(version, &mut storage).await?;
+    crates::block::generate(version, &mut storage).await?;
     // crates::item::generate(version, &mut storage, config).await?;
     // crates::registry::generate(version, &mut storage, config).await?;
 

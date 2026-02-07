@@ -56,4 +56,4 @@ nightly = ["froglight-common/nightly", "parking_lot?/nightly"]
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
 
-v26_1 = []
+v26_1 = ["froglight-common/v26_1"]

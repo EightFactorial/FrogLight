@@ -14,6 +14,7 @@ pub struct ModuleBuilder {
 
 #[derive(Debug, Default, Clone)]
 pub struct SubModuleSettings {
+    pub feature: Option<String>,
     pub public: bool,
     pub import_from: Vec<String>,
     pub reexport: bool,
@@ -39,7 +40,11 @@ impl ModuleBuilder {
     ///
     /// This will only copy content up to the `@generated` marker,
     /// meaning any content after that will be lost.
-    pub async fn new_after_marker(path: PathBuf) -> Result<Self> {
+    pub async fn new_after_marker(mut path: PathBuf) -> Result<Self> {
+        if path.is_dir() {
+            path.push("mod.rs");
+        }
+
         let Some(filename) = path.file_name().and_then(|name| name.to_str()) else {
             miette::bail!("Invalid module file \"{}\"", path.display());
         };
@@ -52,14 +57,13 @@ impl ModuleBuilder {
         };
 
         // Find the last occurrence of the @generated marker, plus a few lines.
-        let Some(mut marker) = contents.lines().rev().position(|l| l.contains("@generated")) else {
+        let Some(marker) = contents.lines().position(|l| l.contains("@generated")) else {
             miette::bail!("No `@generated` marker found in module file \"{}\"", path.display());
         };
-        marker = contents.lines().count().saturating_sub(marker);
 
         // Create a new `ModuleBuilder` with content up to the marker.
         let mut builder = Self::new(filename, folder.to_path_buf());
-        for line in contents.lines().take(marker) {
+        for line in contents.lines().take(marker + 1) {
             if line.starts_with("//!") {
                 builder.docs.push_str(line.trim_start_matches("//!").trim());
                 builder.docs.push('\n');
@@ -68,6 +72,7 @@ impl ModuleBuilder {
                 builder.content.push('\n');
             }
         }
+        builder.content.push('\n');
         Ok(builder)
     }
 
@@ -116,13 +121,37 @@ impl ModuleBuilder {
         let settings = f(&mut submodule, SubModuleSettings::default()).await?;
         submodule.build().await?;
 
-        // Import the submodule into the current module
-        self.imports.push(ModuleImport::Mod {
-            name: name.to_string(),
-            public: settings.public,
-            import_from: settings.import_from,
-            reexport: settings.reexport,
-        });
+        // Add the submodule as an import to the parent module
+        let import_name = name.to_string();
+        let mut import = String::new();
+
+        if let Some(feature) = settings.feature {
+            import.push_str("#[cfg(feature = \"");
+            import.push_str(&feature);
+            import.push_str("\")]\n");
+        }
+
+        if settings.public {
+            import.push_str("pub ");
+        }
+        import.push_str("mod ");
+        import.push_str(&import_name);
+        import.push_str(";\n");
+        for item in &settings.import_from {
+            if settings.reexport {
+                import.push_str("pub ");
+            }
+            import.push_str("use ");
+            import.push_str(&import_name);
+            import.push_str("::");
+            import.push_str(item);
+            import.push_str(";\n");
+        }
+        if !settings.import_from.is_empty() {
+            import.push('\n');
+        }
+
+        self.content.push_str(&import);
 
         Ok(self)
     }
@@ -136,9 +165,18 @@ impl ModuleBuilder {
         self.imports.sort();
 
         // Determine the file path for the module
-        let mut path = self.folder.join(&self.name);
-        if let Some(ModuleImport::Mod { .. }) = self.imports.last() {
-            path = path.join("mod.rs");
+        let mut path;
+        if self.folder.is_file() {
+            path = self.folder;
+            path.set_file_name(self.name);
+        } else {
+            path = self.folder.join(&self.name);
+        }
+
+        if let Some(ModuleImport::Mod { .. }) = self.imports.last()
+            && path.is_dir()
+        {
+            path.push("mod.rs");
         } else {
             path.set_extension("rs");
         }
@@ -150,7 +188,6 @@ impl ModuleBuilder {
                 output.push_str(line.trim());
                 output.push('\n');
             }
-            output.push('\n');
         }
 
         // Write precontent to the output buffer
@@ -215,6 +252,37 @@ impl ModuleBuilder {
             Ok(()) => Ok(()),
             Err(err) => miette::bail!("Failed to write to module \"{}\", {err}", path.display()),
         }
+    }
+}
+
+impl SubModuleSettings {
+    /// Set the feature flag required to enable the submodule.
+    #[must_use]
+    pub fn with_feature(mut self, feature: String) -> Self {
+        self.feature = Some(feature);
+        self
+    }
+
+    /// Set whether the submodule should be public.
+    #[must_use]
+    pub fn with_public(mut self, public: bool) -> Self {
+        self.public = public;
+        self
+    }
+
+    /// Set the items the parent module should import from the submodule.
+    #[must_use]
+    pub fn with_import_from(mut self, import_from: Vec<String>) -> Self {
+        self.import_from = import_from;
+        self
+    }
+
+    /// Set whether the parent module should reexport the imported items from
+    /// the submodule.
+    #[must_use]
+    pub fn with_reexport(mut self, reexport: bool) -> Self {
+        self.reexport = reexport;
+        self
     }
 }
 

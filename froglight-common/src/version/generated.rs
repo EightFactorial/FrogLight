@@ -1,5 +1,5 @@
 //! Version types
-//!
+//! 
 //! This file is automatically @generated, do not edit it manually.
 
 /// Minecraft 26.1

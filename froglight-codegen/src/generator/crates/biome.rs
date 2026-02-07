@@ -125,7 +125,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 
             // Generate the content
             let mut content = String::new();
-            content.push_str("generate! {\n    @biomes\n");
+            content.push_str("\ngenerate! {\n    @biomes\n");
             for identifier in biomes {
                 writeln!(content, "    {identifier},").unwrap();
             }
@@ -151,10 +151,46 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
 }
 
 /// Generate `Version`-specific biome data.
-pub async fn generate(
-    version: &VersionPair,
-    storage: &mut VersionStorage,
-    _config: &ConfigBundle,
-) -> Result<()> {
-    BiomeData::get_for(&version.real, storage, async |_data| Ok(())).await
+pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+    BiomeData::get_for(&version.real, storage, async |data| {
+        let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
+        let mut module = ModuleBuilder::new_after_marker(path).await?;
+
+        module
+            .with_submodule(&version.base.as_feature(), async |module, settings| {
+                let mut content = String::new();
+
+                let version_type = version.base.as_feature().to_ascii_uppercase();
+                content.push_str("\nuse froglight_common::version::");
+                content.push_str(&version_type);
+                content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::{\n    biome::{BiomeAttributeSet, BiomeFeatureSet},\n    generated::biome::*,\n};\n\n");
+
+                content.push_str("generate! {\n    @version ");
+                content.push_str(&version_type);
+                content.push_str(",\n");
+
+                for (index, (biome, ident)) in data.biomes.iter().enumerate() {
+                    content.push_str("    ");
+                    content.push_str(&biome.to_case(Case::Pascal));
+                    content.push_str(" => { ident: \"");
+                    content.push_str(ident);
+                    content.push_str("\", global: ");
+                    content.push_str(&index.to_string());
+                    content.push_str(", prop: { foliage: 0, grass: 0, water: 0, precip: true, temp: 0.0, downfall: 0.0 },\n");
+                    content.push_str("        attr: BiomeAttributeSet::empty(), feat: BiomeFeatureSet::empty() }");
+                    if index != data.biomes.len() - 1 {
+                        content.push(',');
+                    }
+                    content.push('\n');
+                }
+
+                content.push('}');
+                module.with_docs("Placeholder").with_content(&content);
+                Ok(settings.with_feature(version.base.as_feature()))
+            })
+            .await?;
+
+        module.build().await
+    })
+    .await
 }

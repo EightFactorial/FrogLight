@@ -9,8 +9,8 @@ use crate::{common::WORKSPACE_DIR, config::ConfigBundle};
 /// Formatted as `("crate name", &["feature/", "set/"])`.
 const CRATES: &[(&str, &[&str])] = &[
     ("froglight", &["froglight-internal/"]),
-    ("froglight-biome", &[]),
-    ("froglight-block", &[]),
+    ("froglight-biome", &["froglight-common/"]),
+    ("froglight-block", &["froglight-common/"]),
     ("froglight-common", &[]),
     (
         "froglight-internal",
@@ -23,13 +23,13 @@ const CRATES: &[(&str, &[&str])] = &[
             "froglight-registry/",
         ],
     ),
-    ("froglight-item", &[]),
+    ("froglight-item", &["froglight-common/"]),
     (
         "froglight-network",
         &["froglight-block/", "froglight-item/", "froglight-packet/", "froglight-registry/"],
     ),
     ("froglight-packet", &["froglight-common/"]),
-    ("froglight-registry", &[]),
+    ("froglight-registry", &["froglight-common/"]),
 ];
 
 /// Updates `Cargo.toml` files with version-specific feature sets.
