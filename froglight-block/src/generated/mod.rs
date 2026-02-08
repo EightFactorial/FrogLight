@@ -85,7 +85,36 @@ macro_rules! generate {
         }
     };
 
-    (@version) => {};
+    (@version $version:ident, $($ident:ident => {
+        ident: $string:literal,
+        global: $global:literal
+    }),*) => {
+        $(
+            impl crate::block::BlockType<$version> for $ident {
+                type Attributes = ();
+                const ATTRDATA: &'static [(&'static str, core::any::TypeId)] = &[];
+                const METADATA: &'static crate::block::BlockMetadata = {
+                    static METADATA: crate::block::BlockMetadata = unsafe { crate::block::BlockMetadata::new::<$ident, $version>(
+                        froglight_common::identifier::Identifier::new_static($string),
+                        $global,
+                        0,
+                        crate::block::BlockBehavior::new::<$ident, $version>(),
+                    ) };
+                    &METADATA
+                };
+            }
+        )*
+    };
+    (@version @storage $version:ident, $($ident:ident),*) => {
+        crate::implement_blocks!($version => unsafe {
+            crate::storage::BlockStorage::new_static(&[
+                $(
+                    <$ident as crate::block::BlockType<$version>>::METADATA
+                ),*
+            ])
+        });
+    };
+
     (@shape) => {};
 }
 
@@ -95,3 +124,6 @@ pub mod shape;
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.
+
+#[cfg(feature = "v26_1")]
+mod v26_1;
