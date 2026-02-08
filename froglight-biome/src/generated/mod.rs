@@ -1,5 +1,5 @@
 //! Generated biome types, attributes, and features.
-//! 
+//!
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
@@ -109,11 +109,12 @@ macro_rules! generate {
         )*
 
         crate::implement_biomes!($version => unsafe {
-            crate::storage::BiomeStorage::new_static(&[
+            static ARRAY: &'static [&'static crate::biome::BiomeMetadata] = &[
                 $(
                     <$ident as crate::biome::BiomeType<$version>>::METADATA,
                 )*
-            ])
+            ];
+            crate::storage::BiomeStorage::new_static(ARRAY)
         });
     };
 }
@@ -127,4 +128,3 @@ pub mod feature;
 
 #[cfg(feature = "v26_1")]
 mod v26_1;
-

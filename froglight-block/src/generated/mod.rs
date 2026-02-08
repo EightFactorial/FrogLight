@@ -5,7 +5,21 @@
 
 #[expect(unused, reason = "WIP")]
 macro_rules! generate {
-    (@attributes) => {};
+    (@attributes $($ident:ident => [ $($str:literal => $val:ident),+ ] ),*) => {
+        $(
+            #[doc = concat!("The [`", stringify!($ident), "`] block attribute.")]
+            #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+            pub enum $ident {
+                $(
+                    #[doc = concat!("The `", stringify!($val), "` value")]
+                    $val,
+                )*
+            }
+            impl crate::block::BlockAttribute for $ident {
+                const STATES: &'static [(&'static str, Self)] = &[$(($str, Self::$val)),*];
+            }
+        )*
+    };
 
     (@blocks $($ident:ident),* $(,)?) => {
         $(
@@ -87,17 +101,21 @@ macro_rules! generate {
 
     (@version $version:ident, $($ident:ident => {
         ident: $string:literal,
-        global: $global:literal
+        global: $global:literal,
+        default: $default:literal,
+        ty: [$($name:literal => $ty:ty),*]
     }),*) => {
         $(
             impl crate::block::BlockType<$version> for $ident {
-                type Attributes = ();
-                const ATTRDATA: &'static [(&'static str, core::any::TypeId)] = &[];
+                type Attributes = ($($ty,)*);
+                const ATTRDATA: &'static [(&'static str, core::any::TypeId)] = &[$(
+                    ($name, core::any::TypeId::of::<$ty>()),
+                )*];
                 const METADATA: &'static crate::block::BlockMetadata = {
                     static METADATA: crate::block::BlockMetadata = unsafe { crate::block::BlockMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
                         $global,
-                        0,
+                        $default,
                         crate::block::BlockBehavior::new::<$ident, $version>(),
                     ) };
                     &METADATA
@@ -106,12 +124,11 @@ macro_rules! generate {
         )*
     };
     (@version @storage $version:ident, $($ident:ident),*) => {
+        static ARRAY: &'static [&'static crate::block::BlockMetadata] = &[
+            $(<$ident as crate::block::BlockType<$version>>::METADATA),*
+        ];
         crate::implement_blocks!($version => unsafe {
-            crate::storage::BlockStorage::new_static(&[
-                $(
-                    <$ident as crate::block::BlockType<$version>>::METADATA
-                ),*
-            ])
+            crate::storage::BlockStorage::new_static(ARRAY)
         });
     };
 

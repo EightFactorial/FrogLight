@@ -19,7 +19,7 @@ async_zip = { features = ["full", "tokio"], version = "0.0.18" }
 cafebabe = { features = ["threadsafe"], version = "0.9" }
 chrono = { features = ["clock", "std"], version = "0.4"}
 convert_case = { version = "=0.10" }
-facet = { features = ["chrono", "helpful-derive", "std"], workspace = true }
+facet = { features = ["chrono", "helpful-derive", "indexmap", "std"], workspace = true }
 facet-json = { features = ["std", "tokio"], workspace = true }
 facet-toml = { features = ["std"], workspace = true }
 facet-value = { features = ["std"], workspace = true }
