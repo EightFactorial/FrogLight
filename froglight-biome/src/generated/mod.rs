@@ -108,12 +108,12 @@ macro_rules! generate {
             }
         )*
 
+        static ARRAY: &'static [&'static crate::biome::BiomeMetadata] = &[
+            $(
+                <$ident as crate::biome::BiomeType<$version>>::METADATA,
+            )*
+        ];
         crate::implement_biomes!($version => unsafe {
-            static ARRAY: &'static [&'static crate::biome::BiomeMetadata] = &[
-                $(
-                    <$ident as crate::biome::BiomeType<$version>>::METADATA,
-                )*
-            ];
             crate::storage::BiomeStorage::new_static(ARRAY)
         });
     };
