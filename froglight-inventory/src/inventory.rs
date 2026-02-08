@@ -511,7 +511,7 @@ pub use bevy_reflect::Reflect as MaybeReflect;
 pub trait MaybeReflect: Any {
     /// Convert a [`Box<Self>`] into a [`Box<dyn Any>`].
     fn into_any(self: Box<Self>) -> Box<dyn Any>;
-    /// Convert a [`&Self`] into a [`&dyn Any`].
+    /// Convert a `Self` into a [`&dyn Any`].
     fn as_any(&self) -> &dyn Any;
     /// Convert a [`&mut Self`] into a [`&mut dyn Any`].
     fn as_any_mut(&mut self) -> &mut dyn Any;
