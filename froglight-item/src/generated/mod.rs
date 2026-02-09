@@ -1,5 +1,5 @@
 //! Generated item types.
-//!
+//! 
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
@@ -70,7 +70,7 @@ macro_rules! generate {
             impl PartialEq<$ident> for crate::item::Item {
                 #[inline]
                 fn eq(&self, _: &$ident) -> bool {
-                    matches!(self, crate::item::Item::$ident)
+                    self.is_item::<$ident>()
                 }
             }
         )*
@@ -96,7 +96,32 @@ macro_rules! generate {
         }
     };
 
-    (@version) => {};
+    (@version $version:ident, $($ident:ident => {
+        ident: $string:literal,
+        global: $global:literal
+    }),*) => {
+        $(
+            impl crate::item::ItemType<$version> for $ident {
+                const METADATA: &'static crate::item::ItemMetadata = {
+                    static METADATA: crate::item::ItemMetadata = unsafe { crate::item::ItemMetadata::new::<$ident, $version>(
+                        froglight_common::identifier::Identifier::new_static($string),
+                        $global,
+                        ComponentData::empty()
+                    ) };
+                    &METADATA
+                };
+            }
+        )*
+
+        static ARRAY: &'static [&'static crate::item::ItemMetadata] = &[
+            $(
+                <$ident as crate::item::ItemType<$version>>::METADATA,
+            )*
+        ];
+        crate::implement_items!($version => unsafe {
+            crate::storage::ItemStorage::new_static(ARRAY)
+        });
+    };
 }
 
 pub mod component;
@@ -104,3 +129,7 @@ pub mod item;
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.
+
+#[cfg(feature = "v26_1")]
+mod v26_1;
+

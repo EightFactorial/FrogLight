@@ -15,6 +15,11 @@ pub struct ComponentData {
 }
 
 impl ComponentData {
+    /// Create an empty [`ComponentData`]
+    #[inline]
+    #[must_use]
+    pub const fn empty() -> Self { ComponentData { raw: () } }
+
     /// Create a new [`ComponentData`] from raw NBT data.
     #[inline]
     #[must_use]

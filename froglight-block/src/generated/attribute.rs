@@ -1,5 +1,5 @@
 //! Block attributes for all [`Version`](froglight_common::version::Version)s.
-//!
+//! 
 //! @generated
 #![allow(non_camel_case_types, reason = "Generated code")]
 

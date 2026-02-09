@@ -13,6 +13,7 @@ pub mod version_type;
 pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     crates::biome::generate_global(config).await?;
     crates::block::generate_global(config).await?;
+    crates::item::generate_global(config).await?;
 
     Ok(())
 }
@@ -24,7 +25,7 @@ pub async fn generate_specific(version: &VersionPair, _config: &ConfigBundle) ->
 
     crates::biome::generate(version, &mut storage).await?;
     crates::block::generate(version, &mut storage).await?;
-    // crates::item::generate(version, &mut storage, config).await?;
+    crates::item::generate(version, &mut storage).await?;
     // crates::registry::generate(version, &mut storage, config).await?;
 
     Ok(())
