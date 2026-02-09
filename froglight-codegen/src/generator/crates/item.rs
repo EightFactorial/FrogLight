@@ -46,6 +46,7 @@ impl ItemData {
     }
 
     /// Fetch the [`ItemData`] for the given [`Version`].
+    #[allow(clippy::too_many_lines, reason = "Necessary for parsing block and entity bytecode")]
     pub async fn fetch(version: &Version, storage: &mut VersionStorage) -> Result<Self> {
         let mut items = IndexMap::new();
 
