@@ -47,7 +47,7 @@ impl ItemData {
 
     /// Fetch the [`ItemData`] for the given [`Version`].
     pub async fn fetch(version: &Version, storage: &mut VersionStorage) -> Result<Self> {
-        let mut biomes = IndexMap::new();
+        let mut items = IndexMap::new();
 
         let block_data =
             BlockData::get_for(version, storage, async |data| Ok(data.clone())).await?;
@@ -70,9 +70,7 @@ impl ItemData {
                     }
                     Opcode::Getstatic(MemberRef { class_name, name_and_type })
                         if constant.is_none()
-                            && class_name == "net/minecraft/world/level/block/Blocks"
-                            && name_and_type.descriptor
-                                == "Lnet/minecraft/world/level/block/Block;" =>
+                            && class_name == "net/minecraft/world/level/block/Blocks" =>
                     {
                         if let Some(settings) = block_data.blocks.get(name_and_type.name.as_ref()) {
                             name = Some(name_and_type.name.to_string());
@@ -85,34 +83,133 @@ impl ItemData {
                             );
                         }
                     }
+                    Opcode::Getstatic(MemberRef { class_name, name_and_type })
+                        if constant.is_none()
+                            && class_name == "net/minecraft/world/entity/EntityType" =>
+                    {
+                        let code = data
+                            .get_class_method_code(
+                                "net/minecraft/world/entity/EntityType",
+                                "<clinit>",
+                            )
+                            .unwrap();
 
-                    Opcode::Putstatic(MemberRef { class_name, name_and_type }) => {
-                        if class_name != "net/minecraft/world/item/Items" {
-                            tracing::warn!("Unexpected class name in Items <clinit>: {class_name}");
-                        }
-                        if name_and_type.descriptor != "Lnet/minecraft/world/item/Item;" {
-                            tracing::warn!(
-                                "Unexpected descriptor in Items <clinit>: {}",
-                                name_and_type.descriptor
-                            );
-                            continue;
+                        // Find the string constant used to initialize the entity type
+                        let mut extracted = None;
+                        for (_, op) in &code.bytecode.as_ref().unwrap().opcodes {
+                            match op {
+                                Opcode::Ldc(Loadable::LiteralConstant(
+                                    LiteralConstant::String(s),
+                                ))
+                                | Opcode::LdcW(Loadable::LiteralConstant(
+                                    LiteralConstant::String(s),
+                                ))
+                                | Opcode::Ldc2W(Loadable::LiteralConstant(
+                                    LiteralConstant::String(s),
+                                )) => {
+                                    extracted = Some(s);
+                                }
+                                Opcode::Putstatic(MemberRef {
+                                    class_name: constant_class,
+                                    name_and_type: constant_field,
+                                }) if constant_class == class_name
+                                    && constant_field.name == name_and_type.name =>
+                                {
+                                    break;
+                                }
+                                _ => {}
+                            }
                         }
 
-                        if let Some(constant) = constant.take()
-                            && let Some(block) = block.take()
-                        {
-                            biomes.insert(
-                                name.take()
-                                    .unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal)),
-                                ItemSettings { ident: constant, block },
-                            );
+                        if let Some(extracted) = extracted {
+                            constant = Some(format!("minecraft:{extracted}",));
+                            block = Some(false);
                         } else {
-                            tracing::warn!(
-                                "Putstatic without preceding LDC in Items <clinit>: {}",
+                            miette::bail!(
+                                "Failed to extract entity constant for \"{}\" in Items <clinit>",
                                 name_and_type.name
                             );
                         }
                     }
+
+                    Opcode::Putstatic(MemberRef { class_name, name_and_type })
+                        if class_name == "net/minecraft/world/item/Items"
+                            && name_and_type.descriptor == "Lnet/minecraft/world/item/Item;" =>
+                    {
+                        let (Some(constant), Some(block)) = (constant.take(), block.take()) else {
+                            tracing::warn!(
+                                "Putstatic without preceding constant in Items <clinit>: {}",
+                                name_and_type.name
+                            );
+                            continue;
+                        };
+
+                        items.insert(
+                            name.take().unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal)),
+                            ItemSettings { ident: constant, block },
+                        );
+                    }
+                    Opcode::Putstatic(MemberRef { class_name, name_and_type })
+                        if class_name == "net/minecraft/world/item/Items"
+                            && name_and_type.descriptor
+                                == "Lnet/minecraft/world/item/WeatheringCopperItems;" =>
+                    {
+                        let (Some(constant), Some(block)) = (constant.take(), block.take()) else {
+                            tracing::warn!(
+                                "Putstatic without preceding constant in Items <clinit>: {}",
+                                name_and_type.name
+                            );
+                            continue;
+                        };
+
+                        let key =
+                            name.take().unwrap_or_else(|| name_and_type.name.to_case(Case::Pascal));
+                        items.insert(key.clone(), ItemSettings { ident: constant.clone(), block });
+
+                        items.insert(
+                            format!("Exposed{key}"),
+                            ItemSettings { ident: constant.replace(':', ":exposed_"), block },
+                        );
+                        items.insert(
+                            format!("Weathered{key}"),
+                            ItemSettings { ident: constant.replace(':', ":weathered_"), block },
+                        );
+                        items.insert(
+                            format!("Oxidized{key}"),
+                            ItemSettings { ident: constant.replace(':', ":oxidized_"), block },
+                        );
+                        items.insert(
+                            format!("Waxed{key}"),
+                            ItemSettings { ident: constant.replace(':', ":waxed_"), block },
+                        );
+                        items.insert(
+                            format!("WaxedExposed{key}"),
+                            ItemSettings { ident: constant.replace(':', ":waxed_exposed_"), block },
+                        );
+                        items.insert(
+                            format!("WaxedWeathered{key}"),
+                            ItemSettings {
+                                ident: constant.replace(':', ":waxed_weathered_"),
+                                block,
+                            },
+                        );
+                        items.insert(
+                            format!("WaxedOxidized{key}"),
+                            ItemSettings {
+                                ident: constant.replace(':', ":waxed_oxidized_"),
+                                block,
+                            },
+                        );
+                    }
+                    Opcode::Putstatic(MemberRef { class_name, name_and_type })
+                        if class_name == "net/minecraft/world/item/Items" =>
+                    {
+                        tracing::warn!(
+                            "Unexpected static in Items <clinit>: {}",
+                            name_and_type.descriptor
+                        );
+                    }
+
                     _ => {}
                 }
             }
@@ -121,9 +218,9 @@ impl ItemData {
         })
         .await?;
 
-        tracing::debug!("Found {} items for \"{}\"", biomes.len(), version.as_str());
+        tracing::debug!("Found {} items for \"{}\"", items.len(), version.as_str());
 
-        Ok(ItemData { items: biomes })
+        Ok(ItemData { items })
     }
 }
 
