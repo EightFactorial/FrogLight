@@ -187,12 +187,13 @@ impl BlockData {
                     }
 
                     Opcode::Getstatic(MemberRef { class_name, name_and_type })
-                        if class_name == "net/minecraft/references/Blocks"
-                            && current.ident.is_empty() =>
+                        if matches!(
+                            class_name.as_ref(),
+                            "net/minecraft/references/Blocks" | "net/minecraft/references/BlockIds"
+                        ) && current.ident.is_empty() =>
                     {
-                        let code = data
-                            .get_class_method_code("net/minecraft/references/Blocks", "<clinit>")
-                            .unwrap();
+                        let code =
+                            data.get_class_method_code(class_name.as_ref(), "<clinit>").unwrap();
 
                         // Find the string constant used to initialize the block reference
                         let mut constant = None;
@@ -231,6 +232,15 @@ impl BlockData {
                             && name_and_type.descriptor
                                 == "Lnet/minecraft/world/level/block/Block;" =>
                     {
+                        if current.ident.is_empty() {
+                            miette::bail!(
+                                "Failed to find block identifier for \"{}\"",
+                                name_and_type.name
+                            );
+                        }
+
+                        tracing::trace!("Inserting block: {}\n\n", name_and_type.name);
+
                         blocks
                             .insert(name_and_type.name.to_string(), core::mem::take(&mut current));
                     }
@@ -239,6 +249,15 @@ impl BlockData {
                             && name_and_type.descriptor
                                 == "Lnet/minecraft/world/level/block/WeatheringCopperBlocks;" =>
                     {
+                        if current.ident.is_empty() {
+                            miette::bail!(
+                                "Failed to find block identifier for \"{}\"",
+                                name_and_type.name
+                            );
+                        }
+
+                        tracing::trace!("Inserting weathering blocks: {}\n\n", name_and_type.name);
+
                         let original = core::mem::take(&mut current);
                         blocks.insert(name_and_type.name.to_string(), original.clone());
                         blocks.insert(

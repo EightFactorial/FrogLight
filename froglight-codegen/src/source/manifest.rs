@@ -85,10 +85,7 @@ impl Manifest {
         };
 
         match facet_json::from_str::<Self>(&file) {
-            Ok(manifest) => {
-                tracing::trace!("VersionData: {manifest:?}");
-                Ok(manifest)
-            }
+            Ok(manifest) => Ok(manifest),
             Err(_err) => todo!(),
         }
     }

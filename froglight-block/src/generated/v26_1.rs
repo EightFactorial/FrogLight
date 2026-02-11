@@ -337,3178 +337,3178 @@ generate! {
     NoteBlock => { ident: "minecraft:note_block", global: 581, default: 1,
         ty: [ "instrument" => Instrument, "note" => Note, "powered" => PoweredBool ]
     },
-    WhiteBed => { ident: "minecraft:white_bed", global: 1731, default: 3,
+    WhiteBed => { ident: "minecraft:white_bed", global: 1931, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    OrangeBed => { ident: "minecraft:orange_bed", global: 1747, default: 3,
+    OrangeBed => { ident: "minecraft:orange_bed", global: 1947, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    MagentaBed => { ident: "minecraft:magenta_bed", global: 1763, default: 3,
+    MagentaBed => { ident: "minecraft:magenta_bed", global: 1963, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    LightBlueBed => { ident: "minecraft:light_blue_bed", global: 1779, default: 3,
+    LightBlueBed => { ident: "minecraft:light_blue_bed", global: 1979, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    YellowBed => { ident: "minecraft:yellow_bed", global: 1795, default: 3,
+    YellowBed => { ident: "minecraft:yellow_bed", global: 1995, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    LimeBed => { ident: "minecraft:lime_bed", global: 1811, default: 3,
+    LimeBed => { ident: "minecraft:lime_bed", global: 2011, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    PinkBed => { ident: "minecraft:pink_bed", global: 1827, default: 3,
+    PinkBed => { ident: "minecraft:pink_bed", global: 2027, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    GrayBed => { ident: "minecraft:gray_bed", global: 1843, default: 3,
+    GrayBed => { ident: "minecraft:gray_bed", global: 2043, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    LightGrayBed => { ident: "minecraft:light_gray_bed", global: 1859, default: 3,
+    LightGrayBed => { ident: "minecraft:light_gray_bed", global: 2059, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    CyanBed => { ident: "minecraft:cyan_bed", global: 1875, default: 3,
+    CyanBed => { ident: "minecraft:cyan_bed", global: 2075, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    PurpleBed => { ident: "minecraft:purple_bed", global: 1891, default: 3,
+    PurpleBed => { ident: "minecraft:purple_bed", global: 2091, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    BlueBed => { ident: "minecraft:blue_bed", global: 1907, default: 3,
+    BlueBed => { ident: "minecraft:blue_bed", global: 2107, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    BrownBed => { ident: "minecraft:brown_bed", global: 1923, default: 3,
+    BrownBed => { ident: "minecraft:brown_bed", global: 2123, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    GreenBed => { ident: "minecraft:green_bed", global: 1939, default: 3,
+    GreenBed => { ident: "minecraft:green_bed", global: 2139, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    RedBed => { ident: "minecraft:red_bed", global: 1955, default: 3,
+    RedBed => { ident: "minecraft:red_bed", global: 2155, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    BlackBed => { ident: "minecraft:black_bed", global: 1971, default: 3,
+    BlackBed => { ident: "minecraft:black_bed", global: 2171, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "occupied" => OccupiedBool, "part" => Part_HeadFoot ]
     },
-    PoweredRail => { ident: "minecraft:powered_rail", global: 1987, default: 13,
+    PoweredRail => { ident: "minecraft:powered_rail", global: 2187, default: 13,
         ty: [ "powered" => PoweredBool, "shape" => Shape_NorthSouthEastWestAscendingEastAscendingWestAscendingNorthAscendingSouth, "waterlogged" => WaterloggedBool ]
     },
-    DetectorRail => { ident: "minecraft:detector_rail", global: 2011, default: 13,
+    DetectorRail => { ident: "minecraft:detector_rail", global: 2211, default: 13,
         ty: [ "powered" => PoweredBool, "shape" => Shape_NorthSouthEastWestAscendingEastAscendingWestAscendingNorthAscendingSouth, "waterlogged" => WaterloggedBool ]
     },
-    StickyPiston => { ident: "minecraft:sticky_piston", global: 2035, default: 6,
+    StickyPiston => { ident: "minecraft:sticky_piston", global: 2235, default: 6,
         ty: [ "extended" => ExtendedBool, "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    Cobweb => { ident: "minecraft:cobweb", global: 2047, default: 0,
+    Cobweb => { ident: "minecraft:cobweb", global: 2247, default: 0,
         ty: [  ]
     },
-    ShortGrass => { ident: "minecraft:short_grass", global: 2048, default: 0,
+    ShortGrass => { ident: "minecraft:short_grass", global: 2248, default: 0,
         ty: [  ]
     },
-    Fern => { ident: "minecraft:fern", global: 2049, default: 0,
+    Fern => { ident: "minecraft:fern", global: 2249, default: 0,
         ty: [  ]
     },
-    DeadBush => { ident: "minecraft:dead_bush", global: 2050, default: 0,
+    DeadBush => { ident: "minecraft:dead_bush", global: 2250, default: 0,
         ty: [  ]
     },
-    Bush => { ident: "minecraft:bush", global: 2051, default: 0,
+    Bush => { ident: "minecraft:bush", global: 2251, default: 0,
         ty: [  ]
     },
-    ShortDryGrass => { ident: "minecraft:short_dry_grass", global: 2052, default: 0,
+    ShortDryGrass => { ident: "minecraft:short_dry_grass", global: 2252, default: 0,
         ty: [  ]
     },
-    TallDryGrass => { ident: "minecraft:tall_dry_grass", global: 2053, default: 0,
+    TallDryGrass => { ident: "minecraft:tall_dry_grass", global: 2253, default: 0,
         ty: [  ]
     },
-    Seagrass => { ident: "minecraft:seagrass", global: 2054, default: 0,
+    Seagrass => { ident: "minecraft:seagrass", global: 2254, default: 0,
         ty: [  ]
     },
-    TallSeagrass => { ident: "minecraft:tall_seagrass", global: 2055, default: 1,
+    TallSeagrass => { ident: "minecraft:tall_seagrass", global: 2255, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    Piston => { ident: "minecraft:piston", global: 2057, default: 6,
+    Piston => { ident: "minecraft:piston", global: 2257, default: 6,
         ty: [ "extended" => ExtendedBool, "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    PistonHead => { ident: "minecraft:piston_head", global: 2069, default: 2,
+    PistonHead => { ident: "minecraft:piston_head", global: 2269, default: 2,
         ty: [ "type" => Type_NormalSticky, "facing" => Facing_NorthEastSouthWestUpDown, "short" => ShortBool ]
     },
-    WhiteWool => { ident: "minecraft:white_wool", global: 2093, default: 0,
+    WhiteWool => { ident: "minecraft:white_wool", global: 2293, default: 0,
         ty: [  ]
     },
-    OrangeWool => { ident: "minecraft:orange_wool", global: 2094, default: 0,
+    OrangeWool => { ident: "minecraft:orange_wool", global: 2294, default: 0,
         ty: [  ]
     },
-    MagentaWool => { ident: "minecraft:magenta_wool", global: 2095, default: 0,
+    MagentaWool => { ident: "minecraft:magenta_wool", global: 2295, default: 0,
         ty: [  ]
     },
-    LightBlueWool => { ident: "minecraft:light_blue_wool", global: 2096, default: 0,
+    LightBlueWool => { ident: "minecraft:light_blue_wool", global: 2296, default: 0,
         ty: [  ]
     },
-    YellowWool => { ident: "minecraft:yellow_wool", global: 2097, default: 0,
+    YellowWool => { ident: "minecraft:yellow_wool", global: 2297, default: 0,
         ty: [  ]
     },
-    LimeWool => { ident: "minecraft:lime_wool", global: 2098, default: 0,
+    LimeWool => { ident: "minecraft:lime_wool", global: 2298, default: 0,
         ty: [  ]
     },
-    PinkWool => { ident: "minecraft:pink_wool", global: 2099, default: 0,
+    PinkWool => { ident: "minecraft:pink_wool", global: 2299, default: 0,
         ty: [  ]
     },
-    GrayWool => { ident: "minecraft:gray_wool", global: 2100, default: 0,
+    GrayWool => { ident: "minecraft:gray_wool", global: 2300, default: 0,
         ty: [  ]
     },
-    LightGrayWool => { ident: "minecraft:light_gray_wool", global: 2101, default: 0,
+    LightGrayWool => { ident: "minecraft:light_gray_wool", global: 2301, default: 0,
         ty: [  ]
     },
-    CyanWool => { ident: "minecraft:cyan_wool", global: 2102, default: 0,
+    CyanWool => { ident: "minecraft:cyan_wool", global: 2302, default: 0,
         ty: [  ]
     },
-    PurpleWool => { ident: "minecraft:purple_wool", global: 2103, default: 0,
+    PurpleWool => { ident: "minecraft:purple_wool", global: 2303, default: 0,
         ty: [  ]
     },
-    BlueWool => { ident: "minecraft:blue_wool", global: 2104, default: 0,
+    BlueWool => { ident: "minecraft:blue_wool", global: 2304, default: 0,
         ty: [  ]
     },
-    BrownWool => { ident: "minecraft:brown_wool", global: 2105, default: 0,
+    BrownWool => { ident: "minecraft:brown_wool", global: 2305, default: 0,
         ty: [  ]
     },
-    GreenWool => { ident: "minecraft:green_wool", global: 2106, default: 0,
+    GreenWool => { ident: "minecraft:green_wool", global: 2306, default: 0,
         ty: [  ]
     },
-    RedWool => { ident: "minecraft:red_wool", global: 2107, default: 0,
+    RedWool => { ident: "minecraft:red_wool", global: 2307, default: 0,
         ty: [  ]
     },
-    BlackWool => { ident: "minecraft:black_wool", global: 2108, default: 0,
+    BlackWool => { ident: "minecraft:black_wool", global: 2308, default: 0,
         ty: [  ]
     },
-    MovingPiston => { ident: "minecraft:moving_piston", global: 2109, default: 0,
+    MovingPiston => { ident: "minecraft:moving_piston", global: 2309, default: 0,
         ty: [ "type" => Type_NormalSticky, "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    Dandelion => { ident: "minecraft:dandelion", global: 2121, default: 0,
+    Dandelion => { ident: "minecraft:dandelion", global: 2321, default: 0,
         ty: [  ]
     },
-    GoldenDandelion => { ident: "minecraft:golden_dandelion", global: 2122, default: 0,
+    GoldenDandelion => { ident: "minecraft:golden_dandelion", global: 2322, default: 0,
         ty: [  ]
     },
-    Torchflower => { ident: "minecraft:torchflower", global: 2123, default: 0,
+    Torchflower => { ident: "minecraft:torchflower", global: 2323, default: 0,
         ty: [  ]
     },
-    Poppy => { ident: "minecraft:poppy", global: 2124, default: 0,
+    Poppy => { ident: "minecraft:poppy", global: 2324, default: 0,
         ty: [  ]
     },
-    BlueOrchid => { ident: "minecraft:blue_orchid", global: 2125, default: 0,
+    BlueOrchid => { ident: "minecraft:blue_orchid", global: 2325, default: 0,
         ty: [  ]
     },
-    Allium => { ident: "minecraft:allium", global: 2126, default: 0,
+    Allium => { ident: "minecraft:allium", global: 2326, default: 0,
         ty: [  ]
     },
-    AzureBluet => { ident: "minecraft:azure_bluet", global: 2127, default: 0,
+    AzureBluet => { ident: "minecraft:azure_bluet", global: 2327, default: 0,
         ty: [  ]
     },
-    RedTulip => { ident: "minecraft:red_tulip", global: 2128, default: 0,
+    RedTulip => { ident: "minecraft:red_tulip", global: 2328, default: 0,
         ty: [  ]
     },
-    OrangeTulip => { ident: "minecraft:orange_tulip", global: 2129, default: 0,
+    OrangeTulip => { ident: "minecraft:orange_tulip", global: 2329, default: 0,
         ty: [  ]
     },
-    WhiteTulip => { ident: "minecraft:white_tulip", global: 2130, default: 0,
+    WhiteTulip => { ident: "minecraft:white_tulip", global: 2330, default: 0,
         ty: [  ]
     },
-    PinkTulip => { ident: "minecraft:pink_tulip", global: 2131, default: 0,
+    PinkTulip => { ident: "minecraft:pink_tulip", global: 2331, default: 0,
         ty: [  ]
     },
-    OxeyeDaisy => { ident: "minecraft:oxeye_daisy", global: 2132, default: 0,
+    OxeyeDaisy => { ident: "minecraft:oxeye_daisy", global: 2332, default: 0,
         ty: [  ]
     },
-    Cornflower => { ident: "minecraft:cornflower", global: 2133, default: 0,
+    Cornflower => { ident: "minecraft:cornflower", global: 2333, default: 0,
         ty: [  ]
     },
-    WitherRose => { ident: "minecraft:wither_rose", global: 2134, default: 0,
+    WitherRose => { ident: "minecraft:wither_rose", global: 2334, default: 0,
         ty: [  ]
     },
-    LilyOfTheValley => { ident: "minecraft:lily_of_the_valley", global: 2135, default: 0,
+    LilyOfTheValley => { ident: "minecraft:lily_of_the_valley", global: 2335, default: 0,
         ty: [  ]
     },
-    BrownMushroom => { ident: "minecraft:brown_mushroom", global: 2136, default: 0,
+    BrownMushroom => { ident: "minecraft:brown_mushroom", global: 2336, default: 0,
         ty: [  ]
     },
-    RedMushroom => { ident: "minecraft:red_mushroom", global: 2137, default: 0,
+    RedMushroom => { ident: "minecraft:red_mushroom", global: 2337, default: 0,
         ty: [  ]
     },
-    GoldBlock => { ident: "minecraft:gold_block", global: 2138, default: 0,
+    GoldBlock => { ident: "minecraft:gold_block", global: 2338, default: 0,
         ty: [  ]
     },
-    IronBlock => { ident: "minecraft:iron_block", global: 2139, default: 0,
+    IronBlock => { ident: "minecraft:iron_block", global: 2339, default: 0,
         ty: [  ]
     },
-    Bricks => { ident: "minecraft:bricks", global: 2140, default: 0,
+    Bricks => { ident: "minecraft:bricks", global: 2340, default: 0,
         ty: [  ]
     },
-    Tnt => { ident: "minecraft:tnt", global: 2141, default: 1,
+    Tnt => { ident: "minecraft:tnt", global: 2341, default: 1,
         ty: [ "unstable" => UnstableBool ]
     },
-    Bookshelf => { ident: "minecraft:bookshelf", global: 2143, default: 0,
+    Bookshelf => { ident: "minecraft:bookshelf", global: 2343, default: 0,
         ty: [  ]
     },
-    ChiseledBookshelf => { ident: "minecraft:chiseled_bookshelf", global: 2144, default: 63,
+    ChiseledBookshelf => { ident: "minecraft:chiseled_bookshelf", global: 2344, default: 63,
         ty: [ "facing" => Facing_NorthSouthWestEast, "slot_0_occupied" => Slot0OccupiedBool, "slot_1_occupied" => Slot1OccupiedBool, "slot_2_occupied" => Slot2OccupiedBool, "slot_3_occupied" => Slot3OccupiedBool, "slot_4_occupied" => Slot4OccupiedBool, "slot_5_occupied" => Slot5OccupiedBool ]
     },
-    AcaciaShelf => { ident: "minecraft:acacia_shelf", global: 2400, default: 9,
+    AcaciaShelf => { ident: "minecraft:acacia_shelf", global: 2600, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    BambooShelf => { ident: "minecraft:bamboo_shelf", global: 2464, default: 9,
+    BambooShelf => { ident: "minecraft:bamboo_shelf", global: 2664, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    BirchShelf => { ident: "minecraft:birch_shelf", global: 2528, default: 9,
+    BirchShelf => { ident: "minecraft:birch_shelf", global: 2728, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    CherryShelf => { ident: "minecraft:cherry_shelf", global: 2592, default: 9,
+    CherryShelf => { ident: "minecraft:cherry_shelf", global: 2792, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonShelf => { ident: "minecraft:crimson_shelf", global: 2656, default: 9,
+    CrimsonShelf => { ident: "minecraft:crimson_shelf", global: 2856, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakShelf => { ident: "minecraft:dark_oak_shelf", global: 2720, default: 9,
+    DarkOakShelf => { ident: "minecraft:dark_oak_shelf", global: 2920, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    JungleShelf => { ident: "minecraft:jungle_shelf", global: 2784, default: 9,
+    JungleShelf => { ident: "minecraft:jungle_shelf", global: 2984, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    MangroveShelf => { ident: "minecraft:mangrove_shelf", global: 2848, default: 9,
+    MangroveShelf => { ident: "minecraft:mangrove_shelf", global: 3048, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    OakShelf => { ident: "minecraft:oak_shelf", global: 2912, default: 9,
+    OakShelf => { ident: "minecraft:oak_shelf", global: 3112, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakShelf => { ident: "minecraft:pale_oak_shelf", global: 2976, default: 9,
+    PaleOakShelf => { ident: "minecraft:pale_oak_shelf", global: 3176, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    SpruceShelf => { ident: "minecraft:spruce_shelf", global: 3040, default: 9,
+    SpruceShelf => { ident: "minecraft:spruce_shelf", global: 3240, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    WarpedShelf => { ident: "minecraft:warped_shelf", global: 3104, default: 9,
+    WarpedShelf => { ident: "minecraft:warped_shelf", global: 3304, default: 9,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool, "side_chain" => SideChain_UnconnectedRightCenterLeft, "waterlogged" => WaterloggedBool ]
     },
-    MossyCobblestone => { ident: "minecraft:mossy_cobblestone", global: 3168, default: 0,
+    MossyCobblestone => { ident: "minecraft:mossy_cobblestone", global: 3368, default: 0,
         ty: [  ]
     },
-    Obsidian => { ident: "minecraft:obsidian", global: 3169, default: 0,
+    Obsidian => { ident: "minecraft:obsidian", global: 3369, default: 0,
         ty: [  ]
     },
-    Torch => { ident: "minecraft:torch", global: 3170, default: 0,
+    Torch => { ident: "minecraft:torch", global: 3370, default: 0,
         ty: [  ]
     },
-    WallTorch => { ident: "minecraft:wall_torch", global: 3171, default: 0,
+    WallTorch => { ident: "minecraft:wall_torch", global: 3371, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    Fire => { ident: "minecraft:fire", global: 3175, default: 31,
+    Fire => { ident: "minecraft:fire", global: 3375, default: 31,
         ty: [ "age" => Age_0123456789101112131415, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "west" => WestBool ]
     },
-    SoulFire => { ident: "minecraft:soul_fire", global: 3687, default: 0,
+    SoulFire => { ident: "minecraft:soul_fire", global: 3887, default: 0,
         ty: [  ]
     },
-    Spawner => { ident: "minecraft:spawner", global: 3688, default: 0,
+    Spawner => { ident: "minecraft:spawner", global: 3888, default: 0,
         ty: [  ]
     },
-    CreakingHeart => { ident: "minecraft:creaking_heart", global: 3689, default: 7,
+    CreakingHeart => { ident: "minecraft:creaking_heart", global: 3889, default: 7,
         ty: [ "axis" => Axis_XYZ, "creaking_heart_state" => CreakingHeartState, "natural" => NaturalBool ]
     },
-    OakStairs => { ident: "minecraft:oak_stairs", global: 3707, default: 11,
+    OakStairs => { ident: "minecraft:oak_stairs", global: 3907, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    Chest => { ident: "minecraft:chest", global: 3787, default: 1,
+    Chest => { ident: "minecraft:chest", global: 3987, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    RedstoneWire => { ident: "minecraft:redstone_wire", global: 3811, default: 1160,
+    RedstoneWire => { ident: "minecraft:redstone_wire", global: 4011, default: 1160,
         ty: [ "east" => East_UpSideNone, "north" => North_UpSideNone, "power" => Power_0123456789101112131415, "south" => South_UpSideNone, "west" => West_UpSideNone ]
     },
-    DiamondOre => { ident: "minecraft:diamond_ore", global: 5107, default: 0,
+    DiamondOre => { ident: "minecraft:diamond_ore", global: 5307, default: 0,
         ty: [  ]
     },
-    DeepslateDiamondOre => { ident: "minecraft:deepslate_diamond_ore", global: 5108, default: 0,
+    DeepslateDiamondOre => { ident: "minecraft:deepslate_diamond_ore", global: 5308, default: 0,
         ty: [  ]
     },
-    DiamondBlock => { ident: "minecraft:diamond_block", global: 5109, default: 0,
+    DiamondBlock => { ident: "minecraft:diamond_block", global: 5309, default: 0,
         ty: [  ]
     },
-    CraftingTable => { ident: "minecraft:crafting_table", global: 5110, default: 0,
+    CraftingTable => { ident: "minecraft:crafting_table", global: 5310, default: 0,
         ty: [  ]
     },
-    Wheat => { ident: "minecraft:wheat", global: 5111, default: 0,
+    Wheat => { ident: "minecraft:wheat", global: 5311, default: 0,
         ty: [ "age" => Age_01234567 ]
     },
-    Farmland => { ident: "minecraft:farmland", global: 5119, default: 0,
+    Farmland => { ident: "minecraft:farmland", global: 5319, default: 0,
         ty: [ "moisture" => Moisture ]
     },
-    Furnace => { ident: "minecraft:furnace", global: 5127, default: 1,
+    Furnace => { ident: "minecraft:furnace", global: 5327, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "lit" => LitBool ]
     },
-    OakSign => { ident: "minecraft:oak_sign", global: 5135, default: 1,
+    OakSign => { ident: "minecraft:oak_sign", global: 5335, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    SpruceSign => { ident: "minecraft:spruce_sign", global: 5167, default: 1,
+    SpruceSign => { ident: "minecraft:spruce_sign", global: 5367, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BirchSign => { ident: "minecraft:birch_sign", global: 5199, default: 1,
+    BirchSign => { ident: "minecraft:birch_sign", global: 5399, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaSign => { ident: "minecraft:acacia_sign", global: 5231, default: 1,
+    AcaciaSign => { ident: "minecraft:acacia_sign", global: 5431, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    CherrySign => { ident: "minecraft:cherry_sign", global: 5263, default: 1,
+    CherrySign => { ident: "minecraft:cherry_sign", global: 5463, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    JungleSign => { ident: "minecraft:jungle_sign", global: 5295, default: 1,
+    JungleSign => { ident: "minecraft:jungle_sign", global: 5495, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakSign => { ident: "minecraft:dark_oak_sign", global: 5327, default: 1,
+    DarkOakSign => { ident: "minecraft:dark_oak_sign", global: 5527, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakSign => { ident: "minecraft:pale_oak_sign", global: 5359, default: 1,
+    PaleOakSign => { ident: "minecraft:pale_oak_sign", global: 5559, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    MangroveSign => { ident: "minecraft:mangrove_sign", global: 5391, default: 1,
+    MangroveSign => { ident: "minecraft:mangrove_sign", global: 5591, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BambooSign => { ident: "minecraft:bamboo_sign", global: 5423, default: 1,
+    BambooSign => { ident: "minecraft:bamboo_sign", global: 5623, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    OakDoor => { ident: "minecraft:oak_door", global: 5455, default: 11,
+    OakDoor => { ident: "minecraft:oak_door", global: 5655, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    Ladder => { ident: "minecraft:ladder", global: 5519, default: 1,
+    Ladder => { ident: "minecraft:ladder", global: 5719, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    Rail => { ident: "minecraft:rail", global: 5527, default: 1,
+    Rail => { ident: "minecraft:rail", global: 5727, default: 1,
         ty: [ "shape" => Shape_NorthSouthEastWestAscendingEastAscendingWestAscendingNorthAscendingSouthSouthEastSouthWestNorthWestNorthEast, "waterlogged" => WaterloggedBool ]
     },
-    CobblestoneStairs => { ident: "minecraft:cobblestone_stairs", global: 5547, default: 11,
+    CobblestoneStairs => { ident: "minecraft:cobblestone_stairs", global: 5747, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    OakWallSign => { ident: "minecraft:oak_wall_sign", global: 5627, default: 1,
+    OakWallSign => { ident: "minecraft:oak_wall_sign", global: 5827, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    SpruceWallSign => { ident: "minecraft:spruce_wall_sign", global: 5635, default: 1,
+    SpruceWallSign => { ident: "minecraft:spruce_wall_sign", global: 5835, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    BirchWallSign => { ident: "minecraft:birch_wall_sign", global: 5643, default: 1,
+    BirchWallSign => { ident: "minecraft:birch_wall_sign", global: 5843, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaWallSign => { ident: "minecraft:acacia_wall_sign", global: 5651, default: 1,
+    AcaciaWallSign => { ident: "minecraft:acacia_wall_sign", global: 5851, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    CherryWallSign => { ident: "minecraft:cherry_wall_sign", global: 5659, default: 1,
+    CherryWallSign => { ident: "minecraft:cherry_wall_sign", global: 5859, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    JungleWallSign => { ident: "minecraft:jungle_wall_sign", global: 5667, default: 1,
+    JungleWallSign => { ident: "minecraft:jungle_wall_sign", global: 5867, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakWallSign => { ident: "minecraft:dark_oak_wall_sign", global: 5675, default: 1,
+    DarkOakWallSign => { ident: "minecraft:dark_oak_wall_sign", global: 5875, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakWallSign => { ident: "minecraft:pale_oak_wall_sign", global: 5683, default: 1,
+    PaleOakWallSign => { ident: "minecraft:pale_oak_wall_sign", global: 5883, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    MangroveWallSign => { ident: "minecraft:mangrove_wall_sign", global: 5691, default: 1,
+    MangroveWallSign => { ident: "minecraft:mangrove_wall_sign", global: 5891, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    BambooWallSign => { ident: "minecraft:bamboo_wall_sign", global: 5699, default: 1,
+    BambooWallSign => { ident: "minecraft:bamboo_wall_sign", global: 5899, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    OakHangingSign => { ident: "minecraft:oak_hanging_sign", global: 5707, default: 33,
+    OakHangingSign => { ident: "minecraft:oak_hanging_sign", global: 5907, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    SpruceHangingSign => { ident: "minecraft:spruce_hanging_sign", global: 5771, default: 33,
+    SpruceHangingSign => { ident: "minecraft:spruce_hanging_sign", global: 5971, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BirchHangingSign => { ident: "minecraft:birch_hanging_sign", global: 5835, default: 33,
+    BirchHangingSign => { ident: "minecraft:birch_hanging_sign", global: 6035, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaHangingSign => { ident: "minecraft:acacia_hanging_sign", global: 5899, default: 33,
+    AcaciaHangingSign => { ident: "minecraft:acacia_hanging_sign", global: 6099, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    CherryHangingSign => { ident: "minecraft:cherry_hanging_sign", global: 5963, default: 33,
+    CherryHangingSign => { ident: "minecraft:cherry_hanging_sign", global: 6163, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    JungleHangingSign => { ident: "minecraft:jungle_hanging_sign", global: 6027, default: 33,
+    JungleHangingSign => { ident: "minecraft:jungle_hanging_sign", global: 6227, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakHangingSign => { ident: "minecraft:dark_oak_hanging_sign", global: 6091, default: 33,
+    DarkOakHangingSign => { ident: "minecraft:dark_oak_hanging_sign", global: 6291, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakHangingSign => { ident: "minecraft:pale_oak_hanging_sign", global: 6155, default: 33,
+    PaleOakHangingSign => { ident: "minecraft:pale_oak_hanging_sign", global: 6355, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonHangingSign => { ident: "minecraft:crimson_hanging_sign", global: 6219, default: 33,
+    CrimsonHangingSign => { ident: "minecraft:crimson_hanging_sign", global: 6419, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    WarpedHangingSign => { ident: "minecraft:warped_hanging_sign", global: 6283, default: 33,
+    WarpedHangingSign => { ident: "minecraft:warped_hanging_sign", global: 6483, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    MangroveHangingSign => { ident: "minecraft:mangrove_hanging_sign", global: 6347, default: 33,
+    MangroveHangingSign => { ident: "minecraft:mangrove_hanging_sign", global: 6547, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BambooHangingSign => { ident: "minecraft:bamboo_hanging_sign", global: 6411, default: 33,
+    BambooHangingSign => { ident: "minecraft:bamboo_hanging_sign", global: 6611, default: 33,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    OakWallHangingSign => { ident: "minecraft:oak_wall_hanging_sign", global: 6475, default: 1,
+    OakWallHangingSign => { ident: "minecraft:oak_wall_hanging_sign", global: 6675, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    SpruceWallHangingSign => { ident: "minecraft:spruce_wall_hanging_sign", global: 6483, default: 1,
+    SpruceWallHangingSign => { ident: "minecraft:spruce_wall_hanging_sign", global: 6683, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    BirchWallHangingSign => { ident: "minecraft:birch_wall_hanging_sign", global: 6491, default: 1,
+    BirchWallHangingSign => { ident: "minecraft:birch_wall_hanging_sign", global: 6691, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaWallHangingSign => { ident: "minecraft:acacia_wall_hanging_sign", global: 6499, default: 1,
+    AcaciaWallHangingSign => { ident: "minecraft:acacia_wall_hanging_sign", global: 6699, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    CherryWallHangingSign => { ident: "minecraft:cherry_wall_hanging_sign", global: 6507, default: 1,
+    CherryWallHangingSign => { ident: "minecraft:cherry_wall_hanging_sign", global: 6707, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    JungleWallHangingSign => { ident: "minecraft:jungle_wall_hanging_sign", global: 6515, default: 1,
+    JungleWallHangingSign => { ident: "minecraft:jungle_wall_hanging_sign", global: 6715, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakWallHangingSign => { ident: "minecraft:dark_oak_wall_hanging_sign", global: 6523, default: 1,
+    DarkOakWallHangingSign => { ident: "minecraft:dark_oak_wall_hanging_sign", global: 6723, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakWallHangingSign => { ident: "minecraft:pale_oak_wall_hanging_sign", global: 6531, default: 1,
+    PaleOakWallHangingSign => { ident: "minecraft:pale_oak_wall_hanging_sign", global: 6731, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    MangroveWallHangingSign => { ident: "minecraft:mangrove_wall_hanging_sign", global: 6539, default: 1,
+    MangroveWallHangingSign => { ident: "minecraft:mangrove_wall_hanging_sign", global: 6739, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonWallHangingSign => { ident: "minecraft:crimson_wall_hanging_sign", global: 6547, default: 1,
+    CrimsonWallHangingSign => { ident: "minecraft:crimson_wall_hanging_sign", global: 6747, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WarpedWallHangingSign => { ident: "minecraft:warped_wall_hanging_sign", global: 6555, default: 1,
+    WarpedWallHangingSign => { ident: "minecraft:warped_wall_hanging_sign", global: 6755, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    BambooWallHangingSign => { ident: "minecraft:bamboo_wall_hanging_sign", global: 6563, default: 1,
+    BambooWallHangingSign => { ident: "minecraft:bamboo_wall_hanging_sign", global: 6763, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    Lever => { ident: "minecraft:lever", global: 6571, default: 9,
+    Lever => { ident: "minecraft:lever", global: 6771, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    StonePressurePlate => { ident: "minecraft:stone_pressure_plate", global: 6595, default: 1,
+    StonePressurePlate => { ident: "minecraft:stone_pressure_plate", global: 6795, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    IronDoor => { ident: "minecraft:iron_door", global: 6597, default: 11,
+    IronDoor => { ident: "minecraft:iron_door", global: 6797, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    OakPressurePlate => { ident: "minecraft:oak_pressure_plate", global: 6661, default: 1,
+    OakPressurePlate => { ident: "minecraft:oak_pressure_plate", global: 6861, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    SprucePressurePlate => { ident: "minecraft:spruce_pressure_plate", global: 6663, default: 1,
+    SprucePressurePlate => { ident: "minecraft:spruce_pressure_plate", global: 6863, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    BirchPressurePlate => { ident: "minecraft:birch_pressure_plate", global: 6665, default: 1,
+    BirchPressurePlate => { ident: "minecraft:birch_pressure_plate", global: 6865, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    JunglePressurePlate => { ident: "minecraft:jungle_pressure_plate", global: 6667, default: 1,
+    JunglePressurePlate => { ident: "minecraft:jungle_pressure_plate", global: 6867, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    AcaciaPressurePlate => { ident: "minecraft:acacia_pressure_plate", global: 6669, default: 1,
+    AcaciaPressurePlate => { ident: "minecraft:acacia_pressure_plate", global: 6869, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    CherryPressurePlate => { ident: "minecraft:cherry_pressure_plate", global: 6671, default: 1,
+    CherryPressurePlate => { ident: "minecraft:cherry_pressure_plate", global: 6871, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    DarkOakPressurePlate => { ident: "minecraft:dark_oak_pressure_plate", global: 6673, default: 1,
+    DarkOakPressurePlate => { ident: "minecraft:dark_oak_pressure_plate", global: 6873, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    PaleOakPressurePlate => { ident: "minecraft:pale_oak_pressure_plate", global: 6675, default: 1,
+    PaleOakPressurePlate => { ident: "minecraft:pale_oak_pressure_plate", global: 6875, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    MangrovePressurePlate => { ident: "minecraft:mangrove_pressure_plate", global: 6677, default: 1,
+    MangrovePressurePlate => { ident: "minecraft:mangrove_pressure_plate", global: 6877, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    BambooPressurePlate => { ident: "minecraft:bamboo_pressure_plate", global: 6679, default: 1,
+    BambooPressurePlate => { ident: "minecraft:bamboo_pressure_plate", global: 6879, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    RedstoneOre => { ident: "minecraft:redstone_ore", global: 6681, default: 1,
+    RedstoneOre => { ident: "minecraft:redstone_ore", global: 6881, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    DeepslateRedstoneOre => { ident: "minecraft:deepslate_redstone_ore", global: 6683, default: 1,
+    DeepslateRedstoneOre => { ident: "minecraft:deepslate_redstone_ore", global: 6883, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    RedstoneTorch => { ident: "minecraft:redstone_torch", global: 6685, default: 0,
+    RedstoneTorch => { ident: "minecraft:redstone_torch", global: 6885, default: 0,
         ty: [ "lit" => LitBool ]
     },
-    RedstoneWallTorch => { ident: "minecraft:redstone_wall_torch", global: 6687, default: 0,
+    RedstoneWallTorch => { ident: "minecraft:redstone_wall_torch", global: 6887, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "lit" => LitBool ]
     },
-    StoneButton => { ident: "minecraft:stone_button", global: 6695, default: 9,
+    StoneButton => { ident: "minecraft:stone_button", global: 6895, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    Snow => { ident: "minecraft:snow", global: 6719, default: 0,
+    Snow => { ident: "minecraft:snow", global: 6919, default: 0,
         ty: [ "layers" => Layers ]
     },
-    Ice => { ident: "minecraft:ice", global: 6727, default: 0,
+    Ice => { ident: "minecraft:ice", global: 6927, default: 0,
         ty: [  ]
     },
-    SnowBlock => { ident: "minecraft:snow_block", global: 6728, default: 0,
+    SnowBlock => { ident: "minecraft:snow_block", global: 6928, default: 0,
         ty: [  ]
     },
-    Cactus => { ident: "minecraft:cactus", global: 6729, default: 0,
+    Cactus => { ident: "minecraft:cactus", global: 6929, default: 0,
         ty: [ "age" => Age_0123456789101112131415 ]
     },
-    CactusFlower => { ident: "minecraft:cactus_flower", global: 6745, default: 0,
+    CactusFlower => { ident: "minecraft:cactus_flower", global: 6945, default: 0,
         ty: [  ]
     },
-    Clay => { ident: "minecraft:clay", global: 6746, default: 0,
+    Clay => { ident: "minecraft:clay", global: 6946, default: 0,
         ty: [  ]
     },
-    SugarCane => { ident: "minecraft:sugar_cane", global: 6747, default: 0,
+    SugarCane => { ident: "minecraft:sugar_cane", global: 6947, default: 0,
         ty: [ "age" => Age_0123456789101112131415 ]
     },
-    Jukebox => { ident: "minecraft:jukebox", global: 6763, default: 1,
+    Jukebox => { ident: "minecraft:jukebox", global: 6963, default: 1,
         ty: [ "has_record" => HasRecordBool ]
     },
-    OakFence => { ident: "minecraft:oak_fence", global: 6765, default: 31,
+    OakFence => { ident: "minecraft:oak_fence", global: 6965, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    Netherrack => { ident: "minecraft:netherrack", global: 6797, default: 0,
+    Netherrack => { ident: "minecraft:netherrack", global: 6997, default: 0,
         ty: [  ]
     },
-    SoulSand => { ident: "minecraft:soul_sand", global: 6798, default: 0,
+    SoulSand => { ident: "minecraft:soul_sand", global: 6998, default: 0,
         ty: [  ]
     },
-    SoulSoil => { ident: "minecraft:soul_soil", global: 6799, default: 0,
+    SoulSoil => { ident: "minecraft:soul_soil", global: 6999, default: 0,
         ty: [  ]
     },
-    Basalt => { ident: "minecraft:basalt", global: 6800, default: 1,
+    Basalt => { ident: "minecraft:basalt", global: 7000, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    PolishedBasalt => { ident: "minecraft:polished_basalt", global: 6803, default: 1,
+    PolishedBasalt => { ident: "minecraft:polished_basalt", global: 7003, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    SoulTorch => { ident: "minecraft:soul_torch", global: 6806, default: 0,
+    SoulTorch => { ident: "minecraft:soul_torch", global: 7006, default: 0,
         ty: [  ]
     },
-    SoulWallTorch => { ident: "minecraft:soul_wall_torch", global: 6807, default: 0,
+    SoulWallTorch => { ident: "minecraft:soul_wall_torch", global: 7007, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    CopperTorch => { ident: "minecraft:copper_torch", global: 6811, default: 0,
+    CopperTorch => { ident: "minecraft:copper_torch", global: 7011, default: 0,
         ty: [  ]
     },
-    CopperWallTorch => { ident: "minecraft:copper_wall_torch", global: 6812, default: 0,
+    CopperWallTorch => { ident: "minecraft:copper_wall_torch", global: 7012, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    Glowstone => { ident: "minecraft:glowstone", global: 6816, default: 0,
+    Glowstone => { ident: "minecraft:glowstone", global: 7016, default: 0,
         ty: [  ]
     },
-    NetherPortal => { ident: "minecraft:nether_portal", global: 6817, default: 0,
+    NetherPortal => { ident: "minecraft:nether_portal", global: 7017, default: 0,
         ty: [ "axis" => Axis_XZ ]
     },
-    CarvedPumpkin => { ident: "minecraft:carved_pumpkin", global: 6819, default: 0,
+    CarvedPumpkin => { ident: "minecraft:carved_pumpkin", global: 7019, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    JackOLantern => { ident: "minecraft:jack_o_lantern", global: 6823, default: 0,
+    JackOLantern => { ident: "minecraft:jack_o_lantern", global: 7023, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    Cake => { ident: "minecraft:cake", global: 6827, default: 0,
+    Cake => { ident: "minecraft:cake", global: 7027, default: 0,
         ty: [ "bites" => Bites ]
     },
-    Repeater => { ident: "minecraft:repeater", global: 6834, default: 3,
+    Repeater => { ident: "minecraft:repeater", global: 7034, default: 3,
         ty: [ "delay" => Delay, "facing" => Facing_NorthSouthWestEast, "locked" => LockedBool, "powered" => PoweredBool ]
     },
-    WhiteStainedGlass => { ident: "minecraft:white_stained_glass", global: 6898, default: 0,
+    WhiteStainedGlass => { ident: "minecraft:white_stained_glass", global: 7098, default: 0,
         ty: [  ]
     },
-    OrangeStainedGlass => { ident: "minecraft:orange_stained_glass", global: 6899, default: 0,
+    OrangeStainedGlass => { ident: "minecraft:orange_stained_glass", global: 7099, default: 0,
         ty: [  ]
     },
-    MagentaStainedGlass => { ident: "minecraft:magenta_stained_glass", global: 6900, default: 0,
+    MagentaStainedGlass => { ident: "minecraft:magenta_stained_glass", global: 7100, default: 0,
         ty: [  ]
     },
-    LightBlueStainedGlass => { ident: "minecraft:light_blue_stained_glass", global: 6901, default: 0,
+    LightBlueStainedGlass => { ident: "minecraft:light_blue_stained_glass", global: 7101, default: 0,
         ty: [  ]
     },
-    YellowStainedGlass => { ident: "minecraft:yellow_stained_glass", global: 6902, default: 0,
+    YellowStainedGlass => { ident: "minecraft:yellow_stained_glass", global: 7102, default: 0,
         ty: [  ]
     },
-    LimeStainedGlass => { ident: "minecraft:lime_stained_glass", global: 6903, default: 0,
+    LimeStainedGlass => { ident: "minecraft:lime_stained_glass", global: 7103, default: 0,
         ty: [  ]
     },
-    PinkStainedGlass => { ident: "minecraft:pink_stained_glass", global: 6904, default: 0,
+    PinkStainedGlass => { ident: "minecraft:pink_stained_glass", global: 7104, default: 0,
         ty: [  ]
     },
-    GrayStainedGlass => { ident: "minecraft:gray_stained_glass", global: 6905, default: 0,
+    GrayStainedGlass => { ident: "minecraft:gray_stained_glass", global: 7105, default: 0,
         ty: [  ]
     },
-    LightGrayStainedGlass => { ident: "minecraft:light_gray_stained_glass", global: 6906, default: 0,
+    LightGrayStainedGlass => { ident: "minecraft:light_gray_stained_glass", global: 7106, default: 0,
         ty: [  ]
     },
-    CyanStainedGlass => { ident: "minecraft:cyan_stained_glass", global: 6907, default: 0,
+    CyanStainedGlass => { ident: "minecraft:cyan_stained_glass", global: 7107, default: 0,
         ty: [  ]
     },
-    PurpleStainedGlass => { ident: "minecraft:purple_stained_glass", global: 6908, default: 0,
+    PurpleStainedGlass => { ident: "minecraft:purple_stained_glass", global: 7108, default: 0,
         ty: [  ]
     },
-    BlueStainedGlass => { ident: "minecraft:blue_stained_glass", global: 6909, default: 0,
+    BlueStainedGlass => { ident: "minecraft:blue_stained_glass", global: 7109, default: 0,
         ty: [  ]
     },
-    BrownStainedGlass => { ident: "minecraft:brown_stained_glass", global: 6910, default: 0,
+    BrownStainedGlass => { ident: "minecraft:brown_stained_glass", global: 7110, default: 0,
         ty: [  ]
     },
-    GreenStainedGlass => { ident: "minecraft:green_stained_glass", global: 6911, default: 0,
+    GreenStainedGlass => { ident: "minecraft:green_stained_glass", global: 7111, default: 0,
         ty: [  ]
     },
-    RedStainedGlass => { ident: "minecraft:red_stained_glass", global: 6912, default: 0,
+    RedStainedGlass => { ident: "minecraft:red_stained_glass", global: 7112, default: 0,
         ty: [  ]
     },
-    BlackStainedGlass => { ident: "minecraft:black_stained_glass", global: 6913, default: 0,
+    BlackStainedGlass => { ident: "minecraft:black_stained_glass", global: 7113, default: 0,
         ty: [  ]
     },
-    OakTrapdoor => { ident: "minecraft:oak_trapdoor", global: 6914, default: 15,
+    OakTrapdoor => { ident: "minecraft:oak_trapdoor", global: 7114, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    SpruceTrapdoor => { ident: "minecraft:spruce_trapdoor", global: 6978, default: 15,
+    SpruceTrapdoor => { ident: "minecraft:spruce_trapdoor", global: 7178, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    BirchTrapdoor => { ident: "minecraft:birch_trapdoor", global: 7042, default: 15,
+    BirchTrapdoor => { ident: "minecraft:birch_trapdoor", global: 7242, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    JungleTrapdoor => { ident: "minecraft:jungle_trapdoor", global: 7106, default: 15,
+    JungleTrapdoor => { ident: "minecraft:jungle_trapdoor", global: 7306, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaTrapdoor => { ident: "minecraft:acacia_trapdoor", global: 7170, default: 15,
+    AcaciaTrapdoor => { ident: "minecraft:acacia_trapdoor", global: 7370, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    CherryTrapdoor => { ident: "minecraft:cherry_trapdoor", global: 7234, default: 15,
+    CherryTrapdoor => { ident: "minecraft:cherry_trapdoor", global: 7434, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakTrapdoor => { ident: "minecraft:dark_oak_trapdoor", global: 7298, default: 15,
+    DarkOakTrapdoor => { ident: "minecraft:dark_oak_trapdoor", global: 7498, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakTrapdoor => { ident: "minecraft:pale_oak_trapdoor", global: 7362, default: 15,
+    PaleOakTrapdoor => { ident: "minecraft:pale_oak_trapdoor", global: 7562, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    MangroveTrapdoor => { ident: "minecraft:mangrove_trapdoor", global: 7426, default: 15,
+    MangroveTrapdoor => { ident: "minecraft:mangrove_trapdoor", global: 7626, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    BambooTrapdoor => { ident: "minecraft:bamboo_trapdoor", global: 7490, default: 15,
+    BambooTrapdoor => { ident: "minecraft:bamboo_trapdoor", global: 7690, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    StoneBricks => { ident: "minecraft:stone_bricks", global: 7554, default: 0,
+    StoneBricks => { ident: "minecraft:stone_bricks", global: 7754, default: 0,
         ty: [  ]
     },
-    MossyStoneBricks => { ident: "minecraft:mossy_stone_bricks", global: 7555, default: 0,
+    MossyStoneBricks => { ident: "minecraft:mossy_stone_bricks", global: 7755, default: 0,
         ty: [  ]
     },
-    CrackedStoneBricks => { ident: "minecraft:cracked_stone_bricks", global: 7556, default: 0,
+    CrackedStoneBricks => { ident: "minecraft:cracked_stone_bricks", global: 7756, default: 0,
         ty: [  ]
     },
-    ChiseledStoneBricks => { ident: "minecraft:chiseled_stone_bricks", global: 7557, default: 0,
+    ChiseledStoneBricks => { ident: "minecraft:chiseled_stone_bricks", global: 7757, default: 0,
         ty: [  ]
     },
-    PackedMud => { ident: "minecraft:packed_mud", global: 7558, default: 0,
+    PackedMud => { ident: "minecraft:packed_mud", global: 7758, default: 0,
         ty: [  ]
     },
-    MudBricks => { ident: "minecraft:mud_bricks", global: 7559, default: 0,
+    MudBricks => { ident: "minecraft:mud_bricks", global: 7759, default: 0,
         ty: [  ]
     },
-    InfestedStone => { ident: "minecraft:infested_stone", global: 7560, default: 0,
+    InfestedStone => { ident: "minecraft:infested_stone", global: 7760, default: 0,
         ty: [  ]
     },
-    InfestedCobblestone => { ident: "minecraft:infested_cobblestone", global: 7561, default: 0,
+    InfestedCobblestone => { ident: "minecraft:infested_cobblestone", global: 7761, default: 0,
         ty: [  ]
     },
-    InfestedStoneBricks => { ident: "minecraft:infested_stone_bricks", global: 7562, default: 0,
+    InfestedStoneBricks => { ident: "minecraft:infested_stone_bricks", global: 7762, default: 0,
         ty: [  ]
     },
-    InfestedMossyStoneBricks => { ident: "minecraft:infested_mossy_stone_bricks", global: 7563, default: 0,
+    InfestedMossyStoneBricks => { ident: "minecraft:infested_mossy_stone_bricks", global: 7763, default: 0,
         ty: [  ]
     },
-    InfestedCrackedStoneBricks => { ident: "minecraft:infested_cracked_stone_bricks", global: 7564, default: 0,
+    InfestedCrackedStoneBricks => { ident: "minecraft:infested_cracked_stone_bricks", global: 7764, default: 0,
         ty: [  ]
     },
-    InfestedChiseledStoneBricks => { ident: "minecraft:infested_chiseled_stone_bricks", global: 7565, default: 0,
+    InfestedChiseledStoneBricks => { ident: "minecraft:infested_chiseled_stone_bricks", global: 7765, default: 0,
         ty: [  ]
     },
-    BrownMushroomBlock => { ident: "minecraft:brown_mushroom_block", global: 7566, default: 0,
+    BrownMushroomBlock => { ident: "minecraft:brown_mushroom_block", global: 7766, default: 0,
         ty: [ "down" => DownBool, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "west" => WestBool ]
     },
-    RedMushroomBlock => { ident: "minecraft:red_mushroom_block", global: 7630, default: 0,
+    RedMushroomBlock => { ident: "minecraft:red_mushroom_block", global: 7830, default: 0,
         ty: [ "down" => DownBool, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "west" => WestBool ]
     },
-    MushroomStem => { ident: "minecraft:mushroom_stem", global: 7694, default: 0,
+    MushroomStem => { ident: "minecraft:mushroom_stem", global: 7894, default: 0,
         ty: [ "down" => DownBool, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "west" => WestBool ]
     },
-    IronBars => { ident: "minecraft:iron_bars", global: 7758, default: 31,
+    IronBars => { ident: "minecraft:iron_bars", global: 7958, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    CopperBars => { ident: "minecraft:copper_bars", global: 7790, default: 31,
+    CopperBars => { ident: "minecraft:copper_bars", global: 7990, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    ExposedCopperBars => { ident: "minecraft:exposed_copper_bars", global: 7822, default: 31,
+    ExposedCopperBars => { ident: "minecraft:exposed_copper_bars", global: 8022, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    WeatheredCopperBars => { ident: "minecraft:weathered_copper_bars", global: 7854, default: 31,
+    WeatheredCopperBars => { ident: "minecraft:weathered_copper_bars", global: 8054, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    OxidizedCopperBars => { ident: "minecraft:oxidized_copper_bars", global: 7886, default: 31,
+    OxidizedCopperBars => { ident: "minecraft:oxidized_copper_bars", global: 8086, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    WaxedCopperBars => { ident: "minecraft:waxed_copper_bars", global: 7918, default: 31,
+    WaxedCopperBars => { ident: "minecraft:waxed_copper_bars", global: 8118, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    WaxedExposedCopperBars => { ident: "minecraft:waxed_exposed_copper_bars", global: 7950, default: 31,
+    WaxedExposedCopperBars => { ident: "minecraft:waxed_exposed_copper_bars", global: 8150, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    WaxedWeatheredCopperBars => { ident: "minecraft:waxed_weathered_copper_bars", global: 7982, default: 31,
+    WaxedWeatheredCopperBars => { ident: "minecraft:waxed_weathered_copper_bars", global: 8182, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    WaxedOxidizedCopperBars => { ident: "minecraft:waxed_oxidized_copper_bars", global: 8014, default: 31,
+    WaxedOxidizedCopperBars => { ident: "minecraft:waxed_oxidized_copper_bars", global: 8214, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    IronChain => { ident: "minecraft:iron_chain", global: 8046, default: 3,
+    IronChain => { ident: "minecraft:iron_chain", global: 8246, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    CopperChain => { ident: "minecraft:copper_chain", global: 8052, default: 3,
+    CopperChain => { ident: "minecraft:copper_chain", global: 8252, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    ExposedCopperChain => { ident: "minecraft:exposed_copper_chain", global: 8058, default: 3,
+    ExposedCopperChain => { ident: "minecraft:exposed_copper_chain", global: 8258, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCopperChain => { ident: "minecraft:weathered_copper_chain", global: 8064, default: 3,
+    WeatheredCopperChain => { ident: "minecraft:weathered_copper_chain", global: 8264, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    OxidizedCopperChain => { ident: "minecraft:oxidized_copper_chain", global: 8070, default: 3,
+    OxidizedCopperChain => { ident: "minecraft:oxidized_copper_chain", global: 8270, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCopperChain => { ident: "minecraft:waxed_copper_chain", global: 8076, default: 3,
+    WaxedCopperChain => { ident: "minecraft:waxed_copper_chain", global: 8276, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCopperChain => { ident: "minecraft:waxed_exposed_copper_chain", global: 8082, default: 3,
+    WaxedExposedCopperChain => { ident: "minecraft:waxed_exposed_copper_chain", global: 8282, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCopperChain => { ident: "minecraft:waxed_weathered_copper_chain", global: 8088, default: 3,
+    WaxedWeatheredCopperChain => { ident: "minecraft:waxed_weathered_copper_chain", global: 8288, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedCopperChain => { ident: "minecraft:waxed_oxidized_copper_chain", global: 8094, default: 3,
+    WaxedOxidizedCopperChain => { ident: "minecraft:waxed_oxidized_copper_chain", global: 8294, default: 3,
         ty: [ "axis" => Axis_XYZ, "waterlogged" => WaterloggedBool ]
     },
-    GlassPane => { ident: "minecraft:glass_pane", global: 8100, default: 31,
+    GlassPane => { ident: "minecraft:glass_pane", global: 8300, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    Pumpkin => { ident: "minecraft:pumpkin", global: 8132, default: 0,
+    Pumpkin => { ident: "minecraft:pumpkin", global: 8332, default: 0,
         ty: [  ]
     },
-    Melon => { ident: "minecraft:melon", global: 8133, default: 0,
+    Melon => { ident: "minecraft:melon", global: 8333, default: 0,
         ty: [  ]
     },
-    AttachedPumpkinStem => { ident: "minecraft:attached_pumpkin_stem", global: 8134, default: 0,
+    AttachedPumpkinStem => { ident: "minecraft:attached_pumpkin_stem", global: 8334, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    AttachedMelonStem => { ident: "minecraft:attached_melon_stem", global: 8138, default: 0,
+    AttachedMelonStem => { ident: "minecraft:attached_melon_stem", global: 8338, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    PumpkinStem => { ident: "minecraft:pumpkin_stem", global: 8142, default: 0,
+    PumpkinStem => { ident: "minecraft:pumpkin_stem", global: 8342, default: 0,
         ty: [ "age" => Age_01234567 ]
     },
-    MelonStem => { ident: "minecraft:melon_stem", global: 8150, default: 0,
+    MelonStem => { ident: "minecraft:melon_stem", global: 8350, default: 0,
         ty: [ "age" => Age_01234567 ]
     },
-    Vine => { ident: "minecraft:vine", global: 8158, default: 31,
+    Vine => { ident: "minecraft:vine", global: 8358, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "west" => WestBool ]
     },
-    GlowLichen => { ident: "minecraft:glow_lichen", global: 8190, default: 127,
+    GlowLichen => { ident: "minecraft:glow_lichen", global: 8390, default: 127,
         ty: [ "down" => DownBool, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    ResinClump => { ident: "minecraft:resin_clump", global: 8318, default: 127,
+    ResinClump => { ident: "minecraft:resin_clump", global: 8518, default: 127,
         ty: [ "down" => DownBool, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    OakFenceGate => { ident: "minecraft:oak_fence_gate", global: 8446, default: 7,
+    OakFenceGate => { ident: "minecraft:oak_fence_gate", global: 8646, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    BrickStairs => { ident: "minecraft:brick_stairs", global: 8478, default: 11,
+    BrickStairs => { ident: "minecraft:brick_stairs", global: 8678, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    StoneBrickStairs => { ident: "minecraft:stone_brick_stairs", global: 8558, default: 11,
+    StoneBrickStairs => { ident: "minecraft:stone_brick_stairs", global: 8758, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    MudBrickStairs => { ident: "minecraft:mud_brick_stairs", global: 8638, default: 11,
+    MudBrickStairs => { ident: "minecraft:mud_brick_stairs", global: 8838, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    Mycelium => { ident: "minecraft:mycelium", global: 8718, default: 1,
+    Mycelium => { ident: "minecraft:mycelium", global: 8918, default: 1,
         ty: [ "snowy" => SnowyBool ]
     },
-    LilyPad => { ident: "minecraft:lily_pad", global: 8720, default: 0,
+    LilyPad => { ident: "minecraft:lily_pad", global: 8920, default: 0,
         ty: [  ]
     },
-    ResinBlock => { ident: "minecraft:resin_block", global: 8721, default: 0,
+    ResinBlock => { ident: "minecraft:resin_block", global: 8921, default: 0,
         ty: [  ]
     },
-    ResinBricks => { ident: "minecraft:resin_bricks", global: 8722, default: 0,
+    ResinBricks => { ident: "minecraft:resin_bricks", global: 8922, default: 0,
         ty: [  ]
     },
-    ResinBrickStairs => { ident: "minecraft:resin_brick_stairs", global: 8723, default: 11,
+    ResinBrickStairs => { ident: "minecraft:resin_brick_stairs", global: 8923, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    ResinBrickSlab => { ident: "minecraft:resin_brick_slab", global: 8803, default: 3,
+    ResinBrickSlab => { ident: "minecraft:resin_brick_slab", global: 9003, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    ResinBrickWall => { ident: "minecraft:resin_brick_wall", global: 8809, default: 3,
+    ResinBrickWall => { ident: "minecraft:resin_brick_wall", global: 9009, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    ChiseledResinBricks => { ident: "minecraft:chiseled_resin_bricks", global: 9133, default: 0,
+    ChiseledResinBricks => { ident: "minecraft:chiseled_resin_bricks", global: 9333, default: 0,
         ty: [  ]
     },
-    NetherBricks => { ident: "minecraft:nether_bricks", global: 9134, default: 0,
+    NetherBricks => { ident: "minecraft:nether_bricks", global: 9334, default: 0,
         ty: [  ]
     },
-    NetherBrickFence => { ident: "minecraft:nether_brick_fence", global: 9135, default: 31,
+    NetherBrickFence => { ident: "minecraft:nether_brick_fence", global: 9335, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    NetherBrickStairs => { ident: "minecraft:nether_brick_stairs", global: 9167, default: 11,
+    NetherBrickStairs => { ident: "minecraft:nether_brick_stairs", global: 9367, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    NetherWart => { ident: "minecraft:nether_wart", global: 9247, default: 0,
+    NetherWart => { ident: "minecraft:nether_wart", global: 9447, default: 0,
         ty: [ "age" => Age_0123 ]
     },
-    EnchantingTable => { ident: "minecraft:enchanting_table", global: 9251, default: 0,
+    EnchantingTable => { ident: "minecraft:enchanting_table", global: 9451, default: 0,
         ty: [  ]
     },
-    BrewingStand => { ident: "minecraft:brewing_stand", global: 9252, default: 7,
+    BrewingStand => { ident: "minecraft:brewing_stand", global: 9452, default: 7,
         ty: [ "has_bottle_0" => HasBottle0Bool, "has_bottle_1" => HasBottle1Bool, "has_bottle_2" => HasBottle2Bool ]
     },
-    Cauldron => { ident: "minecraft:cauldron", global: 9260, default: 0,
+    Cauldron => { ident: "minecraft:cauldron", global: 9460, default: 0,
         ty: [  ]
     },
-    WaterCauldron => { ident: "minecraft:water_cauldron", global: 9261, default: 0,
+    WaterCauldron => { ident: "minecraft:water_cauldron", global: 9461, default: 0,
         ty: [ "level" => Level_123 ]
     },
-    LavaCauldron => { ident: "minecraft:lava_cauldron", global: 9264, default: 0,
+    LavaCauldron => { ident: "minecraft:lava_cauldron", global: 9464, default: 0,
         ty: [  ]
     },
-    PowderSnowCauldron => { ident: "minecraft:powder_snow_cauldron", global: 9265, default: 0,
+    PowderSnowCauldron => { ident: "minecraft:powder_snow_cauldron", global: 9465, default: 0,
         ty: [ "level" => Level_123 ]
     },
-    EndPortal => { ident: "minecraft:end_portal", global: 9268, default: 0,
+    EndPortal => { ident: "minecraft:end_portal", global: 9468, default: 0,
         ty: [  ]
     },
-    EndPortalFrame => { ident: "minecraft:end_portal_frame", global: 9269, default: 4,
+    EndPortalFrame => { ident: "minecraft:end_portal_frame", global: 9469, default: 4,
         ty: [ "eye" => EyeBool, "facing" => Facing_NorthSouthWestEast ]
     },
-    EndStone => { ident: "minecraft:end_stone", global: 9277, default: 0,
+    EndStone => { ident: "minecraft:end_stone", global: 9477, default: 0,
         ty: [  ]
     },
-    DragonEgg => { ident: "minecraft:dragon_egg", global: 9278, default: 0,
+    DragonEgg => { ident: "minecraft:dragon_egg", global: 9478, default: 0,
         ty: [  ]
     },
-    RedstoneLamp => { ident: "minecraft:redstone_lamp", global: 9279, default: 1,
+    RedstoneLamp => { ident: "minecraft:redstone_lamp", global: 9479, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    Cocoa => { ident: "minecraft:cocoa", global: 9281, default: 0,
+    Cocoa => { ident: "minecraft:cocoa", global: 9481, default: 0,
         ty: [ "age" => Age_012, "facing" => Facing_NorthSouthWestEast ]
     },
-    SandstoneStairs => { ident: "minecraft:sandstone_stairs", global: 9293, default: 11,
+    SandstoneStairs => { ident: "minecraft:sandstone_stairs", global: 9493, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    EmeraldOre => { ident: "minecraft:emerald_ore", global: 9373, default: 0,
+    EmeraldOre => { ident: "minecraft:emerald_ore", global: 9573, default: 0,
         ty: [  ]
     },
-    DeepslateEmeraldOre => { ident: "minecraft:deepslate_emerald_ore", global: 9374, default: 0,
+    DeepslateEmeraldOre => { ident: "minecraft:deepslate_emerald_ore", global: 9574, default: 0,
         ty: [  ]
     },
-    EnderChest => { ident: "minecraft:ender_chest", global: 9375, default: 1,
+    EnderChest => { ident: "minecraft:ender_chest", global: 9575, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    TripwireHook => { ident: "minecraft:tripwire_hook", global: 9383, default: 9,
+    TripwireHook => { ident: "minecraft:tripwire_hook", global: 9583, default: 9,
         ty: [ "attached" => AttachedBool, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    Tripwire => { ident: "minecraft:tripwire", global: 9399, default: 127,
+    Tripwire => { ident: "minecraft:tripwire", global: 9599, default: 127,
         ty: [ "attached" => AttachedBool, "disarmed" => DisarmedBool, "east" => EastBool, "north" => NorthBool, "powered" => PoweredBool, "south" => SouthBool, "west" => WestBool ]
     },
-    EmeraldBlock => { ident: "minecraft:emerald_block", global: 9527, default: 0,
+    EmeraldBlock => { ident: "minecraft:emerald_block", global: 9727, default: 0,
         ty: [  ]
     },
-    SpruceStairs => { ident: "minecraft:spruce_stairs", global: 9528, default: 11,
+    SpruceStairs => { ident: "minecraft:spruce_stairs", global: 9728, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    BirchStairs => { ident: "minecraft:birch_stairs", global: 9608, default: 11,
+    BirchStairs => { ident: "minecraft:birch_stairs", global: 9808, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    JungleStairs => { ident: "minecraft:jungle_stairs", global: 9688, default: 11,
+    JungleStairs => { ident: "minecraft:jungle_stairs", global: 9888, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    CommandBlock => { ident: "minecraft:command_block", global: 9768, default: 6,
+    CommandBlock => { ident: "minecraft:command_block", global: 9968, default: 6,
         ty: [ "conditional" => ConditionalBool, "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    Beacon => { ident: "minecraft:beacon", global: 9780, default: 0,
+    Beacon => { ident: "minecraft:beacon", global: 9980, default: 0,
         ty: [  ]
     },
-    CobblestoneWall => { ident: "minecraft:cobblestone_wall", global: 9781, default: 3,
+    CobblestoneWall => { ident: "minecraft:cobblestone_wall", global: 9981, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    MossyCobblestoneWall => { ident: "minecraft:mossy_cobblestone_wall", global: 10105, default: 3,
+    MossyCobblestoneWall => { ident: "minecraft:mossy_cobblestone_wall", global: 10305, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    FlowerPot => { ident: "minecraft:flower_pot", global: 10429, default: 0,
+    FlowerPot => { ident: "minecraft:flower_pot", global: 10629, default: 0,
         ty: [  ]
     },
-    PottedTorchflower => { ident: "minecraft:potted_torchflower", global: 10430, default: 0,
+    PottedTorchflower => { ident: "minecraft:potted_torchflower", global: 10630, default: 0,
         ty: [  ]
     },
-    PottedOakSapling => { ident: "minecraft:potted_oak_sapling", global: 10431, default: 0,
+    PottedOakSapling => { ident: "minecraft:potted_oak_sapling", global: 10631, default: 0,
         ty: [  ]
     },
-    PottedSpruceSapling => { ident: "minecraft:potted_spruce_sapling", global: 10432, default: 0,
+    PottedSpruceSapling => { ident: "minecraft:potted_spruce_sapling", global: 10632, default: 0,
         ty: [  ]
     },
-    PottedBirchSapling => { ident: "minecraft:potted_birch_sapling", global: 10433, default: 0,
+    PottedBirchSapling => { ident: "minecraft:potted_birch_sapling", global: 10633, default: 0,
         ty: [  ]
     },
-    PottedJungleSapling => { ident: "minecraft:potted_jungle_sapling", global: 10434, default: 0,
+    PottedJungleSapling => { ident: "minecraft:potted_jungle_sapling", global: 10634, default: 0,
         ty: [  ]
     },
-    PottedAcaciaSapling => { ident: "minecraft:potted_acacia_sapling", global: 10435, default: 0,
+    PottedAcaciaSapling => { ident: "minecraft:potted_acacia_sapling", global: 10635, default: 0,
         ty: [  ]
     },
-    PottedCherrySapling => { ident: "minecraft:potted_cherry_sapling", global: 10436, default: 0,
+    PottedCherrySapling => { ident: "minecraft:potted_cherry_sapling", global: 10636, default: 0,
         ty: [  ]
     },
-    PottedDarkOakSapling => { ident: "minecraft:potted_dark_oak_sapling", global: 10437, default: 0,
+    PottedDarkOakSapling => { ident: "minecraft:potted_dark_oak_sapling", global: 10637, default: 0,
         ty: [  ]
     },
-    PottedPaleOakSapling => { ident: "minecraft:potted_pale_oak_sapling", global: 10438, default: 0,
+    PottedPaleOakSapling => { ident: "minecraft:potted_pale_oak_sapling", global: 10638, default: 0,
         ty: [  ]
     },
-    PottedMangrovePropagule => { ident: "minecraft:potted_mangrove_propagule", global: 10439, default: 0,
+    PottedMangrovePropagule => { ident: "minecraft:potted_mangrove_propagule", global: 10639, default: 0,
         ty: [  ]
     },
-    PottedFern => { ident: "minecraft:potted_fern", global: 10440, default: 0,
+    PottedFern => { ident: "minecraft:potted_fern", global: 10640, default: 0,
         ty: [  ]
     },
-    PottedDandelion => { ident: "minecraft:potted_dandelion", global: 10441, default: 0,
+    PottedDandelion => { ident: "minecraft:potted_dandelion", global: 10641, default: 0,
         ty: [  ]
     },
-    PottedGoldenDandelion => { ident: "minecraft:potted_golden_dandelion", global: 10442, default: 0,
+    PottedGoldenDandelion => { ident: "minecraft:potted_golden_dandelion", global: 10642, default: 0,
         ty: [  ]
     },
-    PottedPoppy => { ident: "minecraft:potted_poppy", global: 10443, default: 0,
+    PottedPoppy => { ident: "minecraft:potted_poppy", global: 10643, default: 0,
         ty: [  ]
     },
-    PottedBlueOrchid => { ident: "minecraft:potted_blue_orchid", global: 10444, default: 0,
+    PottedBlueOrchid => { ident: "minecraft:potted_blue_orchid", global: 10644, default: 0,
         ty: [  ]
     },
-    PottedAllium => { ident: "minecraft:potted_allium", global: 10445, default: 0,
+    PottedAllium => { ident: "minecraft:potted_allium", global: 10645, default: 0,
         ty: [  ]
     },
-    PottedAzureBluet => { ident: "minecraft:potted_azure_bluet", global: 10446, default: 0,
+    PottedAzureBluet => { ident: "minecraft:potted_azure_bluet", global: 10646, default: 0,
         ty: [  ]
     },
-    PottedRedTulip => { ident: "minecraft:potted_red_tulip", global: 10447, default: 0,
+    PottedRedTulip => { ident: "minecraft:potted_red_tulip", global: 10647, default: 0,
         ty: [  ]
     },
-    PottedOrangeTulip => { ident: "minecraft:potted_orange_tulip", global: 10448, default: 0,
+    PottedOrangeTulip => { ident: "minecraft:potted_orange_tulip", global: 10648, default: 0,
         ty: [  ]
     },
-    PottedWhiteTulip => { ident: "minecraft:potted_white_tulip", global: 10449, default: 0,
+    PottedWhiteTulip => { ident: "minecraft:potted_white_tulip", global: 10649, default: 0,
         ty: [  ]
     },
-    PottedPinkTulip => { ident: "minecraft:potted_pink_tulip", global: 10450, default: 0,
+    PottedPinkTulip => { ident: "minecraft:potted_pink_tulip", global: 10650, default: 0,
         ty: [  ]
     },
-    PottedOxeyeDaisy => { ident: "minecraft:potted_oxeye_daisy", global: 10451, default: 0,
+    PottedOxeyeDaisy => { ident: "minecraft:potted_oxeye_daisy", global: 10651, default: 0,
         ty: [  ]
     },
-    PottedCornflower => { ident: "minecraft:potted_cornflower", global: 10452, default: 0,
+    PottedCornflower => { ident: "minecraft:potted_cornflower", global: 10652, default: 0,
         ty: [  ]
     },
-    PottedLilyOfTheValley => { ident: "minecraft:potted_lily_of_the_valley", global: 10453, default: 0,
+    PottedLilyOfTheValley => { ident: "minecraft:potted_lily_of_the_valley", global: 10653, default: 0,
         ty: [  ]
     },
-    PottedWitherRose => { ident: "minecraft:potted_wither_rose", global: 10454, default: 0,
+    PottedWitherRose => { ident: "minecraft:potted_wither_rose", global: 10654, default: 0,
         ty: [  ]
     },
-    PottedRedMushroom => { ident: "minecraft:potted_red_mushroom", global: 10455, default: 0,
+    PottedRedMushroom => { ident: "minecraft:potted_red_mushroom", global: 10655, default: 0,
         ty: [  ]
     },
-    PottedBrownMushroom => { ident: "minecraft:potted_brown_mushroom", global: 10456, default: 0,
+    PottedBrownMushroom => { ident: "minecraft:potted_brown_mushroom", global: 10656, default: 0,
         ty: [  ]
     },
-    PottedDeadBush => { ident: "minecraft:potted_dead_bush", global: 10457, default: 0,
+    PottedDeadBush => { ident: "minecraft:potted_dead_bush", global: 10657, default: 0,
         ty: [  ]
     },
-    PottedCactus => { ident: "minecraft:potted_cactus", global: 10458, default: 0,
+    PottedCactus => { ident: "minecraft:potted_cactus", global: 10658, default: 0,
         ty: [  ]
     },
-    Carrots => { ident: "minecraft:carrots", global: 10459, default: 0,
+    Carrots => { ident: "minecraft:carrots", global: 10659, default: 0,
         ty: [ "age" => Age_01234567 ]
     },
-    Potatoes => { ident: "minecraft:potatoes", global: 10467, default: 0,
+    Potatoes => { ident: "minecraft:potatoes", global: 10667, default: 0,
         ty: [ "age" => Age_01234567 ]
     },
-    OakButton => { ident: "minecraft:oak_button", global: 10475, default: 9,
+    OakButton => { ident: "minecraft:oak_button", global: 10675, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    SpruceButton => { ident: "minecraft:spruce_button", global: 10499, default: 9,
+    SpruceButton => { ident: "minecraft:spruce_button", global: 10699, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    BirchButton => { ident: "minecraft:birch_button", global: 10523, default: 9,
+    BirchButton => { ident: "minecraft:birch_button", global: 10723, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    JungleButton => { ident: "minecraft:jungle_button", global: 10547, default: 9,
+    JungleButton => { ident: "minecraft:jungle_button", global: 10747, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    AcaciaButton => { ident: "minecraft:acacia_button", global: 10571, default: 9,
+    AcaciaButton => { ident: "minecraft:acacia_button", global: 10771, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    CherryButton => { ident: "minecraft:cherry_button", global: 10595, default: 9,
+    CherryButton => { ident: "minecraft:cherry_button", global: 10795, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    DarkOakButton => { ident: "minecraft:dark_oak_button", global: 10619, default: 9,
+    DarkOakButton => { ident: "minecraft:dark_oak_button", global: 10819, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    PaleOakButton => { ident: "minecraft:pale_oak_button", global: 10643, default: 9,
+    PaleOakButton => { ident: "minecraft:pale_oak_button", global: 10843, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    MangroveButton => { ident: "minecraft:mangrove_button", global: 10667, default: 9,
+    MangroveButton => { ident: "minecraft:mangrove_button", global: 10867, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    BambooButton => { ident: "minecraft:bamboo_button", global: 10691, default: 9,
+    BambooButton => { ident: "minecraft:bamboo_button", global: 10891, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    SkeletonSkull => { ident: "minecraft:skeleton_skull", global: 10715, default: 16,
+    SkeletonSkull => { ident: "minecraft:skeleton_skull", global: 10915, default: 16,
         ty: [ "powered" => PoweredBool, "rotation" => Rotation_0123456789101112131415 ]
     },
-    SkeletonWallSkull => { ident: "minecraft:skeleton_wall_skull", global: 10747, default: 1,
+    SkeletonWallSkull => { ident: "minecraft:skeleton_wall_skull", global: 10947, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    WitherSkeletonSkull => { ident: "minecraft:wither_skeleton_skull", global: 10755, default: 16,
+    WitherSkeletonSkull => { ident: "minecraft:wither_skeleton_skull", global: 10955, default: 16,
         ty: [ "powered" => PoweredBool, "rotation" => Rotation_0123456789101112131415 ]
     },
-    WitherSkeletonWallSkull => { ident: "minecraft:wither_skeleton_wall_skull", global: 10787, default: 1,
+    WitherSkeletonWallSkull => { ident: "minecraft:wither_skeleton_wall_skull", global: 10987, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    ZombieHead => { ident: "minecraft:zombie_head", global: 10795, default: 16,
+    ZombieHead => { ident: "minecraft:zombie_head", global: 10995, default: 16,
         ty: [ "powered" => PoweredBool, "rotation" => Rotation_0123456789101112131415 ]
     },
-    ZombieWallHead => { ident: "minecraft:zombie_wall_head", global: 10827, default: 1,
+    ZombieWallHead => { ident: "minecraft:zombie_wall_head", global: 11027, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    PlayerHead => { ident: "minecraft:player_head", global: 10835, default: 16,
+    PlayerHead => { ident: "minecraft:player_head", global: 11035, default: 16,
         ty: [ "powered" => PoweredBool, "rotation" => Rotation_0123456789101112131415 ]
     },
-    PlayerWallHead => { ident: "minecraft:player_wall_head", global: 10867, default: 1,
+    PlayerWallHead => { ident: "minecraft:player_wall_head", global: 11067, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    CreeperHead => { ident: "minecraft:creeper_head", global: 10875, default: 16,
+    CreeperHead => { ident: "minecraft:creeper_head", global: 11075, default: 16,
         ty: [ "powered" => PoweredBool, "rotation" => Rotation_0123456789101112131415 ]
     },
-    CreeperWallHead => { ident: "minecraft:creeper_wall_head", global: 10907, default: 1,
+    CreeperWallHead => { ident: "minecraft:creeper_wall_head", global: 11107, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    DragonHead => { ident: "minecraft:dragon_head", global: 10915, default: 16,
+    DragonHead => { ident: "minecraft:dragon_head", global: 11115, default: 16,
         ty: [ "powered" => PoweredBool, "rotation" => Rotation_0123456789101112131415 ]
     },
-    DragonWallHead => { ident: "minecraft:dragon_wall_head", global: 10947, default: 1,
+    DragonWallHead => { ident: "minecraft:dragon_wall_head", global: 11147, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    PiglinHead => { ident: "minecraft:piglin_head", global: 10955, default: 16,
+    PiglinHead => { ident: "minecraft:piglin_head", global: 11155, default: 16,
         ty: [ "powered" => PoweredBool, "rotation" => Rotation_0123456789101112131415 ]
     },
-    PiglinWallHead => { ident: "minecraft:piglin_wall_head", global: 10987, default: 1,
+    PiglinWallHead => { ident: "minecraft:piglin_wall_head", global: 11187, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    Anvil => { ident: "minecraft:anvil", global: 10995, default: 0,
+    Anvil => { ident: "minecraft:anvil", global: 11195, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    ChippedAnvil => { ident: "minecraft:chipped_anvil", global: 10999, default: 0,
+    ChippedAnvil => { ident: "minecraft:chipped_anvil", global: 11199, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    DamagedAnvil => { ident: "minecraft:damaged_anvil", global: 11003, default: 0,
+    DamagedAnvil => { ident: "minecraft:damaged_anvil", global: 11203, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    TrappedChest => { ident: "minecraft:trapped_chest", global: 11007, default: 1,
+    TrappedChest => { ident: "minecraft:trapped_chest", global: 11207, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    LightWeightedPressurePlate => { ident: "minecraft:light_weighted_pressure_plate", global: 11031, default: 0,
+    LightWeightedPressurePlate => { ident: "minecraft:light_weighted_pressure_plate", global: 11231, default: 0,
         ty: [ "power" => Power_0123456789101112131415 ]
     },
-    HeavyWeightedPressurePlate => { ident: "minecraft:heavy_weighted_pressure_plate", global: 11047, default: 0,
+    HeavyWeightedPressurePlate => { ident: "minecraft:heavy_weighted_pressure_plate", global: 11247, default: 0,
         ty: [ "power" => Power_0123456789101112131415 ]
     },
-    Comparator => { ident: "minecraft:comparator", global: 11063, default: 1,
+    Comparator => { ident: "minecraft:comparator", global: 11263, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "mode" => Mode_CompareSubtract, "powered" => PoweredBool ]
     },
-    DaylightDetector => { ident: "minecraft:daylight_detector", global: 11079, default: 16,
+    DaylightDetector => { ident: "minecraft:daylight_detector", global: 11279, default: 16,
         ty: [ "inverted" => InvertedBool, "power" => Power_0123456789101112131415 ]
     },
-    RedstoneBlock => { ident: "minecraft:redstone_block", global: 11111, default: 0,
+    RedstoneBlock => { ident: "minecraft:redstone_block", global: 11311, default: 0,
         ty: [  ]
     },
-    NetherQuartzOre => { ident: "minecraft:nether_quartz_ore", global: 11112, default: 0,
+    NetherQuartzOre => { ident: "minecraft:nether_quartz_ore", global: 11312, default: 0,
         ty: [  ]
     },
-    Hopper => { ident: "minecraft:hopper", global: 11113, default: 0,
+    Hopper => { ident: "minecraft:hopper", global: 11313, default: 0,
         ty: [ "enabled" => EnabledBool, "facing" => Facing_DownNorthSouthWestEast ]
     },
-    QuartzBlock => { ident: "minecraft:quartz_block", global: 11123, default: 0,
+    QuartzBlock => { ident: "minecraft:quartz_block", global: 11323, default: 0,
         ty: [  ]
     },
-    ChiseledQuartzBlock => { ident: "minecraft:chiseled_quartz_block", global: 11124, default: 0,
+    ChiseledQuartzBlock => { ident: "minecraft:chiseled_quartz_block", global: 11324, default: 0,
         ty: [  ]
     },
-    QuartzPillar => { ident: "minecraft:quartz_pillar", global: 11125, default: 1,
+    QuartzPillar => { ident: "minecraft:quartz_pillar", global: 11325, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    QuartzStairs => { ident: "minecraft:quartz_stairs", global: 11128, default: 11,
+    QuartzStairs => { ident: "minecraft:quartz_stairs", global: 11328, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    ActivatorRail => { ident: "minecraft:activator_rail", global: 11208, default: 13,
+    ActivatorRail => { ident: "minecraft:activator_rail", global: 11408, default: 13,
         ty: [ "powered" => PoweredBool, "shape" => Shape_NorthSouthEastWestAscendingEastAscendingWestAscendingNorthAscendingSouth, "waterlogged" => WaterloggedBool ]
     },
-    Dropper => { ident: "minecraft:dropper", global: 11232, default: 1,
+    Dropper => { ident: "minecraft:dropper", global: 11432, default: 1,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "triggered" => TriggeredBool ]
     },
-    WhiteTerracotta => { ident: "minecraft:white_terracotta", global: 11244, default: 0,
+    WhiteTerracotta => { ident: "minecraft:white_terracotta", global: 11444, default: 0,
         ty: [  ]
     },
-    OrangeTerracotta => { ident: "minecraft:orange_terracotta", global: 11245, default: 0,
+    OrangeTerracotta => { ident: "minecraft:orange_terracotta", global: 11445, default: 0,
         ty: [  ]
     },
-    MagentaTerracotta => { ident: "minecraft:magenta_terracotta", global: 11246, default: 0,
+    MagentaTerracotta => { ident: "minecraft:magenta_terracotta", global: 11446, default: 0,
         ty: [  ]
     },
-    LightBlueTerracotta => { ident: "minecraft:light_blue_terracotta", global: 11247, default: 0,
+    LightBlueTerracotta => { ident: "minecraft:light_blue_terracotta", global: 11447, default: 0,
         ty: [  ]
     },
-    YellowTerracotta => { ident: "minecraft:yellow_terracotta", global: 11248, default: 0,
+    YellowTerracotta => { ident: "minecraft:yellow_terracotta", global: 11448, default: 0,
         ty: [  ]
     },
-    LimeTerracotta => { ident: "minecraft:lime_terracotta", global: 11249, default: 0,
+    LimeTerracotta => { ident: "minecraft:lime_terracotta", global: 11449, default: 0,
         ty: [  ]
     },
-    PinkTerracotta => { ident: "minecraft:pink_terracotta", global: 11250, default: 0,
+    PinkTerracotta => { ident: "minecraft:pink_terracotta", global: 11450, default: 0,
         ty: [  ]
     },
-    GrayTerracotta => { ident: "minecraft:gray_terracotta", global: 11251, default: 0,
+    GrayTerracotta => { ident: "minecraft:gray_terracotta", global: 11451, default: 0,
         ty: [  ]
     },
-    LightGrayTerracotta => { ident: "minecraft:light_gray_terracotta", global: 11252, default: 0,
+    LightGrayTerracotta => { ident: "minecraft:light_gray_terracotta", global: 11452, default: 0,
         ty: [  ]
     },
-    CyanTerracotta => { ident: "minecraft:cyan_terracotta", global: 11253, default: 0,
+    CyanTerracotta => { ident: "minecraft:cyan_terracotta", global: 11453, default: 0,
         ty: [  ]
     },
-    PurpleTerracotta => { ident: "minecraft:purple_terracotta", global: 11254, default: 0,
+    PurpleTerracotta => { ident: "minecraft:purple_terracotta", global: 11454, default: 0,
         ty: [  ]
     },
-    BlueTerracotta => { ident: "minecraft:blue_terracotta", global: 11255, default: 0,
+    BlueTerracotta => { ident: "minecraft:blue_terracotta", global: 11455, default: 0,
         ty: [  ]
     },
-    BrownTerracotta => { ident: "minecraft:brown_terracotta", global: 11256, default: 0,
+    BrownTerracotta => { ident: "minecraft:brown_terracotta", global: 11456, default: 0,
         ty: [  ]
     },
-    GreenTerracotta => { ident: "minecraft:green_terracotta", global: 11257, default: 0,
+    GreenTerracotta => { ident: "minecraft:green_terracotta", global: 11457, default: 0,
         ty: [  ]
     },
-    RedTerracotta => { ident: "minecraft:red_terracotta", global: 11258, default: 0,
+    RedTerracotta => { ident: "minecraft:red_terracotta", global: 11458, default: 0,
         ty: [  ]
     },
-    BlackTerracotta => { ident: "minecraft:black_terracotta", global: 11259, default: 0,
+    BlackTerracotta => { ident: "minecraft:black_terracotta", global: 11459, default: 0,
         ty: [  ]
     },
-    WhiteStainedGlassPane => { ident: "minecraft:white_stained_glass_pane", global: 11260, default: 31,
+    WhiteStainedGlassPane => { ident: "minecraft:white_stained_glass_pane", global: 11460, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    OrangeStainedGlassPane => { ident: "minecraft:orange_stained_glass_pane", global: 11292, default: 31,
+    OrangeStainedGlassPane => { ident: "minecraft:orange_stained_glass_pane", global: 11492, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    MagentaStainedGlassPane => { ident: "minecraft:magenta_stained_glass_pane", global: 11324, default: 31,
+    MagentaStainedGlassPane => { ident: "minecraft:magenta_stained_glass_pane", global: 11524, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    LightBlueStainedGlassPane => { ident: "minecraft:light_blue_stained_glass_pane", global: 11356, default: 31,
+    LightBlueStainedGlassPane => { ident: "minecraft:light_blue_stained_glass_pane", global: 11556, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    YellowStainedGlassPane => { ident: "minecraft:yellow_stained_glass_pane", global: 11388, default: 31,
+    YellowStainedGlassPane => { ident: "minecraft:yellow_stained_glass_pane", global: 11588, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    LimeStainedGlassPane => { ident: "minecraft:lime_stained_glass_pane", global: 11420, default: 31,
+    LimeStainedGlassPane => { ident: "minecraft:lime_stained_glass_pane", global: 11620, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    PinkStainedGlassPane => { ident: "minecraft:pink_stained_glass_pane", global: 11452, default: 31,
+    PinkStainedGlassPane => { ident: "minecraft:pink_stained_glass_pane", global: 11652, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    GrayStainedGlassPane => { ident: "minecraft:gray_stained_glass_pane", global: 11484, default: 31,
+    GrayStainedGlassPane => { ident: "minecraft:gray_stained_glass_pane", global: 11684, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    LightGrayStainedGlassPane => { ident: "minecraft:light_gray_stained_glass_pane", global: 11516, default: 31,
+    LightGrayStainedGlassPane => { ident: "minecraft:light_gray_stained_glass_pane", global: 11716, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    CyanStainedGlassPane => { ident: "minecraft:cyan_stained_glass_pane", global: 11548, default: 31,
+    CyanStainedGlassPane => { ident: "minecraft:cyan_stained_glass_pane", global: 11748, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    PurpleStainedGlassPane => { ident: "minecraft:purple_stained_glass_pane", global: 11580, default: 31,
+    PurpleStainedGlassPane => { ident: "minecraft:purple_stained_glass_pane", global: 11780, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    BlueStainedGlassPane => { ident: "minecraft:blue_stained_glass_pane", global: 11612, default: 31,
+    BlueStainedGlassPane => { ident: "minecraft:blue_stained_glass_pane", global: 11812, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    BrownStainedGlassPane => { ident: "minecraft:brown_stained_glass_pane", global: 11644, default: 31,
+    BrownStainedGlassPane => { ident: "minecraft:brown_stained_glass_pane", global: 11844, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    GreenStainedGlassPane => { ident: "minecraft:green_stained_glass_pane", global: 11676, default: 31,
+    GreenStainedGlassPane => { ident: "minecraft:green_stained_glass_pane", global: 11876, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    RedStainedGlassPane => { ident: "minecraft:red_stained_glass_pane", global: 11708, default: 31,
+    RedStainedGlassPane => { ident: "minecraft:red_stained_glass_pane", global: 11908, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    BlackStainedGlassPane => { ident: "minecraft:black_stained_glass_pane", global: 11740, default: 31,
+    BlackStainedGlassPane => { ident: "minecraft:black_stained_glass_pane", global: 11940, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    AcaciaStairs => { ident: "minecraft:acacia_stairs", global: 11772, default: 11,
+    AcaciaStairs => { ident: "minecraft:acacia_stairs", global: 11972, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    CherryStairs => { ident: "minecraft:cherry_stairs", global: 11852, default: 11,
+    CherryStairs => { ident: "minecraft:cherry_stairs", global: 12052, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakStairs => { ident: "minecraft:dark_oak_stairs", global: 11932, default: 11,
+    DarkOakStairs => { ident: "minecraft:dark_oak_stairs", global: 12132, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakStairs => { ident: "minecraft:pale_oak_stairs", global: 12012, default: 11,
+    PaleOakStairs => { ident: "minecraft:pale_oak_stairs", global: 12212, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    MangroveStairs => { ident: "minecraft:mangrove_stairs", global: 12092, default: 11,
+    MangroveStairs => { ident: "minecraft:mangrove_stairs", global: 12292, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    BambooStairs => { ident: "minecraft:bamboo_stairs", global: 12172, default: 11,
+    BambooStairs => { ident: "minecraft:bamboo_stairs", global: 12372, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    BambooMosaicStairs => { ident: "minecraft:bamboo_mosaic_stairs", global: 12252, default: 11,
+    BambooMosaicStairs => { ident: "minecraft:bamboo_mosaic_stairs", global: 12452, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    SlimeBlock => { ident: "minecraft:slime_block", global: 12332, default: 0,
+    SlimeBlock => { ident: "minecraft:slime_block", global: 12532, default: 0,
         ty: [  ]
     },
-    Barrier => { ident: "minecraft:barrier", global: 12333, default: 1,
+    Barrier => { ident: "minecraft:barrier", global: 12533, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    Light => { ident: "minecraft:light", global: 12335, default: 31,
+    Light => { ident: "minecraft:light", global: 12535, default: 31,
         ty: [ "level" => Level_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    IronTrapdoor => { ident: "minecraft:iron_trapdoor", global: 12367, default: 15,
+    IronTrapdoor => { ident: "minecraft:iron_trapdoor", global: 12567, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    Prismarine => { ident: "minecraft:prismarine", global: 12431, default: 0,
+    Prismarine => { ident: "minecraft:prismarine", global: 12631, default: 0,
         ty: [  ]
     },
-    PrismarineBricks => { ident: "minecraft:prismarine_bricks", global: 12432, default: 0,
+    PrismarineBricks => { ident: "minecraft:prismarine_bricks", global: 12632, default: 0,
         ty: [  ]
     },
-    DarkPrismarine => { ident: "minecraft:dark_prismarine", global: 12433, default: 0,
+    DarkPrismarine => { ident: "minecraft:dark_prismarine", global: 12633, default: 0,
         ty: [  ]
     },
-    PrismarineStairs => { ident: "minecraft:prismarine_stairs", global: 12434, default: 11,
+    PrismarineStairs => { ident: "minecraft:prismarine_stairs", global: 12634, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PrismarineBrickStairs => { ident: "minecraft:prismarine_brick_stairs", global: 12514, default: 11,
+    PrismarineBrickStairs => { ident: "minecraft:prismarine_brick_stairs", global: 12714, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    DarkPrismarineStairs => { ident: "minecraft:dark_prismarine_stairs", global: 12594, default: 11,
+    DarkPrismarineStairs => { ident: "minecraft:dark_prismarine_stairs", global: 12794, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PrismarineSlab => { ident: "minecraft:prismarine_slab", global: 12674, default: 3,
+    PrismarineSlab => { ident: "minecraft:prismarine_slab", global: 12874, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PrismarineBrickSlab => { ident: "minecraft:prismarine_brick_slab", global: 12680, default: 3,
+    PrismarineBrickSlab => { ident: "minecraft:prismarine_brick_slab", global: 12880, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    DarkPrismarineSlab => { ident: "minecraft:dark_prismarine_slab", global: 12686, default: 3,
+    DarkPrismarineSlab => { ident: "minecraft:dark_prismarine_slab", global: 12886, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SeaLantern => { ident: "minecraft:sea_lantern", global: 12692, default: 0,
+    SeaLantern => { ident: "minecraft:sea_lantern", global: 12892, default: 0,
         ty: [  ]
     },
-    HayBlock => { ident: "minecraft:hay_block", global: 12693, default: 1,
+    HayBlock => { ident: "minecraft:hay_block", global: 12893, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    WhiteCarpet => { ident: "minecraft:white_carpet", global: 12696, default: 0,
+    WhiteCarpet => { ident: "minecraft:white_carpet", global: 12896, default: 0,
         ty: [  ]
     },
-    OrangeCarpet => { ident: "minecraft:orange_carpet", global: 12697, default: 0,
+    OrangeCarpet => { ident: "minecraft:orange_carpet", global: 12897, default: 0,
         ty: [  ]
     },
-    MagentaCarpet => { ident: "minecraft:magenta_carpet", global: 12698, default: 0,
+    MagentaCarpet => { ident: "minecraft:magenta_carpet", global: 12898, default: 0,
         ty: [  ]
     },
-    LightBlueCarpet => { ident: "minecraft:light_blue_carpet", global: 12699, default: 0,
+    LightBlueCarpet => { ident: "minecraft:light_blue_carpet", global: 12899, default: 0,
         ty: [  ]
     },
-    YellowCarpet => { ident: "minecraft:yellow_carpet", global: 12700, default: 0,
+    YellowCarpet => { ident: "minecraft:yellow_carpet", global: 12900, default: 0,
         ty: [  ]
     },
-    LimeCarpet => { ident: "minecraft:lime_carpet", global: 12701, default: 0,
+    LimeCarpet => { ident: "minecraft:lime_carpet", global: 12901, default: 0,
         ty: [  ]
     },
-    PinkCarpet => { ident: "minecraft:pink_carpet", global: 12702, default: 0,
+    PinkCarpet => { ident: "minecraft:pink_carpet", global: 12902, default: 0,
         ty: [  ]
     },
-    GrayCarpet => { ident: "minecraft:gray_carpet", global: 12703, default: 0,
+    GrayCarpet => { ident: "minecraft:gray_carpet", global: 12903, default: 0,
         ty: [  ]
     },
-    LightGrayCarpet => { ident: "minecraft:light_gray_carpet", global: 12704, default: 0,
+    LightGrayCarpet => { ident: "minecraft:light_gray_carpet", global: 12904, default: 0,
         ty: [  ]
     },
-    CyanCarpet => { ident: "minecraft:cyan_carpet", global: 12705, default: 0,
+    CyanCarpet => { ident: "minecraft:cyan_carpet", global: 12905, default: 0,
         ty: [  ]
     },
-    PurpleCarpet => { ident: "minecraft:purple_carpet", global: 12706, default: 0,
+    PurpleCarpet => { ident: "minecraft:purple_carpet", global: 12906, default: 0,
         ty: [  ]
     },
-    BlueCarpet => { ident: "minecraft:blue_carpet", global: 12707, default: 0,
+    BlueCarpet => { ident: "minecraft:blue_carpet", global: 12907, default: 0,
         ty: [  ]
     },
-    BrownCarpet => { ident: "minecraft:brown_carpet", global: 12708, default: 0,
+    BrownCarpet => { ident: "minecraft:brown_carpet", global: 12908, default: 0,
         ty: [  ]
     },
-    GreenCarpet => { ident: "minecraft:green_carpet", global: 12709, default: 0,
+    GreenCarpet => { ident: "minecraft:green_carpet", global: 12909, default: 0,
         ty: [  ]
     },
-    RedCarpet => { ident: "minecraft:red_carpet", global: 12710, default: 0,
+    RedCarpet => { ident: "minecraft:red_carpet", global: 12910, default: 0,
         ty: [  ]
     },
-    BlackCarpet => { ident: "minecraft:black_carpet", global: 12711, default: 0,
+    BlackCarpet => { ident: "minecraft:black_carpet", global: 12911, default: 0,
         ty: [  ]
     },
-    Terracotta => { ident: "minecraft:terracotta", global: 12712, default: 0,
+    Terracotta => { ident: "minecraft:terracotta", global: 12912, default: 0,
         ty: [  ]
     },
-    CoalBlock => { ident: "minecraft:coal_block", global: 12713, default: 0,
+    CoalBlock => { ident: "minecraft:coal_block", global: 12913, default: 0,
         ty: [  ]
     },
-    PackedIce => { ident: "minecraft:packed_ice", global: 12714, default: 0,
+    PackedIce => { ident: "minecraft:packed_ice", global: 12914, default: 0,
         ty: [  ]
     },
-    Sunflower => { ident: "minecraft:sunflower", global: 12715, default: 1,
+    Sunflower => { ident: "minecraft:sunflower", global: 12915, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    Lilac => { ident: "minecraft:lilac", global: 12717, default: 1,
+    Lilac => { ident: "minecraft:lilac", global: 12917, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    RoseBush => { ident: "minecraft:rose_bush", global: 12719, default: 1,
+    RoseBush => { ident: "minecraft:rose_bush", global: 12919, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    Peony => { ident: "minecraft:peony", global: 12721, default: 1,
+    Peony => { ident: "minecraft:peony", global: 12921, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    TallGrass => { ident: "minecraft:tall_grass", global: 12723, default: 1,
+    TallGrass => { ident: "minecraft:tall_grass", global: 12923, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    LargeFern => { ident: "minecraft:large_fern", global: 12725, default: 1,
+    LargeFern => { ident: "minecraft:large_fern", global: 12925, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    WhiteBanner => { ident: "minecraft:white_banner", global: 12727, default: 0,
+    WhiteBanner => { ident: "minecraft:white_banner", global: 12927, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    OrangeBanner => { ident: "minecraft:orange_banner", global: 12743, default: 0,
+    OrangeBanner => { ident: "minecraft:orange_banner", global: 12943, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    MagentaBanner => { ident: "minecraft:magenta_banner", global: 12759, default: 0,
+    MagentaBanner => { ident: "minecraft:magenta_banner", global: 12959, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    LightBlueBanner => { ident: "minecraft:light_blue_banner", global: 12775, default: 0,
+    LightBlueBanner => { ident: "minecraft:light_blue_banner", global: 12975, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    YellowBanner => { ident: "minecraft:yellow_banner", global: 12791, default: 0,
+    YellowBanner => { ident: "minecraft:yellow_banner", global: 12991, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    LimeBanner => { ident: "minecraft:lime_banner", global: 12807, default: 0,
+    LimeBanner => { ident: "minecraft:lime_banner", global: 13007, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    PinkBanner => { ident: "minecraft:pink_banner", global: 12823, default: 0,
+    PinkBanner => { ident: "minecraft:pink_banner", global: 13023, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    GrayBanner => { ident: "minecraft:gray_banner", global: 12839, default: 0,
+    GrayBanner => { ident: "minecraft:gray_banner", global: 13039, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    LightGrayBanner => { ident: "minecraft:light_gray_banner", global: 12855, default: 0,
+    LightGrayBanner => { ident: "minecraft:light_gray_banner", global: 13055, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    CyanBanner => { ident: "minecraft:cyan_banner", global: 12871, default: 0,
+    CyanBanner => { ident: "minecraft:cyan_banner", global: 13071, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    PurpleBanner => { ident: "minecraft:purple_banner", global: 12887, default: 0,
+    PurpleBanner => { ident: "minecraft:purple_banner", global: 13087, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    BlueBanner => { ident: "minecraft:blue_banner", global: 12903, default: 0,
+    BlueBanner => { ident: "minecraft:blue_banner", global: 13103, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    BrownBanner => { ident: "minecraft:brown_banner", global: 12919, default: 0,
+    BrownBanner => { ident: "minecraft:brown_banner", global: 13119, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    GreenBanner => { ident: "minecraft:green_banner", global: 12935, default: 0,
+    GreenBanner => { ident: "minecraft:green_banner", global: 13135, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    RedBanner => { ident: "minecraft:red_banner", global: 12951, default: 0,
+    RedBanner => { ident: "minecraft:red_banner", global: 13151, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    BlackBanner => { ident: "minecraft:black_banner", global: 12967, default: 0,
+    BlackBanner => { ident: "minecraft:black_banner", global: 13167, default: 0,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    WhiteWallBanner => { ident: "minecraft:white_wall_banner", global: 12983, default: 0,
+    WhiteWallBanner => { ident: "minecraft:white_wall_banner", global: 13183, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    OrangeWallBanner => { ident: "minecraft:orange_wall_banner", global: 12987, default: 0,
+    OrangeWallBanner => { ident: "minecraft:orange_wall_banner", global: 13187, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    MagentaWallBanner => { ident: "minecraft:magenta_wall_banner", global: 12991, default: 0,
+    MagentaWallBanner => { ident: "minecraft:magenta_wall_banner", global: 13191, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    LightBlueWallBanner => { ident: "minecraft:light_blue_wall_banner", global: 12995, default: 0,
+    LightBlueWallBanner => { ident: "minecraft:light_blue_wall_banner", global: 13195, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    YellowWallBanner => { ident: "minecraft:yellow_wall_banner", global: 12999, default: 0,
+    YellowWallBanner => { ident: "minecraft:yellow_wall_banner", global: 13199, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    LimeWallBanner => { ident: "minecraft:lime_wall_banner", global: 13003, default: 0,
+    LimeWallBanner => { ident: "minecraft:lime_wall_banner", global: 13203, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    PinkWallBanner => { ident: "minecraft:pink_wall_banner", global: 13007, default: 0,
+    PinkWallBanner => { ident: "minecraft:pink_wall_banner", global: 13207, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    GrayWallBanner => { ident: "minecraft:gray_wall_banner", global: 13011, default: 0,
+    GrayWallBanner => { ident: "minecraft:gray_wall_banner", global: 13211, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    LightGrayWallBanner => { ident: "minecraft:light_gray_wall_banner", global: 13015, default: 0,
+    LightGrayWallBanner => { ident: "minecraft:light_gray_wall_banner", global: 13215, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    CyanWallBanner => { ident: "minecraft:cyan_wall_banner", global: 13019, default: 0,
+    CyanWallBanner => { ident: "minecraft:cyan_wall_banner", global: 13219, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    PurpleWallBanner => { ident: "minecraft:purple_wall_banner", global: 13023, default: 0,
+    PurpleWallBanner => { ident: "minecraft:purple_wall_banner", global: 13223, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    BlueWallBanner => { ident: "minecraft:blue_wall_banner", global: 13027, default: 0,
+    BlueWallBanner => { ident: "minecraft:blue_wall_banner", global: 13227, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    BrownWallBanner => { ident: "minecraft:brown_wall_banner", global: 13031, default: 0,
+    BrownWallBanner => { ident: "minecraft:brown_wall_banner", global: 13231, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    GreenWallBanner => { ident: "minecraft:green_wall_banner", global: 13035, default: 0,
+    GreenWallBanner => { ident: "minecraft:green_wall_banner", global: 13235, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    RedWallBanner => { ident: "minecraft:red_wall_banner", global: 13039, default: 0,
+    RedWallBanner => { ident: "minecraft:red_wall_banner", global: 13239, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    BlackWallBanner => { ident: "minecraft:black_wall_banner", global: 13043, default: 0,
+    BlackWallBanner => { ident: "minecraft:black_wall_banner", global: 13243, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    RedSandstone => { ident: "minecraft:red_sandstone", global: 13047, default: 0,
+    RedSandstone => { ident: "minecraft:red_sandstone", global: 13247, default: 0,
         ty: [  ]
     },
-    ChiseledRedSandstone => { ident: "minecraft:chiseled_red_sandstone", global: 13048, default: 0,
+    ChiseledRedSandstone => { ident: "minecraft:chiseled_red_sandstone", global: 13248, default: 0,
         ty: [  ]
     },
-    CutRedSandstone => { ident: "minecraft:cut_red_sandstone", global: 13049, default: 0,
+    CutRedSandstone => { ident: "minecraft:cut_red_sandstone", global: 13249, default: 0,
         ty: [  ]
     },
-    RedSandstoneStairs => { ident: "minecraft:red_sandstone_stairs", global: 13050, default: 11,
+    RedSandstoneStairs => { ident: "minecraft:red_sandstone_stairs", global: 13250, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    OakSlab => { ident: "minecraft:oak_slab", global: 13130, default: 3,
+    OakSlab => { ident: "minecraft:oak_slab", global: 13330, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SpruceSlab => { ident: "minecraft:spruce_slab", global: 13136, default: 3,
+    SpruceSlab => { ident: "minecraft:spruce_slab", global: 13336, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    BirchSlab => { ident: "minecraft:birch_slab", global: 13142, default: 3,
+    BirchSlab => { ident: "minecraft:birch_slab", global: 13342, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    JungleSlab => { ident: "minecraft:jungle_slab", global: 13148, default: 3,
+    JungleSlab => { ident: "minecraft:jungle_slab", global: 13348, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaSlab => { ident: "minecraft:acacia_slab", global: 13154, default: 3,
+    AcaciaSlab => { ident: "minecraft:acacia_slab", global: 13354, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CherrySlab => { ident: "minecraft:cherry_slab", global: 13160, default: 3,
+    CherrySlab => { ident: "minecraft:cherry_slab", global: 13360, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakSlab => { ident: "minecraft:dark_oak_slab", global: 13166, default: 3,
+    DarkOakSlab => { ident: "minecraft:dark_oak_slab", global: 13366, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakSlab => { ident: "minecraft:pale_oak_slab", global: 13172, default: 3,
+    PaleOakSlab => { ident: "minecraft:pale_oak_slab", global: 13372, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    MangroveSlab => { ident: "minecraft:mangrove_slab", global: 13178, default: 3,
+    MangroveSlab => { ident: "minecraft:mangrove_slab", global: 13378, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    BambooSlab => { ident: "minecraft:bamboo_slab", global: 13184, default: 3,
+    BambooSlab => { ident: "minecraft:bamboo_slab", global: 13384, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    BambooMosaicSlab => { ident: "minecraft:bamboo_mosaic_slab", global: 13190, default: 3,
+    BambooMosaicSlab => { ident: "minecraft:bamboo_mosaic_slab", global: 13390, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    StoneSlab => { ident: "minecraft:stone_slab", global: 13196, default: 3,
+    StoneSlab => { ident: "minecraft:stone_slab", global: 13396, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SmoothStoneSlab => { ident: "minecraft:smooth_stone_slab", global: 13202, default: 3,
+    SmoothStoneSlab => { ident: "minecraft:smooth_stone_slab", global: 13402, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SandstoneSlab => { ident: "minecraft:sandstone_slab", global: 13208, default: 3,
+    SandstoneSlab => { ident: "minecraft:sandstone_slab", global: 13408, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CutSandstoneSlab => { ident: "minecraft:cut_sandstone_slab", global: 13214, default: 3,
+    CutSandstoneSlab => { ident: "minecraft:cut_sandstone_slab", global: 13414, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PetrifiedOakSlab => { ident: "minecraft:petrified_oak_slab", global: 13220, default: 3,
+    PetrifiedOakSlab => { ident: "minecraft:petrified_oak_slab", global: 13420, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CobblestoneSlab => { ident: "minecraft:cobblestone_slab", global: 13226, default: 3,
+    CobblestoneSlab => { ident: "minecraft:cobblestone_slab", global: 13426, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    BrickSlab => { ident: "minecraft:brick_slab", global: 13232, default: 3,
+    BrickSlab => { ident: "minecraft:brick_slab", global: 13432, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    StoneBrickSlab => { ident: "minecraft:stone_brick_slab", global: 13238, default: 3,
+    StoneBrickSlab => { ident: "minecraft:stone_brick_slab", global: 13438, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    MudBrickSlab => { ident: "minecraft:mud_brick_slab", global: 13244, default: 3,
+    MudBrickSlab => { ident: "minecraft:mud_brick_slab", global: 13444, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    NetherBrickSlab => { ident: "minecraft:nether_brick_slab", global: 13250, default: 3,
+    NetherBrickSlab => { ident: "minecraft:nether_brick_slab", global: 13450, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    QuartzSlab => { ident: "minecraft:quartz_slab", global: 13256, default: 3,
+    QuartzSlab => { ident: "minecraft:quartz_slab", global: 13456, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    RedSandstoneSlab => { ident: "minecraft:red_sandstone_slab", global: 13262, default: 3,
+    RedSandstoneSlab => { ident: "minecraft:red_sandstone_slab", global: 13462, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CutRedSandstoneSlab => { ident: "minecraft:cut_red_sandstone_slab", global: 13268, default: 3,
+    CutRedSandstoneSlab => { ident: "minecraft:cut_red_sandstone_slab", global: 13468, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PurpurSlab => { ident: "minecraft:purpur_slab", global: 13274, default: 3,
+    PurpurSlab => { ident: "minecraft:purpur_slab", global: 13474, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SmoothStone => { ident: "minecraft:smooth_stone", global: 13280, default: 0,
+    SmoothStone => { ident: "minecraft:smooth_stone", global: 13480, default: 0,
         ty: [  ]
     },
-    SmoothSandstone => { ident: "minecraft:smooth_sandstone", global: 13281, default: 0,
+    SmoothSandstone => { ident: "minecraft:smooth_sandstone", global: 13481, default: 0,
         ty: [  ]
     },
-    SmoothQuartz => { ident: "minecraft:smooth_quartz", global: 13282, default: 0,
+    SmoothQuartz => { ident: "minecraft:smooth_quartz", global: 13482, default: 0,
         ty: [  ]
     },
-    SmoothRedSandstone => { ident: "minecraft:smooth_red_sandstone", global: 13283, default: 0,
+    SmoothRedSandstone => { ident: "minecraft:smooth_red_sandstone", global: 13483, default: 0,
         ty: [  ]
     },
-    SpruceFenceGate => { ident: "minecraft:spruce_fence_gate", global: 13284, default: 7,
+    SpruceFenceGate => { ident: "minecraft:spruce_fence_gate", global: 13484, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    BirchFenceGate => { ident: "minecraft:birch_fence_gate", global: 13316, default: 7,
+    BirchFenceGate => { ident: "minecraft:birch_fence_gate", global: 13516, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    JungleFenceGate => { ident: "minecraft:jungle_fence_gate", global: 13348, default: 7,
+    JungleFenceGate => { ident: "minecraft:jungle_fence_gate", global: 13548, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    AcaciaFenceGate => { ident: "minecraft:acacia_fence_gate", global: 13380, default: 7,
+    AcaciaFenceGate => { ident: "minecraft:acacia_fence_gate", global: 13580, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    CherryFenceGate => { ident: "minecraft:cherry_fence_gate", global: 13412, default: 7,
+    CherryFenceGate => { ident: "minecraft:cherry_fence_gate", global: 13612, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    DarkOakFenceGate => { ident: "minecraft:dark_oak_fence_gate", global: 13444, default: 7,
+    DarkOakFenceGate => { ident: "minecraft:dark_oak_fence_gate", global: 13644, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    PaleOakFenceGate => { ident: "minecraft:pale_oak_fence_gate", global: 13476, default: 7,
+    PaleOakFenceGate => { ident: "minecraft:pale_oak_fence_gate", global: 13676, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    MangroveFenceGate => { ident: "minecraft:mangrove_fence_gate", global: 13508, default: 7,
+    MangroveFenceGate => { ident: "minecraft:mangrove_fence_gate", global: 13708, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    BambooFenceGate => { ident: "minecraft:bamboo_fence_gate", global: 13540, default: 7,
+    BambooFenceGate => { ident: "minecraft:bamboo_fence_gate", global: 13740, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    SpruceFence => { ident: "minecraft:spruce_fence", global: 13572, default: 31,
+    SpruceFence => { ident: "minecraft:spruce_fence", global: 13772, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    BirchFence => { ident: "minecraft:birch_fence", global: 13604, default: 31,
+    BirchFence => { ident: "minecraft:birch_fence", global: 13804, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    JungleFence => { ident: "minecraft:jungle_fence", global: 13636, default: 31,
+    JungleFence => { ident: "minecraft:jungle_fence", global: 13836, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    AcaciaFence => { ident: "minecraft:acacia_fence", global: 13668, default: 31,
+    AcaciaFence => { ident: "minecraft:acacia_fence", global: 13868, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    CherryFence => { ident: "minecraft:cherry_fence", global: 13700, default: 31,
+    CherryFence => { ident: "minecraft:cherry_fence", global: 13900, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    DarkOakFence => { ident: "minecraft:dark_oak_fence", global: 13732, default: 31,
+    DarkOakFence => { ident: "minecraft:dark_oak_fence", global: 13932, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    PaleOakFence => { ident: "minecraft:pale_oak_fence", global: 13764, default: 31,
+    PaleOakFence => { ident: "minecraft:pale_oak_fence", global: 13964, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    MangroveFence => { ident: "minecraft:mangrove_fence", global: 13796, default: 31,
+    MangroveFence => { ident: "minecraft:mangrove_fence", global: 13996, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    BambooFence => { ident: "minecraft:bamboo_fence", global: 13828, default: 31,
+    BambooFence => { ident: "minecraft:bamboo_fence", global: 14028, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    SpruceDoor => { ident: "minecraft:spruce_door", global: 13860, default: 11,
+    SpruceDoor => { ident: "minecraft:spruce_door", global: 14060, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    BirchDoor => { ident: "minecraft:birch_door", global: 13924, default: 11,
+    BirchDoor => { ident: "minecraft:birch_door", global: 14124, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    JungleDoor => { ident: "minecraft:jungle_door", global: 13988, default: 11,
+    JungleDoor => { ident: "minecraft:jungle_door", global: 14188, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    AcaciaDoor => { ident: "minecraft:acacia_door", global: 14052, default: 11,
+    AcaciaDoor => { ident: "minecraft:acacia_door", global: 14252, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    CherryDoor => { ident: "minecraft:cherry_door", global: 14116, default: 11,
+    CherryDoor => { ident: "minecraft:cherry_door", global: 14316, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    DarkOakDoor => { ident: "minecraft:dark_oak_door", global: 14180, default: 11,
+    DarkOakDoor => { ident: "minecraft:dark_oak_door", global: 14380, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    PaleOakDoor => { ident: "minecraft:pale_oak_door", global: 14244, default: 11,
+    PaleOakDoor => { ident: "minecraft:pale_oak_door", global: 14444, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    MangroveDoor => { ident: "minecraft:mangrove_door", global: 14308, default: 11,
+    MangroveDoor => { ident: "minecraft:mangrove_door", global: 14508, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    BambooDoor => { ident: "minecraft:bamboo_door", global: 14372, default: 11,
+    BambooDoor => { ident: "minecraft:bamboo_door", global: 14572, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    EndRod => { ident: "minecraft:end_rod", global: 14436, default: 4,
+    EndRod => { ident: "minecraft:end_rod", global: 14636, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    ChorusPlant => { ident: "minecraft:chorus_plant", global: 14442, default: 63,
+    ChorusPlant => { ident: "minecraft:chorus_plant", global: 14642, default: 63,
         ty: [ "down" => DownBool, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "west" => WestBool ]
     },
-    ChorusFlower => { ident: "minecraft:chorus_flower", global: 14506, default: 0,
+    ChorusFlower => { ident: "minecraft:chorus_flower", global: 14706, default: 0,
         ty: [ "age" => Age_012345 ]
     },
-    PurpurBlock => { ident: "minecraft:purpur_block", global: 14512, default: 0,
+    PurpurBlock => { ident: "minecraft:purpur_block", global: 14712, default: 0,
         ty: [  ]
     },
-    PurpurPillar => { ident: "minecraft:purpur_pillar", global: 14513, default: 1,
+    PurpurPillar => { ident: "minecraft:purpur_pillar", global: 14713, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    PurpurStairs => { ident: "minecraft:purpur_stairs", global: 14516, default: 11,
+    PurpurStairs => { ident: "minecraft:purpur_stairs", global: 14716, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    EndStoneBricks => { ident: "minecraft:end_stone_bricks", global: 14596, default: 0,
+    EndStoneBricks => { ident: "minecraft:end_stone_bricks", global: 14796, default: 0,
         ty: [  ]
     },
-    TorchflowerCrop => { ident: "minecraft:torchflower_crop", global: 14597, default: 0,
+    TorchflowerCrop => { ident: "minecraft:torchflower_crop", global: 14797, default: 0,
         ty: [ "age" => Age_01 ]
     },
-    PitcherCrop => { ident: "minecraft:pitcher_crop", global: 14599, default: 1,
+    PitcherCrop => { ident: "minecraft:pitcher_crop", global: 14799, default: 1,
         ty: [ "age" => Age_01234, "half" => Half_UpperLower ]
     },
-    PitcherPlant => { ident: "minecraft:pitcher_plant", global: 14609, default: 1,
+    PitcherPlant => { ident: "minecraft:pitcher_plant", global: 14809, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    Beetroots => { ident: "minecraft:beetroots", global: 14611, default: 0,
+    Beetroots => { ident: "minecraft:beetroots", global: 14811, default: 0,
         ty: [ "age" => Age_0123 ]
     },
-    DirtPath => { ident: "minecraft:dirt_path", global: 14615, default: 0,
+    DirtPath => { ident: "minecraft:dirt_path", global: 14815, default: 0,
         ty: [  ]
     },
-    EndGateway => { ident: "minecraft:end_gateway", global: 14616, default: 0,
+    EndGateway => { ident: "minecraft:end_gateway", global: 14816, default: 0,
         ty: [  ]
     },
-    RepeatingCommandBlock => { ident: "minecraft:repeating_command_block", global: 14617, default: 6,
+    RepeatingCommandBlock => { ident: "minecraft:repeating_command_block", global: 14817, default: 6,
         ty: [ "conditional" => ConditionalBool, "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    ChainCommandBlock => { ident: "minecraft:chain_command_block", global: 14629, default: 6,
+    ChainCommandBlock => { ident: "minecraft:chain_command_block", global: 14829, default: 6,
         ty: [ "conditional" => ConditionalBool, "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    FrostedIce => { ident: "minecraft:frosted_ice", global: 14641, default: 0,
+    FrostedIce => { ident: "minecraft:frosted_ice", global: 14841, default: 0,
         ty: [ "age" => Age_0123 ]
     },
-    MagmaBlock => { ident: "minecraft:magma_block", global: 14645, default: 0,
+    MagmaBlock => { ident: "minecraft:magma_block", global: 14845, default: 0,
         ty: [  ]
     },
-    NetherWartBlock => { ident: "minecraft:nether_wart_block", global: 14646, default: 0,
+    NetherWartBlock => { ident: "minecraft:nether_wart_block", global: 14846, default: 0,
         ty: [  ]
     },
-    RedNetherBricks => { ident: "minecraft:red_nether_bricks", global: 14647, default: 0,
+    RedNetherBricks => { ident: "minecraft:red_nether_bricks", global: 14847, default: 0,
         ty: [  ]
     },
-    BoneBlock => { ident: "minecraft:bone_block", global: 14648, default: 1,
+    BoneBlock => { ident: "minecraft:bone_block", global: 14848, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    StructureVoid => { ident: "minecraft:structure_void", global: 14651, default: 0,
+    StructureVoid => { ident: "minecraft:structure_void", global: 14851, default: 0,
         ty: [  ]
     },
-    Observer => { ident: "minecraft:observer", global: 14652, default: 5,
+    Observer => { ident: "minecraft:observer", global: 14852, default: 5,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool ]
     },
-    ShulkerBox => { ident: "minecraft:shulker_box", global: 14664, default: 4,
+    ShulkerBox => { ident: "minecraft:shulker_box", global: 14864, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    WhiteShulkerBox => { ident: "minecraft:white_shulker_box", global: 14670, default: 4,
+    WhiteShulkerBox => { ident: "minecraft:white_shulker_box", global: 14870, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    OrangeShulkerBox => { ident: "minecraft:orange_shulker_box", global: 14676, default: 4,
+    OrangeShulkerBox => { ident: "minecraft:orange_shulker_box", global: 14876, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    MagentaShulkerBox => { ident: "minecraft:magenta_shulker_box", global: 14682, default: 4,
+    MagentaShulkerBox => { ident: "minecraft:magenta_shulker_box", global: 14882, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    LightBlueShulkerBox => { ident: "minecraft:light_blue_shulker_box", global: 14688, default: 4,
+    LightBlueShulkerBox => { ident: "minecraft:light_blue_shulker_box", global: 14888, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    YellowShulkerBox => { ident: "minecraft:yellow_shulker_box", global: 14694, default: 4,
+    YellowShulkerBox => { ident: "minecraft:yellow_shulker_box", global: 14894, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    LimeShulkerBox => { ident: "minecraft:lime_shulker_box", global: 14700, default: 4,
+    LimeShulkerBox => { ident: "minecraft:lime_shulker_box", global: 14900, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    PinkShulkerBox => { ident: "minecraft:pink_shulker_box", global: 14706, default: 4,
+    PinkShulkerBox => { ident: "minecraft:pink_shulker_box", global: 14906, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    GrayShulkerBox => { ident: "minecraft:gray_shulker_box", global: 14712, default: 4,
+    GrayShulkerBox => { ident: "minecraft:gray_shulker_box", global: 14912, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    LightGrayShulkerBox => { ident: "minecraft:light_gray_shulker_box", global: 14718, default: 4,
+    LightGrayShulkerBox => { ident: "minecraft:light_gray_shulker_box", global: 14918, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    CyanShulkerBox => { ident: "minecraft:cyan_shulker_box", global: 14724, default: 4,
+    CyanShulkerBox => { ident: "minecraft:cyan_shulker_box", global: 14924, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    PurpleShulkerBox => { ident: "minecraft:purple_shulker_box", global: 14730, default: 4,
+    PurpleShulkerBox => { ident: "minecraft:purple_shulker_box", global: 14930, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    BlueShulkerBox => { ident: "minecraft:blue_shulker_box", global: 14736, default: 4,
+    BlueShulkerBox => { ident: "minecraft:blue_shulker_box", global: 14936, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    BrownShulkerBox => { ident: "minecraft:brown_shulker_box", global: 14742, default: 4,
+    BrownShulkerBox => { ident: "minecraft:brown_shulker_box", global: 14942, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    GreenShulkerBox => { ident: "minecraft:green_shulker_box", global: 14748, default: 4,
+    GreenShulkerBox => { ident: "minecraft:green_shulker_box", global: 14948, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    RedShulkerBox => { ident: "minecraft:red_shulker_box", global: 14754, default: 4,
+    RedShulkerBox => { ident: "minecraft:red_shulker_box", global: 14954, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    BlackShulkerBox => { ident: "minecraft:black_shulker_box", global: 14760, default: 4,
+    BlackShulkerBox => { ident: "minecraft:black_shulker_box", global: 14960, default: 4,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown ]
     },
-    WhiteGlazedTerracotta => { ident: "minecraft:white_glazed_terracotta", global: 14766, default: 0,
+    WhiteGlazedTerracotta => { ident: "minecraft:white_glazed_terracotta", global: 14966, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    OrangeGlazedTerracotta => { ident: "minecraft:orange_glazed_terracotta", global: 14770, default: 0,
+    OrangeGlazedTerracotta => { ident: "minecraft:orange_glazed_terracotta", global: 14970, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    MagentaGlazedTerracotta => { ident: "minecraft:magenta_glazed_terracotta", global: 14774, default: 0,
+    MagentaGlazedTerracotta => { ident: "minecraft:magenta_glazed_terracotta", global: 14974, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    LightBlueGlazedTerracotta => { ident: "minecraft:light_blue_glazed_terracotta", global: 14778, default: 0,
+    LightBlueGlazedTerracotta => { ident: "minecraft:light_blue_glazed_terracotta", global: 14978, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    YellowGlazedTerracotta => { ident: "minecraft:yellow_glazed_terracotta", global: 14782, default: 0,
+    YellowGlazedTerracotta => { ident: "minecraft:yellow_glazed_terracotta", global: 14982, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    LimeGlazedTerracotta => { ident: "minecraft:lime_glazed_terracotta", global: 14786, default: 0,
+    LimeGlazedTerracotta => { ident: "minecraft:lime_glazed_terracotta", global: 14986, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    PinkGlazedTerracotta => { ident: "minecraft:pink_glazed_terracotta", global: 14790, default: 0,
+    PinkGlazedTerracotta => { ident: "minecraft:pink_glazed_terracotta", global: 14990, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    GrayGlazedTerracotta => { ident: "minecraft:gray_glazed_terracotta", global: 14794, default: 0,
+    GrayGlazedTerracotta => { ident: "minecraft:gray_glazed_terracotta", global: 14994, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    LightGrayGlazedTerracotta => { ident: "minecraft:light_gray_glazed_terracotta", global: 14798, default: 0,
+    LightGrayGlazedTerracotta => { ident: "minecraft:light_gray_glazed_terracotta", global: 14998, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    CyanGlazedTerracotta => { ident: "minecraft:cyan_glazed_terracotta", global: 14802, default: 0,
+    CyanGlazedTerracotta => { ident: "minecraft:cyan_glazed_terracotta", global: 15002, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    PurpleGlazedTerracotta => { ident: "minecraft:purple_glazed_terracotta", global: 14806, default: 0,
+    PurpleGlazedTerracotta => { ident: "minecraft:purple_glazed_terracotta", global: 15006, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    BlueGlazedTerracotta => { ident: "minecraft:blue_glazed_terracotta", global: 14810, default: 0,
+    BlueGlazedTerracotta => { ident: "minecraft:blue_glazed_terracotta", global: 15010, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    BrownGlazedTerracotta => { ident: "minecraft:brown_glazed_terracotta", global: 14814, default: 0,
+    BrownGlazedTerracotta => { ident: "minecraft:brown_glazed_terracotta", global: 15014, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    GreenGlazedTerracotta => { ident: "minecraft:green_glazed_terracotta", global: 14818, default: 0,
+    GreenGlazedTerracotta => { ident: "minecraft:green_glazed_terracotta", global: 15018, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    RedGlazedTerracotta => { ident: "minecraft:red_glazed_terracotta", global: 14822, default: 0,
+    RedGlazedTerracotta => { ident: "minecraft:red_glazed_terracotta", global: 15022, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    BlackGlazedTerracotta => { ident: "minecraft:black_glazed_terracotta", global: 14826, default: 0,
+    BlackGlazedTerracotta => { ident: "minecraft:black_glazed_terracotta", global: 15026, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    WhiteConcrete => { ident: "minecraft:white_concrete", global: 14830, default: 0,
+    WhiteConcrete => { ident: "minecraft:white_concrete", global: 15030, default: 0,
         ty: [  ]
     },
-    OrangeConcrete => { ident: "minecraft:orange_concrete", global: 14831, default: 0,
+    OrangeConcrete => { ident: "minecraft:orange_concrete", global: 15031, default: 0,
         ty: [  ]
     },
-    MagentaConcrete => { ident: "minecraft:magenta_concrete", global: 14832, default: 0,
+    MagentaConcrete => { ident: "minecraft:magenta_concrete", global: 15032, default: 0,
         ty: [  ]
     },
-    LightBlueConcrete => { ident: "minecraft:light_blue_concrete", global: 14833, default: 0,
+    LightBlueConcrete => { ident: "minecraft:light_blue_concrete", global: 15033, default: 0,
         ty: [  ]
     },
-    YellowConcrete => { ident: "minecraft:yellow_concrete", global: 14834, default: 0,
+    YellowConcrete => { ident: "minecraft:yellow_concrete", global: 15034, default: 0,
         ty: [  ]
     },
-    LimeConcrete => { ident: "minecraft:lime_concrete", global: 14835, default: 0,
+    LimeConcrete => { ident: "minecraft:lime_concrete", global: 15035, default: 0,
         ty: [  ]
     },
-    PinkConcrete => { ident: "minecraft:pink_concrete", global: 14836, default: 0,
+    PinkConcrete => { ident: "minecraft:pink_concrete", global: 15036, default: 0,
         ty: [  ]
     },
-    GrayConcrete => { ident: "minecraft:gray_concrete", global: 14837, default: 0,
+    GrayConcrete => { ident: "minecraft:gray_concrete", global: 15037, default: 0,
         ty: [  ]
     },
-    LightGrayConcrete => { ident: "minecraft:light_gray_concrete", global: 14838, default: 0,
+    LightGrayConcrete => { ident: "minecraft:light_gray_concrete", global: 15038, default: 0,
         ty: [  ]
     },
-    CyanConcrete => { ident: "minecraft:cyan_concrete", global: 14839, default: 0,
+    CyanConcrete => { ident: "minecraft:cyan_concrete", global: 15039, default: 0,
         ty: [  ]
     },
-    PurpleConcrete => { ident: "minecraft:purple_concrete", global: 14840, default: 0,
+    PurpleConcrete => { ident: "minecraft:purple_concrete", global: 15040, default: 0,
         ty: [  ]
     },
-    BlueConcrete => { ident: "minecraft:blue_concrete", global: 14841, default: 0,
+    BlueConcrete => { ident: "minecraft:blue_concrete", global: 15041, default: 0,
         ty: [  ]
     },
-    BrownConcrete => { ident: "minecraft:brown_concrete", global: 14842, default: 0,
+    BrownConcrete => { ident: "minecraft:brown_concrete", global: 15042, default: 0,
         ty: [  ]
     },
-    GreenConcrete => { ident: "minecraft:green_concrete", global: 14843, default: 0,
+    GreenConcrete => { ident: "minecraft:green_concrete", global: 15043, default: 0,
         ty: [  ]
     },
-    RedConcrete => { ident: "minecraft:red_concrete", global: 14844, default: 0,
+    RedConcrete => { ident: "minecraft:red_concrete", global: 15044, default: 0,
         ty: [  ]
     },
-    BlackConcrete => { ident: "minecraft:black_concrete", global: 14845, default: 0,
+    BlackConcrete => { ident: "minecraft:black_concrete", global: 15045, default: 0,
         ty: [  ]
     },
-    WhiteConcretePowder => { ident: "minecraft:white_concrete_powder", global: 14846, default: 0,
+    WhiteConcretePowder => { ident: "minecraft:white_concrete_powder", global: 15046, default: 0,
         ty: [  ]
     },
-    OrangeConcretePowder => { ident: "minecraft:orange_concrete_powder", global: 14847, default: 0,
+    OrangeConcretePowder => { ident: "minecraft:orange_concrete_powder", global: 15047, default: 0,
         ty: [  ]
     },
-    MagentaConcretePowder => { ident: "minecraft:magenta_concrete_powder", global: 14848, default: 0,
+    MagentaConcretePowder => { ident: "minecraft:magenta_concrete_powder", global: 15048, default: 0,
         ty: [  ]
     },
-    LightBlueConcretePowder => { ident: "minecraft:light_blue_concrete_powder", global: 14849, default: 0,
+    LightBlueConcretePowder => { ident: "minecraft:light_blue_concrete_powder", global: 15049, default: 0,
         ty: [  ]
     },
-    YellowConcretePowder => { ident: "minecraft:yellow_concrete_powder", global: 14850, default: 0,
+    YellowConcretePowder => { ident: "minecraft:yellow_concrete_powder", global: 15050, default: 0,
         ty: [  ]
     },
-    LimeConcretePowder => { ident: "minecraft:lime_concrete_powder", global: 14851, default: 0,
+    LimeConcretePowder => { ident: "minecraft:lime_concrete_powder", global: 15051, default: 0,
         ty: [  ]
     },
-    PinkConcretePowder => { ident: "minecraft:pink_concrete_powder", global: 14852, default: 0,
+    PinkConcretePowder => { ident: "minecraft:pink_concrete_powder", global: 15052, default: 0,
         ty: [  ]
     },
-    GrayConcretePowder => { ident: "minecraft:gray_concrete_powder", global: 14853, default: 0,
+    GrayConcretePowder => { ident: "minecraft:gray_concrete_powder", global: 15053, default: 0,
         ty: [  ]
     },
-    LightGrayConcretePowder => { ident: "minecraft:light_gray_concrete_powder", global: 14854, default: 0,
+    LightGrayConcretePowder => { ident: "minecraft:light_gray_concrete_powder", global: 15054, default: 0,
         ty: [  ]
     },
-    CyanConcretePowder => { ident: "minecraft:cyan_concrete_powder", global: 14855, default: 0,
+    CyanConcretePowder => { ident: "minecraft:cyan_concrete_powder", global: 15055, default: 0,
         ty: [  ]
     },
-    PurpleConcretePowder => { ident: "minecraft:purple_concrete_powder", global: 14856, default: 0,
+    PurpleConcretePowder => { ident: "minecraft:purple_concrete_powder", global: 15056, default: 0,
         ty: [  ]
     },
-    BlueConcretePowder => { ident: "minecraft:blue_concrete_powder", global: 14857, default: 0,
+    BlueConcretePowder => { ident: "minecraft:blue_concrete_powder", global: 15057, default: 0,
         ty: [  ]
     },
-    BrownConcretePowder => { ident: "minecraft:brown_concrete_powder", global: 14858, default: 0,
+    BrownConcretePowder => { ident: "minecraft:brown_concrete_powder", global: 15058, default: 0,
         ty: [  ]
     },
-    GreenConcretePowder => { ident: "minecraft:green_concrete_powder", global: 14859, default: 0,
+    GreenConcretePowder => { ident: "minecraft:green_concrete_powder", global: 15059, default: 0,
         ty: [  ]
     },
-    RedConcretePowder => { ident: "minecraft:red_concrete_powder", global: 14860, default: 0,
+    RedConcretePowder => { ident: "minecraft:red_concrete_powder", global: 15060, default: 0,
         ty: [  ]
     },
-    BlackConcretePowder => { ident: "minecraft:black_concrete_powder", global: 14861, default: 0,
+    BlackConcretePowder => { ident: "minecraft:black_concrete_powder", global: 15061, default: 0,
         ty: [  ]
     },
-    Kelp => { ident: "minecraft:kelp", global: 14862, default: 0,
+    Kelp => { ident: "minecraft:kelp", global: 15062, default: 0,
         ty: [ "age" => Age_012345678910111213141516171819202122232425 ]
     },
-    KelpPlant => { ident: "minecraft:kelp_plant", global: 14888, default: 0,
+    KelpPlant => { ident: "minecraft:kelp_plant", global: 15088, default: 0,
         ty: [  ]
     },
-    DriedKelpBlock => { ident: "minecraft:dried_kelp_block", global: 14889, default: 0,
+    DriedKelpBlock => { ident: "minecraft:dried_kelp_block", global: 15089, default: 0,
         ty: [  ]
     },
-    TurtleEgg => { ident: "minecraft:turtle_egg", global: 14890, default: 0,
+    TurtleEgg => { ident: "minecraft:turtle_egg", global: 15090, default: 0,
         ty: [ "eggs" => Eggs, "hatch" => Hatch_012 ]
     },
-    SnifferEgg => { ident: "minecraft:sniffer_egg", global: 14902, default: 0,
+    SnifferEgg => { ident: "minecraft:sniffer_egg", global: 15102, default: 0,
         ty: [ "hatch" => Hatch_012 ]
     },
-    DriedGhast => { ident: "minecraft:dried_ghast", global: 14905, default: 1,
+    DriedGhast => { ident: "minecraft:dried_ghast", global: 15105, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "hydration" => Hydration, "waterlogged" => WaterloggedBool ]
     },
-    DeadTubeCoralBlock => { ident: "minecraft:dead_tube_coral_block", global: 14937, default: 0,
+    DeadTubeCoralBlock => { ident: "minecraft:dead_tube_coral_block", global: 15137, default: 0,
         ty: [  ]
     },
-    DeadBrainCoralBlock => { ident: "minecraft:dead_brain_coral_block", global: 14938, default: 0,
+    DeadBrainCoralBlock => { ident: "minecraft:dead_brain_coral_block", global: 15138, default: 0,
         ty: [  ]
     },
-    DeadBubbleCoralBlock => { ident: "minecraft:dead_bubble_coral_block", global: 14939, default: 0,
+    DeadBubbleCoralBlock => { ident: "minecraft:dead_bubble_coral_block", global: 15139, default: 0,
         ty: [  ]
     },
-    DeadFireCoralBlock => { ident: "minecraft:dead_fire_coral_block", global: 14940, default: 0,
+    DeadFireCoralBlock => { ident: "minecraft:dead_fire_coral_block", global: 15140, default: 0,
         ty: [  ]
     },
-    DeadHornCoralBlock => { ident: "minecraft:dead_horn_coral_block", global: 14941, default: 0,
+    DeadHornCoralBlock => { ident: "minecraft:dead_horn_coral_block", global: 15141, default: 0,
         ty: [  ]
     },
-    TubeCoralBlock => { ident: "minecraft:tube_coral_block", global: 14942, default: 0,
+    TubeCoralBlock => { ident: "minecraft:tube_coral_block", global: 15142, default: 0,
         ty: [  ]
     },
-    BrainCoralBlock => { ident: "minecraft:brain_coral_block", global: 14943, default: 0,
+    BrainCoralBlock => { ident: "minecraft:brain_coral_block", global: 15143, default: 0,
         ty: [  ]
     },
-    BubbleCoralBlock => { ident: "minecraft:bubble_coral_block", global: 14944, default: 0,
+    BubbleCoralBlock => { ident: "minecraft:bubble_coral_block", global: 15144, default: 0,
         ty: [  ]
     },
-    FireCoralBlock => { ident: "minecraft:fire_coral_block", global: 14945, default: 0,
+    FireCoralBlock => { ident: "minecraft:fire_coral_block", global: 15145, default: 0,
         ty: [  ]
     },
-    HornCoralBlock => { ident: "minecraft:horn_coral_block", global: 14946, default: 0,
+    HornCoralBlock => { ident: "minecraft:horn_coral_block", global: 15146, default: 0,
         ty: [  ]
     },
-    DeadTubeCoral => { ident: "minecraft:dead_tube_coral", global: 14947, default: 0,
+    DeadTubeCoral => { ident: "minecraft:dead_tube_coral", global: 15147, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadBrainCoral => { ident: "minecraft:dead_brain_coral", global: 14949, default: 0,
+    DeadBrainCoral => { ident: "minecraft:dead_brain_coral", global: 15149, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadBubbleCoral => { ident: "minecraft:dead_bubble_coral", global: 14951, default: 0,
+    DeadBubbleCoral => { ident: "minecraft:dead_bubble_coral", global: 15151, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadFireCoral => { ident: "minecraft:dead_fire_coral", global: 14953, default: 0,
+    DeadFireCoral => { ident: "minecraft:dead_fire_coral", global: 15153, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadHornCoral => { ident: "minecraft:dead_horn_coral", global: 14955, default: 0,
+    DeadHornCoral => { ident: "minecraft:dead_horn_coral", global: 15155, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    TubeCoral => { ident: "minecraft:tube_coral", global: 14957, default: 0,
+    TubeCoral => { ident: "minecraft:tube_coral", global: 15157, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    BrainCoral => { ident: "minecraft:brain_coral", global: 14959, default: 0,
+    BrainCoral => { ident: "minecraft:brain_coral", global: 15159, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    BubbleCoral => { ident: "minecraft:bubble_coral", global: 14961, default: 0,
+    BubbleCoral => { ident: "minecraft:bubble_coral", global: 15161, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    FireCoral => { ident: "minecraft:fire_coral", global: 14963, default: 0,
+    FireCoral => { ident: "minecraft:fire_coral", global: 15163, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    HornCoral => { ident: "minecraft:horn_coral", global: 14965, default: 0,
+    HornCoral => { ident: "minecraft:horn_coral", global: 15165, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadTubeCoralFan => { ident: "minecraft:dead_tube_coral_fan", global: 14967, default: 0,
+    DeadTubeCoralFan => { ident: "minecraft:dead_tube_coral_fan", global: 15167, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadBrainCoralFan => { ident: "minecraft:dead_brain_coral_fan", global: 14969, default: 0,
+    DeadBrainCoralFan => { ident: "minecraft:dead_brain_coral_fan", global: 15169, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadBubbleCoralFan => { ident: "minecraft:dead_bubble_coral_fan", global: 14971, default: 0,
+    DeadBubbleCoralFan => { ident: "minecraft:dead_bubble_coral_fan", global: 15171, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadFireCoralFan => { ident: "minecraft:dead_fire_coral_fan", global: 14973, default: 0,
+    DeadFireCoralFan => { ident: "minecraft:dead_fire_coral_fan", global: 15173, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadHornCoralFan => { ident: "minecraft:dead_horn_coral_fan", global: 14975, default: 0,
+    DeadHornCoralFan => { ident: "minecraft:dead_horn_coral_fan", global: 15175, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    TubeCoralFan => { ident: "minecraft:tube_coral_fan", global: 14977, default: 0,
+    TubeCoralFan => { ident: "minecraft:tube_coral_fan", global: 15177, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    BrainCoralFan => { ident: "minecraft:brain_coral_fan", global: 14979, default: 0,
+    BrainCoralFan => { ident: "minecraft:brain_coral_fan", global: 15179, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    BubbleCoralFan => { ident: "minecraft:bubble_coral_fan", global: 14981, default: 0,
+    BubbleCoralFan => { ident: "minecraft:bubble_coral_fan", global: 15181, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    FireCoralFan => { ident: "minecraft:fire_coral_fan", global: 14983, default: 0,
+    FireCoralFan => { ident: "minecraft:fire_coral_fan", global: 15183, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    HornCoralFan => { ident: "minecraft:horn_coral_fan", global: 14985, default: 0,
+    HornCoralFan => { ident: "minecraft:horn_coral_fan", global: 15185, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    DeadTubeCoralWallFan => { ident: "minecraft:dead_tube_coral_wall_fan", global: 14987, default: 0,
+    DeadTubeCoralWallFan => { ident: "minecraft:dead_tube_coral_wall_fan", global: 15187, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    DeadBrainCoralWallFan => { ident: "minecraft:dead_brain_coral_wall_fan", global: 14995, default: 0,
+    DeadBrainCoralWallFan => { ident: "minecraft:dead_brain_coral_wall_fan", global: 15195, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    DeadBubbleCoralWallFan => { ident: "minecraft:dead_bubble_coral_wall_fan", global: 15003, default: 0,
+    DeadBubbleCoralWallFan => { ident: "minecraft:dead_bubble_coral_wall_fan", global: 15203, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    DeadFireCoralWallFan => { ident: "minecraft:dead_fire_coral_wall_fan", global: 15011, default: 0,
+    DeadFireCoralWallFan => { ident: "minecraft:dead_fire_coral_wall_fan", global: 15211, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    DeadHornCoralWallFan => { ident: "minecraft:dead_horn_coral_wall_fan", global: 15019, default: 0,
+    DeadHornCoralWallFan => { ident: "minecraft:dead_horn_coral_wall_fan", global: 15219, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    TubeCoralWallFan => { ident: "minecraft:tube_coral_wall_fan", global: 15027, default: 0,
+    TubeCoralWallFan => { ident: "minecraft:tube_coral_wall_fan", global: 15227, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    BrainCoralWallFan => { ident: "minecraft:brain_coral_wall_fan", global: 15035, default: 0,
+    BrainCoralWallFan => { ident: "minecraft:brain_coral_wall_fan", global: 15235, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    BubbleCoralWallFan => { ident: "minecraft:bubble_coral_wall_fan", global: 15043, default: 0,
+    BubbleCoralWallFan => { ident: "minecraft:bubble_coral_wall_fan", global: 15243, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    FireCoralWallFan => { ident: "minecraft:fire_coral_wall_fan", global: 15051, default: 0,
+    FireCoralWallFan => { ident: "minecraft:fire_coral_wall_fan", global: 15251, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    HornCoralWallFan => { ident: "minecraft:horn_coral_wall_fan", global: 15059, default: 0,
+    HornCoralWallFan => { ident: "minecraft:horn_coral_wall_fan", global: 15259, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    SeaPickle => { ident: "minecraft:sea_pickle", global: 15067, default: 0,
+    SeaPickle => { ident: "minecraft:sea_pickle", global: 15267, default: 0,
         ty: [ "pickles" => Pickles, "waterlogged" => WaterloggedBool ]
     },
-    BlueIce => { ident: "minecraft:blue_ice", global: 15075, default: 0,
+    BlueIce => { ident: "minecraft:blue_ice", global: 15275, default: 0,
         ty: [  ]
     },
-    Conduit => { ident: "minecraft:conduit", global: 15076, default: 0,
+    Conduit => { ident: "minecraft:conduit", global: 15276, default: 0,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    BambooSapling => { ident: "minecraft:bamboo_sapling", global: 15078, default: 0,
+    BambooSapling => { ident: "minecraft:bamboo_sapling", global: 15278, default: 0,
         ty: [  ]
     },
-    Bamboo => { ident: "minecraft:bamboo", global: 15079, default: 0,
+    Bamboo => { ident: "minecraft:bamboo", global: 15279, default: 0,
         ty: [ "age" => Age_01, "leaves" => Leaves, "stage" => Stage_01 ]
     },
-    PottedBamboo => { ident: "minecraft:potted_bamboo", global: 15091, default: 0,
+    PottedBamboo => { ident: "minecraft:potted_bamboo", global: 15291, default: 0,
         ty: [  ]
     },
-    VoidAir => { ident: "minecraft:void_air", global: 15092, default: 0,
+    VoidAir => { ident: "minecraft:void_air", global: 15292, default: 0,
         ty: [  ]
     },
-    CaveAir => { ident: "minecraft:cave_air", global: 15093, default: 0,
+    CaveAir => { ident: "minecraft:cave_air", global: 15293, default: 0,
         ty: [  ]
     },
-    BubbleColumn => { ident: "minecraft:bubble_column", global: 15094, default: 0,
+    BubbleColumn => { ident: "minecraft:bubble_column", global: 15294, default: 0,
         ty: [ "drag" => DragBool ]
     },
-    PolishedGraniteStairs => { ident: "minecraft:polished_granite_stairs", global: 15096, default: 11,
+    PolishedGraniteStairs => { ident: "minecraft:polished_granite_stairs", global: 15296, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    SmoothRedSandstoneStairs => { ident: "minecraft:smooth_red_sandstone_stairs", global: 15176, default: 11,
+    SmoothRedSandstoneStairs => { ident: "minecraft:smooth_red_sandstone_stairs", global: 15376, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    MossyStoneBrickStairs => { ident: "minecraft:mossy_stone_brick_stairs", global: 15256, default: 11,
+    MossyStoneBrickStairs => { ident: "minecraft:mossy_stone_brick_stairs", global: 15456, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PolishedDioriteStairs => { ident: "minecraft:polished_diorite_stairs", global: 15336, default: 11,
+    PolishedDioriteStairs => { ident: "minecraft:polished_diorite_stairs", global: 15536, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    MossyCobblestoneStairs => { ident: "minecraft:mossy_cobblestone_stairs", global: 15416, default: 11,
+    MossyCobblestoneStairs => { ident: "minecraft:mossy_cobblestone_stairs", global: 15616, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    EndStoneBrickStairs => { ident: "minecraft:end_stone_brick_stairs", global: 15496, default: 11,
+    EndStoneBrickStairs => { ident: "minecraft:end_stone_brick_stairs", global: 15696, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    StoneStairs => { ident: "minecraft:stone_stairs", global: 15576, default: 11,
+    StoneStairs => { ident: "minecraft:stone_stairs", global: 15776, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    SmoothSandstoneStairs => { ident: "minecraft:smooth_sandstone_stairs", global: 15656, default: 11,
+    SmoothSandstoneStairs => { ident: "minecraft:smooth_sandstone_stairs", global: 15856, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    SmoothQuartzStairs => { ident: "minecraft:smooth_quartz_stairs", global: 15736, default: 11,
+    SmoothQuartzStairs => { ident: "minecraft:smooth_quartz_stairs", global: 15936, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    GraniteStairs => { ident: "minecraft:granite_stairs", global: 15816, default: 11,
+    GraniteStairs => { ident: "minecraft:granite_stairs", global: 16016, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    AndesiteStairs => { ident: "minecraft:andesite_stairs", global: 15896, default: 11,
+    AndesiteStairs => { ident: "minecraft:andesite_stairs", global: 16096, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    RedNetherBrickStairs => { ident: "minecraft:red_nether_brick_stairs", global: 15976, default: 11,
+    RedNetherBrickStairs => { ident: "minecraft:red_nether_brick_stairs", global: 16176, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PolishedAndesiteStairs => { ident: "minecraft:polished_andesite_stairs", global: 16056, default: 11,
+    PolishedAndesiteStairs => { ident: "minecraft:polished_andesite_stairs", global: 16256, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    DioriteStairs => { ident: "minecraft:diorite_stairs", global: 16136, default: 11,
+    DioriteStairs => { ident: "minecraft:diorite_stairs", global: 16336, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PolishedGraniteSlab => { ident: "minecraft:polished_granite_slab", global: 16216, default: 3,
+    PolishedGraniteSlab => { ident: "minecraft:polished_granite_slab", global: 16416, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SmoothRedSandstoneSlab => { ident: "minecraft:smooth_red_sandstone_slab", global: 16222, default: 3,
+    SmoothRedSandstoneSlab => { ident: "minecraft:smooth_red_sandstone_slab", global: 16422, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    MossyStoneBrickSlab => { ident: "minecraft:mossy_stone_brick_slab", global: 16228, default: 3,
+    MossyStoneBrickSlab => { ident: "minecraft:mossy_stone_brick_slab", global: 16428, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PolishedDioriteSlab => { ident: "minecraft:polished_diorite_slab", global: 16234, default: 3,
+    PolishedDioriteSlab => { ident: "minecraft:polished_diorite_slab", global: 16434, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    MossyCobblestoneSlab => { ident: "minecraft:mossy_cobblestone_slab", global: 16240, default: 3,
+    MossyCobblestoneSlab => { ident: "minecraft:mossy_cobblestone_slab", global: 16440, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    EndStoneBrickSlab => { ident: "minecraft:end_stone_brick_slab", global: 16246, default: 3,
+    EndStoneBrickSlab => { ident: "minecraft:end_stone_brick_slab", global: 16446, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SmoothSandstoneSlab => { ident: "minecraft:smooth_sandstone_slab", global: 16252, default: 3,
+    SmoothSandstoneSlab => { ident: "minecraft:smooth_sandstone_slab", global: 16452, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    SmoothQuartzSlab => { ident: "minecraft:smooth_quartz_slab", global: 16258, default: 3,
+    SmoothQuartzSlab => { ident: "minecraft:smooth_quartz_slab", global: 16458, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    GraniteSlab => { ident: "minecraft:granite_slab", global: 16264, default: 3,
+    GraniteSlab => { ident: "minecraft:granite_slab", global: 16464, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    AndesiteSlab => { ident: "minecraft:andesite_slab", global: 16270, default: 3,
+    AndesiteSlab => { ident: "minecraft:andesite_slab", global: 16470, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    RedNetherBrickSlab => { ident: "minecraft:red_nether_brick_slab", global: 16276, default: 3,
+    RedNetherBrickSlab => { ident: "minecraft:red_nether_brick_slab", global: 16476, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PolishedAndesiteSlab => { ident: "minecraft:polished_andesite_slab", global: 16282, default: 3,
+    PolishedAndesiteSlab => { ident: "minecraft:polished_andesite_slab", global: 16482, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    DioriteSlab => { ident: "minecraft:diorite_slab", global: 16288, default: 3,
+    DioriteSlab => { ident: "minecraft:diorite_slab", global: 16488, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    BrickWall => { ident: "minecraft:brick_wall", global: 16294, default: 3,
+    BrickWall => { ident: "minecraft:brick_wall", global: 16494, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    PrismarineWall => { ident: "minecraft:prismarine_wall", global: 16618, default: 3,
+    PrismarineWall => { ident: "minecraft:prismarine_wall", global: 16818, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    RedSandstoneWall => { ident: "minecraft:red_sandstone_wall", global: 16942, default: 3,
+    RedSandstoneWall => { ident: "minecraft:red_sandstone_wall", global: 17142, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    MossyStoneBrickWall => { ident: "minecraft:mossy_stone_brick_wall", global: 17266, default: 3,
+    MossyStoneBrickWall => { ident: "minecraft:mossy_stone_brick_wall", global: 17466, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    GraniteWall => { ident: "minecraft:granite_wall", global: 17590, default: 3,
+    GraniteWall => { ident: "minecraft:granite_wall", global: 17790, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    StoneBrickWall => { ident: "minecraft:stone_brick_wall", global: 17914, default: 3,
+    StoneBrickWall => { ident: "minecraft:stone_brick_wall", global: 18114, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    MudBrickWall => { ident: "minecraft:mud_brick_wall", global: 18238, default: 3,
+    MudBrickWall => { ident: "minecraft:mud_brick_wall", global: 18438, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    NetherBrickWall => { ident: "minecraft:nether_brick_wall", global: 18562, default: 3,
+    NetherBrickWall => { ident: "minecraft:nether_brick_wall", global: 18762, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    AndesiteWall => { ident: "minecraft:andesite_wall", global: 18886, default: 3,
+    AndesiteWall => { ident: "minecraft:andesite_wall", global: 19086, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    RedNetherBrickWall => { ident: "minecraft:red_nether_brick_wall", global: 19210, default: 3,
+    RedNetherBrickWall => { ident: "minecraft:red_nether_brick_wall", global: 19410, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    SandstoneWall => { ident: "minecraft:sandstone_wall", global: 19534, default: 3,
+    SandstoneWall => { ident: "minecraft:sandstone_wall", global: 19734, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    EndStoneBrickWall => { ident: "minecraft:end_stone_brick_wall", global: 19858, default: 3,
+    EndStoneBrickWall => { ident: "minecraft:end_stone_brick_wall", global: 20058, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    DioriteWall => { ident: "minecraft:diorite_wall", global: 20182, default: 3,
+    DioriteWall => { ident: "minecraft:diorite_wall", global: 20382, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    Scaffolding => { ident: "minecraft:scaffolding", global: 20506, default: 31,
+    Scaffolding => { ident: "minecraft:scaffolding", global: 20706, default: 31,
         ty: [ "bottom" => BottomBool, "distance" => Distance_01234567, "waterlogged" => WaterloggedBool ]
     },
-    Loom => { ident: "minecraft:loom", global: 20538, default: 0,
+    Loom => { ident: "minecraft:loom", global: 20738, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    Barrel => { ident: "minecraft:barrel", global: 20542, default: 1,
+    Barrel => { ident: "minecraft:barrel", global: 20742, default: 1,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "open" => OpenBool ]
     },
-    Smoker => { ident: "minecraft:smoker", global: 20554, default: 1,
+    Smoker => { ident: "minecraft:smoker", global: 20754, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "lit" => LitBool ]
     },
-    BlastFurnace => { ident: "minecraft:blast_furnace", global: 20562, default: 1,
+    BlastFurnace => { ident: "minecraft:blast_furnace", global: 20762, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "lit" => LitBool ]
     },
-    CartographyTable => { ident: "minecraft:cartography_table", global: 20570, default: 0,
+    CartographyTable => { ident: "minecraft:cartography_table", global: 20770, default: 0,
         ty: [  ]
     },
-    FletchingTable => { ident: "minecraft:fletching_table", global: 20571, default: 0,
+    FletchingTable => { ident: "minecraft:fletching_table", global: 20771, default: 0,
         ty: [  ]
     },
-    Grindstone => { ident: "minecraft:grindstone", global: 20572, default: 4,
+    Grindstone => { ident: "minecraft:grindstone", global: 20772, default: 4,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast ]
     },
-    Lectern => { ident: "minecraft:lectern", global: 20584, default: 3,
+    Lectern => { ident: "minecraft:lectern", global: 20784, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "has_book" => HasBookBool, "powered" => PoweredBool ]
     },
-    SmithingTable => { ident: "minecraft:smithing_table", global: 20600, default: 0,
+    SmithingTable => { ident: "minecraft:smithing_table", global: 20800, default: 0,
         ty: [  ]
     },
-    Stonecutter => { ident: "minecraft:stonecutter", global: 20601, default: 0,
+    Stonecutter => { ident: "minecraft:stonecutter", global: 20801, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast ]
     },
-    Bell => { ident: "minecraft:bell", global: 20605, default: 1,
+    Bell => { ident: "minecraft:bell", global: 20805, default: 1,
         ty: [ "attachment" => Attachment, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    Lantern => { ident: "minecraft:lantern", global: 20637, default: 3,
+    Lantern => { ident: "minecraft:lantern", global: 20837, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    SoulLantern => { ident: "minecraft:soul_lantern", global: 20641, default: 3,
+    SoulLantern => { ident: "minecraft:soul_lantern", global: 20841, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    CopperLantern => { ident: "minecraft:copper_lantern", global: 20645, default: 3,
+    CopperLantern => { ident: "minecraft:copper_lantern", global: 20845, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    ExposedCopperLantern => { ident: "minecraft:exposed_copper_lantern", global: 20649, default: 3,
+    ExposedCopperLantern => { ident: "minecraft:exposed_copper_lantern", global: 20849, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCopperLantern => { ident: "minecraft:weathered_copper_lantern", global: 20653, default: 3,
+    WeatheredCopperLantern => { ident: "minecraft:weathered_copper_lantern", global: 20853, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    OxidizedCopperLantern => { ident: "minecraft:oxidized_copper_lantern", global: 20657, default: 3,
+    OxidizedCopperLantern => { ident: "minecraft:oxidized_copper_lantern", global: 20857, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCopperLantern => { ident: "minecraft:waxed_copper_lantern", global: 20661, default: 3,
+    WaxedCopperLantern => { ident: "minecraft:waxed_copper_lantern", global: 20861, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCopperLantern => { ident: "minecraft:waxed_exposed_copper_lantern", global: 20665, default: 3,
+    WaxedExposedCopperLantern => { ident: "minecraft:waxed_exposed_copper_lantern", global: 20865, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCopperLantern => { ident: "minecraft:waxed_weathered_copper_lantern", global: 20669, default: 3,
+    WaxedWeatheredCopperLantern => { ident: "minecraft:waxed_weathered_copper_lantern", global: 20869, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedCopperLantern => { ident: "minecraft:waxed_oxidized_copper_lantern", global: 20673, default: 3,
+    WaxedOxidizedCopperLantern => { ident: "minecraft:waxed_oxidized_copper_lantern", global: 20873, default: 3,
         ty: [ "hanging" => HangingBool, "waterlogged" => WaterloggedBool ]
     },
-    Campfire => { ident: "minecraft:campfire", global: 20677, default: 3,
+    Campfire => { ident: "minecraft:campfire", global: 20877, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "lit" => LitBool, "signal_fire" => SignalFireBool, "waterlogged" => WaterloggedBool ]
     },
-    SoulCampfire => { ident: "minecraft:soul_campfire", global: 20709, default: 3,
+    SoulCampfire => { ident: "minecraft:soul_campfire", global: 20909, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "lit" => LitBool, "signal_fire" => SignalFireBool, "waterlogged" => WaterloggedBool ]
     },
-    SweetBerryBush => { ident: "minecraft:sweet_berry_bush", global: 20741, default: 0,
+    SweetBerryBush => { ident: "minecraft:sweet_berry_bush", global: 20941, default: 0,
         ty: [ "age" => Age_0123 ]
     },
-    WarpedStem => { ident: "minecraft:warped_stem", global: 20745, default: 1,
+    WarpedStem => { ident: "minecraft:warped_stem", global: 20945, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    StrippedWarpedStem => { ident: "minecraft:stripped_warped_stem", global: 20748, default: 1,
+    StrippedWarpedStem => { ident: "minecraft:stripped_warped_stem", global: 20948, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    WarpedHyphae => { ident: "minecraft:warped_hyphae", global: 20751, default: 1,
+    WarpedHyphae => { ident: "minecraft:warped_hyphae", global: 20951, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    StrippedWarpedHyphae => { ident: "minecraft:stripped_warped_hyphae", global: 20754, default: 1,
+    StrippedWarpedHyphae => { ident: "minecraft:stripped_warped_hyphae", global: 20954, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    WarpedNylium => { ident: "minecraft:warped_nylium", global: 20757, default: 0,
+    WarpedNylium => { ident: "minecraft:warped_nylium", global: 20957, default: 0,
         ty: [  ]
     },
-    WarpedFungus => { ident: "minecraft:warped_fungus", global: 20758, default: 0,
+    WarpedFungus => { ident: "minecraft:warped_fungus", global: 20958, default: 0,
         ty: [  ]
     },
-    WarpedWartBlock => { ident: "minecraft:warped_wart_block", global: 20759, default: 0,
+    WarpedWartBlock => { ident: "minecraft:warped_wart_block", global: 20959, default: 0,
         ty: [  ]
     },
-    WarpedRoots => { ident: "minecraft:warped_roots", global: 20760, default: 0,
+    WarpedRoots => { ident: "minecraft:warped_roots", global: 20960, default: 0,
         ty: [  ]
     },
-    NetherSprouts => { ident: "minecraft:nether_sprouts", global: 20761, default: 0,
+    NetherSprouts => { ident: "minecraft:nether_sprouts", global: 20961, default: 0,
         ty: [  ]
     },
-    CrimsonStem => { ident: "minecraft:crimson_stem", global: 20762, default: 1,
+    CrimsonStem => { ident: "minecraft:crimson_stem", global: 20962, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    StrippedCrimsonStem => { ident: "minecraft:stripped_crimson_stem", global: 20765, default: 1,
+    StrippedCrimsonStem => { ident: "minecraft:stripped_crimson_stem", global: 20965, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    CrimsonHyphae => { ident: "minecraft:crimson_hyphae", global: 20768, default: 1,
+    CrimsonHyphae => { ident: "minecraft:crimson_hyphae", global: 20968, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    StrippedCrimsonHyphae => { ident: "minecraft:stripped_crimson_hyphae", global: 20771, default: 1,
+    StrippedCrimsonHyphae => { ident: "minecraft:stripped_crimson_hyphae", global: 20971, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    CrimsonNylium => { ident: "minecraft:crimson_nylium", global: 20774, default: 0,
+    CrimsonNylium => { ident: "minecraft:crimson_nylium", global: 20974, default: 0,
         ty: [  ]
     },
-    CrimsonFungus => { ident: "minecraft:crimson_fungus", global: 20775, default: 0,
+    CrimsonFungus => { ident: "minecraft:crimson_fungus", global: 20975, default: 0,
         ty: [  ]
     },
-    Shroomlight => { ident: "minecraft:shroomlight", global: 20776, default: 0,
+    Shroomlight => { ident: "minecraft:shroomlight", global: 20976, default: 0,
         ty: [  ]
     },
-    WeepingVines => { ident: "minecraft:weeping_vines", global: 20777, default: 0,
+    WeepingVines => { ident: "minecraft:weeping_vines", global: 20977, default: 0,
         ty: [ "age" => Age_012345678910111213141516171819202122232425 ]
     },
-    WeepingVinesPlant => { ident: "minecraft:weeping_vines_plant", global: 20803, default: 0,
+    WeepingVinesPlant => { ident: "minecraft:weeping_vines_plant", global: 21003, default: 0,
         ty: [  ]
     },
-    TwistingVines => { ident: "minecraft:twisting_vines", global: 20804, default: 0,
+    TwistingVines => { ident: "minecraft:twisting_vines", global: 21004, default: 0,
         ty: [ "age" => Age_012345678910111213141516171819202122232425 ]
     },
-    TwistingVinesPlant => { ident: "minecraft:twisting_vines_plant", global: 20830, default: 0,
+    TwistingVinesPlant => { ident: "minecraft:twisting_vines_plant", global: 21030, default: 0,
         ty: [  ]
     },
-    CrimsonRoots => { ident: "minecraft:crimson_roots", global: 20831, default: 0,
+    CrimsonRoots => { ident: "minecraft:crimson_roots", global: 21031, default: 0,
         ty: [  ]
     },
-    CrimsonPlanks => { ident: "minecraft:crimson_planks", global: 20832, default: 0,
+    CrimsonPlanks => { ident: "minecraft:crimson_planks", global: 21032, default: 0,
         ty: [  ]
     },
-    WarpedPlanks => { ident: "minecraft:warped_planks", global: 20833, default: 0,
+    WarpedPlanks => { ident: "minecraft:warped_planks", global: 21033, default: 0,
         ty: [  ]
     },
-    CrimsonSlab => { ident: "minecraft:crimson_slab", global: 20834, default: 3,
+    CrimsonSlab => { ident: "minecraft:crimson_slab", global: 21034, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    WarpedSlab => { ident: "minecraft:warped_slab", global: 20840, default: 3,
+    WarpedSlab => { ident: "minecraft:warped_slab", global: 21040, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonPressurePlate => { ident: "minecraft:crimson_pressure_plate", global: 20846, default: 1,
+    CrimsonPressurePlate => { ident: "minecraft:crimson_pressure_plate", global: 21046, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    WarpedPressurePlate => { ident: "minecraft:warped_pressure_plate", global: 20848, default: 1,
+    WarpedPressurePlate => { ident: "minecraft:warped_pressure_plate", global: 21048, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    CrimsonFence => { ident: "minecraft:crimson_fence", global: 20850, default: 31,
+    CrimsonFence => { ident: "minecraft:crimson_fence", global: 21050, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    WarpedFence => { ident: "minecraft:warped_fence", global: 20882, default: 31,
+    WarpedFence => { ident: "minecraft:warped_fence", global: 21082, default: 31,
         ty: [ "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    CrimsonTrapdoor => { ident: "minecraft:crimson_trapdoor", global: 20914, default: 15,
+    CrimsonTrapdoor => { ident: "minecraft:crimson_trapdoor", global: 21114, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WarpedTrapdoor => { ident: "minecraft:warped_trapdoor", global: 20978, default: 15,
+    WarpedTrapdoor => { ident: "minecraft:warped_trapdoor", global: 21178, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonFenceGate => { ident: "minecraft:crimson_fence_gate", global: 21042, default: 7,
+    CrimsonFenceGate => { ident: "minecraft:crimson_fence_gate", global: 21242, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    WarpedFenceGate => { ident: "minecraft:warped_fence_gate", global: 21074, default: 7,
+    WarpedFenceGate => { ident: "minecraft:warped_fence_gate", global: 21274, default: 7,
         ty: [ "facing" => Facing_NorthSouthWestEast, "in_wall" => InWallBool, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    CrimsonStairs => { ident: "minecraft:crimson_stairs", global: 21106, default: 11,
+    CrimsonStairs => { ident: "minecraft:crimson_stairs", global: 21306, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    WarpedStairs => { ident: "minecraft:warped_stairs", global: 21186, default: 11,
+    WarpedStairs => { ident: "minecraft:warped_stairs", global: 21386, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonButton => { ident: "minecraft:crimson_button", global: 21266, default: 9,
+    CrimsonButton => { ident: "minecraft:crimson_button", global: 21466, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    WarpedButton => { ident: "minecraft:warped_button", global: 21290, default: 9,
+    WarpedButton => { ident: "minecraft:warped_button", global: 21490, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    CrimsonDoor => { ident: "minecraft:crimson_door", global: 21314, default: 11,
+    CrimsonDoor => { ident: "minecraft:crimson_door", global: 21514, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    WarpedDoor => { ident: "minecraft:warped_door", global: 21378, default: 11,
+    WarpedDoor => { ident: "minecraft:warped_door", global: 21578, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    CrimsonSign => { ident: "minecraft:crimson_sign", global: 21442, default: 1,
+    CrimsonSign => { ident: "minecraft:crimson_sign", global: 21642, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    WarpedSign => { ident: "minecraft:warped_sign", global: 21474, default: 1,
+    WarpedSign => { ident: "minecraft:warped_sign", global: 21674, default: 1,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonWallSign => { ident: "minecraft:crimson_wall_sign", global: 21506, default: 1,
+    CrimsonWallSign => { ident: "minecraft:crimson_wall_sign", global: 21706, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WarpedWallSign => { ident: "minecraft:warped_wall_sign", global: 21514, default: 1,
+    WarpedWallSign => { ident: "minecraft:warped_wall_sign", global: 21714, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    StructureBlock => { ident: "minecraft:structure_block", global: 21522, default: 1,
+    StructureBlock => { ident: "minecraft:structure_block", global: 21722, default: 1,
         ty: [ "mode" => Mode_SaveLoadCornerData ]
     },
-    Jigsaw => { ident: "minecraft:jigsaw", global: 21526, default: 10,
+    Jigsaw => { ident: "minecraft:jigsaw", global: 21726, default: 10,
         ty: [ "orientation" => Orientation_DownEastDownNorthDownSouthDownWestUpEastUpNorthUpSouthUpWestWestUpEastUpNorthUpSouthUp ]
     },
-    TestBlock => { ident: "minecraft:test_block", global: 21538, default: 0,
+    TestBlock => { ident: "minecraft:test_block", global: 21738, default: 0,
         ty: [ "mode" => Mode_StartLogFailAccept ]
     },
-    TestInstanceBlock => { ident: "minecraft:test_instance_block", global: 21542, default: 0,
+    TestInstanceBlock => { ident: "minecraft:test_instance_block", global: 21742, default: 0,
         ty: [  ]
     },
-    Composter => { ident: "minecraft:composter", global: 21543, default: 0,
+    Composter => { ident: "minecraft:composter", global: 21743, default: 0,
         ty: [ "level" => Level_012345678 ]
     },
-    Target => { ident: "minecraft:target", global: 21552, default: 0,
+    Target => { ident: "minecraft:target", global: 21752, default: 0,
         ty: [ "power" => Power_0123456789101112131415 ]
     },
-    BeeNest => { ident: "minecraft:bee_nest", global: 21568, default: 0,
+    BeeNest => { ident: "minecraft:bee_nest", global: 21768, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "honey_level" => HoneyLevel_012345 ]
     },
-    Beehive => { ident: "minecraft:beehive", global: 21592, default: 0,
+    Beehive => { ident: "minecraft:beehive", global: 21792, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "honey_level" => HoneyLevel_012345 ]
     },
-    HoneyBlock => { ident: "minecraft:honey_block", global: 21616, default: 0,
+    HoneyBlock => { ident: "minecraft:honey_block", global: 21816, default: 0,
         ty: [  ]
     },
-    HoneycombBlock => { ident: "minecraft:honeycomb_block", global: 21617, default: 0,
+    HoneycombBlock => { ident: "minecraft:honeycomb_block", global: 21817, default: 0,
         ty: [  ]
     },
-    NetheriteBlock => { ident: "minecraft:netherite_block", global: 21618, default: 0,
+    NetheriteBlock => { ident: "minecraft:netherite_block", global: 21818, default: 0,
         ty: [  ]
     },
-    AncientDebris => { ident: "minecraft:ancient_debris", global: 21619, default: 0,
+    AncientDebris => { ident: "minecraft:ancient_debris", global: 21819, default: 0,
         ty: [  ]
     },
-    CryingObsidian => { ident: "minecraft:crying_obsidian", global: 21620, default: 0,
+    CryingObsidian => { ident: "minecraft:crying_obsidian", global: 21820, default: 0,
         ty: [  ]
     },
-    RespawnAnchor => { ident: "minecraft:respawn_anchor", global: 21621, default: 0,
+    RespawnAnchor => { ident: "minecraft:respawn_anchor", global: 21821, default: 0,
         ty: [ "charges" => Charges ]
     },
-    PottedCrimsonFungus => { ident: "minecraft:potted_crimson_fungus", global: 21626, default: 0,
+    PottedCrimsonFungus => { ident: "minecraft:potted_crimson_fungus", global: 21826, default: 0,
         ty: [  ]
     },
-    PottedWarpedFungus => { ident: "minecraft:potted_warped_fungus", global: 21627, default: 0,
+    PottedWarpedFungus => { ident: "minecraft:potted_warped_fungus", global: 21827, default: 0,
         ty: [  ]
     },
-    PottedCrimsonRoots => { ident: "minecraft:potted_crimson_roots", global: 21628, default: 0,
+    PottedCrimsonRoots => { ident: "minecraft:potted_crimson_roots", global: 21828, default: 0,
         ty: [  ]
     },
-    PottedWarpedRoots => { ident: "minecraft:potted_warped_roots", global: 21629, default: 0,
+    PottedWarpedRoots => { ident: "minecraft:potted_warped_roots", global: 21829, default: 0,
         ty: [  ]
     },
-    Lodestone => { ident: "minecraft:lodestone", global: 21630, default: 0,
+    Lodestone => { ident: "minecraft:lodestone", global: 21830, default: 0,
         ty: [  ]
     },
-    Blackstone => { ident: "minecraft:blackstone", global: 21631, default: 0,
+    Blackstone => { ident: "minecraft:blackstone", global: 21831, default: 0,
         ty: [  ]
     },
-    BlackstoneStairs => { ident: "minecraft:blackstone_stairs", global: 21632, default: 11,
+    BlackstoneStairs => { ident: "minecraft:blackstone_stairs", global: 21832, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    BlackstoneWall => { ident: "minecraft:blackstone_wall", global: 21712, default: 3,
+    BlackstoneWall => { ident: "minecraft:blackstone_wall", global: 21912, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    BlackstoneSlab => { ident: "minecraft:blackstone_slab", global: 22036, default: 3,
+    BlackstoneSlab => { ident: "minecraft:blackstone_slab", global: 22236, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PolishedBlackstone => { ident: "minecraft:polished_blackstone", global: 22042, default: 0,
+    PolishedBlackstone => { ident: "minecraft:polished_blackstone", global: 22242, default: 0,
         ty: [  ]
     },
-    PolishedBlackstoneBricks => { ident: "minecraft:polished_blackstone_bricks", global: 22043, default: 0,
+    PolishedBlackstoneBricks => { ident: "minecraft:polished_blackstone_bricks", global: 22243, default: 0,
         ty: [  ]
     },
-    CrackedPolishedBlackstoneBricks => { ident: "minecraft:cracked_polished_blackstone_bricks", global: 22044, default: 0,
+    CrackedPolishedBlackstoneBricks => { ident: "minecraft:cracked_polished_blackstone_bricks", global: 22244, default: 0,
         ty: [  ]
     },
-    ChiseledPolishedBlackstone => { ident: "minecraft:chiseled_polished_blackstone", global: 22045, default: 0,
+    ChiseledPolishedBlackstone => { ident: "minecraft:chiseled_polished_blackstone", global: 22245, default: 0,
         ty: [  ]
     },
-    PolishedBlackstoneBrickSlab => { ident: "minecraft:polished_blackstone_brick_slab", global: 22046, default: 3,
+    PolishedBlackstoneBrickSlab => { ident: "minecraft:polished_blackstone_brick_slab", global: 22246, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PolishedBlackstoneBrickStairs => { ident: "minecraft:polished_blackstone_brick_stairs", global: 22052, default: 11,
+    PolishedBlackstoneBrickStairs => { ident: "minecraft:polished_blackstone_brick_stairs", global: 22252, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PolishedBlackstoneBrickWall => { ident: "minecraft:polished_blackstone_brick_wall", global: 22132, default: 3,
+    PolishedBlackstoneBrickWall => { ident: "minecraft:polished_blackstone_brick_wall", global: 22332, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    GildedBlackstone => { ident: "minecraft:gilded_blackstone", global: 22456, default: 0,
+    GildedBlackstone => { ident: "minecraft:gilded_blackstone", global: 22656, default: 0,
         ty: [  ]
     },
-    PolishedBlackstoneStairs => { ident: "minecraft:polished_blackstone_stairs", global: 22457, default: 11,
+    PolishedBlackstoneStairs => { ident: "minecraft:polished_blackstone_stairs", global: 22657, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PolishedBlackstoneSlab => { ident: "minecraft:polished_blackstone_slab", global: 22537, default: 3,
+    PolishedBlackstoneSlab => { ident: "minecraft:polished_blackstone_slab", global: 22737, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PolishedBlackstonePressurePlate => { ident: "minecraft:polished_blackstone_pressure_plate", global: 22543, default: 1,
+    PolishedBlackstonePressurePlate => { ident: "minecraft:polished_blackstone_pressure_plate", global: 22743, default: 1,
         ty: [ "powered" => PoweredBool ]
     },
-    PolishedBlackstoneButton => { ident: "minecraft:polished_blackstone_button", global: 22545, default: 9,
+    PolishedBlackstoneButton => { ident: "minecraft:polished_blackstone_button", global: 22745, default: 9,
         ty: [ "face" => Face_FloorWallCeiling, "facing" => Facing_NorthSouthWestEast, "powered" => PoweredBool ]
     },
-    PolishedBlackstoneWall => { ident: "minecraft:polished_blackstone_wall", global: 22569, default: 3,
+    PolishedBlackstoneWall => { ident: "minecraft:polished_blackstone_wall", global: 22769, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    ChiseledNetherBricks => { ident: "minecraft:chiseled_nether_bricks", global: 22893, default: 0,
+    ChiseledNetherBricks => { ident: "minecraft:chiseled_nether_bricks", global: 23093, default: 0,
         ty: [  ]
     },
-    CrackedNetherBricks => { ident: "minecraft:cracked_nether_bricks", global: 22894, default: 0,
+    CrackedNetherBricks => { ident: "minecraft:cracked_nether_bricks", global: 23094, default: 0,
         ty: [  ]
     },
-    QuartzBricks => { ident: "minecraft:quartz_bricks", global: 22895, default: 0,
+    QuartzBricks => { ident: "minecraft:quartz_bricks", global: 23095, default: 0,
         ty: [  ]
     },
-    Candle => { ident: "minecraft:candle", global: 22896, default: 3,
+    Candle => { ident: "minecraft:candle", global: 23096, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    WhiteCandle => { ident: "minecraft:white_candle", global: 22912, default: 3,
+    WhiteCandle => { ident: "minecraft:white_candle", global: 23112, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    OrangeCandle => { ident: "minecraft:orange_candle", global: 22928, default: 3,
+    OrangeCandle => { ident: "minecraft:orange_candle", global: 23128, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    MagentaCandle => { ident: "minecraft:magenta_candle", global: 22944, default: 3,
+    MagentaCandle => { ident: "minecraft:magenta_candle", global: 23144, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    LightBlueCandle => { ident: "minecraft:light_blue_candle", global: 22960, default: 3,
+    LightBlueCandle => { ident: "minecraft:light_blue_candle", global: 23160, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    YellowCandle => { ident: "minecraft:yellow_candle", global: 22976, default: 3,
+    YellowCandle => { ident: "minecraft:yellow_candle", global: 23176, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    LimeCandle => { ident: "minecraft:lime_candle", global: 22992, default: 3,
+    LimeCandle => { ident: "minecraft:lime_candle", global: 23192, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    PinkCandle => { ident: "minecraft:pink_candle", global: 23008, default: 3,
+    PinkCandle => { ident: "minecraft:pink_candle", global: 23208, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    GrayCandle => { ident: "minecraft:gray_candle", global: 23024, default: 3,
+    GrayCandle => { ident: "minecraft:gray_candle", global: 23224, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    LightGrayCandle => { ident: "minecraft:light_gray_candle", global: 23040, default: 3,
+    LightGrayCandle => { ident: "minecraft:light_gray_candle", global: 23240, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    CyanCandle => { ident: "minecraft:cyan_candle", global: 23056, default: 3,
+    CyanCandle => { ident: "minecraft:cyan_candle", global: 23256, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    PurpleCandle => { ident: "minecraft:purple_candle", global: 23072, default: 3,
+    PurpleCandle => { ident: "minecraft:purple_candle", global: 23272, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    BlueCandle => { ident: "minecraft:blue_candle", global: 23088, default: 3,
+    BlueCandle => { ident: "minecraft:blue_candle", global: 23288, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    BrownCandle => { ident: "minecraft:brown_candle", global: 23104, default: 3,
+    BrownCandle => { ident: "minecraft:brown_candle", global: 23304, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    GreenCandle => { ident: "minecraft:green_candle", global: 23120, default: 3,
+    GreenCandle => { ident: "minecraft:green_candle", global: 23320, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    RedCandle => { ident: "minecraft:red_candle", global: 23136, default: 3,
+    RedCandle => { ident: "minecraft:red_candle", global: 23336, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    BlackCandle => { ident: "minecraft:black_candle", global: 23152, default: 3,
+    BlackCandle => { ident: "minecraft:black_candle", global: 23352, default: 3,
         ty: [ "candles" => Candles_1234, "lit" => LitBool, "waterlogged" => WaterloggedBool ]
     },
-    CandleCake => { ident: "minecraft:candle_cake", global: 23168, default: 1,
+    CandleCake => { ident: "minecraft:candle_cake", global: 23368, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    WhiteCandleCake => { ident: "minecraft:white_candle_cake", global: 23170, default: 1,
+    WhiteCandleCake => { ident: "minecraft:white_candle_cake", global: 23370, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    OrangeCandleCake => { ident: "minecraft:orange_candle_cake", global: 23172, default: 1,
+    OrangeCandleCake => { ident: "minecraft:orange_candle_cake", global: 23372, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    MagentaCandleCake => { ident: "minecraft:magenta_candle_cake", global: 23174, default: 1,
+    MagentaCandleCake => { ident: "minecraft:magenta_candle_cake", global: 23374, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    LightBlueCandleCake => { ident: "minecraft:light_blue_candle_cake", global: 23176, default: 1,
+    LightBlueCandleCake => { ident: "minecraft:light_blue_candle_cake", global: 23376, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    YellowCandleCake => { ident: "minecraft:yellow_candle_cake", global: 23178, default: 1,
+    YellowCandleCake => { ident: "minecraft:yellow_candle_cake", global: 23378, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    LimeCandleCake => { ident: "minecraft:lime_candle_cake", global: 23180, default: 1,
+    LimeCandleCake => { ident: "minecraft:lime_candle_cake", global: 23380, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    PinkCandleCake => { ident: "minecraft:pink_candle_cake", global: 23182, default: 1,
+    PinkCandleCake => { ident: "minecraft:pink_candle_cake", global: 23382, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    GrayCandleCake => { ident: "minecraft:gray_candle_cake", global: 23184, default: 1,
+    GrayCandleCake => { ident: "minecraft:gray_candle_cake", global: 23384, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    LightGrayCandleCake => { ident: "minecraft:light_gray_candle_cake", global: 23186, default: 1,
+    LightGrayCandleCake => { ident: "minecraft:light_gray_candle_cake", global: 23386, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    CyanCandleCake => { ident: "minecraft:cyan_candle_cake", global: 23188, default: 1,
+    CyanCandleCake => { ident: "minecraft:cyan_candle_cake", global: 23388, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    PurpleCandleCake => { ident: "minecraft:purple_candle_cake", global: 23190, default: 1,
+    PurpleCandleCake => { ident: "minecraft:purple_candle_cake", global: 23390, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    BlueCandleCake => { ident: "minecraft:blue_candle_cake", global: 23192, default: 1,
+    BlueCandleCake => { ident: "minecraft:blue_candle_cake", global: 23392, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    BrownCandleCake => { ident: "minecraft:brown_candle_cake", global: 23194, default: 1,
+    BrownCandleCake => { ident: "minecraft:brown_candle_cake", global: 23394, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    GreenCandleCake => { ident: "minecraft:green_candle_cake", global: 23196, default: 1,
+    GreenCandleCake => { ident: "minecraft:green_candle_cake", global: 23396, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    RedCandleCake => { ident: "minecraft:red_candle_cake", global: 23198, default: 1,
+    RedCandleCake => { ident: "minecraft:red_candle_cake", global: 23398, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    BlackCandleCake => { ident: "minecraft:black_candle_cake", global: 23200, default: 1,
+    BlackCandleCake => { ident: "minecraft:black_candle_cake", global: 23400, default: 1,
         ty: [ "lit" => LitBool ]
     },
-    AmethystBlock => { ident: "minecraft:amethyst_block", global: 23202, default: 0,
+    AmethystBlock => { ident: "minecraft:amethyst_block", global: 23402, default: 0,
         ty: [  ]
     },
-    BuddingAmethyst => { ident: "minecraft:budding_amethyst", global: 23203, default: 0,
+    BuddingAmethyst => { ident: "minecraft:budding_amethyst", global: 23403, default: 0,
         ty: [  ]
     },
-    AmethystCluster => { ident: "minecraft:amethyst_cluster", global: 23204, default: 9,
+    AmethystCluster => { ident: "minecraft:amethyst_cluster", global: 23404, default: 9,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "waterlogged" => WaterloggedBool ]
     },
-    LargeAmethystBud => { ident: "minecraft:large_amethyst_bud", global: 23216, default: 9,
+    LargeAmethystBud => { ident: "minecraft:large_amethyst_bud", global: 23416, default: 9,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "waterlogged" => WaterloggedBool ]
     },
-    MediumAmethystBud => { ident: "minecraft:medium_amethyst_bud", global: 23228, default: 9,
+    MediumAmethystBud => { ident: "minecraft:medium_amethyst_bud", global: 23428, default: 9,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "waterlogged" => WaterloggedBool ]
     },
-    SmallAmethystBud => { ident: "minecraft:small_amethyst_bud", global: 23240, default: 9,
+    SmallAmethystBud => { ident: "minecraft:small_amethyst_bud", global: 23440, default: 9,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "waterlogged" => WaterloggedBool ]
     },
-    Tuff => { ident: "minecraft:tuff", global: 23252, default: 0,
+    Tuff => { ident: "minecraft:tuff", global: 23452, default: 0,
         ty: [  ]
     },
-    TuffSlab => { ident: "minecraft:tuff_slab", global: 23253, default: 3,
+    TuffSlab => { ident: "minecraft:tuff_slab", global: 23453, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    TuffStairs => { ident: "minecraft:tuff_stairs", global: 23259, default: 11,
+    TuffStairs => { ident: "minecraft:tuff_stairs", global: 23459, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    TuffWall => { ident: "minecraft:tuff_wall", global: 23339, default: 3,
+    TuffWall => { ident: "minecraft:tuff_wall", global: 23539, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    PolishedTuff => { ident: "minecraft:polished_tuff", global: 23663, default: 0,
+    PolishedTuff => { ident: "minecraft:polished_tuff", global: 23863, default: 0,
         ty: [  ]
     },
-    PolishedTuffSlab => { ident: "minecraft:polished_tuff_slab", global: 23664, default: 3,
+    PolishedTuffSlab => { ident: "minecraft:polished_tuff_slab", global: 23864, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PolishedTuffStairs => { ident: "minecraft:polished_tuff_stairs", global: 23670, default: 11,
+    PolishedTuffStairs => { ident: "minecraft:polished_tuff_stairs", global: 23870, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PolishedTuffWall => { ident: "minecraft:polished_tuff_wall", global: 23750, default: 3,
+    PolishedTuffWall => { ident: "minecraft:polished_tuff_wall", global: 23950, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    ChiseledTuff => { ident: "minecraft:chiseled_tuff", global: 24074, default: 0,
+    ChiseledTuff => { ident: "minecraft:chiseled_tuff", global: 24274, default: 0,
         ty: [  ]
     },
-    TuffBricks => { ident: "minecraft:tuff_bricks", global: 24075, default: 0,
+    TuffBricks => { ident: "minecraft:tuff_bricks", global: 24275, default: 0,
         ty: [  ]
     },
-    TuffBrickSlab => { ident: "minecraft:tuff_brick_slab", global: 24076, default: 3,
+    TuffBrickSlab => { ident: "minecraft:tuff_brick_slab", global: 24276, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    TuffBrickStairs => { ident: "minecraft:tuff_brick_stairs", global: 24082, default: 11,
+    TuffBrickStairs => { ident: "minecraft:tuff_brick_stairs", global: 24282, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    TuffBrickWall => { ident: "minecraft:tuff_brick_wall", global: 24162, default: 3,
+    TuffBrickWall => { ident: "minecraft:tuff_brick_wall", global: 24362, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    ChiseledTuffBricks => { ident: "minecraft:chiseled_tuff_bricks", global: 24486, default: 0,
+    ChiseledTuffBricks => { ident: "minecraft:chiseled_tuff_bricks", global: 24686, default: 0,
         ty: [  ]
     },
-    Calcite => { ident: "minecraft:calcite", global: 24487, default: 0,
+    Calcite => { ident: "minecraft:calcite", global: 24687, default: 0,
         ty: [  ]
     },
-    TintedGlass => { ident: "minecraft:tinted_glass", global: 24488, default: 0,
+    TintedGlass => { ident: "minecraft:tinted_glass", global: 24688, default: 0,
         ty: [  ]
     },
-    PowderSnow => { ident: "minecraft:powder_snow", global: 24489, default: 0,
+    PowderSnow => { ident: "minecraft:powder_snow", global: 24689, default: 0,
         ty: [  ]
     },
-    SculkSensor => { ident: "minecraft:sculk_sensor", global: 24490, default: 1,
+    SculkSensor => { ident: "minecraft:sculk_sensor", global: 24690, default: 1,
         ty: [ "power" => Power_0123456789101112131415, "sculk_sensor_phase" => SculkSensorPhase_InactiveActiveCooldown, "waterlogged" => WaterloggedBool ]
     },
-    CalibratedSculkSensor => { ident: "minecraft:calibrated_sculk_sensor", global: 24586, default: 1,
+    CalibratedSculkSensor => { ident: "minecraft:calibrated_sculk_sensor", global: 24786, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "power" => Power_0123456789101112131415, "sculk_sensor_phase" => SculkSensorPhase_InactiveActiveCooldown, "waterlogged" => WaterloggedBool ]
     },
-    Sculk => { ident: "minecraft:sculk", global: 24970, default: 0,
+    Sculk => { ident: "minecraft:sculk", global: 25170, default: 0,
         ty: [  ]
     },
-    SculkVein => { ident: "minecraft:sculk_vein", global: 24971, default: 127,
+    SculkVein => { ident: "minecraft:sculk_vein", global: 25171, default: 127,
         ty: [ "down" => DownBool, "east" => EastBool, "north" => NorthBool, "south" => SouthBool, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => WestBool ]
     },
-    SculkCatalyst => { ident: "minecraft:sculk_catalyst", global: 25099, default: 1,
+    SculkCatalyst => { ident: "minecraft:sculk_catalyst", global: 25299, default: 1,
         ty: [ "bloom" => BloomBool ]
     },
-    SculkShrieker => { ident: "minecraft:sculk_shrieker", global: 25101, default: 7,
+    SculkShrieker => { ident: "minecraft:sculk_shrieker", global: 25301, default: 7,
         ty: [ "can_summon" => CanSummonBool, "shrieking" => ShriekingBool, "waterlogged" => WaterloggedBool ]
     },
-    CopperBlock => { ident: "minecraft:copper_block", global: 25109, default: 0,
+    CopperBlock => { ident: "minecraft:copper_block", global: 25309, default: 0,
         ty: [  ]
     },
-    ExposedCopper => { ident: "minecraft:exposed_copper", global: 25110, default: 0,
+    ExposedCopper => { ident: "minecraft:exposed_copper", global: 25310, default: 0,
         ty: [  ]
     },
-    WeatheredCopper => { ident: "minecraft:weathered_copper", global: 25111, default: 0,
+    WeatheredCopper => { ident: "minecraft:weathered_copper", global: 25311, default: 0,
         ty: [  ]
     },
-    OxidizedCopper => { ident: "minecraft:oxidized_copper", global: 25112, default: 0,
+    OxidizedCopper => { ident: "minecraft:oxidized_copper", global: 25312, default: 0,
         ty: [  ]
     },
-    CopperOre => { ident: "minecraft:copper_ore", global: 25113, default: 0,
+    CopperOre => { ident: "minecraft:copper_ore", global: 25313, default: 0,
         ty: [  ]
     },
-    DeepslateCopperOre => { ident: "minecraft:deepslate_copper_ore", global: 25114, default: 0,
+    DeepslateCopperOre => { ident: "minecraft:deepslate_copper_ore", global: 25314, default: 0,
         ty: [  ]
     },
-    OxidizedCutCopper => { ident: "minecraft:oxidized_cut_copper", global: 25115, default: 0,
+    OxidizedCutCopper => { ident: "minecraft:oxidized_cut_copper", global: 25315, default: 0,
         ty: [  ]
     },
-    WeatheredCutCopper => { ident: "minecraft:weathered_cut_copper", global: 25116, default: 0,
+    WeatheredCutCopper => { ident: "minecraft:weathered_cut_copper", global: 25316, default: 0,
         ty: [  ]
     },
-    ExposedCutCopper => { ident: "minecraft:exposed_cut_copper", global: 25117, default: 0,
+    ExposedCutCopper => { ident: "minecraft:exposed_cut_copper", global: 25317, default: 0,
         ty: [  ]
     },
-    CutCopper => { ident: "minecraft:cut_copper", global: 25118, default: 0,
+    CutCopper => { ident: "minecraft:cut_copper", global: 25318, default: 0,
         ty: [  ]
     },
-    OxidizedChiseledCopper => { ident: "minecraft:oxidized_chiseled_copper", global: 25119, default: 0,
+    OxidizedChiseledCopper => { ident: "minecraft:oxidized_chiseled_copper", global: 25319, default: 0,
         ty: [  ]
     },
-    WeatheredChiseledCopper => { ident: "minecraft:weathered_chiseled_copper", global: 25120, default: 0,
+    WeatheredChiseledCopper => { ident: "minecraft:weathered_chiseled_copper", global: 25320, default: 0,
         ty: [  ]
     },
-    ExposedChiseledCopper => { ident: "minecraft:exposed_chiseled_copper", global: 25121, default: 0,
+    ExposedChiseledCopper => { ident: "minecraft:exposed_chiseled_copper", global: 25321, default: 0,
         ty: [  ]
     },
-    ChiseledCopper => { ident: "minecraft:chiseled_copper", global: 25122, default: 0,
+    ChiseledCopper => { ident: "minecraft:chiseled_copper", global: 25322, default: 0,
         ty: [  ]
     },
-    WaxedOxidizedChiseledCopper => { ident: "minecraft:waxed_oxidized_chiseled_copper", global: 25123, default: 0,
+    WaxedOxidizedChiseledCopper => { ident: "minecraft:waxed_oxidized_chiseled_copper", global: 25323, default: 0,
         ty: [  ]
     },
-    WaxedWeatheredChiseledCopper => { ident: "minecraft:waxed_weathered_chiseled_copper", global: 25124, default: 0,
+    WaxedWeatheredChiseledCopper => { ident: "minecraft:waxed_weathered_chiseled_copper", global: 25324, default: 0,
         ty: [  ]
     },
-    WaxedExposedChiseledCopper => { ident: "minecraft:waxed_exposed_chiseled_copper", global: 25125, default: 0,
+    WaxedExposedChiseledCopper => { ident: "minecraft:waxed_exposed_chiseled_copper", global: 25325, default: 0,
         ty: [  ]
     },
-    WaxedChiseledCopper => { ident: "minecraft:waxed_chiseled_copper", global: 25126, default: 0,
+    WaxedChiseledCopper => { ident: "minecraft:waxed_chiseled_copper", global: 25326, default: 0,
         ty: [  ]
     },
-    OxidizedCutCopperStairs => { ident: "minecraft:oxidized_cut_copper_stairs", global: 25127, default: 11,
+    OxidizedCutCopperStairs => { ident: "minecraft:oxidized_cut_copper_stairs", global: 25327, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCutCopperStairs => { ident: "minecraft:weathered_cut_copper_stairs", global: 25207, default: 11,
+    WeatheredCutCopperStairs => { ident: "minecraft:weathered_cut_copper_stairs", global: 25407, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    ExposedCutCopperStairs => { ident: "minecraft:exposed_cut_copper_stairs", global: 25287, default: 11,
+    ExposedCutCopperStairs => { ident: "minecraft:exposed_cut_copper_stairs", global: 25487, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    CutCopperStairs => { ident: "minecraft:cut_copper_stairs", global: 25367, default: 11,
+    CutCopperStairs => { ident: "minecraft:cut_copper_stairs", global: 25567, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    OxidizedCutCopperSlab => { ident: "minecraft:oxidized_cut_copper_slab", global: 25447, default: 3,
+    OxidizedCutCopperSlab => { ident: "minecraft:oxidized_cut_copper_slab", global: 25647, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCutCopperSlab => { ident: "minecraft:weathered_cut_copper_slab", global: 25453, default: 3,
+    WeatheredCutCopperSlab => { ident: "minecraft:weathered_cut_copper_slab", global: 25653, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    ExposedCutCopperSlab => { ident: "minecraft:exposed_cut_copper_slab", global: 25459, default: 3,
+    ExposedCutCopperSlab => { ident: "minecraft:exposed_cut_copper_slab", global: 25659, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CutCopperSlab => { ident: "minecraft:cut_copper_slab", global: 25465, default: 3,
+    CutCopperSlab => { ident: "minecraft:cut_copper_slab", global: 25665, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCopperBlock => { ident: "minecraft:waxed_copper_block", global: 25471, default: 0,
+    WaxedCopperBlock => { ident: "minecraft:waxed_copper_block", global: 25671, default: 0,
         ty: [  ]
     },
-    WaxedWeatheredCopper => { ident: "minecraft:waxed_weathered_copper", global: 25472, default: 0,
+    WaxedWeatheredCopper => { ident: "minecraft:waxed_weathered_copper", global: 25672, default: 0,
         ty: [  ]
     },
-    WaxedExposedCopper => { ident: "minecraft:waxed_exposed_copper", global: 25473, default: 0,
+    WaxedExposedCopper => { ident: "minecraft:waxed_exposed_copper", global: 25673, default: 0,
         ty: [  ]
     },
-    WaxedOxidizedCopper => { ident: "minecraft:waxed_oxidized_copper", global: 25474, default: 0,
+    WaxedOxidizedCopper => { ident: "minecraft:waxed_oxidized_copper", global: 25674, default: 0,
         ty: [  ]
     },
-    WaxedOxidizedCutCopper => { ident: "minecraft:waxed_oxidized_cut_copper", global: 25475, default: 0,
+    WaxedOxidizedCutCopper => { ident: "minecraft:waxed_oxidized_cut_copper", global: 25675, default: 0,
         ty: [  ]
     },
-    WaxedWeatheredCutCopper => { ident: "minecraft:waxed_weathered_cut_copper", global: 25476, default: 0,
+    WaxedWeatheredCutCopper => { ident: "minecraft:waxed_weathered_cut_copper", global: 25676, default: 0,
         ty: [  ]
     },
-    WaxedExposedCutCopper => { ident: "minecraft:waxed_exposed_cut_copper", global: 25477, default: 0,
+    WaxedExposedCutCopper => { ident: "minecraft:waxed_exposed_cut_copper", global: 25677, default: 0,
         ty: [  ]
     },
-    WaxedCutCopper => { ident: "minecraft:waxed_cut_copper", global: 25478, default: 0,
+    WaxedCutCopper => { ident: "minecraft:waxed_cut_copper", global: 25678, default: 0,
         ty: [  ]
     },
-    WaxedOxidizedCutCopperStairs => { ident: "minecraft:waxed_oxidized_cut_copper_stairs", global: 25479, default: 11,
+    WaxedOxidizedCutCopperStairs => { ident: "minecraft:waxed_oxidized_cut_copper_stairs", global: 25679, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCutCopperStairs => { ident: "minecraft:waxed_weathered_cut_copper_stairs", global: 25559, default: 11,
+    WaxedWeatheredCutCopperStairs => { ident: "minecraft:waxed_weathered_cut_copper_stairs", global: 25759, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCutCopperStairs => { ident: "minecraft:waxed_exposed_cut_copper_stairs", global: 25639, default: 11,
+    WaxedExposedCutCopperStairs => { ident: "minecraft:waxed_exposed_cut_copper_stairs", global: 25839, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCutCopperStairs => { ident: "minecraft:waxed_cut_copper_stairs", global: 25719, default: 11,
+    WaxedCutCopperStairs => { ident: "minecraft:waxed_cut_copper_stairs", global: 25919, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedCutCopperSlab => { ident: "minecraft:waxed_oxidized_cut_copper_slab", global: 25799, default: 3,
+    WaxedOxidizedCutCopperSlab => { ident: "minecraft:waxed_oxidized_cut_copper_slab", global: 25999, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCutCopperSlab => { ident: "minecraft:waxed_weathered_cut_copper_slab", global: 25805, default: 3,
+    WaxedWeatheredCutCopperSlab => { ident: "minecraft:waxed_weathered_cut_copper_slab", global: 26005, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCutCopperSlab => { ident: "minecraft:waxed_exposed_cut_copper_slab", global: 25811, default: 3,
+    WaxedExposedCutCopperSlab => { ident: "minecraft:waxed_exposed_cut_copper_slab", global: 26011, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCutCopperSlab => { ident: "minecraft:waxed_cut_copper_slab", global: 25817, default: 3,
+    WaxedCutCopperSlab => { ident: "minecraft:waxed_cut_copper_slab", global: 26017, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CopperDoor => { ident: "minecraft:copper_door", global: 25823, default: 11,
+    CopperDoor => { ident: "minecraft:copper_door", global: 26023, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    ExposedCopperDoor => { ident: "minecraft:exposed_copper_door", global: 25887, default: 11,
+    ExposedCopperDoor => { ident: "minecraft:exposed_copper_door", global: 26087, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    OxidizedCopperDoor => { ident: "minecraft:oxidized_copper_door", global: 25951, default: 11,
+    OxidizedCopperDoor => { ident: "minecraft:oxidized_copper_door", global: 26151, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    WeatheredCopperDoor => { ident: "minecraft:weathered_copper_door", global: 26015, default: 11,
+    WeatheredCopperDoor => { ident: "minecraft:weathered_copper_door", global: 26215, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    WaxedCopperDoor => { ident: "minecraft:waxed_copper_door", global: 26079, default: 11,
+    WaxedCopperDoor => { ident: "minecraft:waxed_copper_door", global: 26279, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    WaxedExposedCopperDoor => { ident: "minecraft:waxed_exposed_copper_door", global: 26143, default: 11,
+    WaxedExposedCopperDoor => { ident: "minecraft:waxed_exposed_copper_door", global: 26343, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    WaxedOxidizedCopperDoor => { ident: "minecraft:waxed_oxidized_copper_door", global: 26207, default: 11,
+    WaxedOxidizedCopperDoor => { ident: "minecraft:waxed_oxidized_copper_door", global: 26407, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    WaxedWeatheredCopperDoor => { ident: "minecraft:waxed_weathered_copper_door", global: 26271, default: 11,
+    WaxedWeatheredCopperDoor => { ident: "minecraft:waxed_weathered_copper_door", global: 26471, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    CopperTrapdoor => { ident: "minecraft:copper_trapdoor", global: 26335, default: 15,
+    CopperTrapdoor => { ident: "minecraft:copper_trapdoor", global: 26535, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    ExposedCopperTrapdoor => { ident: "minecraft:exposed_copper_trapdoor", global: 26399, default: 15,
+    ExposedCopperTrapdoor => { ident: "minecraft:exposed_copper_trapdoor", global: 26599, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    OxidizedCopperTrapdoor => { ident: "minecraft:oxidized_copper_trapdoor", global: 26463, default: 15,
+    OxidizedCopperTrapdoor => { ident: "minecraft:oxidized_copper_trapdoor", global: 26663, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCopperTrapdoor => { ident: "minecraft:weathered_copper_trapdoor", global: 26527, default: 15,
+    WeatheredCopperTrapdoor => { ident: "minecraft:weathered_copper_trapdoor", global: 26727, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCopperTrapdoor => { ident: "minecraft:waxed_copper_trapdoor", global: 26591, default: 15,
+    WaxedCopperTrapdoor => { ident: "minecraft:waxed_copper_trapdoor", global: 26791, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCopperTrapdoor => { ident: "minecraft:waxed_exposed_copper_trapdoor", global: 26655, default: 15,
+    WaxedExposedCopperTrapdoor => { ident: "minecraft:waxed_exposed_copper_trapdoor", global: 26855, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedCopperTrapdoor => { ident: "minecraft:waxed_oxidized_copper_trapdoor", global: 26719, default: 15,
+    WaxedOxidizedCopperTrapdoor => { ident: "minecraft:waxed_oxidized_copper_trapdoor", global: 26919, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCopperTrapdoor => { ident: "minecraft:waxed_weathered_copper_trapdoor", global: 26783, default: 15,
+    WaxedWeatheredCopperTrapdoor => { ident: "minecraft:waxed_weathered_copper_trapdoor", global: 26983, default: 15,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "open" => OpenBool, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    CopperGrate => { ident: "minecraft:copper_grate", global: 26847, default: 1,
+    CopperGrate => { ident: "minecraft:copper_grate", global: 27047, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    ExposedCopperGrate => { ident: "minecraft:exposed_copper_grate", global: 26849, default: 1,
+    ExposedCopperGrate => { ident: "minecraft:exposed_copper_grate", global: 27049, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCopperGrate => { ident: "minecraft:weathered_copper_grate", global: 26851, default: 1,
+    WeatheredCopperGrate => { ident: "minecraft:weathered_copper_grate", global: 27051, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    OxidizedCopperGrate => { ident: "minecraft:oxidized_copper_grate", global: 26853, default: 1,
+    OxidizedCopperGrate => { ident: "minecraft:oxidized_copper_grate", global: 27053, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    WaxedCopperGrate => { ident: "minecraft:waxed_copper_grate", global: 26855, default: 1,
+    WaxedCopperGrate => { ident: "minecraft:waxed_copper_grate", global: 27055, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCopperGrate => { ident: "minecraft:waxed_exposed_copper_grate", global: 26857, default: 1,
+    WaxedExposedCopperGrate => { ident: "minecraft:waxed_exposed_copper_grate", global: 27057, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCopperGrate => { ident: "minecraft:waxed_weathered_copper_grate", global: 26859, default: 1,
+    WaxedWeatheredCopperGrate => { ident: "minecraft:waxed_weathered_copper_grate", global: 27059, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedCopperGrate => { ident: "minecraft:waxed_oxidized_copper_grate", global: 26861, default: 1,
+    WaxedOxidizedCopperGrate => { ident: "minecraft:waxed_oxidized_copper_grate", global: 27061, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    CopperBulb => { ident: "minecraft:copper_bulb", global: 26863, default: 3,
+    CopperBulb => { ident: "minecraft:copper_bulb", global: 27063, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    ExposedCopperBulb => { ident: "minecraft:exposed_copper_bulb", global: 26867, default: 3,
+    ExposedCopperBulb => { ident: "minecraft:exposed_copper_bulb", global: 27067, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    WeatheredCopperBulb => { ident: "minecraft:weathered_copper_bulb", global: 26871, default: 3,
+    WeatheredCopperBulb => { ident: "minecraft:weathered_copper_bulb", global: 27071, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    OxidizedCopperBulb => { ident: "minecraft:oxidized_copper_bulb", global: 26875, default: 3,
+    OxidizedCopperBulb => { ident: "minecraft:oxidized_copper_bulb", global: 27075, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    WaxedCopperBulb => { ident: "minecraft:waxed_copper_bulb", global: 26879, default: 3,
+    WaxedCopperBulb => { ident: "minecraft:waxed_copper_bulb", global: 27079, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    WaxedExposedCopperBulb => { ident: "minecraft:waxed_exposed_copper_bulb", global: 26883, default: 3,
+    WaxedExposedCopperBulb => { ident: "minecraft:waxed_exposed_copper_bulb", global: 27083, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    WaxedWeatheredCopperBulb => { ident: "minecraft:waxed_weathered_copper_bulb", global: 26887, default: 3,
+    WaxedWeatheredCopperBulb => { ident: "minecraft:waxed_weathered_copper_bulb", global: 27087, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    WaxedOxidizedCopperBulb => { ident: "minecraft:waxed_oxidized_copper_bulb", global: 26891, default: 3,
+    WaxedOxidizedCopperBulb => { ident: "minecraft:waxed_oxidized_copper_bulb", global: 27091, default: 3,
         ty: [ "lit" => LitBool, "powered" => PoweredBool ]
     },
-    CopperChest => { ident: "minecraft:copper_chest", global: 26895, default: 1,
+    CopperChest => { ident: "minecraft:copper_chest", global: 27095, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    ExposedCopperChest => { ident: "minecraft:exposed_copper_chest", global: 26919, default: 1,
+    ExposedCopperChest => { ident: "minecraft:exposed_copper_chest", global: 27119, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCopperChest => { ident: "minecraft:weathered_copper_chest", global: 26943, default: 1,
+    WeatheredCopperChest => { ident: "minecraft:weathered_copper_chest", global: 27143, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    OxidizedCopperChest => { ident: "minecraft:oxidized_copper_chest", global: 26967, default: 1,
+    OxidizedCopperChest => { ident: "minecraft:oxidized_copper_chest", global: 27167, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCopperChest => { ident: "minecraft:waxed_copper_chest", global: 26991, default: 1,
+    WaxedCopperChest => { ident: "minecraft:waxed_copper_chest", global: 27191, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCopperChest => { ident: "minecraft:waxed_exposed_copper_chest", global: 27015, default: 1,
+    WaxedExposedCopperChest => { ident: "minecraft:waxed_exposed_copper_chest", global: 27215, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCopperChest => { ident: "minecraft:waxed_weathered_copper_chest", global: 27039, default: 1,
+    WaxedWeatheredCopperChest => { ident: "minecraft:waxed_weathered_copper_chest", global: 27239, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedCopperChest => { ident: "minecraft:waxed_oxidized_copper_chest", global: 27063, default: 1,
+    WaxedOxidizedCopperChest => { ident: "minecraft:waxed_oxidized_copper_chest", global: 27263, default: 1,
         ty: [ "type" => Type_SingleLeftRight, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    CopperGolemStatue => { ident: "minecraft:copper_golem_statue", global: 27087, default: 1,
+    CopperGolemStatue => { ident: "minecraft:copper_golem_statue", global: 27287, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    ExposedCopperGolemStatue => { ident: "minecraft:exposed_copper_golem_statue", global: 27119, default: 1,
+    ExposedCopperGolemStatue => { ident: "minecraft:exposed_copper_golem_statue", global: 27319, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredCopperGolemStatue => { ident: "minecraft:weathered_copper_golem_statue", global: 27151, default: 1,
+    WeatheredCopperGolemStatue => { ident: "minecraft:weathered_copper_golem_statue", global: 27351, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    OxidizedCopperGolemStatue => { ident: "minecraft:oxidized_copper_golem_statue", global: 27183, default: 1,
+    OxidizedCopperGolemStatue => { ident: "minecraft:oxidized_copper_golem_statue", global: 27383, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedCopperGolemStatue => { ident: "minecraft:waxed_copper_golem_statue", global: 27215, default: 1,
+    WaxedCopperGolemStatue => { ident: "minecraft:waxed_copper_golem_statue", global: 27415, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedCopperGolemStatue => { ident: "minecraft:waxed_exposed_copper_golem_statue", global: 27247, default: 1,
+    WaxedExposedCopperGolemStatue => { ident: "minecraft:waxed_exposed_copper_golem_statue", global: 27447, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredCopperGolemStatue => { ident: "minecraft:waxed_weathered_copper_golem_statue", global: 27279, default: 1,
+    WaxedWeatheredCopperGolemStatue => { ident: "minecraft:waxed_weathered_copper_golem_statue", global: 27479, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedCopperGolemStatue => { ident: "minecraft:waxed_oxidized_copper_golem_statue", global: 27311, default: 1,
+    WaxedOxidizedCopperGolemStatue => { ident: "minecraft:waxed_oxidized_copper_golem_statue", global: 27511, default: 1,
         ty: [ "copper_golem_pose" => CopperGolemPose_StandingSittingRunningStar, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    LightningRod => { ident: "minecraft:lightning_rod", global: 27343, default: 19,
+    LightningRod => { ident: "minecraft:lightning_rod", global: 27543, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    ExposedLightningRod => { ident: "minecraft:exposed_lightning_rod", global: 27367, default: 19,
+    ExposedLightningRod => { ident: "minecraft:exposed_lightning_rod", global: 27567, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WeatheredLightningRod => { ident: "minecraft:weathered_lightning_rod", global: 27391, default: 19,
+    WeatheredLightningRod => { ident: "minecraft:weathered_lightning_rod", global: 27591, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    OxidizedLightningRod => { ident: "minecraft:oxidized_lightning_rod", global: 27415, default: 19,
+    OxidizedLightningRod => { ident: "minecraft:oxidized_lightning_rod", global: 27615, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedLightningRod => { ident: "minecraft:waxed_lightning_rod", global: 27439, default: 19,
+    WaxedLightningRod => { ident: "minecraft:waxed_lightning_rod", global: 27639, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedExposedLightningRod => { ident: "minecraft:waxed_exposed_lightning_rod", global: 27463, default: 19,
+    WaxedExposedLightningRod => { ident: "minecraft:waxed_exposed_lightning_rod", global: 27663, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedWeatheredLightningRod => { ident: "minecraft:waxed_weathered_lightning_rod", global: 27487, default: 19,
+    WaxedWeatheredLightningRod => { ident: "minecraft:waxed_weathered_lightning_rod", global: 27687, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    WaxedOxidizedLightningRod => { ident: "minecraft:waxed_oxidized_lightning_rod", global: 27511, default: 19,
+    WaxedOxidizedLightningRod => { ident: "minecraft:waxed_oxidized_lightning_rod", global: 27711, default: 19,
         ty: [ "facing" => Facing_NorthEastSouthWestUpDown, "powered" => PoweredBool, "waterlogged" => WaterloggedBool ]
     },
-    PointedDripstone => { ident: "minecraft:pointed_dripstone", global: 27535, default: 5,
+    PointedDripstone => { ident: "minecraft:pointed_dripstone", global: 27735, default: 5,
         ty: [ "thickness" => Thickness, "vertical_direction" => VerticalDirection, "waterlogged" => WaterloggedBool ]
     },
-    DripstoneBlock => { ident: "minecraft:dripstone_block", global: 27555, default: 0,
+    DripstoneBlock => { ident: "minecraft:dripstone_block", global: 27755, default: 0,
         ty: [  ]
     },
-    CaveVines => { ident: "minecraft:cave_vines", global: 27556, default: 1,
+    CaveVines => { ident: "minecraft:cave_vines", global: 27756, default: 1,
         ty: [ "age" => Age_012345678910111213141516171819202122232425, "berries" => BerriesBool ]
     },
-    CaveVinesPlant => { ident: "minecraft:cave_vines_plant", global: 27608, default: 1,
+    CaveVinesPlant => { ident: "minecraft:cave_vines_plant", global: 27808, default: 1,
         ty: [ "berries" => BerriesBool ]
     },
-    SporeBlossom => { ident: "minecraft:spore_blossom", global: 27610, default: 0,
+    SporeBlossom => { ident: "minecraft:spore_blossom", global: 27810, default: 0,
         ty: [  ]
     },
-    Azalea => { ident: "minecraft:azalea", global: 27611, default: 0,
+    Azalea => { ident: "minecraft:azalea", global: 27811, default: 0,
         ty: [  ]
     },
-    FloweringAzalea => { ident: "minecraft:flowering_azalea", global: 27612, default: 0,
+    FloweringAzalea => { ident: "minecraft:flowering_azalea", global: 27812, default: 0,
         ty: [  ]
     },
-    MossCarpet => { ident: "minecraft:moss_carpet", global: 27613, default: 0,
+    MossCarpet => { ident: "minecraft:moss_carpet", global: 27813, default: 0,
         ty: [  ]
     },
-    PinkPetals => { ident: "minecraft:pink_petals", global: 27614, default: 0,
+    PinkPetals => { ident: "minecraft:pink_petals", global: 27814, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "flower_amount" => FlowerAmount_1234 ]
     },
-    Wildflowers => { ident: "minecraft:wildflowers", global: 27630, default: 0,
+    Wildflowers => { ident: "minecraft:wildflowers", global: 27830, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "flower_amount" => FlowerAmount_1234 ]
     },
-    LeafLitter => { ident: "minecraft:leaf_litter", global: 27646, default: 0,
+    LeafLitter => { ident: "minecraft:leaf_litter", global: 27846, default: 0,
         ty: [ "facing" => Facing_NorthSouthWestEast, "segment_amount" => SegmentAmount ]
     },
-    MossBlock => { ident: "minecraft:moss_block", global: 27662, default: 0,
+    MossBlock => { ident: "minecraft:moss_block", global: 27862, default: 0,
         ty: [  ]
     },
-    BigDripleaf => { ident: "minecraft:big_dripleaf", global: 27663, default: 1,
+    BigDripleaf => { ident: "minecraft:big_dripleaf", global: 27863, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "tilt" => Tilt, "waterlogged" => WaterloggedBool ]
     },
-    BigDripleafStem => { ident: "minecraft:big_dripleaf_stem", global: 27695, default: 1,
+    BigDripleafStem => { ident: "minecraft:big_dripleaf_stem", global: 27895, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    SmallDripleaf => { ident: "minecraft:small_dripleaf", global: 27703, default: 3,
+    SmallDripleaf => { ident: "minecraft:small_dripleaf", global: 27903, default: 3,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "waterlogged" => WaterloggedBool ]
     },
-    HangingRoots => { ident: "minecraft:hanging_roots", global: 27719, default: 1,
+    HangingRoots => { ident: "minecraft:hanging_roots", global: 27919, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    RootedDirt => { ident: "minecraft:rooted_dirt", global: 27721, default: 0,
+    RootedDirt => { ident: "minecraft:rooted_dirt", global: 27921, default: 0,
         ty: [  ]
     },
-    Mud => { ident: "minecraft:mud", global: 27722, default: 0,
+    Mud => { ident: "minecraft:mud", global: 27922, default: 0,
         ty: [  ]
     },
-    Deepslate => { ident: "minecraft:deepslate", global: 27723, default: 1,
+    Deepslate => { ident: "minecraft:deepslate", global: 27923, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    CobbledDeepslate => { ident: "minecraft:cobbled_deepslate", global: 27726, default: 0,
+    CobbledDeepslate => { ident: "minecraft:cobbled_deepslate", global: 27926, default: 0,
         ty: [  ]
     },
-    CobbledDeepslateStairs => { ident: "minecraft:cobbled_deepslate_stairs", global: 27727, default: 11,
+    CobbledDeepslateStairs => { ident: "minecraft:cobbled_deepslate_stairs", global: 27927, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    CobbledDeepslateSlab => { ident: "minecraft:cobbled_deepslate_slab", global: 27807, default: 3,
+    CobbledDeepslateSlab => { ident: "minecraft:cobbled_deepslate_slab", global: 28007, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    CobbledDeepslateWall => { ident: "minecraft:cobbled_deepslate_wall", global: 27813, default: 3,
+    CobbledDeepslateWall => { ident: "minecraft:cobbled_deepslate_wall", global: 28013, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    PolishedDeepslate => { ident: "minecraft:polished_deepslate", global: 28137, default: 0,
+    PolishedDeepslate => { ident: "minecraft:polished_deepslate", global: 28337, default: 0,
         ty: [  ]
     },
-    PolishedDeepslateStairs => { ident: "minecraft:polished_deepslate_stairs", global: 28138, default: 11,
+    PolishedDeepslateStairs => { ident: "minecraft:polished_deepslate_stairs", global: 28338, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    PolishedDeepslateSlab => { ident: "minecraft:polished_deepslate_slab", global: 28218, default: 3,
+    PolishedDeepslateSlab => { ident: "minecraft:polished_deepslate_slab", global: 28418, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    PolishedDeepslateWall => { ident: "minecraft:polished_deepslate_wall", global: 28224, default: 3,
+    PolishedDeepslateWall => { ident: "minecraft:polished_deepslate_wall", global: 28424, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    DeepslateTiles => { ident: "minecraft:deepslate_tiles", global: 28548, default: 0,
+    DeepslateTiles => { ident: "minecraft:deepslate_tiles", global: 28748, default: 0,
         ty: [  ]
     },
-    DeepslateTileStairs => { ident: "minecraft:deepslate_tile_stairs", global: 28549, default: 11,
+    DeepslateTileStairs => { ident: "minecraft:deepslate_tile_stairs", global: 28749, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    DeepslateTileSlab => { ident: "minecraft:deepslate_tile_slab", global: 28629, default: 3,
+    DeepslateTileSlab => { ident: "minecraft:deepslate_tile_slab", global: 28829, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    DeepslateTileWall => { ident: "minecraft:deepslate_tile_wall", global: 28635, default: 3,
+    DeepslateTileWall => { ident: "minecraft:deepslate_tile_wall", global: 28835, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    DeepslateBricks => { ident: "minecraft:deepslate_bricks", global: 28959, default: 0,
+    DeepslateBricks => { ident: "minecraft:deepslate_bricks", global: 29159, default: 0,
         ty: [  ]
     },
-    DeepslateBrickStairs => { ident: "minecraft:deepslate_brick_stairs", global: 28960, default: 11,
+    DeepslateBrickStairs => { ident: "minecraft:deepslate_brick_stairs", global: 29160, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_TopBottom, "shape" => Shape_StraightInnerLeftInnerRightOuterLeftOuterRight, "waterlogged" => WaterloggedBool ]
     },
-    DeepslateBrickSlab => { ident: "minecraft:deepslate_brick_slab", global: 29040, default: 3,
+    DeepslateBrickSlab => { ident: "minecraft:deepslate_brick_slab", global: 29240, default: 3,
         ty: [ "type" => Type_TopBottomDouble, "waterlogged" => WaterloggedBool ]
     },
-    DeepslateBrickWall => { ident: "minecraft:deepslate_brick_wall", global: 29046, default: 3,
+    DeepslateBrickWall => { ident: "minecraft:deepslate_brick_wall", global: 29246, default: 3,
         ty: [ "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "up" => UpBool, "waterlogged" => WaterloggedBool, "west" => West_NoneLowTall ]
     },
-    ChiseledDeepslate => { ident: "minecraft:chiseled_deepslate", global: 29370, default: 0,
+    ChiseledDeepslate => { ident: "minecraft:chiseled_deepslate", global: 29570, default: 0,
         ty: [  ]
     },
-    CrackedDeepslateBricks => { ident: "minecraft:cracked_deepslate_bricks", global: 29371, default: 0,
+    CrackedDeepslateBricks => { ident: "minecraft:cracked_deepslate_bricks", global: 29571, default: 0,
         ty: [  ]
     },
-    CrackedDeepslateTiles => { ident: "minecraft:cracked_deepslate_tiles", global: 29372, default: 0,
+    CrackedDeepslateTiles => { ident: "minecraft:cracked_deepslate_tiles", global: 29572, default: 0,
         ty: [  ]
     },
-    InfestedDeepslate => { ident: "minecraft:infested_deepslate", global: 29373, default: 1,
+    InfestedDeepslate => { ident: "minecraft:infested_deepslate", global: 29573, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    SmoothBasalt => { ident: "minecraft:smooth_basalt", global: 29376, default: 0,
+    SmoothBasalt => { ident: "minecraft:smooth_basalt", global: 29576, default: 0,
         ty: [  ]
     },
-    RawIronBlock => { ident: "minecraft:raw_iron_block", global: 29377, default: 0,
+    RawIronBlock => { ident: "minecraft:raw_iron_block", global: 29577, default: 0,
         ty: [  ]
     },
-    RawCopperBlock => { ident: "minecraft:raw_copper_block", global: 29378, default: 0,
+    RawCopperBlock => { ident: "minecraft:raw_copper_block", global: 29578, default: 0,
         ty: [  ]
     },
-    RawGoldBlock => { ident: "minecraft:raw_gold_block", global: 29379, default: 0,
+    RawGoldBlock => { ident: "minecraft:raw_gold_block", global: 29579, default: 0,
         ty: [  ]
     },
-    PottedAzalea => { ident: "minecraft:potted_azalea_bush", global: 29380, default: 0,
+    PottedAzalea => { ident: "minecraft:potted_azalea_bush", global: 29580, default: 0,
         ty: [  ]
     },
-    PottedFloweringAzalea => { ident: "minecraft:potted_flowering_azalea_bush", global: 29381, default: 0,
+    PottedFloweringAzalea => { ident: "minecraft:potted_flowering_azalea_bush", global: 29581, default: 0,
         ty: [  ]
     },
-    OchreFroglight => { ident: "minecraft:ochre_froglight", global: 29382, default: 1,
+    OchreFroglight => { ident: "minecraft:ochre_froglight", global: 29582, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    VerdantFroglight => { ident: "minecraft:verdant_froglight", global: 29385, default: 1,
+    VerdantFroglight => { ident: "minecraft:verdant_froglight", global: 29585, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    PearlescentFroglight => { ident: "minecraft:pearlescent_froglight", global: 29388, default: 1,
+    PearlescentFroglight => { ident: "minecraft:pearlescent_froglight", global: 29588, default: 1,
         ty: [ "axis" => Axis_XYZ ]
     },
-    Frogspawn => { ident: "minecraft:frogspawn", global: 29391, default: 0,
+    Frogspawn => { ident: "minecraft:frogspawn", global: 29591, default: 0,
         ty: [  ]
     },
-    ReinforcedDeepslate => { ident: "minecraft:reinforced_deepslate", global: 29392, default: 0,
+    ReinforcedDeepslate => { ident: "minecraft:reinforced_deepslate", global: 29592, default: 0,
         ty: [  ]
     },
-    DecoratedPot => { ident: "minecraft:decorated_pot", global: 29393, default: 9,
+    DecoratedPot => { ident: "minecraft:decorated_pot", global: 29593, default: 9,
         ty: [ "cracked" => CrackedBool, "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    Crafter => { ident: "minecraft:crafter", global: 29409, default: 45,
+    Crafter => { ident: "minecraft:crafter", global: 29609, default: 45,
         ty: [ "crafting" => CraftingBool, "orientation" => Orientation_DownEastDownNorthDownSouthDownWestUpEastUpNorthUpSouthUpWestWestUpEastUpNorthUpSouthUp, "triggered" => TriggeredBool ]
     },
-    TrialSpawner => { ident: "minecraft:trial_spawner", global: 29457, default: 6,
+    TrialSpawner => { ident: "minecraft:trial_spawner", global: 29657, default: 6,
         ty: [ "ominous" => OminousBool, "trial_spawner_state" => TrialSpawnerState ]
     },
-    Vault => { ident: "minecraft:vault", global: 29469, default: 4,
+    Vault => { ident: "minecraft:vault", global: 29669, default: 4,
         ty: [ "facing" => Facing_NorthSouthWestEast, "ominous" => OminousBool, "vault_state" => VaultState ]
     },
-    HeavyCore => { ident: "minecraft:heavy_core", global: 29501, default: 1,
+    HeavyCore => { ident: "minecraft:heavy_core", global: 29701, default: 1,
         ty: [ "waterlogged" => WaterloggedBool ]
     },
-    PaleMossBlock => { ident: "minecraft:pale_moss_block", global: 29503, default: 0,
+    PaleMossBlock => { ident: "minecraft:pale_moss_block", global: 29703, default: 0,
         ty: [  ]
     },
-    PaleMossCarpet => { ident: "minecraft:pale_moss_carpet", global: 29504, default: 0,
+    PaleMossCarpet => { ident: "minecraft:pale_moss_carpet", global: 29704, default: 0,
         ty: [ "bottom" => BottomBool, "east" => East_NoneLowTall, "north" => North_NoneLowTall, "south" => South_NoneLowTall, "west" => West_NoneLowTall ]
     },
-    PaleHangingMoss => { ident: "minecraft:pale_hanging_moss", global: 29666, default: 0,
+    PaleHangingMoss => { ident: "minecraft:pale_hanging_moss", global: 29866, default: 0,
         ty: [ "tip" => TipBool ]
     },
-    OpenEyeblossom => { ident: "minecraft:open_eyeblossom", global: 29668, default: 0,
+    OpenEyeblossom => { ident: "minecraft:open_eyeblossom", global: 29868, default: 0,
         ty: [  ]
     },
-    ClosedEyeblossom => { ident: "minecraft:closed_eyeblossom", global: 29669, default: 0,
+    ClosedEyeblossom => { ident: "minecraft:closed_eyeblossom", global: 29869, default: 0,
         ty: [  ]
     },
-    PottedOpenEyeblossom => { ident: "minecraft:potted_open_eyeblossom", global: 29670, default: 0,
+    PottedOpenEyeblossom => { ident: "minecraft:potted_open_eyeblossom", global: 29870, default: 0,
         ty: [  ]
     },
-    PottedClosedEyeblossom => { ident: "minecraft:potted_closed_eyeblossom", global: 29671, default: 0,
+    PottedClosedEyeblossom => { ident: "minecraft:potted_closed_eyeblossom", global: 29871, default: 0,
         ty: [  ]
     },
-    FireflyBush => { ident: "minecraft:firefly_bush", global: 29672, default: 0,
+    FireflyBush => { ident: "minecraft:firefly_bush", global: 29872, default: 0,
         ty: [  ]
     }
 }
@@ -3588,6 +3588,31 @@ generate! {
     Sponge, WetSponge, Glass, LapisOre, DeepslateLapisOre, LapisBlock, Dispenser, Dispenser, 
     Dispenser, Dispenser, Dispenser, Dispenser, Dispenser, Dispenser, Dispenser, Dispenser, 
     Dispenser, Dispenser, Sandstone, ChiseledSandstone, CutSandstone, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
+    NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
     NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
     NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 
     NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, NoteBlock, 

@@ -61,7 +61,7 @@ generate! {
     HoneyLevel_012345 => [ "0" => _0, "1" => _1, "2" => _2, "3" => _3, "4" => _4, "5" => _5 ],
     Hydration => [ "0" => _0, "1" => _1, "2" => _2, "3" => _3 ],
     InWallBool => [ "true" => True, "false" => False ],
-    Instrument => [ "harp" => Harp, "basedrum" => Basedrum, "snare" => Snare, "hat" => Hat, "bass" => Bass, "flute" => Flute, "bell" => Bell, "guitar" => Guitar, "chime" => Chime, "xylophone" => Xylophone, "iron_xylophone" => IronXylophone, "cow_bell" => CowBell, "didgeridoo" => Didgeridoo, "bit" => Bit, "banjo" => Banjo, "pling" => Pling, "zombie" => Zombie, "skeleton" => Skeleton, "creeper" => Creeper, "dragon" => Dragon, "wither_skeleton" => WitherSkeleton, "piglin" => Piglin, "custom_head" => CustomHead ],
+    Instrument => [ "harp" => Harp, "basedrum" => Basedrum, "snare" => Snare, "hat" => Hat, "bass" => Bass, "flute" => Flute, "bell" => Bell, "guitar" => Guitar, "chime" => Chime, "xylophone" => Xylophone, "iron_xylophone" => IronXylophone, "cow_bell" => CowBell, "didgeridoo" => Didgeridoo, "bit" => Bit, "banjo" => Banjo, "pling" => Pling, "trumpet" => Trumpet, "trumpet_exposed" => TrumpetExposed, "trumpet_oxidized" => TrumpetOxidized, "trumpet_weathered" => TrumpetWeathered, "zombie" => Zombie, "skeleton" => Skeleton, "creeper" => Creeper, "dragon" => Dragon, "wither_skeleton" => WitherSkeleton, "piglin" => Piglin, "custom_head" => CustomHead ],
     InvertedBool => [ "true" => True, "false" => False ],
     Layers => [ "1" => _1, "2" => _2, "3" => _3, "4" => _4, "5" => _5, "6" => _6, "7" => _7, "8" => _8 ],
     Leaves => [ "none" => None, "small" => Small, "large" => Large ],
