@@ -239,8 +239,6 @@ impl BlockData {
                             );
                         }
 
-                        tracing::trace!("Inserting block: {}\n\n", name_and_type.name);
-
                         blocks
                             .insert(name_and_type.name.to_string(), core::mem::take(&mut current));
                     }

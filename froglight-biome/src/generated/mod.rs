@@ -1,10 +1,115 @@
 //! Generated biome types, attributes, and features.
-//! 
+//!
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
 macro_rules! generate {
-    (@attributes) => {};
+    (
+        @attributes @single
+        @newtype $ident_lit:literal $ident:ident Vec<$ty:ty>
+        $(
+            => { $( $extra_ident:ident { $( $extra_name:tt : $extra_ty:ty ),+ } ),+ }
+        )?
+    ) => {
+        #[repr(transparent)]
+        #[doc = concat!("The [`", stringify!($ident), "`] biome attribute type.")]
+        #[derive(Debug, Clone, PartialEq, Facet)]
+        pub struct $ident(pub Vec<$ty>);
+        $($(
+            generate! {
+                @attributes @struct
+                $extra_ident { $( $extra_name : $extra_ty ),+ }
+            }
+        )*)*
+    };
+    (
+        @attributes @single
+        @newtype $ident_lit:literal $ident:ident $ty:ty
+        $(
+            => { $( $extra_ident:ident { $( $extra_name:tt : $extra_ty:ty ),+ } ),+ }
+        )?
+    ) => {
+        #[repr(transparent)]
+        #[doc = concat!("The [`", stringify!($ident), "`] biome attribute type.")]
+        #[derive(Debug, Clone, PartialEq, Facet)]
+        pub struct $ident(pub $ty);
+        $($(
+            generate! {
+                @attributes @struct
+                $extra_ident { $( $extra_name : $extra_ty ),+ }
+            }
+        )*)*
+    };
+
+    (
+        @attributes @single
+        @object $ident_lit:literal $ident:ident
+        { $( $field_name:tt : $field_ty:ty ),+ }
+        $(
+            => { $( $extra_ident:ident { $( $extra_name:tt : $extra_ty:ty ),+ } ),+ }
+        )?
+    ) => {
+        #[doc = concat!("The [`", stringify!($ident), "`] biome attribute type.")]
+        #[derive(Debug, Clone, PartialEq, Facet)]
+        pub struct $ident {
+            $(
+                #[doc = concat!("The `", stringify!($field_name), "` field")]
+                pub $field_name: $field_ty
+            ),+
+        }
+        $($(
+            generate! {
+                @attributes @struct
+                $extra_ident { $( $extra_name : $extra_ty ),+ }
+            }
+        )*)*
+    };
+
+    (
+        @attributes @struct
+        $ident:ident { $( $field:ident : $ty:ty ),+ }
+    ) => {
+        #[doc = concat!("The [`", stringify!($ident), "`] attribute data type.")]
+        #[derive(Debug, Clone, PartialEq, Facet)]
+        pub struct $ident {
+            $(
+                #[doc = concat!("The `", stringify!($field), "` field")]
+                pub $field: $ty,
+            )*
+        }
+    };
+
+    (
+        @attributes
+        $(
+            @$token:tt $ident_lit:literal $ident:ident
+            $(
+                $newtype_ty:ty
+            )?
+            $(
+                { $( $field_name:tt : $field_ty:ty ),+ }
+            )?
+            $(
+                => { $( $extra_ident:ident { $( $extra_name:tt : $extra_ty:ty ),+ } ),+ }
+            )?
+            ,
+        )*
+    )
+    => {
+        $(
+            generate! {
+                @attributes @single
+                @$token $ident_lit $ident
+                $($newtype_ty)?
+                $({ $( $field_name : $field_ty ),+ })?
+                $( => { $( $extra_ident { $( $extra_name : $extra_ty ),+ } ),+ } )?
+            }
+
+            impl crate::biome::AttributeType for $ident {
+                const IDENTIFIER: froglight_common::identifier::Identifier<'static> = froglight_common::identifier::Identifier::new_static($ident_lit);
+            }
+        )*
+    };
 
     (@biomes $($ident:ident),* $(,)?) => {
         $(
@@ -119,6 +224,7 @@ macro_rules! generate {
     };
 }
 
+#[cfg(feature = "attribute")]
 pub mod attribute;
 pub mod biome;
 pub mod feature;
@@ -128,4 +234,3 @@ pub mod feature;
 
 #[cfg(feature = "v26_1")]
 mod v26_1;
-

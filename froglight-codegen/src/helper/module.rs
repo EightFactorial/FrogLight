@@ -85,6 +85,12 @@ impl ModuleBuilder {
         self
     }
 
+    /// Add an import to the module.
+    pub fn with_import<S: ToString + ?Sized>(&mut self, name: &S, public: bool) -> &mut Self {
+        self.imports.push(ModuleImport::Use { name: name.to_string(), public });
+        self
+    }
+
     /// Add content to the beginning of the module.
     pub fn with_precontent<S: AsRef<str> + ?Sized>(&mut self, content: &S) -> &mut Self {
         if !self.precontent.is_empty() {

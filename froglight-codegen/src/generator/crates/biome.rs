@@ -6,7 +6,7 @@ use cafebabe::{
 };
 use convert_case::{Case, Casing};
 use facet::Facet;
-use facet_value::Value;
+use facet_value::{Value, ValueType};
 use indexmap::{IndexMap, IndexSet};
 use miette::Result;
 use tokio::sync::{OnceCell, RwLock};
@@ -29,7 +29,7 @@ pub struct BiomeSettings {
     pub temperature: f64,
     pub downfall: f64,
     pub precipitation: bool,
-    pub attr: Vec<String>,
+    pub attr: IndexMap<String, Value>,
     pub feat: Vec<Vec<String>>,
 }
 
@@ -104,6 +104,17 @@ impl BiomeData {
         .await?;
 
         JarFile::get_for(version, storage, async |file| {
+            #[derive(Debug, Clone, Facet)]
+            struct BiomeJson {
+                #[facet(default)]
+                attributes: IndexMap<String, Value>,
+                downfall: f64,
+                effects: Value,
+                features: Vec<Vec<String>>,
+                has_precipitation: bool,
+                temperature: f64,
+            }
+
             let directory = file.generated.join("data/minecraft/worldgen/biome");
             for biome in biomes.values_mut() {
                 let mut path = directory.join(biome.ident.trim_start_matches("minecraft:"));
@@ -119,6 +130,7 @@ impl BiomeData {
                         biome.temperature = json.temperature;
                         biome.downfall = json.downfall;
                         biome.precipitation = json.has_precipitation;
+                        biome.attr = json.attributes;
                         biome.feat = json.features;
                     }
                     Err(err) => {
@@ -137,20 +149,10 @@ impl BiomeData {
     }
 }
 
-#[derive(Debug, Clone, Facet)]
-struct BiomeJson {
-    #[facet(default)]
-    attributes: Value,
-    downfall: f64,
-    effects: Value,
-    features: Vec<Vec<String>>,
-    has_precipitation: bool,
-    temperature: f64,
-}
-
 // -------------------------------------------------------------------------------------------------
 
 /// Generate global biome data.
+#[expect(clippy::too_many_lines, reason = ":nod:")]
 pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     static ONCE: OnceCell<Result<()>> = OnceCell::const_new();
     let result = ONCE
@@ -164,37 +166,143 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
             })
             .await?;
 
-            // Deduplicate and sort the biome types
-            let mut biomes = IndexSet::new();
+            // Deduplicate and sort the biome types and attributes across all versions.
+            let mut biomes = IndexSet::<String>::new();
+            let mut attributes = IndexMap::<String, (String, Value)>::new();
             for versioned in global_biomes {
-                for (name, _id) in versioned.biomes {
+                for (name, settings) in versioned.biomes {
                     biomes.insert(name.to_case(Case::Pascal));
+
+                    for (attr, contents) in settings.attr {
+                        let attr_name = attr
+                            .trim_start_matches("minecraft:")
+                            .replace('/', " ")
+                            .to_case(Case::Pascal);
+
+                        if attributes.contains_key(&attr_name) {
+                            let (_, existing) = attributes.get_mut(&attr_name).unwrap();
+
+                            if contents.value_type() != existing.value_type() {
+                                miette::bail!(
+                                    "Mismatched attribute types for \"{attr_name}\": {} vs {}",
+                                    facet_value::format_value(&contents),
+                                    facet_value::format_value(existing)
+                                );
+                            }
+
+                            match (contents.value_type(), existing.value_type()) {
+                                (ValueType::Object, ValueType::Object) => {
+                                    let contents = contents.as_object().unwrap();
+                                    let existing = existing.as_object_mut().unwrap();
+                                    for (field, val) in contents {
+                                        existing.insert(field.clone(), val.clone());
+                                    }
+                                }
+                                (a, b) if a != b => {
+                                    miette::bail!(
+                                        "Mismatched attribute types for \"{attr_name}\": {} vs {}",
+                                        facet_value::format_value(&contents),
+                                        facet_value::format_value(existing)
+                                    );
+                                }
+                                _ => {}
+                            }
+                        } else {
+                            attributes.insert(attr_name, (attr, contents));
+                        }
+                    }
                 }
             }
             biomes.sort_unstable();
+            attributes.sort_unstable_keys();
 
-            // Start building the module
-            let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
-            let mut module = ModuleBuilder::new("biome", path);
+            // Build the `biome` module
+            {
+                let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
+                let mut module = ModuleBuilder::new("biome", path);
 
-            // Generate the content
-            let mut content = String::new();
-            content.push_str("\ngenerate! {\n    @biomes\n");
-            for identifier in biomes {
-                writeln!(content, "    {identifier},").unwrap();
-            }
-            content.push('}');
+                // Generate the content
+                let mut content = String::new();
+                content.push_str("\ngenerate! {\n    @biomes\n");
+                for identifier in biomes {
+                    writeln!(content, "    {identifier},").unwrap();
+                }
+                content.push('}');
 
-            // Finalize and build the module
-            module
-                .with_docs(
-                    "Biome types for all [`Version`](froglight_common::version::Version)s.
+                // Finalize and build the module
+                module
+                    .with_docs(
+                        "Biome types for all [`Version`](froglight_common::version::Version)s.
 
 @generated",
-                )
-                .with_content(&content);
+                    )
+                    .with_content(&content);
 
-            module.build().await
+                module.build().await?;
+            }
+
+            // Build the `attribute` module
+            {
+                let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
+                let mut module = ModuleBuilder::new("attribute", path);
+
+                // Generate the content
+                let mut content = String::new();
+                content.push_str("\nuse alloc::{string::String, vec::Vec};\n\n");
+                content.push_str("use facet::Facet;\n\n");
+                content.push_str("generate! {\n    @attributes\n");
+
+                for (attribute, (ident, value)) in attributes {
+                    content.push_str("    ");
+
+                    let tag = match value.value_type() {
+                        ValueType::Object => "object",
+                        ValueType::Array
+                        | ValueType::Null
+                        | ValueType::Bool
+                        | ValueType::Number
+                        | ValueType::String
+                        | ValueType::Bytes => "newtype",
+                        _ => miette::bail!("Unsupported attribute type: {:?}", value.value_type()),
+                    };
+
+                    content.push('@');
+                    content.push_str(tag);
+                    content.push_str(" \"");
+                    content.push_str(&ident);
+                    content.push_str("\" ");
+                    content.push_str(&attribute);
+                    content.push(' ');
+
+                    let extra_types = generate_value(&attribute, &value, &mut content)?;
+                    if !extra_types.is_empty() {
+                        content.push_str(" => { ");
+                        for (index, extra) in extra_types.iter().enumerate() {
+                            content.push_str(extra);
+                            if index != extra_types.len() - 1 {
+                                content.push_str(", ");
+                            }
+                        }
+                        content.push_str(" }");
+                    }
+
+                    content.push_str(",\n");
+                }
+                content.push('}');
+
+                // Finalize and build the module
+                module
+                    .with_docs(
+                        "Biome attributes for all [`Version`](froglight_common::version::Version)s.
+
+@generated",
+                    )
+                    .with_content(&content);
+
+                module.build().await?;
+            }
+
+            Ok(())
         })
         .await;
 
@@ -202,6 +310,73 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
         Ok(()) => Ok(()),
         Err(err) => miette::bail!("Failed to generate global biome data: {err}"),
     }
+}
+
+fn generate_value(name: &str, value: &Value, content: &mut String) -> Result<Vec<String>> {
+    let mut extra = Vec::<String>::new();
+
+    match value.value_type() {
+        ValueType::Bool => content.push_str("bool"),
+        ValueType::Number => content.push_str("f64"),
+        ValueType::String => content.push_str("String"),
+        ValueType::Bytes => content.push_str("Vec<u8>"),
+        ValueType::Array => {
+            let array = value.as_array().unwrap();
+            let inner_type = array.as_slice().first().unwrap();
+            content.push_str("Vec<");
+            let type_name = format!("{name}Item");
+            content.push_str(&type_name);
+            content.push('>');
+
+            let mut type_content = String::new();
+            let extra_types = generate_value(&type_name, inner_type, &mut type_content)?;
+            extra.push(format!("{type_name} {type_content}"));
+            extra.extend(extra_types);
+        }
+        ValueType::Object => {
+            content.push_str("{ ");
+            let object = value.as_object();
+            for (index, (field, val)) in object.unwrap().iter().enumerate() {
+                // Handle reserved keywords
+                let mut field = field.as_str();
+                match field {
+                    "type" => field = "r#type",
+                    "loop" => field = "r#loop",
+                    _ => {}
+                }
+
+                content.push_str(field);
+                content.push_str(": ");
+                match val.value_type() {
+                    ValueType::Null => {}
+                    ValueType::Bool => content.push_str("bool"),
+                    ValueType::Number => content.push_str("f64"),
+                    ValueType::String => content.push_str("String"),
+                    ValueType::Bytes => content.push_str("Vec<u8>"),
+                    ValueType::Array => content.push_str("Vec<Object>"),
+                    ValueType::Object => {
+                        let type_name = format!("{name}{}", field.to_case(Case::Pascal));
+                        content.push_str(&type_name);
+
+                        let mut type_content = String::new();
+                        let extra_types = generate_value(&type_name, val, &mut type_content)?;
+                        extra.push(format!("{type_name} {type_content}"));
+                        extra.extend(extra_types);
+                    }
+                    ValueType::DateTime | ValueType::Uuid | ValueType::QName => {
+                        miette::bail!("Unsupported attribute value type: {:?}", val.value_type());
+                    }
+                }
+                if index != object.unwrap().len() - 1 {
+                    content.push_str(", ");
+                }
+            }
+            content.push_str(" }");
+        }
+        _ => unreachable!(),
+    }
+
+    Ok(extra)
 }
 
 /// Generate `Version`-specific biome data.

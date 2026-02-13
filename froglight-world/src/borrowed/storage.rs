@@ -14,7 +14,7 @@ use crate::borrowed::BorrowedSection;
 /// A storage container for multiple [`BorrowedSection`]s.
 #[derive(Clone)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque, Clone))]
-#[expect(clippy::large_enum_variant, reason = "This is by design")]
+#[allow(clippy::large_enum_variant, reason = "This is by design")]
 pub enum BorrowedChunkStorage<'a> {
     /// A large chunk.
     ///

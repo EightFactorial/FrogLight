@@ -19,7 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-biome = { workspace = true }
+froglight-biome = { features = ["attribute"], workspace = true }
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-registry = { workspace = true }

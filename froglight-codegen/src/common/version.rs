@@ -42,7 +42,7 @@ impl Version {
 pub struct VersionStorage(HashMap<TypeId, Box<dyn Any + Send + Sync + 'static>>);
 
 impl VersionStorage {
-    /// Create a new empty [`VersionData`].
+    /// Create a new empty [`VersionStorage`].
     #[must_use]
     pub fn new() -> Self { VersionStorage(HashMap::new()) }
 
