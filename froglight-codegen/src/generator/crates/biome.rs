@@ -429,7 +429,8 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                         for _ in 0..4 {
                             formatted = formatted.replace("  ", " ");
                         }
-                        content.push_str(&formatted);
+                        formatted = formatted.replace("}}", "} }");
+                        content.push_str(formatted.trim());
 
                         if index != settings.attr.len() - 1 {
                             content.push(',');
