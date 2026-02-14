@@ -1,5 +1,5 @@
 //! Generated biome types, attributes, and features.
-//! 
+//!
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
@@ -54,7 +54,8 @@ macro_rules! generate {
         pub struct $ident {
             $(
                 #[doc = concat!("The `", stringify!($field_name), "` field")]
-                pub $field_name: $field_ty
+                #[facet(default)]
+                pub $field_name: Option<$field_ty>
             ),+
         }
         $($(
@@ -200,8 +201,6 @@ macro_rules! generate {
         $(
             impl crate::biome::BiomeType<$version> for $ident {
                 const METADATA: &'static crate::biome::BiomeMetadata = {
-                    #[cfg(not(feature = "biome_data"))]
-                    static ATTRIBUTES: LazyLock<crate::biome::BiomeAttributeSet> = LazyLock::new(BiomeAttributeSet::empty);
                     #[cfg(feature = "biome_data")]
                     static ATTRIBUTES: LazyLock<crate::biome::BiomeAttributeSet> = LazyLock::new(|| {
                         crate::biome::BiomeAttributeSet::new_runtime(alloc::vec![
@@ -210,6 +209,8 @@ macro_rules! generate {
                             ),*
                         ])
                     });
+                    #[cfg(not(feature = "biome_data"))]
+                    static ATTRIBUTES: LazyLock<crate::biome::BiomeAttributeSet> = LazyLock::new(BiomeAttributeSet::empty);
 
                     static METADATA: crate::biome::BiomeMetadata = unsafe { crate::biome::BiomeMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
@@ -244,4 +245,3 @@ pub mod feature;
 
 #[cfg(feature = "v26_1")]
 mod v26_1;
-

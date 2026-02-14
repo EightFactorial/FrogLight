@@ -231,10 +231,25 @@ impl BiomeAttributeStorage {
     ) -> Result<bool, SerializeError<ToValueError>> {
         let data = attribute.to_attribute_data()?;
 
-        // SAFETY: `self.contains` ensures no duplicates are added.
+        // SAFETY: `!self.contains` ensures no duplicates are added.
         let inserted =
             (!self.contains::<A>()).then(|| unsafe { self.to_mut().push((A::IDENTIFIER, data)) });
         Ok(inserted.is_some())
+    }
+
+    /// Get the specified attribute type from the set.
+    ///
+    /// Returns `None` if the attribute is not present in the set.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the attribute type could not be converted from its
+    /// [`Value`].
+    pub fn get<A: AttributeType>(&self) -> Option<Result<A, ValueError>> {
+        self.to_ref()
+            .iter()
+            .find(|(id, _)| id == &A::IDENTIFIER)
+            .map(|(_, value)| A::from_attribute_data(value))
     }
 
     /// Removes the specified attribute type from the set.
