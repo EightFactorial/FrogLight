@@ -19,7 +19,7 @@ workspace = true
 # --- Dependencies ---
 
 [dependencies]
-froglight-biome = { features = ["attribute"], workspace = true }
+froglight-biome = { features = ["biome_data"], workspace = true }
 froglight-block = { workspace = true }
 froglight-common = { workspace = true }
 froglight-registry = { workspace = true }
@@ -49,7 +49,7 @@ tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-block
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block/libm", "froglight-math/libm", "froglight-world/libm"]
 # Enable `once_cell` for `no_std` support.
-once_cell = ["froglight-inventory/once_cell", "froglight-math/once_cell"]
+once_cell = ["froglight-biome/once_cell", "froglight-inventory/once_cell", "froglight-math/once_cell"]
 # Enable `parking_lot` for `no_std` support.
 parking_lot = ["froglight-biome/parking_lot", "froglight-block/parking_lot", "froglight-item/parking_lot", "froglight-registry/parking_lot", "froglight-world/parking_lot"]
 

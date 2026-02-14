@@ -1,5 +1,5 @@
 //! Generated biome types, attributes, and features.
-//!
+//! 
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
@@ -195,19 +195,29 @@ macro_rules! generate {
         ident: $string:literal,
         global: $global:literal,
         prop: { foliage: $foliage:literal, grass: $grass:literal, water: $water:literal, precip: $precip:literal, temp: $temp:literal, downfall: $downfall:literal },
-        attr: $attr:expr,
-        feat: $feat:expr
+        attr: { $(  $ty:ty : $tt:tt  ),* }
     }),*) => {
         $(
             impl crate::biome::BiomeType<$version> for $ident {
                 const METADATA: &'static crate::biome::BiomeMetadata = {
+                    #[cfg(not(feature = "biome_data"))]
+                    static ATTRIBUTES: LazyLock<crate::biome::BiomeAttributeSet> = LazyLock::new(BiomeAttributeSet::empty);
+                    #[cfg(feature = "biome_data")]
+                    static ATTRIBUTES: LazyLock<crate::biome::BiomeAttributeSet> = LazyLock::new(|| {
+                        crate::biome::BiomeAttributeSet::new_runtime(alloc::vec![
+                            $(
+                                (<$ty as crate::biome::AttributeType>::IDENTIFIER, facet_value::value!($tt))
+                            ),*
+                        ])
+                    });
+
                     static METADATA: crate::biome::BiomeMetadata = unsafe { crate::biome::BiomeMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
                         $global,
                         $foliage, $grass, $water, $precip, $temp, $downfall,
-                        $attr,
-                        $feat,
+                        &ATTRIBUTES,
                     ) };
+
                     &METADATA
                 };
             }
@@ -224,7 +234,7 @@ macro_rules! generate {
     };
 }
 
-#[cfg(feature = "attribute")]
+#[cfg(feature = "biome_data")]
 pub mod attribute;
 pub mod biome;
 pub mod feature;
@@ -234,3 +244,4 @@ pub mod feature;
 
 #[cfg(feature = "v26_1")]
 mod v26_1;
+

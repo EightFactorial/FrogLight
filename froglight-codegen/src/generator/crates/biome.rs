@@ -379,6 +379,8 @@ fn generate_value(name: &str, value: &Value, content: &mut String) -> Result<Vec
     Ok(extra)
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// Generate `Version`-specific biome data.
 pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
     BiomeData::get_for(&version.real, storage, async |data| {
@@ -389,10 +391,14 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
             .with_submodule(&version.base.as_feature(), async |module, settings| {
                 let mut content = String::new();
 
+                content.push_str("#![allow(clippy::unreadable_literal, reason = \"Generated code\")]\n\n");
+
+                content.push_str("#[cfg(feature = \"std\")]\nuse std::sync::LazyLock;");
                 let version_type = version.base.as_feature().to_ascii_uppercase();
-                content.push_str("\nuse froglight_common::version::");
+                content.push_str("\n\nuse froglight_common::version::");
                 content.push_str(&version_type);
-                content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::{\n    biome::{BiomeAttributeSet, BiomeFeatureSet},\n    generated::biome::*,\n};\n\n");
+                content.push_str(";\n#[cfg(all(feature = \"once_cell\", not(feature = \"std\")))]\nuse once_cell::sync::OnceCell as LazyLock;");
+                content.push_str("\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::generated::{attribute::*, biome::*};\n\n");
 
                 content.push_str("generate! {\n    @version ");
                 content.push_str(&version_type);
@@ -406,7 +412,32 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                     content.push_str("\", global: ");
                     content.push_str(&index.to_string());
                     writeln!(content, ", prop: {{ foliage: {}, grass: {}, water: {}, precip: {}, temp: {}f32, downfall: {}f32 }},", 0, 0, 0, settings.precipitation, settings.temperature, settings.downfall).unwrap();
-                    content.push_str("        attr: BiomeAttributeSet::empty(), feat: BiomeFeatureSet::empty() }");
+
+                    content.push_str("        attr: { ");
+                    for (index, (attr, val)) in settings.attr.iter().enumerate() {
+                        let attr_name = attr
+                            .trim_start_matches("minecraft:")
+                            .replace('/', " ")
+                            .to_case(Case::Pascal);
+
+
+                        content.push_str(&attr_name);
+                        content.push_str(": ");
+
+                        let stringified = facet_value::format_value(val);
+                        let mut formatted = stringified.replace('\n', "");
+                        for _ in 0..4 {
+                            formatted = formatted.replace("  ", " ");
+                        }
+                        content.push_str(&formatted);
+
+                        if index != settings.attr.len() - 1 {
+                            content.push(',');
+                        }
+                        content.push(' ');
+                    }
+
+                    content.push_str("}\n    }");
                     if index != data.biomes.len() - 1 {
                         content.push(',');
                     }
@@ -414,7 +445,12 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                 }
 
                 content.push('}');
-                module.with_docs("Placeholder").with_content(&content);
+
+                let docs = format!(
+                    "Biome data for [`{version_type}`](froglight_common::version::{version_type}).\n\n@generated"
+                );
+
+                module.with_docs(&docs).with_content(&content);
                 Ok(settings.with_feature(version.base.as_feature()))
             })
             .await?;

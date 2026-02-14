@@ -15,10 +15,10 @@ pub mod version;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    #[cfg(feature = "attribute")]
+    #[cfg(feature = "biome_data")]
     pub use crate::biome::AttributeType;
     pub use crate::{
-        biome::{Biome, BiomeType, FeatureType},
+        biome::{Biome, BiomeType},
         generated::{
             attribute as biome_attribute,
             biome::{self, VanillaBiome},

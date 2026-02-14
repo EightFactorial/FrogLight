@@ -1,10 +1,14 @@
 use core::{any::TypeId, fmt::Debug};
+#[cfg(feature = "std")]
+use std::sync::LazyLock;
 
 use froglight_common::prelude::Identifier;
+#[cfg(all(feature = "once_cell", not(feature = "std")))]
+use once_cell::sync::OnceCell as LazyLock;
 
 use crate::{
     atomic::{MaybeAtomicBool, MaybeAtomicF32, MaybeAtomicU32},
-    biome::{BiomeAttributeSet, BiomeFeatureSet, BiomeType, GlobalId},
+    biome::{BiomeAttributeSet, BiomeType, GlobalId},
     version::BiomeVersion,
 };
 
@@ -29,9 +33,7 @@ pub struct BiomeMetadata {
     downfall: MaybeAtomicF32,
 
     /// The attributes of this biome.
-    attributes: BiomeAttributeSet,
-    /// The features of this biome.
-    features: BiomeFeatureSet,
+    attributes: &'static LazyLock<BiomeAttributeSet>,
 
     /// The [`TypeId`] of the biome type.
     biome_ty: TypeId,
@@ -57,8 +59,7 @@ impl BiomeMetadata {
         precipitation: bool,
         temperature: f32,
         downfall: f32,
-        attributes: BiomeAttributeSet,
-        features: BiomeFeatureSet,
+        attributes: &'static LazyLock<BiomeAttributeSet>,
     ) -> Self {
         Self {
             identifier,
@@ -72,7 +73,6 @@ impl BiomeMetadata {
             downfall: MaybeAtomicF32::new(downfall),
 
             attributes,
-            features,
 
             biome_ty: TypeId::of::<B>(),
             version_ty: TypeId::of::<V>(),
@@ -149,11 +149,7 @@ impl BiomeMetadata {
 
     /// Get the attributes of this biome.
     #[must_use]
-    pub const fn attributes(&self) -> &BiomeAttributeSet { &self.attributes }
-
-    /// Get the features of this biome.
-    #[must_use]
-    pub const fn features(&self) -> &BiomeFeatureSet { &self.features }
+    pub fn attributes(&self) -> &BiomeAttributeSet { self.attributes }
 
     /// Returns `true` if this biome is of type `B`.
     #[must_use]

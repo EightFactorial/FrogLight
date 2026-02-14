@@ -1,5 +1,5 @@
 //! Biome attributes for all [`Version`](froglight_common::version::Version)s.
-//!
+//! 
 //! @generated
 
 use alloc::{string::String, vec::Vec};
