@@ -254,8 +254,6 @@ impl BlockData {
                             );
                         }
 
-                        tracing::trace!("Inserting weathering blocks: {}\n\n", name_and_type.name);
-
                         let original = core::mem::take(&mut current);
                         blocks.insert(name_and_type.name.to_string(), original.clone());
                         blocks.insert(

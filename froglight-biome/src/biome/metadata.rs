@@ -21,6 +21,8 @@ pub struct BiomeMetadata {
 
     /// The foliage color of this biome.
     color_foliage: MaybeAtomicU32,
+    /// The dry foliage color of this biome.
+    color_foliage_dry: MaybeAtomicU32,
     /// The grass color of this biome.
     color_grass: MaybeAtomicU32,
     /// The water color of this biome.
@@ -54,6 +56,7 @@ impl BiomeMetadata {
         identifier: Identifier<'static>,
         global_id: u32,
         foliage_color: u32,
+        dry_foliage_color: u32,
         grass_color: u32,
         water_color: u32,
         precipitation: bool,
@@ -66,6 +69,7 @@ impl BiomeMetadata {
             global_id: MaybeAtomicU32::new(global_id),
 
             color_foliage: MaybeAtomicU32::new(foliage_color),
+            color_foliage_dry: MaybeAtomicU32::new(dry_foliage_color),
             color_grass: MaybeAtomicU32::new(grass_color),
             color_water: MaybeAtomicU32::new(water_color),
             precipitation: MaybeAtomicBool::new(precipitation),
@@ -104,6 +108,14 @@ impl BiomeMetadata {
     /// Set the foliage color of this biome.
     #[cfg(feature = "atomic")]
     pub fn set_foliage_color(&self, color: u32) { self.color_foliage.set_atomic(color); }
+
+    /// Get the dry foliage color of this biome.
+    #[must_use]
+    pub fn dry_foliage_color(&self) -> u32 { self.color_foliage_dry.get() }
+
+    /// Set the dry foliage color of this biome.
+    #[cfg(feature = "atomic")]
+    pub fn set_dry_foliage_color(&self, color: u32) { self.color_foliage_dry.set_atomic(color); }
 
     /// Get the grass color of this biome.
     #[must_use]

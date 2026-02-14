@@ -56,6 +56,11 @@ impl Biome {
     #[must_use]
     pub fn foliage_color(&self) -> u32 { self.reference.foliage_color() }
 
+    /// Get the dry foliage color of this biome.
+    #[inline]
+    #[must_use]
+    pub fn dry_foliage_color(&self) -> u32 { self.reference.dry_foliage_color() }
+
     /// Get the water color of this biome.
     #[inline]
     #[must_use]

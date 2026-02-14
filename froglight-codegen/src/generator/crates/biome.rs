@@ -29,6 +29,12 @@ pub struct BiomeSettings {
     pub temperature: f64,
     pub downfall: f64,
     pub precipitation: bool,
+
+    pub foliage_color: u32,
+    pub dry_foliage_color: u32,
+    pub grass_color: u32,
+    pub water_color: u32,
+
     pub attr: IndexMap<String, Value>,
     pub feat: Vec<Vec<String>>,
 }
@@ -109,10 +115,21 @@ impl BiomeData {
                 #[facet(default)]
                 attributes: IndexMap<String, Value>,
                 downfall: f64,
-                effects: Value,
+                effects: BiomeEffectJson,
                 features: Vec<Vec<String>>,
                 has_precipitation: bool,
                 temperature: f64,
+            }
+            #[derive(Debug, Clone, Facet)]
+            struct BiomeEffectJson {
+                #[facet(default)]
+                dry_foliage_color: Option<String>,
+                #[facet(default)]
+                foliage_color: Option<String>,
+                #[facet(default)]
+                grass_color: Option<String>,
+                #[facet(default)]
+                water_color: Option<String>,
             }
 
             let directory = file.generated.join("data/minecraft/worldgen/biome");
@@ -130,6 +147,20 @@ impl BiomeData {
                         biome.temperature = json.temperature;
                         biome.downfall = json.downfall;
                         biome.precipitation = json.has_precipitation;
+
+                        if let Some(foliage_color) = json.effects.foliage_color {
+                            biome.foliage_color = hex_to_u32(&foliage_color)?;
+                        }
+                        if let Some(dry_foliage_color) = json.effects.dry_foliage_color {
+                            biome.dry_foliage_color = hex_to_u32(&dry_foliage_color)?;
+                        }
+                        if let Some(grass_color) = json.effects.grass_color {
+                            biome.grass_color = hex_to_u32(&grass_color)?;
+                        }
+                        if let Some(water_color) = json.effects.water_color {
+                            biome.water_color = hex_to_u32(&water_color)?;
+                        }
+
                         biome.attr = json.attributes;
                         biome.feat = json.features;
                     }
@@ -147,6 +178,14 @@ impl BiomeData {
 
         Ok(BiomeData { biomes })
     }
+}
+
+fn hex_to_u32(hex: &str) -> Result<u32> {
+    let Some(hex) = hex.strip_prefix('#') else {
+        miette::bail!("Invalid hexadecimal color: {hex}");
+    };
+    u32::from_str_radix(hex, 16)
+        .map_err(|err| miette::miette!("Failed to parse hexadecimal color \"{hex}\": {err}"))
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -411,7 +450,7 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                     content.push_str(&settings.ident);
                     content.push_str("\", global: ");
                     content.push_str(&index.to_string());
-                    writeln!(content, ", prop: {{ foliage: {}, grass: {}, water: {}, precip: {}, temp: {}f32, downfall: {}f32 }},", 0, 0, 0, settings.precipitation, settings.temperature, settings.downfall).unwrap();
+                    writeln!(content, ", prop: {{ foliage: {}, dry_foliage: {}, grass: {}, water: {}, precip: {}, temp: {}f32, downfall: {}f32 }},", settings.foliage_color, settings.dry_foliage_color, settings.grass_color, settings.water_color, settings.precipitation, settings.temperature, settings.downfall).unwrap();
 
                     content.push_str("        attr: { ");
                     for (index, (attr, val)) in settings.attr.iter().enumerate() {

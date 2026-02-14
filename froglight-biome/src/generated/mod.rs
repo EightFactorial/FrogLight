@@ -1,5 +1,5 @@
 //! Generated biome types, attributes, and features.
-//!
+//! 
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
@@ -195,7 +195,7 @@ macro_rules! generate {
     (@version $version:ident, $($ident:ident => {
         ident: $string:literal,
         global: $global:literal,
-        prop: { foliage: $foliage:literal, grass: $grass:literal, water: $water:literal, precip: $precip:literal, temp: $temp:literal, downfall: $downfall:literal },
+        prop: { foliage: $foliage:literal, dry_foliage: $dry_foliage:literal, grass: $grass:literal, water: $water:literal, precip: $precip:literal, temp: $temp:literal, downfall: $downfall:literal },
         attr: { $(  $ty:ty : $tt:tt  ),* }
     }),*) => {
         $(
@@ -215,7 +215,7 @@ macro_rules! generate {
                     static METADATA: crate::biome::BiomeMetadata = unsafe { crate::biome::BiomeMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
                         $global,
-                        $foliage, $grass, $water, $precip, $temp, $downfall,
+                        $foliage, $dry_foliage, $grass, $water, $precip, $temp, $downfall,
                         &ATTRIBUTES,
                     ) };
 
@@ -245,3 +245,4 @@ pub mod feature;
 
 #[cfg(feature = "v26_1")]
 mod v26_1;
+
