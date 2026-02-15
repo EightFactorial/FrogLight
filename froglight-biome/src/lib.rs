@@ -17,13 +17,11 @@ pub mod prelude {
 
     #[cfg(feature = "biome_data")]
     pub use crate::biome::AttributeType;
+    #[cfg(feature = "biome_data")]
+    pub use crate::generated::attribute as biome_attribute;
     pub use crate::{
         biome::{Biome, BiomeType},
-        generated::{
-            attribute as biome_attribute,
-            biome::{self, VanillaBiome},
-            feature as biome_feature,
-        },
+        generated::biome::{self, VanillaBiome},
         version::BiomeVersion,
     };
 }

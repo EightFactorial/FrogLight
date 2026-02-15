@@ -1,9 +1,9 @@
 //! TODO
 
-mod attribute;
-pub use attribute::BiomeAttributeSet;
 #[cfg(feature = "biome_data")]
-pub use attribute::{AttributeType, BiomeAttributeStorage};
+mod attribute;
+#[cfg(feature = "biome_data")]
+pub use attribute::{AttributeType, BiomeAttributeSet, BiomeAttributeStorage};
 
 mod biome;
 pub use biome::{Biome, BiomeType};

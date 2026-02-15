@@ -2,35 +2,21 @@
 
 #[cfg(all(feature = "alloc", feature = "biome_data"))]
 use alloc::vec::Vec;
-#[cfg(all(
-    feature = "biome_data",
-    not(feature = "async"),
-    feature = "std",
-    not(feature = "parking_lot")
-))]
+#[cfg(all(not(feature = "async"), feature = "std", not(feature = "parking_lot")))]
 use std::sync::RwLock;
 
 #[cfg(all(feature = "async", feature = "biome_data"))]
 use async_lock::RwLock;
-#[cfg(feature = "biome_data")]
 use facet::Facet;
-#[cfg(feature = "biome_data")]
 use facet_format::SerializeError;
-#[cfg(feature = "biome_data")]
-use facet_value::ToValueError;
-#[cfg(feature = "biome_data")]
-use facet_value::Value;
-#[cfg(feature = "biome_data")]
-use facet_value::ValueError;
-#[cfg(feature = "biome_data")]
+use facet_value::{ToValueError, Value, ValueError};
 use froglight_common::prelude::Identifier;
-#[cfg(all(feature = "biome_data", not(feature = "async"), feature = "parking_lot"))]
+#[cfg(all(not(feature = "async"), feature = "parking_lot"))]
 use parking_lot::RwLock;
 
 /// A set of biome attributes.
 #[repr(transparent)]
 #[derive(Debug)]
-#[cfg(feature = "biome_data")]
 pub struct BiomeAttributeSet {
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
     storage: RwLock<BiomeAttributeStorage>,
@@ -38,7 +24,6 @@ pub struct BiomeAttributeSet {
     storage: BiomeAttributeStorage,
 }
 
-#[cfg(feature = "biome_data")]
 impl BiomeAttributeSet {
     /// Create an empty [`BiomeAttributeSet`] instance.
     #[must_use]
@@ -152,30 +137,16 @@ impl BiomeAttributeSet {
     }
 }
 
-/// A set of biome attributes.
-#[derive(Debug)]
-#[cfg(not(feature = "biome_data"))]
-pub struct BiomeAttributeSet;
-
-#[cfg(not(feature = "biome_data"))]
-impl BiomeAttributeSet {
-    /// Create an empty [`BiomeAttributeSet`] instance.
-    #[must_use]
-    pub const fn empty() -> Self { Self }
-}
-
 // -------------------------------------------------------------------------------------------------
 
 /// The underlying storage for a [`BiomeAttributeSet`].
 #[repr(transparent)]
 #[derive(Debug, Clone)]
-#[cfg(feature = "biome_data")]
 pub struct BiomeAttributeStorage {
     inner: AttributeSetInner,
 }
 
 #[derive(Debug, Clone)]
-#[cfg(feature = "biome_data")]
 enum AttributeSetInner {
     /// Dynamic storage allocated at runtime.
     #[cfg(feature = "alloc")]
@@ -184,7 +155,6 @@ enum AttributeSetInner {
     Static(&'static [(Identifier<'static>, Value)]),
 }
 
-#[cfg(feature = "biome_data")]
 impl BiomeAttributeStorage {
     /// Create a new static [`BiomeAttributeSet`].
     ///
@@ -245,6 +215,7 @@ impl BiomeAttributeStorage {
     ///
     /// Returns an error if the attribute type could not be converted from its
     /// [`Value`].
+    #[must_use]
     pub fn get<A: AttributeType>(&self) -> Option<Result<A, ValueError>> {
         self.to_ref()
             .iter()
@@ -304,7 +275,6 @@ impl BiomeAttributeStorage {
 }
 
 /// Asserts that the given slice contains no duplicate entries.
-#[cfg(feature = "biome_data")]
 const fn assert_no_duplicates(slice: &[(Identifier<'static>, Value)]) {
     let mut i = 0;
     while i < slice.len() {
@@ -323,7 +293,6 @@ const fn assert_no_duplicates(slice: &[(Identifier<'static>, Value)]) {
 // -------------------------------------------------------------------------------------------------
 
 /// A trait implemented by all feature types.
-#[cfg(feature = "biome_data")]
 pub trait AttributeType: Facet<'static> + Sized {
     /// The [`Identifier`] of this attribute type.
     const IDENTIFIER: Identifier<'static>;

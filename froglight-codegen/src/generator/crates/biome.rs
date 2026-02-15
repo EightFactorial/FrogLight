@@ -57,6 +57,7 @@ impl BiomeData {
     }
 
     /// Fetch the [`BiomeData`] for the given [`Version`].
+    #[allow(clippy::too_many_lines, reason = "Yes")]
     pub async fn fetch(version: &Version, storage: &mut VersionStorage) -> Result<Self> {
         let mut biomes = IndexMap::new();
 
@@ -121,6 +122,7 @@ impl BiomeData {
                 temperature: f64,
             }
             #[derive(Debug, Clone, Facet)]
+            #[allow(clippy::struct_field_names, reason = "For now")]
             struct BiomeEffectJson {
                 #[facet(default)]
                 dry_foliage_color: Option<String>,
@@ -430,14 +432,14 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
             .with_submodule(&version.base.as_feature(), async |module, settings| {
                 let mut content = String::new();
 
-                content.push_str("#![allow(clippy::unreadable_literal, reason = \"Generated code\")]\n\n");
+                content.push_str("#![allow(clippy::unreadable_literal, clippy::wildcard_imports, reason = \"Generated code\")]\n\n");
 
                 content.push_str("#[cfg(feature = \"std\")]\nuse std::sync::LazyLock;");
                 let version_type = version.base.as_feature().to_ascii_uppercase();
                 content.push_str("\n\nuse froglight_common::version::");
                 content.push_str(&version_type);
                 content.push_str(";\n#[cfg(all(feature = \"once_cell\", not(feature = \"std\")))]\nuse once_cell::sync::OnceCell as LazyLock;");
-                content.push_str("\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::generated::{attribute::*, biome::*};\n\n");
+                content.push_str("\n\n#[cfg(feature = \"biome_data\")]\nuse crate::generated::attribute::*;\nuse crate::generated::biome::*;\n\n");
 
                 content.push_str("generate! {\n    @version ");
                 content.push_str(&version_type);

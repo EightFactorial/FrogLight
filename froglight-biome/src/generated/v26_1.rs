@@ -1,7 +1,7 @@
 //! Biome data for [`V26_1`](froglight_common::version::V26_1).
 //! 
 //! @generated
-#![allow(clippy::unreadable_literal, reason = "Generated code")]
+#![allow(clippy::unreadable_literal, clippy::wildcard_imports, reason = "Generated code")]
 
 #[cfg(feature = "std")]
 use std::sync::LazyLock;
@@ -10,8 +10,9 @@ use froglight_common::version::V26_1;
 #[cfg(all(feature = "once_cell", not(feature = "std")))]
 use once_cell::sync::OnceCell as LazyLock;
 
-#[allow(clippy::wildcard_imports, reason = "Generated code")]
-use crate::generated::{attribute::*, biome::*};
+#[cfg(feature = "biome_data")]
+use crate::generated::attribute::*;
+use crate::generated::biome::*;
 
 generate! {
     @version V26_1,

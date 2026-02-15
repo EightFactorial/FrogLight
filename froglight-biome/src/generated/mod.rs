@@ -209,13 +209,12 @@ macro_rules! generate {
                             ),*
                         ])
                     });
-                    #[cfg(not(feature = "biome_data"))]
-                    static ATTRIBUTES: LazyLock<crate::biome::BiomeAttributeSet> = LazyLock::new(BiomeAttributeSet::empty);
 
                     static METADATA: crate::biome::BiomeMetadata = unsafe { crate::biome::BiomeMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
                         $global,
                         $foliage, $dry_foliage, $grass, $water, $precip, $temp, $downfall,
+                        #[cfg(feature = "biome_data")]
                         &ATTRIBUTES,
                     ) };
 
@@ -238,7 +237,6 @@ macro_rules! generate {
 #[cfg(feature = "biome_data")]
 pub mod attribute;
 pub mod biome;
-pub mod feature;
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.

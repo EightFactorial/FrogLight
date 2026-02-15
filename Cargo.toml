@@ -76,7 +76,7 @@ socket2 = { default-features = false, version = "0.6" }
 tokio = { default-features = false, version = "1.0" }
 tracing = { default-features = false, version = "0.1" }
 ureq = { default-features = false, version = "3.2" }
-uuid = { default-features = false, version = "1.20" }
+uuid = { default-features = false, version = "1.21" }
 variadics_please = { default-features = false, version = "1.1" }
 zerocopy = { default-features = false, version = "0.8" }
 

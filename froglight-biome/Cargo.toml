@@ -38,7 +38,7 @@ default = ["alloc", "biome_data", "std"]
 # Enable support for atomics
 atomic = []
 # Enable extra support for biome data
-biome_data = ["alloc", "dep:facet", "dep:facet-format", "dep:facet-value"]
+biome_data = ["dep:facet", "dep:facet-format", "dep:facet-value", "std"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 
