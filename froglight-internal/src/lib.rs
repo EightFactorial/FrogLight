@@ -22,6 +22,8 @@ pub use bevy::*;
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
+    #[cfg(feature = "bevy")]
+    pub use crate::plugins::FroglightPlugins;
     #[cfg(feature = "network")]
     pub use crate::{api::prelude::*, network::prelude::*};
     pub use crate::{
