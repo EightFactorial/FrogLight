@@ -24,6 +24,11 @@ pub enum ConnectionError {
     Closed,
     /// The connection channel is full.
     Full,
+
+    /// An unknown event was received.
+    UnknownEvent,
+    /// An unknown packet was received.
+    UnknownPacket,
 }
 
 impl<T> EventConnection<T> {

@@ -56,12 +56,12 @@ impl ClientConnection {
     ///
     /// Returns a [`ConnectionError`] if the event cannot be sent.
     #[inline]
-    pub fn send(
+    pub fn send<T: Into<ServerboundEventEnum>>(
         &self,
-        event: ServerboundEventEnum,
+        event: T,
         entity: EntityRef<'_>,
     ) -> Result<(), ConnectionError> {
-        (self.sender)(event, entity)
+        (self.sender)(event.into(), entity)
     }
 
     /// Receive a [`ClientboundEventEnum`] from the server.
@@ -73,7 +73,7 @@ impl ClientConnection {
     /// Returns a [`ConnectionError`] if an event cannot be received.
     #[inline]
     pub fn receive(
-        &mut self,
+        &self,
         entity: EntityRef<'_>,
     ) -> Result<Option<ClientboundEventEnum>, ConnectionError> {
         (self.receiver)(entity)

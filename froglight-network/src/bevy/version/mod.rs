@@ -351,3 +351,6 @@ async fn read_varint_bytewise<R: RuntimeRead<C>, C: Send>(
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.
+
+#[cfg(feature = "v26_1")]
+mod v26_1;

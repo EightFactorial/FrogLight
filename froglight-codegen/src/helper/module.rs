@@ -12,12 +12,19 @@ pub struct ModuleBuilder {
     content: String,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct SubModuleSettings {
+    pub build: bool,
     pub feature: Option<String>,
     pub public: bool,
     pub import_from: Vec<String>,
     pub reexport: bool,
+}
+
+impl Default for SubModuleSettings {
+    fn default() -> Self {
+        Self { build: true, feature: None, public: false, import_from: Vec::new(), reexport: false }
+    }
 }
 
 impl ModuleBuilder {
@@ -125,7 +132,9 @@ impl ModuleBuilder {
 
         // Run the submodule configuration function and build it.
         let settings = f(&mut submodule, SubModuleSettings::default()).await?;
-        submodule.build().await?;
+        if settings.build {
+            submodule.build().await?;
+        }
 
         // Add the submodule as an import to the parent module
         let import_name = name.to_string();
