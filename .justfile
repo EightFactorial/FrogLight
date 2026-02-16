@@ -8,7 +8,6 @@ changelog path="CHANGELOG.md":
 
 # Run the clippy linter
 clippy:
-    cargo sort-derives
     cargo clippy --workspace --{{ ALL_FEATURES }} -- -D warnings
     cargo clippy --workspace --{{ DEF_FEATURES }} -- -D warnings
     cargo clippy --workspace --{{ NO_FEATURES }} -- -D warnings
@@ -26,6 +25,19 @@ build mode="release":
 # Check all project dependencies
 deny:
     cargo deny --workspace --exclude=froglight-codegen --features=bevy check all
+
+# Format all code
+fmt:
+    cargo fmt
+    cargo sort-derives
+
+# Run the code generator
+generate:
+    RUST_LOG=debug cargo run --package=froglight-codegen --release
+
+# Show the dependency tree for a specific package
+inspect package="froglight":
+    cargo tree --invert --package={{ package }}
 
 # Run all workspace tests
 test:
@@ -45,10 +57,6 @@ update:
     cargo update --verbose
     @echo '{{ CYAN + BOLD }}note{{ NORMAL }}: or, if you have `just` installed, run `just inspect <dep>@<ver>`'
 
-# Show the dependency tree for a specific package
-inspect package="froglight":
-    cargo tree --invert --package={{ package }}
-
 # Update and run all checks
-pre-commit: typos update clippy clean test
+pre-commit: typos update generate fmt clippy test
     @echo '{{ GREEN + BOLD }}Success!{{ NORMAL }} All checks passed!'

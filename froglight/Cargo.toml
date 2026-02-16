@@ -21,6 +21,16 @@ workspace = true
 [dependencies]
 froglight-internal = { workspace = true }
 
+# --- Examples ---
+
+[dev-dependencies]
+bevy = { features = ["2d"], workspace = true }
+
+[[example]]
+name = "frogbot"
+path = "../examples/frogbot/main.rs"
+required-features = ["bevy", "default", "v26_1"]
+
 # --- Features ---
 
 [features]

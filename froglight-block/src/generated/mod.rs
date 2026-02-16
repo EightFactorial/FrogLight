@@ -1,5 +1,5 @@
 //! Generated block types, attributes, and metadata.
-//! 
+//!
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
@@ -144,4 +144,3 @@ pub mod shape;
 
 #[cfg(feature = "v26_1")]
 mod v26_1;
-
