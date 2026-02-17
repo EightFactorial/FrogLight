@@ -5,10 +5,17 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use async_net::TcpStream;
 use bevy::{prelude::*, tasks::block_on};
 use froglight::{
-    network::{connection::FuturesLite, event::ServerboundHandshakeEvent},
-    packet::common::handshake::{ConnectionIntent, HandshakeContent},
+    network::{
+        connection::FuturesLite,
+        event::{ServerboundHandshakeEvent, ServerboundLoginEvent},
+    },
+    packet::common::{
+        handshake::{ConnectionIntent, HandshakeContent},
+        login::LoginHelloContent,
+    },
     prelude::*,
 };
+use uuid::Uuid;
 
 fn main() -> AppExit {
     App::new()
@@ -46,13 +53,15 @@ impl BotPlugin {
         };
 
         // Create a `ClientConnection` and spawn it.
-        let conn = ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream);
-        let entity = world.spawn(conn);
+        let entity = world.spawn(ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream));
         let conn = entity.get::<ClientConnection>().unwrap();
 
         // Send a handshake packet to the server.
         let handshake = HandshakeContent::new_socket::<V26_1>(ADDRESS, ConnectionIntent::Login);
         conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity.as_readonly()).unwrap();
+        // Send a login packet to the server.
+        let login = LoginHelloContent::new(String::from("FrogBot"), Uuid::nil());
+        conn.send(ServerboundLoginEvent::Hello(login), entity.as_readonly()).unwrap();
     }
 
     /// Send messages to the server.
@@ -100,7 +109,7 @@ impl BotPlugin {
                 Ok(None) => break,
 
                 Err(err) => {
-                    error!("Failed to receive message: {err}");
+                    error!("Failed to receive message, {err}");
                     commands.write_message(AppExit::error());
                     return;
                 }

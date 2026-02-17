@@ -5,14 +5,20 @@ use froglight_common::version::V26_1;
 use froglight_packet::{
     generated::v26_1::{
         handshake::{HandshakeC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
-        login::ClientboundPackets as LoginClientboundPackets,
+        login::{
+            ClientboundPackets as LoginClientboundPackets, LoginHelloC2SPacket,
+            ServerboundPackets as LoginServerboundPackets,
+        },
     },
     version::{Clientbound, Serverbound, VersionPacket},
 };
 
 use super::ConnectionUpdate;
 use crate::{
-    bevy::NetworkVersion, connection::ConnectionError, event::ServerboundHandshakeEvent, prelude::*,
+    bevy::NetworkVersion,
+    connection::ConnectionError,
+    event::{ServerboundHandshakeEvent, ServerboundLoginEvent},
+    prelude::*,
 };
 
 impl NetworkVersion for V26_1 {
@@ -20,7 +26,18 @@ impl NetworkVersion for V26_1 {
         packet: &VersionPacket<Self, Clientbound>,
     ) -> Option<ConnectionUpdate> {
         match packet {
-            VersionPacket::Login(LoginClientboundPackets::Placeholder) => todo!(),
+            VersionPacket::Login(LoginClientboundPackets::LoginCompression(p)) => {
+                Some(ConnectionUpdate {
+                    compression_threshold: Some(p.compression_threshold),
+                    encrypion_key: None,
+                })
+            }
+            VersionPacket::Login(LoginClientboundPackets::LoginHello(p)) => {
+                Some(ConnectionUpdate {
+                    compression_threshold: None,
+                    encrypion_key: Some(p.public_key.clone()),
+                })
+            }
             _ => None,
         }
     }
@@ -31,20 +48,22 @@ impl NetworkVersion for V26_1 {
     ) -> Result<VersionPacket<Self, Serverbound>, ConnectionError> {
         match event {
             ServerboundEventEnum::Handshake(handshake) => {
-                let ServerboundHandshakeEvent::Handshake(content) = handshake;
-
-                Ok(VersionPacket::Handshake(HandshakeServerboundPackets::Handshake(
-                    HandshakeC2SPacket::new(content),
-                )))
+                let ServerboundHandshakeEvent::Handshake(c) = handshake;
+                let packet = HandshakeC2SPacket::new(c);
+                Ok(VersionPacket::Handshake(HandshakeServerboundPackets::Handshake(packet)))
             }
 
             ServerboundEventEnum::Status(_status) => {
                 todo!()
             }
 
-            ServerboundEventEnum::Login(_login) => {
-                todo!()
-            }
+            ServerboundEventEnum::Login(login) => match login {
+                ServerboundLoginEvent::Hello(c) => {
+                    let packet =
+                        LoginHelloC2SPacket { name: c.username, uuid: c.uuid.into_bytes() };
+                    Ok(VersionPacket::Login(LoginServerboundPackets::LoginHello(packet)))
+                }
+            },
 
             ServerboundEventEnum::Config(_config) => {
                 todo!()

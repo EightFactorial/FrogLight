@@ -41,15 +41,31 @@ pub trait NetworkVersion: PacketVersion {
             Box::new(move |event, entity| {
                 match sender.try_send(Self::event_to_packet(event, entity)?) {
                     Ok(()) => Ok(()),
-                    Err(TrySendError::Closed(_)) => Err(ConnectionError::Closed),
-                    Err(TrySendError::Full(_)) => Err(ConnectionError::Full),
+                    Err(err) => {
+                        #[cfg(feature = "tracing")]
+                        tracing::error!(
+                            target: "froglight_network",
+                            "Failed to send packet to ClientConnection, {err}"
+                        );
+                        match err {
+                            TrySendError::Full(_) => Err(ConnectionError::Full),
+                            TrySendError::Closed(_) => Err(ConnectionError::Closed),
+                        }
+                    }
                 }
             }),
             // Receive packets from the server and convert them into events.
             Box::new(move |entity| match receiver.try_recv() {
                 Ok(packet) => Self::packet_to_event(packet, entity).map(Some),
                 Err(TryRecvError::Empty) => Ok(None),
-                Err(TryRecvError::Closed) => Err(ConnectionError::Closed),
+                Err(TryRecvError::Closed) => {
+                    #[cfg(feature = "tracing")]
+                    tracing::error!(
+                        target: "froglight_network",
+                        "Failed to receive packet from ClientConnection, channel is empty and closed"
+                    );
+                    Err(ConnectionError::Closed)
+                }
             }),
             // Spawn the connection handler task to communicate with the server.
             R::spawn_task(Self::connection_handler(connection)),
@@ -78,6 +94,9 @@ pub trait NetworkVersion: PacketVersion {
                     loop {
                         let packet: VersionPacket<Self, Serverbound> = channel.recv_async().await?;
 
+                        #[cfg(feature = "tracing")]
+                        tracing::trace!(target: "froglight_network", "Sending Packet: {packet:?}");
+
                         // Note: Holding this lock after receiving the packet to prevent
                         // `server_to_client` from reading it while we potentially update it.
                         let mut state = state.lock().await;
@@ -87,6 +106,8 @@ pub trait NetworkVersion: PacketVersion {
                                 let transition = Self::Handshake::transition_state_to(&packet);
                                 write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
+                                    #[cfg(feature = "tracing")]
+                                    tracing::debug!(target: "froglight_network", "Transitioning connection from `Handshake` to `{transition}`");
                                     *state = transition;
                                     return Ok(None);
                                 }
@@ -95,6 +116,8 @@ pub trait NetworkVersion: PacketVersion {
                                 let transition = Self::Status::transition_state_to(&packet);
                                 write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
+                                    #[cfg(feature = "tracing")]
+                                    tracing::debug!(target: "froglight_network", "Transitioning connection from `Status` to `{transition}`");
                                     *state = transition;
                                     return Ok(None);
                                 }
@@ -103,6 +126,8 @@ pub trait NetworkVersion: PacketVersion {
                                 let transition = Self::Login::transition_state_to(&packet);
                                 write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
+                                    #[cfg(feature = "tracing")]
+                                    tracing::debug!(target: "froglight_network", "Transitioning connection from `Login` to `{transition}`");
                                     *state = transition;
                                     return Ok(None);
                                 }
@@ -111,6 +136,8 @@ pub trait NetworkVersion: PacketVersion {
                                 let transition = Self::Config::transition_state_to(&packet);
                                 write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
+                                    #[cfg(feature = "tracing")]
+                                    tracing::debug!(target: "froglight_network", "Transitioning connection from `Config` to `{transition}`");
                                     *state = transition;
                                     return Ok(None);
                                 }
@@ -119,6 +146,8 @@ pub trait NetworkVersion: PacketVersion {
                                 let transition = Self::Play::transition_state_to(&packet);
                                 write_packet(&packet, writer, writer_buf_a, writer_buf_b).await?;
                                 if let Some(transition) = transition {
+                                    #[cfg(feature = "tracing")]
+                                    tracing::debug!(target: "froglight_network", "Transitioning connection from `Play` to `{transition}`");
                                     *state = transition;
                                     return Ok(None);
                                 }
@@ -149,11 +178,14 @@ pub trait NetworkVersion: PacketVersion {
             let server_to_client =
                 async |reader: &mut DecryptorMut<R, R::Read>, reader_buf: &mut Vec<u8>| {
                     loop {
-                        match *state.lock().await {
+                        match { *state.lock().await } {
                             PacketStateEnum::Handshake => {
                                 let packet = VersionPacket::Handshake(
                                     read_packet(reader, reader_buf).await?,
                                 );
+                                #[cfg(feature = "tracing")]
+                                tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
+
                                 let update = Self::update_connection_details(&packet);
                                 channel.send_async(packet).await?;
                                 if update.is_some() {
@@ -163,6 +195,9 @@ pub trait NetworkVersion: PacketVersion {
                             PacketStateEnum::Status => {
                                 let packet =
                                     VersionPacket::Status(read_packet(reader, reader_buf).await?);
+                                #[cfg(feature = "tracing")]
+                                tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
+
                                 let update = Self::update_connection_details(&packet);
                                 channel.send_async(packet).await?;
                                 if update.is_some() {
@@ -172,6 +207,9 @@ pub trait NetworkVersion: PacketVersion {
                             PacketStateEnum::Login => {
                                 let packet =
                                     VersionPacket::Login(read_packet(reader, reader_buf).await?);
+                                #[cfg(feature = "tracing")]
+                                tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
+
                                 let update = Self::update_connection_details(&packet);
                                 channel.send_async(packet).await?;
                                 if update.is_some() {
@@ -181,6 +219,9 @@ pub trait NetworkVersion: PacketVersion {
                             PacketStateEnum::Config => {
                                 let packet =
                                     VersionPacket::Config(read_packet(reader, reader_buf).await?);
+                                #[cfg(feature = "tracing")]
+                                tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
+
                                 let update = Self::update_connection_details(&packet);
                                 channel.send_async(packet).await?;
                                 if update.is_some() {
@@ -190,6 +231,9 @@ pub trait NetworkVersion: PacketVersion {
                             PacketStateEnum::Play => {
                                 let packet =
                                     VersionPacket::Play(read_packet(reader, reader_buf).await?);
+                                #[cfg(feature = "tracing")]
+                                tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
+
                                 let update = Self::update_connection_details(&packet);
                                 channel.send_async(packet).await?;
                                 if update.is_some() {
@@ -205,22 +249,45 @@ pub trait NetworkVersion: PacketVersion {
             // If a `ConnectionUpdate` is received, update the connection's settings
             // and continue.
             loop {
-                if let Some(update) =
+                let result =
                     or::<Result<Option<ConnectionUpdate>, Box<dyn Error + Send + Sync>>, _, _>(
                         (client_to_server)(&mut writer, &mut write_buf_a, &mut write_buf_b),
                         (server_to_client)(&mut reader, &mut read_buf),
                     )
-                    .await?
-                {
-                    if let Some(threshold) = update.compression_threshold {
-                        reader.compression().store(threshold, Ordering::Relaxed);
-                        writer.compression().store(threshold, Ordering::Relaxed);
+                    .await;
+
+                match result {
+                    Ok(None) => {}
+                    Ok(Some(update)) => {
+                        if let Some(threshold) = update.compression_threshold {
+                            #[cfg(feature = "tracing")]
+                            tracing::trace!(
+                                target: "froglight_network",
+                                "Updating connection compression threshold: {} -> {threshold}",
+                                reader.compression().load(Ordering::Relaxed)
+                            );
+                            reader.compression().store(threshold, Ordering::Relaxed);
+                            writer.compression().store(threshold, Ordering::Relaxed);
+                        }
+                        if let Some(_key) = update.encrypion_key {
+                            #[cfg(feature = "tracing")]
+                            tracing::trace!(
+                                target: "froglight_network",
+                                "Updating connection encryption key: <redacted>"
+                            );
+                            *reader.decryptor() = Decryptor::new(&[0; _].into(), &[0; _].into());
+                            *writer.encryptor() = Encryptor::new(&[0; _].into(), &[0; _].into());
+                            reader.enabled().store(true, Ordering::Relaxed);
+                            writer.enabled().store(true, Ordering::Relaxed);
+                        }
                     }
-                    if let Some(_key) = update.encrypion_key {
-                        *reader.decryptor() = Decryptor::new(&[0; _].into(), &[0; _].into());
-                        *writer.encryptor() = Encryptor::new(&[0; _].into(), &[0; _].into());
-                        reader.enabled().store(true, Ordering::Relaxed);
-                        writer.enabled().store(true, Ordering::Relaxed);
+                    Err(err) => {
+                        #[cfg(feature = "tracing")]
+                        tracing::error!(
+                            target: "froglight_network",
+                            "Connection handler task exiting with error: {err:?}"
+                        );
+                        return Err(err);
                     }
                 }
             }
@@ -261,7 +328,7 @@ pub struct ConnectionUpdate {
     /// A new compression threshold to set.
     pub compression_threshold: Option<i32>,
     /// A new encryption key to set.
-    pub encrypion_key: Option<()>,
+    pub encrypion_key: Option<Vec<u8>>,
 }
 
 /// Read a packet of type `T` from the connection.
@@ -321,6 +388,9 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
 
     // Serialize the packet.
     facet_minecraft::to_buffer(packet, buffer_a)?;
+    #[cfg(feature = "tracing")]
+    tracing::trace!(target: "froglight_network", "Serialized packet as {buffer_a:?}");
+
     // Compress the packet.
     let compressed = writer.compress(buffer_a).await?;
     buffer_b.extend_from_slice(compressed);
@@ -328,6 +398,9 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     // Add the length prefix.
     let len = write_slice_prefix(buffer_b.len(), buffer_b);
     buffer_b.rotate_right(len);
+
+    #[cfg(feature = "tracing")]
+    tracing::trace!(target: "froglight_network", "Writing packet as {buffer_b:?}");
 
     // Write packet data.
     writer.write_all(buffer_b.as_mut_slice()).await.map_err(Into::into)

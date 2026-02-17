@@ -89,8 +89,10 @@ impl Display for ConnectionError {
     #[allow(unreachable_patterns, reason = "Non-exhaustive")]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ConnectionError::Closed => write!(f, "Connection closed"),
-            _ => todo!(),
+            ConnectionError::Closed => f.write_str("connection channel is empty and closed"),
+            ConnectionError::Full => f.write_str("connection channel is full"),
+            ConnectionError::UnknownEvent => f.write_str("unknown event received"),
+            ConnectionError::UnknownPacket => f.write_str("unknown packet received"),
         }
     }
 }

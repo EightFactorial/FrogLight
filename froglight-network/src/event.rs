@@ -3,7 +3,7 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use facet::Facet;
-use froglight_packet::common::handshake::HandshakeContent;
+use froglight_packet::common::{handshake::HandshakeContent, login::LoginHelloContent};
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Facet)]
@@ -108,7 +108,7 @@ pub enum ClientboundLoginEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundLoginEvent {
-    Placeholder,
+    Hello(LoginHelloContent),
 }
 
 // -------------------------------------------------------------------------------------------------
