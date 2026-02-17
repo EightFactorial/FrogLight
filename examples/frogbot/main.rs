@@ -7,7 +7,7 @@ use bevy::{prelude::*, tasks::block_on};
 use froglight::{
     network::{
         connection::FuturesLite,
-        event::{ServerboundHandshakeEvent, ServerboundLoginEvent},
+        event::{ClientboundLoginEvent, ServerboundHandshakeEvent, ServerboundLoginEvent},
     },
     packet::common::{
         handshake::{ConnectionIntent, HandshakeContent},
@@ -15,6 +15,8 @@ use froglight::{
     },
     prelude::*,
 };
+
+mod message;
 
 fn main() -> AppExit {
     App::new()
@@ -30,9 +32,10 @@ struct BotPlugin;
 
 impl Plugin for BotPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, Self::create_bot)
-            .add_systems(PreUpdate, Self::recv_connection_events)
-            .add_systems(PostUpdate, Self::send_connection_events);
+        app.add_systems(Startup, BotPlugin::create_bot)
+            .add_systems(PreUpdate, message::receive_messages)
+            .add_systems(Update, BotPlugin::message_handler)
+            .add_systems(PostUpdate, (message::send_messages, message::poll_connection).chain());
     }
 }
 
@@ -67,55 +70,31 @@ impl BotPlugin {
         conn.send(ServerboundLoginEvent::Hello(login), entity).unwrap();
     }
 
-    /// Send messages to the server.
-    fn send_connection_events(
-        bot: Single<(EntityRef, &ClientConnection)>,
-        mut messages: ResMut<Messages<ServerboundMessage>>,
+    /// Handle reading/writing all messages for the bot.
+    fn message_handler(
+        bot: Single<EntityRef, With<ClientConnection>>,
+        mut reader: MessageReader<ClientboundMessage>,
+        _writer: MessageWriter<ServerboundMessage>,
         mut commands: Commands,
     ) {
-        let (entity, conn) = *bot;
+        for message in reader.read() {
+            match message.event() {
+                ClientboundEventEnum::Play(_event) => todo!(),
 
-        for message in messages.drain() {
-            // Warn if the message isn't for the bot entity.
-            if message.target() != entity.id() {
-                warn!(
-                    "Received a message for a different entity: {} != {}",
-                    message.target(),
-                    entity.id()
-                );
-                continue;
-            }
+                ClientboundEventEnum::Config(_event) => todo!(),
 
-            // Send the message to the server.
-            if let Err(err) = conn.send(message.event, entity) {
-                error!("Failed to send message: {err}");
-                commands.write_message(AppExit::error());
-                return;
-            }
-        }
-    }
+                ClientboundEventEnum::Login(event) => match event {
+                    ClientboundLoginEvent::Profile(profile) => {
+                        info!("Successfully logged in as \"{}\"", profile.username());
+                        commands.entity(bot.entity()).insert(profile.clone());
+                    }
+                    ClientboundLoginEvent::Disconnect(reason) => {
+                        error!("Failed to connect to server: {reason}");
+                        commands.write_message(AppExit::error());
+                    }
+                },
 
-    /// Receive messages from the server.
-    fn recv_connection_events(
-        bot: Single<(EntityRef, &ClientConnection)>,
-        mut messages: MessageWriter<ClientboundMessage>,
-        mut commands: Commands,
-    ) {
-        let (entity, conn) = *bot;
-
-        loop {
-            match conn.receive(entity) {
-                Ok(Some(event)) => {
-                    // Write the message to the world.
-                    messages.write(ClientboundMessage::new(entity.id(), event));
-                }
-                Ok(None) => break,
-
-                Err(err) => {
-                    error!("Failed to receive message, {err}");
-                    commands.write_message(AppExit::error());
-                    return;
-                }
+                ClientboundEventEnum::Status(_) => unreachable!("Bot attempts to login"),
             }
         }
     }

@@ -17,7 +17,7 @@ use super::ConnectionUpdate;
 use crate::{
     bevy::NetworkVersion,
     connection::ConnectionError,
-    event::{ServerboundHandshakeEvent, ServerboundLoginEvent},
+    event::{ClientboundLoginEvent, ServerboundHandshakeEvent, ServerboundLoginEvent},
     prelude::*,
 };
 
@@ -84,9 +84,14 @@ impl NetworkVersion for V26_1 {
                 todo!()
             }
 
-            VersionPacket::Login(_login) => {
-                todo!()
-            }
+            VersionPacket::Login(login) => match login {
+                LoginClientboundPackets::LoginDisconnect(disconnect) => {
+                    Ok(ClientboundEventEnum::Login(ClientboundLoginEvent::Disconnect(
+                        disconnect.reason,
+                    )))
+                }
+                _ => todo!(),
+            },
 
             VersionPacket::Config(_config) => {
                 todo!()

@@ -41,31 +41,17 @@ pub trait NetworkVersion: PacketVersion {
             Box::new(move |event, entity| {
                 match sender.try_send(Self::event_to_packet(event, entity)?) {
                     Ok(()) => Ok(()),
-                    Err(err) => {
-                        #[cfg(feature = "tracing")]
-                        tracing::error!(
-                            target: "froglight_network",
-                            "Failed to send packet to ClientConnection, {err}"
-                        );
-                        match err {
-                            TrySendError::Full(_) => Err(ConnectionError::Full),
-                            TrySendError::Closed(_) => Err(ConnectionError::Closed),
-                        }
-                    }
+                    Err(err) => match err {
+                        TrySendError::Full(_) => Err(ConnectionError::Full),
+                        TrySendError::Closed(_) => Err(ConnectionError::Closed),
+                    },
                 }
             }),
             // Receive packets from the server and convert them into events.
             Box::new(move |entity| match receiver.try_recv() {
                 Ok(packet) => Self::packet_to_event(packet, entity).map(Some),
                 Err(TryRecvError::Empty) => Ok(None),
-                Err(TryRecvError::Closed) => {
-                    #[cfg(feature = "tracing")]
-                    tracing::error!(
-                        target: "froglight_network",
-                        "Failed to receive packet from ClientConnection, channel is empty and closed"
-                    );
-                    Err(ConnectionError::Closed)
-                }
+                Err(TryRecvError::Closed) => Err(ConnectionError::Closed),
             }),
             // Spawn the connection handler task to communicate with the server.
             R::spawn_task(Self::connection_handler(connection)),
@@ -283,14 +269,7 @@ pub trait NetworkVersion: PacketVersion {
                             writer.enabled().store(true, Ordering::Relaxed);
                         }
                     }
-                    Err(err) => {
-                        #[cfg(feature = "tracing")]
-                        tracing::error!(
-                            target: "froglight_network",
-                            "Connection handler task exiting with error: {err:?}"
-                        );
-                        return Err(err);
-                    }
+                    Err(err) => return Err(err),
                 }
             }
         }
@@ -349,23 +328,28 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     reader.read_exact(buffer.as_mut_slice()).await?;
 
     // Decompress the packet.
-    let decompressed = reader.decompress(buffer).await?;
+    let packet = reader.decompress(buffer).await?;
+
+    #[cfg(feature = "tracing")]
+    tracing::trace!(target: "froglight_network", "Reading packet as: {packet:?}");
 
     // Deserialize the packet.
-    match facet_minecraft::from_slice::<T>(decompressed) {
+    match facet_minecraft::from_slice::<T>(packet) {
         #[allow(unused_variables, reason = "Used in tracing only")]
         Ok((val, rem)) => {
             #[cfg(feature = "tracing")]
-            if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
-                tracing::error!(
-                    target: "froglight_network",
-                    "Bytes remaining after reading packet `{}`: {} --v\n    {rem:?}", T::SHAPE.type_name(), rem.len()
-                );
-            } else {
-                tracing::warn!(
-                    target: "froglight_network",
-                    "Bytes remaining after reading packet `{}`: {}", T::SHAPE.type_name(), rem.len()
-                );
+            if !rem.is_empty() {
+                if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
+                    tracing::error!(
+                        target: "froglight_network",
+                        "Bytes remaining after reading packet `{}`: {} --v\n    {rem:?}", T::SHAPE.type_name(), rem.len()
+                    );
+                } else {
+                    tracing::warn!(
+                        target: "froglight_network",
+                        "Bytes remaining after reading packet `{}`: {}", T::SHAPE.type_name(), rem.len()
+                    );
+                }
             }
 
             Ok(val)
@@ -390,8 +374,6 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
 
     // Serialize the packet.
     facet_minecraft::to_buffer(packet, buffer_a)?;
-    #[cfg(feature = "tracing")]
-    tracing::trace!(target: "froglight_network", "Serialized packet as {buffer_a:?}");
 
     // Compress the packet.
     let compressed = writer.compress(buffer_a).await?;
@@ -402,7 +384,7 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     buffer_b.rotate_right(len);
 
     #[cfg(feature = "tracing")]
-    tracing::trace!(target: "froglight_network", "Writing packet as {buffer_b:?}");
+    tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_b:?}");
 
     // Write packet data.
     writer.write_all(buffer_b.as_mut_slice()).await.map_err(Into::into)

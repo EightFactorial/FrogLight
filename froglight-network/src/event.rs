@@ -102,6 +102,7 @@ pub enum ServerboundConfigEvent {
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundLoginEvent {
     Profile(PlayerProfile),
+    Disconnect(String),
 }
 
 #[repr(u8)]

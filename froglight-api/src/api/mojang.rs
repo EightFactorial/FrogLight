@@ -66,7 +66,7 @@ impl NetworkApi for Mojang {
                 let NameAndUuid { name, .. } =
                     facet_json::from_slice::<NameAndUuid>(&response.data)?;
 
-                Ok(Some(Username::new(name)))
+                Ok(Some(name))
             }
             Err(err) => Err(ApiError::Http(err)),
         }
@@ -86,7 +86,7 @@ impl NetworkApi for Mojang {
             Ok(response) => {
                 let api_profile = facet_json::from_slice::<ApiProfile>(&response.data)?;
 
-                let mut profile = PlayerProfile::new(api_profile.uuid, api_profile.name.into());
+                let mut profile = PlayerProfile::new(api_profile.uuid, api_profile.name);
                 for property in api_profile.properties {
                     profile.properties_mut().insert(
                         property.name,
@@ -107,14 +107,14 @@ impl NetworkApi for Mojang {
 struct NameAndUuid {
     #[facet(rename = "id")]
     uuid: Uuid,
-    name: String,
+    name: Username,
 }
 
 #[derive(Facet)]
 struct ApiProfile {
     #[facet(rename = "id")]
     uuid: Uuid,
-    name: String,
+    name: Username,
     properties: Vec<ApiProfileProperty>,
 }
 #[derive(Facet)]

@@ -27,7 +27,7 @@ use uuid::{Builder, Uuid};
 #[cfg_attr(feature = "bevy", derive(Reflect, Component))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
 #[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize), serde(transparent))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct Username(String);
 
