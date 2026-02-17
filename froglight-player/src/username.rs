@@ -24,7 +24,7 @@ use uuid::{Builder, Uuid};
 /// May be changed for things like nicknames.
 #[repr(transparent)]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
 #[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize), serde(transparent))]

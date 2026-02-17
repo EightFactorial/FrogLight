@@ -27,11 +27,11 @@ use crate::username::Username;
 
 /// A player's profile
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bevy", derive(Reflect, Component))]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Component))]
 #[cfg_attr(feature = "bevy", component(on_add = Self::add_hook))]
 #[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct PlayerProfile {
     /// The player's [`Uuid`].
@@ -119,7 +119,7 @@ pub struct ProfilePropertySet(IndexMap<String, ProfileProperty, RandomState>);
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct ProfileProperty {
     /// The value of the property.

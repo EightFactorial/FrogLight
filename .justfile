@@ -34,6 +34,7 @@ fmt:
 # Run the code generator
 generate:
     RUST_LOG=debug cargo run --package=froglight-codegen --release
+    @just fmt
 
 # Show the dependency tree for a specific package
 inspect package="froglight":
@@ -58,5 +59,5 @@ update:
     @echo '{{ CYAN + BOLD }}note{{ NORMAL }}: or, if you have `just` installed, run `just inspect <dep>@<ver>`'
 
 # Update and run all checks
-pre-commit: typos update generate fmt clippy test
+pre-commit: typos update generate clippy test
     @echo '{{ GREEN + BOLD }}Success!{{ NORMAL }} All checks passed!'
