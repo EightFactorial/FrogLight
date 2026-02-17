@@ -59,7 +59,7 @@ impl PlayerProfile {
     /// [`Username`].
     #[must_use]
     pub fn new_offline(username: Username) -> Self {
-        let uuid = username.offline_uuid();
+        let uuid = username.uuid_offline();
         Self::new(uuid, username)
     }
 
@@ -110,7 +110,7 @@ impl PlayerProfile {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Default, Clone, PartialEq))]
 #[cfg_attr(feature = "bevy", reflect(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", derive(Deserialize, Serialize), serde(transparent))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct ProfilePropertySet(IndexMap<String, ProfileProperty, RandomState>);
 
@@ -154,11 +154,12 @@ impl ProfilePropertySet {
     /// Returns an error if the property is not valid base64,
     /// or it cannot be deserialized into the given type.
     #[cfg(feature = "facet")]
-    #[must_use]
     pub fn get_property<T: ProfilePropertyItem>(
         &self,
-    ) -> Option<Result<T, DeserializeError<JsonError>>> {
-        self.0.get(T::PROPERTY_KEY).map(|property| T::from_property(property))
+    ) -> Result<Option<T>, DeserializeError<JsonError>> {
+        self.0
+            .get(T::PROPERTY_KEY)
+            .map_or(Ok(None), |property| T::from_property(property).map(Some))
     }
 
     /// Insert a property into the set, signing it with the given function.
@@ -243,6 +244,14 @@ pub trait ProfilePropertyItem: facet::Facet<'static> + Sized {
         let decoded = BASE64_STANDARD
             .decode(&property.value)
             .map_err(|err| DeserializeError::Unsupported(err.to_string()))?;
+
+        #[cfg(feature = "tracing")]
+        if let Ok(str) = core::str::from_utf8(decoded.as_slice()) {
+            tracing::debug!("Decoded \"{}\": {str}", Self::PROPERTY_KEY);
+        } else {
+            tracing::debug!("Decoded \"{}\": <binary>", Self::PROPERTY_KEY);
+        }
+
         facet_json::from_slice::<Self>(&decoded)
     }
 
@@ -252,7 +261,7 @@ pub trait ProfilePropertyItem: facet::Facet<'static> + Sized {
     ///
     /// Returns an error if the item cannot be serialized.
     fn to_property_unsigned(&self) -> Result<ProfileProperty, SerializeError<JsonSerializeError>> {
-        facet_json::to_string(self)
+        facet_json::to_string_pretty(self)
             .map(|value| ProfileProperty { value: BASE64_STANDARD.encode(value), signature: None })
     }
 
@@ -266,7 +275,7 @@ pub trait ProfilePropertyItem: facet::Facet<'static> + Sized {
         &self,
         signer: F,
     ) -> Result<ProfileProperty, SerializeError<JsonSerializeError>> {
-        facet_json::to_string(self).map(|mut value| {
+        facet_json::to_string_pretty(self).map(|mut value| {
             value = BASE64_STANDARD.encode(value);
             ProfileProperty { signature: Some(signer(&value)), value }
         })

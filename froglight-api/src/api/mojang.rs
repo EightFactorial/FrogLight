@@ -1,5 +1,9 @@
 use async_trait::async_trait;
-use serde::Deserialize;
+use facet::Facet;
+use froglight_player::{
+    prelude::{PlayerProfile, Username},
+    profile::ProfileProperty,
+};
 use uuid::Uuid;
 
 use crate::{
@@ -14,6 +18,9 @@ use crate::{
 pub struct Mojang;
 
 impl Mojang {
+    /// The Mojang API endpoint for querying player profiles.
+    pub const PROFILE_ENDPOINT: &'static str =
+        "https://sessionserver.mojang.com/session/minecraft/profile";
     /// The Mojang API endpoint for querying usernames by UUID.
     pub const USERNAME_ENDPOINT: &'static str =
         "https://sessionserver.mojang.com/session/minecraft/profile";
@@ -36,7 +43,7 @@ impl NetworkApi for Mojang {
 
             Ok(response) => {
                 let NameAndUuid { uuid, .. } =
-                    serde_json::from_slice::<NameAndUuid>(&response.data)?;
+                    facet_json::from_slice::<NameAndUuid>(&response.data)?;
 
                 Ok(Some(uuid))
             }
@@ -48,7 +55,7 @@ impl NetworkApi for Mojang {
         &self,
         uuid: Uuid,
         client: &HttpClient,
-    ) -> Result<Option<String>, ApiError> {
+    ) -> Result<Option<Username>, ApiError> {
         let url = format!("{}/{uuid}?unsigned=false", Self::USERNAME_ENDPOINT);
         match client.get(&url, GetOptions {}).await {
             // Note: Mojang returns a 404 for non-existent UUIDs.
@@ -57,9 +64,37 @@ impl NetworkApi for Mojang {
 
             Ok(response) => {
                 let NameAndUuid { name, .. } =
-                    serde_json::from_slice::<NameAndUuid>(&response.data)?;
+                    facet_json::from_slice::<NameAndUuid>(&response.data)?;
 
-                Ok(Some(name))
+                Ok(Some(Username::new(name)))
+            }
+            Err(err) => Err(ApiError::Http(err)),
+        }
+    }
+
+    async fn query_profile(
+        &self,
+        uuid: Uuid,
+        client: &HttpClient,
+    ) -> Result<Option<PlayerProfile>, ApiError> {
+        let url = format!("{}/{uuid}?unsigned=false", Self::PROFILE_ENDPOINT);
+        match client.get(&url, GetOptions {}).await {
+            // Note: Mojang returns a 204 for non-existent profiles.
+            Ok(response) if response.status == 204 => Ok(None),
+            Err(HttpError::Http(204)) => Ok(None),
+
+            Ok(response) => {
+                let api_profile = facet_json::from_slice::<ApiProfile>(&response.data)?;
+
+                let mut profile = PlayerProfile::new(api_profile.uuid, api_profile.name.into());
+                for property in api_profile.properties {
+                    profile.properties_mut().insert(
+                        property.name,
+                        ProfileProperty { value: property.value, signature: property.signature },
+                    );
+                }
+
+                Ok(Some(profile))
             }
             Err(err) => Err(ApiError::Http(err)),
         }
@@ -68,9 +103,23 @@ impl NetworkApi for Mojang {
 
 // -------------------------------------------------------------------------------------------------
 
-#[derive(Deserialize)]
+#[derive(Facet)]
 struct NameAndUuid {
-    #[serde(rename = "id")]
+    #[facet(rename = "id")]
     uuid: Uuid,
     name: String,
+}
+
+#[derive(Facet)]
+struct ApiProfile {
+    #[facet(rename = "id")]
+    uuid: Uuid,
+    name: String,
+    properties: Vec<ApiProfileProperty>,
+}
+#[derive(Facet)]
+struct ApiProfileProperty {
+    name: String,
+    value: String,
+    signature: Option<String>,
 }

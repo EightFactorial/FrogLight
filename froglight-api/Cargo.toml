@@ -24,10 +24,11 @@ tracing-subscriber = { workspace = true }
 
 [dependencies]
 async-trait = { workspace = true }
-froglight-player = { features = ["std"], workspace = true }
-serde = { features = ["derive", "std"], workspace = true }
-serde_json = { features = ["std"], workspace = true }
-uuid = { features = ["serde", "std"], workspace = true }
+froglight-player = { features = ["facet", "std"], workspace = true }
+facet = { features = ["std", "uuid"], workspace = true }
+facet-format = { workspace = true }
+facet-json = { features = ["std"], workspace = true }
+uuid = { features = ["std"], workspace = true }
 
 # Optional dependencies
 async-io = { workspace = true, optional = true }
@@ -72,7 +73,7 @@ bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "f
 # Enable `hickory-resolver` support.
 resolver = ["dep:async-io", "dep:blocking", "dep:futures-lite", "dep:hickory-resolver", "dep:socket2"]
 # Enable `tracing` support.
-tracing = ["dep:tracing"]
+tracing = ["dep:tracing", "froglight-player/tracing"]
 
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-player/nightly"]

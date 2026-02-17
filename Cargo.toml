@@ -17,6 +17,7 @@ froglight-math = { default-features = false, path = "froglight-math", version = 
 froglight-network = { default-features = false, path = "froglight-network", version = "0.0.1" }
 froglight-packet = { default-features = false, path = "froglight-packet", version = "0.0.1" }
 # froglight-physics = { default-features = false, path = "froglight-physics" }
+froglight-player = { default-features = false, path = "froglight-player", version = "0.0.1" }
 froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
 

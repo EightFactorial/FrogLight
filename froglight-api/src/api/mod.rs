@@ -13,6 +13,8 @@ use async_trait::async_trait;
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+use facet_json::{DeserializeError, JsonError};
+use froglight_player::prelude::{PlayerProfile, Username};
 use uuid::Uuid;
 
 use crate::client::{HttpClient, HttpError};
@@ -53,7 +55,7 @@ impl ClientApi {
     #[must_use]
     pub const fn as_arc(&self) -> &Arc<dyn NetworkApi> { &self.0 }
 
-    /// Queries the API for the UUID of a given username.
+    /// Queries the API for the [`Uuid`] of a given [`Username`].
     ///
     /// Returns `None` if no account with the given username exists.
     ///
@@ -70,7 +72,7 @@ impl ClientApi {
         self.0.query_uuid(username, client).await
     }
 
-    /// Queries the API for the username of a given UUID.
+    /// Queries the API for the [`Username`] of a given [`Uuid`].
     ///
     /// Returns `None` if no account with the given UUID exists.
     ///
@@ -81,10 +83,27 @@ impl ClientApi {
         &self,
         uuid: Uuid,
         client: &HttpClient,
-    ) -> Result<Option<String>, ApiError> {
+    ) -> Result<Option<Username>, ApiError> {
         #[cfg(feature = "tracing")]
         tracing::debug!(target: "froglight_api::api", "Querying username of \"{uuid}\"");
         self.0.query_username(uuid, client).await
+    }
+
+    /// Queries the API for the [`PlayerProfile`] of a given [`Uuid`].
+    ///
+    /// Returns `None` if no account with the given UUID exists.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the API call fails.
+    pub async fn query_profile(
+        &self,
+        uuid: Uuid,
+        client: &HttpClient,
+    ) -> Result<Option<PlayerProfile>, ApiError> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_api::api", "Querying profile of \"{uuid}\"");
+        self.0.query_profile(uuid, client).await
     }
 }
 
@@ -99,7 +118,7 @@ impl Debug for ClientApi {
 /// A trait for types that can perform api calls.
 #[async_trait]
 pub trait NetworkApi: Send + Sync + 'static {
-    /// Queries the API for the UUID of a given username.
+    /// Queries the API for the [`Uuid`] of a given [`Username`].
     ///
     /// Returns `None` if no account with the given username exists.
     ///
@@ -112,7 +131,7 @@ pub trait NetworkApi: Send + Sync + 'static {
         client: &HttpClient,
     ) -> Result<Option<Uuid>, ApiError>;
 
-    /// Queries the API for the username of a given UUID.
+    /// Queries the API for the [`Username`] of a given [`Uuid`].
     ///
     /// Returns `None` if no account with the given UUID exists.
     ///
@@ -123,7 +142,20 @@ pub trait NetworkApi: Send + Sync + 'static {
         &self,
         uuid: Uuid,
         client: &HttpClient,
-    ) -> Result<Option<String>, ApiError>;
+    ) -> Result<Option<Username>, ApiError>;
+
+    /// Queries the API for the [`PlayerProfile`] of a given [`Uuid`].
+    ///
+    /// Returns `None` if no account with the given UUID exists.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the API call fails.
+    async fn query_profile(
+        &self,
+        uuid: Uuid,
+        client: &HttpClient,
+    ) -> Result<Option<PlayerProfile>, ApiError>;
 }
 
 /// An error that occurred while performing an API call.
@@ -134,10 +166,17 @@ pub enum ApiError {
     /// A UTF-8 error occurred.
     Utf8(Utf8Error),
     /// A JSON error occurred.
-    Serde(serde_json::Error),
+    Serde(DeserializeError<JsonError>),
 
     /// An unspecified error occurred.
     Other(Box<dyn Error + Send + Sync>),
+}
+
+impl ApiError {
+    /// Creates a new [`ApiError`] from an arbitrary error.
+    #[inline]
+    #[must_use]
+    pub fn other<E: Error + Send + Sync + 'static>(err: E) -> Self { Self::Other(Box::new(err)) }
 }
 
 impl Error for ApiError {}
@@ -163,6 +202,9 @@ impl From<FromUtf8Error> for ApiError {
     fn from(value: FromUtf8Error) -> Self { ApiError::Utf8(value.utf8_error()) }
 }
 
-impl From<serde_json::Error> for ApiError {
-    fn from(value: serde_json::Error) -> Self { ApiError::Serde(value) }
+impl From<DeserializeError<JsonError>> for ApiError {
+    fn from(value: DeserializeError<JsonError>) -> Self { ApiError::Serde(value) }
+}
+impl From<JsonError> for ApiError {
+    fn from(value: JsonError) -> Self { ApiError::Serde(DeserializeError::Parser(value)) }
 }

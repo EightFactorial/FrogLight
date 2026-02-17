@@ -6,10 +6,15 @@ pub mod api;
 #[cfg(feature = "bevy")]
 pub mod bevy;
 pub mod client;
+pub mod player;
 pub mod resolver;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
-    pub use crate::{client::HttpClient, resolver::DnsResolver};
+    pub use crate::{
+        client::HttpClient,
+        player::{PlayerProfileExt, UsernameExt},
+        resolver::DnsResolver,
+    };
 }

@@ -64,7 +64,7 @@ impl Username {
     ///
     /// Be very sure that this is what you need before using it.
     #[must_use]
-    pub fn offline_uuid(&self) -> Uuid {
+    pub fn uuid_offline(&self) -> Uuid {
         Md5::new()
             .chain("OfflinePlayer:")
             .chain(&self.0)
