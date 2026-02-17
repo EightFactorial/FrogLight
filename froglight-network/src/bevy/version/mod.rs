@@ -178,7 +178,9 @@ pub trait NetworkVersion: PacketVersion {
             let server_to_client =
                 async |reader: &mut DecryptorMut<R, R::Read>, reader_buf: &mut Vec<u8>| {
                     loop {
-                        match { *state.lock().await } {
+                        let state = *state.lock().await;
+
+                        match state {
                             PacketStateEnum::Handshake => {
                                 let packet = VersionPacket::Handshake(
                                     read_packet(reader, reader_buf).await?,
