@@ -7,7 +7,7 @@ pub mod plugins {
     pub use crate::{api::bevy::ApiPlugin, network::bevy::NetworkPlugin};
     pub use crate::{
         bevy::FroglightPlugins, common::bevy::CommonPlugin, inventory::bevy::InventoryPlugin,
-        world::bevy::WorldPlugin,
+        player::bevy::PlayerPlugin, world::bevy::WorldPlugin,
     };
 }
 
@@ -25,6 +25,10 @@ impl PluginGroup for FroglightPlugins {
             group = group.add(plugins::ApiPlugin).add(plugins::NetworkPlugin);
         }
 
-        group.add(plugins::CommonPlugin).add(plugins::InventoryPlugin).add(plugins::WorldPlugin)
+        group
+            .add(plugins::CommonPlugin)
+            .add(plugins::InventoryPlugin)
+            .add(plugins::PlayerPlugin)
+            .add(plugins::WorldPlugin)
     }
 }

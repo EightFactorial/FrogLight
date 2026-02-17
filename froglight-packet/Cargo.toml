@@ -21,11 +21,11 @@ workspace = true
 [dependencies]
 foldhash = { workspace = true }
 froglight-common = { workspace = true }
+froglight-player = { workspace = true }
 indexmap = { workspace = true }
 uuid = { workspace = true }
 
 # Optional dependencies
-bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 facet = { features = ["uuid"], workspace = true, optional = true }
@@ -38,16 +38,16 @@ serde = { features = ["derive"], workspace = true, optional = true }
 default = ["std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "serde"]
+bevy = ["dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "froglight-player/bevy", "serde"]
 # Enable `facet` support.
-facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet"]
+facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet", "froglight-player/facet"]
 # Enable `serde` support.
-serde = ["dep:serde", "froglight-common/serde", "indexmap/serde", "uuid/serde"]
+serde = ["dep:serde", "froglight-common/serde", "froglight-player/serde", "indexmap/serde", "uuid/serde"]
 
 # Enable support for the standard library
-std = ["facet?/std", "facet-minecraft?/std", "foldhash/std", "froglight-common/std", "indexmap/std", "uuid/std"]
+std = ["facet?/std", "facet-minecraft?/std", "foldhash/std", "froglight-common/std", "froglight-player/std", "indexmap/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["facet-minecraft?/nightly", "froglight-common/nightly", "foldhash/nightly"]
+nightly = ["facet-minecraft?/nightly", "froglight-common/nightly", "froglight-player/nightly", "foldhash/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

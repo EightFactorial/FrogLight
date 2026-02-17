@@ -27,6 +27,7 @@ froglight-inventory = { workspace = true }
 froglight-item = { features = ["froglight-block"], workspace = true }
 froglight-math = { workspace = true }
 froglight-packet = { workspace = true }
+froglight-player = { workspace = true }
 froglight-world = { features = ["froglight-biome", "froglight-block"], workspace = true }
 
 # Optional dependencies
@@ -40,7 +41,7 @@ froglight-network = { features = ["futures-lite"], workspace = true, optional = 
 default = ["network", "std"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "froglight-api?/bevy", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-math/bevy", "froglight-network?/bevy", "froglight-packet/bevy", "froglight-world/bevy"]
+bevy = ["dep:bevy_app", "froglight-api?/bevy", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-math/bevy", "froglight-network?/bevy", "froglight-packet/bevy", "froglight-player/bevy", "froglight-world/bevy"]
 # Enable networking support.
 network = ["dep:froglight-api", "dep:froglight-network", "std"]
 # Enable `tracing` support.
@@ -54,9 +55,9 @@ once_cell = ["froglight-biome/once_cell", "froglight-inventory/once_cell", "frog
 parking_lot = ["froglight-biome/parking_lot", "froglight-block/parking_lot", "froglight-item/parking_lot", "froglight-registry/parking_lot", "froglight-world/parking_lot"]
 
 # Enable support for the standard library
-std = ["froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-inventory/std", "froglight-item/std", "froglight-math/std", "froglight-packet/std", "froglight-registry/std", "froglight-world/std"]
+std = ["froglight-biome/std", "froglight-block/std", "froglight-common/std", "froglight-inventory/std", "froglight-item/std", "froglight-math/std", "froglight-packet/std", "froglight-player/std", "froglight-registry/std", "froglight-world/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-api?/nightly", "froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-math/nightly", "froglight-network?/nightly", "froglight-packet/nightly", "froglight-registry/nightly", "froglight-world/nightly", "std"]
+nightly = ["froglight-api?/nightly", "froglight-biome/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-math/nightly", "froglight-network?/nightly", "froglight-packet/nightly", "froglight-player/nightly", "froglight-registry/nightly", "froglight-world/nightly", "std"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

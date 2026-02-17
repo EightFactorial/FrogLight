@@ -33,6 +33,7 @@ froglight-common = { features = ["facet", "std"], workspace = true }
 froglight-inventory = { features = ["std"], workspace = true }
 froglight-item = { features = ["async", "froglight-block", "std"], workspace = true }
 froglight-packet = { features = ["facet", "std"], workspace = true }
+froglight-player = { features = ["facet", "std"], workspace = true }
 froglight-registry = { features = ["async", "std"], workspace = true }
 froglight-world = { features = ["async", "froglight-biome", "froglight-block", "std"], workspace = true }
 
@@ -58,7 +59,7 @@ futures-lite = ["bevy_tasks?/futures-lite", "dep:async-compression", "dep:future
 tokio = ["dep:async-compat", "dep:tokio", "facet-minecraft/tokio", "futures-lite"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-world/bevy", "futures-lite"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-player/bevy", "froglight-world/bevy", "futures-lite"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "facet-minecraft/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-world/tracing"]
 

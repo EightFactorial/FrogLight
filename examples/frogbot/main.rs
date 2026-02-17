@@ -15,7 +15,6 @@ use froglight::{
     },
     prelude::*,
 };
-use uuid::Uuid;
 
 fn main() -> AppExit {
     App::new()
@@ -41,6 +40,7 @@ impl BotPlugin {
     /// Connect to the server and spawn the bot entity.
     fn create_bot(world: &mut World) {
         const ADDRESS: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 25565);
+        const USERNAME: &str = "FrogBot";
 
         // Connect to the server.
         let stream = match block_on(TcpStream::connect(ADDRESS)) {
@@ -52,16 +52,19 @@ impl BotPlugin {
             }
         };
 
-        // Create a `ClientConnection` and spawn it.
-        let entity = world.spawn(ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream));
-        let conn = entity.get::<ClientConnection>().unwrap();
+        // Prepare the connection and player profile.
+        let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
+        let connection = ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream);
 
-        // Send a handshake packet to the server.
+        // Prepare the handshake and login events.
         let handshake = HandshakeContent::new_socket::<V26_1>(ADDRESS, ConnectionIntent::Login);
-        conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity.as_readonly()).unwrap();
-        // Send a login packet to the server.
-        let login = LoginHelloContent::new(String::from("FrogBot"), Uuid::nil());
-        conn.send(ServerboundLoginEvent::Hello(login), entity.as_readonly()).unwrap();
+        let login = LoginHelloContent::new_from_profile(&profile);
+
+        // Spawn the bot entity and send the handshake and login events.
+        let entity = world.spawn((connection, profile)).into_readonly();
+        let conn = entity.get::<ClientConnection>().unwrap();
+        conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity).unwrap();
+        conn.send(ServerboundLoginEvent::Hello(login), entity).unwrap();
     }
 
     /// Send messages to the server.

@@ -4,6 +4,7 @@
 use bevy_reflect::Reflect;
 use facet::Facet;
 use froglight_packet::common::{handshake::HandshakeContent, login::LoginHelloContent};
+use froglight_player::prelude::PlayerProfile;
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Facet)]
@@ -100,7 +101,7 @@ pub enum ServerboundConfigEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundLoginEvent {
-    Placeholder,
+    Profile(PlayerProfile),
 }
 
 #[repr(u8)]

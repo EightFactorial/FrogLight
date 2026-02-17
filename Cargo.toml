@@ -107,6 +107,7 @@ members = [
   "froglight-network",
   "froglight-packet",
   # "froglight-physics",
+  "froglight-player",
   "froglight-registry",
   "froglight-world",
 ]

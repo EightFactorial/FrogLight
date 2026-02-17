@@ -1,11 +1,10 @@
 //! TODO
 
-use alloc::string::String;
-
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Facet;
+use froglight_player::prelude::{PlayerProfile, Username};
 use uuid::Uuid;
 
 /// The content of a login hello packet.
@@ -17,7 +16,7 @@ use uuid::Uuid;
 #[cfg_attr(feature = "facet", derive(Facet))]
 pub struct LoginHelloContent {
     /// The player's username.
-    pub username: String,
+    pub username: Username,
     /// The player's UUID.
     pub uuid: Uuid,
 }
@@ -26,7 +25,13 @@ impl LoginHelloContent {
     /// Create a new [`LoginHelloContent`].
     #[inline]
     #[must_use]
-    pub const fn new(username: String, uuid: Uuid) -> Self { Self { username, uuid } }
+    pub const fn new(username: Username, uuid: Uuid) -> Self { Self { username, uuid } }
+
+    /// Create a new [`LoginHelloContent`] from a [`PlayerProfile`].
+    #[must_use]
+    pub fn new_from_profile(profile: &PlayerProfile) -> Self {
+        Self::new(profile.username().clone(), *profile.uuid())
+    }
 
     /// Get the player's username.
     #[inline]

@@ -1,0 +1,54 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-player"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+froglight-common = { features = ["alloc"], workspace = true }
+foldhash = { workspace = true }
+indexmap = { workspace = true }
+md-5 = { features = ["alloc"], workspace = true }
+uuid = { features = ["md5", "v4"], workspace = true }
+base64 = { features = ["alloc"], workspace = true }
+
+# Optional dependencies
+bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
+bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
+bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
+facet = { features = ["indexmap", "uuid"], workspace = true, optional = true }
+facet-format = { workspace = true, optional = true }
+facet-json = { workspace = true, optional = true }
+facet-minecraft = { workspace = true, optional = true }
+serde = { features = ["derive"], workspace = true, optional = true }
+
+# --- Features ---
+
+[features]
+default = ["std"]
+
+# Enable `bevy` support.
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy", "serde"]
+# Enable `facet` support.
+facet = ["dep:facet", "dep:facet-format", "dep:facet-json", "dep:facet-minecraft", "froglight-common/facet"]
+# Enable `serde` support.
+serde = ["dep:serde", "indexmap/serde", "uuid/serde", "froglight-common/serde"]
+
+# Enable support for the standard library
+std = ["base64/std", "facet?/std", "facet-minecraft?/std", "facet-json?/std", "foldhash/std", "froglight-common/std", "indexmap/std", "uuid/std"]
+# Enable optimizations using the nightly toolchain
+nightly = ["facet-minecraft?/nightly", "froglight-common/nightly", "foldhash/nightly", "std"]

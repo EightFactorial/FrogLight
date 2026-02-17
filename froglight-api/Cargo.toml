@@ -24,6 +24,7 @@ tracing-subscriber = { workspace = true }
 
 [dependencies]
 async-trait = { workspace = true }
+froglight-player = { features = ["std"], workspace = true }
 serde = { features = ["derive", "std"], workspace = true }
 serde_json = { features = ["std"], workspace = true }
 uuid = { features = ["serde", "std"], workspace = true }
@@ -67,11 +68,11 @@ reqwest = ["dep:reqwest"]
 ureq = ["dep:async-io", "dep:ureq"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-player/bevy"]
 # Enable `hickory-resolver` support.
 resolver = ["dep:async-io", "dep:blocking", "dep:futures-lite", "dep:hickory-resolver", "dep:socket2"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 
 # Enable optimizations using the nightly toolchain
-nightly = []
+nightly = ["froglight-player/nightly"]
