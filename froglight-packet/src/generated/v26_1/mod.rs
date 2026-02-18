@@ -34,10 +34,12 @@ mod traits {
             let handshake::ServerboundPackets::Handshake(handshake::HandshakeC2SPacket(
                 HandshakeContent { intent, .. },
             )) = packet;
+
             match intent {
                 ConnectionIntent::Status => Some(PacketStateEnum::Status),
-                ConnectionIntent::Login => Some(PacketStateEnum::Login),
-                ConnectionIntent::Transfer => None,
+                ConnectionIntent::Login | ConnectionIntent::Transfer => {
+                    Some(PacketStateEnum::Login)
+                }
             }
         }
     }
@@ -53,7 +55,10 @@ mod traits {
         type Clientbound = login::ClientboundPackets;
         type Serverbound = login::ServerboundPackets;
 
-        fn transition_state_to(_: &Self::Serverbound) -> Option<PacketStateEnum> { None }
+        fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum> {
+            matches!(packet, login::ServerboundPackets::EnterConfiguration(_))
+                .then_some(PacketStateEnum::Config)
+        }
     }
 
     impl PacketState<V26_1> for Config {

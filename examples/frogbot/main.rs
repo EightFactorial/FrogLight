@@ -46,6 +46,7 @@ impl BotPlugin {
         const USERNAME: &str = "FrogBot";
 
         // Connect to the server.
+        info!("Connecting to {ADDRESS} as {USERNAME}...");
         let stream = match block_on(TcpStream::connect(ADDRESS)) {
             Ok(stream) => stream,
             Err(err) => {
@@ -57,7 +58,7 @@ impl BotPlugin {
 
         // Prepare the connection and player profile.
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
-        let connection = ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream);
+        let connection = ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream, false);
 
         // Prepare the handshake and login events.
         let handshake = HandshakeContent::new_socket::<V26_1>(ADDRESS, ConnectionIntent::Login);
@@ -66,15 +67,15 @@ impl BotPlugin {
         // Spawn the bot entity and send the handshake and login events.
         let entity = world.spawn((connection, profile)).into_readonly();
         let conn = entity.get::<ClientConnection>().unwrap();
-        conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity).unwrap();
-        conn.send(ServerboundLoginEvent::Hello(login), entity).unwrap();
+        let _ = conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity);
+        let _ = conn.send(ServerboundLoginEvent::Hello(login), entity);
     }
 
     /// Handle reading/writing all messages for the bot.
     fn message_handler(
         bot: Single<EntityRef, With<ClientConnection>>,
         mut reader: MessageReader<ClientboundMessage>,
-        _writer: MessageWriter<ServerboundMessage>,
+        mut writer: MessageWriter<ServerboundMessage>,
         mut commands: Commands,
     ) {
         for message in reader.read() {
@@ -84,17 +85,37 @@ impl BotPlugin {
                 ClientboundEventEnum::Config(_event) => todo!(),
 
                 ClientboundEventEnum::Login(event) => match event {
-                    ClientboundLoginEvent::Profile(profile) => {
-                        info!("Successfully logged in as \"{}\"", profile.username());
-                        commands.entity(bot.entity()).insert(profile.clone());
-                    }
                     ClientboundLoginEvent::Disconnect(reason) => {
                         error!("Failed to connect to server: {reason}");
                         commands.write_message(AppExit::error());
                     }
+                    ClientboundLoginEvent::EncryptionRequest() => {
+                        error!("Received encryption request!");
+                        error!("Did you attempt to login to an online-mode server?");
+                        commands.write_message(AppExit::error());
+                    }
+                    ClientboundLoginEvent::QueryRequest() => {
+                        info!("Received query request: <placeholder>");
+                    }
+                    ClientboundLoginEvent::CookieRequest() => {
+                        info!("Received cookie request: <placeholder>");
+                    }
+                    ClientboundLoginEvent::Profile(profile) => {
+                        info!("Received profile for \"{}\"", profile.username());
+                        commands
+                            .entity(bot.entity())
+                            .insert((profile.username().clone(), profile.clone()));
+                    }
+                    ClientboundLoginEvent::LoginComplete => {
+                        info!("Login complete!");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundLoginEvent::AcknowledgeLogin,
+                        ));
+                    }
                 },
 
-                ClientboundEventEnum::Status(_) => unreachable!("Bot attempts to login"),
+                ClientboundEventEnum::Status(_) => unreachable!(),
             }
         }
     }

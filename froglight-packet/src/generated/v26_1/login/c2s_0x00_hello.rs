@@ -1,4 +1,5 @@
 use froglight_player::prelude::Username;
+use uuid::Uuid;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
@@ -6,5 +7,5 @@ use froglight_player::prelude::Username;
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct LoginHelloC2SPacket {
     pub name: Username,
-    pub uuid: [u8; 16],
+    pub uuid: Uuid,
 }

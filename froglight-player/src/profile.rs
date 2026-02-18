@@ -73,11 +73,6 @@ impl PlayerProfile {
     #[must_use]
     pub const fn uuid(&self) -> &Uuid { &self.uuid }
 
-    /// Get a mutable reference to the player's [`Uuid`].
-    #[inline]
-    #[must_use]
-    pub const fn uuid_mut(&mut self) -> &mut Uuid { &mut self.uuid }
-
     /// Get a reference to the [`ProfilePropertySet`].
     #[inline]
     #[must_use]

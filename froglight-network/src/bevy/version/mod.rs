@@ -31,7 +31,10 @@ pub trait NetworkVersion: PacketVersion {
     /// Create a new [`ClientConnection`] for this
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    fn wrap_connection<R: Runtime<C>, C: Send>(connection: C) -> ClientConnection {
+    fn wrap_connection<R: Runtime<C>, C: Send>(
+        connection: C,
+        exit_on_error: bool,
+    ) -> ClientConnection {
         let (channel_a, channel_b) = Channel::new_pair(Some(64));
         let (receiver, sender) = channel_a.into_split();
         let connection = AsyncConnection::<R, C, Self>::new(connection, channel_b);
@@ -39,9 +42,9 @@ pub trait NetworkVersion: PacketVersion {
         ClientConnection::new_from_parts(
             // Receive events from the ECS and send them as packets.
             Box::new(move |event, entity| {
-                match sender.try_send(Self::event_to_packet(event, entity)?) {
-                    Ok(()) => Ok(()),
-                    Err(err) => match err {
+                match Self::event_to_packet(event, entity)?.map(|packet| sender.try_send(packet)) {
+                    Some(Ok(())) | None => Ok(()),
+                    Some(Err(err)) => match err {
                         TrySendError::Full(_) => Err(ConnectionError::Full),
                         TrySendError::Closed(_) => Err(ConnectionError::Closed),
                     },
@@ -49,12 +52,12 @@ pub trait NetworkVersion: PacketVersion {
             }),
             // Receive packets from the server and convert them into events.
             Box::new(move |entity| match receiver.try_recv() {
-                Ok(packet) => Self::packet_to_event(packet, entity).map(Some),
+                Ok(packet) => Self::packet_to_event(packet, entity),
                 Err(TryRecvError::Empty) => Ok(None),
                 Err(TryRecvError::Closed) => Err(ConnectionError::Closed),
             }),
             // Spawn the connection handler task to communicate with the server.
-            R::spawn_task(Self::connection_handler(connection)),
+            R::spawn_task(Self::connection_handler(connection, exit_on_error)),
         )
     }
 
@@ -62,6 +65,7 @@ pub trait NetworkVersion: PacketVersion {
     #[allow(clippy::too_many_lines, reason = "Contains multiple async functions and packet logic")]
     fn connection_handler<R: Runtime<C>, C: Send>(
         connection: AsyncConnection<R, C, Self>,
+        exit_on_error: bool,
     ) -> impl Future<Output = Result<(), Box<dyn Error + Send + Sync>>> + Send + 'static {
         let (connection, channel) = connection.into_parts();
         let (mut reader, mut writer) = connection.into_split();
@@ -168,9 +172,13 @@ pub trait NetworkVersion: PacketVersion {
 
                         match state {
                             PacketStateEnum::Handshake => {
-                                let packet = VersionPacket::Handshake(
-                                    read_packet(reader, reader_buf).await?,
-                                );
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Handshake)
+                                else {
+                                    continue;
+                                };
+
                                 #[cfg(feature = "tracing")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
@@ -181,8 +189,13 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Status => {
-                                let packet =
-                                    VersionPacket::Status(read_packet(reader, reader_buf).await?);
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Status)
+                                else {
+                                    continue;
+                                };
+
                                 #[cfg(feature = "tracing")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
@@ -193,8 +206,13 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Login => {
-                                let packet =
-                                    VersionPacket::Login(read_packet(reader, reader_buf).await?);
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Login)
+                                else {
+                                    continue;
+                                };
+
                                 #[cfg(feature = "tracing")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
@@ -205,8 +223,13 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Config => {
-                                let packet =
-                                    VersionPacket::Config(read_packet(reader, reader_buf).await?);
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Config)
+                                else {
+                                    continue;
+                                };
+
                                 #[cfg(feature = "tracing")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
@@ -217,8 +240,13 @@ pub trait NetworkVersion: PacketVersion {
                                 }
                             }
                             PacketStateEnum::Play => {
-                                let packet =
-                                    VersionPacket::Play(read_packet(reader, reader_buf).await?);
+                                let Some(packet) = read_packet(reader, reader_buf, exit_on_error)
+                                    .await?
+                                    .map(VersionPacket::Play)
+                                else {
+                                    continue;
+                                };
+
                                 #[cfg(feature = "tracing")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
@@ -289,7 +317,7 @@ pub trait NetworkVersion: PacketVersion {
     fn event_to_packet(
         event: ServerboundEventEnum,
         entity: EntityRef<'_>,
-    ) -> Result<VersionPacket<Self, Serverbound>, ConnectionError>;
+    ) -> Result<Option<VersionPacket<Self, Serverbound>>, ConnectionError>;
 
     /// Convert a [`VersionPacket<Self, Clientbound>`] into a
     /// [`ClientboundEventEnum`].
@@ -300,7 +328,7 @@ pub trait NetworkVersion: PacketVersion {
     fn packet_to_event(
         packet: VersionPacket<Self, Clientbound>,
         entity: EntityRef<'_>,
-    ) -> Result<ClientboundEventEnum, ConnectionError>;
+    ) -> Result<Option<ClientboundEventEnum>, ConnectionError>;
 }
 
 /// Details for updating a connection.
@@ -320,7 +348,8 @@ pub struct ConnectionUpdate {
 pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     reader: &mut DecryptorMut<R, C>,
     buffer: &mut Vec<u8>,
-) -> Result<T, Box<dyn Error + Send + Sync>> {
+    exit_on_error: bool,
+) -> Result<Option<T>, Box<dyn Error + Send + Sync>> {
     // Read the packet length prefix.
     let packet_length = read_varint_bytewise(reader).await? as usize;
     // Read the packet data.
@@ -342,7 +371,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
                 if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
                     tracing::error!(
                         target: "froglight_network",
-                        "Bytes remaining after reading packet `{}`: {} --v\n    {rem:?}", T::SHAPE.type_name(), rem.len()
+                        "Bytes remaining after reading packet `{}` ({}) \u{f149}\n    {rem:?}", T::SHAPE.type_name(), rem.len()
                     );
                 } else {
                     tracing::warn!(
@@ -352,7 +381,16 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
                 }
             }
 
-            Ok(val)
+            Ok(Some(val))
+        }
+        #[allow(unused_variables, reason = "Used if tracing is enabled")]
+        Err(err) if !exit_on_error => {
+            #[cfg(feature = "tracing")]
+            tracing::error!(
+                target: "froglight_network",
+                "Failed to read packet: {err}"
+            );
+            Ok(None)
         }
         Err(err) => Err(Box::new(err)),
     }
@@ -379,12 +417,12 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     let compressed = writer.compress(buffer_a).await?;
     buffer_b.extend_from_slice(compressed);
 
+    #[cfg(feature = "tracing")]
+    tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_b:?}");
+
     // Add the length prefix.
     let len = write_slice_prefix(buffer_b.len(), buffer_b);
     buffer_b.rotate_right(len);
-
-    #[cfg(feature = "tracing")]
-    tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_b:?}");
 
     // Write packet data.
     writer.write_all(buffer_b.as_mut_slice()).await.map_err(Into::into)

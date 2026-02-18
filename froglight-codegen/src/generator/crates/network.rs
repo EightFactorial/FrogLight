@@ -46,14 +46,14 @@ impl NetworkVersion for {version_ident} {{
     fn event_to_packet(
         _event: ServerboundEventEnum,
         _entity: EntityRef<'_>,
-    ) -> Result<VersionPacket<Self, Serverbound>, ConnectionError> {{
+    ) -> Result<Option<VersionPacket<Self, Serverbound>>, ConnectionError> {{
         todo!()
     }}
 
     fn packet_to_event(
         _packet: VersionPacket<Self, Clientbound>,
         _entity: EntityRef<'_>,
-    ) -> Result<ClientboundEventEnum, ConnectionError> {{
+    ) -> Result<Option<ClientboundEventEnum>, ConnectionError> {{
         todo!()
     }}
 }}

@@ -24,7 +24,7 @@ froglight-internal = { workspace = true }
 # --- Examples ---
 
 [dev-dependencies]
-async-net = { features = [], workspace = true }
+async-net = { workspace = true }
 bevy = { features = ["bevy_log", "multi_threaded", "std", "sysinfo_plugin"], workspace = true }
 
 [[example]]

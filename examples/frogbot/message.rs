@@ -7,7 +7,6 @@ pub(super) fn send_messages(
     mut messages: ResMut<Messages<ServerboundMessage>>,
 ) {
     let (entity, conn) = *bot;
-
     for message in messages.drain() {
         // Warn if the message isn't for the bot entity.
         if message.target() != entity.id() {
@@ -30,15 +29,13 @@ pub(super) fn send_messages(
 /// Receive messages from the server.
 pub(super) fn receive_messages(
     bot: Single<(EntityRef, &ClientConnection)>,
-    mut messages: MessageWriter<ClientboundMessage>,
+    mut writer: MessageWriter<ClientboundMessage>,
 ) {
     let (entity, conn) = *bot;
-
     loop {
         match conn.receive(entity) {
             Ok(Some(event)) => {
-                // Write the message to the world.
-                messages.write(ClientboundMessage::new(entity.id(), event));
+                writer.write(ClientboundMessage::new(entity.id(), event));
             }
             Ok(None) => break,
 
@@ -50,16 +47,18 @@ pub(super) fn receive_messages(
     }
 }
 
+/// Poll the connection task and handle any errors.
 pub(super) fn poll_connection(
     mut bot: Single<(Entity, &mut ClientConnection)>,
     mut commands: Commands,
 ) {
-    let (entity, bot) = &mut *bot;
-    match bot.poll_task() {
+    let &mut (entity, ref mut conn) = &mut *bot;
+    match conn.poll_task() {
         None => {}
         Some(Ok(())) => {
-            warn!("Connection task completed, disconnecting...");
-            commands.entity(*entity).remove::<ClientConnection>();
+            info!("Connection task completed, disconnecting...");
+            commands.entity(entity).remove::<ClientConnection>();
+            commands.write_message(AppExit::Success);
         }
         Some(Err(err)) => {
             error!("Connection task failed, disconnecting...");
