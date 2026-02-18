@@ -28,10 +28,12 @@ fn main() -> AppExit {
 
 // -------------------------------------------------------------------------------------------------
 
+/// A custom [`Plugin`] for FrogBot.
 struct BotPlugin;
 
 impl Plugin for BotPlugin {
     fn build(&self, app: &mut App) {
+        // Add systems for creating the bot and handling messages.
         app.add_systems(Startup, BotPlugin::create_bot)
             .add_systems(PreUpdate, message::receive_messages)
             .add_systems(Update, BotPlugin::message_handler)
@@ -41,6 +43,8 @@ impl Plugin for BotPlugin {
 
 impl BotPlugin {
     /// Connect to the server and spawn the bot entity.
+    ///
+    /// Run once during [`Startup`].
     fn create_bot(world: &mut World) {
         const ADDRESS: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 25565);
         const USERNAME: &str = "FrogBot";
@@ -72,6 +76,8 @@ impl BotPlugin {
     }
 
     /// Handle reading/writing all messages for the bot.
+    ///
+    /// Run every frame during [`Update`].
     fn message_handler(
         bot: Single<EntityRef, With<ClientConnection>>,
         mut reader: MessageReader<ClientboundMessage>,
@@ -79,11 +85,24 @@ impl BotPlugin {
         mut commands: Commands,
     ) {
         for message in reader.read() {
+            // Warn if the message isn't for the bot entity.
+            if message.source() != bot.id() {
+                warn!(
+                    "Received a message for a different entity: {} != {}",
+                    message.source(),
+                    bot.id()
+                );
+                continue;
+            }
+
             match message.event() {
+                // Handle gameplay events.
                 ClientboundEventEnum::Play(_event) => todo!(),
 
+                // Handle configuration events.
                 ClientboundEventEnum::Config(_event) => todo!(),
 
+                // Handle login events.
                 ClientboundEventEnum::Login(event) => match event {
                     ClientboundLoginEvent::Disconnect(reason) => {
                         error!("Failed to connect to server: {reason}");
@@ -115,6 +134,7 @@ impl BotPlugin {
                     }
                 },
 
+                // Can't receive a status event since the bot attempted to login.
                 ClientboundEventEnum::Status(_) => unreachable!(),
             }
         }
