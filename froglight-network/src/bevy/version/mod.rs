@@ -413,12 +413,12 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     // Serialize the packet.
     facet_minecraft::to_buffer(packet, buffer_a)?;
 
+    #[cfg(feature = "tracing")]
+    tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_a:?}");
+
     // Compress the packet.
     let compressed = writer.compress(buffer_a).await?;
     buffer_b.extend_from_slice(compressed);
-
-    #[cfg(feature = "tracing")]
-    tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_b:?}");
 
     // Add the length prefix.
     let len = write_slice_prefix(buffer_b.len(), buffer_b);
