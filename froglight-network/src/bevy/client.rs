@@ -1,6 +1,14 @@
 use core::error::Error;
 
-use bevy_ecs::{component::Component, world::EntityRef};
+use bevy_ecs::{
+    component::Component,
+    entity::Entity,
+    event::EntityEvent,
+    lifecycle::HookContext,
+    reflect::ReflectEvent,
+    world::{DeferredWorld, EntityRef},
+};
+use bevy_reflect::Reflect;
 use bevy_tasks::Task;
 
 use crate::{
@@ -14,6 +22,7 @@ use crate::{
 /// Sends [`ServerboundEventEnum`]s to the server and receives
 /// [`ClientboundEventEnum`]s from the server.
 #[derive(Component)]
+#[component(on_despawn = ClientDespawn::connection_despawn_hook)]
 pub struct ClientConnection {
     sender: Box<SenderFn>,
     receiver: Box<ReceiverFn>,
@@ -96,5 +105,31 @@ impl ClientConnection {
     /// Returns an error if the task has encountered an error.
     pub fn poll_task(&mut self) -> Option<Result<(), Box<dyn Error + Send + Sync>>> {
         futures_lite::future::block_on(futures_lite::future::poll_once(&mut self.task))
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// An [`EntityEvent`] triggered when a [`ClientConnection`] is despawned.
+#[repr(transparent)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, EntityEvent, Reflect)]
+#[reflect(Debug, Clone, PartialEq, Hash, Event)]
+pub struct ClientDespawn(pub Entity);
+
+impl ClientDespawn {
+    /// Create a new [`ClientDespawn`] event for the given [`Entity`].
+    #[inline]
+    #[must_use]
+    pub const fn new(entity: Entity) -> Self { Self(entity) }
+
+    /// Get the [`Entity`] associated with this event.
+    #[inline]
+    #[must_use]
+    pub const fn entity(&self) -> Entity { self.0 }
+
+    fn connection_despawn_hook(mut world: DeferredWorld, ctx: HookContext) {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_network", "Triggering `ClientDespawn` for Entity {}", ctx.entity);
+        world.trigger(ClientDespawn::new(ctx.entity));
     }
 }

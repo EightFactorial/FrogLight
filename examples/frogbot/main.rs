@@ -6,6 +6,7 @@ use async_net::TcpStream;
 use bevy::{prelude::*, tasks::block_on};
 use froglight::{
     network::{
+        bevy::ClientDespawn,
         connection::FuturesLite,
         event::{ClientboundLoginEvent, ServerboundHandshakeEvent, ServerboundLoginEvent},
     },
@@ -13,10 +14,9 @@ use froglight::{
         handshake::{ConnectionIntent, HandshakeContent},
         login::LoginHelloContent,
     },
+    plugins::NetworkPlugin,
     prelude::*,
 };
-
-mod message;
 
 fn main() -> AppExit {
     App::new()
@@ -35,9 +35,12 @@ impl Plugin for BotPlugin {
     fn build(&self, app: &mut App) {
         // Add systems for creating the bot and handling messages.
         app.add_systems(Startup, BotPlugin::create_bot)
-            .add_systems(PreUpdate, message::receive_messages)
+            .add_systems(PreUpdate, NetworkPlugin::clientbound_messages)
             .add_systems(Update, BotPlugin::message_handler)
-            .add_systems(PostUpdate, (message::send_messages, message::poll_connection).chain());
+            .add_systems(
+                PostUpdate,
+                (NetworkPlugin::serverbound_messages, NetworkPlugin::poll_connections).chain(),
+            );
     }
 }
 
@@ -68,11 +71,21 @@ impl BotPlugin {
         let handshake = HandshakeContent::new_socket::<V26_1>(ADDRESS, ConnectionIntent::Login);
         let login = LoginHelloContent::new_from_profile(&profile);
 
-        // Spawn the bot entity and send the handshake and login events.
-        let entity = world.spawn((connection, profile)).into_readonly();
+        // Spawn the bot entity and exit the app when it despawns.
+        let mut entity = world.spawn((connection, profile));
+        entity.observe(BotPlugin::exit_on_despawn);
+
+        // Send the handshake and login events.
+        let entity = entity.into_readonly();
         let conn = entity.get::<ClientConnection>().unwrap();
         let _ = conn.send(ServerboundHandshakeEvent::Handshake(handshake), entity);
         let _ = conn.send(ServerboundLoginEvent::Hello(login), entity);
+    }
+
+    /// An [`Observer`] that exits the app when the bot entity despawns.
+    fn exit_on_despawn(_: On<ClientDespawn>, mut commands: Commands) {
+        info!("Exiting...");
+        commands.write_message(AppExit::Success);
     }
 
     /// Handle reading/writing all messages for the bot.
