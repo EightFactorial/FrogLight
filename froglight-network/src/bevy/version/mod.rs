@@ -22,7 +22,7 @@ use crate::{
         AsyncConnection, Channel, ConnectionError, DecryptorMut, EncryptorMut, Runtime,
         RuntimeRead, RuntimeWrite, encryption::write_slice_prefix,
     },
-    event::{ClientboundEventEnum, ServerboundEventEnum},
+    event::enums::{ClientboundEventEnum, ServerboundEventEnum},
 };
 
 /// A trait for defining a [`Version`](froglight_common::version::Version)'s
@@ -311,9 +311,17 @@ pub trait NetworkVersion: PacketVersion {
     /// Convert a [`ServerboundEventEnum`] into a
     /// [`VersionPacket<Self, Serverbound>`].
     ///
+    /// Returns `None` if no packet corresponds to the given event.
+    ///
     /// # Errors
     ///
     /// Returns a [`ConnectionError`] if the conversion fails.
+    ///
+    /// ## Note
+    ///
+    /// If the [`Version`](froglight_common::version::Version) implements
+    /// [`EventVersion`](crate::event::EventVersion), this function should call
+    /// [`EventVersion::server_event_to_packet`](crate::event::EventVersion::server_event_to_packet).
     fn event_to_packet(
         event: ServerboundEventEnum,
         entity: EntityRef<'_>,
@@ -322,9 +330,17 @@ pub trait NetworkVersion: PacketVersion {
     /// Convert a [`VersionPacket<Self, Clientbound>`] into a
     /// [`ClientboundEventEnum`].
     ///
+    /// Returns `None` if no event corresponds to the given packet.
+    ///
     /// # Errors
     ///
     /// Returns a [`ConnectionError`] if the conversion fails.
+    ///
+    /// ## Note
+    ///
+    /// If the [`Version`](froglight_common::version::Version) implements
+    /// [`EventVersion`](crate::event::EventVersion), this function should call
+    /// [`EventVersion::client_packet_to_event`](crate::event::EventVersion::client_packet_to_event).
     fn packet_to_event(
         packet: VersionPacket<Self, Clientbound>,
         entity: EntityRef<'_>,
@@ -363,7 +379,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     tracing::trace!(target: "froglight_network", "Reading packet as: {packet:?}");
 
     // Deserialize the packet.
-    match facet_minecraft::from_slice::<T>(packet) {
+    match facet_minecraft::from_slice_remainder::<T>(packet) {
         #[allow(unused_variables, reason = "Used in tracing only")]
         Ok((val, rem)) => {
             #[cfg(feature = "tracing")]

@@ -1,7 +1,7 @@
 use bevy_ecs::{entity::Entity, message::Message};
 use bevy_reflect::Reflect;
 
-use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
+use crate::event::enums::{ClientboundEventEnum, ServerboundEventEnum};
 
 /// A [`Message`] sent from the server to the client.
 ///

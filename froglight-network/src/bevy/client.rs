@@ -14,7 +14,7 @@ use bevy_tasks::Task;
 use crate::{
     bevy::NetworkVersion,
     connection::{ConnectionError, Runtime},
-    event::{ClientboundEventEnum, ServerboundEventEnum},
+    event::enums::{ClientboundEventEnum, ServerboundEventEnum},
 };
 
 /// The client-side end of a network connection.

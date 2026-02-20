@@ -12,5 +12,5 @@ pub mod prelude {
 
     #[cfg(feature = "bevy")]
     pub use crate::bevy::{ClientConnection, ClientboundMessage, ServerboundMessage};
-    pub use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
+    pub use crate::event::enums::{ClientboundEventEnum, ServerboundEventEnum};
 }

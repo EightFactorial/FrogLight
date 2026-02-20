@@ -2,9 +2,9 @@
 
 use core::fmt::{self, Debug, Display};
 
-use crate::event::{ClientboundEventEnum, ServerboundEventEnum};
+use crate::event::enums::{ClientboundEventEnum, ServerboundEventEnum};
 
-/// A connection that can send and receive event using a coroutine.
+/// A connection that can send and receive events.
 pub struct EventConnection<T> {
     sender: Box<SenderFn<T>>,
     receiver: Box<ReceiverFn<T>>,
