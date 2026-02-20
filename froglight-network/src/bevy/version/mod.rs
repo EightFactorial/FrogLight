@@ -2,8 +2,11 @@
 //!
 //! Feel free to edit anything *except* the modules at the end of this file!
 
-use core::error::Error;
-use std::sync::atomic::Ordering;
+use core::{
+    error::Error,
+    fmt::{self, Display},
+    sync::atomic::Ordering,
+};
 
 use aes::cipher::KeyIvInit;
 use async_channel::{TryRecvError, TrySendError};
@@ -368,6 +371,10 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
 ) -> Result<Option<T>, Box<dyn Error + Send + Sync>> {
     // Read the packet length prefix.
     let packet_length = read_varint_bytewise(reader).await? as usize;
+    if packet_length > LengthError::MAX_LENGTH {
+        return Err(LengthError(packet_length))?;
+    }
+
     // Read the packet data.
     buffer.resize(packet_length, 0);
     reader.read_exact(buffer.as_mut_slice()).await?;
@@ -408,7 +415,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
             );
             Ok(None)
         }
-        Err(err) => Err(Box::new(err)),
+        Err(err) => Err(err)?,
     }
 }
 
@@ -434,14 +441,18 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
 
     // Compress the packet.
     let compressed = writer.compress(buffer_a).await?;
-    buffer_b.extend_from_slice(compressed);
+    if compressed.len() > LengthError::MAX_LENGTH {
+        return Err(LengthError(compressed.len()))?;
+    }
 
     // Add the length prefix.
+    buffer_b.extend_from_slice(compressed);
     let len = write_slice_prefix(buffer_b.len(), buffer_b);
     buffer_b.rotate_right(len);
 
     // Write packet data.
-    writer.write_all(buffer_b.as_mut_slice()).await.map_err(Into::into)
+    writer.write_all(buffer_b.as_mut_slice()).await?;
+    Ok(())
 }
 
 /// Read a VarInt per-byte from the connection.
@@ -458,6 +469,22 @@ async fn read_varint_bytewise<R: RuntimeRead<C>, C: Send>(
         }
     }
     Ok(number)
+}
+
+/// An [`Error`] indicating that a packet is too large.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LengthError(pub usize);
+
+impl LengthError {
+    /// The maximum allowed packet length (2^21 - 1).
+    pub const MAX_LENGTH: usize = 2_097_151;
+}
+
+impl Error for LengthError {}
+impl Display for LengthError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Packet length exceeds maximum allowed length, {} > {}", self.0, Self::MAX_LENGTH)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------

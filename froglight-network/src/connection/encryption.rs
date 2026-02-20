@@ -1,8 +1,8 @@
 use core::{
     marker::PhantomData,
-    sync::atomic::{AtomicBool, AtomicI32},
+    sync::atomic::{AtomicBool, AtomicI32, Ordering},
 };
-use std::sync::{Arc, atomic::Ordering};
+use std::sync::Arc;
 
 use aes::{
     Aes128,

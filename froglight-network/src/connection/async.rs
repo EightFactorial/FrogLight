@@ -1,6 +1,6 @@
 //! TODO
 
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 #[cfg(feature = "bevy")]
 use bevy_tasks::{IoTaskPool, Task};
