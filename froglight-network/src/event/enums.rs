@@ -61,6 +61,7 @@ impl From<ServerboundHandshakeEvent> for ServerboundEventEnum {
 // -------------------------------------------------------------------------------------------------
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
@@ -69,6 +70,7 @@ pub enum ClientboundPlayEvent {
 }
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
@@ -79,24 +81,55 @@ pub enum ServerboundPlayEvent {
 // -------------------------------------------------------------------------------------------------
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundConfigEvent {
-    Placeholder,
+    Disconnect(String),
+    TransferServer(),
+    KeepAlive(),
+    Ping(),
+    ResetChat,
+    ResourcePackQuery(),
+    ResourcePackPush(),
+    ResourcePackPop(),
+    UpdateRegistries(),
+    UpdateFeatures(),
+    UpdateTags(),
+    ServerLinks(),
+    CodeOfConduct(),
+    ReportDetails(),
+    QueryRequest(),
+    CookieRequest(),
+    CookieStore(),
+    ShowDialog(),
+    ClearDialog(),
+    FinishConfig,
 }
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundConfigEvent {
-    Placeholder,
+    ClientInformation(),
+    KeepAlive(),
+    Pong(),
+    ResourcePackResponse(),
+    ResourcePackUpdate(),
+    AcceptCodeOfConduct,
+    QueryResponse(),
+    CookieResponse(),
+    DialogAction(),
+    AcknowledgeConfig,
 }
 
 // -------------------------------------------------------------------------------------------------
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
@@ -109,6 +142,7 @@ pub enum ClientboundLoginEvent {
 }
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
@@ -123,6 +157,7 @@ pub enum ServerboundLoginEvent {
 // -------------------------------------------------------------------------------------------------
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
@@ -131,6 +166,7 @@ pub enum ClientboundStatusEvent {
 }
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
@@ -142,6 +178,7 @@ pub enum ServerboundStatusEvent {
 // -------------------------------------------------------------------------------------------------
 
 #[repr(u8)]
+#[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Facet)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]

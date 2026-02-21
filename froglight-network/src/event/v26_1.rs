@@ -1,9 +1,14 @@
 //! [`EventVersion`] implementation for [`V26_1`].
+#![expect(clippy::too_many_lines, reason = "Huge match statements for packet/event conversion")]
 #![expect(unreachable_code, unused_variables, reason = "WIP")]
 
 use froglight_common::version::V26_1;
 use froglight_packet::{
     generated::v26_1::{
+        config::{
+            ClientboundPackets as ConfigClientboundPackets,
+            ServerboundPackets as ConfigServerboundPackets,
+        },
         handshake::{HandshakeC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
         login::{
             ClientboundPackets as LoginClientboundPackets, EnterConfigurationC2SPacket,
@@ -14,11 +19,15 @@ use froglight_packet::{
     version::{Clientbound, Serverbound, VersionPacket},
 };
 
+use super::enums::ServerboundConfigEvent;
 use crate::{
     connection::ConnectionError,
     event::{
         EventVersion,
-        enums::{ClientboundLoginEvent, ServerboundHandshakeEvent, ServerboundLoginEvent},
+        enums::{
+            ClientboundConfigEvent, ClientboundLoginEvent, ServerboundHandshakeEvent,
+            ServerboundLoginEvent,
+        },
     },
     prelude::*,
 };
@@ -55,7 +64,88 @@ impl EventVersion for V26_1 {
                 }
             },
 
-            ClientboundEventEnum::Config(_config) => todo!(),
+            ClientboundEventEnum::Config(config) => match config {
+                ClientboundConfigEvent::Disconnect(_) => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::TransferServer() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::KeepAlive() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::Ping() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ResetChat => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ResourcePackQuery() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ResourcePackPush() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ResourcePackPop() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::UpdateRegistries() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::UpdateFeatures() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::UpdateTags() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ServerLinks() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::CodeOfConduct() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ReportDetails() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::QueryRequest() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::CookieRequest() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::CookieStore() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ShowDialog() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::ClearDialog() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+                ClientboundConfigEvent::FinishConfig => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                }
+            },
 
             ClientboundEventEnum::Play(_play) => todo!(),
         }
@@ -143,9 +233,48 @@ impl EventVersion for V26_1 {
                 }
             },
 
-            ServerboundEventEnum::Config(_config) => {
-                todo!()
-            }
+            ServerboundEventEnum::Config(config) => match config {
+                ServerboundConfigEvent::ClientInformation() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::KeepAlive() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::Pong() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::ResourcePackResponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::ResourcePackUpdate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::AcceptCodeOfConduct => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::QueryResponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::CookieResponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::DialogAction() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+                ServerboundConfigEvent::AcknowledgeConfig => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                }
+            },
 
             ServerboundEventEnum::Play(_play) => {
                 todo!()

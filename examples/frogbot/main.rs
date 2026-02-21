@@ -152,6 +152,7 @@ impl BotPlugin {
                             ServerboundLoginEvent::AcknowledgeLogin,
                         ));
                     }
+                    unk => warn!("Received an unhandled login event: {unk:?}"),
                 },
 
                 // Can't receive a status event since the bot attempted to login.
