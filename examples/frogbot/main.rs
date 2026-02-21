@@ -8,7 +8,7 @@ use froglight::{
     network::{
         bevy::ClientDespawn,
         connection::FuturesLite,
-        event::{ClientboundLoginEvent, ServerboundHandshakeEvent, ServerboundLoginEvent},
+        event::enums::{ClientboundLoginEvent, ServerboundHandshakeEvent, ServerboundLoginEvent},
     },
     packet::common::{
         handshake::{ConnectionIntent, HandshakeContent},
@@ -53,7 +53,7 @@ impl BotPlugin {
         const USERNAME: &str = "FrogBot";
 
         // Connect to the server.
-        info!("Connecting to {ADDRESS} as {USERNAME}...");
+        info!("Connecting to {ADDRESS}...");
         let stream = match block_on(TcpStream::connect(ADDRESS)) {
             Ok(stream) => stream,
             Err(err) => {
@@ -66,6 +66,12 @@ impl BotPlugin {
         // Prepare the connection and player profile.
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
         let connection = ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream, false);
+
+        info!(
+            "Attempting to login as \"{}\" ({})...",
+            profile.username(),
+            profile.uuid().as_hyphenated()
+        );
 
         // Prepare the handshake and login events.
         let handshake = HandshakeContent::new_socket::<V26_1>(ADDRESS, ConnectionIntent::Login);
@@ -133,13 +139,18 @@ impl BotPlugin {
                         info!("Received cookie request: <placeholder>");
                     }
                     ClientboundLoginEvent::Profile(profile) => {
-                        info!("Received profile for \"{}\"", profile.username());
+                        info!(
+                            "Received profile for \"{}\" ({})",
+                            profile.username(),
+                            profile.uuid().as_hyphenated()
+                        );
+
                         commands
                             .entity(bot.entity())
                             .insert((profile.username().clone(), profile.clone()));
                     }
                     ClientboundLoginEvent::LoginComplete => {
-                        info!("Login complete!");
+                        info!("Login successful!");
                         writer.write(ServerboundMessage::new(
                             bot.id(),
                             ServerboundLoginEvent::AcknowledgeLogin,

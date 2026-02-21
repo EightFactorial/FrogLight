@@ -14,6 +14,12 @@ pub use version::NetworkVersion;
 
 /// A [`Plugin`] that adds [`ClientboundMessage`] and [`ServerboundMessage`]s
 /// and provides systems for sending and receiving them.
+///
+/// # Note
+///
+/// This plugin does not add any systems by default. This is to allow
+/// users to choose when to send and receive messages, as well as when to poll
+/// connections for completion.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct NetworkPlugin;
 

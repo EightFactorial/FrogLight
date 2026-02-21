@@ -447,8 +447,7 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
 
     // Add the length prefix.
     buffer_b.extend_from_slice(compressed);
-    let len = write_slice_prefix(buffer_b.len(), buffer_b);
-    buffer_b.rotate_right(len);
+    write_slice_prefix(buffer_b.len(), buffer_b);
 
     // Write packet data.
     writer.write_all(buffer_b.as_mut_slice()).await?;

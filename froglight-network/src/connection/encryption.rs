@@ -198,18 +198,17 @@ impl<R: RuntimeWrite<C>, C: Send> EncryptorMut<R, C> {
             self.scratch.clear();
 
             let prefix = if threshold <= buf.len().try_into().unwrap_or(i32::MAX) {
-                // Compress the buffer and write it to the scratch space
+                // Compress the buffer and write it to the scratch space.
                 let mut compressor = ZlibEncoder::new(Cursor::new(buf));
                 compressor.read_to_end(&mut self.scratch).await?
             } else {
-                // No compression, copy the buffer to the scratch space
+                // No compression, copy the buffer to the scratch space.
                 self.scratch.extend_from_slice(buf);
                 0
             };
 
-            // Write the length prefix and rotate it to the front
-            let len = write_slice_prefix(prefix, &mut self.scratch);
-            self.scratch.rotate_right(len);
+            // Add the length prefix.
+            write_slice_prefix(prefix, &mut self.scratch);
 
             Ok(self.scratch.as_mut_slice())
         } else {
@@ -273,7 +272,7 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
     pub async fn decompress<'a>(&'a mut self, mut buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
         if threshold.is_positive() {
-            // Remove the length prefix from the buffer
+            // Remove the length prefix from the buffer.
             buf = read_prefixed_slice(buf).ok_or_else(|| {
                 std::io::Error::new(
                     std::io::ErrorKind::InvalidData,
@@ -281,7 +280,7 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
                 )
             })?;
 
-            // Decompress if the buffer length exceeds the threshold
+            // Decompress if the buffer length exceeds the threshold.
             if threshold <= buf.len().try_into().unwrap_or(i32::MAX) {
                 self.scratch.clear();
                 let mut decompressor = ZlibDecoder::new(Cursor::new(buf));
@@ -314,10 +313,9 @@ fn read_prefixed_slice(buf: &[u8]) -> Option<&[u8]> {
 }
 
 /// Writes a length prefix into the given buffer.
-#[must_use]
 #[cfg(feature = "futures-lite")]
 #[allow(clippy::cast_possible_truncation, reason = "Bitwise operations")]
-pub(crate) fn write_slice_prefix(mut prefix: usize, buf: &mut Vec<u8>) -> usize {
+pub(crate) fn write_slice_prefix(mut prefix: usize, buf: &mut Vec<u8>) {
     let mut count: usize = 0;
     let mut byte = [0];
     while (prefix != 0 || count == 0) && count < 5 {
@@ -330,5 +328,5 @@ pub(crate) fn write_slice_prefix(mut prefix: usize, buf: &mut Vec<u8>) -> usize 
         count += 1;
         buf.push(byte[0]);
     }
-    count
+    buf.rotate_right(count);
 }
