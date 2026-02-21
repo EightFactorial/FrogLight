@@ -7,3 +7,10 @@ use alloc::string::String;
 pub struct LoginDisconnectS2CPacket {
     pub reason: String,
 }
+
+impl LoginDisconnectS2CPacket {
+    /// Creates a new [`LoginDisconnectS2CPacket`].
+    #[inline]
+    #[must_use]
+    pub const fn new(reason: String) -> Self { Self { reason } }
+}

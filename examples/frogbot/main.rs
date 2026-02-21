@@ -140,17 +140,13 @@ impl BotPlugin {
                     }
                     ClientboundLoginEvent::Profile(profile) => {
                         info!(
-                            "Received profile for \"{}\" ({})",
+                            "Logged in as \"{}\" ({})!",
                             profile.username(),
                             profile.uuid().as_hyphenated()
                         );
-
                         commands
                             .entity(bot.entity())
                             .insert((profile.username().clone(), profile.clone()));
-                    }
-                    ClientboundLoginEvent::LoginComplete => {
-                        info!("Login successful!");
                         writer.write(ServerboundMessage::new(
                             bot.id(),
                             ServerboundLoginEvent::AcknowledgeLogin,

@@ -106,7 +106,6 @@ pub enum ClientboundLoginEvent {
     QueryRequest(),
     CookieRequest(),
     Profile(PlayerProfile),
-    LoginComplete,
 }
 
 #[repr(u8)]

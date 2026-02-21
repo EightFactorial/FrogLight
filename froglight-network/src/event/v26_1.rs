@@ -1,4 +1,5 @@
 //! [`EventVersion`] implementation for [`V26_1`].
+#![expect(unreachable_code, unused_variables, reason = "WIP")]
 
 use froglight_common::version::V26_1;
 use froglight_packet::{
@@ -6,7 +7,8 @@ use froglight_packet::{
         handshake::{HandshakeC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
         login::{
             ClientboundPackets as LoginClientboundPackets, EnterConfigurationC2SPacket,
-            LoginHelloC2SPacket, ServerboundPackets as LoginServerboundPackets,
+            LoginDisconnectS2CPacket, LoginHelloC2SPacket, LoginSuccessS2CPacket,
+            ServerboundPackets as LoginServerboundPackets,
         },
     },
     version::{Clientbound, Serverbound, VersionPacket},
@@ -23,15 +25,49 @@ use crate::{
 
 impl EventVersion for V26_1 {
     fn client_event_to_packet(
-        _event: ClientboundEventEnum,
+        event: ClientboundEventEnum,
     ) -> Result<Option<VersionPacket<Self, Clientbound>>, ConnectionError> {
-        todo!()
+        match event {
+            ClientboundEventEnum::Status(_status) => todo!(),
+
+            ClientboundEventEnum::Login(login) => match login {
+                ClientboundLoginEvent::Disconnect(event) => {
+                    let packet = LoginDisconnectS2CPacket::new(event);
+                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::LoginDisconnect(packet))))
+                }
+                ClientboundLoginEvent::EncryptionRequest() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::LoginHello(packet))))
+                }
+                ClientboundLoginEvent::QueryRequest() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::LoginQueryRequest(
+                        packet,
+                    ))))
+                }
+                ClientboundLoginEvent::CookieRequest() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::CookieRequest(packet))))
+                }
+                ClientboundLoginEvent::Profile(event) => {
+                    let packet = LoginSuccessS2CPacket::new(event);
+                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::LoginSuccess(packet))))
+                }
+            },
+
+            ClientboundEventEnum::Config(_config) => todo!(),
+
+            ClientboundEventEnum::Play(_play) => todo!(),
+        }
     }
 
     fn client_packet_to_event(
         packet: VersionPacket<Self, Clientbound>,
     ) -> Result<Option<ClientboundEventEnum>, ConnectionError> {
         match packet {
+            // Technically unreachable as there are no clientbound handshake packets
+            VersionPacket::Handshake(_) => Ok(None),
+
             VersionPacket::Status(_status) => {
                 todo!()
             }
@@ -43,10 +79,9 @@ impl EventVersion for V26_1 {
                 LoginClientboundPackets::LoginHello(_packet) => Ok(Some(
                     ClientboundEventEnum::Login(ClientboundLoginEvent::EncryptionRequest()),
                 )),
-                #[expect(unreachable_code, reason = "WIP")]
-                LoginClientboundPackets::LoginSuccess(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::Profile(todo!()))))
-                }
+                LoginClientboundPackets::LoginSuccess(packet) => Ok(Some(
+                    ClientboundEventEnum::Login(ClientboundLoginEvent::Profile(packet.profile)),
+                )),
                 LoginClientboundPackets::LoginQueryRequest(_packet) => {
                     Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::QueryRequest())))
                 }
@@ -83,15 +118,29 @@ impl EventVersion for V26_1 {
 
             ServerboundEventEnum::Login(login) => match login {
                 ServerboundLoginEvent::Hello(event) => {
-                    let packet = LoginHelloC2SPacket { name: event.username, uuid: event.uuid };
+                    let packet = LoginHelloC2SPacket::new(event);
                     Ok(Some(VersionPacket::Login(LoginServerboundPackets::LoginHello(packet))))
                 }
-                ServerboundLoginEvent::EncryptionResponse() => todo!(),
-                ServerboundLoginEvent::QueryResponse() => todo!(),
-                ServerboundLoginEvent::Cookieresponse() => todo!(),
-                ServerboundLoginEvent::AcknowledgeLogin => Ok(Some(VersionPacket::Login(
-                    LoginServerboundPackets::EnterConfiguration(EnterConfigurationC2SPacket),
-                ))),
+                ServerboundLoginEvent::EncryptionResponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::LoginKey(packet))))
+                }
+                ServerboundLoginEvent::QueryResponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::LoginQueryResponse(
+                        packet,
+                    ))))
+                }
+                ServerboundLoginEvent::Cookieresponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::CookieResponse(packet))))
+                }
+                ServerboundLoginEvent::AcknowledgeLogin => {
+                    let packet = EnterConfigurationC2SPacket;
+                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::EnterConfiguration(
+                        packet,
+                    ))))
+                }
             },
 
             ServerboundEventEnum::Config(_config) => {
@@ -105,8 +154,38 @@ impl EventVersion for V26_1 {
     }
 
     fn server_packet_to_event(
-        _packet: VersionPacket<Self, Serverbound>,
+        packet: VersionPacket<Self, Serverbound>,
     ) -> Result<Option<ServerboundEventEnum>, ConnectionError> {
-        todo!()
+        match packet {
+            VersionPacket::Handshake(handshake) => match handshake {
+                HandshakeServerboundPackets::Handshake(packet) => Ok(Some(
+                    ServerboundEventEnum::Handshake(ServerboundHandshakeEvent::Handshake(packet.0)),
+                )),
+            },
+
+            VersionPacket::Status(_) => todo!(),
+
+            VersionPacket::Login(login) => match login {
+                LoginServerboundPackets::LoginHello(packet) => {
+                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::Hello(packet.0))))
+                }
+                LoginServerboundPackets::LoginKey(_packet) => Ok(Some(
+                    ServerboundEventEnum::Login(ServerboundLoginEvent::EncryptionResponse()),
+                )),
+                LoginServerboundPackets::LoginQueryResponse(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::QueryResponse())))
+                }
+                LoginServerboundPackets::EnterConfiguration(_) => {
+                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::AcknowledgeLogin)))
+                }
+                LoginServerboundPackets::CookieResponse(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::Cookieresponse())))
+                }
+            },
+
+            VersionPacket::Config(_) => todo!(),
+
+            VersionPacket::Play(_) => todo!(),
+        }
     }
 }

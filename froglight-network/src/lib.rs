@@ -6,6 +6,7 @@
 pub mod bevy;
 pub mod connection;
 pub mod event;
+pub use facet_minecraft;
 
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
