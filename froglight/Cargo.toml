@@ -35,10 +35,12 @@ required-features = ["bevy", "default", "v26_1"]
 # --- Features ---
 
 [features]
-default = ["network", "std"]
+default = ["network", "multi_threaded", "std"]
 
 # Enable `bevy` support.
 bevy = ["froglight-internal/bevy"]
+# Enable multi-threading.
+multi_threaded = ["froglight-internal/multi_threaded"]
 # Enable networking support.
 network = ["froglight-internal/network", "std"]
 # Enable `tracing` support.
