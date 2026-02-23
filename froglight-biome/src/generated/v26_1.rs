@@ -1,5 +1,5 @@
 //! Biome data for [`V26_1`](froglight_common::version::V26_1).
-//!
+//! 
 //! @generated
 #![allow(clippy::unreadable_literal, clippy::wildcard_imports, reason = "Generated code")]
 
