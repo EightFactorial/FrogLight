@@ -8,7 +8,10 @@ use froglight::{
     network::{
         bevy::ClientDespawn,
         connection::FuturesLite,
-        event::enums::{ClientboundLoginEvent, ServerboundHandshakeEvent, ServerboundLoginEvent},
+        event::enums::{
+            ClientboundConfigEvent, ClientboundLoginEvent, ServerboundConfigEvent,
+            ServerboundHandshakeEvent, ServerboundLoginEvent,
+        },
     },
     packet::common::{
         handshake::{ConnectionIntent, HandshakeContent},
@@ -51,6 +54,7 @@ impl BotPlugin {
     fn create_bot(world: &mut World) {
         const ADDRESS: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 25565);
         const USERNAME: &str = "FrogBot";
+        type Protocol = V26_1;
 
         // Connect to the server.
         info!("Connecting to {ADDRESS}...");
@@ -65,7 +69,7 @@ impl BotPlugin {
 
         // Prepare the connection and player profile.
         let profile = PlayerProfile::new_offline(Username::new_from(USERNAME));
-        let connection = ClientConnection::new::<V26_1, FuturesLite, TcpStream>(stream, false);
+        let connection = ClientConnection::new::<Protocol, FuturesLite, TcpStream>(stream, false);
 
         info!(
             "Attempting to login as \"{}\" ({})...",
@@ -74,7 +78,7 @@ impl BotPlugin {
         );
 
         // Prepare the handshake and login events.
-        let handshake = HandshakeContent::new_socket::<V26_1>(ADDRESS, ConnectionIntent::Login);
+        let handshake = HandshakeContent::new_socket::<Protocol>(ADDRESS, ConnectionIntent::Login);
         let login = LoginHelloContent::new_from_profile(&profile);
 
         // Spawn the bot entity and exit the app when it despawns.
@@ -119,7 +123,89 @@ impl BotPlugin {
                 ClientboundEventEnum::Play(_event) => todo!(),
 
                 // Handle configuration events.
-                ClientboundEventEnum::Config(_event) => todo!(),
+                ClientboundEventEnum::Config(event) => match event {
+                    ClientboundConfigEvent::Disconnect(reason) => {
+                        error!("Disconnected from server: {reason}");
+                        commands.write_message(AppExit::error());
+                    }
+                    ClientboundConfigEvent::TransferServer() => {
+                        error!("Received transfer server event!");
+                        error!("Did you attempt to login to a BungeeCord/Velocity proxy?");
+                        commands.write_message(AppExit::error());
+                    }
+                    ClientboundConfigEvent::KeepAlive(id) => {
+                        info!("Received KeepAlive ({id})");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundConfigEvent::KeepAlive(*id),
+                        ));
+                    }
+                    ClientboundConfigEvent::Ping(id) => {
+                        info!("Received Ping ({id})");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundConfigEvent::Pong(*id),
+                        ));
+                    }
+                    ClientboundConfigEvent::ResetChat => {
+                        info!("Received ResetChat");
+                    }
+                    ClientboundConfigEvent::ResourcePackQuery() => {
+                        info!("Received ResourcePackQuery: <placeholder>");
+                    }
+                    ClientboundConfigEvent::ResourcePackPush() => {
+                        info!("Received ResourcePackPush: <placeholder>");
+                    }
+                    ClientboundConfigEvent::ResourcePackPop() => {
+                        info!("Received ResourcePackPop: <placeholder>");
+                    }
+                    ClientboundConfigEvent::UpdateRegistries() => {
+                        info!("Received UpdateRegistries: <placeholder>");
+                    }
+                    ClientboundConfigEvent::UpdateFeatures() => {
+                        info!("Received UpdateFeatures: <placeholder>");
+                    }
+                    ClientboundConfigEvent::UpdateTags() => {
+                        info!("Received UpdateTags: <placeholder>");
+                    }
+                    ClientboundConfigEvent::ServerLinks() => {
+                        info!("Received ServerLinks: <placeholder>");
+                    }
+                    ClientboundConfigEvent::CodeOfConduct() => {
+                        info!("Received Code of Conduct: <placeholder>");
+                        warn!("Accepting code of conduct...");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundConfigEvent::AcceptCodeOfConduct,
+                        ));
+                    }
+                    ClientboundConfigEvent::ReportDetails() => {
+                        info!("Received ReportDetails: <placeholder>");
+                    }
+                    ClientboundConfigEvent::QueryRequest() => {
+                        info!("Received QueryRequest: <placeholder>");
+                    }
+                    ClientboundConfigEvent::CookieRequest() => {
+                        info!("Received CookieRequest: <placeholder>");
+                    }
+                    ClientboundConfigEvent::CookieStore() => {
+                        info!("Received CookieStore: <placeholder>");
+                    }
+                    ClientboundConfigEvent::ShowDialog() => {
+                        info!("Received ShowDialog: <placeholder>");
+                    }
+                    ClientboundConfigEvent::ClearDialog => {
+                        info!("Clearing dialog...");
+                    }
+                    ClientboundConfigEvent::FinishConfig => {
+                        info!("Successfully finished configuration!");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundConfigEvent::AcknowledgeConfig,
+                        ));
+                    }
+                    unk => warn!("Received an unhandled config event: {unk:?}"),
+                },
 
                 // Handle login events.
                 ClientboundEventEnum::Login(event) => match event {
@@ -133,10 +219,10 @@ impl BotPlugin {
                         commands.write_message(AppExit::error());
                     }
                     ClientboundLoginEvent::QueryRequest() => {
-                        info!("Received query request: <placeholder>");
+                        info!("Received QueryRequest: <placeholder>");
                     }
                     ClientboundLoginEvent::CookieRequest() => {
-                        info!("Received cookie request: <placeholder>");
+                        info!("Received CookieRequest: <placeholder>");
                     }
                     ClientboundLoginEvent::Profile(profile) => {
                         info!(

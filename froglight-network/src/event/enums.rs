@@ -88,8 +88,8 @@ pub enum ServerboundPlayEvent {
 pub enum ClientboundConfigEvent {
     Disconnect(String),
     TransferServer(),
-    KeepAlive(),
-    Ping(),
+    KeepAlive(u64),
+    Ping(u32),
     ResetChat,
     ResourcePackQuery(),
     ResourcePackPush(),
@@ -104,7 +104,7 @@ pub enum ClientboundConfigEvent {
     CookieRequest(),
     CookieStore(),
     ShowDialog(),
-    ClearDialog(),
+    ClearDialog,
     FinishConfig,
 }
 
@@ -115,8 +115,8 @@ pub enum ClientboundConfigEvent {
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundConfigEvent {
     ClientInformation(),
-    KeepAlive(),
-    Pong(),
+    KeepAlive(u64),
+    Pong(u32),
     ResourcePackResponse(),
     ResourcePackUpdate(),
     AcceptCodeOfConduct,

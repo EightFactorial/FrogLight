@@ -6,7 +6,9 @@ use froglight_common::version::V26_1;
 use froglight_packet::{
     generated::v26_1::{
         config::{
-            ClientboundPackets as ConfigClientboundPackets,
+            ClearDialogS2CPacket, ClientboundPackets as ConfigClientboundPackets,
+            ConfigDisconnectS2CPacket, FinishConfigurationS2CPacket, KeepAliveC2SPacket,
+            KeepAliveS2CPacket, PingS2CPacket, PongC2SPacket,
             ServerboundPackets as ConfigServerboundPackets,
         },
         handshake::{HandshakeC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
@@ -65,86 +67,94 @@ impl EventVersion for V26_1 {
             },
 
             ClientboundEventEnum::Config(config) => match config {
-                ClientboundConfigEvent::Disconnect(_) => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
-                }
+                ClientboundConfigEvent::Disconnect(reason) => Ok(Some(VersionPacket::Config(
+                    ConfigClientboundPackets::Disconnect(ConfigDisconnectS2CPacket { reason }),
+                ))),
                 ClientboundConfigEvent::TransferServer() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Transfer(packet))))
                 }
-                ClientboundConfigEvent::KeepAlive() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                ClientboundConfigEvent::KeepAlive(packet_id) => {
+                    let packet = KeepAliveS2CPacket { packet_id };
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::KeepAlive(packet))))
                 }
-                ClientboundConfigEvent::Ping() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                ClientboundConfigEvent::Ping(packet_id) => {
+                    let packet = PingS2CPacket { packet_id };
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Ping(packet))))
                 }
                 ClientboundConfigEvent::ResetChat => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ResetChat(packet))))
                 }
                 ClientboundConfigEvent::ResourcePackQuery() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::SelectKnownPacks(
+                        packet,
+                    ))))
                 }
                 ClientboundConfigEvent::ResourcePackPush() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ResourcePackPush(
+                        packet,
+                    ))))
                 }
                 ClientboundConfigEvent::ResourcePackPop() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ResourcePackPop(
+                        packet,
+                    ))))
                 }
                 ClientboundConfigEvent::UpdateRegistries() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::RegistryData(packet))))
                 }
                 ClientboundConfigEvent::UpdateFeatures() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(
+                        ConfigClientboundPackets::UpdateEnabledFeatures(packet),
+                    )))
                 }
                 ClientboundConfigEvent::UpdateTags() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::UpdateTags(packet))))
                 }
                 ClientboundConfigEvent::ServerLinks() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ServerLinks(packet))))
                 }
                 ClientboundConfigEvent::CodeOfConduct() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CodeOfConduct(packet))))
                 }
                 ClientboundConfigEvent::ReportDetails() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CustomReportDetails(
+                        packet,
+                    ))))
                 }
                 ClientboundConfigEvent::QueryRequest() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::QueryRequest(packet))))
                 }
                 ClientboundConfigEvent::CookieRequest() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CookieRequest(packet))))
                 }
                 ClientboundConfigEvent::CookieStore() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::StoreCookie(packet))))
                 }
                 ClientboundConfigEvent::ShowDialog() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ShowDialog(packet))))
                 }
-                ClientboundConfigEvent::ClearDialog() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
+                ClientboundConfigEvent::ClearDialog => {
+                    let packet = ClearDialogS2CPacket;
+                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ClearDialog(packet))))
                 }
-                ClientboundConfigEvent::FinishConfig => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Placeholder)))
-                }
+                ClientboundConfigEvent::FinishConfig => Ok(Some(VersionPacket::Config(
+                    ConfigClientboundPackets::FinishConfiguration(FinishConfigurationS2CPacket),
+                ))),
             },
 
             ClientboundEventEnum::Play(_play) => todo!(),
@@ -182,9 +192,70 @@ impl EventVersion for V26_1 {
                 LoginClientboundPackets::LoginCompression(_) => Ok(None),
             },
 
-            VersionPacket::Config(_config) => {
-                todo!()
-            }
+            VersionPacket::Config(config) => match config {
+                ConfigClientboundPackets::CookieRequest(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CookieRequest())))
+                }
+                ConfigClientboundPackets::QueryRequest(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::QueryRequest())))
+                }
+                ConfigClientboundPackets::Disconnect(packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::Disconnect(packet.reason)),
+                )),
+                ConfigClientboundPackets::FinishConfiguration(_) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::FinishConfig)))
+                }
+                ConfigClientboundPackets::KeepAlive(packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::KeepAlive(
+                        packet.packet_id,
+                    ))))
+                }
+                ConfigClientboundPackets::Ping(packet) => Ok(Some(ClientboundEventEnum::Config(
+                    ClientboundConfigEvent::Ping(packet.packet_id),
+                ))),
+                ConfigClientboundPackets::ResetChat(_) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ResetChat)))
+                }
+                ConfigClientboundPackets::RegistryData(_packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateRegistries()),
+                )),
+                ConfigClientboundPackets::ResourcePackPop(_packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackPop()),
+                )),
+                ConfigClientboundPackets::ResourcePackPush(_packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackPush()),
+                )),
+                ConfigClientboundPackets::StoreCookie(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CookieStore())))
+                }
+                ConfigClientboundPackets::Transfer(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::TransferServer())))
+                }
+                ConfigClientboundPackets::UpdateEnabledFeatures(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateFeatures())))
+                }
+                ConfigClientboundPackets::UpdateTags(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateTags())))
+                }
+                ConfigClientboundPackets::SelectKnownPacks(_packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackQuery()),
+                )),
+                ConfigClientboundPackets::CustomReportDetails(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ReportDetails())))
+                }
+                ConfigClientboundPackets::ServerLinks(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ServerLinks())))
+                }
+                ConfigClientboundPackets::ClearDialog(_) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ClearDialog)))
+                }
+                ConfigClientboundPackets::ShowDialog(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ShowDialog())))
+                }
+                ConfigClientboundPackets::CodeOfConduct(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CodeOfConduct())))
+                }
+            },
 
             VersionPacket::Play(_play) => {
                 todo!()
@@ -236,43 +307,55 @@ impl EventVersion for V26_1 {
             ServerboundEventEnum::Config(config) => match config {
                 ServerboundConfigEvent::ClientInformation() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::ClientInformation(
+                        packet,
+                    ))))
                 }
-                ServerboundConfigEvent::KeepAlive() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                ServerboundConfigEvent::KeepAlive(packet_id) => {
+                    let packet = KeepAliveC2SPacket { packet_id };
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::KeepAlive(packet))))
                 }
-                ServerboundConfigEvent::Pong() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                ServerboundConfigEvent::Pong(packet_id) => {
+                    let packet = PongC2SPacket { packet_id };
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Pong(packet))))
                 }
                 ServerboundConfigEvent::ResourcePackResponse() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::SelectKnownPacks(
+                        packet,
+                    ))))
                 }
                 ServerboundConfigEvent::ResourcePackUpdate() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::ResourcePack(packet))))
                 }
                 ServerboundConfigEvent::AcceptCodeOfConduct => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::AcceptCodeOfConduct(
+                        packet,
+                    ))))
                 }
                 ServerboundConfigEvent::QueryResponse() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::QueryResponse(packet))))
                 }
                 ServerboundConfigEvent::CookieResponse() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::CookieResponse(
+                        packet,
+                    ))))
                 }
                 ServerboundConfigEvent::DialogAction() => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::CustomClickAction(
+                        packet,
+                    ))))
                 }
                 ServerboundConfigEvent::AcknowledgeConfig => {
                     let packet = todo!();
-                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Placeholder)))
+                    Ok(Some(VersionPacket::Config(ConfigServerboundPackets::AcceptCodeOfConduct(
+                        packet,
+                    ))))
                 }
             },
 
@@ -312,7 +395,40 @@ impl EventVersion for V26_1 {
                 }
             },
 
-            VersionPacket::Config(_) => todo!(),
+            VersionPacket::Config(config) => match config {
+                ConfigServerboundPackets::ClientInformation(_packet) => Ok(Some(
+                    ServerboundEventEnum::Config(ServerboundConfigEvent::ClientInformation()),
+                )),
+                ConfigServerboundPackets::CookieResponse(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::CookieResponse())))
+                }
+                ConfigServerboundPackets::QueryResponse(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::QueryResponse())))
+                }
+                ConfigServerboundPackets::FinishConfiguration(_) => Ok(Some(
+                    ServerboundEventEnum::Config(ServerboundConfigEvent::AcknowledgeConfig),
+                )),
+                ConfigServerboundPackets::KeepAlive(packet) => {
+                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::KeepAlive(
+                        packet.packet_id,
+                    ))))
+                }
+                ConfigServerboundPackets::Pong(packet) => Ok(Some(ServerboundEventEnum::Config(
+                    ServerboundConfigEvent::Pong(packet.packet_id),
+                ))),
+                ConfigServerboundPackets::ResourcePack(_packet) => Ok(Some(
+                    ServerboundEventEnum::Config(ServerboundConfigEvent::ResourcePackUpdate()),
+                )),
+                ConfigServerboundPackets::SelectKnownPacks(_packet) => Ok(Some(
+                    ServerboundEventEnum::Config(ServerboundConfigEvent::ResourcePackResponse()),
+                )),
+                ConfigServerboundPackets::CustomClickAction(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::DialogAction())))
+                }
+                ConfigServerboundPackets::AcceptCodeOfConduct(_) => Ok(Some(
+                    ServerboundEventEnum::Config(ServerboundConfigEvent::AcceptCodeOfConduct),
+                )),
+            },
 
             VersionPacket::Play(_) => todo!(),
         }

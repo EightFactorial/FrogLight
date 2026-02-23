@@ -273,12 +273,16 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
         let threshold = self.compression().load(Ordering::Relaxed);
         if threshold.is_positive() {
             // Remove the length prefix from the buffer.
-            buf = read_prefixed_slice(buf).ok_or_else(|| {
-                std::io::Error::new(
-                    std::io::ErrorKind::InvalidData,
-                    "Failed to read prefixed slice for decompression",
-                )
-            })?;
+            if buf.first().is_some_and(|&b| b == 0) {
+                buf = &buf[1..];
+            } else {
+                buf = read_prefixed_slice(buf).ok_or_else(|| {
+                    std::io::Error::new(
+                        std::io::ErrorKind::InvalidData,
+                        "Failed to read prefixed slice for decompression",
+                    )
+                })?;
+            }
 
             // Decompress if the buffer length exceeds the threshold.
             if threshold <= buf.len().try_into().unwrap_or(i32::MAX) {
