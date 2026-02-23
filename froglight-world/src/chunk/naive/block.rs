@@ -2,9 +2,11 @@
 
 use core::any::TypeId;
 
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-use froglight_block::block::BlockType;
-use froglight_block::{block::GlobalId, prelude::*, storage::BlockStorage};
+use froglight_block::{
+    block::{BlockType, GlobalId},
+    prelude::*,
+    storage::BlockStorage,
+};
 
 use crate::{
     chunk::{NaiveChunk, section::SectionPalette},
@@ -19,9 +21,9 @@ impl NaiveChunk {
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn get_block<V: BlockVersion, P: Into<BlockPos>>(&self, position: P) -> Option<Block> {
-        self.get_block_using::<P>(position, &V::blocks().read())
+        self.get_block_using::<P>(position, &V::blocks().load())
     }
 
     /// Get the [`Block`] at the given position within the chunk,
@@ -45,12 +47,12 @@ impl NaiveChunk {
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn get_block_pos<V: BlockVersion, P: Into<ChunkBlockPos>>(
         &self,
         position: P,
     ) -> Option<Block> {
-        self.get_block_pos_using::<P>(position, &V::blocks().read())
+        self.get_block_pos_using::<P>(position, &V::blocks().load())
     }
 
     /// Get the [`Block`] at the given position within the chunk,
@@ -73,13 +75,13 @@ impl NaiveChunk {
     /// Returns `None` if the position is out of bounds,
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn set_block<V: BlockVersion, P: Into<BlockPos>>(
         &mut self,
         position: P,
         block: Block,
     ) -> Option<Block> {
-        self.set_block_using::<P>(position, block, &V::blocks().read())
+        self.set_block_using::<P>(position, block, &V::blocks().load())
     }
 
     /// Set the [`Block`] at the given position within the chunk and return the
@@ -103,13 +105,13 @@ impl NaiveChunk {
     /// Returns `None` if the position is out of bounds,
     /// or if the block is not recognized by the
     /// [`Version`](froglight_common::version::Version).
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn set_block_pos<V: BlockVersion, P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
         block: Block,
     ) -> Option<Block> {
-        self.set_block_pos_using::<P>(position, block, &V::blocks().read())
+        self.set_block_pos_using::<P>(position, block, &V::blocks().load())
     }
 
     /// Set the [`Block`] at the given position within the chunk and return the
@@ -131,9 +133,9 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains at least one block of the same
     /// type.
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn contains_block<V: BlockVersion>(&self, block: Block) -> bool {
-        self.contains_block_using(block, &V::blocks().read())
+        self.contains_block_using(block, &V::blocks().load())
     }
 
     /// Returns `true` if the chunk contains at least one block of the same
@@ -155,9 +157,9 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains at least one block of the same
     /// type.
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn contains_block_type<B: BlockType<V>, V: BlockVersion>(&self) -> bool {
-        self.contains_block_type_using(B::METADATA.block_ty(), &V::blocks().read())
+        self.contains_block_type_using(B::METADATA.block_ty(), &V::blocks().load())
     }
 
     /// Returns `true` if the chunk contains at least one block of the same

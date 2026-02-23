@@ -27,15 +27,15 @@ cipher = { workspace = true }
 facet = { features = ["std"], workspace = true }
 facet-format = { workspace = true }
 facet-minecraft = { features = ["std"], workspace = true }
-froglight-block = { features = ["async", "std"], workspace = true }
+froglight-block = { features = ["std"], workspace = true }
 froglight-common = { features = ["facet", "std"], workspace = true }
-# froglight-entity = { features = ["async", "std"], workspace = true }
+# froglight-entity = { features = ["std"], workspace = true }
 froglight-inventory = { features = ["std"], workspace = true }
-froglight-item = { features = ["async", "froglight-block", "std"], workspace = true }
+froglight-item = { features = ["froglight-block", "std"], workspace = true }
 froglight-packet = { features = ["facet", "std"], workspace = true }
 froglight-player = { features = ["facet", "std"], workspace = true }
-froglight-registry = { features = ["async", "std"], workspace = true }
-froglight-world = { features = ["async", "froglight-biome", "froglight-block", "std"], workspace = true }
+froglight-registry = { features = ["std"], workspace = true }
+froglight-world = { features = ["froglight-biome", "froglight-block", "std"], workspace = true }
 
 # Optional dependencies
 async-compat = { workspace = true, optional = true }

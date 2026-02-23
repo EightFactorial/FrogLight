@@ -3,19 +3,19 @@
 use froglight_common::version::Version;
 
 use crate::storage::BlockStorage;
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 use crate::storage::GlobalBlockStorage;
 
 /// A [`Version`]'s associated block data.
 pub trait BlockVersion: Version {
     /// The [`GlobalBlockStorage`] for this [`Version`].
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-    const BLOCKS: &'static GlobalBlockStorage;
+    #[cfg(feature = "std")]
+    const BLOCKS: &'static std::sync::LazyLock<GlobalBlockStorage>;
 
     /// Get the [`GlobalBlockStorage`] for this [`Version`].
     #[inline]
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     fn blocks() -> &'static GlobalBlockStorage { Self::BLOCKS }
 
     /// Create a new [`BlockStorage`] for this [`Version`].

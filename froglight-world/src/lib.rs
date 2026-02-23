@@ -34,8 +34,7 @@ pub mod prelude {
     pub use crate::bevy::{relationship::ChunkOfInstance, world::WorldInstanceChunks};
     #[cfg(feature = "alloc")]
     pub use crate::chunk::NaiveChunk;
-    #[cfg(all(feature = "froglight-biome", feature = "froglight-block"))]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(all(feature = "froglight-biome", feature = "froglight-block", feature = "std"))]
     pub use crate::chunk::{Chunk, SharedChunk};
     pub use crate::component::{BlockPos, ChunkPos};
 }

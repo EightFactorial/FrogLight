@@ -2,7 +2,7 @@
 
 use core::any::TypeId;
 
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 use froglight_biome::biome::BiomeType;
 use froglight_biome::{biome::GlobalId, prelude::*, storage::BiomeStorage};
 
@@ -19,9 +19,9 @@ impl NaiveChunk {
     /// or if the biome is not recognized by the
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn get_biome<V: BiomeVersion, P: Into<BlockPos>>(&self, position: P) -> Option<Biome> {
-        self.get_biome_using::<P>(position, &V::biomes().read())
+        self.get_biome_using::<P>(position, &V::biomes().load())
     }
 
     /// Get the [`Biome`] at the given position within the chunk,
@@ -45,12 +45,12 @@ impl NaiveChunk {
     /// or if the biome is not recognized by the
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn get_biome_pos<V: BiomeVersion, P: Into<ChunkBlockPos>>(
         &self,
         position: P,
     ) -> Option<Biome> {
-        self.get_biome_pos_using::<P>(position, &V::biomes().read())
+        self.get_biome_pos_using::<P>(position, &V::biomes().load())
     }
 
     /// Get the [`Biome`] at the given position within the chunk,
@@ -73,13 +73,13 @@ impl NaiveChunk {
     /// Returns `None` if the position is out of bounds,
     /// or if the biome is not recognized by the
     /// [`Version`](froglight_common::version::Version).
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn set_biome<V: BiomeVersion, P: Into<BlockPos>>(
         &mut self,
         position: P,
         biome: Biome,
     ) -> Option<Biome> {
-        self.set_biome_using::<P>(position, biome, &V::biomes().read())
+        self.set_biome_using::<P>(position, biome, &V::biomes().load())
     }
 
     /// Get the [`Biome`] at the given position within the chunk and return the
@@ -103,13 +103,13 @@ impl NaiveChunk {
     /// Returns `None` if the position is out of bounds,
     /// or if the biome is not recognized by the
     /// [`Version`](froglight_common::version::Version).
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     pub fn set_biome_pos<V: BiomeVersion, P: Into<ChunkBlockPos>>(
         &mut self,
         position: P,
         biome: Biome,
     ) -> Option<Biome> {
-        self.set_biome_pos_using::<P>(position, biome, &V::biomes().read())
+        self.set_biome_pos_using::<P>(position, biome, &V::biomes().load())
     }
 
     /// Get the [`Biome`] at the given position within the chunk and return the
@@ -139,7 +139,6 @@ impl NaiveChunk {
     /// Returns `true` if the chunk contains at least one biome of the same
     /// type.
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
     pub fn contains_biome_type<B: BiomeType<V>, V: BiomeVersion>(&self) -> bool {
         self.contains_raw_biome(B::METADATA.global_id().into_inner())
     }

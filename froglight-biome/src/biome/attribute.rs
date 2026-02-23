@@ -2,25 +2,23 @@
 
 #[cfg(all(feature = "alloc", feature = "biome_data"))]
 use alloc::vec::Vec;
-#[cfg(all(not(feature = "async"), feature = "std", not(feature = "parking_lot")))]
+#[cfg(all(feature = "std", not(feature = "parking_lot"), feature = "biome_data"))]
 use std::sync::RwLock;
 
-#[cfg(all(feature = "async", feature = "biome_data"))]
-use async_lock::RwLock;
 use facet::Facet;
 use facet_format::SerializeError;
 use facet_value::{ToValueError, Value, ValueError};
 use froglight_common::prelude::Identifier;
-#[cfg(all(not(feature = "async"), feature = "parking_lot"))]
+#[cfg(all(feature = "parking_lot", feature = "biome_data"))]
 use parking_lot::RwLock;
 
 /// A set of biome attributes.
 #[repr(transparent)]
 #[derive(Debug)]
 pub struct BiomeAttributeSet {
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(any(feature = "parking_lot", feature = "std"))]
     storage: RwLock<BiomeAttributeStorage>,
-    #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+    #[cfg(not(any(feature = "parking_lot", feature = "std")))]
     storage: BiomeAttributeStorage,
 }
 
@@ -37,9 +35,9 @@ impl BiomeAttributeSet {
     #[must_use]
     pub const fn new_static(features: &'static [(Identifier<'static>, Value)]) -> Self {
         Self {
-            #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+            #[cfg(any(feature = "parking_lot", feature = "std"))]
             storage: RwLock::new(BiomeAttributeStorage::new_static(features)),
-            #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+            #[cfg(not(any(feature = "parking_lot", feature = "std")))]
             storage: BiomeAttributeStorage::new_static(features),
         }
     }
@@ -53,9 +51,9 @@ impl BiomeAttributeSet {
     #[cfg(feature = "alloc")]
     pub fn new_runtime(vec: Vec<(Identifier<'static>, Value)>) -> Self {
         Self {
-            #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+            #[cfg(any(feature = "parking_lot", feature = "std"))]
             storage: RwLock::new(BiomeAttributeStorage::new_runtime(vec)),
-            #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+            #[cfg(not(any(feature = "parking_lot", feature = "std")))]
             storage: BiomeAttributeStorage::new_runtime(vec),
         }
     }
@@ -63,19 +61,12 @@ impl BiomeAttributeSet {
     /// Acquire a reference without blocking the current thread.
     #[inline]
     #[must_use]
-    #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+    #[cfg(not(any(feature = "parking_lot", feature = "std")))]
     pub const fn read(&self) -> &BiomeAttributeStorage { &self.storage }
 
     /// Acquire a read lock, blocking the current thread.
     #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn read(&self) -> async_lock::RwLockReadGuard<'_, BiomeAttributeStorage> {
-        self.storage.read_blocking()
-    }
-
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
+    #[cfg(feature = "parking_lot")]
     pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, BiomeAttributeStorage> {
         self.storage.read()
     }
@@ -86,34 +77,20 @@ impl BiomeAttributeSet {
     ///
     /// Panics if the [`RwLock`] was poisoned.
     #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
+    #[cfg(all(not(feature = "parking_lot"), feature = "std"))]
     pub fn read(&self) -> std::sync::RwLockReadGuard<'_, BiomeAttributeStorage> {
         self.storage.read().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a read lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn read_async(&self) -> async_lock::RwLockReadGuard<'_, BiomeAttributeStorage> {
-        self.storage.read().await
     }
 
     /// Acquire a mutable reference without blocking the current thread.
     #[inline]
     #[must_use]
-    #[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+    #[cfg(not(any(feature = "parking_lot", feature = "std")))]
     pub const fn write(&mut self) -> &mut BiomeAttributeStorage { &mut self.storage }
 
     /// Acquire a write lock, blocking the current thread.
     #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn write(&self) -> async_lock::RwLockWriteGuard<'_, BiomeAttributeStorage> {
-        self.storage.write_blocking()
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
+    #[cfg(feature = "parking_lot")]
     pub fn write(&self) -> parking_lot::RwLockWriteGuard<'_, BiomeAttributeStorage> {
         self.storage.write()
     }
@@ -124,16 +101,9 @@ impl BiomeAttributeSet {
     ///
     /// Panics if the [`RwLock`] was poisoned.
     #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
+    #[cfg(all(not(feature = "parking_lot"), feature = "std"))]
     pub fn write(&self) -> std::sync::RwLockWriteGuard<'_, BiomeAttributeStorage> {
         self.storage.write().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a write lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn write_async(&self) -> async_lock::RwLockWriteGuard<'_, BiomeAttributeStorage> {
-        self.storage.write().await
     }
 }
 

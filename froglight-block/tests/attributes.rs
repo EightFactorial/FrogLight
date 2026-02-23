@@ -1,9 +1,9 @@
 //! TODO
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 use core::any::TypeId;
 
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 use froglight_block::block::GlobalId;
 use froglight_block::{
     block::{BlockAttribute, BlockBehavior, BlockMetadata, BlockType, StateId},
@@ -143,9 +143,9 @@ fn air() {
     let mut attr_iter = air.get_attributes();
     assert_eq!(attr_iter.next(), None);
 
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().read();
+        let global = TestVersion::blocks().load();
         assert_eq!(global.get_block(GlobalId::new(0)), Some(air));
     }
 
@@ -166,9 +166,9 @@ fn stone() {
     let mut attr_iter = stone.get_attributes();
     assert_eq!(attr_iter.next(), None);
 
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().read();
+        let global = TestVersion::blocks().load();
         assert_eq!(global.get_block(GlobalId::new(1)), Some(stone));
     }
 
@@ -189,9 +189,9 @@ fn dirt() {
     let mut attr_iter = dirt.get_attributes();
     assert_eq!(attr_iter.next(), None);
 
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().read();
+        let global = TestVersion::blocks().load();
         assert_eq!(global.get_block(GlobalId::new(2)), Some(dirt));
     }
 
@@ -248,9 +248,9 @@ fn grass() {
     assert_eq!(attr_iter.next(), Some(("snowy", "true")));
     assert_eq!(attr_iter.next(), None);
 
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     {
-        let global = TestVersion::blocks().read();
+        let global = TestVersion::blocks().load();
         assert_eq!(global.get_block(GlobalId::new(4)), Some(grassy));
         assert_eq!(global.get_block(GlobalId::new(3)), Some(snowy));
     }

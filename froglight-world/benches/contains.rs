@@ -8,18 +8,15 @@ use core::any::TypeId;
 use bitvec::slice::BitSlice;
 use divan::prelude::*;
 #[cfg(feature = "froglight-biome")]
-use froglight_biome::{
-    biome::{BiomeMetadata, BiomeType},
-    implement_biomes,
-    storage::BiomeStorage,
-};
+use froglight_biome::{biome::BiomeMetadata, implement_biomes, prelude::*, storage::BiomeStorage};
 #[cfg(feature = "froglight-block")]
 use froglight_block::{
-    block::{BlockMetadata, BlockType, StateId},
+    block::{BlockBehavior, BlockMetadata, StateId},
+    prelude::*,
     storage::BlockStorage,
 };
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
-use froglight_common::version::Version;
+use froglight_common::prelude::*;
 use froglight_world::borrowed::{
     BorrowedChunk, BorrowedSection,
     section::{BorrowedPalette, BorrowedSectionData},
@@ -290,6 +287,7 @@ struct TestVersion;
 
 #[cfg(any(feature = "froglight-biome", feature = "froglight-block"))]
 impl Version for TestVersion {
+    const DATA_VERSION: u32 = u32::MIN;
     const PROTOCOL_ID: u32 = u32::MIN;
     const RESOURCE_VERSION: u32 = u32::MIN;
 }
@@ -304,11 +302,9 @@ struct Plains;
 impl BiomeType<TestVersion> for Plains {
     const METADATA: &'static BiomeMetadata = {
         static STATIC: BiomeMetadata = unsafe {
-            use froglight_biome::biome::{BiomeAttributeSet, BiomeFeatureSet};
-            use froglight_common::prelude::Identifier;
-
             BiomeMetadata::new::<Plains, TestVersion>(
                 Identifier::new_static("test:plains"),
+                0,
                 0,
                 0,
                 0,
@@ -316,8 +312,6 @@ impl BiomeType<TestVersion> for Plains {
                 true,
                 0.0,
                 0.0,
-                BiomeAttributeSet::empty(),
-                BiomeFeatureSet::empty(),
             )
         };
         &STATIC
@@ -332,20 +326,16 @@ struct Forest;
 impl BiomeType<TestVersion> for Forest {
     const METADATA: &'static BiomeMetadata = {
         static STATIC: BiomeMetadata = unsafe {
-            use froglight_biome::biome::{BiomeAttributeSet, BiomeFeatureSet};
-            use froglight_common::prelude::Identifier;
-
             BiomeMetadata::new::<Forest, TestVersion>(
                 Identifier::new_static("test:forest"),
                 1,
                 0,
                 0,
                 0,
+                0,
                 true,
                 0.0,
                 0.0,
-                BiomeAttributeSet::empty(),
-                BiomeFeatureSet::empty(),
             )
         };
         &STATIC
@@ -411,9 +401,6 @@ impl BlockType<TestVersion> for Air {
     const ATTRDATA: &'static [(&'static str, TypeId)] = &[];
     const METADATA: &'static BlockMetadata = {
         static STATIC: BlockMetadata = unsafe {
-            use froglight_block::block::BlockBehavior;
-            use froglight_common::prelude::Identifier;
-
             BlockMetadata::new::<Air, TestVersion>(
                 Identifier::new_unchecked("test:air"),
                 0,

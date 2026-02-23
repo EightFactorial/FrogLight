@@ -29,7 +29,7 @@ impl Chunk {
     /// Create a new [`Chunk`] using blocks and biomes from the given
     /// [`Version`](froglight_common::version::Version).
     #[must_use]
-    pub const fn new<V: BiomeVersion + BlockVersion>(storage: ChunkStorage) -> Self {
+    pub fn new<V: BiomeVersion + BlockVersion>(storage: ChunkStorage) -> Self {
         Self::new_from(storage, V::BIOMES, V::BLOCKS)
     }
 
@@ -138,7 +138,7 @@ impl Chunk {
             use froglight_block::block::GlobalId;
 
             let raw = section.get_raw_block(position.as_section_blockpos());
-            self.blocks.read().get_block(GlobalId::new(raw))
+            self.blocks.load().get_block(GlobalId::new(raw))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
@@ -171,8 +171,7 @@ impl Chunk {
         if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
             use froglight_block::block::GlobalId;
 
-            let storage = self.blocks.read();
-
+            let storage = self.blocks.load();
             if let Some(lookup) = storage.get_block(block.global_id())
                 && lookup.block_ty() == block.block_ty()
             {
@@ -220,7 +219,7 @@ impl Chunk {
             use froglight_biome::biome::GlobalId;
 
             let raw = section.get_raw_biome(position.as_section_blockpos());
-            self.biomes.read().get_biome(GlobalId::new(raw))
+            self.biomes.load().get_biome(GlobalId::new(raw))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `Chunk`, position was invalid?");
@@ -253,8 +252,7 @@ impl Chunk {
         if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
             use froglight_biome::biome::GlobalId;
 
-            let biomes = self.biomes.read();
-
+            let biomes = self.biomes.load();
             if let Some(lookup) = biomes.get_biome(biome.global_id())
                 && lookup.biome_ty() == biome.biome_ty()
             {

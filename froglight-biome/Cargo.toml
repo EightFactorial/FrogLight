@@ -22,7 +22,7 @@ workspace = true
 froglight-common = { workspace = true }
 
 # Optional dependencies
-async-lock = { workspace = true, optional = true }
+arc-swap = { workspace = true, optional = true }
 facet = { workspace = true, optional = true }
 facet-format = { workspace = true, optional = true }
 facet-value = { workspace = true, optional = true }
@@ -42,8 +42,6 @@ biome_data = ["dep:facet", "dep:facet-format", "dep:facet-value", "std"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 
-# Add async locking support
-async = ["dep:async-lock"]
 # Enable `once_cell` for `no_std` support.
 once_cell = ["dep:once_cell"]
 # Enable `parking_lot` for `no_std` support.
@@ -52,7 +50,7 @@ parking_lot = ["dep:parking_lot", "once_cell?/parking_lot"]
 # Enable support for a global allocator
 alloc = ["facet-value?/alloc", "froglight-common/alloc", "once_cell?/alloc"]
 # Enable support for the standard library
-std = ["alloc", "async-lock?/std", "facet-value?/std", "froglight-common/std", "once_cell?/std"]
+std = ["alloc", "dep:arc-swap", "facet-value?/std", "froglight-common/std", "once_cell?/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-common/nightly", "parking_lot?/nightly"]
 

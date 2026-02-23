@@ -2,93 +2,37 @@
 
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
-#[cfg(all(not(feature = "async"), feature = "std", not(feature = "parking_lot")))]
-use std::sync::RwLock;
 
-#[cfg(feature = "async")]
-use async_lock::RwLock;
-#[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-use parking_lot::RwLock;
+#[cfg(feature = "std")]
+use arc_swap::ArcSwap;
 
 use crate::item::{GlobalId, Item, ItemMetadata};
 
 /// A thread-safe container for a [`ItemStorage`].
 #[repr(transparent)]
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 pub struct GlobalItemStorage {
-    storage: RwLock<ItemStorage>,
+    storage: ArcSwap<ItemStorage>,
 }
 
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 impl GlobalItemStorage {
-    /// Create a new [`GlobalItemStorage`].
+    /// Create a new [`GlobalItemStorage`] from a given [`ItemStorage`].
     #[must_use]
-    pub const fn new(storage: ItemStorage) -> Self { Self { storage: RwLock::new(storage) } }
-
-    /// Get a reference to the underlying [`RwLock`].
-    #[inline]
-    #[must_use]
-    pub const fn as_ref(&self) -> &RwLock<ItemStorage> { &self.storage }
-
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn read(&self) -> async_lock::RwLockReadGuard<'_, ItemStorage> {
-        self.storage.read_blocking()
+    pub fn new(storage: ItemStorage) -> Self {
+        Self { storage: ArcSwap::new(alloc::sync::Arc::new(storage)) }
     }
+}
 
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, ItemStorage> { self.storage.read() }
+#[cfg(feature = "std")]
+impl core::ops::Deref for GlobalItemStorage {
+    type Target = ArcSwap<ItemStorage>;
 
-    /// Acquire a read lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn read(&self) -> std::sync::RwLockReadGuard<'_, ItemStorage> {
-        self.storage.read().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a read lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn read_async(&self) -> async_lock::RwLockReadGuard<'_, ItemStorage> {
-        self.storage.read().await
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn write(&self) -> async_lock::RwLockWriteGuard<'_, ItemStorage> {
-        self.storage.write_blocking()
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn write(&self) -> parking_lot::RwLockWriteGuard<'_, ItemStorage> { self.storage.write() }
-
-    /// Acquire a write lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn write(&self) -> std::sync::RwLockWriteGuard<'_, ItemStorage> {
-        self.storage.write().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a write lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn write_async(&self) -> async_lock::RwLockWriteGuard<'_, ItemStorage> {
-        self.storage.write().await
-    }
+    fn deref(&self) -> &Self::Target { &self.storage }
+}
+#[cfg(feature = "std")]
+impl core::ops::DerefMut for GlobalItemStorage {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.storage }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -184,7 +128,7 @@ impl ItemStorage {
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 macro_rules! implement_items {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@global $version => $($tt)*);
@@ -198,7 +142,7 @@ macro_rules! implement_items {
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
-#[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+#[cfg(not(feature = "std"))]
 macro_rules! implement_items {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@local {}, $version => $($tt)*);
@@ -212,10 +156,10 @@ macro_rules! __implement_storage_inner {
     (@global $version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(
             @local {
-                const ITEMS: &'static $crate::storage::GlobalItemStorage = {
-                    static STATIC: $crate::storage::GlobalItemStorage = $crate::storage::GlobalItemStorage::new(
-                        $($tt)*
-                    );
+                const ITEMS: &'static std::sync::LazyLock<$crate::storage::GlobalItemStorage> = {
+                    static STATIC: std::sync::LazyLock<$crate::storage::GlobalItemStorage> = std::sync::LazyLock::new(|| {
+                        $crate::storage::GlobalItemStorage::new(<$version as $crate::version::ItemVersion>::new_items())
+                    });
                     &STATIC
                 };
             },

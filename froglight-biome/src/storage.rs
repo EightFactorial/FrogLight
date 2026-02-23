@@ -2,93 +2,41 @@
 
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
-#[cfg(all(not(feature = "async"), feature = "std", not(feature = "parking_lot")))]
-use std::sync::RwLock;
+#[cfg(feature = "std")]
+pub use std::sync::LazyLock;
 
-#[cfg(feature = "async")]
-use async_lock::RwLock;
-#[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-use parking_lot::RwLock;
+#[cfg(feature = "std")]
+use arc_swap::ArcSwap;
+#[cfg(all(feature = "once_cell", not(feature = "std")))]
+pub use once_cell::sync::OnceCell as LazyLock;
 
 use crate::biome::{Biome, BiomeMetadata, GlobalId};
 
 /// A thread-safe container for a [`BiomeStorage`].
 #[repr(transparent)]
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 pub struct GlobalBiomeStorage {
-    storage: RwLock<BiomeStorage>,
+    storage: ArcSwap<BiomeStorage>,
 }
 
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 impl GlobalBiomeStorage {
-    /// Create a new [`GlobalBiomeStorage`].
+    /// Create a new [`GlobalBiomeStorage`] with the given [`BiomeStorage`].
     #[must_use]
-    pub const fn new(storage: BiomeStorage) -> Self { Self { storage: RwLock::new(storage) } }
-
-    /// Get a reference to the underlying [`RwLock`].
-    #[inline]
-    #[must_use]
-    pub const fn as_ref(&self) -> &RwLock<BiomeStorage> { &self.storage }
-
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn read(&self) -> async_lock::RwLockReadGuard<'_, BiomeStorage> {
-        self.storage.read_blocking()
+    pub fn new(storage: BiomeStorage) -> Self {
+        Self { storage: ArcSwap::new(alloc::sync::Arc::new(storage)) }
     }
+}
 
-    /// Acquire a read lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn read(&self) -> parking_lot::RwLockReadGuard<'_, BiomeStorage> { self.storage.read() }
+#[cfg(feature = "std")]
+impl core::ops::Deref for GlobalBiomeStorage {
+    type Target = ArcSwap<BiomeStorage>;
 
-    /// Acquire a read lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn read(&self) -> std::sync::RwLockReadGuard<'_, BiomeStorage> {
-        self.storage.read().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a read lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn read_async(&self) -> async_lock::RwLockReadGuard<'_, BiomeStorage> {
-        self.storage.read().await
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(feature = "async", feature = "std"))]
-    pub fn write(&self) -> async_lock::RwLockWriteGuard<'_, BiomeStorage> {
-        self.storage.write_blocking()
-    }
-
-    /// Acquire a write lock, blocking the current thread.
-    #[inline]
-    #[cfg(all(not(feature = "async"), feature = "parking_lot"))]
-    pub fn write(&self) -> parking_lot::RwLockWriteGuard<'_, BiomeStorage> { self.storage.write() }
-
-    /// Acquire a write lock, blocking the current thread.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the [`RwLock`] was poisoned.
-    #[inline]
-    #[cfg(all(not(feature = "async"), not(feature = "parking_lot"), feature = "std"))]
-    pub fn write(&self) -> std::sync::RwLockWriteGuard<'_, BiomeStorage> {
-        self.storage.write().expect("RwLock was poisoned!")
-    }
-
-    /// Acquire a write lock asynchronously.
-    #[inline]
-    #[cfg(feature = "async")]
-    pub async fn write_async(&self) -> async_lock::RwLockWriteGuard<'_, BiomeStorage> {
-        self.storage.write().await
-    }
+    fn deref(&self) -> &Self::Target { &self.storage }
+}
+#[cfg(feature = "std")]
+impl core::ops::DerefMut for GlobalBiomeStorage {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.storage }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -184,7 +132,7 @@ impl BiomeStorage {
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 macro_rules! implement_biomes {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@global $version => $($tt)*);
@@ -198,7 +146,7 @@ macro_rules! implement_biomes {
 /// This macro has will determine whether to generate a global storage constant
 /// based on enabled features.
 #[macro_export]
-#[cfg(not(any(feature = "async", feature = "parking_lot", feature = "std")))]
+#[cfg(not(feature = "std"))]
 macro_rules! implement_biomes {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@local {}, $version => $($tt)*);
@@ -212,10 +160,10 @@ macro_rules! __implement_storage_inner {
     (@global $version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(
             @local {
-                const BIOMES: &'static $crate::storage::GlobalBiomeStorage = {
-                    static STATIC: $crate::storage::GlobalBiomeStorage = $crate::storage::GlobalBiomeStorage::new(
-                        $($tt)*
-                    );
+                const BIOMES: &'static $crate::storage::LazyLock<$crate::storage::GlobalBiomeStorage> = {
+                    static STATIC: $crate::storage::LazyLock<$crate::storage::GlobalBiomeStorage> = $crate::storage::LazyLock::new(|| {
+                        $crate::storage::GlobalBiomeStorage::new(<$version as $crate::version::BiomeVersion>::new_biomes())
+                    });
                     &STATIC
                 };
             },

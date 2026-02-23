@@ -29,7 +29,6 @@ smallvec = { features = ["const_generics", "const_new", "union"], workspace = tr
 
 # Optional dependencies
 arc-swap = { workspace = true, optional = true }
-async-lock = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["glam", "hashbrown", "smallvec"], workspace = true, optional = true }
@@ -63,16 +62,12 @@ serde = ["dep:serde", "smallvec/serde"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-biome?/tracing", "froglight-block?/tracing", "froglight-common/tracing"]
 
-# Add async locking support
-async = ["dep:async-lock", "froglight-biome?/async", "froglight-block?/async", "std"]
 # Enable `libm` for `no_std` support.
 libm = ["glam/nostd-libm"]
-# Enable `parking_lot` for `no_std` support.
-parking_lot = ["dep:parking_lot", "froglight-biome?/parking_lot", "froglight-block?/parking_lot"]
 
 # Enable support for a global allocator
-alloc = ["bitvec/alloc", "dep:arc-swap", "froglight-biome?/alloc", "froglight-block?/alloc", "froglight-common/alloc"]
+alloc = ["bitvec/alloc", "froglight-biome?/alloc", "froglight-block?/alloc", "froglight-common/alloc"]
 # Enable support for the standard library
-std = ["alloc", "async-lock?/std", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "glam/std"]
+std = ["alloc", "bevy_app?/std", "bevy_ecs?/std", "bevy_reflect?/std", "bitvec/std", "dep:arc-swap", "froglight-biome?/std", "froglight-block?/std", "froglight-common/std", "glam/std"]
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-biome?/nightly", "froglight-block?/nightly", "froglight-common/nightly", "hashbrown?/nightly", "parking_lot?/nightly", "smallvec/specialization"]

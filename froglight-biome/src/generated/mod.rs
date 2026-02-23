@@ -202,7 +202,7 @@ macro_rules! generate {
             impl crate::biome::BiomeType<$version> for $ident {
                 const METADATA: &'static crate::biome::BiomeMetadata = {
                     #[cfg(feature = "biome_data")]
-                    static ATTRIBUTES: LazyLock<crate::biome::BiomeAttributeSet> = LazyLock::new(|| {
+                    static ATTRIBUTES: $crate::storage::LazyLock<crate::biome::BiomeAttributeSet> = $crate::storage::LazyLock::new(|| {
                         crate::biome::BiomeAttributeSet::new_runtime(alloc::vec![
                             $(
                                 (<$ty as crate::biome::AttributeType>::IDENTIFIER, facet_value::value!($tt))

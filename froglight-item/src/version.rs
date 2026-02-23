@@ -2,20 +2,20 @@
 
 use froglight_common::version::Version;
 
-#[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+#[cfg(feature = "std")]
 use crate::storage::GlobalItemStorage;
 use crate::storage::ItemStorage;
 
 /// A [`Version`]'s associated item data.
 pub trait ItemVersion: Version {
     /// The [`GlobalItemStorage`] for this [`Version`].
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-    const ITEMS: &'static GlobalItemStorage;
+    #[cfg(feature = "std")]
+    const ITEMS: &'static std::sync::LazyLock<GlobalItemStorage>;
 
     /// Get the [`GlobalItemStorage`] for this [`Version`].
     #[inline]
     #[must_use]
-    #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
+    #[cfg(feature = "std")]
     fn items() -> &'static GlobalItemStorage { Self::ITEMS }
 
     /// Create a new [`ItemStorage`] for this [`Version`].
