@@ -19,6 +19,7 @@ impl JarData {
     /// Get a [`ClassFile`] by its name.
     #[must_use]
     pub fn get_class(&self, class: &str) -> Option<&ClassFile<'static>> {
+        // tracing::trace!("Looking up class \"{class}\"");
         self.classes.get(class.trim_end_matches(".class"))
     }
 

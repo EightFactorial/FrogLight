@@ -15,6 +15,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     crates::block::generate_global(config).await?;
     crates::item::generate_global(config).await?;
     crates::network::generate_global(config).await?;
+    crates::packet::generate_global(config).await?;
 
     Ok(())
 }
