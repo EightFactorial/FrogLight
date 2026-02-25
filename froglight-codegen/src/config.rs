@@ -9,7 +9,7 @@ pub struct ConfigBundle {
     pub versions: Vec<VersionPair>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Facet)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Facet)]
 pub struct VersionPair {
     /// The name to refer to this version as.
     pub base: Version,

@@ -69,10 +69,16 @@ impl PacketData {
         let references = identify_protocol_types_and_codecs(class, template, code, jar)?;
 
         for (packet_type, packet_codec) in references {
-            let identifier = get_packet_type_identifier(&packet_type, jar)?;
+            let mut identifier = get_packet_type_identifier(&packet_type, jar)?;
+
+            // Fix the identifier for "bundle"
+            if identifier == "minecraft:bundle" {
+                identifier += "_delimiter";
+            }
 
             let mut info = PacketInfo {
                 packet_ident: identifier.clone(),
+                protocol_id: u64::MAX,
                 packet_type,
                 packet_codec,
                 read_ops: Vec::new(),
