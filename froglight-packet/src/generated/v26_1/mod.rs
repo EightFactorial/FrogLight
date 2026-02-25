@@ -1,13 +1,13 @@
-//! This file is auto-generated. Disable this by adding an `@manual` tag.
-//!
-//! @manual @generated packets for v26.1.x
-
-pub mod config;
+//! This file is auto-generated. Disable this by adding a `manual` tag.
+//! 
+//! @generated packets for 26.1
 pub mod handshake;
-pub mod login;
-pub mod play;
 pub mod status;
+pub mod login;
+pub mod configuration;
+pub mod play;
 
+// -------------------------------------------------------------------------------------------------
 #[cfg(feature = "v26_1")]
 mod traits {
     use froglight_common::version::V26_1;
@@ -31,7 +31,7 @@ mod traits {
         type Serverbound = handshake::ServerboundPackets;
 
         fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum> {
-            let handshake::ServerboundPackets::Handshake(handshake::HandshakeC2SPacket(
+            let handshake::ServerboundPackets::Intention(handshake::IntentionC2SPacket(
                 HandshakeContent { intent, .. },
             )) = packet;
 
@@ -56,14 +56,14 @@ mod traits {
         type Serverbound = login::ServerboundPackets;
 
         fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum> {
-            matches!(packet, login::ServerboundPackets::EnterConfiguration(_))
+            matches!(packet, login::ServerboundPackets::LoginAcknowledged(_))
                 .then_some(PacketStateEnum::Config)
         }
     }
 
     impl PacketState<V26_1> for Config {
-        type Clientbound = config::ClientboundPackets;
-        type Serverbound = config::ServerboundPackets;
+        type Clientbound = configuration::ClientboundPackets;
+        type Serverbound = configuration::ServerboundPackets;
 
         fn transition_state_to(_: &Self::Serverbound) -> Option<PacketStateEnum> { None }
     }
@@ -75,3 +75,4 @@ mod traits {
         fn transition_state_to(_: &Self::Serverbound) -> Option<PacketStateEnum> { None }
     }
 }
+

@@ -21,12 +21,10 @@ impl NetworkVersion for V26_1 {
                     encrypion_key: None,
                 })
             }
-            VersionPacket::Login(LoginClientboundPackets::LoginHello(p)) => {
-                Some(ConnectionUpdate {
-                    compression_threshold: None,
-                    encrypion_key: Some(p.public_key.clone()),
-                })
-            }
+            VersionPacket::Login(LoginClientboundPackets::Hello(p)) => Some(ConnectionUpdate {
+                compression_threshold: None,
+                encrypion_key: Some(p.public_key.clone()),
+            }),
             _ => None,
         }
     }

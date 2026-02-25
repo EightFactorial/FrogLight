@@ -1,3 +1,7 @@
+//! This file is auto-generated. Disable this by adding a `manual` tag.
+//!
+//! @manual packet for "minecraft:login_disconnect"
+
 use alloc::string::String;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

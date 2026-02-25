@@ -6,14 +6,18 @@ use miette::Result;
 pub struct ModuleBuilder {
     name: String,
     folder: PathBuf,
+    module: bool,
     docs: String,
+    attributes: String,
     precontent: String,
     imports: Vec<ModuleImport>,
     content: String,
 }
 
 #[derive(Debug, Clone)]
+#[expect(clippy::struct_excessive_bools, reason = "No")]
 pub struct SubModuleSettings {
+    pub auto_import: bool,
     pub build: bool,
     pub feature: Option<String>,
     pub public: bool,
@@ -23,7 +27,14 @@ pub struct SubModuleSettings {
 
 impl Default for SubModuleSettings {
     fn default() -> Self {
-        Self { build: true, feature: None, public: false, import_from: Vec::new(), reexport: false }
+        Self {
+            auto_import: true,
+            build: true,
+            feature: None,
+            public: false,
+            import_from: Vec::new(),
+            reexport: false,
+        }
     }
 }
 
@@ -34,7 +45,9 @@ impl ModuleBuilder {
         Self {
             name: name.to_string(),
             folder,
+            module: false,
             docs: String::new(),
+            attributes: String::new(),
             precontent: String::new(),
             imports: Vec::new(),
             content: String::new(),
@@ -92,6 +105,13 @@ impl ModuleBuilder {
         self
     }
 
+    /// Add an attribute to the module.
+    pub fn with_attribute<S: AsRef<str> + ?Sized>(&mut self, attribute: &S) -> &mut Self {
+        self.attributes.push_str(attribute.as_ref());
+        self.attributes.push('\n');
+        self
+    }
+
     /// Add an import to the module.
     pub fn with_import<S: ToString + ?Sized>(&mut self, name: &S, public: bool) -> &mut Self {
         self.imports.push(ModuleImport::Use { name: name.to_string(), public });
@@ -126,6 +146,8 @@ impl ModuleBuilder {
         name: &S,
         f: F,
     ) -> Result<&mut Self> {
+        self.module = true;
+
         // Create a ModuleBuilder for the submodule
         let path = self.folder.join(&self.name);
         let mut submodule = ModuleBuilder::new(name, path);
@@ -134,6 +156,11 @@ impl ModuleBuilder {
         let settings = f(&mut submodule, SubModuleSettings::default()).await?;
         if settings.build {
             submodule.build().await?;
+        }
+
+        // Skip adding the submodule as an import
+        if !settings.auto_import {
+            return Ok(self);
         }
 
         // Add the submodule as an import to the parent module
@@ -188,9 +215,11 @@ impl ModuleBuilder {
             path = self.folder.join(&self.name);
         }
 
-        if let Some(ModuleImport::Mod { .. }) = self.imports.last()
-            && path.is_dir()
-        {
+        // Determine if the module should be a directory or a file.
+        if matches!(self.imports.last(), Some(ModuleImport::Mod { .. })) && path.is_dir() {
+            self.module = true;
+        }
+        if self.module && !path.ends_with("mod.rs") {
             path.push("mod.rs");
         } else {
             path.set_extension("rs");
@@ -203,6 +232,12 @@ impl ModuleBuilder {
                 output.push_str(line.trim());
                 output.push('\n');
             }
+        }
+
+        // Write module attributes to the output buffer
+        if !self.attributes.is_empty() {
+            output.push_str(&self.attributes);
+            output.push('\n');
         }
 
         // Write precontent to the output buffer

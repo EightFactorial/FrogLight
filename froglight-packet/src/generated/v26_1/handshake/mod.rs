@@ -1,7 +1,7 @@
-//! @generated [`Handshake`](crate::version::Handshake) packets for v26.1.x
+//! @generated [`Handshake`](crate::version::Handshake) packets for v26.1
 
-pub mod c2s_0x00_intention;
-pub use c2s_0x00_intention::HandshakeC2SPacket;
+mod c2s_0x00_intention;
+pub use c2s_0x00_intention::IntentionC2SPacket;
 
 #[repr(u8)]
 #[cfg(feature = "v26_1")]
@@ -20,5 +20,5 @@ pub enum ClientboundPackets {
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub enum ServerboundPackets {
-    Handshake(HandshakeC2SPacket) = 0x00,
+    Intention(IntentionC2SPacket) = 0x00,
 }

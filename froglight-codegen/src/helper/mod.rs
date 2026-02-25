@@ -4,7 +4,7 @@ mod class;
 pub use class::ClassFileExt;
 
 mod module;
-pub use module::ModuleBuilder;
+pub use module::{ModuleBuilder, SubModuleSettings};
 
 mod version;
 pub use version::VersionHelper;

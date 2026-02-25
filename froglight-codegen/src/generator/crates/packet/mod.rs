@@ -11,6 +11,7 @@ use crate::{
 };
 
 mod analyze;
+mod generate;
 mod identify;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -334,12 +335,11 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
             Ok(())
         })
         .await?;
+
         last = Some(current);
     }
 
-    tracing::debug!("{generator:#?}");
-
-    Ok(())
+    generate::generate_packets(generator, config).await
 }
 
 #[derive(Debug, Clone)]

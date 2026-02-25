@@ -4,13 +4,11 @@ use core::{
 };
 use std::sync::Arc;
 
-use aes::{
-    Aes128,
-    cipher::{BlockModeDecrypt, BlockModeEncrypt, InOutBuf, KeyIvInit},
-};
+use aes::Aes128;
 #[cfg(feature = "futures-lite")]
 use async_compression::futures::bufread::{ZlibDecoder, ZlibEncoder};
 use cfb8::{Decryptor, Encryptor};
+use cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit, inout::InOutBuf};
 #[cfg(feature = "futures-lite")]
 use futures_lite::{AsyncReadExt, io::Cursor};
 
@@ -178,7 +176,7 @@ impl<R: RuntimeWrite<C>, C: Send> EncryptorMut<R, C> {
         if self.enabled.load(Ordering::Relaxed) {
             let (head, tail) = InOutBuf::from(&mut *buf).into_chunks();
             debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-            self.encryptor.encrypt_blocks_inout(head);
+            self.encryptor.encrypt_blocks_inout_mut(head);
         }
         R::write_all(&mut self.connection, buf).await
     }
@@ -255,7 +253,7 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
         if self.enabled.load(Ordering::Relaxed) {
             let (head, tail) = InOutBuf::from(buf).into_chunks();
             debug_assert!(tail.is_empty(), "InOutBuf tail should be empty!");
-            self.decryptor.decrypt_blocks_inout(head);
+            self.decryptor.decrypt_blocks_inout_mut(head);
         }
         Ok(())
     }

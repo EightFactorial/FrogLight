@@ -1,16 +1,19 @@
+//! This file is auto-generated. Disable this by adding a `manual` tag.
+//!
+//! @manual packet for "minecraft:login_finished"
+
 use froglight_player::prelude::PlayerProfile;
 
-#[repr(transparent)]
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct LoginSuccessS2CPacket {
+pub struct LoginFinishedS2CPacket {
     pub profile: PlayerProfile,
 }
 
-impl LoginSuccessS2CPacket {
-    /// Creates a new [`LoginSuccessS2CPacket`] with the given
+impl LoginFinishedS2CPacket {
+    /// Creates a new [`LoginFinishedS2CPacket`] with the given
     /// [`PlayerProfile`].
     #[inline]
     #[must_use]

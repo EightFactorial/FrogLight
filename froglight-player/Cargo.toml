@@ -22,7 +22,7 @@ workspace = true
 froglight-common = { features = ["alloc"], workspace = true }
 foldhash = { workspace = true }
 indexmap = { workspace = true }
-md-5 = { features = ["alloc"], workspace = true }
+md-5 = { features = [], workspace = true }
 uuid = { features = ["md5", "v4"], workspace = true }
 base64 = { features = ["alloc"], workspace = true }
 
