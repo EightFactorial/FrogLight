@@ -63,7 +63,7 @@ impl BiomeData {
 
         JarData::get_for(version, storage, async |data| {
             let code = data
-                .get_class_method_code("net/minecraft/world/level/biome/Biomes", "<clinit>")
+                .get_class_method_code("net/minecraft/world/level/biome/Biomes", "<clinit>", None)
                 .unwrap();
 
             let mut constant = None;

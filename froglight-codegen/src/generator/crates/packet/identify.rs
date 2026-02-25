@@ -72,6 +72,7 @@ impl PacketData {
             let identifier = get_packet_type_identifier(&packet_type, jar)?;
 
             let mut info = PacketInfo {
+                packet_ident: identifier.clone(),
                 packet_type,
                 packet_codec,
                 read_ops: Vec::new(),
@@ -101,7 +102,7 @@ fn identify_protocol_types_and_codecs(
 
     let mut packet_type = None;
     let bytecode = code.bytecode.as_ref().unwrap();
-    class.iterate_code(bytecode, jar, &mut |_, op| match op {
+    class.iterate_code(bytecode, jar, 0, &mut |_, op| match op {
         Opcode::Getstatic(reference) if !references_complete && reference.name_and_type.descriptor == "Lnet/minecraft/network/protocol/PacketType;" => {
             // Handle the `Bundle` packet types, which has no codec
             if reference.name_and_type.name == "CLIENTBOUND_BUNDLE" {
@@ -140,7 +141,7 @@ fn identify_protocol_types_and_codecs(
 
 /// Get the "minecraft:..." identifier for the given packet type.
 fn get_packet_type_identifier(packet_type: &MemberRef<'static>, jar: &JarData) -> Result<String> {
-    let Some(code) = jar.get_class_method_code(&packet_type.class_name, "<clinit>") else {
+    let Some(code) = jar.get_class_method_code(&packet_type.class_name, "<clinit>", None) else {
         miette::bail!("Failed to find <clinit> method for class \"{}\"", packet_type.class_name);
     };
 

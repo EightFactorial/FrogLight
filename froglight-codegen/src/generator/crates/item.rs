@@ -53,8 +53,9 @@ impl ItemData {
         let block_data =
             BlockData::get_for(version, storage, async |data| Ok(data.clone())).await?;
         JarData::get_for(version, storage, async |data| {
-            let code =
-                data.get_class_method_code("net/minecraft/world/item/Items", "<clinit>").unwrap();
+            let code = data
+                .get_class_method_code("net/minecraft/world/item/Items", "<clinit>", None)
+                .unwrap();
 
             let mut name = None;
             let mut constant = None;
@@ -92,6 +93,7 @@ impl ItemData {
                             .get_class_method_code(
                                 "net/minecraft/world/entity/EntityType",
                                 "<clinit>",
+                                None,
                             )
                             .unwrap();
 

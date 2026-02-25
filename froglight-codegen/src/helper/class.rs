@@ -27,48 +27,9 @@ pub trait ClassFileExt {
         &self,
         code: &ByteCode<'static>,
         jar: &JarData,
+        depth: usize,
         f: &mut F,
-    ) -> Result<()> {
-        let process = |method: &MethodHandle<'static>, f: &mut F| -> Result<()> {
-            if method.class_name.starts_with("java/") {
-                return Ok(()); // Skip Java standard library methods
-            }
-
-            if let Some(code) =
-                jar.get_class_method_code(&method.class_name, &method.member_ref.name)
-            {
-                // Continue iterating through the dynamic method's code
-                self.iterate_code(code.bytecode.as_ref().unwrap(), jar, f)
-            } else {
-                miette::bail!(
-                    "Bootstrap method not found: {}.{}",
-                    method.class_name,
-                    method.member_ref.name
-                );
-            }
-        };
-
-        for (index, opcode) in &code.opcodes {
-            f(*index, opcode)?;
-
-            if let Opcode::Invokedynamic(invoke) = opcode {
-                let dynamic = self.get_bootstrap().unwrap();
-                let entry = &dynamic[invoke.attr_index as usize];
-
-                // Process the invokedynamic bootstrap method
-                (process)(&entry.method, f)?;
-
-                // Process any additional method arguments
-                for arg in &entry.arguments {
-                    if let BootstrapArgument::MethodHandle(method) = arg {
-                        (process)(method, f)?;
-                    }
-                }
-            }
-        }
-
-        Ok(())
-    }
+    ) -> Result<()>;
 }
 
 impl ClassFileExt for ClassFile<'static> {
@@ -100,14 +61,69 @@ impl ClassFileExt for ClassFile<'static> {
                 if name_and_type.name == field {
                     // Stop collecting once we initialize the target field
                     break;
-                } else {
-                    // Clear any operations used for other fields
-                    init_ops.clear();
                 }
+
+                // Clear any operations used for other fields
+                init_ops.clear();
             }
             init_ops.push(op.clone());
         }
 
         Some(init_ops)
+    }
+
+    fn iterate_code<F: FnMut(usize, &Opcode<'static>) -> Result<()>>(
+        &self,
+        code: &ByteCode<'static>,
+        jar: &JarData,
+        depth: usize,
+        f: &mut F,
+    ) -> Result<()> {
+        if depth > 16 {
+            miette::bail!("Maximum bootstrap method depth exceeded");
+        }
+
+        let process = |method: &MethodHandle<'static>, f: &mut F| -> Result<()> {
+            if !method.class_name.starts_with("net/minecraft") {
+                return Ok(()); // Skip outside methods
+            }
+
+            if let Some(method_code) = jar.get_class_method_code(
+                &method.class_name,
+                &method.member_ref.name,
+                Some(&method.member_ref.descriptor),
+            ) {
+                // Continue iterating through the dynamic method's code
+                let bytecode = method_code.bytecode.as_ref().unwrap();
+                self.iterate_code(bytecode, jar, depth + 1, f)
+            } else {
+                miette::bail!(
+                    "Bootstrap method not found: {}.{}",
+                    method.class_name,
+                    method.member_ref.name
+                );
+            }
+        };
+
+        for (index, opcode) in &code.opcodes {
+            f(*index, opcode)?;
+
+            if let Opcode::Invokedynamic(invoke) = opcode {
+                let dynamic = self.get_bootstrap().unwrap();
+                let entry = &dynamic[invoke.attr_index as usize];
+
+                // Process the invokedynamic bootstrap method
+                (process)(&entry.method, f)?;
+
+                // Process any additional method arguments
+                for arg in &entry.arguments {
+                    if let BootstrapArgument::MethodHandle(method) = arg {
+                        (process)(method, f)?;
+                    }
+                }
+            }
+        }
+
+        Ok(())
     }
 }

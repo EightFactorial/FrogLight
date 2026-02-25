@@ -26,14 +26,21 @@ pub struct PacketStateData {
 
 #[derive(Debug, Clone)]
 pub struct PacketInfo {
+    pub packet_ident: String,
     pub packet_type: MemberRef<'static>,
     pub packet_codec: Option<MemberRef<'static>>,
 
-    pub read_ops: Vec<TypeOperation>,
+    pub read_ops: Vec<PacketField>,
     pub read_hash: u64,
 
-    pub write_ops: Vec<TypeOperation>,
+    pub write_ops: Vec<PacketField>,
     pub write_hash: u64,
+}
+
+#[derive(Debug, Clone)]
+pub struct PacketField {
+    pub name: Option<String>,
+    pub ty: FieldType,
 }
 
 impl PartialEq for PacketInfo {
@@ -43,7 +50,7 @@ impl PartialEq for PacketInfo {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum TypeOperation {
+pub enum FieldType {
     Bool,
     Byte,
     Short,

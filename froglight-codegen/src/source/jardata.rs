@@ -25,15 +25,28 @@ impl JarData {
 
     /// Get a [`MethodInfo`] by its class and method name.
     #[must_use]
-    pub fn get_class_method(&self, class: &str, method: &str) -> Option<&MethodInfo<'static>> {
+    pub fn get_class_method(
+        &self,
+        class: &str,
+        method: &str,
+        desc: Option<&str>,
+    ) -> Option<&MethodInfo<'static>> {
         let class_file = self.get_class(class)?;
-        class_file.methods.iter().find(|m| m.name == method)
+        class_file
+            .methods
+            .iter()
+            .find(|m| m.name == method && desc.is_none_or(|d| m.descriptor.to_string() == d))
     }
 
     /// Get the [`CodeData`] for a given class and method.
     #[must_use]
-    pub fn get_class_method_code(&self, class: &str, method: &str) -> Option<&CodeData<'static>> {
-        let Some(method_info) = self.get_class_method(class, method) else {
+    pub fn get_class_method_code(
+        &self,
+        class: &str,
+        method: &str,
+        desc: Option<&str>,
+    ) -> Option<&CodeData<'static>> {
+        let Some(method_info) = self.get_class_method(class, method, desc) else {
             if let Some(class_file) = self.get_class(class) {
                 tracing::trace!(
                     "Available methods in class \"{class}\": {:?}",

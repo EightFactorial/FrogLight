@@ -172,7 +172,7 @@ impl BlockData {
 
         JarData::get_for(version, storage, async |data| {
             let code = data
-                .get_class_method_code("net/minecraft/world/level/block/Blocks", "<clinit>")
+                .get_class_method_code("net/minecraft/world/level/block/Blocks", "<clinit>", None)
                 .unwrap();
 
             let mut current = BlockSettings::default();
@@ -192,8 +192,9 @@ impl BlockData {
                             "net/minecraft/references/Blocks" | "net/minecraft/references/BlockIds"
                         ) && current.ident.is_empty() =>
                     {
-                        let code =
-                            data.get_class_method_code(class_name.as_ref(), "<clinit>").unwrap();
+                        let code = data
+                            .get_class_method_code(class_name.as_ref(), "<clinit>", None)
+                            .unwrap();
 
                         // Find the string constant used to initialize the block reference
                         let mut constant = None;
