@@ -192,6 +192,7 @@ impl<R: RuntimeWrite<C>, C: Send> EncryptorMut<R, C> {
     #[cfg(feature = "futures-lite")]
     pub async fn compress<'a>(&'a mut self, buf: &'a mut [u8]) -> std::io::Result<&'a mut [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
+
         if threshold.is_positive() {
             self.scratch.clear();
 

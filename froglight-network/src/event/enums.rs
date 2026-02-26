@@ -3,7 +3,11 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use facet::Facet;
-use froglight_packet::common::{handshake::HandshakeContent, login::LoginHelloContent};
+use froglight_common::prelude::Identifier;
+use froglight_packet::common::{
+    client_information::ClientInformation, handshake::HandshakeContent,
+    known_packs::KnownResourcePack, login::LoginHelloContent, unsized_buffer::UnsizedBuffer,
+};
 use froglight_player::prelude::PlayerProfile;
 
 #[repr(u8)]
@@ -86,12 +90,12 @@ pub enum ServerboundPlayEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundConfigEvent {
-    Disconnect(String),
+    Disconnect(UnsizedBuffer<'static>),
     TransferServer(),
     KeepAlive(u64),
     Ping(u32),
     ResetChat,
-    ResourcePackQuery(),
+    ResourcePackQuery(Vec<KnownResourcePack>),
     ResourcePackPush(),
     ResourcePackPop(),
     UpdateRegistries(),
@@ -100,7 +104,7 @@ pub enum ClientboundConfigEvent {
     ServerLinks(),
     CodeOfConduct(),
     ReportDetails(),
-    QueryRequest(),
+    CustomQuery(Identifier<'static>, UnsizedBuffer<'static>),
     CookieRequest(),
     CookieStore(),
     ShowDialog(),
@@ -114,13 +118,13 @@ pub enum ClientboundConfigEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundConfigEvent {
-    ClientInformation(),
+    ClientInformation(ClientInformation),
     KeepAlive(u64),
     Pong(u32),
-    ResourcePackResponse(),
+    ResourcePackResponse(Vec<KnownResourcePack>),
     ResourcePackUpdate(),
     AcceptCodeOfConduct,
-    QueryResponse(),
+    CustomQuery(Identifier<'static>, UnsizedBuffer<'static>),
     CookieResponse(),
     DialogAction(),
     AcknowledgeConfig,

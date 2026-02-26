@@ -14,6 +14,7 @@ use froglight::{
         },
     },
     packet::common::{
+        client_information::ClientInformation,
         handshake::{ConnectionIntent, HandshakeContent},
         login::LoginHelloContent,
     },
@@ -125,7 +126,7 @@ impl BotPlugin {
                 // Handle configuration events.
                 ClientboundEventEnum::Config(event) => match event {
                     ClientboundConfigEvent::Disconnect(reason) => {
-                        error!("Disconnected from server: {reason}");
+                        error!("Disconnected from server: {reason:?}");
                         commands.write_message(AppExit::error());
                     }
                     ClientboundConfigEvent::TransferServer() => {
@@ -150,8 +151,12 @@ impl BotPlugin {
                     ClientboundConfigEvent::ResetChat => {
                         info!("Received ResetChat");
                     }
-                    ClientboundConfigEvent::ResourcePackQuery() => {
-                        info!("Received ResourcePackQuery: <placeholder>");
+                    ClientboundConfigEvent::ResourcePackQuery(known) => {
+                        info!("Received ResourcePackQuery: {known:#?}");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundConfigEvent::ResourcePackResponse(Vec::new()),
+                        ));
                     }
                     ClientboundConfigEvent::ResourcePackPush() => {
                         info!("Received ResourcePackPush: <placeholder>");
@@ -182,8 +187,18 @@ impl BotPlugin {
                     ClientboundConfigEvent::ReportDetails() => {
                         info!("Received ReportDetails: <placeholder>");
                     }
-                    ClientboundConfigEvent::QueryRequest() => {
-                        info!("Received QueryRequest: <placeholder>");
+                    ClientboundConfigEvent::CustomQuery(identifier, _) => {
+                        info!("Received CustomQuery: \"{identifier}\"");
+
+                        // Use this as the trigger to send the client information packet
+                        if identifier == "minecraft:brand" {
+                            writer.write(ServerboundMessage::new(
+                                bot.id(),
+                                ServerboundConfigEvent::ClientInformation(
+                                    ClientInformation::default(),
+                                ),
+                            ));
+                        }
                     }
                     ClientboundConfigEvent::CookieRequest() => {
                         info!("Received CookieRequest: <placeholder>");
@@ -204,7 +219,7 @@ impl BotPlugin {
                             ServerboundConfigEvent::AcknowledgeConfig,
                         ));
                     }
-                    unk => warn!("Received an unhandled config event: {unk:?}"),
+                    other => warn!("Received an unhandled config event: {other:?}"),
                 },
 
                 // Handle login events.
@@ -238,7 +253,7 @@ impl BotPlugin {
                             ServerboundLoginEvent::AcknowledgeLogin,
                         ));
                     }
-                    unk => warn!("Received an unhandled login event: {unk:?}"),
+                    other => warn!("Received an unhandled login event: {other:?}"),
                 },
 
                 // Can't receive a status event since the bot attempted to login.

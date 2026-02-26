@@ -8,6 +8,7 @@ extern crate alloc;
 pub mod bevy;
 pub mod entity;
 pub mod identifier;
+pub mod impossible;
 pub mod version;
 
 pub mod prelude {

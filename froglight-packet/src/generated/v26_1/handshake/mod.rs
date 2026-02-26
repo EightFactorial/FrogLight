@@ -10,7 +10,7 @@ pub use c2s_0x00_intention::IntentionC2SPacket;
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub enum ClientboundPackets {
-    None(crate::core::Impossible) = 0x00,
+    None(froglight_common::impossible::Impossible) = 0x00,
 }
 
 #[repr(u8)]

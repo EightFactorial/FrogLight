@@ -101,6 +101,7 @@ impl NetworkPlugin {
         for (entity, mut conn) in &mut query {
             #[allow(unused_variables, reason = "Used if tracing is enabled")]
             let Some(result) = conn.poll_task() else { continue };
+            let mut commands = commands.entity(entity);
 
             #[cfg(feature = "tracing")]
             match result {
@@ -113,7 +114,8 @@ impl NetworkPlugin {
                 }
             }
 
-            commands.entity(entity).remove::<ClientConnection>();
+            commands.remove::<ClientConnection>();
+            commands.trigger(ClientDespawn::new);
         }
     }
 }

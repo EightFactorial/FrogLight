@@ -267,10 +267,10 @@ async fn generate_state(
     }
 
     if clientbound_enum.is_empty() {
-        clientbound_enum.push_str("    None(crate::core::Impossible) = 0x00,\n");
+        clientbound_enum.push_str("    None(froglight_common::impossible::Impossible) = 0x00,\n");
     }
     if serverbound_enum.is_empty() {
-        serverbound_enum.push_str("    None(crate::core::Impossible) = 0x00,\n");
+        serverbound_enum.push_str("    None(froglight_common::impossible::Impossible) = 0x00,\n");
     }
 
     module.with_content(&format!(

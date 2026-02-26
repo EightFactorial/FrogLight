@@ -6,9 +6,13 @@ use froglight_common::version::V26_1;
 use froglight_packet::{
     generated::v26_1::{
         configuration::{
-            ClearDialogS2CPacket, ClientboundPackets as ConfigClientboundPackets,
+            ClearDialogS2CPacket, ClientInformationC2SPacket,
+            ClientboundPackets as ConfigClientboundPackets,
+            CustomPayloadC2SPacket as ConfigCustomPayloadC2SPacket,
+            CustomPayloadS2CPacket as ConfigCustomPayloadS2CPacket,
             DisconnectS2CPacket as ConfigDisconnectS2CPacket, FinishConfigurationS2CPacket,
             KeepAliveC2SPacket, KeepAliveS2CPacket, PingS2CPacket, PongC2SPacket,
+            SelectKnownPacksC2SPacket, SelectKnownPacksS2CPacket,
             ServerboundPackets as ConfigServerboundPackets,
         },
         handshake::{IntentionC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
@@ -84,8 +88,8 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ResetChat(packet))))
                 }
-                ClientboundConfigEvent::ResourcePackQuery() => {
-                    let packet = todo!();
+                ClientboundConfigEvent::ResourcePackQuery(known) => {
+                    let packet = SelectKnownPacksS2CPacket { known };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::SelectKnownPacks(
                         packet,
                     ))))
@@ -130,8 +134,8 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ClientboundConfigEvent::QueryRequest() => {
-                    let packet = todo!();
+                ClientboundConfigEvent::CustomQuery(identifier, buffer) => {
+                    let packet = ConfigCustomPayloadS2CPacket { identifier, buffer };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CustomPayload(packet))))
                 }
                 ClientboundConfigEvent::CookieRequest() => {
@@ -194,8 +198,11 @@ impl EventVersion for V26_1 {
                 ConfigClientboundPackets::CookieRequest(_packet) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CookieRequest())))
                 }
-                ConfigClientboundPackets::CustomPayload(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::QueryRequest())))
+                ConfigClientboundPackets::CustomPayload(packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CustomQuery(
+                        packet.identifier,
+                        packet.buffer,
+                    ))))
                 }
                 ConfigClientboundPackets::Disconnect(packet) => Ok(Some(
                     ClientboundEventEnum::Config(ClientboundConfigEvent::Disconnect(packet.reason)),
@@ -233,9 +240,11 @@ impl EventVersion for V26_1 {
                 ConfigClientboundPackets::UpdateTags(_packet) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateTags())))
                 }
-                ConfigClientboundPackets::SelectKnownPacks(_packet) => Ok(Some(
-                    ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackQuery()),
-                )),
+                ConfigClientboundPackets::SelectKnownPacks(packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(
+                        ClientboundConfigEvent::ResourcePackQuery(packet.known),
+                    )))
+                }
                 ConfigClientboundPackets::CustomReportDetails(_packet) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ReportDetails())))
                 }
@@ -301,8 +310,8 @@ impl EventVersion for V26_1 {
             },
 
             ServerboundEventEnum::Config(config) => match config {
-                ServerboundConfigEvent::ClientInformation() => {
-                    let packet = todo!();
+                ServerboundConfigEvent::ClientInformation(information) => {
+                    let packet = ClientInformationC2SPacket { information };
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::ClientInformation(
                         packet,
                     ))))
@@ -315,8 +324,8 @@ impl EventVersion for V26_1 {
                     let packet = PongC2SPacket { id };
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Pong(packet))))
                 }
-                ServerboundConfigEvent::ResourcePackResponse() => {
-                    let packet = todo!();
+                ServerboundConfigEvent::ResourcePackResponse(selected) => {
+                    let packet = SelectKnownPacksC2SPacket { selected };
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::SelectKnownPacks(
                         packet,
                     ))))
@@ -331,8 +340,8 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ServerboundConfigEvent::QueryResponse() => {
-                    let packet = todo!();
+                ServerboundConfigEvent::CustomQuery(identifier, buffer) => {
+                    let packet = ConfigCustomPayloadC2SPacket { identifier, buffer };
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::CustomPayload(packet))))
                 }
                 ServerboundConfigEvent::CookieResponse() => {
@@ -392,14 +401,19 @@ impl EventVersion for V26_1 {
             },
 
             VersionPacket::Config(config) => match config {
-                ConfigServerboundPackets::ClientInformation(_packet) => Ok(Some(
-                    ServerboundEventEnum::Config(ServerboundConfigEvent::ClientInformation()),
-                )),
+                ConfigServerboundPackets::ClientInformation(packet) => {
+                    Ok(Some(ServerboundEventEnum::Config(
+                        ServerboundConfigEvent::ClientInformation(packet.information),
+                    )))
+                }
                 ConfigServerboundPackets::CookieResponse(_packet) => {
                     Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::CookieResponse())))
                 }
-                ConfigServerboundPackets::CustomPayload(_packet) => {
-                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::QueryResponse())))
+                ConfigServerboundPackets::CustomPayload(packet) => {
+                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::CustomQuery(
+                        packet.identifier,
+                        packet.buffer,
+                    ))))
                 }
                 ConfigServerboundPackets::FinishConfiguration(_) => Ok(Some(
                     ServerboundEventEnum::Config(ServerboundConfigEvent::AcknowledgeConfig),
@@ -413,9 +427,11 @@ impl EventVersion for V26_1 {
                 ConfigServerboundPackets::ResourcePack(_packet) => Ok(Some(
                     ServerboundEventEnum::Config(ServerboundConfigEvent::ResourcePackUpdate()),
                 )),
-                ConfigServerboundPackets::SelectKnownPacks(_packet) => Ok(Some(
-                    ServerboundEventEnum::Config(ServerboundConfigEvent::ResourcePackResponse()),
-                )),
+                ConfigServerboundPackets::SelectKnownPacks(packet) => {
+                    Ok(Some(ServerboundEventEnum::Config(
+                        ServerboundConfigEvent::ResourcePackResponse(packet.selected),
+                    )))
+                }
                 ConfigServerboundPackets::CustomClickAction(_packet) => {
                     Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::DialogAction())))
                 }

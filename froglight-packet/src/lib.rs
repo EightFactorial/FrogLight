@@ -6,7 +6,6 @@ extern crate alloc;
 extern crate std;
 
 pub mod common;
-pub mod core;
 pub mod generated;
 pub mod version;
 

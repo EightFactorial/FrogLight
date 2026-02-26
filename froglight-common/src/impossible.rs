@@ -1,5 +1,8 @@
 //! TODO
 
+#[cfg(all(feature = "bevy", feature = "serde"))]
+use bevy_reflect::{ReflectDeserialize, ReflectSerialize};
+
 /// A type that can never be constructed.
 ///
 /// Equivalent to [`Infallible`](core::convert::Infallible),
@@ -11,6 +14,8 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub enum Impossible {}
 
 #[cfg(feature = "facet")]
