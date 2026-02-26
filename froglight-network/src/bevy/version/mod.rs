@@ -87,12 +87,12 @@ pub trait NetworkVersion: PacketVersion {
                     loop {
                         let packet: VersionPacket<Self, Serverbound> = channel.recv_async().await?;
 
-                        #[cfg(feature = "tracing")]
-                        tracing::trace!(target: "froglight_network", "Sending Packet: {packet:?}");
-
                         // Note: Holding this lock after receiving the packet to prevent
                         // `server_to_client` from reading it while we potentially update it.
                         let mut state = state.lock().await;
+
+                        #[cfg(feature = "tracing")]
+                        tracing::trace!(target: "froglight_network", "Sending Packet: {packet:?}");
 
                         match (packet, *state) {
                             (VersionPacket::Handshake(packet), PacketStateEnum::Handshake) => {
@@ -280,7 +280,7 @@ pub trait NetworkVersion: PacketVersion {
                     Ok(Some(update)) => {
                         if let Some(threshold) = update.compression_threshold {
                             #[cfg(feature = "tracing")]
-                            tracing::trace!(
+                            tracing::debug!(
                                 target: "froglight_network",
                                 "Updating connection compression threshold: {} -> {threshold}",
                                 reader.compression().load(Ordering::Relaxed)
@@ -290,7 +290,7 @@ pub trait NetworkVersion: PacketVersion {
                         }
                         if let Some(_key) = update.encrypion_key {
                             #[cfg(feature = "tracing")]
-                            tracing::trace!(
+                            tracing::debug!(
                                 target: "froglight_network",
                                 "Updating connection encryption key: <redacted>"
                             );
@@ -383,7 +383,17 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     let packet = reader.decompress(buffer).await?;
 
     #[cfg(feature = "tracing")]
-    tracing::trace!(target: "froglight_network", "Reading packet as: {packet:?}");
+    if packet_length > 128 {
+        tracing::trace!(
+            target: "froglight_network",
+            "Reading packet as: {:?}... (snipped)", &packet[..128]
+        );
+    } else {
+        tracing::trace!(
+            target: "froglight_network",
+            "Reading packet as: {packet:?}"
+        );
+    }
 
     // Deserialize the packet.
     match facet_minecraft::from_slice_remainder::<T>(packet) {
@@ -392,10 +402,18 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
             #[cfg(feature = "tracing")]
             if !rem.is_empty() {
                 if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
-                    tracing::error!(
-                        target: "froglight_network",
-                        "Bytes remaining after reading packet `{}` ({}) \u{f149}\n    {rem:?}", T::SHAPE.type_name(), rem.len()
-                    );
+                    let length = rem.len();
+                    if length > 128 {
+                        tracing::error!(
+                            target: "froglight_network",
+                            "Bytes remaining after reading packet: {length} \u{f149}\n    {:?}... (snipped)", &rem[..128]
+                        );
+                    } else {
+                        tracing::error!(
+                            target: "froglight_network",
+                            "Bytes remaining after reading packet: {length} \u{f149}\n    {rem:?}"
+                        );
+                    }
                 } else {
                     tracing::warn!(
                         target: "froglight_network",
