@@ -124,14 +124,20 @@ mod traits {{
         type Clientbound = configuration::ClientboundPackets;
         type Serverbound = configuration::ServerboundPackets;
 
-        fn transition_state_to(_: &Self::Serverbound) -> Option<PacketStateEnum> {{ None }}
+        fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum> {{
+            matches!(packet, configuration::ServerboundPackets::FinishConfiguration(_))
+                .then_some(PacketStateEnum::Play)
+        }}
     }}
 
     impl PacketState<{version_ident}> for Play {{
         type Clientbound = play::ClientboundPackets;
         type Serverbound = play::ServerboundPackets;
 
-        fn transition_state_to(_: &Self::Serverbound) -> Option<PacketStateEnum> {{ None }}
+        fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum> {{
+            matches!(packet, play::ServerboundPackets::ConfigurationAcknowledged(_))
+                .then_some(PacketStateEnum::Play)
+        }}
     }}
 }}
 "

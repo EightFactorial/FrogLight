@@ -270,12 +270,13 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
     #[cfg(feature = "futures-lite")]
     pub async fn decompress<'a>(&'a mut self, mut buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
+
         if threshold.is_positive() {
             // Remove the length prefix from the buffer.
             if buf.first().is_some_and(|&b| b == 0) {
                 buf = &buf[1..];
             } else {
-                buf = read_prefixed_slice(buf).ok_or_else(|| {
+                buf = strip_length_prefix(buf).ok_or_else(|| {
                     std::io::Error::new(
                         std::io::ErrorKind::InvalidData,
                         "Failed to read prefixed slice for decompression",
@@ -296,23 +297,21 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
     }
 }
 
-/// Reads a length-prefixed slice from the given buffer.
+/// Strips the length prefix off of a slice.
 #[must_use]
 #[cfg(feature = "futures-lite")]
-fn read_prefixed_slice(buf: &[u8]) -> Option<&[u8]> {
+fn strip_length_prefix(buf: &[u8]) -> Option<&[u8]> {
     let mut byte: u8;
-    let mut number = 0usize;
     let mut index = 0;
     while index < 5 {
         byte = *buf.get(index)?;
-        number |= usize::from(byte & 0b0111_1111) << (7 * index);
         if byte & 0b1000_0000 != 0 {
             index += 1;
         } else {
             break;
         }
     }
-    buf.get(index..index + number)
+    buf.get(index + 1..)
 }
 
 /// Writes a length prefix into the given buffer.

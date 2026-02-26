@@ -9,8 +9,8 @@ use froglight::{
         bevy::ClientDespawn,
         connection::FuturesLite,
         event::enums::{
-            ClientboundConfigEvent, ClientboundLoginEvent, ServerboundConfigEvent,
-            ServerboundHandshakeEvent, ServerboundLoginEvent,
+            ClientboundConfigEvent, ClientboundLoginEvent, ClientboundPlayEvent,
+            ServerboundConfigEvent, ServerboundHandshakeEvent, ServerboundLoginEvent,
         },
     },
     packet::common::{
@@ -121,7 +121,10 @@ impl BotPlugin {
 
             match message.event() {
                 // Handle gameplay events.
-                ClientboundEventEnum::Play(_event) => todo!(),
+                ClientboundEventEnum::Play(event) => match event {
+                    ClientboundPlayEvent::Placeholder => info!("Received <placeholder>"),
+                    other => info!("Received unhandled play event: {other:?}"),
+                },
 
                 // Handle configuration events.
                 ClientboundEventEnum::Config(event) => match event {
@@ -177,7 +180,6 @@ impl BotPlugin {
                         info!("Received ServerLinks: <placeholder>");
                     }
                     ClientboundConfigEvent::CodeOfConduct() => {
-                        info!("Received Code of Conduct: <placeholder>");
                         warn!("Accepting code of conduct...");
                         writer.write(ServerboundMessage::new(
                             bot.id(),
@@ -192,6 +194,7 @@ impl BotPlugin {
 
                         // Use this as the trigger to send the client information packet
                         if identifier == "minecraft:brand" {
+                            info!("Sending client information...");
                             writer.write(ServerboundMessage::new(
                                 bot.id(),
                                 ServerboundConfigEvent::ClientInformation(
