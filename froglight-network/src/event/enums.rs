@@ -219,7 +219,9 @@ pub enum ClientboundPlayEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundPlayEvent {
-    Placeholder,
+    KeepAlive(u64),
+    PingRequest(u32),
+    Pong(u32),
 }
 
 // -------------------------------------------------------------------------------------------------

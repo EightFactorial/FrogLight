@@ -32,21 +32,24 @@ use froglight_packet::{
             ClientboundPackets as PlayClientboundPackets,
             CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
             DisconnectS2CPacket as PlayDisconnectS2CPacket,
+            KeepAliveC2SPacket as PlayKeepAliveC2SPacket,
             KeepAliveS2CPacket as PlayKeepAliveS2CPacket,
+            PingRequestC2SPacket as PlayPingRequestC2SPacket, PongC2SPacket as PlayPongC2SPacket,
             PongResponseS2CPacket as PlayPongResponseS2CPacket,
+            ServerboundPackets as PlayServerboundPackets,
         },
     },
     version::{Clientbound, Serverbound, VersionPacket},
 };
 
-use super::enums::ServerboundConfigEvent;
 use crate::{
     connection::ConnectionError,
     event::{
         EventVersion,
         enums::{
             ClientboundConfigEvent, ClientboundLoginEvent, ClientboundPlayEvent,
-            ServerboundHandshakeEvent, ServerboundLoginEvent,
+            ServerboundConfigEvent, ServerboundHandshakeEvent, ServerboundLoginEvent,
+            ServerboundPlayEvent,
         },
     },
     prelude::*,
@@ -1421,9 +1424,20 @@ impl EventVersion for V26_1 {
                 ))),
             },
 
-            ServerboundEventEnum::Play(_play) => {
-                todo!()
-            }
+            ServerboundEventEnum::Play(play) => match play {
+                ServerboundPlayEvent::KeepAlive(id) => {
+                    let packet = PlayKeepAliveC2SPacket { id };
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::KeepAlive(packet))))
+                }
+                ServerboundPlayEvent::PingRequest(id) => {
+                    let packet = PlayPingRequestC2SPacket { id };
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PingRequest(packet))))
+                }
+                ServerboundPlayEvent::Pong(id) => {
+                    let packet = PlayPongC2SPacket { id };
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::Pong(packet))))
+                }
+            },
         }
     }
 
@@ -1506,7 +1520,83 @@ impl EventVersion for V26_1 {
                 }
             }
 
-            VersionPacket::Play(_) => todo!(),
+            VersionPacket::Play(play) => match play {
+                PlayServerboundPackets::AcceptTeleportation(_packet) => todo!(),
+                PlayServerboundPackets::Attack(_packet) => todo!(),
+                PlayServerboundPackets::BlockEntityTagQuery(_packet) => todo!(),
+                PlayServerboundPackets::BundleItemSelected(_packet) => todo!(),
+                PlayServerboundPackets::ChangeDifficulty(_packet) => todo!(),
+                PlayServerboundPackets::ChangeGameMode(_packet) => todo!(),
+                PlayServerboundPackets::ChatAck(_packet) => todo!(),
+                PlayServerboundPackets::ChatCommand(_packet) => todo!(),
+                PlayServerboundPackets::ChatCommandSigned(_packet) => todo!(),
+                PlayServerboundPackets::Chat(_packet) => todo!(),
+                PlayServerboundPackets::ChatSessionUpdate(_packet) => todo!(),
+                PlayServerboundPackets::ChunkBatchReceived(_packet) => todo!(),
+                PlayServerboundPackets::ClientCommand(_packet) => todo!(),
+                PlayServerboundPackets::ClientTickEnd(_packet) => todo!(),
+                PlayServerboundPackets::ClientInformation(_packet) => todo!(),
+                PlayServerboundPackets::CommandSuggestion(_packet) => todo!(),
+                PlayServerboundPackets::ConfigurationAcknowledged(_packet) => todo!(),
+                PlayServerboundPackets::ContainerButtonClick(_packet) => todo!(),
+                PlayServerboundPackets::ContainerClick(_packet) => todo!(),
+                PlayServerboundPackets::ContainerClose(_packet) => todo!(),
+                PlayServerboundPackets::ContainerSlotStateChanged(_packet) => todo!(),
+                PlayServerboundPackets::CookieResponse(_packet) => todo!(),
+                PlayServerboundPackets::CustomPayload(_packet) => todo!(),
+                PlayServerboundPackets::DebugSubscriptionRequest(_packet) => todo!(),
+                PlayServerboundPackets::EditBook(_packet) => todo!(),
+                PlayServerboundPackets::EntityTagQuery(_packet) => todo!(),
+                PlayServerboundPackets::Interact(_packet) => todo!(),
+                PlayServerboundPackets::JigsawGenerate(_packet) => todo!(),
+                PlayServerboundPackets::KeepAlive(packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::KeepAlive(packet.id))))
+                }
+                PlayServerboundPackets::LockDifficulty(_packet) => todo!(),
+                PlayServerboundPackets::MovePlayerPos(_packet) => todo!(),
+                PlayServerboundPackets::MovePlayerPosRot(_packet) => todo!(),
+                PlayServerboundPackets::MovePlayerRot(_packet) => todo!(),
+                PlayServerboundPackets::MovePlayerStatusOnly(_packet) => todo!(),
+                PlayServerboundPackets::MoveVehicle(_packet) => todo!(),
+                PlayServerboundPackets::PaddleBoat(_packet) => todo!(),
+                PlayServerboundPackets::PickItemFromBlock(_packet) => todo!(),
+                PlayServerboundPackets::PickItemFromEntity(_packet) => todo!(),
+                PlayServerboundPackets::PingRequest(packet) => Ok(Some(
+                    ServerboundEventEnum::Play(ServerboundPlayEvent::PingRequest(packet.id)),
+                )),
+                PlayServerboundPackets::PlaceRecipe(_packet) => todo!(),
+                PlayServerboundPackets::PlayerAbilities(_packet) => todo!(),
+                PlayServerboundPackets::PlayerAction(_packet) => todo!(),
+                PlayServerboundPackets::PlayerCommand(_packet) => todo!(),
+                PlayServerboundPackets::PlayerInput(_packet) => todo!(),
+                PlayServerboundPackets::PlayerLoaded(_packet) => todo!(),
+                PlayServerboundPackets::Pong(packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::Pong(packet.id))))
+                }
+                PlayServerboundPackets::RecipeBookChangeSettings(_packet) => todo!(),
+                PlayServerboundPackets::RecipeBookSeenRecipe(_packet) => todo!(),
+                PlayServerboundPackets::RenameItem(_packet) => todo!(),
+                PlayServerboundPackets::ResourcePack(_packet) => todo!(),
+                PlayServerboundPackets::SeenAdvancements(_packet) => todo!(),
+                PlayServerboundPackets::SelectTrade(_packet) => todo!(),
+                PlayServerboundPackets::SetBeacon(_packet) => todo!(),
+                PlayServerboundPackets::SetCarriedItem(_packet) => todo!(),
+                PlayServerboundPackets::SetCommandBlock(_packet) => todo!(),
+                PlayServerboundPackets::SetCommandMinecart(_packet) => todo!(),
+                PlayServerboundPackets::SetCreativeModeSlot(_packet) => todo!(),
+                PlayServerboundPackets::SetGameRule(_packet) => todo!(),
+                PlayServerboundPackets::SetJigsawBlock(_packet) => todo!(),
+                PlayServerboundPackets::SetStructureBlock(_packet) => todo!(),
+                PlayServerboundPackets::SetTestBlock(_packet) => todo!(),
+                PlayServerboundPackets::SignUpdate(_packet) => todo!(),
+                PlayServerboundPackets::SpectateEntity(_packet) => todo!(),
+                PlayServerboundPackets::Swing(_packet) => todo!(),
+                PlayServerboundPackets::TeleportToEntity(_packet) => todo!(),
+                PlayServerboundPackets::TestInstanceBlockAction(_packet) => todo!(),
+                PlayServerboundPackets::UseItemOn(_packet) => todo!(),
+                PlayServerboundPackets::UseItem(_packet) => todo!(),
+                PlayServerboundPackets::CustomClickAction(_packet) => todo!(),
+            },
         }
     }
 }

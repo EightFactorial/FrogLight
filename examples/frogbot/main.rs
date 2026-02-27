@@ -11,6 +11,7 @@ use froglight::{
         event::enums::{
             ClientboundConfigEvent, ClientboundLoginEvent, ClientboundPlayEvent,
             ServerboundConfigEvent, ServerboundHandshakeEvent, ServerboundLoginEvent,
+            ServerboundPlayEvent,
         },
     },
     packet::common::{
@@ -132,23 +133,19 @@ impl BotPlugin {
                     }
                     ClientboundPlayEvent::KeepAlive(id) => {
                         info!("Received KeepAlive ({id})");
-                        // writer.write(ServerboundMessage::new(
-                        //     bot.id(),
-                        //     ServerboundPlayEvent::KeepAlive(*id),
-                        // ));
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundPlayEvent::KeepAlive(*id),
+                        ));
                     }
                     ClientboundPlayEvent::Ping(id) => {
                         info!("Received Ping ({id})");
-                        // writer.write(ServerboundMessage::new(
-                        //     bot.id(),
-                        //     ServerboundPlayEvent::Pong(*id),
-                        // ));
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundPlayEvent::Pong(*id),
+                        ));
                     }
-                    ClientboundPlayEvent::Pong(id) => {
-                        info!("Received Pong ({id})");
-                    }
-
-                    other => debug!("Received unhandled play event: {other:?}"),
+                    other => debug!("Unhandled Event: {other:?}"),
                 },
 
                 // Handle configuration events.
@@ -245,13 +242,13 @@ impl BotPlugin {
                         info!("Clearing dialog...");
                     }
                     ClientboundConfigEvent::FinishConfig => {
-                        info!("Successfully finished configuration!");
+                        info!("Successfully configured!");
                         writer.write(ServerboundMessage::new(
                             bot.id(),
                             ServerboundConfigEvent::AcknowledgeConfig,
                         ));
                     }
-                    other => warn!("Received an unhandled config event: {other:?}"),
+                    other => warn!("Unhandled Event: {other:?}"),
                 },
 
                 // Handle login events.
@@ -293,7 +290,7 @@ impl BotPlugin {
                             ServerboundLoginEvent::AcknowledgeLogin,
                         ));
                     }
-                    other => warn!("Received an unhandled login event: {other:?}"),
+                    other => warn!("Unhandled Event: {other:?}"),
                 },
 
                 // Can't receive a status event since the bot attempted to login.
