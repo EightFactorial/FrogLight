@@ -40,10 +40,9 @@ pub trait PacketState<V: PacketVersion> {
     #[cfg(feature = "facet")]
     type Serverbound: Debug + Clone + Send + Sync + Facet<'static> + 'static;
 
-    /// Check if the given clientbound packet is a transition packet,
-    /// meaning it will cause the connection to change states.
+    /// Check if the given [`Serverbound`] packet causes a state transition.
     ///
-    /// Returns `None` if the packet does not cause a state transition.
+    /// If so, it returns the state the connection transitions into.
     fn transition_state_to(packet: &Self::Serverbound) -> Option<PacketStateEnum>;
 }
 

@@ -193,25 +193,27 @@ impl<R: RuntimeWrite<C>, C: Send> EncryptorMut<R, C> {
     pub async fn compress<'a>(&'a mut self, buf: &'a mut [u8]) -> std::io::Result<&'a mut [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
 
-        if threshold.is_positive() {
+        // `false` if 0 or larger
+        if threshold.is_negative() {
+            Ok(buf)
+        } else {
             self.scratch.clear();
 
             let prefix = if threshold <= buf.len().try_into().unwrap_or(i32::MAX) {
                 // Compress the buffer and write it to the scratch space.
-                let mut compressor = ZlibEncoder::new(Cursor::new(buf));
-                compressor.read_to_end(&mut self.scratch).await?
+                let mut compressor = ZlibEncoder::new(Cursor::new(&mut *buf));
+                compressor.read_to_end(&mut self.scratch).await?;
+                buf.len() // Use the input length as the prefix
             } else {
                 // No compression, copy the buffer to the scratch space.
                 self.scratch.extend_from_slice(buf);
-                0
+                0 // Use `0` as the prefix to indicate no compression
             };
 
             // Add the length prefix.
             write_slice_prefix(prefix, &mut self.scratch);
 
             Ok(self.scratch.as_mut_slice())
-        } else {
-            Ok(buf)
         }
     }
 }
@@ -271,21 +273,21 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
     pub async fn decompress<'a>(&'a mut self, mut buf: &'a [u8]) -> std::io::Result<&'a [u8]> {
         let threshold = self.compression().load(Ordering::Relaxed);
 
-        if threshold.is_positive() {
-            // Remove the length prefix from the buffer.
+        // `true` if 0 or larger
+        if !threshold.is_negative() {
             if buf.first().is_some_and(|&b| b == 0) {
+                // Remove the length prefix from the buffer.
                 buf = &buf[1..];
             } else {
+                // Remove the length prefix from the buffer.
                 buf = strip_length_prefix(buf).ok_or_else(|| {
                     std::io::Error::new(
                         std::io::ErrorKind::InvalidData,
                         "Failed to read prefixed slice for decompression",
                     )
                 })?;
-            }
 
-            // Decompress if the buffer length exceeds the threshold.
-            if threshold <= buf.len().try_into().unwrap_or(i32::MAX) {
+                // Decompress the packet
                 self.scratch.clear();
                 let mut decompressor = ZlibDecoder::new(Cursor::new(buf));
                 decompressor.read_to_end(&mut self.scratch).await?;
@@ -301,15 +303,12 @@ impl<R: RuntimeRead<C>, C: Send> DecryptorMut<R, C> {
 #[must_use]
 #[cfg(feature = "futures-lite")]
 fn strip_length_prefix(buf: &[u8]) -> Option<&[u8]> {
-    let mut byte: u8;
     let mut index = 0;
     while index < 5 {
-        byte = *buf.get(index)?;
-        if byte & 0b1000_0000 != 0 {
-            index += 1;
-        } else {
+        if *buf.get(index)? & 0b1000_0000 == 0 {
             break;
         }
+        index += 1;
     }
     buf.get(index + 1..)
 }

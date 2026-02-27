@@ -396,8 +396,8 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     }
 
     // Deserialize the packet.
+    #[allow(unused_variables, reason = "Variables are used if tracing is enabled")]
     match facet_minecraft::from_slice_remainder::<T>(packet) {
-        #[allow(unused_variables, reason = "Used in tracing only")]
         Ok((val, rem)) => {
             #[cfg(feature = "tracing")]
             if !rem.is_empty() {
@@ -424,8 +424,10 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
 
             Ok(Some(val))
         }
-        #[allow(unused_variables, reason = "Used if tracing is enabled")]
-        Err(err) if !exit_on_error => {
+        // If `exit_on_error` is true
+        Err(err) if exit_on_error => Err(err.into()),
+        // If `exit_on_error` is false
+        Err(err) => {
             #[cfg(feature = "tracing")]
             tracing::error!(
                 target: "froglight_network",
@@ -433,7 +435,6 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
             );
             Ok(None)
         }
-        Err(err) => Err(err)?,
     }
 }
 
@@ -476,12 +477,12 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
 async fn read_varint_bytewise<R: RuntimeRead<C>, C: Send>(
     reader: &mut DecryptorMut<R, C>,
 ) -> Result<u32, Box<dyn Error + Send + Sync>> {
-    let mut byte = [0];
-    let mut number = 0;
-    for i in 0..5 {
-        reader.read_exact(byte.as_mut_slice()).await?;
-        number |= u32::from(byte[0] & 0b0111_1111) << (7 * i);
-        if byte[0] & 0b1000_0000 == 0 {
+    let mut byte = 0u8;
+    let mut number = 0u32;
+    for i in 0u32..5u32 {
+        reader.read_exact(core::slice::from_mut(&mut byte)).await?;
+        number |= u32::from(byte & 0b0111_1111) << (7 * i);
+        if byte & 0b1000_0000 == 0 {
             break;
         }
     }

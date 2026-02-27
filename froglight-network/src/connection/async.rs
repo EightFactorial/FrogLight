@@ -118,6 +118,10 @@ pub trait Runtime<C>:
     fn spawn_task<Fut: Future<Output = Ret> + Send + 'static, Ret: Send + 'static>(
         future: Fut,
     ) -> Task<Ret>;
+
+    /// Spawn a task on the [`IoTaskPool`].
+    #[cfg(feature = "bevy")]
+    fn sleep(duration: std::time::Duration) -> impl Future<Output = ()> + Send + Send + 'static;
 }
 
 /// A trait for reading from a connection in a specific runtime.
@@ -159,6 +163,10 @@ impl<C: FAsyncRead + FAsyncWrite + Clone + Unpin + Send + 'static> Runtime<C> fo
     ) -> Task<Ret> {
         IoTaskPool::get().spawn(future)
     }
+
+    #[inline]
+    #[cfg(feature = "bevy")]
+    async fn sleep(duration: std::time::Duration) { async_io::Timer::after(duration).await; }
 }
 
 #[cfg(feature = "futures-lite")]
@@ -204,6 +212,10 @@ impl<C: TAsyncRead + TAsyncWrite + Clone + Send + Unpin + 'static> Runtime<C> fo
     ) -> Task<Ret> {
         IoTaskPool::get().spawn(async_compat::Compat::new(future))
     }
+
+    #[inline]
+    #[cfg(feature = "bevy")]
+    async fn sleep(duration: std::time::Duration) { tokio::time::sleep(duration).await; }
 }
 
 #[cfg(feature = "tokio")]
@@ -249,6 +261,10 @@ impl Runtime<TokioTcpStream> for Tokio {
     ) -> Task<Ret> {
         IoTaskPool::get().spawn(async_compat::Compat::new(future))
     }
+
+    #[inline]
+    #[cfg(feature = "bevy")]
+    async fn sleep(duration: std::time::Duration) { tokio::time::sleep(duration).await; }
 }
 
 #[cfg(feature = "tokio")]
