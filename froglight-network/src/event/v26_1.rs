@@ -6,14 +6,15 @@ use froglight_common::version::V26_1;
 use froglight_packet::{
     generated::v26_1::{
         configuration::{
-            ClearDialogS2CPacket, ClientInformationC2SPacket,
+            ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
             ClientboundPackets as ConfigClientboundPackets,
             CustomPayloadC2SPacket as ConfigCustomPayloadC2SPacket,
             CustomPayloadS2CPacket as ConfigCustomPayloadS2CPacket,
             DisconnectS2CPacket as ConfigDisconnectS2CPacket, FinishConfigurationC2SPacket,
-            FinishConfigurationS2CPacket, KeepAliveC2SPacket, KeepAliveS2CPacket, PingS2CPacket,
-            PongC2SPacket, SelectKnownPacksC2SPacket, SelectKnownPacksS2CPacket,
-            ServerboundPackets as ConfigServerboundPackets,
+            FinishConfigurationS2CPacket, KeepAliveC2SPacket,
+            KeepAliveS2CPacket as ConfigKeepAliveS2CPacket, PingS2CPacket,
+            PongC2SPacket as ConfigPongC2SPacket, SelectKnownPacksC2SPacket,
+            SelectKnownPacksS2CPacket, ServerboundPackets as ConfigServerboundPackets,
         },
         handshake::{IntentionC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
         login::{
@@ -21,7 +22,14 @@ use froglight_packet::{
             LoginAcknowledgedC2SPacket, LoginDisconnectS2CPacket, LoginFinishedS2CPacket,
             ServerboundPackets as LoginServerboundPackets,
         },
-        // play::ClientboundPackets as PlayClientboundPackets,
+        play::{
+            BundleDelimiterS2CPacket, ClearDialogS2CPacket as PlayClearDialogS2CPacket,
+            ClientboundPackets as PlayClientboundPackets,
+            CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
+            DisconnectS2CPacket as PlayDisconnectS2CPacket,
+            KeepAliveS2CPacket as PlayKeepAliveS2CPacket,
+            PongResponseS2CPacket as PlayPongResponseS2CPacket,
+        },
     },
     version::{Clientbound, Serverbound, VersionPacket},
 };
@@ -55,7 +63,7 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::Hello(packet))))
                 }
-                ClientboundLoginEvent::QueryRequest() => {
+                ClientboundLoginEvent::CustomQuery() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::CustomQuery(packet))))
                 }
@@ -63,7 +71,7 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::CookieRequest(packet))))
                 }
-                ClientboundLoginEvent::Profile(event) => {
+                ClientboundLoginEvent::LoginFinshed(event) => {
                     let packet = LoginFinishedS2CPacket::new(event);
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::LoginFinished(packet))))
                 }
@@ -73,12 +81,12 @@ impl EventVersion for V26_1 {
                 ClientboundConfigEvent::Disconnect(reason) => Ok(Some(VersionPacket::Config(
                     ConfigClientboundPackets::Disconnect(ConfigDisconnectS2CPacket { reason }),
                 ))),
-                ClientboundConfigEvent::TransferServer() => {
+                ClientboundConfigEvent::Transfer() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::Transfer(packet))))
                 }
                 ClientboundConfigEvent::KeepAlive(id) => {
-                    let packet = KeepAliveS2CPacket { id };
+                    let packet = ConfigKeepAliveS2CPacket { id };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::KeepAlive(packet))))
                 }
                 ClientboundConfigEvent::Ping(id) => {
@@ -89,7 +97,7 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ResetChat(packet))))
                 }
-                ClientboundConfigEvent::ResourcePackQuery(known) => {
+                ClientboundConfigEvent::KnownResourcePacks(known) => {
                     let packet = SelectKnownPacksS2CPacket { known };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::SelectKnownPacks(
                         packet,
@@ -107,11 +115,11 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ClientboundConfigEvent::UpdateRegistries() => {
+                ClientboundConfigEvent::RegistryData() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::RegistryData(packet))))
                 }
-                ClientboundConfigEvent::UpdateFeatures() => {
+                ClientboundConfigEvent::EnabledFeatures() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(
                         ConfigClientboundPackets::UpdateEnabledFeatures(packet),
@@ -129,13 +137,13 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CodeOfConduct(packet))))
                 }
-                ClientboundConfigEvent::ReportDetails() => {
+                ClientboundConfigEvent::CustomReportDetails() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CustomReportDetails(
                         packet,
                     ))))
                 }
-                ClientboundConfigEvent::CustomQuery(identifier, buffer) => {
+                ClientboundConfigEvent::CustomPayload(identifier, buffer) => {
                     let packet = ConfigCustomPayloadS2CPacket { identifier, buffer };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CustomPayload(packet))))
                 }
@@ -143,7 +151,7 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CookieRequest(packet))))
                 }
-                ClientboundConfigEvent::CookieStore() => {
+                ClientboundConfigEvent::StoreCookie() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::StoreCookie(packet))))
                 }
@@ -151,16 +159,627 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ShowDialog(packet))))
                 }
-                ClientboundConfigEvent::ClearDialog => {
-                    let packet = ClearDialogS2CPacket {};
-                    Ok(Some(VersionPacket::Config(ConfigClientboundPackets::ClearDialog(packet))))
-                }
+                ClientboundConfigEvent::ClearDialog => Ok(Some(VersionPacket::Config(
+                    ConfigClientboundPackets::ClearDialog(LoginClearDialogS2CPacket),
+                ))),
                 ClientboundConfigEvent::FinishConfig => Ok(Some(VersionPacket::Config(
                     ConfigClientboundPackets::FinishConfiguration(FinishConfigurationS2CPacket {}),
                 ))),
             },
 
-            ClientboundEventEnum::Play(_play) => todo!(),
+            ClientboundEventEnum::Play(play) => match play {
+                ClientboundPlayEvent::ActionBarText() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetActionBarText(packet))))
+                }
+                ClientboundPlayEvent::AddEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::AddEntity(packet))))
+                }
+                ClientboundPlayEvent::Animate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Animate(packet))))
+                }
+                ClientboundPlayEvent::AwardStats() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::AwardStats(packet))))
+                }
+                ClientboundPlayEvent::BlockChangedAck() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::BlockChangedAck(packet))))
+                }
+                ClientboundPlayEvent::BlockDestruction() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::BlockDestruction(packet))))
+                }
+                ClientboundPlayEvent::BlockEntityData() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::BlockEntityData(packet))))
+                }
+                ClientboundPlayEvent::BlockEvent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::BlockEvent(packet))))
+                }
+                ClientboundPlayEvent::BlockUpdate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::BlockUpdate(packet))))
+                }
+                ClientboundPlayEvent::BossEvent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::BossEvent(packet))))
+                }
+                ClientboundPlayEvent::BundleDelimiter => Ok(Some(VersionPacket::Play(
+                    PlayClientboundPackets::BundleDelimiter(BundleDelimiterS2CPacket),
+                ))),
+                ClientboundPlayEvent::ChangeDifficulty() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ChangeDifficulty(packet))))
+                }
+                ClientboundPlayEvent::ChatSuggestions() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::CustomChatCompletions(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ChunkBatchFinished() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ChunkBatchFinished(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ChunkBatchStart() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ChunkBatchStart(packet))))
+                }
+                ClientboundPlayEvent::ChunkBiomes() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ChunksBiomes(packet))))
+                }
+                ClientboundPlayEvent::ChunkCacheCenter() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetChunkCacheCenter(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ChunkCacheRadius() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetChunkCacheRadius(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ChunkSectionUpdate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SectionBlocksUpdate(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ChunkWithLight() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelChunkWithLight(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ClearDialog => Ok(Some(VersionPacket::Play(
+                    PlayClientboundPackets::ClearDialog(PlayClearDialogS2CPacket),
+                ))),
+                ClientboundPlayEvent::ClearTitles() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ClearTitles(packet))))
+                }
+                ClientboundPlayEvent::CommandSuggestions() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::CommandSuggestions(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::Commands() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Commands(packet))))
+                }
+                ClientboundPlayEvent::ContainerClose() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ContainerClose(packet))))
+                }
+                ClientboundPlayEvent::ContainerContent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ContainerSetContent(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ContainerData() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ContainerSetData(packet))))
+                }
+                ClientboundPlayEvent::ContainerSlot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ContainerSetSlot(packet))))
+                }
+                ClientboundPlayEvent::CookieRequest() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::CookieRequest(packet))))
+                }
+                ClientboundPlayEvent::Cooldown() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Cooldown(packet))))
+                }
+                ClientboundPlayEvent::CustomPayload(identifier, buffer) => {
+                    let packet = PlayCustomPayloadS2CPacket { identifier, buffer };
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::CustomPayload(packet))))
+                }
+                ClientboundPlayEvent::CustomReportDetails() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::CustomReportDetails(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::DamageEvent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DamageEvent(packet))))
+                }
+                ClientboundPlayEvent::DebugBlock() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DebugBlockValue(packet))))
+                }
+                ClientboundPlayEvent::DebugChunk() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DebugChunkValue(packet))))
+                }
+                ClientboundPlayEvent::DebugEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DebugEntityValue(packet))))
+                }
+                ClientboundPlayEvent::DebugEvent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DebugEvent(packet))))
+                }
+                ClientboundPlayEvent::DebugSample() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DebugSample(packet))))
+                }
+                ClientboundPlayEvent::DeleteChat() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DeleteChat(packet))))
+                }
+                ClientboundPlayEvent::Disconnect(reason) => {
+                    let packet = PlayDisconnectS2CPacket { reason };
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Disconnect(packet))))
+                }
+                ClientboundPlayEvent::DisguisedChat() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::DisguisedChat(packet))))
+                }
+                ClientboundPlayEvent::DiskSpaceWarning() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::LowDiskSpaceWarning(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::EntityEvent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::EntityEvent(packet))))
+                }
+                ClientboundPlayEvent::EntityPosition() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::EntityPositionSync(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::Explode() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Explode(packet))))
+                }
+                ClientboundPlayEvent::ForgetChunk() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ForgetLevelChunk(packet))))
+                }
+                ClientboundPlayEvent::GameEvent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::GameEvent(packet))))
+                }
+                ClientboundPlayEvent::GameRule() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::GameRuleValues(packet))))
+                }
+                ClientboundPlayEvent::GameTestHighlight() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::GameTestHighlightPos(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::GhostRecipe() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlaceGhostRecipe(packet))))
+                }
+                ClientboundPlayEvent::HurtAnimation() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::HurtAnimation(packet))))
+                }
+                ClientboundPlayEvent::InitializeBorder() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::InitializeBorder(packet))))
+                }
+                ClientboundPlayEvent::KeepAlive(id) => {
+                    let packet = PlayKeepAliveS2CPacket { id };
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::KeepAlive(packet))))
+                }
+                ClientboundPlayEvent::LevelEvent() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelEvent(packet))))
+                }
+                ClientboundPlayEvent::LevelParticles() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelParticles(packet))))
+                }
+                ClientboundPlayEvent::LightUpdate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::LightUpdate(packet))))
+                }
+                ClientboundPlayEvent::Login() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Login(packet))))
+                }
+                ClientboundPlayEvent::MapItemData() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MapItemData(packet))))
+                }
+                ClientboundPlayEvent::MerchantOffers() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MerchantOffers(packet))))
+                }
+                ClientboundPlayEvent::MountScreen() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MountScreenOpen(packet))))
+                }
+                ClientboundPlayEvent::MoveEntityPos() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveEntityPos(packet))))
+                }
+                ClientboundPlayEvent::MoveEntityPosRot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveEntityPosRot(packet))))
+                }
+                ClientboundPlayEvent::MoveEntityRot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveEntityRot(packet))))
+                }
+                ClientboundPlayEvent::MoveMinecartTrack() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveMinecartAlongTrack(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::MoveVehicle() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::MoveVehicle(packet))))
+                }
+                ClientboundPlayEvent::OpenBook() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::OpenBook(packet))))
+                }
+                ClientboundPlayEvent::OpenScreen() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::OpenScreen(packet))))
+                }
+                ClientboundPlayEvent::OpenSignEditor() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::OpenSignEditor(packet))))
+                }
+                ClientboundPlayEvent::Ping(id) => {
+                    let packet = PlayPongResponseS2CPacket { id };
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PongResponse(packet))))
+                }
+                ClientboundPlayEvent::PlayerAbilities() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerAbilities(packet))))
+                }
+                ClientboundPlayEvent::PlayerChat() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerChat(packet))))
+                }
+                ClientboundPlayEvent::PlayerCombatEnd() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerCombatEnd(packet))))
+                }
+                ClientboundPlayEvent::PlayerCombatEnter() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerCombatEnter(packet))))
+                }
+                ClientboundPlayEvent::PlayerCombatKill() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerCombatKill(packet))))
+                }
+                ClientboundPlayEvent::PlayerInfoRemove() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerInfoRemove(packet))))
+                }
+                ClientboundPlayEvent::PlayerInfoUpdate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerInfoUpdate(packet))))
+                }
+                ClientboundPlayEvent::PlayerLookAt() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerLookAt(packet))))
+                }
+                ClientboundPlayEvent::PlayerPosition() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerPosition(packet))))
+                }
+                ClientboundPlayEvent::PlayerRotation() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::PlayerRotation(packet))))
+                }
+                ClientboundPlayEvent::Pong(id) => Ok(Some(VersionPacket::Play(
+                    PlayClientboundPackets::PongResponse(PlayPongResponseS2CPacket { id }),
+                ))),
+                ClientboundPlayEvent::ProjectilePower() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ProjectilePower(packet))))
+                }
+                ClientboundPlayEvent::RecipeBookAdd() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::RecipeBookAdd(packet))))
+                }
+                ClientboundPlayEvent::RecipeBookRemove() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::RecipeBookRemove(packet))))
+                }
+                ClientboundPlayEvent::RecipeBookSettings() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::RecipeBookSettings(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::RemoveEntities() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::RemoveEntities(packet))))
+                }
+                ClientboundPlayEvent::RemoveMobEffect() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::RemoveMobEffect(packet))))
+                }
+                ClientboundPlayEvent::ResetScore() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ResetScore(packet))))
+                }
+                ClientboundPlayEvent::ResourcePackPop() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ResourcePackPop(packet))))
+                }
+                ClientboundPlayEvent::ResourcePackPush() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ResourcePackPush(packet))))
+                }
+                ClientboundPlayEvent::Respawn() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Respawn(packet))))
+                }
+                ClientboundPlayEvent::RotateHead() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::RotateHead(packet))))
+                }
+                ClientboundPlayEvent::SelectAdvancementTab() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SelectAdvancementsTab(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::ServerData() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ServerData(packet))))
+                }
+                ClientboundPlayEvent::ServerLinks() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ServerLinks(packet))))
+                }
+                ClientboundPlayEvent::SetBorderCenter() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetBorderCenter(packet))))
+                }
+                ClientboundPlayEvent::SetBorderLerpSize() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetBorderLerpSize(packet))))
+                }
+                ClientboundPlayEvent::SetBorderSize() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetBorderSize(packet))))
+                }
+                ClientboundPlayEvent::SetBorderWarningDelay() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetBorderWarningDelay(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::SetBorderWarningDistance() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetBorderWarningDistance(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::SetCamera() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetCamera(packet))))
+                }
+                ClientboundPlayEvent::SetCursorItem() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetCursorItem(packet))))
+                }
+                ClientboundPlayEvent::SetDefaultSpawn() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetDefaultSpawnPosition(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::SetDisplayObjective() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetDisplayObjective(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::SetEntityData() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityData(packet))))
+                }
+                ClientboundPlayEvent::SetEntityLink() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityLink(packet))))
+                }
+                ClientboundPlayEvent::SetEntityMotion() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityMotion(packet))))
+                }
+                ClientboundPlayEvent::SetEquipment() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEquipment(packet))))
+                }
+                ClientboundPlayEvent::SetExperience() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetExperience(packet))))
+                }
+                ClientboundPlayEvent::SetHealth() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetHealth(packet))))
+                }
+                ClientboundPlayEvent::SetHeldSlot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetHeldSlot(packet))))
+                }
+                ClientboundPlayEvent::SetObjective() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetObjective(packet))))
+                }
+                ClientboundPlayEvent::SetPassengers() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetPassengers(packet))))
+                }
+                ClientboundPlayEvent::SetPlayerInventory() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetPlayerInventory(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::SetPlayerTeam() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetPlayerTeam(packet))))
+                }
+                ClientboundPlayEvent::SetScore() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetScore(packet))))
+                }
+                ClientboundPlayEvent::SetSimulationDistance() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetSimulationDistance(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::SetSubtitleText() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetSubtitleText(packet))))
+                }
+                ClientboundPlayEvent::SetTime() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetTime(packet))))
+                }
+                ClientboundPlayEvent::SetTitleAnimation() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetTitlesAnimation(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::SetTitleText() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetTitleText(packet))))
+                }
+                ClientboundPlayEvent::ShowDialog() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ShowDialog(packet))))
+                }
+                ClientboundPlayEvent::Sound() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Sound(packet))))
+                }
+                ClientboundPlayEvent::SoundEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SoundEntity(packet))))
+                }
+                ClientboundPlayEvent::StartConfiguration => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::StartConfiguration(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::StopSound() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::StopSound(packet))))
+                }
+                ClientboundPlayEvent::StoreCookie() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::StoreCookie(packet))))
+                }
+                ClientboundPlayEvent::SystemChat() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::SystemChat(packet))))
+                }
+                ClientboundPlayEvent::TabList() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::TabList(packet))))
+                }
+                ClientboundPlayEvent::TagQuery() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::TagQuery(packet))))
+                }
+                ClientboundPlayEvent::TakeItemEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::TakeItemEntity(packet))))
+                }
+                ClientboundPlayEvent::TeleportEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::TeleportEntity(packet))))
+                }
+                ClientboundPlayEvent::TestBlockStatus() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::TestInstanceBlockStatus(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::TickingState() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::TickingState(packet))))
+                }
+                ClientboundPlayEvent::TickingStep() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::TickingStep(packet))))
+                }
+                ClientboundPlayEvent::Transfer() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Transfer(packet))))
+                }
+                ClientboundPlayEvent::UpdateAdvancements() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::UpdateAdvancements(
+                        packet,
+                    ))))
+                }
+                ClientboundPlayEvent::UpdateAttributes() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::UpdateAttributes(packet))))
+                }
+                ClientboundPlayEvent::UpdateMobEffect() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::UpdateMobEffect(packet))))
+                }
+                ClientboundPlayEvent::UpdateRecipes() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::UpdateRecipes(packet))))
+                }
+                ClientboundPlayEvent::UpdateTags() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::UpdateTags(packet))))
+                }
+                ClientboundPlayEvent::Waypoint() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::Waypoint(packet))))
+                }
+            },
         }
     }
 
@@ -182,11 +801,13 @@ impl EventVersion for V26_1 {
                 LoginClientboundPackets::Hello(_packet) => Ok(Some(ClientboundEventEnum::Login(
                     ClientboundLoginEvent::EncryptionRequest(),
                 ))),
-                LoginClientboundPackets::LoginFinished(packet) => Ok(Some(
-                    ClientboundEventEnum::Login(ClientboundLoginEvent::Profile(packet.profile)),
-                )),
+                LoginClientboundPackets::LoginFinished(packet) => {
+                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::LoginFinshed(
+                        packet.profile,
+                    ))))
+                }
                 LoginClientboundPackets::CustomQuery(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::QueryRequest())))
+                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::CustomQuery())))
                 }
                 LoginClientboundPackets::CookieRequest(_packet) => {
                     Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::CookieRequest())))
@@ -200,7 +821,7 @@ impl EventVersion for V26_1 {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CookieRequest())))
                 }
                 ConfigClientboundPackets::CustomPayload(packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CustomQuery(
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CustomPayload(
                         packet.identifier,
                         packet.buffer,
                     ))))
@@ -220,9 +841,9 @@ impl EventVersion for V26_1 {
                 ConfigClientboundPackets::ResetChat(_) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ResetChat)))
                 }
-                ConfigClientboundPackets::RegistryData(_packet) => Ok(Some(
-                    ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateRegistries()),
-                )),
+                ConfigClientboundPackets::RegistryData(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::RegistryData())))
+                }
                 ConfigClientboundPackets::ResourcePackPop(_packet) => Ok(Some(
                     ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackPop()),
                 )),
@@ -230,25 +851,25 @@ impl EventVersion for V26_1 {
                     ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackPush()),
                 )),
                 ConfigClientboundPackets::StoreCookie(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CookieStore())))
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::StoreCookie())))
                 }
                 ConfigClientboundPackets::Transfer(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::TransferServer())))
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::Transfer())))
                 }
-                ConfigClientboundPackets::UpdateEnabledFeatures(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateFeatures())))
-                }
+                ConfigClientboundPackets::UpdateEnabledFeatures(_packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::EnabledFeatures()),
+                )),
                 ConfigClientboundPackets::UpdateTags(_packet) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateTags())))
                 }
                 ConfigClientboundPackets::SelectKnownPacks(packet) => {
                     Ok(Some(ClientboundEventEnum::Config(
-                        ClientboundConfigEvent::ResourcePackQuery(packet.known),
+                        ClientboundConfigEvent::KnownResourcePacks(packet.known),
                     )))
                 }
-                ConfigClientboundPackets::CustomReportDetails(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ReportDetails())))
-                }
+                ConfigClientboundPackets::CustomReportDetails(_packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::CustomReportDetails()),
+                )),
                 ConfigClientboundPackets::ServerLinks(_packet) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ServerLinks())))
                 }
@@ -263,150 +884,433 @@ impl EventVersion for V26_1 {
                 }
             },
 
-            #[expect(clippy::match_single_binding, reason = "WIP")]
             VersionPacket::Play(play) => match play {
-                // PlayClientboundPackets::BundleDelimiter(_packet) => todo!(),
-                // PlayClientboundPackets::AddEntity(_packet) => todo!(),
-                // PlayClientboundPackets::Animate(_packet) => todo!(),
-                // PlayClientboundPackets::AwardStats(_packet) => todo!(),
-                // PlayClientboundPackets::BlockChangedAck(_packet) => todo!(),
-                // PlayClientboundPackets::BlockDestruction(_packet) => todo!(),
-                // PlayClientboundPackets::BlockEntityData(_packet) => todo!(),
-                // PlayClientboundPackets::BlockEvent(_packet) => todo!(),
-                // PlayClientboundPackets::BlockUpdate(_packet) => todo!(),
-                // PlayClientboundPackets::BossEvent(_packet) => todo!(),
-                // PlayClientboundPackets::ChangeDifficulty(_packet) => todo!(),
-                // PlayClientboundPackets::ChunkBatchFinished(_packet) => todo!(),
-                // PlayClientboundPackets::ChunkBatchStart(_packet) => todo!(),
-                // PlayClientboundPackets::ChunksBiomes(_packet) => todo!(),
-                // PlayClientboundPackets::ClearTitles(_packet) => todo!(),
-                // PlayClientboundPackets::CommandSuggestions(_packet) => todo!(),
-                // PlayClientboundPackets::Commands(_packet) => todo!(),
-                // PlayClientboundPackets::ContainerClose(_packet) => todo!(),
-                // PlayClientboundPackets::ContainerSetContent(_packet) => todo!(),
-                // PlayClientboundPackets::ContainerSetData(_packet) => todo!(),
-                // PlayClientboundPackets::ContainerSetSlot(_packet) => todo!(),
-                // PlayClientboundPackets::CookieRequest(_packet) => todo!(),
-                // PlayClientboundPackets::Cooldown(_packet) => todo!(),
-                // PlayClientboundPackets::CustomChatCompletions(_packet) => todo!(),
-                // PlayClientboundPackets::CustomPayload(_packet) => todo!(),
-                // PlayClientboundPackets::DamageEvent(_packet) => todo!(),
-                // PlayClientboundPackets::DebugBlockValue(_packet) => todo!(),
-                // PlayClientboundPackets::DebugChunkValue(_packet) => todo!(),
-                // PlayClientboundPackets::DebugEntityValue(_packet) => todo!(),
-                // PlayClientboundPackets::DebugEvent(_packet) => todo!(),
-                // PlayClientboundPackets::DebugSample(_packet) => todo!(),
-                // PlayClientboundPackets::DeleteChat(_packet) => todo!(),
-                // PlayClientboundPackets::Disconnect(_packet) => todo!(),
-                // PlayClientboundPackets::DisguisedChat(_packet) => todo!(),
-                // PlayClientboundPackets::EntityEvent(_packet) => todo!(),
-                // PlayClientboundPackets::EntityPositionSync(_packet) => todo!(),
-                // PlayClientboundPackets::Explode(_packet) => todo!(),
-                // PlayClientboundPackets::ForgetLevelChunk(_packet) => todo!(),
-                // PlayClientboundPackets::GameEvent(_packet) => todo!(),
-                // PlayClientboundPackets::GameRuleValues(_packet) => todo!(),
-                // PlayClientboundPackets::GameTestHighlightPos(_packet) => todo!(),
-                // PlayClientboundPackets::MountScreenOpen(_packet) => todo!(),
-                // PlayClientboundPackets::HurtAnimation(_packet) => todo!(),
-                // PlayClientboundPackets::InitializeBorder(_packet) => todo!(),
-                // PlayClientboundPackets::KeepAlive(_packet) => todo!(),
-                // PlayClientboundPackets::LevelChunkWithLight(_packet) => todo!(),
-                // PlayClientboundPackets::LevelEvent(_packet) => todo!(),
-                // PlayClientboundPackets::LevelParticles(_packet) => todo!(),
-                // PlayClientboundPackets::LightUpdate(_packet) => todo!(),
-                // PlayClientboundPackets::Login(_packet) => todo!(),
-                // PlayClientboundPackets::LowDiskSpaceWarning(_packet) => todo!(),
-                // PlayClientboundPackets::MapItemData(_packet) => todo!(),
-                // PlayClientboundPackets::MerchantOffers(_packet) => todo!(),
-                // PlayClientboundPackets::MoveEntityPos(_packet) => todo!(),
-                // PlayClientboundPackets::MoveEntityPosRot(_packet) => todo!(),
-                // PlayClientboundPackets::MoveMinecartAlongTrack(_packet) => todo!(),
-                // PlayClientboundPackets::MoveEntityRot(_packet) => todo!(),
-                // PlayClientboundPackets::MoveVehicle(_packet) => todo!(),
-                // PlayClientboundPackets::OpenBook(_packet) => todo!(),
-                // PlayClientboundPackets::OpenScreen(_packet) => todo!(),
-                // PlayClientboundPackets::OpenSignEditor(_packet) => todo!(),
-                // PlayClientboundPackets::Ping(_packet) => todo!(),
-                // PlayClientboundPackets::PongResponse(_packet) => todo!(),
-                // PlayClientboundPackets::PlaceGhostRecipe(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerAbilities(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerChat(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerCombatEnd(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerCombatEnter(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerCombatKill(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerInfoRemove(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerInfoUpdate(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerLookAt(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerPosition(_packet) => todo!(),
-                // PlayClientboundPackets::PlayerRotation(_packet) => todo!(),
-                // PlayClientboundPackets::RecipeBookAdd(_packet) => todo!(),
-                // PlayClientboundPackets::RecipeBookRemove(_packet) => todo!(),
-                // PlayClientboundPackets::RecipeBookSettings(_packet) => todo!(),
-                // PlayClientboundPackets::RemoveEntities(_packet) => todo!(),
-                // PlayClientboundPackets::RemoveMobEffect(_packet) => todo!(),
-                // PlayClientboundPackets::ResetScore(_packet) => todo!(),
-                // PlayClientboundPackets::ResourcePackPop(_packet) => todo!(),
-                // PlayClientboundPackets::ResourcePackPush(_packet) => todo!(),
-                // PlayClientboundPackets::Respawn(_packet) => todo!(),
-                // PlayClientboundPackets::RotateHead(_packet) => todo!(),
-                // PlayClientboundPackets::SectionBlocksUpdate(_packet) => todo!(),
-                // PlayClientboundPackets::SelectAdvancementsTab(_packet) => todo!(),
-                // PlayClientboundPackets::ServerData(_packet) => todo!(),
-                // PlayClientboundPackets::SetActionBarText(_packet) => todo!(),
-                // PlayClientboundPackets::SetBorderCenter(_packet) => todo!(),
-                // PlayClientboundPackets::SetBorderLerpSize(_packet) => todo!(),
-                // PlayClientboundPackets::SetBorderSize(_packet) => todo!(),
-                // PlayClientboundPackets::SetBorderWarningDelay(_packet) => todo!(),
-                // PlayClientboundPackets::SetBorderWarningDistance(_packet) => todo!(),
-                // PlayClientboundPackets::SetCamera(_packet) => todo!(),
-                // PlayClientboundPackets::SetChunkCacheCenter(_packet) => todo!(),
-                // PlayClientboundPackets::SetChunkCacheRadius(_packet) => todo!(),
-                // PlayClientboundPackets::SetCursorItem(_packet) => todo!(),
-                // PlayClientboundPackets::SetDefaultSpawnPosition(_packet) => todo!(),
-                // PlayClientboundPackets::SetDisplayObjective(_packet) => todo!(),
-                // PlayClientboundPackets::SetEntityData(_packet) => todo!(),
-                // PlayClientboundPackets::SetEntityLink(_packet) => todo!(),
-                // PlayClientboundPackets::SetEntityMotion(_packet) => todo!(),
-                // PlayClientboundPackets::SetEquipment(_packet) => todo!(),
-                // PlayClientboundPackets::SetExperience(_packet) => todo!(),
-                // PlayClientboundPackets::SetHealth(_packet) => todo!(),
-                // PlayClientboundPackets::SetHeldSlot(_packet) => todo!(),
-                // PlayClientboundPackets::SetObjective(_packet) => todo!(),
-                // PlayClientboundPackets::SetPassengers(_packet) => todo!(),
-                // PlayClientboundPackets::SetPlayerInventory(_packet) => todo!(),
-                // PlayClientboundPackets::SetPlayerTeam(_packet) => todo!(),
-                // PlayClientboundPackets::SetScore(_packet) => todo!(),
-                // PlayClientboundPackets::SetSimulationDistance(_packet) => todo!(),
-                // PlayClientboundPackets::SetSubtitleText(_packet) => todo!(),
-                // PlayClientboundPackets::SetTime(_packet) => todo!(),
-                // PlayClientboundPackets::SetTitleText(_packet) => todo!(),
-                // PlayClientboundPackets::SetTitlesAnimation(_packet) => todo!(),
-                // PlayClientboundPackets::SoundEntity(_packet) => todo!(),
-                // PlayClientboundPackets::Sound(_packet) => todo!(),
-                // PlayClientboundPackets::StartConfiguration(_packet) => todo!(),
-                // PlayClientboundPackets::StopSound(_packet) => todo!(),
-                // PlayClientboundPackets::StoreCookie(_packet) => todo!(),
-                // PlayClientboundPackets::SystemChat(_packet) => todo!(),
-                // PlayClientboundPackets::TabList(_packet) => todo!(),
-                // PlayClientboundPackets::TagQuery(_packet) => todo!(),
-                // PlayClientboundPackets::TakeItemEntity(_packet) => todo!(),
-                // PlayClientboundPackets::TeleportEntity(_packet) => todo!(),
-                // PlayClientboundPackets::TestInstanceBlockStatus(_packet) => todo!(),
-                // PlayClientboundPackets::TickingState(_packet) => todo!(),
-                // PlayClientboundPackets::TickingStep(_packet) => todo!(),
-                // PlayClientboundPackets::Transfer(_packet) => todo!(),
-                // PlayClientboundPackets::UpdateAdvancements(_packet) => todo!(),
-                // PlayClientboundPackets::UpdateAttributes(_packet) => todo!(),
-                // PlayClientboundPackets::UpdateMobEffect(_packet) => todo!(),
-                // PlayClientboundPackets::UpdateRecipes(_packet) => todo!(),
-                // PlayClientboundPackets::UpdateTags(_packet) => todo!(),
-                // PlayClientboundPackets::ProjectilePower(_packet) => todo!(),
-                // PlayClientboundPackets::CustomReportDetails(_packet) => todo!(),
-                // PlayClientboundPackets::ServerLinks(_packet) => todo!(),
-                // PlayClientboundPackets::Waypoint(_packet) => todo!(),
-                // PlayClientboundPackets::ClearDialog(_packet) => todo!(),
-                // PlayClientboundPackets::ShowDialog(_packet) => todo!(),
-                _ => Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Placeholder))),
+                PlayClientboundPackets::BundleDelimiter(_) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BundleDelimiter)))
+                }
+                PlayClientboundPackets::AddEntity(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::AddEntity())))
+                }
+                PlayClientboundPackets::Animate(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Animate())))
+                }
+                PlayClientboundPackets::AwardStats(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::AwardStats())))
+                }
+                PlayClientboundPackets::BlockChangedAck(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockChangedAck())))
+                }
+                PlayClientboundPackets::BlockDestruction(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockDestruction())))
+                }
+                PlayClientboundPackets::BlockEntityData(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockEntityData())))
+                }
+                PlayClientboundPackets::BlockEvent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockEvent())))
+                }
+                PlayClientboundPackets::BlockUpdate(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BlockUpdate())))
+                }
+                PlayClientboundPackets::BossEvent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BossEvent())))
+                }
+                PlayClientboundPackets::ChangeDifficulty(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChangeDifficulty())))
+                }
+                PlayClientboundPackets::ChunkBatchFinished(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBatchFinished())))
+                }
+                PlayClientboundPackets::ChunkBatchStart(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBatchStart())))
+                }
+                PlayClientboundPackets::ChunksBiomes(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBiomes())))
+                }
+                PlayClientboundPackets::ClearTitles(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ClearTitles())))
+                }
+                PlayClientboundPackets::CommandSuggestions(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::CommandSuggestions())))
+                }
+                PlayClientboundPackets::Commands(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Commands())))
+                }
+                PlayClientboundPackets::ContainerClose(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ContainerClose())))
+                }
+                PlayClientboundPackets::ContainerSetContent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ContainerContent())))
+                }
+                PlayClientboundPackets::ContainerSetData(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ContainerData())))
+                }
+                PlayClientboundPackets::ContainerSetSlot(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ContainerSlot())))
+                }
+                PlayClientboundPackets::CookieRequest(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::CookieRequest())))
+                }
+                PlayClientboundPackets::Cooldown(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Cooldown())))
+                }
+                PlayClientboundPackets::CustomChatCompletions(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChatSuggestions())))
+                }
+                PlayClientboundPackets::CustomPayload(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::CustomPayload(
+                        packet.identifier,
+                        packet.buffer,
+                    ))))
+                }
+                PlayClientboundPackets::DamageEvent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DamageEvent())))
+                }
+                PlayClientboundPackets::DebugBlockValue(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DebugBlock())))
+                }
+                PlayClientboundPackets::DebugChunkValue(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight())))
+                }
+                PlayClientboundPackets::DebugEntityValue(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DebugEntity())))
+                }
+                PlayClientboundPackets::DebugEvent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DebugEvent())))
+                }
+                PlayClientboundPackets::DebugSample(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DebugSample())))
+                }
+                PlayClientboundPackets::DeleteChat(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DeleteChat())))
+                }
+                PlayClientboundPackets::Disconnect(packet) => Ok(Some(ClientboundEventEnum::Play(
+                    ClientboundPlayEvent::Disconnect(packet.reason),
+                ))),
+                PlayClientboundPackets::DisguisedChat(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DisguisedChat())))
+                }
+                PlayClientboundPackets::EntityEvent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::EntityEvent())))
+                }
+                PlayClientboundPackets::EntityPositionSync(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::EntityPosition())))
+                }
+                PlayClientboundPackets::Explode(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Explode())))
+                }
+                PlayClientboundPackets::ForgetLevelChunk(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ForgetChunk())))
+                }
+                PlayClientboundPackets::GameEvent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::GameEvent())))
+                }
+                PlayClientboundPackets::GameRuleValues(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::GameRule())))
+                }
+                PlayClientboundPackets::GameTestHighlightPos(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::GameTestHighlight())))
+                }
+                PlayClientboundPackets::MountScreenOpen(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MountScreen())))
+                }
+                PlayClientboundPackets::HurtAnimation(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::HurtAnimation())))
+                }
+                PlayClientboundPackets::InitializeBorder(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::InitializeBorder())))
+                }
+                PlayClientboundPackets::KeepAlive(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::KeepAlive(packet.id))))
+                }
+                PlayClientboundPackets::LevelChunkWithLight(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight())))
+                }
+                PlayClientboundPackets::LevelEvent(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LevelEvent())))
+                }
+                PlayClientboundPackets::LevelParticles(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LevelParticles())))
+                }
+                PlayClientboundPackets::LightUpdate(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LightUpdate())))
+                }
+                PlayClientboundPackets::Login(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Login())))
+                }
+                PlayClientboundPackets::LowDiskSpaceWarning(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DiskSpaceWarning())))
+                }
+                PlayClientboundPackets::MapItemData(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MapItemData())))
+                }
+                PlayClientboundPackets::MerchantOffers(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MerchantOffers())))
+                }
+                PlayClientboundPackets::MoveEntityPos(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPos())))
+                }
+                PlayClientboundPackets::MoveEntityPosRot(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPosRot())))
+                }
+                PlayClientboundPackets::MoveMinecartAlongTrack(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityPosRot())))
+                }
+                PlayClientboundPackets::MoveEntityRot(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveEntityRot())))
+                }
+                PlayClientboundPackets::MoveVehicle(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::MoveVehicle())))
+                }
+                PlayClientboundPackets::OpenBook(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::OpenBook())))
+                }
+                PlayClientboundPackets::OpenScreen(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::OpenScreen())))
+                }
+                PlayClientboundPackets::OpenSignEditor(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::OpenSignEditor())))
+                }
+                PlayClientboundPackets::Ping(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Ping(packet.id))))
+                }
+                PlayClientboundPackets::PongResponse(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Pong(packet.id))))
+                }
+                PlayClientboundPackets::PlaceGhostRecipe(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::GhostRecipe())))
+                }
+                PlayClientboundPackets::PlayerAbilities(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerAbilities())))
+                }
+                PlayClientboundPackets::PlayerChat(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerChat())))
+                }
+                PlayClientboundPackets::PlayerCombatEnd(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerCombatEnd())))
+                }
+                PlayClientboundPackets::PlayerCombatEnter(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerCombatEnter())))
+                }
+                PlayClientboundPackets::PlayerCombatKill(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerCombatKill())))
+                }
+                PlayClientboundPackets::PlayerInfoRemove(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerInfoRemove())))
+                }
+                PlayClientboundPackets::PlayerInfoUpdate(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerInfoUpdate())))
+                }
+                PlayClientboundPackets::PlayerLookAt(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerLookAt())))
+                }
+                PlayClientboundPackets::PlayerPosition(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerPosition())))
+                }
+                PlayClientboundPackets::PlayerRotation(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::PlayerRotation())))
+                }
+                PlayClientboundPackets::RecipeBookAdd(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RecipeBookAdd())))
+                }
+                PlayClientboundPackets::RecipeBookRemove(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RecipeBookRemove())))
+                }
+                PlayClientboundPackets::RecipeBookSettings(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RecipeBookSettings())))
+                }
+                PlayClientboundPackets::RemoveEntities(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RemoveEntities())))
+                }
+                PlayClientboundPackets::RemoveMobEffect(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RemoveMobEffect())))
+                }
+                PlayClientboundPackets::ResetScore(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ResetScore())))
+                }
+                PlayClientboundPackets::ResourcePackPop(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ResourcePackPop())))
+                }
+                PlayClientboundPackets::ResourcePackPush(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ResourcePackPush())))
+                }
+                PlayClientboundPackets::Respawn(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Respawn())))
+                }
+                PlayClientboundPackets::RotateHead(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RotateHead())))
+                }
+                PlayClientboundPackets::SectionBlocksUpdate(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkSectionUpdate())))
+                }
+                PlayClientboundPackets::SelectAdvancementsTab(_packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::SelectAdvancementTab()),
+                )),
+                PlayClientboundPackets::ServerData(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ServerData())))
+                }
+                PlayClientboundPackets::SetActionBarText(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ActionBarText())))
+                }
+                PlayClientboundPackets::SetBorderCenter(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetBorderCenter())))
+                }
+                PlayClientboundPackets::SetBorderLerpSize(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetBorderLerpSize())))
+                }
+                PlayClientboundPackets::SetBorderSize(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetBorderSize())))
+                }
+                PlayClientboundPackets::SetBorderWarningDelay(_packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::SetBorderWarningDelay()),
+                )),
+                PlayClientboundPackets::SetBorderWarningDistance(_packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::SetBorderWarningDistance()),
+                )),
+                PlayClientboundPackets::SetCamera(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetCamera())))
+                }
+                PlayClientboundPackets::SetChunkCacheCenter(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkCacheCenter())))
+                }
+                PlayClientboundPackets::SetChunkCacheRadius(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkCacheRadius())))
+                }
+                PlayClientboundPackets::SetCursorItem(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetCursorItem())))
+                }
+                PlayClientboundPackets::SetDefaultSpawnPosition(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetDefaultSpawn())))
+                }
+                PlayClientboundPackets::SetDisplayObjective(_packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::SetDisplayObjective()),
+                )),
+                PlayClientboundPackets::SetEntityData(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityData())))
+                }
+                PlayClientboundPackets::SetEntityLink(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityLink())))
+                }
+                PlayClientboundPackets::SetEntityMotion(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityMotion())))
+                }
+                PlayClientboundPackets::SetEquipment(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEquipment())))
+                }
+                PlayClientboundPackets::SetExperience(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetExperience())))
+                }
+                PlayClientboundPackets::SetHealth(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetHealth())))
+                }
+                PlayClientboundPackets::SetHeldSlot(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetHeldSlot())))
+                }
+                PlayClientboundPackets::SetObjective(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetObjective())))
+                }
+                PlayClientboundPackets::SetPassengers(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetPassengers())))
+                }
+                PlayClientboundPackets::SetPlayerInventory(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetPlayerInventory())))
+                }
+                PlayClientboundPackets::SetPlayerTeam(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetPlayerTeam())))
+                }
+                PlayClientboundPackets::SetScore(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetScore())))
+                }
+                PlayClientboundPackets::SetSimulationDistance(_packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::SetSimulationDistance()),
+                )),
+                PlayClientboundPackets::SetSubtitleText(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetSubtitleText())))
+                }
+                PlayClientboundPackets::SetTime(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetTime())))
+                }
+                PlayClientboundPackets::SetTitleText(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetTitleText())))
+                }
+                PlayClientboundPackets::SetTitlesAnimation(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetTitleAnimation())))
+                }
+                PlayClientboundPackets::SoundEntity(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SoundEntity())))
+                }
+                PlayClientboundPackets::Sound(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Sound())))
+                }
+                PlayClientboundPackets::StartConfiguration(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::StartConfiguration)))
+                }
+                PlayClientboundPackets::StopSound(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::StopSound())))
+                }
+                PlayClientboundPackets::StoreCookie(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::StoreCookie())))
+                }
+                PlayClientboundPackets::SystemChat(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SystemChat())))
+                }
+                PlayClientboundPackets::TabList(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TabList())))
+                }
+                PlayClientboundPackets::TagQuery(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TagQuery())))
+                }
+                PlayClientboundPackets::TakeItemEntity(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TakeItemEntity())))
+                }
+                PlayClientboundPackets::TeleportEntity(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TeleportEntity())))
+                }
+                PlayClientboundPackets::TestInstanceBlockStatus(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TestBlockStatus())))
+                }
+                PlayClientboundPackets::TickingState(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TickingState())))
+                }
+                PlayClientboundPackets::TickingStep(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::TickingStep())))
+                }
+                PlayClientboundPackets::Transfer(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Transfer())))
+                }
+                PlayClientboundPackets::UpdateAdvancements(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::UpdateAdvancements())))
+                }
+                PlayClientboundPackets::UpdateAttributes(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::UpdateAttributes())))
+                }
+                PlayClientboundPackets::UpdateMobEffect(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::UpdateMobEffect())))
+                }
+                PlayClientboundPackets::UpdateRecipes(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::UpdateRecipes())))
+                }
+                PlayClientboundPackets::UpdateTags(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::UpdateTags())))
+                }
+                PlayClientboundPackets::ProjectilePower(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ProjectilePower())))
+                }
+                PlayClientboundPackets::CustomReportDetails(_packet) => Ok(Some(
+                    ClientboundEventEnum::Play(ClientboundPlayEvent::CustomReportDetails()),
+                )),
+                PlayClientboundPackets::ServerLinks(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ServerLinks())))
+                }
+                PlayClientboundPackets::Waypoint(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Waypoint())))
+                }
+                PlayClientboundPackets::ClearDialog(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ClearDialog)))
+                }
+                PlayClientboundPackets::ShowDialog(_packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ShowDialog())))
+                }
             },
         }
     }
@@ -464,7 +1368,7 @@ impl EventVersion for V26_1 {
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::KeepAlive(packet))))
                 }
                 ServerboundConfigEvent::Pong(id) => {
-                    let packet = PongC2SPacket { id };
+                    let packet = ConfigPongC2SPacket { id };
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::Pong(packet))))
                 }
                 ServerboundConfigEvent::ResourcePackResponse(selected) => {

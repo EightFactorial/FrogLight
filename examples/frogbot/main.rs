@@ -122,8 +122,28 @@ impl BotPlugin {
             match message.event() {
                 // Handle gameplay events.
                 ClientboundEventEnum::Play(event) => match event {
-                    ClientboundPlayEvent::Placeholder => info!("Received <placeholder>"),
-                    other => info!("Received unhandled play event: {other:?}"),
+                    ClientboundPlayEvent::Disconnect(reason) => {
+                        error!("Disconnected from server: {reason:?}");
+                        commands.write_message(AppExit::Success);
+                    }
+                    ClientboundPlayEvent::KeepAlive(id) => {
+                        info!("Received KeepAlive ({id})");
+                        // writer.write(ServerboundMessage::new(
+                        //     bot.id(),
+                        //     ServerboundPlayEvent::KeepAlive(*id),
+                        // ));
+                    }
+                    ClientboundPlayEvent::Ping(id) => {
+                        info!("Received Ping ({id})");
+                        // writer.write(ServerboundMessage::new(
+                        //     bot.id(),
+                        //     ServerboundPlayEvent::Pong(*id),
+                        // ));
+                    }
+                    ClientboundPlayEvent::Pong(id) => {
+                        info!("Received Pong ({id})");
+                    }
+                    other => debug!("Received unhandled play event: {other:?}"),
                 },
 
                 // Handle configuration events.
@@ -132,7 +152,7 @@ impl BotPlugin {
                         error!("Disconnected from server: {reason:?}");
                         commands.write_message(AppExit::error());
                     }
-                    ClientboundConfigEvent::TransferServer() => {
+                    ClientboundConfigEvent::Transfer() => {
                         error!("Received transfer server event!");
                         error!("Did you attempt to login to a BungeeCord/Velocity proxy?");
                         commands.write_message(AppExit::error());
@@ -154,7 +174,7 @@ impl BotPlugin {
                     ClientboundConfigEvent::ResetChat => {
                         info!("Received ResetChat");
                     }
-                    ClientboundConfigEvent::ResourcePackQuery(known) => {
+                    ClientboundConfigEvent::KnownResourcePacks(known) => {
                         info!("Received ResourcePackQuery: {known:#?}");
                         writer.write(ServerboundMessage::new(
                             bot.id(),
@@ -167,10 +187,10 @@ impl BotPlugin {
                     ClientboundConfigEvent::ResourcePackPop() => {
                         info!("Received ResourcePackPop: <placeholder>");
                     }
-                    ClientboundConfigEvent::UpdateRegistries() => {
+                    ClientboundConfigEvent::RegistryData() => {
                         info!("Received UpdateRegistries: <placeholder>");
                     }
-                    ClientboundConfigEvent::UpdateFeatures() => {
+                    ClientboundConfigEvent::EnabledFeatures() => {
                         info!("Received UpdateFeatures: <placeholder>");
                     }
                     ClientboundConfigEvent::UpdateTags() => {
@@ -186,10 +206,10 @@ impl BotPlugin {
                             ServerboundConfigEvent::AcceptCodeOfConduct,
                         ));
                     }
-                    ClientboundConfigEvent::ReportDetails() => {
+                    ClientboundConfigEvent::CustomReportDetails() => {
                         info!("Received ReportDetails: <placeholder>");
                     }
-                    ClientboundConfigEvent::CustomQuery(identifier, _) => {
+                    ClientboundConfigEvent::CustomPayload(identifier, _) => {
                         info!("Received CustomQuery: \"{identifier}\"");
 
                         // Use this as the trigger to send the client information packet
@@ -206,7 +226,7 @@ impl BotPlugin {
                     ClientboundConfigEvent::CookieRequest() => {
                         info!("Received CookieRequest: <placeholder>");
                     }
-                    ClientboundConfigEvent::CookieStore() => {
+                    ClientboundConfigEvent::StoreCookie() => {
                         info!("Received CookieStore: <placeholder>");
                     }
                     ClientboundConfigEvent::ShowDialog() => {
@@ -236,13 +256,13 @@ impl BotPlugin {
                         error!("Did you attempt to login to an online-mode server?");
                         commands.write_message(AppExit::error());
                     }
-                    ClientboundLoginEvent::QueryRequest() => {
+                    ClientboundLoginEvent::CustomQuery() => {
                         info!("Received QueryRequest: <placeholder>");
                     }
                     ClientboundLoginEvent::CookieRequest() => {
                         info!("Received CookieRequest: <placeholder>");
                     }
-                    ClientboundLoginEvent::Profile(profile) => {
+                    ClientboundLoginEvent::LoginFinshed(profile) => {
                         info!(
                             "Logged in as \"{}\" ({})!",
                             profile.username(),

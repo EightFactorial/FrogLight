@@ -417,7 +417,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
                 } else {
                     tracing::warn!(
                         target: "froglight_network",
-                        "Bytes remaining after reading packet `{}`: {}", T::SHAPE.type_name(), rem.len()
+                        "Bytes remaining after reading packet: {}", rem.len()
                     );
                 }
             }
