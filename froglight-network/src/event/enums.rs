@@ -245,8 +245,8 @@ pub enum ClientboundConfigEvent {
     CodeOfConduct(),
     CustomReportDetails(),
     CustomPayload(Identifier<'static>, UnsizedBuffer<'static>),
-    CookieRequest(),
-    StoreCookie(),
+    CookieRequest(Identifier<'static>),
+    StoreCookie(Identifier<'static>, Vec<u8>),
     ShowDialog(),
     ClearDialog,
     FinishConfig,
@@ -264,8 +264,8 @@ pub enum ServerboundConfigEvent {
     ResourcePackResponse(Vec<KnownResourcePack>),
     ResourcePackUpdate(),
     AcceptCodeOfConduct,
-    CustomQuery(Identifier<'static>, UnsizedBuffer<'static>),
-    CookieResponse(),
+    CustomPayload(Identifier<'static>, UnsizedBuffer<'static>),
+    CookieResponse(Identifier<'static>, Option<Vec<u8>>),
     DialogAction(),
     AcknowledgeConfig,
 }
@@ -280,9 +280,9 @@ pub enum ServerboundConfigEvent {
 pub enum ClientboundLoginEvent {
     Disconnect(String),
     EncryptionRequest(),
-    CustomQuery(),
-    CookieRequest(),
-    LoginFinshed(PlayerProfile),
+    CustomPayload(u32, Identifier<'static>, UnsizedBuffer<'static>),
+    CookieRequest(Identifier<'static>),
+    LoginFinished(PlayerProfile),
 }
 
 #[repr(u8)]
@@ -293,8 +293,8 @@ pub enum ClientboundLoginEvent {
 pub enum ServerboundLoginEvent {
     Hello(LoginHelloContent),
     EncryptionResponse(),
-    QueryResponse(),
-    Cookieresponse(),
+    CustomPayload(u32, Option<UnsizedBuffer<'static>>),
+    CookieResponse(Identifier<'static>, Option<Vec<u8>>),
     AcknowledgeLogin,
 }
 

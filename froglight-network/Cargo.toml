@@ -46,7 +46,7 @@ bevy_ecs = { features = ["bevy_reflect", "std"], workspace = true, optional = tr
 bevy_reflect = { features = ["std"], workspace = true, optional = true }
 bevy_tasks = { features = ["async-io"], workspace = true, optional = true }
 futures-lite = { features = ["std"], workspace = true, optional = true }
-tokio = { features = ["io-util", "net"], workspace = true, optional = true }
+tokio = { features = ["io-util", "net", "time"], workspace = true, optional = true }
 tracing = { features = ["std"], workspace = true, optional = true }
 
 # --- Features ---

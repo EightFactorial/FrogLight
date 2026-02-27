@@ -5,6 +5,8 @@
 #[cfg(feature = "facet")]
 use facet_minecraft as mc;
 
+use crate::common::unsized_buffer::UnsizedBuffer;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
@@ -12,5 +14,5 @@ use facet_minecraft as mc;
 pub struct CustomQueryAnswerC2SPacket {
     #[cfg_attr(feature = "facet", facet(mc::variable))]
     pub query_id: u32,
-    pub payload: Option<()>,
+    pub payload: Option<UnsizedBuffer<'static>>,
 }

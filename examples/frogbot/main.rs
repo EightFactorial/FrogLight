@@ -126,6 +126,10 @@ impl BotPlugin {
                         error!("Disconnected from server: {reason:?}");
                         commands.write_message(AppExit::Success);
                     }
+
+                    ClientboundPlayEvent::CustomPayload(identifier, _) => {
+                        info!("Received CustomPayload: \"{identifier}\"");
+                    }
                     ClientboundPlayEvent::KeepAlive(id) => {
                         info!("Received KeepAlive ({id})");
                         // writer.write(ServerboundMessage::new(
@@ -143,6 +147,7 @@ impl BotPlugin {
                     ClientboundPlayEvent::Pong(id) => {
                         info!("Received Pong ({id})");
                     }
+
                     other => debug!("Received unhandled play event: {other:?}"),
                 },
 
@@ -223,11 +228,15 @@ impl BotPlugin {
                             ));
                         }
                     }
-                    ClientboundConfigEvent::CookieRequest() => {
-                        info!("Received CookieRequest: <placeholder>");
+                    ClientboundConfigEvent::CookieRequest(identifier) => {
+                        info!("Received CookieRequest: \"{identifier}\"");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundConfigEvent::CookieResponse(identifier.clone(), None),
+                        ));
                     }
-                    ClientboundConfigEvent::StoreCookie() => {
-                        info!("Received CookieStore: <placeholder>");
+                    ClientboundConfigEvent::StoreCookie(identifier, payload) => {
+                        info!("Received CookieStore \"{identifier}\": {payload:?}");
                     }
                     ClientboundConfigEvent::ShowDialog() => {
                         info!("Received ShowDialog: <placeholder>");
@@ -256,13 +265,21 @@ impl BotPlugin {
                         error!("Did you attempt to login to an online-mode server?");
                         commands.write_message(AppExit::error());
                     }
-                    ClientboundLoginEvent::CustomQuery() => {
-                        info!("Received QueryRequest: <placeholder>");
+                    ClientboundLoginEvent::CustomPayload(id, identifier, _) => {
+                        info!("Received CustomPayload: \"{identifier}\"");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundLoginEvent::CustomPayload(*id, None),
+                        ));
                     }
-                    ClientboundLoginEvent::CookieRequest() => {
-                        info!("Received CookieRequest: <placeholder>");
+                    ClientboundLoginEvent::CookieRequest(identifier) => {
+                        info!("Received CookieRequest: \"{identifier}\"");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundLoginEvent::CookieResponse(identifier.clone(), None),
+                        ));
                     }
-                    ClientboundLoginEvent::LoginFinshed(profile) => {
+                    ClientboundLoginEvent::LoginFinished(profile) => {
                         info!(
                             "Logged in as \"{}\" ({})!",
                             profile.username(),

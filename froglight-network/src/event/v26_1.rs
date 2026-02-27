@@ -8,6 +8,7 @@ use froglight_packet::{
         configuration::{
             ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
             ClientboundPackets as ConfigClientboundPackets,
+            CookieResponseC2SPacket as ConfigCookieResponseC2SPacket,
             CustomPayloadC2SPacket as ConfigCustomPayloadC2SPacket,
             CustomPayloadS2CPacket as ConfigCustomPayloadS2CPacket,
             DisconnectS2CPacket as ConfigDisconnectS2CPacket, FinishConfigurationC2SPacket,
@@ -15,11 +16,15 @@ use froglight_packet::{
             KeepAliveS2CPacket as ConfigKeepAliveS2CPacket, PingS2CPacket,
             PongC2SPacket as ConfigPongC2SPacket, SelectKnownPacksC2SPacket,
             SelectKnownPacksS2CPacket, ServerboundPackets as ConfigServerboundPackets,
+            StoreCookieS2CPacket as ConfigStoreCookieS2CPacket,
         },
         handshake::{IntentionC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
         login::{
-            ClientboundPackets as LoginClientboundPackets, HelloC2SPacket,
-            LoginAcknowledgedC2SPacket, LoginDisconnectS2CPacket, LoginFinishedS2CPacket,
+            ClientboundPackets as LoginClientboundPackets,
+            CookieRequestS2CPacket as LoginCookieRequestS2CPacket,
+            CookieResponseC2SPacket as LoginCookieResponseC2SPacket, CustomQueryAnswerC2SPacket,
+            CustomQueryS2CPacket, HelloC2SPacket, LoginAcknowledgedC2SPacket,
+            LoginDisconnectS2CPacket, LoginFinishedS2CPacket,
             ServerboundPackets as LoginServerboundPackets,
         },
         play::{
@@ -63,15 +68,15 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::Hello(packet))))
                 }
-                ClientboundLoginEvent::CustomQuery() => {
-                    let packet = todo!();
+                ClientboundLoginEvent::CustomPayload(query_id, identifier, payload) => {
+                    let packet = CustomQueryS2CPacket { query_id, identifier, payload };
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::CustomQuery(packet))))
                 }
-                ClientboundLoginEvent::CookieRequest() => {
-                    let packet = todo!();
+                ClientboundLoginEvent::CookieRequest(identifier) => {
+                    let packet = LoginCookieRequestS2CPacket { cookie: identifier };
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::CookieRequest(packet))))
                 }
-                ClientboundLoginEvent::LoginFinshed(event) => {
+                ClientboundLoginEvent::LoginFinished(event) => {
                     let packet = LoginFinishedS2CPacket::new(event);
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::LoginFinished(packet))))
                 }
@@ -147,12 +152,12 @@ impl EventVersion for V26_1 {
                     let packet = ConfigCustomPayloadS2CPacket { identifier, buffer };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CustomPayload(packet))))
                 }
-                ClientboundConfigEvent::CookieRequest() => {
+                ClientboundConfigEvent::CookieRequest(identifier) => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::CookieRequest(packet))))
                 }
-                ClientboundConfigEvent::StoreCookie() => {
-                    let packet = todo!();
+                ClientboundConfigEvent::StoreCookie(cookie, payload) => {
+                    let packet = ConfigStoreCookieS2CPacket { cookie, payload };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::StoreCookie(packet))))
                 }
                 ClientboundConfigEvent::ShowDialog() => {
@@ -802,23 +807,31 @@ impl EventVersion for V26_1 {
                     ClientboundLoginEvent::EncryptionRequest(),
                 ))),
                 LoginClientboundPackets::LoginFinished(packet) => {
-                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::LoginFinshed(
+                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::LoginFinished(
                         packet.profile,
                     ))))
                 }
-                LoginClientboundPackets::CustomQuery(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::CustomQuery())))
+                LoginClientboundPackets::CustomQuery(packet) => {
+                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::CustomPayload(
+                        packet.query_id,
+                        packet.identifier,
+                        packet.payload,
+                    ))))
                 }
-                LoginClientboundPackets::CookieRequest(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::CookieRequest())))
+                LoginClientboundPackets::CookieRequest(packet) => {
+                    Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::CookieRequest(
+                        packet.cookie,
+                    ))))
                 }
 
                 LoginClientboundPackets::LoginCompression(_) => Ok(None),
             },
 
             VersionPacket::Config(config) => match config {
-                ConfigClientboundPackets::CookieRequest(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CookieRequest())))
+                ConfigClientboundPackets::CookieRequest(packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CookieRequest(
+                        packet.cookie,
+                    ))))
                 }
                 ConfigClientboundPackets::CustomPayload(packet) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::CustomPayload(
@@ -850,8 +863,11 @@ impl EventVersion for V26_1 {
                 ConfigClientboundPackets::ResourcePackPush(_packet) => Ok(Some(
                     ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackPush()),
                 )),
-                ConfigClientboundPackets::StoreCookie(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::StoreCookie())))
+                ConfigClientboundPackets::StoreCookie(packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::StoreCookie(
+                        packet.cookie,
+                        packet.payload,
+                    ))))
                 }
                 ConfigClientboundPackets::Transfer(_packet) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::Transfer())))
@@ -1338,22 +1354,19 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Login(LoginServerboundPackets::Key(packet))))
                 }
-                ServerboundLoginEvent::QueryResponse() => {
-                    let packet = todo!();
+                ServerboundLoginEvent::CustomPayload(query_id, payload) => {
+                    let packet = CustomQueryAnswerC2SPacket { query_id, payload };
                     Ok(Some(VersionPacket::Login(LoginServerboundPackets::CustomQueryAnswer(
                         packet,
                     ))))
                 }
-                ServerboundLoginEvent::Cookieresponse() => {
-                    let packet = todo!();
+                ServerboundLoginEvent::CookieResponse(cookie, payload) => {
+                    let packet = LoginCookieResponseC2SPacket { cookie, payload };
                     Ok(Some(VersionPacket::Login(LoginServerboundPackets::CookieResponse(packet))))
                 }
-                ServerboundLoginEvent::AcknowledgeLogin => {
-                    let packet = LoginAcknowledgedC2SPacket;
-                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::LoginAcknowledged(
-                        packet,
-                    ))))
-                }
+                ServerboundLoginEvent::AcknowledgeLogin => Ok(Some(VersionPacket::Login(
+                    LoginServerboundPackets::LoginAcknowledged(LoginAcknowledgedC2SPacket),
+                ))),
             },
 
             ServerboundEventEnum::Config(config) => match config {
@@ -1387,12 +1400,12 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ServerboundConfigEvent::CustomQuery(identifier, buffer) => {
+                ServerboundConfigEvent::CustomPayload(identifier, buffer) => {
                     let packet = ConfigCustomPayloadC2SPacket { identifier, buffer };
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::CustomPayload(packet))))
                 }
-                ServerboundConfigEvent::CookieResponse() => {
-                    let packet = todo!();
+                ServerboundConfigEvent::CookieResponse(cookie, payload) => {
+                    let packet = ConfigCookieResponseC2SPacket { cookie, payload };
                     Ok(Some(VersionPacket::Config(ConfigServerboundPackets::CookieResponse(
                         packet,
                     ))))
@@ -1433,56 +1446,65 @@ impl EventVersion for V26_1 {
                 LoginServerboundPackets::Key(_packet) => Ok(Some(ServerboundEventEnum::Login(
                     ServerboundLoginEvent::EncryptionResponse(),
                 ))),
-                LoginServerboundPackets::CustomQueryAnswer(_packet) => {
-                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::QueryResponse())))
+                LoginServerboundPackets::CustomQueryAnswer(packet) => {
+                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::CustomPayload(
+                        packet.query_id,
+                        packet.payload,
+                    ))))
                 }
                 LoginServerboundPackets::LoginAcknowledged(_) => {
                     Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::AcknowledgeLogin)))
                 }
-                LoginServerboundPackets::CookieResponse(_packet) => {
-                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::Cookieresponse())))
+                LoginServerboundPackets::CookieResponse(packet) => {
+                    Ok(Some(ServerboundEventEnum::Login(ServerboundLoginEvent::CookieResponse(
+                        packet.cookie,
+                        packet.payload,
+                    ))))
                 }
             },
 
-            VersionPacket::Config(config) => match config {
-                ConfigServerboundPackets::ClientInformation(packet) => {
-                    Ok(Some(ServerboundEventEnum::Config(
-                        ServerboundConfigEvent::ClientInformation(packet.information),
-                    )))
+            VersionPacket::Config(config) => {
+                match config {
+                    ConfigServerboundPackets::ClientInformation(packet) => {
+                        Ok(Some(ServerboundEventEnum::Config(
+                            ServerboundConfigEvent::ClientInformation(packet.information),
+                        )))
+                    }
+                    ConfigServerboundPackets::CookieResponse(packet) => {
+                        Ok(Some(ServerboundEventEnum::Config(
+                            ServerboundConfigEvent::CookieResponse(packet.cookie, packet.payload),
+                        )))
+                    }
+                    ConfigServerboundPackets::CustomPayload(packet) => {
+                        Ok(Some(ServerboundEventEnum::Config(
+                            ServerboundConfigEvent::CustomPayload(packet.identifier, packet.buffer),
+                        )))
+                    }
+                    ConfigServerboundPackets::FinishConfiguration(_) => Ok(Some(
+                        ServerboundEventEnum::Config(ServerboundConfigEvent::AcknowledgeConfig),
+                    )),
+                    ConfigServerboundPackets::KeepAlive(packet) => Ok(Some(
+                        ServerboundEventEnum::Config(ServerboundConfigEvent::KeepAlive(packet.id)),
+                    )),
+                    ConfigServerboundPackets::Pong(packet) => Ok(Some(
+                        ServerboundEventEnum::Config(ServerboundConfigEvent::Pong(packet.id)),
+                    )),
+                    ConfigServerboundPackets::ResourcePack(_packet) => Ok(Some(
+                        ServerboundEventEnum::Config(ServerboundConfigEvent::ResourcePackUpdate()),
+                    )),
+                    ConfigServerboundPackets::SelectKnownPacks(packet) => {
+                        Ok(Some(ServerboundEventEnum::Config(
+                            ServerboundConfigEvent::ResourcePackResponse(packet.selected),
+                        )))
+                    }
+                    ConfigServerboundPackets::CustomClickAction(_packet) => Ok(Some(
+                        ServerboundEventEnum::Config(ServerboundConfigEvent::DialogAction()),
+                    )),
+                    ConfigServerboundPackets::AcceptCodeOfConduct(_) => Ok(Some(
+                        ServerboundEventEnum::Config(ServerboundConfigEvent::AcceptCodeOfConduct),
+                    )),
                 }
-                ConfigServerboundPackets::CookieResponse(_packet) => {
-                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::CookieResponse())))
-                }
-                ConfigServerboundPackets::CustomPayload(packet) => {
-                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::CustomQuery(
-                        packet.identifier,
-                        packet.buffer,
-                    ))))
-                }
-                ConfigServerboundPackets::FinishConfiguration(_) => Ok(Some(
-                    ServerboundEventEnum::Config(ServerboundConfigEvent::AcknowledgeConfig),
-                )),
-                ConfigServerboundPackets::KeepAlive(packet) => Ok(Some(
-                    ServerboundEventEnum::Config(ServerboundConfigEvent::KeepAlive(packet.id)),
-                )),
-                ConfigServerboundPackets::Pong(packet) => {
-                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::Pong(packet.id))))
-                }
-                ConfigServerboundPackets::ResourcePack(_packet) => Ok(Some(
-                    ServerboundEventEnum::Config(ServerboundConfigEvent::ResourcePackUpdate()),
-                )),
-                ConfigServerboundPackets::SelectKnownPacks(packet) => {
-                    Ok(Some(ServerboundEventEnum::Config(
-                        ServerboundConfigEvent::ResourcePackResponse(packet.selected),
-                    )))
-                }
-                ConfigServerboundPackets::CustomClickAction(_packet) => {
-                    Ok(Some(ServerboundEventEnum::Config(ServerboundConfigEvent::DialogAction())))
-                }
-                ConfigServerboundPackets::AcceptCodeOfConduct(_) => Ok(Some(
-                    ServerboundEventEnum::Config(ServerboundConfigEvent::AcceptCodeOfConduct),
-                )),
-            },
+            }
 
             VersionPacket::Play(_) => todo!(),
         }
