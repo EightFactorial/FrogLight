@@ -7,6 +7,8 @@ use crate::connection::ConnectionError;
 pub mod enums;
 pub use enums::{ClientboundEventEnum, ServerboundEventEnum};
 
+pub mod translate;
+
 /// A trait for defining event-to-packet and packet-to-event conversions for a
 /// specific [`Version`](froglight_common::version::Version).
 pub trait EventVersion: PacketVersion {

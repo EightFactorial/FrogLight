@@ -125,7 +125,7 @@ impl ItemData {
                         }
 
                         if let Some(extracted) = extracted {
-                            constant = Some(format!("minecraft:{extracted}",));
+                            constant = Some(format!("minecraft:{extracted}"));
                             block = Some(false);
                         } else {
                             miette::bail!(

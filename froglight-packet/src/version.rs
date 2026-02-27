@@ -141,7 +141,7 @@ impl<V: PacketVersion, S: PacketState<V>> PacketDirection<V, S> for Serverbound 
 /// An enum containing all [`Clientbound`] and [`Serverbound`]
 /// packets for a specific [`Version`]
 #[derive(Debug, Clone)]
-pub enum VersionPacketDirectional<V: PacketVersion> {
+pub enum VersionPacketBidirectional<V: PacketVersion> {
     /// A packet sent from the server to the client.
     Clientbound(VersionPacket<V, Clientbound>),
     /// A packet sent from the client to the server.
