@@ -4,14 +4,32 @@ use bevy_reflect::TypePath;
 
 use crate::{bevy::world::InstanceData, prelude::WorldInstance};
 
-/// Hook for when an instance-tracked component is added to an entity.
-pub(super) fn instance_add_hook<T: InstanceData>(mut world: DeferredWorld, ctx: HookContext) {
+/// Hook for when an instance-tracked component is inserted into an entity.
+pub(super) fn instance_insert_hook<T: InstanceData>(mut world: DeferredWorld, ctx: HookContext) {
     // Get the relationship component that points to the `WorldInstance`
     let Some(instance) = world.get::<T::Relationship>(ctx.entity) else {
         #[cfg(feature = "tracing")]
         tracing::warn!(target: "froglight_common", "Entity {} added a `{}`, but has no `{}` component!", ctx.entity, T::short_type_path(), T::Relationship::short_type_path());
         return;
     };
+
+    // Check if the trigger and instance are on the same entity
+    if ctx.entity == **instance {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_common", "Entity {} added a `{}` that points to itself", ctx.entity, T::short_type_path());
+        // Get the trigger component
+        let trigger = world
+            .get::<T>(ctx.entity)
+            .expect("Component does not exist after being added?")
+            .clone();
+        // Get the instance component
+        let mut instance = world
+            .get_mut::<WorldInstance>(ctx.entity)
+            .expect("Component does not exist after being added?");
+        // Insert the new entity and despawn any previous entity
+        T::insert(&trigger, &mut instance, ctx.entity);
+        return;
+    }
 
     // Get both the trigger entity and the instance entity
     let Ok([trigger, mut instance]) = world.get_entity_mut([ctx.entity, **instance]) else {
@@ -37,13 +55,31 @@ pub(super) fn instance_add_hook<T: InstanceData>(mut world: DeferredWorld, ctx: 
 }
 
 /// Hook for when an instance-tracked component is removed from an entity.
-pub(super) fn instance_remove_hook<T: InstanceData>(mut world: DeferredWorld, ctx: HookContext) {
+pub(super) fn instance_replace_hook<T: InstanceData>(mut world: DeferredWorld, ctx: HookContext) {
     // Get the relationship component that points to the `WorldInstance`
     let Some(instance) = world.get::<T::Relationship>(ctx.entity) else {
         #[cfg(feature = "tracing")]
         tracing::warn!(target: "froglight_common", "Entity {} removed a `{}`, but has no `{}` component!", ctx.entity, T::short_type_path(), T::Relationship::short_type_path());
         return;
     };
+
+    // Check if the trigger and instance are on the same entity
+    if ctx.entity == **instance {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(target: "froglight_common", "Entity {} added a `{}` that points to itself", ctx.entity, T::short_type_path());
+        // Get the trigger component
+        let trigger = world
+            .get::<T>(ctx.entity)
+            .expect("Component does not exist after being added?")
+            .clone();
+        // Get the instance component
+        let mut instance = world
+            .get_mut::<WorldInstance>(ctx.entity)
+            .expect("Component does not exist after being added?");
+        // Remove the entity from the instance
+        T::remove(&trigger, &mut instance);
+        return;
+    }
 
     // Get both the trigger entity and the instance entity
     let Ok([trigger, mut instance]) = world.get_entity_mut([ctx.entity, **instance]) else {

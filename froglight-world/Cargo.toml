@@ -32,6 +32,8 @@ arc-swap = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["glam", "hashbrown", "smallvec"], workspace = true, optional = true }
+facet = { workspace = true, optional = true }
+facet-minecraft = { workspace = true, optional = true }
 froglight-biome = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }
 hashbrown = { features = ["alloc", "core", "default-hasher"], workspace = true, optional = true }
@@ -53,6 +55,8 @@ default = ["alloc", "std"]
 
 # Enable `bevy` support.
 bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:hashbrown", "froglight-common/bevy", "serde"]
+# Enable `facet` support.
+facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet"]
 # Enable `froglight-biome` support.
 froglight-biome = ["dep:froglight-biome"]
 # Enable `froglight-block` support.

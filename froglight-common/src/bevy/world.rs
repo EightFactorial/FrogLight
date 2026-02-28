@@ -50,6 +50,39 @@ impl WorldInstance {
     #[expect(private_bounds, reason = "Only two possible data types")]
     pub fn get<T: InstanceData>(&self, data: &T) -> Option<Entity> { data.query(self) }
 
+    /// Insert an association between an entity and some data into the
+    /// [`WorldInstance`].
+    ///
+    /// Returns the previous entity if one existed.
+    #[expect(private_bounds, reason = "Only two possible data types")]
+    pub fn insert<T: InstanceData>(&mut self, data: &T, entity: Entity) -> Option<Entity> {
+        data.insert(self, entity)
+    }
+
+    /// Remove the association between an entity and all data.
+    ///
+    /// Returns `true` if any associations were removed.
+    pub fn remove(&mut self, entity: Entity) -> bool {
+        let mut removed = false;
+        self.entity_id.retain(|_, &mut e| -> bool {
+            if e == entity {
+                removed = true;
+                false
+            } else {
+                true
+            }
+        });
+        self.entity_uuid.retain(|_, &mut e| {
+            if e == entity {
+                removed = true;
+                false
+            } else {
+                true
+            }
+        });
+        removed
+    }
+
     /// Hook for when a [`WorldInstance`] is removed from an entity.
     #[allow(unused_variables, reason = "Used by tracing macros")]
     fn remove_hook(mut world: DeferredWorld, ctx: HookContext) {
@@ -63,13 +96,23 @@ impl WorldInstance {
             (core::mem::take(&mut instance.entity_id), core::mem::take(&mut instance.entity_uuid));
 
         for (entity_id, entity) in id_map.drain() {
+            if entity == ctx.entity {
+                world.commands().entity(entity).remove::<EntityOfInstance>().remove::<EntityId>();
+                continue;
+            }
+
             #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_common", "Despawning Entity {} associated with EntityId {:?}!", entity, entity_id);
+            tracing::trace!(target: "froglight_common", "Despawning Entity {} associated with EntityId {}!", entity, entity_id.0);
             world.commands().entity(entity).despawn();
         }
         for (entity_uuid, entity) in uuid_map.drain() {
+            if entity == ctx.entity {
+                world.commands().entity(entity).remove::<EntityOfInstance>().remove::<EntityUuid>();
+                continue;
+            }
+
             #[cfg(feature = "tracing")]
-            tracing::trace!(target: "froglight_common", "Despawning Entity {} associated with EntityUuid {:?}!", entity, entity_uuid);
+            tracing::trace!(target: "froglight_common", "Despawning Entity {} associated with EntityUuid {}!", entity, entity_uuid.0.as_hyphenated());
             world.commands().entity(entity).despawn();
         }
     }
@@ -77,7 +120,7 @@ impl WorldInstance {
 
 // -------------------------------------------------------------------------------------------------
 
-pub(super) trait InstanceData: Component + TypePath {
+pub(super) trait InstanceData: Clone + Component + TypePath {
     /// The relationship component that points to the [`WorldInstance`].
     type Relationship: Component + TypePath + Deref<Target = Entity>;
     /// Query the [`WorldInstance`] for the associated [`Entity`].

@@ -17,7 +17,7 @@ impl NetworkVersion for V26_1 {
         match packet {
             VersionPacket::Login(LoginClientboundPackets::LoginCompression(p)) => {
                 Some(ConnectionUpdate {
-                    compression_threshold: Some(p.compression_threshold),
+                    compression_threshold: Some(p.threshold),
                     ..ConnectionUpdate::default()
                 })
             }

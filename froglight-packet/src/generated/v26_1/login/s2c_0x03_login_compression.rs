@@ -11,5 +11,5 @@ use facet_minecraft as mc;
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct LoginCompressionS2CPacket {
     #[cfg_attr(feature = "facet", facet(mc::variable))]
-    pub compression_threshold: i32,
+    pub threshold: i32,
 }

@@ -4,6 +4,7 @@
 
 use froglight_common::version::V26_1;
 use froglight_packet::{
+    common::entity_id::VarEntityId,
     generated::v26_1::{
         configuration::{
             ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
@@ -28,14 +29,15 @@ use froglight_packet::{
             ServerboundPackets as LoginServerboundPackets,
         },
         play::{
-            BundleDelimiterS2CPacket, ClearDialogS2CPacket as PlayClearDialogS2CPacket,
+            AddEntityS2CPacket, BundleDelimiterS2CPacket,
+            ClearDialogS2CPacket as PlayClearDialogS2CPacket,
             ClientboundPackets as PlayClientboundPackets,
             CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
             DisconnectS2CPacket as PlayDisconnectS2CPacket,
             KeepAliveC2SPacket as PlayKeepAliveC2SPacket,
-            KeepAliveS2CPacket as PlayKeepAliveS2CPacket,
+            KeepAliveS2CPacket as PlayKeepAliveS2CPacket, LoginS2CPacket,
             PingRequestC2SPacket as PlayPingRequestC2SPacket, PongC2SPacket as PlayPongC2SPacket,
-            PongResponseS2CPacket as PlayPongResponseS2CPacket,
+            PongResponseS2CPacket as PlayPongResponseS2CPacket, RemoveEntitiesS2CPacket,
             ServerboundPackets as PlayServerboundPackets,
         },
     },
@@ -63,6 +65,15 @@ impl EventVersion for V26_1 {
             ClientboundEventEnum::Status(_status) => todo!(),
 
             ClientboundEventEnum::Login(login) => match login {
+                ClientboundLoginEvent::CompressionThreshold(_) => Ok(None),
+                ClientboundLoginEvent::CookieRequest(identifier) => {
+                    let packet = LoginCookieRequestS2CPacket { cookie: identifier };
+                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::CookieRequest(packet))))
+                }
+                ClientboundLoginEvent::CustomPayload(query_id, identifier, payload) => {
+                    let packet = CustomQueryS2CPacket { query_id, identifier, payload };
+                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::CustomQuery(packet))))
+                }
                 ClientboundLoginEvent::Disconnect(event) => {
                     let packet = LoginDisconnectS2CPacket::new(event);
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::LoginDisconnect(packet))))
@@ -70,14 +81,6 @@ impl EventVersion for V26_1 {
                 ClientboundLoginEvent::EncryptionRequest() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Login(LoginClientboundPackets::Hello(packet))))
-                }
-                ClientboundLoginEvent::CustomPayload(query_id, identifier, payload) => {
-                    let packet = CustomQueryS2CPacket { query_id, identifier, payload };
-                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::CustomQuery(packet))))
-                }
-                ClientboundLoginEvent::CookieRequest(identifier) => {
-                    let packet = LoginCookieRequestS2CPacket { cookie: identifier };
-                    Ok(Some(VersionPacket::Login(LoginClientboundPackets::CookieRequest(packet))))
                 }
                 ClientboundLoginEvent::LoginFinished(event) => {
                     let packet = LoginFinishedS2CPacket::new(event);
@@ -180,8 +183,8 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetActionBarText(packet))))
                 }
-                ClientboundPlayEvent::AddEntity() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::AddEntity(entity_data) => {
+                    let packet = AddEntityS2CPacket(entity_data);
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::AddEntity(packet))))
                 }
                 ClientboundPlayEvent::Animate() => {
@@ -422,8 +425,8 @@ impl EventVersion for V26_1 {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::LightUpdate(packet))))
                 }
-                ClientboundPlayEvent::Login() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::Login(content) => {
+                    let packet = LoginS2CPacket(content);
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::Login(packet))))
                 }
                 ClientboundPlayEvent::MapItemData() => {
@@ -537,8 +540,9 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ClientboundPlayEvent::RemoveEntities() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::RemoveEntities(entities) => {
+                    let entities = entities.into_iter().map(VarEntityId).collect();
+                    let packet = RemoveEntitiesS2CPacket { entities };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::RemoveEntities(packet))))
                 }
                 ClientboundPlayEvent::RemoveMobEffect() => {
@@ -814,6 +818,7 @@ impl EventVersion for V26_1 {
                         packet.profile,
                     ))))
                 }
+                LoginClientboundPackets::LoginCompression(_) => Ok(None),
                 LoginClientboundPackets::CustomQuery(packet) => {
                     Ok(Some(ClientboundEventEnum::Login(ClientboundLoginEvent::CustomPayload(
                         packet.query_id,
@@ -826,8 +831,6 @@ impl EventVersion for V26_1 {
                         packet.cookie,
                     ))))
                 }
-
-                LoginClientboundPackets::LoginCompression(_) => Ok(None),
             },
 
             VersionPacket::Config(config) => match config {
@@ -907,8 +910,8 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::BundleDelimiter(_) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::BundleDelimiter)))
                 }
-                PlayClientboundPackets::AddEntity(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::AddEntity())))
+                PlayClientboundPackets::AddEntity(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::AddEntity(packet.0))))
                 }
                 PlayClientboundPackets::Animate(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Animate())))
@@ -1054,8 +1057,8 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::LightUpdate(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LightUpdate())))
                 }
-                PlayClientboundPackets::Login(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Login())))
+                PlayClientboundPackets::Login(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::Login(packet.0))))
                 }
                 PlayClientboundPackets::LowDiskSpaceWarning(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DiskSpaceWarning())))
@@ -1138,8 +1141,10 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::RecipeBookSettings(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RecipeBookSettings())))
                 }
-                PlayClientboundPackets::RemoveEntities(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RemoveEntities())))
+                PlayClientboundPackets::RemoveEntities(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RemoveEntities(
+                        packet.entities.into_iter().map(|entity| entity.0).collect(),
+                    ))))
                 }
                 PlayClientboundPackets::RemoveMobEffect(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::RemoveMobEffect())))
@@ -1349,13 +1354,12 @@ impl EventVersion for V26_1 {
             }
 
             ServerboundEventEnum::Login(login) => match login {
-                ServerboundLoginEvent::Hello(event) => {
-                    let packet = HelloC2SPacket::new(event);
-                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::Hello(packet))))
-                }
-                ServerboundLoginEvent::EncryptionResponse() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::Key(packet))))
+                ServerboundLoginEvent::AcknowledgeLogin => Ok(Some(VersionPacket::Login(
+                    LoginServerboundPackets::LoginAcknowledged(LoginAcknowledgedC2SPacket),
+                ))),
+                ServerboundLoginEvent::CookieResponse(cookie, payload) => {
+                    let packet = LoginCookieResponseC2SPacket { cookie, payload };
+                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::CookieResponse(packet))))
                 }
                 ServerboundLoginEvent::CustomPayload(query_id, payload) => {
                     let packet = CustomQueryAnswerC2SPacket { query_id, payload };
@@ -1363,13 +1367,14 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ServerboundLoginEvent::CookieResponse(cookie, payload) => {
-                    let packet = LoginCookieResponseC2SPacket { cookie, payload };
-                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::CookieResponse(packet))))
+                ServerboundLoginEvent::EncryptionResponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::Key(packet))))
                 }
-                ServerboundLoginEvent::AcknowledgeLogin => Ok(Some(VersionPacket::Login(
-                    LoginServerboundPackets::LoginAcknowledged(LoginAcknowledgedC2SPacket),
-                ))),
+                ServerboundLoginEvent::Hello(event) => {
+                    let packet = HelloC2SPacket::new(event);
+                    Ok(Some(VersionPacket::Login(LoginServerboundPackets::Hello(packet))))
+                }
             },
 
             ServerboundEventEnum::Config(config) => match config {

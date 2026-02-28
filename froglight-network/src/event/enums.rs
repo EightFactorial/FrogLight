@@ -3,10 +3,14 @@
 #[cfg(feature = "bevy")]
 use bevy_reflect::Reflect;
 use facet::Facet;
-use froglight_common::prelude::Identifier;
+use froglight_common::{entity::EntityId, prelude::Identifier};
 use froglight_packet::common::{
-    client_information::ClientInformation, handshake::HandshakeContent,
-    known_packs::KnownResourcePack, login::LoginHelloContent, unsized_buffer::UnsizedBuffer,
+    client_information::ClientInformation,
+    entity_data::EntityData,
+    handshake::HandshakeContent,
+    known_packs::KnownResourcePack,
+    login::{LoginHelloContent, PlayLoginContent},
+    unsized_buffer::UnsizedBuffer,
 };
 use froglight_player::prelude::PlayerProfile;
 
@@ -71,7 +75,7 @@ impl From<ServerboundHandshakeEvent> for ServerboundEventEnum {
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundPlayEvent {
     ActionBarText(),
-    AddEntity(),
+    AddEntity(EntityData),
     Animate(),
     AwardStats(),
     BlockChangedAck(),
@@ -126,7 +130,7 @@ pub enum ClientboundPlayEvent {
     LevelEvent(),
     LevelParticles(),
     LightUpdate(),
-    Login(),
+    Login(PlayLoginContent),
     MapItemData(),
     MerchantOffers(),
     MountScreen(),
@@ -154,7 +158,7 @@ pub enum ClientboundPlayEvent {
     RecipeBookAdd(),
     RecipeBookRemove(),
     RecipeBookSettings(),
-    RemoveEntities(),
+    RemoveEntities(Vec<EntityId>),
     RemoveMobEffect(),
     ResetScore(),
     ResourcePackPop(),
@@ -232,26 +236,26 @@ pub enum ServerboundPlayEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundConfigEvent {
-    Disconnect(UnsizedBuffer<'static>),
-    Transfer(),
-    KeepAlive(u64),
-    Ping(u32),
-    ResetChat,
-    KnownResourcePacks(Vec<KnownResourcePack>),
-    ResourcePackPush(),
-    ResourcePackPop(),
-    RegistryData(),
-    EnabledFeatures(),
-    UpdateTags(),
-    ServerLinks(),
-    CodeOfConduct(),
-    CustomReportDetails(),
-    CustomPayload(Identifier<'static>, UnsizedBuffer<'static>),
-    CookieRequest(Identifier<'static>),
-    StoreCookie(Identifier<'static>, Vec<u8>),
-    ShowDialog(),
     ClearDialog,
+    CodeOfConduct(),
+    CookieRequest(Identifier<'static>),
+    CustomPayload(Identifier<'static>, UnsizedBuffer<'static>),
+    CustomReportDetails(),
+    Disconnect(UnsizedBuffer<'static>),
+    EnabledFeatures(),
     FinishConfig,
+    KeepAlive(u64),
+    KnownResourcePacks(Vec<KnownResourcePack>),
+    Ping(u32),
+    RegistryData(),
+    ResetChat,
+    ResourcePackPop(),
+    ResourcePackPush(),
+    ServerLinks(),
+    ShowDialog(),
+    StoreCookie(Identifier<'static>, Vec<u8>),
+    Transfer(),
+    UpdateTags(),
 }
 
 #[repr(u8)]
@@ -260,16 +264,16 @@ pub enum ClientboundConfigEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundConfigEvent {
+    AcceptCodeOfConduct,
+    AcknowledgeConfig,
     ClientInformation(ClientInformation),
+    CookieResponse(Identifier<'static>, Option<Vec<u8>>),
+    CustomPayload(Identifier<'static>, UnsizedBuffer<'static>),
+    DialogAction(),
     KeepAlive(u64),
     Pong(u32),
     ResourcePackResponse(Vec<KnownResourcePack>),
     ResourcePackUpdate(),
-    AcceptCodeOfConduct,
-    CustomPayload(Identifier<'static>, UnsizedBuffer<'static>),
-    CookieResponse(Identifier<'static>, Option<Vec<u8>>),
-    DialogAction(),
-    AcknowledgeConfig,
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -280,10 +284,11 @@ pub enum ServerboundConfigEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundLoginEvent {
+    CompressionThreshold(u32),
+    CookieRequest(Identifier<'static>),
+    CustomPayload(u32, Identifier<'static>, UnsizedBuffer<'static>),
     Disconnect(String),
     EncryptionRequest(),
-    CustomPayload(u32, Identifier<'static>, UnsizedBuffer<'static>),
-    CookieRequest(Identifier<'static>),
     LoginFinished(PlayerProfile),
 }
 
@@ -293,11 +298,11 @@ pub enum ClientboundLoginEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundLoginEvent {
-    Hello(LoginHelloContent),
-    EncryptionResponse(),
-    CustomPayload(u32, Option<UnsizedBuffer<'static>>),
-    CookieResponse(Identifier<'static>, Option<Vec<u8>>),
     AcknowledgeLogin,
+    CookieResponse(Identifier<'static>, Option<Vec<u8>>),
+    CustomPayload(u32, Option<UnsizedBuffer<'static>>),
+    EncryptionResponse(),
+    Hello(LoginHelloContent),
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -1,3 +1,8 @@
+#![allow(
+    clippy::unsafe_derive_deserialize,
+    reason = "Triggered by deriving `Facet` and `Deserialize`"
+)]
+
 use core::ops::{Add, Sub};
 
 #[cfg(feature = "bevy")]
@@ -12,6 +17,7 @@ use crate::prelude::BlockPos;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "facet", derive(facet::Facet))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
 pub struct DimensionPos {

@@ -1,9 +1,23 @@
+#![allow(
+    clippy::unsafe_derive_deserialize,
+    reason = "Triggered by deriving `Facet` and `Deserialize`"
+)]
+
 use core::ops::{Add, Div, Mul, Sub};
 
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize};
+#[cfg(feature = "facet")]
+use facet::{Partial, Peek};
+#[cfg(feature = "facet")]
+use facet_minecraft::{
+    self as mc, DeserializeFn, SerializeFn,
+    deserialize::{InputCursor, bytes_to_variable, error::DeserializeValueError},
+    replace_with::replace_with_or_abort,
+    serialize::{buffer::SerializeWriter, error::SerializeIterError, variable_to_bytes},
+};
 use glam::IVec3;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -11,10 +25,12 @@ use serde::{Deserialize, Serialize};
 use crate::{CHUNK_LENGTH, CHUNK_WIDTH, component::ChunkBlockPos, prelude::ChunkPos};
 
 /// A block's position in the world.
-#[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
+#[cfg_attr(feature = "facet", facet(mc::serialize = BlockPos::SERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::deserialize = BlockPos::DESERIALIZE))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 #[cfg_attr(all(feature = "bevy", feature = "serde"), reflect(Serialize, Deserialize))]
@@ -60,6 +76,50 @@ impl BlockPos {
             block.y() as i32 + offset,
             block.z() as i32 + (chunk.z() * CHUNK_WIDTH as i32),
         ))
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+#[cfg(feature = "facet")]
+impl BlockPos {
+    const DESERIALIZE: DeserializeFn =
+        DeserializeFn::new(Self::facet_deserialize, Self::facet_deserialize);
+    const SERIALIZE: SerializeFn = SerializeFn::new(Self::facet_serialize);
+
+    #[expect(clippy::cast_possible_truncation, reason = "Desired behavior")]
+    fn facet_deserialize<'facet, const BORROW: bool>(
+        partial: &mut Partial<'facet, BORROW>,
+        cursor: &mut InputCursor<'_, 'facet>,
+    ) -> Result<(), DeserializeValueError> {
+        let [mut x, mut y, mut z] = [0; 3];
+        for val in [&mut x, &mut y, &mut z] {
+            let (len, value) = bytes_to_variable(cursor.as_slice())?;
+            cursor.consume(len)?;
+            *val = value as i32;
+        }
+
+        let value = Self::new(IVec3::new(x, y, z));
+        replace_with_or_abort(partial, |partial| partial.set(value).unwrap());
+        Ok(())
+    }
+
+    #[expect(clippy::cast_sign_loss, reason = "Desired behavior")]
+    fn facet_serialize<'mem, 'facet>(
+        peek: Peek<'mem, 'facet>,
+        writer: &mut dyn SerializeWriter,
+    ) -> Result<(), SerializeIterError<'mem, 'facet>> {
+        let value = peek.get::<Self>()?;
+
+        let mut buffer = [0; _];
+        for val in [value.x(), value.y(), value.z()] {
+            let len = variable_to_bytes(val as u128, &mut buffer);
+            if !writer.write_data(&buffer[..len]) {
+                return Err(SerializeIterError::new());
+            }
+        }
+
+        Ok(())
     }
 }
 
