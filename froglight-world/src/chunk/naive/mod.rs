@@ -7,6 +7,8 @@ use core::ops::Range;
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+#[cfg(feature = "facet")]
+use facet_minecraft as mc;
 
 use crate::{
     chunk::{Section, storage::ChunkStorage},
@@ -18,6 +20,8 @@ use crate::{
 mod biome;
 #[cfg(feature = "froglight-block")]
 mod block;
+#[cfg(feature = "facet")]
+mod facet;
 
 /// A region of blocks in a world.
 ///
@@ -26,36 +30,39 @@ mod block;
 #[derive(Default, Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
+#[cfg_attr(feature = "facet", derive(::facet::Facet), facet(opaque))]
+#[cfg_attr(feature = "facet", facet(mc::serialize = NaiveChunk::SERIALIZE))]
+#[cfg_attr(feature = "facet", facet(mc::deserialize = NaiveChunk::DESERIALIZE))]
 pub struct NaiveChunk {
     storage: ChunkStorage,
 }
 
 impl NaiveChunk {
-    /// Create a new [`Chunk`] from the given storage.
+    /// Create a new [`NaiveChunk`] from the given storage.
     #[must_use]
     pub const fn new(storage: ChunkStorage) -> Self { Self { storage } }
 
-    /// Create a new [`Chunk`] from the given sections and offset.
+    /// Create a new [`NaiveChunk`] from the given sections and offset.
     #[must_use]
     pub fn new_from(sections: Vec<Section>, offset: i32) -> Self {
         Self { storage: ChunkStorage::new_from_vec(sections, offset) }
     }
 
-    /// Create a new empty large [`Chunk`].
+    /// Create a new empty large [`NaiveChunk`].
     ///
     /// This is equivalent to an overworld chunk,
     /// or 24 sections (384 blocks) tall with an offset of -64.
     #[must_use]
     pub fn new_empty_large() -> Self { Self::new(ChunkStorage::empty_large()) }
 
-    /// Create a new empty normal [`Chunk`].
+    /// Create a new empty normal [`NaiveChunk`].
     ///
     /// This is equivalent to a nether or end chunk,
     /// or 16 sections (256 blocks) tall with an offset of 0.
     #[must_use]
     pub fn new_empty_normal() -> Self { Self::new(ChunkStorage::empty_normal()) }
 
-    /// Get the height of this [`Chunk`].
+    /// Get the height of this [`NaiveChunk`].
     ///
     /// ## Note
     ///
@@ -68,7 +75,7 @@ impl NaiveChunk {
         (self.storage.len() as i32 * 16).saturating_add(self.height_offset())
     }
 
-    /// Get the height range of this [`Chunk`].
+    /// Get the height range of this [`NaiveChunk`].
     ///
     /// ## Note
     ///
@@ -77,7 +84,8 @@ impl NaiveChunk {
     #[must_use]
     pub const fn height_range(&self) -> Range<i32> { self.height_offset()..self.height() }
 
-    /// Get the total height of this [`Chunk`], ignoring it's vertical offset.
+    /// Get the total height of this [`NaiveChunk`], ignoring it's vertical
+    /// offset.
     ///
     /// ## Note
     ///
@@ -87,15 +95,15 @@ impl NaiveChunk {
     #[must_use]
     pub const fn height_total(&self) -> usize { self.storage.len() * 16 }
 
-    /// Get the height offset of this [`Chunk`].
+    /// Get the height offset of this [`NaiveChunk`].
     #[must_use]
     pub const fn height_offset(&self) -> i32 { self.storage.offset() }
 
-    /// Get a reference to the sections in this [`Chunk`].
+    /// Get a reference to the sections in this [`NaiveChunk`].
     #[must_use]
     pub const fn sections(&self) -> &[Section] { self.storage.as_slice() }
 
-    /// Get a mutable reference to the sections in this [`Chunk`].
+    /// Get a mutable reference to the sections in this [`NaiveChunk`].
     #[must_use]
     pub const fn sections_mut(&mut self) -> &mut [Section] { self.storage.as_slice_mut() }
 

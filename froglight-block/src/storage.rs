@@ -2,6 +2,8 @@
 
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
+#[cfg(feature = "std")]
+use core::any::TypeId;
 
 #[cfg(feature = "std")]
 use arc_swap::ArcSwap;
@@ -9,19 +11,28 @@ use arc_swap::ArcSwap;
 use crate::block::{Block, BlockMetadata, GlobalId, StateId};
 
 /// A thread-safe container for a [`BlockStorage`].
-#[repr(transparent)]
 #[cfg(feature = "std")]
 pub struct GlobalBlockStorage {
     storage: ArcSwap<BlockStorage>,
+    version_ty: TypeId,
 }
 
 #[cfg(feature = "std")]
 impl GlobalBlockStorage {
     /// Create a new [`GlobalBlockStorage`] with the given [`BlockStorage`].
     #[must_use]
-    pub fn new(storage: BlockStorage) -> Self {
-        Self { storage: ArcSwap::new(alloc::sync::Arc::new(storage)) }
+    pub fn new<T: 'static>(storage: BlockStorage) -> Self {
+        Self {
+            storage: ArcSwap::new(alloc::sync::Arc::new(storage)),
+            version_ty: TypeId::of::<T>(),
+        }
     }
+
+    /// Get the [`TypeId`] of the
+    /// [`Version`](froglight_common::version::Version) this storage belongs to.
+    #[inline]
+    #[must_use]
+    pub const fn version_ty(&self) -> TypeId { self.version_ty }
 }
 
 #[cfg(feature = "std")]

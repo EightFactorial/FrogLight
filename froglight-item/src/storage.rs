@@ -2,6 +2,8 @@
 
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
+#[cfg(feature = "std")]
+use core::any::TypeId;
 
 #[cfg(feature = "std")]
 use arc_swap::ArcSwap;
@@ -9,19 +11,28 @@ use arc_swap::ArcSwap;
 use crate::item::{GlobalId, Item, ItemMetadata};
 
 /// A thread-safe container for a [`ItemStorage`].
-#[repr(transparent)]
 #[cfg(feature = "std")]
 pub struct GlobalItemStorage {
     storage: ArcSwap<ItemStorage>,
+    version_ty: TypeId,
 }
 
 #[cfg(feature = "std")]
 impl GlobalItemStorage {
     /// Create a new [`GlobalItemStorage`] from a given [`ItemStorage`].
     #[must_use]
-    pub fn new(storage: ItemStorage) -> Self {
-        Self { storage: ArcSwap::new(alloc::sync::Arc::new(storage)) }
+    pub fn new<T: 'static>(storage: ItemStorage) -> Self {
+        Self {
+            storage: ArcSwap::new(alloc::sync::Arc::new(storage)),
+            version_ty: TypeId::of::<T>(),
+        }
     }
+
+    /// Get the [`TypeId`] of the
+    /// [`Version`](froglight_common::version::Version) this storage belongs to.
+    #[inline]
+    #[must_use]
+    pub const fn version_ty(&self) -> TypeId { self.version_ty }
 }
 
 #[cfg(feature = "std")]
@@ -158,7 +169,7 @@ macro_rules! __implement_storage_inner {
             @local {
                 const ITEMS: &'static std::sync::LazyLock<$crate::storage::GlobalItemStorage> = {
                     static STATIC: std::sync::LazyLock<$crate::storage::GlobalItemStorage> = std::sync::LazyLock::new(|| {
-                        $crate::storage::GlobalItemStorage::new(<$version as $crate::version::ItemVersion>::new_items())
+                        $crate::storage::GlobalItemStorage::new::<$version>(<$version as $crate::version::ItemVersion>::new_items())
                     });
                     &STATIC
                 };

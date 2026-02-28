@@ -3,6 +3,8 @@
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 #[cfg(feature = "std")]
+use core::any::TypeId;
+#[cfg(feature = "std")]
 pub use std::sync::LazyLock;
 
 #[cfg(feature = "std")]
@@ -13,19 +15,28 @@ pub use once_cell::sync::OnceCell as LazyLock;
 use crate::biome::{Biome, BiomeMetadata, GlobalId};
 
 /// A thread-safe container for a [`BiomeStorage`].
-#[repr(transparent)]
 #[cfg(feature = "std")]
 pub struct GlobalBiomeStorage {
     storage: ArcSwap<BiomeStorage>,
+    version_ty: TypeId,
 }
 
 #[cfg(feature = "std")]
 impl GlobalBiomeStorage {
     /// Create a new [`GlobalBiomeStorage`] with the given [`BiomeStorage`].
     #[must_use]
-    pub fn new(storage: BiomeStorage) -> Self {
-        Self { storage: ArcSwap::new(alloc::sync::Arc::new(storage)) }
+    pub fn new<T: 'static>(storage: BiomeStorage) -> Self {
+        Self {
+            storage: ArcSwap::new(alloc::sync::Arc::new(storage)),
+            version_ty: TypeId::of::<T>(),
+        }
     }
+
+    /// Get the [`TypeId`] of the
+    /// [`Version`](froglight_common::version::Version) this storage belongs to.
+    #[inline]
+    #[must_use]
+    pub const fn version_ty(&self) -> TypeId { self.version_ty }
 }
 
 #[cfg(feature = "std")]
@@ -162,7 +173,7 @@ macro_rules! __implement_storage_inner {
             @local {
                 const BIOMES: &'static $crate::storage::LazyLock<$crate::storage::GlobalBiomeStorage> = {
                     static STATIC: $crate::storage::LazyLock<$crate::storage::GlobalBiomeStorage> = $crate::storage::LazyLock::new(|| {
-                        $crate::storage::GlobalBiomeStorage::new(<$version as $crate::version::BiomeVersion>::new_biomes())
+                        $crate::storage::GlobalBiomeStorage::new::<$version>(<$version as $crate::version::BiomeVersion>::new_biomes())
                     });
                     &STATIC
                 };
