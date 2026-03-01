@@ -32,7 +32,7 @@ arc-swap = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_reflect = { features = ["glam", "hashbrown", "smallvec"], workspace = true, optional = true }
-facet = { workspace = true, optional = true }
+facet = { features = ["reflect"], workspace = true, optional = true }
 facet-minecraft = { workspace = true, optional = true }
 froglight-biome = { workspace = true, optional = true }
 froglight-block = { workspace = true, optional = true }

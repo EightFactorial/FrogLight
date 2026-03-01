@@ -13,6 +13,8 @@ use async_trait::async_trait;
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+use facet::Span;
+use facet_format::{DeserializeErrorKind, ParseError};
 use facet_json::{DeserializeError, JsonError};
 use froglight_player::prelude::{PlayerProfile, Username};
 use uuid::Uuid;
@@ -165,8 +167,8 @@ pub enum ApiError {
     Http(HttpError),
     /// A UTF-8 error occurred.
     Utf8(Utf8Error),
-    /// A JSON error occurred.
-    Serde(DeserializeError<JsonError>),
+    /// A deserialiser error occurred.
+    Serde(DeserializeError),
 
     /// An unspecified error occurred.
     Other(Box<dyn Error + Send + Sync>),
@@ -202,9 +204,14 @@ impl From<FromUtf8Error> for ApiError {
     fn from(value: FromUtf8Error) -> Self { ApiError::Utf8(value.utf8_error()) }
 }
 
-impl From<DeserializeError<JsonError>> for ApiError {
-    fn from(value: DeserializeError<JsonError>) -> Self { ApiError::Serde(value) }
+impl From<DeserializeError> for ApiError {
+    fn from(value: DeserializeError) -> Self { ApiError::Serde(value) }
 }
 impl From<JsonError> for ApiError {
-    fn from(value: JsonError) -> Self { ApiError::Serde(DeserializeError::Parser(value)) }
+    fn from(value: JsonError) -> Self {
+        ApiError::Serde(DeserializeError::from(ParseError::new(
+            value.span.unwrap_or_else(|| Span::new(0, 0)),
+            DeserializeErrorKind::Unsupported { message: value.to_string().into() },
+        )))
+    }
 }

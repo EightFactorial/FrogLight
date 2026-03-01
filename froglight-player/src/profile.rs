@@ -14,9 +14,11 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, ReflectDeserialize, ReflectSerialize, std_traits::ReflectDefault};
 #[cfg(feature = "facet")]
-use facet_format::SerializeError;
+use facet::Span;
 #[cfg(feature = "facet")]
-use facet_json::{DeserializeError, JsonError, JsonSerializeError};
+use facet_format::{DeserializeErrorKind, ParseError, SerializeError};
+#[cfg(feature = "facet")]
+use facet_json::{DeserializeError, JsonSerializeError};
 use foldhash::fast::RandomState;
 use indexmap::IndexMap;
 #[cfg(feature = "serde")]
@@ -149,9 +151,7 @@ impl ProfilePropertySet {
     /// Returns an error if the property is not valid base64,
     /// or it cannot be deserialized into the given type.
     #[cfg(feature = "facet")]
-    pub fn get_property<T: ProfilePropertyItem>(
-        &self,
-    ) -> Result<Option<T>, DeserializeError<JsonError>> {
+    pub fn get_property<T: ProfilePropertyItem>(&self) -> Result<Option<T>, DeserializeError> {
         self.0
             .get(T::PROPERTY_KEY)
             .map_or(Ok(None), |property| T::from_property(property).map(Some))
@@ -233,12 +233,15 @@ pub trait ProfilePropertyItem: facet::Facet<'static> + Sized {
     ///
     /// Returns an error if the property is not valid base64,
     /// or it cannot be deserialized into the item.
-    fn from_property(property: &ProfileProperty) -> Result<Self, DeserializeError<JsonError>> {
+    fn from_property(property: &ProfileProperty) -> Result<Self, DeserializeError> {
         use alloc::string::ToString;
 
-        let decoded = BASE64_STANDARD
-            .decode(&property.value)
-            .map_err(|err| DeserializeError::Unsupported(err.to_string()))?;
+        let decoded = BASE64_STANDARD.decode(&property.value).map_err(|err| {
+            DeserializeError::from(ParseError::new(
+                Span::new(0, 0),
+                DeserializeErrorKind::Unsupported { message: err.to_string().into() },
+            ))
+        })?;
 
         #[cfg(feature = "tracing")]
         if let Ok(str) = core::str::from_utf8(decoded.as_slice()) {
