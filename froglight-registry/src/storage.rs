@@ -404,7 +404,7 @@ macro_rules! __implement_storage_inner {
     (@global $version:ty => { $($tt:tt)* } ) => {
         $crate::__implement_storage_inner!(
             @local {
-                const REGISTRIES: &'static $crate::storage::GlobalRegistrySetStorage = {
+                const REGISTRY: &'static $crate::storage::GlobalRegistrySetStorage = {
                     static STATIC: $crate::storage::GlobalRegistrySetStorage = $crate::storage::GlobalRegistrySetStorage::new(
                         $crate::storage::RegistrySetStorage::new_static(ENTRIES)
                     );
@@ -426,7 +426,7 @@ macro_rules! __implement_storage_inner {
             impl $crate::version::RegistryVersion for $version {
                 $($constant)*
 
-                fn new_registries() -> $crate::storage::RegistrySetStorage {
+                fn new_registry() -> $crate::storage::RegistrySetStorage {
                     $crate::storage::RegistrySetStorage::new_static(ENTRIES)
                 }
             }

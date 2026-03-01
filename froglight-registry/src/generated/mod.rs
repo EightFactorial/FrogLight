@@ -10,3 +10,6 @@ macro_rules! generate {
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.
+
+#[cfg(feature = "v26_1")]
+mod v26_1;

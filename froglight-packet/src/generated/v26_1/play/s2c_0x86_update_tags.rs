@@ -1,9 +1,13 @@
 //! This file is auto-generated. Disable this by adding a `manual` tag.
-//! 
-//! @generated packet for "minecraft:update_tags"
+//!
+//! @manual packet for "minecraft:update_tags"
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+use crate::common::update_tags::TagMap;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
+#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct UpdateTagsS2CPacket;
+pub struct UpdateTagsS2CPacket {
+    pub tags: TagMap,
+}

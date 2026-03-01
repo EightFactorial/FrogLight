@@ -15,9 +15,10 @@ use froglight_packet::{
             DisconnectS2CPacket as ConfigDisconnectS2CPacket, FinishConfigurationC2SPacket,
             FinishConfigurationS2CPacket, KeepAliveC2SPacket,
             KeepAliveS2CPacket as ConfigKeepAliveS2CPacket, PingS2CPacket,
-            PongC2SPacket as ConfigPongC2SPacket, SelectKnownPacksC2SPacket,
+            PongC2SPacket as ConfigPongC2SPacket, RegistryDataS2CPacket, SelectKnownPacksC2SPacket,
             SelectKnownPacksS2CPacket, ServerboundPackets as ConfigServerboundPackets,
             StoreCookieS2CPacket as ConfigStoreCookieS2CPacket,
+            UpdateTagsS2CPacket as ConfigUpdateTagsS2CPacket,
         },
         handshake::{IntentionC2SPacket, ServerboundPackets as HandshakeServerboundPackets},
         login::{
@@ -128,8 +129,8 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ClientboundConfigEvent::RegistryData() => {
-                    let packet = todo!();
+                ClientboundConfigEvent::RegistryData(registry, payload) => {
+                    let packet = RegistryDataS2CPacket { registry, payload };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::RegistryData(packet))))
                 }
                 ClientboundConfigEvent::EnabledFeatures() => {
@@ -138,8 +139,8 @@ impl EventVersion for V26_1 {
                         ConfigClientboundPackets::UpdateEnabledFeatures(packet),
                     )))
                 }
-                ClientboundConfigEvent::UpdateTags() => {
-                    let packet = todo!();
+                ClientboundConfigEvent::UpdateTags(tags) => {
+                    let packet = ConfigUpdateTagsS2CPacket { tags };
                     Ok(Some(VersionPacket::Config(ConfigClientboundPackets::UpdateTags(packet))))
                 }
                 ClientboundConfigEvent::ServerLinks() => {
@@ -866,8 +867,11 @@ impl EventVersion for V26_1 {
                 ConfigClientboundPackets::ResetChat(_) => {
                     Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::ResetChat)))
                 }
-                ConfigClientboundPackets::RegistryData(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::RegistryData())))
+                ConfigClientboundPackets::RegistryData(packet) => {
+                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::RegistryData(
+                        packet.registry,
+                        packet.payload,
+                    ))))
                 }
                 ConfigClientboundPackets::ResourcePackPop(_packet) => Ok(Some(
                     ClientboundEventEnum::Config(ClientboundConfigEvent::ResourcePackPop()),
@@ -887,9 +891,9 @@ impl EventVersion for V26_1 {
                 ConfigClientboundPackets::UpdateEnabledFeatures(_packet) => Ok(Some(
                     ClientboundEventEnum::Config(ClientboundConfigEvent::EnabledFeatures()),
                 )),
-                ConfigClientboundPackets::UpdateTags(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateTags())))
-                }
+                ConfigClientboundPackets::UpdateTags(packet) => Ok(Some(
+                    ClientboundEventEnum::Config(ClientboundConfigEvent::UpdateTags(packet.tags)),
+                )),
                 ConfigClientboundPackets::SelectKnownPacks(packet) => {
                     Ok(Some(ClientboundEventEnum::Config(
                         ClientboundConfigEvent::KnownResourcePacks(packet.known),

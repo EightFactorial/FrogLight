@@ -12,6 +12,7 @@ use froglight_packet::common::{
     known_packs::KnownResourcePack,
     login::{LoginHelloContent, PlayLoginContent},
     unsized_buffer::UnsizedBuffer,
+    update_tags::TagMap,
 };
 use froglight_player::prelude::PlayerProfile;
 use froglight_world::prelude::ChunkPos;
@@ -250,7 +251,7 @@ pub enum ClientboundConfigEvent {
     KeepAlive(u64),
     KnownResourcePacks(Vec<KnownResourcePack>),
     Ping(u32),
-    RegistryData(),
+    RegistryData(Identifier<'static>, UnsizedBuffer<'static>),
     ResetChat,
     ResourcePackPop(),
     ResourcePackPush(),
@@ -258,7 +259,7 @@ pub enum ClientboundConfigEvent {
     ShowDialog(),
     StoreCookie(Identifier<'static>, Vec<u8>),
     Transfer(),
-    UpdateTags(),
+    UpdateTags(TagMap),
 }
 
 #[repr(u8)]

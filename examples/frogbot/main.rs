@@ -240,6 +240,9 @@ impl BotPlugin {
                             login.spawn_info.dimension
                         );
 
+                        // TODO: Get the `height_max` and `height_min` from the server.
+                        // Currently panics if the bot logs into other dimensions.
+
                         // Prepare the bot's `WorldInstance` for tracking entities
                         let mut commands = commands.entity(bot.id());
                         commands.insert((
@@ -437,8 +440,8 @@ impl BotPlugin {
                             ServerboundConfigEvent::Pong(*id),
                         ));
                     }
-                    ClientboundConfigEvent::RegistryData() => {
-                        info!("Received RegistryData: <placeholder>");
+                    ClientboundConfigEvent::RegistryData(identifier, _) => {
+                        info!("Received RegistryData: \"{identifier}\"");
                     }
                     ClientboundConfigEvent::ResetChat => {
                         info!("Received ResetChat");
@@ -463,8 +466,13 @@ impl BotPlugin {
                         error!("Did you attempt to join a proxy?");
                         commands.write_message(AppExit::error());
                     }
-                    ClientboundConfigEvent::UpdateTags() => {
-                        info!("Received UpdateTags: <placeholder>");
+                    ClientboundConfigEvent::UpdateTags(tags) => {
+                        for (identifier, tags) in &tags.0 {
+                            info!("Received UpdateTags: \"{identifier}\"");
+                            for tag in tags {
+                                debug!(" - \"{}\"", tag.identifier);
+                            }
+                        }
                     }
                     other => warn!("Unhandled Event: {other:?}"),
                 },

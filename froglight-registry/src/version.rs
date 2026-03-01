@@ -10,13 +10,13 @@ use crate::storage::RegistrySetStorage;
 pub trait RegistryVersion: Version {
     /// The [`GlobalRegistrySetStorage`] for this [`Version`].
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-    const REGISTRIES: &'static GlobalRegistrySetStorage;
+    const REGISTRY: &'static GlobalRegistrySetStorage;
 
     /// Get the [`GlobalRegistrySetStorage`] for this [`Version`].
     #[inline]
     #[must_use]
     #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
-    fn registries() -> &'static GlobalRegistrySetStorage { Self::REGISTRIES }
+    fn registry() -> &'static GlobalRegistrySetStorage { Self::REGISTRY }
 
     /// Create a new [`RegistrySetStorage`] for this [`Version`].
     ///
@@ -26,5 +26,5 @@ pub trait RegistryVersion: Version {
     ///
     /// Unless you are in a `no_std` environment, you should probably be using
     /// [`RegistryVersion::registries`] or the associated constant.
-    fn new_registries() -> RegistrySetStorage;
+    fn new_registry() -> RegistrySetStorage;
 }

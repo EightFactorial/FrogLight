@@ -9,3 +9,4 @@ pub mod known_packs;
 pub mod login;
 pub mod spawn_info;
 pub mod unsized_buffer;
+pub mod update_tags;

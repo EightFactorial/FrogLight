@@ -32,7 +32,7 @@ implement_registry! {
 #[test]
 #[allow(unused_mut, reason = "Used if `alloc` feature is enabled")]
 fn entry_a() {
-    let mut storage = TestVersion::new_registries();
+    let mut storage = TestVersion::new_registry();
     let registry = storage.get("test:example_a").unwrap();
 
     assert_eq!(registry.len(), 3);
@@ -64,7 +64,7 @@ fn entry_a() {
 #[allow(unused_mut, reason = "Used if `alloc` feature is enabled")]
 #[cfg(any(feature = "async", feature = "parking_lot", feature = "std"))]
 fn entry_b() {
-    let mut storage = TestVersion::registries().write();
+    let mut storage = TestVersion::registry().write();
     let registry = storage.get("test:example_b").unwrap();
 
     assert_eq!(registry.len(), 2);
