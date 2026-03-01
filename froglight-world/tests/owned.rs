@@ -48,6 +48,7 @@ fn empty() {
     let section = unsafe {
         Section::new_unchecked(
             0,
+            0,
             SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::EMPTY),
             SectionData::new_unchecked(0, SectionPalette::Single(0), BitVec::EMPTY),
         )

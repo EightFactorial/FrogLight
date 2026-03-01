@@ -13,7 +13,8 @@ use crate::{
 /// A borrowed piece of a chunk.
 #[derive(Default, Clone)]
 pub struct BorrowedSection<'a> {
-    non_air: u32,
+    block_count: u16,
+    fluid_count: u16,
     blocks: BorrowedSectionData<'a, BlockSection>,
     biomes: BorrowedSectionData<'a, BiomeSection>,
 }
@@ -26,16 +27,21 @@ impl<'a> BorrowedSection<'a> {
     /// The caller must ensure that the provided data is valid.
     #[must_use]
     pub const unsafe fn new_unchecked(
-        non_air: u32,
+        block_count: u16,
+        fluid_count: u16,
         blocks: BorrowedSectionData<'a, BlockSection>,
         biomes: BorrowedSectionData<'a, BiomeSection>,
     ) -> Self {
-        Self { non_air, blocks, biomes }
+        Self { block_count, fluid_count, blocks, biomes }
     }
 
     /// Get the number of non-air blocks in this section.
     #[must_use]
-    pub const fn block_count(&self) -> u32 { self.non_air }
+    pub const fn block_count(&self) -> u16 { self.block_count }
+
+    /// Get the number of fluid blocks in this section.
+    #[must_use]
+    pub const fn fluid_count(&self) -> u16 { self.fluid_count }
 
     /// Get the [`BorrowedSectionData`] for blocks.
     #[must_use]

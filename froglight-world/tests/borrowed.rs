@@ -44,6 +44,7 @@ fn empty() {
     let section = unsafe {
         BorrowedSection::new_unchecked(
             0,
+            0,
             BorrowedSectionData::new_unchecked(0, BorrowedPalette::Single(0), BitSlice::empty()),
             BorrowedSectionData::new_unchecked(0, BorrowedPalette::Single(0), BitSlice::empty()),
         )
