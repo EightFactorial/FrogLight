@@ -91,7 +91,7 @@ pub trait NetworkVersion: PacketVersion {
                         // `server_to_client` from reading it while we potentially update it.
                         let mut state = state.lock().await;
 
-                        #[cfg(feature = "tracing")]
+                        #[cfg(feature = "tracing_ext")]
                         tracing::trace!(target: "froglight_network", "Sending Packet: {packet:?}");
 
                         match (packet, *state) {
@@ -182,7 +182,7 @@ pub trait NetworkVersion: PacketVersion {
                                     continue;
                                 };
 
-                                #[cfg(feature = "tracing")]
+                                #[cfg(feature = "tracing_ext")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
                                 let update = Self::update_connection_details(&packet);
@@ -199,7 +199,7 @@ pub trait NetworkVersion: PacketVersion {
                                     continue;
                                 };
 
-                                #[cfg(feature = "tracing")]
+                                #[cfg(feature = "tracing_ext")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
                                 let update = Self::update_connection_details(&packet);
@@ -216,7 +216,7 @@ pub trait NetworkVersion: PacketVersion {
                                     continue;
                                 };
 
-                                #[cfg(feature = "tracing")]
+                                #[cfg(feature = "tracing_ext")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
                                 let update = Self::update_connection_details(&packet);
@@ -233,7 +233,7 @@ pub trait NetworkVersion: PacketVersion {
                                     continue;
                                 };
 
-                                #[cfg(feature = "tracing")]
+                                #[cfg(feature = "tracing_ext")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
                                 let update = Self::update_connection_details(&packet);
@@ -250,7 +250,7 @@ pub trait NetworkVersion: PacketVersion {
                                     continue;
                                 };
 
-                                #[cfg(feature = "tracing")]
+                                #[cfg(feature = "tracing_ext")]
                                 tracing::trace!(target: "froglight_network", "Received Packet: {packet:?}");
 
                                 let update = Self::update_connection_details(&packet);
@@ -382,7 +382,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     // Decompress the packet.
     let packet = reader.decompress(buffer).await?;
 
-    #[cfg(feature = "tracing")]
+    #[cfg(feature = "tracing_ext")]
     if packet_length > 128 {
         tracing::trace!(
             target: "froglight_network",
@@ -399,7 +399,7 @@ pub async fn read_packet<R: RuntimeRead<C>, C: Send, T: Facet<'static>>(
     #[allow(unused_variables, reason = "Variables are used if tracing is enabled")]
     match facet_minecraft::from_slice_remainder::<T>(packet) {
         Ok((val, rem)) => {
-            #[cfg(feature = "tracing")]
+            #[cfg(feature = "tracing_ext")]
             if !rem.is_empty() {
                 if tracing::enabled!(target: "froglight_network", tracing::Level::DEBUG) {
                     let length = rem.len();
@@ -455,7 +455,7 @@ pub async fn write_packet<R: RuntimeWrite<C>, C: Send, T: Facet<'static>>(
     // Serialize the packet.
     facet_minecraft::to_buffer(packet, buffer_a)?;
 
-    #[cfg(feature = "tracing")]
+    #[cfg(feature = "tracing_ext")]
     tracing::trace!(target: "froglight_network", "Writing packet as: {buffer_a:?}");
 
     // Compress the packet.

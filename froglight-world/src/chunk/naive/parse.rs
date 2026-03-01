@@ -15,7 +15,10 @@ use crate::{
 
 /// An error that can occur when parsing chunk data.
 #[derive(Debug)]
-pub enum ParseError {}
+pub enum ParseError {
+    /// The input data was not long enough
+    EndOfInput,
+}
 
 impl NaiveChunk {
     /// Attempt to parse a [`NaiveChunk`] from the given data.

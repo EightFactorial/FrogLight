@@ -74,6 +74,8 @@ bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "f
 resolver = ["dep:async-io", "dep:blocking", "dep:futures-lite", "dep:hickory-resolver", "dep:socket2"]
 # Enable `tracing` support.
 tracing = ["dep:tracing", "froglight-player/tracing"]
+# Enable extended `tracing` support.
+tracing_ext = ["tracing"]
 
 # Enable optimizations using the nightly toolchain
 nightly = ["froglight-player/nightly"]

@@ -45,6 +45,8 @@ multi_threaded = ["froglight-internal/multi_threaded"]
 network = ["froglight-internal/network", "std"]
 # Enable `tracing` support.
 tracing = ["froglight-internal/tracing"]
+# Enable extended`tracing` support.
+tracing_ext = ["froglight-internal/tracing_ext", "tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-internal/libm"]
