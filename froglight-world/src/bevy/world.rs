@@ -61,6 +61,9 @@ impl WorldInstanceChunks {
     #[must_use]
     pub fn get(&self, position: &ChunkPos) -> Option<Entity> { self.chunks.get(position).copied() }
 
+    /// Get an iterator over the chunks in this [`WorldInstanceChunks`].
+    pub fn iter(&self) -> impl Iterator<Item = (&ChunkPos, &Entity)> { self.chunks.iter() }
+
     #[allow(unused_variables, reason = "Used by tracing macros")]
     fn remove_hook(mut world: DeferredWorld, ctx: HookContext) {
         let mut instance = world
