@@ -50,39 +50,6 @@ impl WorldInstance {
     #[expect(private_bounds, reason = "Only two possible data types")]
     pub fn get<T: InstanceData>(&self, data: &T) -> Option<Entity> { data.query(self) }
 
-    /// Insert an association between an entity and some data into the
-    /// [`WorldInstance`].
-    ///
-    /// Returns the previous entity if one existed.
-    #[expect(private_bounds, reason = "Only two possible data types")]
-    pub fn insert<T: InstanceData>(&mut self, data: &T, entity: Entity) -> Option<Entity> {
-        data.insert(self, entity)
-    }
-
-    /// Remove the association between an entity and all data.
-    ///
-    /// Returns `true` if any associations were removed.
-    pub fn remove(&mut self, entity: Entity) -> bool {
-        let mut removed = false;
-        self.entity_id.retain(|_, &mut e| -> bool {
-            if e == entity {
-                removed = true;
-                false
-            } else {
-                true
-            }
-        });
-        self.entity_uuid.retain(|_, &mut e| {
-            if e == entity {
-                removed = true;
-                false
-            } else {
-                true
-            }
-        });
-        removed
-    }
-
     /// Hook for when a [`WorldInstance`] is removed from an entity.
     #[allow(unused_variables, reason = "Used by tracing macros")]
     fn remove_hook(mut world: DeferredWorld, ctx: HookContext) {
