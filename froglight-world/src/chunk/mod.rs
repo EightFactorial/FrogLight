@@ -6,7 +6,7 @@ mod chunk;
 pub use chunk::Chunk;
 
 mod naive;
-pub use naive::NaiveChunk;
+pub use naive::{NaiveChunk, parse::ParseError};
 
 pub mod section;
 pub use section::Section;

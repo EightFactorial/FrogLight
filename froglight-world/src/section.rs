@@ -14,7 +14,7 @@ pub trait SectionType: Debug + Default + Clone + Send + Sync + Sealed + 'static 
     const QUANTIZATION: usize;
 
     /// Get a [`SectionPaletteType`] for this number of bits.
-    fn palette_for(bits: usize) -> SectionPaletteType;
+    fn palette_for(bits: u8) -> SectionPaletteType;
 }
 
 /// A type of section palette.
@@ -43,7 +43,7 @@ impl Sealed for BlockSection {}
 impl SectionType for BlockSection {
     const QUANTIZATION: usize = 1;
 
-    fn palette_for(bits: usize) -> SectionPaletteType {
+    fn palette_for(bits: u8) -> SectionPaletteType {
         match bits {
             0 => SectionPaletteType::Single,
             1..=8 => SectionPaletteType::Vector,
@@ -60,7 +60,7 @@ impl Sealed for BiomeSection {}
 impl SectionType for BiomeSection {
     const QUANTIZATION: usize = 4;
 
-    fn palette_for(bits: usize) -> SectionPaletteType {
+    fn palette_for(bits: u8) -> SectionPaletteType {
         match bits {
             0 => SectionPaletteType::Single,
             1..=3 => SectionPaletteType::Vector,

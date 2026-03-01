@@ -178,7 +178,7 @@ macro_rules! __implement_storage_inner {
             @local {
                 const BLOCKS: &'static std::sync::LazyLock<$crate::storage::GlobalBlockStorage> = {
                     static STATIC: std::sync::LazyLock<$crate::storage::GlobalBlockStorage> = std::sync::LazyLock::new(|| {
-                        $crate::storage::GlobalBlockStorage::new(<$version as $crate::version::BlockVersion>::new_blocks())
+                        $crate::storage::GlobalBlockStorage::new::<$version>(<$version as $crate::version::BlockVersion>::new_blocks())
                     });
                     &STATIC
                 };

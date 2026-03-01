@@ -1,9 +1,9 @@
 //! This file is auto-generated. Disable this by adding a `manual` tag.
-//! 
-//! @generated packet for "minecraft:chunk_batch_start"
+//!
+//! @manual packet for "minecraft:chunk_batch_start"
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct ChunkBatchStartS2CPacket {}
+pub struct ChunkBatchStartS2CPacket;

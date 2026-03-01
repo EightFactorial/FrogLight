@@ -126,7 +126,9 @@ impl NaiveChunk {
         storage: &BlockStorage,
     ) -> Option<Block> {
         let is_air = |id| storage.get_block(GlobalId::new(id)).is_some_and(|block| block.is_air());
-        self.set_raw_block_pos::<P>(position, block.global_id().into_inner(), is_air)
+        let is_fluid =
+            |id| storage.get_block(GlobalId::new(id)).is_some_and(|block| block.is_liquid());
+        self.set_raw_block_pos::<P>(position, block.global_id().into_inner(), is_air, is_fluid)
             .and_then(|id| storage.get_block(GlobalId::new(id)))
     }
 

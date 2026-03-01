@@ -36,6 +36,10 @@ fn main() -> AppExit {
 /// A custom [`Plugin`] for FrogBot.
 struct BotPlugin;
 
+const ADDRESS: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 25565);
+const USERNAME: &str = "FrogBot";
+type Protocol = V26_1;
+
 impl Plugin for BotPlugin {
     fn build(&self, app: &mut App) {
         // Add systems for creating the bot and handling messages.
@@ -54,10 +58,6 @@ impl BotPlugin {
     ///
     /// Run once during [`Startup`].
     fn create_bot(world: &mut World) {
-        const ADDRESS: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 25565);
-        const USERNAME: &str = "FrogBot";
-        type Protocol = V26_1;
-
         // Connect to the server.
         info!("Connecting to {ADDRESS}...");
         let stream = match block_on(TcpStream::connect(ADDRESS)) {
@@ -145,13 +145,46 @@ impl BotPlugin {
                     // ClientboundPlayEvent::BundleDelimiter => todo!(),
                     // ClientboundPlayEvent::ChangeDifficulty() => todo!(),
                     // ClientboundPlayEvent::ChatSuggestions() => todo!(),
-                    // ClientboundPlayEvent::ChunkBatchFinished() => todo!(),
-                    // ClientboundPlayEvent::ChunkBatchStart() => todo!(),
+                    ClientboundPlayEvent::ChunkBatchFinished(size) => {
+                        debug!("Received ChunkBatchFinished: {size} chunks");
+                        writer.write(ServerboundMessage::new(
+                            bot.id(),
+                            ServerboundPlayEvent::ChunkBatchReceived(8.0),
+                        ));
+                    }
+                    ClientboundPlayEvent::ChunkBatchStart => {
+                        debug!("Received ChunkBatchStart");
+                    }
                     // ClientboundPlayEvent::ChunkBiomes() => todo!(),
                     // ClientboundPlayEvent::ChunkCacheCenter() => todo!(),
                     // ClientboundPlayEvent::ChunkCacheRadius() => todo!(),
                     // ClientboundPlayEvent::ChunkSectionUpdate() => todo!(),
-                    // ClientboundPlayEvent::ChunkWithLight() => todo!(),
+                    ClientboundPlayEvent::ChunkWithLight(pos, chunk, _) => {
+                        let Some(instance) = bot.get::<WorldInstanceChunks>() else {
+                            error!(
+                                "Received ChunkWithLight but bot doesn't have a WorldInstanceChunks!"
+                            );
+                            continue;
+                        };
+
+                        match chunk.try_into_naive(instance.height_max(), instance.height_min()) {
+                            Ok(naive) => {
+                                let entity = commands.spawn((
+                                    ChunkOfInstance::new(bot.id()),
+                                    SharedChunk::new(Chunk::new::<Protocol>(naive)),
+                                    *pos,
+                                ));
+
+                                debug!(
+                                    "Spawning Chunk as Entity {} ({}, {})",
+                                    entity.id(),
+                                    pos.x(),
+                                    pos.z()
+                                );
+                            }
+                            Err(err) => error!("Failed to convert chunk data: {err:?}"),
+                        }
+                    }
                     // ClientboundPlayEvent::ClearDialog => todo!(),
                     // ClientboundPlayEvent::ClearTitles() => todo!(),
                     // ClientboundPlayEvent::CommandSuggestions() => todo!(),
@@ -211,6 +244,7 @@ impl BotPlugin {
                         let mut commands = commands.entity(bot.id());
                         commands.insert((
                             WorldInstance::new(login.spawn_info.dimension.clone()),
+                            WorldInstanceChunks::new(320, -64),
                             EntityOfInstance::new(bot.id()),
                         ));
 

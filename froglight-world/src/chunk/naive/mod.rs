@@ -7,10 +7,9 @@ use core::ops::Range;
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
 use bevy_reflect::{Reflect, std_traits::ReflectDefault};
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
 
 use crate::{
+    SECTION_HEIGHT,
     chunk::{Section, storage::ChunkStorage},
     component::ChunkBlockPos,
     prelude::*,
@@ -20,8 +19,7 @@ use crate::{
 mod biome;
 #[cfg(feature = "froglight-block")]
 mod block;
-#[cfg(feature = "facet")]
-mod facet;
+pub(super) mod parse;
 
 /// A region of blocks in a world.
 ///
@@ -30,9 +28,7 @@ mod facet;
 #[derive(Default, Clone)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
-#[cfg_attr(feature = "facet", derive(::facet::Facet), facet(opaque))]
-#[cfg_attr(feature = "facet", facet(mc::serialize = NaiveChunk::SERIALIZE))]
-#[cfg_attr(feature = "facet", facet(mc::deserialize = NaiveChunk::DESERIALIZE))]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
 pub struct NaiveChunk {
     storage: ChunkStorage,
 }
@@ -72,7 +68,7 @@ impl NaiveChunk {
     #[expect(clippy::cast_possible_truncation, reason = "Chunks will never be that tall")]
     #[expect(clippy::cast_possible_wrap, reason = "Chunks will never be that tall")]
     pub const fn height(&self) -> i32 {
-        (self.storage.len() as i32 * 16).saturating_add(self.height_offset())
+        (self.height_total() as i32).saturating_add(self.height_offset())
     }
 
     /// Get the height range of this [`NaiveChunk`].
@@ -93,7 +89,7 @@ impl NaiveChunk {
     ///
     /// In most cases, you probably want [`Chunk::height`] instead.
     #[must_use]
-    pub const fn height_total(&self) -> usize { self.storage.len() * 16 }
+    pub const fn height_total(&self) -> usize { self.storage.len() * SECTION_HEIGHT as usize }
 
     /// Get the height offset of this [`NaiveChunk`].
     #[must_use]
@@ -143,9 +139,11 @@ impl NaiveChunk {
         position: P,
         block_id: u32,
         is_air: impl Fn(u32) -> bool,
+        is_fluid: impl Fn(u32) -> bool,
     ) -> Option<u32> {
-        ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset())
-            .and_then(|pos| self.set_raw_block_pos::<ChunkBlockPos>(pos, block_id, is_air))
+        ChunkBlockPos::try_from_blockpos(position.into(), self.height_offset()).and_then(|pos| {
+            self.set_raw_block_pos::<ChunkBlockPos>(pos, block_id, is_air, is_fluid)
+        })
     }
 
     /// Set the block id at the given position within the chunk,
@@ -158,12 +156,13 @@ impl NaiveChunk {
         position: P,
         block_id: u32,
         is_air: impl Fn(u32) -> bool,
+        is_fluid: impl Fn(u32) -> bool,
     ) -> Option<u32> {
         let position = position.into();
         let index = position.as_section_index();
 
         if let Some(section) = self.storage.as_slice_mut().get_mut(index) {
-            Some(section.set_raw_block(position.as_section_blockpos(), block_id, is_air))
+            Some(section.set_raw_block(position.as_section_blockpos(), block_id, is_air, is_fluid))
         } else {
             #[cfg(feature = "tracing")]
             tracing::warn!(target: "froglight_world", "Failed to access `NaiveChunk`, position was invalid?");

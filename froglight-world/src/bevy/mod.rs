@@ -4,7 +4,7 @@ use bevy_app::{App, Plugin};
 use froglight_common::prelude::WorldInstance;
 
 mod hook;
-use hook::{instance_add_hook, instance_remove_hook};
+use hook::{instance_insert_hook, instance_replace_hook};
 
 pub mod relationship;
 use relationship::ChunkOfInstance;
@@ -24,11 +24,9 @@ impl Plugin for WorldPlugin {
             .register_type::<WorldInstanceChunks>()
             .register_type::<WorldInstance>();
 
-        let world = app.world_mut();
-        world.register_required_components::<WorldInstance, WorldInstanceChunks>();
-        world
+        app.world_mut()
             .register_component_hooks::<ChunkPos>()
-            .on_add(instance_add_hook)
-            .on_remove(instance_remove_hook);
+            .on_insert(instance_insert_hook)
+            .on_replace(instance_replace_hook);
     }
 }

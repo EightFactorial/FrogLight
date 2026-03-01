@@ -1,5 +1,6 @@
 //! TODO
 
+pub mod chunk_data;
 pub mod client_information;
 pub mod entity_data;
 pub mod entity_id;

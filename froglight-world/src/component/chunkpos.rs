@@ -1,3 +1,8 @@
+#![allow(
+    clippy::unsafe_derive_deserialize,
+    reason = "Triggered by deriving `Facet` and `Deserialize`"
+)]
+
 use core::ops::{Add, Div, Mul, Sub};
 
 #[cfg(feature = "bevy")]
@@ -9,9 +14,10 @@ use glam::IVec2;
 use serde::{Deserialize, Serialize};
 
 /// A chunk's position in the world.
-#[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
+#[cfg_attr(feature = "bevy", component(immutable))]
+#[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]

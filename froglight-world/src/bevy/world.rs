@@ -4,23 +4,55 @@ use bevy_ecs::{
     component::Component, entity::Entity, lifecycle::HookContext, reflect::ReflectComponent,
     world::DeferredWorld,
 };
-use bevy_reflect::{Reflect, std_traits::ReflectDefault};
+use bevy_reflect::Reflect;
 use hashbrown::HashMap;
 
 use crate::prelude::ChunkPos;
 
 /// A world instance containing information about chunks.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Component, Reflect)]
-#[reflect(opaque, Debug, Default, Clone, PartialEq, Component)]
+#[derive(Debug, Clone, PartialEq, Eq, Component, Reflect)]
+#[reflect(opaque, Debug, Clone, PartialEq, Component)]
 #[component(on_remove = WorldInstanceChunks::remove_hook)]
 pub struct WorldInstanceChunks {
+    height_max: u32,
+    height_min: i32,
     pub(super) chunks: HashMap<ChunkPos, Entity>,
 }
 
 impl WorldInstanceChunks {
     /// Create a new, empty [`WorldInstanceChunks`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if the maximum height is less than the minimum height.
     #[must_use]
-    pub fn new() -> Self { Self { chunks: HashMap::new() } }
+    pub fn new(height_max: u32, height_min: i32) -> Self {
+        assert!(
+            height_min.is_negative() || height_max >= height_min.unsigned_abs(),
+            "Maximum height must be greater than or equal to minimum height!"
+        );
+
+        Self { chunks: HashMap::new(), height_max, height_min }
+    }
+
+    /// Get the maximum height of the world.
+    #[inline]
+    #[must_use]
+    pub const fn height_max(&self) -> u32 { self.height_max }
+
+    /// Get the minimum height of the world.
+    #[inline]
+    #[must_use]
+    pub const fn height_min(&self) -> i32 { self.height_min }
+
+    /// Get the total height of the world.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the maximum height is less than the minimum height.
+    #[inline]
+    #[must_use]
+    pub const fn height_total(&self) -> u32 { self.height_max.strict_sub_signed(self.height_min) }
 
     /// Query the [`WorldInstanceChunks`] for the [`Entity`] associated with the
     /// given [`ChunkPos`].

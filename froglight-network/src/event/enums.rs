@@ -5,6 +5,7 @@ use bevy_reflect::Reflect;
 use facet::Facet;
 use froglight_common::{entity::EntityId, prelude::Identifier};
 use froglight_packet::common::{
+    chunk_data::ChunkData,
     client_information::ClientInformation,
     entity_data::EntityData,
     handshake::HandshakeContent,
@@ -13,6 +14,7 @@ use froglight_packet::common::{
     unsized_buffer::UnsizedBuffer,
 };
 use froglight_player::prelude::PlayerProfile;
+use froglight_world::prelude::ChunkPos;
 
 #[repr(u8)]
 #[derive(Debug, Clone, PartialEq, Facet)]
@@ -87,13 +89,13 @@ pub enum ClientboundPlayEvent {
     BundleDelimiter,
     ChangeDifficulty(),
     ChatSuggestions(),
-    ChunkBatchFinished(),
-    ChunkBatchStart(),
+    ChunkBatchFinished(u32),
+    ChunkBatchStart,
     ChunkBiomes(),
     ChunkCacheCenter(),
     ChunkCacheRadius(),
     ChunkSectionUpdate(),
-    ChunkWithLight(),
+    ChunkWithLight(ChunkPos, ChunkData, UnsizedBuffer<'static>),
     ClearDialog,
     ClearTitles(),
     CommandSuggestions(),
@@ -223,6 +225,7 @@ pub enum ClientboundPlayEvent {
 #[cfg_attr(feature = "bevy", derive(Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ServerboundPlayEvent {
+    ChunkBatchReceived(f32),
     KeepAlive(u64),
     PingRequest(u32),
     Pong(u32),

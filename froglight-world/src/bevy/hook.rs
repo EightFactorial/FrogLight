@@ -5,8 +5,8 @@ use crate::{
     prelude::{ChunkOfInstance, ChunkPos},
 };
 
-/// Hook for when an instance-tracked component is added to an entity.
-pub(super) fn instance_add_hook(mut world: DeferredWorld, ctx: HookContext) {
+/// Hook for when an instance-tracked component is inserted into an entity.
+pub(super) fn instance_insert_hook(mut world: DeferredWorld, ctx: HookContext) {
     // Get the relationship component that points to the `WorldInstanceChunks`
     let Some(instance) = world.get::<ChunkOfInstance>(ctx.entity) else {
         #[cfg(feature = "tracing")]
@@ -38,7 +38,7 @@ pub(super) fn instance_add_hook(mut world: DeferredWorld, ctx: HookContext) {
 }
 
 /// Hook for when an instance-tracked component is removed from an entity.
-pub(super) fn instance_remove_hook(mut world: DeferredWorld, ctx: HookContext) {
+pub(super) fn instance_replace_hook(mut world: DeferredWorld, ctx: HookContext) {
     // Get the relationship component that points to the `WorldInstanceChunks`
     let Some(instance) = world.get::<ChunkOfInstance>(ctx.entity) else {
         #[cfg(feature = "tracing")]

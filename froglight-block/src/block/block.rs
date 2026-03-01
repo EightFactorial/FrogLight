@@ -157,6 +157,10 @@ impl Block {
     #[must_use]
     pub fn is_solid(&self) -> bool { self.reference.behavior().is_solid(self.state) }
 
+    /// Returns `true` if this block is liquid.
+    #[must_use]
+    pub fn is_liquid(&self) -> bool { self.reference.behavior().is_liquid(self.state) }
+
     /// Returns `true` if this block is transparent.
     #[must_use]
     pub fn is_transparent(&self) -> bool { self.reference.behavior().is_transparent(self.state) }

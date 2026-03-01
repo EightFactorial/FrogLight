@@ -29,20 +29,22 @@ use froglight_packet::{
             ServerboundPackets as LoginServerboundPackets,
         },
         play::{
-            AddEntityS2CPacket, BundleDelimiterS2CPacket,
+            AddEntityS2CPacket, BundleDelimiterS2CPacket, ChunkBatchFinishedS2CPacket,
+            ChunkBatchReceivedC2SPacket, ChunkBatchStartS2CPacket,
             ClearDialogS2CPacket as PlayClearDialogS2CPacket,
             ClientboundPackets as PlayClientboundPackets,
             CustomPayloadS2CPacket as PlayCustomPayloadS2CPacket,
             DisconnectS2CPacket as PlayDisconnectS2CPacket,
             KeepAliveC2SPacket as PlayKeepAliveC2SPacket,
-            KeepAliveS2CPacket as PlayKeepAliveS2CPacket, LoginS2CPacket,
-            PingRequestC2SPacket as PlayPingRequestC2SPacket, PongC2SPacket as PlayPongC2SPacket,
-            PongResponseS2CPacket as PlayPongResponseS2CPacket, RemoveEntitiesS2CPacket,
-            ServerboundPackets as PlayServerboundPackets,
+            KeepAliveS2CPacket as PlayKeepAliveS2CPacket, LevelChunkWithLightS2CPacket,
+            LoginS2CPacket, PingRequestC2SPacket as PlayPingRequestC2SPacket,
+            PongC2SPacket as PlayPongC2SPacket, PongResponseS2CPacket as PlayPongResponseS2CPacket,
+            RemoveEntitiesS2CPacket, ServerboundPackets as PlayServerboundPackets,
         },
     },
     version::{Clientbound, Serverbound, VersionPacket},
 };
+use froglight_world::prelude::ChunkPos;
 
 use crate::{
     connection::ConnectionError,
@@ -232,16 +234,15 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ClientboundPlayEvent::ChunkBatchFinished() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::ChunkBatchFinished(batch_size) => {
+                    let packet = ChunkBatchFinishedS2CPacket { batch_size };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::ChunkBatchFinished(
                         packet,
                     ))))
                 }
-                ClientboundPlayEvent::ChunkBatchStart() => {
-                    let packet = todo!();
-                    Ok(Some(VersionPacket::Play(PlayClientboundPackets::ChunkBatchStart(packet))))
-                }
+                ClientboundPlayEvent::ChunkBatchStart => Ok(Some(VersionPacket::Play(
+                    PlayClientboundPackets::ChunkBatchStart(ChunkBatchStartS2CPacket),
+                ))),
                 ClientboundPlayEvent::ChunkBiomes() => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::ChunksBiomes(packet))))
@@ -264,8 +265,13 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ClientboundPlayEvent::ChunkWithLight() => {
-                    let packet = todo!();
+                ClientboundPlayEvent::ChunkWithLight(pos, chunk, light) => {
+                    let packet = LevelChunkWithLightS2CPacket {
+                        chunk_x: pos.x(),
+                        chunk_z: pos.z(),
+                        chunk_data: chunk,
+                        light_data: light,
+                    };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelChunkWithLight(
                         packet,
                     ))))
@@ -940,11 +946,13 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::ChangeDifficulty(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChangeDifficulty())))
                 }
-                PlayClientboundPackets::ChunkBatchFinished(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBatchFinished())))
+                PlayClientboundPackets::ChunkBatchFinished(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBatchFinished(
+                        packet.batch_size,
+                    ))))
                 }
-                PlayClientboundPackets::ChunkBatchStart(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBatchStart())))
+                PlayClientboundPackets::ChunkBatchStart(_) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBatchStart)))
                 }
                 PlayClientboundPackets::ChunksBiomes(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkBiomes())))
@@ -992,7 +1000,7 @@ impl EventVersion for V26_1 {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DebugBlock())))
                 }
                 PlayClientboundPackets::DebugChunkValue(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight())))
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DebugChunk())))
                 }
                 PlayClientboundPackets::DebugEntityValue(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::DebugEntity())))
@@ -1045,8 +1053,12 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::KeepAlive(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::KeepAlive(packet.id))))
                 }
-                PlayClientboundPackets::LevelChunkWithLight(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight())))
+                PlayClientboundPackets::LevelChunkWithLight(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight(
+                        ChunkPos::new_xz(packet.chunk_x, packet.chunk_z),
+                        packet.chunk_data,
+                        packet.light_data,
+                    ))))
                 }
                 PlayClientboundPackets::LevelEvent(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::LevelEvent())))
@@ -1430,6 +1442,12 @@ impl EventVersion for V26_1 {
             },
 
             ServerboundEventEnum::Play(play) => match play {
+                ServerboundPlayEvent::ChunkBatchReceived(rate) => {
+                    let packet = ChunkBatchReceivedC2SPacket { rate };
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChunkBatchReceived(
+                        packet,
+                    ))))
+                }
                 ServerboundPlayEvent::KeepAlive(id) => {
                     let packet = PlayKeepAliveC2SPacket { id };
                     Ok(Some(VersionPacket::Play(PlayServerboundPackets::KeepAlive(packet))))
