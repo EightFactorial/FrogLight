@@ -6,6 +6,9 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+#[cfg(feature = "bevy")]
+pub mod bevy;
+
 pub mod prelude {
     //! Re-exports of common types, traits, and macros.
 
