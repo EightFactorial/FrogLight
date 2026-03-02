@@ -17,12 +17,14 @@ const CRATES: &[(&str, &[&str])] = &[
         &[
             "froglight-biome/",
             "froglight-block/",
+            "froglight-entity/",
             "froglight-item/",
             "froglight-network?/",
             "froglight-packet/",
             "froglight-registry/",
         ],
     ),
+    ("froglight-entity", &["froglight-common/"]),
     ("froglight-item", &["froglight-common/"]),
     (
         "froglight-network",

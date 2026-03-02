@@ -123,7 +123,9 @@ impl PacketData {
 
             #[derive(Debug, Clone, PartialEq, Eq, Facet)]
             struct PacketReportState {
+                #[facet(default)]
                 pub clientbound: IndexMap<String, PacketReportPacket>,
+                #[facet(default)]
                 pub serverbound: IndexMap<String, PacketReportPacket>,
             }
 

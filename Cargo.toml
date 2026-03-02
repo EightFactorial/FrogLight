@@ -9,14 +9,14 @@ froglight-biome = { default-features = false, path = "froglight-biome", version 
 froglight-block = { default-features = false, path = "froglight-block", version = "0.0.1" }
 # froglight-brigadier = { default-features = false, path = "froglight-brigadier" }
 froglight-common = { default-features = false, path = "froglight-common", version = "0.0.1" }
-# froglight-entity = { default-features = false, path = "froglight-entity" }
+froglight-entity = { default-features = false, path = "froglight-entity", version = "0.0.1" }
 froglight-internal = { default-features = false, path = "froglight-internal", version = "0.0.1" }
 froglight-inventory = { default-features = false, path = "froglight-inventory", version = "0.0.1" }
 froglight-item = { default-features = false,  path = "froglight-item", version = "0.0.1" }
 froglight-math = { default-features = false, path = "froglight-math", version = "0.0.1" }
 froglight-network = { default-features = false, path = "froglight-network", version = "0.0.1" }
-froglight-packet = { default-features = false, path = "froglight-packet", version = "0.0.1" }
-# froglight-physics = { default-features = false, path = "froglight-physics" }
+froglight-packet = { default-features = false, path = "froglight-packet" }
+froglight-physics = { default-features = false, path = "froglight-physics", version = "0.0.1" }
 froglight-player = { default-features = false, path = "froglight-player", version = "0.0.1" }
 froglight-registry = { default-features = false, path = "froglight-registry", version = "0.0.1" }
 froglight-world = { default-features = false, path = "froglight-world", version = "0.0.1" }
@@ -100,14 +100,14 @@ members = [
   # "froglight-brigadier",
   "froglight-codegen",
   "froglight-common",
-  # "froglight-entity",
+  "froglight-entity",
   "froglight-internal",
   "froglight-inventory",
   "froglight-item",
   "froglight-math",
   "froglight-network",
   "froglight-packet",
-  # "froglight-physics",
+  "froglight-physics",
   "froglight-player",
   "froglight-registry",
   "froglight-world",

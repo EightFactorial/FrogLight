@@ -57,6 +57,7 @@ pub struct BlockReport(pub IndexMap<String, BlockReportEntry>);
 pub struct BlockReportEntry {
     #[facet(default)]
     pub definition: Value,
+    #[facet(default)]
     pub properties: IndexMap<String, Vec<String>>,
     pub states: Vec<BlockReportState>,
 }
@@ -66,6 +67,7 @@ pub struct BlockReportState {
     #[facet(default)]
     pub default: bool,
     pub id: usize,
+    #[facet(default)]
     pub properties: IndexMap<String, String>,
 }
 

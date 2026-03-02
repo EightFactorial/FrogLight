@@ -11,6 +11,7 @@ pub use froglight_math as math;
 #[cfg(feature = "network")]
 pub use froglight_network as network;
 pub use froglight_packet as packet;
+pub use froglight_physics as physics;
 pub use froglight_player as player;
 pub use froglight_registry as registry;
 pub use froglight_world as world;
@@ -29,7 +30,7 @@ pub mod prelude {
     pub use crate::{api::prelude::*, network::prelude::*};
     pub use crate::{
         biome::prelude::*, block::prelude::*, common::prelude::*, inventory::prelude::*,
-        math::prelude::*, packet::prelude::*, player::prelude::*, registry::prelude::*,
-        world::prelude::*,
+        math::prelude::*, packet::prelude::*, physics::prelude::*, player::prelude::*,
+        registry::prelude::*, world::prelude::*,
     };
 }

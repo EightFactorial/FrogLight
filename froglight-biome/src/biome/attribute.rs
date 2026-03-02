@@ -1,4 +1,5 @@
 //! TODO
+#![allow(clippy::result_large_err, reason = "Facet's error type")]
 
 #[cfg(all(feature = "alloc", feature = "biome_data"))]
 use alloc::vec::Vec;

@@ -1,0 +1,56 @@
+[package]
+edition = { workspace = true }
+homepage = { workspace = true }
+include = { workspace = true }
+license = { workspace = true }
+name = "froglight-entity"
+readme = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints]
+workspace = true
+
+# --- Dependencies ---
+
+[dependencies]
+froglight-common = { workspace = true }
+glam = { workspace = true }
+
+# Optional dependencies
+arc-swap = { workspace = true, optional = true }
+bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
+bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
+bevy_reflect = { workspace = true, optional = true }
+libm = { workspace = true, optional = true }
+tracing = { workspace = true, optional = true }
+
+# --- Features ---
+
+[features]
+default = ["alloc", "std"]
+
+# Enable `bevy` support.
+bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect"]
+# Enable `tracing` support.
+tracing = ["dep:tracing"]
+
+# Enable `libm` for `no_std` support.
+libm = ["dep:libm", "glam/nostd-libm"]
+
+# Enable support for a global allocator
+alloc = ["froglight-common/alloc"]
+# Enable support for the standard library
+std = ["alloc", "dep:arc-swap", "froglight-common/std", "glam/std"]
+# Enable optimizations using the nightly toolchain
+nightly = ["froglight-common/nightly"]
+
+# -------------------------------------------------------------------------------------------------
+# Note: The following features are automatically @generated.
+
+v26_1 = ["froglight-common/v26_1"]
