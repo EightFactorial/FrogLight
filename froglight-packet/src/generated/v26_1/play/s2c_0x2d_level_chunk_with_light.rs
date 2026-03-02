@@ -2,7 +2,7 @@
 //!
 //! @manual packet for "minecraft:level_chunk_with_light"
 
-use crate::common::{chunk_data::ChunkData, unsized_buffer::UnsizedBuffer};
+use crate::common::{chunk_data::RawChunkData, unsized_buffer::UnsizedBuffer};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
@@ -11,6 +11,6 @@ use crate::common::{chunk_data::ChunkData, unsized_buffer::UnsizedBuffer};
 pub struct LevelChunkWithLightS2CPacket {
     pub chunk_x: i32,
     pub chunk_z: i32,
-    pub chunk_data: ChunkData,
+    pub chunk_data: RawChunkData,
     pub light_data: UnsizedBuffer<'static>,
 }

@@ -139,6 +139,28 @@ impl Block {
     #[must_use]
     pub fn is_version<V: 'static>(&self) -> bool { self.reference.is_version::<V>() }
 
+    /// Attempt to convert this block into a [`Block`] of another
+    /// [`Version`](froglight_common::version::Version).
+    ///
+    /// Returns `None` if the blocks are not of the same [`BlockType`].
+    #[must_use]
+    pub fn try_using_metadata(&self, metadata: &'static BlockMetadata) -> Option<Block> {
+        if self.reference.block_ty() == metadata.block_ty() {
+            if self.reference.version_ty() == metadata.version_ty() {
+                // Skip the conversion
+                Some(*self)
+            } else {
+                // Convert using the new version's metadata.
+                Some(Block {
+                    state: self.metadata().try_using_metadata(self.state, metadata),
+                    reference: metadata,
+                })
+            }
+        } else {
+            None
+        }
+    }
+
     /// Get the [`TypeId`] of the block type.
     #[inline]
     #[must_use]

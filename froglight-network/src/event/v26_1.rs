@@ -4,7 +4,7 @@
 
 use froglight_common::version::V26_1;
 use froglight_packet::{
-    common::entity_id::VarEntityId,
+    common::{chunk_data::ChunkData, entity_id::VarEntityId},
     generated::v26_1::{
         configuration::{
             ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
@@ -270,7 +270,7 @@ impl EventVersion for V26_1 {
                     let packet = LevelChunkWithLightS2CPacket {
                         chunk_x: pos.x(),
                         chunk_z: pos.z(),
-                        chunk_data: chunk,
+                        chunk_data: chunk.into_raw::<Self>(),
                         light_data: light,
                     };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelChunkWithLight(
@@ -1060,7 +1060,11 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::LevelChunkWithLight(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight(
                         ChunkPos::new_xz(packet.chunk_x, packet.chunk_z),
-                        packet.chunk_data,
+                        ChunkData::new::<Self>(
+                            packet.chunk_data.heightmaps,
+                            packet.chunk_data.chunk_data,
+                            packet.chunk_data.entity_data,
+                        ),
                         packet.light_data,
                     ))))
                 }

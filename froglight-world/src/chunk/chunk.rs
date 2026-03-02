@@ -8,7 +8,9 @@ use bevy_ecs::{component::Component, reflect::ReflectComponent};
 use bevy_reflect::Reflect;
 use froglight_biome::{biome::Biome, storage::GlobalBiomeStorage, version::BiomeVersion};
 use froglight_block::{block::Block, storage::GlobalBlockStorage, version::BlockVersion};
+use smallvec::SmallVec;
 
+use super::section::SectionPalette;
 use crate::{
     chunk::{Section, storage::ChunkStorage},
     component::ChunkBlockPos,
@@ -214,5 +216,77 @@ impl Chunk {
         }
 
         self.naive.set_biome_pos_using::<P>(position, biome, &self.biomes.load())
+    }
+
+    /// Convert this [`Chunk`] into another version.
+    ///
+    /// Uses [`Air`](froglight_block::prelude::block::Air) for blocks and
+    /// [`Plains`](froglight_biome::prelude::biome::Plains) for biomes that
+    /// cannot be converted.
+    #[must_use]
+    #[expect(unused, reason = "WIP")]
+    pub fn convert_into<V: BiomeVersion + BlockVersion>(&self) -> Self {
+        // Skip if the chunk is already in the correct version.
+        if self.biomes.version_ty() == V::biomes().version_ty()
+            && self.blocks.version_ty() == V::blocks().version_ty()
+        {
+            return self.clone();
+        }
+
+        let new_biomes = V::biomes().load();
+        let old_biomes = self.biomes.load();
+        // let mut biome_cache = Vec::with_capacity(16);
+
+        let biome_convert = |old: u32| -> u32 { todo!() };
+
+        let new_blocks = V::blocks().load();
+        let old_blocks = self.blocks.load();
+        // let mut block_cache = Vec::with_capacity(16);
+
+        let block_convert = |old: u32| -> u32 { todo!() };
+
+        let mut chunk = self.clone();
+
+        for section in chunk.sections_mut() {
+            let biome = section.biome_data_mut();
+            match biome.palette() {
+                SectionPalette::Single(old) => {
+                    // SAFETY: Only the palette is being modified
+                    *unsafe { biome.palette_mut() } = SectionPalette::Single(biome_convert(*old));
+                }
+                SectionPalette::Vector(vals) => {
+                    let mut new = SmallVec::with_capacity(vals.len());
+                    for &old in vals {
+                        new.push(biome_convert(old));
+                    }
+                    // SAFETY: Only the palette is being modified
+                    *unsafe { biome.palette_mut() } = SectionPalette::Vector(new);
+                }
+                SectionPalette::Global => todo!("Set each biome individually"),
+            }
+
+            let block = section.block_data_mut();
+            match block.palette() {
+                SectionPalette::Single(old) => {
+                    // SAFETY: Only the palette is being modified
+                    *unsafe { block.palette_mut() } = SectionPalette::Single(block_convert(*old));
+                }
+                SectionPalette::Vector(vals) => {
+                    let mut new = SmallVec::with_capacity(vals.len());
+                    for &old in vals {
+                        new.push(block_convert(old));
+                    }
+                    // SAFETY: Only the palette is being modified
+                    *unsafe { block.palette_mut() } = SectionPalette::Vector(new);
+                }
+                SectionPalette::Global => todo!("Set each block individually"),
+            }
+        }
+
+        // Use the new version's biome and block storage.
+        chunk.biomes = V::biomes();
+        chunk.blocks = V::blocks();
+
+        chunk
     }
 }

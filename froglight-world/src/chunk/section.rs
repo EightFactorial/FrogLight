@@ -162,6 +162,15 @@ impl<T: SectionType> SectionData<T> {
     #[must_use]
     pub const fn palette(&self) -> &SectionPalette { &self.palette }
 
+    /// Get the palette used by this data mutably.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure that the underlying data is still valid after the
+    /// palette is modified.
+    #[must_use]
+    pub const unsafe fn palette_mut(&mut self) -> &mut SectionPalette { &mut self.palette }
+
     /// Get the raw bit data.
     #[must_use]
     pub fn data(&self) -> &BitSlice<u64, Msb0> { self.data.as_bitslice() }

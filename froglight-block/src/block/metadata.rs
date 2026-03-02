@@ -82,6 +82,29 @@ impl BlockMetadata {
         }
     }
 
+    /// Convert a state using this metadata into another metadata.
+    ///
+    /// If an invalid state is given the default state will be used instead.
+    #[must_use]
+    pub fn try_using_metadata(
+        &self,
+        mut state: StateId,
+        metadata: &'static BlockMetadata,
+    ) -> StateId {
+        if self.state_count() < state.into_inner() {
+            state = self.state_default();
+        }
+
+        let mut other = metadata.state_default();
+        for (name, value) in self.get_attributes(state) {
+            if let Some((updated, _)) = metadata.set_attribute_str(other, name, value) {
+                other = updated;
+            }
+        }
+
+        other
+    }
+
     /// Get the string identifier of this block.
     #[inline]
     #[must_use]

@@ -27,6 +27,7 @@ cipher = { workspace = true }
 facet = { features = ["std"], workspace = true }
 facet-format = { workspace = true }
 facet-minecraft = { features = ["std"], workspace = true }
+froglight-biome = { features = ["std"], workspace = true }
 froglight-block = { features = ["std"], workspace = true }
 froglight-common = { features = ["facet", "std"], workspace = true }
 # froglight-entity = { features = ["std"], workspace = true }
@@ -72,4 +73,4 @@ nightly = ["facet-minecraft/nightly", "froglight-block/nightly", "froglight-comm
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
 
-v26_1 = ["froglight-block/v26_1", "froglight-item/v26_1", "froglight-packet/v26_1", "froglight-registry/v26_1"]
+v26_1 = ["froglight-biome/v26_1", "froglight-block/v26_1", "froglight-item/v26_1", "froglight-packet/v26_1", "froglight-registry/v26_1"]
