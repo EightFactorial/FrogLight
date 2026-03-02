@@ -1,6 +1,8 @@
 //! TODO
 #![allow(clippy::unsafe_derive_deserialize, reason = "Triggered by `Facet` impl")]
 
+use core::{borrow::Borrow, ops::Deref};
+
 #[cfg(feature = "bevy")]
 use bevy_ecs::{component::Component, reflect::ReflectComponent};
 #[cfg(feature = "bevy")]
@@ -43,6 +45,18 @@ impl From<EntityId> for i32 {
     fn from(value: EntityId) -> Self { value.0 }
 }
 
+impl AsRef<i32> for EntityId {
+    fn as_ref(&self) -> &i32 { &self.0 }
+}
+impl Borrow<i32> for EntityId {
+    fn borrow(&self) -> &i32 { &self.0 }
+}
+impl Deref for EntityId {
+    type Target = i32;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// A unique identifier for an entity.
@@ -75,4 +89,16 @@ impl From<Uuid> for EntityUuid {
 }
 impl From<EntityUuid> for Uuid {
     fn from(value: EntityUuid) -> Self { value.0 }
+}
+
+impl AsRef<Uuid> for EntityUuid {
+    fn as_ref(&self) -> &Uuid { &self.0 }
+}
+impl Borrow<Uuid> for EntityUuid {
+    fn borrow(&self) -> &Uuid { &self.0 }
+}
+impl Deref for EntityUuid {
+    type Target = Uuid;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
 }

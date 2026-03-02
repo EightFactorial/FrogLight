@@ -1,5 +1,11 @@
 //! TODO
 
+use core::{
+    borrow::{Borrow, BorrowMut},
+    cmp::Ordering,
+    ops::{Deref, DerefMut},
+};
+
 #[cfg(feature = "facet")]
 use facet::{Facet, Partial, Peek};
 #[cfg(feature = "facet")]
@@ -50,4 +56,41 @@ impl VarEntityId {
         let len = variable_to_bytes(value.0.0 as u128, &mut buffer);
         if writer.write_data(&buffer[..len]) { Ok(()) } else { Err(SerializeIterError::new()) }
     }
+}
+
+impl AsRef<EntityId> for VarEntityId {
+    fn as_ref(&self) -> &EntityId { &self.0 }
+}
+impl AsMut<EntityId> for VarEntityId {
+    fn as_mut(&mut self) -> &mut EntityId { &mut self.0 }
+}
+
+impl Borrow<EntityId> for VarEntityId {
+    fn borrow(&self) -> &EntityId { &self.0 }
+}
+impl BorrowMut<EntityId> for VarEntityId {
+    fn borrow_mut(&mut self) -> &mut EntityId { &mut self.0 }
+}
+
+impl Deref for VarEntityId {
+    type Target = EntityId;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl DerefMut for VarEntityId {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl PartialEq<EntityId> for VarEntityId {
+    fn eq(&self, other: &EntityId) -> bool { self.0 == *other }
+}
+impl PartialEq<VarEntityId> for EntityId {
+    fn eq(&self, other: &VarEntityId) -> bool { *self == other.0 }
+}
+
+impl PartialOrd<EntityId> for VarEntityId {
+    fn partial_cmp(&self, other: &EntityId) -> Option<Ordering> { Some(self.0.cmp(other)) }
+}
+impl PartialOrd<VarEntityId> for EntityId {
+    fn partial_cmp(&self, other: &VarEntityId) -> Option<Ordering> { Some(self.cmp(&other.0)) }
 }
