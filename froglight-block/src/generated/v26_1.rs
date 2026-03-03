@@ -637,34 +637,34 @@ generate! {
     Furnace => { ident: "minecraft:furnace", global: 5327, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "lit" => LitBool ]
     },
-    OakSign => { ident: "minecraft:oak_sign", global: 5335, default: 1,
+    OakSign => { ident: "minecraft:oak_sign", global: 5335, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    SpruceSign => { ident: "minecraft:spruce_sign", global: 5367, default: 1,
+    SpruceSign => { ident: "minecraft:spruce_sign", global: 5367, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BirchSign => { ident: "minecraft:birch_sign", global: 5399, default: 1,
+    BirchSign => { ident: "minecraft:birch_sign", global: 5399, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaSign => { ident: "minecraft:acacia_sign", global: 5431, default: 1,
+    AcaciaSign => { ident: "minecraft:acacia_sign", global: 5431, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    CherrySign => { ident: "minecraft:cherry_sign", global: 5463, default: 1,
+    CherrySign => { ident: "minecraft:cherry_sign", global: 5463, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    JungleSign => { ident: "minecraft:jungle_sign", global: 5495, default: 1,
+    JungleSign => { ident: "minecraft:jungle_sign", global: 5495, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakSign => { ident: "minecraft:dark_oak_sign", global: 5527, default: 1,
+    DarkOakSign => { ident: "minecraft:dark_oak_sign", global: 5527, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakSign => { ident: "minecraft:pale_oak_sign", global: 5559, default: 1,
+    PaleOakSign => { ident: "minecraft:pale_oak_sign", global: 5559, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    MangroveSign => { ident: "minecraft:mangrove_sign", global: 5591, default: 1,
+    MangroveSign => { ident: "minecraft:mangrove_sign", global: 5591, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BambooSign => { ident: "minecraft:bamboo_sign", global: 5623, default: 1,
+    BambooSign => { ident: "minecraft:bamboo_sign", global: 5623, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
     OakDoor => { ident: "minecraft:oak_door", global: 5655, default: 11,
@@ -709,40 +709,40 @@ generate! {
     BambooWallSign => { ident: "minecraft:bamboo_wall_sign", global: 5899, default: 1,
         ty: [ "facing" => Facing_NorthSouthWestEast, "waterlogged" => WaterloggedBool ]
     },
-    OakHangingSign => { ident: "minecraft:oak_hanging_sign", global: 5907, default: 33,
+    OakHangingSign => { ident: "minecraft:oak_hanging_sign", global: 5907, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    SpruceHangingSign => { ident: "minecraft:spruce_hanging_sign", global: 5971, default: 33,
+    SpruceHangingSign => { ident: "minecraft:spruce_hanging_sign", global: 5971, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BirchHangingSign => { ident: "minecraft:birch_hanging_sign", global: 6035, default: 33,
+    BirchHangingSign => { ident: "minecraft:birch_hanging_sign", global: 6035, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    AcaciaHangingSign => { ident: "minecraft:acacia_hanging_sign", global: 6099, default: 33,
+    AcaciaHangingSign => { ident: "minecraft:acacia_hanging_sign", global: 6099, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    CherryHangingSign => { ident: "minecraft:cherry_hanging_sign", global: 6163, default: 33,
+    CherryHangingSign => { ident: "minecraft:cherry_hanging_sign", global: 6163, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    JungleHangingSign => { ident: "minecraft:jungle_hanging_sign", global: 6227, default: 33,
+    JungleHangingSign => { ident: "minecraft:jungle_hanging_sign", global: 6227, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    DarkOakHangingSign => { ident: "minecraft:dark_oak_hanging_sign", global: 6291, default: 33,
+    DarkOakHangingSign => { ident: "minecraft:dark_oak_hanging_sign", global: 6291, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    PaleOakHangingSign => { ident: "minecraft:pale_oak_hanging_sign", global: 6355, default: 33,
+    PaleOakHangingSign => { ident: "minecraft:pale_oak_hanging_sign", global: 6355, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    CrimsonHangingSign => { ident: "minecraft:crimson_hanging_sign", global: 6419, default: 33,
+    CrimsonHangingSign => { ident: "minecraft:crimson_hanging_sign", global: 6419, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    WarpedHangingSign => { ident: "minecraft:warped_hanging_sign", global: 6483, default: 33,
+    WarpedHangingSign => { ident: "minecraft:warped_hanging_sign", global: 6483, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    MangroveHangingSign => { ident: "minecraft:mangrove_hanging_sign", global: 6547, default: 33,
+    MangroveHangingSign => { ident: "minecraft:mangrove_hanging_sign", global: 6547, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    BambooHangingSign => { ident: "minecraft:bamboo_hanging_sign", global: 6611, default: 33,
+    BambooHangingSign => { ident: "minecraft:bamboo_hanging_sign", global: 6611, default: 49,
         ty: [ "attached" => AttachedBool, "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
     OakWallHangingSign => { ident: "minecraft:oak_wall_hanging_sign", global: 6675, default: 1,
@@ -1696,52 +1696,52 @@ generate! {
     LargeFern => { ident: "minecraft:large_fern", global: 12925, default: 1,
         ty: [ "half" => Half_UpperLower ]
     },
-    WhiteBanner => { ident: "minecraft:white_banner", global: 12927, default: 0,
+    WhiteBanner => { ident: "minecraft:white_banner", global: 12927, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    OrangeBanner => { ident: "minecraft:orange_banner", global: 12943, default: 0,
+    OrangeBanner => { ident: "minecraft:orange_banner", global: 12943, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    MagentaBanner => { ident: "minecraft:magenta_banner", global: 12959, default: 0,
+    MagentaBanner => { ident: "minecraft:magenta_banner", global: 12959, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    LightBlueBanner => { ident: "minecraft:light_blue_banner", global: 12975, default: 0,
+    LightBlueBanner => { ident: "minecraft:light_blue_banner", global: 12975, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    YellowBanner => { ident: "minecraft:yellow_banner", global: 12991, default: 0,
+    YellowBanner => { ident: "minecraft:yellow_banner", global: 12991, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    LimeBanner => { ident: "minecraft:lime_banner", global: 13007, default: 0,
+    LimeBanner => { ident: "minecraft:lime_banner", global: 13007, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    PinkBanner => { ident: "minecraft:pink_banner", global: 13023, default: 0,
+    PinkBanner => { ident: "minecraft:pink_banner", global: 13023, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    GrayBanner => { ident: "minecraft:gray_banner", global: 13039, default: 0,
+    GrayBanner => { ident: "minecraft:gray_banner", global: 13039, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    LightGrayBanner => { ident: "minecraft:light_gray_banner", global: 13055, default: 0,
+    LightGrayBanner => { ident: "minecraft:light_gray_banner", global: 13055, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    CyanBanner => { ident: "minecraft:cyan_banner", global: 13071, default: 0,
+    CyanBanner => { ident: "minecraft:cyan_banner", global: 13071, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    PurpleBanner => { ident: "minecraft:purple_banner", global: 13087, default: 0,
+    PurpleBanner => { ident: "minecraft:purple_banner", global: 13087, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    BlueBanner => { ident: "minecraft:blue_banner", global: 13103, default: 0,
+    BlueBanner => { ident: "minecraft:blue_banner", global: 13103, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    BrownBanner => { ident: "minecraft:brown_banner", global: 13119, default: 0,
+    BrownBanner => { ident: "minecraft:brown_banner", global: 13119, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    GreenBanner => { ident: "minecraft:green_banner", global: 13135, default: 0,
+    GreenBanner => { ident: "minecraft:green_banner", global: 13135, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    RedBanner => { ident: "minecraft:red_banner", global: 13151, default: 0,
+    RedBanner => { ident: "minecraft:red_banner", global: 13151, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
-    BlackBanner => { ident: "minecraft:black_banner", global: 13167, default: 0,
+    BlackBanner => { ident: "minecraft:black_banner", global: 13167, default: 8,
         ty: [ "rotation" => Rotation_0123456789101112131415 ]
     },
     WhiteWallBanner => { ident: "minecraft:white_wall_banner", global: 13183, default: 0,
@@ -2710,10 +2710,10 @@ generate! {
     WarpedDoor => { ident: "minecraft:warped_door", global: 21578, default: 11,
         ty: [ "facing" => Facing_NorthSouthWestEast, "half" => Half_UpperLower, "hinge" => Hinge_LeftRight, "open" => OpenBool, "powered" => PoweredBool ]
     },
-    CrimsonSign => { ident: "minecraft:crimson_sign", global: 21642, default: 1,
+    CrimsonSign => { ident: "minecraft:crimson_sign", global: 21642, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
-    WarpedSign => { ident: "minecraft:warped_sign", global: 21674, default: 1,
+    WarpedSign => { ident: "minecraft:warped_sign", global: 21674, default: 17,
         ty: [ "rotation" => Rotation_0123456789101112131415, "waterlogged" => WaterloggedBool ]
     },
     CrimsonWallSign => { ident: "minecraft:crimson_wall_sign", global: 21706, default: 1,
