@@ -159,7 +159,7 @@ impl BotPlugin {
                     // ClientboundPlayEvent::ChunkCacheCenter() => todo!(),
                     // ClientboundPlayEvent::ChunkCacheRadius() => todo!(),
                     // ClientboundPlayEvent::ChunkSectionUpdate() => todo!(),
-                    ClientboundPlayEvent::ChunkWithLight(pos, chunk, _) => {
+                    ClientboundPlayEvent::ChunkWithLight(pos, data, _) => {
                         let Some(instance) = bot.get::<WorldInstanceChunks>() else {
                             error!(
                                 "Received ChunkWithLight but bot doesn't have a WorldInstanceChunks!"
@@ -167,11 +167,11 @@ impl BotPlugin {
                             continue;
                         };
 
-                        match chunk.try_into_naive(instance.height_max(), instance.height_min()) {
-                            Ok(naive) => {
+                        match data.chunk_data.parse(instance.height_max(), instance.height_min()) {
+                            Ok(chunk) => {
                                 let entity = commands.spawn((
                                     ChunkOfInstance::new(bot.id()),
-                                    SharedChunk::new(Chunk::new::<Protocol>(naive)),
+                                    SharedChunk::new(chunk),
                                     *pos,
                                 ));
 
