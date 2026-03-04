@@ -30,12 +30,31 @@ impl NaiveChunk {
     /// # Errors
     ///
     /// Returns an error of the input is not a valid chunk.
-    pub fn try_from(
+    pub fn parse_from(
         input: &[u8],
         height_max: u32,
         height_min: i32,
     ) -> Result<NaiveChunk, ParseError> {
-        Self::try_from_remainder(input, height_max, height_min).map(|(chunk, _)| chunk)
+        Self::parse_from_remainder(input, height_max, height_min).map(|(chunk, _)| chunk)
+    }
+
+    /// Attempt to parse a [`NaiveChunk`] from the given data.
+    ///
+    /// Uses the legacy format, which does not include fluid data.
+    ///
+    /// Inputs:
+    ///   - `height_max`: The maximum Y-level in the chunk.
+    ///   - `height_min`: The minimum Y-level in the chunk.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error of the input is not a valid chunk.
+    pub fn parse_from_legacy(
+        input: &[u8],
+        height_max: u32,
+        height_min: i32,
+    ) -> Result<NaiveChunk, ParseError> {
+        Self::parse_from_legacy_remainder(input, height_max, height_min).map(|(chunk, _)| chunk)
     }
 
     /// Attempt to parse a [`NaiveChunk`] from the given data,
@@ -48,7 +67,7 @@ impl NaiveChunk {
     /// # Errors
     ///
     /// Returns an error of the input is not a valid chunk.
-    pub fn try_from_remainder(
+    pub fn parse_from_remainder(
         mut input: &[u8],
         height_max: u32,
         height_min: i32,
@@ -58,7 +77,37 @@ impl NaiveChunk {
 
         let mut sections = Vec::with_capacity(section_count as usize);
         for _ in 0..section_count {
-            let (section, remainder) = Section::try_from_remainder(input)?;
+            let (section, remainder) = Section::parse_from_remainder(input)?;
+            sections.push(section);
+            input = remainder;
+        }
+
+        Ok((NaiveChunk::new_from(sections, height_min), input))
+    }
+
+    /// Attempt to parse a [`NaiveChunk`] from the given data,
+    /// returning any remaining data left over.
+    ///
+    /// Uses the legacy format, which does not include fluid data.
+    ///
+    /// Inputs:
+    ///   - `height_max`: The maximum Y-level in the chunk.
+    ///   - `height_min`: The minimum Y-level in the chunk.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error of the input is not a valid chunk.
+    pub fn parse_from_legacy_remainder(
+        mut input: &[u8],
+        height_max: u32,
+        height_min: i32,
+    ) -> Result<(NaiveChunk, &[u8]), ParseError> {
+        let Some(total_height) = height_max.checked_sub_signed(height_min) else { todo!() };
+        let section_count = total_height / u32::from(SECTION_HEIGHT);
+
+        let mut sections = Vec::with_capacity(section_count as usize);
+        for _ in 0..section_count {
+            let (section, remainder) = Section::parse_from_remainder(input)?;
             sections.push(section);
             input = remainder;
         }
@@ -73,8 +122,19 @@ impl Section {
     /// # Errors
     ///
     /// Returns an error of the input is not a valid section.
-    pub fn try_from(input: &[u8]) -> Result<Section, ParseError> {
-        Self::try_from_remainder(input).map(|(section, _)| section)
+    pub fn parse_from(input: &[u8]) -> Result<Section, ParseError> {
+        Self::parse_from_remainder(input).map(|(section, _)| section)
+    }
+
+    /// Attempt to parse a [`Section`] from the given data.
+    ///
+    /// Uses the legacy format, which does not include fluid data.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error of the input is not a valid section.
+    pub fn parse_from_legacy(input: &[u8]) -> Result<Section, ParseError> {
+        Self::parse_from_legacy_remainder(input).map(|(section, _)| section)
     }
 
     /// Attempt to parse a [`Section`] from the given data,
@@ -83,18 +143,37 @@ impl Section {
     /// # Errors
     ///
     /// Returns an error of the input is not a valid section.
-    pub fn try_from_remainder(input: &[u8]) -> Result<(Section, &[u8]), ParseError> {
+    pub fn parse_from_remainder(input: &[u8]) -> Result<(Section, &[u8]), ParseError> {
         let Some((block_count, input)) = input.split_first_chunk() else { todo!() };
         let block_count = u16::from_be_bytes(*block_count);
 
         let Some((fluid_count, input)) = input.split_first_chunk() else { todo!() };
         let fluid_count = u16::from_be_bytes(*fluid_count);
 
-        let (blocks, input) = SectionData::<BlockSection>::try_from_remainder(input)?;
-        let (biomes, input) = SectionData::<BiomeSection>::try_from_remainder(input)?;
+        let (blocks, input) = SectionData::<BlockSection>::parse_from_remainder(input)?;
+        let (biomes, input) = SectionData::<BiomeSection>::parse_from_remainder(input)?;
 
         // SAFETY: Input was parsed and is valid
         unsafe { Ok((Section::new_unchecked(block_count, fluid_count, blocks, biomes), input)) }
+    }
+
+    /// Attempt to parse a [`Section`] from the given data,
+    /// returning any remaining data left over.
+    ///
+    /// Uses the legacy format, which does not include fluid data.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error of the input is not a valid section.
+    pub fn parse_from_legacy_remainder(input: &[u8]) -> Result<(Section, &[u8]), ParseError> {
+        let Some((block_count, input)) = input.split_first_chunk() else { todo!() };
+        let block_count = u16::from_be_bytes(*block_count);
+
+        let (blocks, input) = SectionData::<BlockSection>::parse_from_remainder(input)?;
+        let (biomes, input) = SectionData::<BiomeSection>::parse_from_remainder(input)?;
+
+        // SAFETY: Input was parsed and is valid
+        unsafe { Ok((Section::new_unchecked(block_count, 0, blocks, biomes), input)) }
     }
 }
 
@@ -104,8 +183,8 @@ impl<T: SectionType> SectionData<T> {
     /// # Errors
     ///
     /// Returns an error of the input is not a valid section data.
-    pub fn try_from(input: &[u8]) -> Result<SectionData<T>, ParseError> {
-        Self::try_from_remainder(input).map(|(section, _)| section)
+    pub fn parse_from(input: &[u8]) -> Result<SectionData<T>, ParseError> {
+        Self::parse_from_remainder(input).map(|(section, _)| section)
     }
 
     /// Attempt to parse a [`SectionData`] from the given data,
@@ -114,7 +193,7 @@ impl<T: SectionType> SectionData<T> {
     /// # Errors
     ///
     /// Returns an error of the input is not a valid section data.
-    pub fn try_from_remainder(input: &[u8]) -> Result<(SectionData<T>, &[u8]), ParseError> {
+    pub fn parse_from_remainder(input: &[u8]) -> Result<(SectionData<T>, &[u8]), ParseError> {
         let Some((&bits, mut input)) = input.split_first() else { todo!() };
 
         let palette = match T::palette_for(bits) {

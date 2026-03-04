@@ -76,10 +76,15 @@ impl ChunkData {
         Self {
             raw: RawChunkData { heightmaps, chunk_data: block_data, entity_data },
             fn_ptr: |_heightmaps, blocks, _entities, height_max, height_min| {
-                NaiveChunk::try_from(blocks, height_max, height_min).map(Chunk::new::<V>)
+                NaiveChunk::parse_from(blocks, height_max, height_min).map(Chunk::new::<V>)
             },
         }
     }
+
+    /// Get a reference to the inner [`RawChunkData`].
+    #[inline]
+    #[must_use]
+    pub const fn as_raw(&self) -> &RawChunkData { &self.raw }
 
     /// Attempt to parse the chunk data into a [`Chunk`].
     ///
@@ -89,16 +94,25 @@ impl ChunkData {
     ///
     /// Returns an error if the chunk data is invalid,
     /// or the height limits are invalid.
-    /// Returns an error if the chunk data is invalid.
     #[inline]
-    pub fn parse(&self, height_max: u32, height_min: i32) -> Result<Chunk, ParseError> {
-        (self.fn_ptr)(
+    pub fn parse<V: BiomeVersion + BlockVersion>(
+        &self,
+        height_max: u32,
+        height_min: i32,
+    ) -> Result<Chunk, ParseError> {
+        match (self.fn_ptr)(
             &self.raw.heightmaps,
             &self.raw.chunk_data,
             &self.raw.entity_data,
             height_max,
             height_min,
-        )
+        ) {
+            Ok(mut chunk) => {
+                chunk.convert_into::<V>();
+                Ok(chunk)
+            }
+            Err(err) => Err(err),
+        }
     }
 
     /// Convert this into a [`RawChunkData`].
@@ -108,16 +122,12 @@ impl ChunkData {
     #[inline]
     #[must_use]
     pub fn into_raw<V: BiomeVersion + BlockVersion>(self) -> RawChunkData {
-        // Parse the chunk data.
-        let Ok(mut chunk) = self.parse(320, -64) else {
-            // Return the data as-is if parsing fails.
-            return self.raw;
-        };
-
-        // Convert the chunk data into the provided version.
-        chunk.convert_into::<V>();
-
-        todo!("Write the chunk as RawChunkData")
+        if let Ok(_chunk) = self.parse::<V>(320, -64) {
+            todo!("Write the chunk as RawChunkData")
+        } else {
+            // Return the raw data if parsing fails
+            self.raw
+        }
     }
 
     /// Attempt to create a [`NaiveChunk`] from this chunk data.
@@ -134,7 +144,14 @@ impl ChunkData {
         height_max: u32,
         height_min: i32,
     ) -> Result<NaiveChunk, ParseError> {
-        self.parse(height_max, height_min).map(Chunk::into_naive)
+        (self.fn_ptr)(
+            &self.raw.heightmaps,
+            &self.raw.chunk_data,
+            &self.raw.entity_data,
+            height_max,
+            height_min,
+        )
+        .map(Chunk::into_naive)
     }
 }
 
@@ -171,6 +188,6 @@ impl RawChunkData {
         height_max: u32,
         height_min: i32,
     ) -> Result<NaiveChunk, ParseError> {
-        NaiveChunk::try_from(&self.chunk_data, height_max, height_min)
+        NaiveChunk::parse_from(&self.chunk_data, height_max, height_min)
     }
 }

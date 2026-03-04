@@ -167,7 +167,8 @@ impl BotPlugin {
                             continue;
                         };
 
-                        match chunk.parse(instance.height_max(), instance.height_min()) {
+                        match chunk.parse::<Protocol>(instance.height_max(), instance.height_min())
+                        {
                             Ok(chunk) => {
                                 let entity = commands.spawn((
                                     ChunkOfInstance::new(bot.id()),
