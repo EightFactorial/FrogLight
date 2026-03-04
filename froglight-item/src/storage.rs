@@ -7,6 +7,7 @@ use core::any::TypeId;
 
 #[cfg(feature = "std")]
 use arc_swap::ArcSwap;
+use froglight_common::prelude::Identifier;
 
 use crate::item::{GlobalId, Item, ItemMetadata};
 
@@ -93,6 +94,15 @@ impl ItemStorage {
     #[must_use]
     pub fn get_item(&self, id: GlobalId) -> Option<Item> {
         self.get_metadata(id).map(Item::new_from)
+    }
+
+    /// Get the [`Item`] for a given [`Identifier`].
+    #[must_use]
+    pub fn get_item_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Item> {
+        self.to_ref()
+            .iter()
+            .find(|&&meta| meta.identifier() == identifier)
+            .map(|&meta| Item::new_from(meta))
     }
 
     /// Get the [`ItemMetadata`] for a given [`GlobalId`].

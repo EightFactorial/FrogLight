@@ -7,6 +7,7 @@ use core::any::TypeId;
 
 #[cfg(feature = "std")]
 use arc_swap::ArcSwap;
+use froglight_common::prelude::Identifier;
 
 use crate::block::{Block, BlockMetadata, GlobalId, StateId};
 
@@ -102,6 +103,19 @@ impl BlockStorage {
         } else {
             None
         }
+    }
+
+    /// Get the [`Block`] for a given [`Identifier`].
+    #[must_use]
+    pub fn get_block_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Block> {
+        let mut index = 0usize;
+        while let Some(&metadata) = self.to_ref().get(index) {
+            if metadata.identifier() == identifier {
+                return self.get_block(metadata.default_id());
+            }
+            index += usize::from(metadata.state_count());
+        }
+        None
     }
 
     /// Get the [`BlockMetadata`] for a given [`GlobalId`].

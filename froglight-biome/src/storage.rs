@@ -9,6 +9,7 @@ pub use std::sync::LazyLock;
 
 #[cfg(feature = "std")]
 use arc_swap::ArcSwap;
+use froglight_common::prelude::Identifier;
 #[cfg(all(feature = "once_cell", not(feature = "std")))]
 pub use once_cell::sync::OnceCell as LazyLock;
 
@@ -97,6 +98,15 @@ impl BiomeStorage {
     #[must_use]
     pub fn get_biome(&self, id: GlobalId) -> Option<Biome> {
         self.get_metadata(id).map(Biome::new_from)
+    }
+
+    /// Get the [`Biome`] for a given [`Identifier`].
+    #[must_use]
+    pub fn get_biome_by_identifier(&self, identifier: &Identifier<'_>) -> Option<Biome> {
+        self.to_ref()
+            .iter()
+            .find(|&&meta| meta.identifier() == identifier)
+            .map(|&meta| Biome::new_from(meta))
     }
 
     /// Get the [`BiomeMetadata`] for a given [`GlobalId`].

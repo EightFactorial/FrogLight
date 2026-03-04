@@ -1,6 +1,6 @@
 //! TODO
 
-use alloc::{borrow::Cow, vec::Vec};
+use alloc::vec::Vec;
 
 #[cfg(feature = "facet")]
 use facet_minecraft as mc;
@@ -17,85 +17,19 @@ pub type ChunkData = RawChunkData;
 
 /// Raw chunk data.
 #[cfg(feature = "std")]
-#[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
-#[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct ChunkData {
-    /// The chunk's height maps.
-    pub heightmaps: Vec<HeightMapData>,
-    /// The chunk's block data.
-    pub chunk_data: ChunkDataWrapper<'static>,
-    /// The chunk's block entities.
-    pub entity_data: UnsizedBuffer<'static>,
-}
-
-/// A chunk's block data and a parsing function.
-#[cfg(feature = "std")]
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]
-pub struct ChunkDataWrapper<'a> {
-    data: Cow<'a, [u8]>,
-    fn_ptr: fn(&[u8], u32, i32) -> Result<Chunk, ParseError>,
+pub struct ChunkData {
+    raw: RawChunkData,
+    #[expect(clippy::type_complexity, reason = "function pointer")]
+    fn_ptr: fn(&[HeightMapData], &[u8], &[u8], u32, i32) -> Result<Chunk, ParseError>,
 }
 
 #[cfg(feature = "std")]
-impl<'a> ChunkDataWrapper<'a> {
-    /// Create a new [`ChunkDataWrapper`] using the given data and
-    /// [`Version`](froglight_common::version::Version).
-    #[must_use]
-    pub const fn wrap_borrowed<V: BiomeVersion + BlockVersion>(data: &'a [u8]) -> Self {
-        Self::wrap_using(Cow::Borrowed(data), Self::default_parser::<V>)
-    }
-
-    /// Create a new [`ChunkDataWrapper`] using the given data and
-    /// [`Version`](froglight_common::version::Version).
-    #[must_use]
-    pub const fn wrap<V: BiomeVersion + BlockVersion>(data: Vec<u8>) -> Self {
-        Self::wrap_using(Cow::Owned(data), Self::default_parser::<V>)
-    }
-
-    /// The default [`Version`](froglight_common::version::Version)'ed [`Chunk`]
-    /// parser.
-    fn default_parser<V: BiomeVersion + BlockVersion>(
-        data: &[u8],
-        height_max: u32,
-        height_min: i32,
-    ) -> Result<Chunk, ParseError> {
-        NaiveChunk::try_from(data, height_max, height_min).map(Chunk::new::<V>)
-    }
-
-    /// Create a new [`ChunkDataWrapper`] using the given data and fn.
-    #[inline]
-    #[must_use]
-    pub const fn wrap_using(
-        data: Cow<'a, [u8]>,
-        fn_ptr: fn(&[u8], u32, i32) -> Result<Chunk, ParseError>,
-    ) -> ChunkDataWrapper<'a> {
-        ChunkDataWrapper { data, fn_ptr }
-    }
-
-    /// Attempt to parse a [`Chunk`] using the provided heights.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the data was invalid or the heights are incorrect.
-    #[inline]
-    pub fn parse(&self, height_max: u32, height_min: i32) -> Result<Chunk, ParseError> {
-        (self.fn_ptr)(&self.data, height_max, height_min)
-    }
-
-    /// Return the inner data.
-    #[inline]
-    #[must_use]
-    pub fn into_inner(self) -> Cow<'a, [u8]> { self.data }
-}
-
-#[cfg(feature = "std")]
-impl PartialEq for ChunkDataWrapper<'_> {
-    fn eq(&self, other: &Self) -> bool { self.data == other.data }
+impl PartialEq for ChunkData {
+    fn eq(&self, other: &Self) -> bool { self.raw == other.raw }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -136,10 +70,35 @@ impl ChunkData {
     #[must_use]
     pub const fn new<V: BiomeVersion + BlockVersion>(
         heightmaps: Vec<HeightMapData>,
-        chunk_data: Vec<u8>,
+        block_data: Vec<u8>,
         entity_data: UnsizedBuffer<'static>,
     ) -> Self {
-        Self { heightmaps, chunk_data: ChunkDataWrapper::wrap::<V>(chunk_data), entity_data }
+        Self {
+            raw: RawChunkData { heightmaps, chunk_data: block_data, entity_data },
+            fn_ptr: |_heightmaps, blocks, _entities, height_max, height_min| {
+                NaiveChunk::try_from(blocks, height_max, height_min).map(Chunk::new::<V>)
+            },
+        }
+    }
+
+    /// Attempt to parse the chunk data into a [`Chunk`].
+    ///
+    /// Requires the maximum and minimum heights of the chunk.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the chunk data is invalid,
+    /// or the height limits are invalid.
+    /// Returns an error if the chunk data is invalid.
+    #[inline]
+    pub fn parse(&self, height_max: u32, height_min: i32) -> Result<Chunk, ParseError> {
+        (self.fn_ptr)(
+            &self.raw.heightmaps,
+            &self.raw.chunk_data,
+            &self.raw.entity_data,
+            height_max,
+            height_min,
+        )
     }
 
     /// Convert this into a [`RawChunkData`].
@@ -149,24 +108,39 @@ impl ChunkData {
     #[inline]
     #[must_use]
     pub fn into_raw<V: BiomeVersion + BlockVersion>(self) -> RawChunkData {
-        // Parse the chunk data, or return the data as-is if it was invalid.
-        let Ok(chunk) = self.chunk_data.parse(320, -64) else {
-            return RawChunkData {
-                heightmaps: self.heightmaps,
-                chunk_data: self.chunk_data.into_inner().into_owned(),
-                entity_data: self.entity_data,
-            };
+        // Parse the chunk data.
+        let Ok(mut chunk) = self.parse(320, -64) else {
+            // Return the data as-is if parsing fails.
+            return self.raw;
         };
 
         // Convert the chunk data into the provided version.
-        let _chunk = chunk.convert_into::<V>();
+        chunk.convert_into::<V>();
 
         todo!("Write the chunk as RawChunkData")
+    }
+
+    /// Attempt to create a [`NaiveChunk`] from this chunk data.
+    ///
+    /// Requires the maximum and minimum heights of the chunk.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the chunk data is invalid,
+    /// or the height limits are invalid.
+    #[inline]
+    pub fn try_into_naive(
+        &self,
+        height_max: u32,
+        height_min: i32,
+    ) -> Result<NaiveChunk, ParseError> {
+        self.parse(height_max, height_min).map(Chunk::into_naive)
     }
 }
 
 impl RawChunkData {
     /// Create a new [`RawChunkData`] using the given data.
+    #[inline]
     #[must_use]
     pub const fn new<V>(
         heightmaps: Vec<HeightMapData>,
@@ -189,7 +163,9 @@ impl RawChunkData {
     ///
     /// # Errors
     ///
-    /// Returns an error if the chunk data is invalid.
+    /// Returns an error if the chunk data is invalid,
+    /// or the height limits are invalid.
+    #[inline]
     pub fn try_into_naive(
         &self,
         height_max: u32,

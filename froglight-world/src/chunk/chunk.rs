@@ -15,6 +15,7 @@ use crate::{
     chunk::{Section, storage::ChunkStorage},
     component::ChunkBlockPos,
     prelude::{BlockPos, NaiveChunk},
+    section::{BiomeSection, BlockSection, SectionType},
 };
 
 /// A region of blocks in a world.
@@ -73,6 +74,11 @@ impl Chunk {
     #[inline]
     #[must_use]
     pub const fn blocks(&self) -> &'static GlobalBlockStorage { self.blocks }
+
+    /// Get the inner [`NaiveChunk`] of this chunk.
+    #[inline]
+    #[must_use]
+    pub fn into_naive(self) -> NaiveChunk { self.naive }
 
     /// Get the height of this [`Chunk`].
     ///
@@ -223,31 +229,55 @@ impl Chunk {
     /// Uses [`Air`](froglight_block::prelude::block::Air) for blocks and
     /// [`Plains`](froglight_biome::prelude::biome::Plains) for biomes that
     /// cannot be converted.
-    #[must_use]
-    #[expect(unused, reason = "WIP")]
-    pub fn convert_into<V: BiomeVersion + BlockVersion>(&self) -> Self {
+    #[expect(clippy::missing_panics_doc, reason = "Cannot panic")]
+    pub fn convert_into<V: BiomeVersion + BlockVersion>(&mut self) {
         // Skip if the chunk is already in the correct version.
         if self.biomes.version_ty() == V::biomes().version_ty()
             && self.blocks.version_ty() == V::blocks().version_ty()
         {
-            return self.clone();
+            return;
         }
 
         let new_biomes = V::biomes().load();
         let old_biomes = self.biomes.load();
-        // let mut biome_cache = Vec::with_capacity(16);
+        let mut biome_cache = SmallVec::<[(u32, u32); 16]>::new();
 
-        let biome_convert = |old: u32| -> u32 { todo!() };
+        let mut biome_convert = |old: u32| -> u32 {
+            if let Some((_, new)) = biome_cache.iter().find(|(o, _)| *o == old) {
+                // Use the cached value
+                *new
+            } else if let Some(old_meta) = old_biomes.get_metadata(old.into())
+                && let Some(new) = new_biomes.get_biome_by_identifier(old_meta.identifier())
+            {
+                // Add the value to the cache and return it
+                biome_cache.push((old, new.global_id().into_inner()));
+                new.global_id().into_inner()
+            } else {
+                0 // Plains
+            }
+        };
 
         let new_blocks = V::blocks().load();
         let old_blocks = self.blocks.load();
-        // let mut block_cache = Vec::with_capacity(16);
+        let mut block_cache = SmallVec::<[(u32, u32); 16]>::new();
 
-        let block_convert = |old: u32| -> u32 { todo!() };
+        let mut block_convert = |old: u32| -> u32 {
+            if let Some((_, new)) = block_cache.iter().find(|(o, _)| *o == old) {
+                // Use the cached value
+                *new
+            } else if let Some(old_block) = old_blocks.get_block(old.into())
+                && let Some(new_block) = new_blocks.get_block_by_identifier(old_block.identifier())
+                && let Some(converted) = old_block.try_using_metadata(new_block.metadata())
+            {
+                // Add the value to the cache and return it
+                block_cache.push((old, converted.global_id().into_inner()));
+                converted.global_id().into_inner()
+            } else {
+                0 // Air
+            }
+        };
 
-        let mut chunk = self.clone();
-
-        for section in chunk.sections_mut() {
+        for section in self.sections_mut() {
             let biome = section.biome_data_mut();
             match biome.palette() {
                 SectionPalette::Single(old) => {
@@ -262,7 +292,13 @@ impl Chunk {
                     // SAFETY: Only the palette is being modified
                     *unsafe { biome.palette_mut() } = SectionPalette::Vector(new);
                 }
-                SectionPalette::Global => todo!("Set each biome individually"),
+                SectionPalette::Global => {
+                    // Iterate over each biome index and convert it.
+                    for index in (0..BiomeSection::VOLUME).map(usize::from) {
+                        let old = biome.get_index(index).unwrap();
+                        biome.set_index(index, biome_convert(old)).unwrap();
+                    }
+                }
             }
 
             let block = section.block_data_mut();
@@ -279,14 +315,18 @@ impl Chunk {
                     // SAFETY: Only the palette is being modified
                     *unsafe { block.palette_mut() } = SectionPalette::Vector(new);
                 }
-                SectionPalette::Global => todo!("Set each block individually"),
+                SectionPalette::Global => {
+                    // Iterate over each block index and convert it.
+                    for index in (0..BlockSection::VOLUME).map(usize::from) {
+                        let old = block.get_index(index).unwrap();
+                        block.set_index(index, block_convert(old)).unwrap();
+                    }
+                }
             }
         }
 
         // Use the new version's biome and block storage.
-        chunk.biomes = V::biomes();
-        chunk.blocks = V::blocks();
-
-        chunk
+        self.biomes = V::biomes();
+        self.blocks = V::blocks();
     }
 }
