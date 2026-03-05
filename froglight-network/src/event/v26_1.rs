@@ -1446,23 +1446,309 @@ impl EventVersion for V26_1 {
             },
 
             ServerboundEventEnum::Play(play) => match play {
+                ServerboundPlayEvent::AcceptTeleportation() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::AcceptTeleportation(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::AcknowledgeConfiguration => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ClientCommand(packet))))
+                }
+                ServerboundPlayEvent::AdvancementSeen() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SeenAdvancements(packet))))
+                }
+                ServerboundPlayEvent::Attack() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::Attack(packet))))
+                }
+                ServerboundPlayEvent::BlockEntityTagQuery() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::BlockEntityTagQuery(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::BundleItemSelect() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::BundleItemSelected(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::ChangeDifficulty() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChangeDifficulty(packet))))
+                }
+                ServerboundPlayEvent::ChangeGameMode() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChangeGameMode(packet))))
+                }
+                ServerboundPlayEvent::ChatAcknowledge() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChatAck(packet))))
+                }
+                ServerboundPlayEvent::ChatCommand() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChatCommand(packet))))
+                }
+                ServerboundPlayEvent::ChatCommandSigned() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChatCommandSigned(packet))))
+                }
+                ServerboundPlayEvent::ChatCommandSuggestion() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::CommandSuggestion(packet))))
+                }
+                ServerboundPlayEvent::ChatMessage() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::Chat(packet))))
+                }
+                ServerboundPlayEvent::ChatSessionUpdate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChatSessionUpdate(packet))))
+                }
                 ServerboundPlayEvent::ChunkBatchReceived(rate) => {
                     let packet = ChunkBatchReceivedC2SPacket { rate };
                     Ok(Some(VersionPacket::Play(PlayServerboundPackets::ChunkBatchReceived(
                         packet,
                     ))))
                 }
+                ServerboundPlayEvent::ClientCommand() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ClientCommand(packet))))
+                }
+                ServerboundPlayEvent::ClientInformation() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ClientInformation(packet))))
+                }
+                ServerboundPlayEvent::ClientTickEnd() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ClientTickEnd(packet))))
+                }
+                ServerboundPlayEvent::ContainerButtonClick() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ContainerButtonClick(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::ContainerClick() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ContainerClick(packet))))
+                }
+                ServerboundPlayEvent::ContainerClose() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ContainerClose(packet))))
+                }
+                ServerboundPlayEvent::ContainerSlotState() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(
+                        PlayServerboundPackets::ContainerSlotStateChanged(packet),
+                    )))
+                }
+                ServerboundPlayEvent::CookieResponse() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::CookieResponse(packet))))
+                }
+                ServerboundPlayEvent::CustomClickAction() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::CustomClickAction(packet))))
+                }
+                ServerboundPlayEvent::CustomPayload() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::CustomPayload(packet))))
+                }
+                ServerboundPlayEvent::DebugSubscription() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::DebugSubscriptionRequest(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::EditBoot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::EditBook(packet))))
+                }
+                ServerboundPlayEvent::EntityTagQuery() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::EntityTagQuery(packet))))
+                }
+                ServerboundPlayEvent::Interact() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::Interact(packet))))
+                }
+                ServerboundPlayEvent::ItemRename() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::RenameItem(packet))))
+                }
+                ServerboundPlayEvent::JigsawGenerate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::JigsawGenerate(packet))))
+                }
                 ServerboundPlayEvent::KeepAlive(id) => {
                     let packet = PlayKeepAliveC2SPacket { id };
                     Ok(Some(VersionPacket::Play(PlayServerboundPackets::KeepAlive(packet))))
+                }
+                ServerboundPlayEvent::LockDifficulty() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::LockDifficulty(packet))))
+                }
+                ServerboundPlayEvent::MoveBoat() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PaddleBoat(packet))))
+                }
+                ServerboundPlayEvent::MovePlayerPos() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::MovePlayerPos(packet))))
+                }
+                ServerboundPlayEvent::MovePlayerPosRot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::MovePlayerPosRot(packet))))
+                }
+                ServerboundPlayEvent::MovePlayerRot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::MovePlayerRot(packet))))
+                }
+                ServerboundPlayEvent::MovePlayerStatus() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::MovePlayerStatusOnly(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::MoveVehicle() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::MoveVehicle(packet))))
+                }
+                ServerboundPlayEvent::PickItemFromBlock() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PickItemFromBlock(packet))))
+                }
+                ServerboundPlayEvent::PickItemFromEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PickItemFromEntity(
+                        packet,
+                    ))))
                 }
                 ServerboundPlayEvent::PingRequest(id) => {
                     let packet = PlayPingRequestC2SPacket { id };
                     Ok(Some(VersionPacket::Play(PlayServerboundPackets::PingRequest(packet))))
                 }
+                ServerboundPlayEvent::PlaceRecipe() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PlaceRecipe(packet))))
+                }
+                ServerboundPlayEvent::PlayerAbilities() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PlayerAbilities(packet))))
+                }
+                ServerboundPlayEvent::PlayerAction() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PlayerAction(packet))))
+                }
+                ServerboundPlayEvent::PlayerCommand() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PlayerCommand(packet))))
+                }
+                ServerboundPlayEvent::PlayerInput() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PlayerInput(packet))))
+                }
+                ServerboundPlayEvent::PlayerLoaded() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::PlayerLoaded(packet))))
+                }
                 ServerboundPlayEvent::Pong(id) => {
                     let packet = PlayPongC2SPacket { id };
                     Ok(Some(VersionPacket::Play(PlayServerboundPackets::Pong(packet))))
+                }
+                ServerboundPlayEvent::RecipeBookSeen() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::RecipeBookSeenRecipe(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::RecipeBookSettings() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::RecipeBookChangeSettings(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::ResourcePack() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::ResourcePack(packet))))
+                }
+                ServerboundPlayEvent::SelectTrade() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SelectTrade(packet))))
+                }
+                ServerboundPlayEvent::SetBeaconEffect() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetBeacon(packet))))
+                }
+                ServerboundPlayEvent::SetCarriedItem() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetCarriedItem(packet))))
+                }
+                ServerboundPlayEvent::SetCommandBlock() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetCommandBlock(packet))))
+                }
+                ServerboundPlayEvent::SetCommandMinecart() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetCommandMinecart(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::SetCreativeSlot() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetCreativeModeSlot(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::SetGameRule() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetGameRule(packet))))
+                }
+                ServerboundPlayEvent::SetJigsawBlock() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetJigsawBlock(packet))))
+                }
+                ServerboundPlayEvent::SetStructureBlock() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetStructureBlock(packet))))
+                }
+                ServerboundPlayEvent::SetTestBlock() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SetTestBlock(packet))))
+                }
+                ServerboundPlayEvent::SignUpdate() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SignUpdate(packet))))
+                }
+                ServerboundPlayEvent::SpectateEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::SpectateEntity(packet))))
+                }
+                ServerboundPlayEvent::SwingArm() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::Swing(packet))))
+                }
+                ServerboundPlayEvent::TeleportToEntity() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::TeleportToEntity(packet))))
+                }
+                ServerboundPlayEvent::TestBlockAction() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::TestInstanceBlockAction(
+                        packet,
+                    ))))
+                }
+                ServerboundPlayEvent::UseItem() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::UseItem(packet))))
+                }
+                ServerboundPlayEvent::UseItemOn() => {
+                    let packet = todo!();
+                    Ok(Some(VersionPacket::Play(PlayServerboundPackets::UseItemOn(packet))))
                 }
             },
         }
@@ -1548,81 +1834,215 @@ impl EventVersion for V26_1 {
             }
 
             VersionPacket::Play(play) => match play {
-                PlayServerboundPackets::AcceptTeleportation(_packet) => todo!(),
-                PlayServerboundPackets::Attack(_packet) => todo!(),
-                PlayServerboundPackets::BlockEntityTagQuery(_packet) => todo!(),
-                PlayServerboundPackets::BundleItemSelected(_packet) => todo!(),
-                PlayServerboundPackets::ChangeDifficulty(_packet) => todo!(),
-                PlayServerboundPackets::ChangeGameMode(_packet) => todo!(),
-                PlayServerboundPackets::ChatAck(_packet) => todo!(),
-                PlayServerboundPackets::ChatCommand(_packet) => todo!(),
-                PlayServerboundPackets::ChatCommandSigned(_packet) => todo!(),
-                PlayServerboundPackets::Chat(_packet) => todo!(),
-                PlayServerboundPackets::ChatSessionUpdate(_packet) => todo!(),
-                PlayServerboundPackets::ChunkBatchReceived(_packet) => todo!(),
-                PlayServerboundPackets::ClientCommand(_packet) => todo!(),
-                PlayServerboundPackets::ClientTickEnd(_packet) => todo!(),
-                PlayServerboundPackets::ClientInformation(_packet) => todo!(),
-                PlayServerboundPackets::CommandSuggestion(_packet) => todo!(),
-                PlayServerboundPackets::ConfigurationAcknowledged(_packet) => todo!(),
-                PlayServerboundPackets::ContainerButtonClick(_packet) => todo!(),
-                PlayServerboundPackets::ContainerClick(_packet) => todo!(),
-                PlayServerboundPackets::ContainerClose(_packet) => todo!(),
-                PlayServerboundPackets::ContainerSlotStateChanged(_packet) => todo!(),
-                PlayServerboundPackets::CookieResponse(_packet) => todo!(),
-                PlayServerboundPackets::CustomPayload(_packet) => todo!(),
-                PlayServerboundPackets::DebugSubscriptionRequest(_packet) => todo!(),
-                PlayServerboundPackets::EditBook(_packet) => todo!(),
-                PlayServerboundPackets::EntityTagQuery(_packet) => todo!(),
-                PlayServerboundPackets::Interact(_packet) => todo!(),
-                PlayServerboundPackets::JigsawGenerate(_packet) => todo!(),
+                PlayServerboundPackets::AcceptTeleportation(_packet) => Ok(Some(
+                    ServerboundEventEnum::Play(ServerboundPlayEvent::AcceptTeleportation()),
+                )),
+                PlayServerboundPackets::Attack(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::Attack())))
+                }
+                PlayServerboundPackets::BlockEntityTagQuery(_packet) => Ok(Some(
+                    ServerboundEventEnum::Play(ServerboundPlayEvent::BlockEntityTagQuery()),
+                )),
+                PlayServerboundPackets::BundleItemSelected(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::BundleItemSelect())))
+                }
+                PlayServerboundPackets::ChangeDifficulty(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChangeDifficulty())))
+                }
+                PlayServerboundPackets::ChangeGameMode(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChangeGameMode())))
+                }
+                PlayServerboundPackets::ChatAck(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChatAcknowledge())))
+                }
+                PlayServerboundPackets::ChatCommand(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChatCommand())))
+                }
+                PlayServerboundPackets::ChatCommandSigned(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChatCommandSigned())))
+                }
+                PlayServerboundPackets::Chat(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChatMessage())))
+                }
+                PlayServerboundPackets::ChatSessionUpdate(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChatSessionUpdate())))
+                }
+                PlayServerboundPackets::ChunkBatchReceived(packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ChunkBatchReceived(
+                        packet.rate,
+                    ))))
+                }
+                PlayServerboundPackets::ClientCommand(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ClientCommand())))
+                }
+                PlayServerboundPackets::ClientTickEnd(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ClientTickEnd())))
+                }
+                PlayServerboundPackets::ClientInformation(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ClientInformation())))
+                }
+                PlayServerboundPackets::CommandSuggestion(_packet) => Ok(Some(
+                    ServerboundEventEnum::Play(ServerboundPlayEvent::ChatCommandSuggestion()),
+                )),
+                PlayServerboundPackets::ConfigurationAcknowledged(_) => Ok(Some(
+                    ServerboundEventEnum::Play(ServerboundPlayEvent::AcknowledgeConfiguration),
+                )),
+                PlayServerboundPackets::ContainerButtonClick(_packet) => Ok(Some(
+                    ServerboundEventEnum::Play(ServerboundPlayEvent::ContainerButtonClick()),
+                )),
+                PlayServerboundPackets::ContainerClick(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ContainerClick())))
+                }
+                PlayServerboundPackets::ContainerClose(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ContainerClose())))
+                }
+                PlayServerboundPackets::ContainerSlotStateChanged(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ContainerSlotState())))
+                }
+                PlayServerboundPackets::CookieResponse(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::CookieResponse())))
+                }
+                PlayServerboundPackets::CustomPayload(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::CustomPayload())))
+                }
+                PlayServerboundPackets::DebugSubscriptionRequest(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::DebugSubscription())))
+                }
+                PlayServerboundPackets::EditBook(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::EditBoot())))
+                }
+                PlayServerboundPackets::EntityTagQuery(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::EntityTagQuery())))
+                }
+                PlayServerboundPackets::Interact(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::Interact())))
+                }
+                PlayServerboundPackets::JigsawGenerate(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::JigsawGenerate())))
+                }
                 PlayServerboundPackets::KeepAlive(packet) => {
                     Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::KeepAlive(packet.id))))
                 }
-                PlayServerboundPackets::LockDifficulty(_packet) => todo!(),
-                PlayServerboundPackets::MovePlayerPos(_packet) => todo!(),
-                PlayServerboundPackets::MovePlayerPosRot(_packet) => todo!(),
-                PlayServerboundPackets::MovePlayerRot(_packet) => todo!(),
-                PlayServerboundPackets::MovePlayerStatusOnly(_packet) => todo!(),
-                PlayServerboundPackets::MoveVehicle(_packet) => todo!(),
-                PlayServerboundPackets::PaddleBoat(_packet) => todo!(),
-                PlayServerboundPackets::PickItemFromBlock(_packet) => todo!(),
-                PlayServerboundPackets::PickItemFromEntity(_packet) => todo!(),
+                PlayServerboundPackets::LockDifficulty(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::LockDifficulty())))
+                }
+                PlayServerboundPackets::MovePlayerPos(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::MovePlayerPos())))
+                }
+                PlayServerboundPackets::MovePlayerPosRot(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::MovePlayerPosRot())))
+                }
+                PlayServerboundPackets::MovePlayerRot(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::MovePlayerRot())))
+                }
+                PlayServerboundPackets::MovePlayerStatusOnly(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::MovePlayerStatus())))
+                }
+                PlayServerboundPackets::MoveVehicle(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::MoveVehicle())))
+                }
+                PlayServerboundPackets::PaddleBoat(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::MoveBoat())))
+                }
+                PlayServerboundPackets::PickItemFromBlock(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PickItemFromBlock())))
+                }
+                PlayServerboundPackets::PickItemFromEntity(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PickItemFromEntity())))
+                }
                 PlayServerboundPackets::PingRequest(packet) => Ok(Some(
                     ServerboundEventEnum::Play(ServerboundPlayEvent::PingRequest(packet.id)),
                 )),
-                PlayServerboundPackets::PlaceRecipe(_packet) => todo!(),
-                PlayServerboundPackets::PlayerAbilities(_packet) => todo!(),
-                PlayServerboundPackets::PlayerAction(_packet) => todo!(),
-                PlayServerboundPackets::PlayerCommand(_packet) => todo!(),
-                PlayServerboundPackets::PlayerInput(_packet) => todo!(),
-                PlayServerboundPackets::PlayerLoaded(_packet) => todo!(),
+                PlayServerboundPackets::PlaceRecipe(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PlaceRecipe())))
+                }
+                PlayServerboundPackets::PlayerAbilities(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PlayerAbilities())))
+                }
+                PlayServerboundPackets::PlayerAction(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PlayerAction())))
+                }
+                PlayServerboundPackets::PlayerCommand(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PlayerCommand())))
+                }
+                PlayServerboundPackets::PlayerInput(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PlayerInput())))
+                }
+                PlayServerboundPackets::PlayerLoaded(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::PlayerLoaded())))
+                }
                 PlayServerboundPackets::Pong(packet) => {
                     Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::Pong(packet.id))))
                 }
-                PlayServerboundPackets::RecipeBookChangeSettings(_packet) => todo!(),
-                PlayServerboundPackets::RecipeBookSeenRecipe(_packet) => todo!(),
-                PlayServerboundPackets::RenameItem(_packet) => todo!(),
-                PlayServerboundPackets::ResourcePack(_packet) => todo!(),
-                PlayServerboundPackets::SeenAdvancements(_packet) => todo!(),
-                PlayServerboundPackets::SelectTrade(_packet) => todo!(),
-                PlayServerboundPackets::SetBeacon(_packet) => todo!(),
-                PlayServerboundPackets::SetCarriedItem(_packet) => todo!(),
-                PlayServerboundPackets::SetCommandBlock(_packet) => todo!(),
-                PlayServerboundPackets::SetCommandMinecart(_packet) => todo!(),
-                PlayServerboundPackets::SetCreativeModeSlot(_packet) => todo!(),
-                PlayServerboundPackets::SetGameRule(_packet) => todo!(),
-                PlayServerboundPackets::SetJigsawBlock(_packet) => todo!(),
-                PlayServerboundPackets::SetStructureBlock(_packet) => todo!(),
-                PlayServerboundPackets::SetTestBlock(_packet) => todo!(),
-                PlayServerboundPackets::SignUpdate(_packet) => todo!(),
-                PlayServerboundPackets::SpectateEntity(_packet) => todo!(),
-                PlayServerboundPackets::Swing(_packet) => todo!(),
-                PlayServerboundPackets::TeleportToEntity(_packet) => todo!(),
-                PlayServerboundPackets::TestInstanceBlockAction(_packet) => todo!(),
-                PlayServerboundPackets::UseItemOn(_packet) => todo!(),
-                PlayServerboundPackets::UseItem(_packet) => todo!(),
-                PlayServerboundPackets::CustomClickAction(_packet) => todo!(),
+                PlayServerboundPackets::RecipeBookChangeSettings(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::RecipeBookSettings())))
+                }
+                PlayServerboundPackets::RecipeBookSeenRecipe(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::RecipeBookSeen())))
+                }
+                PlayServerboundPackets::RenameItem(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ItemRename())))
+                }
+                PlayServerboundPackets::ResourcePack(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::ResourcePack())))
+                }
+                PlayServerboundPackets::SeenAdvancements(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::AdvancementSeen())))
+                }
+                PlayServerboundPackets::SelectTrade(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SelectTrade())))
+                }
+                PlayServerboundPackets::SetBeacon(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetBeaconEffect())))
+                }
+                PlayServerboundPackets::SetCarriedItem(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetCarriedItem())))
+                }
+                PlayServerboundPackets::SetCommandBlock(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetCommandBlock())))
+                }
+                PlayServerboundPackets::SetCommandMinecart(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetCommandMinecart())))
+                }
+                PlayServerboundPackets::SetCreativeModeSlot(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetCreativeSlot())))
+                }
+                PlayServerboundPackets::SetGameRule(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetGameRule())))
+                }
+                PlayServerboundPackets::SetJigsawBlock(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetJigsawBlock())))
+                }
+                PlayServerboundPackets::SetStructureBlock(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetStructureBlock())))
+                }
+                PlayServerboundPackets::SetTestBlock(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SetTestBlock())))
+                }
+                PlayServerboundPackets::SignUpdate(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SignUpdate())))
+                }
+                PlayServerboundPackets::SpectateEntity(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SpectateEntity())))
+                }
+                PlayServerboundPackets::Swing(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::SwingArm())))
+                }
+                PlayServerboundPackets::TeleportToEntity(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::TeleportToEntity())))
+                }
+                PlayServerboundPackets::TestInstanceBlockAction(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::TestBlockAction())))
+                }
+                PlayServerboundPackets::UseItemOn(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::UseItemOn())))
+                }
+                PlayServerboundPackets::UseItem(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::UseItem())))
+                }
+                PlayServerboundPackets::CustomClickAction(_packet) => {
+                    Ok(Some(ServerboundEventEnum::Play(ServerboundPlayEvent::CustomClickAction())))
+                }
             },
         }
     }
