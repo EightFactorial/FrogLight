@@ -9,7 +9,7 @@ use bevy_reflect::Reflect;
 use crate::chunk::Section;
 
 /// A storage container for multiple [`Section`]s.
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Reflect), reflect(opaque, Clone))]
 #[allow(clippy::large_enum_variant, reason = "This is by design")]
 pub enum ChunkStorage {
@@ -168,7 +168,7 @@ impl Default for ChunkStorage {
 ///
 /// 1. It guarantees that the number of sections is always correct.
 /// 2. It prevents unnecessary bounds checks when accessing the array.
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct ArrayChunkStorage<const SECTIONS: usize, const OFFSET: i32>(Box<[Section; SECTIONS]>);
 
 impl<const SECTIONS: usize, const OFFSET: i32> ArrayChunkStorage<SECTIONS, OFFSET> {
@@ -204,7 +204,7 @@ impl<const SECTIONS: usize, const OFFSET: i32> Deref for ArrayChunkStorage<SECTI
 /// A vertical slice of the world.
 ///
 /// Has a variable number of sections and a known offset.
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct VecChunkStorage(Vec<Section>, i32);
 
 impl VecChunkStorage {

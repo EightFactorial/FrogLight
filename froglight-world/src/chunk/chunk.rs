@@ -330,3 +330,12 @@ impl Chunk {
         self.blocks = V::blocks();
     }
 }
+
+impl Eq for Chunk {}
+impl PartialEq for Chunk {
+    fn eq(&self, other: &Self) -> bool {
+        self.biomes.version_ty() == other.biomes.version_ty()
+            && self.blocks.version_ty() == other.blocks.version_ty()
+            && self.naive == other.naive
+    }
+}

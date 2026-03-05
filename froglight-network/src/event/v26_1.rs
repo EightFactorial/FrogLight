@@ -270,7 +270,7 @@ impl EventVersion for V26_1 {
                     let packet = LevelChunkWithLightS2CPacket {
                         chunk_x: pos.x(),
                         chunk_z: pos.z(),
-                        chunk_data: chunk.into_raw::<Self>(),
+                        chunk_data: chunk.as_raw::<Self>(),
                         light_data: light,
                     };
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::LevelChunkWithLight(
@@ -1060,11 +1060,7 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::LevelChunkWithLight(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::ChunkWithLight(
                         ChunkPos::new_xz(packet.chunk_x, packet.chunk_z),
-                        ChunkData::new::<Self>(
-                            packet.chunk_data.heightmaps,
-                            packet.chunk_data.chunk_data,
-                            packet.chunk_data.entity_data,
-                        ),
+                        ChunkData::new_versioned::<Self>(packet.chunk_data),
                         packet.light_data,
                     ))))
                 }

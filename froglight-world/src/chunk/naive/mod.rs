@@ -25,7 +25,7 @@ pub(super) mod parse;
 ///
 /// Contains no internal information about biomes or blocks,
 /// and requires the user to provide that information when needed.
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "bevy", derive(Component, Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Clone, Default, Component))]
 #[cfg_attr(feature = "facet", derive(facet::Facet), facet(opaque))]

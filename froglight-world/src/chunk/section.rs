@@ -12,7 +12,7 @@ use crate::{
 };
 
 /// A piece of a chunk.
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq, Eq)]
 pub struct Section {
     block_count: u16,
     fluid_count: u16,
@@ -131,7 +131,7 @@ impl Section {
 // ------------------------------------------------------------------------------------------------
 
 /// A bit-packed bundle of chunk data.
-#[derive(Default, Clone)]
+#[derive(Default, Clone, PartialEq, Eq)]
 pub struct SectionData<T: SectionType> {
     bits: usize,
     palette: SectionPalette,
