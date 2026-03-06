@@ -182,6 +182,14 @@ impl RegistrySetStorage {
         self.to_mut().get_mut(identifier.as_ref())
     }
 
+    /// Get a mutable reference to a [`RegistryStorage`] by its [`Identifier`],
+    /// or insert a new empty [`RegistryStorage`] if one does not exist.
+    #[must_use]
+    #[cfg(feature = "alloc")]
+    pub fn get_mut_or_default(&mut self, identifier: Identifier<'static>) -> &mut RegistryStorage {
+        self.to_mut().entry(identifier).or_insert_with(|| RegistryStorage::new_runtime(Vec::new()))
+    }
+
     /// Insert a new [`RegistryStorage`] with the given [`Identifier`].
     #[cfg(feature = "alloc")]
     pub fn insert(&mut self, identifier: Identifier<'static>, storage: RegistryStorage) {
@@ -245,22 +253,22 @@ pub struct RegistryStorage {
 enum StorageInner {
     /// Dynamic storage allocated at runtime.
     #[cfg(feature = "alloc")]
-    Runtime(Vec<Identifier<'static>>),
+    Runtime(Vec<RegistryValue>),
     /// Static storage allocated at compile time.
-    Static(&'static [Identifier<'static>]),
+    Static(&'static [RegistryValue]),
 }
 
 impl RegistryStorage {
     /// Create a new static [`RegistryStorage`].
     #[must_use]
-    pub const fn new_static(slice: &'static [Identifier<'static>]) -> Self {
+    pub const fn new_static(slice: &'static [RegistryValue]) -> Self {
         Self { inner: StorageInner::Static(slice) }
     }
 
     /// Create a new runtime-allocated [`RegistryStorage`].
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub const fn new_runtime(vec: Vec<Identifier<'static>>) -> Self {
+    pub const fn new_runtime(vec: Vec<RegistryValue>) -> Self {
         Self { inner: StorageInner::Runtime(vec) }
     }
 
@@ -284,41 +292,64 @@ impl RegistryStorage {
         }
     }
 
-    /// Get an [`Identifier`] by its registry index.
+    /// Get a reference to a [`RegistryValue`] by its registry index.
     #[must_use]
-    pub const fn get_name(&self, index: usize) -> Option<&Identifier<'static>> {
-        if index < self.len() { Some(&self.as_slice()[index]) } else { None }
+    pub const fn get(&self, index: usize) -> Option<&RegistryValue> {
+        if index < self.len() { Some(&self.to_ref()[index]) } else { None }
     }
 
-    /// Get the index of an [`Identifier`] by its name.
+    /// Get a mutable reference to a [`RegistryValue`] by its registry index.
+    ///
+    /// If the storage is static, it will be converted into a dynamic storage.
     #[must_use]
-    pub fn get_index<T: AsRef<str> + ?Sized>(&self, name: &T) -> Option<usize> {
+    #[cfg(feature = "alloc")]
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut RegistryValue> {
+        self.to_mut().get_mut(index)
+    }
+
+    /// Get a reference to a [`RegistryValue`] by its identifier.
+    #[must_use]
+    pub fn get_by_name<T: AsRef<str> + ?Sized>(&self, name: &T) -> Option<&RegistryValue> {
         let name = name.as_ref();
-        self.as_slice().iter().position(|id| id.as_str() == name)
+        self.to_ref().iter().find(|value| value.key.as_str() == name)
     }
 
-    /// Get the index of an [`Identifier`] by its name.
+    /// Get a mutable reference to a [`RegistryValue`] by its identifier.
+    ///
+    /// If the storage is static, it will be converted into a dynamic storage.
     #[must_use]
-    pub fn get_index_const(&self, name: &str) -> Option<usize> {
-        let slice = self.as_slice();
-        let mut index = 0;
-        while index < slice.len() {
-            if slice[index].as_str() == name {
-                return Some(index);
-            }
-            index += 1;
+    #[cfg(feature = "alloc")]
+    pub fn get_mut_by_name<T: AsRef<str> + ?Sized>(
+        &mut self,
+        name: &T,
+    ) -> Option<&mut RegistryValue> {
+        let name = name.as_ref();
+        self.to_mut().iter_mut().find(|value| value.key.as_str() == name)
+    }
+
+    /// Get a mutable reference to a [`RegistryValue`] by its identifier,
+    /// or insert a new one and return a mutable reference to it.
+    ///
+    ///
+    /// If the storage is static, it will be converted into a dynamic storage.
+    #[must_use]
+    #[cfg(feature = "alloc")]
+    pub fn get_mut_or_default(&mut self, name: Identifier<'static>) -> &mut RegistryValue {
+        let slice = self.to_ref();
+
+        let mut index = slice.iter().position(|value| value.key.as_str() == name.as_str());
+        if index.is_none() {
+            index = Some(slice.len());
+            self.to_mut().push(RegistryValue::new_runtime(name, Vec::new()));
         }
-        None
+
+        // SAFETY: Index is guaranteed to exist and be within bounds
+        unsafe { self.to_mut().get_mut(index.unwrap_unchecked()).unwrap_unchecked() }
     }
 
     /// Get a reference to the underlying slice of identifiers.
-    #[inline]
     #[must_use]
-    pub const fn as_slice(&self) -> &[Identifier<'static>] { self.to_ref() }
-
-    /// Get a reference to the underlying slice of identifiers.
-    #[must_use]
-    pub const fn to_ref(&self) -> &[Identifier<'static>] {
+    pub const fn to_ref(&self) -> &[RegistryValue] {
         match &self.inner {
             #[cfg(feature = "alloc")]
             StorageInner::Runtime(vec) => vec.as_slice(),
@@ -330,7 +361,7 @@ impl RegistryStorage {
     ///
     /// If the storage is static, it will be converted into a dynamic storage.
     #[cfg(feature = "alloc")]
-    pub fn to_mut(&mut self) -> &mut Vec<Identifier<'static>> {
+    pub fn to_mut(&mut self) -> &mut Vec<RegistryValue> {
         match self.inner {
             StorageInner::Runtime(ref mut vec) => vec,
             StorageInner::Static(slice) => {
@@ -345,9 +376,74 @@ impl RegistryStorage {
     }
 }
 
-impl AsRef<[Identifier<'static>]> for RegistryStorage {
+// -------------------------------------------------------------------------------------------------
+
+/// A container for registry values.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RegistryValue {
+    key: Identifier<'static>,
+    inner: RegistryValueInner,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+enum RegistryValueInner {
+    #[cfg(feature = "alloc")]
+    Runtime(Vec<i32>),
+    Static(&'static [i32]),
+}
+
+impl RegistryValue {
+    /// Create a new static [`RegistryValue`].
+    #[must_use]
+    pub const fn new_static(key: Identifier<'static>, slice: &'static [i32]) -> Self {
+        Self { key, inner: RegistryValueInner::Static(slice) }
+    }
+
+    /// Create a new runtime-allocated [`RegistryValue`].
+    #[must_use]
+    #[cfg(feature = "alloc")]
+    pub const fn new_runtime(key: Identifier<'static>, vec: Vec<i32>) -> Self {
+        Self { key, inner: RegistryValueInner::Runtime(vec) }
+    }
+
+    /// Get the key of this value.
     #[inline]
-    fn as_ref(&self) -> &[Identifier<'static>] { self.as_slice() }
+    #[must_use]
+    pub const fn key(&self) -> &Identifier<'static> { &self.key }
+
+    /// Get a reference to the tag values associated with this value.
+    #[must_use]
+    pub const fn values(&self) -> &[i32] {
+        match &self.inner {
+            #[cfg(feature = "alloc")]
+            RegistryValueInner::Runtime(vec) => vec.as_slice(),
+            RegistryValueInner::Static(slice) => slice,
+        }
+    }
+
+    /// Get a mutable reference to the tag values associated with this value.
+    ///
+    /// If the storage is static, it will be converted into a dynamic storage.
+    #[must_use]
+    #[cfg(feature = "alloc")]
+    pub fn values_mut(&mut self) -> &mut Vec<i32> {
+        match self.inner {
+            RegistryValueInner::Runtime(ref mut vec) => vec,
+            RegistryValueInner::Static(slice) => {
+                let vec = slice.to_vec();
+                self.inner = RegistryValueInner::Runtime(vec);
+                match self.inner {
+                    RegistryValueInner::Runtime(ref mut vec) => vec,
+                    _ => unreachable!(),
+                }
+            }
+        }
+    }
+
+    /// Set the tag values associated with this value, replacing any existing
+    /// tags.
+    #[cfg(feature = "alloc")]
+    pub fn set_values(&mut self, tags: Vec<i32>) { self.inner = RegistryValueInner::Runtime(tags); }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -433,22 +529,25 @@ macro_rules! __implement_storage_inner {
         }
     };
 
-    (@parse { $( $id:expr => [ $( $entry:expr ),* $(,)? ] ),* $(,)? }) => {{
+    (@parse { $( $id:expr => [ $( $entry:expr => $values:expr ),* $(,)? ] ),* $(,)? }) => {{
         &[
             $(
                 (
                     $crate::storage::__Identifier::new_static($id),
                     $crate::storage::RegistryStorage::new_static({
-                        static INNER: &'static [ $crate::storage::__Identifier<'static> ] =
+                        static INNER: &'static [ $crate::storage::RegistryValue ] =
                         &[
                             $(
-                                $crate::storage::__Identifier::new_static($entry),
-                            )*
+                                $crate::storage::RegistryValue::new_static(
+                                    $crate::storage::__Identifier::new_static($entry),
+                                    $values,
+                                )
+                            ),*
                         ];
                         INNER
-                    }),
-                ),
-            )*
+                    })
+                )
+            ),*
         ]
     }}
 }

@@ -16,13 +16,13 @@ impl Version for TestVersion {
 implement_registry! {
     TestVersion => {
         "test:example_a" => [
-            "test:example_a_a",
-            "test:example_a_b",
-            "test:example_a_c",
+            "test:example_a_a" => &[],
+            "test:example_a_b" => &[],
+            "test:example_a_c" => &[],
         ],
         "test:example_b" => [
-            "test:example_b_1",
-            "test:example_b_2",
+            "test:example_b_1" => &[],
+            "test:example_b_2" => &[],
         ]
     }
 }
@@ -36,27 +36,31 @@ fn entry_a() {
     let registry = storage.get("test:example_a").unwrap();
 
     assert_eq!(registry.len(), 3);
-    assert_eq!(registry.get_index("test:example_a_a"), Some(0));
-    assert_eq!(registry.get_name(0).unwrap(), "test:example_a_a");
-    assert_eq!(registry.get_index("test:example_a_b"), Some(1));
-    assert_eq!(registry.get_name(1).unwrap(), "test:example_a_b");
-    assert_eq!(registry.get_index("test:example_a_c"), Some(2));
-    assert_eq!(registry.get_name(2).unwrap(), "test:example_a_c");
+    assert!(registry.get_by_name("test:example_a_a").is_some());
+    assert_eq!(registry.get(0).unwrap().key(), "test:example_a_a");
+    assert!(registry.get_by_name("test:example_a_b").is_some());
+    assert_eq!(registry.get(1).unwrap().key(), "test:example_a_b");
+    assert!(registry.get_by_name("test:example_a_c").is_some());
+    assert_eq!(registry.get(2).unwrap().key(), "test:example_a_c");
 
     #[cfg(feature = "alloc")]
     {
+        use froglight_registry::storage::RegistryValue;
+
         let registry = storage.get_mut("test:example_a").unwrap();
-        registry.to_mut().push(Identifier::new_static("test:example_a_d"));
+        registry
+            .to_mut()
+            .push(RegistryValue::new_static(Identifier::new_static("test:example_a_d"), &[]));
 
         assert_eq!(registry.len(), 4);
-        assert_eq!(registry.get_index("test:example_a_a"), Some(0));
-        assert_eq!(registry.get_name(0).unwrap(), "test:example_a_a");
-        assert_eq!(registry.get_index("test:example_a_b"), Some(1));
-        assert_eq!(registry.get_name(1).unwrap(), "test:example_a_b");
-        assert_eq!(registry.get_index("test:example_a_c"), Some(2));
-        assert_eq!(registry.get_name(2).unwrap(), "test:example_a_c");
-        assert_eq!(registry.get_index("test:example_a_d"), Some(3));
-        assert_eq!(registry.get_name(3).unwrap(), "test:example_a_d");
+        assert!(registry.get_by_name("test:example_a_a").is_some());
+        assert_eq!(registry.get(0).unwrap().key(), "test:example_a_a");
+        assert!(registry.get_by_name("test:example_a_b").is_some());
+        assert_eq!(registry.get(1).unwrap().key(), "test:example_a_b");
+        assert!(registry.get_by_name("test:example_a_c").is_some());
+        assert_eq!(registry.get(2).unwrap().key(), "test:example_a_c");
+        assert!(registry.get_by_name("test:example_a_d").is_some());
+        assert_eq!(registry.get(3).unwrap().key(), "test:example_a_d");
     }
 }
 
@@ -68,22 +72,26 @@ fn entry_b() {
     let registry = storage.get("test:example_b").unwrap();
 
     assert_eq!(registry.len(), 2);
-    assert_eq!(registry.get_index("test:example_b_1"), Some(0));
-    assert_eq!(registry.get_name(0).unwrap(), "test:example_b_1");
-    assert_eq!(registry.get_index("test:example_b_2"), Some(1));
-    assert_eq!(registry.get_name(1).unwrap(), "test:example_b_2");
+    assert!(registry.get_by_name("test:example_b_1").is_some());
+    assert_eq!(registry.get(0).unwrap().key(), "test:example_b_1");
+    assert!(registry.get_by_name("test:example_b_2").is_some());
+    assert_eq!(registry.get(1).unwrap().key(), "test:example_b_2");
 
     #[cfg(feature = "alloc")]
     {
+        use froglight_registry::storage::RegistryValue;
+
         let registry = storage.get_mut("test:example_b").unwrap();
-        registry.to_mut().push(Identifier::new_static("test:example_b_3"));
+        registry
+            .to_mut()
+            .push(RegistryValue::new_static(Identifier::new_static("test:example_b_3"), &[]));
 
         assert_eq!(registry.len(), 3);
-        assert_eq!(registry.get_index("test:example_b_1"), Some(0));
-        assert_eq!(registry.get_name(0).unwrap(), "test:example_b_1");
-        assert_eq!(registry.get_index("test:example_b_2"), Some(1));
-        assert_eq!(registry.get_name(1).unwrap(), "test:example_b_2");
-        assert_eq!(registry.get_index("test:example_b_3"), Some(2));
-        assert_eq!(registry.get_name(2).unwrap(), "test:example_b_3");
+        assert!(registry.get_by_name("test:example_b_1").is_some());
+        assert_eq!(registry.get(0).unwrap().key(), "test:example_b_1");
+        assert!(registry.get_by_name("test:example_b_2").is_some());
+        assert_eq!(registry.get(1).unwrap().key(), "test:example_b_2");
+        assert!(registry.get_by_name("test:example_b_3").is_some());
+        assert_eq!(registry.get(2).unwrap().key(), "test:example_b_3");
     }
 }

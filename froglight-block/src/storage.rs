@@ -118,6 +118,30 @@ impl BlockStorage {
         None
     }
 
+    /// Get the [`Block`] for a given block ID.
+    ///
+    /// # Note
+    ///
+    /// This is not the same as the [`GlobalId`]!
+    ///
+    /// This is the index of the [`BlockType`](crate::block::BlockType),
+    /// determined by the order the blocks are stored in.
+    ///
+    /// This is typically used by the registry.
+    #[must_use]
+    pub fn get_block_by_id(&self, id: u32) -> Option<Block> {
+        let mut count = 0u32;
+        let mut index = 0usize;
+        while let Some(&metadata) = self.to_ref().get(index) {
+            if count == id {
+                return self.get_block(metadata.default_id());
+            }
+            count += 1;
+            index += usize::from(metadata.state_count());
+        }
+        None
+    }
+
     /// Get the [`BlockMetadata`] for a given [`GlobalId`].
     #[must_use]
     pub fn get_metadata(&self, id: GlobalId) -> Option<&'static BlockMetadata> {

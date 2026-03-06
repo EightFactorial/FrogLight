@@ -470,10 +470,33 @@ impl BotPlugin {
                         commands.write_message(AppExit::error());
                     }
                     ClientboundConfigEvent::UpdateTags(tags) => {
+                        let mut registry = Protocol::registry().write();
+
                         for (identifier, tags) in &tags.0 {
                             info!("Received UpdateTags: \"{identifier}\"");
-                            for tag in tags {
+                            let storage = registry.get_mut_or_default(identifier.clone());
+
+                            for tag in tags.clone() {
                                 debug!(" - \"{}\"", tag.identifier);
+                                storage.get_mut_or_default(tag.identifier).set_values(tag.values);
+                            }
+                        }
+
+                        // As an example, trace log the "minecraft:slabs" tag.
+                        let blocks = Protocol::blocks().load();
+                        let Some(block_reg) = registry.get("minecraft:block") else { continue };
+                        let Some(slabs_val) = block_reg.get_by_name("minecraft:slabs") else {
+                            continue;
+                        };
+
+                        trace!("Example UpdateTags: \"minecraft:block\" -> \"minecraft:slabs\"");
+                        for val in slabs_val.values() {
+                            if let Some(meta) =
+                                u32::try_from(*val).ok().and_then(|v| blocks.get_block_by_id(v))
+                            {
+                                trace!(" - \"{}\"", meta.identifier());
+                            } else {
+                                error!("Failed to get metadata for block with ID {val}!");
                             }
                         }
                     }
