@@ -44,6 +44,20 @@ impl BlockShape<'_> {
         }
     }
 
+    /// Creates a new [`BlockShape`] from the given minimum and maximum
+    /// coordinates.
+    #[must_use]
+    pub const fn new_xyz(
+        min_x: f64,
+        min_y: f64,
+        min_z: f64,
+        max_x: f64,
+        max_y: f64,
+        max_z: f64,
+    ) -> Self {
+        Self::new(DVec3::new(min_x, min_y, min_z), DVec3::new(max_x, max_y, max_z))
+    }
+
     /// Creates a new [`BlockShape`] from the given two corner points.
     #[must_use]
     #[cfg(feature = "std")]

@@ -1,8 +1,11 @@
+use core::cmp::Ordering;
 use std::fmt::Write;
 
 use cafebabe::{
+    ClassFile,
+    attributes::CodeData,
     bytecode::Opcode,
-    constant_pool::{LiteralConstant, Loadable, MemberRef},
+    constant_pool::{BootstrapArgument, InvokeDynamic, LiteralConstant, Loadable, MemberRef},
 };
 use convert_case::{Case, Casing};
 use facet::Facet;
@@ -14,7 +17,7 @@ use tokio::sync::{OnceCell, RwLock};
 use crate::{
     common::{DATA, Version, VersionStorage, WORKSPACE_DIR},
     config::{ConfigBundle, VersionPair},
-    helper::{ModuleBuilder, VersionHelper},
+    helper::{ClassFileExt, ModuleBuilder, VersionHelper},
     source::{JarData, JarFile},
 };
 
@@ -26,19 +29,122 @@ pub struct BlockData {
     pub report: BlockReport,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct BlockSettings {
     pub ident: String,
+    pub classes: Vec<String>,
+
+    pub is_air: bool,
+
+    pub shape: BlockShape,
     pub attributes: Vec<BlockAttribute>,
-    /// Note: Total states (min 1)
+
+    /// Total states (min 1)
     pub states: usize,
-    /// Note: Zero-indexed
+    /// Zero-indexed
     pub default: usize,
 }
 
 impl Default for BlockSettings {
     fn default() -> Self {
-        Self { ident: String::new(), attributes: Vec::new(), states: 1, default: 0 }
+        Self {
+            ident: String::new(),
+            classes: Vec::new(),
+            is_air: false,
+            shape: BlockShape::default(),
+            attributes: Vec::new(),
+            states: 1,
+            default: 0,
+        }
+    }
+}
+
+#[derive(Debug, Default, Clone)]
+pub enum BlockShape {
+    Single([f64; 6]),
+    Variable(Vec<[f64; 6]>),
+    Custom(String),
+    Unknown,
+    #[default]
+    Unset,
+}
+
+impl BlockShape {
+    /// Returns true if the shape is [`BlockShape::Unknown`].
+    #[must_use]
+    pub const fn is_unknown(&self) -> bool { matches!(self, Self::Unknown) }
+
+    /// Returns true if the shape is [`BlockShape::Unset`].
+    #[must_use]
+    pub const fn is_unset(&self) -> bool { matches!(self, Self::Unset) }
+}
+
+impl Eq for BlockShape {}
+impl PartialEq for BlockShape {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Single(a), Self::Single(b)) => {
+                a.iter().zip(b).all(|(a, b)| a.total_cmp(b) == Ordering::Equal)
+            }
+            (Self::Variable(a), Self::Variable(b)) => {
+                a.len() == b.len()
+                    && a.iter().zip(b).all(|(a, b)| {
+                        a.iter().zip(b).all(|(a, b)| a.total_cmp(b) == Ordering::Equal)
+                    })
+            }
+            (Self::Custom(a), Self::Custom(b)) => a == b,
+            (Self::Unknown, Self::Unknown) | (Self::Unset, Self::Unset) => true,
+            _ => false,
+        }
+    }
+}
+
+impl std::fmt::Display for BlockShape {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let write_arr = |f: &mut std::fmt::Formatter<'_>, arr: &[f64; 6]| {
+            write!(
+                f,
+                "{}f64, {}f64, {}f64, {}f64, {}f64, {}f64",
+                arr[0], arr[1], arr[2], arr[3], arr[4], arr[5]
+            )
+        };
+
+        match self {
+            Self::Single(shape) => {
+                write!(f, "BlockShape::new_xyz(")?;
+                write_arr(f, shape)?;
+                write!(f, ")")
+            }
+            Self::Variable(shapes) => {
+                write!(f, "BlockShape::Collection(&[")?;
+                for (i, shape) in shapes.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "BlockAabb::new_xyz(")?;
+                    write_arr(f, shape)?;
+                    write!(f, ")")?;
+                }
+                write!(f, "])")
+            }
+            _ => write!(f, "BlockShape::FULL"),
+        }
+    }
+}
+
+impl std::hash::Hash for BlockShape {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        core::mem::discriminant(self).hash(state);
+        match self {
+            Self::Single(shape) => shape.iter().for_each(|f| f.to_bits().hash(state)),
+            Self::Variable(shapes) => shapes.iter().for_each(|shape| {
+                for f in shape {
+                    f.to_bits().hash(state);
+                }
+            }),
+            Self::Custom(name) => name.hash(state),
+            _ => {}
+        }
     }
 }
 
@@ -173,12 +279,13 @@ impl BlockData {
         let block_families = IndexMap::new();
 
         JarData::get_for(version, storage, async |data| {
-            let code = data
-                .get_class_method_code("net/minecraft/world/level/block/Blocks", "<clinit>", None)
-                .unwrap();
+            let class = data.get_class("net/minecraft/world/level/block/Blocks").unwrap();
+            let code = class.get_static_code().unwrap();
 
             let mut current = BlockSettings::default();
-            for (_, op) in &code.bytecode.as_ref().unwrap().opcodes {
+            let bytecode = code.bytecode.as_ref().unwrap();
+
+            class.iterate_code(bytecode, data, 0, &mut |_, op| {
                 match op {
                     Opcode::Ldc(Loadable::LiteralConstant(LiteralConstant::String(s)))
                     | Opcode::LdcW(Loadable::LiteralConstant(LiteralConstant::String(s)))
@@ -309,14 +416,68 @@ impl BlockData {
                             },
                         );
                     }
+                    Opcode::Putstatic(..) => {
+                        current = BlockSettings::default();
+                    }
+
+                    Opcode::Invokeinterface(MemberRef { class_name, name_and_type }, _)
+                    | Opcode::Invokespecial(MemberRef { class_name, name_and_type })
+                    | Opcode::Invokestatic(MemberRef { class_name, name_and_type })
+                    | Opcode::Invokevirtual(MemberRef { class_name, name_and_type })
+                        if class_name.starts_with("net/minecraft/world/level/block/")
+                            && name_and_type.name == "<init>" =>
+                    {
+                        current.classes.push(class_name.to_string());
+                    }
+                    Opcode::Invokedynamic(InvokeDynamic { attr_index, .. }) => {
+                        let entry = &class.get_bootstrap().unwrap()[usize::from(*attr_index)];
+                        for arg in &entry.arguments {
+                            if let BootstrapArgument::MethodHandle(handle) = arg
+                                && handle.class_name.starts_with("net/minecraft/world/level/block/")
+                                && handle.member_ref.name == "<init>"
+                            {
+                                current.classes.push(handle.class_name.to_string());
+                            }
+                        }
+                    }
+
+                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
+                        if class_name == "net/minecraft/world/level/block/Blocks"
+                        && name_and_type.name == "register" && matches!(name_and_type.descriptor.as_ref(), "(Ljava/lang/String;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;" | "(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;") => {
+                            current.classes.push(String::from("net/minecraft/world/level/block/Block"));
+                        }
+                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
+                    if class_name == "net/minecraft/world/level/block/Blocks" && name_and_type.name == "registerBed" => {
+                        current.classes.push(String::from("net/minecraft/world/level/block/BedBlock"));
+                    }
+                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
+                    if class_name == "net/minecraft/world/level/block/Blocks" && name_and_type.name == "registerStainedGlass" => {
+                        current.classes.push(String::from("net/minecraft/world/level/block/StainedGlassBlock"));
+                    }
+                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
+                    if class_name == "net/minecraft/world/level/block/Blocks" && matches!(name_and_type.name.as_ref(), "registerStair" | "registerLegacyStair") => {
+                        current.classes.push(String::from("net/minecraft/world/level/block/StairBlock"));
+                    }
 
                     _ => {}
                 }
-            }
+
+                Ok(())
+            })?;
 
             Ok(())
         })
         .await?;
+
+        // Mark blocks as air
+        for block in blocks.values_mut() {
+            if matches!(
+                block.ident.as_str(),
+                "minecraft:air" | "minecraft:cave_air" | "minecraft:void_air"
+            ) {
+                block.is_air = true;
+            }
+        }
 
         let report = JarFile::get_for(version, storage, async |jar| {
             let path = jar.generated.join("reports/blocks.json");
@@ -337,6 +498,49 @@ impl BlockData {
         })
         .await?;
 
+        JarData::get_for(version, storage, async |data| {
+            for (block_name, block) in &mut blocks {
+                if block.classes.is_empty() {
+                    miette::bail!(
+                        "Failed to find any classes for block \"{}\" ({block_name})!",
+                        block.ident
+                    );
+                }
+
+                for class_name in &block.classes {
+                    let mut class_name = class_name.as_str();
+                    let mut class = data.get_class(class_name).unwrap();
+
+                    while block.shape.is_unset() {
+                        match class_name {
+                            "net/minecraft/world/level/block/Block" => {
+                                block.shape = BlockShape::Single([0.0, 0.0, 0.0, 1.0, 1.0, 1.0]);
+                            }
+                            "net/minecraft/world/level/block/ShulkerBoxBlock" => {
+                                block.shape = BlockShape::Custom(String::from("ShulkerBoxBlock"));
+                            }
+                            _ => {
+                                if let Some(shape_init) = class.get_method_code("getShape") {
+                                    block.shape = parse_shape_init_method(shape_init, class, data)?;
+                                } else if let Some(parent) = class.super_class.as_ref() {
+                                    class_name = parent;
+                                    class = data.get_class(class_name).unwrap();
+                                } else {
+                                    miette::bail!(
+                                        "Failed to find block shape for \"{}\" ({block_name})!",
+                                        block.ident
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Ok(())
+        })
+        .await?;
+
         tracing::debug!("Found {} blocks for \"{}\"", blocks.len(), version.as_str());
         tracing::debug!(
             "Found {} block families for \"{}\"",
@@ -348,15 +552,315 @@ impl BlockData {
     }
 }
 
+fn parse_shape_init_method(
+    init: &CodeData<'static>,
+    class: &ClassFile<'static>,
+    jar: &JarData,
+) -> Result<BlockShape> {
+    let bytecode = init.bytecode.as_ref().unwrap();
+    let mut shape = BlockShape::Unknown;
+
+    class.iterate_code(bytecode, jar, 0, &mut |_, op| {
+        if !shape.is_unknown() {
+            return Ok(());
+        }
+
+        tracing::trace!("{op:#?}");
+        match op {
+            Opcode::Getstatic(MemberRef { class_name, name_and_type })
+                if name_and_type.descriptor == "Lnet/minecraft/world/phys/shapes/VoxelShape;" =>
+            {
+                let class = jar.get_class(class_name).unwrap();
+                let init = class.get_static_field_init(&name_and_type.name).unwrap();
+                shape = parse_shape_init_static(&init, class, jar)?;
+            }
+
+            Opcode::Invokestatic(MemberRef { class_name, name_and_type })
+                if class_name == "net/minecraft/world/phys/shapes/Shapes" =>
+            {
+                match name_and_type.name.as_ref() {
+                    "block" => shape = BlockShape::Single([0.0, 0.0, 0.0, 1.0, 1.0, 1.0]),
+                    "empty" => shape = BlockShape::Single([0.0, 0.0, 0.0, 0.0, 0.0, 0.0]),
+                    unk => miette::bail!("Unknown \"Shapes\" method: {unk}"),
+                }
+            }
+
+            _ => {}
+        }
+
+        Ok(())
+    })?;
+
+    Ok(shape)
+}
+
+#[expect(clippy::too_many_lines, reason = "Large, multi-argument match statement")]
+fn parse_shape_init_static(
+    init: &[Opcode<'static>],
+    _class: &ClassFile<'static>,
+    _jar: &JarData,
+) -> Result<BlockShape> {
+    let mut constants = Vec::new();
+    for op in init {
+        match op {
+            Opcode::Ldc(Loadable::LiteralConstant(c))
+            | Opcode::LdcW(Loadable::LiteralConstant(c))
+            | Opcode::Ldc2W(Loadable::LiteralConstant(c)) => {
+                constants.push(c);
+            }
+            Opcode::Dconst0 => {
+                constants.push(&LiteralConstant::Double(0.0));
+            }
+            Opcode::Dconst1 => {
+                constants.push(&LiteralConstant::Double(1.0));
+            }
+
+            Opcode::Invokestatic(MemberRef { class_name, name_and_type })
+                if name_and_type
+                    .descriptor
+                    .ends_with("Lnet/minecraft/world/phys/shapes/VoxelShape;") =>
+            {
+                match (
+                    class_name.as_ref(),
+                    name_and_type.name.as_ref(),
+                    name_and_type.descriptor.as_ref(),
+                ) {
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "box",
+                        "(DDDDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let [
+                            ..,
+                            LiteralConstant::Double(min_x),
+                            LiteralConstant::Double(min_y),
+                            LiteralConstant::Double(min_z),
+                            LiteralConstant::Double(max_x),
+                            LiteralConstant::Double(max_y),
+                            LiteralConstant::Double(max_z),
+                        ] = constants.as_slice()
+                        {
+                            return Ok(BlockShape::Single([
+                                min_x / 16.,
+                                min_y / 16.,
+                                min_z / 16.,
+                                max_x / 16.,
+                                max_y / 16.,
+                                max_z / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"box\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"box\" shape!");
+                    }
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "boxZ",
+                        "(DDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let [
+                            ..,
+                            LiteralConstant::Double(size_xy),
+                            LiteralConstant::Double(min_z),
+                            LiteralConstant::Double(max_z),
+                        ] = constants.as_slice()
+                        {
+                            let half_xy = size_xy / 2.0;
+                            return Ok(BlockShape::Single([
+                                (8. - half_xy) / 16.,
+                                (8. - half_xy) / 16.,
+                                min_z / 16.,
+                                (8. + half_xy) / 16.,
+                                (8. + half_xy) / 16.,
+                                max_z / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"box\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"box\" shape!");
+                    }
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "boxZ",
+                        "(DDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let [
+                            ..,
+                            LiteralConstant::Double(size_x),
+                            LiteralConstant::Double(size_y),
+                            LiteralConstant::Double(min_z),
+                            LiteralConstant::Double(max_z),
+                        ] = constants.as_slice()
+                        {
+                            let half_x = size_x / 2.0;
+                            let half_y = size_y / 2.0;
+                            return Ok(BlockShape::Single([
+                                (8. - half_x) / 16.,
+                                (8. - half_y) / 16.,
+                                min_z / 16.,
+                                (8. + half_x) / 16.,
+                                (8. + half_y) / 16.,
+                                max_z / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"box\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"box\" shape!");
+                    }
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "boxZ",
+                        "(DDDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let [
+                            ..,
+                            LiteralConstant::Double(size_x),
+                            LiteralConstant::Double(min_y),
+                            LiteralConstant::Double(max_y),
+                            LiteralConstant::Double(min_z),
+                            LiteralConstant::Double(max_z),
+                        ] = constants.as_slice()
+                        {
+                            let half_x = size_x / 2.0;
+                            return Ok(BlockShape::Single([
+                                (8. - half_x) / 16.,
+                                min_y / 16.,
+                                min_z / 16.,
+                                (8. + half_x) / 16.,
+                                max_y / 16.,
+                                max_z / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"box\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"box\" shape!");
+                    }
+
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "column",
+                        "(DDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let [
+                            ..,
+                            LiteralConstant::Double(size_xz),
+                            LiteralConstant::Double(min_y),
+                            LiteralConstant::Double(max_y),
+                        ] = constants.as_slice()
+                        {
+                            let half_xz = size_xz / 2.0;
+                            return Ok(BlockShape::Single([
+                                (8. - half_xz) / 16.,
+                                min_y / 16.,
+                                (8. - half_xz) / 16.,
+                                (8. + half_xz) / 16.,
+                                max_y / 16.,
+                                (8. + half_xz) / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"column\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"column\" shape!");
+                    }
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "column",
+                        "(DDDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let [
+                            ..,
+                            LiteralConstant::Double(size_x),
+                            LiteralConstant::Double(size_z),
+                            LiteralConstant::Double(min_y),
+                            LiteralConstant::Double(max_y),
+                        ] = constants.as_slice()
+                        {
+                            let half_x = size_x / 2.0;
+                            let half_z = size_z / 2.0;
+                            return Ok(BlockShape::Single([
+                                (8. - half_x) / 16.,
+                                min_y / 16.,
+                                (8. - half_z) / 16.,
+                                (8. + half_x) / 16.,
+                                max_y / 16.,
+                                (8. + half_z) / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"column\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"column\" shape!");
+                    }
+
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "cube",
+                        "(D)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let Some(LiteralConstant::Double(size)) = constants.last() {
+                            let half = size / 2.0;
+                            return Ok(BlockShape::Single([
+                                (8. - half) / 16.,
+                                (8. - half) / 16.,
+                                (8. - half) / 16.,
+                                (8. + half) / 16.,
+                                (8. + half) / 16.,
+                                (8. + half) / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"cube\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"cube\" shape!");
+                    }
+                    (
+                        "net/minecraft/world/level/block/Block",
+                        "cube",
+                        "(DDD)Lnet/minecraft/world/phys/shapes/VoxelShape;",
+                    ) => {
+                        if let [
+                            ..,
+                            LiteralConstant::Double(size_x),
+                            LiteralConstant::Double(size_y),
+                            LiteralConstant::Double(size_z),
+                        ] = constants.as_slice()
+                        {
+                            let half_x = size_x / 2.0;
+                            let half_y = size_y / 2.0;
+                            let half_z = size_z / 2.0;
+                            return Ok(BlockShape::Single([
+                                (8. - half_x) / 16.,
+                                (8. - half_y) / 16.,
+                                (8. - half_z) / 16.,
+                                (8. + half_x) / 16.,
+                                (8. + half_y) / 16.,
+                                (8. + half_z) / 16.,
+                            ]));
+                        }
+                        tracing::error!("Constants for \"cube\" shape: {constants:#?}");
+                        miette::bail!("Failed to find constants for \"cube\" shape!");
+                    }
+
+                    _ => miette::bail!(
+                        "Unknown method in shape init: {}.{}{}",
+                        class_name,
+                        name_and_type.name,
+                        name_and_type.descriptor
+                    ),
+                }
+            }
+            _ => {}
+        }
+    }
+
+    Ok(BlockShape::Unknown)
+}
+
 // -------------------------------------------------------------------------------------------------
 
+pub struct GlobalBlockData {
+    pub global_shapes: IndexMap<Version, IndexMap<String, (BlockShape, usize)>>,
+}
+
 /// Generate global block data.
+#[allow(clippy::too_many_lines, reason = "Necessary")]
 pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
-    static ONCE: OnceCell<Result<()>> = OnceCell::const_new();
+    static ONCE: OnceCell<Result<GlobalBlockData>> = OnceCell::const_new();
     let result = ONCE
         .get_or_init(|| async {
             // Collect the `BlockData` for all versions.
-            let global_blocks = VersionHelper::for_all(config, async |version| {
+            let global_blocks = VersionHelper::for_all_map(config, async |version| {
                 let pinned = DATA.pin_owned();
                 let storage = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
                 let mut storage = storage.write().await;
@@ -370,8 +874,8 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 let mut module = ModuleBuilder::new("attribute", path);
 
                 // Deduplicate and sort the block types
-                let mut attributes = IndexSet::new();
-                for versioned in &global_blocks {
+                let mut attributes = IndexSet::<BlockAttribute>::new();
+                for versioned in global_blocks.values() {
                     for settings in versioned.blocks.values() {
                         attributes.extend(settings.attributes.clone());
                     }
@@ -428,8 +932,8 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 let mut module = ModuleBuilder::new("block", path);
 
                 // Deduplicate and sort the block types
-                let mut blocks = IndexSet::new();
-                for versioned in &global_blocks {
+                let mut blocks = IndexSet::<String>::new();
+                for versioned in global_blocks.values() {
                     for (name, _id) in &versioned.blocks {
                         blocks.insert(name.to_case(Case::Pascal));
                     }
@@ -456,18 +960,75 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 module.build().await?;
             };
 
-            Ok(())
+            // Build the `shape` module with the collected block shapes
+            let mut global_shapes =
+                IndexMap::<_, IndexMap<_, _>>::with_capacity(global_blocks.len());
+            {
+                let path = WORKSPACE_DIR.join("froglight-block/src/generated");
+                let mut module = ModuleBuilder::new("shape", path);
+
+                // Deduplicate and sort the block shapes
+                let mut shapes = IndexSet::<BlockShape>::new();
+                for (version, data) in &global_blocks {
+                    let global = global_shapes.entry(version.clone()).or_default();
+
+                    for (name, settings) in &data.blocks {
+                        shapes.insert(settings.shape.clone());
+                        global.insert(
+                            name.clone(),
+                            (settings.shape.clone(), shapes.get_index_of(&settings.shape).unwrap()),
+                        );
+                    }
+                }
+
+                // Generate the content
+                let mut content = String::from("\nuse crate::block::BlockShape;\n");
+
+                content.push_str("\ngenerate! {\n    @shape\n");
+                for (index, shape) in shapes.into_iter().enumerate() {
+                    writeln!(content, "    SHAPE_{index} => {{ {shape} }}").unwrap();
+                }
+                content.push('}');
+
+                // Finalize and build the module
+                module
+                    .with_docs(
+                        "Block shapes for all [`Version`](froglight_common::version::Version)s.
+
+@generated",
+                    )
+                    .with_content(&content);
+
+                module.build().await?;
+            }
+
+            Ok(GlobalBlockData { global_shapes })
         })
         .await;
 
     match result {
-        Ok(()) => Ok(()),
+        Ok(global) => {
+            for version in &config.versions {
+                let guard = DATA.owned_guard();
+                let storage =
+                    DATA.get_or_insert_with(version.real.clone(), RwLock::default, &guard);
+
+                let mut storage = storage.write().await;
+                generate(version, global, &mut storage).await?;
+            }
+            Ok(())
+        }
         Err(err) => miette::bail!("Failed to generate global block data: {err}"),
     }
 }
 
 /// Generate `Version`-specific block data.
-pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+async fn generate(
+    version: &VersionPair,
+    global: &GlobalBlockData,
+    storage: &mut VersionStorage,
+) -> Result<()> {
+    let global = global.global_shapes.get(&version.real).unwrap();
     BlockData::get_for(&version.real, storage, async |data| {
         let path = WORKSPACE_DIR.join("froglight-block/src/generated");
         let mut module = ModuleBuilder::new_after_marker(path).await?;
@@ -479,7 +1040,7 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                 let version_type = version.base.as_feature().to_ascii_uppercase();
                 content.push_str("\nuse froglight_common::version::");
                 content.push_str(&version_type);
-                content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::generated::{attribute::*, block::*};\n\n");
+                content.push_str(";\n\n#[allow(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::generated::{attribute::*, block::*, shape::*};\n\n");
 
                 // Generate the block data macro invocation
                 content.push_str("generate! {\n    @version ");
@@ -496,6 +1057,8 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                     content.push_str(&global_index.to_string());
                     content.push_str(", default: ");
                     content.push_str(&settings.default.to_string());
+                    content.push_str(", air: ");
+                    content.push_str(&settings.is_air.to_string());
 
                     content.push_str(",\n        ty: [ ");
                     for (attr_index, attr) in settings.attributes.iter().enumerate() {
@@ -507,8 +1070,13 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                             content.push_str(", ");
                         }
                     }
+                    content.push_str(" ], ");
 
-                    content.push_str(" ]\n    }");
+                    let (_shape, shape_index) = global.get(block).unwrap();
+                    content.push_str("shape: { SHAPE_");
+                    content.push_str(&shape_index.to_string());
+                    content.push_str(" }\n    }");
+
                     if index != data.blocks.len() - 1 {
                         content.push(',');
                     }
@@ -538,9 +1106,7 @@ pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Re
                         total_index += 1;
                     }
                 }
-
                 content.push('}');
-
 
                 module.with_docs("Placeholder").with_content(&content);
                 Ok(settings.with_feature(version.base.as_feature()))

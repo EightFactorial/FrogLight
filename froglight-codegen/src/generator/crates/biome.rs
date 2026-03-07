@@ -199,7 +199,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     let result = ONCE
         .get_or_init(|| async move {
             // Collect the `BiomeData` for all versions.
-            let global_biomes = VersionHelper::for_all(config, async |version| {
+            let global_biomes = VersionHelper::for_all_vec(config, async |version| {
                 let pinned = DATA.pin_owned();
                 let storage = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
                 let mut storage = storage.write().await;
@@ -423,7 +423,7 @@ fn generate_value(name: &str, value: &Value, content: &mut String) -> Result<Vec
 // -------------------------------------------------------------------------------------------------
 
 /// Generate `Version`-specific biome data.
-pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
     BiomeData::get_for(&version.real, storage, async |data| {
         let path = WORKSPACE_DIR.join("froglight-biome/src/generated");
         let mut module = ModuleBuilder::new_after_marker(path).await?;

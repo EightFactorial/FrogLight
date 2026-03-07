@@ -235,7 +235,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     let result = ONCE
         .get_or_init(|| async move {
             // Collect the `ItemData` for all versions.
-            let global_items = VersionHelper::for_all(config, async |version| {
+            let global_items = VersionHelper::for_all_vec(config, async |version| {
                 let pinned = DATA.pin_owned();
                 let storage = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
                 let mut storage = storage.write().await;
@@ -291,13 +291,23 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
         .await;
 
     match result {
-        Ok(()) => Ok(()),
+        Ok(()) => {
+            for version in &config.versions {
+                let guard = DATA.owned_guard();
+                let storage =
+                    DATA.get_or_insert_with(version.real.clone(), RwLock::default, &guard);
+
+                let mut storage = storage.write().await;
+                generate(version, &mut storage).await?;
+            }
+            Ok(())
+        }
         Err(err) => miette::bail!("Failed to generate global biome data: {err}"),
     }
 }
 
 /// Generate `Version`-specific item data.
-pub async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
+async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
     ItemData::get_for(&version.real, storage, async |data| {
         let path = WORKSPACE_DIR.join("froglight-item/src/generated");
         let mut module = ModuleBuilder::new_after_marker(path).await?;

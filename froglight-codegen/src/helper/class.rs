@@ -60,7 +60,7 @@ impl ClassFileExt for ClassFile<'static> {
 
                 if name_and_type.name == field {
                     // Stop collecting once we initialize the target field
-                    break;
+                    return Some(init_ops);
                 }
 
                 // Clear any operations used for other fields
@@ -69,7 +69,7 @@ impl ClassFileExt for ClassFile<'static> {
             init_ops.push(op.clone());
         }
 
-        Some(init_ops)
+        None
     }
 
     fn iterate_code<F: FnMut(usize, &Opcode<'static>) -> Result<()>>(

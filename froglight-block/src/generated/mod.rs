@@ -3,7 +3,6 @@
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, reason = "Ignore all lints for generated code")]
 
-#[expect(unused, reason = "WIP")]
 macro_rules! generate {
     (@attributes $($ident:ident => [ $($str:literal => $val:ident),+ ] ),*) => {
         $(
@@ -15,7 +14,7 @@ macro_rules! generate {
                     $val,
                 )*
             }
-            impl crate::block::BlockAttribute for $ident {
+            impl $crate::block::BlockAttribute for $ident {
                 const STATES: &'static [(&'static str, Self)] = &[$(($str, Self::$val)),*];
             }
         )*
@@ -63,14 +62,14 @@ macro_rules! generate {
             }
 
             #[automatically_derived]
-            impl PartialEq<crate::block::Block> for $ident {
+            impl PartialEq<$crate::block::Block> for $ident {
                 #[inline]
-                fn eq(&self, other: &crate::block::Block) -> bool {
+                fn eq(&self, other: &$crate::block::Block) -> bool {
                     other.is_block::<$ident>()
                 }
             }
             #[automatically_derived]
-            impl PartialEq<$ident> for crate::block::Block {
+            impl PartialEq<$ident> for $crate::block::Block {
                 #[inline]
                 fn eq(&self, _: &$ident) -> bool {
                     self.is_block::<$ident>()
@@ -79,9 +78,9 @@ macro_rules! generate {
         )*
 
         #[automatically_derived]
-        impl PartialEq<crate::block::Block> for VanillaBlock {
+        impl PartialEq<$crate::block::Block> for VanillaBlock {
             #[allow(unreachable_patterns, reason = "Nonexhaustive")]
-            fn eq(&self, other: &crate::block::Block) -> bool {
+            fn eq(&self, other: &$crate::block::Block) -> bool {
                 match self {
                     $(
                         VanillaBlock::$ident => other.is_block::<$ident>(),
@@ -91,10 +90,10 @@ macro_rules! generate {
             }
         }
         #[automatically_derived]
-        impl PartialEq<VanillaBlock> for crate::block::Block {
+        impl PartialEq<VanillaBlock> for $crate::block::Block {
             #[inline]
             fn eq(&self, other: &VanillaBlock) -> bool {
-                PartialEq::<crate::block::Block>::eq(other, self)
+                PartialEq::<$crate::block::Block>::eq(other, self)
             }
         }
     };
@@ -103,36 +102,50 @@ macro_rules! generate {
         ident: $string:literal,
         global: $global:literal,
         default: $default:literal,
-        ty: [$($name:literal => $ty:ty),*]
+        air: $air:literal,
+        ty: [$($name:literal => $ty:ty),*],
+        shape: $shape:tt
     }),*) => {
         $(
-            impl crate::block::BlockType<$version> for $ident {
+            impl $crate::block::BlockType<$version> for $ident {
                 type Attributes = ($($ty,)*);
                 const ATTRDATA: &'static [(&'static str, core::any::TypeId)] = &[$(
                     ($name, core::any::TypeId::of::<$ty>()),
                 )*];
-                const METADATA: &'static crate::block::BlockMetadata = {
-                    static METADATA: crate::block::BlockMetadata = unsafe { crate::block::BlockMetadata::new::<$ident, $version>(
+                const METADATA: &'static $crate::block::BlockMetadata = {
+                    static METADATA: $crate::block::BlockMetadata = unsafe { $crate::block::BlockMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
                         $global,
                         $default,
-                        crate::block::BlockBehavior::new::<$ident, $version>(),
+                        $crate::block::BlockBehavior::new::<$ident, $version>(),
                     ) };
                     &METADATA
                 };
+
+                fn is_air(_: $crate::block::StateId) -> bool { $air }
+
+                #[allow(unused, reason = "Automatically generated")]
+                fn shape_of(state: $crate::block::StateId) -> &'static $crate::block::BlockShape<'static> {
+                    $shape
+                }
             }
         )*
     };
     (@version @storage $version:ident, $($ident:ident),*) => {
-        static ARRAY: &'static [&'static crate::block::BlockMetadata] = &[
-            $(<$ident as crate::block::BlockType<$version>>::METADATA),*
+        static ARRAY: &'static [&'static $crate::block::BlockMetadata] = &[
+            $(<$ident as $crate::block::BlockType<$version>>::METADATA),*
         ];
-        crate::implement_blocks!($version => unsafe {
-            crate::storage::BlockStorage::new_static(ARRAY)
+        $crate::implement_blocks!($version => unsafe {
+            $crate::storage::BlockStorage::new_static(ARRAY)
         });
     };
 
-    (@shape) => {};
+    (@shape $( $ident:ident => $tt:tt )*) => {
+        $(
+            #[allow(missing_docs, unused, reason = "Automatically generated")]
+            pub const $ident: &'static $crate::block::BlockShape<'static> = &$tt;
+        )*
+    };
 }
 
 pub mod attribute;

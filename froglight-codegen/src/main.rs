@@ -10,7 +10,10 @@ use crate::config::ConfigBundle;
 
 mod common;
 mod config;
+
 mod generator;
+use generator::crates;
+
 mod helper;
 mod source;
 
@@ -27,12 +30,12 @@ async fn main() -> Result<()> {
     // Generate `Version` structs
     tasks.spawn(generator::version_type::generate(config));
 
-    // Generate global code (block types, item types, etc.)
-    tasks.spawn(generator::generate_global(config));
-    // Generate `Version`-specific code (block definitions, item definitions, etc.)
-    for version in &config.versions {
-        tasks.spawn(generator::generate_specific(version, config));
-    }
+    // Generate code (block types, item types, etc.)
+    tasks.spawn(crates::biome::generate_global(config));
+    tasks.spawn(crates::block::generate_global(config));
+    tasks.spawn(crates::item::generate_global(config));
+    tasks.spawn(crates::network::generate_global(config));
+    tasks.spawn(crates::packet::generate_global(config));
 
     // Wait for all tasks to complete, returning the first error encountered.
     while let Some(result) = tasks.join_next().await {
