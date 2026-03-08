@@ -42,6 +42,8 @@ default = ["alloc", "std"]
 atomic = []
 # Enable `bevy` support.
 bevy = ["alloc", "dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect"]
+# Enable `facet` support.
+facet = ["alloc", "dep:facet", "dep:facet-minecraft", "froglight-common/facet"]
 # Enable `tracing` support.
 tracing = ["dep:tracing"]
 
@@ -51,9 +53,9 @@ libm = ["dep:libm", "glam/nostd-libm"]
 # Enable support for a global allocator
 alloc = ["froglight-common/alloc"]
 # Enable support for the standard library
-std = ["alloc", "dep:arc-swap", "froglight-common/std", "glam/std", "uuid/std"]
+std = ["alloc", "dep:arc-swap", "facet?/std", "facet-minecraft?/std", "froglight-common/std", "glam/std", "uuid/std"]
 # Enable optimizations using the nightly toolchain
-nightly = ["froglight-common/nightly"]
+nightly = ["facet-minecraft?/nightly", "froglight-common/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.

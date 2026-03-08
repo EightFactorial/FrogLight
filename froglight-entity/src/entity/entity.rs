@@ -1,3 +1,5 @@
+use core::any::TypeId;
+
 use froglight_common::prelude::Identifier;
 
 use crate::{
@@ -6,20 +8,19 @@ use crate::{
 };
 
 /// A bundle of data and metadata for an entity.
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct EntityBundle {
-    #[expect(dead_code, reason = "WIP")]
     dataset: EntityDataSet<'static>,
     reference: &'static EntityMetadata,
 }
 
 impl EntityBundle {
-    /// Create a new [`Biome`] of the given type.
+    /// Create a new [`EntityBundle`] of the given type.
     #[inline]
     #[must_use]
     pub fn new<E: EntityType<V>, V: EntityVersion>() -> Self { Self::new_from(E::METADATA) }
 
-    /// Create a new [`Biome`] from the given metadata.
+    /// Create a new [`EntityBundle`] from the given metadata.
     #[inline]
     #[must_use]
     pub fn new_from(metadata: &'static EntityMetadata) -> Self {
@@ -41,20 +42,55 @@ impl EntityBundle {
         Self { dataset, reference: metadata }
     }
 
-    /// Get the string identifier of this biome.
+    /// Get a reference to the [`EntityDataSet`] of this entity.
+    #[inline]
+    #[must_use]
+    pub const fn dataset(&self) -> &EntityDataSet<'static> { &self.dataset }
+
+    /// Get a mutable reference to the [`EntityDataSet`] of this entity.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure the dataset is still valid for this entity after
+    /// mutation.
+    #[inline]
+    #[must_use]
+    pub const unsafe fn dataset_mut(&mut self) -> &mut EntityDataSet<'static> { &mut self.dataset }
+
+    /// Get the string identifier of this entity.
     #[inline]
     #[must_use]
     pub const fn identifier(&self) -> &Identifier<'static> { self.reference.identifier() }
 
-    /// Get the [`BiomeMetadata`] of this biome.
+    /// Get the [`EntityMetadata`] of this entity.
     #[inline]
     #[must_use]
     pub const fn metadata(&self) -> &'static EntityMetadata { self.reference }
 
-    /// Get the [`GlobalId`] of this biome.
+    /// Get the [`GlobalId`] of this entity type.
     #[inline]
     #[must_use]
     pub fn global_id(&self) -> GlobalId { self.reference.global_id() }
+
+    /// Returns `true` if this entity is of type `E`.
+    #[inline]
+    #[must_use]
+    pub fn is_entity<E: 'static>(&self) -> bool { self.reference.is_entity::<E>() }
+
+    /// Returns `true` if this entity is of version `V`.
+    #[inline]
+    #[must_use]
+    pub fn is_version<V: 'static>(&self) -> bool { self.reference.is_version::<V>() }
+
+    /// Get the [`TypeId`] of the entity type.
+    #[inline]
+    #[must_use]
+    pub const fn entity_ty(&self) -> TypeId { self.reference.entity_ty() }
+
+    /// Get the [`TypeId`] of the version type.
+    #[inline]
+    #[must_use]
+    pub const fn version_ty(&self) -> TypeId { self.reference.version_ty() }
 }
 
 // -------------------------------------------------------------------------------------------------

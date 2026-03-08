@@ -9,7 +9,7 @@ use crate::generated::data::EntityDataType;
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct EntityDataSet<'a>(Cow<'a, [EntityDataType]>);
+pub struct EntityDataSet<'a>(Cow<'a, [(u8, EntityDataType)]>);
 
 /// A collection of [`EntityDataType`]s that used to create an entity.
 #[cfg(not(feature = "alloc"))]
@@ -17,19 +17,19 @@ pub struct EntityDataSet<'a>(Cow<'a, [EntityDataType]>);
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct EntityDataSet<'a>(&'a [EntityDataType]);
+pub struct EntityDataSet<'a>(&'a [(u8, EntityDataType)]);
 
 impl<'a> EntityDataSet<'a> {
     /// Creates a new [`EntityDataSet`] from a set of [`EntityDataType`]s.
     #[inline]
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub fn new<T: Into<Cow<'a, [EntityDataType]>>>(data: T) -> Self { Self(data.into()) }
+    pub fn new<T: Into<Cow<'a, [(u8, EntityDataType)]>>>(data: T) -> Self { Self(data.into()) }
 
     /// Creates a new [`EntityDataSet`] from a set of [`EntityDataType`]s.
     #[inline]
     #[must_use]
-    pub const fn new_slice(data: &'a [EntityDataType]) -> Self {
+    pub const fn new_slice(data: &'a [(u8, EntityDataType)]) -> Self {
         #[cfg(feature = "alloc")]
         {
             Self(Cow::Borrowed(data))
@@ -44,11 +44,11 @@ impl<'a> EntityDataSet<'a> {
     #[inline]
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub const fn new_vec(data: Vec<EntityDataType>) -> Self { Self(Cow::Owned(data)) }
+    pub const fn new_vec(data: Vec<(u8, EntityDataType)>) -> Self { Self(Cow::Owned(data)) }
 
     /// Returns the data types in this set as a slice.
     #[must_use]
-    pub const fn to_ref(&self) -> &[EntityDataType] {
+    pub const fn to_ref(&self) -> &[(u8, EntityDataType)] {
         #[cfg(feature = "alloc")]
         {
             match &self.0 {
@@ -67,7 +67,7 @@ impl<'a> EntityDataSet<'a> {
     /// If the inner set is a reference, it will be cloned into a vector.
     #[must_use]
     #[cfg(feature = "alloc")]
-    pub fn to_mut(&mut self) -> &mut Vec<EntityDataType> {
+    pub fn to_mut(&mut self) -> &mut Vec<(u8, EntityDataType)> {
         match self.0 {
             Cow::Borrowed(slice) => {
                 let vec = slice.to_vec();
