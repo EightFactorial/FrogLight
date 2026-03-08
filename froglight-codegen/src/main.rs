@@ -33,6 +33,7 @@ async fn main() -> Result<()> {
     // Generate code (block types, item types, etc.)
     tasks.spawn(crates::biome::generate_global(config));
     tasks.spawn(crates::block::generate_global(config));
+    tasks.spawn(crates::entity::generate_global(config));
     tasks.spawn(crates::item::generate_global(config));
     tasks.spawn(crates::network::generate_global(config));
     tasks.spawn(crates::packet::generate_global(config));
