@@ -183,6 +183,14 @@ impl Block {
     #[must_use]
     pub fn is_liquid(&self) -> bool { self.reference.behavior().is_liquid(self.state) }
 
+    /// Returns `true` if this block has collision.
+    #[must_use]
+    pub fn has_collision(&self) -> bool { self.reference.behavior().has_collision(self.state) }
+
+    /// Returns `true` if this block has occlusion.
+    #[must_use]
+    pub fn has_occlusion(&self) -> bool { self.reference.behavior().has_occlusion(self.state) }
+
     /// Returns `true` if this block is transparent.
     #[must_use]
     pub fn is_transparent(&self) -> bool { self.reference.behavior().is_transparent(self.state) }

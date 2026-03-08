@@ -103,6 +103,10 @@ macro_rules! generate {
         global: $global:literal,
         default: $default:literal,
         air: $air:literal,
+        solid: $solid:literal,
+        liquid: $liquid:literal,
+        collision: $collision:literal,
+        occlusion: $occlusion:literal,
         ty: [$($name:literal => $ty:ty),*],
         shape: $shape:tt
     }),*) => {
@@ -123,6 +127,14 @@ macro_rules! generate {
                 };
 
                 fn is_air(_: $crate::block::StateId) -> bool { $air }
+
+                fn is_solid(_: $crate::block::StateId) -> bool { $solid }
+
+                fn is_liquid(_: $crate::block::StateId) -> bool { $liquid }
+
+                fn has_collision(_: $crate::block::StateId) -> bool { $collision }
+
+                fn has_occlusion(_: $crate::block::StateId) -> bool { $occlusion }
 
                 #[allow(unused, reason = "Automatically generated")]
                 fn shape_of(state: $crate::block::StateId) -> &'static $crate::block::BlockShape<'static> {

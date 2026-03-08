@@ -83,15 +83,15 @@ impl BlockBehavior {
     #[must_use]
     pub fn has_collision(&self, state: StateId) -> bool { (self.has_collision)(state) }
 
-    /// Returns `true` if the block is transparent.
-    #[inline]
-    #[must_use]
-    pub fn is_transparent(&self, state: StateId) -> bool { (self.is_transparent)(state) }
-
     /// Returns `true` if the block has occlusion.
     #[inline]
     #[must_use]
     pub fn has_occlusion(&self, state: StateId) -> bool { (self.has_occlusion)(state) }
+
+    /// Returns `true` if the block is transparent.
+    #[inline]
+    #[must_use]
+    pub fn is_transparent(&self, state: StateId) -> bool { (self.is_transparent)(state) }
 
     /// Returns the light emission level of the block.
     #[inline]

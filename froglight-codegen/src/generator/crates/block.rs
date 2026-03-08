@@ -30,11 +30,16 @@ pub struct BlockData {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[expect(clippy::struct_excessive_bools, reason = "False")]
 pub struct BlockSettings {
     pub ident: String,
     pub classes: Vec<String>,
 
     pub is_air: bool,
+    pub is_solid: bool,
+    pub is_liquid: bool,
+    pub has_collision: bool,
+    pub has_occlusion: bool,
 
     pub shape: BlockShape,
     pub attributes: Vec<BlockAttribute>,
@@ -51,6 +56,10 @@ impl Default for BlockSettings {
             ident: String::new(),
             classes: Vec::new(),
             is_air: false,
+            is_solid: true,
+            is_liquid: false,
+            has_collision: true,
+            has_occlusion: true,
             shape: BlockShape::default(),
             attributes: Vec::new(),
             states: 1,
@@ -285,6 +294,10 @@ impl BlockData {
             let mut current = BlockSettings::default();
             let bytecode = code.bytecode.as_ref().unwrap();
 
+            let mut constants = Vec::new();
+            let mut retrieved: Option<MemberRef> = None;
+
+
             class.iterate_code(bytecode, data, 0, &mut |_, op| {
                 match op {
                     Opcode::Ldc(Loadable::LiteralConstant(LiteralConstant::String(s)))
@@ -293,6 +306,51 @@ impl BlockData {
                         if current.ident.is_empty() =>
                     {
                         current.ident = format!("minecraft:{s}");
+                    }
+
+                    Opcode::Ldc(Loadable::LiteralConstant(c))
+                    | Opcode::LdcW(Loadable::LiteralConstant(c))
+                    | Opcode::Ldc2W(Loadable::LiteralConstant(c)) => {
+                        constants.push(c.clone());
+                    }
+                    Opcode::Iconst0 => {
+                        constants.push(LiteralConstant::Integer(0));
+                    }
+                    Opcode::Iconst1 => {
+                        constants.push(LiteralConstant::Integer(1));
+                    }
+                    Opcode::Iconst2 => {
+                        constants.push(LiteralConstant::Integer(2));
+                    }
+                    Opcode::Iconst3 => {
+                        constants.push(LiteralConstant::Integer(3));
+                    }
+                    Opcode::Iconst4 => {
+                        constants.push(LiteralConstant::Integer(4));
+                    }
+                    Opcode::Iconst5 => {
+                        constants.push(LiteralConstant::Integer(5));
+                    }
+                    Opcode::Lconst0 => {
+                        constants.push(LiteralConstant::Long(0));
+                    }
+                    Opcode::Lconst1 => {
+                        constants.push(LiteralConstant::Long(1));
+                    }
+                    Opcode::Fconst0 => {
+                        constants.push(LiteralConstant::Float(0.0));
+                    }
+                    Opcode::Fconst1 => {
+                        constants.push(LiteralConstant::Float(1.0));
+                    }
+                    Opcode::Fconst2 => {
+                        constants.push(LiteralConstant::Float(2.0));
+                    }
+                    Opcode::Dconst0 => {
+                        constants.push(LiteralConstant::Double(0.0));
+                    }
+                    Opcode::Dconst1 => {
+                        constants.push(LiteralConstant::Double(1.0));
                     }
 
                     Opcode::Getstatic(MemberRef { class_name, name_and_type })
@@ -336,6 +394,10 @@ impl BlockData {
                             }
                         }
                     }
+                    Opcode::Getstatic(member @ MemberRef { class_name, name_and_type }) if name_and_type.descriptor == "Lnet/minecraft/world/level/block/Block;" => {
+                        retrieved = Some(member.clone());
+                    }
+
 
                     Opcode::Putstatic(MemberRef { class_name, name_and_type })
                         if class_name == "net/minecraft/world/level/block/Blocks"
@@ -351,6 +413,8 @@ impl BlockData {
 
                         blocks
                             .insert(name_and_type.name.to_string(), core::mem::take(&mut current));
+                        constants.clear();
+                        retrieved = None;
                     }
                     Opcode::Putstatic(MemberRef { class_name, name_and_type })
                         if class_name == "net/minecraft/world/level/block/Blocks"
@@ -415,8 +479,13 @@ impl BlockData {
                                 ..original.clone()
                             },
                         );
+
+                        constants.clear();
+                        retrieved = None;
                     }
                     Opcode::Putstatic(..) => {
+                        constants.clear();
+                        retrieved = None;
                         current = BlockSettings::default();
                     }
 
@@ -425,9 +494,153 @@ impl BlockData {
                     | Opcode::Invokestatic(MemberRef { class_name, name_and_type })
                     | Opcode::Invokevirtual(MemberRef { class_name, name_and_type })
                         if class_name.starts_with("net/minecraft/world/level/block/")
-                            && name_and_type.name == "<init>" =>
+                             =>
                     {
-                        current.classes.push(class_name.to_string());
+                        // Add block classes based
+                        if name_and_type.name == "<init>" {
+                            current.classes.push(class_name.to_string());
+                        } else if name_and_type.name == "register" && matches!(name_and_type.descriptor.as_ref(), "(Ljava/lang/String;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;" | "(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;") {
+                            current.classes.push(String::from("net/minecraft/world/level/block/Block"));
+                        } else if name_and_type.name == "registerBed" {
+                            current
+                                .classes
+                                .push(String::from("net/minecraft/world/level/block/BedBlock"));
+                        } else if name_and_type.name == "registerStainedGlass" {
+                            current
+                                .classes
+                                .push(String::from("net/minecraft/world/level/block/StainedGlassBlock"));
+                        } else if matches!(
+                            name_and_type.name.as_ref(),
+                            "registerStair" | "registerLegacyStair"
+                        ) {
+                            current
+                                .classes
+                                .push(String::from("net/minecraft/world/level/block/StairBlock"));
+                        }
+
+                        // Add block properties
+                        #[expect(clippy::match_same_arms, reason = "Easier to read")]
+                        if name_and_type.descriptor.ends_with("Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;") {
+                            match (name_and_type.name.as_ref(), name_and_type.descriptor.as_ref()) {
+                                ("air", _) => current.is_air = true,
+                                ("buttonProperties", _) => {}
+                                ("candleProperties", _) => {}
+                                ("dynamicShape", _) => {}
+                                ("emissiveRendering", _) => {}
+                                ("explosionResistance", _) => {}
+                                ("flowerPotProperties", _) => {}
+                                ("forceSolidOff", _) => {}
+                                ("forceSolidOn", _) => {}
+                                ("friction", _) => {}
+                                ("hasPostProcess", _) => {}
+                                ("ignitedByLava", _) => {}
+                                ("instabreak", _) => {}
+                                ("instrument", _) => {}
+                                ("isRedstoneConductor", _) => {}
+                                ("isSuffocating", _) => {}
+                                ("isValidSpawn", _) => {}
+                                ("isViewBlocking", _) => {}
+                                ("jumpFactor", _) => {}
+                                ("leavesProperties", _) => {}
+                                ("lightLevel", _) => {}
+                                ("liquid", _) => current.is_liquid = true,
+                                ("litBlockEmission", _) => {}
+                                ("logProperties", _) => {}
+                                ("mapColor", _) => {}
+                                ("netherStemProperties", _) => {}
+                                ("noCollision", _) => {
+                                    current.has_collision = false;
+                                    current.has_occlusion = false;
+                                },
+                                ("noLootTable", _) => {}
+                                ("noOcclusion", _) => current.has_occlusion = false,
+                                ("noTerrainParticles", _) => {}
+                                ("ofFullCopy", _) => {
+                                    let retrieved = retrieved.as_ref().unwrap();
+                                    let retrieved = blocks.get(retrieved.name_and_type.name.as_ref()).unwrap();
+                                    // copyTo.jumpFactor = copyFrom.jumpFactor;
+                                    // copyTo.isRedstoneConductor = copyFrom.isRedstoneConductor;
+                                    // copyTo.isValidSpawn = copyFrom.isValidSpawn;
+                                    // copyTo.hasPostProcess = copyFrom.hasPostProcess;
+                                    // copyTo.isSuffocating = copyFrom.isSuffocating;
+                                    // copyTo.isViewBlocking = copyFrom.isViewBlocking;
+                                    // copyTo.drops = copyFrom.drops;
+                                    // copyTo.destroyTime = copyFrom.destroyTime;
+                                    // copyTo.explosionResistance = copyFrom.explosionResistance;
+                                    current.has_collision = retrieved.has_collision;
+                                    // copyTo.isRandomlyTicking = copyFrom.isRandomlyTicking;
+                                    // copyTo.lightEmission = copyFrom.lightEmission;
+                                    // copyTo.mapColor = copyFrom.mapColor;
+                                    // copyTo.soundType = copyFrom.soundType;
+                                    // copyTo.friction = copyFrom.friction;
+                                    // copyTo.speedFactor = copyFrom.speedFactor;
+                                    // copyTo.dynamicShape = copyFrom.dynamicShape;
+                                    current.has_collision = retrieved.has_collision;
+                                    current.is_air = retrieved.is_air;
+                                    // copyTo.ignitedByLava = copyFrom.ignitedByLava;
+                                    current.is_liquid = retrieved.is_liquid;
+                                    // copyTo.forceSolidOff = copyFrom.forceSolidOff;
+                                    // copyTo.forceSolidOn = copyFrom.forceSolidOn;
+                                    // copyTo.pushReaction = copyFrom.pushReaction;
+                                    // copyTo.requiresCorrectToolForDrops = copyFrom.requiresCorrectToolForDrops;
+                                    // copyTo.offsetFunction = copyFrom.offsetFunction;
+                                    // copyTo.spawnTerrainParticles = copyFrom.spawnTerrainParticles;
+                                    // copyTo.requiredFeatures = copyFrom.requiredFeatures;
+                                    // copyTo.emissiveRendering = copyFrom.emissiveRendering;
+                                    // copyTo.instrument = copyFrom.instrument;
+                                    // copyTo.replaceable = copyFrom.replaceable;
+                                }
+                                ("ofLegacyCopy", _) => {
+                                    let retrieved = retrieved.as_ref().unwrap();
+                                    let retrieved = blocks.get(retrieved.name_and_type.name.as_ref()).unwrap();
+                                    // copyTo.destroyTime = copyFrom.destroyTime;
+                                    // copyTo.explosionResistance = copyFrom.explosionResistance;
+                                    current.has_collision = retrieved.has_collision;
+                                    // copyTo.isRandomlyTicking = copyFrom.isRandomlyTicking;
+                                    // copyTo.lightEmission = copyFrom.lightEmission;
+                                    // copyTo.mapColor = copyFrom.mapColor;
+                                    // copyTo.soundType = copyFrom.soundType;
+                                    // copyTo.friction = copyFrom.friction;
+                                    // copyTo.speedFactor = copyFrom.speedFactor;
+                                    // copyTo.dynamicShape = copyFrom.dynamicShape;
+                                    current.has_collision = retrieved.has_collision;
+                                    current.is_air = retrieved.is_air;
+                                    // copyTo.ignitedByLava = copyFrom.ignitedByLava;
+                                    current.is_liquid = retrieved.is_liquid;
+                                    // copyTo.forceSolidOff = copyFrom.forceSolidOff;
+                                    // copyTo.forceSolidOn = copyFrom.forceSolidOn;
+                                    // copyTo.pushReaction = copyFrom.pushReaction;
+                                    // copyTo.requiresCorrectToolForDrops = copyFrom.requiresCorrectToolForDrops;
+                                    // copyTo.offsetFunction = copyFrom.offsetFunction;
+                                    // copyTo.spawnTerrainParticles = copyFrom.spawnTerrainParticles;
+                                    // copyTo.requiredFeatures = copyFrom.requiredFeatures;
+                                    // copyTo.emissiveRendering = copyFrom.emissiveRendering;
+                                    // copyTo.instrument = copyFrom.instrument;
+                                    // copyTo.replaceable = copyFrom.replaceable;
+                                }
+                                ("offsetType", _) => {}
+                                ("pistonProperties", _) => {}
+                                ("pushReaction", _) => {}
+                                ("randomTicks", _) => {}
+                                ("replaceable", _) => {}
+                                ("requiresCorrectToolForDrops", _) => {}
+                                ("shulkerBoxProperties", _) => {}
+                                ("sound", _) => {}
+                                ("speedFactor", _) => {}
+                                ("strength", _) => {}
+                                ("vanillaBlockId", _) => {}
+                                ("wallVariant", _) => {}
+                                ("waterloggedMapColor", _) => {}
+                                // ("", _) => {}
+
+                                // Ignore these
+                                ("of", _) => {}
+
+                                (unk, desc) => {
+                                    miette::bail!("Unknown \"Blocks\" method: \"{unk}{desc}\"")
+                                }
+                            }
+                        }
                     }
                     Opcode::Invokedynamic(InvokeDynamic { attr_index, .. }) => {
                         let entry = &class.get_bootstrap().unwrap()[usize::from(*attr_index)];
@@ -441,24 +654,6 @@ impl BlockData {
                         }
                     }
 
-                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
-                        if class_name == "net/minecraft/world/level/block/Blocks"
-                        && name_and_type.name == "register" && matches!(name_and_type.descriptor.as_ref(), "(Ljava/lang/String;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;" | "(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)Lnet/minecraft/world/level/block/Block;") => {
-                            current.classes.push(String::from("net/minecraft/world/level/block/Block"));
-                        }
-                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
-                    if class_name == "net/minecraft/world/level/block/Blocks" && name_and_type.name == "registerBed" => {
-                        current.classes.push(String::from("net/minecraft/world/level/block/BedBlock"));
-                    }
-                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
-                    if class_name == "net/minecraft/world/level/block/Blocks" && name_and_type.name == "registerStainedGlass" => {
-                        current.classes.push(String::from("net/minecraft/world/level/block/StainedGlassBlock"));
-                    }
-                    Opcode::Invokestatic(MemberRef { class_name, name_and_type })
-                    if class_name == "net/minecraft/world/level/block/Blocks" && matches!(name_and_type.name.as_ref(), "registerStair" | "registerLegacyStair") => {
-                        current.classes.push(String::from("net/minecraft/world/level/block/StairBlock"));
-                    }
-
                     _ => {}
                 }
 
@@ -468,16 +663,6 @@ impl BlockData {
             Ok(())
         })
         .await?;
-
-        // Mark blocks as air
-        for block in blocks.values_mut() {
-            if matches!(
-                block.ident.as_str(),
-                "minecraft:air" | "minecraft:cave_air" | "minecraft:void_air"
-            ) {
-                block.is_air = true;
-            }
-        }
 
         let report = JarFile::get_for(version, storage, async |jar| {
             let path = jar.generated.join("reports/blocks.json");
@@ -548,6 +733,20 @@ impl BlockData {
             version.as_str()
         );
 
+        let mut count = 0;
+        for block in blocks.values() {
+            if block.shape.is_unknown() {
+                count += 1;
+            }
+        }
+        if count > 0 {
+            tracing::warn!(
+                "Could not find shapes for {count} (out of {}) blocks for \"{}\".",
+                blocks.len(),
+                version.as_str()
+            );
+        }
+
         Ok(BlockData { blocks, block_families, report })
     }
 }
@@ -565,7 +764,6 @@ fn parse_shape_init_method(
             return Ok(());
         }
 
-        tracing::trace!("{op:#?}");
         match op {
             Opcode::Getstatic(MemberRef { class_name, name_and_type })
                 if name_and_type.descriptor == "Lnet/minecraft/world/phys/shapes/VoxelShape;" =>
@@ -1059,6 +1257,14 @@ async fn generate(
                     content.push_str(&settings.default.to_string());
                     content.push_str(", air: ");
                     content.push_str(&settings.is_air.to_string());
+                    content.push_str(", solid: ");
+                    content.push_str(&settings.is_solid.to_string());
+                    content.push_str(", liquid: ");
+                    content.push_str(&settings.is_liquid.to_string());
+                    content.push_str(", collision: ");
+                    content.push_str(&settings.has_collision.to_string());
+                    content.push_str(", occlusion: ");
+                    content.push_str(&settings.has_occlusion.to_string());
 
                     content.push_str(",\n        ty: [ ");
                     for (attr_index, attr) in settings.attributes.iter().enumerate() {
