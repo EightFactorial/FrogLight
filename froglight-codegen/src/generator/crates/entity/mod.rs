@@ -253,7 +253,6 @@ impl EntityData {
         .await?;
 
         tracing::debug!("Found {} entities for \"{}\"", entities.len(), version.as_str());
-        tracing::debug!("Entities: {:#?}", entities);
 
         Ok(EntityData { entities })
     }

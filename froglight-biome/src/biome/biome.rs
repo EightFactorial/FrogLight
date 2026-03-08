@@ -134,6 +134,6 @@ impl Debug for Biome {
 
 /// A trait implemented by all biome types.
 pub trait BiomeType<V: BiomeVersion>: 'static {
-    /// The [`BiomeMetadata`] for this block type.
+    /// The [`BiomeMetadata`] for this biome type.
     const METADATA: &'static BiomeMetadata;
 }
