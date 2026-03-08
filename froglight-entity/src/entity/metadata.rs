@@ -1,8 +1,14 @@
+#[cfg(feature = "bevy")]
+use alloc::boxed::Box;
 use core::{
     any::TypeId,
     fmt::{self, Debug},
 };
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::PartialReflect;
+#[cfg(feature = "facet")]
+use facet::Peek;
 use froglight_common::prelude::Identifier;
 
 use crate::{
@@ -18,6 +24,13 @@ pub struct EntityMetadata {
     /// The [`GlobalId`] assigned to this entity.
     global_id: MaybeAtomicU32,
 
+    #[cfg(feature = "bevy")]
+    #[allow(clippy::type_complexity, reason = "Function pointers")]
+    inspect_reflect: fn(&EntityDataSet, &mut dyn FnMut(Box<dyn PartialReflect>)),
+    #[cfg(feature = "facet")]
+    #[allow(clippy::type_complexity, reason = "Function pointers")]
+    inspect_peek: fn(&EntityDataSet, &mut dyn FnMut(Peek<'_, '_>)),
+
     entity_ty: TypeId,
     version_ty: TypeId,
 }
@@ -31,13 +44,26 @@ impl EntityMetadata {
     /// [`EntityStorage`](crate::storage::EntityStorage) it will be used in.
     #[must_use]
     #[allow(clippy::too_many_arguments, reason = "Yes")]
+    #[allow(clippy::type_complexity, reason = "Function pointers")]
     pub const unsafe fn new<E: EntityType<V>, V: EntityVersion>(
         identifier: Identifier<'static>,
+
+        #[cfg(feature = "bevy")] inspect_reflect: fn(
+            &EntityDataSet,
+            &mut dyn FnMut(Box<dyn PartialReflect>),
+        ),
+        #[cfg(feature = "facet")] inspect_peek: fn(&EntityDataSet, &mut dyn FnMut(Peek<'_, '_>)),
+
         global_id: u32,
     ) -> Self {
         Self {
             identifier,
             global_id: MaybeAtomicU32::new(global_id),
+
+            #[cfg(feature = "bevy")]
+            inspect_reflect,
+            #[cfg(feature = "facet")]
+            inspect_peek,
 
             entity_ty: TypeId::of::<E>(),
             version_ty: TypeId::of::<V>(),
@@ -64,6 +90,24 @@ impl EntityMetadata {
     /// Returns `true` if this version is of version `V`.
     #[must_use]
     pub fn is_version<V: 'static>(&self) -> bool { self.version_ty == TypeId::of::<V>() }
+
+    /// Inspect the entity's component data using [`PartialReflect`].
+    #[inline]
+    #[cfg(feature = "bevy")]
+    pub fn inspect_reflect(
+        &self,
+        dataset: &EntityDataSet,
+        mut f: impl FnMut(Box<dyn PartialReflect>),
+    ) {
+        (self.inspect_reflect)(dataset, &mut f);
+    }
+
+    /// Inspect the entity's component data using [`Peek`].
+    #[inline]
+    #[cfg(feature = "facet")]
+    pub fn inspect_peek(&self, dataset: &EntityDataSet, mut f: impl FnMut(Peek<'_, '_>)) {
+        (self.inspect_peek)(dataset, &mut f);
+    }
 
     /// Get the [`TypeId`] of the entity type.
     #[inline]

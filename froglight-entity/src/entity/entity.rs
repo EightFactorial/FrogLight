@@ -1,5 +1,11 @@
+#[cfg(feature = "bevy")]
+use alloc::boxed::Box;
 use core::any::TypeId;
 
+#[cfg(feature = "bevy")]
+use bevy_reflect::PartialReflect;
+#[cfg(feature = "facet")]
+use facet::Peek;
 use froglight_common::prelude::Identifier;
 
 use crate::{
@@ -71,6 +77,22 @@ impl EntityBundle {
     #[inline]
     #[must_use]
     pub fn global_id(&self) -> GlobalId { self.reference.global_id() }
+
+    /// Inspect this entity's data using the given function.
+    ///
+    /// Requires the `bevy` feature to be enabled.
+    #[cfg(feature = "bevy")]
+    pub fn inspect_reflect(&self, f: impl FnMut(Box<dyn PartialReflect>)) {
+        self.reference.inspect_reflect(&self.dataset, f);
+    }
+
+    /// Inspect this entity's data using the given function.
+    ///
+    /// Requires the `facet` feature to be enabled.
+    #[cfg(feature = "facet")]
+    pub fn inspect_peek(&self, f: impl FnMut(Peek<'_, '_>)) {
+        self.reference.inspect_peek(&self.dataset, f);
+    }
 
     /// Returns `true` if this entity is of type `E`.
     #[inline]
