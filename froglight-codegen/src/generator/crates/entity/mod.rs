@@ -347,6 +347,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 for data in &global_entities {
                     unique.extend(data.metadata_classes.clone());
                 }
+                unique.sort_unstable_by_key(|a, _| a.name.clone());
 
                 let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
                 for (index, (meta, classes)) in unique.iter().enumerate() {
@@ -375,6 +376,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 for data in &global_entities {
                     unique.extend(data.entities.values().map(|v| v.id.clone()));
                 }
+                unique.sort_unstable();
 
                 let mut content = String::from("#![allow(clippy::large_stack_arrays, reason = \"Triggered by Facet\")]\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @entities");
                 for (index, id) in unique.iter().enumerate() {
