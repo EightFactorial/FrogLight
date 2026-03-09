@@ -4,6 +4,6 @@
 use bevy_ecs::reflect::ReflectComponent;
 
 generate! {
-    @entities
-    Placeholder,
+    @components
+    Placeholder(u8)
 }

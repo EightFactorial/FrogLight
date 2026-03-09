@@ -1,7 +1,6 @@
 #![doc = include_str!("../README.md")]
 #![no_std]
 
-#[cfg(feature = "alloc")]
 extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
@@ -19,7 +18,10 @@ pub mod prelude {
 
     pub use crate::{
         entity::{EntityBundle, EntityType},
-        generated::entity::{self, VanillaEntity},
+        generated::{
+            component as entity_data,
+            entity::{self, VanillaEntity},
+        },
         version::EntityVersion,
     };
 }

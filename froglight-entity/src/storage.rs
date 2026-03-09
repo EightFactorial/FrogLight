@@ -1,6 +1,5 @@
 //! TODO
 
-#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 #[cfg(feature = "std")]
 use core::any::TypeId;
@@ -60,7 +59,6 @@ pub struct EntityStorage {
 #[derive(Debug, Clone)]
 enum StorageInner {
     /// Dynamic storage allocated at runtime.
-    #[cfg(feature = "alloc")]
     Runtime(Vec<&'static EntityMetadata>),
     /// Static storage allocated at compile time.
     Static(&'static [&'static EntityMetadata]),
@@ -85,7 +83,6 @@ impl EntityStorage {
     /// The caller must ensure that the provided vec is valid, with one entry
     /// per [`GlobalId`] in ascending order.
     #[must_use]
-    #[cfg(feature = "alloc")]
     pub const unsafe fn new_runtime(vec: Vec<&'static EntityMetadata>) -> Self {
         Self { inner: StorageInner::Runtime(vec) }
     }
@@ -115,7 +112,6 @@ impl EntityStorage {
     #[must_use]
     pub const fn to_ref(&self) -> &[&'static EntityMetadata] {
         match self.inner {
-            #[cfg(feature = "alloc")]
             StorageInner::Runtime(ref vec) => vec.as_slice(),
             StorageInner::Static(slice) => slice,
         }
@@ -125,7 +121,6 @@ impl EntityStorage {
     ///
     /// If the storage is static, it will be converted into a dynamic storage.
     #[must_use]
-    #[cfg(feature = "alloc")]
     pub fn to_mut(&mut self) -> &mut Vec<&'static EntityMetadata> {
         match self.inner {
             StorageInner::Runtime(ref mut vec) => vec,
@@ -150,7 +145,7 @@ impl EntityStorage {
 /// based on enabled features.
 #[macro_export]
 #[cfg(feature = "std")]
-macro_rules! implement_blocks {
+macro_rules! implement_entities {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@global $version => $($tt)*);
     };
@@ -164,7 +159,7 @@ macro_rules! implement_blocks {
 /// based on enabled features.
 #[macro_export]
 #[cfg(not(feature = "std"))]
-macro_rules! implement_blocks {
+macro_rules! implement_entities {
     ($version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(@local {}, $version => $($tt)*);
     };
@@ -177,7 +172,7 @@ macro_rules! __implement_storage_inner {
     (@global $version:ty => $($tt:tt)*) => {
         $crate::__implement_storage_inner!(
             @local {
-                const BLOCKS: &'static std::sync::LazyLock<$crate::storage::GlobalEntityStorage> = {
+                const ENTITY: &'static std::sync::LazyLock<$crate::storage::GlobalEntityStorage> = {
                     static STATIC: std::sync::LazyLock<$crate::storage::GlobalEntityStorage> = std::sync::LazyLock::new(|| {
                         $crate::storage::GlobalEntityStorage::new::<$version>(<$version as $crate::version::EntityVersion>::new_blocks())
                     });
@@ -187,13 +182,25 @@ macro_rules! __implement_storage_inner {
             $version => $($tt)*
         );
     };
-    (@local {$($constant:tt)*}, $version:ty => $($tt:tt)*) => {
+    (@local {$($constant:tt)*}, $version:ty => $($tt:tt)*, read: $(read:tt)*, write: $(write:tt)*) => {
         impl $crate::version::EntityVersion for $version {
             $($constant)*
 
-            fn new_blocks() -> $crate::storage::EntityStorage {
+            fn new_entity() -> $crate::storage::EntityStorage {
                 $($tt)*
             }
+
+            #[cfg(feature = "facet")]
+            const DATATYPE_DESERIALIZE: fn(
+                &mut facet_minecraft::deserialize::InputCursor,
+            ) -> Result<$crate::generated::datatype::EntityDataType, facet_minecraft::deserialize::error::DeserializeValueError> = $($read)*;
+
+            #[cfg(feature = "facet")]
+            const DATATYPE_SERIALIZE: for<'input, 'facet> fn(
+                &'facet (),
+                &'input $crate::generated::datatype::EntityDataType,
+                &mut dyn facet_minecraft::serialize::SerializeWriter,
+            ) -> Result<(), facet_minecraft::serialize::error::SerializeIterError<'input, 'facet>> = $($write)*;
         }
     };
 }
