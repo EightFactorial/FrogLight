@@ -50,9 +50,9 @@ multi_threaded = ["bevy", "bevy_ecs?/multi_threaded", "std"]
 # Enable networking support.
 network = ["dep:froglight-api", "dep:froglight-network", "std"]
 # Enable `tracing` support.
-tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-world/tracing"]
+tracing = ["froglight-api?/tracing", "froglight-biome/tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-network?/tracing", "froglight-packet/tracing", "froglight-physics/tracing", "froglight-registry/tracing", "froglight-world/tracing"]
 # Enable extended `tracing` support.
-tracing_ext = ["froglight-api?/tracing_ext", "froglight-network?/tracing_ext", "tracing"]
+tracing_ext = ["froglight-api?/tracing_ext", "froglight-entity/tracing_ext", "froglight-network?/tracing_ext", "froglight-packet/tracing_ext", "tracing"]
 
 # Enable `libm` for `no_std` support.
 libm = ["froglight-block/libm", "froglight-entity/libm", "froglight-math/libm", "froglight-physics/libm", "froglight-world/libm"]

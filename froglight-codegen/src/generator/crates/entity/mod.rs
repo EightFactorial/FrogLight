@@ -490,11 +490,59 @@ fn datatype_type(name: &str, class: &str, attr: bool) -> Result<&'static str> {
         ("STRING", "net/minecraft/network/syncher/EntityDataSerializers") => {
             Ok("Cow<'static, str>")
         }
-        ("OPTIONAL_COMPONENT", "net/minecraft/network/syncher/EntityDataSerializers") => {
-            Ok("Option<()>")
+
+        ("OPTIONAL_UNSIGNED_INT", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            if attr {
+                Ok("#[cfg_attr(feature = \"facet\", facet(mc::variable))] Option<u32>")
+            } else {
+                Ok("Option<u32>")
+            }
         }
-        _ => Ok("()"),
-        // _ => miette::bail!("Unknown entity datatype: \"{class}.{name}\")"),
+
+        // TODO
+        (
+            "ARMADILLO_STATE"
+            | "BLOCK_POS"
+            | "BLOCK_STATE"
+            | "CAT_SOUND_VARIANT"
+            | "CAT_VARIANT"
+            | "CHICKEN_SOUND_VARIANT"
+            | "CHICKEN_VARIANT"
+            | "COMPONENT"
+            | "COPPER_GOLEM_STATE"
+            | "COW_SOUND_VARIANT"
+            | "COW_VARIANT"
+            | "DIRECTION"
+            | "FROG_VARIANT"
+            | "HUMANOID_ARM"
+            | "ITEM_STACK"
+            | "PAINTING_VARIANT"
+            | "PARTICLE"
+            | "PARTICLES"
+            | "PIG_SOUND_VARIANT"
+            | "PIG_VARIANT"
+            | "POSE"
+            | "QUATERNION"
+            | "RESOLVABLE_PROFILE"
+            | "ROTATIONS"
+            | "SNIFFER_STATE"
+            | "VECTOR3"
+            | "VILLAGER_DATA"
+            | "WEATHERING_COPPER_STATE"
+            | "WOLF_SOUND_VARIANT"
+            | "WOLF_VARIANT"
+            | "ZOMBIE_NAUTILUS_VARIANT",
+            "net/minecraft/network/syncher/EntityDataSerializers",
+        ) => Ok("()"),
+        (
+            "OPTIONAL_COMPONENT"
+            | "OPTIONAL_BLOCK_POS"
+            | "OPTIONAL_BLOCK_STATE"
+            | "OPTIONAL_LIVING_ENTITY_REFERENCE",
+            "net/minecraft/network/syncher/EntityDataSerializers",
+        ) => Ok("Option<()>"),
+
+        _ => miette::bail!("Unknown entity datatype: \"{class}.{name}\")"),
     }
 }
 

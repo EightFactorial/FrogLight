@@ -234,7 +234,39 @@ macro_rules! generate {
                         core::any::TypeId::of::<$component>(),
                     )*
                 ];
-                const DATASET: crate::entity::EntityDataSet<'static> = crate::entity::EntityDataSet::new_slice(&[]);
+                const DATASET: crate::entity::EntityDataSet<'static> = crate::entity::EntityDataSet::new_slice(&[
+                    (0, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (1, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (2, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (3, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (4, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (5, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (6, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (7, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (8, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (9, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (10, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (11, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (12, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (13, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (14, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (15, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (16, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (17, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (18, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (19, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (20, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (21, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (22, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (23, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (24, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (25, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (26, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (27, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (28, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (29, crate::generated::datatype::EntityDataType::Byte(0)),
+                    (30, crate::generated::datatype::EntityDataType::Byte(0)),
+                ]);
 
                 #[cfg(feature = "bevy")]
                 #[allow(unused, reason = "Generated code")]
@@ -245,15 +277,16 @@ macro_rules! generate {
                         match index {
                             $(
                                 $componentid => {
-                                    let component = <$component as crate::entity::EntityComponentType>::try_from_data(data).unwrap();
-                                    f(alloc::boxed::Box::new(component));
+                                    if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data){
+                                        f(alloc::boxed::Box::new(component));
+                                    }
                                 }
                             )*
                             #[cfg(not(feature = "tracing"))]
                             _ => {},
                             #[cfg(feature = "tracing")]
                             unk => {
-                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component index {unk}", $string);
+                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component at index {unk}", $string);
                             }
                         }
                     }
@@ -267,15 +300,16 @@ macro_rules! generate {
                         match index {
                             $(
                                 $componentid => {
-                                    let component = <$component as crate::entity::EntityComponentType>::try_from_data(data).unwrap();
-                                    f(facet::Peek::new(&component));
+                                    if let Some(component) = <$component as crate::entity::EntityComponentType>::try_from_data(data) {
+                                        f(facet::Peek::new(&component));
+                                    }
                                 },
                             )*
                             #[cfg(not(feature = "tracing"))]
                             _ => {},
                             #[cfg(feature = "tracing")]
                             unk => {
-                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component index {unk}", $string);
+                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component at index {unk}", $string);
                             }
                         }
                     }
@@ -292,22 +326,38 @@ macro_rules! generate {
                 ])
             },
             read: { |cursor| {
-                let mut slice: &[u8] = cursor.as_slice();
                 let remainder: &[u8];
                 let data: crate::generated::datatype::EntityDataType;
 
-                match cursor.take(1)?[0] {
+                #[cfg(feature = "tracing_ext")]
+                tracing::trace!(target: "froglight_entity::entity", "Peek: {:?}", cursor.as_slice());
+
+                let (len, val) = facet_minecraft::deserialize::bytes_to_variable(cursor.as_slice())?;
+                cursor.consume(len);
+
+                match val {
                     $(
                         $dataid => {
-                            let (value, rem) = facet_minecraft::from_slice_remainder(slice).map_err(|_| facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow)?;
+                            #[cfg(feature = "tracing_ext")]
+                            tracing::trace!(target: "froglight_entity::entity", "EntityDataId: {:?} ({})", $dataid, stringify!($datatype));
+
+                            let (value, rem) = facet_minecraft::from_slice_remainder(cursor.as_slice()).map_err(|_err| {
+                                #[cfg(feature = "tracing")]
+                                tracing::error!(target: "froglight_entity::entity", "Failed to deserialize \"{}\", {_err}", stringify!($datatype));
+                                facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow
+                            })?;
+
                             data = crate::generated::datatype::EntityDataType::$datatype(value);
-                            remainder = rem;
+                            cursor.consume(cursor.as_slice().len() - rem.len());
                         }
                     )*
                     _ => return Err(facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow),
                 }
 
-                cursor.consume(slice.len() - remainder.len());
+
+                #[cfg(feature = "tracing_ext")]
+                tracing::trace!(target: "froglight_entity::entity", "EntityDataType: {data:?}");
+
                 Ok(data)
             } },
             write: { |(), data, buffer| {
@@ -358,14 +408,14 @@ fn insert_hook<T: Component + EntityComponentType>(mut world: DeferredWorld, ctx
         bundle.metadata().component_tys().iter().position(|ty| *ty == TypeId::of::<T>())
     else {
         #[cfg(feature = "tracing")]
-        tracing::warn!(target: "froglight_entity", "Failed to sync bundle, entity should not have a `{}` component", core::any::type_name::<T>());
+        tracing::warn!(target: "froglight_entity", "Failed to sync bundle, entity should not have a `{}`", core::any::type_name::<T>());
         return;
     };
 
     // Get the existing data
-    let Some((id, existing)) = bundle.dataset().to_ref().get(index) else {
+    let Some((_, existing)) = bundle.dataset().to_ref().get(index) else {
         #[cfg(feature = "tracing")]
-        tracing::error!(target: "froglight_entity", "Failed to sync bundle, entity should have a `{}` component at index {index}", core::any::type_name::<T>());
+        tracing::error!(target: "froglight_entity", "Failed to sync bundle, entity should have a `{}` at index {index}", core::any::type_name::<T>());
         return;
     };
 
@@ -374,7 +424,12 @@ fn insert_hook<T: Component + EntityComponentType>(mut world: DeferredWorld, ctx
     if component != *existing {
         // SAFETY: Id does not change, and the data is guaranteed to be valid
         // as it came from a component with the correct type.
-        unsafe { bundle.dataset_mut().to_mut()[index] = (*id, component) };
+        if let Some((_, existing)) = unsafe { bundle.dataset_mut() }.to_mut().get_mut(index) {
+            unsafe { *existing = component };
+        } else {
+            #[cfg(feature = "tracing")]
+            tracing::error!(target: "froglight_entity", "Failed to sync bundle, bundle should have a `{}` at index {index}", core::any::type_name::<T>());
+        }
     }
 }
 

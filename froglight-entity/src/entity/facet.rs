@@ -61,9 +61,13 @@ impl<V: EntityVersion> DataSetSerializer<V> {
         let mut list = Vec::new();
         loop {
             let id = cursor.take(1)?[0];
+            #[cfg(feature = "tracing_ext")]
+            tracing::trace!(target: "froglight_entity::entity", "EntityDataPos: {id:?}");
+
             if id == 0xff {
                 break;
             }
+
             list.push((id, (V::DATATYPE_DESERIALIZE)(cursor)?));
         }
 

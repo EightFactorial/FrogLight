@@ -345,15 +345,21 @@ impl BotPlugin {
                         commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
                             let Some(instance) = entity.get::<WorldInstance>() else { return };
 
-                            if let Some(target) = instance.get(&id)
-                                && let Some(mut bundle) =
-                                    entity.into_world_mut().get_mut::<EntityBundle>(target)
-                            {
-                                // SAFETY: TODO :)
-                                unsafe { *bundle.dataset_mut() = dataset };
-                            } else {
-                                error!("Received SetEntityData for unknown EntityId {}!", id.0);
+                            if let Some(target) = instance.get(&id) {
+                                let (entities, mut commands) =
+                                    entity.into_world_mut().entities_and_commands();
+
+                                if let Ok(entity) = entities.get(target)
+                                    && let Some(bundle) = entity.get::<EntityBundle>()
+                                {
+                                    // SAFETY: TODO :)
+                                    commands.entity(entity.id()).insert(unsafe {
+                                        EntityBundle::new_unchecked(dataset, bundle.metadata())
+                                    });
+                                }
                             }
+
+                            error!("Received SetEntityData for unknown EntityId {}!", id.0);
                         });
                     }
                     // ClientboundPlayEvent::SetEntityLink() => todo!(),
