@@ -342,21 +342,19 @@ impl BotPlugin {
                             continue;
                         };
 
-                        commands.entity(bot.id()).queue_silenced(
-                            move |entity: EntityWorldMut<'_>| {
-                                let Some(instance) = entity.get::<WorldInstance>() else { return };
+                        commands.entity(bot.id()).queue(move |entity: EntityWorldMut| {
+                            let Some(instance) = entity.get::<WorldInstance>() else { return };
 
-                                if let Some(target) = instance.get(&id)
-                                    && let Some(mut bundle) =
-                                        entity.into_world_mut().get_mut::<EntityBundle>(target)
-                                {
-                                    // SAFETY: TODO :)
-                                    unsafe { *bundle.dataset_mut() = dataset };
-                                } else {
-                                    error!("Received SetEntityData for unknown EntityId {}!", id.0);
-                                }
-                            },
-                        );
+                            if let Some(target) = instance.get(&id)
+                                && let Some(mut bundle) =
+                                    entity.into_world_mut().get_mut::<EntityBundle>(target)
+                            {
+                                // SAFETY: TODO :)
+                                unsafe { *bundle.dataset_mut() = dataset };
+                            } else {
+                                error!("Received SetEntityData for unknown EntityId {}!", id.0);
+                            }
+                        });
                     }
                     // ClientboundPlayEvent::SetEntityLink() => todo!(),
                     // ClientboundPlayEvent::SetEntityMotion() => todo!(),

@@ -104,15 +104,15 @@ macro_rules! generate {
             )*
         }
 
-        $(
-            #[automatically_derived]
-            impl From<$ty> for EntityDataType {
-                #[inline]
-                fn from(value: $ty) -> Self {
-                    EntityDataType::$ident(value)
-                }
-            }
-        )*
+        // $(
+        //     #[automatically_derived]
+        //     impl From<$ty> for EntityDataType {
+        //         #[inline]
+        //         fn from(value: $ty) -> Self {
+        //             EntityDataType::$ident(value)
+        //         }
+        //     }
+        // )*
     };
     (@entities $($ident:ident),* $(,)?) => {
         $(
@@ -292,26 +292,23 @@ macro_rules! generate {
                 ])
             },
             read: { |cursor| {
-                // let mut slice: &[u8] = cursor.as_slice();
-                // let remainder: &[u8];
-                // let data: crate::generated::datatype::EntityDataType;
+                let mut slice: &[u8] = cursor.as_slice();
+                let remainder: &[u8];
+                let data: crate::generated::datatype::EntityDataType;
 
-                // match cursor.take(1)?[0] {
-                //     $(
-                //         $dataid => {
-                //             let (value, rem) = facet_minecraft::from_slice_remainder(slice).unwrap();
-                //             data = crate::generated::datatype::EntityDataType::$datatype(value);
-                //             remainder = rem;
-                //         }
-                //     )*
-                //     _ => todo!(),
-                // }
+                match cursor.take(1)?[0] {
+                    $(
+                        $dataid => {
+                            let (value, rem) = facet_minecraft::from_slice_remainder(slice).map_err(|_| facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow)?;
+                            data = crate::generated::datatype::EntityDataType::$datatype(value);
+                            remainder = rem;
+                        }
+                    )*
+                    _ => return Err(facet_minecraft::deserialize::error::DeserializeValueError::StaticBorrow),
+                }
 
-                // cursor.consume(slice.len() - remainder.len());
-                // Ok(data)
-
-                let _ = cursor.take(1);
-                Ok(crate::generated::datatype::EntityDataType::Byte(0))
+                cursor.consume(slice.len() - remainder.len());
+                Ok(data)
             } },
             write: { |(), data, buffer| {
                 let mut content = alloc::vec::Vec::with_capacity(8);

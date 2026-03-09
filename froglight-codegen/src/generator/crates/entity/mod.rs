@@ -22,6 +22,7 @@ mod metadata;
 pub struct EntityData {
     pub entities: IndexMap<String, EntityInfo>,
     pub metadata_classes: IndexMap<EntityMetadataItem, Vec<String>>,
+    pub datatypes: IndexSet<(String, String)>,
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
@@ -35,13 +36,15 @@ pub struct EntityInfo {
 pub struct EntityMetadataItem {
     pub name: String,
     pub registered_class: String,
-    pub serializer: String,
+
+    pub serializer_name: String,
+    pub serializer_class: String,
 }
 
 impl std::hash::Hash for EntityMetadataItem {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.name.hash(state);
-        self.serializer.hash(state);
+        self.serializer_name.hash(state);
     }
 }
 
@@ -264,8 +267,6 @@ impl EntityData {
         })
         .await?;
 
-        tracing::debug!("Found {} entities for \"{}\"", entities.len(), version.as_str());
-
         let mut metadata_classes = IndexMap::<_, Vec<_>>::new();
         for entity in entities.values() {
             for meta in &entity.metadata {
@@ -276,13 +277,22 @@ impl EntityData {
             }
         }
 
-        Ok(EntityData { entities, metadata_classes })
+        let mut datatypes = IndexSet::new();
+        for entity in entities.values() {
+            for meta in &entity.metadata {
+                datatypes.insert((meta.serializer_name.clone(), meta.serializer_class.clone()));
+            }
+        }
+
+        tracing::debug!("Found {} entities for \"{}\"", entities.len(), version.as_str());
+        Ok(EntityData { entities, metadata_classes, datatypes })
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// Generate global entity data.
+#[allow(clippy::too_many_lines, reason = "Aaa")]
 pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     static ONCE: OnceCell<Result<()>> = OnceCell::const_new();
     let result = ONCE
@@ -299,6 +309,34 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
             .await?;
 
             // Generate `datatypes`
+            {
+                let folder = WORKSPACE_DIR.join("froglight-entity/src/generated/");
+                let mut module = ModuleBuilder::new("datatype", folder);
+
+                let mut unique = IndexSet::new();
+                for data in &global_entities {
+                    unique.extend(data.datatypes.iter().cloned());
+                }
+                unique.sort_unstable();
+
+                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n#[cfg(feature = \"facet\")]\nuse facet_minecraft as mc;\n\ngenerate! {\n    @datatypes");
+                for (index, (name, class)) in unique.iter().enumerate() {
+                    content.push_str("\n    as_");
+                    content.push_str(&name.to_ascii_lowercase());
+                    content.push_str(" => ");
+                    content.push_str(&name.to_case(Case::Pascal));
+                    content.push('(');
+                    content.push_str(datatype_type(name, class, true)?);
+                    content.push(')');
+                    if index != unique.len() - 1 {
+                        content.push(',');
+                    }
+                }
+                content.push_str("\n}\n");
+
+                module.with_docs("Placeholder").with_content(&content);
+                module.build().await?;
+            }
 
             // Generate `components`
             {
@@ -310,11 +348,14 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                     unique.extend(data.metadata_classes.clone());
                 }
 
-                let mut content = String::from("\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
+                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
                 for (index, (meta, classes)) in unique.iter().enumerate() {
                     content.push_str("\n    ");
                     content.push_str(&component_name(meta, classes));
-                    content.push_str("(u8) = Byte");
+                    content.push('(');
+                    content.push_str(datatype_type(&meta.serializer_name, &meta.serializer_class, false)?);
+                    content.push_str(") = ");
+                    content.push_str(&meta.serializer_name.to_case(Case::Pascal));
                     if index != unique.len() - 1 {
                         content.push(',');
                     }
@@ -423,6 +464,38 @@ fn component_name(meta: &EntityMetadataItem, classes: &[String]) -> String {
     name
 }
 
+#[allow(clippy::unnecessary_wraps, reason = "For now")]
+fn datatype_type(name: &str, class: &str, attr: bool) -> Result<&'static str> {
+    match (name, class) {
+        ("BOOLEAN", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("bool"),
+        ("BYTE", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("u8"),
+        ("INT", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            if attr {
+                Ok("#[cfg_attr(feature = \"facet\", facet(mc::variable))] i32")
+            } else {
+                Ok("i32")
+            }
+        }
+        ("LONG", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            if attr {
+                Ok("#[cfg_attr(feature = \"facet\", facet(mc::variable))] i64")
+            } else {
+                Ok("i64")
+            }
+        }
+        ("FLOAT", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("f32"),
+        ("DOUBLE", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("f64"),
+        ("STRING", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("Cow<'static, str>")
+        }
+        ("OPTIONAL_COMPONENT", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("Option<()>")
+        }
+        _ => Ok("()"),
+        // _ => miette::bail!("Unknown entity datatype: \"{class}.{name}\")"),
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// Generate `Version`-specific entity data.
@@ -441,11 +514,24 @@ use crate::generated::{{component::*, entity::*}};
 generate! {{
     @version {version_ident},
     datatypes: {{
-        Byte(u8) = 0
-    }},
 "
         );
 
+        for (index, (datatype, class)) in data.datatypes.iter().enumerate() {
+            write!(
+                content,
+                "        {}({}) = {index}",
+                datatype.to_case(Case::Pascal),
+                datatype_type(datatype, class, false)?,
+            )
+            .unwrap();
+            if index != data.datatypes.len() - 1 {
+                content.push(',');
+            }
+            content.push('\n');
+        }
+
+        content.push_str("    },\n");
         for (index, entity) in data.entities.values().enumerate() {
             let ident = entity_name(&entity.id);
 

@@ -93,13 +93,14 @@ pub(super) fn parse_data_accessor(
     let init = class.get_static_field_init(&accessor.name).unwrap();
 
     for op in init {
-        if let Opcode::Getstatic(MemberRef { class_name: _, name_and_type }) = op
+        if let Opcode::Getstatic(MemberRef { class_name, name_and_type }) = op
             && name_and_type.descriptor == "Lnet/minecraft/network/syncher/EntityDataSerializer;"
         {
             return Some(EntityMetadataItem {
                 name: accessor.name.to_string(),
                 registered_class: class.this_class.to_string(),
-                serializer: name_and_type.name.to_string(),
+                serializer_name: name_and_type.name.to_string(),
+                serializer_class: class_name.to_string(),
             });
         }
     }
