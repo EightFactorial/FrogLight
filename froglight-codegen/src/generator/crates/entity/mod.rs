@@ -1,15 +1,18 @@
+use std::fmt::Write;
+
 use cafebabe::{
     bytecode::Opcode,
     constant_pool::{BootstrapArgument, InvokeDynamic, LiteralConstant, Loadable, MemberRef},
 };
-use indexmap::IndexMap;
+use convert_case::{Case, Casing};
+use indexmap::{IndexMap, IndexSet};
 use miette::Result;
 use tokio::sync::{OnceCell, RwLock};
 
 use crate::{
-    common::{DATA, Version, VersionStorage},
+    common::{DATA, Version, VersionStorage, WORKSPACE_DIR},
     config::{ConfigBundle, VersionPair},
-    helper::{ClassFileExt, VersionHelper},
+    helper::{ClassFileExt, ModuleBuilder, VersionHelper},
     source::JarData,
 };
 
@@ -18,19 +21,28 @@ mod metadata;
 #[derive(Debug, Clone, PartialEq)]
 pub struct EntityData {
     pub entities: IndexMap<String, EntityInfo>,
+    pub metadata_classes: IndexMap<EntityMetadataItem, Vec<String>>,
 }
 
-#[derive(Debug, Default, Clone, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct EntityInfo {
     pub id: String,
     pub class: Option<String>,
     pub metadata: Vec<EntityMetadataItem>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EntityMetadataItem {
     pub name: String,
+    pub registered_class: String,
     pub serializer: String,
+}
+
+impl std::hash::Hash for EntityMetadataItem {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+        self.serializer.hash(state);
+    }
 }
 
 impl EntityData {
@@ -254,7 +266,17 @@ impl EntityData {
 
         tracing::debug!("Found {} entities for \"{}\"", entities.len(), version.as_str());
 
-        Ok(EntityData { entities })
+        let mut metadata_classes = IndexMap::<_, Vec<_>>::new();
+        for entity in entities.values() {
+            for meta in &entity.metadata {
+                let entry = metadata_classes.entry(meta.clone()).or_default();
+                if let Some(class) = &entity.class {
+                    entry.push(class.clone());
+                }
+            }
+        }
+
+        Ok(EntityData { entities, metadata_classes })
     }
 }
 
@@ -266,14 +288,83 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     let result = ONCE
         .get_or_init(|| async move {
             // Collect the `EntityData` for all versions.
-            let _global_entities = VersionHelper::for_all_vec(config, async |version| {
+            let global_entities = VersionHelper::for_all_vec(config, async |version| {
                 let pinned = DATA.pin_owned();
                 let storage = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
+
                 let mut storage = storage.write().await;
                 EntityData::get_for(&version.real, &mut storage, async |data| Ok(data.clone()))
                     .await
             })
             .await?;
+
+            // Generate `datatypes`
+
+            // Generate `components`
+            {
+                let folder = WORKSPACE_DIR.join("froglight-entity/src/generated/");
+                let mut module = ModuleBuilder::new("component", folder);
+
+                let mut unique = IndexMap::<_, Vec<_>>::new();
+                for data in &global_entities {
+                    unique.extend(data.metadata_classes.clone());
+                }
+
+                let mut content = String::from("\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
+                for (index, (meta, classes)) in unique.iter().enumerate() {
+                    content.push_str("\n    ");
+                    content.push_str(&component_name(meta, classes));
+                    content.push_str("(u8) = Byte");
+                    if index != unique.len() - 1 {
+                        content.push(',');
+                    }
+                }
+                content.push_str("\n}\n");
+
+                module.with_docs("Placeholder").with_content(&content);
+                module.build().await?;
+            }
+
+            // Generate `entities`
+            {
+                let folder = WORKSPACE_DIR.join("froglight-entity/src/generated/");
+                let mut module = ModuleBuilder::new("entity", folder);
+
+                let mut unique = IndexSet::new();
+                for data in &global_entities {
+                    unique.extend(data.entities.values().map(|v| v.id.clone()));
+                }
+
+                let mut content = String::from("#![allow(clippy::large_stack_arrays, reason = \"Triggered by Facet\")]\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @entities");
+                for (index, id) in unique.iter().enumerate() {
+                    content.push_str("\n    ");
+                    content.push_str(&entity_name(id));
+                    if index != unique.len() - 1 {
+                        content.push(',');
+                    }
+                }
+                content.push_str("\n}\n");
+
+                module.with_docs("Placeholder").with_content(&content);
+                module.build().await?;
+            }
+
+            // Generate `versions`
+            {
+                let path = WORKSPACE_DIR.join("froglight-entity/src/generated/mod.rs");
+                let mut module = ModuleBuilder::new_after_marker(path).await?;
+
+                for version in &config.versions {
+                    let pinned = DATA.pin_owned();
+                    let storage = pinned.get_or_insert_with(version.real.clone(), RwLock::default);
+
+                    let mut storage = storage.write().await;
+                    module.with_submodule(&version.base.as_feature(), async |module, settings| {
+                        generate(version, module, &mut storage).await?;
+                        Ok(settings.with_feature(version.base.as_feature()))
+                    }).await?;
+                }
+            }
 
             Ok(())
         })
@@ -285,9 +376,104 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
     }
 }
 
+fn entity_name(id: &str) -> String {
+    let name = id.split(':').next_back().unwrap();
+    let mut name = name.to_case(Case::Pascal);
+
+    if name == "Item" {
+        name = String::from("ItemEntity");
+    }
+
+    name
+}
+
+fn component_name(meta: &EntityMetadataItem, classes: &[String]) -> String {
+    let name = meta.name.trim_start_matches("DATA_");
+    let mut name = name.to_case(Case::Pascal);
+
+    {
+        let mut prefix = meta.registered_class.split('/').next_back().unwrap();
+        if let Some((first, _last)) = prefix.split_once('$') {
+            prefix = first;
+        }
+
+        let prefix = prefix.to_case(Case::Pascal);
+        if !name.starts_with(&prefix) {
+            name = format!("{prefix}{name}");
+        }
+    }
+
+    if classes.len() == 1 {
+        let class = &classes[0];
+        let mut prefix = class.split('/').next_back().unwrap();
+        if let Some((first, _last)) = prefix.split_once('$') {
+            prefix = first;
+        }
+
+        let prefix = prefix.to_case(Case::Pascal);
+        if !name.starts_with(&prefix) {
+            name = format!("{prefix}{name}");
+        }
+    }
+
+    if name == "Item" {
+        name = String::from("ItemType");
+    }
+
+    name
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// Generate `Version`-specific entity data.
-async fn generate(version: &VersionPair, storage: &mut VersionStorage) -> Result<()> {
-    EntityData::get_for(&version.real, storage, async |_data| Ok(())).await
+async fn generate(
+    version: &VersionPair,
+    module: &mut ModuleBuilder,
+    storage: &mut VersionStorage,
+) -> Result<()> {
+    EntityData::get_for(&version.real, storage, async |data| {
+        let version_ident = version.base.as_feature().to_ascii_uppercase();
+        let mut content = format!(
+            "use froglight_common::version::{version_ident};
+#[expect(clippy::wildcard_imports, reason = \"Generated code\")]
+use crate::generated::{{component::*, entity::*}};
+
+generate! {{
+    @version {version_ident},
+    datatypes: {{
+        Byte(u8) = 0
+    }},
+"
+        );
+
+        for (index, entity) in data.entities.values().enumerate() {
+            let ident = entity_name(&entity.id);
+
+            write!(
+                content,
+                "    {ident} => {{ ident: \"minecraft:{}\", global: {index},\n        components: [",
+                entity.id,
+            )
+            .unwrap();
+
+            for (index, component) in entity.metadata.iter().enumerate() {
+                let classes = data.metadata_classes.get(component).unwrap();
+                write!(content, " {} = {}", component_name(component, classes), index).unwrap();
+                if index != entity.metadata.len() - 1 {
+                    content.push(',');
+                }
+            }
+
+            content.push_str(" ]\n    }");
+            if index != data.entities.len() - 1 {
+                content.push(',');
+            }
+            content.push('\n');
+        }
+        content.push('}');
+
+        module.with_content(&content);
+        Ok(())
+    })
+    .await
 }

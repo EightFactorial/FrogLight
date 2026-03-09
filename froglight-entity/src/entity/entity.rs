@@ -1,7 +1,19 @@
+#[cfg(feature = "bevy")]
+use alloc::boxed::Box;
 use core::any::TypeId;
 
 #[cfg(feature = "bevy")]
+use bevy_ecs::lifecycle::HookContext;
+#[cfg(feature = "bevy")]
+use bevy_ecs::reflect::ReflectCommandExt;
+#[cfg(feature = "bevy")]
+use bevy_ecs::world::{DeferredWorld, EntityWorldMut};
+#[cfg(feature = "bevy")]
+use bevy_ecs::{component::Component, reflect::ReflectComponent};
+#[cfg(feature = "bevy")]
 use bevy_reflect::PartialReflect;
+#[cfg(feature = "bevy")]
+use bevy_reflect::Reflect;
 #[cfg(feature = "facet")]
 use facet::Peek;
 use froglight_common::prelude::Identifier;
@@ -14,6 +26,9 @@ use crate::{
 
 /// A bundle of data and metadata for an entity.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Component, Reflect))]
+#[cfg_attr(feature = "bevy", component(on_insert = Self::insert_hook, on_replace = Self::replace_hook))]
+#[cfg_attr(feature = "bevy", reflect(opaque, Debug, Clone, PartialEq, Component))]
 pub struct EntityBundle {
     dataset: EntityDataSet<'static>,
     reference: &'static EntityMetadata,
@@ -81,7 +96,7 @@ impl EntityBundle {
     ///
     /// Requires the `bevy` feature to be enabled.
     #[cfg(feature = "bevy")]
-    pub fn inspect_reflect(&self, f: impl FnMut(&dyn PartialReflect)) {
+    pub fn inspect_reflect(&self, f: impl FnMut(Box<dyn PartialReflect>)) {
         self.reference.inspect_reflect(&self.dataset, f);
     }
 
@@ -114,18 +129,57 @@ impl EntityBundle {
     pub const fn version_ty(&self) -> TypeId { self.reference.version_ty() }
 }
 
+#[cfg(feature = "bevy")]
+impl EntityBundle {
+    fn insert_hook(mut world: DeferredWorld, ctx: HookContext) {
+        let (entities, mut commands) = world.entities_and_commands();
+        let entity = entities.get(ctx.entity).unwrap();
+        let mut commands = commands.entity(ctx.entity);
+
+        let bundle = entity.get::<Self>().unwrap();
+        bundle.inspect_reflect(|c| {
+            commands.insert_reflect(c);
+        });
+
+        #[cfg(feature = "tracing")]
+        tracing::trace!(target: "froglight_entity", "Applying EntityBundle \"{}\" to Entity {}", bundle.identifier(), ctx.entity);
+    }
+
+    fn replace_hook(mut world: DeferredWorld, ctx: HookContext) {
+        let (entities, mut commands) = world.entities_and_commands();
+        let Ok(entity) = entities.get(ctx.entity) else { return };
+
+        let mut commands = commands.entity(ctx.entity);
+
+        let bundle = entity.get::<Self>().unwrap();
+        bundle.inspect_reflect(|c| {
+            let type_path = alloc::string::String::from(c.reflect_type_path());
+            commands.queue_silenced(move |mut entity: EntityWorldMut| {
+                entity.remove_reflect(type_path.into());
+            });
+        });
+
+        #[cfg(feature = "tracing")]
+        tracing::trace!(target: "froglight_entity", "Removing EntityBundle \"{}\" from Entity {}", bundle.identifier(), ctx.entity);
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// A trait implemented by all entity types.
 pub trait EntityType<V: EntityVersion>: 'static {
     /// The [`EntityMetadata`] for this entity type.
     const METADATA: &'static EntityMetadata;
+    /// The [`TypeId`]s of the components that make up this entity.
+    const COMPONENTS: &'static [TypeId];
+    /// The default [`EntityDataSet`] for this entity type.
+    const DATASET: EntityDataSet<'static>;
 
     /// Inspect this entity's data using the given function.
     ///
     /// Requires the `bevy` feature to be enabled.
     #[cfg(feature = "bevy")]
-    fn inspect_reflect(dataset: &EntityDataSet, f: &mut dyn FnMut(&dyn PartialReflect));
+    fn inspect_reflect(dataset: &EntityDataSet, f: &mut dyn FnMut(Box<dyn PartialReflect>));
 
     /// Inspect this entity's data using the given function.
     ///
@@ -135,7 +189,7 @@ pub trait EntityType<V: EntityVersion>: 'static {
 }
 
 /// A trait implemented by all entity component types.
-pub trait EntityComponentType: 'static + Sized {
+pub trait EntityComponentType: Clone + Sized + 'static {
     /// Try to create the component from the given [`EntityDataType`].
     fn try_from_data(data: &EntityDataType) -> Option<Self>;
     /// Convert this component into an [`EntityDataType`].

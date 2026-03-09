@@ -30,7 +30,7 @@ facet-minecraft = { features = ["std"], workspace = true }
 froglight-biome = { features = ["std"], workspace = true }
 froglight-block = { features = ["std"], workspace = true }
 froglight-common = { features = ["facet", "std"], workspace = true }
-# froglight-entity = { features = ["std"], workspace = true }
+froglight-entity = { features = ["facet", "std"], workspace = true }
 froglight-inventory = { features = ["std"], workspace = true }
 froglight-item = { features = ["froglight-block", "std"], workspace = true }
 froglight-packet = { features = ["facet", "std"], workspace = true }
@@ -61,16 +61,16 @@ futures-lite = ["dep:async-io", "bevy_tasks?/futures-lite", "dep:async-compressi
 tokio = ["dep:async-compat", "dep:tokio", "facet-minecraft/tokio", "futures-lite"]
 
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-player/bevy", "froglight-world/bevy", "futures-lite"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "dep:bevy_tasks", "froglight-common/bevy", "froglight-entity/bevy", "froglight-inventory/bevy", "froglight-packet/bevy", "froglight-player/bevy", "froglight-world/bevy", "futures-lite"]
 # Enable `tracing` support.
-tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-world/tracing"]
+tracing = ["dep:tracing", "froglight-block/tracing", "froglight-common/tracing", "froglight-entity/tracing", "froglight-inventory/tracing", "froglight-item/tracing", "froglight-world/tracing"]
 # Enable extended `tracing` support.
 tracing_ext = ["facet-minecraft/tracing", "tracing"]
 
 # Enable optimizations using the nightly toolchain
-nightly = ["facet-minecraft/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-packet/nightly", "froglight-registry/nightly", "froglight-world/nightly"]
+nightly = ["facet-minecraft/nightly", "froglight-block/nightly", "froglight-common/nightly", "froglight-entity/nightly", "froglight-inventory/nightly", "froglight-item/nightly", "froglight-packet/nightly", "froglight-registry/nightly", "froglight-world/nightly"]
 
 # -------------------------------------------------------------------------------------------------
 # Note: The following features are automatically @generated.
 
-v26_1 = ["froglight-biome/v26_1", "froglight-block/v26_1", "froglight-item/v26_1", "froglight-packet/v26_1", "froglight-registry/v26_1"]
+v26_1 = ["froglight-biome/v26_1", "froglight-block/v26_1", "froglight-entity/v26_1", "froglight-item/v26_1", "froglight-packet/v26_1", "froglight-registry/v26_1"]

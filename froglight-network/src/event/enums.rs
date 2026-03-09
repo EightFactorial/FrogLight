@@ -7,7 +7,7 @@ use froglight_common::{entity::EntityId, prelude::Identifier};
 use froglight_packet::common::{
     chunk_data::ChunkData,
     client_information::ClientInformation,
-    entity_data::EntityData,
+    entity_data::{AddedEntityData, SetEntityData},
     handshake::HandshakeContent,
     known_packs::KnownResourcePack,
     login::{LoginHelloContent, PlayLoginContent},
@@ -78,7 +78,7 @@ impl From<ServerboundHandshakeEvent> for ServerboundEventEnum {
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq))]
 pub enum ClientboundPlayEvent {
     ActionBarText(),
-    AddEntity(EntityData),
+    AddEntity(AddedEntityData),
     Animate(),
     AwardStats(),
     BlockChangedAck(),
@@ -180,7 +180,7 @@ pub enum ClientboundPlayEvent {
     SetCursorItem(),
     SetDefaultSpawn(),
     SetDisplayObjective(),
-    SetEntityData(),
+    SetEntityData(SetEntityData),
     SetEntityLink(),
     SetEntityMotion(),
     SetEquipment(),

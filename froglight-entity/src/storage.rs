@@ -89,13 +89,13 @@ impl EntityStorage {
 
     /// Get the [`Entity`] for a given [`GlobalId`].
     #[must_use]
-    pub fn get_biome(&self, id: GlobalId) -> Option<EntityBundle> {
+    pub fn get_entity(&self, id: GlobalId) -> Option<EntityBundle> {
         self.get_metadata(id).map(EntityBundle::new_from)
     }
 
     /// Get the [`Entity`] for a given [`Identifier`].
     #[must_use]
-    pub fn get_biome_by_identifier(&self, identifier: &Identifier<'_>) -> Option<EntityBundle> {
+    pub fn get_entity_by_identifier(&self, identifier: &Identifier<'_>) -> Option<EntityBundle> {
         self.to_ref()
             .iter()
             .find(|&&meta| meta.identifier() == identifier)

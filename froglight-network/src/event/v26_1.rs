@@ -4,7 +4,7 @@
 
 use froglight_common::version::V26_1;
 use froglight_packet::{
-    common::{chunk_data::ChunkData, entity_id::VarEntityId},
+    common::{chunk_data::ChunkData, entity_data::SetEntityData, entity_id::VarEntityId},
     generated::v26_1::{
         configuration::{
             ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
@@ -634,7 +634,7 @@ impl EventVersion for V26_1 {
                         packet,
                     ))))
                 }
-                ClientboundPlayEvent::SetEntityData() => {
+                ClientboundPlayEvent::SetEntityData(_data) => {
                     let packet = todo!();
                     Ok(Some(VersionPacket::Play(PlayClientboundPackets::SetEntityData(packet))))
                 }
@@ -1225,8 +1225,11 @@ impl EventVersion for V26_1 {
                 PlayClientboundPackets::SetDisplayObjective(_packet) => Ok(Some(
                     ClientboundEventEnum::Play(ClientboundPlayEvent::SetDisplayObjective()),
                 )),
-                PlayClientboundPackets::SetEntityData(_packet) => {
-                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityData())))
+                PlayClientboundPackets::SetEntityData(packet) => {
+                    Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityData(
+                        SetEntityData::try_from::<Self>(packet.entity_id, packet.metadata)
+                            .map_err(ConnectionError::other)?,
+                    ))))
                 }
                 PlayClientboundPackets::SetEntityLink(_packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityLink())))

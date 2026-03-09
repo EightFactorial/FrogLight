@@ -1,3 +1,5 @@
+#[cfg(feature = "bevy")]
+use alloc::boxed::Box;
 use core::{
     any::TypeId,
     fmt::{self, Debug},
@@ -21,14 +23,17 @@ pub struct EntityMetadata {
     identifier: Identifier<'static>,
     /// The [`GlobalId`] assigned to this entity.
     global_id: MaybeAtomicU32,
+    /// The default [`EntityDataSet`] for this entity type.
+    dataset: EntityDataSet<'static>,
 
     #[cfg(feature = "bevy")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
-    inspect_reflect: fn(&EntityDataSet, &mut dyn FnMut(&dyn PartialReflect)),
+    inspect_reflect: fn(&EntityDataSet, &mut dyn FnMut(Box<dyn PartialReflect>)),
     #[cfg(feature = "facet")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
     inspect_peek: fn(&EntityDataSet, &mut dyn FnMut(Peek<'_, '_>)),
 
+    component_tys: &'static [TypeId],
     entity_ty: TypeId,
     version_ty: TypeId,
 }
@@ -50,12 +55,14 @@ impl EntityMetadata {
         Self {
             identifier,
             global_id: MaybeAtomicU32::new(global_id),
+            dataset: E::DATASET,
 
             #[cfg(feature = "bevy")]
             inspect_reflect: E::inspect_reflect,
             #[cfg(feature = "facet")]
             inspect_peek: E::inspect_peek,
 
+            component_tys: E::COMPONENTS,
             entity_ty: TypeId::of::<E>(),
             version_ty: TypeId::of::<V>(),
         }
@@ -72,7 +79,7 @@ impl EntityMetadata {
 
     /// Get the default [`EntityDataSet`] for this entity type.
     #[must_use]
-    pub fn default_data(&self) -> EntityDataSet<'static> { todo!() }
+    pub fn default_data(&self) -> EntityDataSet<'static> { self.dataset.clone() }
 
     /// Returns `true` if this entity is of type `E`.
     #[must_use]
@@ -85,7 +92,11 @@ impl EntityMetadata {
     /// Inspect the entity's component data using [`PartialReflect`].
     #[inline]
     #[cfg(feature = "bevy")]
-    pub fn inspect_reflect(&self, dataset: &EntityDataSet, mut f: impl FnMut(&dyn PartialReflect)) {
+    pub fn inspect_reflect(
+        &self,
+        dataset: &EntityDataSet,
+        mut f: impl FnMut(Box<dyn PartialReflect>),
+    ) {
         (self.inspect_reflect)(dataset, &mut f);
     }
 
@@ -95,6 +106,11 @@ impl EntityMetadata {
     pub fn inspect_peek(&self, dataset: &EntityDataSet, mut f: impl FnMut(Peek<'_, '_>)) {
         (self.inspect_peek)(dataset, &mut f);
     }
+
+    /// Get the [`TypeId`]s of the entity's components.
+    #[inline]
+    #[must_use]
+    pub const fn component_tys(&self) -> &'static [TypeId] { self.component_tys }
 
     /// Get the [`TypeId`] of the entity type.
     #[inline]

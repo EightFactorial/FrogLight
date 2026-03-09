@@ -5,6 +5,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use async_net::TcpStream;
 use bevy::{prelude::*, tasks::block_on};
 use froglight::{
+    entity::bevy::ApplyEntityDataSet,
     network::{
         bevy::ClientDespawn,
         connection::FuturesLite,
@@ -125,14 +126,20 @@ impl BotPlugin {
                 ClientboundEventEnum::Play(event) => match event {
                     // ClientboundPlayEvent::ActionBarText() => todo!(),
                     ClientboundPlayEvent::AddEntity(entity_data) => {
-                        let bundle = (
+                        let mut entity = commands.spawn((
                             EntityOfInstance::new(bot.id()),
                             entity_data.entity_id.0,
                             entity_data.entity_uuid,
-                        );
+                        ));
 
-                        let entity = commands.spawn(bundle).id();
-                        debug!("Spawning Entity {entity} ({})", entity_data.entity_id.0.0);
+                        let entities = Protocol::entities().load();
+                        if let Some(bundle) = entities.get_entity(entity_data.entity_type.into()) {
+                            entity.insert(bundle);
+                        } else {
+                            error!("Unknown Entity Type {:?}!", entity_data.entity_type);
+                        }
+
+                        debug!("Spawning Entity {} ({})", entity.id(), entity_data.entity_id.0.0);
                     }
                     // ClientboundPlayEvent::Animate() => todo!(),
                     // ClientboundPlayEvent::AwardStats() => todo!(),
@@ -252,6 +259,7 @@ impl BotPlugin {
                             WorldInstance::new(login.spawn_info.dimension.clone()),
                             WorldInstanceChunks::new(320, -64),
                             EntityOfInstance::new(bot.id()),
+                            EntityBundle::new::<entity::Player, Protocol>(),
                         ));
 
                         // Add the bot's `EntityId` and `EntityUuid`
@@ -326,7 +334,21 @@ impl BotPlugin {
                     // ClientboundPlayEvent::SetCursorItem() => todo!(),
                     // ClientboundPlayEvent::SetDefaultSpawn() => todo!(),
                     // ClientboundPlayEvent::SetDisplayObjective() => todo!(),
-                    // ClientboundPlayEvent::SetEntityData() => todo!(),
+                    ClientboundPlayEvent::SetEntityData(data) => {
+                        let Some(instance) = bot.get::<WorldInstance>() else {
+                            error!("Received SetEntityData but bot doesn't have a WorldInstance!");
+                            continue;
+                        };
+
+                        if let Some(entity) = instance.get(&data.entity_id.0) {
+                            commands
+                                .entity(entity)
+                                .queue(ApplyEntityDataSet::new(data.dataset.clone()));
+                        } else {
+                            // TODO: Entity was likely just spawned,
+                            // need to figure out a solution later.
+                        }
+                    }
                     // ClientboundPlayEvent::SetEntityLink() => todo!(),
                     // ClientboundPlayEvent::SetEntityMotion() => todo!(),
                     // ClientboundPlayEvent::SetEquipment() => todo!(),

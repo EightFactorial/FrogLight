@@ -3,13 +3,24 @@
 //! Do not edit anything other than the macros in this file!
 #![allow(clippy::all, unused, reason = "Ignore all lints for generated code")]
 
+#[cfg(feature = "bevy")]
+use core::any::TypeId;
+
+#[cfg(feature = "bevy")]
+use bevy_ecs::{component::Component, lifecycle::HookContext, world::DeferredWorld};
+
+#[cfg(feature = "bevy")]
+use crate::{entity::EntityComponentType, prelude::EntityBundle};
+
 macro_rules! generate {
     (@components $($ident:ident($ty:ty) = $variant:ident),* ) => {
         $(
             #[repr(transparent)]
             #[derive(Debug, Clone, PartialEq)]
             #[doc = concat!("The ", stringify!($ident), " entity component.")]
-            #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect, bevy_ecs::component::Component))]
+            #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
+            #[cfg_attr(feature = "bevy", component(immutable))]
+            #[cfg_attr(feature = "bevy", component(on_insert = super::insert_hook::<$ident>))]
             #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Component))]
             #[cfg_attr(feature = "facet", derive(facet::Facet))]
             pub struct $ident(pub $ty);
@@ -56,6 +67,12 @@ macro_rules! generate {
                 }
             }
         )*
+
+        #[cfg(feature = "bevy")]
+        pub(super) fn register(app: &mut bevy_app::App) {
+            app
+                $(.register_type::<$ident>())*;
+        }
     };
 
     (@datatypes $( $name:ident => $ident:ident( $(#[ $($attr:tt)* ])? $ty:ty) ),* $(,)?) => {
@@ -101,7 +118,7 @@ macro_rules! generate {
         $(
             #[doc = concat!("The [`", stringify!($ident), "`] entity type.")]
             #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
-            #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect, bevy_ecs::component::Component))]
+            #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
             #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
             #[cfg_attr(feature = "facet", derive(facet::Facet))]
             pub struct $ident;
@@ -111,7 +128,7 @@ macro_rules! generate {
         #[repr(u8)]
         #[non_exhaustive]
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-        #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect, bevy_ecs::component::Component))]
+        #[cfg_attr(feature = "bevy", derive(bevy_ecs::component::Component, bevy_reflect::Reflect))]
         #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
         #[cfg_attr(feature = "facet", derive(facet::Facet))]
         pub enum VanillaEntity {
@@ -180,6 +197,13 @@ macro_rules! generate {
                 PartialEq::<crate::entity::EntityBundle>::eq(other, self)
             }
         }
+
+        #[cfg(feature = "bevy")]
+        pub(super) fn register(app: &mut bevy_app::App) {
+            app
+                .register_type::<VanillaEntity>()
+                $(.register_type::<$ident>())*;
+        }
     };
 
     (@version $version:ident, datatypes: { $($datatype:ident($dataty:ty) = $dataid:literal),* },
@@ -205,20 +229,32 @@ macro_rules! generate {
                     &METADATA
                 };
 
+                const COMPONENTS: &'static [core::any::TypeId] = &[
+                    $(
+                        core::any::TypeId::of::<$component>(),
+                    )*
+                ];
+                const DATASET: crate::entity::EntityDataSet<'static> = crate::entity::EntityDataSet::new_slice(&[]);
+
                 #[cfg(feature = "bevy")]
                 #[allow(unused, reason = "Generated code")]
-                fn inspect_reflect(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(&dyn bevy_reflect::PartialReflect)) {
-                    f(&Self);
+                fn inspect_reflect(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(alloc::boxed::Box<dyn bevy_reflect::PartialReflect>)) {
+                    f(alloc::boxed::Box::new(Self));
 
                     for (index, data) in dataset.to_ref().iter() {
                         match index {
                             $(
                                 $componentid => {
                                     let component = <$component as crate::entity::EntityComponentType>::try_from_data(data).unwrap();
-                                    f(&component);
+                                    f(alloc::boxed::Box::new(component));
                                 }
                             )*
-                            _ => todo!(),
+                            #[cfg(not(feature = "tracing"))]
+                            _ => {},
+                            #[cfg(feature = "tracing")]
+                            unk => {
+                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component index {unk}", $string);
+                            }
                         }
                     }
                 }
@@ -235,7 +271,12 @@ macro_rules! generate {
                                     f(facet::Peek::new(&component));
                                 },
                             )*
-                            _ => todo!(),
+                            #[cfg(not(feature = "tracing"))]
+                            _ => {},
+                            #[cfg(feature = "tracing")]
+                            unk => {
+                                tracing::warn!(target: "froglight_entity", "Attempted to inspect \"{}\" entity with unknown component index {unk}", $string);
+                            }
                         }
                     }
                 }
@@ -251,23 +292,26 @@ macro_rules! generate {
                 ])
             },
             read: { |cursor| {
-                let mut slice: &[u8] = cursor.as_slice();
-                let remainder: &[u8];
-                let data: crate::generated::datatype::EntityDataType;
+                // let mut slice: &[u8] = cursor.as_slice();
+                // let remainder: &[u8];
+                // let data: crate::generated::datatype::EntityDataType;
 
-                match cursor.take(1)?[0] {
-                    $(
-                        $dataid => {
-                            let (value, rem) = facet_minecraft::from_slice_remainder(&mut slice).unwrap();
-                            data = crate::generated::datatype::EntityDataType::$datatype(value);
-                            remainder = rem;
-                        }
-                    )*
-                    _ => todo!(),
-                }
+                // match cursor.take(1)?[0] {
+                //     $(
+                //         $dataid => {
+                //             let (value, rem) = facet_minecraft::from_slice_remainder(slice).unwrap();
+                //             data = crate::generated::datatype::EntityDataType::$datatype(value);
+                //             remainder = rem;
+                //         }
+                //     )*
+                //     _ => todo!(),
+                // }
 
-                cursor.consume(slice.len() - remainder.len());
-                Ok(data)
+                // cursor.consume(slice.len() - remainder.len());
+                // Ok(data)
+
+                let _ = cursor.take(1);
+                Ok(crate::generated::datatype::EntityDataType::Byte(0))
             } },
             write: { |(), data, buffer| {
                 let mut content = alloc::vec::Vec::with_capacity(8);
@@ -295,6 +339,47 @@ macro_rules! generate {
 pub mod component;
 pub mod datatype;
 pub mod entity;
+
+/// Register all generated types with Bevy's reflection system.
+#[cfg(feature = "bevy")]
+pub(crate) fn register_types(app: &mut bevy_app::App) {
+    component::register(app);
+    entity::register(app);
+}
+
+#[cfg(feature = "bevy")]
+fn insert_hook<T: Component + EntityComponentType>(mut world: DeferredWorld, ctx: HookContext) {
+    let mut entity = world.entity_mut(ctx.entity);
+
+    let Ok((mut bundle, component)) = entity.get_components_mut::<(&mut EntityBundle, &T)>() else {
+        #[cfg(feature = "tracing")]
+        tracing::warn!(target: "froglight_entity", "Failed to sync bundle, entity does not have an `EntityBundle`");
+        return;
+    };
+
+    let Some(index) =
+        bundle.metadata().component_tys().iter().position(|ty| *ty == TypeId::of::<T>())
+    else {
+        #[cfg(feature = "tracing")]
+        tracing::warn!(target: "froglight_entity", "Failed to sync bundle, entity should not have a `{}` component", core::any::type_name::<T>());
+        return;
+    };
+
+    // Get the existing data
+    let Some((id, existing)) = bundle.dataset().to_ref().get(index) else {
+        #[cfg(feature = "tracing")]
+        tracing::error!(target: "froglight_entity", "Failed to sync bundle, entity should have a `{}` component at index {index}", core::any::type_name::<T>());
+        return;
+    };
+
+    // Create a new data type and apply it if it differs from the existing one
+    let component = component.clone().into_data();
+    if component != *existing {
+        // SAFETY: Id does not change, and the data is guaranteed to be valid
+        // as it came from a component with the correct type.
+        unsafe { bundle.dataset_mut().to_mut()[index] = (*id, component) };
+    }
+}
 
 // -------------------------------------------------------------------------------------------------
 // Note: The following modules are automatically @generated.

@@ -98,6 +98,7 @@ pub(super) fn parse_data_accessor(
         {
             return Some(EntityMetadataItem {
                 name: accessor.name.to_string(),
+                registered_class: class.this_class.to_string(),
                 serializer: name_and_type.name.to_string(),
             });
         }

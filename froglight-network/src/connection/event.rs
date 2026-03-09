@@ -1,6 +1,9 @@
 //! TODO
 
-use core::fmt::{self, Debug, Display};
+use core::{
+    error::Error,
+    fmt::{self, Debug, Display},
+};
 
 use crate::event::enums::{ClientboundEventEnum, ServerboundEventEnum};
 
@@ -29,6 +32,18 @@ pub enum ConnectionError {
     UnknownEvent,
     /// An unknown packet was received.
     UnknownPacket,
+
+    /// Some other error occurred.
+    Other(Box<dyn Error + Send + Sync>),
+}
+
+impl ConnectionError {
+    /// Creates a new [`ConnectionError`] from the given error.
+    #[inline]
+    #[must_use]
+    pub fn other<E: Error + Send + Sync + 'static>(error: E) -> Self {
+        Self::Other(Box::new(error))
+    }
 }
 
 impl<T> EventConnection<T> {
@@ -93,6 +108,7 @@ impl Display for ConnectionError {
             ConnectionError::Full => f.write_str("connection channel is full"),
             ConnectionError::UnknownEvent => f.write_str("unknown event received"),
             ConnectionError::UnknownPacket => f.write_str("unknown packet received"),
+            ConnectionError::Other(error) => write!(f, "other, {error}"),
         }
     }
 }
