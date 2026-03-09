@@ -1,5 +1,3 @@
-#[cfg(feature = "bevy")]
-use alloc::boxed::Box;
 use core::any::TypeId;
 
 #[cfg(feature = "bevy")]
@@ -10,6 +8,7 @@ use froglight_common::prelude::Identifier;
 
 use crate::{
     entity::{EntityDataSet, GlobalId, metadata::EntityMetadata},
+    generated::datatype::EntityDataType,
     prelude::EntityVersion,
 };
 
@@ -82,7 +81,7 @@ impl EntityBundle {
     ///
     /// Requires the `bevy` feature to be enabled.
     #[cfg(feature = "bevy")]
-    pub fn inspect_reflect(&self, f: impl FnMut(Box<dyn PartialReflect>)) {
+    pub fn inspect_reflect(&self, f: impl FnMut(&dyn PartialReflect)) {
         self.reference.inspect_reflect(&self.dataset, f);
     }
 
@@ -121,4 +120,24 @@ impl EntityBundle {
 pub trait EntityType<V: EntityVersion>: 'static {
     /// The [`EntityMetadata`] for this entity type.
     const METADATA: &'static EntityMetadata;
+
+    /// Inspect this entity's data using the given function.
+    ///
+    /// Requires the `bevy` feature to be enabled.
+    #[cfg(feature = "bevy")]
+    fn inspect_reflect(dataset: &EntityDataSet, f: &mut dyn FnMut(&dyn PartialReflect));
+
+    /// Inspect this entity's data using the given function.
+    ///
+    /// Requires the `facet` feature to be enabled.
+    #[cfg(feature = "facet")]
+    fn inspect_peek(dataset: &EntityDataSet, f: &mut dyn FnMut(Peek<'_, '_>));
+}
+
+/// A trait implemented by all entity component types.
+pub trait EntityComponentType: 'static + Sized {
+    /// Try to create the component from the given [`EntityDataType`].
+    fn try_from_data(data: &EntityDataType) -> Option<Self>;
+    /// Convert this component into an [`EntityDataType`].
+    fn into_data(self) -> EntityDataType;
 }

@@ -1,5 +1,3 @@
-#[cfg(feature = "bevy")]
-use alloc::boxed::Box;
 use core::{
     any::TypeId,
     fmt::{self, Debug},
@@ -26,7 +24,7 @@ pub struct EntityMetadata {
 
     #[cfg(feature = "bevy")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
-    inspect_reflect: fn(&EntityDataSet, &mut dyn FnMut(Box<dyn PartialReflect>)),
+    inspect_reflect: fn(&EntityDataSet, &mut dyn FnMut(&dyn PartialReflect)),
     #[cfg(feature = "facet")]
     #[allow(clippy::type_complexity, reason = "Function pointers")]
     inspect_peek: fn(&EntityDataSet, &mut dyn FnMut(Peek<'_, '_>)),
@@ -47,13 +45,6 @@ impl EntityMetadata {
     #[allow(clippy::type_complexity, reason = "Function pointers")]
     pub const unsafe fn new<E: EntityType<V>, V: EntityVersion>(
         identifier: Identifier<'static>,
-
-        #[cfg(feature = "bevy")] inspect_reflect: fn(
-            &EntityDataSet,
-            &mut dyn FnMut(Box<dyn PartialReflect>),
-        ),
-        #[cfg(feature = "facet")] inspect_peek: fn(&EntityDataSet, &mut dyn FnMut(Peek<'_, '_>)),
-
         global_id: u32,
     ) -> Self {
         Self {
@@ -61,9 +52,9 @@ impl EntityMetadata {
             global_id: MaybeAtomicU32::new(global_id),
 
             #[cfg(feature = "bevy")]
-            inspect_reflect,
+            inspect_reflect: E::inspect_reflect,
             #[cfg(feature = "facet")]
-            inspect_peek,
+            inspect_peek: E::inspect_peek,
 
             entity_ty: TypeId::of::<E>(),
             version_ty: TypeId::of::<V>(),
@@ -94,11 +85,7 @@ impl EntityMetadata {
     /// Inspect the entity's component data using [`PartialReflect`].
     #[inline]
     #[cfg(feature = "bevy")]
-    pub fn inspect_reflect(
-        &self,
-        dataset: &EntityDataSet,
-        mut f: impl FnMut(Box<dyn PartialReflect>),
-    ) {
+    pub fn inspect_reflect(&self, dataset: &EntityDataSet, mut f: impl FnMut(&dyn PartialReflect)) {
         (self.inspect_reflect)(dataset, &mut f);
     }
 

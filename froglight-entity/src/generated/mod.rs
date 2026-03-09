@@ -4,7 +4,7 @@
 #![allow(clippy::all, unused, reason = "Ignore all lints for generated code")]
 
 macro_rules! generate {
-    (@components $($ident:ident($ty:ty)),* ) => {
+    (@components $($ident:ident($ty:ty) = $variant:ident),* ) => {
         $(
             #[repr(transparent)]
             #[derive(Debug, Clone, PartialEq)]
@@ -13,6 +13,20 @@ macro_rules! generate {
             #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Component))]
             #[cfg_attr(feature = "facet", derive(facet::Facet))]
             pub struct $ident(pub $ty);
+
+            impl crate::entity::EntityComponentType for $ident {
+                fn try_from_data(data: &crate::generated::datatype::EntityDataType) -> Option<Self> {
+                    if let crate::generated::datatype::EntityDataType::$variant(value) = data {
+                        Some($ident(value.clone()))
+                    } else {
+                        None
+                    }
+                }
+
+                fn into_data(self) -> crate::generated::datatype::EntityDataType {
+                    crate::generated::datatype::EntityDataType::$variant(self.0)
+                }
+            }
 
             impl core::ops::Deref for $ident {
                 type Target = $ty;
@@ -165,17 +179,20 @@ macro_rules! generate {
         }
     };
 
-    (@version $version:ident,
+    (@version $version:ident, datatypes: { $($datatype:ident($dataty:ty) = $dataid:literal),* },
         $(
             $ident:ident => {
                 ident: $string:literal,
                 global: $global:literal,
+                components: [
+                    $($component:ident = $componentid:literal),*
+                ]
             }
         ),*
-        read: $($read:tt)*, write: $($write:tt)*
     ) => {
         $(
-            impl crate::biome::EntityType<$version> for $ident {
+            #[automatically_derived]
+            impl crate::entity::EntityType<$version> for $ident {
                 const METADATA: &'static crate::entity::EntityMetadata = {
                     static METADATA: crate::entity::EntityMetadata = unsafe { crate::entity::EntityMetadata::new::<$ident, $version>(
                         froglight_common::identifier::Identifier::new_static($string),
@@ -184,6 +201,37 @@ macro_rules! generate {
 
                     &METADATA
                 };
+
+                #[cfg(feature = "bevy")]
+                #[allow(unused, reason = "Generated code")]
+                fn inspect_reflect(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(&dyn bevy_reflect::PartialReflect)) {
+                    for (index, data) in dataset.to_ref().iter() {
+                        match index {
+                            $(
+                                $componentid => {
+                                    let component = <$component as crate::entity::EntityComponentType>::try_from_data(data).unwrap();
+                                    f(&component);
+                                }
+                            )*
+                            _ => todo!(),
+                        }
+                    }
+                }
+                #[cfg(feature = "facet")]
+                #[allow(unused, reason = "Generated code")]
+                fn inspect_peek(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(facet::Peek<'_, '_>)) {
+                    for (index, data) in dataset.to_ref().iter() {
+                        match index {
+                            $(
+                                $componentid => {
+                                    let component = <$component as crate::entity::EntityComponentType>::try_from_data(data).unwrap();
+                                    f(facet::Peek::new(&component));
+                                },
+                            )*
+                            _ => todo!(),
+                        }
+                    }
+                }
             }
         )*
 
@@ -195,8 +243,44 @@ macro_rules! generate {
                     )*
                 ])
             },
-            read: $($read)*,
-            write: $($write)*
+            read: { |cursor| {
+                let mut slice: &[u8] = cursor.as_slice();
+                let remainder: &[u8];
+                let data: crate::generated::datatype::EntityDataType;
+
+                match cursor.take(1)?[0] {
+                    $(
+                        $dataid => {
+                            let (value, rem) = facet_minecraft::from_slice_remainder(&mut slice).unwrap();
+                            data = crate::generated::datatype::EntityDataType::$datatype(value);
+                            remainder = rem;
+                        }
+                    )*
+                    _ => todo!(),
+                }
+
+                cursor.consume(slice.len() - remainder.len());
+                Ok(data)
+            } },
+            write: { |(), data, buffer| {
+                let mut content = alloc::vec::Vec::with_capacity(8);
+
+                match data {
+                    $(
+                        crate::generated::datatype::EntityDataType::$datatype(value) => {
+                            content.push($dataid);
+                            facet_minecraft::to_buffer(value, &mut content).unwrap();
+                        }
+                    )*
+                    _ => todo!(),
+                }
+
+                if buffer.write_data(&content) {
+                    Ok(())
+                } else {
+                    Err(facet_minecraft::serialize::error::SerializeIterError::new())
+                }
+            } }
         );
     };
 }

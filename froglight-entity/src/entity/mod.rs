@@ -4,7 +4,7 @@ mod dataset;
 pub use dataset::EntityDataSet;
 
 mod entity;
-pub use entity::{EntityBundle, EntityType};
+pub use entity::{EntityBundle, EntityComponentType, EntityType};
 
 #[cfg(feature = "facet")]
 mod facet;

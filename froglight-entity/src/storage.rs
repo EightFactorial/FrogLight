@@ -169,38 +169,40 @@ macro_rules! implement_entities {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __implement_storage_inner {
-    (@global $version:ty => $($tt:tt)*) => {
+    (@global $version:ty => unsafe { $($tt:tt)* }, read: $read:block, write: $write:block ) => {
         $crate::__implement_storage_inner!(
             @local {
                 const ENTITY: &'static std::sync::LazyLock<$crate::storage::GlobalEntityStorage> = {
                     static STATIC: std::sync::LazyLock<$crate::storage::GlobalEntityStorage> = std::sync::LazyLock::new(|| {
-                        $crate::storage::GlobalEntityStorage::new::<$version>(<$version as $crate::version::EntityVersion>::new_blocks())
+                        $crate::storage::GlobalEntityStorage::new::<$version>(<$version as $crate::version::EntityVersion>::new_entity())
                     });
                     &STATIC
                 };
             },
-            $version => $($tt)*
+            $version => unsafe { $($tt)* },
+            read: $read,
+            write: $write
         );
     };
-    (@local {$($constant:tt)*}, $version:ty => $($tt:tt)*, read: $(read:tt)*, write: $(write:tt)*) => {
+    (@local {$($constant:tt)*}, $version:ty => unsafe { $($tt:tt)* }, read: $read:block, write: $write:block )  => {
         impl $crate::version::EntityVersion for $version {
             $($constant)*
 
             fn new_entity() -> $crate::storage::EntityStorage {
-                $($tt)*
+               unsafe { $($tt)* }
             }
 
             #[cfg(feature = "facet")]
             const DATATYPE_DESERIALIZE: fn(
                 &mut facet_minecraft::deserialize::InputCursor,
-            ) -> Result<$crate::generated::datatype::EntityDataType, facet_minecraft::deserialize::error::DeserializeValueError> = $($read)*;
+            ) -> Result<$crate::generated::datatype::EntityDataType, facet_minecraft::deserialize::error::DeserializeValueError> = $read;
 
             #[cfg(feature = "facet")]
             const DATATYPE_SERIALIZE: for<'input, 'facet> fn(
                 &'facet (),
                 &'input $crate::generated::datatype::EntityDataType,
-                &mut dyn facet_minecraft::serialize::SerializeWriter,
-            ) -> Result<(), facet_minecraft::serialize::error::SerializeIterError<'input, 'facet>> = $($write)*;
+                &mut dyn facet_minecraft::serialize::buffer::SerializeWriter,
+            ) -> Result<(), facet_minecraft::serialize::error::SerializeIterError<'input, 'facet>> = $write;
         }
     };
 }
