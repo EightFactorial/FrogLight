@@ -101,6 +101,9 @@ macro_rules! generate {
         $(
             #[doc = concat!("The [`", stringify!($ident), "`] entity type.")]
             #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+            #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect, bevy_ecs::component::Component))]
+            #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash, Component))]
+            #[cfg_attr(feature = "facet", derive(facet::Facet))]
             pub struct $ident;
         )*
 
@@ -205,6 +208,8 @@ macro_rules! generate {
                 #[cfg(feature = "bevy")]
                 #[allow(unused, reason = "Generated code")]
                 fn inspect_reflect(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(&dyn bevy_reflect::PartialReflect)) {
+                    f(&Self);
+
                     for (index, data) in dataset.to_ref().iter() {
                         match index {
                             $(
@@ -220,6 +225,8 @@ macro_rules! generate {
                 #[cfg(feature = "facet")]
                 #[allow(unused, reason = "Generated code")]
                 fn inspect_peek(dataset: &crate::entity::EntityDataSet, f: &mut dyn FnMut(facet::Peek<'_, '_>)) {
+                    f(facet::Peek::new(&Self));
+
                     for (index, data) in dataset.to_ref().iter() {
                         match index {
                             $(

@@ -5,5 +5,5 @@ use bevy_ecs::reflect::ReflectComponent;
 
 generate! {
     @components
-    Placeholder(u8) = Byte
+    ComponentPlaceholder(u8) = Byte
 }
