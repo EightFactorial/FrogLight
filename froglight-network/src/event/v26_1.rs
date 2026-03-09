@@ -4,7 +4,7 @@
 
 use froglight_common::version::V26_1;
 use froglight_packet::{
-    common::{chunk_data::ChunkData, entity_data::SetEntityData, entity_id::VarEntityId},
+    common::{chunk_data::ChunkData, entity_data::SetEntityBundle, entity_id::VarEntityId},
     generated::v26_1::{
         configuration::{
             ClearDialogS2CPacket as LoginClearDialogS2CPacket, ClientInformationC2SPacket,
@@ -1227,8 +1227,7 @@ impl EventVersion for V26_1 {
                 )),
                 PlayClientboundPackets::SetEntityData(packet) => {
                     Ok(Some(ClientboundEventEnum::Play(ClientboundPlayEvent::SetEntityData(
-                        SetEntityData::try_from::<Self>(packet.entity_id, packet.metadata)
-                            .map_err(ConnectionError::other)?,
+                        SetEntityBundle::new::<Self>(packet.entity_id, packet.metadata),
                     ))))
                 }
                 PlayClientboundPackets::SetEntityLink(_packet) => {

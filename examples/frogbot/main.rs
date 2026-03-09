@@ -5,7 +5,6 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use async_net::TcpStream;
 use bevy::{prelude::*, tasks::block_on};
 use froglight::{
-    entity::bevy::ApplyEntityDataSet,
     network::{
         bevy::ClientDespawn,
         connection::FuturesLite,
@@ -335,19 +334,29 @@ impl BotPlugin {
                     // ClientboundPlayEvent::SetDefaultSpawn() => todo!(),
                     // ClientboundPlayEvent::SetDisplayObjective() => todo!(),
                     ClientboundPlayEvent::SetEntityData(data) => {
-                        let Some(instance) = bot.get::<WorldInstance>() else {
-                            error!("Received SetEntityData but bot doesn't have a WorldInstance!");
+                        debug!("Received SetEntityData for EntityId {}", data.entity_id().0);
+
+                        let id = data.entity_id();
+                        let Ok(dataset) = data.parse() else {
+                            error!("Failed to parse EntityData for EntityId {}!", id.0);
                             continue;
                         };
 
-                        if let Some(entity) = instance.get(&data.entity_id.0) {
-                            commands
-                                .entity(entity)
-                                .queue(ApplyEntityDataSet::new(data.dataset.clone()));
-                        } else {
-                            // TODO: Entity was likely just spawned,
-                            // need to figure out a solution later.
-                        }
+                        commands.entity(bot.id()).queue_silenced(
+                            move |entity: EntityWorldMut<'_>| {
+                                let Some(instance) = entity.get::<WorldInstance>() else { return };
+
+                                if let Some(target) = instance.get(&id)
+                                    && let Some(mut bundle) =
+                                        entity.into_world_mut().get_mut::<EntityBundle>(target)
+                                {
+                                    // SAFETY: TODO :)
+                                    unsafe { *bundle.dataset_mut() = dataset };
+                                } else {
+                                    error!("Received SetEntityData for unknown EntityId {}!", id.0);
+                                }
+                            },
+                        );
                     }
                     // ClientboundPlayEvent::SetEntityLink() => todo!(),
                     // ClientboundPlayEvent::SetEntityMotion() => todo!(),
