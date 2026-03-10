@@ -77,6 +77,33 @@ impl EntityBundle {
     #[must_use]
     pub const unsafe fn dataset_mut(&mut self) -> &mut EntityDataSet<'static> { &mut self.dataset }
 
+    /// Apply the given [`EntityDataSet`] to this entity.
+    ///
+    /// # Errors
+    ///
+    /// Returns the given dataset if it was not compatible with this entity.
+    pub fn with_dataset(mut self, dataset: EntityDataSet<'_>) -> Result<Self, EntityDataSet<'_>> {
+        for (other_id, other_data) in dataset.to_ref() {
+            // Find the corresponding data in this dataset.
+            if let Some((_, this_data)) =
+                self.dataset.to_mut().iter_mut().find(|(id, _)| id == other_id)
+            {
+                // If the data types match, set the data.
+                if core::mem::discriminant(this_data) == core::mem::discriminant(other_data) {
+                    *this_data = other_data.clone();
+                } else {
+                    #[cfg(feature = "tracing_ext")]
+                    tracing::error!(target: "froglight_entity", "Incompatible dataset, expected index {other_id} to be \"{}\", found \"{}\"", this_data.variant_name(), other_data.variant_name());
+                    return Err(dataset);
+                }
+            } else {
+                // Otherwise, push the new data to the dataset.
+                self.dataset.to_mut().push((*other_id, other_data.clone()));
+            }
+        }
+        Ok(self)
+    }
+
     /// Get the string identifier of this entity.
     #[inline]
     #[must_use]

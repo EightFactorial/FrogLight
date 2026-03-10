@@ -23,6 +23,7 @@ impl Plugin for CommonPlugin {
         app.register_type::<EntityOfInstance>().register_type::<WorldInstance>();
 
         let world = app.world_mut();
+
         world
             .register_component_hooks::<EntityId>()
             .on_insert(instance_insert_hook::<EntityId>)

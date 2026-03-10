@@ -47,7 +47,9 @@ pub(super) fn instance_insert_hook<T: InstanceData>(mut world: DeferredWorld, ct
     };
 
     // Insert the new entity and despawn any previous entity
-    if let Some(previous) = T::insert(trigger, &mut instance, ctx.entity) {
+    if let Some(previous) = T::insert(trigger, &mut instance, ctx.entity)
+        && previous != ctx.entity
+    {
         #[cfg(feature = "tracing")]
         tracing::debug!(target: "froglight_common", "Entity {} is replacing Entity {} via `{}`, despawning!", ctx.entity, previous, T::short_type_path());
         world.commands().entity(previous).despawn();

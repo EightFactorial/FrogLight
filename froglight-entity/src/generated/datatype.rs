@@ -7,6 +7,8 @@ use bevy_ecs::reflect::ReflectComponent;
 #[cfg(feature = "facet")]
 use facet_minecraft as mc;
 
+use crate::entity::{VarInt, VarLong};
+
 generate! {
     @datatypes
     as_armadillo_state => ArmadilloState(()),
@@ -26,14 +28,15 @@ generate! {
     as_float => Float(f32),
     as_frog_variant => FrogVariant(()),
     as_humanoid_arm => HumanoidArm(()),
-    as_int => Int(#[cfg_attr(feature = "facet", facet(mc::variable))] i32),
+    as_int => Int(VarInt),
     as_item_stack => ItemStack(()),
-    as_long => Long(#[cfg_attr(feature = "facet", facet(mc::variable))] i64),
+    as_long => Long(VarLong),
     as_optional_block_pos => OptionalBlockPos(Option<()>),
     as_optional_block_state => OptionalBlockState(Option<()>),
     as_optional_component => OptionalComponent(Option<()>),
+    as_optional_global_pos => OptionalGlobalPos(Option<()>),
     as_optional_living_entity_reference => OptionalLivingEntityReference(Option<()>),
-    as_optional_unsigned_int => OptionalUnsignedInt(#[cfg_attr(feature = "facet", facet(mc::variable))] Option<u32>),
+    as_optional_unsigned_int => OptionalUnsignedInt(Option<VarInt>),
     as_painting_variant => PaintingVariant(()),
     as_particle => Particle(()),
     as_particles => Particles(()),

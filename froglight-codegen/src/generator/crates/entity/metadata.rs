@@ -107,3 +107,20 @@ pub(super) fn parse_data_accessor(
 
     None
 }
+
+/// Parse the order of serializers in `EntityDataSerializers`.
+pub(super) fn parse_serializer_order(jar: &JarData) -> Vec<String> {
+    let class = jar.get_class("net/minecraft/network/syncher/EntityDataSerializers").unwrap();
+    let clinit = class.get_method_code("<clinit>").unwrap();
+
+    let mut order = Vec::new();
+    for (_, op) in &clinit.bytecode.as_ref().unwrap().opcodes {
+        if let Opcode::Putstatic(MemberRef { name_and_type, .. }) = op
+            && name_and_type.descriptor == "Lnet/minecraft/network/syncher/EntityDataSerializer;"
+        {
+            order.push(name_and_type.name.to_string());
+        }
+    }
+
+    order
+}

@@ -23,6 +23,7 @@ pub struct EntityData {
     pub entities: IndexMap<String, EntityInfo>,
     pub metadata_classes: IndexMap<EntityMetadataItem, Vec<String>>,
     pub datatypes: IndexSet<(String, String)>,
+    pub datatype_order: Vec<String>,
 }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
@@ -69,8 +70,11 @@ impl EntityData {
     #[allow(clippy::too_many_lines, reason = "Yes")]
     pub async fn fetch(version: &Version, storage: &mut VersionStorage) -> Result<Self> {
         let mut entities = IndexMap::new();
+        let mut datatype_order = Vec::new();
 
         JarData::get_for(version, storage, async |data| {
+            datatype_order = metadata::parse_serializer_order(data);
+
             let class = data.get_class("net/minecraft/world/entity/EntityType").unwrap();
             let code = class.get_method_code("<clinit>").unwrap();
             let mut skip = true;
@@ -283,9 +287,17 @@ impl EntityData {
                 datatypes.insert((meta.serializer_name.clone(), meta.serializer_class.clone()));
             }
         }
+        for datatype in &datatype_order {
+            if datatypes.iter().all(|(name, _)| name != datatype) {
+                datatypes.insert((
+                    datatype.clone(),
+                    String::from("net/minecraft/network/syncher/EntityDataSerializers"),
+                ));
+            }
+        }
 
         tracing::debug!("Found {} entities for \"{}\"", entities.len(), version.as_str());
-        Ok(EntityData { entities, metadata_classes, datatypes })
+        Ok(EntityData { entities, metadata_classes, datatypes, datatype_order })
     }
 }
 
@@ -319,14 +331,14 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 }
                 unique.sort_unstable();
 
-                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n#[cfg(feature = \"facet\")]\nuse facet_minecraft as mc;\n\ngenerate! {\n    @datatypes");
+                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\nuse crate::entity::{VarInt, VarLong};\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n#[cfg(feature = \"facet\")]\nuse facet_minecraft as mc;\n\ngenerate! {\n    @datatypes");
                 for (index, (name, class)) in unique.iter().enumerate() {
                     content.push_str("\n    as_");
                     content.push_str(&name.to_ascii_lowercase());
                     content.push_str(" => ");
                     content.push_str(&name.to_case(Case::Pascal));
                     content.push('(');
-                    content.push_str(datatype_type(name, class, true)?);
+                    content.push_str(datatype_type(name, class)?);
                     content.push(')');
                     if index != unique.len() - 1 {
                         content.push(',');
@@ -349,12 +361,12 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 }
                 unique.sort_unstable_by_key(|a, _| a.name.clone());
 
-                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
+                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\nuse crate::entity::{VarInt, VarLong};\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
                 for (index, (meta, classes)) in unique.iter().enumerate() {
                     content.push_str("\n    ");
                     content.push_str(&component_name(meta, classes));
                     content.push('(');
-                    content.push_str(datatype_type(&meta.serializer_name, &meta.serializer_class, false)?);
+                    content.push_str(datatype_type(&meta.serializer_name, &meta.serializer_class)?);
                     content.push_str(") = ");
                     content.push_str(&meta.serializer_name.to_case(Case::Pascal));
                     if index != unique.len() - 1 {
@@ -467,24 +479,12 @@ fn component_name(meta: &EntityMetadataItem, classes: &[String]) -> String {
 }
 
 #[allow(clippy::unnecessary_wraps, reason = "For now")]
-fn datatype_type(name: &str, class: &str, attr: bool) -> Result<&'static str> {
+fn datatype_type(name: &str, class: &str) -> Result<&'static str> {
     match (name, class) {
         ("BOOLEAN", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("bool"),
         ("BYTE", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("u8"),
-        ("INT", "net/minecraft/network/syncher/EntityDataSerializers") => {
-            if attr {
-                Ok("#[cfg_attr(feature = \"facet\", facet(mc::variable))] i32")
-            } else {
-                Ok("i32")
-            }
-        }
-        ("LONG", "net/minecraft/network/syncher/EntityDataSerializers") => {
-            if attr {
-                Ok("#[cfg_attr(feature = \"facet\", facet(mc::variable))] i64")
-            } else {
-                Ok("i64")
-            }
-        }
+        ("INT", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("VarInt"),
+        ("LONG", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("VarLong"),
         ("FLOAT", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("f32"),
         ("DOUBLE", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("f64"),
         ("STRING", "net/minecraft/network/syncher/EntityDataSerializers") => {
@@ -492,11 +492,7 @@ fn datatype_type(name: &str, class: &str, attr: bool) -> Result<&'static str> {
         }
 
         ("OPTIONAL_UNSIGNED_INT", "net/minecraft/network/syncher/EntityDataSerializers") => {
-            if attr {
-                Ok("#[cfg_attr(feature = \"facet\", facet(mc::variable))] Option<u32>")
-            } else {
-                Ok("Option<u32>")
-            }
+            Ok("Option<VarInt>")
         }
 
         // TODO
@@ -538,7 +534,8 @@ fn datatype_type(name: &str, class: &str, attr: bool) -> Result<&'static str> {
             "OPTIONAL_COMPONENT"
             | "OPTIONAL_BLOCK_POS"
             | "OPTIONAL_BLOCK_STATE"
-            | "OPTIONAL_LIVING_ENTITY_REFERENCE",
+            | "OPTIONAL_LIVING_ENTITY_REFERENCE"
+            | "OPTIONAL_GLOBAL_POS",
             "net/minecraft/network/syncher/EntityDataSerializers",
         ) => Ok("Option<()>"),
 
@@ -558,6 +555,7 @@ async fn generate(
         let version_ident = version.base.as_feature().to_ascii_uppercase();
         let mut content = format!(
             "use froglight_common::version::{version_ident};
+use crate::entity::{{VarInt, VarLong}};
 #[expect(clippy::wildcard_imports, reason = \"Generated code\")]
 use crate::generated::{{component::*, entity::*}};
 
@@ -567,12 +565,14 @@ generate! {{
 "
         );
 
-        for (index, (datatype, class)) in data.datatypes.iter().enumerate() {
+        for (index, datatype) in data.datatype_order.iter().enumerate() {
+            let (_, class) = data.datatypes.iter().find(|(name, _)| name == datatype).unwrap();
+
             write!(
                 content,
                 "        {}({}) = {index}",
                 datatype.to_case(Case::Pascal),
-                datatype_type(datatype, class, false)?,
+                datatype_type(datatype, class)?,
             )
             .unwrap();
             if index != data.datatypes.len() - 1 {

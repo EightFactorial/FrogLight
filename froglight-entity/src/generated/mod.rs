@@ -91,6 +91,16 @@ macro_rules! generate {
         }
 
         impl EntityDataType {
+            /// Get the name of this data type.
+            #[must_use]
+            pub const fn variant_name(&self) -> &'static str {
+                match self {
+                    $(
+                        EntityDataType::$ident(_) => stringify!($ident),
+                    )*
+                }
+            }
+
             $(
                 #[must_use]
                 #[doc = concat!("Get the value of this data type as a [`",stringify!($ty),"`], if it is one.\n\nOtherwise, returns `None`.")]
@@ -234,39 +244,7 @@ macro_rules! generate {
                         core::any::TypeId::of::<$component>(),
                     )*
                 ];
-                const DATASET: crate::entity::EntityDataSet<'static> = crate::entity::EntityDataSet::new_slice(&[
-                    (0, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (1, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (2, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (3, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (4, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (5, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (6, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (7, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (8, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (9, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (10, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (11, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (12, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (13, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (14, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (15, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (16, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (17, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (18, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (19, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (20, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (21, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (22, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (23, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (24, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (25, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (26, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (27, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (28, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (29, crate::generated::datatype::EntityDataType::Byte(0)),
-                    (30, crate::generated::datatype::EntityDataType::Byte(0)),
-                ]);
+                const DATASET: crate::entity::EntityDataSet<'static> = crate::entity::EntityDataSet::new_slice(&[]);
 
                 #[cfg(feature = "bevy")]
                 #[allow(unused, reason = "Generated code")]
@@ -413,9 +391,13 @@ fn insert_hook<T: Component + EntityComponentType>(mut world: DeferredWorld, ctx
     };
 
     // Get the existing data
-    let Some((_, existing)) = bundle.dataset().to_ref().get(index) else {
+    let Some((_, existing)) =
+        bundle.dataset().to_ref().iter().find(|(i, _)| usize::from(*i) == index)
+    else {
         #[cfg(feature = "tracing")]
         tracing::error!(target: "froglight_entity", "Failed to sync bundle, entity should have a `{}` at index {index}", core::any::type_name::<T>());
+        #[cfg(feature = "tracing_ext")]
+        tracing::debug!(target: "froglight_entity", "Existing dataset: {:?}", bundle.dataset().to_ref());
         return;
     };
 
@@ -424,11 +406,14 @@ fn insert_hook<T: Component + EntityComponentType>(mut world: DeferredWorld, ctx
     if component != *existing {
         // SAFETY: Id does not change, and the data is guaranteed to be valid
         // as it came from a component with the correct type.
-        if let Some((_, existing)) = unsafe { bundle.dataset_mut() }.to_mut().get_mut(index) {
+        let bundle = unsafe { bundle.dataset_mut().to_mut() };
+
+        if let Some((_, existing)) = bundle.iter_mut().find(|(i, _)| usize::from(*i) == index) {
             unsafe { *existing = component };
         } else {
             #[cfg(feature = "tracing")]
-            tracing::error!(target: "froglight_entity", "Failed to sync bundle, bundle should have a `{}` at index {index}", core::any::type_name::<T>());
+            tracing::warn!(target: "froglight_entity", "Entity missing bundle component, should have a `{}` at index {index}", core::any::type_name::<T>());
+            bundle.push((index.try_into().unwrap(), component));
         }
     }
 }

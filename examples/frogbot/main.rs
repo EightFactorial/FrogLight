@@ -309,7 +309,30 @@ impl BotPlugin {
                         for entity_id in entities {
                             if let Some(entity) = instance.get(entity_id) {
                                 debug!("Despawning Entity {entity} ({})", entity_id.0);
-                                commands.entity(entity).despawn();
+                                commands
+                                    .entity(entity)
+                                    .queue(|mut entity: EntityWorldMut| {
+                                        let entity_id = entity.id();
+                                        entity.world_scope(|world| {
+                                            let registry =
+                                                world.resource::<AppTypeRegistry>().clone();
+                                            let registry = registry.read();
+
+                                            for component in
+                                                world.inspect_entity(entity_id).unwrap()
+                                            {
+                                                let info = registry
+                                                    .get_type_info(component.type_id().unwrap())
+                                                    .unwrap();
+
+                                                debug!(
+                                                    "    - {}",
+                                                    info.type_path_table().short_path()
+                                                );
+                                            }
+                                        })
+                                    })
+                                    .despawn();
                             } else {
                                 error!("Attempted to despawn unknown EntityId {:?}!", entity_id.0);
                             }
@@ -350,16 +373,14 @@ impl BotPlugin {
                                     entity.into_world_mut().entities_and_commands();
 
                                 if let Ok(entity) = entities.get(target)
-                                    && let Some(bundle) = entity.get::<EntityBundle>()
+                                    && let Some(bundle) = entity.get::<EntityBundle>().cloned()
+                                    && let Ok(bundle) = bundle.with_dataset(dataset)
                                 {
-                                    // SAFETY: TODO :)
-                                    commands.entity(entity.id()).insert(unsafe {
-                                        EntityBundle::new_unchecked(dataset, bundle.metadata())
-                                    });
+                                    commands.entity(target).insert(bundle);
                                 }
+                            } else {
+                                error!("Received SetEntityData for unknown EntityId {}!", id.0);
                             }
-
-                            error!("Received SetEntityData for unknown EntityId {}!", id.0);
                         });
                     }
                     // ClientboundPlayEvent::SetEntityLink() => todo!(),
