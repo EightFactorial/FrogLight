@@ -15,4 +15,4 @@ mod metadata;
 pub use metadata::EntityMetadata;
 
 mod state;
-pub use state::{GlobalId, VarInt, VarLong};
+pub use state::GlobalId;

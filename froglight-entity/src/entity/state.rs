@@ -1,6 +1,3 @@
-#[cfg(feature = "facet")]
-use facet_minecraft as mc;
-
 use crate::entity::EntityBundle;
 
 /// A unique identifier for an entity type,
@@ -31,19 +28,3 @@ impl From<EntityBundle> for GlobalId {
 impl<T: PartialEq<u32>> PartialEq<T> for GlobalId {
     fn eq(&self, other: &T) -> bool { other.eq(&self.0) }
 }
-
-// -------------------------------------------------------------------------------------------------
-
-/// A variable-length [`u32`].
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct VarInt(#[cfg_attr(feature = "facet", facet(mc::variable))] pub i32);
-
-/// A variable-length [`u64`].
-#[repr(transparent)]
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[cfg_attr(feature = "facet", derive(facet::Facet))]
-pub struct VarLong(#[cfg_attr(feature = "facet", facet(mc::variable))] pub i32);

@@ -309,26 +309,31 @@ impl BotPlugin {
                         for entity_id in entities {
                             if let Some(entity) = instance.get(entity_id) {
                                 debug!("Despawning Entity {entity} ({})", entity_id.0);
+
+                                // Log the entity's components before despawning it.
                                 commands
                                     .entity(entity)
                                     .queue(|mut entity: EntityWorldMut| {
                                         let entity_id = entity.id();
                                         entity.world_scope(|world| {
+                                            // Get the type registry
                                             let registry =
                                                 world.resource::<AppTypeRegistry>().clone();
                                             let registry = registry.read();
 
+                                            // Iterate over the entity's components
                                             for component in
                                                 world.inspect_entity(entity_id).unwrap()
                                             {
-                                                let info = registry
+                                                if let Some(info) = registry
                                                     .get_type_info(component.type_id().unwrap())
-                                                    .unwrap();
-
-                                                debug!(
-                                                    "    - {}",
-                                                    info.type_path_table().short_path()
-                                                );
+                                                {
+                                                    // Log the component's type
+                                                    trace!(
+                                                        "    - {}",
+                                                        info.type_path_table().short_path()
+                                                    );
+                                                }
                                             }
                                         })
                                     })

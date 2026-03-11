@@ -27,7 +27,7 @@ uuid = { workspace = true }
 arc-swap = { workspace = true, optional = true }
 bevy_app = { features = ["bevy_reflect"], workspace = true, optional = true }
 bevy_ecs = { features = ["bevy_reflect"], workspace = true, optional = true }
-bevy_reflect = { workspace = true, optional = true }
+bevy_reflect = { features = ["uuid"], workspace = true, optional = true }
 facet = { features = ["alloc", "uuid"], workspace = true, optional = true }
 facet-minecraft = { workspace = true, optional = true }
 libm = { workspace = true, optional = true }

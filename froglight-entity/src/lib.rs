@@ -11,6 +11,7 @@ pub mod bevy;
 pub mod entity;
 pub mod generated;
 pub mod storage;
+pub mod types;
 pub mod version;
 
 pub mod prelude {

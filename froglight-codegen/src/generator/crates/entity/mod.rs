@@ -331,7 +331,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 }
                 unique.sort_unstable();
 
-                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\nuse crate::entity::{VarInt, VarLong};\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n#[cfg(feature = \"facet\")]\nuse facet_minecraft as mc;\n\ngenerate! {\n    @datatypes");
+                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\n#[expect(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::types::*;\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n#[cfg(feature = \"facet\")]\nuse facet_minecraft as mc;\n\ngenerate! {\n    @datatypes");
                 for (index, (name, class)) in unique.iter().enumerate() {
                     content.push_str("\n    as_");
                     content.push_str(&name.to_ascii_lowercase());
@@ -361,7 +361,7 @@ pub async fn generate_global(config: &ConfigBundle) -> Result<()> {
                 }
                 unique.sort_unstable_by_key(|a, _| a.name.clone());
 
-                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\nuse crate::entity::{VarInt, VarLong};\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
+                let mut content = String::from("\n\nuse alloc::borrow::Cow;\n\n#[expect(clippy::wildcard_imports, reason = \"Generated code\")]\nuse crate::types::*;\n#[cfg(feature = \"bevy\")]\nuse bevy_ecs::reflect::ReflectComponent;\n\ngenerate! {\n    @components");
                 for (index, (meta, classes)) in unique.iter().enumerate() {
                     content.push_str("\n    ");
                     content.push_str(&component_name(meta, classes));
@@ -479,12 +479,13 @@ fn component_name(meta: &EntityMetadataItem, classes: &[String]) -> String {
 }
 
 #[allow(clippy::unnecessary_wraps, reason = "For now")]
+#[allow(clippy::match_same_arms, reason = "Readability")]
 fn datatype_type(name: &str, class: &str) -> Result<&'static str> {
     match (name, class) {
         ("BOOLEAN", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("bool"),
         ("BYTE", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("u8"),
-        ("INT", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("VarInt"),
-        ("LONG", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("VarLong"),
+        ("INT", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("EntityVarInt"),
+        ("LONG", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("EntityVarLong"),
         ("FLOAT", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("f32"),
         ("DOUBLE", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("f64"),
         ("STRING", "net/minecraft/network/syncher/EntityDataSerializers") => {
@@ -492,52 +493,75 @@ fn datatype_type(name: &str, class: &str) -> Result<&'static str> {
         }
 
         ("OPTIONAL_UNSIGNED_INT", "net/minecraft/network/syncher/EntityDataSerializers") => {
-            Ok("Option<VarInt>")
+            Ok("EntityOptionalVarInt")
         }
+
+        (
+            "CAT_SOUND_VARIANT"
+            | "CAT_VARIANT"
+            | "CHICKEN_SOUND_VARIANT"
+            | "CHICKEN_VARIANT"
+            | "COW_SOUND_VARIANT"
+            | "COW_VARIANT"
+            | "FROG_VARIANT"
+            | "PIG_SOUND_VARIANT"
+            | "PIG_VARIANT"
+            | "WOLF_SOUND_VARIANT"
+            | "WOLF_VARIANT"
+            | "ZOMBIE_NAUTILUS_VARIANT",
+            "net/minecraft/network/syncher/EntityDataSerializers",
+        ) => Ok("EntityVarInt"),
+
+        ("BLOCK_POS", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("EntityPosition")
+        }
+        ("OPTIONAL_BLOCK_POS", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("Option<EntityPosition>")
+        }
+        ("OPTIONAL_GLOBAL_POS", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("Option<EntityGlobalPosition>")
+        }
+        (
+            "BLOCK_STATE" | "OPTIONAL_BLOCK_STATE",
+            "net/minecraft/network/syncher/EntityDataSerializers",
+        ) => Ok("EntityBlockState"),
+        ("DIRECTION", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("EntityDirection")
+        }
+        ("QUATERNION", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("EntityQuaternion")
+        }
+        ("ROTATIONS", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("EntityRotation")
+        }
+        ("VECTOR3", "net/minecraft/network/syncher/EntityDataSerializers") => Ok("EntityVec3"),
+        ("VILLAGER_DATA", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("EntityVillagerData")
+        }
+        (
+            "OPTIONAL_LIVING_ENTITY_REFERENCE",
+            "net/minecraft/network/syncher/EntityDataSerializers",
+        ) => Ok("Option<uuid::Uuid>"),
 
         // TODO
         (
             "ARMADILLO_STATE"
-            | "BLOCK_POS"
-            | "BLOCK_STATE"
-            | "CAT_SOUND_VARIANT"
-            | "CAT_VARIANT"
-            | "CHICKEN_SOUND_VARIANT"
-            | "CHICKEN_VARIANT"
             | "COMPONENT"
             | "COPPER_GOLEM_STATE"
-            | "COW_SOUND_VARIANT"
-            | "COW_VARIANT"
-            | "DIRECTION"
-            | "FROG_VARIANT"
             | "HUMANOID_ARM"
             | "ITEM_STACK"
             | "PAINTING_VARIANT"
             | "PARTICLE"
             | "PARTICLES"
-            | "PIG_SOUND_VARIANT"
-            | "PIG_VARIANT"
             | "POSE"
-            | "QUATERNION"
             | "RESOLVABLE_PROFILE"
-            | "ROTATIONS"
             | "SNIFFER_STATE"
-            | "VECTOR3"
-            | "VILLAGER_DATA"
-            | "WEATHERING_COPPER_STATE"
-            | "WOLF_SOUND_VARIANT"
-            | "WOLF_VARIANT"
-            | "ZOMBIE_NAUTILUS_VARIANT",
+            | "WEATHERING_COPPER_STATE",
             "net/minecraft/network/syncher/EntityDataSerializers",
         ) => Ok("()"),
-        (
-            "OPTIONAL_COMPONENT"
-            | "OPTIONAL_BLOCK_POS"
-            | "OPTIONAL_BLOCK_STATE"
-            | "OPTIONAL_LIVING_ENTITY_REFERENCE"
-            | "OPTIONAL_GLOBAL_POS",
-            "net/minecraft/network/syncher/EntityDataSerializers",
-        ) => Ok("Option<()>"),
+        ("OPTIONAL_COMPONENT", "net/minecraft/network/syncher/EntityDataSerializers") => {
+            Ok("Option<()>")
+        }
 
         _ => miette::bail!("Unknown entity datatype: \"{class}.{name}\")"),
     }
@@ -555,9 +579,8 @@ async fn generate(
         let version_ident = version.base.as_feature().to_ascii_uppercase();
         let mut content = format!(
             "use froglight_common::version::{version_ident};
-use crate::entity::{{VarInt, VarLong}};
 #[expect(clippy::wildcard_imports, reason = \"Generated code\")]
-use crate::generated::{{component::*, entity::*}};
+use crate::{{generated::{{component::*, entity::*}}, types::*}};
 
 generate! {{
     @version {version_ident},
