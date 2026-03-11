@@ -1,5 +1,7 @@
 //! TODO
 
+use core::ops::{Deref, DerefMut};
+
 #[cfg(feature = "bevy")]
 use bevy_reflect::std_traits::ReflectDefault;
 #[cfg(feature = "facet")]
@@ -21,6 +23,22 @@ use froglight_common::prelude::Identifier;
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityVarInt(#[cfg_attr(feature = "facet", facet(mc::variable))] pub i32);
 
+impl Deref for EntityVarInt {
+    type Target = i32;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl DerefMut for EntityVarInt {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl From<i32> for EntityVarInt {
+    fn from(value: i32) -> Self { Self(value) }
+}
+impl From<EntityVarInt> for i32 {
+    fn from(value: EntityVarInt) -> Self { value.0 }
+}
+
 /// A variable-length [`i64`].
 #[repr(transparent)]
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -28,6 +46,22 @@ pub struct EntityVarInt(#[cfg_attr(feature = "facet", facet(mc::variable))] pub 
 #[cfg_attr(feature = "bevy", reflect(Debug, Clone, PartialEq, Hash))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityVarLong(#[cfg_attr(feature = "facet", facet(mc::variable))] pub i64);
+
+impl Deref for EntityVarLong {
+    type Target = i64;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl DerefMut for EntityVarLong {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl From<i64> for EntityVarLong {
+    fn from(value: i64) -> Self { Self(value) }
+}
+impl From<EntityVarLong> for i64 {
+    fn from(value: EntityVarLong) -> Self { value.0 }
+}
 
 /// An optional variable-length [`i32`].
 #[repr(transparent)]
@@ -73,6 +107,22 @@ impl EntityOptionalVarInt {
         };
         if writer.write_data(&buffer[..len]) { Ok(()) } else { Err(SerializeIterError::new()) }
     }
+}
+
+impl Deref for EntityOptionalVarInt {
+    type Target = Option<i32>;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl DerefMut for EntityOptionalVarInt {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl From<Option<i32>> for EntityOptionalVarInt {
+    fn from(value: Option<i32>) -> Self { Self(value) }
+}
+impl From<EntityOptionalVarInt> for Option<i32> {
+    fn from(value: EntityOptionalVarInt) -> Self { value.0 }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -233,6 +283,22 @@ pub struct EntityVillagerData {
 #[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 #[cfg_attr(feature = "facet", derive(facet::Facet))]
 pub struct EntityBlockState(#[cfg_attr(feature = "facet", facet(mc::variable))] pub u32);
+
+impl Deref for EntityBlockState {
+    type Target = u32;
+
+    fn deref(&self) -> &Self::Target { &self.0 }
+}
+impl DerefMut for EntityBlockState {
+    fn deref_mut(&mut self) -> &mut Self::Target { &mut self.0 }
+}
+
+impl From<u32> for EntityBlockState {
+    fn from(value: u32) -> Self { Self(value) }
+}
+impl From<EntityBlockState> for u32 {
+    fn from(value: EntityBlockState) -> Self { value.0 }
+}
 
 /// An entity's item slot.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

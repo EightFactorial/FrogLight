@@ -41,7 +41,7 @@ default = ["std"]
 # Enable support for atomics
 atomic = []
 # Enable `bevy` support.
-bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect"]
+bevy = ["dep:bevy_app", "dep:bevy_ecs", "dep:bevy_reflect", "froglight-common/bevy"]
 # Enable `facet` support.
 facet = ["dep:facet", "dep:facet-minecraft", "froglight-common/facet"]
 # Enable `tracing` support.

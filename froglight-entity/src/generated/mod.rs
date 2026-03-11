@@ -113,16 +113,6 @@ macro_rules! generate {
                 }
             )*
         }
-
-        // $(
-        //     #[automatically_derived]
-        //     impl From<$ty> for EntityDataType {
-        //         #[inline]
-        //         fn from(value: $ty) -> Self {
-        //             EntityDataType::$ident(value)
-        //         }
-        //     }
-        // )*
     };
     (@entities $($ident:ident),* $(,)?) => {
         $(
