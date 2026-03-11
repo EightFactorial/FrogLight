@@ -162,6 +162,8 @@ pub struct EntityGlobalPosition {
 pub struct EntityPosition(u64);
 
 impl EntityPosition {
+    // <3 Azalea
+
     const PACKED_X_LENGTH: u64 = 1 + 25;
     const PACKED_X_MASK: u64 = (1 << Self::PACKED_X_LENGTH) - 1;
     const PACKED_Y_LENGTH: u64 = 64 - Self::PACKED_X_LENGTH - Self::PACKED_Z_LENGTH;
