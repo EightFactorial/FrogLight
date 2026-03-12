@@ -634,7 +634,7 @@ impl BlockData {
                                 // ("", _) => {}
 
                                 // Ignore these
-                                ("of", _) => {}
+                                ("of" | "postProcess", _) => {}
 
                                 (unk, desc) => {
                                     miette::bail!("Unknown \"Blocks\" method: \"{unk}{desc}\"")
